@@ -5,6 +5,7 @@ import argparse
 import ctypes
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import shutil
@@ -46,6 +47,30 @@ class RSP:
         self.send(text)
         return self.receive()
 
+    def read_memory(self, address, length):
+        """Return exact bytes despite ares' aligned short-read optimisation."""
+        if length < 1 or address < 0 or address+length > 0x100000000:
+            raise ValueError("Invalid debugger memory range")
+        start = address & ~3
+        size = (address-start+length+3) & ~3
+        data = bytes.fromhex(self.command(f"m{start:x},{size:x}"))
+        if len(data) != size:
+            raise ValueError("Truncated debugger memory read")
+        return data[address-start:address-start+length]
+
+    def write_memory(self, address, data):
+        """Use byte edges and aligned bulk writes, without rewriting neighbours."""
+        if not data or address < 0 or address+len(data) > 0x100000000:
+            raise ValueError("Invalid debugger memory range")
+        offset = 0
+        while offset < len(data):
+            count = ((len(data)-offset) & ~3) if (address+offset) % 4 == 0 else 1
+            count = max(1, count)
+            part = data[offset:offset+count]
+            if self.command(f"M{address+offset:x},{count:x}:{part.hex()}") != "OK":
+                raise ValueError("Debugger rejected test RAM write")
+            offset += count
+
     def call(self, address, arguments):
         """Test-only o32 call in module scratch RAM; leaves the game paused.
 
@@ -59,7 +84,7 @@ class RSP:
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
             raise ValueError("Invalid test function or o32 arguments")
         self.command("?")
-        header = bytes.fromhex(self.command("m801948e0,14"))
+        header = self.read_memory(0x801948E0, 20)
         magic, abi, reserved, used, ready = struct.unpack(">5I", header)
         if (magic, abi, reserved, ready) != (0x41465254, 1, 0x4000, 1) or used > 0x2000:
             raise ValueError("Module does not provide the required unused test scratch RAM")
@@ -72,8 +97,7 @@ class RSP:
         expected.update({29: stack, 31: 0x801968E0, 37: address})
         if len(arguments) > 4:
             outgoing = b"".join(struct.pack(">I", value) for value in arguments[4:])
-            if self.command(f"M{stack+16:x},{len(outgoing):x}:{outgoing.hex()}") != "OK":
-                raise ValueError("Debugger rejected test stack arguments")
+            self.write_memory(stack+16, outgoing)
         for index, value in expected.items():
             registers[index] = value | (0xFFFFFFFF00000000 if value & 0x80000000 else 0)
         breakpoint = "0,801968e0,4"
@@ -89,7 +113,11 @@ class RSP:
             after = self.command("g")
             values = [int(after[i:i+16], 16) for i in range(0, len(after), 16)]
             if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != 0x801968E0:
-                raise ValueError(f"Test function stopped unexpectedly: {stopped}, PC={values[37]:016X}")
+                stack_dump = self.read_memory(stack-0x100, 0x180).hex()
+                raise ValueError(f"Test function stopped unexpectedly: {stopped}, "
+                                 f"PC={values[37]:016X}, SP={values[29]:016X}, RA={values[31]:016X}, "
+                                 f"before_registers={before}, after_registers={after}, "
+                                 f"scratch_stack={stack_dump}")
             if values[29] & 0xFFFFFFFF != stack:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
@@ -148,16 +176,42 @@ def expand_actions(actions):
 
 
 def message_snapshot(debug):
-    pointer = int(debug.command("m8014241c,4"), 16)
+    pointer = int.from_bytes(debug.read_memory(0x8014241C, 4), "big")
     if not 0x80000000 <= pointer <= 0x803FFBF0:
         return {"message_pointer": f"{pointer:08X}", "status": "not_loaded"}
-    header = bytes.fromhex(debug.command(f"m{pointer:x},10"))
+    header = debug.read_memory(pointer, 16)
     loaded, number, length, cut = struct.unpack(">4I", header)
     result = {"message_pointer": f"{pointer:08X}", "loaded": loaded,
               "message_id": f"{number:04X}", "length": length, "cut": cut}
     if loaded and 0 < length <= 1024:
-        result["data"] = debug.command(f"m{pointer+16:x},{length:x}")
+        result["data"] = debug.read_memory(pointer+16, length).hex()
     return result
+
+
+def player_snapshot(debug):
+    """Read the native player actor; never change position or progression."""
+    def read(address, length):
+        data = debug.read_memory(address, length)
+        if len(data) != length:
+            raise ValueError("Truncated player state read")
+        return data
+    def pointer(address, size):
+        value = struct.unpack(">I", read(address, 4))[0]
+        if value % 4 or not 0x80000000 <= value <= 0x80400000-size:
+            raise ValueError("No valid loaded player/game pointer")
+        return value
+    game = pointer(0x8010EF90, 0x1C94)
+    player = pointer(game+0x1C90, 0x3C)
+    state = read(player, 0x3C)
+    if state[2] != 2:
+        raise ValueError("Loaded actor is not the player")
+    position = struct.unpack_from(">3f", state, 0x28)
+    if not all(math.isfinite(value) for value in position):
+        raise ValueError("Invalid native player coordinates")
+    return {"game_pointer": f"{game:08X}", "player_pointer": f"{player:08X}",
+            "block_x": struct.unpack_from(">b", state, 8)[0],
+            "block_z": struct.unpack_from(">b", state, 9)[0],
+            "world_position": dict(zip(("x", "y", "z"), position)), "read_only": True}
 
 
 def keyboard_snapshot(debug):
@@ -166,7 +220,7 @@ def keyboard_snapshot(debug):
     matches = []
     previous = b""
     for address in range(0x80200000, 0x80400000, 0x10000):
-        chunk = bytes.fromhex(debug.command(f"m{address:x},10000"))
+        chunk = debug.read_memory(address, 0x10000)
         if len(chunk) != 0x10000:
             raise ValueError("Truncated keyboard RAM search")
         data = previous+chunk
@@ -178,7 +232,7 @@ def keyboard_snapshot(debug):
     if len(matches) != 1:
         raise ValueError(f"Expected one loaded English keyboard overlay, found {len(matches)}")
     base = matches[0]
-    state = bytes.fromhex(debug.command(f"m{base+0x39b0:x},30"))
+    state = debug.read_memory(base+0x39B0, 48)
     pointer = struct.unpack_from(">I", state, 0x24)[0]
     columns, rows, length = struct.unpack_from(">3h", state, 0x18)
     if not (1 <= rows <= 16 and 1 <= columns <= 96 and 0 <= length <= rows*columns <= 1024):
@@ -188,29 +242,29 @@ def keyboard_snapshot(debug):
     return {"keyboard_base": f"{base:08X}", "mode": state[4],
             "cursor": struct.unpack_from(">h", state, 0x16)[0],
             "rows": rows, "columns": columns, "length": length,
-            "text_hex": debug.command(f"m{pointer:x},{rows*columns:x}")}
+            "text_hex": debug.read_memory(pointer, rows*columns).hex()}
 
 
 def choice_snapshot(debug):
     """Read the opt-in English runtime's singleton choice window and rows."""
     from english_runtime import ChoiceLayout, split_address
     layout = ChoiceLayout()
-    header = bytes.fromhex(debug.command("m801948e0,38"))
+    header = debug.read_memory(0x801948E0, 56)
     if header[:4] == b"AFRT" and header[40:44] == bytes.fromhex("00000014"):
         candidate = ChoiceLayout(*struct.unpack_from(">4I", header, 40))
         high, low = split_address(candidate.rows)
         # A module can be built without enabling the expanded choice patches.
         instructions = struct.pack(">2I", 0x3C030000 | high, 0x24630000 | low)
-        if bytes.fromhex(debug.command("m80065208,8")) == instructions:
+        if debug.read_memory(0x80065208, 8) == instructions:
             layout = candidate
-    state = bytes.fromhex(debug.command("m801425c0,bc"))
+    state = debug.read_memory(0x801425C0, 0xBC)
     lengths = list(struct.unpack_from(">4i", state, 0x5C))
     selected_length, count, last_selected, cursor = struct.unpack_from(">4i", state, 0x78)
     if (not 0 <= count <= 4 or not 0 <= selected_length <= layout.capacity
             or any(not 0 <= n <= layout.capacity for n in lengths[:count])):
         raise ValueError("Invalid expanded choice dimensions")
-    rows = bytes.fromhex(debug.command(f"m{layout.rows:x},{4*layout.stride:x}"))
-    selected = bytes.fromhex(debug.command(f"m{layout.selected:x},{layout.capacity:x}"))
+    rows = debug.read_memory(layout.rows, 4*layout.stride)
+    selected = debug.read_memory(layout.selected, layout.capacity)
     return {"choice_count": count, "choice_lengths": lengths[:count],
             "choice_capacity": layout.capacity, "choice_stride": layout.stride,
             "choice_hex": [rows[i*layout.stride:i*layout.stride+lengths[i]].hex() for i in range(count)],
@@ -266,7 +320,11 @@ def main():
     rom = out / "test.z64"
     shutil.copyfile(args.rom, rom)
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
-    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False}
+    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False,
+                  "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+                  "scenario_sha256": hashlib.sha256(args.scenario.read_bytes()).hexdigest() if args.scenario else None,
+                  "post_scenario_sha256": hashlib.sha256(args.post_scenario.read_bytes()).hexdigest()
+                  if args.post_scenario else None}
     if args.seed_state:
         source_rom = args.seed_state / "test.z64"
         if not source_rom.is_file() or hashlib.sha256(source_rom.read_bytes()).hexdigest() != rom_hash:
@@ -364,7 +422,7 @@ def main():
                 advance_to_choice(debug, keyboard, action["advance_to_choice"], record)
             if "read" in action:
                 address, length = action["read"]
-                data = debug.command(f"m{address},{length:x}")
+                data = debug.read_memory(int(address, 16), length).hex()
                 if len(data) != length*2:
                     raise ValueError("Debugger memory read length mismatch")
                 if "expect" in action and data.lower() != action["expect"].lower():
@@ -379,8 +437,7 @@ def main():
                 location = int(address, 16)
                 if not data or not 0x80000000 <= location <= 0x80400000-len(data):
                     raise ValueError("Scenario writes must stay inside four-MiB test RAM")
-                if debug.command(f"M{address},{len(data):x}:{data.hex()}") != "OK":
-                    raise ValueError("Debugger rejected test RAM write")
+                debug.write_memory(location, data)
                 results.append({"test_only_ram_write": address, "bytes": len(data), "data": data.hex()})
             if action.get("resume"):
                 debug.send("c")  # Stop-mode RSP replies only on a later halt.
@@ -398,6 +455,8 @@ def main():
                 results.append(snapshot)
                 if "expect_message" in action and snapshot.get("message_id") != action["expect_message"]:
                     raise ValueError(f"Unexpected message: {snapshot.get('message_id')}")
+            if action.get("snapshot_player"):
+                results.append(player_snapshot(debug))
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 results.append(snapshot)

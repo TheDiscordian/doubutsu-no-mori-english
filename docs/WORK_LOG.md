@@ -533,6 +533,31 @@
   layout queries locate homes at acre `(3,2)`, the shop at `(2,1)`, and the station
   at `(3,1)` for this isolated town; no player position is edited.
 
+### Native item regression and exact debugger observations
+
+- The eight `smoke-items-native-batch-0-01` through `-7-01` runs each pass 1,545
+  recorded steps. `smoke-items-native-batch-8-02` passes 1,362. Together these
+  cover all 4,547 requested native item IDs, including every furniture rotation,
+  ordinary names, empty zero, and unsupported types, with adjacent guards.
+- The first batch-eight attempt (`smoke-items-native-batch-8-01`) stopped on its
+  first injected call for item `1D0C`, with `S0b` and PC `20202020`. The complete
+  rerun passes, but the initial failure is unexplained and remains open. This
+  is not a clean repeatability result or a hardware claim. Call failures now
+  capture complete before/after register packets and scratch-stack bytes.
+- A separate focused diagnostic establishes ares' unaligned short-read behaviour:
+  raw four-byte reads at offsets one, two, and three all return the aligned
+  preceding word. A two-byte read at offset one returns the preceding halfword.
+  The corrected exact-read API and byte-edge write API pass portable alignment
+  cases and all assertions in `smoke-debugger-alignment-02` (21 recorded steps).
+  Two preliminary item-field runs' apparent two-byte guard overwrites result
+  from these reads; the complete field regression is rerun with exact reads.
+- Read-only native actor snapshots guide ordinary movement into Nook's shop.
+  `smoke-space-shop-front-01`, `shop-door-01`, and `shop-entry-01` each record
+  eight steps. `smoke-space-job-introduction-01` records 36 steps and reaches
+  English `07EE`, `07F1`, and `07F2`, followed by native clothing instructions
+  `07F3`. That entry needs an approved GameCube Y-to-N64-START button adaptation.
+  No player position or progression is edited; FlashRAM save validation remains.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

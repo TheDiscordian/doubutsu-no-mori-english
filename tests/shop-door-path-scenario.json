@@ -1,0 +1,10 @@
+[
+  {"wait": 2},
+  {"key": "f", "duration": 0.4},
+  {"key": "w", "duration": 0.3},
+  {"wait": 3},
+  {"capture": "shop-door.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

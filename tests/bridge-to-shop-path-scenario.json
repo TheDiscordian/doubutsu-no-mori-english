@@ -1,0 +1,10 @@
+[
+  {"wait": 2},
+  {"key": "w", "duration": 1.8},
+  {"capture": "bridge-to-shop-north.png"},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "bridge-to-shop-interaction.png"},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

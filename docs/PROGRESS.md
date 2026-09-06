@@ -154,11 +154,17 @@ identities use identical native shop/reward records at confirmed reference IDs;
 their caller-specific gameplay review remains open. The name build passes all 216
 real cartridge name loads and the invalid-ID no-write check, with 660 recorded
 steps. Native name storage, identity structures, and file size stay unchanged.
-The item build's complete native item-loader regression is in progress in nine
-bounded isolated runs. It covers every ordinary item and furniture rotation,
-including placed-item conversions. Normal gameplay on the space build traverses
+The item build has passing runs covering all 4,547 native item-ID cases across
+nine bounded scenarios, including every ordinary item, furniture rotation,
+placed-item conversion, and empty/unsupported type. The final batch's first
+attempt stopped unexpectedly at its first injected call; its complete rerun
+passes, but that unexplained failure remains open for repeatability work.
+Normal gameplay on the space build traverses
 the English purchase confirmation and all four home-explanation records.
 The exercise drafts retain every native command; seasonal-event testing remains.
+Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
+The following clothing reminder needs an approved GameCube Y-to-N64-START button
+adaptation. Read-only player coordinates support navigation without position edits.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.
 

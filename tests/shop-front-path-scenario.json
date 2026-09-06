@@ -1,0 +1,9 @@
+[
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"key": "g", "duration": 0.5},
+  {"key": "s", "duration": 0.6},
+  {"capture": "shop-approach.png"},
+  {"snapshot_player": true},
+  {"save_state": true}
+]
