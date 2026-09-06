@@ -1,0 +1,13 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.3},
+  {"key": "f", "duration": 0.8},
+  {"capture": "house-to-shop-west.png"},
+  {"key": "w", "duration": 1.8},
+  {"capture": "house-to-shop-north.png"},
+  {"key": "f", "duration": 1.5},
+  {"capture": "house-to-shop-acre.png"},
+  {"snapshot_message": true},
+  {"read": ["801988D0", 16], "expect": "AF16C0DEAF16C0DEAF16C0DEAF16C0DE"},
+  {"save_state": true}
+]

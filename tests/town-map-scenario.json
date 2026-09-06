@@ -1,0 +1,8 @@
+[
+  {"wait": 2},
+  {"key": "r", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "town-map.png"},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

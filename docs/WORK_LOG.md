@@ -502,6 +502,37 @@
   the bounded menu run records 30 with intact module guards. This verifies the
   approved purchase's normal continuation, not merely an injected DMA call.
 
+### Standalone sixteen-byte item-name runtime
+
+- Added a separately configured `02A00000` resource with 4,544 sixteen-byte
+  slots, 648 English candidate slots, and 282 distinct confirmed reference IDs.
+  The source is 72,736 bytes including its guarded header. Unconfirmed names
+  remain Japanese; native ten-byte callers and save formats are unchanged.
+- The original C API checks capacity, item indices after native conversion,
+  resource configuration, and header before writing exactly sixteen bytes.
+  Aligned staging supports unaligned destinations. The builder reconstructs the
+  resource from guarded edits, verifies hashes, and requires the capable module.
+  No source text is truncated. This is an API test build, not full integration.
+- All 103 tests pass, including all 65,536 possible item values in the portable
+  implementation, invalid capacities, no-write failures, source/reference guards,
+  resource reconstruction, and complete module configuration checks.
+  The module links 4,288 bytes; unconfigured module SHA-256:
+  `a6beaa858edcde94e398e2e61c6ecdf8990f028f49bd56c71f6ea3be84632a3b`.
+- `build/smoke-extended-items-native-01` passes 1,101 recorded steps. It covers
+  every confirmed reference identity, category endpoints, placed conversions,
+  invalid IDs/capacities, null pointers, unaligned writes, resource disabling,
+  all header words, adjacent/end guards, and complete checkpoint restoration.
+  ROM SHA-256:
+  `4aaa0600b5d23336bbdd04f010b119f61f98e3620644bce1f078796e0be95f71`.
+  UPS SHA-256:
+  `f6b5b4143feb4b1376e2bee8aae905fa7869fbfe8e3726456799438f567c7efb`.
+- `build/smoke-space-home-continue-01` traverses invoice `081E`, work offer
+  `07EC`, and continuation `2AE9` in 45 recorded steps. The subsequent 66-step
+  `smoke-space-work-offer-end-01` completes the continuation, closes the message,
+  and returns normal player control. FlashRAM remains blank. Read-only native
+  layout queries locate homes at acre `(3,2)`, the shop at `(2,1)`, and the station
+  at `(3,1)` for this isolated town; no player position is edited.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

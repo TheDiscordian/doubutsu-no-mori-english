@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 98 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 103 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -90,6 +90,12 @@ user's direction. The production build retains the approved spacing metrics.
   slots, retaining GameCube spelling/case and the original ten-byte fields.
   Thirty-five direct item-loader calls and their contexts are inventoried.
   Wider imports remain gated on name, message, handbill, and UI destinations.
+- Standalone sixteen-byte item-name API and separately configured DMA resource.
+  All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
+  DMA tests cover every confirmed reference identity, group boundaries, invalid
+  inputs, unaligned destinations, resource disabling, and header validation.
+  The resource has 282 candidate identities in 648 slots. Existing gameplay
+  callers remain ten-byte; this API alone does not enable wider names there.
 
 ## Current reference candidates
 
@@ -134,8 +140,9 @@ The sequence build passes name/town entry and a continuation to
 arrival. The cancellation build passes the complete long-choice/train-to-town
 regression and all ten acceptance checks, as does the delivery build. Its 366
 page-delivery candidates still need broader gameplay review. The work-offer split
-passes native DMA, continuation, final-termination, and guard tests; normal actor
-progression through the English work-offer split remains open. The work-offer build
+passes native DMA, continuation, final-termination, and guard tests. Normal actor
+progression also traverses `07EC` and `2AE9`, finishes the English work offer,
+and returns control to the player. The work-offer build
 also passes all 225 full train-to-town steps and ten acceptance checks. The layout
 build adds 264 formatting candidates with 1,308 total conservative layout warnings;
 the layout build also passes the complete train-to-town regression and all ten

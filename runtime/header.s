@@ -15,3 +15,4 @@
 .word 32         # Resident row stride
 .word af_choice_storage
 .word af_choice_storage + 128
+.word 0          # Optional verified extended item-resource VROM, configured by builder

@@ -11,7 +11,9 @@ REFERENCE_WIDTH = 16
 FURNITURE_COUNT = 947
 
 
-def item_candidates(bank, inventory, references, info, skip_ids=()):
+def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=ITEM_WIDTH):
+    if capacity not in (ITEM_WIDTH, REFERENCE_WIDTH):
+        raise ValueError("Unsupported item-name candidate capacity")
     source = bank.entries()
     if bank.name not in [f"item_{g:02X}" for g in [0x10, *range(0x20, 0x30)]] or bank.fixed_size != ITEM_WIDTH:
         raise ValueError("Unexpected native item-name layout")
@@ -54,13 +56,14 @@ def item_candidates(bank, inventory, references, info, skip_ids=()):
                 raise ValueError("English item-name reference hash mismatch")
             if any(t.kind != "text" or t.data[0] not in LATIN for t in tokenize(encoded, info)):
                 raise ValueError("Item name must contain only supported plain Latin text")
-            if len(encoded) > ITEM_WIDTH:
+            if len(encoded) > capacity:
                 reason = "full_reference_name_exceeds_native_ten_bytes"
         if reason:
             counts["rejected"] += 1
             remaining.append({"id": id, "reference_id": reference_id, "reason": reason})
             continue
-        validate_entry(source[index], encoded, info, bank.name)
+        # The sixteen-byte mode feeds a separate resource, never the native bank.
+        validate_entry(source[index].ljust(capacity, b" "), encoded, info, bank.name)
         edit = {"id": id, "source_sha256": row["source_sha256"],
                 "translation": reference["text"], "control_policy": "exact",
                 "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
@@ -72,7 +75,7 @@ def item_candidates(bank, inventory, references, info, skip_ids=()):
         edits.append(edit)
         manifest = {k: v for k, v in edit.items() if k != "translation"}
         manifest.update(encoded_bytes=len(encoded), encoded_sha256=sha256(encoded),
-                        stored_bytes=ITEM_WIDTH, stored_sha256=sha256(encoded.ljust(ITEM_WIDTH, b" ")),
+                        stored_bytes=capacity, stored_sha256=sha256(encoded.ljust(capacity, b" ")),
                         layout_issues=[], expanded_bound=len(encoded))
         manifests.append(manifest)
         counts["accepted_candidates"] += 1

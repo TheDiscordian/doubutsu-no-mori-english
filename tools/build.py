@@ -15,6 +15,7 @@ from keyboard import make_english_keyboard
 from english_runtime import ChoiceLayout, make_english_runtime, verify_english_runtime
 from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
 from reference_sequences import validate_sequences
+from extended_items import install as install_extended_items
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -97,6 +98,7 @@ def main():
     parser.add_argument("--english-keyboard", action="store_true")
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
+    parser.add_argument("--extended-items", type=Path, help="Standalone sixteen-byte item-loader resource experiment")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -117,6 +119,8 @@ def main():
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
+    if args.extended_items:
+        report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():

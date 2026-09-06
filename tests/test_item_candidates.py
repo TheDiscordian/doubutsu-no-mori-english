@@ -80,6 +80,20 @@ class ItemCandidateTests(unittest.TestCase):
         self.assertEqual([e["id"] for e in edits], ["item_22:0001"])
         self.assertEqual(report["original_draft_override"], 1)
 
+    def test_sixteen_byte_mode_is_separate_from_native_import(self):
+        rows, refs = deepcopy(self.inventory), deepcopy(self.references)
+        rows[0]["legacy"] = "Fishing Rod"
+        refs[0].update(text="fishing rod", source_sha256=sha256(b"fishing rod     "))
+        native, _, remaining, _ = item_candidates(self.bank, rows, refs, self.info)
+        self.assertEqual(len(native), 1)
+        self.assertEqual(remaining[0]["reason"], "full_reference_name_exceeds_native_ten_bytes")
+        extended, manifest, remaining, _ = item_candidates(self.bank, rows, refs, self.info, capacity=16)
+        self.assertEqual(extended[0]["translation"], "fishing rod")
+        self.assertEqual(manifest[0]["stored_bytes"], 16)
+        self.assertEqual(remaining, [])
+        with self.assertRaisesRegex(ValueError, "capacity"):
+            item_candidates(self.bank, rows, refs, self.info, capacity=17)
+
     def test_placed_item_conversion_boundaries_and_rotations(self):
         for start, end, base in ((0x17AC, 0x1BA8, 0x2400), (0x1BA8, 0x1C28, 0x2D00),
                                   (0x1C28, 0x1CA8, 0x2300), (0x1CA8, 0x1D28, 0x2204)):
