@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.08},
+  {"key": "g", "duration": 0.1},
+  {"key": "w", "duration": 0.04},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "door-step.png"},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]

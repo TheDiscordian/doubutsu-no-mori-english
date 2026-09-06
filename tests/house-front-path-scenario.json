@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.2},
+  {"capture": "front-path-south.png"},
+  {"key": "g", "duration": 0.28},
+  {"capture": "front-path-east.png"},
+  {"key": "w", "duration": 0.12},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "front-path-door.png"},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]

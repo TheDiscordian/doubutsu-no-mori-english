@@ -28,5 +28,27 @@
         "encoded_sha256": "97199a394f025df4c5635583be793155345738b442e769e7242aa917d2f53d00"
       }
     ]
+  },
+  {
+    "id": "nook_work_offer",
+    "evidence": "Native and GameCube 07EC cover the same insufficient payment, part-time work, and shop-location explanation. The complete English record exceeds the native buffer. Split only at its existing page transition after the thorny-situation passage, replacing that single wait/page clear with the native continuing-message boundary. Source 2AE9 is an unused train-demo reserve slot with no incoming native script branch; the legacy also uses it for this continuation. Preserve every English text byte outside the declared separator, all BGM/actor argument tuples, fields, and the final native end 00. See specs/REFERENCE_SEQUENCES.md; normal actor traversal remains required.",
+    "members": [
+      {
+        "id": "message:07EC",
+        "source_sha256": "8848a8cd66a7227dcb0059efedc79489602f31230fa95c003f37dd34b0c54fe1",
+        "reference_id": "message:07EC",
+        "reference_sha256": "ccf4c45adb542a24258e35dd66f537f485462848fc66fb2165ca022397af656b",
+        "reference_slice": [0, 472],
+        "encoded_sha256": "16256d7df36137c3f486e31e2682f350d95d6d1242e7abda5d3717771c21da3a"
+      },
+      {
+        "id": "message:2AE9",
+        "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+        "reference_id": "message:07EC",
+        "reference_sha256": "ccf4c45adb542a24258e35dd66f537f485462848fc66fb2165ca022397af656b",
+        "reference_slice": [477, 1051],
+        "encoded_sha256": "8416ee1345bf6b9310cba343fae74c8269e716046549f689a423ab8a61a17bf6"
+      }
+    ]
   }
 ]

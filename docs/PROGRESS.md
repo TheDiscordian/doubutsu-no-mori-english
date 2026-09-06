@@ -3,9 +3,10 @@
 ## Active work
 
 Complete the main translation/runtime port, then the matching GameCube image
-replacements and GameCube-style keyboard. The immediate work is runtime text
-substitutions and choice-buffer expansion, followed by the remaining banks and
-candidate review. The [completion queue](WORK_QUEUE.md) tracks all required work;
+replacements and GameCube-style keyboard. Immediate work covers the remaining
+introductory dialogue, normal gameplay/save validation, unsupported text controls,
+and the general-string/name/mail destinations. Candidate review remains required.
+The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -37,7 +38,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 69 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 70 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -53,6 +54,8 @@ user's direction. The production build retains the approved spacing metrics.
   within the native message buffer. Nook's house explanation uses four approved,
   hash-bound records. Partial installation, stale placeholders, incoming native
   script branches, altered gameplay controls, and changed payloads are rejected.
+  Nook's work offer also has a reviewed split at an existing English page boundary;
+  complete reference coverage and the native final terminator are checked.
 - Experimental resident runtime module with a verified new DMA entry, sixteen-KiB
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
   Four-MiB boot and the complete train-to-town regression pass with intact guards.
@@ -89,11 +92,11 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,677 edits, including
-8,833 reference dialogue candidates, all 460 choices, and four N64-specific
+The separate resident-module experiment contains 9,679 edits, including
+8,835 reference dialogue candidates, all 460 choices, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 2,913; matching, actor fields, flow controls,
+Its remaining main-dialogue count is 2,911; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -106,8 +109,10 @@ all house-explanation loads, continuation links, both choice branches, the repea
 response, and memory guards. Normal actor traversal of that English sequence is
 still required. The sequence build passes name/town entry and a continuation to
 arrival. The cancellation build passes the complete long-choice/train-to-town
-regression and all ten acceptance checks. A new delivery-build regression is
-running. Its 366 page-delivery candidates still need broader gameplay review.
+regression and all ten acceptance checks, as does the delivery build. Its 366
+page-delivery candidates still need broader gameplay review. The work-offer split
+passes native DMA, continuation, final-termination, and guard tests; normal actor
+progression through both English sequences remains open.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.

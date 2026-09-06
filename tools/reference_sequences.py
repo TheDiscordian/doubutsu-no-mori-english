@@ -6,7 +6,7 @@ from pathlib import Path
 import re
 
 from aflib import sha256
-from textcodec import encode, tokenize
+from textcodec import decode, encode, tokenize
 
 APPROVALS = Path(__file__).resolve().parents[1]/"translations/reference_sequences.json"
 PRESENTATION = {0x02, 0x03, 0x04, 0x05, 0x50}
@@ -37,10 +37,20 @@ def load_sequences(path=APPROVALS):
             if (not re.fullmatch(r"message:[0-9A-F]{4}", member.get("id", ""))
                     or member["id"] in seen):
                 raise ValueError("Duplicate or invalid sequence member")
+            if not re.fullmatch(r"message:[0-9A-F]{4}", member.get("reference_id", member["id"])):
+                raise ValueError("Invalid sequence reference ID")
+            if "reference_slice" in member:
+                span = member["reference_slice"]
+                if (not isinstance(span, list) or len(span) != 2 or any(type(n) is not int for n in span)
+                        or not 0 <= span[0] < span[1]):
+                    raise ValueError("Invalid reference sequence slice")
             for key in ("source_sha256", "reference_sha256", "encoded_sha256"):
                 if not re.fullmatch(r"[0-9a-f]{64}", member.get(key, "")):
                     raise ValueError("Invalid reference sequence hash")
             seen.add(member["id"])
+        sliced = ["reference_slice" in member for member in members]
+        if any(sliced) and not all(sliced):
+            raise ValueError("Sequence cannot mix sliced and complete reference records")
         result[record["id"]] = record
     return result
 
@@ -75,15 +85,16 @@ def normalize_assignments(cmds):
 def audit_sequence(original, replacements, member_numbers, info):
     """Check semantics independently of the approved payload hashes."""
     root = commands(original, info)
-    if not original.endswith(b"\x7f\x01") or sum(c[1] in (0, 1) for c in root) != 1:
-        raise ValueError("Sequence root must have one continuing terminator")
+    if original[-2:] not in (b"\x7f\x00", b"\x7f\x01") or sum(c[1] in (0, 1) for c in root) != 1:
+        raise ValueError("Sequence root must have one final terminator")
     available_fields = {c[1] for c in root if c[1] in FIELDS}
     available_actor = {c for c in root if c[1] in ACTOR}
     translated = []
     for index, data in enumerate(replacements):
         part = commands(data, info)
-        if not data.endswith(b"\x7f\x01") or sum(c[1] in (0, 1) for c in part) != 1:
-            raise ValueError("Sequence part must have one continuing terminator")
+        terminator = b"\x7f\x01" if index+1 < len(replacements) else original[-2:]
+        if not data.endswith(terminator) or sum(c[1] in (0, 1) for c in part) != 1:
+            raise ValueError("Sequence part changes the required final/continuing terminator")
         links = [c for c in part if c[1] == 0x0E]
         expected = ([b"\x7f\x0e"+member_numbers[index+1].to_bytes(2, "big")]
                     if index+1 < len(replacements) else [])
@@ -94,7 +105,7 @@ def audit_sequence(original, replacements, member_numbers, info):
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
         translated.extend(c for c in part if c[1] != 0x0E)
-    ignored = PRESENTATION | ACTOR | FIELDS | {0x01}
+    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01}
     native_flow = normalize_assignments([c for c in root if c[1] not in ignored])
     translated_flow = normalize_assignments([c for c in translated if c[1] not in ignored])
     if native_flow != translated_flow:
@@ -144,16 +155,49 @@ def validate_sequences(edits, source, info, groups=None):
     return permits
 
 
+def reference_payloads(group, references, info):
+    members = group["members"]
+    payloads, encoded_references = [], []
+    for member in members:
+        reference = references.get(member.get("reference_id", member["id"]))
+        if not reference or reference.get("sha256") != member["reference_sha256"]:
+            raise ValueError("Stale reviewed sequence reference")
+        encoded_references.append(encode(reference["text"], info))
+    if "reference_slice" not in members[0]:
+        return encoded_references
+    encoded = encoded_references[0]
+    if (len({member.get("reference_id", member["id"]) for member in members}) != 1
+            or any(data != encoded for data in encoded_references)
+            or any(member["reference_sha256"] != sha256(encoded) for member in members)):
+        raise ValueError("Sliced sequence requires the exact complete encoded reference")
+    boundaries = {t.offset for t in tokenize(encoded, info)} | {len(encoded)}
+    if members[0]["reference_slice"][0] != 0 or members[-1]["reference_slice"][1] != len(encoded):
+        raise ValueError("Sequence slices do not cover the complete reference")
+    for index, member in enumerate(members):
+        start, end = member["reference_slice"]
+        if start not in boundaries or end not in boundaries or not start < end:
+            raise ValueError("Sequence slice cuts a reference token")
+        part = encoded[start:end]
+        if index+1 < len(members):
+            following = members[index+1]
+            next_start = following["reference_slice"][0]
+            if next_start <= end or encoded[end:next_start] != b"\x7f\x04\xcd\x7f\x02":
+                raise ValueError("Sequence slice gap must be exactly one native wait/page boundary")
+            number = int(following["id"].split(":")[1], 16)
+            part += b"\x7f\x0e"+number.to_bytes(2, "big")+b"\xcd\x7f\x01"
+        payloads.append(part)
+    return payloads
+
+
 def reference_sequence_edits(references, source, info, groups=None):
     groups = load_sequences() if groups is None else groups
     edits = []
     for name, group in groups.items():
-        for member in group["members"]:
-            reference = references.get(member["id"])
-            if not reference or reference.get("sha256") != member["reference_sha256"]:
-                raise ValueError("Stale reviewed sequence reference")
+        payloads = reference_payloads(group, references, info)
+        for member, payload in zip(group["members"], payloads):
+            reference = references[member.get("reference_id", member["id"])]
             edits.append({"id": member["id"], "source_sha256": member["source_sha256"],
-                          "translation": reference["text"], "control_policy": "reviewed_sequence",
+                          "translation": decode(payload, info), "control_policy": "reviewed_sequence",
                           "reference_sequence": name,
                           "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
                                          "reference_id": reference["id"],
@@ -161,4 +205,6 @@ def reference_sequence_edits(references, source, info, groups=None):
                                          "match_basis": "reviewed_sequence_identity"},
                           "status": "mechanically_validated_candidate_not_reviewed",
                           "adaptations": [{"kind": "reviewed_multi_message_sequence", "sequence": name}]})
+            if "reference_slice" in member:
+                edits[-1]["provenance"]["reference_slice"] = member["reference_slice"]
     return edits, validate_sequences(edits, source, info, groups)

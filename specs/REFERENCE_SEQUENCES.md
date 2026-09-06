@@ -23,6 +23,30 @@ The native Nook guide's talk table enters through `07E6`; the explanation is
 reached by message branches. Its code contains no direct reference to `07EA` or
 the three continuation IDs. Broader reference and runtime checks still apply.
 
+## Work offer
+
+N64 `07EC` and the supplied GameCube `07EC` both describe the insufficient house
+payment, the part-time-work arrangement, and the shop location. The complete
+English record is 1,051 bytes, exceeding the N64 loader limit before substitution.
+Use the existing train-demo reserve slot `2AE9` as its second part. The legacy
+translation independently uses that same split; its presence is supporting
+evidence, not permission to bypass native-source guards.
+
+The split replaces the reference's existing button-wait/newline/page-clear span
+at encoded offsets `472..476` with a continuing-message boundary. The first part
+retains reference bytes `[0,472)`, then appends `0E 2AE9`, newline, and end `01`.
+The second retains `[477,1051)`, including the original end `00`. This replaces
+one page transition with one message transition; it does not add a second wait,
+remove English text, or reflow lines. Expanded bounds are 495 and 650 bytes.
+
+Slice-based approvals require the same complete source-reference hash, valid
+token boundaries, complete ordered coverage of the reference, and only the
+explicit native `04`/newline/`02` gap between parts. Each resulting payload has
+its own approved hash. Final termination matches the native root; intermediate
+parts continue. Native message scripts do not target `2AE9`, and the Nook guide
+code contains no direct `07EC` or `2AE9` reference. Actor traversal still needs
+runtime verification.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English

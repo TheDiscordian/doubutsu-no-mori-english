@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import CODE_VROM, by_vrom, sha256
 from reference_sequences import (audit_sequence, load_sequences, message_targets,
-                                 reference_sequence_edits, validate_sequences)
+                                 reference_payloads, reference_sequence_edits, validate_sequences)
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import validate_entry
@@ -129,6 +129,29 @@ class ReferenceSequenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "signature"):
             validate_entry(native, replacement, self.info, "message", "reference_text")
 
+    def test_split_reference_preserves_one_wait_boundary_and_final_end(self):
+        text = "First{cmd:7F04}\n{cmd:7F02}Second{cmd:7F00}"
+        encoded = encode(text, self.info)
+        digest = sha256(encoded)
+        refs = {"message:0000": {"id": "message:0000", "text": text, "sha256": digest}}
+        group = deepcopy(self.groups["test_sequence"])
+        for member, span in zip(group["members"], [[0, 5], [10, len(encoded)]]):
+            member.update(reference_id="message:0000", reference_sha256=digest, reference_slice=span)
+        parts = reference_payloads(group, refs, self.info)
+        self.assertEqual(parts, [b"First\x7f\x0e\x00\x01\xcd\x7f\x01", b"Second\x7f\x00"])
+        audit_sequence(b"Original\x7f\x00", parts, [0, 1], self.info)
+        for index, span in ((0, [1, 5]), (1, [10, len(encoded)-1]),
+                            (0, [0, 6]), (1, [9, len(encoded)])):
+            altered = deepcopy(group)
+            altered["members"][index]["reference_slice"] = span
+            with self.assertRaises(ValueError):
+                reference_payloads(altered, refs, self.info)
+        stale = {"message:0000": {**refs["message:0000"], "text": text.replace("First", "Other")}}
+        with self.assertRaisesRegex(ValueError, "exact complete"):
+            reference_payloads(group, stale, self.info)
+        with self.assertRaisesRegex(ValueError, "terminator"):
+            audit_sequence(b"Original\x7f\x00", [parts[0], parts[1][:-1]+b"\x01"], [0, 1], self.info)
+
     @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
                          "Retail ROM and English text extraction are local-only test inputs")
     def test_home_explanation_retail_slots_and_reference(self):
@@ -137,7 +160,7 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 4)
+        self.assertEqual(len(edits), 6)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",

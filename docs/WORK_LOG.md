@@ -316,6 +316,33 @@
   with an expansion bound of 1,127. The legacy uses reserved slot `2AE9` for its
   second part; the source placeholder and incoming references require verification.
 
+### Bounded English work offer
+
+- Split the complete GameCube `07EC` at its existing wait/page-clear transition
+  after the thorny-situation passage. The first 472 reference bytes continue to
+  native reserve slot `2AE9`; the second part retains reference bytes 477 through
+  1050, including native final end `00`. No English text is omitted or reflowed.
+  Expanded bounds are 495 and 650 bytes. The approved five-byte separator is
+  replaced by one continuing-message boundary, not an extra button wait.
+- Added token-boundary, exact-reference, complete-coverage, and separator checks
+  for sliced reference sequences. Every output part remains hash-bound and must
+  be installed together. Source `2AE9` is a verified placeholder with no incoming
+  native message-script branches. The native Nook guide has no direct reference
+  to either record; actor progression still requires runtime verification.
+- All 70 tests pass. The work-offer build contains 9,679 edits, with 2,911 main
+  messages still rejected and 1,118 conservative reference layout warnings.
+  ROM SHA-256:
+  `882ff4d076c4c1a566fe4ca152510e79c857890155977de26d226b16dcc2a688`.
+  UPS SHA-256:
+  `d7fcb38486c277e939c3c1a03e73a711a491e29f32a416d1a56b75a96c6b5087`.
+- `build/smoke-work-offer-native-01` passes 45 recorded steps covering both
+  cartridge loads, the continuation, native final end, and buffer/module guards.
+  `build/smoke-delivery-arrival-01` passes all 225 full-regression steps and all
+  ten acceptance checks. Normal sequence-build gameplay also reaches Nook's
+  housing area; the English house-explanation traversal is still in progress.
+- `build/smoke-work-offer-home-01` passes the 99-step house-explanation DMA and
+  branch regression on the same build after the additional message-bank changes.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
