@@ -15,6 +15,7 @@ from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import reference_sequence_edits
+from name_candidates import npc_candidates
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -37,6 +38,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
+    parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
     parser.add_argument("--inventory", type=Path, default=Path("build/inventory"))
     parser.add_argument("--drafts", type=Path, action="append", help="Repeat to select explicit original-edit files")
     parser.add_argument("--matches", type=Path, default=Path("translations/reference_matches.json"))
@@ -147,6 +149,15 @@ def main():
                          "remaining_by_reason": dict(Counter(r["reason"] for r in review))}
         args.output.mkdir(parents=True, exist_ok=True)
         (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in review))
+    name_edits, name_manifests, name_remaining, name_report = npc_candidates(
+        source_banks["npc_names"],
+        list(map(json.loads, (args.inventory/"npc_names.jsonl").read_text().splitlines())),
+        list(map(json.loads, (args.gc_names/"npc_names.jsonl").read_text().splitlines())),
+        info, override_ids)
+    edits.extend(name_edits)
+    manifests.extend(name_manifests)
+    reports["npc_names"] = name_report
+    (args.output/"npc_names-remaining.jsonl").write_text("".join(json.dumps(r)+"\n" for r in name_remaining))
     if matches.keys()-visited_matches:
         raise ValueError(f"Reviewed references are absent from the inventory: {matches.keys()-visited_matches}")
     selected = {edit["id"] for edit in edits}

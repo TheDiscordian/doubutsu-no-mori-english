@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 82 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 87 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -79,6 +79,10 @@ user's direction. The production build retains the approved spacing metrics.
 - GameCube pixel-space (`67`) through both message cursor and sentence renderer.
   Native tests verify scaled width, complete token advancement, missing-argument
   handling, unchanged native formatting handlers, and memory guards.
+- 178 complete English villager-name candidates within the unchanged six-byte
+  native fields. All 216 names have confirmed reference identities; 38 longer
+  names remain withheld for wider-name work. All native name loads and their
+  adjacent guards pass, including the no-write invalid-ID path.
 
 ## Current reference candidates
 
@@ -100,8 +104,8 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,951 edits, including
-9,107 reference dialogue candidates, all 460 choices, and four N64-specific
+The separate resident-module experiment contains 10,129 edits, including
+9,107 reference dialogue candidates, all 460 choices, 178 villager names, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
 Its remaining main-dialogue count is 2,639; matching, actor fields, flow controls,
@@ -131,7 +135,9 @@ Its native formatting/space test passes 476 recorded steps without modifying the
 font assets. The space build also passes the full train-to-town regression, the
 twenty-byte-choice regression, and cancellation tests. Six additional reviewed
 identities use identical native shop/reward records at confirmed reference IDs;
-their caller-specific gameplay review remains open.
+their caller-specific gameplay review remains open. The name build passes all 216
+real cartridge name loads and the invalid-ID no-write check, with 660 recorded
+steps. Native name storage, identity structures, and file size stay unchanged.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.

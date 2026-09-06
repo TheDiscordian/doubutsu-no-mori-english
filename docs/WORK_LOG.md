@@ -442,6 +442,27 @@
   memory scenario included in some earlier runs; their assertion coverage is
   recorded in each result file.
 
+### Bounded English villager names
+
+- Confirmed all 216 same-index English villager names against the legacy text;
+  the first 216 N64/GameCube personality-table entries also agree. Each name
+  reference's complete padded eight-byte hash is verified before import.
+  Added 178 complete names that fit the native six-byte destination. The 38
+  seven/eight-byte names remain withheld, without abbreviations or truncation.
+  Four alignment/reserve slots, the file header, and all other bytes remain intact.
+- All 87 tests pass, including identity/hash guards, plain-text checks, complete
+  storage-span preservation, and overlong-name rejection. The name build has
+  10,129 edits; main-dialogue counts remain 9,107 candidates and 2,639 rejected.
+  ROM SHA-256:
+  `cf2a9ccf541c9dfd41559c7d04b9e76cbe96c0b499b11fcc2eee2780fada7016`.
+  UPS SHA-256:
+  `bc772a146628b1751112ad0d995b721a499a1246fb7ea05a2ff9fd141b028a9c`.
+- `build/smoke-npc-names-native-01` passes 660 recorded steps: all 216 actual
+  name DMA loads, exact six-byte results, sixteen-byte guards on both sides,
+  the no-write `FF` path, module guards, and complete checkpoint restoration.
+  Dialogue labels, quest names, letters, and game-save round trips still need
+  their gameplay tests. This does not establish full name coverage.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
