@@ -100,3 +100,7 @@ still apply. Native actor arguments may be restored only when the complete
 non-presentation opcode sequence agrees. Explicit font geometry and colour-span
 commands remain separately gated. Generated manifests record the page/wait counts
 and keep these imports labelled as candidates awaiting gameplay/layout review.
+
+The separate `reference_layout` policy also retains the native formatting
+commands after verification of the actual font consumers and parameter limits.
+See [reference formatting](REFERENCE_LAYOUT.md). Sound code `51` remains strict.

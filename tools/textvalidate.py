@@ -13,6 +13,9 @@ PRESENTATION = {0x03, 0x05}
 TEXT_FIELDS = set(range(0x1A, 0x30)) | set(range(0x31, 0x40)) | {0x76}
 DATE_FIELDS = set(range(0x1D, 0x24))
 RUNTIME_PRESENTATION = {0x72, 0x73, 0x75}
+# Native sentence/character consumers agree with the English reference. Sound
+# control 51 is intentionally absent. No reference line breaks are rewritten.
+FONT_PRESENTATION = {0x50, 0x52, 0x53, 0x54, 0x5A}
 
 
 def compared_commands(policy, resident_runtime=False):
@@ -25,6 +28,8 @@ def compared_commands(policy, resident_runtime=False):
         return presentation | TEXT_FIELDS
     if policy == "reference_delivery":
         return presentation | TEXT_FIELDS | {0x02, 0x04}
+    if policy == "reference_layout":
+        return presentation | TEXT_FIELDS | {0x02, 0x04} | FONT_PRESENTATION
     raise ValueError("Unknown control policy")
 
 
@@ -58,6 +63,12 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                    sequence_permit=None):
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
+    for token in tokenize(replacement, info):
+        if token.kind == "cmd":
+            if token.data[1] == 0x53 and token.data[2] > 2:
+                raise ValueError("Line anchor exceeds native three-entry table")
+            if token.data[1] in (0x54, 0x5A) and token.data[2] == 0:
+                raise ValueError("Text scale must be nonzero")
     if resident_runtime:
         hour_seen = False
         for token in tokenize(replacement, info):
@@ -66,7 +77,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                     hour_seen = True
                 elif token.data[1] == 0x76 and not hour_seen:
                     raise ValueError("AM/PM requires a preceding hour field in the message")
-    if policy in ("reference_text", "reference_delivery"):
+    if policy in ("reference_text", "reference_delivery", "reference_layout"):
         if bank != "message":
             raise ValueError("Reference text policy is only audited for dialogue")
         def fields(data):
@@ -120,7 +131,7 @@ def layout_issues(data, info, advances, max_width=192, max_lines=4):
             elif 0x1A <= command <= 0x40 or command == 0x76:
                 chars = {0x1A: 6, 0x1B: 6, 0x1C: 4, 0x2F: 16, 0x40: 68}.get(command, 10)
                 x += chars*12  # Existing Japanese names remain possible.
-            elif command in (0x51, 0x52, 0x53, 0x5A):
+            elif command in (0x52, 0x53, 0x54, 0x5A):
                 issues.append("explicit_layout_command_needs_review")
         if x > max_width:
             issues.append(f"page_{page}_line_{line}_width_{x}")

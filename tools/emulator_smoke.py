@@ -219,6 +219,29 @@ def choice_snapshot(debug):
             "choice_state": struct.unpack_from(">i", state, 0x9C)[0]}
 
 
+def advance_to_choice(debug, keyboard, options, record, pause=time.sleep):
+    """Advance at most the declared page count, never confirm an active menu."""
+    maximum = options.get("max_presses", 40)
+    settle = options.get("settle_seconds", 3)
+    if type(maximum) is not int or not 1 <= maximum <= 100:
+        raise ValueError("Invalid advance-to-choice press limit")
+    if not isinstance(settle, (int, float)) or not 0.1 <= settle <= 10:
+        raise ValueError("Invalid advance-to-choice settling time")
+    for pressed in range(maximum+1):
+        pause(settle)
+        message = message_snapshot(debug)
+        choice = choice_snapshot(debug)
+        record(message)
+        record(choice)
+        if choice["choice_state"] == 2 and choice["choice_count"] > 0:
+            record({"advanced_to_active_choice": True, "presses": pressed,
+                    "message_id": message.get("message_id")})
+            return
+        if pressed < maximum:
+            keyboard.press("a", 0.08)
+    raise ValueError("No active choice within the declared page-advance limit")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
@@ -329,11 +352,16 @@ def main():
         if args.post_scenario:
             actions += json.loads(args.post_scenario.read_text())
         needs_checkpoint_restore = False
+        def record(snapshot):
+            results.append(snapshot)
+            (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
         for action in expand_actions(actions):
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
             if "key" in action:
                 keyboard.press(action["key"], action.get("duration", 0.15))
+            if "advance_to_choice" in action:
+                advance_to_choice(debug, keyboard, action["advance_to_choice"], record)
             if "read" in action:
                 address, length = action["read"]
                 data = debug.command(f"m{address},{length:x}")

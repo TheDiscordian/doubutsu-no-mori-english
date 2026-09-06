@@ -343,6 +343,32 @@
 - `build/smoke-work-offer-home-01` passes the 99-step house-explanation DMA and
   branch regression on the same build after the additional message-bank changes.
 
+### Native reference formatting and normal house explanation
+
+- Verified the native sentence and character consumers against the pinned
+  GameCube implementation. Added explicit formatting import with parameter guards:
+  line anchor 0–2, nonzero character/line scales, and unchanged sound/flow checks.
+  No font asset or reference line break changes. The manifest records formatting
+  tokens, and geometry remains marked for individual layout review.
+- `build/smoke-font-controls-native-01` passes 385 recorded steps, including actual
+  sentence dispatch, RGB/span restoration, scale extremes/reset/recalculation,
+  token advancement, scratch display-list guards, and checkpoint restoration.
+- All 78 tests pass. The layout build has 9,943 edits, 9,099 reference dialogue
+  candidates, 264 newly admitted formatting candidates, 2,647 remaining main
+  messages, and 1,308 conservative layout warnings. ROM SHA-256:
+  `055a6643739ce365499894e51a0e92b5545d5d342e6d36d94acd82a601f16fae`.
+  UPS SHA-256:
+  `9da4083433566f34a77f83fb06020040d2bdc25eed7af5e7f0b8767d461a19c0`.
+- Added bounded normal dialogue advancement that stops on native active-choice
+  state, preserving the menu for explicit branch testing. The sequence build
+  enters/exits the house, confirms the purchase, and traverses all four English
+  explanation records normally. `build/smoke-sequence-home-choice-01` reaches
+  `083A` with two active English options and intact module guards. No game save
+  has occurred; its FlashRAM remains blank.
+- `build/smoke-work-offer-arrival-01` passes all 225 full train-to-town regression
+  steps and all ten acceptance checks. The layout build's full regression and
+  both normal house-explanation choice outcomes remain to be tested.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

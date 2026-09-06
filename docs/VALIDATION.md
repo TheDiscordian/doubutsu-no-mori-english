@@ -33,6 +33,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Choice menus | All lengths, four entries, cancellation, branch outcome | Sixteen-byte rows, selected text, and three long choices tested; four active rows, cancellation, and actor paths outstanding |
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
+| Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
 | Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Outstanding |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
 
@@ -41,6 +42,11 @@ L=`q`, R=`r`, C-Up=`u`, C-Down=`j`, C-Left=`h`, C-Right=`k`, D-pad=arrow keys,
 and analogue stick up/down/left/right=`w`/`s`/`f`/`g`. An action's `key` may be
 a list for simultaneous presses. These are isolated test mappings, not changes
 to the user's emulator configuration.
+
+`advance_to_choice` advances dialogue within an explicit press/time limit and
+stops before confirming an active choice. It checks native choice state 2,
+not stale row contents left by a closed menu. Every message/choice snapshot is
+recorded as the action runs, and failure to reach a menu fails the scenario.
 
 F5 saves an emulator checkpoint, F6 loads it, and F12 closes the isolated
 emulator normally. Test output records flushed FlashRAM, RTC, and Controller Pak
