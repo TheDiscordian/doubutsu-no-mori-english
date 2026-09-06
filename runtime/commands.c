@@ -1,5 +1,6 @@
 /* Preserve native commands while adding explicit English-only operations. */
 #include "dateformat.h"
+#include "choice_cancel.h"
 
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -97,6 +98,10 @@ int af_dispatch_command(struct MessageWindow *window, int *index) {
             if (first >= 'a' && first <= 'z') data->text[*index] = first - ('a' - 'A');
         }
         return result;
+    }
+    if (command == 0x62) {
+        *index += 2;
+        af_choice_no_b_close(window);
     }
     if (command == 0x75) {
         *index += 2;

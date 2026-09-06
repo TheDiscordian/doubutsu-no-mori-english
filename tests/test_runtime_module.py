@@ -57,7 +57,7 @@ class ModuleRetailTests(unittest.TestCase):
     def test_command_gaps_and_clock_field_policy(self):
         info = module_command_info(self.rom)
         self.assertEqual(encode("{cmd:7F76}", info), b"\x7f\x76")
-        for command in (0x61, 0x62, 0x74, 0x77, 0xFF):
+        for command in (0x61, 0x63, 0x74, 0x77, 0xFF):
             with self.assertRaisesRegex(ValueError, "Unsupported"):
                 list(tokenize(bytes([0x7F, command]), info))
             self.assertEqual(list(tokenize(bytes([0x7F, command]), info, strict=False))[0].kind, "raw")
@@ -71,6 +71,16 @@ class ModuleRetailTests(unittest.TestCase):
         validate_entry(b"\x7f\x24", b"\x7f\x75\x7f\x24", info, "message", "presentation", resident_runtime=True)
         with self.assertRaisesRegex(ValueError, "signature"):
             validate_entry(b"\x7f\x24", b"\x7f\x75\x7f\x24", info, "message", "presentation")
+
+    def test_cancel_policy_requires_matching_native_b_behaviour(self):
+        info = module_command_info(self.rom)
+        self.assertEqual(encode("{cmd:7F62}", info), b"\x7f\x62")
+        validate_entry(b"\x7f\x5e", b"\x7f\x62", info, "message", "presentation", resident_runtime=True)
+        for source, policy, runtime in ((b"\x7f\x5e", "exact", True),
+                                        (b"\x7f\x5e", "presentation", False),
+                                        (b"", "presentation", True)):
+            with self.assertRaisesRegex(ValueError, "signature"):
+                validate_entry(source, b"\x7f\x62", info, "message", policy, resident_runtime=runtime)
 
     @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(),
                          "Build resident-module artifacts to exercise guarded insertion")

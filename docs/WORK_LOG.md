@@ -263,6 +263,34 @@
   inactive (`choice_state = 0`) and must not be mistaken for a displayed menu.
   FlashRAM remains blank; completing the introductory jobs remains necessary.
 
+### Choice cancellation and closing sounds
+
+- Ported GameCube `62` with both choice flag bytes, native B-to-last selection,
+  short/long/decision sound routing, duplicate message-closing sound suppression,
+  and wait/initialiser resets. The flag names do not mean B is disabled: native
+  input inspection and targeted calls confirm that the flag enables B-to-last.
+  Native disappearance setup and animation remain unchanged.
+- `build/smoke-cancel-native-01` passes 83 recorded steps, including real native
+  A/B selection, neighbouring flag-byte guards, all sound decisions, suppression,
+  native setup fields, separate-window reset checks, and module guards. Audio
+  output is disabled. All 68 unit/integration tests pass.
+- The cancellation build imports four additional inventory prompts: `0A4D`,
+  `1348`, `17B2`, and `17B3`. Other GameCube storage/music menus have different
+  choices or extra actions and remain rejected. There are 9,310 edits and 3,280
+  remaining main-dialogue candidates. ROM SHA-256:
+  `34eb6c003b84518182084793875b7d42f142278ed02da7592feec88539dd2b84`.
+  UPS SHA-256:
+  `4c67293af8f921d217a707e418ba20085b0851a397a92eae02215ef28ea0d616`.
+  The module links 3,424 bytes within the existing sixteen-KiB reservation.
+- `build/smoke-cancel-choice20-01` passes all 94 long-choice regression steps
+  after the additional module code moves its linked text-storage addresses.
+- `build/smoke-sequence-arrival-01` passes the English-keyboard scenario through
+  Rover's telephone conversation, but that scenario does not record the full
+  long-choice/arrival acceptance data. Its validator correctly rejects the missing
+  evidence. `build/smoke-sequence-town-01` continues to `07DD` with intact guards.
+  The cancellation build uses the complete `runtime-choice-scenario.json` for
+  the full regression rather than claiming the shorter run is equivalent.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

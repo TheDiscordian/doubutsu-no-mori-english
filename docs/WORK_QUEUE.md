@@ -19,7 +19,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; catchphrase, gyroid, mail, special-name, and shop constraints identified; wider imports remain gated |
 | R04 | NPC and item names | pending | IDs matched from actor/item tables; full English names supported by every destination |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
-| R06 | Remaining GameCube controls | active | AM/PM, capitalization, and protected pacing have targeted MIPS tests; choice-close, random-range, space, and wider flow coverage remain |
+| R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, and complete choice-close handling pass targeted MIPS tests; random-range, space, and wider flow coverage remain |
 | R07 | Remaining message matching | active | Hash-bound identities and complete multi-message approvals implemented; Nook explanation DMA/branches pass; further matching and actor traversal remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |

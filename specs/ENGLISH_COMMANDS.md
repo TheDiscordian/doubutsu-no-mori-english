@@ -75,3 +75,12 @@ dialogue regression are required before accepting pacing-dependent imports.
 
 Article semantics beyond the existing narrow adapter and other GameCube flow
 commands remain separate work until their complete semantics and tests exist.
+
+## Choice cancellation
+
+`7F62` enables B-to-last-option selection with the GameCube closing-sound policy.
+The module ports the choice flags, closing-sound decision, duplicate message-sound
+suppression, and both flag-reset paths. Native animation geometry remains intact.
+See [choice cancellation](CHOICE_CANCELLATION.md) for the layouts, hooks, import
+restrictions, and silent native regression. A changed GameCube menu is not made
+compatible merely by supporting this opcode.

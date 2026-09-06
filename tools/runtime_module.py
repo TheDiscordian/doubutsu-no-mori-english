@@ -26,16 +26,21 @@ DATE_CALLS = (
     (0x8009F1D4, 0x800C4350, "af_format_second"),
 )
 COMMAND_HOOKS = {0x8009034C: "af_code_size", 0x800903CC: "af_code_attribute",
-                 0x800A21C0: "af_dispatch_command", 0x800A054C: "af_cancel_order"}
+                 0x800A21C0: "af_dispatch_command", 0x800A054C: "af_cancel_order",
+                 0x8009FA18: "af_message_close_short", 0x8009FA38: "af_message_close_long",
+                 0x800A28D4: "af_message_wait_clear"}
 HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800903CC, 0x800903E4), (0x800A21C0, 0x800A223C),
-                (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C))
+                (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C),
+                (0x8009FA18, 0x8009FA38), (0x8009FA38, 0x8009FA58),
+                (0x800A28D4, 0x800A28DC))
 
 
 def module_command_info(rom):
     """Only implemented extension codes are tokenizable; gaps remain invalid."""
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     info += [(0, 0)]*(0x77-len(info))
+    info[0x62] = (2, 0)
     info[0x72] = info[0x73] = (2, 0)
     info[0x75] = (2, 0)
     info[0x76] = (2, 2)
@@ -172,7 +177,9 @@ def add_runtime_module(rom, replacements, directory):
     code.instruction(0x800A0720, 0, 0x240A0100)
     code.instruction(0x800A0730, 0x31090100, 0x31094100)
     code.instruction(0x800A0734, 0x11200006, 0x152A0006)
-    code.immediate(0x8009E8A4, 0xFF3F, 0xBF3F)
+    code.immediate(0x8009E8A4, 0xFF3F, 0xB73F)
+    code.instruction(0x80065128, 0xA08000B8, 0xA48000B8)  # Clear B8 and B9, leave BA/BB alone.
+    code.instruction(0x800667C0, 0x0C0197BE, call("af_choice_close_sound"))
     replacements[CODE_VROM] = bytes(code.data)
     report["date_scope"] = "Seven message substitutions; other UI formatter callers remain native"
     report["code_changes"] = code.changes

@@ -28,7 +28,10 @@ def compared_commands(policy, resident_runtime=False):
 
 def signature(data, info, policy="exact", resident_runtime=False):
     ignored = compared_commands(policy, resident_runtime)
-    return [token.data for token in tokenize(data, info) if token.kind == "cmd"
+    def canonical(command):
+        # Both enable B-to-last-option. Only their closing-sound policy differs.
+        return b"\x7f\x5e" if resident_runtime and policy != "exact" and command == b"\x7f\x62" else command
+    return [canonical(token.data) for token in tokenize(data, info) if token.kind == "cmd"
             and token.data[1] not in ignored]
 
 
