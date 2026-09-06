@@ -9,9 +9,13 @@ from pathlib import Path
 from aflib import CODE_VROM, by_vrom, sha256, verified_rom
 from font import make_halfwidth
 from gc_text import plain
+from gc_adapter import adapt_reference
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
+
+REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
+                   "maila", "mailb", "mailc", "psz", "superz")
 
 
 def main():
@@ -28,9 +32,9 @@ def main():
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
     drafts = json.loads(args.drafts.read_text())
-    override_ids = {r["id"] for r in drafts}
+    override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     edits, manifests, reports = [], [], {}
-    for name in ("message", "select"):
+    for name in REFERENCE_BANKS:
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
         inventory = [json.loads(line) for line in (args.inventory/(name+".jsonl")).read_text().splitlines()]
         source = source_banks[name].entries()
@@ -48,9 +52,19 @@ def main():
                 reason = "same_id_not_confirmed_by_legacy"
             else:
                 try:
-                    candidate = encode(reference["text"], info)
                     original = source[int(id.split(":")[1], 16)]
-                    validate_entry(original, candidate, info, name, "presentation")
+                    policy = "presentation"
+                    try:
+                        text, adaptations = adapt_reference(reference["text"], original, info)
+                        candidate = encode(text, info)
+                        validate_entry(original, candidate, info, name, policy)
+                    except ValueError as exc:
+                        if name != "message" or str(exc) != "Control signature changed":
+                            raise
+                        policy = "reference_text"
+                        text, adaptations = adapt_reference(reference["text"], original, info, policy)
+                        candidate = encode(text, info)
+                        validate_entry(original, candidate, info, name, policy)
                 except ValueError as exc:
                     reason = str(exc)
             if reason:
@@ -58,10 +72,10 @@ def main():
                 review.append({"id": id, "reason": reason})
                 continue
             edit = {"id": id, "source_sha256": row["source_sha256"],
-                    "translation": reference["text"], "control_policy": "presentation",
+                    "translation": text, "control_policy": policy,
                     "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
                                    "reference_id": reference["id"], "reference_sha256": reference["sha256"]},
-                    "status": "mechanically_validated_candidate_not_reviewed"}
+                    "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
             issues = layout_issues(candidate, info, advances) if name == "message" else []
             manifest = {k: v for k, v in edit.items() if k != "translation"}
             manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
@@ -70,11 +84,15 @@ def main():
             edits.append(edit)
             manifests.append(manifest)
             counts["accepted_candidates"] += 1
+            counts["adapted_candidates"] += bool(adaptations)
+            counts["text_field_delivery_candidates"] += policy == "reference_text"
             counts["layout_review_required"] += bool(issues)
-        reports[name] = dict(counts)
+        reports[name] = {**dict(counts), "source_entries": len(source),
+                         "remaining_by_reason": dict(Counter(r["reason"] for r in review))}
         args.output.mkdir(parents=True, exist_ok=True)
         (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in review))
-    edits += drafts
+    selected = {edit["id"] for edit in edits}
+    edits += [edit for edit in drafts if edit["id"] not in selected]
     (args.output/"translations.json").write_text(json.dumps(edits, ensure_ascii=False, indent=2)+"\n")
     (args.output/"manifest.json").write_text(json.dumps(manifests, indent=2)+"\n")
     (args.output/"summary.json").write_text(json.dumps(reports, indent=2)+"\n")

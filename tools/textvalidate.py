@@ -6,13 +6,25 @@ from textcodec import LATIN, tokenize
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
 # string insertion remain exact and ordered.
 PRESENTATION = {0x03, 0x05}
+# Read-only substitutions. Random-number generation (30) and embedded mail
+# (40) remain ordered commands, not freely movable text fields.
+TEXT_FIELDS = set(range(0x1A, 0x30)) | set(range(0x31, 0x40))
+
+
+def compared_commands(policy):
+    if policy == "exact":
+        return set()
+    if policy == "presentation":
+        return PRESENTATION
+    if policy == "reference_text":
+        return PRESENTATION | TEXT_FIELDS
+    raise ValueError("Unknown control policy")
 
 
 def signature(data, info, policy="exact"):
-    if policy not in ("exact", "presentation"):
-        raise ValueError("Unknown control policy")
+    ignored = compared_commands(policy)
     return [token.data for token in tokenize(data, info) if token.kind == "cmd"
-            and not (policy == "presentation" and token.data[1] in PRESENTATION)]
+            and token.data[1] not in ignored]
 
 
 def expanded_bound(data, info):
@@ -33,6 +45,14 @@ def expanded_bound(data, info):
 
 
 def validate_entry(original, replacement, info, bank, policy="exact"):
+    if policy == "reference_text":
+        if bank != "message":
+            raise ValueError("Reference text policy is only audited for dialogue")
+        def fields(data):
+            return {t.data[1] for t in tokenize(data, info)
+                    if t.kind == "cmd" and t.data[1] in TEXT_FIELDS}
+        if not fields(replacement) <= fields(original):
+            raise ValueError("Reference requests a text field absent from the N64 message")
     if signature(original, info, policy) != signature(replacement, info, policy):
         raise ValueError("Control signature changed")
     if bank == "message":

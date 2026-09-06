@@ -50,6 +50,8 @@ class Bank:
         offset = 0
         for index, entry in enumerate(entries):
             offset += len(entry)
+            if offset == 0:
+                raise ValueError(f"{self.name}: empty leading entry would become a bank terminator")
             struct.pack_into(">I", table, index*4, offset)
         # Preserve original unused bytes for exact no-change round trips.
         return data + self.data[len(data):], bytes(table)

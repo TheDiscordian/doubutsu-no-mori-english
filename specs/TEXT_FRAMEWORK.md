@@ -60,6 +60,18 @@ The optional `presentation` control policy permits pause (`7F03`) and text-colou
 including button waits, page clears, animation, sound, insertions, choices, and
 branches. A command mismatch blocks import; it is not repaired by guessing.
 
+The dialogue-only `reference_text` policy additionally permits the English
+delivery to omit, repeat, or reorder already available read-only text fields
+(`7F1A..7F2F`, `7F31..7F3F`). A requested field absent from the N64 source is
+rejected. RNG `7F30` and embedded mail `7F40` remain strict. This is not permission
+to reorder branches, waits, animation, or sound. The expansion bound is applied
+to the final candidate, including every repeated insertion.
+
+Reference adaptation removes GameCube article-suppression `7F74` only directly
+before a supported N64 text field: N64 does not generate articles there. Matched
+actor-demo operations `7F08..7F0C` retain N64 arguments instead of importing
+GameCube actor-specific values. Every adaptation is recorded for review.
+
 ## Halfwidth prototype
 
 - Main code virtual file: `0x675720`, RAM load address `0x80051A80`.
@@ -104,6 +116,21 @@ ROM storage does not increase these buffers. Save format compatibility is a
 separate requirement from rendering width.
 
 ## Coverage and validation
+
+### Layout and timing fidelity
+
+The English GameCube version is the presentation reference. Preserve its
+intentional line breaks, page breaks, emphasis, and pause timing wherever the
+N64 engine can reproduce them. A sparse bubble is not itself a defect. Layout
+checks report constraints; they must not silently rewrite the script or remove
+pauses. Necessary departures require an explicit entry-level note and visual
+review. Original translation drafts are not an approved pacing reference.
+
+The `presentation` comparison policy allows an English candidate to retain its
+GameCube pause/colour tokens while verifying the other N64 commands. It does
+not strip pause tokens from the candidate or authorise arbitrary timing changes.
+
+### Acceptance
 
 Inventory records untranslated, legacy candidate, reviewed, and tested states
 separately. Changed command signatures indicate required review, not automatically

@@ -3,6 +3,7 @@
 
 import argparse
 import ctypes
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -10,6 +11,7 @@ import shutil
 import signal
 import socket
 import subprocess
+import struct
 import time
 
 
@@ -63,14 +65,77 @@ class Keyboard:
             raise RuntimeError("Cannot open isolated X display")
 
     def press(self, name, duration=0.15):
-        key = self.x11.XKeysymToKeycode(self.display, self.x11.XStringToKeysym(name.encode()))
-        if not key:
+        names = [name] if isinstance(name, str) else name
+        keys = [self.x11.XKeysymToKeycode(self.display, self.x11.XStringToKeysym(n.encode()))
+                for n in names]
+        if not keys or not all(keys):
             raise ValueError(f"Unknown key: {name}")
-        self.xtst.XTestFakeKeyEvent(self.display, key, 1, 0)
+        for key in keys:
+            self.xtst.XTestFakeKeyEvent(self.display, key, 1, 0)
         self.x11.XFlush(self.display)
         time.sleep(duration)
-        self.xtst.XTestFakeKeyEvent(self.display, key, 0, 0)
+        for key in reversed(keys):
+            self.xtst.XTestFakeKeyEvent(self.display, key, 0, 0)
         self.x11.XFlush(self.display)
+
+
+def expand_actions(actions):
+    for action in actions:
+        if "repeat" in action:
+            if not 1 <= action["repeat"] <= 100:
+                raise ValueError("Invalid scenario repetition count")
+            for index in range(action["repeat"]):
+                for child in action["actions"]:
+                    child = dict(child)
+                    if "capture" in child:
+                        child["capture"] = child["capture"].format(index=index)
+                    yield child
+        else:
+            yield action
+
+
+def message_snapshot(debug):
+    pointer = int(debug.command("m8014241c,4"), 16)
+    if not 0x80000000 <= pointer <= 0x803FFBF0:
+        return {"message_pointer": f"{pointer:08X}", "status": "not_loaded"}
+    header = bytes.fromhex(debug.command(f"m{pointer:x},10"))
+    loaded, number, length, cut = struct.unpack(">4I", header)
+    result = {"message_pointer": f"{pointer:08X}", "loaded": loaded,
+              "message_id": f"{number:04X}", "length": length, "cut": cut}
+    if loaded and 0 < length <= 1024:
+        result["data"] = debug.command(f"m{pointer+16:x},{length:x}")
+    return result
+
+
+def keyboard_snapshot(debug):
+    """Locate the English-first overlay in four-MiB RAM and read its state."""
+    marker = bytes.fromhex("A0660000A0660001A060000224190300A4790004A4780006")
+    matches = []
+    previous = b""
+    for address in range(0x80200000, 0x80400000, 0x10000):
+        chunk = bytes.fromhex(debug.command(f"m{address:x},10000"))
+        if len(chunk) != 0x10000:
+            raise ValueError("Truncated keyboard RAM search")
+        data = previous+chunk
+        offset = data.find(marker)
+        while offset >= 0:
+            matches.append(address-len(previous)+offset-0x760)
+            offset = data.find(marker, offset+1)
+        previous = data[-(len(marker)-1):]
+    if len(matches) != 1:
+        raise ValueError(f"Expected one loaded English keyboard overlay, found {len(matches)}")
+    base = matches[0]
+    state = bytes.fromhex(debug.command(f"m{base+0x39b0:x},30"))
+    pointer = struct.unpack_from(">I", state, 0x24)[0]
+    rows, columns, length = struct.unpack_from(">3h", state, 0x18)
+    if not (1 <= rows <= 16 and 1 <= columns <= 96 and 0 <= length <= rows*columns <= 1024):
+        raise ValueError("Invalid keyboard state dimensions")
+    if not 0x80000000 <= pointer <= 0x80400000-rows*columns:
+        raise ValueError("Invalid keyboard string pointer")
+    return {"keyboard_base": f"{base:08X}", "mode": state[4],
+            "cursor": struct.unpack_from(">h", state, 0x16)[0],
+            "rows": rows, "columns": columns, "length": length,
+            "text_hex": debug.command(f"m{pointer:x},{rows*columns:x}")}
 
 
 def main():
@@ -100,6 +165,12 @@ def main():
                         "  Input\n    Controller.Port.1\n      Gamepad\n"
                         "        A: 0x1/0/35;;\n        B: 0x1/0/36;;\n"
                         "        Start: 0x1/0/89;;\n"
+                        "        Z: 0x1/0/60;;\n"
+                        "        L: 0x1/0/51;;\n        R: 0x1/0/52;;\n"
+                        "        X-Axis\n          Lo: 0x1/0/40;;\n          Hi: 0x1/0/41;;\n"
+                        "        Y-Axis\n          Lo: 0x1/0/57;;\n          Hi: 0x1/0/53;;\n"
+                        "        C-Up: 0x1/0/55;;\n        C-Down: 0x1/0/44;;\n"
+                        "        C-Left: 0x1/0/42;;\n        C-Right: 0x1/0/45;;\n"
                         "        Up: 0x1/0/84;;\n        Down: 0x1/0/85;;\n"
                         "        Left: 0x1/0/86;;\n        Right: 0x1/0/87;;\n")
     logs, processes, debug = [], [], None
@@ -131,7 +202,9 @@ def main():
         ares = subprocess.Popen(command, env=env, stdout=log, stderr=log, start_new_session=True)
         processes.append(ares)
         time.sleep(3)
-        results = []
+        results = [{"rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
+                    "audio": "disabled", "expansion_pak": False,
+                    "scenario": str(args.scenario) if args.scenario else "default"}]
         subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
                         "-video_size", "800x640", "-i", display, "-frames:v", "1", str(out / "initial.png")],
                        env=env, check=True, timeout=15, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
@@ -142,7 +215,7 @@ def main():
             {"wait": args.seconds-5}, {"capture": "boot.png"},
             {"read": ["80090294", 4]}, {"read": ["80106AF4", 256]},
             {"read": ["8013A680", 32]}]
-        for action in actions:
+        for action in expand_actions(actions):
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
             if "key" in action:
@@ -158,6 +231,17 @@ def main():
                                 "assertion": "passed" if "expect" in action else "not_requested"})
             if "command" in action:
                 results.append({"command": action["command"], "result": debug.command(action["command"])})
+            if action.get("snapshot_message"):
+                snapshot = message_snapshot(debug)
+                results.append(snapshot)
+                if "expect_message" in action and snapshot.get("message_id") != action["expect_message"]:
+                    raise ValueError(f"Unexpected message: {snapshot.get('message_id')}")
+            if action.get("snapshot_keyboard"):
+                snapshot = keyboard_snapshot(debug)
+                results.append(snapshot)
+                for field, expected in action.get("expect_keyboard", {}).items():
+                    if snapshot.get(field) != expected:
+                        raise ValueError(f"Keyboard {field}: {snapshot.get(field)!r}, expected {expected!r}")
             if "capture" in action:
                 target = out / Path(action["capture"]).name
                 subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
@@ -165,6 +249,7 @@ def main():
                                env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
                                stderr=subprocess.PIPE)
                 results.append({"capture": target.name})
+            (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
         # Register numbering has changed across ares builds; retain the raw
         # response without claiming this is a trustworthy PC measurement.
         results.append({"raw_register_p25": debug.command("p25"), "process_alive": ares.poll() is None})

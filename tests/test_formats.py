@@ -12,6 +12,7 @@ from textbanks import Bank
 from textcodec import decode, encode, tokenize
 from font import glyph_metrics
 from textvalidate import expanded_bound, signature, validate_entry
+from gc_adapter import adapt_reference, remove_redundant_article_suppression
 
 
 class PatchTests(unittest.TestCase):
@@ -121,6 +122,48 @@ class TextTests(unittest.TestCase):
         validate_entry(b"Yes", b"Certainly!", self.info, "select")
         with self.assertRaisesRegex(ValueError, "10-byte"):
             validate_entry(b"Yes", b"Absolutely!", self.info, "select")
+
+    def test_gc_article_adapter_is_narrow_and_auditable(self):
+        text, changes = remove_redundant_article_suppression("the {cmd:7F74}{cmd:7F26}")
+        self.assertEqual(text, "the {cmd:7F26}")
+        self.assertEqual(len(changes), 1)
+        for text in ("{cmd:7F74}word", "{cmd:7F74}{cmd:7F00}", "{cmd:7F75}{cmd:7F26}"):
+            self.assertEqual(remove_redundant_article_suppression(text), (text, []))
+
+    def test_reference_text_policy_preserves_flow_and_existing_field_sources(self):
+        original = b"Hi\x7f\x1a!\x7f\x04\x7f\x00"
+        replacement = b"Hello!\x7f\x04\x7f\x00"
+        validate_entry(original, replacement, self.info, "message", "reference_text")
+        for changed in (replacement.replace(b"\x7f\x04", b""),
+                        replacement.replace(b"\x7f\x00", b"\x7f\x01")):
+            with self.assertRaisesRegex(ValueError, "signature"):
+                validate_entry(original, changed, self.info, "message", "reference_text")
+        with self.assertRaisesRegex(ValueError, "absent"):
+            validate_entry(original, b"\x7f\x25"+replacement, self.info, "message", "reference_text")
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(b"\x7f\x30"+original, replacement, self.info, "message", "reference_text")
+        with self.assertRaisesRegex(ValueError, "only audited"):
+            validate_entry(original, replacement, self.info, "mail", "reference_text")
+
+    def test_demo_adapter_preserves_n64_arguments_and_gamecube_delivery(self):
+        self.info[9] = (5, 0)
+        source = b"\x7f\x09\x01\x02\x03Hi\x7f\x1a\x7f\x04\x7f\x00"
+        text = "{cmd:7F09010209}Hello\nthere{cmd:7F0305}{cmd:7F04}{cmd:7F00}"
+        adapted, operations = adapt_reference(text, source, self.info, "reference_text")
+        self.assertEqual(adapted, text.replace("7F09010209", "7F09010203"))
+        self.assertEqual(len(operations), 1)
+        validate_entry(source, encode(adapted, self.info), self.info, "message", "reference_text")
+        # A branch mismatch must not be concealed by an animation adaptation.
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(source, encode(adapted.replace("7F00", "7F01"), self.info),
+                           self.info, "message", "reference_text")
+
+    def test_empty_first_edit_cannot_terminate_the_bank(self):
+        bank = Bank("test", 0, 1, b"ab", struct.pack(">3I", 1, 2, 0))
+        with self.assertRaisesRegex(ValueError, "terminator"):
+            bank.rebuild([b"", b"b"])
+        data, table = bank.rebuild([b"a", b""])
+        self.assertEqual(Bank("test", 0, 1, data, table).entries(), [b"a", b""])
 
 
 class RomTests(unittest.TestCase):

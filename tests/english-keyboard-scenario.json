@@ -1,0 +1,35 @@
+[
+  {"wait": 10},
+  {"key": "Return", "duration": 0.3},
+  {"wait": 8},
+  {"repeat": 27, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 5},
+    {"snapshot_message": true}
+  ]},
+  {"capture": "english-keyboard.png"},
+  {"key": "w", "duration": 0.4},
+  {"wait": 1},
+  {"capture": "stick-up.png"},
+  {"repeat": 3, "actions": [
+    {"key": ["w", "a"], "duration": 0.3},
+    {"wait": 1}
+  ]},
+  {"capture": "letters-entered.png"},
+  {"key": "r", "duration": 0.2},
+  {"wait": 1},
+  {"capture": "case-change.png"},
+  {"key": "b", "duration": 0.2},
+  {"wait": 1},
+  {"capture": "delete-letter.png"},
+  {"key": "Return", "duration": 0.2},
+  {"wait": 5},
+  {"capture": "name-confirmed.png"},
+  {"repeat": 5, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 3},
+    {"snapshot_message": true}
+  ]},
+  {"capture": "after-name.png"},
+  {"read": ["80000318", 4], "expect": "00400000"}
+]

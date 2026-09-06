@@ -1,0 +1,14 @@
+[
+  {"wait": 10},
+  {"key": "Return", "duration": 0.3},
+  {"wait": 8},
+  {"capture": "intro.png"},
+  {"repeat": 20, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 5},
+    {"capture": "advance-{index:02d}.png"}
+  ]},
+  {"read": ["80000318", 4], "expect": "00400000"},
+  {"read": ["80065614", 8], "expect": "3C18024027180000"},
+  {"read": ["80142410", 1024]}
+]

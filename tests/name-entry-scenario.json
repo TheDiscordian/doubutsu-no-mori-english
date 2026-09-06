@@ -1,0 +1,35 @@
+[
+  {"wait": 10},
+  {"key": "Return", "duration": 0.3},
+  {"wait": 8},
+  {"repeat": 27, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 5},
+    {"snapshot_message": true}
+  ]},
+  {"capture": "name-before-confirm.png"},
+  {"key": "Return", "duration": 0.2},
+  {"wait": 5},
+  {"capture": "name-after-start.png"},
+  {"key": "j", "duration": 0.2},
+  {"wait": 5},
+  {"capture": "name-after-cdown.png"},
+  {"repeat": 14, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"capture": "travel-{index:02d}.png"}
+  ]},
+  {"key": "Return", "duration": 0.2},
+  {"wait": 5},
+  {"key": "j", "duration": 0.2},
+  {"wait": 5},
+  {"repeat": 18, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"capture": "arrival-{index:02d}.png"}
+  ]},
+  {"read": ["80000318", 4], "expect": "00400000"},
+  {"read": ["80065614", 8], "expect": "3C18024027180000"}
+]

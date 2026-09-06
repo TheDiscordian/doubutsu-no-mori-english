@@ -2,53 +2,67 @@
 
 ## Active work
 
-Expand the text replacement framework, audit runtime buffer limits, match the
-extracted GameCube English script, and identify remaining translation work.
-Line wrapping and paragraph balance are a later polish pass, after text and
-command handling are settled. Preserve explicit page/branch commands during
-reflow; use the proportional glyph metrics for line widths.
+English-first keyboard input, English keyboard graphics and prompts, repeatable
+input tests, and a GameCube-style keyboard design. The wider translation work
+continues with buffer audits, reference matching, and missing-text coverage.
 
-## Complete
+GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
+reference. Do not automatically reflow text to fill a bubble. Deliberate layout
+polish follows translation and command handling. The reported atlas-edge defect
+in `font-halfwidth.png` remains unresolved; font investigation is paused at the
+user's direction. The production build retains the approved spacing metrics.
 
-- Private GitHub repository created and initial documentation pushed.
-- Retail ROM SHA-256 verified; all 3,374 DMA entries extracted without errors.
-- Legacy UPS applied with source, target, and patch CRC validation.
-- Lossless text codec handles Japanese glyphs, Latin glyphs, and command tokens.
-- All extracted text entries and bank tables pass unchanged round trips.
-- Inventory covers 11,752 dialogue entries, 460 choices, 544 entries each in
-  the main mail/header/footer banks, 1,562 strings, five 384-entry NPC mail
-  component banks, and 220 original NPC names.
-- Experimental halfwidth build changes 81 Latin glyphs to at most a 6-pixel advance.
-  Japanese/symbol textures remain identical to the source.
-- Narrow glyphs use ink width plus one spacing pixel: `i`, `I`, `l`, and the
-  apostrophe advance four pixels. Shared drawing/measurement tables agree.
-- Silent isolated ares tests boot the ROM, accept controller input, and render
-  original English K.K. introduction drafts. Message-bank relocation is confirmed
-  by reading the active loader instructions in emulator memory.
-- English GameCube CISO, FST, RARC, and Yaz0 extraction succeeds without expanding
-  the sparse disc. All 16,273 dialogue entries decode without command errors.
-- Exact visible-text matching through the legacy script identifies 9,440 unique
-  GameCube references for N64 dialogue. These remain unapproved candidates.
-- Generated UPS applies directly to the original 16 MiB ROM and reproduces the
-  32 MiB experimental build. No manual ROM extension is needed.
-- Twelve synthetic tests cover corrupt patches, bounds checks, byte order,
-  malformed Yaz0 streams, character collisions, command boundaries, and tables.
-- CIC 6102/7101 checksum independently matches `ipl3checksum` and retail header.
+## Implemented
 
-## Remaining
+- Private GitHub repository, pinned reference sources, and local-only inputs.
+- Verified extraction of all 3,374 retail DMA entries; checksummed UPS generation
+  and application directly to the original 16 MiB ROM.
+- Lossless text codec and unchanged round trips for 29 banks, including dialogue,
+  choices, strings, mail components, NPC names, and fixed-width item-name groups.
+- Proportional Latin rendering for 81 glyphs, at most six pixels advance. Narrow
+  `i`, `I`, `l`, and apostrophe advance four pixels. Japanese glyphs are preserved.
+- Relocatable dialogue and choice banks, guarded loader patches, command checks,
+  source hashes, and conservative runtime expansion bounds.
+- GameCube CISO/FST/RARC/Yaz0 extraction and decoding of all 16,273 main messages.
+  Fixed-width GameCube item and NPC names are also extracted as local references.
+- Reference import retains GameCube presentation commands and restores matching
+  N64 actor-demo arguments. Read-only text insertions may differ only when the
+  N64 message already supplies the requested fields. Flow commands stay ordered.
+- English-first native keyboard, translated name-entry prompts and ten texture
+  labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
+- Silent isolated ares test runner, debugger memory assertions, controller input,
+  repeated scenarios, and incremental message-state recording.
+- 31 passing synthetic and retail-input tests. Retail tests require the local ROM.
 
-- Expand text banks and audit per-entry runtime buffer limits.
-- Add fixed-width item names, embedded UI strings, graphics, and credits to inventory.
-- Audit text coverage, crashes, menu constraints, and save compatibility.
-- Improve GameCube matching and audit every reused entry against N64 semantics.
-- Translate and review all remaining text and graphics.
-- Polish line wrapping, page balance, punctuation, and text alignment using the
-  final glyph widths; do not conflate this with translation completeness.
-- Complete silent emulator regressions and an original hardware test matrix.
-- Prepare a patch-only public release after validation and provenance review.
+## Current reference candidates
 
-## Release status
+The generated pilot contains 8,902 edits. These are candidates, not a claim of
+reviewed translation coverage. Accepted reference imports comprise 8,301 dialogue
+entries, 221 choices, and 376 string/mail-component entries, plus four original
+introductory drafts. Three draft IDs override reference selection.
 
-No release candidate exists. `build/halfwidth/animal-forest-halfwidth.z64` is an
-experimental renderer build with Japanese text. Original hardware validation is
-outstanding. Legacy ASCII-looking text is only a candidate, not reviewed English.
+Main dialogue still has 3,448 rejected entries. Principal reasons are unconfirmed
+same-ID matching (1,854), flow/control mismatches (1,251), new text fields (143),
+unsupported GameCube commands, and two expansion-bound failures. Another 996
+accepted dialogue candidates have conservative layout warnings. Entry-level
+rejection and adaptation reports are generated in `build/candidates/`.
+
+238 choices exceed the unchanged ten-byte runtime buffer. Extending ROM storage
+does not fix that buffer. General strings, mail, saved names, dates, and item
+names have separate restrictions. Unsafe legacy item-name mappings are withheld.
+
+## Validation and release status
+
+Silent emulator runs confirm a four-MiB configuration, active relocated text
+loaders, intro dialogue, and arrival at the name-entry editor. The English
+keyboard's full input regression is in progress. No hardware-certified build or
+release candidate exists. Save/reload, travel, mail, board, RTC, calendar, credits,
+seasonal events, and original hardware tests remain outstanding.
+
+The GameCube-style grid is a separate implementation task; the current keyboard
+still uses the N64 radial layout. See [keyboard design](../specs/KEYBOARD.md),
+[validation](VALIDATION.md), and [build instructions](BUILDING.md).
+
+Public release requires completed translation review, stability testing,
+original-hardware results, and third-party provenance review. Only patches and
+original tooling may be published; ROMs and extracted assets stay local.

@@ -11,6 +11,7 @@ from font import ATLAS_OFFSET, ATLAS_SIZE, FONT_VROM, make_halfwidth, pixels, pn
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import validate_entry
+from keyboard import make_english_keyboard
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -77,10 +78,15 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--translations", type=Path)
+    parser.add_argument("--english-keyboard", action="store_true")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     replacements, report = make_halfwidth(rom)
+    if args.english_keyboard:
+        info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+        keyboard, report["keyboard"] = make_english_keyboard(rom, info, report["advance_by_glyph"])
+        replacements.update(keyboard)
     report["translation_edits"], relocations = apply_translations(rom, replacements, args.translations)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations)

@@ -72,6 +72,15 @@ class Disc:
         if u32(self.header, 0x1C) != 0xC2339F3D:
             raise ValueError("Not a GameCube disc")
 
+    def close(self):
+        self.file.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
     def read(self, offset, size):
         if offset < 0 or size < 0 or size > 64*1024*1024:
             raise ValueError("Invalid disc read bounds")
@@ -103,8 +112,10 @@ class Disc:
     def files(self):
         offset, size = struct.unpack_from(">2I", self.header, 0x424)
         fst = self.read(offset, size)
+        if len(fst) < 12 or fst[0] != 1:
+            raise ValueError("Invalid FST root")
         count = u32(fst, 8)
-        if count*12 > len(fst):
+        if count < 1 or count*12 > len(fst):
             raise ValueError("Invalid FST entry count")
         names = fst[count*12:]
         stack, result = [(count, PurePosixPath())], []
@@ -116,10 +127,13 @@ class Disc:
             if at >= len(names) or b"\0" not in names[at:]:
                 raise ValueError("Invalid FST name offset")
             name = names[at:names.index(0, at)].decode("ascii")
-            if name in (".", "..") or "/" in name or "\\" in name:
+            if not name or name in (".", "..") or "/" in name or "\\" in name:
                 raise ValueError("Unsafe FST path")
             path = stack[-1][1] / name
-            if kind_name >> 24:
+            kind = kind_name >> 24
+            if kind not in (0, 1):
+                raise ValueError("Unknown FST entry kind")
+            if kind:
                 if not i < length <= stack[-1][0]:
                     raise ValueError("Invalid FST directory range")
                 stack.append((length, path))
@@ -158,6 +172,7 @@ def main():
                 entry["decoded_size"] = len(unpacked)
     report = {"disc_id": disc.header[:6].decode("ascii"), "revision": disc.header[7],
               "container_sha256": sha256(args.disc.read_bytes()), "files": files}
+    disc.close()
     (args.output / "disc.json").write_text(json.dumps(report, indent=2)+"\n")
     print(json.dumps({"disc_id": report["disc_id"], "revision": report["revision"],
                       "files": len(files), "output": str(args.output)}, indent=2))

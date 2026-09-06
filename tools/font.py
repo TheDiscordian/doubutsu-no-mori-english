@@ -35,6 +35,26 @@ def glyph_metrics(glyph):
     return left, right, ink_width, advance
 
 
+def resize_glyph(glyph, left_padding=0):
+    """Resample inside one cell; padding never changes the advance width."""
+    if left_padding not in (0, 1):
+        raise ValueError("Unsupported glyph padding")
+    left, right, target_width, advance = glyph_metrics(glyph)
+    width = right-left
+    result = []
+    for row in glyph:
+        out = [0]*12
+        for dx in range(target_width):
+            total = 0
+            for sx in range(width):
+                overlap = max(0, min((dx+1)*width, (sx+1)*target_width)
+                              - max(dx*width, sx*target_width))
+                total += row[left+sx]*overlap
+            out[left_padding+dx] = (total+width//2)//width
+        result.append(out)
+    return result, advance
+
+
 def png_gray(width, height, values):
     def chunk(kind, content):
         return (struct.pack(">I", len(content)) + kind + content +
@@ -45,7 +65,7 @@ def png_gray(width, height, values):
             chunk(b"IDAT", zlib.compress(scanlines)) + chunk(b"IEND", b""))
 
 
-def make_halfwidth(rom):
+def make_halfwidth(rom, left_padding=0):
     files = by_vrom(rom)
     code = bytearray(files[CODE_VROM].extract(rom))
     font = bytearray(files[FONT_VROM].extract(rom))
@@ -60,19 +80,8 @@ def make_halfwidth(rom):
     advances = {}
     for char in sorted(LATIN):
         glyph = get_glyph(original, char)
-        left, right, target_width, advance = glyph_metrics(glyph)
-        width = right-left
-        for y, row in enumerate(glyph):
-            out = [0]*12
-            # Area coverage preserves thin strokes while reducing to five ink
-            # columns plus one spacing column. The 12x16 storage cell remains.
-            for dx in range(target_width):
-                total = 0
-                for sx in range(width):
-                    overlap = max(0, min((dx+1)*width, (sx+1)*target_width)
-                                  - max(dx*width, sx*target_width))
-                    total += row[left+sx]*overlap
-                out[dx] = (total+width//2)//width
+        resized, advance = resize_glyph(glyph, left_padding)
+        for y, out in enumerate(resized):
             start = (char//16*16+y)*192+char%16*12
             atlas[start:start+12] = out
         code[WIDTH_TABLE+char] = 12-advance
@@ -85,5 +94,6 @@ def make_halfwidth(rom):
     return {CODE_VROM: bytes(code), FONT_VROM: bytes(font)}, {
         "latin_glyphs": len(LATIN), "advance_pixels_max": 6, "ink_columns_max": 5,
         "advance_by_glyph": advances,
+        "left_padding_pixels": left_padding,
         "storage_cell": [12, 16], "japanese_glyphs_unchanged": True,
         "width_branch_ram": "0x80090294", "width_table_ram": "0x80106AF4"}
