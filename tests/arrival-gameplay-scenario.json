@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"repeat": 20, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"snapshot_choices": true},
+    {"capture": "arrival-gameplay-{index:02d}.png"}
+  ]},
+  {"read": ["80000318", 4], "expect": "00400000"},
+  {"save_state": true}
+]

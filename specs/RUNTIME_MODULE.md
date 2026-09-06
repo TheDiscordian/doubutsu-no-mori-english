@@ -33,6 +33,9 @@ framebuffer at the top of RAM does not overlap this bottom-of-heap reservation.
 The linker rejects code, constants, or BSS reaching the guard. The DMA file is
 zero-padded to the entire reservation, so BSS starts cleared. Runtime startup
 records the old/new heap bounds and guard values for debugger assertions.
+Its header also describes the linked twenty-byte choice capacity and thirty-two
+byte row stride. Choice storage is part of the linked BSS, not a second heap
+reservation. See [choice storage](ENGLISH_RUNTIME.md) for the complete contract.
 
 ## Bootstrap and watchdog preservation
 

@@ -9,9 +9,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from build import apply_translations
-from english_runtime import (CHOICE_ROWS, CHOICE_SELECTED, GuardedCode, PLAYER_SELECT_RAM,
+from english_runtime import (CHOICE_ROWS, CHOICE_SELECTED, ChoiceLayout, GuardedCode, PLAYER_SELECT_RAM,
                              PLAYER_SELECT_VROM, QUEST_RAM, QUEST_VROM, TOWN_RETURN,
                              WIDTH_CODE, make_english_runtime, verify_english_runtime)
+from runtime_module import add_runtime_module
 from font import make_halfwidth
 from textbanks import banks
 from textcodec import command_info, tokenize
@@ -50,6 +51,19 @@ class RuntimeGuardTests(unittest.TestCase):
                 validate_entry(data, data, info, "select", choice_bytes=16)
         with self.assertRaisesRegex(ValueError, "Unsupported"):
             validate_entry(b"A", b"B", info, "select", choice_bytes=64)
+        validate_entry(b"A", b"A"*20, info, "select", choice_bytes=20, resident_runtime=True)
+        with self.assertRaisesRegex(ValueError, "20-byte"):
+            validate_entry(b"A", b"A"*21, info, "select", choice_bytes=20, resident_runtime=True)
+        with self.assertRaisesRegex(ValueError, "Unsupported"):
+            validate_entry(b"A", b"A"*20, info, "select", choice_bytes=20)
+        with self.assertRaisesRegex(ValueError, "plain text"):
+            validate_entry(b"\x7f\x1a", b"\x7f\x1a", info, "select", choice_bytes=20, resident_runtime=True)
+
+    def test_invalid_resident_layouts(self):
+        for values in ((20, 20, 0x80196000, 0x80196080), (20, 32, 0x80196001, 0x80196081),
+                       (20, 32, 0x80198840, 0x801988C0), (20, 32, 0x80096000, 0x80096080)):
+            with self.assertRaisesRegex(ValueError, "layout"):
+                ChoiceLayout(*values)
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM is a local-only optional test input")
@@ -115,3 +129,46 @@ class RuntimeRetailTests(unittest.TestCase):
     def test_double_application_rejected(self):
         with self.assertRaisesRegex(ValueError, "instruction guard"):
             make_english_runtime(self.rom, self.runtime)
+
+    def test_twenty_byte_frames_strides_and_loader(self):
+        layout = ChoiceLayout(20, 32, 0x80196000, 0x80196080)
+        runtime, report = make_english_runtime(self.rom, self.font, layout)
+        self.assertEqual(report["largest_added_stack_bytes"], 40)
+        def word(vrom, ram, address):
+            return struct.unpack_from(">I", runtime[vrom], address-ram)[0]
+        for vrom, ram, pairs in (
+            (CODE_VROM, CODE_RAM, ((0x800A0F14, 0x26310020), (0x80066D00, 0x26B50020),
+                                 (0x80065204, 0x0009C140), (0x80066150, 0x24850080),
+                                 (0x80065D90, 0x27BDFF90), (0x80065E18, 0x27A40048),
+                                 (0x80065E1C, 0x8FA30068))),
+            (QUEST_VROM, QUEST_RAM, ((0x80955814, 0x27BDFF28), (0x8095593C, 0x27BD00D8),
+                                    (0x80955880, 0x0018C080), (0x80955884, 0x00084080))),
+            (PLAYER_SELECT_VROM, PLAYER_SELECT_RAM,
+             ((0x809BF244, 0x27BDFF50), (0x809BF3D8, 0x27BD00B0),
+              (0x809BF3E4, 0x27BDFF58), (0x809BF4B4, 0x27BD00A8),
+              (0x809BF264, 0xAFA200AC), (0x809BF404, 0xAFA200A4))),
+        ):
+            for address, expected in pairs:
+                self.assertEqual(word(vrom, ram, address), expected, f"{address:08X}")
+        # Staging ends before the live length temporary for every ROM alignment.
+        self.assertTrue(all(((offset+20+7) & ~7) <= 0x68-0x48 for offset in range(8)))
+        verify_english_runtime(self.rom, runtime, layout)
+        with self.assertRaisesRegex(ValueError, "Missing English runtime"):
+            verify_english_runtime(self.rom, runtime)
+
+    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(), "Build resident module first")
+    def test_resident_choice_capability_requires_both_patch_sets(self):
+        directory = ROOT/"build/runtime-module"
+        replacements = dict(self.font)
+        additions, report = add_runtime_module(self.rom, replacements, directory)
+        layout = ChoiceLayout(**report["choice_layout"])
+        with self.assertRaisesRegex(ValueError, "English runtime"):
+            apply_translations(self.rom, replacements, None, english_runtime=True,
+                               runtime_module=directory, module_additions=additions)
+        runtime, _ = make_english_runtime(self.rom, replacements, layout)
+        replacements.update(runtime)
+        apply_translations(self.rom, replacements, None, english_runtime=True,
+                           runtime_module=directory, module_additions=additions)
+        with self.assertRaisesRegex(ValueError, "complete resident"):
+            apply_translations(self.rom, replacements, None, english_runtime=True,
+                               runtime_module=directory, module_additions={})

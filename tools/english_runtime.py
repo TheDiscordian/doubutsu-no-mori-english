@@ -1,5 +1,6 @@
-"""Guarded sixteen-byte choice runtime and English town-name substitution."""
+"""Guarded English choice runtimes and town-name substitution."""
 
+from dataclasses import dataclass
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
@@ -20,6 +21,34 @@ WIDTH_CODE = bytes.fromhex(
     "0262082A1020000226100004004098252652FFFF1640FFF62631001002601025"
     "8FBF00248FB000208FB1001C8FB200188FB3001403E0000827BD00280000000000000000")
 TOWN_RETURN = bytes.fromhex("8FA200548FBF00248FB0002003E0000827BD0058")
+
+
+@dataclass(frozen=True)
+class ChoiceLayout:
+    capacity: int = 16
+    stride: int = 16
+    rows: int = CHOICE_ROWS
+    selected: int = CHOICE_SELECTED
+
+    def __post_init__(self):
+        if (self.capacity, self.stride, self.rows, self.selected) == (16, 16, CHOICE_ROWS, CHOICE_SELECTED):
+            return
+        if (self.capacity != 20 or self.stride != 32 or self.rows % 32
+                or not 0x80194BE0 <= self.rows < self.selected
+                or self.selected != self.rows+128 or self.selected+32 > 0x801988D0):
+            raise ValueError("Unsupported English choice storage layout")
+
+
+def split_address(address):
+    return ((address+0x8000) >> 16) & 0xFFFF, address & 0xFFFF
+
+
+def width_code(layout=ChoiceLayout()):
+    code = bytearray(WIDTH_CODE)
+    high, low = split_address(layout.rows)
+    struct.pack_into(">2I", code, 32, 0x3C110000 | high, 0x26310000 | low)
+    struct.pack_into(">I", code, 88, 0x26310000 | layout.stride)
+    return bytes(code)
 
 
 class GuardedCode:
@@ -81,54 +110,65 @@ class GuardedCode:
             raise ValueError("Missing English choice stack-frame adjustments")
 
 
-def patch_main(code):
+def patch_main(code, layout):
+    cap, stride = layout.capacity, layout.stride
+    high, low = split_address(layout.rows)
+    selected_high, selected_low = split_address(layout.selected)
+    shift = 4 if stride == 16 else 5
     code.write(0x8009F4A4, TOWN_RETURN+b" "*80+bytes(4))
-    code.write(0x80065348, WIDTH_CODE)
+    code.write(0x80065348, width_code(layout))
     # Add and set: preserve the Choice structure and its length array.
     for address in (0x800651C0, 0x800652AC, 0x800652D4, 0x800652FC, 0x80065324, 0x80065604):
-        code.immediate(address, 11, 17)
+        code.immediate(address, 11, cap+1)
     for address, before, after in (
-        (0x80065204, 0x0009C080, 0x0009C100),  # row * 16
-        (0x80065208, 0x0309C021, 0x3C03800A),
-        (0x8006520C, 0x0018C040, 0x2463F4B8),
+        (0x80065204, 0x0009C080, 0x0009C000 | shift << 6),
+        (0x80065208, 0x0309C021, 0x3C030000 | high),
+        (0x8006520C, 0x0018C040, 0x24630000 | low),
         (0x80065210, 0x00D81821, 0x00781821),
         (0x8006521C, 0x24630034, 0),
-        (0x80066144, 0x24E5006C, 0x3C04800A),
-        (0x80066148, 0x00037080, 0x2484F4B8),
-        (0x8006614C, 0x01C37021, 0x00037100),
-        (0x80066150, 0x000E7040, 0x24850040),
+        (0x80066144, 0x24E5006C, 0x3C040000 | high),
+        (0x80066148, 0x00037080, 0x24840000 | low),
+        (0x8006614C, 0x01C37021, 0x00037000 | shift << 6),
+        (0x80066150, 0x000E7040, 0x24850000 | 4*stride),
         (0x80066154, 0x00EE2021, 0x008E2021),
         (0x80066158, 0x24840034, 0),
         # t9 already holds the selected row's length pointer on the first
         # iteration. Reload it in the existing loop's branch delay slot.
-        (0x80066C38, 0x26150034, 0x3C15800A),
-        (0x80066C3C, 0x02008825, 0x26B5F4B8),
+        (0x80066C38, 0x26150034, 0x3C150000 | high),
+        (0x80066C3C, 0x02008825, 0x26B50000 | low),
         (0x80066C40, 0x8FAA009C, 0x02008825),
         (0x80066C4C, 0x162A0015, 0x16390015),
         (0x80066D08, 0x8FAA009C, 0x8FB9009C),
-        (0x8009F3FC, 0x8FA50030, 0x3C05800A),
-        (0x8009F410, 0x24A5021C, 0x24A5F4F8),
+        (0x8009F3FC, 0x8FA50030, 0x3C050000 | selected_high),
+        (0x8009F410, 0x24A5021C, 0x24A50000 | selected_low),
     ):
         code.instruction(address, before, after)
     for address in (0x80065DD0, 0x80065E20, 0x80065E34, 0x80065E74,
                     0x80065EA8, 0x80065EB0, 0x80065EBC, 0x8006615C,
-                    0x80066D00, 0x800A0F14, 0x800A0F58, 0x800A0F5C,
+                    0x800A0F58, 0x800A0F5C,
                     0x800A0F60, 0x800A0F7C):
-        code.immediate(address, 10, 16)
+        code.immediate(address, 10, cap)
+    code.immediate(0x80066D00, 10, stride)
+    code.immediate(0x800A0F14, 10, stride)
     # Main message staging may share rows: SetChoiceData copies each row to
     # itself, without a prior clear. The selected-answer buffer is separate.
     for address in (0x800A0EDC, 0x800A0F24, 0x800A0F3C, 0x800A0F50, 0x800A0F54):
-        code.immediate(address, 0x8014, 0x800A)
+        # These pointers use signed low immediates; each row is checked below.
+        code.immediate(address, 0x8014, high)
     for address, before, after in (
-        (0x800A0EEC, 0x2700, 0xF4B8), (0x800A0F2C, 0x2714, 0xF4D8),
-        (0x800A0F44, 0x271E, 0xF4E8), (0x800A0F70, 0x270A, 0xF4C8),
-        (0x800A0F74, 0x2700, 0xF4B8),
+        (0x800A0EEC, 0x2700, 0), (0x800A0F2C, 0x2714, 2),
+        (0x800A0F44, 0x271E, 3), (0x800A0F70, 0x270A, 1),
+        (0x800A0F74, 0x2700, 0),
     ):
-        code.immediate(address, before, after)
+        row_high, row_low = split_address(layout.rows+after*stride)
+        if row_high != high:
+            raise ValueError("Choice rows cross a signed address boundary")
+        code.immediate(address, before, row_low)
 
 
-def patch_quest(code):
-    code.grow_stack(0x80955814, 0x80955940, 176, 0xAC)
+def patch_quest(code, layout):
+    cap = layout.capacity
+    code.grow_stack(0x80955814, 0x80955940, 176, 0xAC, growth=4*(cap-10))
     for address, before, after in (
         (0x80955870, 0x0011C080, 0x0011C100),
         (0x80955874, 0x00114080, 0x00114100),
@@ -137,24 +177,30 @@ def patch_quest(code):
         (0x80955880, 0x0018C040, 0),
         (0x80955884, 0x00084040, 0),
     ):
-        code.instruction(address, before, after)
+        if cap == 16:
+            code.instruction(address, before, after)
+    if cap == 20:
+        # Existing (row*4 + row)*2 becomes (row*4 + row)*4.
+        code.instruction(0x80955880, 0x0018C040, 0x0018C080)
+        code.instruction(0x80955884, 0x00084040, 0x00084080)
     for address in (0x809558E0, 0x809558E4, 0x809558E8, 0x80955900):
-        code.immediate(address, 10, 16)
+        code.immediate(address, 10, cap)
 
 
-def patch_player_select(code):
-    code.grow_stack(0x809BF244, 0x809BF3E4, 136, 0x84)
-    code.grow_stack(0x809BF3E4, 0x809BF4C0, 128, 0x7C)
+def patch_player_select(code, layout):
+    cap = layout.capacity
+    code.grow_stack(0x809BF244, 0x809BF3E4, 136, 0x84, growth=4*(cap-10))
+    code.grow_stack(0x809BF3E4, 0x809BF4C0, 128, 0x7C, growth=4*(cap-10))
     for address in (0x809BF0B4, 0x809BF170, 0x809BF39C, 0x809BF3A0,
                     0x809BF3A4, 0x809BF3C0, 0x809BF478, 0x809BF47C,
                     0x809BF480, 0x809BF498):
-        code.immediate(address, 10, 16)
+        code.immediate(address, 10, cap)
     for address in (0x809BF26C, 0x809BF40C):
-        code.immediate(address, 40, 64)
+        code.immediate(address, 40, 4*cap)
     for address, before, after in (
-        (0x809BF218, 20, 32), (0x809BF230, 30, 48),
-        (0x809BF41C, 0x5E, 0x64), (0x809BF420, 0x68, 0x74),
-        (0x809BF424, 0x72, 0x84),
+        (0x809BF218, 20, 2*cap), (0x809BF230, 30, 3*cap),
+        (0x809BF41C, 0x5E, 0x54+cap), (0x809BF420, 0x68, 0x54+2*cap),
+        (0x809BF424, 0x72, 0x54+3*cap),
     ):
         code.immediate(address, before, after)
     for address, before, after in (
@@ -165,28 +211,34 @@ def patch_player_select(code):
         (0x809BF31C, 0x0310C021, 0),
         (0x809BF320, 0x0018C040, 0),
     ):
-        code.instruction(address, before, after)
+        if cap == 16:
+            code.instruction(address, before, after)
+    if cap == 20:
+        code.instruction(0x809BF314, 0x00084040, 0x00084080)
+        code.instruction(0x809BF320, 0x0018C040, 0x0018C080)
 
 
-def make_english_runtime(rom, replacements):
+def make_english_runtime(rom, replacements, layout=ChoiceLayout()):
     files, result, reports = by_vrom(rom), {}, {}
     for vrom, ram, patcher in ((CODE_VROM, CODE_RAM, patch_main),
                                (QUEST_VROM, QUEST_RAM, patch_quest),
                                (PLAYER_SELECT_VROM, PLAYER_SELECT_RAM, patch_player_select)):
         original = files[vrom].extract(rom)
         code = GuardedCode(original, replacements.get(vrom, original), ram, SOURCE_HASHES[vrom])
-        patcher(code)
+        patcher(code, layout)
         result[vrom] = bytes(code.data)
         reports[f"{vrom:08X}"] = {"size": len(code.data), "changes": code.changes}
-    return result, {"choice_bytes": CHOICE_BYTES, "choice_rows_ram": f"{CHOICE_ROWS:08X}",
-                    "choice_selected_ram": f"{CHOICE_SELECTED:08X}",
+    return result, {"choice_bytes": layout.capacity, "choice_row_stride": layout.stride,
+                    "choice_rows_ram": f"{layout.rows:08X}",
+                    "choice_selected_ram": f"{layout.selected:08X}",
                     "town_suffix": "none", "extra_permanent_ram": 0,
-                    "largest_added_stack_bytes": 24, "files": reports}
+                    "resident_storage_bytes": 160 if layout.capacity == 20 else 0,
+                    "largest_added_stack_bytes": 4*(layout.capacity-10), "files": reports}
 
 
-def verify_english_runtime(rom, replacements):
+def verify_english_runtime(rom, replacements, layout=ChoiceLayout()):
     """Capacity opt-in requires every runtime/actor patch, not just a flag."""
-    expected, report = make_english_runtime(rom, {})
+    expected, report = make_english_runtime(rom, {}, layout)
     bases = {CODE_VROM: CODE_RAM, QUEST_VROM: QUEST_RAM, PLAYER_SELECT_VROM: PLAYER_SELECT_RAM}
     for key, file in report["files"].items():
         vrom = int(key, 16)

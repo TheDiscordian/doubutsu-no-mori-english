@@ -11,3 +11,7 @@
 .word 0          # New heap base
 .word 0          # New heap size
 .word 0          # Initialization count
+.word 20         # Plain choice capacity
+.word 32         # Resident row stride
+.word af_choice_storage
+.word af_choice_storage + 128

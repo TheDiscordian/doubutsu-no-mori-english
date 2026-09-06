@@ -31,8 +31,11 @@ def main():
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+    choice_bytes = 16 if args.english_runtime else 10
     if args.runtime_module:
-        add_runtime_module(rom, {}, args.runtime_module)
+        _, module_report = add_runtime_module(rom, {}, args.runtime_module)
+        if args.english_runtime:
+            choice_bytes = module_report["choice_layout"]["capacity"]
         info = module_command_info(rom)
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
@@ -65,7 +68,7 @@ def main():
                                                             resident_runtime=bool(args.runtime_module))
                         candidate = encode(text, info)
                         validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=16 if args.english_runtime else 10,
+                                       choice_bytes=choice_bytes,
                                        resident_runtime=bool(args.runtime_module))
                     except ValueError as exc:
                         if name != "message" or str(exc) != "Control signature changed":
@@ -75,7 +78,7 @@ def main():
                                                             resident_runtime=bool(args.runtime_module))
                         candidate = encode(text, info)
                         validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=16 if args.english_runtime else 10,
+                                       choice_bytes=choice_bytes,
                                        resident_runtime=bool(args.runtime_module))
                 except ValueError as exc:
                     reason = str(exc)

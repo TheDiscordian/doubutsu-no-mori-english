@@ -4,6 +4,12 @@
 .set noat
 .section .patch,"ax",@progbits
 .balign 4
+.ifndef choice_rows
+.set choice_rows, 0x8009f4b8
+.endif
+.ifndef choice_stride
+.set choice_stride, 16
+.endif
     addiu $sp, $sp, -40
     sw $ra, 36($sp)
     sw $s0, 32($sp)
@@ -12,8 +18,8 @@
     sw $s3, 20($sp)
     lw $s2, 0x7c($a0)
     addiu $s0, $a0, 0x5c
-    lui $s1, 0x800a
-    addiu $s1, $s1, -2888 # 0x8009f4b8
+    lui $s1, %hi(choice_rows)
+    addiu $s1, $s1, %lo(choice_rows)
     blez $s2, done
     or $s3, $zero, $zero
 row:
@@ -28,7 +34,7 @@ row:
 next:
     addiu $s2, $s2, -1
     bne $s2, $zero, row
-    addiu $s1, $s1, 16
+    addiu $s1, $s1, choice_stride
 done:
     or $v0, $s3, $zero
     lw $ra, 36($sp)

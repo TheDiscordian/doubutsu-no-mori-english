@@ -24,7 +24,9 @@ def validate(directory):
     checks["three_long_choices"] = any(sum(n > 10 for n in r["choice_lengths"]) >= 3 for r in choices)
     checks["choice_dimensions"] = bool(choices) and all(
         0 <= r["choice_count"] <= 4 and len(r["choice_hex"]) == r["choice_count"]
-        and all(len(bytes.fromhex(s)) == n <= 16 for s, n in zip(r["choice_hex"], r["choice_lengths"]))
+        and r.get("choice_capacity", 16) in (16, 20)
+        and all(len(bytes.fromhex(s)) == n <= r.get("choice_capacity", 16)
+                for s, n in zip(r["choice_hex"], r["choice_lengths"]))
         for r in choices)
     for label, value in (("player", "434343434343"), ("town", "414141414141")):
         checks[label+"_six_character_entry"] = any(r.get("text_hex") == value and r.get("length") == 6

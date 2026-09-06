@@ -6,7 +6,7 @@ import re
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, dma_entries, sha256
-from english_runtime import GuardedCode, SOURCE_HASHES
+from english_runtime import ChoiceLayout, GuardedCode, SOURCE_HASHES
 from textcodec import command_info
 
 MODULE_RAM = 0x801948E0
@@ -131,6 +131,12 @@ def add_runtime_module(rom, replacements, directory):
         raise ValueError("Invalid resident-module linked size or zero padding")
     if data[0x100:0x2F0] != watchdog_bytes(rom):
         raise ValueError("Resident module does not preserve the watchdog")
+    layout = ChoiceLayout(*struct.unpack_from(">4I", data, 40))
+    storage = int(report["symbols"]["af_choice_storage"], 16)
+    if layout.rows != storage or layout.selected+32 > MODULE_RAM+used:
+        raise ValueError("Resident choice storage is outside linked module data")
+    report["choice_layout"] = {"capacity": layout.capacity, "stride": layout.stride,
+                               "rows": layout.rows, "selected": layout.selected}
     original = by_vrom(rom)[CODE_VROM].extract(rom)
     code = GuardedCode(original, replacements.get(CODE_VROM, original), CODE_RAM, SOURCE_HASHES[CODE_VROM])
     jump = struct.pack(">4I", 0x08000000 | ((WATCHDOG_COPY & 0x0FFFFFFF) >> 2), 0, 0, 0)

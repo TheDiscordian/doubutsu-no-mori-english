@@ -48,7 +48,7 @@ def expanded_bound(data, info):
 
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False):
-    if choice_bytes not in (10, 16):
+    if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
     if resident_runtime:
         hour_seen = False
@@ -79,7 +79,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
     elif bank == "select":
         if len(replacement) > choice_bytes:
             raise ValueError(f"Choice exceeds {'retail ' if choice_bytes == 10 else ''}{choice_bytes}-byte buffer")
-        if choice_bytes == 16 and any(t.kind != "text" for t in tokenize(replacement, info)):
+        if choice_bytes > 10 and any(t.kind != "text" for t in tokenize(replacement, info)):
             raise ValueError("Expanded choice runtime requires plain text")
         # Choice substitution has a separate 10-byte destination. Until its
         # complete expansion proof exists, dynamic edits may not grow.

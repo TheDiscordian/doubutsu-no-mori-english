@@ -10,11 +10,21 @@ struct ModuleHeader {
     u32 ready, original_heap, original_size, heap, heap_size, initializations;
 };
 
+struct ChoiceStorage {
+    unsigned char rows[4][32];
+    unsigned char selected[32];
+};
+struct ChoiceStorage af_choice_storage __attribute__((aligned(32)));
+
 __attribute__((section(".text.af_runtime_init")))
 void af_runtime_init(u32 original_heap, u32 original_size) {
     volatile struct ModuleHeader *header = (void *)MODULE_RAM;
     volatile u32 *guard = (void *)(MODULE_RAM + RESERVATION - 16);
     unsigned int i;
+
+    for (i = 0; i < sizeof(af_choice_storage); ++i) {
+        ((unsigned char *)&af_choice_storage)[i] = ' ';
+    }
 
     header->original_heap = original_heap;
     header->original_size = original_size;

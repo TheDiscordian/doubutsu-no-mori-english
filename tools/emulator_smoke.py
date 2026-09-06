@@ -55,7 +55,7 @@ class RSP:
         """
         address = int(address, 16)
         arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
-        if (address % 4 or not 0x80051A80 <= address < 0x801968E0 or len(arguments) > 4
+        if (address % 4 or not 0x80051A80 <= address < 0x801968E0 or len(arguments) > 9
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
             raise ValueError("Invalid test function or o32 arguments")
         self.command("?")
@@ -67,8 +67,13 @@ class RSP:
         if len(before) != 71*16 or int(before[:16], 16):
             raise ValueError("Unknown debugger bulk register layout")
         registers = [int(before[i:i+16], 16) for i in range(0, len(before), 16)]
-        expected = dict(zip(range(4, 4+len(arguments)), arguments))
-        expected.update({29: 0x801988C0, 31: 0x801968E0, 37: address})
+        stack = 0x80198880
+        expected = dict(zip(range(4, 8), arguments[:4]))
+        expected.update({29: stack, 31: 0x801968E0, 37: address})
+        if len(arguments) > 4:
+            outgoing = b"".join(struct.pack(">I", value) for value in arguments[4:])
+            if self.command(f"M{stack+16:x},{len(outgoing):x}:{outgoing.hex()}") != "OK":
+                raise ValueError("Debugger rejected test stack arguments")
         for index, value in expected.items():
             registers[index] = value | (0xFFFFFFFF00000000 if value & 0x80000000 else 0)
         breakpoint = "0,801968e0,4"
@@ -85,7 +90,7 @@ class RSP:
             values = [int(after[i:i+16], 16) for i in range(0, len(after), 16)]
             if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != 0x801968E0:
                 raise ValueError(f"Test function stopped unexpectedly: {stopped}, PC={values[37]:016X}")
-            if values[29] & 0xFFFFFFFF != 0x801988C0:
+            if values[29] & 0xFFFFFFFF != stack:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
                     "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": "801968E0",
@@ -188,18 +193,28 @@ def keyboard_snapshot(debug):
 
 def choice_snapshot(debug):
     """Read the opt-in English runtime's singleton choice window and rows."""
-    from english_runtime import CHOICE_ROWS, CHOICE_SELECTED
+    from english_runtime import ChoiceLayout, split_address
+    layout = ChoiceLayout()
+    header = bytes.fromhex(debug.command("m801948e0,38"))
+    if header[:4] == b"AFRT" and header[40:44] == bytes.fromhex("00000014"):
+        candidate = ChoiceLayout(*struct.unpack_from(">4I", header, 40))
+        high, low = split_address(candidate.rows)
+        # A module can be built without enabling the expanded choice patches.
+        instructions = struct.pack(">2I", 0x3C030000 | high, 0x24630000 | low)
+        if bytes.fromhex(debug.command("m80065208,8")) == instructions:
+            layout = candidate
     state = bytes.fromhex(debug.command("m801425c0,bc"))
     lengths = list(struct.unpack_from(">4i", state, 0x5C))
     selected_length, count, last_selected, cursor = struct.unpack_from(">4i", state, 0x78)
-    if (not 0 <= count <= 4 or not 0 <= selected_length <= 16
-            or any(not 0 <= n <= 16 for n in lengths[:count])):
+    if (not 0 <= count <= 4 or not 0 <= selected_length <= layout.capacity
+            or any(not 0 <= n <= layout.capacity for n in lengths[:count])):
         raise ValueError("Invalid expanded choice dimensions")
-    rows = bytes.fromhex(debug.command(f"m{CHOICE_ROWS:x},40"))
-    selected = bytes.fromhex(debug.command(f"m{CHOICE_SELECTED:x},10"))
+    rows = bytes.fromhex(debug.command(f"m{layout.rows:x},{4*layout.stride:x}"))
+    selected = bytes.fromhex(debug.command(f"m{layout.selected:x},{layout.capacity:x}"))
     return {"choice_count": count, "choice_lengths": lengths[:count],
-            "choice_hex": [rows[i*16:i*16+lengths[i]].hex() for i in range(count)],
-            "selected_length": selected_length, "selected_hex": selected[:max(0, min(16, selected_length))].hex(),
+            "choice_capacity": layout.capacity, "choice_stride": layout.stride,
+            "choice_hex": [rows[i*layout.stride:i*layout.stride+lengths[i]].hex() for i in range(count)],
+            "selected_length": selected_length, "selected_hex": selected[:selected_length].hex(),
             "last_selected": last_selected, "choice_cursor": cursor,
             "choice_state": struct.unpack_from(">i", state, 0x9C)[0]}
 

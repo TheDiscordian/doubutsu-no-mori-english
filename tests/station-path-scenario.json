@@ -1,0 +1,15 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 1.4},
+  {"key": "s", "duration": 4},
+  {"wait": 2},
+  {"capture": "station-path.png"},
+  {"repeat": 10, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"snapshot_choices": true},
+    {"capture": "station-path-dialogue-{index:02d}.png"}
+  ]},
+  {"save_state": true}
+]

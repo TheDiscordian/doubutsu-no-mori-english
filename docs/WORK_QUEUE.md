@@ -15,7 +15,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
-| R02 | Choice strings beyond ten bytes | active | Sixteen-byte main path passes; fourteen choice translations, four-row/cancellation, and actor runtime tests remain |
+| R02 | Choice strings beyond ten bytes | active | Twenty-byte capacity, thirteen long DMA loads, four rows, and insertion pass targeted MIPS tests; one reference match, cancellation, and actor runtime paths remain |
 | R03 | General strings and UI caller capacities | pending | Each imported string has a proven destination limit; no truncation |
 | R04 | NPC and item names | pending | IDs matched from actor/item tables; full English names supported by every destination |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
@@ -31,7 +31,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
-| V02 | New-town creation through normal gameplay | active | Name and town entry and arrival pass; house selection and introductory jobs remain |
+| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, and Nook's escort pass; choosing a house and introductory jobs remain |
 | V03 | Save/reload and long names | pending | Isolated FlashRAM, RTC, no lost/truncated text, restart across sessions |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |

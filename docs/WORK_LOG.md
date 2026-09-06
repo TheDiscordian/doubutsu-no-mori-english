@@ -162,8 +162,9 @@
   54 recorded steps: locked timers decrement instead of fast-forwarding, unlock
   restores input behaviour, and an eight-frame pause retains speed nine rather
   than the fast-path speed two. The stronger repeated scenario asserts both
-  observed pause values explicitly; its run and full arrival regression are
-  in progress at this checkpoint.
+  observed pause values explicitly; `build/smoke-module-pacing-02` passes all
+  54 steps. `build/smoke-module-pacing-arrival-01` passes 225 steps and all ten
+  choice/name/town acceptance checks.
 - The new pacing experiment contains 9,284 candidates and links 2,944 module
   bytes. ROM SHA-256:
   `141da327dd49654e8a9d39ab82c1727a819efa93c83a815abcc45cab60ac7d4e`.
@@ -174,6 +175,29 @@
   executable DMA segments from the pinned definitions, checks aligned literal
   pointers throughout the ROM, and finds no external hook-interior references.
   The 48-test suite and the five focused module checks pass.
+
+### Resident twenty-character choices
+
+- Added module-owned 160-byte choice storage, twenty-byte text capacity, and
+  thirty-two-byte global row stride. Actor staging arrays use twenty-byte rows;
+  their frames and high temporaries grow by forty bytes. Both width variants
+  match independently assembled MIPS source; the baseline variant is unchanged.
+- Verified the loader's existing physical thirty-two-byte DMA slot. No stack
+  enlargement is needed for its largest aligned read; the adjacent live length
+  temporary remains outside the transfer.
+- `build/smoke-module20-choice-02` passes 94 recorded steps: all thirteen long
+  reference loads, all four rows, maximum width, fifth-row and overflow rejection,
+  each selected row, selected-text insertion, stack restoration, and end guards.
+  The initial test expected a length difference from an insertion function that
+  returns the complete new message length; correcting that test expectation and
+  passing the actual input length resolves the test failure without a ROM change.
+- The module links 3,168 bytes and contains 9,297 candidates. ROM SHA-256:
+  `cec487f850af1ce5a36b1868db0ce2dc02a63f0f21dd4e99645439925c5f7ae6`.
+  UPS SHA-256:
+  `b571120b2b60b7fc649930f02f1ff8d5d38d699e51561c2288832071d5098366`.
+  All 51 tests pass. The full twenty-byte train-to-town regression is running.
+- Separate pacing-build gameplay continuations reach Nook's escort and the
+  house-selection area. Those snapshots do not establish a completed normal save.
 
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in

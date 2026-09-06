@@ -34,7 +34,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 48 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 51 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -42,6 +42,10 @@ user's direction. The production build retains the approved spacing metrics.
   plain choice bytes, including actor-specific staging buffers. Source guards,
   complete-capability checks, and independently assembled width code pass.
   Main-dialogue runtime regressions pass; actor-specific runtime tests remain.
+- Resident twenty-byte choice capacity imports the thirteen longer reference
+  choices without truncation. Native MIPS tests pass real DMA loading, all four
+  rows, width calculation, overflow rejection, selection, insertion, and guards.
+  Actor frames grow by forty bytes with their saved values and arguments adjusted.
 - Experimental resident runtime module with a verified new DMA entry, sixteen-KiB
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
   Four-MiB boot and the complete train-to-town regression pass with intact guards.
@@ -74,12 +78,15 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,284 candidates, including
-8,458 main dialogue entries. It retains the GameCube calendar wording in Rover's
+The separate resident-module experiment contains 9,297 candidates, including
+8,458 main dialogue entries and 459 choices. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
 Its remaining main-dialogue count is 3,292; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
+Only one choice still lacks a confirmed reference match. The twenty-byte build's
+complete train-to-town regression is in progress; the preceding pacing build
+passes that regression and continues through Nook's escort to house selection.
 
 Silent emulator runs confirm a four-MiB configuration, active relocated text
 loaders, intro dialogue, English-first input, case conversion, single-character
