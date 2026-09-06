@@ -18,6 +18,12 @@ def load_matches(path):
                 raise ValueError("Invalid reviewed reference ID")
         if record["id"].split(":")[0] != record["reference_id"].split(":")[0]:
             raise ValueError("Cross-bank reference matches require a separate audit")
+        if "native_equivalent_id" in record:
+            equivalent = record["native_equivalent_id"]
+            if (not re.fullmatch(r"[a-z_]+:[0-9A-F]{4}", equivalent)
+                    or equivalent.split(":")[0] != record["id"].split(":")[0]
+                    or equivalent == record["id"]):
+                raise ValueError("Invalid native-equivalent reference ID")
         for key in ("source_sha256", "reference_sha256"):
             if not re.fullmatch(r"[0-9a-f]{64}", record.get(key, "")):
                 raise ValueError("Invalid reviewed reference hash")
@@ -25,6 +31,17 @@ def load_matches(path):
             raise ValueError("Duplicate or unexplained reviewed reference match")
         result[record["id"]] = record
     return result
+
+
+def verify_native_equivalents(matches, source_banks):
+    for match in matches.values():
+        if "native_equivalent_id" not in match:
+            continue
+        name, number = match["native_equivalent_id"].split(":")
+        entries = source_banks[name].entries()
+        index = int(number, 16)
+        if index >= len(entries) or sha256(entries[index]) != match["source_sha256"]:
+            raise ValueError("Reviewed native-equivalent record changed")
 
 
 def resolve_reference(row, references, matches, source):

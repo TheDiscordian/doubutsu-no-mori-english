@@ -13,7 +13,7 @@ from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import add_runtime_module, module_command_info
-from reference_matches import load_matches, resolve_reference
+from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import reference_sequence_edits
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
@@ -58,6 +58,7 @@ def main():
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     matches = load_matches(args.matches)
+    verify_native_equivalents(matches, source_banks)
     visited_matches = set()
     if override_ids & matches.keys():
         raise ValueError("Reviewed reference match conflicts with an original draft override")

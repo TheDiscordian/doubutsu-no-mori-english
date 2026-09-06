@@ -421,6 +421,27 @@
 - `build/smoke-layout-arrival-01` passes all 225 full train-to-town steps and ten
   acceptance checks. The space build's full regression is in progress.
 
+### Identical native shop and reward records
+
+- Reviewed six additional reference identities: native `02DC`, `02E7`, `02E9`,
+  `02EA`, and `02ED` are complete duplicates of confirmed Nook shop records;
+  `0DFB` duplicates a confirmed same-personality full-inventory reward response.
+  The English meanings match, and all native controls agree. The approval records
+  bind source/reference hashes and identify the equivalent native record.
+  Generation verifies that donor record as well; similar text is not sufficient.
+- All 82 tests pass. The equivalent-record build has 9,951 edits, 9,107 reference
+  dialogue candidates, 2,639 remaining main messages, and 1,310 layout warnings.
+  ROM SHA-256:
+  `7ecbf773c5d35a829b22857bf2db5d0794ba0e9ab575ced39a29c6b0465b69e9`.
+  UPS SHA-256:
+  `404c509b2c30362b2913dbd1e24da22dfe519206b399379a7a66da4e0cb40055`.
+- `build/smoke-space-arrival-01` passes the complete 225-step train-to-town
+  regression and ten acceptance checks. The space build also passes the 78-step
+  cancellation regression and 89-step twenty-byte-choice regression after linked
+  module storage moves. These targeted runs omit the separate six-step post-run
+  memory scenario included in some earlier runs; their assertion coverage is
+  recorded in each result file.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

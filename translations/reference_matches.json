@@ -12,5 +12,53 @@
     "reference_id": "message:09C9",
     "reference_sha256": "e4c65c62b23b3eaee6c712d06e0715cbaf1fc0dabe7f4d907a03b0d001994aa7",
     "evidence": "This introductory farewell tells the player that life is more enjoyable with friends and hopes friends will visit the town. The native and English reference commands and actor arguments agree. The legacy text changes the game's English name from Animal Crossing to Animal Forest, which prevents an exact visible-text match but does not change this message's identity. Use the supplied GameCube wording and retain its complete presentation."
+  },
+  {
+    "id": "message:02DC",
+    "source_sha256": "4f98121e957e5399e98018fdeddabfbccab983878164759576bb6df8521080fc",
+    "reference_id": "message:1091",
+    "reference_sha256": "e4a83f90031dbf1a47777c8b459ccc2bf03c9ee96b0df2325b98b7ac528f9b7c",
+    "native_equivalent_id": "message:1091",
+    "evidence": "The complete native record is identical to native 1091, including all controls. Both are Nook's shop greeting inviting the player to browse. The supplied GameCube 1091 is independently confirmed by the legacy text at 1091, and its English meaning matches this native greeting. Preserve the complete English reference and run the usual command and capacity checks."
+  },
+  {
+    "id": "message:02E7",
+    "source_sha256": "515649e12eb4a213aa7a40b0a9bbed5c3cd8ccf5b112379c2d9fc53ba08d7d10",
+    "reference_id": "message:109C",
+    "reference_sha256": "e384d638f04217dd3668ebcbaa15ae54b3f75d248951ad499968ddeaf3afbd7a",
+    "native_equivalent_id": "message:109C",
+    "evidence": "The complete native record is identical to native 109C, including all controls. Both are Nook's refusal to sell because the player has insufficient money. GameCube 109C is independently confirmed by the legacy text at 109C and expresses that same refusal. This identity approval does not relax any command or capacity check."
+  },
+  {
+    "id": "message:02E9",
+    "source_sha256": "239369b4895b26bb5689f23b2a91a94dd5d6c85850013103a6650a422c7046d1",
+    "reference_id": "message:109E",
+    "reference_sha256": "0e20f7e500578a8de3f5a0afcf58def66265fcc52a3a2b778b1ae9c7b765f938",
+    "native_equivalent_id": "message:109E",
+    "evidence": "The complete native record is identical to native 109E, including all controls. Both are Nook's shop farewell thanking the player and asking the player to visit again. GameCube 109E is independently confirmed by the legacy text at 109E. Keep its complete English presentation with the usual command and capacity checks."
+  },
+  {
+    "id": "message:02EA",
+    "source_sha256": "3d263e87c8edb337242f375a4036210201129064a07238d7b902ed6801da0e1b",
+    "reference_id": "message:109F",
+    "reference_sha256": "b418f5262503fdddf8161a76aa88e56d22b179f2eb6a5fefa5221ec1f45a5d1d",
+    "native_equivalent_id": "message:109F",
+    "evidence": "The complete native record is identical to native 109F, including all controls. Both explain that Nook does not buy turnips on Sunday. GameCube 109F is independently confirmed by the legacy text at 109F and preserves the same condition. This identity approval does not alter the caller's day checks or any script control."
+  },
+  {
+    "id": "message:02ED",
+    "source_sha256": "c66a74dda1485f86eb4b4f0258460ce5101f5c77d2269a3c9e1c80c5b27629df",
+    "reference_id": "message:10A2",
+    "reference_sha256": "197289f6559adc7671c3031b2751b140dff0abcb8ba76a77278f7ca656a03946",
+    "native_equivalent_id": "message:10A2",
+    "evidence": "The complete native record is identical to native 10A2, including all controls. Both ask the player to clear inventory space before returning to buy an item. GameCube 10A2 is independently confirmed by the legacy text at 10A2. Keep the full English response and normal command, field, and capacity validation."
+  },
+  {
+    "id": "message:0DFB",
+    "source_sha256": "4d81e679a158d699e9f87efbcca8b8415034f531f5c867d0bee4e8db3cd9a253",
+    "reference_id": "message:0EAF",
+    "reference_sha256": "244564780b0156ba478dacf3233770cbefdb8825e94d8c71be236b6f0326c43e",
+    "native_equivalent_id": "message:0EAF",
+    "evidence": "The complete native record is identical to native 0EAF, including emotion and catchphrase commands. Both are the same villager-personality reward refusal because the player cannot carry another item, followed by a request to organise the inventory and return. GameCube 0EAF is independently confirmed by the legacy text at 0EAF. All actor arguments, available fields, gameplay controls, and capacity checks still apply."
   }
 ]

@@ -9,9 +9,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import sha256
-from reference_matches import load_matches, resolve_reference
+from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_candidates import load_drafts
-from textbanks import banks
+from textbanks import Bank, banks
 from textcodec import command_info, encode
 from aflib import CODE_VROM, by_vrom
 from textvalidate import validate_entry
@@ -64,6 +64,24 @@ class ReferenceMatchTests(unittest.TestCase):
 
     def test_repository_matches_have_explanations_and_hashes(self):
         self.assertIn("select:0013", load_matches(ROOT/"translations/reference_matches.json"))
+
+    def test_native_equivalence_is_exact_and_bounded(self):
+        bank = Bank("select", 0, None, b"AA", None, fixed_size=1)
+        match = {**self.match, "source_sha256": sha256(b"A"), "native_equivalent_id": "select:0001"}
+        verify_native_equivalents({"select:0000": match}, {"select": bank})
+        for change in ({"source_sha256": sha256(b"B")}, {"native_equivalent_id": "select:0002"}):
+            with self.assertRaisesRegex(ValueError, "native-equivalent"):
+                verify_native_equivalents({"select:0000": {**match, **change}}, {"select": bank})
+
+    @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM is a local-only optional test input")
+    def test_reviewed_native_equivalents_match_retail(self):
+        matches = load_matches(ROOT/"translations/reference_matches.json")
+        source = {b.name: b for b in banks(ROM_PATH.read_bytes())}
+        verify_native_equivalents(matches, source)
+        for match in matches.values():
+            if "native_equivalent_id" in match:
+                name, number = match["id"].split(":")
+                self.assertEqual(sha256(source[name].entries()[int(number, 16)]), match["source_sha256"])
 
     def test_multiple_original_files_reject_duplicate_ids(self):
         opening = ROOT/"translations/opening.json"
