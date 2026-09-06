@@ -217,6 +217,30 @@
   full hands. GameCube random targets `3A2A..3A31` exceed the N64 message count.
   These findings do not authorise importing or deleting the branch commands.
 
+### N64 exercise cues and general-string audit
+
+- Added original drafts for `2665`, `2666`, `2669`, and `266A`, preserving every
+  native pause and end command. The rejected GameCube continuations lead to
+  C Stick exercise instructions absent from these N64 cues. Existing compatible
+  GameCube exercise lines remain unchanged. Event-specific runtime review remains.
+- The exercise build contains 9,302 edits. ROM SHA-256:
+  `4c1558d32a53b40a7a6fa74744cb577199fe8f6f5ff5a0da7385810449165b35`.
+  UPS SHA-256:
+  `680079b7a9845cc6732568417c818822720a25cb8fed35f125b894e76efd7b6c`.
+  All 59 tests pass. Original-file loading rejects duplicate IDs and exercises
+  all four draft hashes and complete native command signatures.
+- `build/smoke-module20-arrival-01` passes 225 steps and all ten acceptance
+  conditions. `build/smoke-reviewed-match-choice-01` passes 94 targeted steps
+  after the final label changes the choice-bank offsets.
+- Pacing-build continuations enter the orange-roofed starter house, leave it,
+  and reach Nook's home-gyroid explanation. Several untranslated messages are
+  visible in that sequence and need entry-level follow-up. No normal save is
+  claimed from those emulator checkpoints.
+- Added a thirty-four-site direct string-loader audit. Main-code review
+  identifies fixed saved catchphrases, home-gyroid messages, NPC-letter fragments,
+  special-NPC names, and shop-level labels as distinct constraints. The inventory
+  is evidence for further implementation, not permission to enlarge every entry.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

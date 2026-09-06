@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.35},
+  {"capture": "house-fence-south.png"},
+  {"key": "f", "duration": 0.5},
+  {"capture": "house-fence-west.png"},
+  {"key": "w", "duration": 0.3},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "house-fence-enter.png"},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]

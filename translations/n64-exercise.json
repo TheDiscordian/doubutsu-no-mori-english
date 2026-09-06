@@ -1,0 +1,34 @@
+[
+  {
+    "id": "message:2665",
+    "source_sha256": "ee150c78c9e9bdc6055a8abbf92eef4524eda628571d7d8506998e76dc6c5f88",
+    "translation": "Come on,{cmd:7F0306} you too!{cmd:7F0306}\nWatch me{cmd:7F0306} carefully,{cmd:7F0306}\nand join in{cmd:7F0306} with{cmd:7F0306} the exercises!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "N64 exercise cue. Preserve all original pauses and the native end command. The same-ID GameCube message branches into added C Stick instructions absent from N64. Exercise-event runtime and pacing review remain required."
+  },
+  {
+    "id": "message:2666",
+    "source_sha256": "3fe2d0100e72844226e0707104fe780e2858ae15da62045a3e21412eede3adeb",
+    "translation": "Ready!{cmd:7F0306}\n1{cmd:7F0303} -{cmd:7F0303} 2{cmd:7F0303} -{cmd:7F0303} 3{cmd:7F0303} -{cmd:7F0303} 4!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Counted N64 exercise cue, not the same-ID GameCube full-hands warning. Every beat pause remains in order. Exercise-event runtime and pacing review remain required."
+  },
+  {
+    "id": "message:2669",
+    "source_sha256": "457730299ce258ae28537212b862620e2005f7576f565fb944d9a4cf47c6fa52",
+    "translation": "Watch me{cmd:7F0306} carefully!{cmd:7F0306}\nKeep time{cmd:7F0306} with the music!{cmd:7F0306}\n1{cmd:7F0303} -{cmd:7F0303} 2,{cmd:7F0306} 1{cmd:7F0303} -{cmd:7F0303} 2!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the native counted cue and all pauses. The legacy and same-ID GameCube message describe a different condition and contain an unsupported branch into GameCube-only C Stick instructions. Exercise-event runtime review remains required."
+  },
+  {
+    "id": "message:266A",
+    "source_sha256": "b42e070f78e66b3dbdfd6ae4544b8511c84ddb55bf4b8786b59401fc55d19569",
+    "translation": "Come on!{cmd:7F0306}\nMake those{cmd:7F0306} movements bigger!{cmd:7F0306}\nMove{cmd:7F0306} your whole body!{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the N64 cue's pauses and native end command. Do not import the GameCube-only random continuation or its C Stick instructions. Exercise-event runtime and pacing review remain required."
+  }
+]

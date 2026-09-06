@@ -19,12 +19,25 @@ REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
 
 
+def load_drafts(paths):
+    drafts = []
+    for path in paths:
+        rows = json.loads(path.read_text())
+        if not isinstance(rows, list):
+            raise ValueError("Original translations must be a list")
+        drafts.extend(rows)
+    ids = [row["id"] for row in drafts]
+    if len(ids) != len(set(ids)):
+        raise ValueError("Duplicate original translation ID")
+    return drafts
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--inventory", type=Path, default=Path("build/inventory"))
-    parser.add_argument("--drafts", type=Path, default=Path("translations/opening.json"))
+    parser.add_argument("--drafts", type=Path, action="append", help="Repeat to select explicit original-edit files")
     parser.add_argument("--matches", type=Path, default=Path("translations/reference_matches.json"))
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
     parser.add_argument("--english-runtime", action="store_true")
@@ -41,7 +54,7 @@ def main():
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
-    drafts = json.loads(args.drafts.read_text())
+    drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     matches = load_matches(args.matches)
     visited_matches = set()

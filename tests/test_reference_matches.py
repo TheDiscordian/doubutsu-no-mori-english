@@ -10,7 +10,12 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import sha256
 from reference_matches import load_matches, resolve_reference
+from reference_candidates import load_drafts
+from textbanks import banks
+from textcodec import command_info, encode
+from aflib import CODE_VROM, by_vrom
 from textvalidate import validate_entry
+from test_retail import ROM_PATH
 
 
 class ReferenceMatchTests(unittest.TestCase):
@@ -59,3 +64,22 @@ class ReferenceMatchTests(unittest.TestCase):
 
     def test_repository_matches_have_explanations_and_hashes(self):
         self.assertIn("select:0013", load_matches(ROOT/"translations/reference_matches.json"))
+
+    def test_multiple_original_files_reject_duplicate_ids(self):
+        opening = ROOT/"translations/opening.json"
+        exercise = ROOT/"translations/n64-exercise.json"
+        self.assertEqual(len(load_drafts([opening, exercise])), 8)
+        with self.assertRaisesRegex(ValueError, "Duplicate"):
+            load_drafts([opening, opening])
+
+    @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM is a local-only optional test input")
+    def test_exercise_translations_preserve_every_native_command(self):
+        rom = ROM_PATH.read_bytes()
+        info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+        entries = next(bank for bank in banks(rom) if bank.name == "message").entries()
+        for edit in load_drafts([ROOT/"translations/n64-exercise.json"]):
+            original = entries[int(edit["id"].split(":")[1], 16)]
+            self.assertEqual(sha256(original), edit["source_sha256"])
+            translated = encode(edit["translation"], info)
+            validate_entry(original, translated, info, "message")
+            self.assertTrue(translated.endswith(b"\x7f\x00"))

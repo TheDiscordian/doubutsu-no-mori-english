@@ -73,6 +73,9 @@ The generated fixture contains local game text and stays under `build/`.
 Reviewed reference identities live in `translations/reference_matches.json`.
 The candidate generator's `--matches` option selects another explicit record
 file when needed. Identity overrides do not bypass runtime or control checks.
+The default original edits comprise `translations/opening.json` and
+`translations/n64-exercise.json`. Repeat `--drafts <file>` to select a different
+explicit set; duplicate IDs fail instead of silently overwriting each other.
 
 `tools/emulator_smoke.py` requires ares, Xvfb, FFmpeg, X11, and XTest. Pass an
 explicit `--xvfb` path if the existing binary is outside PATH. Every test requires
@@ -108,6 +111,8 @@ name-cursor patch against its assembly source using the pinned Docker toolchain.
 `python3 tools/check_runtime_assembly.py` verifies the choice-width routine.
 `python3 tools/audit_choice_callers.py --rom '<retail-ROM-path>'` repeats the
 complete DMA caller and reclaimed-code reference scan.
+`tools/audit_string_callers.py --rom '<retail-ROM-path>'` records the direct
+general-string callers and their immediate argument hints for capacity review.
 
 For module tests, append `--post-scenario tests/runtime-module-memory-scenario.json`
 to verify heap bounds and guards after any scenario. The dedicated

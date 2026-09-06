@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.15},
+  {"capture": "house-open-aligned.png"},
+  {"key": "w", "duration": 0.08},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "house-open-result.png"},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]
