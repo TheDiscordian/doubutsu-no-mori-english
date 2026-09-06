@@ -89,6 +89,24 @@
   observations confirm a sixteen-byte row and its selected-answer copy match.
   The full scenario and town-suffix assertions remain in progress at this checkpoint.
 
+### Choice acceptance and reusable emulator checkpoints
+
+- `build/smoke-runtime16-choice-01` passed 218 recorded steps through town
+  arrival. `tools/validate_runtime_smoke.py` verifies ten acceptance conditions,
+  including sixteen-byte choice preservation, three long menu rows, player and
+  destination limits, and town insertion without the Japanese suffix.
+- Promoted the verified sixteen-byte runtime into the reproducible pilot target.
+  `make pilot` passes all 39 tests and retains ROM SHA-256
+  `6b5f7ce98c4d21565d45c2bcea6969ec2f3e3b81ae8c439282b9a6560595f152`.
+- Added isolated cartridge-save seeding, same-ROM emulator checkpoint seeding,
+  save/load-state actions, bounded test-RAM writes, and graceful silent shutdown.
+  The state round-trip regression restores a deliberately changed RAM marker.
+  These are emulator checkpoints, not evidence of in-game save compatibility.
+- `build/smoke-arrival-checkpoint-01` repeats the complete choice/name/town
+  regression with 220 recorded steps and saves an arrival checkpoint for further
+  gameplay tests. All ten post-run acceptance checks pass. FlashRAM is still
+  blank; house selection, introductory jobs, and a normal game save remain.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

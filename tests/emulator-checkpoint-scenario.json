@@ -1,0 +1,12 @@
+[
+  {"wait": 8},
+  {"command": "?"},
+  {"command": "g"},
+  {"command": "p25"},
+  {"command": "p20"},
+  {"command": "qXfer:features:read:target.xml:0,fff"},
+  {"resume": true},
+  {"wait": 2},
+  {"save_state": true},
+  {"read": ["80000318", 4], "expect": "00400000"}
+]

@@ -37,16 +37,16 @@ user's direction. The production build retains the approved spacing metrics.
 - 39 passing synthetic and retail-input tests. Retail tests require the local ROM.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
-- Opt-in English runtime removes the Japanese town suffix and supports sixteen
+- English runtime removes the Japanese town suffix and supports sixteen
   plain choice bytes, including actor-specific staging buffers. Source guards,
   complete-capability checks, and independently assembled width code pass.
-  Runtime regressions are in progress; this is not yet the default pilot.
+  Main-dialogue runtime regressions pass; actor-specific runtime tests remain.
 
 ## Current reference candidates
 
-The generated pilot contains 8,902 edits. These are candidates, not a claim of
+The generated pilot contains 9,127 edits. These are candidates, not a claim of
 reviewed translation coverage. Accepted reference imports comprise 8,301 dialogue
-entries, 221 choices, and 376 string/mail-component entries, plus four original
+entries, 446 choices, and 376 string/mail-component entries, plus four original
 introductory drafts. Three draft IDs override reference selection.
 
 Main dialogue still has 3,448 rejected entries. Principal reasons are unconfirmed
@@ -55,9 +55,8 @@ unsupported GameCube commands, and two expansion-bound failures. Another 996
 accepted dialogue candidates have conservative layout warnings. Entry-level
 rejection and adaptation reports are generated in `build/candidates/`.
 
-The separate `build/runtime16/` experiment contains 9,127 edits, including 446
-English choice candidates: 225 more than the default pilot. Thirteen English
-reference choices exceed sixteen bytes and one lacks the same-ID legacy match.
+Thirteen English reference choices exceed sixteen bytes and one lacks the
+same-ID legacy match.
 Those fourteen remain withheld. General strings, mail, saved names, dates, and
 item names have separate restrictions. Unsafe legacy item-name mappings are withheld.
 
@@ -68,12 +67,14 @@ loaders, intro dialogue, English-first input, case conversion, single-character
 deletion, cursor movement, six-character enforcement, all five mode transitions,
 and successful name confirmation. The proportional name-cursor correction passes
 the same regression and has been visually checked during entry. Destination-name
-entry, its six-character limit, and confirmation also pass. No hardware-certified build or
+entry, its six-character limit, and confirmation also pass. A 218-step run reaches
+town arrival and verifies long choices, selected text, and the English town field.
+No hardware-certified build or
 release candidate exists. Save/reload, travel, mail, board, RTC, calendar, credits,
 seasonal events, and original hardware tests remain outstanding.
 
-The opt-in runtime changes the town insertion command `7F2F`; its suffix removal
-and expanded choices need runtime assertions before promotion to the pilot.
+The runtime changes the town insertion command `7F2F`; recorded message assertions
+confirm the supplied town name appears without the Japanese village suffix.
 Catchphrase, song, mail, and board editor callers also need their own regressions.
 
 The GameCube-style grid is a separate implementation task; the current keyboard

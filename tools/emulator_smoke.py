@@ -144,7 +144,8 @@ def choice_snapshot(debug):
     state = bytes.fromhex(debug.command("m801425c0,bc"))
     lengths = list(struct.unpack_from(">4i", state, 0x5C))
     selected_length, count, last_selected, cursor = struct.unpack_from(">4i", state, 0x78)
-    if not 0 <= count <= 4 or any(not 0 <= n <= 16 for n in lengths[:count]):
+    if (not 0 <= count <= 4 or not 0 <= selected_length <= 16
+            or any(not 0 <= n <= 16 for n in lengths[:count])):
         raise ValueError("Invalid expanded choice dimensions")
     rows = bytes.fromhex(debug.command(f"m{CHOICE_ROWS:x},40"))
     selected = bytes.fromhex(debug.command(f"m{CHOICE_SELECTED:x},10"))
@@ -164,7 +165,11 @@ def main():
     parser.add_argument("--seconds", type=int, default=40)
     parser.add_argument("--scenario", type=Path)
     parser.add_argument("--port", type=int, default=19264)
+    parser.add_argument("--seed-save", type=Path, help="Copy this isolated test directory's cartridge saves")
+    parser.add_argument("--seed-state", type=Path, help="Resume this isolated test directory's matching-ROM state")
     args = parser.parse_args()
+    if args.seed_save and args.seed_state:
+        parser.error("choose cartridge saves or a matching-ROM state, not both")
     if not 1 <= args.seconds <= 600:
         parser.error("seconds must be between 1 and 600")
     if args.output.exists():
@@ -173,11 +178,34 @@ def main():
     out.mkdir(parents=True)
     rom = out / "test.z64"
     shutil.copyfile(args.rom, rom)
+    rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
+    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False}
+    if args.seed_state:
+        source_rom = args.seed_state / "test.z64"
+        if not source_rom.is_file() or hashlib.sha256(source_rom.read_bytes()).hexdigest() != rom_hash:
+            parser.error("save states require the identical test ROM; use cartridge saves for cross-build tests")
+    seed = args.seed_state or args.seed_save
+    if seed:
+        for suffix in ("flash", "rtc", "pak") + (("bs1",) if args.seed_state else ()):
+            source = seed / ("test."+suffix)
+            if not source.is_file():
+                if suffix in ("flash", "bs1"):
+                    parser.error(f"missing seed file: {source}")
+                continue
+            content = source.read_bytes()
+            if not content or len(content) > 128*1024*1024:
+                parser.error(f"invalid seed file size: {source}")
+            shutil.copyfile(source, out/source.name)
+            provenance["seed_files"].append({"file": source.name, "sha256": hashlib.sha256(content).hexdigest(),
+                                             "bytes": len(content)})
+    (out/"run.json").write_text(json.dumps(provenance, indent=2)+"\n")
     settings = out / "settings.bml"
     settings.write_text("Video\n  Driver: OpenGL 3.2\n  Multiplier: 2\n"
                         "Audio\n  Driver: None\n  Mute: true\n  Volume: 0.0\n"
                         "Input\n  Driver: SDL\n  Defocus: Allow\n"
-                        "General\n  NoFilePrompt: true\n"
+                        "General\n  NoFilePrompt: true\n  AutoSaveMemory: true\n"
+                        "Hotkey\n  SaveState: 0x1/0/5;;\n  LoadState: 0x1/0/6;;\n"
+                        "  QuitEmulator: 0x1/0/12;;\n"
                         "Nintendo64\n  ExpansionPak: false\n"
                         "  Input\n    Controller.Port.1\n      Gamepad\n"
                         "        A: 0x1/0/35;;\n        B: 0x1/0/36;;\n"
@@ -216,6 +244,8 @@ def main():
                    "--setting", "DebugServer/Enabled=true", "--setting", "DebugServer/UseIPv4=true",
                    "--setting", f"DebugServer/Port={args.port}",
                    "--setting", "Nintendo64/ExpansionPak=false", str(rom)]
+        if args.seed_state:
+            command[5:5] = ["--save-state", "1"]
         ares = subprocess.Popen(command, env=env, stdout=log, stderr=log, start_new_session=True)
         processes.append(ares)
         time.sleep(3)
@@ -248,6 +278,17 @@ def main():
                                 "assertion": "passed" if "expect" in action else "not_requested"})
             if "command" in action:
                 results.append({"command": action["command"], "result": debug.command(action["command"])})
+            if "write" in action:
+                address, value = action["write"]
+                data = bytes.fromhex(value)
+                location = int(address, 16)
+                if not data or not 0x80000000 <= location <= 0x80400000-len(data):
+                    raise ValueError("Scenario writes must stay inside four-MiB test RAM")
+                if debug.command(f"M{address},{len(data):x}:{data.hex()}") != "OK":
+                    raise ValueError("Debugger rejected test RAM write")
+                results.append({"test_only_ram_write": address, "bytes": len(data), "data": data.hex()})
+            if action.get("resume"):
+                debug.send("c")  # Stop-mode RSP replies only on a later halt.
             if action.get("snapshot_message"):
                 snapshot = message_snapshot(debug)
                 results.append(snapshot)
@@ -272,10 +313,34 @@ def main():
                                env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
                                stderr=subprocess.PIPE)
                 results.append({"capture": target.name})
+            if action.get("save_state"):
+                keyboard.press("F5", 0.08)
+                time.sleep(1)
+                state = out/"test.bs1"
+                if not state.is_file() or state.stat().st_size < 1024:
+                    raise ValueError("Emulator did not create the requested checkpoint state")
+                results.append({"state_file": state.name, "bytes": state.stat().st_size,
+                                "sha256": hashlib.sha256(state.read_bytes()).hexdigest(),
+                                "kind": "emulator_checkpoint_not_game_save_validation"})
+            if action.get("load_state"):
+                if not (out/"test.bs1").is_file():
+                    raise ValueError("Missing emulator checkpoint")
+                keyboard.press("F6", 0.08)
+                time.sleep(1)
+                results.append({"loaded_state": "test.bs1"})
             (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
         # Register numbering has changed across ares builds; retain the raw
         # response without claiming this is a trustworthy PC measurement.
         results.append({"raw_register_p25": debug.command("p25"), "process_alive": ares.poll() is None})
+        debug.sock.close()
+        debug = None
+        keyboard.press("F12", 0.08)
+        status = ares.wait(timeout=10)
+        if status != 0:
+            raise ValueError(f"Emulator failed graceful shutdown: {status}")
+        results.append({"graceful_shutdown": True, "save_files": [
+            {"file": p.name, "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+            for p in (out/"test.flash", out/"test.rtc", out/"test.pak") if p.is_file()]})
         (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
         print(json.dumps({"output": str(out), "steps": len(results)}, indent=2))
     finally:

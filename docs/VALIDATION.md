@@ -27,7 +27,8 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
 | Name limits | Six-character player/town, four-character catchphrase, ten-character request | Player and town limits runtime-tested; others have static invariants |
 | Saved text | Enter names/mail/board text, save, restart, recover correctly | Outstanding |
-| Choice menus | All lengths, four entries, cancellation, branch outcome | Outstanding |
+| Choice menus | All lengths, four entries, cancellation, branch outcome | Sixteen-byte rows, selected text, and three long choices tested; four active rows, cancellation, and actor paths outstanding |
+| Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
 | Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Outstanding |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
@@ -37,6 +38,16 @@ L=`q`, R=`r`, C-Up=`u`, C-Down=`j`, C-Left=`h`, C-Right=`k`, D-pad=arrow keys,
 and analogue stick up/down/left/right=`w`/`s`/`f`/`g`. An action's `key` may be
 a list for simultaneous presses. These are isolated test mappings, not changes
 to the user's emulator configuration.
+
+F5 saves an emulator checkpoint, F6 loads it, and F12 closes the isolated
+emulator normally. Test output records flushed FlashRAM, RTC, and Controller Pak
+file hashes. A blank FlashRAM file or an emulator checkpoint does not establish
+that the game itself has saved and reloaded a town.
+
+The installed debugger's scalar register packets interpret indices differently
+from the current source. `p25` is retained only as a raw observation and is not
+labelled a PC. The bulk `g` response follows the N64 core's 71-register ordering;
+the checkpoint probe records both forms for comparison.
 
 ## Original hardware and release
 

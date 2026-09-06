@@ -31,10 +31,10 @@ gamecube: inventory references
 	$(PYTHON) tools/gc_names.py
 
 candidates: gamecube
-	$(PYTHON) tools/reference_candidates.py --rom "$(ROM)"
+	$(PYTHON) tools/reference_candidates.py --rom "$(ROM)" --english-runtime
 
 pilot: test candidates
-	$(PYTHON) tools/build.py --rom "$(ROM)" --translations build/candidates/translations.json --english-keyboard --output build/pilot
+	$(PYTHON) tools/build.py --rom "$(ROM)" --translations build/candidates/translations.json --english-keyboard --english-runtime --output build/pilot
 
 smoke:
 	$(PYTHON) tools/emulator_smoke.py --rom build/pilot/animal-forest-halfwidth.z64 --output "$(SMOKE_OUT)" --xvfb "$(AF_XVFB)" --seconds 220 --scenario tests/keyboard-scenario.json
