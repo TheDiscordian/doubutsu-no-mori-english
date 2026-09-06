@@ -1,0 +1,83 @@
+"""Complete reference item names within the unchanged ten-byte native fields."""
+
+from collections import Counter
+
+from aflib import sha256
+from textcodec import LATIN, encode, tokenize
+from textvalidate import validate_entry
+
+ITEM_WIDTH = 10
+REFERENCE_WIDTH = 16
+FURNITURE_COUNT = 947
+
+
+def item_candidates(bank, inventory, references, info, skip_ids=()):
+    source = bank.entries()
+    if bank.name not in [f"item_{g:02X}" for g in [0x10, *range(0x20, 0x30)]] or bank.fixed_size != ITEM_WIDTH:
+        raise ValueError("Unexpected native item-name layout")
+    furniture = bank.name == "item_10"
+    if furniture and len(source) != FURNITURE_COUNT*4+1:
+        raise ValueError("Unexpected native furniture-name count")
+    def indexed(rows):
+        result = {}
+        for row in rows:
+            if row["id"] in result:
+                raise ValueError("Duplicate item-name input ID")
+            result[row["id"]] = row
+        return result
+    inventory, references = indexed(inventory), indexed(references)
+    edits, manifests, remaining, counts, identities = [], [], [], Counter(), set()
+    count = FURNITURE_COUNT*4 if furniture else len(source)
+    for index in range(count):
+        id = f"{bank.name}:{index:04X}"
+        reference_index = index//4 if furniture else index
+        reference_id = f"{'furniture' if furniture else bank.name}:{reference_index:04X}"
+        legacy_id = f"{bank.name}:{reference_index:04X}"
+        if furniture and source[index] != source[index//4*4]:
+            raise ValueError("Native furniture rotation names differ")
+        if id in skip_ids:
+            counts["original_draft_override"] += 1
+            continue
+        row, reference = inventory.get(id), references.get(reference_id)
+        if not row or row.get("source_sha256") != sha256(source[index]):
+            raise ValueError("Missing or stale item-name inventory")
+        if row.get("legacy_entry_id") != legacy_id:
+            raise ValueError("Unverified legacy item-name donor mapping")
+        reason = None
+        if not reference or not reference.get("text"):
+            reason = "missing_english_item_reference"
+        elif row.get("legacy", "").strip().casefold() != reference["text"].casefold():
+            reason = "item_identity_not_confirmed_by_legacy"
+        else:
+            encoded = encode(reference["text"], info)
+            if len(encoded) > REFERENCE_WIDTH or sha256(encoded.ljust(REFERENCE_WIDTH, b" ")) != reference["source_sha256"]:
+                raise ValueError("English item-name reference hash mismatch")
+            if any(t.kind != "text" or t.data[0] not in LATIN for t in tokenize(encoded, info)):
+                raise ValueError("Item name must contain only supported plain Latin text")
+            if len(encoded) > ITEM_WIDTH:
+                reason = "full_reference_name_exceeds_native_ten_bytes"
+        if reason:
+            counts["rejected"] += 1
+            remaining.append({"id": id, "reference_id": reference_id, "reason": reason})
+            continue
+        validate_entry(source[index], encoded, info, bank.name)
+        edit = {"id": id, "source_sha256": row["source_sha256"],
+                "translation": reference["text"], "control_policy": "exact",
+                "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
+                               "reference_id": reference_id, "reference_sha256": reference["source_sha256"],
+                               "legacy_entry_id": legacy_id,
+                               "match_basis": "rotation_index_name_confirmed_case_insensitive_by_legacy"
+                               if furniture else "same_id_name_confirmed_case_insensitive_by_legacy"},
+                "status": "mechanically_validated_candidate_not_reviewed", "adaptations": []}
+        edits.append(edit)
+        manifest = {k: v for k, v in edit.items() if k != "translation"}
+        manifest.update(encoded_bytes=len(encoded), encoded_sha256=sha256(encoded),
+                        stored_bytes=ITEM_WIDTH, stored_sha256=sha256(encoded.ljust(ITEM_WIDTH, b" ")),
+                        layout_issues=[], expanded_bound=len(encoded))
+        manifests.append(manifest)
+        counts["accepted_candidates"] += 1
+        identities.add(reference_id)
+    report = {**counts, "source_entries": count, "storage_slots": len(source),
+              "excluded_filler_slots": len(source)-count, "accepted_reference_identities": len(identities),
+              "remaining_by_reason": dict(Counter(r["reason"] for r in remaining))}
+    return edits, manifests, remaining, report

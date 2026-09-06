@@ -17,7 +17,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
 | R02 | Choice strings beyond ten bytes | active | All 460 choices import; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; full review and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; catchphrase, gyroid, mail, special-name, and shop constraints identified; wider imports remain gated |
-| R04 | NPC and item names | active | All 216 villager-name identities confirmed; 178 six-byte candidates and all native loads pass; 38 longer names, special NPCs, and item mappings/readers remain |
+| R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; 107 complete item-name candidates occupy 230 ten-byte slots; full item-loader tests running; 35 item callers inventoried; wider names and unresolved identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
 | R07 | Remaining message matching | active | Hash-bound identities and complete sequence approvals implemented; Nook explanation DMA and both normal choice outcomes pass; work-offer split traversal and further matching remain |

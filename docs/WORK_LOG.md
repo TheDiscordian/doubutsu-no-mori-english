@@ -478,6 +478,30 @@
   normal controller input in 66 recorded steps. It reaches `07E1`; FlashRAM
   remains blank, so this is not a game-save result.
 
+### Bounded English item-name import and reader audit
+
+- Added 107 distinct GameCube item-name candidates across 230 native storage
+  slots. Complete legacy names must agree after case-only comparison; donor IDs,
+  native/reference hashes, plain glyphs, rotation equality, and ten-byte capacity
+  are checked. Exact GameCube spelling/case is retained. No overlong name is
+  shortened. The entire item DMA file, including untouched bytes, is verified.
+- All 98 tests pass. The item build has 10,359 edits with unchanged main-dialogue
+  counts. ROM SHA-256:
+  `1b0d710d5809debc76889398a4ce22603c9159d34c3ea2513bf44efae9d56801`.
+  UPS SHA-256:
+  `f7c5be877b587934efdfc9567691ec75376e5f6a411020d469a388019ee6072c`.
+  The native regression covers 4,544 item positions plus empty/unsupported types,
+  split into nine independent scenarios to retain the runner's ten-minute bound.
+  Results remain pending; generating a scenario is not a passed test.
+- Added a direct-reader inventory: 35 item-loader calls in main code and 23
+  overlays, and two villager-loader calls. The main item paths expose separate
+  ten-byte handbill, message-free, message-item, and ground-label destinations.
+  Increasing only the source-name loader would not preserve longer English names.
+- Normal space-build gameplay reaches the English purchase `07E9`, then `07EA`,
+  `0838`, `0839`, and the active `083A` menu. The selection run records 65 steps;
+  the bounded menu run records 30 with intact module guards. This verifies the
+  approved purchase's normal continuation, not merely an injected DMA call.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

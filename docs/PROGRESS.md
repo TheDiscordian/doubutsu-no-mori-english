@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 90 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 98 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -86,6 +86,10 @@ user's direction. The production build retains the approved spacing metrics.
 - Legacy item references recovered from the shipped loader's verified tables.
   All seventeen banks reconstruct unchanged, and 947 furniture groups map to
   their four native rotation slots. These are references, not approved imports.
+- 107 distinct complete English item-name candidates in 230 native storage
+  slots, retaining GameCube spelling/case and the original ten-byte fields.
+  Thirty-five direct item-loader calls and their contexts are inventoried.
+  Wider imports remain gated on name, message, handbill, and UI destinations.
 
 ## Current reference candidates
 
@@ -104,12 +108,13 @@ Thirteen English reference choices exceed sixteen bytes and one lacks the
 same-ID legacy match.
 Those fourteen remain withheld. General strings, mail, saved names, dates, and
 item names have separate restrictions. Legacy item references have verified
-storage mappings; English item identities and destination capacities still gate import.
+  storage mappings; English item identities and destination capacities still gate import.
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,129 edits, including
-9,107 reference dialogue candidates, all 460 choices, 178 villager names, and four N64-specific
+The separate resident-module experiment contains 10,359 edits, including
+9,107 reference dialogue candidates, all 460 choices, 178 villager names,
+230 item-name slots, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
 Its remaining main-dialogue count is 2,639; matching, actor fields, flow controls,
@@ -142,6 +147,10 @@ identities use identical native shop/reward records at confirmed reference IDs;
 their caller-specific gameplay review remains open. The name build passes all 216
 real cartridge name loads and the invalid-ID no-write check, with 660 recorded
 steps. Native name storage, identity structures, and file size stay unchanged.
+The item build's complete native item-loader regression is in progress in nine
+bounded isolated runs. It covers every ordinary item and furniture rotation,
+including placed-item conversions. Normal gameplay on the space build traverses
+the English purchase confirmation and all four home-explanation records.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.

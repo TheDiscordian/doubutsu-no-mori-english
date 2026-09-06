@@ -45,7 +45,7 @@ def immediate_argument(words, call, register):
     return None
 
 
-def audit(rom):
+def audit(rom, target=TARGET):
     files, records, definitions = by_vrom(rom), [], {}
     root = Path(__file__).resolve().parents[1]/"upstream/af/yamls/jp"
     for name in ("makerom.yaml", "boot.yaml", "code.yaml", "overlays.yaml"):
@@ -65,8 +65,8 @@ def audit(rom):
             code = entry.extract(rom)
             words = [value for (value,) in struct.iter_unpack(">I", code[:len(code)//4*4])]
             for index, word in enumerate(words):
-                if word not in (0x08000000 | (TARGET & 0x0FFFFFFF) >> 2,
-                                0x0C000000 | (TARGET & 0x0FFFFFFF) >> 2):
+                if word not in (0x08000000 | (target & 0x0FFFFFFF) >> 2,
+                                0x0C000000 | (target & 0x0FFFFFFF) >> 2):
                     continue
                 records.append({"segment": block.splitlines()[0].strip(), "vrom": f"{vrom:08X}",
                                 "linked_ram": f"{base:08X}", "file_sha256": sha256(code),
@@ -77,7 +77,7 @@ def audit(rom):
                                             for i in range(max(0, index-16), min(len(words), index+3))]})
     if not records:
         raise ValueError("No string loader callers found")
-    return {"source_sha256": sha256(rom), "target_ram": f"{TARGET:08X}",
+    return {"source_sha256": sha256(rom), "target_ram": f"{target:08X}",
             "definition_sha256": definitions, "callers": records,
             "capacity_counts": dict(Counter(str(r["destination_length"]["value"])
                                     if r["destination_length"] else "unknown" for r in records)),

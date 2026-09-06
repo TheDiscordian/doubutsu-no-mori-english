@@ -16,6 +16,7 @@ from runtime_module import add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import reference_sequence_edits
 from name_candidates import npc_candidates
+from item_candidates import item_candidates
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -158,6 +159,18 @@ def main():
     manifests.extend(name_manifests)
     reports["npc_names"] = name_report
     (args.output/"npc_names-remaining.jsonl").write_text("".join(json.dumps(r)+"\n" for r in name_remaining))
+    for name, bank in source_banks.items():
+        if not name.startswith("item_"):
+            continue
+        reference_name = "furniture" if name == "item_10" else name
+        item_edits, item_manifests, item_remaining, item_report = item_candidates(
+            bank, list(map(json.loads, (args.inventory/(name+".jsonl")).read_text().splitlines())),
+            list(map(json.loads, (args.gc_names/(reference_name+".jsonl")).read_text().splitlines())),
+            info, override_ids)
+        edits.extend(item_edits)
+        manifests.extend(item_manifests)
+        reports[name] = item_report
+        (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in item_remaining))
     if matches.keys()-visited_matches:
         raise ValueError(f"Reviewed references are absent from the inventory: {matches.keys()-visited_matches}")
     selected = {edit["id"] for edit in edits}
