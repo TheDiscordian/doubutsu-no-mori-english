@@ -10,6 +10,7 @@
   },
   {
     "id": "message:0464",
+    "reference_fallback": true,
     "source_sha256": "6c2ce20b4fa7c528e9df6ccb7fca8ff0941ce34064a3b6ae383942044c5dc50f",
     "translation": "Excuse me!{cmd:7F0308}\nGot a moment?{cmd:7F04}\n{cmd:7F02}Is it{cmd:7F0306}\n{cmd:7F1D} {cmd:7F1E}{cmd:7F20}{cmd:7F0310}\n{cmd:7F21}{cmd:7F22}\nright now?{cmd:7F1600250026}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0465}{cmd:7F10047F}{cmd:7F19}\n{cmd:7F01}",
     "provenance": "Original translation of the Japanese N64 entry",

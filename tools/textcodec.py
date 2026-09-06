@@ -58,7 +58,7 @@ def tokenize(data, info, strict=True):
                 yield Token("raw", data[pos:], pos)
                 break
             command = data[pos+1]
-            if command >= len(info):
+            if command >= len(info) or info[command][0] < 2:
                 if strict:
                     raise ValueError(f"Unsupported command 7F{command:02X} at {pos:#x}")
                 size, kind = 2, "raw"

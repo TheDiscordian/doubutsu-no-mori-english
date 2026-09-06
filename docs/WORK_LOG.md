@@ -140,6 +140,41 @@
   All 47 tests pass. The ordinary pilot remains separate until command handling
   and broader gameplay/save regressions are complete.
 
+### GameCube English command handling
+
+- Added guarded module entry hooks for code size/attributes and message dispatch.
+  All native opcode metadata and handlers remain in use. Extended text requires
+  verification of the complete module code patches and its added DMA data.
+- `build/smoke-module-ampm-01` passes 48 recorded steps. Midnight and late-night
+  hour insertions latch the correct meridiem; changing the RTC afterwards does
+  not change the corresponding AM/PM result. Length, cursor, metadata, guards,
+  and checkpoint restoration pass.
+- `build/smoke-module-capital-01` passes 43 recorded steps. The first substituted
+  field is capitalized, the following field is not, intervening literals remain
+  unchanged, source strings remain lowercase, and date fields do not consume the
+  capitalization flag. AM/PM and capitalization flags coexist correctly.
+- `build/smoke-module-commands-arrival-01` passes 225 recorded steps and the full
+  choice/name/town acceptance checks with the English GameCube calendar question.
+  ROM SHA-256:
+  `c0a0e5475ab980a74119446dad0c7ec75e79054703e5cc321dc85087b2171833`.
+- Added protected-pacing commands and their complete B-button, cancel-order,
+  cursor-timer, and explicit-pause handling. `build/smoke-module-pacing-01` passes
+  54 recorded steps: locked timers decrement instead of fast-forwarding, unlock
+  restores input behaviour, and an eight-frame pause retains speed nine rather
+  than the fast-path speed two. The stronger repeated scenario asserts both
+  observed pause values explicitly; its run and full arrival regression are
+  in progress at this checkpoint.
+- The new pacing experiment contains 9,284 candidates and links 2,944 module
+  bytes. ROM SHA-256:
+  `141da327dd49654e8a9d39ab82c1727a819efa93c83a815abcc45cab60ac7d4e`.
+  UPS SHA-256:
+  `04af7c26e3efe8ba84e4d65722a852e632d3bb9ba88d8371f7de5ed09d3df546`.
+- The expanded hook audit found an audio-sample word resembling a MIPS call and
+  an unaligned graphics word resembling a function pointer. It now classifies
+  executable DMA segments from the pinned definitions, checks aligned literal
+  pointers throughout the ROM, and finds no external hook-interior references.
+  The 48-test suite and the five focused module checks pass.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

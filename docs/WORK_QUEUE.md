@@ -14,12 +14,12 @@ its acceptance checks pass, not when a candidate or specification exists.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| R01 | English runtime substitutions, including town/date/time formats | active | Town and seven message date/time fields pass; AM/PM and other UI callers remain |
+| R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
 | R02 | Choice strings beyond ten bytes | active | Sixteen-byte main path passes; fourteen choice translations, four-row/cancellation, and actor runtime tests remain |
 | R03 | General strings and UI caller capacities | pending | Each imported string has a proven destination limit; no truncation |
 | R04 | NPC and item names | pending | IDs matched from actor/item tables; full English names supported by every destination |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
-| R06 | Remaining GameCube controls | pending | Implement or explicitly translate each semantic difference; no guessed command removal |
+| R06 | Remaining GameCube controls | active | AM/PM, capitalization, and protected pacing have targeted MIPS tests; choice-close, random-range, space, and wider flow coverage remain |
 | R07 | Remaining message matching | pending | Every N64 ID classified, references established, N64-only content translated |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |

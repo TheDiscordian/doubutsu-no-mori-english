@@ -26,8 +26,8 @@ January, Sunday, day one, or zero hours/minutes/seconds.
 The formatter writes space-padded game bytes without a C-string terminator and
 returns the actual length. An insufficient destination or unknown field returns
 minus one without writing. All production wrapper capacities accommodate every
-valid result. AM/PM formatting is available internally; the separate GameCube
-insertion command still requires command-dispatch integration.
+valid result. The separate GameCube AM/PM insertion is implemented through the
+[English command dispatcher](ENGLISH_COMMANDS.md), retaining the hour-time latch.
 
 ## Native stack safety
 

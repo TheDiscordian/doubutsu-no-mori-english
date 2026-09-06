@@ -13,6 +13,7 @@ from gc_adapter import adapt_reference
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
+from runtime_module import add_runtime_module, module_command_info
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -26,9 +27,13 @@ def main():
     parser.add_argument("--drafts", type=Path, default=Path("translations/opening.json"))
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
     parser.add_argument("--english-runtime", action="store_true")
+    parser.add_argument("--runtime-module", type=Path)
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+    if args.runtime_module:
+        add_runtime_module(rom, {}, args.runtime_module)
+        info = module_command_info(rom)
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
@@ -56,18 +61,22 @@ def main():
                     original = source[int(id.split(":")[1], 16)]
                     policy = "presentation"
                     try:
-                        text, adaptations = adapt_reference(reference["text"], original, info)
+                        text, adaptations = adapt_reference(reference["text"], original, info,
+                                                            resident_runtime=bool(args.runtime_module))
                         candidate = encode(text, info)
                         validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=16 if args.english_runtime else 10)
+                                       choice_bytes=16 if args.english_runtime else 10,
+                                       resident_runtime=bool(args.runtime_module))
                     except ValueError as exc:
                         if name != "message" or str(exc) != "Control signature changed":
                             raise
                         policy = "reference_text"
-                        text, adaptations = adapt_reference(reference["text"], original, info, policy)
+                        text, adaptations = adapt_reference(reference["text"], original, info, policy,
+                                                            resident_runtime=bool(args.runtime_module))
                         candidate = encode(text, info)
                         validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=16 if args.english_runtime else 10)
+                                       choice_bytes=16 if args.english_runtime else 10,
+                                       resident_runtime=bool(args.runtime_module))
                 except ValueError as exc:
                     reason = str(exc)
             if reason:

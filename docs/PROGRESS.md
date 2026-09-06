@@ -34,7 +34,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 47 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 48 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -47,8 +47,12 @@ user's direction. The production build retains the approved spacing metrics.
   Four-MiB boot and the complete train-to-town regression pass with intact guards.
 - Seven English message date/time substitutions, including full month/weekday
   names, ordinal days, twelve-hour time, and zero-padded minutes/seconds. Portable
-  exhaustive tests and native MIPS insertion calls pass. Other UI callers and
-  the separate AM/PM command still require implementation and validation.
+  exhaustive tests and native MIPS insertion calls pass. Other UI callers remain.
+- GameCube AM/PM insertion, one-shot capitalization, and protected text pacing
+  in the resident module. Targeted MIPS tests verify the latched meridiem,
+  unchanged source strings, flag consumption, B-button/cancel gating, timer
+  behaviour, and retained explicit pauses. Unsupported extension codes stay
+  rejected. Whole-game command and actor coverage remains incomplete.
 
 ## Current reference candidates
 
@@ -69,6 +73,13 @@ Those fourteen remain withheld. General strings, mail, saved names, dates, and
 item names have separate restrictions. Unsafe legacy item-name mappings are withheld.
 
 ## Validation and release status
+
+The separate resident-module experiment contains 9,284 candidates, including
+8,458 main dialogue entries. It retains the GameCube calendar wording in Rover's
+opening question and admits reference capitalization and protected-pacing spans.
+Its remaining main-dialogue count is 3,292; matching, actor fields, flow controls,
+and review are still required. This experimental count does not replace the
+ordinary pilot's coverage or establish translation completion.
 
 Silent emulator runs confirm a four-MiB configuration, active relocated text
 loaders, intro dialogue, English-first input, case conversion, single-character

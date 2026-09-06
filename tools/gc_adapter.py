@@ -24,10 +24,10 @@ def remove_redundant_article_suppression(text):
     return pattern.sub(replace, text), edits
 
 
-def adapt_reference(text, source, info, policy="presentation"):
+def adapt_reference(text, source, info, policy="presentation", resident_runtime=False):
     text, edits = remove_redundant_article_suppression(text)
     candidate = encode(text, info)
-    ignored = compared_commands(policy)
+    ignored = compared_commands(policy, resident_runtime)
     old = [t.data for t in tokenize(source, info) if t.kind == "cmd" and t.data[1] not in ignored]
     new = [t.data for t in tokenize(candidate, info) if t.kind == "cmd" and t.data[1] not in ignored]
     # Demo animation arguments are platform-specific. Only adapt when the

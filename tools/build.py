@@ -13,7 +13,7 @@ from textcodec import command_info, encode
 from textvalidate import validate_entry
 from keyboard import make_english_keyboard
 from english_runtime import make_english_runtime, verify_english_runtime
-from runtime_module import add_runtime_module
+from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -21,10 +21,14 @@ RELOCATED_BANKS = {
 }
 
 
-def apply_translations(rom, replacements, path, *, english_runtime=False):
+def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None):
     if english_runtime:
         verify_english_runtime(rom, replacements)
-    info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+    if runtime_module:
+        verify_runtime_module(rom, replacements, module_additions, runtime_module)
+        info = module_command_info(rom)
+    else:
+        info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     edits = json.loads(path.read_text()) if path else []
     grouped, seen = {}, set()
     for edit in edits:
@@ -49,7 +53,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False):
             replacement = encode(edit["translation"], info)
             try:
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
-                               choice_bytes=16 if english_runtime else 10)
+                               choice_bytes=16 if english_runtime else 10, resident_runtime=bool(runtime_module))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -97,11 +101,12 @@ def main():
     if args.english_runtime:
         runtime, report["english_runtime"] = make_english_runtime(rom, replacements)
         replacements.update(runtime)
-    report["translation_edits"], relocations = apply_translations(
-        rom, replacements, args.translations, english_runtime=args.english_runtime)
     additions = {}
     if args.runtime_module:
         additions, report["runtime_module"] = add_runtime_module(rom, replacements, args.runtime_module)
+    report["translation_edits"], relocations = apply_translations(
+        rom, replacements, args.translations, english_runtime=args.english_runtime,
+        runtime_module=args.runtime_module, module_additions=additions)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

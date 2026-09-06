@@ -12,7 +12,10 @@ sys.path.insert(0, str(ROOT/"tools"))
 from aflib import CODE_RAM, CODE_VROM, DMA_START, by_vrom, dma_entries, replace_dma
 from runtime_module import (BOOTSTRAP_RAM, MODULE_RAM, MODULE_VROM, RESERVATION,
                             WATCHDOG_COPY, WATCHDOG_START, add_runtime_module,
-                            audit_watchdog_references, watchdog_bytes)
+                            audit_watchdog_references, module_command_info,
+                            verify_runtime_module, watchdog_bytes)
+from textcodec import encode, tokenize
+from textvalidate import validate_entry
 from test_retail import ROM_PATH
 
 
@@ -51,6 +54,24 @@ class ModuleRetailTests(unittest.TestCase):
         self.assertEqual(len(watchdog_bytes(self.rom)), 496)
         self.assertEqual(audit_watchdog_references(self.rom)["external_interior_references"], [])
 
+    def test_command_gaps_and_clock_field_policy(self):
+        info = module_command_info(self.rom)
+        self.assertEqual(encode("{cmd:7F76}", info), b"\x7f\x76")
+        for command in (0x61, 0x62, 0x74, 0x77, 0xFF):
+            with self.assertRaisesRegex(ValueError, "Unsupported"):
+                list(tokenize(bytes([0x7F, command]), info))
+            self.assertEqual(list(tokenize(bytes([0x7F, command]), info, strict=False))[0].kind, "raw")
+        original = b"\x7f\x21"
+        translated = b"\x7f\x21 \x7f\x76 \x7f\x1f"
+        validate_entry(original, translated, info, "message", "reference_text", resident_runtime=True)
+        with self.assertRaisesRegex(ValueError, "absent"):
+            validate_entry(original, translated, info, "message", "reference_text")
+        with self.assertRaisesRegex(ValueError, "preceding hour"):
+            validate_entry(original, b"\x7f\x76", info, "message", "reference_text", resident_runtime=True)
+        validate_entry(b"\x7f\x24", b"\x7f\x75\x7f\x24", info, "message", "presentation", resident_runtime=True)
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(b"\x7f\x24", b"\x7f\x75\x7f\x24", info, "message", "presentation")
+
     @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(),
                          "Build resident-module artifacts to exercise guarded insertion")
     def test_module_artifacts_guards_and_insertion(self):
@@ -63,6 +84,9 @@ class ModuleRetailTests(unittest.TestCase):
         self.assertEqual(word(WATCHDOG_START), 0x08000000 | ((WATCHDOG_COPY & 0x0FFFFFFF) >> 2))
         self.assertEqual(word(0x800D6720), 0x0C000000 | ((BOOTSTRAP_RAM & 0x0FFFFFFF) >> 2))
         self.assertEqual(report["ram"], f"{MODULE_RAM:08X}")
+        verify_runtime_module(self.rom, replacements, additions, directory)
+        with self.assertRaisesRegex(ValueError, "complete resident"):
+            verify_runtime_module(self.rom, replacements, {}, directory)
         with self.assertRaisesRegex(ValueError, "instruction guard"):
             add_runtime_module(self.rom, replacements, directory)
         with tempfile.TemporaryDirectory() as temporary:

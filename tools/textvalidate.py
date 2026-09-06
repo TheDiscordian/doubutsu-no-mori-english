@@ -8,21 +8,24 @@ from textcodec import LATIN, tokenize
 PRESENTATION = {0x03, 0x05}
 # Read-only substitutions. Random-number generation (30) and embedded mail
 # (40) remain ordered commands, not freely movable text fields.
-TEXT_FIELDS = set(range(0x1A, 0x30)) | set(range(0x31, 0x40))
+TEXT_FIELDS = set(range(0x1A, 0x30)) | set(range(0x31, 0x40)) | {0x76}
+DATE_FIELDS = set(range(0x1D, 0x24))
+RUNTIME_PRESENTATION = {0x72, 0x73, 0x75}
 
 
-def compared_commands(policy):
+def compared_commands(policy, resident_runtime=False):
+    presentation = PRESENTATION | (RUNTIME_PRESENTATION if resident_runtime else set())
     if policy == "exact":
         return set()
     if policy == "presentation":
-        return PRESENTATION
+        return presentation
     if policy == "reference_text":
-        return PRESENTATION | TEXT_FIELDS
+        return presentation | TEXT_FIELDS
     raise ValueError("Unknown control policy")
 
 
-def signature(data, info, policy="exact"):
-    ignored = compared_commands(policy)
+def signature(data, info, policy="exact", resident_runtime=False):
+    ignored = compared_commands(policy, resident_runtime)
     return [token.data for token in tokenize(data, info) if token.kind == "cmd"
             and token.data[1] not in ignored]
 
@@ -39,23 +42,36 @@ def expanded_bound(data, info):
     for token in tokenize(data, info):
         if token.kind == "glyph":
             raise ValueError("Two-byte message tags need explicit semantic review")
-        if token.kind == "cmd" and 0x1A <= token.data[1] <= 0x40:
+        if token.kind == "cmd" and (0x1A <= token.data[1] <= 0x40 or token.data[1] == 0x76):
             total += (96 if token.data[1] == 0x40 else 32)-len(token.data)
     return total
 
 
-def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10):
+def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False):
     if choice_bytes not in (10, 16):
         raise ValueError("Unsupported choice runtime capacity")
+    if resident_runtime:
+        hour_seen = False
+        for token in tokenize(replacement, info):
+            if token.kind == "cmd":
+                if token.data[1] == 0x21:
+                    hour_seen = True
+                elif token.data[1] == 0x76 and not hour_seen:
+                    raise ValueError("AM/PM requires a preceding hour field in the message")
     if policy == "reference_text":
         if bank != "message":
             raise ValueError("Reference text policy is only audited for dialogue")
         def fields(data):
             return {t.data[1] for t in tokenize(data, info)
                     if t.kind == "cmd" and t.data[1] in TEXT_FIELDS}
-        if not fields(replacement) <= fields(original):
+        available = fields(original)
+        if resident_runtime and available & DATE_FIELDS:
+            available |= DATE_FIELDS
+        if resident_runtime and 0x21 in available:
+            available.add(0x76)
+        if not fields(replacement) <= available:
             raise ValueError("Reference requests a text field absent from the N64 message")
-    if signature(original, info, policy) != signature(replacement, info, policy):
+    if signature(original, info, policy, resident_runtime) != signature(replacement, info, policy, resident_runtime):
         raise ValueError("Control signature changed")
     if bank == "message":
         if expanded_bound(replacement, info) > 1024:
@@ -88,7 +104,7 @@ def layout_issues(data, info, advances, max_width=192, max_lines=4):
             command = token.data[1]
             if command in (0x02,):
                 x, line, page = 0, 1, page+1
-            elif 0x1A <= command <= 0x40:
+            elif 0x1A <= command <= 0x40 or command == 0x76:
                 chars = {0x1A: 6, 0x1B: 6, 0x1C: 4, 0x2F: 16, 0x40: 68}.get(command, 10)
                 x += chars*12  # Existing Japanese names remain possible.
             elif command in (0x51, 0x52, 0x53, 0x5A):

@@ -60,6 +60,12 @@ Module source changes require rebuilding its artifacts. The linker limits the
 complete code/data/BSS reservation to sixteen KiB. The normal pilot does not yet
 enable the module. See [module design](../specs/RUNTIME_MODULE.md).
 
+Generate module-aware candidates with `tools/reference_candidates.py`, passing
+`--english-runtime --runtime-module build/runtime-module --output build/module-candidates`
+and the verified `--rom`. Use that directory's `translations.json` in the module
+build to include the implemented GameCube commands and bounded calendar fields.
+The build verifies the entire module capability before accepting those edits.
+
 `tools/emulator_smoke.py` requires ares, Xvfb, FFmpeg, X11, and XTest. Pass an
 explicit `--xvfb` path if the existing binary is outside PATH. Every test requires
 a fresh `--output` directory, copies the ROM, disables audio, isolates saves,
@@ -101,3 +107,5 @@ to verify heap bounds and guards after any scenario. The dedicated
 functions using bounded debugger scratch RAM. It requires a checkpoint and
 restores the complete emulator state afterwards; it does not alter a release ROM
 or establish game-save compatibility. The runner rejects an unrestored call test.
+The same checkpoint discipline applies to `runtime-ampm-scenario.json`,
+`runtime-capital-scenario.json`, and `runtime-pacing-scenario.json` under `tests/`.
