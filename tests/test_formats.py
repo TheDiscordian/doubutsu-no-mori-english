@@ -10,6 +10,8 @@ from aflib import (apply_ups, make_ups, normalise_rom, read_varint, varint,
                    verified_rom, yaz0_decode)
 from textbanks import Bank
 from textcodec import decode, encode, tokenize
+from font import glyph_metrics
+from textvalidate import expanded_bound, signature, validate_entry
 
 
 class PatchTests(unittest.TestCase):
@@ -59,6 +61,7 @@ class Yaz0Tests(unittest.TestCase):
 class TextTests(unittest.TestCase):
     def setUp(self):
         self.info = [(2, 0)]*0x61
+        self.info[3] = (3, 0)
         self.info[5] = (5, 0)
 
     def test_controls_do_not_decode_as_letters(self):
@@ -98,6 +101,27 @@ class TextTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             Bank("bad", 0, 1, b"abc", struct.pack(">2I", 4, 0)).entries()
 
+    def test_expansion_accounts_for_repeated_insertions(self):
+        data = b"\x7f\x24"*32
+        self.assertGreater(expanded_bound(data, self.info), 1024)
+        with self.assertRaisesRegex(ValueError, "Expanded message"):
+            validate_entry(data, data, self.info, "message")
+        self.assertEqual(expanded_bound(b"Hi\x7f\x00", self.info), 20)
+
+    def test_presentation_policy_never_drops_branch_or_button_commands(self):
+        a = b"Hi\x7f\x03\x04\x7f\x04\x7f\x00"
+        b = b"Hello\x7f\x04\x7f\x00"
+        validate_entry(a, b, self.info, "message", "presentation")
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(a, b.replace(b"\x7f\x04", b""), self.info, "message", "presentation")
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(a, b, self.info, "message")
+
+    def test_choice_limit_is_runtime_limit_not_source_length(self):
+        validate_entry(b"Yes", b"Certainly!", self.info, "select")
+        with self.assertRaisesRegex(ValueError, "10-byte"):
+            validate_entry(b"Yes", b"Absolutely!", self.info, "select")
+
 
 class RomTests(unittest.TestCase):
     def test_byte_orders(self):
@@ -109,6 +133,15 @@ class RomTests(unittest.TestCase):
         self.assertEqual(normalise_rom(words), data)
         with self.assertRaisesRegex(ValueError, "Unsupported source"):
             verified_rom(data)
+
+
+class FontTests(unittest.TestCase):
+    def test_narrow_glyph_spacing_uses_ink_width(self):
+        glyph = [[0]*5+[15]*3+[0]*4 for _ in range(16)]
+        self.assertEqual(glyph_metrics(glyph), (5, 8, 3, 4))
+        wide = [[0]+[15]*10+[0] for _ in range(16)]
+        self.assertEqual(glyph_metrics(wide), (1, 11, 5, 6))
+        self.assertEqual(glyph_metrics([[0]*12 for _ in range(16)]), (0, 0, 0, 6))
 
 
 if __name__ == "__main__":

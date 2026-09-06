@@ -26,6 +26,15 @@ def get_glyph(atlas, char):
     return [atlas[(y+row)*192+x:(y+row)*192+x+12] for row in range(16)]
 
 
+def glyph_metrics(glyph):
+    columns = [x for x in range(12) if any(row[x] for row in glyph)]
+    left, right = (min(columns), max(columns)+1) if columns else (0, 0)
+    ink_width = min(right-left, 5)
+    # Keep a normal space; narrow ink receives exactly one spacing column.
+    advance = ink_width+1 if columns else 6
+    return left, right, ink_width, advance
+
+
 def png_gray(width, height, values):
     def chunk(kind, content):
         return (struct.pack(">I", len(content)) + kind + content +
@@ -48,12 +57,11 @@ def make_halfwidth(rom):
         raise ValueError("Font DMA file too short")
     atlas = pixels(font[ATLAS_OFFSET:ATLAS_OFFSET+ATLAS_SIZE])
     original = atlas[:]
+    advances = {}
     for char in sorted(LATIN):
         glyph = get_glyph(original, char)
-        columns = [x for x in range(12) if any(row[x] for row in glyph)]
-        left, right = (min(columns), max(columns)+1) if columns else (0, 0)
+        left, right, target_width, advance = glyph_metrics(glyph)
         width = right-left
-        target_width = min(width, 5)
         for y, row in enumerate(glyph):
             out = [0]*12
             # Area coverage preserves thin strokes while reducing to five ink
@@ -67,13 +75,15 @@ def make_halfwidth(rom):
                 out[dx] = (total+width//2)//width
             start = (char//16*16+y)*192+char%16*12
             atlas[start:start+12] = out
-        code[WIDTH_TABLE+char] = 6
+        code[WIDTH_TABLE+char] = 12-advance
+        advances[f"{char:02X}"] = advance
     code[WIDTH_BRANCH:WIDTH_BRANCH+4] = bytes(4)
     font[ATLAS_OFFSET:ATLAS_OFFSET+ATLAS_SIZE] = pack_pixels(atlas)
     for char in set(range(256))-LATIN:
         if get_glyph(atlas, char) != get_glyph(original, char):
             raise ValueError("Japanese/symbol glyph unexpectedly changed")
     return {CODE_VROM: bytes(code), FONT_VROM: bytes(font)}, {
-        "latin_glyphs": len(LATIN), "advance_pixels": 6, "ink_columns_max": 5,
+        "latin_glyphs": len(LATIN), "advance_pixels_max": 6, "ink_columns_max": 5,
+        "advance_by_glyph": advances,
         "storage_cell": [12, 16], "japanese_glyphs_unchanged": True,
         "width_branch_ram": "0x80090294", "width_table_ram": "0x80106AF4"}

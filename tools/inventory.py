@@ -24,7 +24,11 @@ def main():
     args.output.mkdir(parents=True, exist_ok=True)
     report = {}
     for bank in original:
-        old, translated = bank.entries(), legacy[bank.name].entries()
+        old, legacy_error = bank.entries(), None
+        try:
+            translated = legacy[bank.name].entries()
+        except ValueError as exc:
+            translated, legacy_error = [], str(exc)
         assert bank.rebuild(old) == (bank.data, bank.table), bank.name
         rows, counts = [], Counter()
         for i, data in enumerate(old):
@@ -71,6 +75,10 @@ def main():
             rows.append(row)
         report[bank.name] = {**dict(counts), "legacy_entries": len(translated),
                              "capacity": len(bank.data), "roundtrip": "passed"}
+        if legacy_error:
+            report[bank.name]["legacy_bank_error"] = legacy_error
+        if bank.name.startswith("item_"):
+            report[bank.name]["legacy_mapping_status"] = "provisional; legacy layout notes require verification"
         (args.output / f"{bank.name}.jsonl").write_text(
             "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows))
     (args.output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")

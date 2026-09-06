@@ -35,7 +35,7 @@ class Bank:
             start = end
         return result
 
-    def rebuild(self, entries):
+    def rebuild(self, entries, allow_expand=False):
         old = self.entries()
         if len(entries) != len(old):
             raise ValueError(f"{self.name}: entry count change is not supported")
@@ -44,7 +44,7 @@ class Bank:
                 raise ValueError(f"{self.name}: fixed entry size changed")
             return b"".join(entries), None
         data = b"".join(entries)
-        if len(data) > len(self.data):
+        if len(data) > len(self.data) and not allow_expand:
             raise ValueError(f"{self.name}: bank capacity exceeded ({len(data)} > {len(self.data)})")
         table = bytearray(self.table)
         offset = 0
@@ -88,7 +88,41 @@ def banks(rom, legacy=False):
                            file[ts:ts+0x610], data_offset=bounds[i], table_offset=ts))
     vrom, width = (0x1BE6000, 8) if legacy else (0xE04000, 6)
     file = extract(vrom)
-    # The legacy file includes trailing alignment after 238 names.
-    result.append(Bank("npc_names", vrom, None, file[8:8+238*width], None,
+    # Retain every complete storage slot, including reserved/alignment slots.
+    # This is not a count of villagers: the retail actor table has 216 NPCs.
+    end = 8 + (len(file)-8)//width*width
+    result.append(Bank("npc_names", vrom, None, file[8:end], None,
                        fixed_size=width, data_offset=8))
+    vrom = 0x10F4000
+    file = extract(vrom)
+    if legacy:
+        # Legacy variable-length item-name banks. Each end-offset table is
+        # independent; names are still indexed by their original item group.
+        layouts = [
+            (0x10, 0x104, 0x1B20, 0x1FA0), (0x118, 0x14, 0x1FA0, 0x1FC8),
+            (0x130, 0x94, 0x1FC8, 0x2248), (0x1C8, 0x84, 0x2248, 0x2348),
+            (0x250, 0x400, 0x2348, 0x3348), (0x650, 0x7C, 0x3348, 0x3440),
+            (0x6D0, 0x104, 0x3440, 0x38C0), (0x7D8, 0x104, 0x38C0, 0x3D40),
+            (0x8E0, 0x20, 0x3D40, 0x3D68), (0x900, 0x2C, 0x3D68, 0x3DE0),
+            (0x930, 0xE0, 0x3DE0, 0x3FB0), (0xA10, 8, 0x3FB0, 0x3FB8),
+            (0xA18, 0x184, 0x3FB8, 0x420C), (0xBA0, 0x84, 0x420C, 0x43BC),
+            (0xC28, 0xC, 0x43BC, 0x43CC), (0xC38, 0x14, 0x43CC, 0x440C),
+            (0xC50, 0xED0, 0x440C, len(file)),
+        ]
+        for group, (ts, size, start, end) in zip([*range(0x20, 0x30), 0x10], layouts):
+            result.append(Bank(f"item_{group:02X}", vrom, vrom,
+                               file[start:end], file[ts:ts+size],
+                               data_offset=start, table_offset=ts))
+    else:
+        ranges = [(8, 0x288), (0x288, 0x2B0), (0x2B0, 0x418), (0x418, 0x558),
+                  (0x558, 0xF50), (0xF50, 0x107C), (0x107C, 0x12FC),
+                  (0x12FC, 0x157C), (0x157C, 0x15C2), (0x15C4, 0x1628),
+                  (0x1628, 0x1850), (0x1850, 0x185A), (0x185C, 0x1C1C),
+                  (0x1C1C, 0x1D5C), (0x1D5C, 0x1D70), (0x1D70, 0x1D98),
+                  (0x1D98, 0x1D98+(len(file)-0x1D98)//10*10)]
+        for group, (start, end) in zip([*range(0x20, 0x30), 0x10], ranges):
+            # Sub-banks have 0–3 alignment bytes before the next group.
+            end = start+(end-start)//10*10
+            result.append(Bank(f"item_{group:02X}", vrom, None, file[start:end], None,
+                               fixed_size=10, data_offset=start))
     return result

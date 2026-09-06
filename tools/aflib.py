@@ -242,18 +242,25 @@ def fix_checksum(rom):
     struct.pack_into(">2I", rom, 0x10, *n64_checksum(rom))
 
 
-def replace_dma(rom, replacements):
+def replace_dma(rom, replacements, relocations=None):
     """Append replacement files; keep VROM identity and all original file ranges."""
     entries = by_vrom(rom)
+    relocations = relocations or {}
     out = bytearray(rom)
     for vrom, data in sorted(replacements.items()):
         entry = entries[vrom]
-        if len(data) != entry.size:
+        if len(data) != entry.size and vrom not in relocations:
             raise ValueError(f"DMA size change requires a separate VROM relocation: {vrom:#x}")
         out.extend(b"\0" * (-len(out) % 16))
         start = len(out)
         out.extend(data)
         struct.pack_into(">2I", out, DMA_START + entry.index*16 + 8, start, 0)
+        if vrom in relocations:
+            new_vrom = relocations[vrom]
+            struct.pack_into(">2I", out, DMA_START+entry.index*16, new_vrom, new_vrom+len(data))
+    intervals = sorted((e.vstart, e.vend) for e in dma_entries(out) if e.pstart != 0xFFFFFFFF)
+    if any(right[0] < left[1] for left, right in zip(intervals, intervals[1:])):
+        raise ValueError("Relocated virtual DMA ranges overlap")
     target_size = 1 << (len(out)-1).bit_length()
     if target_size > MAX_ROM:
         raise ValueError("ROM exceeds 64 MiB")

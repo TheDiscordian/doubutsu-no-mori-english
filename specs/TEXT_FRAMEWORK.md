@@ -45,7 +45,20 @@ represent empty entries. Preserve IDs and original unused bytes on round trips.
 Each translation edit records the source entry hash, its bank and hexadecimal
 ID, replacement text, provenance, and review status. A stale source hash fails
 the build. Initial builds require unchanged control tokens and original byte
-budgets; expansion needs a documented loader and buffer audit.
+budgets for banks without an audited relocation. Main dialogue and choices
+support bank expansion, within the unchanged runtime buffer limits.
+
+Dialogue relocates to virtual ROM `0x02000000`. The loader address at RAM
+`0x8009E474` changes from `3C1800BD27184000` to `3C18020027180000`.
+Choices relocate to virtual ROM `0x02400000`; RAM `0x80065614` changes from
+`3C1800D027185000` to `3C18024027180000`. Both patches require the exact retail
+instructions before modification. End-offset tables retain their original IDs.
+The DMA lookup is a linear scan, so relocated rows need not be sorted.
+
+The optional `presentation` control policy permits pause (`7F03`) and text-colour
+(`7F05`) differences. All other commands and arguments remain exact and ordered,
+including button waits, page clears, animation, sound, insertions, choices, and
+branches. A command mismatch blocks import; it is not repaired by guessing.
 
 ## Halfwidth prototype
 
@@ -56,16 +69,32 @@ budgets; expansion needs a documented loader and buffer audit.
 - Font virtual file: `0xBCD000`; atlas at file offset `0x128`.
 - Atlas: 192×256 intensity-4 texture, 16×16 glyph cells, each 12×16 pixels.
 
-The prototype replaces the width guard with a NOP, sets supported Latin offsets
-to six, and reduces Latin ink to at most five columns plus spacing. Other table
+The prototype replaces the width guard with a NOP and reduces Latin ink to at
+most five columns plus one spacing pixel. Narrow glyphs use their actual ink
+width plus one; `i`, `I`, `l`, and the apostrophe advance four pixels. The width
+table stores `12 - advance`, so these narrow glyphs have an offset of eight.
+Space advances six pixels. Other table
 entries stay zero. Font storage size and Japanese textures stay unchanged.
-This establishes a shared six-pixel measurement path. Every draw path, menu
+This establishes a shared proportional measurement path. Every draw path, menu
 cursor, text entry UI, and bubble still requires in-game verification.
 
 ## Buffer constraints
 
 The retail message loader rejects entries larger than 1,024 bytes. That limit
 includes control bytes; inserted player/item strings can require more room.
+The builder budgets 32 bytes per insertion, 96 for embedded mail, and a 16-byte
+work/alignment reserve. Retail disassembly confirms six-byte player/NPC names,
+four-byte catchphrases, ten-byte free/item strings, and colour wrappers of six
+bytes. The country-name insertion adds a six-byte name and a suffix loaded into
+a ten-byte buffer. The embedded-mail message setter uses a 68-byte buffer.
+These deliberately generous bounds apply only while those runtime structures
+remain unchanged. Two-byte message tags are excluded from expanded edits until
+their semantics are established.
+
+`mMsg_MoveDataCut` at RAM `0x8009EA2C` only moves an expanded suffix when its new
+length is at most 1,024; callers still perform their insertion copy. Avoiding
+overflow before building is therefore essential, even though the move routine
+contains a size check.
 The retail choice loader accepts at most ten bytes. The general string loader
 accepts at most 64 bytes and copies into caller-specific buffers.
 

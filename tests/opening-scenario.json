@@ -1,0 +1,17 @@
+[
+  {"wait": 8},
+  {"key": "Return", "duration": 0.5},
+  {"wait": 7},
+  {"capture": "after-start.png"},
+  {"key": "a", "duration": 0.3},
+  {"wait": 15},
+  {"capture": "opening.png"},
+  {"read": ["8009E474", 8], "expect": "3C18020027180000"},
+  {"read": ["80090294", 4], "expect": "00000000"},
+  {"read": ["80106B1B", 1], "expect": "08"},
+  {"read": ["80106B3D", 1], "expect": "08"},
+  {"read": ["80106B5D", 1], "expect": "08"},
+  {"read": ["80000318", 4], "expect": "00400000"},
+  {"read": ["80106AF4", 256]},
+  {"read": ["8013A680", 24576]}
+]

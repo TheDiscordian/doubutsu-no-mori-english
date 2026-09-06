@@ -17,6 +17,7 @@ class RSP:
     def __init__(self, port):
         self.sock = socket.create_connection(("127.0.0.1", port), timeout=5)
         self.buf = b""
+        self.sock.sendall(b"+")  # ares TCP security handshake requires this first.
 
     def send(self, text):
         data = text.encode()
@@ -95,7 +96,12 @@ def main():
                         "Audio\n  Driver: None\n  Mute: true\n  Volume: 0.0\n"
                         "Input\n  Driver: SDL\n  Defocus: Allow\n"
                         "General\n  NoFilePrompt: true\n"
-                        "Nintendo64\n  ExpansionPak: false\n")
+                        "Nintendo64\n  ExpansionPak: false\n"
+                        "  Input\n    Controller.Port.1\n      Gamepad\n"
+                        "        A: 0x1/0/35;;\n        B: 0x1/0/36;;\n"
+                        "        Start: 0x1/0/89;;\n"
+                        "        Up: 0x1/0/84;;\n        Down: 0x1/0/85;;\n"
+                        "        Left: 0x1/0/86;;\n        Right: 0x1/0/87;;\n")
     logs, processes, debug = [], [], None
     readfd, writefd = os.pipe()
     try:
@@ -143,7 +149,13 @@ def main():
                 keyboard.press(action["key"], action.get("duration", 0.15))
             if "read" in action:
                 address, length = action["read"]
-                results.append({"read": action["read"], "data": debug.command(f"m{address},{length:x}")})
+                data = debug.command(f"m{address},{length:x}")
+                if len(data) != length*2:
+                    raise ValueError("Debugger memory read length mismatch")
+                if "expect" in action and data.lower() != action["expect"].lower():
+                    raise ValueError(f"Runtime assertion failed at {address}: {data}")
+                results.append({"read": action["read"], "data": data,
+                                "assertion": "passed" if "expect" in action else "not_requested"})
             if "command" in action:
                 results.append({"command": action["command"], "result": debug.command(action["command"])})
             if "capture" in action:
@@ -153,7 +165,9 @@ def main():
                                env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
                                stderr=subprocess.PIPE)
                 results.append({"capture": target.name})
-        results.append({"pc": debug.command("p25"), "process_alive": ares.poll() is None})
+        # Register numbering has changed across ares builds; retain the raw
+        # response without claiming this is a trustworthy PC measurement.
+        results.append({"raw_register_p25": debug.command("p25"), "process_alive": ares.poll() is None})
         (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
         print(json.dumps({"output": str(out), "steps": len(results)}, indent=2))
     finally:

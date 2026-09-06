@@ -6,10 +6,16 @@ import json
 from pathlib import Path
 import struct
 
-from aflib import CODE_VROM, apply_ups, by_vrom, make_ups, n64_checksum, replace_dma, sha256, verified_rom
+from aflib import CODE_RAM, CODE_VROM, apply_ups, by_vrom, make_ups, n64_checksum, replace_dma, sha256, verified_rom
 from font import ATLAS_OFFSET, ATLAS_SIZE, FONT_VROM, make_halfwidth, pixels, png_gray
 from textbanks import banks
-from textcodec import command_info, control_signature, encode
+from textcodec import command_info, encode
+from textvalidate import validate_entry
+
+RELOCATED_BANKS = {
+    "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
+    "select": (0x02400000, 0x80065614, "3C1800D027185000", "3C18024027180000"),
+}
 
 
 def apply_translations(rom, replacements, path):
@@ -23,6 +29,7 @@ def apply_translations(rom, replacements, path):
         seen.add(edit["id"])
         grouped.setdefault(bank, {})[int(index, 16)] = edit
     count = 0
+    relocations = {}
     files = by_vrom(rom)
     for bank in banks(rom):
         if bank.name not in grouped:
@@ -35,16 +42,25 @@ def apply_translations(rom, replacements, path):
             if sha256(original) != edit["source_sha256"]:
                 raise ValueError(f"Stale translation: {edit['id']}")
             replacement = encode(edit["translation"], info)
-            if control_signature(original, info) != control_signature(replacement, info):
-                raise ValueError(f"Translation changes control flow or formatting commands: {edit['id']}")
-            # Per-entry expansion is enabled separately after loader/buffer audit.
-            if len(replacement) > len(original):
-                raise ValueError(f"Translation exceeds current entry budget: {edit['id']}")
+            try:
+                validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"))
+            except ValueError as exc:
+                raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
                 replacement = replacement.ljust(bank.fixed_size, b" ")
             entries[index] = replacement
             count += 1
-        data, table = bank.rebuild(entries)
+        data, table = bank.rebuild(entries, allow_expand=(bank.name in RELOCATED_BANKS))
+        if bank.name in RELOCATED_BANKS:
+            new_vrom, address, expected, patched = RELOCATED_BANKS[bank.name]
+            relocations[bank.data_vrom] = new_vrom
+            data += bytes(-len(data) % 16)
+            code = bytearray(replacements[CODE_VROM])
+            offset = address-CODE_RAM
+            if code[offset:offset+8] != bytes.fromhex(expected):
+                raise ValueError(f"Retail {bank.name} loader address does not match")
+            code[offset:offset+8] = bytes.fromhex(patched)
+            replacements[CODE_VROM] = bytes(code)
         for vrom, offset, content in ((bank.data_vrom, bank.data_offset, data),
                                       (bank.table_vrom, bank.table_offset, table)):
             if vrom is None:
@@ -54,7 +70,7 @@ def apply_translations(rom, replacements, path):
             replacements[vrom] = bytes(whole)
     if grouped:
         raise ValueError(f"Unknown translation banks: {list(grouped)}")
-    return count
+    return count, relocations
 
 
 def main():
@@ -65,11 +81,12 @@ def main():
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     replacements, report = make_halfwidth(rom)
-    report["translation_edits"] = apply_translations(rom, replacements, args.translations)
-    output = replace_dma(rom, replacements)
+    report["translation_edits"], relocations = apply_translations(rom, replacements, args.translations)
+    report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
+    output = replace_dma(rom, replacements, relocations)
     files = by_vrom(output)
     for vrom, data in replacements.items():
-        if files[vrom].extract(output) != data:
+        if files[relocations.get(vrom, vrom)].extract(output) != data:
             raise ValueError("Reinserted file does not match replacement")
     if n64_checksum(output) != struct.unpack_from(">2I", output, 16):
         raise ValueError("Output checksum failure")

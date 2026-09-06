@@ -1,0 +1,32 @@
+[
+  {
+    "id": "message:09C7",
+    "source_sha256": "acc0962a0dc2841a0be0e393dcb7dd9dee93c55fc4a8d1ff3f40a15bb0c8bae0",
+    "translation": "Hey there.{cmd:7F030C}\nSo you've{cmd:7F0304} decided to live{cmd:7F0306}\non your own.{cmd:7F04}\n{cmd:7F02}It's nice,{cmd:7F0308}\nwith nobody around{cmd:7F0306}\ntelling you what to do.{cmd:7F04}\n{cmd:7F02}You can do what you like,{cmd:7F0308}\nwhenever you feel like it.{cmd:7F04}\n{cmd:7F02}Living alone,{cmd:7F0306}\nfree to do your own thing,{cmd:7F0306}\nis pretty great.{cmd:7F04}\n{cmd:7F02}{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}But{cmd:7F030C}\nliving on your own{cmd:7F0308}\ngets lonely sometimes.{cmd:7F04}\n{cmd:7F02}At times like that,{cmd:7F0306}\nhaving a{cmd:7F0304} good friend\nclose by{cmd:7F0308}\nmakes all the difference.{cmd:7F04}\n{cmd:7F02}Friends really do{cmd:7F0306}\nmean a lot.{cmd:7F04}\n{cmd:7F02}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0306}\nSorry for{cmd:7F0304} going on\nso long.{cmd:7F0306}{cmd:7F04}\n{cmd:7F02}Well,{cmd:7F0306}\nready to catch your train\nand get going?{cmd:7F16006E006F}{cmd:7F04}{cmd:7F0D}{cmd:7F0F09C9}{cmd:7F1009C8}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserves all original command tokens. Fresh-save K.K. introduction."
+  },
+  {
+    "id": "message:0464",
+    "source_sha256": "6c2ce20b4fa7c528e9df6ccb7fca8ff0941ce34064a3b6ae383942044c5dc50f",
+    "translation": "Excuse me!{cmd:7F0308}\nGot a moment?{cmd:7F04}\n{cmd:7F02}Is it{cmd:7F0306}\n{cmd:7F1D} {cmd:7F1E}{cmd:7F20}{cmd:7F0310}\n{cmd:7F21}{cmd:7F22}\nright now?{cmd:7F1600250026}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0465}{cmd:7F10047F}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Date/time inserted strings still need English localisation. Gameplay control tokens are preserved."
+  },
+  {
+    "id": "message:0465",
+    "source_sha256": "31abaad634fedc5aba0cb2b3adbd8373eee16691a034430b9acaa13aca98757f",
+    "translation": "Thanks.{cmd:7F0308}\nI had my reasons for asking.{cmd:7F0308}\n{cmd:7F09000003}Ha ha ha!{cmd:7F04}\n{cmd:7F090000FF}\n{cmd:7F02}Hey,{cmd:7F030A}\nmind if I sit here?{cmd:7F1600170018}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0466}{cmd:7F100467}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft"
+  },
+  {
+    "id": "message:0466",
+    "source_sha256": "d0cf7a02ff8eadf4b7571243a0ae2bea1a016b1dcf84a4d738ffac5be51aabd2",
+    "translation": "Thanks!{cmd:7F04}\n{cmd:7F02}By the way,{cmd:7F0306}\nwhat's your name?\n{cmd:7F09090001}\n{cmd:7F55}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft"
+  }
+]
