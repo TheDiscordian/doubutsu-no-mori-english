@@ -30,10 +30,6 @@ def main():
         except ValueError as exc:
             translated, legacy_error = [], str(exc)
         legacy_entries = len(translated)
-        # The supplied item layout notes disagree with the actual legacy ROM.
-        # Do not attach unrelated strings to original IDs as apparent matches.
-        if bank.name.startswith("item_"):
-            translated = []
         assert bank.rebuild(old) == (bank.data, bank.table), bank.name
         rows, counts = [], Counter()
         for i, data in enumerate(old):
@@ -48,8 +44,11 @@ def main():
             except ValueError as exc:
                 row["source_error"] = str(exc)
                 counts["source_errors"] += 1
-            if i < len(translated):
-                candidate = translated[i]
+            legacy_index = i//4 if bank.name == "item_10" else i
+            if legacy_index < len(translated):
+                candidate = translated[legacy_index]
+                if bank.name.startswith("item_"):
+                    row["legacy_entry_id"] = f"{bank.name}:{legacy_index:04X}"
                 row["legacy"] = decode(candidate, info, strict=False)
                 row["legacy_bytes"] = len(candidate)
                 row["legacy_japanese"] = has_japanese(candidate, info)
@@ -83,7 +82,7 @@ def main():
         if legacy_error:
             report[bank.name]["legacy_bank_error"] = legacy_error
         if bank.name.startswith("item_"):
-            report[bank.name]["legacy_mapping_status"] = "withheld; legacy layout notes require verification"
+            report[bank.name]["legacy_mapping_status"] = "verified actual loader tables; furniture rotation IDs map four to one"
         (args.output / f"{bank.name}.jsonl").write_text(
             "".join(json.dumps(row, ensure_ascii=False) + "\n" for row in rows))
     (args.output / "summary.json").write_text(json.dumps(report, indent=2) + "\n")

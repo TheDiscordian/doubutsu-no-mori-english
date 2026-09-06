@@ -463,6 +463,21 @@
   Dialogue labels, quest names, letters, and game-save round trips still need
   their gameplay tests. This does not establish full name coverage.
 
+### Recover actual legacy item references
+
+- Replaced archived item-data offsets with the supplied patched ROM's actual
+  guarded loader tables. Verified all sixteen ordinary groups and the furniture
+  group's table, count, data range, terminator, and unchanged reconstruction.
+  Native furniture has 947 groups of four identical rotation-name slots plus one
+  filler; the inventory records the four-to-one donor mapping explicitly.
+- All 90 tests pass. The generated inventory now exposes usable legacy names
+  without pretending they establish GameCube identities. The first two legacy
+  music labels are exchanged, and the GameCube plant list has an inserted entry;
+  these differences prohibit blind same-index import.
+- The current space-runtime gameplay run reaches Nook's housing escort through
+  normal controller input in 66 recorded steps. It reaches `07E1`; FlashRAM
+  remains blank, so this is not a game-save result.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -3,7 +3,8 @@
 from dataclasses import dataclass
 import struct
 
-from aflib import by_vrom
+from aflib import CODE_VROM, by_vrom
+from legacy_items import layout as legacy_item_layout
 
 
 @dataclass
@@ -98,20 +99,9 @@ def banks(rom, legacy=False):
     vrom = 0x10F4000
     file = extract(vrom)
     if legacy:
-        # Legacy variable-length item-name banks. Each end-offset table is
-        # independent; names are still indexed by their original item group.
-        layouts = [
-            (0x10, 0x104, 0x1B20, 0x1FA0), (0x118, 0x14, 0x1FA0, 0x1FC8),
-            (0x130, 0x94, 0x1FC8, 0x2248), (0x1C8, 0x84, 0x2248, 0x2348),
-            (0x250, 0x400, 0x2348, 0x3348), (0x650, 0x7C, 0x3348, 0x3440),
-            (0x6D0, 0x104, 0x3440, 0x38C0), (0x7D8, 0x104, 0x38C0, 0x3D40),
-            (0x8E0, 0x20, 0x3D40, 0x3D68), (0x900, 0x2C, 0x3D68, 0x3DE0),
-            (0x930, 0xE0, 0x3DE0, 0x3FB0), (0xA10, 8, 0x3FB0, 0x3FB8),
-            (0xA18, 0x184, 0x3FB8, 0x420C), (0xBA0, 0x84, 0x420C, 0x43BC),
-            (0xC28, 0xC, 0x43BC, 0x43CC), (0xC38, 0x14, 0x43CC, 0x440C),
-            (0xC50, 0xED0, 0x440C, len(file)),
-        ]
-        for group, (ts, size, start, end) in zip([*range(0x20, 0x30), 0x10], layouts):
+        # The shipped loader is the authority; archived offset notes are stale.
+        # Furniture has one record per four native rotation IDs.
+        for group, ts, size, start, end, _ in legacy_item_layout(extract(CODE_VROM), file):
             result.append(Bank(f"item_{group:02X}", vrom, vrom,
                                file[start:end], file[ts:ts+size],
                                data_offset=start, table_offset=ts))

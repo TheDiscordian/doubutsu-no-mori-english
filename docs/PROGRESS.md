@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 87 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 90 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -83,6 +83,9 @@ user's direction. The production build retains the approved spacing metrics.
   native fields. All 216 names have confirmed reference identities; 38 longer
   names remain withheld for wider-name work. All native name loads and their
   adjacent guards pass, including the no-write invalid-ID path.
+- Legacy item references recovered from the shipped loader's verified tables.
+  All seventeen banks reconstruct unchanged, and 947 furniture groups map to
+  their four native rotation slots. These are references, not approved imports.
 
 ## Current reference candidates
 
@@ -100,7 +103,8 @@ rejection and adaptation reports are generated in `build/candidates/`.
 Thirteen English reference choices exceed sixteen bytes and one lacks the
 same-ID legacy match.
 Those fourteen remain withheld. General strings, mail, saved names, dates, and
-item names have separate restrictions. Unsafe legacy item-name mappings are withheld.
+item names have separate restrictions. Legacy item references have verified
+storage mappings; English item identities and destination capacities still gate import.
 
 ## Validation and release status
 
