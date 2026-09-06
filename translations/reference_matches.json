@@ -1,0 +1,9 @@
+[
+  {
+    "id": "select:0013",
+    "source_sha256": "06b4cedef308731f5697fb8ec195d715314bd3ae2a5df1e25feac1e22c2bebe5",
+    "reference_id": "select:0013",
+    "reference_sha256": "f1323f09f63c867d520b3b267f6e314e4eaf92fb314f916b1c50b67076dfcab7",
+    "evidence": "The Japanese choice explicitly requests editing the message. The legacy adds the noun to its English label; the English GameCube label abbreviates the same action. N64 messages 0382, 0925, 0927, and 0936 reference this choice in the home gyroid menu. Keep those N64 menu IDs and branches: the GameCube gyroid menus expose different actions. This record confirms only this label's identity, not the surrounding dialogue flow or runtime behaviour."
+  }
+]

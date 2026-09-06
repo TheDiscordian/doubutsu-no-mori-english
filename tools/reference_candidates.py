@@ -8,12 +8,12 @@ from pathlib import Path
 
 from aflib import CODE_VROM, by_vrom, sha256, verified_rom
 from font import make_halfwidth
-from gc_text import plain
 from gc_adapter import adapt_reference
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import add_runtime_module, module_command_info
+from reference_matches import load_matches, resolve_reference
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--inventory", type=Path, default=Path("build/inventory"))
     parser.add_argument("--drafts", type=Path, default=Path("translations/opening.json"))
+    parser.add_argument("--matches", type=Path, default=Path("translations/reference_matches.json"))
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path)
@@ -42,6 +43,10 @@ def main():
     source_banks = {bank.name: bank for bank in banks(rom)}
     drafts = json.loads(args.drafts.read_text())
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
+    matches = load_matches(args.matches)
+    visited_matches = set()
+    if override_ids & matches.keys():
+        raise ValueError("Reviewed reference match conflicts with an original draft override")
     edits, manifests, reports = [], [], {}
     for name in REFERENCE_BANKS:
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
@@ -53,15 +58,12 @@ def main():
             if id in override_ids:
                 counts["original_draft_override"] += 1
                 continue
-            reference = gc.get(id)
-            reason = None
-            if not reference or "text" not in reference:
-                reason = "no_same_id_reference"
-            elif not plain(reference["text"]) or plain(reference["text"]) != plain(row.get("legacy", "")):
-                reason = "same_id_not_confirmed_by_legacy"
-            else:
+            original = source[int(id.split(":")[1], 16)]
+            reference, match_basis, reason = resolve_reference(row, gc, matches, original)
+            if id in matches:
+                visited_matches.add(id)
+            if reason is None:
                 try:
-                    original = source[int(id.split(":")[1], 16)]
                     policy = "presentation"
                     try:
                         text, adaptations = adapt_reference(reference["text"], original, info,
@@ -89,7 +91,8 @@ def main():
             edit = {"id": id, "source_sha256": row["source_sha256"],
                     "translation": text, "control_policy": policy,
                     "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
-                                   "reference_id": reference["id"], "reference_sha256": reference["sha256"]},
+                                   "reference_id": reference["id"], "reference_sha256": reference["sha256"],
+                                   "match_basis": match_basis},
                     "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
             issues = layout_issues(candidate, info, advances) if name == "message" else []
             manifest = {k: v for k, v in edit.items() if k != "translation"}
@@ -106,6 +109,8 @@ def main():
                          "remaining_by_reason": dict(Counter(r["reason"] for r in review))}
         args.output.mkdir(parents=True, exist_ok=True)
         (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in review))
+    if matches.keys()-visited_matches:
+        raise ValueError(f"Reviewed references are absent from the inventory: {matches.keys()-visited_matches}")
     selected = {edit["id"] for edit in edits}
     edits += [edit for edit in drafts if edit["id"] not in selected]
     (args.output/"translations.json").write_text(json.dumps(edits, ensure_ascii=False, indent=2)+"\n")

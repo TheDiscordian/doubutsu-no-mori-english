@@ -72,6 +72,13 @@ before a supported N64 text field: N64 does not generate articles there. Matched
 actor-demo operations `7F08..7F0C` retain N64 arguments instead of importing
 GameCube actor-specific values. Every adaptation is recorded for review.
 
+`translations/reference_matches.json` records individually reviewed reference
+identity matches when the legacy wording is insufficient. Each record binds
+the N64 ID and source hash to a GameCube ID and reference hash, with a specific
+explanation. Unknown, duplicated, unexplained, or stale records fail. These
+records confirm identity only: all command, field, capacity, and layout checks
+still run, and the resulting translations remain candidates until reviewed.
+
 ## Halfwidth prototype
 
 - Main code virtual file: `0x675720`, RAM load address `0x80051A80`.
@@ -108,7 +115,7 @@ length is at most 1,024; callers still perform their insertion copy. Avoiding
 overflow before building is therefore essential, even though the move routine
 contains a size check.
 The retail choice loader accepts at most ten bytes. The opt-in English runtime
-supports sixteen plain bytes after patching every identified loader caller,
+supports sixteen plain bytes, or twenty with verified resident storage, after patching every identified loader caller,
 storage destination, and reader; see [English runtime](ENGLISH_RUNTIME.md).
 The general string loader
 accepts at most 64 bytes and copies into caller-specific buffers.

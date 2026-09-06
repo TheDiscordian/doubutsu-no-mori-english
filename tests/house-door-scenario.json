@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 1.8},
+  {"capture": "house-front-path.png"},
+  {"key": "g", "duration": 1.8},
+  {"capture": "house-front-door.png"},
+  {"key": "w", "duration": 2},
+  {"wait": 3},
+  {"capture": "house-interior.png"},
+  {"save_state": true}
+]

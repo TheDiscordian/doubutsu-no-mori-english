@@ -34,7 +34,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 51 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 55 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -78,13 +78,14 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,297 candidates, including
-8,458 main dialogue entries and 459 choices. It retains the GameCube calendar wording in Rover's
+The separate resident-module experiment contains 9,298 candidates, including
+8,458 main dialogue entries and all 460 choices. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
 Its remaining main-dialogue count is 3,292; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
-Only one choice still lacks a confirmed reference match. The twenty-byte build's
+The final choice identity is individually reviewed and hash-bound; complete
+choice translation review and actor-runtime coverage still remain. The twenty-byte build's
 complete train-to-town regression is in progress; the preceding pacing build
 passes that regression and continues through Nook's escort to house selection.
 

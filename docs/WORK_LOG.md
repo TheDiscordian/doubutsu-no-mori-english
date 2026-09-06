@@ -199,6 +199,24 @@
 - Separate pacing-build gameplay continuations reach Nook's escort and the
   house-selection area. Those snapshots do not establish a completed normal save.
 
+### Reviewed reference identities
+
+- Added individually explained, source/reference-hash-bound identity overrides.
+  The final choice `0013` is an abbreviated GameCube label for the N64 message-edit
+  action. The gyroid's surrounding GameCube menu changes remain unimported.
+- All 460 choice labels now produce candidates. The separate match build contains
+  9,298 edits; ROM SHA-256:
+  `48a0c7e417da809b5a17953e8b323e7e6fbfb779dfe2e6223c5521a7b017babc`.
+  UPS SHA-256:
+  `21693a05c3ee9e61a2a78a2d381dd14e875635d06ec0de7cdfed5023f8c0dfe0`.
+  All 55 tests pass, including stale/duplicate/unexplained reference rejection.
+- `build/smoke-module20-dates-01` passes 39 steps and
+  `build/smoke-module20-pacing-01` passes 54 steps on the twenty-byte runtime.
+- Exercise entries `2665..266A` need an N64-specific review. In particular,
+  N64 `2666` is a counted exercise cue, not the same-ID GameCube warning about
+  full hands. GameCube random targets `3A2A..3A31` exceed the N64 message count.
+  These findings do not authorise importing or deleting the branch commands.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -65,6 +65,14 @@ Generate module-aware candidates with `tools/reference_candidates.py`, passing
 and the verified `--rom`. Use that directory's `translations.json` in the module
 build to include the implemented GameCube commands and bounded calendar fields.
 The build verifies the entire module capability before accepting those edits.
+The resident variant also enables twenty-character choices. Generate its native
+four-row and DMA test with `tools/choice_test_scenario.py --rom <built-ROM>
+--output <ignored-scenario.json>`, then pass that scenario to the test runner.
+The generated fixture contains local game text and stays under `build/`.
+
+Reviewed reference identities live in `translations/reference_matches.json`.
+The candidate generator's `--matches` option selects another explicit record
+file when needed. Identity overrides do not bypass runtime or control checks.
 
 `tools/emulator_smoke.py` requires ares, Xvfb, FFmpeg, X11, and XTest. Pass an
 explicit `--xvfb` path if the existing binary is outside PATH. Every test requires
