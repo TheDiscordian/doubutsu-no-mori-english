@@ -52,10 +52,13 @@ explicit `--xvfb` path if the existing binary is outside PATH. Every test requir
 a fresh `--output` directory, copies the ROM, disables audio, isolates saves,
 and enforces a bounded process lifetime. It never reads or replaces a user save.
 
-Use `--scenario tests/english-keyboard-scenario.json --seconds 245` for the
+Use `--scenario tests/english-keyboard-scenario.json --seconds 410` for the
 English-entry sequence. Generated `results.json` records ROM hash, message
 snapshots, memory assertions, and captures. The controller test mapping is in
 [validation](VALIDATION.md). Emulator process survival alone is not a pass.
 
-`make test` runs all tests. The three retail-input integration tests are skipped
+`make test` runs all tests. The four retail-input integration tests are skipped
 when the source ROM is absent; synthetic format and safety tests still run.
+
+`python3 tools/check_keyboard_assembly.py` separately verifies the embedded
+name-cursor patch against its assembly source using the pinned Docker toolchain.

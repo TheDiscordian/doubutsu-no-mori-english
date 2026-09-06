@@ -7,6 +7,12 @@ This project is under development. It is not a complete translation or a
 hardware-validated release. See [progress](docs/PROGRESS.md) for verified results
 and remaining work, and [sources](docs/SOURCES.md) for third-party provenance.
 
+The experimental pilot includes proportional Latin text, guarded GameCube
+reference imports, and an English-first N64 keyboard with translated labels and
+prompts. It retains the native radial layout and saved-name limits; a
+GameCube-style grid remains a separate upgrade. See [building](docs/BUILDING.md)
+and [keyboard design](specs/KEYBOARD.md).
+
 The repository stores tools, translation edits, and documentation. A legally
 obtained source ROM is required to build; ROMs and extracted assets stay local.
 

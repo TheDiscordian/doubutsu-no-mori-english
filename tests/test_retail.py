@@ -13,8 +13,9 @@ from build import apply_translations
 from font import FONT_VROM, WIDTH_TABLE, make_halfwidth
 from textbanks import Bank, banks
 from textcodec import command_info, decode, encode
-from keyboard import (EDITOR_VROM, LABELS, LABELS_VROM, LEDIT_RAM, LEDIT_VROM,
-                      TITLES, make_english_keyboard)
+from keyboard import (CURSOR_CODE, EDITOR_VROM, LABELS, LABELS_VROM, LEDIT_RAM,
+                      LEDIT_RELOC_VROM, LEDIT_VROM, TITLES, make_english_keyboard,
+                      validate_label_layout)
 
 ROM_PATH = Path(os.environ.get("AF_TEST_ROM", ROOT/"local/rom/Doubutsu no Mori (Japan).z64"))
 
@@ -85,5 +86,21 @@ class RetailTests(unittest.TestCase):
         files = by_vrom(output)
         for vrom, content in replacements.items():
             self.assertEqual(files[vrom].extract(output), content)
-        for vrom in (0x78CAD0, 0x790530):
-            self.assertEqual(files[vrom].extract(output), self.files[vrom].extract(self.rom))
+        self.assertEqual(files[0x790530].extract(output), self.files[0x790530].extract(self.rom))
+        before = self.files[LEDIT_RELOC_VROM].extract(self.rom)
+        after = files[LEDIT_RELOC_VROM].extract(output)
+        self.assertEqual(before[:16], after[:16])
+        self.assertEqual(before[-4:], after[-4:])
+        records = list(struct.unpack_from(">37I", before, 20))
+        self.assertEqual(struct.unpack_from(">I", after, 16)[0], 35)
+        self.assertEqual(list(struct.unpack_from(">35I", after, 20)),
+                         [r for r in records if r not in (0x450006E4, 0x460006E8)])
+        self.assertEqual(data[0x6E0:0x740], CURSOR_CODE)
+
+    def test_keyboard_texture_descriptors_are_verified(self):
+        data = bytearray(self.files[LABELS_VROM].extract(self.rom))
+        validate_label_layout(data)
+        # Corrupt the render-tile width for the first tab, not its pixel data.
+        data[0x1448+53] ^= 1
+        with self.assertRaisesRegex(ValueError, "descriptor"):
+            validate_label_layout(data)

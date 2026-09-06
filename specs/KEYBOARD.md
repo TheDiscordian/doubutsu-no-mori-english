@@ -14,9 +14,10 @@ removed.
 | Name-entry window | `0x78BFB0` | `0x80884340` | `0xB20` |
 | Keyboard object | `0xA40000` | Segmented graphics resource | `0x17140` |
 
-All three original resources have pinned SHA-256 guards in `tools/keyboard.py`.
-Replacements retain their lengths. Separate relocation files at `0x790530` and
-`0x78CAD0` remain unchanged.
+Original resources have pinned SHA-256 guards in `tools/keyboard.py`.
+Replacements retain their lengths. The editor relocation file at `0x790530`
+remains unchanged; the name-window relocation file at `0x78CAD0` drops only two
+obsolete cursor-constant relocations, retaining its size and other records.
 
 ### Default mode
 
@@ -43,6 +44,22 @@ song!”. The destination suffix becomes “town”, and its guarded immediate l
 changes from three to four. Input limits remain six characters for player/town,
 four for catchphrases, and ten for apology/song input. These are storage limits,
 not widths to increase simply because Latin letters are narrower.
+
+### Name-entry cursor
+
+The native cursor's fixed `12 * (index - 0.7)` calculation is replaced by
+`mFont_GetStringWidth(input, index, TRUE) - 8.4`, so mixed-width text and the
+cursor agree. This changes no font pixels and retains the original cursor
+graphic's origin adjustment. The 24-instruction patch occupies the same range at
+linked RAM `0x80884A20..0x80884A7F`. The existing function prologue preserves the
+return address and saved registers for the added call to `0x800902CC`.
+
+`tools/keyboard_cursor.s` is assembled using the pinned toolchain. Its verified
+encoding is embedded in `tools/keyboard.py` so ordinary builds need no compiler.
+`python3 tools/check_keyboard_assembly.py` checks source/encoding agreement.
+Name-window relocation records `0x450006E4` and `0x460006E8`, which formerly
+addressed the old floating-point constant, are removed. Every other relocation
+record, the section sizes, and the relocation file's final length word remain.
 
 ### Texture labels
 

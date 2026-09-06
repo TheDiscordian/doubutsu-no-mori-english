@@ -31,6 +31,39 @@
 - Documented the GameCube 10×4 keyboard reference and the separate grid port.
   The grid is not implemented, and original hardware remains untested.
 
+### Keyboard input and cursor validation
+
+- `build/smoke-english-keyboard-03` passed 62 recorded steps in silent ares 148
+  with four-MiB RAM. Memory assertions verified mode 3 on opening, `CCC` entry,
+  `CCc` case conversion, one-character deletion to `CC`, left/right cursor
+  movement, six-character enforcement after excess insertion attempts, and mode
+  transitions 3→4→0→1→2→3. Name confirmation returned to Rover messages
+  `2ACA` and `2AD6`.
+- Replaced the name cursor's fixed-cell position calculation with the existing
+  proportional prefix-width routine. Assembled and independently checked the
+  96-byte MIPS patch; removed only its two obsolete constant relocations.
+  `build/smoke-keyboard-cursor-01` passed the same 62-step regression, and entry
+  captures confirmed the caret follows the text. No font textures changed.
+- Added verification of all ten RDP texture descriptors and strict rejection of
+  unsupported label characters. Added an inventory of sixteen embedded/graphical
+  keyboard UI entries. The test suite passes 33 checks, including four optional
+  retail-input integration checks.
+- Rebuilt pilot ROM SHA-256:
+  `344d4290c7877f446f01175d9cffb90fcead5bb064f7cde148c8c18c5b9f701a`.
+  UPS SHA-256:
+  `32a3c109dae53858a0ecf7d4bf5f0d5c85ac8f7cbc0cdaea7f6653cd33baed6c`.
+- `build/smoke-keyboard-town-01` passed the extended 93-step regression in
+  5 minutes 14 seconds. Destination naming opened in English mode, rejected
+  excess letters beyond `AAAAAA`, and returned to Rover dialogue after
+  confirmation. The destination prompt and translated “town” label were
+  visually checked. Four-MiB RAM remained confirmed at test completion.
+- The post-destination dialogue exposed a separate untranslated path: `7F2F`
+  appends the Japanese town suffix inside messages such as `2ACE`. This is
+  recorded for the main translation work; the keyboard patch does not alter that
+  insertion routine. Save/reload and hardware testing remain outstanding.
+- Repeated the complete `make pilot` pipeline with 33 passing tests and the same
+  output hashes. Confirmed the GitHub repository remains private.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

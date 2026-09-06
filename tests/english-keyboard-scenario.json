@@ -8,6 +8,7 @@
     {"snapshot_message": true}
   ]},
   {"capture": "english-keyboard.png"},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3, "columns": 6, "rows": 1, "length": 0}},
   {"key": "w", "duration": 0.4},
   {"wait": 1},
   {"capture": "stick-up.png"},
@@ -16,13 +17,35 @@
     {"wait": 1}
   ]},
   {"capture": "letters-entered.png"},
-  {"key": "r", "duration": 0.2},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3, "length": 3, "text_hex": "434343202020"}},
+  {"key": "r", "duration": 0.04},
   {"wait": 1},
   {"capture": "case-change.png"},
-  {"key": "b", "duration": 0.2},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 3, "text_hex": "434363202020"}},
+  {"key": "b", "duration": 0.04},
   {"wait": 1},
   {"capture": "delete-letter.png"},
-  {"key": "Return", "duration": 0.2},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 2, "text_hex": "434320202020"}},
+  {"key": "h", "duration": 0.04},
+  {"wait": 1},
+  {"snapshot_keyboard": true, "expect_keyboard": {"cursor": 1}},
+  {"key": "k", "duration": 0.04},
+  {"wait": 1},
+  {"snapshot_keyboard": true, "expect_keyboard": {"cursor": 2}},
+  {"repeat": 8, "actions": [
+    {"key": ["w", "a"], "duration": 0.08},
+    {"wait": 0.3}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 6, "text_hex": "434343434343"}},
+  {"capture": "name-at-limit.png"},
+  {"repeat": 5, "actions": [
+    {"key": "z", "duration": 0.04},
+    {"wait": 0.4},
+    {"snapshot_keyboard": true},
+    {"capture": "mode-{index:02d}.png"}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3}},
+  {"key": "Return", "duration": 0.04},
   {"wait": 5},
   {"capture": "name-confirmed.png"},
   {"repeat": 5, "actions": [
@@ -31,5 +54,26 @@
     {"snapshot_message": true}
   ]},
   {"capture": "after-name.png"},
+  {"repeat": 12, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true}
+  ]},
+  {"capture": "destination-keyboard.png"},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3, "columns": 6, "rows": 1, "length": 0}},
+  {"repeat": 8, "actions": [
+    {"key": ["f", "a"], "duration": 0.08},
+    {"wait": 0.3}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 6, "text_hex": "414141414141"}},
+  {"capture": "destination-at-limit.png"},
+  {"key": "Return", "duration": 0.04},
+  {"wait": 5},
+  {"repeat": 14, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true}
+  ]},
+  {"capture": "after-destination.png"},
   {"read": ["80000318", 4], "expect": "00400000"}
 ]

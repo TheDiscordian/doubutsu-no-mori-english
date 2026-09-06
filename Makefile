@@ -14,6 +14,7 @@ inspect:
 
 inventory: inspect
 	$(PYTHON) tools/inventory.py --rom "$(ROM)"
+	$(PYTHON) tools/keyboard_inventory.py --rom "$(ROM)"
 
 halfwidth: test
 	$(PYTHON) tools/build.py --rom "$(ROM)"

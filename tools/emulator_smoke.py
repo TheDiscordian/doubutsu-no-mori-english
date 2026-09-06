@@ -127,7 +127,7 @@ def keyboard_snapshot(debug):
     base = matches[0]
     state = bytes.fromhex(debug.command(f"m{base+0x39b0:x},30"))
     pointer = struct.unpack_from(">I", state, 0x24)[0]
-    rows, columns, length = struct.unpack_from(">3h", state, 0x18)
+    columns, rows, length = struct.unpack_from(">3h", state, 0x18)
     if not (1 <= rows <= 16 and 1 <= columns <= 96 and 0 <= length <= rows*columns <= 1024):
         raise ValueError("Invalid keyboard state dimensions")
     if not 0x80000000 <= pointer <= 0x80400000-rows*columns:

@@ -4,7 +4,7 @@ import struct
 
 from aflib import by_vrom, sha256
 from font import ATLAS_OFFSET, ATLAS_SIZE, FONT_VROM, get_glyph, pixels, pack_pixels
-from textcodec import encode
+from textcodec import GLYPHS, LATIN, encode
 
 # Offsets in the decompressed keyboard object, not physical ROM addresses.
 LABELS = (
@@ -22,14 +22,37 @@ LABELS = (
 
 EDITOR_VROM = 0x78CB80
 LEDIT_VROM = 0x78BFB0
+LEDIT_RELOC_VROM = 0x78CAD0
 LABELS_VROM = 0xA40000
 LEDIT_RAM = 0x80884340
 SOURCE_HASHES = {
     EDITOR_VROM: "3def63100dd8c7910784eab8f14277bb99813be632fefd2e0afebcfddc9c3011",
     LEDIT_VROM: "86798d5b77c3f49bae23d90dc553cfaa7eaeab543fd4649979e9652706638987",
+    LEDIT_RELOC_VROM: "0d35e043c7d3acffc5ac6997052e025123dabf59d17850f0014288aa594698b2",
     LABELS_VROM: "0445bb9fdb4634ccfe31cce544695a98c471a77266d94455390868324bf87f17",
 }
 TITLES = ("Your name?", "Destination", "Catchphrase", "Say it!", "Request a song!")
+# Assembled from keyboard_cursor.s with the pinned MIPS toolchain. Keeping the
+# verified encoding here lets ordinary builds remain Python-only.
+CURSOR_CODE = bytes.fromhex(
+    "8E840024868500160C0240B32406000144824000468042203C01410634216666"
+    "4481900046124101C7A600788FA400908FA500948FA70074460432003C190001"
+    "8C8D002C44064000032DC8218F3906E08F39002C0320F8090000000000000000")
+
+
+def cursor_relocations(data):
+    """Remove only the obsolete float-constant HI16/LO16 relocation pair."""
+    data = bytearray(data)
+    if len(data) != 176 or struct.unpack_from(">I", data, 16)[0] != 37:
+        raise ValueError("Unexpected name-entry relocation table")
+    records = list(struct.unpack_from(">37I", data, 20))
+    for expected in (0x450006E4, 0x460006E8):
+        if records.count(expected) != 1:
+            raise ValueError("Missing cursor relocation")
+        records.remove(expected)
+    struct.pack_into(">I", data, 16, len(records))
+    data[20:-4] = struct.pack(">35I", *records)+bytes(12)
+    return bytes(data)
 
 
 def english_editor(data):
@@ -66,6 +89,7 @@ def english_titles(data, info, advances):
         raise ValueError("Town-name suffix does not match retail")
     data[0x68C:0x690] = bytes.fromhex("24060004")
     data[0xAF4:0xAF8] = encode("town", info)
+    data[0x6E0:0x740] = CURSOR_CODE
     return bytes(data)
 
 
@@ -73,6 +97,8 @@ def label_pixels(atlas, text, width, height=16):
     """Centre unscaled retail glyphs, trimming only empty outer columns."""
     glyphs = []
     for ch in text:
+        if ord(ch) not in LATIN or GLYPHS[ord(ch)] != ch:
+            raise ValueError(f"Unrepresentable keyboard label character: {ch!r}")
         glyph = get_glyph(atlas, ord(ch))
         ink = [x for x in range(12) if any(row[x] for row in glyph)]
         left, right = (min(ink), max(ink)+1) if ink else (0, 4)
@@ -89,6 +115,31 @@ def label_pixels(atlas, text, width, height=16):
     return result
 
 
+def validate_label_layout(data):
+    """Verify each declared texture against its actual RDP display list."""
+    occupied = set()
+    for offset, width, height, fmt, _ in LABELS:
+        expected_format, expected_size = (4, 0) if fmt == "I4" else (3, 1)
+        matches = []
+        for position in range(0, len(data)-56, 8):
+            command, address = struct.unpack_from(">2I", data, position)
+            if command >> 24 != 0xFD or address != 0x0C000000+offset:
+                continue
+            tile = struct.unpack_from(">I", data, position+40)[0]
+            size_command, size = struct.unpack_from(">2I", data, position+48)
+            if tile >> 24 != 0xF5 or size_command >> 24 != 0xF2:
+                raise ValueError("Unexpected keyboard texture display-list sequence")
+            matches.append(((tile >> 21)&7, (tile >> 19)&3,
+                            ((size >> 12)&0xFFF)//4+1, (size&0xFFF)//4+1))
+        if matches != [(expected_format, expected_size, width, height)]:
+            raise ValueError(f"Keyboard texture descriptor mismatch at {offset:05X}")
+        size = width*height//2 if fmt == "I4" else width*height
+        region = set(range(offset, offset+size))
+        if offset+size > len(data) or occupied & region:
+            raise ValueError("Keyboard textures overlap or exceed the DMA file")
+        occupied.update(region)
+
+
 def make_english_keyboard(rom, info, advances, labels=True):
     files = by_vrom(rom)
     source = {v: files[v].extract(rom) for v in SOURCE_HASHES}
@@ -98,15 +149,18 @@ def make_english_keyboard(rom, info, advances, labels=True):
     replacements = {
         EDITOR_VROM: english_editor(source[EDITOR_VROM]),
         LEDIT_VROM: english_titles(source[LEDIT_VROM], info, advances),
+        LEDIT_RELOC_VROM: cursor_relocations(source[LEDIT_RELOC_VROM]),
     }
     report = {"default_mode": "English", "mode_index": 3,
               "titles": list(TITLES), "name_limits": [6, 6, 4, 10, 10],
               "save_format_changed": False, "layout": "native N64 radial keyboard",
+              "name_cursor": "rendered prefix width with native graphic origin",
               "graphics_labels": []}
     if labels:
         font = files[FONT_VROM].extract(rom)
         atlas = pixels(font[ATLAS_OFFSET:ATLAS_OFFSET+ATLAS_SIZE])
         data = bytearray(source[LABELS_VROM])
+        validate_label_layout(data)
         for offset, width, height, fmt, text in LABELS:
             rendered = label_pixels(atlas, text, width, height)
             texture = (pack_pixels(rendered) if fmt == "I4" else

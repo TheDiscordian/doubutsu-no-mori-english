@@ -7,7 +7,8 @@
 - Reject stale patch guards, unsafe controls, and entry/bank overflows.
 - Re-extract every replacement and verify the generated UPS round trip and CIC
   checksum. Preserve the source ROM region except checksum and DMA metadata.
-- Keep keyboard input limits, state size, callbacks, and relocation files intact.
+- Keep keyboard input limits, state size, and callbacks intact. Preserve each
+  relocation not deliberately replaced by an audited code patch.
 - Keep graphics edits inside declared texture spans; never resize neighbours.
 - Record candidate provenance, command adaptations, rejection reasons, and layout
   warnings independently of translation approval.
@@ -22,8 +23,9 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Boot and intro | Rendered dialogue, advancing messages, active loader instructions | Tested in ares 148 |
 | Four-MiB memory | `osMemSize` at `0x80000318` equals `0x00400000` | Tested |
 | Name-entry opening | Fresh-town intro reaches the native editor | Tested |
-| English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | In progress |
-| Name limits | Six-character player/town, four-character catchphrase, ten-character request | Static invariants tested; runtime outstanding |
+| English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | Tested with memory assertions in ares 148 |
+| Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
+| Name limits | Six-character player/town, four-character catchphrase, ten-character request | Player and town limits runtime-tested; others have static invariants |
 | Saved text | Enter names/mail/board text, save, restart, recover correctly | Outstanding |
 | Choice menus | All lengths, four entries, cancellation, branch outcome | Outstanding |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |

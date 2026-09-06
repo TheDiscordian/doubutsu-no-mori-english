@@ -32,7 +32,9 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 31 passing synthetic and retail-input tests. Retail tests require the local ROM.
+- 33 passing synthetic and retail-input tests. Retail tests require the local ROM.
+- Keyboard UI inventory identifies six embedded text entries and ten graphical
+  labels, with per-entry source hashes and verified texture formats/dimensions.
 
 ## Current reference candidates
 
@@ -54,10 +56,18 @@ names have separate restrictions. Unsafe legacy item-name mappings are withheld.
 ## Validation and release status
 
 Silent emulator runs confirm a four-MiB configuration, active relocated text
-loaders, intro dialogue, and arrival at the name-entry editor. The English
-keyboard's full input regression is in progress. No hardware-certified build or
+loaders, intro dialogue, English-first input, case conversion, single-character
+deletion, cursor movement, six-character enforcement, all five mode transitions,
+and successful name confirmation. The proportional name-cursor correction passes
+the same regression and has been visually checked during entry. Destination-name
+entry, its six-character limit, and confirmation also pass. No hardware-certified build or
 release candidate exists. Save/reload, travel, mail, board, RTC, calendar, credits,
 seasonal events, and original hardware tests remain outstanding.
+
+An observed remaining translation issue is the Japanese town suffix appended by
+dialogue insertion command `7F2F`. The keyboard's destination label is English,
+but the separate dialogue insertion path still needs translation. Catchphrase,
+song, mail, and board editor callers also need their own runtime regressions.
 
 The GameCube-style grid is a separate implementation task; the current keyboard
 still uses the N64 radial layout. See [keyboard design](../specs/KEYBOARD.md),
