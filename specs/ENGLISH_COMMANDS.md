@@ -33,6 +33,12 @@ Window data is at offset `0C`, status flags at `28C`, and the data structure's
 length and text are at offsets `08` and `10`; compile-time layout checks enforce
 these offsets.
 
+`7F67` adds an unsigned pixel space through the sentence renderer, scaled by the
+character's current total X scale. The cursor advances over its three-byte
+encoding, while the renderer adds width without drawing a glyph. Both hooks are
+required before import. The original native sentence controls retain their
+handlers. See [reference formatting](REFERENCE_LAYOUT.md) for the state contract.
+
 Unsupported extension codes remain invalid translation tokens. The codec uses
 zero-size sentinel rows for gaps and rejects them rather than looping or treating
 their arguments as characters. Runtime size lookup retains the native unknown

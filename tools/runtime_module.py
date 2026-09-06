@@ -26,6 +26,7 @@ DATE_CALLS = (
     (0x8009F1D4, 0x800C4350, "af_format_second"),
 )
 COMMAND_HOOKS = {0x8009034C: "af_code_size", 0x800903CC: "af_code_attribute",
+                 0x800919D0: "af_sentence_control",
                  0x800A21C0: "af_dispatch_command", 0x800A054C: "af_cancel_order",
                  0x8009FA18: "af_message_close_short", 0x8009FA38: "af_message_close_long",
                  0x800A28D4: "af_message_wait_clear"}
@@ -33,7 +34,7 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800903CC, 0x800903E4), (0x800A21C0, 0x800A223C),
                 (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C),
                 (0x8009FA18, 0x8009FA38), (0x8009FA38, 0x8009FA58),
-                (0x800A28D4, 0x800A28DC))
+                (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18))
 
 
 def module_command_info(rom):
@@ -41,6 +42,7 @@ def module_command_info(rom):
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     info += [(0, 0)]*(0x77-len(info))
     info[0x62] = (2, 0)
+    info[0x67] = (3, 4)
     info[0x72] = info[0x73] = (2, 0)
     info[0x75] = (2, 0)
     info[0x76] = (2, 2)

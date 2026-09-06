@@ -7,7 +7,7 @@ from pathlib import Path
 import struct
 
 
-def scenario():
+def scenario(include_space=False):
     actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
     sentence, text, graph, gfx_pp, gfx = 0x80197000, 0x80197200, 0x80197300, 0x80197310, 0x80197400
     char = sentence+0x48
@@ -28,7 +28,7 @@ def scenario():
     def floats(*values):
         return struct.pack(">"+"f"*len(values), *values)
 
-    def dispatch(command):
+    def dispatch(command, expected_width=11):
         write(sentence, bytes(0x88))
         write(sentence, struct.pack(">II", text, len(command)))
         write(sentence+0x0C, floats(25, 100))
@@ -36,13 +36,14 @@ def scenario():
         write(sentence+0x1C, floats(2, 3, 0.5, 1/3))
         write(sentence+0x34, floats(11, 1, 1))
         write(char+5, b"\x81")
+        write(char+0x20, floats(0.5))
         write(text, command)
         write(gfx_pp, struct.pack(">I", gfx))
         call(0x8009034C, [text], len(command))
         call(0x800903CC, [command[1]], 5 if command[1] in (0x50, 0x54) else 4)
         call(0x80091C98, [sentence, graph, gfx_pp])
         read(sentence+0x2C, struct.pack(">I", len(command)))
-        read(sentence+0x34, floats(11))
+        read(sentence+0x34, floats(expected_width))
         read(sentence-16, guard)
         read(sentence+0x88, guard)
 
@@ -91,6 +92,26 @@ def scenario():
     call(0x80091470, [char, sentence])
     read(char+0x20, floats(0.25, 1, 4, 1))
     read(char+5, b"\x81")
+    if include_space:
+        for command, address in ((0x52, 0x80091900), (0x53, 0x8009193C),
+                                 (0x5A, 0x80091980), (0x51, 0), (0xFF, 0)):
+            call(0x800919D0, [command], address)
+        for argument in (0, 7, 255):
+            dispatch(bytes([0x7F, 0x67, argument]), 11+argument*0.5)
+        window, data, index = 0x80197800, 0x80197C00, 0x80197B80
+        write(window, bytes(0x330))
+        write(window+12, struct.pack(">I", data))
+        write(data-16, guard)
+        write(data+0x410, guard)
+        for payload, expected_index in ((b"\x7f\x67\x07Z\x7f\x00", 3), (b"\x7f\x67", 0)):
+            encoded = struct.pack(">4I", 1, 1, len(payload), 0)+payload
+            write(data, encoded)
+            write(index, bytes(4))
+            call(0x800A21C0, [window, index], 0)
+            read(index, struct.pack(">I", expected_index))
+            read(data, encoded)
+        read(data-16, guard)
+        read(data+0x410, guard)
     read(gfx-16, guard)
     read(gfx+64, guard)
     actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
@@ -102,8 +123,9 @@ def scenario():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--english-space", action="store_true")
     args = parser.parse_args()
-    actions = scenario()
+    actions = scenario(args.english_space)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"actions": len(actions), "output": str(args.output)}))

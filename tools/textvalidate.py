@@ -29,7 +29,7 @@ def compared_commands(policy, resident_runtime=False):
     if policy == "reference_delivery":
         return presentation | TEXT_FIELDS | {0x02, 0x04}
     if policy == "reference_layout":
-        return presentation | TEXT_FIELDS | {0x02, 0x04} | FONT_PRESENTATION
+        return presentation | TEXT_FIELDS | {0x02, 0x04} | FONT_PRESENTATION | ({0x67} if resident_runtime else set())
     raise ValueError("Unknown control policy")
 
 
@@ -131,7 +131,7 @@ def layout_issues(data, info, advances, max_width=192, max_lines=4):
             elif 0x1A <= command <= 0x40 or command == 0x76:
                 chars = {0x1A: 6, 0x1B: 6, 0x1C: 4, 0x2F: 16, 0x40: 68}.get(command, 10)
                 x += chars*12  # Existing Japanese names remain possible.
-            elif command in (0x52, 0x53, 0x54, 0x5A):
+            elif command in (0x52, 0x53, 0x54, 0x5A, 0x67):
                 issues.append("explicit_layout_command_needs_review")
         if x > max_width:
             issues.append(f"page_{page}_line_{line}_width_{x}")

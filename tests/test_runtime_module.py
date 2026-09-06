@@ -82,6 +82,19 @@ class ModuleRetailTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "signature"):
                 validate_entry(source, b"\x7f\x62", info, "message", policy, resident_runtime=runtime)
 
+    def test_space_requires_resident_layout_and_complete_argument(self):
+        info = module_command_info(self.rom)
+        self.assertEqual(info[0x67], (3, 4))
+        for argument in (0, 7, 255):
+            data = bytes([0x7F, 0x67, argument])
+            self.assertEqual(encode("{cmd:"+data.hex()+"}", info), data)
+            validate_entry(b"", data, info, "message", "reference_layout", resident_runtime=True)
+            for policy, runtime in (("reference_layout", False), ("reference_delivery", True), ("exact", True)):
+                with self.assertRaisesRegex(ValueError, "signature"):
+                    validate_entry(b"", data, info, "message", policy, resident_runtime=runtime)
+        with self.assertRaises(ValueError):
+            list(tokenize(b"\x7f\x67", info))
+
     @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(),
                          "Build resident-module artifacts to exercise guarded insertion")
     def test_module_artifacts_guards_and_insertion(self):
@@ -95,6 +108,12 @@ class ModuleRetailTests(unittest.TestCase):
         self.assertEqual(word(0x800D6720), 0x0C000000 | ((BOOTSTRAP_RAM & 0x0FFFFFFF) >> 2))
         self.assertEqual(report["ram"], f"{MODULE_RAM:08X}")
         verify_runtime_module(self.rom, replacements, additions, directory)
+        broken = dict(replacements)
+        partial = bytearray(code)
+        partial[0x800919D0-CODE_RAM:0x800919D8-CODE_RAM] = bytes(8)
+        broken[CODE_VROM] = bytes(partial)
+        with self.assertRaisesRegex(ValueError, "Missing resident module patch"):
+            verify_runtime_module(self.rom, broken, additions, directory)
         with self.assertRaisesRegex(ValueError, "complete resident"):
             verify_runtime_module(self.rom, replacements, {}, directory)
         with self.assertRaisesRegex(ValueError, "instruction guard"):

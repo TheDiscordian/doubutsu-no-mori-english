@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 79 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 80 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -76,6 +76,9 @@ user's direction. The production build retains the approved spacing metrics.
   closing-sound decisions, duplicate-sound suppression, and flag resets. Targeted
   MIPS tests pass without host audio output. Four inventory prompts become
   candidates; storage/music menus with changed actions remain withheld.
+- GameCube pixel-space (`67`) through both message cursor and sentence renderer.
+  Native tests verify scaled width, complete token advancement, missing-argument
+  handling, unchanged native formatting handlers, and memory guards.
 
 ## Current reference candidates
 
@@ -97,11 +100,11 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,944 edits, including
-9,100 reference dialogue candidates, all 460 choices, and four N64-specific
+The separate resident-module experiment contains 9,945 edits, including
+9,101 reference dialogue candidates, all 460 choices, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 2,646; matching, actor fields, flow controls,
+Its remaining main-dialogue count is 2,645; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -122,9 +125,10 @@ passes native DMA, continuation, final-termination, and guard tests; normal acto
 progression through the English work-offer split remains open. The work-offer build
 also passes all 225 full train-to-town steps and ten acceptance checks. The layout
 build adds 264 formatting candidates with 1,308 total conservative layout warnings;
-its broader gameplay regression remains open. The purchase build adds one guarded
-record and has 1,309 total conservative layout warnings. The native formatting test passes
-385 recorded steps without modifying the font assets.
+the layout build also passes the complete train-to-town regression and all ten
+acceptance checks. The space build has 1,310 total conservative layout warnings.
+Its native formatting/space test passes 476 recorded steps without modifying the
+font assets. Its broader gameplay regression remains in progress.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.

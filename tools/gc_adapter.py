@@ -39,7 +39,7 @@ def adapt_reference(text, source, info, policy="presentation", resident_runtime=
     if policy == "reference_layout":
         def formatting(data):
             return [t.data.hex().upper() for t in tokenize(data, info)
-                    if t.kind == "cmd" and t.data[1] in FONT_PRESENTATION]
+                    if t.kind == "cmd" and t.data[1] in FONT_PRESENTATION | {0x67}]
         edits.append({"operation": "retain_gamecube_native_text_formatting",
                       "n64": formatting(source), "gamecube": formatting(candidate)})
     # Demo animation arguments are platform-specific. Only adapt when the

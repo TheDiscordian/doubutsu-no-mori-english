@@ -69,3 +69,7 @@ class ReferenceLayoutTests(unittest.TestCase):
         self.assertIn("800913D4", calls)
         self.assertIn("80091470", calls)
         self.assertTrue(any(a.get("load_state") for a in actions))
+        extended = scenario(include_space=True)
+        calls = [a["call"]["address"] for a in extended if "call" in a]
+        self.assertEqual(calls.count("80091C98"), 22)
+        self.assertEqual(calls.count("800A21C0"), 2)

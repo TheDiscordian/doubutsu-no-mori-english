@@ -58,6 +58,7 @@ void af_cursor_timer(struct MessageWindow *window) {
 int af_code_size(const u8 *text) {
     if (text[0] == 0x7F) {
         unsigned command = text[1];
+        if (command == 0x67) return 3;
         return command < NATIVE_COUNT ? NATIVE_INFO[command][0] : 2;
     }
     return text[0] == 0x80 ? 2 : 1;
@@ -66,6 +67,7 @@ int af_code_size(const u8 *text) {
 int af_code_attribute(unsigned command) {
     if (command < NATIVE_COUNT) return NATIVE_INFO[command][1];
     if (command == 0x76) return 2; /* Read-only string insertion. */
+    if (command == 0x67) return 4; /* Native sentence formatting dispatch. */
     return 0;
 }
 
@@ -102,6 +104,11 @@ int af_dispatch_command(struct MessageWindow *window, int *index) {
     if (command == 0x62) {
         *index += 2;
         af_choice_no_b_close(window);
+    }
+    if (command == 0x67) {
+        /* Width is applied later by the sentence renderer. Keep the argument
+           out of cursor text, and do not read a missing argument. */
+        if (*index <= data->length-3) *index += 3;
     }
     if (command == 0x75) {
         *index += 2;

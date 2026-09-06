@@ -395,6 +395,32 @@
   branch calls. The sequence ROM predates the English work-offer split, so it
   cannot establish that newer split's normal progression. FlashRAM is still blank.
 
+### Complete English pixel-space control
+
+- Added GameCube `67` with size 3, sentence attribute 4, native cursor advancement,
+  and a resident sentence-width consumer. The lookup retains all three native
+  sentence handler addresses and returns zero for unsupported codes. It applies
+  the unsigned pixel amount at the current total character X scale; no glyph is
+  drawn. Missing arguments do not advance the cursor. No font assets change.
+- Source/build guards include the sentence lookup hook and its replaced-function
+  interior audit. The builder rejects an incomplete hook. The module links 3,680
+  bytes in its existing sixteen-KiB reservation; module SHA-256 is
+  `f499ecd258c8bd7e4b4703ef13f6412a52a4b0b09b47b0af36a1d97e55ed8c93`.
+- All 80 tests pass. `build/smoke-space-native-01` passes 476 recorded steps,
+  including the original native formatting cases, SPACE arguments 0, 7, and 255,
+  scaled width changes, message advancement, malformed-token handling, display-list
+  and module guards, and complete checkpoint restoration.
+- The space build imports `069A` and contains 9,945 edits, 9,101 reference dialogue
+  candidates, 2,645 remaining main entries, and 1,310 conservative layout warnings.
+  ROM SHA-256:
+  `621474f6455e54a450faa50266f1e3852a21226817e1d47d79dff8d6e464da13`.
+  UPS SHA-256:
+  `962a18f3a09f34abdbf57787ec2b212ae4be16ea7d8cdf1f98c40ae91c7cf521`.
+  No confirmed same-ID candidate is now rejected for an unsupported opcode;
+  unconfirmed reference identities and incompatible flow remain unapproved.
+- `build/smoke-layout-arrival-01` passes all 225 full train-to-town steps and ten
+  acceptance checks. The space build's full regression is in progress.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
