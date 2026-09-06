@@ -13,6 +13,7 @@ from textcodec import command_info, encode
 from textvalidate import validate_entry
 from keyboard import make_english_keyboard
 from english_runtime import make_english_runtime, verify_english_runtime
+from runtime_module import add_runtime_module
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -84,6 +85,7 @@ def main():
     parser.add_argument("--translations", type=Path)
     parser.add_argument("--english-keyboard", action="store_true")
     parser.add_argument("--english-runtime", action="store_true")
+    parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -97,10 +99,13 @@ def main():
         replacements.update(runtime)
     report["translation_edits"], relocations = apply_translations(
         rom, replacements, args.translations, english_runtime=args.english_runtime)
+    additions = {}
+    if args.runtime_module:
+        additions, report["runtime_module"] = add_runtime_module(rom, replacements, args.runtime_module)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
-    output = replace_dma(rom, replacements, relocations)
+    output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
-    for vrom, data in replacements.items():
+    for vrom, data in {**replacements, **additions}.items():
         if files[relocations.get(vrom, vrom)].extract(output) != data:
             raise ValueError("Reinserted file does not match replacement")
     if n64_checksum(output) != struct.unpack_from(">2I", output, 16):
@@ -114,6 +119,7 @@ def main():
     report.update(source_sha256=sha256(rom), output_sha256=sha256(output),
                   size=len(output), patch_sha256=sha256(patch),
                   replacement_files=[f"{v:08X}" for v in replacements],
+                  added_files=[f"{v:08X}" for v in additions],
                   release_status="experimental; original hardware untested")
     (args.output / "build.json").write_text(json.dumps(report, indent=2) + "\n")
     for name, font in (("original", by_vrom(rom)[FONT_VROM].extract(rom)),

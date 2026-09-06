@@ -47,6 +47,19 @@ edits, unknown commands, and unsafe expansion fail the build.
 
 ## Silent emulator tests
 
+The experimental resident-module build uses the existing pinned Docker compiler:
+
+```sh
+python3 tools/build_runtime_module.py --rom 'local/rom/Doubutsu no Mori (Japan).z64'
+python3 tools/build.py --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
+  --translations build/candidates/translations.json --english-keyboard \
+  --english-runtime --runtime-module build/runtime-module --output build/module-pilot
+```
+
+Module source changes require rebuilding its artifacts. The linker limits the
+complete code/data/BSS reservation to sixteen KiB. The normal pilot does not yet
+enable the module. See [module design](../specs/RUNTIME_MODULE.md).
+
 `tools/emulator_smoke.py` requires ares, Xvfb, FFmpeg, X11, and XTest. Pass an
 explicit `--xvfb` path if the existing binary is outside PATH. Every test requires
 a fresh `--output` directory, copies the ROM, disables audio, isolates saves,
@@ -81,3 +94,10 @@ name-cursor patch against its assembly source using the pinned Docker toolchain.
 `python3 tools/check_runtime_assembly.py` verifies the choice-width routine.
 `python3 tools/audit_choice_callers.py --rom '<retail-ROM-path>'` repeats the
 complete DMA caller and reclaimed-code reference scan.
+
+For module tests, append `--post-scenario tests/runtime-module-memory-scenario.json`
+to verify heap bounds and guards after any scenario. The dedicated
+`tests/runtime-date-scenario.json` invokes the real MIPS message insertion
+functions using bounded debugger scratch RAM. It requires a checkpoint and
+restores the complete emulator state afterwards; it does not alter a release ROM
+or establish game-save compatibility. The runner rejects an unrestored call test.

@@ -14,7 +14,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| R01 | English runtime substitutions, including town/date/time formats | active | GameCube semantics; bounded destinations; runtime message assertions |
+| R01 | English runtime substitutions, including town/date/time formats | active | Town and seven message date/time fields pass; AM/PM and other UI callers remain |
 | R02 | Choice strings beyond ten bytes | active | Sixteen-byte main path passes; fourteen choice translations, four-row/cancellation, and actor runtime tests remain |
 | R03 | General strings and UI caller capacities | pending | Each imported string has a proven destination limit; no truncation |
 | R04 | NPC and item names | pending | IDs matched from actor/item tables; full English names supported by every destination |
@@ -38,7 +38,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | V06 | Travel and Controller Pak | pending | Export/import, error paths, different towns, saved names |
 | V07 | Dates, RTC, seasons, events, and credits | pending | Event coverage and boundary dates with controlled test saves |
 | V08 | Legacy glitch/crash audit | pending | Reproduce reports where possible; distinguish damaged data from mere command differences |
-| V09 | Four-MiB memory and resource budgets | active | Runtime allocation/graphics checks; do not assume Expansion Pak memory |
+| V09 | Four-MiB memory and resource budgets | active | Sixteen-KiB module reservation retains guards through town arrival; broader heap/graphics tests remain |
 | V10 | Original hardware matrix | external validation | Real console/flash cartridge/Controller Pak evidence; emulator evidence is insufficient |
 
 ## Image and keyboard stretch goals

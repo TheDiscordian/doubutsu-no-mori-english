@@ -46,6 +46,54 @@ class RSP:
         self.send(text)
         return self.receive()
 
+    def call(self, address, arguments):
+        """Test-only o32 call in module scratch RAM; leaves the game paused.
+
+        A checkpoint must restore the complete emulated machine afterwards.
+        Bulk register packets avoid the scalar-register indexing discrepancy in
+        the installed ares build. No game save is used or modified by this API.
+        """
+        address = int(address, 16)
+        arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
+        if (address % 4 or not 0x80051A80 <= address < 0x801968E0 or len(arguments) > 4
+                or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
+            raise ValueError("Invalid test function or o32 arguments")
+        self.command("?")
+        header = bytes.fromhex(self.command("m801948e0,14"))
+        magic, abi, reserved, used, ready = struct.unpack(">5I", header)
+        if (magic, abi, reserved, ready) != (0x41465254, 1, 0x4000, 1) or used > 0x2000:
+            raise ValueError("Module does not provide the required unused test scratch RAM")
+        before = self.command("g")
+        if len(before) != 71*16 or int(before[:16], 16):
+            raise ValueError("Unknown debugger bulk register layout")
+        registers = [int(before[i:i+16], 16) for i in range(0, len(before), 16)]
+        expected = dict(zip(range(4, 4+len(arguments)), arguments))
+        expected.update({29: 0x801988C0, 31: 0x801968E0, 37: address})
+        for index, value in expected.items():
+            registers[index] = value | (0xFFFFFFFF00000000 if value & 0x80000000 else 0)
+        breakpoint = "0,801968e0,4"
+        if self.command("Z"+breakpoint) != "OK":
+            raise ValueError("Debugger rejected test return breakpoint")
+        try:
+            if self.command("G"+"".join(f"{value:016x}" for value in registers)) != "OK":
+                raise ValueError("Debugger rejected test registers")
+            observed = self.command("g")
+            if any(int(observed[i*16:(i+1)*16], 16) != registers[i] for i in expected):
+                raise ValueError("Debugger did not apply test argument/stack/PC registers")
+            stopped = self.command("c")
+            after = self.command("g")
+            values = [int(after[i:i+16], 16) for i in range(0, len(after), 16)]
+            if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != 0x801968E0:
+                raise ValueError(f"Test function stopped unexpectedly: {stopped}, PC={values[37]:016X}")
+            if values[29] & 0xFFFFFFFF != 0x801988C0:
+                raise ValueError("Test function did not restore its stack")
+            return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
+                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": "801968E0",
+                    "stack_restored": True, "requires_checkpoint_restore": True}
+        finally:
+            self.command("z"+breakpoint)
+            self.command("G"+before)
+
 
 class Keyboard:
     def __init__(self, display):
@@ -164,6 +212,7 @@ def main():
     parser.add_argument("--ares", default="/usr/bin/ares")
     parser.add_argument("--seconds", type=int, default=40)
     parser.add_argument("--scenario", type=Path)
+    parser.add_argument("--post-scenario", type=Path, help="Additional assertions after the main scenario")
     parser.add_argument("--port", type=int, default=19264)
     parser.add_argument("--seed-save", type=Path, help="Copy this isolated test directory's cartridge saves")
     parser.add_argument("--seed-state", type=Path, help="Resume this isolated test directory's matching-ROM state")
@@ -262,6 +311,9 @@ def main():
             {"wait": args.seconds-5}, {"capture": "boot.png"},
             {"read": ["80090294", 4]}, {"read": ["80106AF4", 256]},
             {"read": ["8013A680", 32]}]
+        if args.post_scenario:
+            actions += json.loads(args.post_scenario.read_text())
+        needs_checkpoint_restore = False
         for action in expand_actions(actions):
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
@@ -289,6 +341,15 @@ def main():
                 results.append({"test_only_ram_write": address, "bytes": len(data), "data": data.hex()})
             if action.get("resume"):
                 debug.send("c")  # Stop-mode RSP replies only on a later halt.
+            if "call" in action:
+                if not (out/"test.bs1").is_file():
+                    raise ValueError("Test function calls require a saved emulator checkpoint")
+                call = action["call"]
+                result = debug.call(call["address"], call.get("arguments", []))
+                needs_checkpoint_restore = True
+                results.append(result)
+                if "expect_return" in call and result["return_value"] != call["expect_return"]:
+                    raise ValueError(f"Unexpected function return: {result['return_value']}")
             if action.get("snapshot_message"):
                 snapshot = message_snapshot(debug)
                 results.append(snapshot)
@@ -328,7 +389,10 @@ def main():
                 keyboard.press("F6", 0.08)
                 time.sleep(1)
                 results.append({"loaded_state": "test.bs1"})
+                needs_checkpoint_restore = False
             (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
+        if needs_checkpoint_restore:
+            raise ValueError("Test function calls must finish by restoring the emulator checkpoint")
         # Register numbering has changed across ares builds; retain the raw
         # response without claiming this is a trustworthy PC measurement.
         results.append({"raw_register_p25": debug.command("p25"), "process_alive": ares.poll() is None})

@@ -242,10 +242,11 @@ def fix_checksum(rom):
     struct.pack_into(">2I", rom, 0x10, *n64_checksum(rom))
 
 
-def replace_dma(rom, replacements, relocations=None):
+def replace_dma(rom, replacements, relocations=None, additions=None):
     """Append replacement files; keep VROM identity and all original file ranges."""
     entries = by_vrom(rom)
     relocations = relocations or {}
+    additions = additions or {}
     out = bytearray(rom)
     for vrom, data in sorted(replacements.items()):
         entry = entries[vrom]
@@ -258,6 +259,19 @@ def replace_dma(rom, replacements, relocations=None):
         if vrom in relocations:
             new_vrom = relocations[vrom]
             struct.pack_into(">2I", out, DMA_START+entry.index*16, new_vrom, new_vrom+len(data))
+    next_index = len(entries)
+    for vrom, data in sorted(additions.items()):
+        row = DMA_START+next_index*16
+        if (vrom in entries or not data or vrom % 16 or len(data) % 16
+                or vrom < 0 or vrom+len(data) > MAX_ROM):
+            raise ValueError("Invalid new DMA file")
+        if row+32 > DMA_END or out[row:row+32] != bytes(32):
+            raise ValueError("No unused DMA row and terminator available")
+        out.extend(bytes(-len(out) % 16))
+        start = len(out)
+        out.extend(data)
+        struct.pack_into(">4I", out, row, vrom, vrom+len(data), start, 0)
+        next_index += 1
     intervals = sorted((e.vstart, e.vend) for e in dma_entries(out) if e.pstart != 0xFFFFFFFF)
     if any(right[0] < left[1] for left, right in zip(intervals, intervals[1:])):
         raise ValueError("Relocated virtual DMA ranges overlap")

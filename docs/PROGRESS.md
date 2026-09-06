@@ -34,13 +34,21 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 39 passing synthetic and retail-input tests. Retail tests require the local ROM.
+- 47 passing portable-C, synthetic, and retail-input tests. Retail tests require
+  the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
 - English runtime removes the Japanese town suffix and supports sixteen
   plain choice bytes, including actor-specific staging buffers. Source guards,
   complete-capability checks, and independently assembled width code pass.
   Main-dialogue runtime regressions pass; actor-specific runtime tests remain.
+- Experimental resident runtime module with a verified new DMA entry, sixteen-KiB
+  heap reservation, preserved watchdog, source/build guards, and linker bounds.
+  Four-MiB boot and the complete train-to-town regression pass with intact guards.
+- Seven English message date/time substitutions, including full month/weekday
+  names, ordinal days, twelve-hour time, and zero-padded minutes/seconds. Portable
+  exhaustive tests and native MIPS insertion calls pass. Other UI callers and
+  the separate AM/PM command still require implementation and validation.
 
 ## Current reference candidates
 

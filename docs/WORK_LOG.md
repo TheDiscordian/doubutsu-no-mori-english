@@ -107,6 +107,39 @@
   gameplay tests. All ten post-run acceptance checks pass. FlashRAM is still
   blank; house selection, introductory jobs, and a normal game save remain.
 
+### Resident runtime module and English message dates
+
+- Added a pinned Docker C/MIPS build, bounded linker script, module manifest,
+  strict DMA additions, and guarded bootstrap. The new file at VROM `02800000`
+  reserves sixteen KiB at RAM `801948E0` before the first heap allocation.
+  The original watchdog is preserved at `801949E0`; its callers and relative
+  control flow pass the complete DMA reference audit.
+- `build/smoke-module-boot-01` passed module magic, readiness, heap bounds, and
+  end guards. The hardened bootstrap additionally checks the heap size and
+  loaded module version/reservation before executing it.
+- `build/smoke-module-arrival-01` passed 225 recorded steps and all ten choice,
+  name, and town acceptance conditions, with all module guards intact at arrival.
+  ROM SHA-256:
+  `16b0511bf706b5b566ab609f8a9d399fbbbed8a9d3c02652a7e6d02d4a13b8fa`.
+- Added seven bounded English date/time message formatters. Month and weekday
+  insertion frames grow by eight bytes; other UI formatter callers remain
+  native. Portable C tests cover every sixteen-bit year, every byte-valued
+  component, ordinal exceptions, padding, capacity failure, and guard bytes.
+  All calendar words match the supplied English GameCube disc.
+- `build/smoke-module-dates-02` passed 39 recorded steps, calling all seven
+  real MIPS message-insertion functions and verifying results, surrounding text,
+  return lengths, stack restoration, and guards. The complete emulator checkpoint
+  is restored after test-only RTC and scratch-memory changes. The initial probe
+  exposed the debugger's valid `S05` stop spelling; accepting both standard stop
+  spellings fixed the test harness, not the game code.
+- The date module links to 2,016 bytes within its sixteen-KiB reservation. Its
+  experimental ROM SHA-256 is
+  `6e19c9057e4ea3d4be2fe66bedbcc2b3886e5619622e467f0d342759d379f329`;
+  UPS SHA-256:
+  `e69ba1e6e93ce178562436f3dec998409e408581b4efd3b7975949e4a21deee9`.
+  All 47 tests pass. The ordinary pilot remains separate until command handling
+  and broader gameplay/save regressions are complete.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

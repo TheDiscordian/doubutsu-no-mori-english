@@ -22,6 +22,8 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | --- | --- | --- |
 | Boot and intro | Rendered dialogue, advancing messages, active loader instructions | Tested in ares 148 |
 | Four-MiB memory | `osMemSize` at `0x80000318` equals `0x00400000` | Tested |
+| Resident module | Startup identity, reduced heap bounds, guards through gameplay | Tested through town arrival; wider allocation and hardware coverage outstanding |
+| English date fields | Month/weekday expansion, ordinal day, twelve-hour time, padded minutes/seconds | Seven native insertion calls and exhaustive portable format tests pass; other UI and AM/PM outstanding |
 | Name-entry opening | Fresh-town intro reaches the native editor | Tested |
 | English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | Tested with memory assertions in ares 148 |
 | Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
