@@ -30,6 +30,18 @@
     ]
   },
   {
+    "id": "nook_house_purchase",
+    "evidence": "Native and GameCube 07E9 confirm the chosen house belongs to the player, give the unsold radio as a moving-in gift, and continue to the same home explanation at 07EA. The English reference repeats the native 09 emotion tuples 000015 and 0000FF at its added page boundaries; it introduces no new actor argument or gameplay operation. Keep the complete reference, including its small-print aside using native line anchor 2 and line scale 20/32, instead of the Japanese per-character scale/offset layout. BGM operations, player field, outgoing 07EA link, and end 01 remain unchanged. See specs/REFERENCE_SEQUENCES.md and specs/REFERENCE_LAYOUT.md; normal actor traversal remains required.",
+    "members": [
+      {
+        "id": "message:07E9",
+        "source_sha256": "52f088ec5b43c16a370c1aad1a7cff235ed3e621803ad3e670564bb928c67692",
+        "reference_sha256": "f9bc90f735e6b52d62c6aecad5163004b9338dee04076870e56c0d18d4e8b996",
+        "encoded_sha256": "f9bc90f735e6b52d62c6aecad5163004b9338dee04076870e56c0d18d4e8b996"
+      }
+    ]
+  },
+  {
     "id": "nook_work_offer",
     "evidence": "Native and GameCube 07EC cover the same insufficient payment, part-time work, and shop-location explanation. The complete English record exceeds the native buffer. Split only at its existing page transition after the thorny-situation passage, replacing that single wait/page clear with the native continuing-message boundary. Source 2AE9 is an unused train-demo reserve slot with no incoming native script branch; the legacy also uses it for this continuation. Preserve every English text byte outside the declared separator, all BGM/actor argument tuples, fields, and the final native end 00. See specs/REFERENCE_SEQUENCES.md; normal actor traversal remains required.",
     "members": [

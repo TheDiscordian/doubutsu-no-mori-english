@@ -98,6 +98,21 @@ class ReferenceSequenceTests(unittest.TestCase):
             validate_entry(self.source[0], encode(edits[0]["translation"], self.info), self.info,
                            "message", "reviewed_sequence", sequence_permit=permits["message:0000"])
 
+    def test_single_record_keeps_external_link_and_original_actor_tuples(self):
+        native = self.original[:-2]+b"\x7f\x0e\x00\x09\x7f\x01"
+        translated = native.replace(b"A", b"English\x7f\x09\x00\x00\x03")
+        audit_sequence(native, [translated], [0], self.info)
+        for altered in (translated.replace(b"\x0e\x00\x09", b"\x0e\x00\x08"),
+                        translated.replace(b"\x7f\x0e\x00\x09", b""),
+                        translated.replace(b"\x7f\x09\x00\x00\x03", b"\x7f\x09\x00\x00\x04")):
+            with self.assertRaises(ValueError):
+                audit_sequence(native, [altered], [0], self.info)
+        parts = [b"Part one\x7f\x0e\x00\x01\x7f\x01", translated]
+        audit_sequence(native, parts, [0, 1], self.info)
+        with self.assertRaises(ValueError):
+            audit_sequence(native, [parts[0], translated.replace(b"\x0e\x00\x09", b"\x0e\x00\x08")],
+                           [0, 1], self.info)
+
     def test_approval_schema(self):
         record = self.groups["test_sequence"]
         with tempfile.TemporaryDirectory() as directory:
@@ -160,7 +175,7 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 6)
+        self.assertEqual(len(edits), 7)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",

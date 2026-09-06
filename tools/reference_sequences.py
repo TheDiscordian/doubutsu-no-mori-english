@@ -1,4 +1,4 @@
-"""Exact, all-or-nothing approvals for reviewed multi-record dialogue ports."""
+"""Exact, all-or-nothing approvals for reviewed dialogue sequences."""
 
 from dataclasses import dataclass
 import json
@@ -9,7 +9,8 @@ from aflib import sha256
 from textcodec import decode, encode, tokenize
 
 APPROVALS = Path(__file__).resolve().parents[1]/"translations/reference_sequences.json"
-PRESENTATION = {0x02, 0x03, 0x04, 0x05, 0x50}
+# Native font consumers and argument constraints are audited in REFERENCE_LAYOUT.
+PRESENTATION = {0x02, 0x03, 0x04, 0x05, 0x50, 0x52, 0x53, 0x54, 0x5A}
 ACTOR = set(range(0x08, 0x0D))
 FIELDS = set(range(0x1A, 0x30)) | set(range(0x31, 0x40)) | {0x76}
 
@@ -31,8 +32,8 @@ def load_sequences(path=APPROVALS):
                 or record["id"] in result or not record.get("evidence", "").strip()):
             raise ValueError("Duplicate, invalid, or unexplained reference sequence")
         members = record.get("members")
-        if not isinstance(members, list) or not 2 <= len(members) <= 16:
-            raise ValueError("Reference sequence requires two to sixteen members")
+        if not isinstance(members, list) or not 1 <= len(members) <= 16:
+            raise ValueError("Reference sequence requires one to sixteen members")
         for member in members:
             if (not re.fullmatch(r"message:[0-9A-F]{4}", member.get("id", ""))
                     or member["id"] in seen):
@@ -97,14 +98,14 @@ def audit_sequence(original, replacements, member_numbers, info):
             raise ValueError("Sequence part changes the required final/continuing terminator")
         links = [c for c in part if c[1] == 0x0E]
         expected = ([b"\x7f\x0e"+member_numbers[index+1].to_bytes(2, "big")]
-                    if index+1 < len(replacements) else [])
-        if links != expected or expected and part[-2] != expected[0]:
+                    if index+1 < len(replacements) else [c for c in root if c[1] == 0x0E])
+        if links != expected or index+1 < len(replacements) and part[-2] != expected[0]:
             raise ValueError("Sequence continuation link changed")
         if any(c[1] in FIELDS and c[1] not in available_fields for c in part):
             raise ValueError("Sequence requests an unavailable text field")
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
-        translated.extend(c for c in part if c[1] != 0x0E)
+        translated.extend(c for c in part if c[1] != 0x0E or index+1 == len(replacements))
     ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01}
     native_flow = normalize_assignments([c for c in root if c[1] not in ignored])
     translated_flow = normalize_assignments([c for c in translated if c[1] not in ignored])

@@ -18,7 +18,7 @@ def scenario(rom, group_name="nook_home_explanation"):
     bank = Bank("message", 0x02000000, 0x00CF9000,
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
-    if group_name not in ("nook_home_explanation", "nook_work_offer"):
+    if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase"):
         raise ValueError("No native scenario exists for this sequence")
     members = load_sequences()[group_name]["members"]
     numbers = [int(member["id"].split(":")[1], 16) for member in members]
@@ -56,10 +56,11 @@ def scenario(rom, group_name="nook_home_explanation"):
     for position, number in enumerate(numbers):
         load(number)
         commands = [t for t in tokenize(entries[number], info) if t.kind == "cmd"]
-        if position+1 < len(numbers):
+        if position+1 < len(numbers) or group_name == "nook_house_purchase":
             link = next(t for t in commands if t.data[1] == 0x0E)
             dispatch(link)
-            read(window+0x2C4, struct.pack(">I", numbers[position+1]))
+            target = numbers[position+1] if position+1 < len(numbers) else 0x07EA
+            read(window+0x2C4, struct.pack(">I", target))
             write(window+0x28C, bytes(4))
             dispatch(commands[-1], 2)
             read(window+0x28C, struct.pack(">I", 8))

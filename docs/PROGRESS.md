@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 78 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 79 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -59,6 +59,8 @@ user's direction. The production build retains the approved spacing metrics.
   script branches, altered gameplay controls, and changed payloads are rejected.
   Nook's work offer also has a reviewed split at an existing English page boundary;
   complete reference coverage and the native final terminator are checked.
+  The purchase confirmation has a one-record approval preserving its small-print
+  radio aside, repeated native emotions, and unchanged outgoing explanation link.
 - Experimental resident runtime module with a verified new DMA entry, sixteen-KiB
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
   Four-MiB boot and the complete train-to-town regression pass with intact guards.
@@ -95,11 +97,11 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,943 edits, including
-9,099 reference dialogue candidates, all 460 choices, and four N64-specific
+The separate resident-module experiment contains 9,944 edits, including
+9,100 reference dialogue candidates, all 460 choices, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 2,647; matching, actor fields, flow controls,
+Its remaining main-dialogue count is 2,646; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -110,16 +112,18 @@ Nook's introductory work offer also completes. The gyroid remains in its job-tim
 state and does not expose the normal save menu yet. A separate native test passes
 all house-explanation loads, continuation links, both choice branches, the repeat
 response, and memory guards. Normal actor traversal reaches all four English
-records and the active final choice; both actor outcomes still need testing.
+records and the active final choice. Choosing repeat traverses all four records
+again; choosing continue reaches the invoice and the native work-offer entry.
 The sequence build passes name/town entry and a continuation to
 arrival. The cancellation build passes the complete long-choice/train-to-town
 regression and all ten acceptance checks, as does the delivery build. Its 366
 page-delivery candidates still need broader gameplay review. The work-offer split
 passes native DMA, continuation, final-termination, and guard tests; normal actor
-progression through both English sequences remains open. The work-offer build
+progression through the English work-offer split remains open. The work-offer build
 also passes all 225 full train-to-town steps and ten acceptance checks. The layout
 build adds 264 formatting candidates with 1,308 total conservative layout warnings;
-its broader gameplay regression remains open. The native formatting test passes
+its broader gameplay regression remains open. The purchase build adds one guarded
+record and has 1,309 total conservative layout warnings. The native formatting test passes
 385 recorded steps without modifying the font assets.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four

@@ -47,6 +47,23 @@ parts continue. Native message scripts do not target `2AE9`, and the Nook guide
 code contains no direct `07EC` or `2AE9` reference. Actor traversal still needs
 runtime verification.
 
+## House purchase confirmation
+
+The one-record `nook_house_purchase` approval retains the complete English
+`07E9`: purchase confirmation, the unsold-radio gift, and the introduction to
+the home explanation. The GameCube repeats the two existing native emotion
+argument tuples at its added page boundaries. Its small-print aside uses native
+line anchor 2 and line scale 20/32; the Japanese version uses a Y offset and
+repeated per-character scaling. Those native formatting controls have verified
+consumers and parameter guards. Neither presentation is automatically reflowed.
+
+The exact approved payload keeps the native BGM operations, player field,
+outgoing `0E 07EA`, and continuing terminator. One-member approvals need the same
+source/reference/payload hashes and structural checks as larger sequences.
+An external continuation is permitted only in the final member and must match
+the original root's complete outgoing-link list and gameplay-command order.
+No new target or omitted original link is accepted.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English

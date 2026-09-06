@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"snapshot_choices": true, "expect_choices": {"choice_count": 2, "choice_state": 2, "choice_cursor": 0}},
+  {"key": "s", "duration": 0.03},
+  {"wait": 1},
+  {"snapshot_choices": true, "expect_choices": {"choice_cursor": 1}},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"snapshot_message": true, "expect_message": "081D"},
+  {"advance_to_choice": {"max_presses": 50, "settle_seconds": 3}},
+  {"snapshot_message": true, "expect_message": "083A"},
+  {"snapshot_choices": true, "expect_choices": {"choice_count": 2, "choice_state": 2, "choice_cursor": 0}},
+  {"capture": "explanation-repeated.png"},
+  {"read": ["801988D0", 16], "expect": "AF16C0DEAF16C0DEAF16C0DEAF16C0DE"},
+  {"save_state": true}
+]

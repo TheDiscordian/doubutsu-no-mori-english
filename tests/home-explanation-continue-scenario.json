@@ -1,0 +1,17 @@
+[
+  {"wait": 2},
+  {"snapshot_choices": true, "expect_choices": {"choice_count": 2, "choice_state": 2, "choice_cursor": 0}},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"snapshot_message": true, "expect_message": "081E"},
+  {"capture": "explanation-accepted.png"},
+  {"repeat": 12, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"snapshot_choices": true},
+    {"capture": "home-payment-{index:02d}.png"}
+  ]},
+  {"read": ["801988D0", 16], "expect": "AF16C0DEAF16C0DEAF16C0DEAF16C0DE"},
+  {"save_state": true}
+]

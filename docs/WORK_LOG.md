@@ -369,6 +369,32 @@
   steps and all ten acceptance checks. The layout build's full regression and
   both normal house-explanation choice outcomes remain to be tested.
 
+### Purchase confirmation and normal explanation outcomes
+
+- Added a hash-bound one-record approval for `07E9`, retaining the full English
+  purchase/radio-gift confirmation. Its repeated emotion commands use only the
+  original native argument tuples, and its BGM, player field, `07EA` continuation,
+  and end marker remain intact. Its small-print aside follows the GameCube's own
+  anchor/line-scale commands. Sequence validation now retains and compares the
+  original root's outgoing links in the final member instead of dropping them.
+- All 79 tests pass, including changed/omitted external-link and actor-argument
+  rejection. The purchase build has 9,944 edits, 9,100 reference dialogue
+  candidates, 2,646 rejected main messages, and 1,309 layout warnings.
+  ROM SHA-256:
+  `52dc7bce97a836eb68acd3df62a920ede4d678ab18a0d964b85dc049a18d998d`.
+  UPS SHA-256:
+  `cf7ca0c96ab8e62ac13fe64afd7588462a41689730871b1e3c8c8405edb6b53b`.
+- `build/smoke-purchase-native-01` passes 28 recorded steps: real cartridge load,
+  complete payload and buffer guards, unchanged outgoing `07EA`, both continuing
+  terminator phases, module guards, and complete checkpoint restoration.
+- `build/smoke-sequence-home-repeat-01` passes 59 recorded steps: selecting the
+  second option reaches native repeat response `081D`, traverses all four English
+  explanation records, and returns to the active `083A` menu. The continuation run
+  passes 45 steps: the first option reaches invoice `081E` and then work offer
+  `07EC`, with intact guards. These are normal actor/controller paths, not injected
+  branch calls. The sequence ROM predates the English work-offer split, so it
+  cannot establish that newer split's normal progression. FlashRAM is still blank.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
