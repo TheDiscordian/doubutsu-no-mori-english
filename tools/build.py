@@ -14,6 +14,7 @@ from textvalidate import validate_entry
 from keyboard import make_english_keyboard
 from english_runtime import ChoiceLayout, make_english_runtime, verify_english_runtime
 from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
+from reference_sequences import validate_sequences
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -33,6 +34,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     if english_runtime:
         verify_english_runtime(rom, replacements, layout)
     edits = json.loads(path.read_text()) if path else []
+    source_banks = banks(rom)
+    permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info)
     grouped, seen = {}, set()
     for edit in edits:
         bank, index = edit["id"].split(":")
@@ -43,7 +46,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     count = 0
     relocations = {}
     files = by_vrom(rom)
-    for bank in banks(rom):
+    for bank in source_banks:
         if bank.name not in grouped:
             continue
         entries = bank.entries()
@@ -57,7 +60,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             try:
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
-                               resident_runtime=bool(runtime_module))
+                               resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:

@@ -1,6 +1,8 @@
 """Control preservation, expansion budgets, and conservative dialogue layout checks."""
 
 from textcodec import LATIN, tokenize
+from aflib import sha256
+from reference_sequences import SequencePermit
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -47,7 +49,8 @@ def expanded_bound(data, info):
     return total
 
 
-def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False):
+def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
+                   sequence_permit=None):
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
     if resident_runtime:
@@ -71,7 +74,12 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
             available.add(0x76)
         if not fields(replacement) <= available:
             raise ValueError("Reference requests a text field absent from the N64 message")
-    if signature(original, info, policy, resident_runtime) != signature(replacement, info, policy, resident_runtime):
+    if policy == "reviewed_sequence":
+        if (bank != "message" or not isinstance(sequence_permit, SequencePermit)
+                or sequence_permit.source_sha256 != sha256(original)
+                or sequence_permit.encoded_sha256 != sha256(replacement)):
+            raise ValueError("Reviewed sequence requires complete hash-bound approval")
+    elif signature(original, info, policy, resident_runtime) != signature(replacement, info, policy, resident_runtime):
         raise ValueError("Control signature changed")
     if bank == "message":
         if expanded_bound(replacement, info) > 1024:

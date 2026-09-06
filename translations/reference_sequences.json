@@ -1,0 +1,32 @@
+[
+  {
+    "id": "nook_home_explanation",
+    "evidence": "The Japanese root includes the complete home, gyroid, and save explanation. The GameCube splits the equivalent explanation into three N64 opening-reserve slots. Keep the exact GameCube presentation and the original final choice-index mapping. Actor emotion argument tuples remain drawn from the original root. See specs/REFERENCE_SEQUENCES.md; runtime traversal and both choice paths remain required.",
+    "members": [
+      {
+        "id": "message:07EA",
+        "source_sha256": "9a4942914163fedefb8cc62206653c3195f884cdf74b03d193272e56aeb6e8ac",
+        "reference_sha256": "98c798aa64b885678dafcdee1833d2dd8cc186a5079a2386ad0101ea3aa53707",
+        "encoded_sha256": "98c798aa64b885678dafcdee1833d2dd8cc186a5079a2386ad0101ea3aa53707"
+      },
+      {
+        "id": "message:0838",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "a3a4a18a4075ec25ae8188710f75f717a958ff85d8f2a2f19bac86f9ae4af151",
+        "encoded_sha256": "a3a4a18a4075ec25ae8188710f75f717a958ff85d8f2a2f19bac86f9ae4af151"
+      },
+      {
+        "id": "message:0839",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "acdbccbed046d8ac95ac1b67829556d102a696dbf5359f857405af22f52ae392",
+        "encoded_sha256": "acdbccbed046d8ac95ac1b67829556d102a696dbf5359f857405af22f52ae392"
+      },
+      {
+        "id": "message:083A",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "97199a394f025df4c5635583be793155345738b442e769e7242aa917d2f53d00",
+        "encoded_sha256": "97199a394f025df4c5635583be793155345738b442e769e7242aa917d2f53d00"
+      }
+    ]
+  }
+]

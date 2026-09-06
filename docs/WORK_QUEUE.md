@@ -20,7 +20,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | R04 | NPC and item names | pending | IDs matched from actor/item tables; full English names supported by every destination |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, and protected pacing have targeted MIPS tests; choice-close, random-range, space, and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound reviewed identity records implemented; exercise sequence reveals incompatible same-ID references requiring original N64 translations |
+| R07 | Remaining message matching | active | Hash-bound identities and complete multi-message approvals implemented; Nook explanation DMA/branches pass; further matching and actor traversal remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |
@@ -31,7 +31,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
-| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, escort, and house interior pass; home explanation, normal save, and introductory jobs remain |
+| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, escort, house interior, and work offer pass; English home-explanation traversal, normal save, and introductory jobs remain |
 | V03 | Save/reload and long names | pending | Isolated FlashRAM, RTC, no lost/truncated text, restart across sessions |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |

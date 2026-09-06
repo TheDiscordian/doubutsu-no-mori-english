@@ -1,0 +1,9 @@
+[
+  {"wait": 2},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"capture": "gyroid-choices.png"},
+  {"save_state": true}
+]

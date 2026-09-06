@@ -14,6 +14,7 @@ from textcodec import command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference
+from reference_sequences import reference_sequence_edits
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -65,6 +66,12 @@ def main():
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
         inventory = [json.loads(line) for line in (args.inventory/(name+".jsonl")).read_text().splitlines()]
         source = source_banks[name].entries()
+        sequence_edits, permits = reference_sequence_edits(gc, source, info) if name == "message" else ([], {})
+        sequences = {edit["id"]: edit for edit in sequence_edits}
+        if sequences.keys() & (override_ids | matches.keys()):
+            raise ValueError("Reviewed sequence conflicts with a draft or identity override")
+        if sequences.keys() - {row["id"] for row in inventory}:
+            raise ValueError("Reviewed sequence is absent from the inventory")
         counts, review = Counter(), []
         for row in inventory:
             id = row["id"]
@@ -72,41 +79,50 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            reference, match_basis, reason = resolve_reference(row, gc, matches, original)
-            if id in matches:
-                visited_matches.add(id)
-            if reason is None:
-                try:
-                    policy = "presentation"
+            if id in sequences:
+                edit = sequences[id]
+                if row["source_sha256"] != edit["source_sha256"]:
+                    raise ValueError("Stale sequence inventory")
+                text, policy, adaptations = edit["translation"], edit["control_policy"], edit["adaptations"]
+                candidate = encode(text, info)
+                validate_entry(original, candidate, info, name, policy, choice_bytes=choice_bytes,
+                               resident_runtime=bool(args.runtime_module), sequence_permit=permits[id])
+            else:
+                reference, match_basis, reason = resolve_reference(row, gc, matches, original)
+                if id in matches:
+                    visited_matches.add(id)
+                if reason is None:
                     try:
-                        text, adaptations = adapt_reference(reference["text"], original, info,
-                                                            resident_runtime=bool(args.runtime_module))
-                        candidate = encode(text, info)
-                        validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=choice_bytes,
-                                       resident_runtime=bool(args.runtime_module))
+                        policy = "presentation"
+                        try:
+                            text, adaptations = adapt_reference(reference["text"], original, info,
+                                                                resident_runtime=bool(args.runtime_module))
+                            candidate = encode(text, info)
+                            validate_entry(original, candidate, info, name, policy,
+                                           choice_bytes=choice_bytes,
+                                           resident_runtime=bool(args.runtime_module))
+                        except ValueError as exc:
+                            if name != "message" or str(exc) != "Control signature changed":
+                                raise
+                            policy = "reference_text"
+                            text, adaptations = adapt_reference(reference["text"], original, info, policy,
+                                                                resident_runtime=bool(args.runtime_module))
+                            candidate = encode(text, info)
+                            validate_entry(original, candidate, info, name, policy,
+                                           choice_bytes=choice_bytes,
+                                           resident_runtime=bool(args.runtime_module))
                     except ValueError as exc:
-                        if name != "message" or str(exc) != "Control signature changed":
-                            raise
-                        policy = "reference_text"
-                        text, adaptations = adapt_reference(reference["text"], original, info, policy,
-                                                            resident_runtime=bool(args.runtime_module))
-                        candidate = encode(text, info)
-                        validate_entry(original, candidate, info, name, policy,
-                                       choice_bytes=choice_bytes,
-                                       resident_runtime=bool(args.runtime_module))
-                except ValueError as exc:
-                    reason = str(exc)
-            if reason:
-                counts["rejected"] += 1
-                review.append({"id": id, "reason": reason})
-                continue
-            edit = {"id": id, "source_sha256": row["source_sha256"],
-                    "translation": text, "control_policy": policy,
-                    "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
-                                   "reference_id": reference["id"], "reference_sha256": reference["sha256"],
-                                   "match_basis": match_basis},
-                    "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
+                        reason = str(exc)
+                if reason:
+                    counts["rejected"] += 1
+                    review.append({"id": id, "reason": reason})
+                    continue
+                edit = {"id": id, "source_sha256": row["source_sha256"],
+                        "translation": text, "control_policy": policy,
+                        "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
+                                       "reference_id": reference["id"], "reference_sha256": reference["sha256"],
+                                       "match_basis": match_basis},
+                        "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
             issues = layout_issues(candidate, info, advances) if name == "message" else []
             manifest = {k: v for k, v in edit.items() if k != "translation"}
             manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
@@ -117,6 +133,7 @@ def main():
             counts["accepted_candidates"] += 1
             counts["adapted_candidates"] += bool(adaptations)
             counts["text_field_delivery_candidates"] += policy == "reference_text"
+            counts["reviewed_sequence_candidates"] += policy == "reviewed_sequence"
             counts["layout_review_required"] += bool(issues)
         reports[name] = {**dict(counts), "source_entries": len(source),
                          "remaining_by_reason": dict(Counter(r["reason"] for r in review))}

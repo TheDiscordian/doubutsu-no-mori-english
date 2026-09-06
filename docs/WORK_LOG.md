@@ -241,6 +241,28 @@
   special-NPC names, and shop-level labels as distinct constraints. The inventory
   is evidence for further implementation, not permission to enlarge every entry.
 
+### Reviewed multi-message house explanation
+
+- Added exact all-or-nothing approvals for multi-record GameCube dialogue.
+  Nook's `07EA` explanation continues through N64 opening-reserve slots `0838`,
+  `0839`, and `083A`, preserving the supplied English pages, timing, and emphasis.
+  Independent checks preserve choice-index mappings and other gameplay commands,
+  restrict actor arguments and text fields, and reject incoming native branches
+  to reserved slots. The builder does not trust an edit's policy flag alone.
+- All 67 tests pass. Candidate generation admits four additional records, for
+  9,306 edits. ROM SHA-256:
+  `c691fa6059b8766df1fbe3432609e48918d04e0ee1914079a783050b9b569f12`.
+  UPS SHA-256:
+  `bb9a4110046e566e8742a0649278a507be1a92d42560d59d61745774bc7c50f4`.
+- `build/smoke-sequence-native-01` passes 99 recorded steps: all four real DMA
+  loads, three native continuation assignments, both terminator phases, both
+  final choice branches, the native repeat response, and buffer/module guards.
+  This injected-call test restores the checkpoint and is not actor-flow approval.
+- Pacing-build normal gameplay completes Nook's work offer. Gyroid message `092E`
+  is the job-time greeting, not its normal save menu. Choice snapshot data is
+  inactive (`choice_state = 0`) and must not be mistaken for a displayed menu.
+  FlashRAM remains blank; completing the introductory jobs remains necessary.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
