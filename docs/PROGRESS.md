@@ -2,9 +2,11 @@
 
 ## Active work
 
-English-first keyboard input, English keyboard graphics and prompts, repeatable
-input tests, and a GameCube-style keyboard design. The wider translation work
-continues with buffer audits, reference matching, and missing-text coverage.
+Complete the main translation/runtime port, then the matching GameCube image
+replacements and GameCube-style keyboard. The immediate work is runtime text
+substitutions and choice-buffer expansion, followed by the remaining banks and
+candidate review. The [completion queue](WORK_QUEUE.md) tracks all required work;
+partial milestones do not complete the project.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -32,9 +34,13 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 33 passing synthetic and retail-input tests. Retail tests require the local ROM.
+- 39 passing synthetic and retail-input tests. Retail tests require the local ROM.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
+- Opt-in English runtime removes the Japanese town suffix and supports sixteen
+  plain choice bytes, including actor-specific staging buffers. Source guards,
+  complete-capability checks, and independently assembled width code pass.
+  Runtime regressions are in progress; this is not yet the default pilot.
 
 ## Current reference candidates
 
@@ -49,9 +55,11 @@ unsupported GameCube commands, and two expansion-bound failures. Another 996
 accepted dialogue candidates have conservative layout warnings. Entry-level
 rejection and adaptation reports are generated in `build/candidates/`.
 
-238 choices exceed the unchanged ten-byte runtime buffer. Extending ROM storage
-does not fix that buffer. General strings, mail, saved names, dates, and item
-names have separate restrictions. Unsafe legacy item-name mappings are withheld.
+The separate `build/runtime16/` experiment contains 9,127 edits, including 446
+English choice candidates: 225 more than the default pilot. Thirteen English
+reference choices exceed sixteen bytes and one lacks the same-ID legacy match.
+Those fourteen remain withheld. General strings, mail, saved names, dates, and
+item names have separate restrictions. Unsafe legacy item-name mappings are withheld.
 
 ## Validation and release status
 
@@ -64,10 +72,9 @@ entry, its six-character limit, and confirmation also pass. No hardware-certifie
 release candidate exists. Save/reload, travel, mail, board, RTC, calendar, credits,
 seasonal events, and original hardware tests remain outstanding.
 
-An observed remaining translation issue is the Japanese town suffix appended by
-dialogue insertion command `7F2F`. The keyboard's destination label is English,
-but the separate dialogue insertion path still needs translation. Catchphrase,
-song, mail, and board editor callers also need their own runtime regressions.
+The opt-in runtime changes the town insertion command `7F2F`; its suffix removal
+and expanded choices need runtime assertions before promotion to the pilot.
+Catchphrase, song, mail, and board editor callers also need their own regressions.
 
 The GameCube-style grid is a separate implementation task; the current keyboard
 still uses the N64 radial layout. See [keyboard design](../specs/KEYBOARD.md),

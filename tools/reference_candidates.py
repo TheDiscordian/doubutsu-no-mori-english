@@ -25,6 +25,7 @@ def main():
     parser.add_argument("--inventory", type=Path, default=Path("build/inventory"))
     parser.add_argument("--drafts", type=Path, default=Path("translations/opening.json"))
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
+    parser.add_argument("--english-runtime", action="store_true")
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
@@ -57,14 +58,16 @@ def main():
                     try:
                         text, adaptations = adapt_reference(reference["text"], original, info)
                         candidate = encode(text, info)
-                        validate_entry(original, candidate, info, name, policy)
+                        validate_entry(original, candidate, info, name, policy,
+                                       choice_bytes=16 if args.english_runtime else 10)
                     except ValueError as exc:
                         if name != "message" or str(exc) != "Control signature changed":
                             raise
                         policy = "reference_text"
                         text, adaptations = adapt_reference(reference["text"], original, info, policy)
                         candidate = encode(text, info)
-                        validate_entry(original, candidate, info, name, policy)
+                        validate_entry(original, candidate, info, name, policy,
+                                       choice_bytes=16 if args.english_runtime else 10)
                 except ValueError as exc:
                     reason = str(exc)
             if reason:

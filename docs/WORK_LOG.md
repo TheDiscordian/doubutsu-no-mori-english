@@ -64,6 +64,31 @@
 - Repeated the complete `make pilot` pipeline with 33 passing tests and the same
   output hashes. Confirmed the GitHub repository remains private.
 
+### Full-project continuation and choice runtime
+
+- Added `WORK_QUEUE.md` to track main porting, translation review, stability,
+  hardware validation, image replacement, keyboard stretch work, and release.
+- Audited all 3,374 decoded DMA files. Five direct choice-loader calls span
+  main code, Quest Manager, and Player Select 2; all are covered by the runtime
+  patch. The Festival Stall's setter-only path keeps its valid ten-byte inputs.
+  No direct jumps, literal pointers, or main-code branches target the reclaimed
+  choice-storage region. Detailed local evidence: `build/audits/choice-callers.json`.
+- Implemented guarded sixteen-byte rows, selected-answer storage/insertion,
+  width measurement, drawing, main staging, and actor stack-frame expansion.
+  The English town field no longer appends the Japanese village suffix. The
+  permanent code and overlay sizes, save layouts, and font assets stay unchanged.
+- All 39 tests passed. The pinned MIPS assembler verified the 132-byte width
+  routine, SHA-256 `4884d7eea3c26fc42c5cf3ee1aee92aa66cb742452d18129e949d05e9559a781`.
+- Experimental `build/runtime16/` contains 9,127 edits, with 446 English choice
+  candidates. Thirteen over-sixteen-byte disc references and one unmatched
+  choice remain withheld. ROM SHA-256:
+  `6b5f7ce98c4d21565d45c2bcea6969ec2f3e3b81ae8c439282b9a6560595f152`.
+  UPS SHA-256:
+  `a64fab5c1fc63485e980c6e24d40ecff01ddca93375bc6a42dc8fe1094bd7d62`.
+- Started a silent, bounded four-MiB regression with choice snapshots. Early
+  observations confirm a sixteen-byte row and its selected-answer copy match.
+  The full scenario and town-suffix assertions remain in progress at this checkpoint.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -107,7 +107,10 @@ their semantics are established.
 length is at most 1,024; callers still perform their insertion copy. Avoiding
 overflow before building is therefore essential, even though the move routine
 contains a size check.
-The retail choice loader accepts at most ten bytes. The general string loader
+The retail choice loader accepts at most ten bytes. The opt-in English runtime
+supports sixteen plain bytes after patching every identified loader caller,
+storage destination, and reader; see [English runtime](ENGLISH_RUNTIME.md).
+The general string loader
 accepts at most 64 bytes and copies into caller-specific buffers.
 
 Retail mail bodies are 96 bytes (`include/m_mail.h`). Header, footer, NPC

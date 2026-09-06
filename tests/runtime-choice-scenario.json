@@ -1,0 +1,44 @@
+[
+  {"wait": 10},
+  {"key": "Return", "duration": 0.3},
+  {"wait": 8},
+  {"repeat": 27, "actions": [
+    {"key": "a", "duration": 0.2},
+    {"wait": 5},
+    {"snapshot_message": true},
+    {"snapshot_choices": true}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3, "columns": 6, "rows": 1, "length": 0}},
+  {"key": "w", "duration": 0.4},
+  {"wait": 1},
+  {"repeat": 8, "actions": [
+    {"key": ["w", "a"], "duration": 0.08},
+    {"wait": 0.3}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 6, "text_hex": "434343434343"}},
+  {"key": "Return", "duration": 0.04},
+  {"wait": 5},
+  {"repeat": 17, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"snapshot_choices": true},
+    {"capture": "name-choice-{index:02d}.png"}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"mode": 3, "columns": 6, "rows": 1, "length": 0}},
+  {"repeat": 8, "actions": [
+    {"key": ["f", "a"], "duration": 0.08},
+    {"wait": 0.3}
+  ]},
+  {"snapshot_keyboard": true, "expect_keyboard": {"length": 6, "text_hex": "414141414141"}},
+  {"key": "Return", "duration": 0.04},
+  {"wait": 5},
+  {"repeat": 35, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true},
+    {"snapshot_choices": true},
+    {"capture": "town-choice-{index:02d}.png"}
+  ]},
+  {"read": ["80000318", 4], "expect": "00400000"}
+]

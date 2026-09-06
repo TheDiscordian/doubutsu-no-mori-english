@@ -12,6 +12,7 @@ from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import validate_entry
 from keyboard import make_english_keyboard
+from english_runtime import make_english_runtime, verify_english_runtime
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -19,7 +20,9 @@ RELOCATED_BANKS = {
 }
 
 
-def apply_translations(rom, replacements, path):
+def apply_translations(rom, replacements, path, *, english_runtime=False):
+    if english_runtime:
+        verify_english_runtime(rom, replacements)
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     edits = json.loads(path.read_text()) if path else []
     grouped, seen = {}, set()
@@ -44,7 +47,8 @@ def apply_translations(rom, replacements, path):
                 raise ValueError(f"Stale translation: {edit['id']}")
             replacement = encode(edit["translation"], info)
             try:
-                validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"))
+                validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
+                               choice_bytes=16 if english_runtime else 10)
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -79,6 +83,7 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--translations", type=Path)
     parser.add_argument("--english-keyboard", action="store_true")
+    parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -87,7 +92,11 @@ def main():
         info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
         keyboard, report["keyboard"] = make_english_keyboard(rom, info, report["advance_by_glyph"])
         replacements.update(keyboard)
-    report["translation_edits"], relocations = apply_translations(rom, replacements, args.translations)
+    if args.english_runtime:
+        runtime, report["english_runtime"] = make_english_runtime(rom, replacements)
+        replacements.update(runtime)
+    report["translation_edits"], relocations = apply_translations(
+        rom, replacements, args.translations, english_runtime=args.english_runtime)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations)
     files = by_vrom(output)

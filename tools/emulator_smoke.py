@@ -138,6 +138,23 @@ def keyboard_snapshot(debug):
             "text_hex": debug.command(f"m{pointer:x},{rows*columns:x}")}
 
 
+def choice_snapshot(debug):
+    """Read the opt-in English runtime's singleton choice window and rows."""
+    from english_runtime import CHOICE_ROWS, CHOICE_SELECTED
+    state = bytes.fromhex(debug.command("m801425c0,bc"))
+    lengths = list(struct.unpack_from(">4i", state, 0x5C))
+    selected_length, count, last_selected, cursor = struct.unpack_from(">4i", state, 0x78)
+    if not 0 <= count <= 4 or any(not 0 <= n <= 16 for n in lengths[:count]):
+        raise ValueError("Invalid expanded choice dimensions")
+    rows = bytes.fromhex(debug.command(f"m{CHOICE_ROWS:x},40"))
+    selected = bytes.fromhex(debug.command(f"m{CHOICE_SELECTED:x},10"))
+    return {"choice_count": count, "choice_lengths": lengths[:count],
+            "choice_hex": [rows[i*16:i*16+lengths[i]].hex() for i in range(count)],
+            "selected_length": selected_length, "selected_hex": selected[:max(0, min(16, selected_length))].hex(),
+            "last_selected": last_selected, "choice_cursor": cursor,
+            "choice_state": struct.unpack_from(">i", state, 0x9C)[0]}
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
@@ -242,6 +259,12 @@ def main():
                 for field, expected in action.get("expect_keyboard", {}).items():
                     if snapshot.get(field) != expected:
                         raise ValueError(f"Keyboard {field}: {snapshot.get(field)!r}, expected {expected!r}")
+            if action.get("snapshot_choices"):
+                snapshot = choice_snapshot(debug)
+                results.append(snapshot)
+                for field, expected in action.get("expect_choices", {}).items():
+                    if snapshot.get(field) != expected:
+                        raise ValueError(f"Choice {field}: {snapshot.get(field)!r}, expected {expected!r}")
             if "capture" in action:
                 target = out / Path(action["capture"]).name
                 subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
