@@ -30,11 +30,14 @@ user's direction. The production build retains the approved spacing metrics.
 - Reference import retains GameCube presentation commands and restores matching
   N64 actor-demo arguments. Read-only text insertions may differ only when the
   N64 message already supplies the requested fields. Flow commands stay ordered.
+- Dialogue-only reference delivery accepts the GameCube's own page and button-wait
+  layout when gameplay commands still agree. It does not reflow or remove English
+  pages. Manifests record native/reference counts and retain candidate review status.
 - English-first native keyboard, translated name-entry prompts and ten texture
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 68 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 69 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -86,11 +89,11 @@ item names have separate restrictions. Unsafe legacy item-name mappings are with
 
 ## Validation and release status
 
-The separate resident-module experiment contains 9,310 edits, including
-8,466 reference dialogue candidates, all 460 choices, and four N64-specific
+The separate resident-module experiment contains 9,677 edits, including
+8,833 reference dialogue candidates, all 460 choices, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 3,280; matching, actor fields, flow controls,
+Its remaining main-dialogue count is 2,913; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -102,8 +105,9 @@ state and does not expose the normal save menu yet. A separate native test passe
 all house-explanation loads, continuation links, both choice branches, the repeat
 response, and memory guards. Normal actor traversal of that English sequence is
 still required. The sequence build passes name/town entry and a continuation to
-arrival. The cancellation build's complete long-choice/train-to-town regression
-is running.
+arrival. The cancellation build passes the complete long-choice/train-to-town
+regression and all ten acceptance checks. A new delivery-build regression is
+running. Its 366 page-delivery candidates still need broader gameplay review.
 The exercise drafts retain every native command; seasonal-event testing remains.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.

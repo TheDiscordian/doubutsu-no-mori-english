@@ -30,6 +30,12 @@ def adapt_reference(text, source, info, policy="presentation", resident_runtime=
     ignored = compared_commands(policy, resident_runtime)
     old = [t.data for t in tokenize(source, info) if t.kind == "cmd" and t.data[1] not in ignored]
     new = [t.data for t in tokenize(candidate, info) if t.kind == "cmd" and t.data[1] not in ignored]
+    if policy == "reference_delivery":
+        def delivery(data):
+            codes = [t.data[1] for t in tokenize(data, info) if t.kind == "cmd"]
+            return {"page_clears": codes.count(0x02), "button_waits": codes.count(0x04)}
+        edits.append({"operation": "retain_gamecube_page_and_button_delivery",
+                      "n64": delivery(source), "gamecube": delivery(candidate)})
     # Demo animation arguments are platform-specific. Only adapt when the
     # complete command opcode sequence agrees; preserve all original N64 demo
     # arguments in their corresponding positions. Never align by fuzzy text.

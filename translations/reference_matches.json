@@ -5,5 +5,12 @@
     "reference_id": "select:0013",
     "reference_sha256": "f1323f09f63c867d520b3b267f6e314e4eaf92fb314f916b1c50b67076dfcab7",
     "evidence": "The Japanese choice explicitly requests editing the message. The legacy adds the noun to its English label; the English GameCube label abbreviates the same action. N64 messages 0382, 0925, 0927, and 0936 reference this choice in the home gyroid menu. Keep those N64 menu IDs and branches: the GameCube gyroid menus expose different actions. This record confirms only this label's identity, not the surrounding dialogue flow or runtime behaviour."
+  },
+  {
+    "id": "message:09C9",
+    "source_sha256": "79f581b59474bb77abd9f38598aed484415a2d6e3f52611256a7ddeadc658079",
+    "reference_id": "message:09C9",
+    "reference_sha256": "e4c65c62b23b3eaee6c712d06e0715cbaf1fc0dabe7f4d907a03b0d001994aa7",
+    "evidence": "This introductory farewell tells the player that life is more enjoyable with friends and hopes friends will visit the town. The native and English reference commands and actor arguments agree. The legacy text changes the game's English name from Animal Crossing to Animal Forest, which prevents an exact visible-text match but does not change this message's identity. Use the supplied GameCube wording and retain its complete presentation."
   }
 ]

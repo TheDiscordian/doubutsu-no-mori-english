@@ -104,13 +104,18 @@ def main():
                         except ValueError as exc:
                             if name != "message" or str(exc) != "Control signature changed":
                                 raise
-                            policy = "reference_text"
-                            text, adaptations = adapt_reference(reference["text"], original, info, policy,
-                                                                resident_runtime=bool(args.runtime_module))
-                            candidate = encode(text, info)
-                            validate_entry(original, candidate, info, name, policy,
-                                           choice_bytes=choice_bytes,
-                                           resident_runtime=bool(args.runtime_module))
+                            for policy in ("reference_text", "reference_delivery"):
+                                try:
+                                    text, adaptations = adapt_reference(reference["text"], original, info, policy,
+                                                                        resident_runtime=bool(args.runtime_module))
+                                    candidate = encode(text, info)
+                                    validate_entry(original, candidate, info, name, policy,
+                                                   choice_bytes=choice_bytes,
+                                                   resident_runtime=bool(args.runtime_module))
+                                    break
+                                except ValueError as exc:
+                                    if policy == "reference_delivery" or str(exc) != "Control signature changed":
+                                        raise
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:
@@ -133,6 +138,7 @@ def main():
             counts["accepted_candidates"] += 1
             counts["adapted_candidates"] += bool(adaptations)
             counts["text_field_delivery_candidates"] += policy == "reference_text"
+            counts["reference_page_delivery_candidates"] += policy == "reference_delivery"
             counts["reviewed_sequence_candidates"] += policy == "reviewed_sequence"
             counts["layout_review_required"] += bool(issues)
         reports[name] = {**dict(counts), "source_entries": len(source),

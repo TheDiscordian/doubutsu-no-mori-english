@@ -291,6 +291,31 @@
   The cancellation build uses the complete `runtime-choice-scenario.json` for
   the full regression rather than claiming the shorter run is equivalent.
 
+### GameCube page delivery and introductory farewell
+
+- Added a dialogue-only policy that retains the confirmed GameCube reference's
+  native page-clear and button-wait commands even when their count or placement
+  differs from the Japanese text. Branches, choices, actor commands, terminators,
+  geometry commands, and expansion limits remain checked. No English reflow or
+  removal of GameCube waits/pages occurs. Manifests record both delivery counts.
+- Added a reviewed identity for `09C9`: the legacy farewell differs only by
+  renaming Animal Crossing to Animal Forest, so exact visible-text matching had
+  withheld the correct English reference. Native actor arguments and commands
+  agree. The new candidate uses the supplied GameCube wording.
+- All 69 tests pass. The delivery build contains 9,677 edits, including 366
+  newly admitted page-delivery candidates, and leaves 2,913 main messages rejected.
+  ROM SHA-256:
+  `d034b987952be85a09c3277d0d3ef2a8326fa30bea161d37b3d9e4f0bdf5fa95`.
+  UPS SHA-256:
+  `492e4d30b4830717f791d3c2822377d494d40ec666ad7c892fb66ee8cf877170`.
+  There are 1,117 conservative reference-dialogue layout warnings. These counts
+  are not reviewed coverage or release approval.
+- `build/smoke-cancel-arrival-01` passes 225 steps and all ten acceptance checks.
+  The delivery build's full regression is running. The work-offer `07EC` needs
+  its own reviewed split: its supplied English reference is 1,051 encoded bytes
+  with an expansion bound of 1,127. The legacy uses reserved slot `2AE9` for its
+  second part; the source placeholder and incoming references require verification.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

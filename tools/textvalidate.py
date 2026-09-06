@@ -23,6 +23,8 @@ def compared_commands(policy, resident_runtime=False):
         return presentation
     if policy == "reference_text":
         return presentation | TEXT_FIELDS
+    if policy == "reference_delivery":
+        return presentation | TEXT_FIELDS | {0x02, 0x04}
     raise ValueError("Unknown control policy")
 
 
@@ -64,7 +66,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                     hour_seen = True
                 elif token.data[1] == 0x76 and not hour_seen:
                     raise ValueError("AM/PM requires a preceding hour field in the message")
-    if policy == "reference_text":
+    if policy in ("reference_text", "reference_delivery"):
         if bank != "message":
             raise ValueError("Reference text policy is only audited for dialogue")
         def fields(data):

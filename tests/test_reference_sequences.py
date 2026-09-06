@@ -15,6 +15,7 @@ from reference_sequences import (audit_sequence, load_sequences, message_targets
 from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import validate_entry
+from gc_adapter import adapt_reference
 from test_retail import ROM_PATH
 
 
@@ -108,6 +109,25 @@ class ReferenceSequenceTests(unittest.TestCase):
                 path.write_text(json.dumps(records))
                 with self.assertRaises(ValueError):
                     load_sequences(path)
+
+    def test_reference_delivery_keeps_english_pages_and_gameplay_guards(self):
+        native = b"A\x7f\x04\x7f\x02B\x7f\x09\x00\x00\x03\x7f\x0e\x00\x08\x7f\x01"
+        text = "First{cmd:7F04}{cmd:7F02}Second{cmd:7F04}{cmd:7F02}Third{cmd:7F09000007}{cmd:7F0E0008}{cmd:7F01}"
+        adapted, changes = adapt_reference(text, native, self.info, "reference_delivery")
+        self.assertEqual(adapted, text.replace("7F09000007", "7F09000003"))
+        self.assertEqual(changes[0]["gamecube"], {"page_clears": 2, "button_waits": 2})
+        replacement = encode(adapted, self.info)
+        validate_entry(native, replacement, self.info, "message", "reference_delivery")
+        for altered in (replacement.replace(b"\x0e\x00\x08", b"\x0e\x00\x09"),
+                        replacement.replace(b"\x7f\x01", b"\x7f\x00"),
+                        replacement.replace(b"Third", b"Third\x7f\x1a"),
+                        replacement.replace(b"\x7f\x09\x00\x00\x03", b"")):
+            with self.assertRaises(ValueError):
+                validate_entry(native, altered, self.info, "message", "reference_delivery")
+        with self.assertRaises(ValueError):
+            validate_entry(native, replacement, self.info, "select", "reference_delivery")
+        with self.assertRaisesRegex(ValueError, "signature"):
+            validate_entry(native, replacement, self.info, "message", "reference_text")
 
     @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
                          "Retail ROM and English text extraction are local-only test inputs")

@@ -84,3 +84,19 @@ suppression, and both flag-reset paths. Native animation geometry remains intact
 See [choice cancellation](CHOICE_CANCELLATION.md) for the layouts, hooks, import
 restrictions, and silent native regression. A changed GameCube menu is not made
 compatible merely by supporting this opcode.
+
+## Reference page delivery
+
+The dialogue-only `reference_delivery` policy permits the confirmed English
+reference to use different page-clear (`02`) and wait-for-button (`04`) placement
+from the Japanese source. These are native display/input operations, not new
+runtime opcodes. The imported English text retains its exact reference newlines,
+pages, waits, and pauses; the tool does not reflow or remove them to fit a bubble.
+
+Other controls still compare in order: end/continue markers, choices, branch
+targets, actor requests, sound/BGM, and embedded operations are not discarded.
+The existing read-only-field rules and conservative 1,024-byte expansion budget
+still apply. Native actor arguments may be restored only when the complete
+non-presentation opcode sequence agrees. Explicit font geometry and colour-span
+commands remain separately gated. Generated manifests record the page/wait counts
+and keep these imports labelled as candidates awaiting gameplay/layout review.
