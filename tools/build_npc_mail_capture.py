@@ -41,10 +41,10 @@ def build(module,words,aliases,out):
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
-    for name in ('digest','npc_capture','generate'):
+    for name in ('digest','npc_capture','generate','npc_creator'):
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
-    objects = ['digest.o','npc_capture.o','generate.o','sources.o']
+    objects = ['digest.o','npc_capture.o','generate.o','npc_creator.o','sources.o']
     result = subprocess.run([str(out/'fado'),*objects,'-n','af_npc_capture','-o','relocation.s'],
                             cwd=out,capture_output=True,text=True,timeout=60)
     (out/'fado.log').write_text(result.stdout+result.stderr)
@@ -92,7 +92,7 @@ def build(module,words,aliases,out):
               'word_sha256':sha256(words),'alias_sha256':sha256(aliases),
               'symbols':{name:value-RAM for name,value in symbols.items() if name.startswith('af_') and RAM <= value < RAM+len(data)},
               'compiler':run('gcc','--version').splitlines()[0],'flags':flags,'toolchain_image':IMAGE,
-              'stack_usage':{name:(out/(name+'.su')).read_text() for name in ('digest','npc_capture','generate')},
+              'stack_usage':{name:(out/(name+'.su')).read_text() for name in ('digest','npc_capture','generate','npc_creator')},
               'fado_sources':fado_hashes,'status':'Complete capture/generation code; gameplay publication not installed'}
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)

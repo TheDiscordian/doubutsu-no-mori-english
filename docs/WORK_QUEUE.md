@@ -86,8 +86,13 @@ guessing unknown identities. The scoped source/capture implementation passes
 complete host coverage and cross-compiles as a bounded relocatable image.
 All 48 original-versus-captured native creator comparisons pass, including full
 English generation with unchanged RNG state, gifts, stationery, native fields,
-and saved data. Cartridge loading, whole-creator ownership, and publication
-through the tested failure gate remain.
+and saved data. The whole-creator transaction now combines private metadata,
+capture, complete generation, and guarded publication; host/sanitizer tests pass.
+The native combined transaction passes 48 reply comparisons, eight successive
+letters, and six rejected requests, including complete output/capital retention
+on failure. Next implement the
+[resident cartridge loader](../specs/NPC_MAIL_LOADER.md), allocation ownership,
+and the real creator binding for the tested submission gate.
 The resident capture adapters leave 2,912 linked bytes available inside the
 unchanged 32 KiB reservation. Allocation/error ownership tests,
 four-MiB town arrival, and all eight complete native letter windows pass.

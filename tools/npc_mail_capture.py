@@ -36,7 +36,8 @@ def call_patches(code,module):
 
 def source_hashes():
     names = ['overlays/mail_generation/'+name for name in
-             ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h','capture.ld','sources.s')]
+             ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
+              'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
     names += ['runtime/mail/'+name for name in ('npc_generation.h','catalog.h','format.h','record.h')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
@@ -60,7 +61,8 @@ def validate(data,reloc,report,module):
     symbols = report.get('symbols',{})
     required = {'af_mail_capture_reset','af_mail_capture_set','af_mail_generate','af_mail_source_digest',
                 'af_npc_mail_sources_init','af_npc_mail_source_word','af_npc_mail_source_name',
-                'af_npc_mail_source_alias','af_npc_mail_capture_event','af_npc_word_data','af_npc_alias_data'}
+                'af_npc_mail_source_alias','af_npc_mail_capture_event','af_npc_mail_create',
+                'af_npc_word_data','af_npc_alias_data'}
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data')):

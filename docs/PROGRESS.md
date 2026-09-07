@@ -46,8 +46,8 @@ reference assembly cases. Native calls pass 46 complete English reference cases,
 seven rejected generations, and 42 capture cases, with complete save retention
 and intact guards. Publication changes only validated text/split bytes and the
 transient capital state. The 1,380-byte generation probe is separate from the
-resident image, which has 2,912 linked bytes free. Whole-creator ownership,
-on-demand loading, failure propagation, and
+resident image, which has 2,912 linked bytes free. Resident allocation ownership,
+on-demand loading, delivery failure propagation, and
 semantic template approval remain. Ordinary gameplay snapshot generation stays
 disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
 [receipt evidence](../specs/PELLY_RECEIPT.md).
@@ -86,7 +86,15 @@ including complete English generation, unchanged random state and native fields,
 all six personalities, both reply types/origins, thirteen retained gifts, and
 complete save retention. The 197-call run also checks source validation, native
 relocation/cache maintenance, guards, and checkpoint restoration. Cartridge
-loading, whole-creator ownership, and ordinary delivery remain. All eight letter
+loading, resident allocation ownership, and ordinary delivery remain. The
+[whole-creator transaction](../specs/NPC_MAIL_CREATOR.md) now stages complete native
+metadata and English text and publishes all 164 bytes only after validation.
+It resets stale capture, rejects nested/intersecting requests, detaches its
+session, and retains caller text/capitalization on failure. Host sanitizer checks
+pass. The native transaction passes 48 reply comparisons, eight successive
+letters, and six rejected requests, with 163 calls and 898 assertions. Complete
+save retention, shared capitalization, scope cleanup, and checkpoint restoration
+pass. Next is the [resident loader](../specs/NPC_MAIL_LOADER.md). All eight letter
 windows also pass the new-module regression across fourteen pages, including
 1,705 glyphs and 6,820 vertex positions. The tested failure gate
 provides the required return boundary; it does not replace source or semantic
@@ -124,7 +132,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 366 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 372 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

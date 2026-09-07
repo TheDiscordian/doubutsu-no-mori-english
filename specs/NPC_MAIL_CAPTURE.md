@@ -13,8 +13,9 @@ An outer creator owns the entire session, on-demand code/resources, temporary
 routine with its private letter, then validates the captured parts and generates
 the complete snapshot. Only successful whole-letter generation copies all 164
 bytes to the caller's staging record. A failure publishes nothing and returns
-zero through the tested submission gate. The outer creator and cartridge loader
-remain required integration work; the capture code alone does not install hooks.
+zero through the tested submission gate. The [whole-creator transaction](NPC_MAIL_CREATOR.md)
+implements private staging and publication. Its resident cartridge loader and
+gameplay installation remain required; the capture code alone installs no hooks.
 
 The session prefix is 32 bytes on N64: an event callback, the private stage
 pointer, player/animal/foreign-reply pointers, original condition/origin values,
@@ -96,9 +97,10 @@ Range validation is not semantic approval of every native/reference template.
 The resident forwarding adapters and complete-source callback are implemented.
 Twelve host tests cover full sources, event ordering, original temporary-field
 retention, complete selected IDs, inactive forwarding, relocation validation,
-and exact guarded call sites. The 23,280-byte native image contains 5,168 bytes
+and exact guarded call sites. The 24,176-byte image, including the whole creator,
+contains 6,064 bytes
 of code and 18,112 read-only bytes; no writable/BSS section is required. Its
-160-byte relocation section has 33 entries, independently compared with the
+208-byte relocation section has 45 entries, independently compared with the
 linked ELF inventory. The resident adapters use 736 additional linked bytes,
 leaving 2,912 bytes inside the unchanged linked-code limit.
 
@@ -130,8 +132,7 @@ checkpoint restoration. FlashRAM stays blank and the Controller Pak unchanged.
 The image is loaded through isolated debugger fixture writes; actual cartridge
 loading and ordinary delivery are not exercised.
 
-Production guarded hook
-installation, on-demand resource loading, full creator ownership,
-sticky capitalization across successive successful creations, allocation/DMA
+Production guarded hook installation, on-demand resource loading, allocation
+ownership, resident sticky capitalization across successful creations, allocation/DMA
 failure handling, and the pending-reply loop remain required. The font, saved
 formats, template wording, reference layout, and RNG algorithms are unchanged.

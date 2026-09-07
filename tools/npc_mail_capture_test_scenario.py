@@ -21,7 +21,8 @@ def scenario(rom,native,module,data,reloc,report):
     hooks = call_patches(code,module)
     guards = {}
     for start,end in ((0x800A8B10,0x800A9110),(0x800A7D70,0x800A80E8),
-                      (0x800ACD18,0x800ACD80),(0x800950D8,0x800950E8)):
+                      (0x800ACD18,0x800ACD80),(0x800950D8,0x800950E8),
+                      (0x8009C344,0x8009C3D0)):
         value = code[start-CODE_RAM:end-CODE_RAM]
         if value != original[start-CODE_RAM:end-CODE_RAM]:
             raise ValueError('Changed native NPC capture helper')
@@ -59,10 +60,12 @@ def main():
     parser.add_argument('--module',type=Path,default=Path('build/runtime-module/module.json'))
     parser.add_argument('--overlay',type=Path,default=Path('build/npc-mail-capture'))
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--whole-creator',action='store_true',help='Exercise complete native metadata/capture/publication ownership')
     args = parser.parse_args()
     actions = scenario(args.rom.read_bytes(),args.native_rom.read_bytes(),json.loads(args.module.read_text()),
                        (args.overlay/'overlay.bin').read_bytes(),(args.overlay/'relocation.bin').read_bytes(),
                        json.loads((args.overlay/'overlay.json').read_text()))
+    actions[3]['test_npc_mail_capture']['whole_creator'] = args.whole_creator
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(actions,indent=2)+'\n')
     print(json.dumps({'actions':len(actions),'creator_contexts':48,'production_hooks_installed':False}))

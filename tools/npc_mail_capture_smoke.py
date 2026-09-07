@@ -52,19 +52,27 @@ def exercise(debug,request,record):
     hooks = [(at,bytes.fromhex(before),bytes.fromhex(after)) for at,before,after in request['hooks']]
     saved = read(SAVE_RAM,SAVE_BYTES)
     globals_before = {at:read(at,size) for at,size in ((FREE,200),(0x80142CF0,0x34C),*((at,4) for at in RNG))}
-    size = 0x7800
+    whole = request.get('whole_creator',False)
+    size = 0xA000
     allocation = call(0x8009BFC0,[size])
     if allocation&15 or not MODULE_RAM+RESERVATION <= allocation <= 0x80400000-size:
         raise ValueError('NPC capture test allocation failed')
     base = allocation+16
     relocation_at = base+len(data)+16
     state = (relocation_at+len(reloc)+31)&~15
-    stage,player,animal,remail = state+464,state+656,state+688,state+720
-    generation = state+768
-    probe = generation+4736
-    if probe+64 > allocation+size-16: raise ValueError('NPC capture fixture exceeds allocation')
-    guards = (allocation,base+len(data),state-16,state+448,stage+176,player+16,animal+16,
-              remail+32,generation+4720,probe+48,allocation+size-16)
+    if whole:
+        stage,generation = state+448,state+624
+        player,animal,remail,probe = state+5360,state+5392,state+5424,state+5488
+        destination,capital_at = state+5552,state+5728
+    else:
+        stage,player,animal,remail = state+464,state+656,state+688,state+720
+        generation = state+768
+        probe = generation+4736
+        destination,capital_at = stage,0
+    if max(probe+64,destination+176,capital_at+32) > allocation+size-16:
+        raise ValueError('NPC capture fixture exceeds allocation')
+    guards = (allocation,base+len(data),state-16,player+16,animal+16,remail+32,probe+48,allocation+size-16)
+    guards += (state+5344,destination-16,capital_at+16) if whole else (state+448,stage+176,generation+4720)
     for at in guards: write(at,EDGE)
     write(TEST_STACK-0x1000,EDGE);write(TEST_STACK+0x30,EDGE)
     loaded = relocate(data,reloc,base,report['imports'].values())
@@ -120,7 +128,7 @@ def exercise(debug,request,record):
     if identity is None: raise ValueError('NPC capture needs a populated isolated town')
     sender = int.from_bytes(identity[:2],'big')-0xE000
     key = next(row.key for row in aliases if row.npc_index == sender)
-    pid = b'PLAYER'+identity[2:10]+b'\x30\x01'
+    pid = b'PLAYER'+identity[4:10]+identity[2:4]+b'\x30\x01'
     if len(pid) != 16: raise ValueError('NPC capture player fixture size changed')
     write(player,pid)
     town = read(call(0x800950D8),6)
@@ -158,9 +166,14 @@ def exercise(debug,request,record):
         baseline,baseline_fields,baseline_rng = baselines[index]
         prefix = struct.pack('>8I',base+symbols['af_npc_mail_capture_event'],*args[:4],condition,foreign,capital)
         write(state,prefix+sources+bytes(400))
-        write(session,state.to_bytes(4,'big'))
-        call(0x800A9028,args)
-        write(session,bytes(4))
+        if whole:
+            write(destination,b'!'*164);write(capital_at,capital.to_bytes(4,'big'))
+            created = native('af_npc_mail_create',[state,destination,session,capital_at])
+            check('whole creator releases session before returning',session,bytes(4))
+        else:
+            write(session,state.to_bytes(4,'big'))
+            call(0x800A9028,args)
+            write(session,bytes(4))
         captured = read(state+44,368)
         selection = read(state+412,14)
         record({'npc_capture_state':index,'state':read(state+428,16).hex(),
@@ -171,7 +184,8 @@ def exercise(debug,request,record):
         check('unchanged identity gift and received status',stage,baseline[:39])
         check('unchanged native mail type and paper',stage+40,baseline[40:42])
         check('creator capture retains entire save',SAVE_RAM,saved)
-        mask,initial = struct.unpack_from('>2I',captured)
+        mask = int.from_bytes(captured[:4],'big')
+        initial = int.from_bytes(read(state+28,4) if whole else captured[4:8],'big')
         if (mask,initial) != (0xFFFF if foreign else 0x3FFF,capital):
             raise ValueError('NPC capture field mask/capital mismatch')
         fields = {}
@@ -203,20 +217,25 @@ def exercise(debug,request,record):
         elif not BAD_BASES[foreign]+looks*3 <= ids[0] < BAD_BASES[foreign]+looks*3+3 or any(ids[1:]):
             raise ValueError('Incorrect classic selection')
         selected = Record(2,kind,tuple(ids if kind else ids[:1]),tuple(sorted(fields.items())),bool(capital))
-        before = read(stage,164)
+        before = b'!'*164 if whole else read(stage,164)
         after_capture = bytearray(captured)
         try:
             parts = templates(catalog,selected)
             needed = set().union(*(template_fields(part) for part in parts.parts))
             selected = replace(selected,fields=tuple((slot,field) for slot,field in selected.fields if slot in needed))
-            expected_mail = bytearray(before);expected_mail[39] = 128;expected_mail[42:] = pack(selected)
+            expected_mail = bytearray(baseline if whole else before)
+            expected_mail[39] = 128;expected_mail[42:] = pack(selected)
             full_text = output_bytes(selected,parts)
             after_capture[4:8] = int(format_letter(selected,parts).final_capital).to_bytes(4,'big')
             success = True
         except ValueError:
             expected_mail,success = before,False
-        native('af_mail_generate',[stage,164,state+44,state+412,generation],int(success))
-        check('complete generated or retained letter',stage,expected_mail)
+        if whole:
+            if created != int(success): raise ValueError('Whole creator returned incorrect publication result')
+            check('shared capital advances only after complete publication',capital_at,
+                  after_capture[4:8] if success else capital.to_bytes(4,'big'))
+        else: native('af_mail_generate',[stage,164,state+44,state+412,generation],int(success))
+        check('complete generated or retained letter',destination,expected_mail)
         check('capture updates only successful capital state',state+44,after_capture)
         check('selected template IDs retained',state+412,selection)
         if success:
@@ -228,6 +247,60 @@ def exercise(debug,request,record):
         record({'native_npc_capture_case':index,'foreign':foreign,'good':condition,'looks':looks,
                 'initial_capital':capital,'selected_ids':list(selected.templates),'generated':success,
                 'gift':baseline[36:38].hex(),'paper':baseline[41],'passed':True})
+    if whole:
+        # Keep one actual shared capital word across successive creations;
+        # deliberately stale work cannot supply the next initial state.
+        write(capital_at,(1).to_bytes(4,'big'))
+        for sequence,index in enumerate((14,15,38,39,0,1,24,25)):
+            initial = int.from_bytes(read(capital_at,4),'big')
+            foreign,condition,looks,_,args = fixture(index)
+            write(state,struct.pack('>8I',0,0,*args[1:4],condition,foreign,999)+b'!'*400)
+            write(destination,b'!'*164)
+            native('af_npc_mail_create',[state,destination,session,capital_at],1)
+            captured = read(state+44,368)
+            selected = struct.unpack('>HBB5H',read(state+412,14))
+            fields = []
+            mask = int.from_bytes(captured[:4],'big')
+            for slot in range(20):
+                if mask&(1<<slot):
+                    at = 8+slot*18
+                    fields.append((slot,Field(captured[at+2:at+2+captured[at]],captured[at+1])))
+            snapshot = Record(2,selected[1],tuple(selected[3:] if selected[1] else selected[3:4]),tuple(fields),bool(initial))
+            parts = templates(catalog,snapshot)
+            needed = set().union(*(template_fields(part) for part in parts.parts))
+            snapshot = replace(snapshot,fields=tuple((slot,field) for slot,field in snapshot.fields if slot in needed))
+            expected = bytearray(baselines[index][0]);expected[39] = 128;expected[42:] = pack(snapshot)
+            check('successive creator preserves exact complete metadata and snapshot',destination,expected)
+            check('successive creator reads shared initial capital',state+28,initial.to_bytes(4,'big'))
+            check('successive creator advances shared final capital',capital_at,
+                  int(format_letter(snapshot,parts).final_capital).to_bytes(4,'big'))
+            check('successive complete English text',generation+3552,output_bytes(snapshot,parts))
+            check('successive creation releases its session',session,bytes(4))
+            check('successive creation retains complete save',SAVE_RAM,saved)
+            record({'native_npc_creator_sequence':sequence,'initial_capital':initial,'passed':True})
+        # Failures must not expose private metadata or an older caller letter.
+        for fault in ('source','catalog','foreign_name','already_active','work_alias_capital','work_alias_session'):
+            foreign,condition,looks,capital,args = fixture(24)
+            write(state,struct.pack('>8I',0,0,*args[1:4],condition,foreign,999)+b'!'*400)
+            write(destination,b'!'*164);write(capital_at,(1).to_bytes(4,'big'))
+            if fault == 'source': write(words_at+11327,b'!')
+            if fault == 'catalog': write(MODULE_RAM+0x44,bytes(4))
+            if fault == 'foreign_name': write(remail+4,b'??????')
+            if fault == 'already_active': write(session,state.to_bytes(4,'big'))
+            before_rng = {at:read(at,4) for at in RNG}
+            supplied = capital_at if fault == 'work_alias_capital' else session if fault == 'work_alias_session' else state
+            native('af_npc_mail_create',[supplied,destination,session,capital_at],0)
+            check('failed whole creator retains complete destination',destination,b'!'*164)
+            check('failed whole creator retains shared capital',capital_at,(1).to_bytes(4,'big'))
+            check('rejection retains or releases original session correctly',session,
+                  state.to_bytes(4,'big') if fault == 'already_active' else bytes(4))
+            if fault == 'source': write(words_at+11327,word_data[-1:])
+            if fault == 'catalog': write(MODULE_RAM+0x44,(0x03000000).to_bytes(4,'big'))
+            if fault in ('source','already_active','work_alias_capital','work_alias_session'):
+                for at,value in before_rng.items(): check('pre-creation rejection retains native RNG state',at,value)
+            write(session,bytes(4))
+            check('whole-creator failure retains entire save',SAVE_RAM,saved)
+            record({'native_npc_creator_rejection':fault,'passed':True})
     for at,before,after in hooks:
         check('exact scoped native call hook retained',at,after)
         write(at,before)
@@ -244,4 +317,6 @@ def exercise(debug,request,record):
     call(0x8009C040,[allocation])
     return {'native_npc_capture_cases':48,'generated_english_letters':successes,'rejected_generations':failures,
             'original_gifts_retained':with_gifts,'production_hooks_installed':False,
+            'whole_creator_tested':whole,'whole_creator_rejections':6 if whole else 0,
+            'whole_creator_successive_letters':8 if whole else 0,
             'cartridge_loading_tested':False,'requires_checkpoint_restore':True}

@@ -2407,6 +2407,70 @@
   acceptance remain. Font assets/metrics, candidate wording, explicit reference
   layout, and native saved record formats are unchanged.
 
+### Whole NPC reply transaction and shared capitalization
+
+- Implemented `af_npc_mail_create` in the on-demand image. Its 5,344-byte aligned
+  workspace owns capture, a complete private 164-byte native letter, and full
+  generation scratch. It validates object separation, request origin/personality,
+  existing scope, and capitalization before mutation; then it clears stale work,
+  validates both complete sources, calls original native clear/metadata with
+  scoped capture, and publishes all 164 bytes only after full English generation.
+  Failure retains caller text and capitalization; successful calls advance the
+  shared capital word. No temporary session pointer remains active after return.
+- Six host tests pass every origin/condition/personality/initial-capital
+  combination, full metadata/text, padding, source retention, sixteen successive
+  dirty-workspace generations, nested calls, missing preparation/selection,
+  unknown identities, lost ownership, corrupted resources, disabled catalog,
+  unavailable footer, every catalog-read failure, invalid requests, and object
+  alignment/overlap. The initial test mock required explicit unsigned-character
+  pointer casts for its conditional string sources; that compile error is fixed.
+- Hardened preflight ordering: an alleged workspace aliased to a smaller active
+  pointer or capital word is rejected before reading its session fields. A native
+  C stack fixture uses actual small control objects. AddressSanitizer and
+  UndefinedBehaviorSanitizer pass all six tests at
+  `build/tests-npc-mail-creator-sanitized-01.log`, with leak checks disabled for
+  the host Python process and no system installation. Sanitizer instrumentation
+  and suppression of the host preload apply only to this test/compiler invocation.
+- The complete image is 24,176 bytes, comprising 6,064 bytes of code and 18,112
+  read-only bytes. It has no writable/BSS section. The 208-byte relocation
+  section has 45 entries, verified independently against the linked ELF.
+  Native assertions pin capture/stage/generation offsets; the creator's own
+  stack frame is 120 bytes. The new entry adds no resident module bytes.
+  Image SHA-256 is
+  `febefdce556213c49358ab4f393e74cec65812e0cdd93c3aedfae5454484b8ab`;
+  relocation SHA-256 is
+  `7e3363bd8992441587eba275d8824aac6bec23989a6ec23db02655e1ae1bd82f`.
+  Independent builds in `build/npc-mail-capture/` and
+  `build/npc-mail-creator-repeat/` match completely.
+- `build/smoke-npc-mail-creator-03` passes 48 original-versus-whole-creator
+  comparisons with real native RNG, preparation, gift, identity, and stationery
+  routines. Complete metadata, native temporary fields, both final RNG words,
+  full English snapshots/text, and all original save bytes agree. Thirteen
+  gifts are retained. Eight more letters pass in sequence using one shared
+  capitalization word and deliberately stale workspace state.
+- Six native failures pass: altered embedded source, disabled catalog, unknown
+  visitor sender, an existing session, and workspace aliases to the capital
+  and active-session words. All retain the complete caller letter and capital;
+  rejection before native creation also retains the two RNG words. Existing
+  sessions are retained, and sessions owned by the creator are detached.
+- The final native run passes 163 calls and 898 assertions across 2,101 steps.
+  Complete source/code retention, hook restoration with cache maintenance,
+  original globals, full save retention, heap/stack/module guards, allocation
+  free, checkpoint restoration, and graceful shutdown pass. FlashRAM stays blank
+  and the Controller Pak unchanged. Earlier passing runs are retained: `01`
+  tests the first complete transaction; `02` adds successive capitalization;
+  `03` exercises the final preflight ordering and both small-control aliases.
+- Documented the next resident loader boundary, bounded allocation, approved
+  blob/configuration checks, cache-maintenance sequence, failure cleanup, and
+  optional all-or-nothing hook installation. That loader is not implemented
+  yet. Native code/resources still enter through isolated fixture writes;
+  ordinary creation-to-receipt and pending-loop gameplay remain untested.
+  The resident module, ordinary ROM/patch, approved font/spacing, reference text
+  layout, and existing saved formats are unchanged.
+- The complete regression suite passes 372 tests in 172.872 seconds at
+  `build/tests-npc-mail-creator-full-02.log`. Python compilation and whitespace
+  checks pass; the repository remains private.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -13,9 +13,11 @@ The source checks and selection/coverage tests pass. A separate
 [complete word resource](NPC_MAIL_WORDS.md) verifies all 352 randomized phrases
 against the supplied English and legacy sources. No ordinary NPC creator
 currently generates English snapshot letters. Scoped full-word/name capture
-passes 48 isolated real-creator comparisons and complete English generation;
-semantic template approval, cartridge loading/lifetime, and delivery integration
-remain required. See [capture evidence](NPC_MAIL_CAPTURE.md).
+passes 48 isolated real-creator comparisons and complete English generation.
+The complete [creator transaction](NPC_MAIL_CREATOR.md) owns transient capture,
+private metadata, and publication. Semantic template approval, resident cartridge
+loading/lifetime, and delivery integration remain required. See
+[capture evidence](NPC_MAIL_CAPTURE.md).
 An [exact saved-name mapping](NPC_MAIL_NAMES.md) supplies full names for both
 known native Japanese and fitting English saved-name forms. Unknown names remain
 unresolved; native lookup and capture pass isolated execution, but ordinary
@@ -166,7 +168,7 @@ cartesian combination of selected parts.
 
 ## Remaining acceptance
 
-1. Connect the tested scoped full-word/name capture to whole-creator ownership
+1. Connect the complete creator transaction to resident allocation ownership
    and cartridge loading, including repeated and failed sessions.
 2. Approve selected template meanings and support the unavailable footer without
    changing existing catalog identities or shortening text.
