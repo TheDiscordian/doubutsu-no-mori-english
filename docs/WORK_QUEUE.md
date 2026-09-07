@@ -107,6 +107,22 @@ four-MiB town arrival, and all eight complete native letter windows pass.
 
 ## Main translation and runtime
 
+Next content audits target the remaining actor-command and inserted-text gaps.
+A read-only comparison identifies 25 reference-confirmed messages whose aligned
+non-presentation differences are entirely native `09` versus GameCube `0C` actor
+requests. Retaining the native requests makes their existing command/capacity
+checks pass, but this is not an approved import rule yet. Start with the
+errand/apology family around `02B8..02D2`; inspect the native/English request
+semantics and preserve original native arguments before enabling any adaptation.
+
+The 140 missing-field rejections include forty catchphrase-only (`1C`), twenty-eight
+player-name-only (`1A`), and twenty-four town-name-only (`2F`) cases, plus mixed and
+other fields. Audit the actual insertion consumers and caller context rather
+than assuming that a field absent from a native message is available globally.
+Do not weaken field/actor guards simply to reduce rejection counts. These audits
+must proceed in bounded content batches, without returning to repeated isolated
+mail tests while broader implementation remains.
+
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
