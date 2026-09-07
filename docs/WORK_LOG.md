@@ -2471,6 +2471,57 @@
   `build/tests-npc-mail-creator-full-02.log`. Python compilation and whitespace
   checks pass; the repository remains private.
 
+### Cartridge-loaded NPC creator and batch-validation priority
+
+- Implemented the six-argument resident creator loader and opt-in complete
+  installation. It owns one 29,743-byte transient allocation, checks an externally
+  approved complete-blob CRC before relocation/execution, performs native cache
+  maintenance, preserves caller capitalization on failure, and frees before return.
+  Configuration is disabled by default. Eight capture calls, the tested submission
+  gate, catalog, and complete reader must be present together. Configured native
+  tests require the ROM build's enriched `runtime-module.json` approval.
+- Thirteen loader/installer/CLI tests pass at
+  `build/tests-npc-mail-loader-targeted-01.log`. Seven loader tests also pass
+  AddressSanitizer and UndefinedBehaviorSanitizer at
+  `build/tests-npc-mail-loader-sanitized-01.log`. The initial MIPS compile exposed
+  an implicit `memcpy` from struct assignment; explicit volatile configuration
+  copying removes that unavailable dependency. No host installation was needed.
+- Independent module builds match at 22,720 linked bytes, 1,856 bytes free,
+  with the unchanged 32 KiB reservation. Module SHA-256 is
+  `60c05ab0295e43afa71a1e9b1d5ff4750a890f4a7b3141aec1ecaae94d483aea`.
+  Independent creator builds match: image SHA-256
+  `a61414849256df574c859877c7728f84752eb7e1fa50e597c6b76a962a4df6ae`,
+  relocation SHA-256
+  `7e3363bd8992441587eba275d8824aac6bec23989a6ec23db02655e1ae1bd82f`.
+- The opt-in ROM in `build/npc-loader-pilot/` has SHA-256
+  `bf8537f212f299f6e2df2db0cc2e1435a209041fc39b3045f3e498a163550ce1`;
+  its verified round-trip UPS has SHA-256
+  `cdd1138de8c55afeb3459c9259fbb25a98075c32284c30015aa3b23aed2888f7`.
+  Fresh four-MiB boot-to-town passes all 188 steps and ten acceptance checks in
+  `build/smoke-npc-loader-full-01`. This ROM supplies its own matching checkpoint.
+- `build/smoke-npc-mail-loader-01` passes all 48 original-metadata comparisons,
+  eight successive letters, and eight rejected requests across 1,763 steps and
+  539 assertions. The creator and its resources are loaded only from cartridge;
+  zero creator bytes are debugger-uploaded. Complete English reconstruction,
+  original metadata, selected full words/names, RNG, capitalization, complete
+  save retention, and unchanged native heap totals pass. Controlled free-block
+  exhaustion exercises actual allocation failure. Hooks/globals/configuration,
+  guards, allocation free, full checkpoint restore, and graceful shutdown pass.
+  FlashRAM remains blank and the Controller Pak unchanged. Delivery itself is
+  not exercised by this loader test and remains a follow-up integration item.
+- The full regression run covers 385 tests in 179 seconds with one stale
+  module-bound generation-probe error, recorded in
+  `build/tests-npc-mail-loader-full-01.log`. Rebuilding the affected ignored probe
+  and rerunning its six-test group passes at
+  `build/tests-npc-mail-loader-probe-refresh.log`. No further full-suite rerun is
+  needed solely for that generated-artifact refresh.
+- Recorded the user's batching direction: prioritise bulk English coverage and
+  playable sections; difficult isolated edge cases must not repeatedly hold up
+  unrelated implementation. A human playthrough follows the main work and drives
+  the broad bug/polish pass. Main work returns to missing introductory-job text.
+  Font metrics/assets, reference layout, saved formats, and repository privacy
+  remain unchanged.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -38,7 +38,7 @@ def source_hashes():
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
-    names += ['runtime/mail/'+name for name in ('npc_generation.h','catalog.h','format.h','record.h')]
+    names += ['runtime/mail/'+name for name in ('npc_generation.h','npc_loader.h','catalog.h','format.h','record.h')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 

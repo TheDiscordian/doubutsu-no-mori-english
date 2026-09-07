@@ -4,7 +4,7 @@ extern const unsigned char af_npc_word_data[AF_NPC_WORD_BYTES];
 extern const unsigned char af_npc_alias_data[AF_NPC_ALIAS_BYTES];
 
 #ifdef __mips__
-typedef char creator_size_check[sizeof(AfNpcMailCreateWork) == 5344 ? 1 : -1];
+typedef char creator_size_check[sizeof(AfNpcMailCreateWork) == AF_NPC_MAIL_WORK_BYTES ? 1 : -1];
 typedef char creator_stage_check[__builtin_offsetof(AfNpcMailCreateWork,stage) == 448 ? 1 : -1];
 typedef char creator_generation_check[__builtin_offsetof(AfNpcMailCreateWork,generation) == 624 ? 1 : -1];
 #define native_clear ((void (*)(unsigned char *))0x8009C384u)

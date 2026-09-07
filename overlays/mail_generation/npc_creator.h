@@ -2,6 +2,7 @@
 #define AF_NPC_MAIL_CREATOR_H
 
 #include "npc_capture.h"
+#include "../../runtime/mail/npc_loader.h"
 
 typedef struct {
     AfNpcMailCaptureWork captured;

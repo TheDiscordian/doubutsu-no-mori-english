@@ -101,8 +101,8 @@ and exact guarded call sites. The 24,176-byte image, including the whole creator
 contains 6,064 bytes
 of code and 18,112 read-only bytes; no writable/BSS section is required. Its
 208-byte relocation section has 45 entries, independently compared with the
-linked ELF inventory. The resident adapters use 736 additional linked bytes,
-leaving 2,912 bytes inside the unchanged linked-code limit.
+linked ELF inventory. Including capture adapters and the cartridge loader, the
+resident module leaves 1,856 bytes inside the unchanged linked-code limit.
 
 The native harness uses the original relocation routine followed by the original
 data-cache writeback and instruction-cache invalidation routines. Complete
@@ -132,7 +132,8 @@ checkpoint restoration. FlashRAM stays blank and the Controller Pak unchanged.
 The image is loaded through isolated debugger fixture writes; actual cartridge
 loading and ordinary delivery are not exercised.
 
-Production guarded hook installation, on-demand resource loading, allocation
-ownership, resident sticky capitalization across successful creations, allocation/DMA
-failure handling, and the pending-reply loop remain required. The font, saved
+The [resident loader](NPC_MAIL_LOADER.md) supplies optional guarded installation,
+cartridge loading, allocation ownership, and shared capitalization. Its native
+cartridge test passes complete creations, heap cleanup, and failure retention.
+The pending-reply loop and normal delivery remain follow-up checks. The font, saved
 formats, template wording, reference layout, and RNG algorithms are unchanged.

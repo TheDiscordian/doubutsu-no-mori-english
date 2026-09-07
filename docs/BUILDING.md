@@ -134,8 +134,24 @@ resident module, then pass `--english-mail-grading build/mail-grading` to the
 ROM builder. This optional patch changes ordinary reply scoring and the quest
 word tables. Combining it with `--english-mail-snapshots` also installs complete
 record decoding before NPC sends and preserves post-office letters on failure.
-Native snapshot generation remains disabled.
+These options alone leave native snapshot generation disabled.
 See [grading design](../specs/MAIL_GRADING.md).
+
+`tools/build_npc_mail_capture.py --module <module.json> --output <creator-directory>`
+builds the complete NPC reply creator and immutable word/name sources against
+that exact resident module. Pass `--npc-mail-generation <creator-directory>` to
+the ROM builder together with English runtime, full snapshot reader/catalog,
+and English grading. This explicitly enables experimental cartridge-loaded NPC
+generation, the eight scoped capture calls, and submission failure handling.
+It does not establish complete gameplay, semantic review, or hardware acceptance.
+
+For configured-generation ROMs, native test tools require the ROM output's
+`runtime-module.json`, not the unconfigured compiler report. The build report
+binds the approved creator blob, complete source/import checks, and header words.
+`tools/npc_mail_loader_test_scenario.py --rom <built-ROM> --module
+<ROM-directory>/runtime-module.json --output <ignored-json>` tests actual
+cartridge loading, complete letters, failure retention, and heap cleanup against
+a matching-ROM town checkpoint. See [loader contract](../specs/NPC_MAIL_LOADER.md).
 
 `tools/mail_grade_test_scenario.py --rom <built-ROM> --output <ignored-json>`
 generates ordinary reply, complete-body, and native quest calls with memory

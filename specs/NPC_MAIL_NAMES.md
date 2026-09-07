@@ -15,7 +15,7 @@ There are 394 distinct keys, and every key identifies exactly one villager.
 Long English prefixes are never added as keys. Names and saved identities are
 not rewritten by this preparation.
 
-This resource remains local and uninstalled. It provides a verified source for
+This local resource is embedded in the optional cartridge creator. It provides a verified source for
 generation-time capture, not a reader that regenerates names in existing letters.
 The capture must store the full resolved literal name. Existing snapshot wording
 must remain unchanged if reference name resources change later.
@@ -37,7 +37,8 @@ save formats need separate compatibility evidence.
 ## Canonical resource
 
 The current map occupies 6,368 bytes: a 64-byte header and 394 sorted sixteen-byte
-rows. All integer fields are big endian. No cartridge VROM is assigned yet.
+rows. All integer fields are big endian. It belongs to the creator blob at
+VROM `03200000`, with no separate DMA entry.
 
 The header's eight words are magic `AFNA`, version one, row count, row width
 sixteen, header width 64, villager count 216, key width six, and output width eight.
@@ -63,7 +64,7 @@ with a recalculated manifest hash.
 The [scoped capture consumer](NPC_MAIL_CAPTURE.md) validates the complete resource
 and resolves full names during isolated native local/visitor reply creation.
 Its host tests cover all 394 aliases, and native tests cover complete-name lookup,
-unknown-key rejection, and real creator-selected names. Cartridge loading,
-whole-creator ownership, and unresolved-name failure propagation through actual
-delivery remain. The resource does not establish normal travel or old-save
+unknown-key rejection, and real creator-selected names. The resident loader also
+passes cartridge loading, whole-creator ownership, and unknown-name rejection.
+Failure propagation through actual delivery remains. The resource does not establish normal travel or old-save
 compatibility.

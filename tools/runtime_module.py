@@ -65,6 +65,12 @@ def verify_test_module(rom, report):
         if value and (value != expected or value not in files):
             raise ValueError("Unexpected native test resource configuration")
         module[offset:offset+4] = bytes(4)
+    if any(module[0x48:0x68]) or report.get('npc_mail_loader'):
+        from npc_mail_loader import VROM, verify_configuration
+        if VROM not in files:
+            raise ValueError('NPC creator configuration has no cartridge resource')
+        verify_configuration(module,files[VROM].extract(rom),report)
+        module[0x48:0x68] = bytes(32)
     if (sha256(module) != report["module_sha256"] or not 0x300 <= report["linked_bytes"] <= LINKED_LIMIT
             or struct.unpack_from(">I", module, 12)[0] != report["linked_bytes"]):
         raise ValueError("Native test symbols or scratch-space boundaries do not match the module")

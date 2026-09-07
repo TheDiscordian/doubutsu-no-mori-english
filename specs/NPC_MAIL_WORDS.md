@@ -11,8 +11,8 @@ Every selected English phrase exactly equals the complete transcoded legacy
 value for the native-selected ID. This comparison does not trim spaces, fold
 case, accept a prefix, or infer identity solely from a shared numeric ID.
 Native and reference hashes are recorded per row. The resource and manifest
-remain local under `build/npc-mail-words/`; no resource or capture hook is
-installed in the production ROM.
+remain local under `build/npc-mail-words/`. The optional cartridge creator embeds
+the resource and installs scoped capture; default builds keep generation disabled.
 
 All 352 values fit sixteen bytes. Eighty-three exceed ten bytes, so those values
 cannot pass through the original ten-byte temporary without losing text. The
@@ -51,8 +51,8 @@ failure propagation remain separate bindings.
 ## Canonical binary format
 
 The candidate resource occupies 11,328 bytes, with a 64-byte header and 352
-32-byte rows. Integers are big endian. It has no assigned cartridge VROM address
-and is not a persistent save format.
+32-byte rows. Integers are big endian. It is embedded in the creator blob at
+VROM `03200000`, not installed as a separate DMA file or persistent save format.
 
 | Header offset, decimal | Field |
 | --- | --- |
@@ -98,5 +98,7 @@ against both English and legacy sources, not an editable inventory file.
 
 The runtime consumer must validate its source and row before publishing a field,
 invalidate a failed replacement, and preserve the native-selected ID. It must
-capture the full value before the ten-byte native loader truncates it. Bounded
-loading and real cartridge-read/failure tests remain required before installation.
+capture the full value before the ten-byte native loader truncates it. The
+[resident loader](NPC_MAIL_LOADER.md) supplies bounded cartridge loading and
+passes complete native creation and failure checks. Ordinary delivery remains
+part of the broader integration/playthrough pass.

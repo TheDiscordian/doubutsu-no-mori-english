@@ -5,6 +5,12 @@ milestone does not complete the project. Continue through available work without
 requiring the user to advance an automated procedure. Commit verified changes
 and update the evidence links as each task progresses.
 
+Prioritise bulk English content and complete playable sections. Batch automated
+crash, save-integrity, text, and regression checks around meaningful changes.
+Do not repeatedly retry difficult isolated tests while unrelated implementation
+waits. A human playthrough supplies broad gameplay bug reports after the main
+port, followed by the edge-case and polish pass.
+
 Status meanings: **active** = being implemented or audited; **pending** = required
 work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
@@ -17,7 +23,7 @@ refusal selectors, and ten index boundaries. Failed letters return to their
 original pockets without reporting success. The fixtures run actual action
 initializers but do not establish normal animation or subsequent player input.
 See [receipt evidence](../specs/PELLY_RECEIPT.md).
-Keep generation disabled.
+Keep generation opt-in while completing unrelated content and gameplay work.
 
 The first-job and ordinary NPC letter-show handlers in overlays `00814FA0` and
 `00815B70` pass isolated native caller-level validation. Their three
@@ -40,7 +46,7 @@ The isolated [native FlashRAM persistence test](../specs/FLASH_MAIL.md) passes
 all 192 saved mail slots in both native save banks. A separate fresh process
 receives only the exported cartridge save and passes all 384 complete-record
 checks and eight complete English reconstructions. This is not normal save-menu
-or post-load gameplay validation; generation remains disabled.
+or post-load gameplay validation; generation remains opt-in.
 
 Native Controller Pak writing and fresh-process reading pass for the `1200`-byte
 passport and `6700`-byte stored-letter note: all 177 complete letter records,
@@ -62,11 +68,9 @@ The [whole-letter generation transaction](../specs/MAIL_GENERATION.md) now passe
 all 6,398 supported host reference assembly cases and 53 native generation cases,
 plus 42 native field-capture cases. It preserves complete saved metadata and
 rejects missing fields, overflow, and unavailable resources before publication.
-This code is an isolated heap-loaded probe, not an installed gameplay overlay.
-Next generation work connects approved field/template sources and complete
-native creator boundaries, with bounded loading and failure propagation through
-delivery. Keep ordinary gameplay generation disabled while those checks and
-remaining reader/editor/normal-interaction requirements are incomplete.
+The generation code also belongs to the optional cartridge-loaded NPC creator.
+Normal delivery and remaining reader/editor interactions remain follow-up work;
+generation is not enabled by default.
 The [NPC creator binding contract](../specs/NPC_MAIL_GENERATION.md) verifies
 complete native/reference functions and selection tables. All available reply
 parts have supplied source slots across 24 group/gift contexts and 36 classic
@@ -74,9 +78,9 @@ selections. One composite footer remains unavailable. Original creation failure
 is not propagated to submission. The guarded failure-return gate passes 41
 isolated native cases, including twenty actual queue receipts, rejected creation,
 both counter components, every queue slot, invalid recipients, and full home
-mailboxes. Its creator is a controlled fixture, and the production hook remains
-uninstalled. Next steps connect complete word/name capture and runtime ownership
-to the real creator, then test creator failures and the pending-reply loop.
+mailboxes. That receipt test uses a controlled creator fixture. Optional
+installation connects the real creator; actual creator-to-receipt and pending-loop
+checks remain queued for batch integration.
 The [complete word source resource](../specs/NPC_MAIL_WORDS.md) verifies all 352
 phrases against the actual source banks and records full source/reference IDs.
 All 83 phrases beyond ten bytes are retained within sixteen bytes. Connect this
@@ -90,11 +94,15 @@ and saved data. The whole-creator transaction now combines private metadata,
 capture, complete generation, and guarded publication; host/sanitizer tests pass.
 The native combined transaction passes 48 reply comparisons, eight successive
 letters, and six rejected requests, including complete output/capital retention
-on failure. Next implement the
-[resident cartridge loader](../specs/NPC_MAIL_LOADER.md), allocation ownership,
-and the real creator binding for the tested submission gate.
-The resident capture adapters leave 2,912 linked bytes available inside the
-unchanged 32 KiB reservation. Allocation/error ownership tests,
+on failure. The [resident cartridge loader](../specs/NPC_MAIL_LOADER.md), allocation
+ownership, and real creator binding are implemented as one optional installation.
+Native cartridge loading passes 56 complete English creations and eight failures,
+including controlled allocation exhaustion, full save retention, and exact heap
+totals after release. No creator code/resources are debugger-uploaded. The new
+ROM passes four-MiB town arrival. Main content work proceeds while actual
+creator-to-receipt and pending-loop checks stay queued for batch integration.
+The resident module leaves 1,856 linked bytes inside the unchanged 32 KiB
+reservation. Allocation/error ownership tests,
 four-MiB town arrival, and all eight complete native letter windows pass.
 
 ## Main translation and runtime

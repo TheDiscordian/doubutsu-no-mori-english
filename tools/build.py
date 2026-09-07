@@ -23,6 +23,7 @@ from mail_view_patch import install as install_mail_view
 from mail_grading import install as install_mail_grading
 from mail_npc import install as install_mail_npc
 from pelly_receipt import install as install_pelly_receipt
+from npc_mail_loader import install as install_npc_mail_loader
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -114,12 +115,16 @@ def main():
     parser.add_argument("--catchphrases", type=Path, help="Directory containing the full default catchphrase display resource")
     parser.add_argument("--mail-catalog", type=Path, help="Directory containing the registered immutable English mail catalog")
     parser.add_argument("--english-mail-layout", action="store_true", help="Experimental pixel-width body/footer in read mode; native editor and saved fields unchanged")
-    parser.add_argument("--english-mail-snapshots", action="store_true", help="Experimental full-letter reader and paging; requires mail layout/catalog; no generated records or save approval")
+    parser.add_argument("--english-mail-snapshots", action="store_true", help="Experimental full-letter reader and paging; requires mail layout/catalog; does not itself enable generation")
     parser.add_argument('--english-mail-grading', type=Path, help='Directory containing the source-verified on-demand English mail-scoring overlay')
+    parser.add_argument('--npc-mail-generation', type=Path, help='Experimental complete NPC creator overlay directory; enables guarded cartridge loading and delivery; gameplay/save acceptance remains')
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
         parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
+    if args.npc_mail_generation and not (args.runtime_module and args.english_runtime
+                                        and args.english_mail_snapshots and args.english_mail_grading):
+        parser.error('--npc-mail-generation requires the runtime module, English runtime, full snapshot reader, and English mail grading')
     rom = verified_rom(args.rom.read_bytes())
     replacements, report = make_halfwidth(rom)
     if args.english_keyboard:
@@ -154,6 +159,8 @@ def main():
         report["catchphrases"] = install_catchphrases(rom, additions, report.get("runtime_module"), args.catchphrases, replacements)
     if args.mail_catalog:
         report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'), args.mail_catalog)
+    if args.npc_mail_generation:
+        report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():
@@ -173,6 +180,8 @@ def main():
                   added_files=[f"{v:08X}" for v in additions],
                   release_status="experimental; original hardware untested")
     (args.output / "build.json").write_text(json.dumps(report, indent=2) + "\n")
+    if args.runtime_module:
+        (args.output / 'runtime-module.json').write_text(json.dumps(report['runtime_module'],indent=2)+'\n')
     for name, font in (("original", by_vrom(rom)[FONT_VROM].extract(rom)),
                        ("halfwidth", replacements[FONT_VROM])):
         atlas = pixels(font[ATLAS_OFFSET:ATLAS_OFFSET+ATLAS_SIZE])

@@ -12,6 +12,14 @@
 - Keep graphics edits inside declared texture spans; never resize neighbours.
 - Record candidate provenance, command adaptations, rejection reasons, and layout
   warnings independently of translation approval.
+- Batch checks around complete content/runtime changes. Keep difficult isolated
+  edge cases in the follow-up queue rather than repeatedly delaying bulk work.
+
+The user plans a human playthrough after the main translation work, reporting
+bugs for the final fix and polish pass. Prepare a broadly complete playable build
+with known issues and untested areas listed. Automated checks focus on crashes,
+save corruption, broken text, and obvious regressions. Neither planned manual
+testing nor passing narrow fixtures proves full gameplay or hardware acceptance.
 
 ## Emulator matrix
 

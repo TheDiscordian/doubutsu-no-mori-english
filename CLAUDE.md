@@ -24,6 +24,12 @@ recorded tests. An emulator boot does not establish hardware compatibility.
 - Document what is complete, what is experimental, and what is untested.
 - Keep progress updates in chat and describe concrete completed work. Do not
   open repeated status renders or repeat an unchanged completion percentage.
+- Prioritise complete English content and playable sections. Batch verification
+  around meaningful changes; record difficult edge cases for the later bug pass
+  instead of repeatedly attempting them while bulk implementation waits.
+- A human playthrough supplies broad gameplay bug reports after the main work.
+  Automated checks concentrate on crashes, save corruption, broken text, and
+  obvious regressions. Do not claim that planned playthrough as completed proof.
 - Use public names only in committed files. Use Commonwealth punctuation.
 
 ## Project map

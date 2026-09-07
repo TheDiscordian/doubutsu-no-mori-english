@@ -9,6 +9,11 @@ and the general-string/name/mail destinations. Candidate review remains required
 The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
 
+Prioritise bulk English coverage and complete playable sections, batching useful
+crash/save/text checks across changes. Difficult isolated edge cases stay in the
+follow-up queue. A human playthrough drives the broad gameplay bug and polish
+pass after the main port; planned human testing is not completed validation.
+
 Pelly's receipt-failure patch returns rejected letters to their original pockets
 and selects accurate English errors. Native tests pass 48 receipt cases, eight
 hand-back initializer cases, sixteen refusal selectors, and ten index boundaries.
@@ -46,10 +51,11 @@ reference assembly cases. Native calls pass 46 complete English reference cases,
 seven rejected generations, and 42 capture cases, with complete save retention
 and intact guards. Publication changes only validated text/split bytes and the
 transient capital state. The 1,380-byte generation probe is separate from the
-resident image, which has 2,912 linked bytes free. Resident allocation ownership,
-on-demand loading, delivery failure propagation, and
-semantic template approval remain. Ordinary gameplay snapshot generation stays
-disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
+resident image, which has 1,856 linked bytes free. NPC resident allocation and
+on-demand loading are implemented; delivery integration tests and semantic
+template approval remain. Default builds leave snapshot generation disabled;
+an explicit experimental option installs NPC generation. See
+[generation contract](../specs/MAIL_GENERATION.md) and
 [receipt evidence](../specs/PELLY_RECEIPT.md).
 The [NPC creator binding audit](../specs/NPC_MAIL_GENERATION.md) checks seven
 native functions, six native tables, and corresponding English executable
@@ -59,17 +65,16 @@ The native caller ignores assembly failure. A source-guarded submission gate
 passes 41 isolated native cases using actual receipt/copy/capacity routines and
 a controlled creator fixture. Twenty cases deliver complete records into the
 native queue; rejected cases retain all save data and never use older staging
-text. The gate remains uninstalled until the real creator is connected and
-validated. This is not normal NPC reply generation or pending-loop validation.
+text. The gate is connected to the cartridge creator in the optional experimental
+build. Real creator-to-receipt and pending-loop validation remain follow-up work.
 The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
 352 complete phrases with exact legacy/English agreement and explicit native
 ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
-The resource is connected to the scoped capture implementation, but is not yet
-loaded from the cartridge by ordinary gameplay.
+The resource is connected to scoped capture and the optional cartridge creator.
 The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md) recovers full English
 names for all 216 villagers from 394 exact known saved-name keys. It rejects
 ambiguous mappings and leaves unknown names unresolved. Complete native lookup
-and generation-time capture are implemented; gameplay installation remains.
+and generation-time capture are implemented and optionally installed.
 The reader releases its 3,552-byte decode workspace immediately after opening
 a snapshot. Its complete 2,236-byte display cache remains resident; the 32 KiB
 reservation and heap boundary are unchanged. Host allocation/error tests, the
@@ -79,14 +84,14 @@ The [scoped capture implementation](../specs/NPC_MAIL_CAPTURE.md) retains full
 English source values beside the original native preparation calls. Host tests
 cover all 352 phrases and 394 saved-name aliases, ordered capture, unchanged
 native temporary fields, and failure rejection. The relocatable code builds with
-the existing VR4300 toolchain; the resident image uses 21,664 linked bytes.
+the existing VR4300 toolchain; the resident image uses 22,720 linked bytes.
 The new module passes the four-MiB train-to-town regression, and independent
 module, ROM, and patch builds match. All 48 native creator comparisons pass,
 including complete English generation, unchanged random state and native fields,
 all six personalities, both reply types/origins, thirteen retained gifts, and
 complete save retention. The 197-call run also checks source validation, native
-relocation/cache maintenance, guards, and checkpoint restoration. Cartridge
-loading, resident allocation ownership, and ordinary delivery remain. The
+relocation/cache maintenance, guards, and checkpoint restoration. Ordinary
+delivery remains a follow-up integration check. The
 [whole-creator transaction](../specs/NPC_MAIL_CREATOR.md) now stages complete native
 metadata and English text and publishes all 164 bytes only after validation.
 It resets stale capture, rejects nested/intersecting requests, detaches its
@@ -94,8 +99,17 @@ session, and retains caller text/capitalization on failure. Host sanitizer check
 pass. The native transaction passes 48 reply comparisons, eight successive
 letters, and six rejected requests, with 163 calls and 898 assertions. Complete
 save retention, shared capitalization, scope cleanup, and checkpoint restoration
-pass. Next is the [resident loader](../specs/NPC_MAIL_LOADER.md). All eight letter
-windows also pass the new-module regression across fourteen pages, including
+pass. The [resident loader](../specs/NPC_MAIL_LOADER.md) passes 56 complete native
+cartridge-created letters and eight failures, with no debugger-uploaded creator
+code/resources. Whole-letter reconstruction, original metadata/RNG, shared
+capitalization, heap release, full save retention, and checkpoint restoration
+pass. The optional generation ROM also passes all ten four-MiB train-to-town
+checks. Independent module and creator builds match. Thirteen loader/installer
+tests and the seven loader sanitizer tests pass. The complete 385-test run has
+one stale generated-probe failure; rebuilding that module-bound probe makes
+all six affected test cases pass. Main work now returns to missing dialogue and
+normal-play coverage; remaining delivery and edge cases are tracked for batching.
+All eight letter windows pass the capture-module regression across fourteen pages, including
 1,705 glyphs and 6,820 vertex positions. The tested failure gate
 provides the required return boundary; it does not replace source or semantic
 review, normal reader/editor interactions, or save/hardware acceptance.
@@ -132,7 +146,8 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 372 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 385 portable-C, synthetic, and retail-input tests; the full run's stale-probe
+  failure passes after rebuilding and rerunning its six-test group. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -302,10 +317,10 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 21,664 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 22,720 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
-  editing, and save validation remain. Native generation does not emit snapshots;
-  the optional full reader calls restoration for isolated tagged-record probes.
+  editing, and normal save validation remain. Optional NPC generation emits
+  complete snapshots, and the full reader calls restoration for tagged records.
 - An immutable cartridge mail catalog contains 4,807 complete reference parts
   with all 4,866 original indices preserved; 59 unavailable glyph rows remain
   explicit failures. Its 319,344-byte content is registered by complete hashes.

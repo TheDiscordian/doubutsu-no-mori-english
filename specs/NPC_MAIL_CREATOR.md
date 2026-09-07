@@ -3,8 +3,8 @@
 ## Implemented boundary
 
 `af_npc_mail_create` owns the synchronous capture-to-publication transaction
-within caller-supplied transient memory. It does not yet allocate/load cartridge
-code or install gameplay hooks. The separate resident loader remains required.
+within caller-supplied transient memory. Allocation/loading and optional gameplay
+hook installation belong to the implemented [resident loader](NPC_MAIL_LOADER.md).
 
 The caller supplies a sixteen-byte-aligned `AfNpcMailCreateWork`, a separate
 164-byte output letter, the resident active-session pointer, and the shared
@@ -87,10 +87,11 @@ scope, and control-alias rejections also retain both native RNG words.
 The final run passes 163 native calls and 898 assertions across 2,101 steps,
 including complete save retention, unchanged sources/code, hook/global restoration,
 guards, allocation free, and checkpoint restoration. FlashRAM remains blank and
-the Controller Pak unchanged. Code/resources still enter through isolated
-debugger fixture writes, not the planned cartridge loader.
+the Controller Pak unchanged. That fixture uses debugger-loaded code/resources;
+the separate resident-loader fixture verifies actual cartridge loading.
 
-Cartridge loading, allocation failure, resident sticky-state ownership, connection
-to the tested submission gate, pending-loop behaviour, normal delivery/read/edit
-and save flows, semantic approval, and hardware validation remain. This API alone
+The loader supplies cartridge loading, allocation-failure handling, resident
+sticky-state ownership, and the submission-gate connection. Pending-loop
+behaviour, normal delivery/read/edit and save flows, semantic approval, and
+hardware validation remain. This API alone
 does not enable ordinary gameplay generation.
