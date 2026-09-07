@@ -49,7 +49,11 @@ The handbill setter `80092D10` limits its twenty fields at `80140680` to ten byt
 The message free-string setter `8009D6D0` has twenty ten-byte fields at window
 offset `38`; the item setter `8009D88C` has five at offset `100`.
 `mMsg_CopyItem` at `8009F5B4` reads the same ten-byte stride and width.
-All of these storage/read limits must change together with wider source names.
+Every source expansion requires a matching complete destination/read-path change.
+The [message item-field integration](ITEM_MESSAGE_FIELDS.md) provides resident
+sixteen-byte main-window values and covers the item-ID wrapper at `800BB6A0`.
+Other source-loader callers, the ten-byte compatibility getter, and dynamic
+choice insertion are not approved wider destinations.
 
 ## Acceptance
 

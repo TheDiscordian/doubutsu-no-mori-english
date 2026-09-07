@@ -2,12 +2,12 @@
 
 import json
 from pathlib import Path
-import re
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, dma_entries, sha256
 from english_runtime import ChoiceLayout, GuardedCode, SOURCE_HASHES
 from textcodec import command_info
+from code_sections import code_segments
 
 MODULE_RAM = 0x801948E0
 MODULE_VROM = 0x02800000
@@ -29,12 +29,14 @@ COMMAND_HOOKS = {0x8009034C: "af_code_size", 0x800903CC: "af_code_attribute",
                  0x800919D0: "af_sentence_control",
                  0x800A21C0: "af_dispatch_command", 0x800A054C: "af_cancel_order",
                  0x8009FA18: "af_message_close_short", 0x8009FA38: "af_message_close_long",
-                 0x800A28D4: "af_message_wait_clear"}
+                 0x800A28D4: "af_message_wait_clear", 0x8009D88C: "af_set_item_str",
+                 0x800BB6A0: "af_quest_set_item"}
 HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800903CC, 0x800903E4), (0x800A21C0, 0x800A223C),
                 (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C),
                 (0x8009FA18, 0x8009FA38), (0x8009FA38, 0x8009FA58),
-                (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18))
+                (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18),
+                (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0))
 
 
 def module_command_info(rom):
@@ -73,27 +75,18 @@ def audit_watchdog_references(rom):
     """Preserved entries must not have external callers bypassing their hooks.
 
     Literal aligned code pointers are checked in all files. J/JAL decoding is
-    restricted to pinned code-segment definitions: audio and graphics data can
+    restricted to pinned text subsegments: audio and graphics data can
     contain words resembling instructions but are not executed by the CPU.
     """
     references = []
-    executable, definitions = set(), {}
-    root = Path(__file__).resolve().parents[1]/"upstream/af/yamls/jp"
-    for name in ("makerom.yaml", "boot.yaml", "code.yaml", "overlays.yaml"):
-        content = (root/name).read_text()
-        definitions[name] = sha256(content.encode())
-        for block in re.split(r"(?m)^  - name: ", content)[1:]:
-            if re.search(r"(?m)^    type: code\s*$", block):
-                match = re.search(r"(?m)^    start: (0x[0-9A-Fa-f]+)\s*$", block)
-                if not match:
-                    raise ValueError("Unexpected pinned executable-segment definition")
-                executable.add(int(match[1], 16))
+    executable, definitions = code_segments()
     if CODE_VROM not in executable or len(executable) < 100:
         raise ValueError("Incomplete pinned executable-segment inventory")
     for entry in dma_entries(rom):
         if entry.pstart == 0xFFFFFFFF:
             continue
         data = entry.extract(rom)
+        segment = executable.get(entry.vstart)
         for offset in range(0, len(data)-3, 4):
             pc = CODE_RAM+offset if entry.vstart == CODE_VROM else None
             if pc is not None and any(start <= pc < end for start, end in HOOK_REGIONS):
@@ -101,9 +94,10 @@ def audit_watchdog_references(rom):
             word = struct.unpack_from(">I", data, offset)[0]
             op = word >> 26
             targets = [word] if word % 4 == 0 else []
-            if entry.vstart in executable and op in (2, 3):
+            is_text = segment is not None and segment.is_text(offset)
+            if is_text and op in (2, 3):
                 targets.append(0x80000000 | ((word & 0x3FFFFFF) << 2))
-            if pc is not None and (op in (1, 4, 5, 6, 7, 20, 21, 22, 23)
+            if is_text and pc is not None and (op in (1, 4, 5, 6, 7, 20, 21, 22, 23)
                                    or op == 17 and (word >> 21) & 31 == 8):
                 immediate = (word & 0xFFFF) - (0x10000 if word & 0x8000 else 0)
                 targets.append(pc+4+immediate*4)
@@ -182,6 +176,9 @@ def add_runtime_module(rom, replacements, directory):
     code.immediate(0x8009E8A4, 0xFF3F, 0xB73F)
     code.instruction(0x80065128, 0xA08000B8, 0xA48000B8)  # Clear B8 and B9, leave BA/BB alone.
     code.instruction(0x800667C0, 0x0C0197BE, call("af_choice_close_sound"))
+    # Dialogue gets complete item values. The separate dynamic-choice caller
+    # keeps its native ten-byte API pending its own expansion proof.
+    code.instruction(0x800A1820, 0x0C027D6D, call("af_copy_item_string"))
     replacements[CODE_VROM] = bytes(code.data)
     report["date_scope"] = "Seven message substitutions; other UI formatter callers remain native"
     report["code_changes"] = code.changes

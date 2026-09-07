@@ -558,6 +558,40 @@
   `07F3`. That entry needs an approved GameCube Y-to-N64-START button adaptation.
   No player position or progression is edited; FlashRAM save validation remains.
 
+### Sixteen-byte main-message item fields
+
+- Added five resident sixteen-byte item rows and a validity mask, with ten-byte
+  compatibility mirrors in the unchanged native window. Hooked the native
+  setter, the main message insertion call, and the item-ID convenience wrapper.
+  The separate dynamic-choice reader remains ten-byte pending its capacity proof.
+- The pinned subsegment audit distinguishes executable text from embedded data.
+  Two texture pointers (`0C027630`) at board offset `1C04` and catalogue offset
+  `8A74` resemble calls into the setter's interior but are in verified data
+  sections. Real instruction calls and literal function pointers remain guarded;
+  mutation tests prove both are rejected when they bypass a replaced entry.
+  The item-field audit identifies 27 setter calls, two insertion calls, five
+  wrapper calls, and no direct or literal-pointer uses of the ten-byte getter.
+- All 115 local tests pass. `smoke-item-fields-native-03` passes 1,634 recorded
+  steps and 429 actual MIPS calls using the corrected memory-observation API.
+  Tests cover all five fields, full/short/empty replacement, native handler calls,
+  exact 1,024-byte limits, invalid/no-write cases, non-main ten-byte windows,
+  capitalization, wrapper loads, absent-resource fallback, and intact guards.
+  The complete emulator checkpoint is restored; FlashRAM stays blank.
+- The module links 5,184 bytes; its unconfigured SHA-256 is
+  `9c3961af390b363604f7eadc45334f5229e9cef61d645ed2b4b75b20e90a8faa`.
+  ROM SHA-256:
+  `7d9a6780411d4280a8addab22b922f609786616a68dd92e25286168b5f7a54f4`.
+  UPS SHA-256:
+  `b2dc041a7e6dd227fa64ff7900c6bb03a01610836c9bacb2d82855c015538c6d`.
+  The build retains 10,359 ordinary edits and the separate 648-slot resource.
+  The full train-to-town regression is running; actor-specific wider-item
+  gameplay and other name destinations still require work.
+- The wrapper tests expose a remaining alias: furniture `0A84..0A87` has the
+  confirmed English W-shirt name, but native conversion reads ordinary
+  `item_24:00B6`, whose equal Japanese source is not yet translated. This is
+  recorded as untranslated destination coverage, not counted as English output
+  merely because the requested furniture resource row has a candidate.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

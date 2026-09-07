@@ -5,10 +5,10 @@ import argparse
 from collections import Counter
 import json
 from pathlib import Path
-import re
 import struct
 
 from aflib import by_vrom, sha256, verified_rom
+from code_sections import code_segments
 
 TARGET = 0x800C3F70
 
@@ -45,37 +45,29 @@ def immediate_argument(words, call, register):
     return None
 
 
-def audit(rom, target=TARGET):
-    files, records, definitions = by_vrom(rom), [], {}
-    root = Path(__file__).resolve().parents[1]/"upstream/af/yamls/jp"
-    for name in ("makerom.yaml", "boot.yaml", "code.yaml", "overlays.yaml"):
-        data = (root/name).read_bytes()
-        definitions[name] = sha256(data)
-        for block in re.split(r"(?m)^  - name: ", data.decode())[1:]:
-            if not re.search(r"(?m)^    type: code\s*$", block):
+def audit(rom, target=TARGET, *, allow_empty=False):
+    files, records = by_vrom(rom), []
+    segments, definitions = code_segments()
+    for vrom, segment in segments.items():
+        base = segment.ram
+        entry = files.get(vrom)
+        if not entry or entry.pstart == 0xFFFFFFFF:
+            continue
+        code = entry.extract(rom)
+        words = [value for (value,) in struct.iter_unpack(">I", code[:len(code)//4*4])]
+        for index, word in enumerate(words):
+            if not segment.is_text(index*4) or word not in (
+                    0x08000000 | (target & 0x0FFFFFFF) >> 2,
+                    0x0C000000 | (target & 0x0FFFFFFF) >> 2):
                 continue
-            start = re.search(r"(?m)^    start: (0x[0-9a-fA-F]+)\s*$", block)
-            ram = re.search(r"(?m)^    vram: (0x[0-9a-fA-F]+)\s*$", block)
-            if not start or not ram:
-                raise ValueError("Unexpected executable segment definition")
-            vrom, base = int(start[1], 16), int(ram[1], 16)
-            entry = files.get(vrom)
-            if not entry or entry.pstart == 0xFFFFFFFF:
-                continue
-            code = entry.extract(rom)
-            words = [value for (value,) in struct.iter_unpack(">I", code[:len(code)//4*4])]
-            for index, word in enumerate(words):
-                if word not in (0x08000000 | (target & 0x0FFFFFFF) >> 2,
-                                0x0C000000 | (target & 0x0FFFFFFF) >> 2):
-                    continue
-                records.append({"segment": block.splitlines()[0].strip(), "vrom": f"{vrom:08X}",
-                                "linked_ram": f"{base:08X}", "file_sha256": sha256(code),
-                                "offset": f"{index*4:06X}", "call_ram": f"{base+index*4:08X}",
-                                "destination_length": immediate_argument(words, index, 5),
-                                "string_id": immediate_argument(words, index, 6),
-                                "context": [{"ram": f"{base+i*4:08X}", "word": f"{words[i]:08X}"}
-                                            for i in range(max(0, index-16), min(len(words), index+3))]})
-    if not records:
+            records.append({"segment": segment.name, "vrom": f"{vrom:08X}",
+                            "linked_ram": f"{base:08X}", "file_sha256": sha256(code),
+                            "offset": f"{index*4:06X}", "call_ram": f"{base+index*4:08X}",
+                            "destination_length": immediate_argument(words, index, 5),
+                            "string_id": immediate_argument(words, index, 6),
+                            "context": [{"ram": f"{base+i*4:08X}", "word": f"{words[i]:08X}"}
+                                        for i in range(max(0, index-16), min(len(words), index+3))]})
+    if not records and not allow_empty:
         raise ValueError("No string loader callers found")
     return {"source_sha256": sha256(rom), "target_ram": f"{target:08X}",
             "definition_sha256": definitions, "callers": records,

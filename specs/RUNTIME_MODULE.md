@@ -46,6 +46,13 @@ to existing external functions. Copying it preserves branch distances. The
 builder checks for internal absolute jumps and external references to its
 interior; unsupported relocation forms fail the build.
 
+Reference checks scan aligned literal function pointers in every DMA file.
+Instruction decoding uses only executable subsegments from the pinned Splat
+definitions, not entire containers labelled `type: code`. Embedded graphics,
+rodata, library data sections, and relocation files are not CPU instructions.
+Unknown definition forms/types fail closed. Synthetic mutation tests ensure real
+calls and literal data pointers into replaced functions still fail the audit.
+
 The heap-initialisation call targets the bootstrap at `800D64F0`. It preserves
 the o32 ABI, saves the original heap arguments, verifies the expected heap bounds,
 requests the new DMA file, checks its magic/version/reservation, writes back data

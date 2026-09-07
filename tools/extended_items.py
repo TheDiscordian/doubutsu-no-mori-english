@@ -75,7 +75,7 @@ def install(rom, additions, module_report, directory):
             "candidate_slots": len(report["edits"]), "bytes": len(data),
             "module_configuration_ram": f"{MODULE_RAM+56:08X}",
             "configured_module_sha256": sha256(module),
-            "status": "standalone loader experiment; native callers remain ten bytes"}
+            "status": "experimental item resource; only independently verified caller hooks may use sixteen bytes"}
 
 
 def main():

@@ -42,9 +42,11 @@ checked before loading names. A DMA request copies an aligned sixteen-byte entry
 to a local staging buffer, then the result is copied to the destination. This
 also supports unaligned caller buffers without unaligned cartridge DMA.
 
-The API does not hook `mIN_copy_name_str` or change message/handbill storage.
-Those integrations require the [item reader audit](ITEM_NAMES.md), complete
-field/read-path expansion, and dedicated native/gameplay tests.
+The API does not hook `mIN_copy_name_str`. The separate
+[message-field integration](ITEM_MESSAGE_FIELDS.md) uses resident sixteen-byte
+values for the main window and integrates one item-ID wrapper. Other message,
+handbill, inventory, and display callers require the [item reader audit](ITEM_NAMES.md),
+complete field/read-path expansion, and dedicated native/gameplay tests.
 
 ## Acceptance
 

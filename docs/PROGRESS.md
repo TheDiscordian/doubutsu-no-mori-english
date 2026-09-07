@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 103 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 115 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -94,8 +94,17 @@ user's direction. The production build retains the approved spacing metrics.
   All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
   DMA tests cover every confirmed reference identity, group boundaries, invalid
   inputs, unaligned destinations, resource disabling, and header validation.
-  The resource has 282 candidate identities in 648 slots. Existing gameplay
-  callers remain ten-byte; this API alone does not enable wider names there.
+  The resource has 282 candidate identities in 648 slots. This API alone does not
+  enable wider names at a destination. One converted clothing alias still lacks
+  its confirmed English value in the ordinary item group.
+- Sixteen-byte main-message item fields with unchanged native structure/save
+  layout. All five rows retain complete values, clear shorter replacements,
+  and reject overflows. The message insertion hook and item-ID wrapper pass
+  429 native calls and 1,634 recorded steps, including capitalization, real DMA,
+  disabled-resource fallback, exact message limits, and memory guards. The
+  wrapper's five identified callers are integrated; other direct item loaders,
+  free-string fields, handbills, and dynamic-choice insertion remain gated.
+  Full train-to-town regression of this integration is in progress.
 
 ## Current reference candidates
 
