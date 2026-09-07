@@ -3777,6 +3777,99 @@
   preparation and menu variants, broader text destinations, ordinary storage
   and gameplay, full review, patch-only release, and both stretch goals remain.
 
+## 2026-09-07 — Complete native startup preparations and menu variants
+
+- Added `translations/n64-startup-greetings.json` with fifty original drafts,
+  the default candidate input, eight focused tests, and
+  `specs/STARTUP_GREETINGS.md`. Six variants each cover remembered players,
+  new faces, returning travellers, visitors, and continued use of the record
+  retained during travel. Eleven menus, six clock acknowledgements, and three
+  distinct warning/cancellation/identity records complete this batch.
+- All eighteen ordinary preparations retain their two native `05` commands,
+  the power-off warning before `59:04`/`09:9:0001`, wait, full completion
+  dialogue, and final `00`. They are not replaced with GameCube linked
+  preparations. The lazy speaker's grey muted aside in `1454`, the repeated
+  name in `147C`, and the snooty speaker's final remarks remain.
+- Returning travellers copy from Controller Pak to cartridge and keep their
+  six native post-wait continuations. Visitors keep separate preparation
+  paths and continuations. Both groups retain all four warning-format
+  commands and power/removal warnings. Native field order remains, including
+  town before player in `145A` and no town field in `14AA/14D2`. Only twelve
+  hardware highlight counts change, for six Controller Pak and six cartridge
+  terms. `1480` keeps its one-character highlight after the name, using an
+  English exclamation mark. The other 44 drafts use exact native controls.
+- Six first menus retain Sound settings, Other things, and cancellation,
+  with native choices `0070/01B3/0029`. No rumble option or fourth branch is
+  added. Five further menus retain demolish-house/rebuild-town/clock/cancel
+  order `0072/0073/0071/0029`; existing `143A` remains. All targets and
+  `09:9:0003` requests stay exact. Six clock acknowledgements retain their
+  continuations without adding the GameCube `5B` command.
+- `1437` retains the away-player/items/money warning before its original
+  choices and `1438/1439` branches, with `09:9:0007`. `14A2` cancels town
+  rebuilding, expresses relief at not disappearing, and returns to `1494`.
+  `14D9` retains the identity retry and `09:9:0006`. Neither title speaker
+  receives standing-resident expression permissions.
+- All fifty complete source hashes and command streams pass. An initially
+  overwide original first-meeting line was shortened without changing any
+  source command or dropping meaning. Seventeen generic town-name width
+  warnings remain. Independently substituting the native six-fullwidth-cell
+  town limit makes all fifty draft layouts fit, with every other field at
+  its conservative bound. No font, generic limit, or GameCube line is changed.
+  All expansions fit the unchanged 1,024-byte buffer.
+- Eight focused tests pass in 0.241 seconds. The complete suite passes
+  527 tests in 210.441 seconds in `build/tests-startup-greetings-full-01.log`.
+  Full generation contains 11,098 edits, retaining all earlier 11,048 edits;
+  basic generation contains 10,406 edits, retaining all earlier 10,356.
+  Every new draft is present and no existing candidate changes.
+- All 53 unique outgoing targets have candidates. The native batch tests
+  every new record and 42 unchanged connected candidates in one scenario.
+  `build/smoke-startup-greetings-01/` passes 92 complete loader calls,
+  278 assertions, and 469 recorded steps. Complete headers/text, adjacent
+  and module guards, restored checkpoint, and graceful shutdown pass.
+  The fresh four-MiB process has audio disabled, no seeded saves, and both
+  test write permissions false; FlashRAM remains 131,072 erased bytes.
+  Only `8009E558` is injected. No ordinary startup, selection, preparation,
+  erasure, transfer, date insertion, save action, or hardware test is executed.
+- Scenario SHA-256 is
+  `619e689faa35b353806ddd173c87c4649e648f749d1eed96e8ffb188535947e4`.
+  ROM `build/startup-greetings-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `c8e0a92a452c07b63ba396cda7a8a22096027c3586e655b4c8e321003e0eccf2`.
+  UPS SHA-256 is
+  `69e34fb940d287d8ddf6d7056c0c6db06f9e0edaad490751b226474d9871417e`;
+  applying it to the verified original reconstructs the complete ROM.
+  Comparing all extracted DMA files with the startup/Pak pilot shows only
+  main text `02000000`, pointers `00CF9000`, and DMA directory rows differ.
+  Other directory-container bytes, executable code, overlays, runtime
+  resources, fonts, and saved layouts remain unchanged.
+- Main coverage is 9,549 reference candidates plus 304 original drafts,
+  giving 9,853 candidates. The 1,899 unfilled records include 968 with Japanese
+  static text, nine placeholders, 919 without static text, one Latin record,
+  and two number/symbol records. Ten command-only records have dynamic
+  insertions. Reference rejections number 1,900: 1,578 unconfirmed identities,
+  273 control differences, 47 missing-field records, and two overflows.
+  The original fallback fills one rejection. There are 1,436 reference layout
+  warnings, 41 aliases, and 65 conflicts; none proves complete review.
+- Regenerated coverage and queues under `build/startup-greetings-*`. The
+  unconfirmed same-ID pool is empty: 1,461 lack visible same-ID English,
+  33 need fields, seventeen differ in controls, seven overflow, 36 have no
+  native static text, 24 fail glyph encoding, one needs encoding/hash review,
+  and one has an original fallback. The expression queue has ten unapproved
+  records; title-menu `14A2/14D9` leave it through native originals, not new
+  expression permissions.
+- The native range `13F2..14E1` now has only six unfilled Japanese-static
+  records: `13F2/141A/1442/146A/1492/14BA`. Their complete GameCube references
+  add unavailable storage field `28` and its colour/possessive clause while
+  reordering the date and adding AM/PM `76`. Existing complete-reference
+  wording spans deliberately forbid deleting non-colour controls. The next
+  step must preserve GameCube calendar/line/pause intent and omit only the
+  unavailable device clause with complete source/output checks. Original
+  draft selection also needs a module-command gate: it currently appends
+  originals directly, whereas the full builder independently verifies runtime
+  hooks and rejects unsupported tokens. No unsafe clock candidate is installed.
+  Broader translation, other text destinations, ordinary gameplay/storage,
+  final review, hardware acceptance, patch-only release, and stretch goals
+  remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

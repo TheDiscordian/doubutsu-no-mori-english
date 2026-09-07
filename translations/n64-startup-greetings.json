@@ -1,0 +1,408 @@
+[
+  {
+    "id": "message:13F5",
+    "source_sha256": "bee00c72de32653a4f1341c4ff43f58894436f9c7852b5ab473a00a8e27e02b5",
+    "translation": "Before we begin,\n{cmd:7F0900000B}what would you like to do?{cmd:7F0306}\n{cmd:7F1C}?\n{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F13F6}{cmd:7F101412}{cmd:7F1113F4}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:13F7",
+    "source_sha256": "e10924202d122d6a7e8f70abf95cfcac2ceb56dfbcae9b1f4540b37874be01ce",
+    "translation": "You'd like to set the clock.\n{cmd:7F04}{cmd:7F0E13F8}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1404",
+    "source_sha256": "6308945e8363734f7286803282727110b4e38c8d58ac85cca2553c473c5e656d",
+    "translation": "That's right,\n{cmd:7F1A}!{cmd:7F030C}\n{cmd:7F09000015}Of course I remember you.{cmd:7F0306}\nHow could I forget?{cmd:7F04}\n{cmd:7F02}Now,{cmd:7F0306}\nI'll get everything ready.\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you enjoy\nlife in {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1405",
+    "source_sha256": "a6119547b1e1799d007034488e0416292b4701445bb6d273a9d2562eda7597da",
+    "translation": "I thought so.{cmd:7F0308}\nI didn't think we'd met,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get things ready.\nPlease wait a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you'll soon{cmd:7F0308}\nfeel at home in {cmd:7F2F}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1408",
+    "source_sha256": "a7e1a3016373c853bc08efc70873d5ad90a6cebd845c5934d66591b6d8be9de8",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}{cmd:7F26}!{cmd:7F0308}\nWelcome home!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nPlease wait a moment.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E1407}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:140A",
+    "source_sha256": "f11b18e4faa39d46bb47c9ba4384569fa63bdc4b5f1349b0031170c92c188958",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}{cmd:7F26}, is it?{cmd:7F0308}\nWelcome to {cmd:7F2F}!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E1409}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1410",
+    "source_sha256": "a63796ee47bb8c7ef823b381fa057e136ecfc8af1d03f4978365b0db621bbb93",
+    "translation": "All right.{cmd:7F04}\nWell then,{cmd:7F0306}\nI'll get things ready.\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well then,{cmd:7F0306}\nenjoy life in {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1412",
+    "source_sha256": "271aa93691e32064320087e36224b9ed61657762af3531930b5099816995f654",
+    "translation": "{cmd:7F090000FF}These are the other\nthings you can do.{cmd:7F0308}\nWhich will it be,{cmd:7F0306} {cmd:7F1C}?\n{cmd:7F180072007300710029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F13F9}{cmd:7F1013FF}{cmd:7F1113F7}{cmd:7F1213F4}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Four native other-settings choices, in original demolish-house/rebuild-town/clock/cancel order. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:141D",
+    "source_sha256": "2fc6b5c234ddaf23ba9f4777789d2683462e8b1f085894c401a153c3ece8f601",
+    "translation": "What's this?\n{cmd:7F0900000B}You want to change settings?{cmd:7F030C}\n{cmd:7F1C}?{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F141E}{cmd:7F10143A}{cmd:7F11141C}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:141F",
+    "source_sha256": "d67e00396e6c831952fdf3e3d7c884724c7739bf7d4f6f891c09302cd7a8b0e8",
+    "translation": "You're setting the clock, right?\n{cmd:7F04}{cmd:7F0E1420}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:142C",
+    "source_sha256": "5055d0b04a2f97d10db99f8363b1c7f893b4755dd414826211e00e9770a5802c",
+    "translation": "Sorry, sorry!\nIt's {cmd:7F1A}, isn't it!{cmd:7F030C}\n{cmd:7F09000015}My mind went blank!{cmd:7F0306}\nDon't be mad at me!{cmd:7F04}\n{cmd:7F02}I'll get things ready,{cmd:7F0308}\nso just wait a little!{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Have a great time\nin {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:142D",
+    "source_sha256": "92c1a25eb99006559983879c88b0d0bd4651e0f4954a18c15fd56f9ceadb77df",
+    "translation": "I thought so!{cmd:7F0308}\nI didn't recognise you,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}All right,{cmd:7F0306}\nI'll get things ready.\nJust wait a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you'll soon{cmd:7F0308}\nfeel at home in {cmd:7F2F}!\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1430",
+    "source_sha256": "82e70f01df01229094022d006189ac8474cb208d6be2ff1e85bb8706281b2be1",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Oh! {cmd:7F26}!{cmd:7F0308}\nWelcome hoooome!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nJust wait a little, OK?{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E142F}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1432",
+    "source_sha256": "7f841d28ca3a4b6c3edd810b1350a1a2597458ccfad23df3cdab3522a5296f85",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It's {cmd:7F26}, right?{cmd:7F0308}\nWelcome to {cmd:7F2F}!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nJust wait a little, OK?{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E1431}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1437",
+    "source_sha256": "d4449178cb1ed8292653c61722cf84bebabb66da59596c168959e99aef865803",
+    "translation": "Huh?{cmd:7F0306} {cmd:7F1A} is\nsupposed to be{cmd:7F0306}\nout travelling right now.{cmd:7F04}\n{cmd:7F02}You can play using\nthe record left here,{cmd:7F04}\n{cmd:7F02}but the items and money{cmd:7F0306}\nwent along on the trip,{cmd:7F0306}\nso there's nothing\nleft here for you.{cmd:7F04}\n{cmd:7F02}Still want to play as\n{cmd:7F1A}?{cmd:7F0306} {cmd:7F1C}?{cmd:7F160044003D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1438}{cmd:7F101439}{cmd:7F19}{cmd:7F09090007}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native title/startup conversation with its complete warnings, responses, and targets. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1438",
+    "source_sha256": "c14be0ebe619e05fa6e28dcc5f4e7b399026a059e748da159d1c8fc21d9150de",
+    "translation": "I see.{cmd:7F04}\nWell then,{cmd:7F0306}\nI'll get things ready.\nJust wait a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Have a great time\nin {cmd:7F2F},{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1445",
+    "source_sha256": "f2ecab000005f28828c5f7da2aedaf892f519d2cfe65f139dd3c27b1801cc6e8",
+    "translation": "Before we begin,\n{cmd:7F0900000B}what would you like to do?{cmd:7F0306}\n{cmd:7F1C}?\n{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1446}{cmd:7F101462}{cmd:7F111444}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1447",
+    "source_sha256": "65d9d08599918814fbba634f7d11568faa12887969bc298a26a576af7d4f43f3",
+    "translation": "You want to set the clock, huh?\n{cmd:7F04}{cmd:7F0E1448}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1454",
+    "source_sha256": "99ddaa5e33c29695a3bef78ceb0ae28f0364d6c029e4e94212001fa3a3d34896",
+    "translation": "I was only joking,\n{cmd:7F1A}!{cmd:7F030C}\n{cmd:7F09000015}How could I forget you?{cmd:7F0306}\n{cmd:7F05969696}{cmd:7F5100}(I totally forgot.){cmd:7F5101}{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get things ready,\nso wait here a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you enjoy\nlife in {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1455",
+    "source_sha256": "34a2eec776aee2028d8c9d1eb07f49a482fc6cc785521e9c3d0dcd53d52032fe",
+    "translation": "Oh, I thought so.{cmd:7F0308}\nI didn't think we'd met,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get things ready.\nWait here a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you'll soon{cmd:7F0308}\nfeel at home in {cmd:7F2F}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1458",
+    "source_sha256": "de7f3fa8c3c4f227d346815947af1882df1b8291df0800160e2a48b54588fa74",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}{cmd:7F26}!{cmd:7F0308}\nWelcome home!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nWait here a little while.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E1457}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:145A",
+    "source_sha256": "a0fb5b2fe18972d35e1713d350019d4bb0003e0f81c56de8ea5306ea65c12118",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F09000015}Welcome to {cmd:7F2F},{cmd:7F030C}\n{cmd:7F26}!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nWait here a little while.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E1459}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1460",
+    "source_sha256": "6b1638db3a4164f3fd4cf009377c0dd3b29cd6a57b983f829ebe3e54a914a776",
+    "translation": "I see.{cmd:7F04}\nWell then,{cmd:7F0306}\nI'll get things ready.\nWait here a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well then,{cmd:7F030C}\nenjoy life in {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1462",
+    "source_sha256": "f327ec4f8dce9661022c170e7d9dcfc662d217f2ce1cb073cf5d2d5be2673e76",
+    "translation": "{cmd:7F090000FF}These are the other\nthings you can do.{cmd:7F0308}\nWhich will it be,{cmd:7F0306} {cmd:7F1C}?\n{cmd:7F180072007300710029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1449}{cmd:7F10144F}{cmd:7F111447}{cmd:7F121444}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Four native other-settings choices, in original demolish-house/rebuild-town/clock/cancel order. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:146D",
+    "source_sha256": "1add59da91445fb22e1fff309061695bc5939728af03bc8fceab69ff47b6284f",
+    "translation": "Before we begin,\n{cmd:7F0900000B}what would you like to do?{cmd:7F0306}\n{cmd:7F1C}?\n{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F146E}{cmd:7F10148A}{cmd:7F11146C}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:146F",
+    "source_sha256": "91f4d43a72e97642227f4ae300e7a13d2532d9e6dc37c5f2fa46ed0f7030d0dd",
+    "translation": "Let's set the clock, then.\n{cmd:7F04}{cmd:7F0E1470}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:147C",
+    "source_sha256": "c3f9fe3cc82de4d270bdeb37c5de885166ca757148cc5c91f996aca0ce66e641",
+    "translation": "Just kidding!\nI know you're {cmd:7F1A}!{cmd:7F04}\n{cmd:7F09000015}Don't take it seriously,{cmd:7F0306}\n{cmd:7F1A}!{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get things ready.\nHang on a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Now,{cmd:7F0308}\nlet's have some fun\nagain today,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:147D",
+    "source_sha256": "4e0d435825455daa9f1774f43d84badaee2c560b5044c6799aceb78daecf1c06",
+    "translation": "I thought so!{cmd:7F0308}\nI didn't recognise you,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}I'll get things ready,{cmd:7F0308}\nso hang on a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}From now on,{cmd:7F0308}\nwe're neighbours in {cmd:7F2F}!\nLet's be good friends,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1480",
+    "source_sha256": "d013aeecb446be1b9ec238db3104c5b6c1c1bd15f730f3fdc9a484df3b7a7051",
+    "translation": "{cmd:7F09000015}Hey! {cmd:7F26}{cmd:7F504B5F9B01}!{cmd:7F0308}\nWelcome back!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nHang on a moment!{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E147F}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1482",
+    "source_sha256": "08510581378152a193cb479bdcbd68b97cb50b833056bff3cebc8bd7002a89e8",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}So you're {cmd:7F26}.{cmd:7F04}\nWelcome to {cmd:7F2F}!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nHang on a moment!{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E1481}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1488",
+    "source_sha256": "bf47fbe1cad7164502030cf56c5ee4af469b6ef82543b89f5482a0a0d6dac0f0",
+    "translation": "All right!{cmd:7F04}\nNow,{cmd:7F0306} I'll get things ready.\nHang on a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Let's have another\nfun day in {cmd:7F2F}!{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:148A",
+    "source_sha256": "5ef6077c223169fbb8b19070030b29ba2f3908d5b35eaedead3fa6155c08e100",
+    "translation": "{cmd:7F090000FF}These are the other\nthings you can do.{cmd:7F0308}\nWhich will it be,{cmd:7F0306} {cmd:7F1C}?\n{cmd:7F180072007300710029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1471}{cmd:7F101477}{cmd:7F11146F}{cmd:7F12146C}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Four native other-settings choices, in original demolish-house/rebuild-town/clock/cancel order. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1495",
+    "source_sha256": "08dea813a10bd8c8f35008582c34db092a3bd5f78c0a3b5f69d8b365d1eed655",
+    "translation": "Before we begin,\n{cmd:7F0900000B}what would you like to do?{cmd:7F0306}\n{cmd:7F1C}?\n{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1496}{cmd:7F1014B2}{cmd:7F111494}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1497",
+    "source_sha256": "4a8a89756508fe07e328009c12c47a1d5ed9b9f8e55d7a3dd6e7a35f5f564da8",
+    "translation": "So you're setting the clock.\n{cmd:7F04}{cmd:7F0E1498}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14A2",
+    "source_sha256": "8c05d529f7cb3f3322d7698f5588815dc0c36e188719ca18ccc1bfc5b8de01dc",
+    "translation": "{cmd:7F09000015}So you're not going to\nrebuild the town!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}That's better!{cmd:7F0308}\nI'm not ready\nto disappear yet!{cmd:7F04}\n{cmd:7F02}Glad you thought\nbetter of it,{cmd:7F0306} {cmd:7F1C}!{cmd:7F0E1494}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native title/startup conversation with its complete warnings, responses, and targets. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14A4",
+    "source_sha256": "da14b9b446af01c921069e78d14478a02b69cb996feeaadbb69272234256e8df",
+    "translation": "Sorry about that,{cmd:7F0308}\n{cmd:7F1A}!{cmd:7F030C}\n{cmd:7F09000015}My mind just went blank,{cmd:7F030C}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}I'll get things ready.\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well then,{cmd:7F030C} enjoy another\nday in {cmd:7F2F},{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14A5",
+    "source_sha256": "a606eb1243db0d00b8b9cbfeb1b1b03428d3bfb4a5f9b2438520a746f06cc8fc",
+    "translation": "Thought so.{cmd:7F0308}\nDidn't think I'd seen you before,{cmd:7F030C}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}I'll get things ready.\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well then,\nhere's to getting along,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14A8",
+    "source_sha256": "0b7ee4249c5b459fbbc97851607d5fd303570d082ad1b6bdb94c55b82bfd9391",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It's {cmd:7F26}!{cmd:7F0308}\nYou're back,{cmd:7F0308}\nwelcome home!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nWait here a moment.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E14A7}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14AA",
+    "source_sha256": "4da9f631638123b76ac810ab9dc8a5a9ccaa96aac81c5b61c5ee6429f18a392f",
+    "translation": "Um{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}{cmd:7F26}, eh?{cmd:7F0308}\nGlad you came,{cmd:7F0308} welcome!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E14A9}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B0",
+    "source_sha256": "120bf0ef67859ab754e41d553a0e3f967f135c20a856c960c2ea086fcc4e58bd",
+    "translation": "All right,{cmd:7F0306} I get it.{cmd:7F04}\nWell then,{cmd:7F0304}\nI'll get things ready.\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well then,{cmd:7F0304}\ntake it easy in {cmd:7F2F}{cmd:7F0308}\nand have some fun,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B2",
+    "source_sha256": "8485cbc9831154796d3591424e980e050a32b2d52668457b04c55bd9b4c4eee2",
+    "translation": "{cmd:7F090000FF}These are the other\nthings you can do.{cmd:7F0308}\nWhich will it be,{cmd:7F0306} {cmd:7F1C}?\n{cmd:7F180072007300710029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1499}{cmd:7F10149F}{cmd:7F111497}{cmd:7F121494}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Four native other-settings choices, in original demolish-house/rebuild-town/clock/cancel order. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14BD",
+    "source_sha256": "b4069bc05b5af4c90c67581a3fecbc3ab4c9d0687241eecb2125e70fda0038ba",
+    "translation": "Before we begin,\n{cmd:7F0900000B}what would you like to do?{cmd:7F0306}\n{cmd:7F1C}?\n{cmd:7F17007001B30029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F14BE}{cmd:7F1014DA}{cmd:7F1114BC}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native three-option sound/other/cancel menu, without a GameCube-only rumble option. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14BF",
+    "source_sha256": "8197330541b53c13c1db46d99c8a6786ac4c8157213669265ae0cd52b1b5a798",
+    "translation": "You'd like to set the clock.\n{cmd:7F04}{cmd:7F0E14C0}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native clock-setting acknowledgement and its continuation; do not add the GameCube 5B command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14CC",
+    "source_sha256": "eab77b53f0c9241b35ee3239fb9e2ff4f97c04af184cfd83c8256292a31dc013",
+    "translation": "That's right,\nyou're {cmd:7F1A}!{cmd:7F030C}\n{cmd:7F09000015}Of course I remember.{cmd:7F0306}\nHow could I possibly forget?{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get everything ready.\nJust wait a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Hmhm.\nLet's have another\npleasant chat today,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Remembering the selected player's name before native preparation and the complete post-wait farewell. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14CD",
+    "source_sha256": "3d09292fec7cbc3feafaf8bc0ee3026a4aae0d4989ce4425fdb1b28f1ee28071",
+    "translation": "I thought we'd never met.{cmd:7F0308}\nI wouldn't forget\na face like{cmd:7F0310}\nyours.{cmd:7F04}\n{cmd:7F02}Well then,{cmd:7F0306}\nI'll get things ready.\nWait here a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Hmhm.{cmd:7F030C}\nDon't worry.\nI'll take good care of you,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledging a new face, native preparation, and the complete native post-wait welcome. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14D0",
+    "source_sha256": "8aff12a77424253818ea4794d2f9012decc818b59eaa62bf6408a51e36ee6992",
+    "translation": "{cmd:7F09000015}Oh! {cmd:7F26}!{cmd:7F0308}\nWelcome home!{cmd:7F04}\n{cmd:7F02}I'll copy your record from the\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nJust wait a little.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E14CF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Returning traveller greeting and copying the Controller Pak record to the cartridge, not GameCube source/destination-card fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14D2",
+    "source_sha256": "06a6a88893293745c9e7cdfd6ce140816a9a3d784fae5ae911780818c2c5e561",
+    "translation": "{cmd:7F09000015}Oh! {cmd:7F26}!{cmd:7F0308}\nYou've come quite a way!{cmd:7F04}\n{cmd:7F02}I'll get everything ready.\nJust wait a little.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F0E14D1}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Welcoming a visitor and preparing the native game, with the original player/town fields and original post-wait continuation. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14D8",
+    "source_sha256": "8d88c11fa90193cafd8c9b6f55d165f8712232d70387d956fa84c552137786ac",
+    "translation": "Well,{cmd:7F0308} if that's what you want.{cmd:7F04}\nI'll get things ready,{cmd:7F0306}\nso wait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}Getting things ready...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Hmhm.\nI'll take care of you today,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Continuing with the record retained while the player is away; native preparation and complete post-wait farewell remain in this record. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14D9",
+    "source_sha256": "54835368350c13659f4444dfcd196b7e5d46bd3b58643c67ce2918760fa8f964",
+    "translation": "You're not {cmd:7F1A},\nthen?{cmd:7F04}\n{cmd:7F02}Tell me again{cmd:7F0308}\nwho you are.{cmd:7F04}{cmd:7F0D}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090006}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native identity retry returns to player selection without adding a GameCube expression. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14DA",
+    "source_sha256": "269a827dcfd30f4b156340a4364686520d0b9c5fda3ee0d5a1026a2525206a74",
+    "translation": "{cmd:7F090000FF}These are the other\nthings you can do.{cmd:7F0308}\nWhich will it be,{cmd:7F0306} {cmd:7F1C}?\n{cmd:7F180072007300710029}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F14C1}{cmd:7F1014C7}{cmd:7F1114BF}{cmd:7F1214BC}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Four native other-settings choices, in original demolish-house/rebuild-town/clock/cancel order. Preserve every native command and argument, page, pause, field, choice, branch, and terminator; only return-copy highlights change from nine to fourteen bytes for Controller Pak and four to nine for cartridge. Final wording/layout and ordinary startup/travel/save behaviour remain review."
+  }
+]
