@@ -941,6 +941,43 @@
   This build still requires its own gameplay regression and does not imply that
   English mail assembly, delivery, or saving is implemented.
 
+### Complete generated-letter snapshot prototype
+
+- Implemented a canonical 122-byte envelope with immutable catalog/template IDs,
+  exact literal fields, article settings, version/kind, and CRC-16. Six full
+  sixteen-byte substitutions and five composite IDs fit exactly, without
+  shortening values. Empty and absent fields stay distinct. The Python codec
+  and standalone C codec agree on every slot/length/article combination, random
+  literal data, corruption checks, malformed payloads with recomputed checksums,
+  exact capacity, rejected overflows, unchanged failure destinations, and aliasing.
+- Read the actual English bank bytes and computed every possible field union in
+  all twelve native reply groups. The group-selection function and start tables
+  have mutation-tested guards. All composite groups fit at maximum field width;
+  981 of 982 classic references fit, including 543 of the 544 native numeric IDs.
+  Record `0001` requires actual field bounds and remains explicitly unresolved.
+  These are capacity findings, not approved semantic matches.
+- `smoke-mail-native-01` passes 878 steps and 287 injected native calls in three
+  minutes fourteen seconds. It verifies all 256 dispatcher opcodes without
+  invoking an unsupported token's stalled outer loop, all twenty free-string
+  setters, normal conversion, header split adjustment, ordinary mail copying,
+  and both directions of villager-owned mail conversion. All three test envelopes,
+  including a completely full one, retain their entire encoded contents and
+  adjacent guards. The machine checkpoint is restored; FlashRAM remains blank.
+- `smoke-mail-audit-full-01` passes all 225 train-to-town steps and ten acceptance
+  checks in six minutes twenty-two seconds. Its ROM is the mail-audit build
+  recorded above. It does not establish actual save/reload or hardware operation.
+- The standalone C codec cross-compiles with pinned GCC 14.2.0 for big-endian
+  VR4300/o32, `-Os`, `-mfix4300`, and freestanding/no-PIC/no-library assumptions.
+  The object has no undefined symbols and no data/BSS; GNU size reports 1,204
+  text-category bytes. Object SHA-256:
+  `8a52be441affc758885312e09cf4dd34f9a37d985da3283fc3eb41a2ae2443ab`.
+  It is intentionally not linked into the resident module pending reader and
+  module/test-memory integration. All 190 local tests pass.
+- The next mail work is the complete record-discriminator/reader audit, immutable
+  catalog construction and identity review, full-text assembly, and lossless
+  editor/save integration. `specs/MAIL_SNAPSHOTS.md` documents the exact format,
+  scope, unresolved record, and prohibition on rendering an envelope as text.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 177 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 190 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -173,6 +173,16 @@ user's direction. The production build retains the approved spacing metrics.
   This withholds one previously accepted composite-mail candidate. Complete
   English mail still requires a lossless storage/display/editor design and
   delivery/save validation. See [mail requirements](../specs/MAIL.md).
+- A lossless generated-mail snapshot prototype stores immutable template IDs,
+  exact literal substitutions, article choices, and a checksum within the native
+  122-byte text area. Python and freestanding C codecs agree, reject malformed
+  inputs without partial writes, and preserve full-width fields. Every possible
+  field union in the twelve native composite-reply groups fits; 981 of 982
+  classic English records fit the conservative sixteen-byte field bound, with
+  the remaining record requiring actual source bounds. All 287 native command/
+  copy calls pass, including complete ordinary/villager mail record copying.
+  The codec is not installed in the resident module. Record discrimination,
+  full-text assembly/readers, custom editing, and save integration remain.
 
 ## Current reference candidates
 

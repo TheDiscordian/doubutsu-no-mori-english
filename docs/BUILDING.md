@@ -149,6 +149,12 @@ general-string callers and their immediate argument hints for capacity review.
 `tools/audit_mail.py --rom '<retail-ROM-path>'` repeats the instruction-guarded
 mail-layout and reference inventory using local GameCube text metadata. Its size
 counts are evidence, not approval to expand saved mail fields.
+`tools/audit_mail_templates.py --rom '<retail-ROM-path>'` checks the storage
+budget of complete generated-letter snapshots using actual extracted English
+banks and guarded native reply-group selection. `tools/mail_test_scenario.py
+--rom '<built-ROM-path>'` generates the isolated native command/copy regression.
+The snapshot prototype and its uninstalled C codec are specified in
+`specs/MAIL_SNAPSHOTS.md`; the playable build does not use encoded mail yet.
 
 For module tests, append `--post-scenario tests/runtime-module-memory-scenario.json`
 to verify heap bounds and guards after any scenario. The dedicated

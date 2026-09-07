@@ -93,12 +93,14 @@ and persistence support them.
 
 ### Lossless representation
 
-The representation is not chosen yet. Either a complete, lossless compact
-representation or a fully migrated record/save layout must preserve all required
-text. A display cache alone cannot preserve edited or delivered letters across
-saving, moving, and restarting. Template references require saved snapshots of
-all variable substitutions and coverage of every reader; they cannot silently
-regenerate different random words or current names when an old letter is read.
+The [generated-letter snapshot prototype](MAIL_SNAPSHOTS.md) stores immutable
+template IDs and literal substitution snapshots within the native 122-byte text
+area. The Python and portable C codecs pass lossless and rejection tests, and
+native copying preserves complete envelopes. This is not installed in the game;
+the discriminator, catalog, full-text readers, editing, and persistence remain.
+A display cache alone cannot preserve edited or delivered letters across saving,
+moving, and restarting. No old letter may regenerate different random words or
+current names when read. Custom editor storage remains unresolved separately.
 
 Before enabling wider imports:
 
