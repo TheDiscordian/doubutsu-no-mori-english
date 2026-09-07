@@ -592,6 +592,31 @@
   recorded as untranslated destination coverage, not counted as English output
   merely because the requested furniture resource row has a candidate.
 
+### Controller-specific reference wording and full item-field regression
+
+- `smoke-item-fields-full-01` passes all 225 train-to-town recorded steps and
+  all ten checks in the acceptance validator. Player/town entry, long choices,
+  selected text, arrival, four-MiB memory, and module guards pass. Hardware,
+  actual save/reload, and actor-specific choice coverage remain unclaimed.
+- Added a hash-bound `inventory_y_to_start` operation for Nook's `07F3` clothing
+  reminder. It changes only the GameCube highlighted Y-button span at byte 84
+  to START, correcting its count from eight to twelve characters. The remaining
+  text, colour, manual line/page breaks, pauses, and actor commands are retained.
+  The builder independently rejects unadapted, partial, or modified payloads.
+- All 119 local tests pass. The 382-byte adapted message has no layout warning
+  and an expansion bound of 398. The generated controller build contains 10,360
+  ordinary edits, 9,108 reference dialogue candidates, and 2,638 remaining main
+  records; the separate item resource remains at 648 candidate slots.
+  ROM SHA-256:
+  `7c56f9242a490a4c133f01eb16cbd278aa69ab910adf1c9e1b77f66d8abf6a9b`.
+  UPS SHA-256:
+  `5be91cbf9fb0e61eb72fe2a16d5f0021a4d27869e8ee06e160819674c410dd7c`.
+- `smoke-controller-native-01` passes all 26 recorded steps: actual message DMA,
+  complete approved content, native final-termination behaviour, buffer/module
+  guards, and checkpoint restoration. The normal space-build shop test confirms
+  START opens the inventory and reaches the uniform's native grab/cancel menu.
+  The adapted reminder still needs its own ordinary-gameplay traversal.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

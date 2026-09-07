@@ -17,6 +17,7 @@ from reference_matches import load_matches, resolve_reference, verify_native_equ
 from reference_sequences import reference_sequence_edits
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
+from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -97,9 +98,11 @@ def main():
                     visited_matches.add(id)
                 if reason is None:
                     try:
+                        reference_text, controller_edits = adapt_controller_reference(
+                            reference, original, matches.get(id), info)
                         policy = "presentation"
                         try:
-                            text, adaptations = adapt_reference(reference["text"], original, info,
+                            text, adaptations = adapt_reference(reference_text, original, info,
                                                                 resident_runtime=bool(args.runtime_module))
                             candidate = encode(text, info)
                             validate_entry(original, candidate, info, name, policy,
@@ -110,7 +113,7 @@ def main():
                                 raise
                             for policy in ("reference_text", "reference_delivery", "reference_layout"):
                                 try:
-                                    text, adaptations = adapt_reference(reference["text"], original, info, policy,
+                                    text, adaptations = adapt_reference(reference_text, original, info, policy,
                                                                         resident_runtime=bool(args.runtime_module))
                                     candidate = encode(text, info)
                                     validate_entry(original, candidate, info, name, policy,
@@ -120,6 +123,8 @@ def main():
                                 except ValueError as exc:
                                     if policy == "reference_layout" or str(exc) != "Control signature changed":
                                         raise
+                        validate_controller_candidate(id, original, candidate, matches)
+                        adaptations = controller_edits+adaptations
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

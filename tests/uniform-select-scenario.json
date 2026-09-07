@@ -1,0 +1,8 @@
+[
+  {"wait": 2},
+  {"key": "a", "duration": 0.08},
+  {"wait": 2},
+  {"capture": "uniform-selected.png"},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]

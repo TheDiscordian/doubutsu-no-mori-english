@@ -1,0 +1,9 @@
+[
+  {"wait": 2},
+  {"key": "a", "duration": 0.08},
+  {"wait": 1},
+  {"key": "w", "duration": 0.08},
+  {"wait": 1},
+  {"capture": "uniform-grabbed.png"},
+  {"save_state": true}
+]

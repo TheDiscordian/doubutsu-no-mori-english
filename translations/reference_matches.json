@@ -1,5 +1,17 @@
 [
   {
+    "id": "message:07F3",
+    "source_sha256": "51f4d22c4e07aad374c4e7c6aa90ae587c44c86cb7c4752d8d226692fcf59a0b",
+    "reference_id": "message:07F3",
+    "reference_sha256": "24252e3d737b97726c3a93c858aced54a2036719fdedf5fe30a1157cf5eb043f",
+    "controller": {
+      "operation": "inventory_y_to_start",
+      "offset": 84,
+      "adapted_sha256": "69c120094cbbd05ff5d4ec5e09dcd194d5c505111dc14b57dc4f1f84a8d85652"
+    },
+    "evidence": "Both records are Nook's reminder to wear the supplied work uniform. The native Japanese explicitly says START opens inventory and A changes clothes after dragging them onto the body. The English reference uses Y to open the same screen. Replace only that highlighted button span, retaining its colour and correcting its length. Keep all GameCube line breaks, page breaks, pauses, other wording, and matching native actor commands. Normal N64 shop progression reaches this record after the uniform handoff."
+  },
+  {
     "id": "select:0013",
     "source_sha256": "06b4cedef308731f5697fb8ec195d715314bd3ae2a5df1e25feac1e22c2bebe5",
     "reference_id": "select:0013",

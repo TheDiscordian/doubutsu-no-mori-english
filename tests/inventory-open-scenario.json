@@ -1,0 +1,8 @@
+[
+  {"wait": 2},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "inventory-open.png"},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

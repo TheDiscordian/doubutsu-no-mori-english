@@ -16,6 +16,8 @@ from english_runtime import ChoiceLayout, make_english_runtime, verify_english_r
 from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
 from reference_sequences import validate_sequences
 from extended_items import install as install_extended_items
+from reference_matches import load_matches
+from controller_adaptations import validate_controller_candidate
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -36,6 +38,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         verify_english_runtime(rom, replacements, layout)
     edits = json.loads(path.read_text()) if path else []
     source_banks = banks(rom)
+    matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info)
     grouped, seen = {}, set()
     for edit in edits:
@@ -59,6 +62,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 raise ValueError(f"Stale translation: {edit['id']}")
             replacement = encode(edit["translation"], info)
             try:
+                validate_controller_candidate(edit["id"], original, replacement, matches)
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]))

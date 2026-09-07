@@ -5,6 +5,7 @@ import re
 
 from aflib import sha256
 from gc_text import plain
+from controller_adaptations import validate_approval
 
 
 def load_matches(path):
@@ -29,6 +30,7 @@ def load_matches(path):
                 raise ValueError("Invalid reviewed reference hash")
         if not record.get("evidence", "").strip() or record["id"] in result:
             raise ValueError("Duplicate or unexplained reviewed reference match")
+        validate_approval(record)
         result[record["id"]] = record
     return result
 

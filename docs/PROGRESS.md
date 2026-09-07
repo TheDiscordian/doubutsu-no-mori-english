@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 115 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 119 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -104,7 +104,12 @@ user's direction. The production build retains the approved spacing metrics.
   disabled-resource fallback, exact message limits, and memory guards. The
   wrapper's five identified callers are integrated; other direct item loaders,
   free-string fields, handbills, and dynamic-choice insertion remain gated.
-  Full train-to-town regression of this integration is in progress.
+  The full train-to-town regression passes all 225 steps and ten acceptance checks.
+- Hash-bound controller-text adaptations preserve the English reference except
+  for individually approved button spans. Nook's clothing reminder uses START
+  instead of GameCube Y, with the highlighted span length corrected and all
+  surrounding GameCube layout/timing preserved. Portable and native DMA/end
+  tests pass; ordinary gameplay of the adapted reminder remains.
 
 ## Current reference candidates
 
@@ -127,12 +132,12 @@ item names have separate restrictions. Legacy item references have verified
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,359 edits, including
-9,107 reference dialogue candidates, all 460 choices, 178 villager names,
+The separate resident-module experiment contains 10,360 edits, including
+9,108 reference dialogue candidates, all 460 choices, 178 villager names,
 230 item-name slots, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 2,639; matching, actor fields, flow controls,
+Its remaining main-dialogue count is 2,638; matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -172,8 +177,9 @@ Normal gameplay on the space build traverses
 the English purchase confirmation and all four home-explanation records.
 The exercise drafts retain every native command; seasonal-event testing remains.
 Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
-The following clothing reminder needs an approved GameCube Y-to-N64-START button
-adaptation. Read-only player coordinates support navigation without position edits.
+The following clothing reminder has an approved GameCube Y-to-N64-START button
+adaptation in the controller build. Read-only player coordinates support navigation
+without position edits. START opens the inventory during the normal shop test.
 The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
 direct loader calls and their destination constraints; wider imports remain gated.
 
