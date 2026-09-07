@@ -140,6 +140,14 @@ alongside the native wording. Seven original advice/travel drafts cover
 pass. See [draft contract](../specs/NATIVE_ADVICE_TRAVEL.md). Ordinary actions,
 draft wording/layout review, and blank native-record flow review remain.
 
+The carp reminder `27C0` retains native choices `0010/0018`, not the reference's
+`0066/0018`, and branches to `27E8/27E9`. Both response candidates already fit
+the native eating/refusal joke and preserve its complete actor/flow commands;
+do not replace them solely because the GameCube preceding question mentions pies.
+Moon-viewing drafts `11AC/180B` require preparation checks for free fields
+`3C/3D`; these are not automatically covered by the existing direct date-format
+commands. Complete the native wording alongside that source audit.
+
 Twenty-seven individually approved resident conversations add the speaker's
 catchphrase under a separate [hash-bound contract](../specs/REFERENCE_CATCHPHRASES.md).
 The native appearance request/initializer preserves the actor through window
