@@ -22,6 +22,8 @@ recorded tests. An emulator boot does not establish hardware compatibility.
 - Keep save format changes out of the initial rendering work.
 - Emulator tests must be silent, isolated from existing saves, and time bounded.
 - Document what is complete, what is experimental, and what is untested.
+- Keep progress updates in chat and describe concrete completed work. Do not
+  open repeated status renders or repeat an unchanged completion percentage.
 - Use public names only in committed files. Use Commonwealth punctuation.
 
 ## Project map
