@@ -9,10 +9,12 @@ locally. The functions are source contracts, not installed production hooks.
 The [generation transaction](MAIL_GENERATION.md) provides complete field capture
 and publication; these bindings identify where that API must be connected.
 
-The source checks and selection/coverage tests pass. No ordinary NPC creator
-currently generates English snapshot letters. Complete English word and name
-sources, semantic template approval, loading/lifetime, and delivery integration
-remain required.
+The source checks and selection/coverage tests pass. A separate
+[complete word resource](NPC_MAIL_WORDS.md) verifies all 352 randomized phrases
+against the supplied English and legacy sources. No ordinary NPC creator
+currently generates English snapshot letters. Native word capture, complete
+name sources, semantic template approval, loading/lifetime, and delivery
+integration remain required.
 
 ## Whole-record boundaries
 
@@ -114,9 +116,11 @@ every translated sentence.
 The eleven native word families each choose among 32 entries. Nine English
 families retain the same base and size. Fish (slot six) moves from `0219` to
 `06A1`, and insects (slot seven) from `01E5` to `0679`; both English families have
-40 entries. Full creature identities must be mapped explicitly. Preserve the
-native-selected creature instead of shifting an ID or drawing a different one.
-The other nine equal-number ranges still require source/reference review.
+40 entries. The complete word resource confirms all 352 source/reference pairs
+through exact full-value legacy agreement, including the first 32 fish/insect
+entries. Its explicit slot/native-ID lookup preserves the selected creature;
+it does not draw a replacement or use the eight added English entries. This
+mapping still needs native capture integration and review in complete letters.
 
 All available selectable reference parts use only fields provided by the
 corresponding local or visitor preparation path. The coverage check includes
@@ -128,8 +132,8 @@ cartesian combination of selected parts.
 
 ## Remaining acceptance
 
-1. Resolve complete captured values and stable source identities, including
-   foreign NPC names and the fish/insect word mappings.
+1. Connect the verified full-word mappings and resolve complete captured names,
+   including stable foreign NPC identity recovery.
 2. Approve selected template meanings and support the unavailable footer without
    changing existing catalog identities or shortening text.
 3. Implement bounded loading and whole-record staging with explicit error returns;

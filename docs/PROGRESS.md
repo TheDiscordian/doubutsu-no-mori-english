@@ -57,6 +57,10 @@ evidence. All 24 composite group/gift contexts and 36 classic reply selections
 use supplied source slots; composite footer `psz:004D` remains unavailable.
 The native caller ignores assembly failure, so a specified submission gate must
 also be implemented and tested. This source audit does not establish delivery.
+The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
+352 complete phrases with exact legacy/English agreement and explicit native
+ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
+The resource is verified locally but not installed or connected to capture.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -90,7 +94,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 335 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 342 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

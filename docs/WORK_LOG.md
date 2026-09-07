@@ -2197,6 +2197,40 @@
   checks pass. No production ROM/module, save, font, or translation candidate
   changes accompany this binding audit.
 
+### Complete randomized NPC reply-word mappings
+
+- Implemented guarded preparation directly from the original, legacy, and
+  English string banks. All 352 selected full values match exactly; source,
+  legacy, reference, and captured hashes are retained for each native ID and
+  field slot. The fish/insect mappings preserve the original first-32 selection
+  ranges without introducing a new random draw or replacing a selected creature.
+- The canonical 11,328-byte resource at `build/npc-mail-words/words.bin` has
+  SHA-256 `698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1`.
+  All values fit sixteen bytes; 83 exceed ten bytes. The guarded English setter
+  proves that this preparation path supplies article zero. Its complete function
+  SHA-256 is `1d6b2bef84d1cd4d296852a60df2951382d796cfa9a99e84233dd4fb41b2d62b`.
+- Seven targeted tests pass in 0.122 seconds at `build/tests-npc-mail-words.log`.
+  Coverage includes every full value and lookup, snapshot field round trips,
+  family boundaries, ordering, padding, lengths, articles, glyph restrictions,
+  header/payload integrity, bound whole-resource hashes, all three source banks,
+  and a changed decoder. A recalculated embedded payload hash does not bypass
+  the separate complete-resource hash requirement.
+- The resource remains local and uninstalled. No production ROM/module, saved
+  record, font, or main translation candidate is changed. Native capture before
+  truncation, on-demand loading, full names, and submission failure handling
+  remain required; see `specs/NPC_MAIL_WORDS.md`.
+- The full regression suite passes 342 tests in 165.677 seconds at
+  `build/tests-npc-mail-words-full.log`. Python compilation and whitespace
+  checks pass. Repeated preparation produces the same resource hash.
+- A read-only name-source check finds 394 distinct six-byte keys across all
+  216 original villager names and the current pilot's 178 replaced short-name
+  rows, with no keys identifying multiple villagers. This offers a bounded
+  exact-name recovery path for visitor replies; the source-guarded alias builder,
+  full display-name agreement, unknown-name policy, and native integration are
+  not implemented by this observation. The initial attempt to use the generic
+  whole-bank helper on a relocated pilot ROM failed because its main text bank
+  moved; direct extraction of the unchanged `E04000` name DMA entry succeeds.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -74,6 +74,11 @@ selections. One composite footer remains unavailable. Original creation failure
 is not propagated to submission; an uninstalled failure-return gate is specified.
 Complete English word/name capture, runtime ownership, and native gate validation
 remain the next implementation steps.
+The [complete word source resource](../specs/NPC_MAIL_WORDS.md) verifies all 352
+phrases against the actual source banks and records full source/reference IDs.
+All 83 phrases beyond ten bytes are retained within sixteen bytes. Connect this
+resource before native truncation; complete NPC name sources and runtime capture
+are still required. The resource is not installed in the production ROM.
 
 ## Main translation and runtime
 
