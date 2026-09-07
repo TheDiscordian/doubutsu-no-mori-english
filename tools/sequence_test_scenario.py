@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate native DMA and branch tests for the approved home explanation."""
+"""Generate bounded native DMA, continuation, and termination sequence tests."""
 
 import argparse
 import json
@@ -12,6 +12,10 @@ from runtime_module import module_command_info, verify_test_module
 from textbanks import Bank
 from textcodec import command_info, tokenize
 
+LONG_ADVICE_GROUPS = ('rover_repeat_phone', 'resident_lazy_furniture_advice',
+                      'resident_cranky_furniture_advice', 'resident_snooty_furniture_advice',
+                      'resident_cranky_letter_advice')
+
 
 def scenario(rom, group_name="nook_home_explanation", module=None):
     files = by_vrom(rom)
@@ -20,7 +24,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
-                          "resident_late_night_introduction"):
+                          "resident_late_night_introduction", *LONG_ADVICE_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):
@@ -64,10 +68,13 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     for position, number in enumerate(numbers):
         load(number)
         commands = [t for t in tokenize(entries[number], info) if t.kind == "cmd"]
-        if position+1 < len(numbers) or group_name == "nook_house_purchase":
-            link = next(t for t in commands if t.data[1] == 0x0E)
+        links = [t for t in commands if t.data[1] == 0x0E]
+        if position+1 < len(numbers) or links:
+            if len(links) != 1:
+                raise ValueError('Sequence part requires one approved continuation')
+            link = links[0]
             dispatch(link)
-            target = numbers[position+1] if position+1 < len(numbers) else 0x07EA
+            target = numbers[position+1] if position+1 < len(numbers) else int.from_bytes(link.data[2:], 'big')
             read(window+0x2C4, struct.pack(">I", target))
             write(window+0x28C, bytes(4))
             dispatch(commands[-1], 2)
@@ -108,15 +115,32 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     return actions
 
 
+def batch_scenario(rom, group_names, module=None):
+    """Check several approved sequences in one isolated machine checkpoint."""
+    if not group_names or len(set(group_names)) != len(group_names):
+        raise ValueError('Sequence batch requires distinct named groups')
+    result, prefix, suffix = [], None, None
+    for name in group_names:
+        actions = scenario(rom, name, module)
+        if prefix is None:
+            prefix, suffix = actions[:3], actions[-5:]
+            result.extend(prefix)
+        elif actions[:3] != prefix or actions[-5:] != suffix:
+            raise ValueError('Sequence checkpoint setup or restoration differs')
+        result.extend(actions[3:-5])
+    return result+suffix
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
-    parser.add_argument("--sequence", default="nook_home_explanation")
+    parser.add_argument("--sequence", action='append', help='Repeat to batch approved groups in one checkpoint')
     parser.add_argument('--module', type=Path)
     args = parser.parse_args()
     rom = args.rom.read_bytes()
-    actions = scenario(rom, args.sequence, json.loads(args.module.read_text()) if args.module else None)
+    actions = batch_scenario(rom, args.sequence or ['nook_home_explanation'],
+                             json.loads(args.module.read_text()) if args.module else None)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"rom_sha256": sha256(rom), "actions": len(actions), "output": str(args.output)}))

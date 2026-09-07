@@ -3425,6 +3425,96 @@
   work, wider destinations, normal gameplay/save validation, final review,
   release preparation, and both stretch goals remain active.
 
+## 2026-09-07 — Complete overlong phone, furniture, and letter conversations
+
+- Revalidated the pending Pak/festival work and its terminal test reports,
+  updated living documentation, and committed/pushed `0e26d7a`. Confirmed a
+  clean worktree, matching remote main, and private repository visibility.
+  Continued with complete overlong references rather than abbreviating them.
+- Added five exact sequence approvals covering ten new records:
+  `047C → 0486 → 046F`, `08F4 → 0921`, `08F8 → 2B05`, `08FA → 2B06`, and
+  `0910 → 0A26`. The last `046F` is an existing external destination, not a
+  reused slot. Topics are Rover's repeat phone call, lazy/cranky/snooty
+  furniture advice, and cranky letter-sharing advice. All 10,930 previous
+  candidate edits remain unchanged. Contract: `specs/LONG_ADVICE_SEQUENCES.md`.
+- Full conservative expansion bounds are 1,049, 1,031, 1,259, 1,053, and
+  1,079 bytes. Part bounds are respectively `155/912`, `535/514`, `623/654`,
+  `667/404`, and `541/556`. The replaced existing wait/newline/page-clear spans
+  are `[132,137)`, `[452,457)`, `[540,545)`, `[584,589)`, and `[458,463)`.
+  All complete English wording, manual lines, remaining pages, pauses, and
+  native field/actor/flow meaning remain. No buffer enlargement is needed.
+- Rover's `06/07` phone-mode pair stays wholly in the second record, followed
+  by its original `0E046F` and `01`. Furniture explanations retain complete
+  hold-A push/pull/rotate and tap-A dresser/radio instructions, gift context,
+  decorating remarks, and work/life advice. `08F8` includes all pages after
+  the legacy's first linked part; this project does not use legacy slot `0914`.
+- The explicit Boolean sequence-member article flag permits only the existing
+  redundant `74`-before-string adaptation. `08FA` removes one such command
+  immediately before its already-native item field `31`. The full unmodified
+  reference hash is checked before adaptation, all slices must agree, the
+  entire adapted reference is covered, and each final output hash is guarded.
+  Strengthened complete reference reconstruction checks also apply to unsliced
+  records. No unknown opcode, new field, or arbitrary deletion is accepted.
+- `0910` keeps `75` immediately with its following catchphrase in part two.
+  Auditing treats this existing one-shot capitalization as presentation only
+  with the resident runtime. Its entire group requires that runtime; unrelated
+  protected/range/flow controls gain no permission. Basic generation has
+  10,254 edits, adds the other eight records, and retains every earlier basic
+  edit. Both `0910/0A26` are withheld without the runtime, as are existing
+  gated sequences and the five date-dependent drafts.
+- The five selected native slots contain source-bound reserve text and only
+  a final `00`. Whole-bank message target scanning finds no incoming script
+  branches. A separate pinned executable/data scan finds no matching arithmetic,
+  comparison, or logical immediate and no aligned non-executable halfword for
+  any selected slot. Tests repeat these exact checks. This is slot-specific
+  evidence, not a general indirect-flow or unreachable-record proof.
+- Added nine focused tests covering complete reconstruction, capacity, native
+  fields/phone mode, basic/runtime selection, malformed or stale article
+  approvals, unrelated-command rejection, slot scans, and batched checkpoint
+  structure. The first existing-sequence test run exposed only the two expected
+  total-count assertions; updated those from `22/20` to `32/28`. All nine
+  focused tests pass in 5.058 seconds. The complete suite passes 494 tests in
+  201.225 seconds in `build/tests-long-advice-full-01.log`.
+- Extended `tools/sequence_test_scenario.py` to accept repeated `--sequence`
+  values and retain every group's checks within one checkpoint. The fresh
+  silent four-MiB run in `build/smoke-long-advice-01/` passes ten complete
+  cartridge loads, five internal links, Rover's existing external link, and
+  both termination phases: 36 native calls, 70 assertions, and 169 recorded
+  steps. Complete headers/text, adjacent/module guards, checkpoint restoration,
+  graceful shutdown, disabled audio, and blank 131,072-byte FlashRAM pass.
+  Both test write permissions are false. No actual phone animation, normal
+  actor traversal, gift/handoff, mail interaction, saving, or hardware test is
+  claimed. No unchanged train, mail, or resident-selector batch is repeated.
+- Final ROM `build/long-advice-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `1e3a6651f2034d1401973a3fc985a7dd06e7e95dccb69a45f925927f091a2984`.
+  UPS SHA-256 is
+  `835024c12fac6a8c8b49c45247d3b99ecbd1f089bf7ac861b3ae2ecd4d1010fa`;
+  applying it to the verified original reconstructs the complete ROM. Comparing
+  all extracted DMA files against the Pak/festival pilot confines changes to
+  main text `02000000`, pointers `00CF9000`, and DMA directory rows. All other
+  directory-container bytes, code, fonts, overlays, runtime resources, and
+  saved structures remain unchanged.
+- The new candidate file contains 10,940 edits: 9,552 reference main records
+  plus 143 original drafts give 9,695 main candidates. The 2,057 unfilled
+  native records comprise 1,126 with Japanese static text, nine placeholders,
+  919 without static text, one Latin record, and two numeric/symbol records.
+  Ten command-only records have dynamic insertions. Five filled slots are
+  continuations, not five additional original conversations. Reference
+  rejections total 2,058: 1,667 unconfirmed, 320 control differences, 69 missing
+  fields, and two direct overflows. Layout warnings total 1,437; the added
+  `0486` town-width and `2B06` item-width warnings remain unsuppressed for polish.
+  There are 41 aliases and 65 conflicts. Candidate counts are not final review.
+- Regenerated coverage and both review queues in `build/long-advice-*`.
+  The unconfirmed same-ID comparison pool remains empty, with 1,461 lacking
+  visible same-ID English, 102 needing fields, 36 control differences, seven
+  overflows, 36 non-static records, 24 glyph failures, one encoding/hash
+  uncertainty, and the separately tracked original fallback. Fourteen special-
+  context expression comparisons remain unapproved. The two direct overflow
+  records are native numeric test loop `0B14` and Resetti `2511`, whose special
+  `58:08` ending needs a separate continuation audit. Broader native/cross-ID
+  content, fields/controls, destinations, normal gameplay/save validation,
+  final review, patch-only release, and image/keyboard stretch goals remain.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

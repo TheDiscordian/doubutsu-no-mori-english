@@ -37,6 +37,8 @@ def load_sequences(path=APPROVALS):
         if not isinstance(members, list) or not 1 <= len(members) <= 16:
             raise ValueError("Reference sequence requires one to sixteen members")
         for member in members:
+            if type(member.get('remove_redundant_cutarticle', False)) is not bool:
+                raise ValueError('Invalid sequence article-suppression requirement')
             if (not re.fullmatch(r"message:[0-9A-F]{4}", member.get("id", ""))
                     or member["id"] in seen):
                 raise ValueError("Duplicate or invalid sequence member")
@@ -126,7 +128,9 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
         translated.extend(c for c in part if c[1] != 0x0E or index+1 == len(replacements))
-    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01}
+    # This is the existing one-shot capitalization implementation, not a new
+    # actor/flow permission. Exact complete payload approvals still apply.
+    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01} | ({0x75} if resident_runtime else set())
     native_flow = normalize_assignments([c for c in root if c[1] not in ignored])
     translated_flow = normalize_assignments([c for c in translated if c[1] not in ignored])
     if native_flow != translated_flow:
@@ -199,7 +203,24 @@ def reference_payloads(group, references, info):
         reference = references.get(member.get("reference_id", member["id"]))
         if not reference or reference.get("sha256") != member["reference_sha256"]:
             raise ValueError("Stale reviewed sequence reference")
-        encoded_references.append(encode(reference["text"], info))
+        text = reference['text']
+        reference_info = list(info)
+        remove_article = member.get('remove_redundant_cutarticle', False)
+        if type(remove_article) is not bool:
+            raise ValueError('Invalid sequence article-suppression requirement')
+        if remove_article:
+            reference_info += [(0, 0)]*max(0, 0x75-len(reference_info))
+            reference_info[0x74] = (2, 0)
+        if sha256(encode(text, reference_info)) != member['reference_sha256']:
+            raise ValueError('Sequence requires the exact complete encoded reference')
+        if remove_article:
+            # Import at use time: the existing adapter also uses textvalidate,
+            # whose sequence-permit type is defined in this module.
+            from gc_adapter import remove_redundant_article_suppression
+            text, changes = remove_redundant_article_suppression(text)
+            if not changes:
+                raise ValueError('Sequence article approval requires a redundant CUTARTICLE')
+        encoded_references.append(encode(text, info))
     # Each reference may contribute one complete record or a contiguous group
     # of fully covering slices. This also handles a long final record after
     # earlier complete GameCube continuation records without dropping wording.
@@ -219,7 +240,9 @@ def reference_payloads(group, references, info):
         selected = members[index:last]
         if (any('reference_slice' not in member for member in selected)
                 or any(data != encoded for data in encoded_references[index:last])
-                or any(member['reference_sha256'] != sha256(encoded) for member in selected)):
+                or any(member['reference_sha256'] != first['reference_sha256']
+                       or member.get('remove_redundant_cutarticle', False)
+                       != first.get('remove_redundant_cutarticle', False) for member in selected)):
             raise ValueError('Sliced sequence requires the exact complete encoded reference')
         boundaries = {t.offset for t in tokenize(encoded,info)} | {len(encoded)}
         if selected[0]['reference_slice'][0] != 0 or selected[-1]['reference_slice'][1] != len(encoded):
@@ -261,4 +284,6 @@ def reference_sequence_edits(references, source, info, groups=None, *, resident_
                           "adaptations": [{"kind": "reviewed_multi_message_sequence", "sequence": name}]})
             if "reference_slice" in member:
                 edits[-1]["provenance"]["reference_slice"] = member["reference_slice"]
+            if member.get('remove_redundant_cutarticle', False):
+                edits[-1]['adaptations'].append({'kind': 'remove_redundant_cutarticle_before_string'})
     return edits, validate_sequences(edits, source, info, groups, resident_runtime=resident_runtime)

@@ -151,6 +151,24 @@ calls and fifteen assertions across forty recorded steps. It does not exercise
 normal resident progression, clock insertion during rendered playback, or final
 visual review. These remain in the combined gameplay/playthrough pass.
 
+## Complete phone, furniture, and letter advice
+
+Five further [complete reference sequences](LONG_ADVICE_SEQUENCES.md) cover
+Rover's repeated phone call, three residents' furniture advice, and a cranky
+resident's letter-sharing explanation. Each uses one existing English page
+transition and an individually checked native reserve. Full English text remains.
+The phone-mode pair stays together; the existing external `046F` continuation
+remains. The letter explanation retains `75` with its following catchphrase and
+requires the resident runtime. Only that verified capitalization command gains
+runtime-conditional presentation treatment; unrelated controls remain guarded.
+
+The snooty furniture reference explicitly removes redundant `74` before its
+already-native item field. An individual member flag enables the established
+adjacent-string-only adaptation. The unmodified full reference hash is checked
+before adaptation; slice coverage applies to the complete adapted result, and
+every final payload retains its own hash. All members using that reference must
+agree on adaptation. Unknown commands and unavailable native fields still fail.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English
@@ -182,7 +200,8 @@ complete. A test build may inject its entry through an isolated checkpoint only;
 normal progression is tested separately.
 
 `tools/sequence_test_scenario.py` generates a local-only native regression from
-the built ROM. It checks all four actual cartridge loads, all three continuation
+the built ROM. Repeated `--sequence` options batch supported groups in one
+checkpoint. The home-explanation case checks all four actual cartridge loads, all three continuation
 assignments, both phases of the native continuing terminator, both final branch
 indices, and the native repeat response back to `07EA`. Scratch-buffer and module
 guards remain intact, and the emulator checkpoint is restored after injected

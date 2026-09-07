@@ -1,5 +1,148 @@
 [
   {
+    "id": "rover_repeat_phone",
+    "evidence": "Both native and English Rover conversations call Nook for another player who needs a house, give the town and player names, and return to 046F. Retain the complete English conversation, actor requests, inner voice, and phone mode 06/07 pair. Split only at the existing page boundary [132,137) after the greeting, before 06, so the entire phone-mode span stays in the second record. Final 0E046F and continuing end 01 remain exact. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
+    "members": [
+      {
+        "id": "message:047C",
+        "source_sha256": "0b92e69f3a0c2433283147ecf82b8c00fcd6f4abfcb2270d6bdd09a78acd974d",
+        "reference_sha256": "0844ebcbc1ff13d4b46809597ebb5102cf18949c992fbd72d9f40b3e0aab25c7",
+        "reference_id": "message:047C",
+        "reference_slice": [
+          0,
+          132
+        ],
+        "encoded_sha256": "511fe336b7000b3da55d1594e24d1ec02316c02a40d184800b3aead305aff9fa"
+      },
+      {
+        "id": "message:0486",
+        "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+        "reference_sha256": "0844ebcbc1ff13d4b46809597ebb5102cf18949c992fbd72d9f40b3e0aab25c7",
+        "reference_id": "message:047C",
+        "reference_slice": [
+          137,
+          973
+        ],
+        "encoded_sha256": "b5abaf1b40677e13fe6624e5effbb4fbb4c4a070d89af04d9cc14ffc743ee18c"
+      }
+    ]
+  },
+  {
+    "id": "resident_lazy_furniture_advice",
+    "evidence": "Both native and English lazy-resident replies discuss collecting furniture, hold-A push/pull/rotate controls, tap-A radio/dresser interaction, and not skipping Nook's work. Retain the complete English wording and all presentation. Split only at the existing page boundary [452,457) after the hold-A instruction. Every actor tuple already exists in the native root; retain the final end 00. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
+    "members": [
+      {
+        "id": "message:08F4",
+        "source_sha256": "7340015e54b32cca8723ca61469343eb46f0189359ed506d971b522aeafaebc2",
+        "reference_sha256": "ba0b7543bf9c5ef3b689484d09ee4034e96253aed37d55ba052ff891d9fd9604",
+        "reference_id": "message:08F4",
+        "reference_slice": [
+          0,
+          452
+        ],
+        "encoded_sha256": "9aee1d31cf12c5fd02f9cb722393459c191d5dcfd3df3de453c3740ec51fd967"
+      },
+      {
+        "id": "message:0921",
+        "source_sha256": "26c9415581c90ff8d0f18be65cc7733a9ee668b3f8ddd96bac58687fa0553e4e",
+        "reference_sha256": "ba0b7543bf9c5ef3b689484d09ee4034e96253aed37d55ba052ff891d9fd9604",
+        "reference_id": "message:08F4",
+        "reference_slice": [
+          457,
+          925
+        ],
+        "encoded_sha256": "1091a69c65146309f55c1168245fd686d164782b895e79e8a2d95f32ce1ebef7"
+      }
+    ]
+  },
+  {
+    "id": "resident_cranky_furniture_advice",
+    "evidence": "Both native and English cranky-resident replies encourage accepting the furniture gift, decorating the new home, holding A to push/pull/rotate, tapping A for dressers/radios, and doing well with the new life/job. Use the entire supplied English record, not merely the legacy's first linked part. Split at its existing [540,545) page transition after the complete movement instruction. Retain all original English layout/timing, the native existing actor tuple, player/catchphrase fields, and final end 00. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
+    "members": [
+      {
+        "id": "message:08F8",
+        "source_sha256": "d5cc1e62237e5751f8fd0b38bcfd7ea016889181411936e9884cd514006bf6e1",
+        "reference_sha256": "69ebbb1113a2c68cd4009dd2e989c36fd0280b121c0a46d7a9eef055afbbdf1d",
+        "reference_id": "message:08F8",
+        "reference_slice": [
+          0,
+          540
+        ],
+        "encoded_sha256": "dca79fb91c763214a55ba818ed401b20a867386f6d9afcf6e34faee78ec322ba"
+      },
+      {
+        "id": "message:2B05",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_sha256": "69ebbb1113a2c68cd4009dd2e989c36fd0280b121c0a46d7a9eef055afbbdf1d",
+        "reference_id": "message:08F8",
+        "reference_slice": [
+          545,
+          1123
+        ],
+        "encoded_sha256": "a5bf082ff96c5f896c7b684af331dc7fc822d46d18d36311682c2103350d4bde"
+      }
+    ]
+  },
+  {
+    "id": "resident_snooty_furniture_advice",
+    "evidence": "Both native and English snooty-resident replies describe an empty house, accepting furniture, holding A to push/pull/rotate, enjoying decorating, taking home native item field 31, tapping A for dresser/radio interaction, and not skipping work. Remove only the redundant GC 74 immediately before the already-native item field 31; N64 insertion never prepends an article. Bind the complete unmodified GC source hash and both final payload hashes. Slice offsets cover the complete article-adapted reference, with only existing page gap [584,589) replaced. All English words, manual lines, other pages/pauses, native actor tuples, fields, and final end 00 remain. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
+    "members": [
+      {
+        "id": "message:08FA",
+        "source_sha256": "058e8ebed7acbe0df53a9bc3083e1f8853ec02959d2f6965b15c3a3a03091cf9",
+        "reference_sha256": "999ff1d373f7eae0621c930a48e459a20d855e6d4c380b3196dd8f5d53e74d88",
+        "reference_id": "message:08FA",
+        "remove_redundant_cutarticle": true,
+        "reference_slice": [
+          0,
+          584
+        ],
+        "encoded_sha256": "5057fe9d9578d5e0f9c3e2452a071b4687671a65432cba6617e567d4135f074b"
+      },
+      {
+        "id": "message:2B06",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_sha256": "999ff1d373f7eae0621c930a48e459a20d855e6d4c380b3196dd8f5d53e74d88",
+        "reference_id": "message:08FA",
+        "remove_redundant_cutarticle": true,
+        "reference_slice": [
+          589,
+          887
+        ],
+        "encoded_sha256": "7d8f5a5a31151ecf2bd6e7ec678ff595c335c5557333b9b02613efcc02220e97"
+      }
+    ]
+  },
+  {
+    "id": "resident_cranky_letter_advice",
+    "requires_resident_runtime": true,
+    "evidence": "Both native and English cranky-resident replies joke about a displayed letter, save/show received mail, warn about embarrassing writing, and explain taking letters by train when moving to another town and seeing letters from newcomers. Preserve the complete English text and presentation, all native actor tuples, and final end 00. Split only at the existing page boundary [458,463) before the anger warning. Its existing one-shot capitalization 75 and following native catchphrase stay together in part two; the entire group requires the verified resident runtime. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
+    "members": [
+      {
+        "id": "message:0910",
+        "source_sha256": "59336b2eb340b691ca51bbae1e146c55d5d0c49ce397e7ecfe9f0a4beee9c449",
+        "reference_sha256": "040399cf1707ea440d75ff8d576ad9be9456b0894e688af93f4af3f8720112ac",
+        "reference_id": "message:0910",
+        "reference_slice": [
+          0,
+          458
+        ],
+        "encoded_sha256": "917b312e174976d84bf16a113579d7253bf6f2dfec49a201fdc72982c5e8bd34"
+      },
+      {
+        "id": "message:0A26",
+        "source_sha256": "90d32ead3827a2e2920a43565ba4e28cd4db7e82eeedf7005ad201fd6b8e4d1f",
+        "reference_sha256": "040399cf1707ea440d75ff8d576ad9be9456b0894e688af93f4af3f8720112ac",
+        "reference_id": "message:0910",
+        "reference_slice": [
+          463,
+          913
+        ],
+        "encoded_sha256": "9b59c3219ceb1ac0c267043bcca46280d841306507c8537298f7cee08ceaba4b"
+      }
+    ]
+  },
+  {
     "id": "resident_late_night_introduction",
     "requires_resident_runtime": true,
     "evidence": "Native and GameCube 04F7 both introduce the startled late-night resident, complain about the current time, reconsider the friendship request, and give the speaker's name. Preserve the complete English reference, all native actor argument tuples, speaker fields, clock reads, pauses, and manual layout. The conservative expanded bound is 1174 bytes, so split only at the existing wait/newline/page-clear span [480,485) after the clock aside. Native 083E is an opening-reserve placeholder with no incoming native message-script branch and no matching immediate in the pinned native executable sections. The only aligned non-executable 083E halfword is part of the arctangent table, not a dialogue pointer. Each complete output hash is approved; all members install together. The existing English hour formatter supplies AM/PM only after an hour field in the same record, requiring the verified resident runtime. No actor argument, choice, quest action, or final termination is added. Normal resident progression and visual review remain separate from native loader/continuation tests.",
