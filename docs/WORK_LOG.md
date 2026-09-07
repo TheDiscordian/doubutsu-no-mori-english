@@ -1988,6 +1988,74 @@
   travel, and original hardware remain required. Generation stays disabled;
   no production code, text, font, saved record size, or release setting changes.
 
+### Native Controller Pak write and fresh-process letter persistence
+
+- Guarded the original native Pak module, `sCPk` transport, pad-manager serial
+  lock/unlock, raw PIF read routine, and both file sizes. The passport holds ten
+  full player letters and seven compact NPC letters in its 4,608 bytes. The
+  26,368-byte stored-letter file holds eight ten-byte page labels followed by
+  160 complete letters at offset `52`, with 46 trailing padding bytes. Native
+  storage initialization and tag pointer arithmetic establish that layout.
+  The ten temporary inventory pockets at storage offset `6700` are outside the
+  persisted file. The complete original storage overlay is hash-guarded.
+- Added an original test-only 144-byte assembly probe that locks the native
+  serial queue, reads 1,024 Pak blocks through `__osContRamRead`, and unlocks
+  on success or error. Independent Docker assembly agrees with the checked
+  fixture bytes, SHA-256
+  `e4bc4002ce0fe02410dfb88990742cc0b7c2392e6adeed1b948f42e79d914e91`.
+  It runs in a freed private native heap allocation, not the production module.
+  A single 33,280-byte allocation reuses its chip buffer for note/decoder work.
+- The writer uses the original passport save function and first stored-letter
+  writer stage. The latter's following FlashRAM stage is deliberately excluded.
+  It requires an empty isolated Pak, enough native-reported space, and explicit
+  `--allow-test-pak-write`. Host refusal tests cover nonempty and insufficient
+  Paks before fixture allocation or writes. No format, repair, or delete routine
+  is called. Existing user saves and Paks are never write targets.
+- `build/smoke-pak-mail-save-01` stops before either native note-writing call:
+  the fixture used an incorrect current-player pointer address. Corrected that
+  test address from `80126FD8` to the verified `80136FD8`. No production change
+  is involved. The failed run and its successful initial raw Pak read remain
+  recorded. The first audit-report attempt also exposed makerom's absence from
+  the DMA table; the executable scan now reads its actual pre-DMA ROM region.
+- `build/smoke-pak-mail-save-02` passes all 433 steps, 189 native/test-probe
+  calls, and 209 assertions. Native note counts change from zero to two, and
+  free bytes change from 31,488 to 512: exactly 121 allocated pages. Complete
+  file checksums, all 177 complete records, whole player/NPC import copies, and
+  six English reconstructions pass. Both snapshot kinds cover player, compact
+  NPC, and stored-letter sources. The unchanged live save payload, all memory
+  guards, allocation free, checkpoint restoration, and graceful shutdown pass.
+- `build/smoke-pak-mail-read-01` starts a new process from only the exported Pak
+  and an entirely blank FlashRAM control file. No RTC, town save, RAM image, or
+  writer checkpoint is supplied. It passes 258 steps, 21 native/test-probe calls,
+  and 208 assertions, including all 177 complete records and six reconstructions.
+  Complete native raw reads match the exported chip both before and after the
+  read-only checks. The process restores its own checkpoint and exits gracefully.
+- The native export and fresh reader's flushed Pak share SHA-256
+  `476a2001dfe0c4523a0c7a2ff4e864a351987147c54e46e850c5a69be0d11876`.
+  Restoring the writer checkpoint restores its original empty Pak, with SHA-256
+  `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  This is why the test exports via native reads before restoration instead of
+  treating the writer's eventual flushed file as the result. Both runs retain
+  blank FlashRAM. Original isolated input files are unchanged.
+- Extended the repeatable mail audit with 28 narrow executable marker-offset
+  candidates and complete reference inventories for the three shared text
+  helpers: 22, one, and zero direct calls, with no aligned literal pointers.
+  The report explicitly does not establish complete computed-pointer coverage.
+  Documented PIF, unrelated-array, and item-label false positives, identity-only
+  tag name sizing, and the Pak UI's separate ten-byte page-label length/render
+  path. Report: `build/audits/mail-storage-pak.json`.
+- The final full suite passes 307 tests in 164.904 seconds, recorded in
+  `build/tests-pak-mail-final.log`. The earlier full run passes 305 tests in
+  167.252 seconds before the final audit and refusal tests are added; the
+  targeted six-test Pak suite also passes. Python compilation and whitespace
+  checks pass. Production
+  code, all text candidates, font metrics, snapshot-generation gating, and ROM
+  remain unchanged. Tested ROM SHA-256:
+  `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`.
+  The Pak test proves only the specified transport path. Ordinary travel and
+  storage-menu operation, error progression, editing, remaining metadata/readers,
+  semantic template approval, generation, delivery, and original hardware remain.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

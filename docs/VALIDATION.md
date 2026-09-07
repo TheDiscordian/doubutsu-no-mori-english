@@ -34,7 +34,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
-| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM mail persistence passes; normal saving, travel, RTC, and calendar remain |
+| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM and both Controller Pak letter-file persistence tests pass fresh-process reads; normal saving, travel/storage UI, RTC, and calendar remain |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
 
 The smoke runner's XTest mappings are A=`a`, B=`b`, Start=`Return`, Z=`z`,

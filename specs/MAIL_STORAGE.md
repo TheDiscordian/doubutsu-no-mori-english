@@ -82,6 +82,33 @@ The source overlay has SHA-256
 `a2fe6daee4180fd7fdcbe04cb62e514a8d88067b74bf7e43506f17986c204db6`.
 The audit and mutation tests retain these original-source checks explicitly.
 
+## Inline and shared-text candidate search
+
+The reproducible search in `audit_mail_storage.py` checks executable LB/LBU/SB
+instructions with non-stack bases and immediate offsets `27` or `2F`. It finds
+28 candidates in the pinned N64 executable. This narrow scan is not a complete
+reader audit: adjusted pointers, compact offset `04`, other load sizes, stack
+locals, and calculated addresses need separate data-flow review.
+
+The candidates contain the known generators, full/compact conversion routines,
+board normalisation, and editor split adjustment. Two boot hits operate on PIF
+packets, `800AB100` clears a distinct array of fifteen 56-byte records, and
+`800CC01C`/`800CC3D8` access an item-label flag. Those are not evidence of mail
+envelope interpretation. The shared `mMl_strlen` helper has 22 direct callers,
+`mMl_strlen2` has one, and `mMl_strcpy_back` has none. Their call and aligned
+literal-pointer inventories are recorded separately; a shared helper's name
+does not establish what each caller reads.
+
+The tag label routine beginning at `8086FD3C` copies recipient/sender identities
+into its name buffers and selects special-actor names by mail type. Its examined
+name-sizing calls do not read the stored letter text. Complete English menu
+labels and wider sender/recipient labels remain UI work. The tag mail-pointer
+resolver at `8086FBE4` selects player pockets, home mailboxes, or a Pak record at
+`storage+52+page*3280+slot*A4`. In the Pak storage UI, the shared length call at
+`8089B984` measures a ten-byte page label at `storage+02+page*0A`; the associated
+renderer at `8089BA58` draws that label, not a letter envelope. The
+[Pak format](PAK_MAIL.md) records those distinct regions and transport tests.
+
 ## Validation limits
 
 The selected native storage run passes 140 cases, 217 function calls, and 267

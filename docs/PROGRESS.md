@@ -30,6 +30,11 @@ both save banks. A separate fresh process reads only the cartridge save and
 reconstructs complete English letters from both formats and both record layouts.
 This does not establish normal saving, edited-letter persistence, or hardware
 compatibility. See [persistence scope](../specs/FLASH_MAIL.md).
+Isolated native Controller Pak writing and fresh-process reading also pass the
+17 passport letter slots and all 160 stored-letter slots. Complete files,
+checksums, player/NPC imports, and English reconstruction pass without changing
+the live save payload. The ordinary station-travel and storage-menu flows remain
+unverified. See [Pak persistence scope](../specs/PAK_MAIL.md).
 Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -64,7 +69,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 301 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 307 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

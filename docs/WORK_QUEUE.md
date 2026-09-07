@@ -42,6 +42,12 @@ receives only the exported cartridge save and passes all 384 complete-record
 checks and eight complete English reconstructions. This is not normal save-menu
 or post-load gameplay validation; generation remains disabled.
 
+Native Controller Pak writing and fresh-process reading pass for the `1200`-byte
+passport and `6700`-byte stored-letter note: all 177 complete letter records,
+both file checksums, complete player/NPC imports, and six English reconstructions
+in each process. See [Pak persistence contract](../specs/PAK_MAIL.md). Ordinary
+travel and storage-menu flows remain separate requirements.
+
 ## Main translation and runtime
 
 | ID | Task | Status | Acceptance/evidence |
@@ -67,7 +73,7 @@ or post-load gameplay validation; generation remains disabled.
 | V03 | Save/reload and long names | active | Native two-bank FlashRAM writing and fresh-process reading pass all 192 synthetic stored-letter slots, complete records, and English reconstruction; normal save-menu/post-load gameplay, custom editing, longer names, and RTC remain |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |
-| V06 | Travel and Controller Pak | pending | Export/import, error paths, different towns, saved names |
+| V06 | Travel and Controller Pak | active | Isolated native passport/stored-letter writes and fresh-process reads pass all 177 complete letters, file checksums, complete player/NPC imports, and English reconstruction; ordinary travel/storage UI, error paths, different towns, and saved names remain |
 | V07 | Dates, RTC, seasons, events, and credits | pending | Event coverage and boundary dates with controlled test saves |
 | V08 | Legacy glitch/crash audit | pending | Reproduce reports where possible; distinguish damaged data from mere command differences |
 | V09 | Four-MiB memory and resource budgets | active | 32 KiB module reservation and actual malloc arena start pass boot and town-arrival guards; linked mail calls pass separate stack/buffer guards; broader heap/graphics tests remain |

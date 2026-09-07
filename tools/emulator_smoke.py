@@ -641,6 +641,8 @@ def main():
     parser.add_argument("--seed-state", type=Path, help="Resume this isolated test directory's matching-ROM state")
     parser.add_argument('--allow-test-flash-write',action='store_true',
                         help='Permit the native save fixture to write an otherwise blank isolated FlashRAM chip')
+    parser.add_argument('--allow-test-pak-write',action='store_true',
+                        help='Permit native note writes to an otherwise empty isolated Controller Pak')
     args = parser.parse_args()
     if args.seed_save and args.seed_state:
         parser.error("choose cartridge saves or a matching-ROM state, not both")
@@ -655,6 +657,7 @@ def main():
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
     provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False,
                   "allow_test_flash_write": args.allow_test_flash_write,
+                  "allow_test_pak_write": args.allow_test_pak_write,
                   "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "scenario_sha256": hashlib.sha256(args.scenario.read_bytes()).hexdigest() if args.scenario else None,
                   "post_scenario_sha256": hashlib.sha256(args.post_scenario.read_bytes()).hexdigest()
@@ -833,6 +836,17 @@ def main():
                     raise ValueError('Native FlashRAM readback requires a fresh start from cartridge saves only')
                 needs_checkpoint_restore = True
                 request = action['test_native_flash_mail_save' if writing else 'test_native_flash_mail_read']
+                results.append(exercise(debug,request,record,
+                    export_directory=out/'exported-save' if writing else None))
+            if 'test_native_pak_mail_save' in action or 'test_native_pak_mail_read' in action:
+                from pak_mail_smoke import exercise
+                writing = 'test_native_pak_mail_save' in action
+                if not (out/'test.bs1').is_file() or writing and not args.allow_test_pak_write:
+                    raise ValueError('Native Pak fixtures require a checkpoint and explicit write opt-in')
+                if not writing and (not args.seed_save or args.seed_state):
+                    raise ValueError('Native Pak readback requires a fresh start from cartridge saves only')
+                needs_checkpoint_restore = True
+                request = action['test_native_pak_mail_save' if writing else 'test_native_pak_mail_read']
                 results.append(exercise(debug,request,record,
                     export_directory=out/'exported-save' if writing else None))
             if 'test_npc_mail_show' in action:
