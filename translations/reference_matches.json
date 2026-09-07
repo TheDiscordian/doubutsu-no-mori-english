@@ -1,5 +1,291 @@
 [
   {
+    "id": "message:1092",
+    "source_sha256": "af43a0329ab0a72b9af33cd82880903826cb26a222e6768bbc518f3f83288f5c",
+    "reference_id": "message:1092",
+    "reference_sha256": "c227a44e7d5e594d9d921eef3801992455c785753c012014fbea4fa666751391",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 39,
+      "adapted_sha256": "eb9ceaf761c1aa183b9a397b60a51b87d6688f67355dd3461eae8619f27ab72f"
+    },
+    "evidence": "Native and supplied English records describe the opening shop-service question. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1097",
+    "source_sha256": "610bf643e4dc345ee93fb3b9ce7e640776d547cbae8c8160881c16396fff5e4d",
+    "reference_id": "message:1097",
+    "reference_sha256": "fff6bcf9b00a2b59470ebf9360e0440af3208f09ced7df4be5730bc4b2dd1ef8",
+    "native_choices": {
+      "reference_command": "7F1600030004",
+      "native_command": "7F16000C00FA",
+      "offset": 68,
+      "adapted_sha256": "8cc44529a2947517df49b051cef433e6ca46139f293ad2db67c00622f62fd56f"
+    },
+    "evidence": "Native and supplied English records describe the completed-sale follow-up. Keep native choices 000C/00FA and their existing sell-again/stop indices instead of substituting the GameCube yes/no label IDs. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1098",
+    "source_sha256": "4f067afc221b017c369866d6d668f6078df1d5c9860eabe1eb306e205dcf2bb4",
+    "reference_id": "message:1098",
+    "reference_sha256": "43ed5bcbb2e5b853941e63d5aa0be6838115c7746829d50522e8e5c181af9eb2",
+    "native_choices": {
+      "reference_command": "7F1600030004",
+      "native_command": "7F16000C00FA",
+      "offset": 53,
+      "adapted_sha256": "bba7a9e80afea0a5a1480a5d0d44c86aed09c068ee8ea759c864dd47436e1f89"
+    },
+    "evidence": "Native and supplied English records describe the declined-sale follow-up. Keep native choices 000C/00FA and their existing sell-again/stop indices instead of substituting the GameCube yes/no label IDs. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10A8",
+    "source_sha256": "de5087500f93a2f17be114a9b6fb63bada2984b72cd787697fd7115e59a0d8da",
+    "reference_id": "message:10A8",
+    "reference_sha256": "54b79c56bbd0787b031b8e945fb46bae0a4d3e36eca64de8d7a70417e43a9e26",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 414,
+      "adapted_sha256": "3fec2b0b76edbd3f3d7da5cfdaba05b9c9a7a8fa4aabce60760d843eeed05434"
+    },
+    "evidence": "Native and supplied English records describe the refusal to order an unavailable item. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10A9",
+    "source_sha256": "e2894ac67e0fe23db73016663f2ae1e6730230598f263b3c4eba89d6edced41d",
+    "reference_id": "message:10A9",
+    "reference_sha256": "d902275924c9a8db68b21c09bd332f62f0b7ab17f49f0ec2620be93010adc216",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 164,
+      "adapted_sha256": "8f289ca231aa01ecc9b7050584bec1e200a1e94c13eac12feab4267aa73e4dd5"
+    },
+    "evidence": "Native and supplied English records describe the cancelled furniture order. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10AA",
+    "source_sha256": "bb9a992136920fab778fc3a7883e40cc75ea42283869d1b6ebb2853f7234e320",
+    "reference_id": "message:10AA",
+    "reference_sha256": "c3ccf47ba23bff09201f756391dec5dccfbc1d9ee0efdd01a1386ecc48a0dab5",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 236,
+      "adapted_sha256": "392f16c7f6b926f21254b2b40b9cd5ac3b39e9de72e78b26d0da1e94bd49df45"
+    },
+    "evidence": "Native and supplied English records describe the successful order and delivery-by-mail explanation. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10AB",
+    "source_sha256": "de73891493420bec770d84d24a14150dc127acf69ac9bf74fc0f1a5d5a5ae13c",
+    "reference_id": "message:10AB",
+    "reference_sha256": "0170679c9393835422177e74dc2fd38fc722f014023b43be04932d475e467ef2",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 271,
+      "adapted_sha256": "864a2668f31b09f26632d48062f83bc9de5fedfc64d077991f13b53e038c8005"
+    },
+    "evidence": "Native and supplied English records describe the insufficient-money and advance-payment explanation. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10AC",
+    "source_sha256": "8708eebabfd7bf3ffef9a7b645a64903e76017c3db50ce0c79a36aee990cdb13",
+    "reference_id": "message:10AC",
+    "reference_sha256": "0bc509f3adccb2024fab794501d518a1bf356c357c4b797a0f97731d8f3f7734",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 240,
+      "adapted_sha256": "f6b2346b78a0d3c5f26b9b6bc58ed9f265dcaf2746d4a8bcd901ebfbba8087bd"
+    },
+    "evidence": "Native and supplied English records describe the full-order-list refusal. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10AD",
+    "source_sha256": "0a6f2d779e7dda14a27a5dc248b8a8b60f34ac542f98d28c65ff0329307a8aa3",
+    "reference_id": "message:10AD",
+    "reference_sha256": "3c9a4f3e0edbfb338f4a88a27766e07965b5e67e3e1438d22522d503445982c0",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 291,
+      "adapted_sha256": "62dcc35ceef947724957126fd97909682a7f1c539ba4f1b90942d1a981525be0"
+    },
+    "evidence": "Native and supplied English records describe the furniture-only ordering explanation. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10B4",
+    "source_sha256": "8c593f2d027cf41497d2b37264586f02799a345d2fe9dc496a29877952f1c4a5",
+    "reference_id": "message:10B4",
+    "reference_sha256": "70008f385f6186c9648046608318b9286ebcb8f31cf87dba28f965f66a1037d8",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 216,
+      "adapted_sha256": "2533b4671438556694c8e80943b4642e45ae6e4582312dff15f4cc59bbfb9d2f"
+    },
+    "evidence": "Native and supplied English records describe the refusal to sell another person's entrusted item. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10B5",
+    "source_sha256": "04a08b3916da94e8b2c5694ff4efcecb3695fc88f8e22b74400b2a61c9582de4",
+    "reference_id": "message:10B5",
+    "reference_sha256": "50c5cd2b75f9d68baefae07e6b5f19cf95712a617c7e1117a6d86c01892833a2",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 213,
+      "adapted_sha256": "95d81f6463861fee73c7fabb759f8e9187ef590dcc94a2a5aaed08de1dd0fbb7"
+    },
+    "evidence": "Native and supplied English records describe the unwanted-item disposal service. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:10B6",
+    "source_sha256": "a04234709e0314e174eaf89de461da6eea25441dc8633fd4367ac73cc6e77bde",
+    "reference_id": "message:10B6",
+    "reference_sha256": "c51b497ebf0925e0271d0179d928d8cd151ce3a23920a64c9f8b6856e80aef5d",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 114,
+      "adapted_sha256": "7896283e809625110353f83eb3c06ea903d6065b5e6b29dbd9a111eb1d1c840f"
+    },
+    "evidence": "Native and supplied English records describe the decision to keep an unwanted item. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1714",
+    "source_sha256": "5d86a8d104504c4fcb624c3d94cab02280f1ebbacccbeec33385273b12b65116",
+    "reference_id": "message:1714",
+    "reference_sha256": "b913e6c7488f4a6501a29112bd3913843e143702b7f2b737f92b3d9f16afd74f",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 115,
+      "adapted_sha256": "319d1e01fa73c9e960bdbbb7436a2d5a23689ae7341f915a0247f3684f9e9561"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' opening service question. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1719",
+    "source_sha256": "975503f41e170f54d20e8a931cec12d870a14aa1e495fb4c661f1fea5c160294",
+    "reference_id": "message:1719",
+    "reference_sha256": "3febd29bf16f879b1e978b2fecaa75d9558bf3de6ffe646f1c653e050982636e",
+    "native_choices": {
+      "reference_command": "7F16004C0051",
+      "native_command": "7F16000C00FA",
+      "offset": 159,
+      "adapted_sha256": "3e5e47c5fd616da031fbcbb4669b41cfd26b320adc48da6e6ebe4bd8c9556570"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' completed-sale follow-up. Keep native choices 000C/00FA and their existing sell-again/stop indices instead of substituting the GameCube yes/no label IDs. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:171A",
+    "source_sha256": "ac01036167b0a8cf9ebdaad70553839cb6014c7d91cc74d5ded9c76cd6fb5571",
+    "reference_id": "message:171A",
+    "reference_sha256": "829218c1728fa81d7b7453af85716a00e9275986d05cddb0136901ead00155b3",
+    "native_choices": {
+      "reference_command": "7F16004C0051",
+      "native_command": "7F16000C00FA",
+      "offset": 103,
+      "adapted_sha256": "20b7a54c444442c845b989d6af571c3b62164942ceadeceb8d2493df5aa9e243"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' declined-sale follow-up. Keep native choices 000C/00FA and their existing sell-again/stop indices instead of substituting the GameCube yes/no label IDs. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:172B",
+    "source_sha256": "b1df018f250acd3d8c1470e0a83e964908fe99faf75e2432f251ea0335abb470",
+    "reference_id": "message:172B",
+    "reference_sha256": "7b5e7f5aa335ccd97220b591c11f2d94c2d763ada36a142f554de2ec7be5b6fb",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 191,
+      "adapted_sha256": "65d30eee21f1c3626e936bd40f4d70d131dd7bba5eba000f7d72ead551968c5d"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' cancelled furniture order. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:172C",
+    "source_sha256": "31aeb888282ee4401c12f3f432cac5e8b1254fa50e6b179310e374c85084c37a",
+    "reference_id": "message:172C",
+    "reference_sha256": "7e1ba0808c43b8b73089345c319c705432ced58fdf2d12a9dad0acc520cae61f",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 363,
+      "adapted_sha256": "45feb52df9d8c4daa0eb1f23ad342817aa0326e3c3f518d2170e41798d1ad113"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' order and mailbox reminder. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:172D",
+    "source_sha256": "0dce79644b9e08475941823dcdd15f9d834318ae32cecfe023652b66fbc25e6c",
+    "reference_id": "message:172D",
+    "reference_sha256": "d98861431b45b0115bdc04239519315564333a6b2b111ff174ddbd9e4b8d764a",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 519,
+      "adapted_sha256": "68d4ba2a78ec1615c5f769f1ee3d5d4e6c7b890073b1476b8739dca934018cfc"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' insufficient-money refusal. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:172E",
+    "source_sha256": "fb719ece92b15eb2aafa6f4c4a9539a8f22de6c39974159f49dd8ff7e1130eb2",
+    "reference_id": "message:172E",
+    "reference_sha256": "5055649be49ca1164f8f38501b3351be1c82d11c988487ecbe06947b5d24381a",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 435,
+      "adapted_sha256": "b3e7a2ef10b6c864a071e6814ebd0e518668a4f50e1d5d8cef204e0aaefcd25b"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' full-order-list refusal. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:172F",
+    "source_sha256": "788dff702c63e1fc2380215bebef841d9ee16307f128f30d2a2d952f390b1205",
+    "reference_id": "message:172F",
+    "reference_sha256": "17a6902ddf5e5f6f716dd35f5b0a6b905e43f032ce3ac298ba9550d0d819b910",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 261,
+      "adapted_sha256": "a2225cda2d4c562b027517fedd2afa1d8cb52d4f8cc014a306b8cd527294855d"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' furniture-only ordering refusal. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1736",
+    "source_sha256": "a4181c530a0565e079542bb065251559d4720c3fca4a348eb0226b4176a8be97",
+    "reference_id": "message:1736",
+    "reference_sha256": "dc36e17543fdc0e140f5e2da933693b5e36ee4864b3d0571e600443f497d3ab4",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 198,
+      "adapted_sha256": "08d32c93b690dac2bdf13ab1f3fbbce5cc3a6e6a39907d6ac7646b3168e09a6b"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' refusal to sell entrusted items. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
+    "id": "message:1738",
+    "source_sha256": "51dc6f3fa36669459d2d46f36277f7e27e71cb0e740b491cf4562ffb78746236",
+    "reference_id": "message:1738",
+    "reference_sha256": "2ed77934f6de3d1c8e83144996afd2fbb403c588b61ce3b93c8155c25d5479c9",
+    "native_choices": {
+      "reference_command": "7F18000A01C40009000B",
+      "native_command": "7F180009000A01C4000B",
+      "offset": 162,
+      "adapted_sha256": "6c1aadf15dd9007e040a06bdde270e510acdf421b606c4e973906ba19658e2e3"
+    },
+    "evidence": "Native and supplied English records describe the twin shopkeepers' acknowledgement of keeping an item. Keep the native choice IDs in order 0009/000A/01C4/000B: turnip prices, selling, catalog, and leaving. The GameCube moves selling/catalog ahead of its different Other things action. Native 0009 is separately translated from its Japanese price question. Only the exact approved choice command changes; complete English wording, line/page breaks, pauses, and supported formatting remain. Normal command, native actor-argument, field, and capacity checks still apply. Source/reference/final-payload hashes are independent build guards. Ordinary shop selection remains validation."
+  },
+  {
     "id": "message:0801",
     "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
     "reference_id": "message:0801",

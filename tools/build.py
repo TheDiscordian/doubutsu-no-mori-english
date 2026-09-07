@@ -26,6 +26,7 @@ from pelly_receipt import install as install_pelly_receipt
 from npc_mail_loader import install as install_npc_mail_loader
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
+from reference_choices import validate_choice_candidate
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -71,6 +72,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             replacement = encode(edit["translation"], info)
             try:
                 validate_controller_candidate(edit["id"], original, replacement, matches)
+                validate_choice_candidate(edit["id"], original, replacement, matches)
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]))

@@ -1,0 +1,56 @@
+# Native shop choices in English dialogue
+
+## Contract
+
+GameCube shop menus can reorder actions or expose different submenus. Importing
+their choice commands unchanged can attach English labels to the wrong native
+selection indices. The `native_choices` approval keeps the original N64 choice
+command while retaining the surrounding complete English reference.
+
+Each record in `translations/reference_matches.json` binds the native source,
+complete GameCube reference, exact choice-command span and offset, complete
+native command, and final adapted payload. There must be exactly one choice
+command in each source/reference record. Both commands must have the same number
+of choices, and the replacement must be the actual complete native command.
+Arbitrary branch changes, new choices, multiple menus, stale sources, altered
+layout, and partial final-payload changes are rejected. Normal command, dynamic
+field, native actor-argument, and capacity checks still run after adaptation.
+The builder verifies the approved final hash independently of candidate metadata.
+Controller-text and native-choice adaptations cannot share an approval.
+
+## Shop-service batch
+
+The approved Nook records are `1092`, `1097`, `1098`, `10A8..10AD`, and
+`10B4..10B6`. The twin-shopkeeper records are `1714`, `1719`, `171A`,
+`172B..172F`, `1736`, and `1738`. These cover the service question, successful
+and declined sales, orders, unavailable or unaffordable orders, full order lists,
+furniture-only ordering, entrusted items, and disposal/retention decisions.
+
+The native four-choice order is `0009/000A/01C4/000B`: turnip prices, selling,
+catalog, and leaving. GameCube uses `000A/01C4/0009/000B`, and its `0009` label
+means Other things. Native `0009` explicitly asks today's turnip price, so
+`translations/n64-shop-menus.json` supplies the original fourteen-byte English
+label `Turnip prices?`. The existing expanded choice runtime handles it without
+changing any action, saved field, or controller mapping.
+
+Sale follow-ups retain native `000C/00FA` and their sell-again/stop indices,
+instead of the GameCube `0003/0004` or `004C/0051` labels. These changes retain
+the native choices, not the GameCube action table. Every ordinary shop selection
+still requires gameplay review; a text match cannot establish that review.
+
+The twins' `172A` and `1737` remain withheld: even after their choice correction,
+their speaker/echo control sequences differ. This approval does not relax those
+controls. Other menu families require their own source and action review.
+
+## Validation
+
+Portable tests cover exact replacement, changed sources/references, missing or
+duplicate menus, wrong offsets, changed action counts, unrelated controls, and
+the independent final-payload guard. Retail-input tests check all 22 approvals,
+their unchanged native choice commands, complete capacity validation, and the
+source-bound turnip-price label. The native batch generator loads every complete
+approved message and all six referenced labels from the actual cartridge, with
+buffer/module guards and full checkpoint restoration. Ordinary selection,
+selling/ordering, the twins' echo rendering, and layout warnings remain combined
+gameplay and human-playthrough checks. The tool does not display reports or
+produce host audio.

@@ -2566,6 +2566,47 @@
   batch. Font assets/metrics, runtime code, saved layouts, and opt-in generation
   settings remain unchanged. Broader missing dialogue is the next content task.
 
+### Shop-service dialogue and native menu choices
+
+- Added 22 complete English shop-service/sale/order/disposal messages: twelve
+  Nook records and ten twin-shopkeeper records. Each approval retains the exact
+  N64 choice IDs and selection order instead of importing the GameCube action
+  arrangement. The only existing candidate changed is `select:0009`, whose
+  native Japanese asks for today's turnip price; its original fourteen-byte
+  translation is `Turnip prices?`, not the GameCube Other things submenu label.
+- Implemented exact, individually hash-bound `native_choices` adaptations.
+  Each source/reference must contain one approved menu, with equal choice count,
+  an exact offset, and the complete native command. The builder independently
+  requires the final adapted hash. Other commands, fields, capacity, and actor
+  arguments keep their normal checks. No runtime or saved structure changes.
+  Full GameCube text remains in ignored inputs/generated candidates.
+- The two twin-shopkeeper records `172A/1737` remain withheld because their
+  speaker/echo controls differ after the menu correction. Existing font assets,
+  metrics, English line/page breaks, and pause intent are retained. Eleven
+  additional conservative layout warnings are queued for the later polish pass.
+- The four new native-choice tests pass, together with existing reference-match
+  and controller groups. The combined 32-test reference batch passes in 4.753
+  seconds at `build/tests-shop-menu-reference-batch-01.log`. This meaningful
+  content batch does not repeat the full 389-test baseline run. Python compilation
+  and whitespace checks pass.
+- `build/smoke-shop-menu-01` passes all 22 complete native cartridge message
+  loads and six referenced choice-label loads, including the full corrected
+  turnip label. The fresh four-MiB run records 143 steps, 28 native calls, and
+  74 memory assertions. Buffer/module guards, full checkpoint restoration, and
+  graceful shutdown pass; FlashRAM remains blank and the Pak unchanged. Ordinary
+  menu selection, sale/order gameplay, and echo rendering remain batch/human
+  playthrough work, not claimed by these isolated loader calls.
+- `build/shop-menu-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `620180612973a02ca95590b6bd89a87eb8e58ea2d4585d676cea2df765425e60`;
+  its verified round-trip UPS has SHA-256
+  `1ad1654fc1ea381e67d493cd039fdfddf3dae511e2da1531ed0610077686d403`.
+  The current candidate file contains 10,441 edits, including 9,186 reference
+  dialogue candidates, ten original dialogue drafts, and all 460 choices
+  (459 reference labels plus the original price label). The original main-bank
+  audit leaves 2,556 records without candidates, including 1,625 with Japanese
+  static text. There are 1,365 conservative layout warnings. Detailed reports
+  remain in `build/shop-menu-candidates/` and `build/shop-menu-coverage/`.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -452,17 +452,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/nook-jobs-complete-pilot/`
-contains 10,419 edits, including
-9,164 reference dialogue candidates, all 460 choices, and ten original dialogue
+The current experimental resident-module pilot in `build/shop-menu-pilot/`
+contains 10,441 edits, including
+9,186 reference dialogue candidates, all 460 choices, and ten original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,578
+still require review. The original main-bank audit leaves 2,556
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,354 conservative layout warnings include full default
+listed below. The 1,365 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/nook-jobs-complete-candidates/` and `build/nook-jobs-complete-coverage/`. The independent
+`build/shop-menu-candidates/` and `build/shop-menu-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -479,6 +479,20 @@ traversal, HRA choices, and the HRA invitation's line-width warning remain queue
 for the combined gameplay and human bug/polish passes. Existing candidates,
 font assets/metrics, and saved structures are unchanged by this batch.
 
+Twenty-two shop-service, sale, order, and disposal messages retain complete
+English wording with the original native choice IDs and selection order.
+Individually source/reference/payload-bound choice approvals prevent accidental
+import of GameCube menu actions. Native choice `0009` has an original
+fourteen-byte translation, `Turnip prices?`, replacing the incompatible GameCube
+Other things label. All 460 native choices still have candidates: 459 supplied
+reference labels and this original draft. The twins' `172A/1737` remain withheld
+for their separate speaker/echo differences. All 22 complete messages and six
+referenced choice labels pass native cartridge loads with buffer/module guards
+and checkpoint restoration. The 32-test reference batch passes, including four
+new native-choice tests. See [native choice contract](../specs/REFERENCE_CHOICES.md).
+Ordinary selection, selling/ordering, echo rendering, and line-width warnings
+remain gameplay and human-playthrough checks.
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -486,14 +500,14 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,419 edits, including
-9,164 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,441 edits, including
+9,186 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 and four other introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,579 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,578 main records without
-candidates: 1,647 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,557 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,556 main records without
+candidates: 1,625 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

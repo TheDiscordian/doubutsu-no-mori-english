@@ -1,0 +1,10 @@
+[
+  {
+    "id": "select:0009",
+    "source_sha256": "3b109665a0ba757cc86930e1021a645693a57f3bd26e998a86b7a07929fdf50f",
+    "translation": "Turnip prices?",
+    "provenance": "Original translation of the Japanese N64 choice",
+    "status": "draft",
+    "notes": "The native label asks for today's turnip price. GameCube 0009 says Other things and belongs to a different shop menu arrangement. Preserve native ID 0009 and selection order; do not label the native price question as an unrelated submenu. The complete fourteen-byte English label requires the existing expanded choice runtime. Ordinary shop selection remains validation."
+  }
+]

@@ -18,6 +18,7 @@ from reference_sequences import reference_sequence_edits
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
+from reference_choices import adapt_choice_reference, validate_choice_candidate
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 
@@ -81,7 +82,8 @@ def main():
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
-                                       Path("translations/n64-intro-jobs.json")])
+                                       Path("translations/n64-intro-jobs.json"),
+                                       Path("translations/n64-shop-menus.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     matches = load_matches(args.matches)
     verify_native_equivalents(matches, source_banks)
@@ -120,8 +122,9 @@ def main():
                     visited_matches.add(id)
                 if reason is None:
                     try:
+                        reference_text, choice_edits = adapt_choice_reference(reference, original, matches.get(id), info)
                         reference_text, controller_edits = adapt_controller_reference(
-                            reference, original, matches.get(id), info)
+                            {**reference, "text": reference_text}, original, matches.get(id), info)
                         policy = "presentation"
                         try:
                             text, adaptations = adapt_reference(reference_text, original, info,
@@ -146,7 +149,8 @@ def main():
                                     if policy == "reference_layout" or str(exc) != "Control signature changed":
                                         raise
                         validate_controller_candidate(id, original, candidate, matches)
-                        adaptations = controller_edits+adaptations
+                        validate_choice_candidate(id, original, candidate, matches)
+                        adaptations = choice_edits+controller_edits+adaptations
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

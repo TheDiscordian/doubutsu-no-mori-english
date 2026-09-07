@@ -84,6 +84,12 @@ record that already has a confirmed reference translation. Candidate generation
 requires that complete donor record to match the approved source hash as well.
 This cannot equate merely similar Japanese text or changed control sequences.
 
+An explicit `native_choices` approval can retain the N64 menu's choice IDs and
+order inside a complete English reference. This does not import GameCube action
+indices. Source/reference/complete-payload hashes, a unique exact menu command,
+and unchanged choice count are mandatory; normal flow and capacity checks still
+apply. See [native choice approvals](REFERENCE_CHOICES.md).
+
 ## Halfwidth prototype
 
 - Main code virtual file: `0x675720`, RAM load address `0x80051A80`.
