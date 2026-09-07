@@ -846,6 +846,60 @@
   separate general-string/field task. No actor position, schedule, or greeting
   data is written to reach the conversation. All 157 local tests pass.
 
+### Complete default catchphrase display and debugger alignment
+
+- Matched all 216 villager catchphrases through confirmed villager identities,
+  both actual default tables, and exact legacy/reference agreement. The resource
+  has 214 distinct four-byte saved keys and 216 sixteen-byte rows. Key `D0902020`
+  has different English defaults for `E014` and `E0C5`; each owner resolves its
+  own phrase, while an ambiguous borrowed use remains native. English custom
+  text cannot match any original non-Latin key. Native saved/default fields and
+  the shared choice insertion remain unchanged.
+- The 3,488-byte resource uses VROM `02E00000`, module configuration offset `40`,
+  and SHA-256
+  `6af738a7c89ce7fea041897efd8c4f95d85732d32cd3de1a3f99aeca5163f675`.
+  The module uses 7,488 bytes, unconfigured SHA-256
+  `a44c3faa08486be6e3b90e637005025fe93df99de37b5ca6942737af813fffeb`.
+  Its only catchphrase consumer patch redirects the main call at `800A114C`.
+  The audit records the unchanged choice caller, getter, setter, and resetter.
+- `catchphrase-pilot` retains all 10,406 ordinary edits and the item/display-name
+  resources. ROM SHA-256:
+  `a978f56a5a183a5c14fb2cdafa922bfa6c4510f2c453f85b3c485c2911622b69`.
+  UPS SHA-256:
+  `78864a5031a647d395206f2d3ba0022dc6823265dd319176441ece4e86b4ebf1`.
+- `smoke-catchphrase-native-01` passes all 216 default loads and two borrowed
+  cases, then exposes an eight-byte debugger guard-read discrepancy after a
+  zero-capacity call. The observed bytes correspond to an aligned-down read,
+  not the requested range. The ares GDB/cache source and an expanded synthetic
+  test reproduce the missing eight-byte alignment case. The runner now aligns
+  read spans to eight bytes and splits unaligned eight-byte writes into words.
+  Portable read/write tests cover every offset and length from one to 33 bytes.
+- The second native run passes the repaired source guard and empty-phrase
+  capitalization, then rejects a negative test argument before calling game
+  code. The generator now serializes signed values as their unsigned o32 words;
+  the runner already sign-extends those words into MIPS registers. A generator
+  test checks every call's argument range before launching the emulator.
+- `smoke-catchphrase-native-03` passes all 1,505 recorded steps in four minutes
+  sixteen seconds: 261 native calls and 501 memory assertions, all default
+  identities, borrowed/custom text, exact 1,024-byte insertion, overflow and
+  incomplete-command rejection, actual `7F1C` capitalization dispatch, unchanged
+  shared insertion, disabled resources, header checks, and full restoration.
+  Blank-phrase capitalization affects the following output byte, as in GameCube.
+- `smoke-catchphrase-full-01` passes all 225 train-to-town steps and ten acceptance
+  checks in six minutes twenty seconds. `smoke-catchphrase-display-fields-01`
+  passes all 228 nameplate/insertion steps with the corrected debugger reader.
+  `smoke-catchphrase-item-fields-01` passes 429 calls and 1,629 recorded steps.
+  All FlashRAM files remain blank; none establishes actual game save/reload.
+- Candidate generation now budgets the larger of four native catchphrase cells
+  and ten maximum Latin advances. The 1,353 layout-warning candidates include
+  41 additional review flags. The translation file itself remains unchanged,
+  SHA-256 `30443536425c3274a814117dd1e4eea800f557c1442ff205b1cd637e6b639d33`.
+  No GameCube lines, pages, timing, or font metrics change. All 171 local tests pass.
+- `smoke-space-greeting-finish-01` completes Cousteau's normal introduction with
+  four A presses and stops before reopening it. Nineteen steps pass; other
+  introductions and later introductory jobs remain. Atomic result publication
+  prevents live observers from reading a partially serialized JSON document.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

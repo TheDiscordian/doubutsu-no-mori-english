@@ -34,3 +34,21 @@ No running-thread pointer, native scheduling field, or gameplay progression valu
 is edited to obtain this context. The existing socket and process time bounds
 limit a missing frame breakpoint. Native behaviour and real hardware still need
 independent validation.
+
+## Exact debugger memory access
+
+The ares GDB interface uses native CPU accesses for one-, two-, four-, and
+eight-byte requests. Short unaligned reads may align down, and an eight-byte
+read can differ between the bus and a cached line. The runner aligns read spans
+to eight bytes and slices the requested range. Writes use byte edges and aligned
+word/bulk spans; an eight-byte request at an address aligned to only four bytes
+is split into two words. Neighbouring bytes are never rewritten to fix alignment.
+Synthetic tests cover every offset and short length, including cached-style
+eight-byte alignment. Native source/destination guards test the actual interface.
+The upstream [GDB access dispatcher](https://github.com/ares-emulator/ares/blob/v148/ares/n64/system/system.cpp)
+and [debug cache access](https://github.com/ares-emulator/ares/blob/v148/ares/n64/cpu/dcache.cpp)
+define these short-access paths; the synthetic model includes all four sizes.
+
+Incremental result files are atomically replaced after complete serialization,
+so concurrent status readers cannot mistake a partially written JSON document
+for a terminal test failure.

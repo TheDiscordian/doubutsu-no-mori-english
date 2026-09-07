@@ -13,8 +13,9 @@ TARGETS = {"world_name": 0x800ACDF8, "talk_name": 0x8009ED14,
            "nameplate_setup": 0x8009D308, "nameplate_draw": 0x800A2BB0}
 
 
-def audit(rom):
-    reports = {name: audit_calls(rom, target) for name, target in TARGETS.items()}
+def audit(rom, targets=None, *, allow_empty=False):
+    targets = TARGETS if targets is None else targets
+    reports = {name: audit_calls(rom, target, allow_empty=allow_empty) for name, target in targets.items()}
     for report in reports.values():
         report.pop("capacity_counts")
         report["literal_pointers"] = []
@@ -28,7 +29,7 @@ def audit(rom):
         data = entry.extract(rom)
         for offset in range(0, len(data)-3, 4):
             value = struct.unpack_from(">I", data, offset)[0]
-            for name, target in TARGETS.items():
+            for name, target in targets.items():
                 if value == target:
                     reports[name]["literal_pointers"].append({"vrom": f"{entry.vstart:08X}",
                         "offset": f"{offset:06X}", "file_sha256": sha256(data)})

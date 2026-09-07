@@ -16,6 +16,13 @@ import struct
 import time
 
 
+def write_results(directory, results):
+    """Publish one complete result snapshot for concurrent read-only observers."""
+    temporary = directory/"results.json.tmp"
+    temporary.write_text(json.dumps(results, indent=2)+"\n")
+    temporary.replace(directory/"results.json")
+
+
 class RSP:
     def __init__(self, port):
         self.sock = socket.create_connection(("127.0.0.1", port), timeout=5)
@@ -51,8 +58,9 @@ class RSP:
         """Return exact bytes despite ares' aligned short-read optimisation."""
         if length < 1 or address < 0 or address+length > 0x100000000:
             raise ValueError("Invalid debugger memory range")
-        start = address & ~3
-        size = (address-start+length+3) & ~3
+        # The eight-byte fast path also aligns down, including cached accesses.
+        start = address & ~7
+        size = (address-start+length+7) & ~7
         data = bytes.fromhex(self.command(f"m{start:x},{size:x}"))
         if len(data) != size:
             raise ValueError("Truncated debugger memory read")
@@ -66,6 +74,8 @@ class RSP:
         while offset < len(data):
             count = ((len(data)-offset) & ~3) if (address+offset) % 4 == 0 else 1
             count = max(1, count)
+            if count == 8 and (address+offset) % 8:
+                count = 4
             part = data[offset:offset+count]
             if self.command(f"M{address+offset:x},{count:x}:{part.hex()}") != "OK":
                 raise ValueError("Debugger rejected test RAM write")
@@ -443,7 +453,7 @@ def choice_snapshot(debug):
             "choice_state": struct.unpack_from(">i", state, 0x9C)[0]}
 
 
-def advance_to_choice(debug, keyboard, options, record, pause=time.sleep):
+def advance_to_choice(debug, keyboard, options, record, pause=time.sleep, *, stop_when_closed=False):
     """Advance at most the declared page count, never confirm an active menu."""
     maximum = options.get("max_presses", 40)
     settle = options.get("settle_seconds", 3)
@@ -461,6 +471,12 @@ def advance_to_choice(debug, keyboard, options, record, pause=time.sleep):
             record({"advanced_to_active_choice": True, "presses": pressed,
                     "message_id": message.get("message_id")})
             return
+        if stop_when_closed and message.get("loaded") == 0:
+            record({"dialogue_closed": True, "presses": pressed,
+                    "message_id": message.get("message_id")})
+            return
+        if stop_when_closed and message.get("loaded") != 1:
+            raise ValueError("Cannot advance dialogue without a valid loaded-state observation")
         if pressed < maximum:
             keyboard.press("a", 0.08)
     raise ValueError("No active choice within the declared page-advance limit")
@@ -582,7 +598,7 @@ def main():
         needs_checkpoint_restore = False
         def record(snapshot):
             results.append(snapshot)
-            (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
+            write_results(out, results)
         for action in expand_actions(actions):
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
@@ -590,6 +606,8 @@ def main():
                 keyboard.press(action["key"], action.get("duration", 0.15))
             if "advance_to_choice" in action:
                 advance_to_choice(debug, keyboard, action["advance_to_choice"], record)
+            if "advance_dialogue" in action:
+                advance_to_choice(debug, keyboard, action["advance_dialogue"], record, stop_when_closed=True)
             if "read" in action:
                 address, length = action["read"]
                 data = debug.read_memory(int(address, 16), length).hex()
@@ -676,7 +694,7 @@ def main():
                 time.sleep(1)
                 results.append({"loaded_state": "test.bs1"})
                 needs_checkpoint_restore = False
-            (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
+            write_results(out, results)
         if needs_checkpoint_restore:
             raise ValueError("Test function calls must finish by restoring the emulator checkpoint")
         # Register numbering has changed across ares builds; retain the raw
@@ -691,7 +709,7 @@ def main():
         results.append({"graceful_shutdown": True, "save_files": [
             {"file": p.name, "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
             for p in (out/"test.flash", out/"test.rtc", out/"test.pak") if p.is_file()]})
-        (out / "results.json").write_text(json.dumps(results, indent=2)+"\n")
+        write_results(out, results)
         print(json.dumps({"output": str(out), "steps": len(results)}, indent=2))
     finally:
         if debug:

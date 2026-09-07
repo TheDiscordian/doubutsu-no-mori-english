@@ -38,10 +38,10 @@ def load_drafts(paths):
     return drafts
 
 
-def record_candidate(edit, info, advances, name, edits, manifests, counts):
+def record_candidate(edit, info, advances, name, edits, manifests, counts, *, resident_runtime=False):
     candidate = encode(edit["translation"], info)
     policy = edit["control_policy"]
-    issues = layout_issues(candidate, info, advances) if name == "message" else []
+    issues = layout_issues(candidate, info, advances, resident_runtime=resident_runtime) if name == "message" else []
     manifest = {k: v for k, v in edit.items() if k != "translation"}
     manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
                     layout_issues=issues,
@@ -159,7 +159,7 @@ def main():
                                        "reference_id": reference["id"], "reference_sha256": reference["sha256"],
                                        "match_basis": match_basis},
                         "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
-            record_candidate(edit, info, advances, name, edits, manifests, counts)
+            record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
                 skip_ids=override_ids | matches.keys(), resident_runtime=bool(args.runtime_module))
@@ -169,7 +169,7 @@ def main():
                     raise ValueError("Message alias is not a unique previously rejected record")
                 review.remove(rejected[0])
                 counts["rejected"] -= 1
-                record_candidate(edit, info, advances, name, edits, manifests, counts)
+                record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
             counts["confirmed_native_aliases"] = len(aliases)
             counts["native_alias_conflicts"] = len(conflicts)
             args.output.mkdir(parents=True, exist_ok=True)

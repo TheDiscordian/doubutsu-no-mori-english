@@ -23,7 +23,7 @@ class VillageMemory(RSP):
         if not command.startswith("m"):
             raise AssertionError("Villager observations must be read-only")
         address, length = [int(value, 16) for value in command[1:].split(",")]
-        data = {0x80126EB8: bytes([self.maximum, 0, 0, 0]),
+        data = {0x80126EB8: bytes([self.maximum])+bytes(7),
                 0x80130DB8: self.animals, 0x80137000: self.listing}[address]
         return data[:length].hex()
 

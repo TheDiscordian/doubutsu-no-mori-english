@@ -38,7 +38,7 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18),
                 (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0),
                 (0x8009D308, 0x8009D3B4), (0x800A2BB0, 0x800A2C4C),
-                (0x800A10D8, 0x800A1124))
+                (0x800A10D8, 0x800A1124), (0x800A1124, 0x800A1170))
 
 
 def module_command_info(rom):
@@ -57,7 +57,7 @@ def verify_test_module(rom, report):
     """Bind native test symbols to the ROM, allowing only known resource words."""
     files = by_vrom(rom)
     module = bytearray(files[MODULE_VROM].extract(rom))
-    for offset, expected in ((56, 0x02A00000), (60, 0x02C00000)):
+    for offset, expected in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000)):
         value = struct.unpack_from(">I", module, offset)[0]
         if value and (value != expected or value not in files):
             raise ValueError("Unexpected native test resource configuration")
@@ -202,9 +202,11 @@ def add_runtime_module(rom, replacements, directory):
         code.instruction(address, 0x0C02B37E, call("af_get_display_name"))
     code.instruction(0x8009D334, 0x24050006, 0x24050008)
     code.instruction(0x800A1100, 0x0C027B45, call("af_copy_talk_name"))
+    code.instruction(0x800A114C, 0x0C027B6F, call("af_copy_catchphrase"))
     replacements[CODE_VROM] = bytes(code.data)
     report["date_scope"] = "Seven message substitutions; other UI formatter callers remain native"
     report["display_name_scope"] = "Two nameplate consumers and bounded main-message insertion; shared choice and saved-name APIs remain native"
+    report["catchphrase_scope"] = "Main-message default display only; shared choices and four-byte saved fields remain native"
     report["code_changes"] = code.changes
     return {MODULE_VROM: data}, report
 

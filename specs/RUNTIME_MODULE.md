@@ -37,6 +37,12 @@ Its header also describes the linked twenty-byte choice capacity and thirty-two
 byte row stride. Choice storage is part of the linked BSS, not a second heap
 reservation. See [choice storage](ENGLISH_RUNTIME.md) for the complete contract.
 
+Optional resource configuration words at header byte offsets `38`, `3C`, and
+`40` hexadecimal enable the sixteen-byte item names, eight-byte display names,
+and ten-byte default catchphrases respectively. Each accepts only its designated
+VROM and a separately verified DMA resource. Resources are installed in that
+order; test-module verification normalizes only these known configuration words.
+
 ## Bootstrap and watchdog preservation
 
 The original watchdog occupies `800D64E0..800D66CF`. Its entry becomes a jump to

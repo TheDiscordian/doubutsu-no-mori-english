@@ -62,6 +62,13 @@ class ReferenceLayoutTests(unittest.TestCase):
         self.assertIn("explicit_layout_command_needs_review",
                       layout_issues(bytes.fromhex("7F5414"), self.info, {}))
 
+    def test_complete_catchphrases_increase_only_the_conservative_width_warning(self):
+        data = b"A"*23+b"\x7f\x1c"
+        self.assertEqual(layout_issues(data, self.info, {65: 6}), [])
+        self.assertEqual(layout_issues(data, self.info, {65: 6}, resident_runtime=True),
+                         ["page_0_line_1_width_198"])
+        self.assertEqual(data, b"A"*23+b"\x7f\x1c")
+
     def test_native_scenario_covers_real_dispatch_and_restores_checkpoint(self):
         actions = scenario()
         calls = [a["call"]["address"] for a in actions if "call" in a]

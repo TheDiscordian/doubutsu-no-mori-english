@@ -8,11 +8,20 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from audit_name_callers import name_audit
 from audit_display_names import audit as display_audit
+from audit_catchphrases import audit as catchphrase_audit
 from test_retail import ROM_PATH
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Original ROM is a local-only test input")
 class NameCallerTests(unittest.TestCase):
+    def test_catchphrase_shared_choice_and_reset_references(self):
+        result = catchphrase_audit(ROM_PATH.read_bytes())
+        for name, sites in (("copy_tail", {"800656EC", "800A114C"}),
+                             ("get_ending", {"8009EDF0"}), ("set_ending", set()),
+                             ("reset_ending", {"80979ED8"})):
+            self.assertEqual({r["call_ram"] for r in result[name]["callers"]}, sites)
+            self.assertEqual(result[name]["literal_pointers"], [])
+
     def test_display_consumers_include_event_overlays_and_shared_choice_caller(self):
         result = display_audit(ROM_PATH.read_bytes())
         self.assertEqual({r["call_ram"] for r in result["world_name"]["callers"]},

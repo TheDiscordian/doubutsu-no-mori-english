@@ -32,8 +32,8 @@ and seven sites without a straight-line immediate length.
 | `80094F3C`, unreachable English-runtime `8009F4AC` | Town suffix, string `01E4` | Audit non-message town-name display separately |
 | `800A6428` | Shop-level name at `0558 + shop level`, ten-byte local and mail free-string copy | Full shop names need larger local storage and handbill substitutions |
 | `800A8D70` | Eleven families of randomized NPC-letter words, ten-byte local and handbill free strings | Expand only with the mail assembly, saved body, and editor design |
-| `800A9F7C`, `800AA264` | Saved villager catchphrase at `Animal+4E5`, four bytes | Saved-text compatibility cannot be fixed by enlarging the ROM entry |
-| `800ACDC0` | Special-NPC name table, six-byte singleton then personal-name copy | All name readers, dialogue labels, and identity storage need review |
+| `800A9F7C`, `800AA264` | Saved villager catchphrase at `Animal+4E5`, four bytes | Default main-dialogue display uses a separate ten-byte resource; custom editing, shared choices, mail, and save compatibility remain |
+| `800ACDC0` | Special-NPC name table, six-byte singleton then personal-name copy | Main dialogue/nameplates use the separate eight-byte display resource; other readers and identity storage remain native |
 | `800C40D4..800C43F4` | Native date/unit suffix formatters | Message date calls already use resident English formatters; other UI paths remain native |
 | Actor overlays | Shops, fortune-telling, fruit-box labels, and an unidentified overlay | Resolve ID tables, local frames, and downstream insertion/draw limits |
 

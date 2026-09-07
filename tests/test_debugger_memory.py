@@ -17,7 +17,7 @@ class AlignedDebugger(RSP):
         address, size = [int(value, 16) for value in parts[0].split(",")]
         # Observed ares short reads align down; model writes the same way to
         # verify byte-edge operations do not depend on unaligned word support.
-        if size in (2, 4):
+        if size in (2, 4, 8):
             address &= ~(size-1)
         if command.startswith("m"):
             return self.memory[address:address+size].hex()

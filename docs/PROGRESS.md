@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 157 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 171 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -145,8 +145,25 @@ user's direction. The production build retains the approved spacing metrics.
 - Bounded controller navigation approaches a moving NPC from observed actor and
   player coordinates, without position, schedule, or greeting writes. It stops
   when dialogue opens, a target disappears, the route stalls, or its step limit
-  is reached. Normal gameplay reaches Cousteau's English introduction at `04E7`;
-  the native catchphrase remains Japanese pending its separate field expansion.
+  is reached. Normal gameplay completes Cousteau's English introduction at `04E7`.
+  The bounded page-advance helper stops at a closed conversation or active choice,
+  without reopening a conversation. This older checkpoint still has native
+  catchphrase text; ordinary conversations on the new catchphrase build remain.
+- A separate ten-byte default-catchphrase resource covers all 216 confirmed
+  villagers using the actual native/GameCube default tables and legacy agreement.
+  Display lookup preserves four-byte saved/custom text and distinguishes a
+  villager's own default from an unambiguous borrowed default. One ambiguous
+  borrowed key remains native. Portable tests cover every default on every
+  villager. Native tests pass 261 calls, 501 memory assertions, and 1,505 steps,
+  including actual capitalization dispatch, exact message limits, unchanged
+  saved bytes, resource disabling, and checkpoint restoration. The new build
+  also passes all 225 train-to-town steps, ten acceptance checks, the eight-byte
+  nameplate consumer regression, and the 429-call item-field regression.
+  Shared choices, ten-character custom editing, mail, save/reload, and hardware
+  remain separate work.
+- Exact debugger reads account for one-, two-, four-, and eight-byte access
+  alignment, including cached reads. Writes preserve neighbouring bytes.
+  Incremental result files are atomically replaced for concurrent observers.
 
 ## Current reference candidates
 
@@ -154,12 +171,15 @@ The current experimental resident-module pilot contains 10,406 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,312 conservative layout warnings do not trigger automatic
+listed below. The 1,353 conservative layout warnings include full default
+catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/intro-jobs-candidates/` and `build/intro-jobs-coverage/`.
+`build/catchphrase-candidates/` and `build/intro-jobs-coverage/`. The candidate text
+is unchanged from the intro-jobs set; only its layout warnings account for the
+wider catchphrase display.
 
 General strings, mail, saved names, dates, and item names have separate caller
-restrictions. The independent wider item and display-name resources are not
+restrictions. The independent wider item, display-name, and catchphrase resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
 gameplay destination uses its wider names.
 

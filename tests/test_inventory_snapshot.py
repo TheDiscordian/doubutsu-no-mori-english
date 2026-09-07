@@ -12,7 +12,7 @@ from emulator_smoke import RSP, inventory_snapshot
 class InventoryMemory(RSP):
     def __init__(self):
         self.pointer = 0x80126EC0
-        self.data = bytearray(0xA7C)
+        self.data = bytearray(0xA80)
         self.data[0x10:0x12] = b"\x01\x07"
         struct.pack_into(">15H", self.data, 0x14, *range(0x2200, 0x220F))
         struct.pack_into(">3I", self.data, 0x34, sum((i % 4) << (2*i) for i in range(15)), 12, 18800)
@@ -23,7 +23,7 @@ class InventoryMemory(RSP):
             raise AssertionError("Inventory observations must be read-only")
         address, length = [int(value, 16) for value in command[1:].split(",")]
         if address == 0x80136FD8:
-            return struct.pack(">I", self.pointer).hex()
+            return (struct.pack(">I", self.pointer)+bytes(4))[:length].hex()
         if address == self.pointer:
             return self.data[:length].hex()
         raise AssertionError(command)

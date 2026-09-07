@@ -31,7 +31,7 @@ class TestModuleConfigurationTests(unittest.TestCase):
         files = {MODULE_VROM: Entry()}
         with patch("runtime_module.by_vrom", return_value=files):
             verify_test_module(b"synthetic", report)
-            for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000)):
+            for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000)):
                 struct.pack_into(">I", module, offset, vrom)
                 with self.assertRaisesRegex(ValueError, "configuration"):
                     verify_test_module(b"synthetic", report)
@@ -142,7 +142,7 @@ class ModuleRetailTests(unittest.TestCase):
         for address, size in ((0x800919D0, 8), (0x8009D88C, 8),
                               (0x800BB6A0, 8), (0x800A1820, 4),
                               (0x8009D324, 4), (0x800A2BCC, 4),
-                              (0x8009D334, 4), (0x800A1100, 4)):
+                              (0x8009D334, 4), (0x800A1100, 4), (0x800A114C, 4)):
             broken = dict(replacements)
             partial = bytearray(code)
             partial[address-CODE_RAM:address-CODE_RAM+size] = bytes(size)

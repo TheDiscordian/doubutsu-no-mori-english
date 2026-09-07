@@ -113,7 +113,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
         raise ValueError("Translation exceeds current entry budget")
 
 
-def layout_issues(data, info, advances, max_width=192, max_lines=4):
+def layout_issues(data, info, advances, max_width=192, max_lines=4, *, resident_runtime=False):
     """Conservative retail-size bubble check; unknown dynamic layout is flagged."""
     x, line, issues, page = 0, 1, [], 0
     for token in tokenize(data, info):
@@ -130,7 +130,12 @@ def layout_issues(data, info, advances, max_width=192, max_lines=4):
                 x, line, page = 0, 1, page+1
             elif 0x1A <= command <= 0x40 or command == 0x76:
                 chars = {0x1A: 6, 0x1B: 6, 0x1C: 4, 0x2F: 16, 0x40: 68}.get(command, 10)
-                x += chars*12  # Existing Japanese names remain possible.
+                width = chars*12  # Existing Japanese names remain possible.
+                if command == 0x1C and resident_runtime:
+                    # A default may display ten English bytes while saved
+                    # custom/Japanese phrases still occupy four native cells.
+                    width = max(width, 10*max(advances.values(), default=12))
+                x += width
             elif command in (0x52, 0x53, 0x54, 0x5A, 0x67):
                 issues.append("explicit_layout_command_needs_review")
         if x > max_width:

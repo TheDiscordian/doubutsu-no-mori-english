@@ -76,6 +76,26 @@ Pass that directory, containing both `names.bin` and `names.json`, to the ROM
 builder's `--extended-items` option. The resource alone does not widen native
 callers; only separately verified resident hooks use its sixteen-byte names.
 
+`tools/display_names.py --rom <native-ROM>` generates the independent eight-byte
+villager/special-character resource in `build/display-names/`. Pass that directory
+to `tools/build.py --display-names`; main dialogue and nameplates use the complete
+names, while saved names and unrelated callers retain their native limits.
+
+`tools/catchphrases.py --rom <native-ROM>` generates the independent ten-byte
+default catchphrase resource in `build/catchphrases/`. Pass that directory to
+`tools/build.py --catchphrases`. This translates recognised default saved phrases
+at display time without expanding four-byte saved fields or custom editing.
+It verifies the actual GameCube default table and confirmed villager identities.
+All three resource options may be supplied together to a resident-module build.
+See [catchphrase design](../specs/CATCHPHRASES.md) for ambiguous borrowed phrases
+and the remaining editor/mail/save work.
+
+The corresponding native-call generators are `tools/display_fields_test_scenario.py`
+and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
+matching module/resource manifests. Generated fixtures remain local under
+`build/`. Native calls run only at the verified graph-thread boundary and must
+restore the complete checkpoint; see [test-call contract](../specs/NATIVE_TEST_CALLS.md).
+
 `tools/text_coverage.py --rom <native-ROM> --translations <candidates.json>
 --output build/coverage` audits final candidate presence across all 29 native
 banks. It distinguishes static text from commands and dynamic-only records,

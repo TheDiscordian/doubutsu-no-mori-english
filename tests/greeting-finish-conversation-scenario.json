@@ -1,11 +1,6 @@
 [
   {"wait": 2},
-  {"repeat": 8, "actions": [
-    {"key": "a", "duration": 0.08},
-    {"wait": 2},
-    {"snapshot_message": true},
-    {"snapshot_choices": true}
-  ]},
+  {"advance_dialogue": {"max_presses": 20, "settle_seconds": 2}},
   {"snapshot_player": true},
   {"snapshot_npc_actors": true},
   {"capture": "greeting-finish-conversation.png"},
