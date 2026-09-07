@@ -1,0 +1,149 @@
+[
+  {
+    "id": "message:02BB",
+    "source_sha256": "af473202aa8811685169375366f364dde6102bcbd5e587d44011bac0b92d41c5",
+    "translation": "{cmd:7F0905006B}{cmd:7F09000010}{cmd:7F031E}.{cmd:7F0308}.{cmd:7F0308}.{cmd:7F030C}\nI can't believe{cmd:7F0306} you\ncouldn't even do something\nthis simple,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native failed-errand request 09:5:006B and catchphrase, without the reference quest-row request or added player name. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:03B9",
+    "source_sha256": "d97250be7119e71f50fb2bf3949c3bd757cc9c2fba3b57cb120056e2e29bc6bd",
+    "translation": "{cmd:7F09000015}Oh, that thing,{cmd:7F0306} right?{cmd:7F030C}\nYou came to pick up\n{cmd:7F26},\ndidn't you?{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Well,{cmd:7F0306} it's not here now.{cmd:7F030A}\n{cmd:7F25} came\nand took it away.{cmd:7F04}\n{cmd:7F02}Why?{cmd:7F0304} How should I know?{cmd:7F030C}\nGo see {cmd:7F25}\nand{cmd:7F0308} ask about it\nyourself.{cmd:7F0308} OK?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The item has already been taken by the named borrower; ask that borrower directly. Retain item 26 and both borrower 25 insertions, without a new catchphrase. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:084F",
+    "source_sha256": "2bfac67a3c93b996b20bc0cdf6a85c99c739626c0b3d4c9184d9804dbfc74bf4",
+    "translation": "{cmd:7F090000FF}From the {cmd:7F504BA0000B}post office,{cmd:7F0306}\nyou can send letters{cmd:7F0306}\nto people in town,{cmd:7F030C}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}You should send me\na letter, too!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}If it's interesting,{cmd:7F0304}\nI'll write you back,{cmd:7F0306}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}{cmd:7F0305}Oh, right!{cmd:7F0308}{cmd:7F090000FF}\nYou can send presents\nwith your letters, too!{cmd:7F04}\n{cmd:7F02}Grab the item you want\nto send with the letter{cmd:7F0304}\non your {cmd:7F50E11ED70B}item screen.{cmd:7F04}\n{cmd:7F02}Then move it over\nto the letter and\npress the {cmd:7F50324BE108}A Button.{cmd:7F04}\n{cmd:7F02}There you go!{cmd:7F0306}\nYou've attached a\npresent to your letter!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Sometimes I send{cmd:7F0306}\npresents with my\nletters, too, so look\nforward to it!{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the complete post-office letter and attached-present instructions, including grabbing an item, moving it to the letter, and pressing A. Only post office, item screen, and A Button highlight lengths change. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:0850",
+    "source_sha256": "febccd014f6b6817e7dcd1efd216b11abdddfb5982cf7feae656d4e45b0575f3",
+    "translation": "{cmd:7F090000FF}By the {cmd:7F504BA0000B}post office is the\n{cmd:7F50E11ED70B}town melody {cmd:7F504BA0000E}bulletin board.{cmd:7F0305}\n{cmd:7F0900000B}{cmd:7F0305}Have you seen it?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}The music written there?{cmd:7F0308}\nAnybody{cmd:7F0304} can change it{cmd:7F0306}\nwhenever they want!{cmd:7F04}\n{cmd:7F02}It's used for the chimes.{cmd:7F0306}\nIt's the original song\nof {cmd:7F2F},{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}And,{cmd:7F030C} there's a\n{cmd:7F0306}{cmd:7F504BA0000E}bulletin board by\nyour house, too,{cmd:7F030C}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Anybody can{cmd:7F0306} read\nor write messages there,{cmd:7F0304}\nno matter where\nthey're from!{cmd:7F04}\n{cmd:7F02}Maybe I'll write{cmd:7F0306}\n\"Looking for friends!\"\nor{cmd:7F0304} something like that!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}What if cute boys{cmd:7F0304}\nstart lining up\nto be my friend?!{cmd:7F09000014}{cmd:7F0308}\nOh, my gosh!\n{cmd:7F00}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve both different boards, freely editable town melody used by the chimes, any person's reading/writing rights, and the cute-boy friend-advertisement joke. Only the post office, town melody, and two bulletin board highlight lengths change. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:087B",
+    "source_sha256": "687b39ba0e087e3b6e0a8bed79ade3014df48545808bc5567f1016e5cd983949",
+    "translation": "{cmd:7F090000FF}You know,{cmd:7F0304} I don't plan\nto stay in the same town\nforever,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}If I could,{cmd:7F0306} I'd like to\nlive in all sorts{cmd:7F0304}\nof places,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}The trouble is,{cmd:7F0304} I can't{cmd:7F0304}\nmove to another town\nall by myself,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}If you{cmd:7F0304} took a trip\nout of town,{cmd:7F0308}\nI could come with you{cmd:7F0304}\nand move there.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F09000007}So,{cmd:7F0304} pretty please,{cmd:7F0306}\ngo visit another town!{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native villagers move by accompanying the player's trip; retain the request to visit another town and the inability to move alone, not the GameCube's independently leaving villager. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:0AF8",
+    "source_sha256": "1438a4307320214f94082f9f57382e8b7a3cbe1f0ebf66b2c61491074bf01cb8",
+    "translation": "{cmd:7F09000001}{cmd:7F0308}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F09000016}{cmd:7F0304}.{cmd:7F0304}.{cmd:7F090000FF}Sigh.\nAt a time like this,\ntake a deep breath.{cmd:7F04}\n{cmd:7F02}Come to think of it,{cmd:7F0308}\nsome people reject\neverything they\ndon't understand{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well, anyway,{cmd:7F0306}\nI'll give you this outfit.{cmd:7F0308}\nIt's one of my favorites,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F0C030001}{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Experiencing fine things\nwill enrich your life,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain breathing after frustration, the criticism of dismissing unfamiliar things, the favorite-outfit gift before 0C:3:0001, and the final life-enrichment advice. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:0F8B",
+    "source_sha256": "4a68ff3bedae3ed1a36cfde3f088b840560c008a232d029af68dcb33d9a21dac",
+    "translation": "Sometimes the rain stops\nwithout you noticing.{cmd:7F04}{cmd:7F09000007}\n{cmd:7F02}Then you realize{cmd:7F0304}\nyou're the only one\nwith an open umbrella.{cmd:7F0306}\nThat's happened, right?{cmd:7F09000017}{cmd:7F04}\n{cmd:7F02}It's so embarrassing!{cmd:7F04}{cmd:7F090000FF}\nBut once you notice,{cmd:7F0306}\nclosing it in a hurry\nfeels embarrassing, too.{cmd:7F04}\n{cmd:7F02}So don't you just\nkeep{cmd:7F0900000B} walking like that\nfor a little while?{cmd:7F1600DC00ED}{cmd:7F04}{cmd:7F0D}{cmd:7F0F29A8}{cmd:7F1029A9}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the open-umbrella embarrassment question, native choices 00DC/00ED, and successors 29A8/29A9. Do not add the reference catchphrase or change the second choice. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:10C8",
+    "source_sha256": "c496964c8e6ff5ac4eb4a68a89e0bac2674f57b6d59023035c08635f772c170e",
+    "translation": "{cmd:7F09000004}Oh!{cmd:7F030C} {cmd:7F26}!{cmd:7F0304}\nYou brought it for me!{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}But this is a surprise!{cmd:7F030F}\nHow did you know\nwhere to find me?!{cmd:7F0308}\n{cmd:7F1C}?!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The resident thanks the named player for bringing item 26 and wonders how the player found this location. Do not invent an order or add borrower field 24. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1506",
+    "source_sha256": "8ffedc58e7dc9d92e5d8c02d440e6f07a28612242b9faf2fb2ca6d72f7a2cc46",
+    "translation": "{cmd:7F09000006}Oh, yeah!{cmd:7F030C}\nYou probably know,{cmd:7F0306}\nbut I'm getting ready\nto move!{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}The town you visit\nwill be the town\nI move to,{cmd:7F0306} so\nthink{cmd:7F0304} carefully!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000012}Otherwise,{cmd:7F0306} I'll come\nstraight back to\n{cmd:7F2F}!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The player's destination determines the villager's move; choose carefully or the villager will return to this town. Preserve native final 00, without GameCube moving-help choices or new actions. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:17C9",
+    "source_sha256": "b3a9021916cc5a951ed75645bb10fa7826adb1dcdf94280d1eb4a3b23b21c7db",
+    "translation": "{cmd:7F09000010}Oh,{cmd:7F0308} no!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}You{cmd:7F0308} can't possibly\ncarry anything more!{cmd:7F030C}\nIt's absolutely hopeless!\nNo way,{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native inventory capacity refusal, not the incompatible reference's Gracie fashion advice. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1C82",
+    "source_sha256": "70555f1a01384c803c1ebb3b19ed32b7a144ac257c9083fb50d329567c2ff581",
+    "translation": "{cmd:7F0900000A}I was,{cmd:7F0306}\nlike, really touched!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Whatever the letter said,{cmd:7F0306}\ncoming to {cmd:7F2F}\nto send it was\nwhat made me happy!\n{cmd:7F04}\n{cmd:7F02}One little thing can\nchange your impression\nof someone,{cmd:7F0306}\nso take a lesson from that!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The effort of coming to this town and sending a letter matters more than its contents. Keep town field 2F, not the reference's unprepared sender field 3B. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1DCD",
+    "source_sha256": "97c3de1d6015f7ac6d176b5aa90a7d0ad8aa1c80e375adf4057e5b6c23a39a30",
+    "translation": "{cmd:7F09000015}Happy New Year!{cmd:7F0310}\nLet's have another\ngreat year together!\n{cmd:7F5832}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native New Year greeting and continuing friendship wish; retain special ending 58:32 without adding an unprepared year field. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:213B",
+    "source_sha256": "02512b789eb5f6bb01af62ce60f9dc6413112d0ff9dba0454a0a3b95e61e41cd",
+    "translation": "{cmd:7F0C050003}{cmd:7F09000015}Heh heh{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nWell, let me explain\nthe rules of the game,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Try to guess{cmd:7F0306}\nmy favorite color!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}But,{cmd:7F0308} it changes with\nmy mood,{cmd:7F0306} so it won't\nbe that easy,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}{cmd:7F0303}Are you ready?\n{cmd:7F160044003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F213C}{cmd:7F10213D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Guess the resident's favorite color, which varies with mood. Preserve 0C:5:0003, ready/cancel choices 0044/003D, successors 213C/213D, and all native expressions. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:2311",
+    "source_sha256": "fc56c58d82fbf68d3c0350c4576d3f96e8c53294f7d55144206f08e0dbc17898",
+    "translation": "{cmd:7F09000016}You,{cmd:7F0306} as usual,\nhave no sense of time!\n{cmd:7F04}\n{cmd:7F02}I know you can't wait\nto see me,{cmd:7F0306} but\nit's {cmd:7F21} {cmd:7F76}!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}Really,{cmd:7F0306} didn't you think\nI'd be asleep by now?!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The player is visiting too late despite eagerness to see the resident. Retain the hour and native ending; add only the existing resident-runtime AM/PM immediately after the hour. Basic builds must withhold this draft. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:23E2",
+    "source_sha256": "d7443748bb8facfae22a4675fbd919d97c815c8ea572182a7e1f893897c783df",
+    "translation": "{cmd:7F09000017}In the town where\nI used to live,{cmd:7F0306}\nthe train never\narrived on time.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0C090002}It was usually about\n{cmd:7F32} minutes late,{cmd:7F0308}\n{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Every town has\ngood and bad points,{cmd:7F0306}\nbut I think {cmd:7F2F}\nis a nice place,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native train delays use actor-prepared free field 32 after 0C:9:0002, not the reference's current RTC minute field 22. Retain current-town praise and both catchphrases. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:24D5",
+    "source_sha256": "ed45bc32af4d9a60238cc7dcccd09c01c3fadc4123289f4a00ee936223fe4725",
+    "translation": "{cmd:7F09000015}Despite appearances,\nthat's one fun person!\n{cmd:7F04}\n{cmd:7F02}Looks can give you\nthe wrong impression,{cmd:7F0306}\nbut having a chat\nis really quite fun!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}You should go say\nhello now and then!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the unnamed person's entertaining conversation despite misleading appearances, without adding unprepared person field 39. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:24D6",
+    "source_sha256": "afdbaa6e17b647bd36e549aa6372ac292f05a72e54885fc66c47a88d3a098bfd",
+    "translation": "{cmd:7F09000016}That's a pretty\nnasty personality.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}I don't really like\nto talk behind\npeople's backs,{cmd:7F0306}\nbut it does bother me.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}Anyway, be careful\nnot to fall for\nall that sweet talk,{cmd:7F0304}\n{cmd:7F0308}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain reluctance to gossip and warning against the unnamed person's sweet talk, without adding unprepared person field 39. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:2A43",
+    "source_sha256": "ec7bccba285a0dd543cca6922436737d5ce24fc3b0bc5144a3e5e8be2eb3b8d8",
+    "translation": "{cmd:7F090000FF}Planting flowers\nthis time of year{cmd:7F0304}\n{cmd:7F09000017}is no use,{cmd:7F0308} {cmd:7F1A}.{cmd:7F04}\n{cmd:7F02}Even if you plant them,{cmd:7F0308}\nthey just wilt\nstraight away.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native flowers wilt in this season. Do not replace this with GameCube cold-weather hobby advice or field 33. Complete native meaning and control order retained; only the explicitly documented colour lengths or AM/PM insertion differ. Final wording/layout and ordinary gameplay remain review."
+  }
+]

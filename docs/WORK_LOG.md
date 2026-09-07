@@ -3947,6 +3947,86 @@
   broader content, other text destinations, normal gameplay/saves, complete
   review, hardware acceptance, patch-only release, and both stretch goals.
 
+## 2026-09-07 — Native resident topics and complete cross-ID introductions
+
+- Filled 22 missing main messages: eighteen original drafts in
+  `translations/n64-resident-gaps.json` and four complete GameCube references.
+  Added default draft input, eight focused tests, and `specs/RESIDENT_GAPS.md`.
+  Native topics include complete letter/gift instructions, both bulletin boards,
+  moving through player travel, errands, umbrella embarrassment, the colour
+  game, inventory capacity, train delays, unnamed-person advice, New Year,
+  bedtime, and seasonal flowers. No incompatible GameCube actions or actor
+  fields are substituted. The final GameCube introductions are
+  `2BC3 → 2DD1`, `2BC5 → 2DD3`, `2BC7 → 2DD5`, and `2BC9 → 2DD7`.
+- Initially drafted all 22 from Japanese. Full native-record comparison then
+  identified the four introduction references, so replaced those four drafts
+  before committing. Their complete original/reference/output hashes are bound,
+  all GameCube wording and delivery stays exact, and the original NPC0 requests
+  and names match. No new runtime permission or schema extension is needed.
+  The initial all-draft build/test outputs under `build/resident-gaps-*` are
+  superseded by the final `build/resident-topics-*` artifacts below.
+- All original commands remain exact except seven highlight lengths in the
+  letter/board instructions and a single AM/PM insertion after the native hour
+  in `2311`. The three affected drafts use `reference_layout`, independently
+  checked against the full native command sequence; fifteen use `exact`.
+  Native choices `00DC/00ED → 29A8/29A9` and `0044/003D → 213C/213D` remain.
+  Failed-errand request `09:5:006B`, gift `0C:3:0001`, colour-game `0C:5:0003`,
+  delay preparation `0C:9:0002` with field `32`, and special ending `58:32`
+  remain. No RTC minute is substituted for a train-delay value.
+- All eight focused tests pass in 0.340 seconds in
+  `build/tests-resident-topics-focused-01.log`; the complete final regression
+  passes 546 tests in 195.053 seconds in `build/tests-resident-topics-full-01.log`.
+  The shared complete-reference tests now cover 68 unchanged-delivery approvals,
+  with the original 52 wording-span adaptations unchanged; the six separate
+  clock storage omissions retain their dedicated tests.
+  Corrected an initial five-line original page in `02BB` without changing any
+  command. Five original drafts retain generic field-width warnings:
+  `0850/1506/1C82/2311/23E2`. Checks with six fullwidth town cells, all twelve
+  hours and both meridiems, and a ten-digit delay value fit the draft lines.
+  Generic bounds remain unchanged; no GC line or pause is reflowed.
+- The final full file has 11,126 edits, 22 more than the opening-clock checkpoint.
+  All earlier edits are identical. Basic generation retains all 10,406 earlier
+  edits and adds 21, giving 10,427; only the new bedtime draft requires the
+  resident module and remains withheld. No ordinary-dialogue date patch is
+  required by these drafts. All messages fit the unchanged expansion limit.
+- `build/smoke-resident-topics-01/` passes 31 complete loader calls, 95 assertions,
+  and 164 recorded steps. The nine unchanged connected messages are
+  `213C/213D/213E/213F/2140/2141/2142/29A8/29A9`; all outgoing targets in this
+  recursively inspected dialogue set have candidates. Complete headers/text,
+  adjacent/module guards, checkpoint restoration, and graceful shutdown pass.
+  This fresh four-MiB run is silent, has no seed saves, disables both save-write
+  permissions, and retains blank FlashRAM and Pak files. The only injected
+  function is `8009E558`. The test does not execute choices, errands, gifts,
+  moving, letter delivery, bedtime/New Year events, normal saving, or hardware.
+- Scenario `build/resident-topics-scenario.json` SHA-256 is
+  `031eca6cf3aa8da3e73e7e1e33c5baad93bf65323cbed9d2c17ed065678c6886`.
+  ROM `build/resident-topics-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `bcb9ee54b8d23977c64eda0163eb3da130b01d02c49d9677ced55b34fdd9a83e`.
+  UPS SHA-256 is
+  `6d47e0100527491ed51445288973f72b477134334f5881bed4041e0b68494288`.
+  Applying the UPS to verified retail input reconstructs the complete ROM.
+  Comparing every extracted DMA file against the opening-clock build changes
+  only main text, its pointers, and DMA directory rows. Other directory-container
+  bytes, all code, fonts, overlays, runtime resources, and save structures remain.
+- Main coverage is 9,881 candidates: 9,559 reference-based and 322 originals.
+  Of 1,871 unfilled records, 940 are classified as Japanese static text, nine
+  as placeholders, 919 as non-static, one as Latin, and two as number/symbol
+  records; ten command-only records have dynamic fields. Reference rejections
+  total 1,872: 1,572 unconfirmed identities, 273 control differences, 25 missing
+  fields, and two overflows; one rejection receives an original fallback.
+  Reference layout warnings remain at 1,442, aliases at 41, and conflicts drop
+  to 61. Coverage and both read-only review queues are regenerated; the empty
+  same-ID comparison pool and ten unapproved expression comparisons are unchanged.
+- Inspected all remaining alias conflicts: three train-demo reserved labels and
+  58 exact `よび` reserved labels account for all 61. The same reserved source
+  has ten existing candidates, including door/sleep signs and the GameCube-only
+  Game Boy Advance instruction at `2B42`. The classifier recognises `ダミー`,
+  not these reserved labels. Added a next-action caller/source/import audit to
+  the durable queue; do not treat candidate agreement, placeholder text, or
+  missing references as reachability or semantic approval. Broader translation,
+  normal gameplay/saves, complete review, hardware, release, and stretch goals
+  remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

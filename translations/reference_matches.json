@@ -4863,6 +4863,46 @@
     "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 14BC. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
   },
   {
+    "id": "message:2BC3",
+    "source_sha256": "c69922fc54e7299f91785340e5be1881cfedceb69e7392e5f8fff248441453e4",
+    "reference_id": "message:2DD1",
+    "reference_sha256": "8415c3156036195c69e6b91ee4dd8b9123d4c7fe7f165b5eeba54d70df93ad86",
+    "complete_reference": {
+      "adapted_sha256": "8415c3156036195c69e6b91ee4dd8b9123d4c7fe7f165b5eeba54d70df93ad86"
+    },
+    "evidence": "Complete native source equals message 2DD1, including first-introduction NPC0 row-two/row-eight requests, expressions, player/speaker/catchphrase fields, and final 00. The English reference at that ID preserves the native introduction meaning without previous-town field 36. Use its complete wording, manual lines/pages, pauses, and closing variant unchanged. Full source/reference/output hashes are bound; no new actor or field permission. See specs/RESIDENT_GAPS.md. Ordinary introductions and final presentation remain review."
+  },
+  {
+    "id": "message:2BC5",
+    "source_sha256": "c69922fc54e7299f91785340e5be1881cfedceb69e7392e5f8fff248441453e4",
+    "reference_id": "message:2DD3",
+    "reference_sha256": "80aac1f401678a1bcd246315d287155a5cba1ccb6b649203cc0d4b6ab428d1e6",
+    "complete_reference": {
+      "adapted_sha256": "80aac1f401678a1bcd246315d287155a5cba1ccb6b649203cc0d4b6ab428d1e6"
+    },
+    "evidence": "Complete native source equals message 2DD3, including first-introduction NPC0 row-two/row-eight requests, expressions, player/speaker/catchphrase fields, and final 00. The English reference at that ID preserves the native introduction meaning without previous-town field 36. Use its complete wording, manual lines/pages, pauses, and closing variant unchanged. Full source/reference/output hashes are bound; no new actor or field permission. See specs/RESIDENT_GAPS.md. Ordinary introductions and final presentation remain review."
+  },
+  {
+    "id": "message:2BC7",
+    "source_sha256": "c69922fc54e7299f91785340e5be1881cfedceb69e7392e5f8fff248441453e4",
+    "reference_id": "message:2DD5",
+    "reference_sha256": "e47b2da7b29b6f73e7131f6c442a2da7663f85730e6b7c858861796f7ef8b01a",
+    "complete_reference": {
+      "adapted_sha256": "e47b2da7b29b6f73e7131f6c442a2da7663f85730e6b7c858861796f7ef8b01a"
+    },
+    "evidence": "Complete native source equals message 2DD5, including first-introduction NPC0 row-two/row-eight requests, expressions, player/speaker/catchphrase fields, and final 00. The English reference at that ID preserves the native introduction meaning without previous-town field 36. Use its complete wording, manual lines/pages, pauses, and closing variant unchanged. Full source/reference/output hashes are bound; no new actor or field permission. See specs/RESIDENT_GAPS.md. Ordinary introductions and final presentation remain review."
+  },
+  {
+    "id": "message:2BC9",
+    "source_sha256": "dedb021bea9adfa7e53e0822e33077d3355b5d394589fbd2d1ba62ad9c1700cb",
+    "reference_id": "message:2DD7",
+    "reference_sha256": "7f1bea729253592da3e91962e8e85b1264a8ee6b9ff4605d1c310f2885fa0393",
+    "complete_reference": {
+      "adapted_sha256": "7f1bea729253592da3e91962e8e85b1264a8ee6b9ff4605d1c310f2885fa0393"
+    },
+    "evidence": "Complete native source equals message 2DD7, including first-introduction NPC0 row-two/row-eight requests, expressions, player/speaker/catchphrase fields, and final 00. The English reference at that ID preserves the native introduction meaning without previous-town field 36. Use its complete wording, manual lines/pages, pauses, and closing variant unchanged. Full source/reference/output hashes are bound; no new actor or field permission. See specs/RESIDENT_GAPS.md. Ordinary introductions and final presentation remain review."
+  },
+  {
     "id": "message:18CA",
     "reference_id": "message:18CA",
     "source_sha256": "7cd5f9a23959beab75d481561b03bae8708a97f06bc16a90d38b6e98fb63a201",
