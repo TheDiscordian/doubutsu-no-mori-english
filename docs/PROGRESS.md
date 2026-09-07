@@ -35,6 +35,12 @@ Isolated native Controller Pak writing and fresh-process reading also pass the
 checksums, player/NPC imports, and English reconstruction pass without changing
 the live save payload. The ordinary station-travel and storage-menu flows remain
 unverified. See [Pak persistence scope](../specs/PAK_MAIL.md).
+The original letter-menu selector passes 120 isolated status/gift/marker/context
+cases with unchanged complete letters. All 44 static menu-label definitions pass
+native length calls; that shared text helper is not a snapshot reader. Received
+letters select Read, while player-written drafts select Rewrite. Normal UI
+transitions, generated status assignments, and custom editing remain separate
+requirements. See [menu evidence](../specs/MAIL_MENU.md).
 Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -69,7 +75,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 307 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 314 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

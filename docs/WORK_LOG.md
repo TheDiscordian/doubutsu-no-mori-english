@@ -2074,6 +2074,48 @@
   consumer. No production code or test harness changes follow from this
   additional source inspection; the passing 307-test checkpoint is unchanged.
 
+### Native letter-menu selection and static-label provenance
+
+- Added source-guarded native TAG overlay inspection, a bounded independent
+  relocation model, a fresh-process scenario, and an isolated heap fixture.
+  The original overlay has SHA-256
+  `eee60f36d61212bd1719b752916be4825ba0952660fafe1c68054dbd1e9fa9d5`;
+  its relocation file has SHA-256
+  `d5703988bd132d02415c4db7cbc2ac9a794dc1908cf9e6fb33f01f03def92af2`.
+  The complete native-loaded file and BSS agree with the independent model.
+- `build/smoke-mail-menu-01` passes 973 recorded steps, 167 native calls, and
+  138 memory assertions. All 120 status/gift/marker/context cases choose the
+  expected menu and retain the complete source letter. All 44 static tag-label
+  definitions pass actual native maximum-length calls, including empty rows.
+  Current-player/field globals, complete live save payload, source image,
+  allocation/stack/module guards, allocation free, checkpoint restoration,
+  blank FlashRAM, and graceful shutdown pass. The fixture allocates 116,576
+  bytes in a fresh process, including the whole fake overlay prefix.
+- Received-letter types 19/20/21 point to Read; draft types 22/23/24 point to
+  Rewrite. Source inspection establishes Read's mode-one and Rewrite's mode-two
+  board opening calls. This harness does not execute those wrappers, paper
+  collection side effects, or the normal UI. Opaque marker fixtures are not
+  valid snapshot envelopes and make no decoder claim.
+- Traced board program 12 through recipient-selector program 13 to keyboard
+  editor program 10. The recipient selector passes the board's temporary body
+  to the editor with sixteen columns; the editor remains a real text consumer.
+  Snapshot read mode bypasses the recipient opener after the installed copy
+  hook. All input ownership, generated status values, parent-menu interaction,
+  and player-created/custom edited letters remain required. Generation stays
+  disabled; production ROM, text candidates, saved formats, and font are unchanged.
+- Added seven passing portable/retail tests covering all reference status-byte
+  values, paired marker cases, source mutation rejection, static pointer graphs
+  at three RAM bases, unrelocated bytes, BSS, and invalid destinations. The full
+  suite passes 314 tests in 162.870 seconds, recorded in
+  `build/tests-mail-menu-full.log`. Python compilation and whitespace checks pass.
+- Inspected the actual shared submenu callback assignments, change-motion,
+  movement, end, and return instructions. Read close takes state two through
+  motion state zero to end state four, not edit-accept state three. Recorded
+  complete original file/function hashes in `specs/MAIL_MENU.md`. The return
+  routine restores parent procedures or destroys loaded programs; it does not
+  read or copy letter text. The board's saved parent-move callback remains an
+  explicit ordinary-interaction check, not an inferred passing gameplay test.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -849,6 +849,12 @@ def main():
                 request = action['test_native_pak_mail_save' if writing else 'test_native_pak_mail_read']
                 results.append(exercise(debug,request,record,
                     export_directory=out/'exported-save' if writing else None))
+            if 'test_mail_menu' in action:
+                from mail_menu_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native mail-menu probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_mail_menu'],record))
             if 'test_npc_mail_show' in action:
                 from npc_mail_show_smoke import exercise
                 if not (out/'test.bs1').is_file():

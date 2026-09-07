@@ -48,6 +48,16 @@ both file checksums, complete player/NPC imports, and six English reconstruction
 in each process. See [Pak persistence contract](../specs/PAK_MAIL.md). Ordinary
 travel and storage-menu flows remain separate requirements.
 
+The [native letter-menu selector](../specs/MAIL_MENU.md) passes 120 isolated
+status/gift/marker/context cases and retains every complete source letter.
+All 44 static tag-label definitions pass native length checks, closing that
+specific shared-helper provenance item. Received letters select Read; drafts
+select Rewrite. Shared close-helper inspection establishes the read path's
+motion-to-end transition without entering edit acceptance. Remaining editor work
+includes parent-menu interaction, complete pointer ownership, generation status
+assignments, and normal custom editing. These checks do not enable generation
+or establish full menu gameplay.
+
 ## Main translation and runtime
 
 | ID | Task | Status | Acceptance/evidence |

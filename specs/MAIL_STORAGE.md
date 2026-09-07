@@ -132,9 +132,15 @@ of its row and column limits. Its complete caller/pointer ownership needs review
 the shared helper does not know whether that pointer belongs to mail. The board
 initializer's ordinary header/body/footer scans follow the installed snapshot
 copy hook, which blanks only its temporary ordinary fields and forces read mode.
-The separate editor-acceptance footer scan at `80889334` and generic tag-option
-pointer-array sizing at `8086FAC4` remain explicit control-flow/provenance checks,
-not automatically cleared by this inventory.
+The separate editor-acceptance footer scan at `80889334` remains an explicit
+control-flow check. The generic tag-option sizing at `8086FAC4` is established
+as a static-label reader: all 44 native definition arrays and their label and
+callback pointers pass guarded inspection, relocation, and native length calls.
+The native letter-menu selector also passes 120 status/gift/marker/context cases
+without changing any letter. Received-letter actions select Read, while ordinary
+player-written draft actions select Rewrite. See [menu and editor boundaries](MAIL_MENU.md).
+This does not establish all generated status assignments, normal UI transitions,
+or custom editing, and does not enable snapshot generation.
 
 ## Validation limits
 
