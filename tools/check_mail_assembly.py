@@ -45,7 +45,7 @@ def main():
         columns = line.split()
         if len(columns) >= 2 and columns[0].startswith(('.data', '.bss', '.sdata', '.sbss')) and int(columns[1]):
             mutable[columns[0]] = int(columns[1])
-    if mutable != {'.bss.af_mail_reader': 5792}:
+    if mutable != {'.bss.af_mail_reader': 2236}:
         raise ValueError('Unexpected mail display cache layout: '+repr(mutable))
     assembly = run('objdump', '-d', 'mail.o')
     (out/'mail.asm').write_text(assembly)

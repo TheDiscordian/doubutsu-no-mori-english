@@ -77,8 +77,12 @@ remain the next implementation steps.
 The [complete word source resource](../specs/NPC_MAIL_WORDS.md) verifies all 352
 phrases against the actual source banks and records full source/reference IDs.
 All 83 phrases beyond ten bytes are retained within sixteen bytes. Connect this
-resource before native truncation; complete NPC name sources and runtime capture
-are still required. The resource is not installed in the production ROM.
+resource before native truncation. The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md)
+supplies all 216 full names from 394 exact original/short-English keys, without
+guessing unknown identities. Both resources still need native loading and capture.
+The reader's temporary decode allocation leaves 3,648 linked bytes available
+inside the unchanged 32 KiB reservation. Allocation/error ownership tests,
+four-MiB town arrival, and all eight complete native letter windows pass.
 
 ## Main translation and runtime
 

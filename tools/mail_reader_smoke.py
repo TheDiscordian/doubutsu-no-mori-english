@@ -10,7 +10,7 @@ from runtime_layout import MODULE_RAM, TEST_RETURN
 
 def snapshot(debug, address):
     address = int(address,16) if isinstance(address,str) else address
-    if address & 15 or not MODULE_RAM+0x300 <= address <= TEST_RETURN-5792:
+    if address & 15 or not MODULE_RAM+0x300 <= address <= TEST_RETURN-2236:
         raise ValueError('Snapshot reader cache must remain inside linked module RAM')
     owner,status,page,total,h,b,f = struct.unpack('>7I',debug.read_memory(address,28))
     if status not in (1,2) or not 0 <= page < total <= 1029 or h > 1032 or b > 1024 or f > 1024:

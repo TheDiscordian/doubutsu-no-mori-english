@@ -5,8 +5,9 @@
 `overlays/mail_generation/generate.c` implements transient field capture and
 complete generated-letter publication using the existing immutable cartridge
 catalog and snapshot format. It is separate from the resident module: the
-current resident image has only 96 bytes of linked-code headroom. The generation
-code is compiled and loaded into private heap memory for isolated native tests.
+resident reader uses short-lived decode scratch to leave room for generation.
+The generation code is compiled and loaded into private heap memory for isolated
+native tests.
 It is not yet installed as an on-demand gameplay overlay or a native creator
 hook. Ordinary gameplay generation remains disabled.
 

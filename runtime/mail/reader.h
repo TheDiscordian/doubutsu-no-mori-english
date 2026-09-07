@@ -16,7 +16,6 @@ typedef struct {
     AfMailPage layout;
     unsigned char header[1032];
     AfMailText letter;
-    AfMailWorkspace workspace;
 } AfMailReader;
 
 extern AfMailReader af_mail_reader;

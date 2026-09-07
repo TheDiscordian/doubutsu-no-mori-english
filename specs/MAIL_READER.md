@@ -28,11 +28,18 @@ as the third argument to the resident copy wrapper.
 
 The wrapper copies the complete 164-byte native record, resets its display
 cache, and handles tagged records before returning to initialization. Decoding
-uses a separate, aligned 3,552-byte workspace in resident RAM. Complete output,
-header-name insertion, and the selected page also live in that cache. The
-5,792-byte cache is bound to the current board address. Reopening a different
-letter resets it. Reading never regenerates random words, queries current names,
-changes capitalization state, or writes the source record.
+uses a separate, aligned 3,552-byte workspace allocated only during restoration.
+The allocation includes fifteen alignment bytes and is released immediately
+after successful or rejected decoding. No workspace or source-descriptor pointer
+escapes into the cached result. Allocation failure follows the existing English
+error-letter path, without changing the saved source.
+
+Complete output, header-name insertion, and the selected page live in a
+2,236-byte cache bound to the current board address. The cache is sixteen-byte
+aligned independently of its member layout. Reopening a different letter resets
+it. Drawing and page input do not allocate decode scratch or reread the catalog.
+Reading never regenerates random words, changes captured capitalization state,
+or writes the source record.
 
 For tagged records, only the board's temporary copy receives blank ordinary
 text fields and a zero split, preventing opaque snapshot bytes from reaching
@@ -59,9 +66,9 @@ name padding is trimmed; header text, explicit spacing, and the insertion split
 are unchanged. No recipient, sender, town, or saved text bytes are rewritten.
 
 The snapshot header capacity is 1,032 bytes: 1,024 formatted bytes plus the full
-eight-byte display name. Its two additional bytes occupy existing structure
-padding, so the resident cache remains 5,792 bytes. The formatted-letter member
-begins at offset 1,196; the decoder workspace remains at offset 2,236. Ordinary
+eight-byte display name. The formatted-letter member begins at offset 1,196 and
+ends at 2,236; decode scratch is outside the resident cache. MIPS compile-time
+checks pin the cache size and formatted-letter offset. Ordinary
 headers use an eighteen-byte stack buffer for the native ten-byte header plus
 the display name. Snapshot names load once on open; ordinary read-mode headers
 resolve the name during drawing. Hardware timing remains unverified.
@@ -123,7 +130,10 @@ targets are native resident functions and have no overlay-call relocations.
 Host tests cover full reconstruction, measured page spans, extreme section
 lengths, ordinary-record fallback, corrupt snapshots, disabled resources,
 unchanged input and adjacent bytes, special header types, page bounds, native
-close-button priority, and stale/inactive cache input. N64 compilation checks
+close-button priority, and stale/inactive cache input. Additional allocation
+tests exercise deliberately unaligned returned storage, allocation failure,
+every decode-read failure, released/poisoned scratch, exact release ownership,
+guard retention, and no allocations for ordinary or unused letters. N64 compilation checks
 the exact display-cache BSS size and rejects other mutable globals in the
 codec/formatter/catalog/page/reader objects or undefined symbols. The separate
 NPC send adapter owns one four-byte scoped-context pointer.

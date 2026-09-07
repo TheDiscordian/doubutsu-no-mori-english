@@ -2231,6 +2231,58 @@
   whole-bank helper on a relocated pilot ROM failed because its main text bank
   moved; direct extraction of the unchanged `E04000` name DMA entry succeeds.
 
+### Short-lived reader scratch and complete saved-name sources
+
+- Removed the 3,552-byte decoder workspace from permanent reader state. Each
+  snapshot open allocates 3,567 bytes, aligns the workspace, and releases the
+  original allocation after restoration on both success and failure. Drawing
+  uses only the independently owned complete cached text. Allocation failure
+  shows the existing English error without changing the source letter.
+- The resident cache is 2,236 bytes and explicitly aligned to sixteen; MIPS
+  assertions pin its size and the formatted-text offset. The module links to
+  20,928 bytes, leaving 3,648 bytes within the existing linked limit. The 32 KiB
+  reservation, test region, and actual native heap boundary are unchanged.
+- Nine reader tests pass at `build/tests-reader-scratch.log`. New cases cover
+  deliberately unaligned allocations, every decode-read failure, poisoned freed
+  scratch, original-pointer release, guards, repeated opens, and no allocation
+  for ordinary/unused letters. Cross-compilation passes with the expected
+  2,236-byte BSS and no undefined symbols.
+- `build/smoke-reader-scratch-full-01` passes 188 train-to-town steps and all
+  ten acceptance checks in four MiB. `build/smoke-reader-scratch-pages-01`
+  passes all eight letters across fourteen pages: 1,705 glyphs, 6,820 vertex
+  positions, all eight source/preference checks, checkpoint restoration, and
+  graceful shutdown in 218 recorded steps. The cartridge save remains blank.
+- Independent module and ROM builds match. Module SHA-256:
+  `2ae761c6bd9c1e0cd0707555b60bda3e9e3b988e6ab34d2fb1c306a06406ef94`.
+  The ROM at `build/reader-scratch-pilot/animal-forest-halfwidth.z64` and its
+  independent repeat have SHA-256
+  `300c8b5b4de252d3962d649c31496578ee8db12a4624e8db423ecbf3876f4fc0`.
+  UPS SHA-256:
+  `7384668a29132d8800063888b2e7cc19e7fae32ffad4b85ba50c32586f741227`.
+- Implemented source-bound exact saved-name aliases: 394 unique original and
+  fitting English keys recover the complete eight-byte names of all 216
+  villagers. Original ROM and complete display resource hashes are checked;
+  reconstructed source edits must agree. No truncated English prefix is a key,
+  and unknown names remain unresolved. The 6,368-byte local resource has SHA-256
+  `a79b6bc3c5b36c7ce2bcea55932ccdf4ce694608e5dcfb896226a24d368bf5d6`;
+  independent preparation matches. Native lookup/capture remains uninstalled.
+- Six name tests pass at `build/tests-npc-mail-names.log`, covering every real
+  key, complete output, collisions, unknown values, invalid resources, and source
+  changes with recalculated manifest hashes. The complete regression suite
+  passes 350 tests in 181.567 seconds at `build/tests-reader-scratch-full.log`.
+  Python compilation and whitespace checks pass. Font metrics, reference line
+  breaks, candidate text, saved record formats, and the disabled gameplay
+  generation setting are unchanged.
+- Rebuilt the isolated generation probe against the new resident symbol
+  addresses; code SHA-256 is
+  `158959692289be5b336a53adc73699abb6671e0cc56ce13f622e6af9a53b916e`.
+  `build/smoke-reader-scratch-generation-02` passes all 53 generation cases,
+  42 capture cases, 99 native calls, and 719 memory assertions in 1,149 steps,
+  including complete save retention, allocation free, checkpoint restoration,
+  and graceful shutdown. The first launch stopped before emulator startup
+  because the scenario output was a JSON file rather than a directory; the
+  corrected launch uses that actual file. Both logs remain local.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

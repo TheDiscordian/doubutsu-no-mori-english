@@ -13,8 +13,11 @@ The source checks and selection/coverage tests pass. A separate
 [complete word resource](NPC_MAIL_WORDS.md) verifies all 352 randomized phrases
 against the supplied English and legacy sources. No ordinary NPC creator
 currently generates English snapshot letters. Native word capture, complete
-name sources, semantic template approval, loading/lifetime, and delivery
+name capture, semantic template approval, loading/lifetime, and delivery
 integration remain required.
+An [exact saved-name mapping](NPC_MAIL_NAMES.md) supplies full names for both
+known native Japanese and fitting English saved-name forms. Unknown names remain
+unresolved; this source resource still needs native lookup and capture bindings.
 
 ## Whole-record boundaries
 
@@ -77,7 +80,7 @@ ordinary delivery must pass before installing the gate.
 | Slot, decimal | Local reply source | Visitor reply source |
 | --- | --- | --- |
 | 0 | Player's saved six-byte name | Same |
-| 1 | Complete display name of sender NPC | Saved foreign NPC name at reply `+4`, with wider identity recovery unresolved |
+| 1 | Complete display name of sender NPC | Exact saved-name recovery from reply `+4`; native lookup remains unimplemented |
 | 2 | Name of the native-selected other NPC | Name of the native-selected local NPC |
 | 3–13 | Eleven selected general-string values | Same families |
 | 14 | Not supplied | Foreign town's saved six-byte name at reply `+A` |

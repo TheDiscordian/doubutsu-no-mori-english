@@ -78,18 +78,22 @@ class MailReaderTests(unittest.TestCase):
         self.widths[:] = [12]*256
         for code in range(32,127): self.widths[code] = 4 if code in b"iIl'" else 6
 
+    def tearDown(self):
+        self.assertEqual(C.c_uint.in_dll(self.lib,'af_reader_live_allocations').value,0)
+        self.assertEqual(C.c_uint.in_dll(self.lib,'af_reader_allocation_errors').value,0)
+
     def record(self,index):
         record = Record(2,0,(index,),())
         parts = templates(self.catalog,record)
         mask = set().union(*(template_fields(part) for part in parts.parts))
         return replace(record,fields=tuple((i,Field(b'x'*16,4)) for i in sorted(mask)))
 
-    def open(self,record,*,wire=None,marker=0x80,kind=4,recipient_type=0,recipient_index=0):
+    def open(self,record,*,wire=None,marker=0x80,kind=4,recipient_type=0,recipient_index=0,font=0):
         source = bytearray(164)
         source[:6] = b'READER'
         source[0x12:0x18] = b'WRITER'
         source[0x10],source[0x0C] = recipient_type,recipient_index
-        source[0x26:0x2A] = bytes([0,marker,kind,0])
+        source[0x26:0x2A] = bytes([font,marker,kind,0])
         source[0x2A:] = pack(record) if wire is None else wire
         buffer = C.create_string_buffer(bytes(source),164)
         self.lib.af_mail_reader_copy(C.byref(self.board,8),buffer,self.menu)
@@ -204,6 +208,46 @@ class MailReaderTests(unittest.TestCase):
             self.assertEqual((self.state.status,self.state.page,self.state.total),(2,0,1))
             self.assertEqual(self.menu[14],1)
             self.assertEqual(self.draw(),[(b'Unable to read this letter.',64,64)])
+
+    def test_scratch_allocation_failure_and_every_decode_failure_release_ownership(self):
+        record = self.record(0)
+        allocations = C.c_uint.in_dll(self.lib,'af_reader_allocations')
+        releases = C.c_uint.in_dll(self.lib,'af_reader_releases')
+        fail = C.c_uint.in_dll(self.lib,'af_reader_fail_allocate')
+        fail.value = 1
+        self.open(record)
+        self.assertEqual((self.state.status,allocations.value,releases.value,self.reads.value),(2,1,0,0))
+        self.assertEqual(self.draw(),[(b'Unable to read this letter.',64,64)])
+        fail.value = 0
+        self.open(record)
+        self.assertEqual((self.state.status,allocations.value,releases.value),(1,2,1))
+        reads = self.reads.value
+        self.assertGreater(reads,1)
+        failures = C.c_uint.in_dll(self.lib,'af_mail_catalog_fail_read')
+        for index in range(1,reads+1):
+            self.reads.value = 0
+            failures.value = index
+            self.open(record)
+            self.assertEqual(self.state.status,2)
+            self.assertEqual(allocations.value,releases.value+1)
+            self.assertEqual(self.draw(),[(b'Unable to read this letter.',64,64)])
+
+    def test_decode_scratch_is_released_before_draw_and_unused_for_ordinary_mail(self):
+        record = self.record(0)
+        allocations = C.c_uint.in_dll(self.lib,'af_reader_allocations')
+        releases = C.c_uint.in_dll(self.lib,'af_reader_releases')
+        self.open(record,marker=3,wire=b' '*122)
+        self.assertEqual((allocations.value,releases.value),(0,0))
+        self.open(record,font=255)
+        self.assertEqual((self.state.status,allocations.value,releases.value),(2,0,0))
+        self.assertEqual(self.reads.value,0)
+        for count in range(1,9):
+            self.open(record)
+            self.assertEqual((self.state.status,allocations.value,releases.value),(1,count,count))
+            self.assertEqual(C.c_uint.in_dll(self.lib,'af_reader_live_allocations').value,0)
+            reads = self.reads.value
+            self.assertTrue(self.draw())
+            self.assertEqual(self.reads.value,reads)
 
     def test_ordinary_records_clear_cache_and_keep_copy_and_editor_mode(self):
         record = self.record(0)

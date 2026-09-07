@@ -2,9 +2,13 @@
 #include "view.h"
 #include "../display_name.h"
 
-AfMailReader af_mail_reader;
+AfMailReader af_mail_reader __attribute__((aligned(16)));
 
 #ifdef __mips__
+typedef char reader_size_check[sizeof(AfMailReader) == 2236 ? 1 : -1];
+typedef char reader_text_check[__builtin_offsetof(AfMailReader,letter) == 1196 ? 1 : -1];
+static void *allocate(unsigned int size) { return ((void *(*)(unsigned int))0x8009BFC0u)(size); }
+static void release(void *memory) { ((void (*)(void *))0x8009C040u)(memory); }
 static unsigned char *board(void *submenu) {
     unsigned char *overlay = *(unsigned char **)((unsigned char *)submenu+0x2C);
     return *(unsigned char **)(overlay+0x106E4);
@@ -25,6 +29,8 @@ static void draw(void *game, const unsigned char *text, unsigned int length,
         (game, text, length, x, y, colour[0], colour[1], colour[2], 255, 0, 0, 1.0f, 1.0f, 0);
 }
 #else
+extern void *af_mail_reader_test_allocate(unsigned int);
+extern void af_mail_reader_test_release(void *);
 extern unsigned char *af_mail_view_test_board(void *);
 extern void af_mail_reader_test_copy(unsigned char *, const unsigned char *);
 extern unsigned int af_mail_reader_test_trigger(void);
@@ -35,6 +41,8 @@ extern void af_mail_view_test_draw(void *, const unsigned char *, unsigned int, 
 #define trigger af_mail_reader_test_trigger
 #define width af_mail_view_test_width
 #define draw af_mail_view_test_draw
+#define allocate af_mail_reader_test_allocate
+#define release af_mail_reader_test_release
 #endif
 
 static int active(const void *state) {
@@ -80,6 +88,21 @@ static void error_letter(void) {
     select_page(0);
 }
 
+static int restore_letter(const unsigned char *source) {
+    void *memory = allocate(sizeof(AfMailWorkspace)+15u);
+    AfMailWorkspace *work;
+    int result;
+    if (!memory)
+        return 0;
+    work = (AfMailWorkspace *)(((__UINTPTR_TYPE__)memory+15u) & ~(__UINTPTR_TYPE__)15u);
+    result = af_mail_restore(&af_mail_reader.letter,source+0x2A,122,work);
+    /* The formatted letter owns its complete bytes. No source descriptor or
+     * decoder-workspace pointer escapes restoration, including on rejection.
+     */
+    release(memory);
+    return result;
+}
+
 void af_mail_reader_copy(unsigned char *destination, const unsigned char *source, void *menu) {
     AfMailReader *r = &af_mail_reader;
     unsigned int i, name, split, length, type;
@@ -96,7 +119,7 @@ void af_mail_reader_copy(unsigned char *destination, const unsigned char *source
      */
     *(unsigned int *)((unsigned char *)menu+0x38) = 1;
     r->owner = destination-8;
-    if (source[0x26] == 255u || !af_mail_restore(&r->letter, source+0x2A, 122, &r->workspace)) {
+    if (source[0x26] == 255u || !restore_letter(source)) {
         error_letter();
     } else {
         type = source[0x28];

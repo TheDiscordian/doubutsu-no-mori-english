@@ -46,7 +46,7 @@ reference assembly cases. Native calls pass 46 complete English reference cases,
 seven rejected generations, and 42 capture cases, with complete save retention
 and intact guards. Publication changes only validated text/split bytes and the
 transient capital state. The 1,380-byte generation probe is separate from the
-resident image, which has only 96 linked bytes free. Native creator bindings,
+resident image, which has 3,648 linked bytes free. Native creator bindings,
 complete English field sources, on-demand loading, failure propagation, and
 semantic template approval remain. Ordinary gameplay snapshot generation stays
 disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
@@ -61,6 +61,15 @@ The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
 352 complete phrases with exact legacy/English agreement and explicit native
 ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
 The resource is verified locally but not installed or connected to capture.
+The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md) recovers full English
+names for all 216 villagers from 394 exact known saved-name keys. It rejects
+ambiguous mappings and leaves unknown names unresolved. Native lookup and
+generation-time capture remain uninstalled.
+The reader releases its 3,552-byte decode workspace immediately after opening
+a snapshot. Its complete 2,236-byte display cache remains resident; the 32 KiB
+reservation and heap boundary are unchanged. Host allocation/error tests, the
+four-MiB train-to-town run, and all eight native letter windows pass. Independent
+module, ROM, and patch builds match.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -94,7 +103,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 342 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 350 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -264,7 +273,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 24,352 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 20,928 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -367,7 +376,8 @@ user's direction. The production build retains the approved spacing metrics.
   suppressed-name header types retain their intended fallback behaviour.
   Native windows pass eight letters across fourteen pages, checking 1,705
   glyphs, 6,820 vertex positions, and all source/preference guards. Two probes
-  use the original native NPC identity setter. The cache remains 5,792 bytes;
+  use the original native NPC identity setter. The cache occupies 2,236 bytes;
+  decode scratch is allocated only during restoration and freed before drawing;
   saved names, source records, font metrics, and reference layout are unchanged.
   The ordinary-header regression passes ten cases, body/footer glyph checks,
   and all non-read-mode forwarding checks: 36 calls and 842 memory assertions
@@ -400,7 +410,7 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-names-repeat-pilot/`
+The current experimental resident-module pilot in `build/reader-scratch-repeat-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
