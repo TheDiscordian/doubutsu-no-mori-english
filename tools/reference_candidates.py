@@ -19,6 +19,7 @@ from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 from item_aliases import confirmed_aliases, update_alias_reports
+from message_aliases import confirmed_message_aliases
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -35,6 +36,25 @@ def load_drafts(paths):
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate original translation ID")
     return drafts
+
+
+def record_candidate(edit, info, advances, name, edits, manifests, counts):
+    candidate = encode(edit["translation"], info)
+    policy = edit["control_policy"]
+    issues = layout_issues(candidate, info, advances) if name == "message" else []
+    manifest = {k: v for k, v in edit.items() if k != "translation"}
+    manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
+                    layout_issues=issues,
+                    expanded_bound=expanded_bound(candidate, info) if name == "message" else len(candidate))
+    edits.append(edit)
+    manifests.append(manifest)
+    counts["accepted_candidates"] += 1
+    counts["adapted_candidates"] += bool(edit.get("adaptations"))
+    counts["text_field_delivery_candidates"] += policy == "reference_text"
+    counts["reference_page_delivery_candidates"] += policy == "reference_delivery"
+    counts["reference_layout_candidates"] += policy == "reference_layout"
+    counts["reviewed_sequence_candidates"] += policy == "reviewed_sequence"
+    counts["layout_review_required"] += bool(issues)
 
 
 def main():
@@ -138,20 +158,21 @@ def main():
                                        "reference_id": reference["id"], "reference_sha256": reference["sha256"],
                                        "match_basis": match_basis},
                         "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
-            issues = layout_issues(candidate, info, advances) if name == "message" else []
-            manifest = {k: v for k, v in edit.items() if k != "translation"}
-            manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
-                            layout_issues=issues,
-                            expanded_bound=expanded_bound(candidate, info) if name == "message" else len(candidate))
-            edits.append(edit)
-            manifests.append(manifest)
-            counts["accepted_candidates"] += 1
-            counts["adapted_candidates"] += bool(adaptations)
-            counts["text_field_delivery_candidates"] += policy == "reference_text"
-            counts["reference_page_delivery_candidates"] += policy == "reference_delivery"
-            counts["reference_layout_candidates"] += policy == "reference_layout"
-            counts["reviewed_sequence_candidates"] += policy == "reviewed_sequence"
-            counts["layout_review_required"] += bool(issues)
+            record_candidate(edit, info, advances, name, edits, manifests, counts)
+        if name == "message":
+            aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
+                skip_ids=override_ids | matches.keys(), resident_runtime=bool(args.runtime_module))
+            for edit in aliases:
+                rejected = [row for row in review if row["id"] == edit["id"]]
+                if len(rejected) != 1:
+                    raise ValueError("Message alias is not a unique previously rejected record")
+                review.remove(rejected[0])
+                counts["rejected"] -= 1
+                record_candidate(edit, info, advances, name, edits, manifests, counts)
+            counts["confirmed_native_aliases"] = len(aliases)
+            counts["native_alias_conflicts"] = len(conflicts)
+            args.output.mkdir(parents=True, exist_ok=True)
+            (args.output/"message-alias-conflicts.jsonl").write_text("".join(json.dumps(r)+"\n" for r in conflicts))
         reports[name] = {**dict(counts), "source_entries": len(source),
                          "remaining_by_reason": dict(Counter(r["reason"] for r in review))}
         args.output.mkdir(parents=True, exist_ok=True)

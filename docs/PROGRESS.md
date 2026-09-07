@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 132 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 136 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -115,6 +115,11 @@ user's direction. The production build retains the approved spacing metrics.
   records, exact placeholder labels, visible kana, Latin text, unknown glyphs,
   and candidate presence stay distinct. Source hashes and unique IDs are checked;
   candidate presence never implies review or unreachable code.
+- Complete-native-record alias matching adds 41 unambiguous dialogue candidates.
+  Source/reference hashes, the entire adapted output, and normal command/capacity
+  checks are retained. Seventy-nine conflicting groups remain withheld; drafts,
+  special approvals, and sequence permissions do not transfer automatically.
+  All 41 native DMA loads pass full-content and adjacent-guard checks.
 
 ## Current reference candidates
 
@@ -137,14 +142,14 @@ item names have separate restrictions. Legacy item references have verified
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,362 edits, including
-9,109 reference dialogue candidates, all 460 choices, 178 villager names,
+The separate resident-module experiment contains 10,403 edits, including
+9,150 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,637 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,636 main records without
-candidates: 1,691 with Japanese text, 23 exact placeholders, 919 with no static
+Its reference generator rejects 2,596 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,595 main records without
+candidates: 1,664 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.
@@ -190,9 +195,9 @@ The exercise drafts retain every native command; seasonal-event testing remains.
 Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
 The uniform is equipped through the inventory, acknowledged by Nook, and confirmed
 by the native clothing item ID. The English planting-job instructions complete.
-Three supplied flowers are planted through normal inventory actions, with native
-pocket consumption checked. The remaining planting work and subsequent jobs
-remain in progress.
+All seven supplied flowers and three saplings are planted through normal
+inventory actions, with native pocket consumption checked after each item in
+the final batches. Returning to Nook and subsequent jobs remain in progress.
 The following clothing reminder has an approved GameCube Y-to-N64-START button
 adaptation in the controller build. Read-only player coordinates support navigation
 without position edits. START opens the inventory during the normal shop test.

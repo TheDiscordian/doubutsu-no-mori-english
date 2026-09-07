@@ -679,6 +679,35 @@
   or player-position data is edited. Successful individual plants receive their
   own emulator checkpoints; those are not FlashRAM save evidence.
 
+### Complete native message aliases and planting completion
+
+- A single-stage exact-native-record pass adds 41 English reference candidates
+  after verifying complete source equality, donor/reference hashes, the full
+  adapted English output, command policy, and capacity. Multiple eligible donors
+  must produce identical output; 79 target records with conflicting English
+  remain withheld in an explicit report. Drafts, special approvals, and reviewed
+  sequence permissions are excluded from transfer.
+- The alias build contains 10,403 edits and 9,150 reference dialogue candidates.
+  Final main candidate coverage is 9,157 records, with 2,595 absent: 1,664 Japanese
+  texts, nine exact placeholders, 919 command-only/empty records, one Latin text,
+  and two number/symbol records. These counts do not imply translation review.
+  There are 1,312 conservative layout warnings. The wider item resource and
+  resident module are unchanged. ROM SHA-256:
+  `4bedb03d7bec984b05df5ca85d91278478f21209cfdee2061b54dee412cd523b`.
+  UPS SHA-256:
+  `068ec1af9db9ff3fbed0f9cf8d99d7a3ff754503d3968fdecbc5b9a933b07b79`.
+- All 136 tests pass. `smoke-message-alias-native-01` passes 219 recorded steps,
+  including all 41 actual message loads, complete headers/content, adjacent
+  and module guards, and checkpoint restoration. The full train-to-town run
+  is in progress; ordinary actor traversal of the new aliases remains.
+- `smoke-space-plant-flowers-01` passes 21 recorded steps and consumes the four
+  remaining flower seeds. `smoke-space-plant-saplings-01` passes 17 steps and
+  consumes all three saplings. Every successful plant in these batches asserts
+  the full expected pocket array and creates a checkpoint. All ten supplied
+  planting items are gone; the previous shirt remains in pocket zero and the
+  work uniform remains equipped. The player returns toward Nook through normal
+  movement. FlashRAM save/reload and subsequent jobs remain unverified.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

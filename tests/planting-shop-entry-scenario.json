@@ -1,0 +1,13 @@
+[
+  {"wait": 2},
+  {"key": "w", "duration": 0.30},
+  {"wait": 2},
+  {"key": "f", "duration": 0.33},
+  {"wait": 1},
+  {"key": "w", "duration": 0.20},
+  {"wait": 5},
+  {"capture": "planting-shop-entry.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

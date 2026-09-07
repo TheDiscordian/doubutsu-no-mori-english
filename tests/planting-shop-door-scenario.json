@@ -1,0 +1,10 @@
+[
+  {"wait": 2},
+  {"key": "w", "duration": 0.48},
+  {"wait": 5},
+  {"capture": "planting-shop-door.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_inventory": true},
+  {"save_state": true}
+]
