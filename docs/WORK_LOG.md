@@ -2769,6 +2769,53 @@
   and `build/native-advice-coverage/`. The next queue retains native festival
   drafts, their dynamic fields, and the separately reviewed catchphrase batch.
 
+### Resident-speaker catchphrase dialogue
+
+- Added 27 individually hash-bound resident conversations under the separate
+  `speaker_catchphrase` approval. Complete source/reference/output hashes, the
+  `native_resident_talk` context, and exact added field `1C` are mandatory.
+  Other fields, combined permissions, aliases, new gameplay controls, and changed
+  payloads remain rejected. English wording, manual layout/timing, and original
+  corresponding actor values are preserved. See `specs/REFERENCE_CATCHPHRASES.md`.
+- Audited the actual native talk caller at `8007BF64`, appearance request
+  `8009D3E4`, initializer `8009FFB0`, client setter `8009D308`, and catchphrase
+  consumer `800A1124`. The current actor passes from demo `E0` through window
+  request `2E0` into client `20`; the installed nameplate changes leave the actor
+  stores intact. The separate actorless event-message caller is not treated as
+  a resident context. Source/meaning evidence is recorded separately for all
+  27 references; normal per-message callback traversal remains unclaimed.
+- Eight new host tests pass. The complete suite passes 415 tests in 175.047
+  seconds at `build/tests-resident-catchphrases-full-01.log`, covering all retail
+  approvals and independent builder rejection as well as existing regressions.
+- The initial native run loads and opens the first complete message and inserts
+  its full phrase, then stops at a test cursor assertion. The fixture placed
+  the cursor only 384 bytes below the test SP, overlapping nested native call
+  workspace. Moving all fixtures lower and leaving over two KiB below the SP
+  fixes the harness without changing production code or the expected cursor.
+  The initial evidence remains at `build/smoke-resident-catchphrase-01`.
+- The corrected complete batch at `build/smoke-resident-catchphrase-02` passes
+  688 recorded steps, 91 native calls, and 432 assertions. All 27 messages open
+  through the actual request and initializer, which performs real cartridge DMA
+  and speaker binding. Thirty insertions cover two distinct ten-character defaults,
+  custom input, and a null request clearing a previously assigned client. Complete
+  messages/headers, cursors, both full actors/animals, window/message/stack/module
+  guards, and checkpoint restoration pass. FlashRAM remains blank, the Pak
+  unchanged, and shutdown is graceful. This is not ordinary NPC traversal,
+  final page rendering, save/travel validation, or hardware acceptance.
+- `build/resident-catchphrase-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `63dc82e931bfe78ffc08fcc55559b466de9aa38a592af7d375893e663f5c470f`;
+  its verified round-trip UPS has SHA-256
+  `11c17f784ce68b16308a45074147c1b0e5cf2bbc2fe83191d735e56e94ecc46d`.
+  The candidate file contains 10,542 edits, including 9,269 reference main
+  candidates and 28 original main drafts. All previous 10,515 edits are unchanged.
+  The original main-bank audit leaves 2,455 records without candidates, including
+  1,524 with Japanese static text. There are 1,388 reference-layout warning
+  records. Rejections comprise 1,800 unconfirmed identities, 570 control-signature
+  differences, 80 unavailable-field references, and six expansion overflows.
+  Reports remain local in `build/resident-catchphrase-candidates/` and
+  `build/resident-catchphrase-coverage/`. Font/runtime/save structures and optional
+  generation settings remain unchanged. Final candidate review is still required.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -20,7 +20,8 @@ from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 from reference_choices import adapt_choice_reference, validate_choice_candidate
 from reference_actor_requests import adapt_actor_request_reference, validate_actor_request_candidate
-from reference_fields import field_permit, verify_field_reference
+from reference_fields import (field_permit, verify_field_reference, catchphrase_permit,
+                              verify_catchphrase_reference)
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 
@@ -131,8 +132,10 @@ def main():
                         reference_text, controller_edits = adapt_controller_reference(
                             {**reference, "text": reference_text}, original, matches.get(id), info)
                         added_fields = matches.get(id, {}).get("available_fields")
+                        added_catchphrase = matches.get(id, {}).get("speaker_catchphrase")
                         verify_field_reference(reference, original, matches.get(id), info)
-                        policy = "reference_layout" if added_fields else "presentation"
+                        verify_catchphrase_reference(reference, original, matches.get(id), info)
+                        policy = "reference_layout" if added_fields or added_catchphrase else "presentation"
                         try:
                             text, adaptations = adapt_reference(reference_text, original, info, policy,
                                                                 resident_runtime=bool(args.runtime_module))
@@ -140,9 +143,10 @@ def main():
                             validate_entry(original, candidate, info, name, policy,
                                            choice_bytes=choice_bytes,
                                            resident_runtime=bool(args.runtime_module),
-                                           field_permit=field_permit(id, original, candidate, matches))
+                                           field_permit=field_permit(id, original, candidate, matches),
+                                           catchphrase_permit=catchphrase_permit(id, original, candidate, matches))
                         except ValueError as exc:
-                            if added_fields or name != "message" or str(exc) != "Control signature changed":
+                            if added_fields or added_catchphrase or name != "message" or str(exc) != "Control signature changed":
                                 raise
                             for policy in ("reference_text", "reference_delivery", "reference_layout"):
                                 try:
@@ -163,6 +167,9 @@ def main():
                         if added_fields:
                             adaptations.append({"operation": "use_reviewed_current_player_town_fields",
                                                 "commands": added_fields["commands"]})
+                        if added_catchphrase:
+                            adaptations.append({"operation": "use_reviewed_resident_catchphrase",
+                                                "context": added_catchphrase["context"], "commands": ["1C"]})
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

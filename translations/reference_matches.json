@@ -1080,5 +1080,302 @@
     "reference_sha256": "244564780b0156ba478dacf3233770cbefdb8825e94d8c71be236b6f0326c43e",
     "native_equivalent_id": "message:0EAF",
     "evidence": "The complete native record is identical to native 0EAF, including emotion and catchphrase commands. Both are the same villager-personality reward refusal because the player cannot carry another item, followed by a request to organise the inventory and return. GameCube 0EAF is independently confirmed by the legacy text at 0EAF. All actor arguments, available fields, gameplay controls, and capacity checks still apply."
+  },
+  {
+    "id": "message:036A",
+    "source_sha256": "52733da361e3b26c372c6733fc266fae2101342775b517cd192ae707c449c97f",
+    "reference_id": "message:036A",
+    "reference_sha256": "5707c822ae1b4a02cb24d7b7639dac75f51e380fdefc4b13456b8a9e028d53d0",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "5707c822ae1b4a02cb24d7b7639dac75f51e380fdefc4b13456b8a9e028d53d0"
+    },
+    "evidence": "Delayed errand reward after the player makes pocket space. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:039A",
+    "source_sha256": "f454605065b74f975d6659bb4c0f416f760815750b5d61e77bcb05ca82b5543e",
+    "reference_id": "message:039A",
+    "reference_sha256": "b68942cf6de540eb7aceeeed956610e3dc9d03209faf9c246c55d7914697e531",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "4100036ce1dcbaf8ab68f7f34c40617c6c4cca2659407d8e78b8be252651830b"
+    },
+    "evidence": "Recovering an item lent onwards to a third villager; both named parties keep their supplied fields. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:03BB",
+    "source_sha256": "764f502e8eb16b2c47d70e26ece852c8ddd62c31e76fb3f71ef928ef67c30bdb",
+    "reference_id": "message:03BB",
+    "reference_sha256": "d8cde12aed301f019fbbdff134ae095e58dceb856e428203d5bb11ef3f722f37",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b40dc164839b813020579b8b8acda6ec132dd8d76354ee6f3f887f6680a30d27"
+    },
+    "evidence": "The borrowed item has been lent onwards; the player is asked to find its current holder. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:03BF",
+    "source_sha256": "3d74d8c3e99c2b885233d778f14c45a5b5b86c1848c85f7bd92ec526bc6baa8e",
+    "reference_id": "message:03BF",
+    "reference_sha256": "9265f220939040d52120757a9ebd78c1d3d14e00cd4e78b5aac34673998580f0",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "f4e5fe72039edd91c1a662de93a9c8e2f54b3317008d7321f08a35e4c911422e"
+    },
+    "evidence": "Apology about the lent item and a complaint directed at the borrower. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0428",
+    "source_sha256": "c47addddda57d4871d650541b8daf1d25bdbdc0b393c329a5bb4e228b2950f34",
+    "reference_id": "message:0428",
+    "reference_sha256": "43d885dd83a692d0980cdf4e065bfd2afab73c6f395538a03e41c37b691b43df",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "316468167ed17624d60247860cb8de8f50a3bf1d4430a49985fd3a6822bd25a7"
+    },
+    "evidence": "The owner already has the borrowed item back, so the errand is unnecessary. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:042D",
+    "source_sha256": "922b9fb66ab4248c779a40fb200d51762fff3a061a645dfbd3fd5100e448b16c",
+    "reference_id": "message:042D",
+    "reference_sha256": "6a26a32d4f50cc7f030d1b1bbf534cde29c62eb2ea82446ed4fa4adf6648b938",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "997f9de4b5bd59eb59431edd3037215bf133a2128488831844d74a45a79e9212"
+    },
+    "evidence": "The borrowed item is already returned, ending the unnecessary request. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0439",
+    "source_sha256": "3e3952f66cd484b64cf021d5aa0f5061c7e76247753da2f9c38a873475ab7f75",
+    "reference_id": "message:0439",
+    "reference_sha256": "d7eb3f9eb60114d19a72869631f52d71f83721a82f7057bb94196beac739f23c",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "d7eb3f9eb60114d19a72869631f52d71f83721a82f7057bb94196beac739f23c"
+    },
+    "evidence": "Thanks and reward continuation for a completed resident errand. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0524",
+    "source_sha256": "1433a0568866ad1e6a5762e440932d40ad9c7fcfaa3f5744799e1651cc8c6820",
+    "reference_id": "message:0524",
+    "reference_sha256": "a4fcc25a436807536e3c4c8a5bca3bf086c98fe3aecf18be87c06761e323e238",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a4fcc25a436807536e3c4c8a5bca3bf086c98fe3aecf18be87c06761e323e238"
+    },
+    "evidence": "Late-night greeting and joke about oversleeping; the speaker recognises the current player. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:084A",
+    "source_sha256": "e2c94984b498bd5ff0fa68ee4c40dba72cf16df266971a1883cef00279e3695b",
+    "reference_id": "message:084A",
+    "reference_sha256": "81a3dd950377cfb79d4a45cfa29609abdc9a64935446a621c63dae619d48a5cb",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "81a3dd950377cfb79d4a45cfa29609abdc9a64935446a621c63dae619d48a5cb"
+    },
+    "evidence": "Resident birthday questionnaire retains date input, original month/day/zodiac fields, choices, and branches 087D/087E. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0AE2",
+    "source_sha256": "d681ad290296f360ce73bf731b18cc61d67c982290326d289b8a1a41799db0e5",
+    "reference_id": "message:0AE2",
+    "reference_sha256": "245a7eb220886a00ec08d13d802d6dab652c3ec02996a8b9f6394d168fddb8d6",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "245a7eb220886a00ec08d13d802d6dab652c3ec02996a8b9f6394d168fddb8d6"
+    },
+    "evidence": "Cherry Blossom Festival reminder preserves native April 5, 6, and 7 dates and continuation 0AE0. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0F30",
+    "source_sha256": "43c83f8d3d7f1a50cd3b9f8e499a514b4fe4460539fcbfa69a0da17fceb6cb93",
+    "reference_id": "message:0F30",
+    "reference_sha256": "b231efc3a5ed95e87a66e4c834a275077fdeb54d1eb94e80066f93f9017cf78e",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b231efc3a5ed95e87a66e4c834a275077fdeb54d1eb94e80066f93f9017cf78e"
+    },
+    "evidence": "House-cleanliness question preserves native choices and response branches. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:129D",
+    "source_sha256": "8156feb949f19027ae9980a138682597d889fdf915676194f4b1b92a2722cd2f",
+    "reference_id": "message:129D",
+    "reference_sha256": "d095b81afb4c1a13b417acd6e57b5a9bfecb627923d15fa2da2894843c56259d",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "d095b81afb4c1a13b417acd6e57b5a9bfecb627923d15fa2da2894843c56259d"
+    },
+    "evidence": "Cranky resident greeting asks the player to cheer up, retaining the leading native command 4E. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:16CA",
+    "source_sha256": "1f9984710603d350dc2fa413ffeb04dd386d2897a7ec02277993aeadf61ee031",
+    "reference_id": "message:16CA",
+    "reference_sha256": "af91282be4d8eea8255a58da19afc6663dac173cc271b73b7871ecb0ecfc110d",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "af91282be4d8eea8255a58da19afc6663dac173cc271b73b7871ecb0ecfc110d"
+    },
+    "evidence": "Tree-planting favour acknowledgement; English adds fruit-tree advice without changing the native accepted-task command. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1AEC",
+    "source_sha256": "05d449fa60e26d997efb47b263674203f549f8de3bcac185ee676f642fc1a9ea",
+    "reference_id": "message:1AEC",
+    "reference_sha256": "89f57d27e88d8cd2e607935d5c64bfeb90b74335e04f2011595ce9c24d5cc60a",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "89f57d27e88d8cd2e607935d5c64bfeb90b74335e04f2011595ce9c24d5cc60a"
+    },
+    "evidence": "Conversation about replying to a letter. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1E24",
+    "source_sha256": "0b2a3b18abfc7ab83c06757958af6a5f5c6e3f86a483f86e9b97ada5dfbf358e",
+    "reference_id": "message:1E24",
+    "reference_sha256": "256c67c212877d6381b49718aecc861f7d2d5d4b2d95208e5f3368cdbc77088e",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "256c67c212877d6381b49718aecc861f7d2d5d4b2d95208e5f3368cdbc77088e"
+    },
+    "evidence": "Annual wishes conversation retains the repeated-wish context. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1F6F",
+    "source_sha256": "cc4edfa27d5740f657cd1c484f2ea2cf7c2be2506c843dd1a71bacdb8e42373b",
+    "reference_id": "message:1F6F",
+    "reference_sha256": "5d3d45c9731a290bfb05e6e87df4d88ce577a12a23f2c94ffd902daf0f8a6896",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "5d3d45c9731a290bfb05e6e87df4d88ce577a12a23f2c94ffd902daf0f8a6896"
+    },
+    "evidence": "Giant stag beetle hunting conversation retains morning/evening search advice; the English Resetti joke is incidental. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:202D",
+    "source_sha256": "2e1f021a5873add7c78149ba7d8b02cdd59adcd9a7c06f5868aefb7d8befacfa",
+    "reference_id": "message:202D",
+    "reference_sha256": "f5806db08b29c9c4e5f3827e0134961798584bfaa80e9279c570e93a88445a05",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "f5806db08b29c9c4e5f3827e0134961798584bfaa80e9279c570e93a88445a05"
+    },
+    "evidence": "Offer of old clothes preserves the original acceptance/refusal choices and branches. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2227",
+    "source_sha256": "4cedf510abc3580feb4ba4dec33d72493b1e8f99cb0cba187ffffa789c7ed647",
+    "reference_id": "message:2227",
+    "reference_sha256": "65ee6994c552733081c3f1024fcb4846b04341398278a3c61cae35a696281bf0",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "65ee6994c552733081c3f1024fcb4846b04341398278a3c61cae35a696281bf0"
+    },
+    "evidence": "Greeting for a player who visits the resident house frequently. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:258B",
+    "source_sha256": "2579f4a434a6a40914aba3638cf6fbc4bcb1785f243108f4e5d978a4c896c680",
+    "reference_id": "message:258B",
+    "reference_sha256": "f005768dc434b8a1b8a78db15690a2fcff0a1a9fe1829582f956ce12d3bf21f6",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "baa7e68a9eb14a9db113f10a956e55e997521cbc0d6b74d1bf6df1c6d438e169"
+    },
+    "evidence": "Joining the sports club; the player trains alone while the resident recruits members. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:25B9",
+    "source_sha256": "1f5b55e5cd17fb47e8f03d2af87c7a65ca6688f89c493a1bd42f2a312497bdbc",
+    "reference_id": "message:25B9",
+    "reference_sha256": "a0d6de9ce2e664b74d08b0d17d803359216b28d2050b87bdef436104e5084c01",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a0d6de9ce2e664b74d08b0d17d803359216b28d2050b87bdef436104e5084c01"
+    },
+    "evidence": "Favourite weekend-day question retains all four native choices and their order. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:25BA",
+    "source_sha256": "9703c9988bb797550b193aa66764da2eae5ce18553681d5a7be5ca9c86c181ec",
+    "reference_id": "message:25BA",
+    "reference_sha256": "e322565c256809a86833ecd245b417f45744ee2dbcdbe9a339f1c80f797a9ec2",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e322565c256809a86833ecd245b417f45744ee2dbcdbe9a339f1c80f797a9ec2"
+    },
+    "evidence": "Resident declines the offered gyroid. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:25BC",
+    "source_sha256": "b7eb37a29ece4f45f3c631e3c756b3b21703ab72550dda1ab3500b65bd069eea",
+    "reference_id": "message:25BC",
+    "reference_sha256": "2ade9ecf48f9a65f1a26562a015a3f5eb1f717877f2f877e6b3ac4053447bb61",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "2ade9ecf48f9a65f1a26562a015a3f5eb1f717877f2f877e6b3ac4053447bb61"
+    },
+    "evidence": "Food-club founding and cooking conversation names the player president; original gameplay and actor controls remain. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2610",
+    "source_sha256": "d39e63cf3a8134bc2a9b84fbe3b86b0ce20aa1fadab76a52fe2ef08b937e55db",
+    "reference_id": "message:2610",
+    "reference_sha256": "0604502877f955c9d47db8a519c5d26b1401aedc642fee172195af9f4d1f9eb3",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "0604502877f955c9d47db8a519c5d26b1401aedc642fee172195af9f4d1f9eb3"
+    },
+    "evidence": "Snowy-day dangerous-sport joke retains the supplied sport field and admission that the speaker has not tried it. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2703",
+    "source_sha256": "081028dc4b4549f0207d541a42ed387bbeb96307eae1f69b84d854fea223aa2a",
+    "reference_id": "message:2703",
+    "reference_sha256": "14bc2e2ecdf8ea52559528cc70fdae2191002209561ebf249e273ffbefd4961e",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "14bc2e2ecdf8ea52559528cc70fdae2191002209561ebf249e273ffbefd4961e"
+    },
+    "evidence": "Fishing tournament conversation retains Sundays during the tournament month and advice to seek larger bass later in the day. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:271F",
+    "source_sha256": "c1bf2136c9bbac2fe84b6aba7bf2d6755009ea2bbd7db0b5599efa7a8071872c",
+    "reference_id": "message:271F",
+    "reference_sha256": "f984f2574560af199be668f209e459363cba598594b0da06d8d9b293a59b6bcf",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "f984f2574560af199be668f209e459363cba598594b0da06d8d9b293a59b6bcf"
+    },
+    "evidence": "New Year countdown conversation says staying up late is worthwhile. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:282B",
+    "source_sha256": "9a956ee18afb821f77d4ba4d47d260217b2b771e4e874e6bd0e66987888b3b3e",
+    "reference_id": "message:282B",
+    "reference_sha256": "3d30c5f569613f68981f2e805c99232e0d9334c3cfc9c637d156aa7549c39a47",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "3d30c5f569613f68981f2e805c99232e0d9334c3cfc9c637d156aa7549c39a47"
+    },
+    "evidence": "Mushroom-season conversation retains its short duration; native ten days and English rarely even ten days agree. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2840",
+    "source_sha256": "38b2ba3d4dc1e5ae71cdd4eacdca12a638642d8d60330c363189ee50510b74c0",
+    "reference_id": "message:2840",
+    "reference_sha256": "81dd9093d887124f4bda977956590db3e95cc943a4d613c996ba378bee37e80d",
+    "speaker_catchphrase": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "81dd9093d887124f4bda977956590db3e95cc943a4d613c996ba378bee37e80d"
+    },
+    "evidence": "Six-in-the-morning conversation about sunrise and early breakfast. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
   }
 ]

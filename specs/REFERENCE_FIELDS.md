@@ -40,8 +40,8 @@ consumers; actual N64 instructions establish the sources used here.
 
 Catchphrase `1C` has a different contract: the main handler passes the actor at
 message-window offset `20` into the installed catchphrase reader. New catchphrase
-requests remain withheld pending caller-context review; this permission cannot
-admit them.
+requests require their own [resident-speaker contract](REFERENCE_CATCHPHRASES.md);
+this current-player/current-town permission cannot admit them.
 
 ## Approval and preservation contract
 

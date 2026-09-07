@@ -140,17 +140,16 @@ alongside the native wording. Seven original advice/travel drafts cover
 pass. See [draft contract](../specs/NATIVE_ADVICE_TRAVEL.md). Ordinary actions,
 draft wording/layout review, and blank native-record flow review remain.
 
-Catchphrase `1C` receives the message's actor at window offset `20`; its caller
-identity still requires a distinct check before added-field permission. Its
-read-only semantic audit finds viable native errand/reward and ordinary resident
-conversation matches, but also changed choices, actor sequences, blank records,
-and different topics. Do not import all forty as one unrestricted class.
-Twenty-seven meaning-reviewed candidates pass the remaining flow and expansion
-comparison after setting aside only the added catchphrase: `036A`, `039A`,
-`03BB`, `03BF`, `0428`, `042D`, `0439`, `0524`, `084A`, `0AE2`, `0F30`, `129D`,
-`16CA`, `1AEC`, `1E24`, `1F6F`, `202D`, `2227`, `258B`, `25B9`, `25BA`, `25BC`,
-`2610`, `2703`, `271F`, `282B`, and `2840`. This is a next-audit list, not an
-enabled field permission or a claim of passed ordinary gameplay.
+Twenty-seven individually approved resident conversations add the speaker's
+catchphrase under a separate [hash-bound contract](../specs/REFERENCE_CATCHPHRASES.md).
+The native appearance request/initializer preserves the actor through window
+`2E0` to client `20`. All 27 actual initializer/DMA loads and field dispatches
+pass, with distinct long defaults, custom input, null-client clearing, complete
+source retention, and guards. This is not ordinary NPC traversal or final review.
+The remaining thirteen catchphrase-only rejections have changed choices/actor
+commands, blank native records, or different topics; do not import them as an
+unrestricted class. Broader missing-field, control-signature, and unconfirmed
+identity batches remain, alongside the native festival drafts above.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |

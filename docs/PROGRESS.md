@@ -135,7 +135,7 @@ user's direction. The production build retains the approved spacing metrics.
 - Reference import retains GameCube presentation commands and restores matching
   N64 actor-demo arguments. Read-only text insertions may differ only when the
   N64 message already supplies the requested fields or an individually hash-bound
-  current-player/current-town approval establishes the added fields. Flow commands
+  current-player/current-town or resident-speaker approval establishes the added fields. Flow commands
   stay ordered; actor-prepared fields retain their original restrictions.
 - Dialogue-only reference delivery accepts the GameCube's own page and button-wait
   layout when gameplay commands still agree. It does not reflow or remove English
@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 406 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 415 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -454,17 +454,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/native-advice-pilot/`
-contains 10,515 edits, including
-9,242 reference dialogue candidates, all 460 choices, and 28 original dialogue
+The current experimental resident-module pilot in `build/resident-catchphrase-pilot/`
+contains 10,542 edits, including
+9,269 reference dialogue candidates, all 460 choices, and 28 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,482
+still require review. The original main-bank audit leaves 2,455
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,382 conservative layout warnings include full default
+listed below. The 1,388 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/native-advice-candidates/` and `build/native-advice-coverage/`. The independent
+`build/resident-catchphrase-candidates/` and `build/resident-catchphrase-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -528,7 +528,7 @@ complete resulting text/headers, player-name colour spans, cursor positions,
 unchanged source names, buffer/module guards, and checkpoint restoration.
 Existing candidates and production runtime/font/save structures are unchanged.
 Seventeen additional conservative layout-warning records remain for polish.
-The complete 406-test suite passes with the shared validation changes.
+The complete 415-test suite passes with the shared validation changes.
 Different GameCube festival, tailor, and travel-rule records stay withheld for
 native-specific translation. See [reviewed field contract](../specs/REFERENCE_FIELDS.md).
 
@@ -542,6 +542,20 @@ batch passes, and all seven complete native cartridge loads pass with guards
 and checkpoint restoration. Ordinary travel/post-office actions and draft
 presentation review remain. Existing candidates and production code are unchanged.
 
+Twenty-seven [resident catchphrase approvals](../specs/REFERENCE_CATCHPHRASES.md)
+retain the full English reference where the native speaker supplies the added
+phrase. The normal talk request preserves its actor through requested window
+`2E0`, native appearance initialization, and client `20`. The permission adds
+only `1C`, binds complete source/reference/output hashes, and cannot combine with
+other added-field or control approvals. All 27 messages pass actual native
+appearance requests, complete initializer/DMA loads, and catchphrase dispatch.
+The batch includes two distinct ten-character defaults, custom input, and a null
+request clearing the previous client: 91 native calls and 432 assertions pass.
+Complete actor/animal sources, message/window/stack/module guards, and checkpoint
+restoration pass. The full 415-test regression suite passes. All existing 10,515
+edits remain unchanged, as do production runtime, font, and saved structures.
+Ordinary NPC traversal and final dialogue/presentation review remain.
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -549,15 +563,15 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,515 edits, including
-9,242 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,542 edits, including
+9,269 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, and seven native
 advice/travel drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,483 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,482 main records without
-candidates: 1,551 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,456 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,455 main records without
+candidates: 1,524 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.
