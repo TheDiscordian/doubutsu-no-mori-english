@@ -14,6 +14,15 @@ substitute words, or shift indices to manufacture a match. Retain the exact
 GameCube capitalisation and spelling. Missing identities remain explicit in each
 bank's generated remaining report.
 
+An additional alias pass may transfer an already confirmed placed-object name
+to the ordinary item that the pinned native `800BF10C` conversion actually reads.
+Require identical complete Japanese source fields, a valid donor source/reference
+hash, a complete plain-Latin name within the destination capacity, and no original
+draft override. Conflicting English values fail. Four rotations yield one target
+edit, not four translations. Preserve the donor reference ID and record the native
+source/converted item IDs. Remove accepted aliases from the corresponding remaining
+report and count modified slots separately from distinct reference IDs.
+
 Require the native slot hash, expected legacy donor ID, and complete padded
 sixteen-byte GameCube reference hash. Accept only supported plain Latin text.
 Complete names of at most ten bytes are padded to the original native width.

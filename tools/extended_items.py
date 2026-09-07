@@ -8,6 +8,7 @@ import struct
 
 from aflib import CODE_VROM, by_vrom, sha256, verified_rom
 from item_candidates import item_candidates
+from item_aliases import confirmed_aliases, update_alias_reports
 from textbanks import banks
 from textcodec import LATIN, command_info, encode, tokenize
 
@@ -87,9 +88,10 @@ def main():
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
-    edits, reports = [], {}
+    edits, reports, remaining_by_bank = [], {}, {}
+    source_banks = {bank.name: bank for bank in banks(rom)}
     args.output.mkdir(parents=True, exist_ok=True)
-    for bank in banks(rom):
+    for bank in source_banks.values():
         if not bank.name.startswith("item_"):
             continue
         reference_name = "furniture" if bank.name == "item_10" else bank.name
@@ -98,7 +100,12 @@ def main():
         candidates, _, remaining, report = item_candidates(bank, rows, refs, info, capacity=WIDTH)
         edits.extend(candidates)
         reports[bank.name] = report
-        (args.output/(bank.name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in remaining))
+        remaining_by_bank[bank.name] = remaining
+    aliases = confirmed_aliases(source_banks, edits, info, capacity=WIDTH)
+    update_alias_reports(edits, aliases, remaining_by_bank, reports)
+    edits.extend(aliases)
+    for name, remaining in remaining_by_bank.items():
+        (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in remaining))
     data = resource(rom, edits)
     report = {"source_sha256": sha256(rom), "data_sha256": sha256(data), "banks": reports, "edits": edits,
               "status": "local candidates; no native caller expansion or translation review implied"}

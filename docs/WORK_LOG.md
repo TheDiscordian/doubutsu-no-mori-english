@@ -617,6 +617,33 @@
   START opens the inventory and reaches the uniform's native grab/cancel menu.
   The adapted reminder still needs its own ordinary-gameplay traversal.
 
+### Verified clothing alias and ordinary uniform equipment
+
+- Added a guarded native placed-item alias pass. The confirmed W-shirt donor
+  `item_10:0A84` has the same native Japanese field as `item_24:00B6`; retail
+  conversion reads that ordinary row for all four placed rotations. The pass
+  transfers the complete seven-character name and its verified reference hash,
+  rejects conflicting/stale/nonplain donors, and preserves original overrides.
+  Remaining reports and per-bank slot counters are updated together.
+- The alias build contains 10,361 ordinary edits and 231 ten-byte item slots,
+  still representing 107 distinct reference IDs. The separate wider resource
+  contains 649 candidate slots and 282 distinct reference IDs. Resource SHA-256:
+  `a1f6d036f41518d3268236122aedecba52f18a62b1b1ae7fbc8b3e740c1c4341`.
+  ROM SHA-256:
+  `40b658b275c351ff515696fcfe76b88707c51c7d261d55203a0b12638abd37b2`.
+  UPS SHA-256:
+  `b9170009c7d8ecec0059daa0e17d0d8a28de2bfd911f0be93eb69e493a713b1f`.
+- All 125 local tests pass. `smoke-alias-native-01` passes 29 recorded steps,
+  including direct ordinary loading and all four placed rotations with guards.
+  `smoke-alias-fields-01` repeats all 429 MIPS field/wrapper calls in 1,634 steps,
+  now including the English ordinary alias. The runtime module is unchanged.
+- Normal space-build gameplay selects the uniform, grabs it, moves it to the
+  avatar, and equips it. `smoke-space-first-job-01` passes 30 steps, with Nook's
+  acknowledgement `07F4` and English planting request `07F6`/`07F7`.
+  `smoke-space-first-job-outside-01` records nine steps and read-only proof of
+  equipped item `2410`, the previous shirt in pocket zero, and ten planting
+  items in pockets one through ten. The actual planting/save work remains.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

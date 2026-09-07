@@ -18,6 +18,7 @@ from reference_sequences import reference_sequence_edits
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
+from item_aliases import confirmed_aliases, update_alias_reports
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -164,6 +165,7 @@ def main():
     manifests.extend(name_manifests)
     reports["npc_names"] = name_report
     (args.output/"npc_names-remaining.jsonl").write_text("".join(json.dumps(r)+"\n" for r in name_remaining))
+    item_remaining_by_bank = {}
     for name, bank in source_banks.items():
         if not name.startswith("item_"):
             continue
@@ -175,7 +177,18 @@ def main():
         edits.extend(item_edits)
         manifests.extend(item_manifests)
         reports[name] = item_report
-        (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in item_remaining))
+        item_remaining_by_bank[name] = item_remaining
+    aliases = confirmed_aliases(source_banks, edits, info, skip_ids=override_ids)
+    update_alias_reports(edits, aliases, item_remaining_by_bank, reports)
+    edits.extend(aliases)
+    for edit in aliases:
+        encoded = encode(edit["translation"], info)
+        manifest = {k: v for k, v in edit.items() if k != "translation"}
+        manifest.update(encoded_bytes=len(encoded), encoded_sha256=sha256(encoded), stored_bytes=10,
+                        stored_sha256=sha256(encoded.ljust(10, b" ")), layout_issues=[], expanded_bound=len(encoded))
+        manifests.append(manifest)
+    for name, remaining in item_remaining_by_bank.items():
+        (args.output/(name+"-remaining.jsonl")).write_text("".join(json.dumps(r)+"\n" for r in remaining))
     if matches.keys()-visited_matches:
         raise ValueError(f"Reviewed references are absent from the inventory: {matches.keys()-visited_matches}")
     selected = {edit["id"] for edit in edits}

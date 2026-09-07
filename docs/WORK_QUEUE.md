@@ -17,7 +17,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
 | R02 | Choice strings beyond ten bytes | active | All 460 choices import; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; full review and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; catchphrase, gyroid, mail, special-name, and shop constraints identified; wider imports remain gated |
-| R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; 107 item-name candidates occupy 230 ten-byte slots; all 4,547 item-ID cases have passing runs, with one unexplained initial stop retained; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and a confirmed clothing alias remain |
+| R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; 107 item reference IDs occupy 231 ten-byte slots; all 4,547 item-ID cases have passing runs, with one unexplained initial stop retained; sixteen-byte main item fields, one item-ID wrapper, and a confirmed clothing alias pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | pending | Safe expansion, editing, display, delivery, and save/reload |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
 | R07 | Remaining message matching | active | Hash-bound identities and complete sequence approvals implemented; Nook explanation, both choices, English purchase, and complete work-offer traversal pass; further matching remains |
@@ -31,7 +31,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
-| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, house purchase, both explanation choices, English work offer, shop entry, and uniform handoff pass; normal save and introductory jobs remain |
+| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, house purchase, both explanation choices, English work offer, shop entry, uniform equipment/acknowledgement, and planting instructions pass; normal save and introductory jobs remain |
 | V03 | Save/reload and long names | pending | Isolated FlashRAM, RTC, no lost/truncated text, restart across sessions |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |

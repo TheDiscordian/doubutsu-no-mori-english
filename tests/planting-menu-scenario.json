@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "f", "duration": 0.2},
+  {"key": "s", "duration": 0.15},
+  {"snapshot_player": true},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 2},
+  {"key": "g", "duration": 0.04},
+  {"key": "a", "duration": 0.08},
+  {"wait": 2},
+  {"capture": "planting-menu.png"},
+  {"snapshot_inventory": true, "expect_inventory": {"cloth_item": "2410"}},
+  {"save_state": true}
+]

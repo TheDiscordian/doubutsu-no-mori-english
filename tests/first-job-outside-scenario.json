@@ -1,0 +1,10 @@
+[
+  {"wait": 2},
+  {"snapshot_inventory": true},
+  {"key": "s", "duration": 0.4},
+  {"wait": 4},
+  {"capture": "first-job-outside.png"},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"save_state": true}
+]

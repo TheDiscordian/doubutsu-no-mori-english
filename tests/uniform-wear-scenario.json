@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"key": "a", "duration": 0.08},
+  {"wait": 2},
+  {"capture": "uniform-equipped-inventory.png"},
+  {"key": "b", "duration": 0.08},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 2},
+  {"capture": "uniform-equipped-shop.png"},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

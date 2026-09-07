@@ -7,18 +7,11 @@ from pathlib import Path
 
 from aflib import by_vrom, sha256, verified_rom
 from item_candidates import FURNITURE_COUNT
+from item_aliases import ordinary_item
 from textbanks import banks
 
 
-def ordinary_item(item):
-    for start, end, base in ((0x17AC, 0x1BA8, 0x2400), (0x1BA8, 0x1C28, 0x2D00),
-                              (0x1C28, 0x1CA8, 0x2300), (0x1CA8, 0x1D28, 0x2204)):
-        if start <= item < end:
-            return base+((item-start) >> 2)
-    return item
-
-
-def scenario(original, rom):
+def scenario(original, rom, only_items=None):
     data = by_vrom(rom)[0x10F4000].extract(rom)
     source = by_vrom(original)[0x10F4000].extract(original)
     if len(data) != len(source):
@@ -29,8 +22,13 @@ def scenario(original, rom):
         group = int(name.split("_")[1], 16)
         items += ([0x1000+i for i in range(FURNITURE_COUNT*4)] if group == 0x10 else
                   [(group << 8)+i for i in range(len(bank.entries()))])
+    items += [0, 0x3000, 0xFFFF]
+    if only_items is not None:
+        if not only_items or len(only_items) != len(set(only_items)) or set(only_items)-set(items):
+            raise ValueError("Requested native test items must be unique known cases")
+        items = list(only_items)
     actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
-    for item in [*items, 0, 0x3000, 0xFFFF]:
+    for item in items:
         converted = ordinary_item(item)
         if converted == 0:
             expected = b" "*10
@@ -59,9 +57,11 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--batch-size", type=int, help="Bound each isolated scenario to this many item loads")
+    parser.add_argument("--item", type=lambda value: int(value, 0), action="append",
+                        help="Repeat to run only explicit native item cases")
     args = parser.parse_args()
     original, rom = verified_rom(args.source.read_bytes()), args.rom.read_bytes()
-    actions = scenario(original, rom)
+    actions = scenario(original, rom, args.item)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     outputs = []
     if args.batch_size is not None:

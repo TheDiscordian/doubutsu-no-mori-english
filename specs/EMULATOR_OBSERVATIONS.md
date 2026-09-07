@@ -34,3 +34,17 @@ nonfinite coordinates, and truncated reads.
 This observation does not teleport the player, unlock progression, or establish
 save compatibility. Normal gameplay tests use controller input. Captures belong
 only to the isolated silent emulator display, never the user's working desktop.
+
+## Read-only inventory
+
+`snapshot_inventory` reads the current `PrivateInfo` pointer at `80136FD8`, the
+`common_data.privateInfo` field. Validate the pointer, complete structure bounds,
+gender, and face values. The fifteen pocket item IDs start at private offset `14`;
+the condition bits, wallet, and loan are at `34`, `38`, and `3C`. Clothing ID/item
+are the two halfwords at `A76` and `A78`. These offsets are defined in the pinned
+private headers and the native pocket lookup at `800B8068`.
+
+The snapshot reports IDs, conditions, and balances only. It does not create items,
+change clothes, reduce the loan, or write save data. Scenario assertions can verify
+these observations after actual controller actions, including uniform selection
+and planting. Emulator checkpoints are still distinct from FlashRAM saves.

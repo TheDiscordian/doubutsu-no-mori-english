@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 119 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 125 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -86,7 +86,7 @@ user's direction. The production build retains the approved spacing metrics.
 - Legacy item references recovered from the shipped loader's verified tables.
   All seventeen banks reconstruct unchanged, and 947 furniture groups map to
   their four native rotation slots. These are references, not approved imports.
-- 107 distinct complete English item-name candidates in 230 native storage
+- 107 distinct reference IDs for complete English item-name candidates in 231 native storage
   slots, retaining GameCube spelling/case and the original ten-byte fields.
   Thirty-five direct item-loader calls and their contexts are inventoried.
   Wider imports remain gated on name, message, handbill, and UI destinations.
@@ -94,9 +94,9 @@ user's direction. The production build retains the approved spacing metrics.
   All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
   DMA tests cover every confirmed reference identity, group boundaries, invalid
   inputs, unaligned destinations, resource disabling, and header validation.
-  The resource has 282 candidate identities in 648 slots. This API alone does not
-  enable wider names at a destination. One converted clothing alias still lacks
-  its confirmed English value in the ordinary item group.
+  The resource has 282 candidate reference IDs in 649 slots. This API alone does
+  not enable wider names at a destination. A verified placed-clothing alias fills
+  its ordinary-name destination; direct loading and all four rotations pass.
 - Sixteen-byte main-message item fields with unchanged native structure/save
   layout. All five rows retain complete values, clear shorter replacements,
   and reject overflows. The message insertion hook and item-ID wrapper pass
@@ -132,9 +132,9 @@ item names have separate restrictions. Legacy item references have verified
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,360 edits, including
+The separate resident-module experiment contains 10,361 edits, including
 9,108 reference dialogue candidates, all 460 choices, 178 villager names,
-230 item-name slots, and four N64-specific
+231 item-name slots, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
 Its remaining main-dialogue count is 2,638; matching, actor fields, flow controls,
@@ -177,6 +177,9 @@ Normal gameplay on the space build traverses
 the English purchase confirmation and all four home-explanation records.
 The exercise drafts retain every native command; seasonal-event testing remains.
 Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
+The uniform is equipped through the inventory, acknowledged by Nook, and confirmed
+by the native clothing item ID. The English planting-job instructions complete;
+the planting work and subsequent jobs remain in progress.
 The following clothing reminder has an approved GameCube Y-to-N64-START button
 adaptation in the controller build. Read-only player coordinates support navigation
 without position edits. START opens the inventory during the normal shop test.

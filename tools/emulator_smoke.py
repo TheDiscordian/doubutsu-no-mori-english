@@ -214,6 +214,23 @@ def player_snapshot(debug):
             "world_position": dict(zip(("x", "y", "z"), position)), "read_only": True}
 
 
+def inventory_snapshot(debug):
+    """Read the current native PrivateInfo without editing pockets or clothes."""
+    pointer = int.from_bytes(debug.read_memory(0x80136FD8, 4), "big")
+    if pointer % 4 or not 0x80000000 <= pointer <= 0x80400000-0xBD0:
+        raise ValueError("No valid loaded private-info pointer")
+    data = debug.read_memory(pointer, 0xA7A)
+    if data[0x10] > 1 or data[0x11] > 7:
+        raise ValueError("Invalid native private-info identity")
+    pockets = struct.unpack_from(">15H", data, 0x14)
+    conditions, wallet, loan = struct.unpack_from(">3I", data, 0x34)
+    cloth_id, cloth_item = struct.unpack_from(">2H", data, 0xA76)
+    return {"private_pointer": f"{pointer:08X}", "pockets": [f"{item:04X}" for item in pockets],
+            "item_conditions": [(conditions >> (slot*2)) & 3 for slot in range(15)],
+            "wallet": wallet, "loan": loan, "cloth_id": f"{cloth_id:04X}",
+            "cloth_item": f"{cloth_item:04X}", "read_only": True}
+
+
 def keyboard_snapshot(debug):
     """Locate the English-first overlay in four-MiB RAM and read its state."""
     marker = bytes.fromhex("A0660000A0660001A060000224190300A4790004A4780006")
@@ -457,6 +474,12 @@ def main():
                     raise ValueError(f"Unexpected message: {snapshot.get('message_id')}")
             if action.get("snapshot_player"):
                 results.append(player_snapshot(debug))
+            if action.get("snapshot_inventory"):
+                snapshot = inventory_snapshot(debug)
+                results.append(snapshot)
+                for field, expected in action.get("expect_inventory", {}).items():
+                    if snapshot.get(field) != expected:
+                        raise ValueError(f"Inventory {field}: {snapshot.get(field)!r}, expected {expected!r}")
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 results.append(snapshot)
