@@ -2,7 +2,9 @@
 """Silent ares tests on an isolated X display, with bounded process lifetime."""
 
 import argparse
+from contextlib import contextmanager
 import ctypes
+import fcntl
 import hashlib
 import json
 import math
@@ -14,6 +16,25 @@ import socket
 import subprocess
 import struct
 import time
+
+
+@contextmanager
+def reserve_x_display(tmp=Path("/tmp")):
+    """Serialize startup and choose a display without touching existing sockets."""
+    # Xvfb's automatic -displayfd allocation can replace a live filesystem
+    # socket when its server does not also publish an abstract socket.
+    allocation_lock = tmp / f"af-xvfb-allocation-{os.getuid()}.lock"
+    fd = os.open(allocation_lock, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW, 0o600)
+    with os.fdopen(fd, "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        for number in range(200, 1000):
+            paths = (tmp/f".X{number}-lock", tmp/f".X11-unix/X{number}",
+                     tmp/f".X11-unix/X{number}_")
+            if any(os.path.lexists(path) for path in paths):
+                continue
+            yield str(number)
+            return
+        raise RuntimeError("No unused test X display available between :200 and :999")
 
 
 def write_results(directory, results):
@@ -554,15 +575,17 @@ def main():
     try:
         log = (out / "xvfb.log").open("wb")
         logs.append(log)
-        xvfb = subprocess.Popen(["timeout", "-s", "KILL", str(args.seconds+30), args.xvfb,
-                                  "-displayfd", str(writefd), "-screen", "0", "800x640x24", "-nolisten", "tcp"],
-                                 pass_fds=(writefd,), stdout=log, stderr=log, start_new_session=True)
-        processes.append(xvfb)
-        os.close(writefd)
-        display_number = os.read(readfd, 32).decode().strip()
-        os.close(readfd)
-        if not display_number.isdigit():
-            raise RuntimeError("Xvfb failed to start; see xvfb.log")
+        with reserve_x_display() as selected_display:
+            xvfb = subprocess.Popen(["timeout", "-s", "KILL", str(args.seconds+30), args.xvfb,
+                                      ":"+selected_display, "-displayfd", str(writefd),
+                                      "-screen", "0", "800x640x24", "-nolisten", "tcp"],
+                                     pass_fds=(writefd,), stdout=log, stderr=log, start_new_session=True)
+            processes.append(xvfb)
+            os.close(writefd)
+            display_number = os.read(readfd, 32).decode().strip()
+            os.close(readfd)
+            if display_number != selected_display:
+                raise RuntimeError("Xvfb failed to start on the reserved display; see xvfb.log")
         display = ":"+display_number
         env = dict(os.environ, DISPLAY=display, GDK_BACKEND="x11",
                    SDL_AUDIODRIVER="dummy", PULSE_SERVER="unix:/nonexistent-af-audio")
