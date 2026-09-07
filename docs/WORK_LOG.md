@@ -2881,6 +2881,56 @@
   Normal seasonal gameplay and final draft review remain for the combined
   gameplay and human-playthrough passes.
 
+### Native seasonal conversations and related advice
+
+- Added 21 original drafts in `translations/n64-seasonal-conversations.json`:
+  six shrine/queue conversations, eight moon-viewing conversations, five
+  spring/winter conversations, and the fullness/travel-stock responses.
+  All complete native commands and arguments are preserved, including the slow
+  New Year's proverb recital. The first focused check catches two omitted
+  one-frame pauses in that draft; both are restored before building/testing.
+- The complete spring exchange `1F6B/1F77/1F78` retains choices `011E/0128`
+  (`Maybe...` / `That's not true!`), both branches, and native quest requests
+  `0C/5/0003` and `0C/5/0067`. The GameCube spring-training/groundhog exchange
+  is not imported. `1EB7` keeps inviter field `26`, not player field `1A`.
+  Other native topics retain the shrine, dumpling offerings, rice-cake rabbit,
+  returning insects, winter fishing/neighbours, and other towns' shop stock.
+- Three new host tests check all original hashes, complete ordered controls,
+  expansion limits, layout using the approved advances, spring action order,
+  quest values, and inviter identity. The complete suite passes all 428 tests
+  in 176.758 seconds at `build/tests-native-seasonal-full-01.log`.
+- `build/smoke-native-seasonal-01` passes all 21 complete cartridge message
+  loads in one fresh silent four-MiB process: 114 recorded steps, 21 native
+  calls, and 65 assertions. Full messages/headers, adjacent/module guards,
+  restored stack/checkpoint, blank FlashRAM, and graceful shutdown pass.
+  This tests text loading, not shrine/seasonal actor progression, travel,
+  final presentation, ordinary saving, or hardware compatibility. Runtime code
+  and module bindings are unchanged, so no repeated train or mail-window batch
+  is performed for these content additions.
+- `build/native-seasonal-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `823753ec45c6f646f6b0849d3ddd5f880b98b0f4f81be486891fda54dae4e715`;
+  its verified round-trip UPS has SHA-256
+  `ab59c4c718a83b7de676a6f4148055d601307d63bd243aeb2784acb0fd7b7c42`.
+  The candidate file contains 10,567 edits: 9,269 reference main candidates
+  and 53 original main drafts. All previous 10,546 edits and all 460 choice
+  labels remain unchanged. The main-bank audit leaves 2,430 records without
+  candidates, including 1,499 with Japanese static text. Reference rejections
+  comprise 1,797 unconfirmed identities, 559 control-signature differences,
+  69 unavailable-field references, and six expansion overflows. The 1,388
+  reference-layout warnings are unchanged; original-draft presentation is
+  tracked separately. Reports stay in `build/native-seasonal-candidates/` and
+  `build/native-seasonal-coverage/`.
+  Comparing every extracted DMA file with the festival build finds changes
+  only in main text, its pointer table, and the DMA directory's expected size
+  and physical-address rows. All code, overlays, font data, and wider resources
+  are unchanged; bytes outside the DMA rows in its container are also retained.
+- The remaining moon references `1EA2/1EDD/1EE7` and secret-spot `1F09` have
+  broadly matching meaning but different actor controls. Their next audit
+  should retain matching English reference text under a scoped native-control
+  review. The GameCube `aNPC_check_manpu_demoCode` reads NPC0 slot zero for
+  animation selection; this alone is not proof of N64 values or consumer
+  bounds and does not authorize relaxing the current command guard.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

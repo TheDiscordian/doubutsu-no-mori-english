@@ -1,0 +1,170 @@
+[
+  {
+    "id": "message:1E09",
+    "source_sha256": "5fc249083d641775991943dfd1e4d5a154dd8bbd558a35368090d64ba3799ca3",
+    "translation": "{cmd:7F09000017}With only one shrine in town,\nit's no wonder{cmd:7F0306}\nthere's a queue like this,\n{cmd:7F0308}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native shrine and its queue, not the GameCube wishing well. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1E17",
+    "source_sha256": "a6f357444cf02e92d5d2ab6a9aaaae08e94b954b7e369a7ea467e75cad369cad",
+    "translation": "{cmd:7F090000FF}Two in front,{cmd:7F030A} two behind.{cmd:7F04}\n{cmd:7F09000006}{cmd:7F0314}That means{cmd:7F0306} I'm right\nin the middle!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}Still,{cmd:7F0306}\nthat doesn't do me\nany good,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native queue joke, including the final disappointed aside omitted from the GameCube record. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1E2A",
+    "source_sha256": "648b3644ca5c732918ee4ffc64cd12368295f4f1aab4b7c3fb68933d68b6744e",
+    "translation": "{cmd:7F0900000E}Patience! Patience!{cmd:7F030C}\nThere's no point in me\nlosing my temper{cmd:7F030C}\nhere!{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the resident's self-restraint while queuing, without adding the GameCube speaker-name field or changing the native pauses. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1E2B",
+    "source_sha256": "8b493fb539c3f15a4e6da3969e3378a35b5db12b353b51e6d95d72cdae37edda",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Hey!{cmd:7F0306} {cmd:7F1A}!{cmd:7F0310}\n{cmd:7F090000FF}Have you got something\nyou want to wish for, too?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}If you have,{cmd:7F0306}\nwhy not pay a visit\nto the shrine?{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}If you want to pray,{cmd:7F0308}\ntry asking whoever's\nat the front of the queue.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native shrine visit and asking the front of the queue; do not direct the player to a GameCube wishing well. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1E3E",
+    "source_sha256": "70b7b20dc672d256df804e247066a8f3856cd1ee47f9ba2a06d867c72c14626a",
+    "translation": "{cmd:7F090000FF}\"P{cmd:7F0301}l{cmd:7F0301}a{cmd:7F0301}n{cmd:7F0301} the{cmd:7F0301} y{cmd:7F0301}e{cmd:7F0301}ar{cmd:7F0306}\non{cmd:7F0301} N{cmd:7F0301}ew{cmd:7F0301} Year's{cmd:7F0301} D{cmd:7F0301}a{cmd:7F0301}y\",{cmd:7F0304} they say.{cmd:7F04}\n{cmd:7F02}Making a fresh start{cmd:7F0304}\nand planning ahead{cmd:7F0304}\nat the start of the year{cmd:7F0308}\nisn't such a bad idea.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Most folks{cmd:7F0304} don't stick\nwith it for long, though.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Translate the native proverb about planning the year on New Year's Day and the short-lived resolution joke. Preserve its deliberate slow recital. The GameCube fate/superstition explanation changes the meaning. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1E4E",
+    "source_sha256": "1df888f80fcc1a917e49b9614eb32538e7847aaab2c6435ef93fad0f0cdde768",
+    "translation": "{cmd:7F09000017}Oh dear,{cmd:7F0308} all this queuing{cmd:7F0304}\nhas left me{cmd:7F0302} quite dizzy.{cmd:7F04}\n{cmd:7F02}Still,{cmd:7F0308}\n{cmd:7F09000015}it's our yearly shrine visit.{cmd:7F0310}\nI ought to see it through.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve exhaustion and completing the annual first shrine visit, rather than the GameCube demand that the queue move faster. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EAF",
+    "source_sha256": "672fb8ddb1fca51f04eefd7718668fd0f933747a4b4406d30a24b50d45e0e558",
+    "translation": "Hooray! Hooray!{cmd:7F030C}\nIt's all mine!{cmd:7F030A}\nAll mine!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native claim to everything, in the neighbouring feast/uneaten-food context. Do not replace it with the GameCube claim to the best viewing spot. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EB7",
+    "source_sha256": "946c92de02d5007c55b72abfecaa10af145d0f17588f69c5c8cf09550b043ff0",
+    "translation": "{cmd:7F26} invited me\nto come and see this.\nNow{cmd:7F0306} I've become\na fan of moon viewing!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the inviter in native free field 26 and becoming a moon-viewing fan. The GameCube same-ID text addresses the player about staking out a spot, which is a different conversation. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1ECB",
+    "source_sha256": "606843632cd812f30c47b917b72d18a4c97a99027793ebe214e8e480898eaf76",
+    "translation": "Forget romance!{cmd:7F0306}\nI'm going to eat every\nlast dumpling here today!\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain choosing food over romance and eating the dumplings, not the GameCube candy/sugar-rush conversation. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EE9",
+    "source_sha256": "50a3e7b843df97c0baeb6fd0eb43cd89990dca94d42185cc740e37d209482f40",
+    "translation": "We can make all the offerings\nwe like,{cmd:7F0308} but the moon{cmd:7F0306}\ncan't eat these dumplings!{cmd:7F04}\n{cmd:7F02}Leaving them would be a waste.{cmd:7F030E}\nHow about it?{cmd:7F0306} Want some?{cmd:7F030C}\nThey're pretty good!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain eating the moon's dumpling offerings and inviting the player to share, not the GameCube uncertainty about the gathering. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EEA",
+    "source_sha256": "d0d30e7000dc383d3fc30e29a9ebee54cb45c4614f98eee9bb320a96dbf64fd6",
+    "translation": "Huh?{cmd:7F0308} I was stuffing myself\nwith dumplings{cmd:7F0308} at the\ncherry-blossom viewing, too?{cmd:7F0310}\nDon't go making{cmd:7F0304} accusations!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the callback to eating dumplings at cherry-blossom viewing, not the GameCube complaint about people failing to bring snacks. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EF7",
+    "source_sha256": "3dcad5cf33306a6e58fc7dfc1cc102c1753e8198a6b0e2309071009cfc3a36a1",
+    "translation": "Tell me,{cmd:7F0310} can you see\na rabbit pounding rice cakes\nup there?{cmd:7F0310}\nNo, you can't, can you?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native rabbit-pounding-rice-cakes image in the moon, not the unrelated GameCube marshmallow insult. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EF8",
+    "source_sha256": "f06139d7a3a1238b3aa9a25f15fee22d8968eb3e60dbf5631c3fee8d2eb4bef7",
+    "translation": "Today's a special day,{cmd:7F0308}\nso I've decided I can eat\nas much as I like.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the resident's special-day exemption from limiting food, not the broader GameCube assertion of doing anything. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1EF9",
+    "source_sha256": "7b8f93121ce9ffad419896b17326a8afa90b947f41b9b3c2ce6364994f090921",
+    "translation": "You there,{cmd:7F0306} have you got{cmd:7F0304}\na problem with me?!{cmd:7F030C}\nStaring at the moon{cmd:7F0308}\nwon't fill your stomach!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native defence of eating rather than watching the moon. Do not import the GameCube argument over viewing spots or its added catchphrase. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1F55",
+    "source_sha256": "4577bad236676895e6e84b0874603796baae72630d771364c50a1a09f854adcc",
+    "translation": "{cmd:7F09000015}At this time of year,{cmd:7F0308}\nall the bugs that vanished\nover the winter{cmd:7F0303}\nstart coming back.\n{cmd:7F04}\n{cmd:7F02}The town feels\nso lively again,{cmd:7F0306}\nand that makes me happy,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}I feel like dancing{cmd:7F0306}\nthe lambada!{cmd:7F0310}{cmd:7F04}\n{cmd:7F09000017}If only I knew how\nto dance{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain returning insects and the lively village before the lambada joke. The GameCube shortens the topic to nicer weather and adds a different injury joke. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1F6B",
+    "source_sha256": "0f4d104b4262823303dd266aa1c028f26b2b8f3bf1b79e08fe54c3f9a1722eef",
+    "translation": "{cmd:7F090000FF}Not being able to catch bugs\nall winter{cmd:7F0308} left you feeling\na little bored,{cmd:7F0306}\nright, {cmd:7F1A}?{cmd:7F16011E0128}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1F77}{cmd:7F101F78}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native winter bug-catching question, choices 011E/0128 (Maybe... / That's not true!), and branches 1F77/1F78. Do not import the GameCube spring-training question or choice 006C. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1F76",
+    "source_sha256": "324d7daa152936e31cea2f4f99eaaa38a07d07b936d14037ac9c7d9ad1e8447e",
+    "translation": "{cmd:7F09000017}Are you getting{cmd:7F0306}\nbored now that{cmd:7F0308}\nthe bugs have disappeared,\n{cmd:7F0306}{cmd:7F1C}?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Don't worry,\n{cmd:7F0306}{cmd:7F1A}!{cmd:7F0310}\nWe've still got fish in winter{cmd:7F0308}\nand everyone in {cmd:7F2F}!\n{cmd:7F04}\n{cmd:7F02}And most importantly,{cmd:7F0308}\n{cmd:7F09000012}{cmd:7F0314}you've got ME!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native reassurance about winter fishing, villagers, and the speaker. The GameCube January/time-passing remark is unrelated. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1F77",
+    "source_sha256": "b415edc9c5b46b6d645f81dff3c04ea98dacdc0866cfd83566d3ef5a73a19e4f",
+    "translation": "{cmd:7F0C050003}{cmd:7F09000015}At this time of year,{cmd:7F0308}\nall those bugs\nthat disappeared\nstart coming back!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}We can finally\ngo bug catching again!\n{cmd:7F1A}!{cmd:7F0306} All right!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the affirmative response about insects returning and renewed bug catching, together with exact native quest request 0C/5/0003. The GameCube groundhog conversation is incompatible. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1F78",
+    "source_sha256": "3ab4159037f1ae94ea5078da235da77e8e744397097d1b049a8b8148e4ff7b10",
+    "translation": "{cmd:7F0C050067}{cmd:7F09000007}{cmd:7F0305}All winter long,{cmd:7F0308}\nI've been itching\nto put my training{cmd:7F0306}\nto the test!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}The way I feel now,{cmd:7F0308}\nI could catch\nany bug out there!\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the response about testing winter training on insect catching and exact native quest request 0C/5/0067. The GameCube warm-weather workout invitation is a different response. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:2600",
+    "source_sha256": "0cc653a6d0ea77b0bfe17d5e8f305f575be4feede064a6d821c05e5428cc33d8",
+    "translation": "{cmd:7F0C050066}{cmd:7F09000007}{cmd:7F0305}Ohhh,{cmd:7F0306}\nI'm so full{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nI can't eat another bite{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native fullness response and quest request 0C/5/0066. Do not replace it with the GameCube greeting/belch explanation or added catchphrase. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:285A",
+    "source_sha256": "3a6b2813e36fab3676b19698a8ee9d424d5d0bc2004e0d6d7b0cf7dd765665c5",
+    "translation": "{cmd:7F090000FF}Hey,{cmd:7F0308} have you ever\n{cmd:7F0900000B}gone to visit another town?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Different towns{cmd:7F0304} can have\ndifferent things for sale,\nyou know.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native advice about other towns having different shop stock. The GameCube ghostly-light conversation is unrelated. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  }
+]

@@ -116,7 +116,7 @@ and native request dispatches pass, including complete order-table and memory
 guards. See [request semantics and scope](../specs/ACTOR_REQUESTS.md). Normal
 subsequent actor actions and quest traversal remain gameplay/playthrough checks.
 
-The 76 missing-field rejections include remaining catchphrases (`1C`), player
+The 69 missing-field rejections include remaining catchphrases (`1C`), player
 names (`1A`), town names (`2F`), mixed fields, and incompatible native topics.
 Audit the actual insertion consumers and caller context rather
 than assuming that a field absent from a native message is available globally.
@@ -150,8 +150,19 @@ conversions, six message loads, and eight date insertions with unchanged saves
 and field bounds. Free fields `3C/3D` retain the year's converted event dates,
 not the current date. See [date preparation](../specs/DIALOGUE_DATES.md).
 Normal seasonal selection/rendering and final wording/layout review remain.
-Next native-specific audits include moon-viewing `1EB7/1EF9`, spring `1F77`,
-and visiting-town advice `285A`. Birthday fields `34/35` are separate item
+Twenty-one further [native seasonal drafts](../specs/NATIVE_SEASONAL_CONVERSATIONS.md)
+cover six shrine/queue conversations, eight moon-viewing conversations, five
+spring/winter conversations, and the fullness/travel-stock responses. The
+complete spring question `1F6B` and responses `1F77/1F78` retain native
+choices `011E/0128`, both branches, and quest values. All original commands,
+fields, pauses, and pages are preserved. No reference permissions or production
+runtime changes are needed. All 21 complete cartridge loads pass in one native
+batch, with 65 assertions, adjacent/module guards, and checkpoint restoration;
+the full 428-test suite passes. Final native wording/layout and gameplay remain.
+Further moon-viewing references `1EA2/1EDD/1EE7` and the secret-spot joke `1F09`
+have broadly matching meaning but different actor controls; review a scoped
+reference adaptation rather than replacing them with unrelated dialogue.
+Birthday fields `34/35` are separate item
 slots, not these free fields. Other date preparers and native calendar years
 outside 2000–2032 require their own audit.
 

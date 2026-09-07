@@ -216,7 +216,8 @@ file when needed. Identity overrides do not bypass runtime or control checks.
 The default original edits comprise `translations/opening.json`,
 `translations/n64-exercise.json`, `translations/n64-intro-jobs.json`,
 `translations/n64-shop-menus.json`, `translations/n64-advice-travel.json`,
-and `translations/n64-festivals.json`, subject to declared runtime requirements.
+`translations/n64-festivals.json`, and `translations/n64-seasonal-conversations.json`,
+subject to declared runtime requirements.
 Repeat `--drafts <file>` to select a different
 explicit set; duplicate IDs fail instead of silently overwriting each other.
 
