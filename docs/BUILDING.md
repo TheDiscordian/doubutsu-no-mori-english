@@ -132,7 +132,9 @@ prefix tables locally, builds the provided Fado relocation tool without a
 system installation, and uses the pinned Docker MIPS compiler. Rebuild the
 resident module, then pass `--english-mail-grading build/mail-grading` to the
 ROM builder. This optional patch changes ordinary reply scoring and the quest
-word tables; it does not decode snapshots or enable generated delivery.
+word tables. Combining it with `--english-mail-snapshots` also installs complete
+record decoding before NPC sends and preserves post-office letters on failure.
+Native snapshot generation remains disabled.
 See [grading design](../specs/MAIL_GRADING.md).
 
 `tools/mail_grade_test_scenario.py --rom <built-ROM> --output <ignored-json>`
@@ -141,6 +143,13 @@ guards. It accepts `--module <module.json>` and `--overlay <overlay.json>` for
 non-default builds. Run it in a fresh silent emulator instance; it establishes
 and restores its own checkpoint. `tools/audit_mail_grading.py --rom <native-ROM>`
 reproduces the direct-call and aligned-pointer inventory independently.
+
+`tools/mail_npc_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates full native NPC/post-office send tests for a matching-ROM town
+checkpoint. It accepts the matching `--module` and `--overlay` manifests.
+Tests set controlled in-memory NPC/player/quest state and temporarily clear the
+first-job event; the complete checkpoint must be restored. They do not complete
+introductory jobs or validate FlashRAM saves. See [send integration](../specs/MAIL_NPC_SEND.md).
 
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and

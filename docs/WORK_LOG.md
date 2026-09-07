@@ -1546,6 +1546,90 @@
   semantic template approvals, custom editing, saving, hardware validation,
   and the remaining translation work are not marked complete.
 
+### Complete-letter NPC sending and post-office failure retention
+
+- Connected complete-record decoding to the actual NPC send entry at `800A8868`.
+  The wrapper validates and assembles tagged letters before any NPC mutation,
+  computes separate ordinary and legacy grades across the complete body, and
+  frees its temporary allocation before calling the original send routine.
+  An exact-pointer context supplies those values to both existing body consumers
+  and restores any previous context afterwards. Ordinary mail bypasses decoding.
+  The original reply, friendship, date, quest, gift, and first-job code remains.
+- Audited the actual post-office receipt checker and found it discards NPC mail
+  without checking the send result. A guarded twenty-four-byte shim now lets
+  successful sends clear/count normally and returns failures through the existing
+  epilogue without clearing the letter or incrementing counters. The public
+  `mPO_receipt_proc` path with send type zero propagates this result. The other
+  receipt modes and ordinary Pelly UI still require gameplay validation.
+- Added source-hash, displaced-instruction, trampoline, target-bound, prerequisite,
+  and overlap checks before any installer changes are published. The reference
+  inventory verifies eight entry points across all DMA files, including the one
+  direct NPC send caller. No aligned literal pointers match these entries;
+  computed indirect references remain unproven.
+- Host tests pass every one of the 6,398 full-reference cases, checking both
+  grades and non-space counts without changing the source. Other tests cover
+  ordinary fallback, unaligned allocations, nested contexts, unrelated body
+  pointers, bad envelopes/catalogs/fonts, selected DMA failures, and failure of
+  the second grader allocation. All failures free their storage and avoid
+  native sending. An initial DMA-failure test accumulated read counts across
+  cases; resetting that test counter corrected the overlong injection range.
+  The final complete suite passes 281 tests in 180.694 seconds.
+- The first controlled N64 send test exposed an incorrect expected visitor date
+  in the fixture: native invalid time is `00FFFFFF`, not zero. The guarded native
+  date constant at `80117AE8` now supplies the expectation. No production change
+  was needed for that mismatch. The corrected pre-post-office run,
+  `smoke-mail-npc-sends-02`, passes twenty-six cases, sixty-six native calls,
+  231 assertions, and 508 steps. Its failed predecessor remains local evidence.
+- The final combined build's `smoke-mail-npc-post-full-01` passes 188 train-to-town
+  steps and all ten acceptance checks. Four-MiB configuration, approved font and
+  input, actual reduced malloc arena, and module guards pass. This run supplies
+  the matching-ROM town checkpoint for the following tests.
+- `smoke-mail-npc-post-sends-01` passes thirty-two cases, eighty actual native
+  calls, 313 assertions, and 649 steps. Twenty long-letter cases cover both
+  record kinds and all ordinary ranks across local, visitor, quest, and gift
+  paths. Two ordinary-letter and four rejection cases also pass. Six additional
+  cases call the public post-office receipt function: two successful letters
+  clear/count correctly and four rejected letters remain intact with unchanged
+  counters and a failure return. Exact affected/unrelated NPC and player state,
+  saved compact-letter text, dates, flags, friendship, quest score, source records,
+  scoped context, and stack/module guards pass. The original prize function runs;
+  its random selected item is recorded, not independently predicted.
+- The isolated fixture clears the first-job event only for native send testing
+  and restores the complete machine checkpoint afterwards. It does not establish
+  normal introductory-job completion or ordinary post-office UI progression.
+  Every test FlashRAM remains blank with SHA-256
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- `smoke-mail-npc-post-reader-01` passes all six actual letter windows across
+  156 steps, ten pages, 1,134 glyphs, and 4,536 vertex positions. Full reference
+  text, error letters, edit-open safeguarding, sources/preferences, and guards
+  pass on the final matching-ROM checkpoint. Both final runs restore their
+  checkpoints and shut down cleanly. Earlier pre-post-office native grading and
+  reader regressions also pass in `smoke-mail-npc-grade-01` and
+  `smoke-mail-npc-reader-01`.
+- Resident linked usage is 24,256 bytes, leaving 320 bytes before the separate
+  final 8 KiB test area in the unchanged 32 KiB reservation. The send workspace
+  requests 4,607 bytes including alignment; concurrent grading storage brings
+  peak requested temporary allocation to 11,007 bytes before allocator overhead.
+  Compiler stack-usage reports record the send frame at 96 bytes, restoration
+  at 256, formatting at 1,224, expansion at 64, and unpacking at 408. Unpacking
+  finishes before formatting. Native tests also verify a guard 3,072 bytes below
+  the injected test stack; this does not prove a whole-game stack maximum.
+- Independent module, ROM, and UPS rebuilds match. The source-bound module is
+  in `build/runtime-module/`, repeated in `build/runtime-module-mail-npc-repeat/`.
+  The final and repeated pilots are `build/mail-npc-post-pilot/` and
+  `build/mail-npc-post-repeat-pilot/`. They retain all 10,405 candidate edits,
+  four optional resources, approved font/metrics, full reader, and English
+  grading. The overlay and relocation binaries retain their preceding hashes.
+  Final artifact SHA-256 values:
+
+  - Resident module: `b52e6a94d8a24ca2962261ed96c9a22a083bb947d6942342664b8481c33c8be1`.
+  - ROM: `ea1129ef7c189c5eecff727a611503c5f37608bb5f2f8143d71e4e2dacdce960`.
+  - UPS: `93e02c48cde02ceea77d094ece32906e959afbe064e50a49ba8b038f8a9a2c21`.
+- Native snapshot generation remains disabled. Complete metadata/other-reader
+  coverage, semantic template approvals, missing glyphs, lossless editing,
+  normal delivery, actual save/reload, and original hardware remain required.
+  The repository remains private; no ROM, reference asset, or patch is published.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

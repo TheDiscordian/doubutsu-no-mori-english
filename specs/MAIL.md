@@ -57,8 +57,10 @@ inventory of every inline field access or structure copy. Calls to the shared
 memory routines, stack/static/persistent allocations, rendering, and editor
 destinations still need their own proofs before changing the representation.
 The [NPC reader investigation](MAIL_NPC.md) distinguishes ordinary reply grading
-from the separate letter-quest score path; both consume the native body pointer
-and require complete-text handling before snapshot generation is enabled.
+from the separate letter-quest score path. The combined experimental build
+supplies both through [complete-record send decoding](MAIL_NPC_SEND.md), with
+guarded post-office failure retention. Other readers and metadata still require
+validation before snapshot generation is enabled.
 
 ## Text-bank evidence
 

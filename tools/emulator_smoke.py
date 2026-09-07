@@ -758,6 +758,12 @@ def main():
                 results.append(result)
                 if "expect_return" in call and result["return_value"] != call["expect_return"]:
                     raise ValueError(f"Unexpected function return: {result['return_value']}")
+            if 'test_npc_mail_sends' in action:
+                from mail_npc_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('NPC send probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_npc_mail_sends'],record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():

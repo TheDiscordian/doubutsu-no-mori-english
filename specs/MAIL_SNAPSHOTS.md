@@ -9,7 +9,10 @@ codec is `tools/mail_record.py`; the freestanding C implementation is
 the experimental resident module and pass isolated N64 CPU calls. Native
 generation, editing, and persistence are not connected to these APIs. The
 separately enabled [experimental full reader](MAIL_READER.md) connects them to
-the native letter window for isolated snapshot probes.
+the native letter window for isolated snapshot probes. With English grading,
+the [whole-record send wrapper](MAIL_NPC_SEND.md) also supplies complete decoded
+body scores to ordinary replies and letter quests, preserving rejected letters
+at the post-office receipt boundary.
 See [assembly semantics and executed coverage](MAIL_FORMAT.md).
 
 The snapshot stores immutable template identities plus the exact substitutions,
@@ -183,8 +186,8 @@ by this audit.
 4. Integrate the bounded full-text assembler with header-name placement and
    all display/excerpt readers. Preserve its captured capitalization/article
    behaviour without changing generation state when reading existing letters.
-5. Implement lossless editing and conversion between generated and custom mail,
-   including villager mail grading and quest checks.
+5. Implement lossless editing and conversion between generated and custom mail;
+   validate ordinary gameplay through the complete-record grading/quest hooks.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save
    behaviour, catalog upgrades, and original-hardware operation.
 

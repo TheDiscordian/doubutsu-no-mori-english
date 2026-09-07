@@ -3,11 +3,12 @@
 static unsigned int memory[(AF_MAIL_CHECK_BYTES+AF_MAIL_CHECK_RELOC_BYTES)/4];
 unsigned int af_grade_allocated, af_grade_freed, af_grade_loaded, af_grade_invoked;
 unsigned int af_grade_allocation_size;
+unsigned int af_grade_fail_at;
 int af_grade_fail_allocate, af_grade_wrong_overlay;
 void *af_grade_test_allocate(unsigned int size) {
     ++af_grade_allocated;
     af_grade_allocation_size = size;
-    return af_grade_fail_allocate ? 0 : memory;
+    return af_grade_fail_allocate || af_grade_fail_at == af_grade_allocated ? 0 : memory;
 }
 void af_grade_test_release(void *p) { if (p == memory) ++af_grade_freed; }
 void af_grade_test_load(void *p) {
@@ -20,4 +21,9 @@ int af_grade_test_invoke(void *p, AfMailGrade *out, const unsigned char *body, u
     if (p != memory) return 0;
     ++af_grade_invoked;
     return af_mail_grade(out,body,size);
+}
+int af_grade_test_invoke_word(void *p, int *words, const unsigned char *body, unsigned int size) {
+    if (p != memory) return -1;
+    ++af_grade_invoked;
+    return af_mail_word_rate(words,body,size);
 }

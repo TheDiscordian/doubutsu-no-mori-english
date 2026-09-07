@@ -8,9 +8,13 @@ from pathlib import Path
 from aflib import sha256, verified_rom
 from audit_display_names import audit as audit_references
 
-TARGETS = {'ordinary_grade':0x800A86C4,'length_grade':0x800A8614,'word_rate':0x8009C900}
+TARGETS = {'ordinary_grade':0x800A86C4,'length_grade':0x800A8614,'word_rate':0x8009C900,
+           'send':0x800A8868,'reply_dispatch':0x800A8814,'local_reply':0x800A86E8,
+           'visitor_reply':0x800A8764,'quest_receiver':0x800BBB30}
 EXPECTED = {'ordinary_grade':['800A8718','800A8770'],
-            'length_grade':['800A86D0','800BBACC'],'word_rate':['800A8634']}
+            'length_grade':['800A86D0','800BBACC'],'word_rate':['800A8634'],
+            'send':['800B69B4'],'reply_dispatch':['800A89A0'],'local_reply':['800A8838'],
+            'visitor_reply':['800A8848'],'quest_receiver':['800A8A50']}
 
 
 def audit(rom):
@@ -20,7 +24,7 @@ def audit(rom):
         if ([row['call_ram'] for row in report['callers']] != EXPECTED[name]
                 or report['literal_pointers']):
             raise ValueError('Unexpected native mail grading references: '+name)
-        report['status'] = 'Original body-only callers; computed pointers and full-record snapshot integration remain separate work'
+        report['status'] = 'Original-ROM direct references; installed whole-record send handling and computed pointers require separate validation'
     return {'rom_sha256':sha256(rom),'targets':reports,
             'scope':'Direct jumps/calls and aligned literal pointers across extracted DMA files; not proof that computed indirect references are absent'}
 

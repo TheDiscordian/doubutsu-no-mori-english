@@ -41,12 +41,12 @@ def main():
         (out/relative.parent).mkdir(parents=True, exist_ok=True)
         run("gcc", "-c", "-Os", "-EB", "-mabi=32", "-march=vr4300", "-mfix4300", "-G0",
             "-mno-abicalls", "-fno-pic", "-ffreestanding", "-fno-builtin", "-fno-common",
-            "-fno-stack-protector", "-ffunction-sections", "-fdata-sections", "-Wall", "-Wextra", "-Werror",
+            "-fno-stack-protector", "-ffunction-sections", "-fdata-sections", "-fstack-usage", "-Wall", "-Wextra", "-Werror",
             "-I/source", "/source/"+relative.as_posix(), "-o", name)
         c_objects.append(name)
-    for name in ("header", "watchdog", "bootstrap", "mail_view_hooks"):
+    for name in ("header", "watchdog", "bootstrap", "mail_view_hooks", "mail_npc_hooks"):
         run("as", "-EB", "-mabi=32", "-march=vr4300", "-I", "/out", "-o", name+".o", "/source/"+name+".s")
-    run("ld", "-EB", "-T", "/source/module.ld", "-Map=module.map", "-o", "module.elf", "header.o", "watchdog.o", "mail_view_hooks.o", *c_objects)
+    run("ld", "-EB", "-T", "/source/module.ld", "-Map=module.map", "-o", "module.elf", "header.o", "watchdog.o", "mail_view_hooks.o", "mail_npc_hooks.o", *c_objects)
     run("objcopy", "-O", "binary", "module.elf", "module.bin")
     run("objcopy", "-O", "binary", "-j", ".bootstrap", "bootstrap.o", "bootstrap.bin")
     symbols = {}
@@ -73,6 +73,8 @@ def main():
               "ram": f"{MODULE_RAM:08X}", "vrom": f"{MODULE_VROM:08X}", "reserved_bytes": RESERVATION,
               "linked_bytes": symbols["__module_end"]-MODULE_RAM, "compiler": compiler, "toolchain_image": IMAGE,
               "runtime_sources": source_hashes,
+              "stack_usage": {path.with_suffix('.su').as_posix(): (out/path.with_suffix('.su')).read_text()
+                              for path in (p.relative_to(source) for p in sorted(source.rglob('*.c')))},
               "symbols": {name: f"{value:08X}" for name, value in sorted(symbols.items())}, "audit": audit,
               "status": "experimental; boot, heap, gameplay, and hardware validation required"}
     (out/"module.json").write_text(json.dumps(report, indent=2)+"\n")

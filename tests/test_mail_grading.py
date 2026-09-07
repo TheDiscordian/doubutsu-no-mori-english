@@ -63,7 +63,7 @@ class MailGradingTests(unittest.TestCase):
     def setUp(self):
         (C.c_ubyte*1606).in_dll(self.lib,'af_mail_prefixes')[:] = self.prefixes
         for name in ('af_grade_allocated','af_grade_freed','af_grade_loaded','af_grade_invoked',
-                     'af_grade_allocation_size','af_grade_fail_allocate','af_grade_wrong_overlay'):
+                     'af_grade_allocation_size','af_grade_fail_allocate','af_grade_fail_at','af_grade_wrong_overlay'):
             C.c_int.in_dll(self.lib,name).value = 0
 
     def grade(self,text,function='af_mail_grade'):

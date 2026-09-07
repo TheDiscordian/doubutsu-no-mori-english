@@ -21,6 +21,7 @@ from catchphrases import install as install_catchphrases
 from mail_catalog import install as install_mail_catalog
 from mail_view_patch import install as install_mail_view
 from mail_grading import install as install_mail_grading
+from mail_npc import install as install_mail_npc
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -141,6 +142,8 @@ def main():
                                               snapshots=args.english_mail_snapshots)
     if args.english_mail_grading:
         report['mail_grading'] = install_mail_grading(rom,replacements,additions,report.get('runtime_module'),args.english_mail_grading)
+        if args.english_mail_snapshots:
+            report['mail_npc'] = install_mail_npc(rom,replacements,additions,report.get('runtime_module'))
     if args.extended_items:
         report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
     if args.display_names:

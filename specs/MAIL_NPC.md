@@ -5,8 +5,9 @@
 Snapshot letters are not ordinary text. Their complete decoded body must reach
 any grading or quest consumer that reads text, while ordinary/custom letters
 retain their correct representation and bounds. The full-window decoder alone
-does not satisfy this requirement. Generation remains disabled pending this
-work, metadata validation, and semantic template approval.
+does not satisfy this requirement. The whole-record send wrapper handles both
+identified body consumers. Generation remains disabled pending complete metadata
+and other-reader validation, semantic template approval, editing, and saving.
 
 The similarly named gyroid/demo formatter is separate; neither identified
 caller passes a stored letter. See [gyroid display](GYROID_MESSAGE.md).
@@ -54,7 +55,8 @@ punctuation/capitalization, three-letter matches, repetition, spacing, and long
 sentences. The optional English grading patch installs this algorithm for
 ordinary ninety-six-byte native bodies, using virtual space padding to the
 reference's 192-byte capacity. The complete-body API supports up to 1,024 bytes,
-but no snapshot-decoding hook is installed at these body-only consumers.
+and the combined snapshot/grading build supplies complete-body scores through
+the scoped whole-record send wrapper described below.
 
 GAFE01's letter-quest rank helper still calls `mNpc_CheckNormalMail_length`.
 It does not use the ordinary reply scorer. The two reference paths must remain
@@ -76,12 +78,28 @@ extracted DMA files:
 | Ordinary reply, `800A86C4` | `800A8718`, `800A8770` |
 | Length/quest grade, `800A8614` | `800A86D0`, `800BBACC` |
 | Overlay word rate, `8009C900` | `800A8634` |
+| Complete NPC send, `800A8868` | `800B69B4` |
+| Reply dispatch, `800A8814` | `800A89A0` |
+| Local reply, `800A86E8` | `800A8838` |
+| Visitor reply, `800A8764` | `800A8848` |
+| Quest receiver, `800BBB30` | `800A8A50` |
 
-No aligned literal pointers match these three entries. This does not prove
+No aligned literal pointers match these eight entries. This does not prove
 the absence of computed indirect references. The old ordinary grader's call
 at `800A86D0` is bypassed when the optional entry hook is installed. The quest
 call remains active and distinct. Neither inventory nor ordinary-body grading
 authorizes treating snapshot bytes as text or enabling generated delivery.
+
+## Complete-record send wrapper
+
+The combined snapshot/grading build decodes tagged records before native send
+mutation. An exact-pointer context supplies ordinary and distinct legacy grades
+during that one send. Native local/visitor reply, quest, gift, and friendship
+operations remain in place. Untagged records use the original functions through
+verified trampolines. A post-office result shim preserves letters when NPC
+sending rejects them; the original caller otherwise discards them without
+checking its return value. See [complete send integration](MAIL_NPC_SEND.md)
+for ownership, validation, and remaining generation/editor/save requirements.
 
 ## Source evidence
 

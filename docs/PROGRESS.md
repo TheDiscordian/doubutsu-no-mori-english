@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 269 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 281 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -211,7 +211,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 23,424 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 24,256 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -260,8 +260,8 @@ user's direction. The production build retains the approved spacing metrics.
   train-to-town and the complete snapshot-reader and ordinary-layout regressions.
   Ordinary other-owner interaction, the longer English default, and wider custom
   storage/editing remain. The audit distinguishes this routine from actual
-  stored-letter consumers; separate NPC reply and letter-quest grading paths
-  still require complete-text handling. See [gyroid display](../specs/GYROID_MESSAGE.md)
+  stored-letter consumers; the separate NPC reply and letter-quest grading paths
+  use the complete-record integration below. See [gyroid display](../specs/GYROID_MESSAGE.md)
   and [NPC letter readers](../specs/MAIL_NPC.md).
 - Optional English ordinary-letter grading uses the GameCube's seven-rule
   scorer, with bounded English prefix tables in the original on-demand overlay
@@ -271,13 +271,28 @@ user's direction. The production build retains the approved spacing metrics.
   rejection tests pass. Native tests pass 91 calls and 157 assertions, including
   actual cartridge loading, quest gifts/ranks, and local reply flags. The
   combined build passes train-to-town and all six complete-letter reader probes.
-  Native bodies remain ninety-six bytes; the complete-body API does not yet
-  connect snapshots to reply/quest consumers. Generation, visitor outcomes,
-  normal delivery, and saving remain. See [English grading](../specs/MAIL_GRADING.md).
+  Native ordinary bodies remain ninety-six bytes; the combined snapshot build
+  connects complete decoded bodies through the send integration below.
+  Generation, normal delivery, and saving remain. See [English grading](../specs/MAIL_GRADING.md).
+- Whole-record NPC sending decodes tagged letters before native mutation and
+  supplies distinct complete-body ordinary/quest grades through an exact-pointer
+  context. Ordinary records retain native handling. Local and visiting-player
+  reply flags, dates, friendship, gifts, and quest updates execute their original
+  code. A guarded post-office result hook preserves failed letters and counters
+  instead of discarding rejected snapshots. All 6,398 host reference cases pass;
+  the N64 integration passes thirty-two controlled send cases, eighty native
+  calls, and 313 assertions across 649 steps. Source records, unrelated NPC/player
+  state, allocation ownership, nested contexts, and memory guards are checked.
+  The combined build passes all 188 train-to-town steps and ten acceptance checks.
+  Its full-letter reader regression passes all six windows and ten pages, with
+  1,134 glyphs and 4,536 vertex positions checked.
+  These tests restore isolated checkpoints; normal Pelly interaction, actual
+  saving, complete metadata handling, semantic approvals, generation, and lossless
+  editing remain. See [complete-letter sending](../specs/MAIL_NPC_SEND.md).
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-grading-final-pilot/`
+The current experimental resident-module pilot in `build/mail-npc-post-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592

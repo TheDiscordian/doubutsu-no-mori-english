@@ -23,6 +23,7 @@ int af_mail_word_rate(int *words, const unsigned char *body, unsigned int size);
 
 /* Resident loader; invokes the separately installed on-demand scorer. */
 int af_mail_grade_body(AfMailGrade *output, const unsigned char *body, unsigned int size);
+int af_mail_word_rate_body(int *words, const unsigned char *body, unsigned int size);
 unsigned int af_mail_grade_native(const unsigned char *body);
 
 #endif

@@ -15,10 +15,11 @@ reading beyond native storage. A separate complete-body API accepts up to
 this is a bounded extension, not an existing GameCube storage format.
 
 These APIs receive ordinary text only. A binary snapshot must first be decoded
-from a proven whole-record pointer. No such hook is installed here, and native
-snapshot generation remains disabled. Ordinary delivery, visitor memory,
-friendship outcomes, lossless editing, actual saves, and hardware need separate
-validation. See [native consumers](MAIL_NPC.md).
+from a proven whole-record pointer. The combined snapshot/grading build uses
+the [complete-record send wrapper](MAIL_NPC_SEND.md) to do so before NPC
+mutation. Native snapshot generation remains disabled. Normal post-office
+gameplay, lossless editing, actual saves, and hardware need separate validation.
+See [native consumers](MAIL_NPC.md).
 
 ## Ordinary reply rules
 
@@ -87,8 +88,8 @@ neutral. Native DMA, relocation, and instruction/data-cache maintenance remain
 in use. The old quest word-rate loader remains unchanged, including its original
 allocation behaviour; this patch does not claim to harden that allocator path.
 
-Resident code occupies 23,424 bytes, including the 320-byte loader/adapter
-addition. The 32 KiB reservation, heap start, and final 8 KiB test area are
+Resident code and data occupy 24,256 bytes with the complete-record send hooks.
+The 32 KiB reservation, heap start, and final 8 KiB test area are
 unchanged. The main scoring function has an eighty-byte compiler stack frame;
 its callees use additional small frames. Native tests check stack guards.
 

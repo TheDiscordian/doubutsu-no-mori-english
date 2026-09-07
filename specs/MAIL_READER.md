@@ -14,8 +14,10 @@ gift, recipient, sender, and mail-type fields retain their meanings. The marker
 alone never establishes a valid snapshot: catalog identity, complete envelope,
 checksum, fields, source rows, and formatting must all validate. Ordinary records
 without this marker retain their original copy and editor path. All metadata
-writers, other readers, NPC processing, excerpt consumers, delivery, and actual
-save/reload still require integration before generation or release is enabled.
+writers, other readers, excerpt consumers, normal delivery, and actual save/reload
+still require integration before generation or release is enabled. The combined
+grading build supplies [complete-record NPC sending](MAIL_NPC_SEND.md), including
+distinct ordinary/quest grades and post-office failure retention.
 
 ## Initialization and ownership
 
@@ -92,8 +94,9 @@ Host tests cover full reconstruction, measured page spans, extreme section
 lengths, ordinary-record fallback, corrupt snapshots, disabled resources,
 unchanged input and adjacent bytes, special header types, page bounds, native
 close-button priority, and stale/inactive cache input. N64 compilation checks
-the exact display-cache BSS size and rejects other mutable mail globals or
-undefined symbols.
+the exact display-cache BSS size and rejects other mutable globals in the
+codec/formatter/catalog/page/reader objects or undefined symbols. The separate
+NPC send adapter owns one four-byte scoped-context pointer.
 
 `mail_reader_test_scenario.py` selects long classic and composite reference
 witnesses from the installed cartridge catalog. The silent real-window test
@@ -114,6 +117,6 @@ also pass. Both complete machine checkpoints and blank FlashRAM status are
 retained in local evidence; this remains distinct from actual game saving.
 
 Ordinary generation, semantic template matches, missing glyph support, complete
-metadata/excerpt/NPC reader handling, lossless editing, delivery, persistence,
+metadata/excerpt/other-reader handling, lossless editing, normal delivery, persistence,
 and original-hardware validation remain required. No public release or save
 compatibility claim follows from isolated snapshot-window tests.
