@@ -2684,6 +2684,53 @@
   identifies the actual player/town-name consumers and their global sources;
   no added-field permission is enabled without individual meaning/context review.
 
+### Reviewed current-player/current-town dialogue insertions
+
+- Added 26 complete English candidates using individually approved `1A`/`2F`
+  insertions. Native instruction review establishes current-player name reads
+  through `80136FD8` and current-village name reads through `800950D8`, returning
+  `80129E00`. These fields do not use actor-prepared free-string slots. Complete
+  native/reference meanings are reviewed for the selected resident conversations;
+  separate other-player and destination-town fields remain intact.
+- Implemented `available_fields` approvals with complete source/reference/final
+  hashes, exact added-command sets, typed validation permissions, and independent
+  builder checks. Only current player/town fields are supported, only for the
+  resident main-message `reference_layout` policy. Other field requests, actor
+  changes, flow changes, format errors, and expansion bounds keep their checks.
+  Controller, menu, actor-request, sequence, and alias permissions do not transfer
+  into this approval. GameCube wording, manual lines/pages, and pauses remain.
+- Seven new host tests pass, including all 26 retail pairs, stale/altered evidence,
+  article-prefix reference hashes, wrong scopes and added sets, overflows, flow
+  changes, and independent builder rejection. Since the shared validator changes,
+  the complete suite runs once for the batch: 406 tests pass in 176.659 seconds,
+  recorded at `build/tests-global-fields-full-01.log`.
+- `build/smoke-global-field-01` passes 339 recorded steps, 53 native calls, and
+  194 assertions in a fresh four-MiB process. All 26 complete cartridge messages
+  and 27 added insertions pass through their actual native sources/dispatcher.
+  Complete messages, lengths, colour prefixes, cursor positions, unchanged source
+  names, buffer/module guards, verified consumer code, the English suffix return,
+  and checkpoint restoration pass. FlashRAM stays blank, the Pak unchanged, and
+  shutdown is graceful. This is not ordinary actor traversal or visual/hardware
+  acceptance; those remain batched gameplay and human-playthrough requirements.
+- `build/global-field-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `014835ffbd32087b491b17707c04c9395f16f84936d6e0ee209308f16f0c7a6a`;
+  its verified round-trip UPS has SHA-256
+  `7539e80ad9a8b44bda450ea989bf62fbf90ab70d0b00194413d0bc6711de472d`.
+  The candidate file contains 10,508 edits: 9,242 reference dialogue candidates,
+  21 original dialogue drafts, and all 460 choices among the covered banks.
+  All 10,482 existing edits are unchanged. The original main-bank audit leaves
+  2,489 records without candidates, including 1,558 with Japanese static text.
+  There are 1,382 conservative reference-layout warning records. Reports remain
+  local in `build/global-field-candidates/` and `build/global-field-coverage/`.
+- The full missing-field wording audit identifies incompatible Harvest Festival,
+  meteor-shower, tailor-shop, and travel/storage references. They remain withheld
+  for native-specific translation, not a general name-field import. Twenty-seven
+  additional catchphrase-only candidates have plausible native meanings and
+  matching remaining flow/bounds, but need the distinct speaker-context audit.
+  Their IDs and the native-specific draft queue are recorded in `WORK_QUEUE.md`.
+  Runtime code, font assets/metrics, saved layouts, and generation settings stay
+  unchanged; all candidates still require final review.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

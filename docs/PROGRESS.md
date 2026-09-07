@@ -134,7 +134,9 @@ user's direction. The production build retains the approved spacing metrics.
   Fixed-width GameCube item and NPC names are also extracted as local references.
 - Reference import retains GameCube presentation commands and restores matching
   N64 actor-demo arguments. Read-only text insertions may differ only when the
-  N64 message already supplies the requested fields. Flow commands stay ordered.
+  N64 message already supplies the requested fields or an individually hash-bound
+  current-player/current-town approval establishes the added fields. Flow commands
+  stay ordered; actor-prepared fields retain their original restrictions.
 - Dialogue-only reference delivery accepts the GameCube's own page and button-wait
   layout when gameplay commands still agree. It does not reflow or remove English
   pages. Manifests record native/reference counts and retain candidate review status.
@@ -145,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 389 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 406 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -452,17 +454,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/actor-request-pilot/`
-contains 10,482 edits, including
-9,216 reference dialogue candidates, all 460 choices, and 21 original dialogue
+The current experimental resident-module pilot in `build/global-field-pilot/`
+contains 10,508 edits, including
+9,242 reference dialogue candidates, all 460 choices, and 21 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,515
+still require review. The original main-bank audit leaves 2,489
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,365 conservative layout warnings include full default
+listed below. The 1,382 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/actor-request-candidates/` and `build/actor-request-coverage/`. The independent
+`build/global-field-candidates/` and `build/global-field-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -516,6 +518,20 @@ and saved layouts are unchanged. Ordinary NPC actions and quest progression
 remain combined gameplay/human-playthrough work. See
 [native actor-request contract](../specs/ACTOR_REQUESTS.md).
 
+Twenty-six further messages have individually reviewed current-player/current-town
+field permissions, retaining complete GameCube wording/layout and all ordinary
+flow, actor, and expansion guards. Native `1A` and `2F` read verified current
+player/village sources, not actor-prepared free strings. The complete final hashes
+and exact added-field sets are independently checked by the builder. All 26
+cartridge loads and 27 actual insertions pass in a fresh four-MiB run, including
+complete resulting text/headers, player-name colour spans, cursor positions,
+unchanged source names, buffer/module guards, and checkpoint restoration.
+Existing candidates and production runtime/font/save structures are unchanged.
+Seventeen additional conservative layout-warning records remain for polish.
+The complete 406-test suite passes with the shared validation changes.
+Different GameCube festival, tailor, and travel-rule records stay withheld for
+native-specific translation. See [reviewed field contract](../specs/REFERENCE_FIELDS.md).
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -523,14 +539,14 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,482 edits, including
-9,216 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,508 edits, including
+9,242 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, and eleven earlier-shop drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,516 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,515 main records without
-candidates: 1,584 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,490 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,489 main records without
+candidates: 1,558 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

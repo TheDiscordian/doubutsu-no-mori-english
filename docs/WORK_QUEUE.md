@@ -116,22 +116,39 @@ and native request dispatches pass, including complete order-table and memory
 guards. See [request semantics and scope](../specs/ACTOR_REQUESTS.md). Normal
 subsequent actor actions and quest traversal remain gameplay/playthrough checks.
 
-The 140 missing-field rejections include forty catchphrase-only (`1C`), twenty-eight
-player-name-only (`1A`), and twenty-four town-name-only (`2F`) cases, plus mixed and
+The 114 missing-field rejections include forty catchphrase-only (`1C`), sixteen
+player-name-only (`1A`), and ten town-name-only (`2F`) cases, plus mixed and
 other fields. Audit the actual insertion consumers and caller context rather
 than assuming that a field absent from a native message is available globally.
 Do not weaken field/actor guards simply to reduce rejection counts. These audits
 must proceed in bounded content batches, without returning to repeated isolated
 mail tests while broader implementation remains.
 
-Native `1A` reads the current-player pointer at `80136FD8` through `8009EBB0`
-and `8009EC88`; `2F` reads the current town through `800950D8` (fixed address
-`80129E00`) and `8009F428`. These are not actor-prepared free-string slots.
-Their initialization/caller context and each message's meaning still need review
-before approving added fields. In particular, GameCube tailor/event descriptions
-must not be admitted solely because the name field is available. Catchphrase
-`1C` instead receives the message's actor at window offset `20`, so its caller
-identity requires a distinct check. No new field allowance is enabled yet.
+Twenty-six messages have exact, independently source/reference/payload-bound
+permissions for added current-player/current-town fields. Native `1A` reads the
+current-player pointer at `80136FD8` through `8009EBB0` and `8009EC88`; `2F` reads
+the current town through `800950D8` and `8009F428`. All 26 complete cartridge
+loads and 27 native insertions pass, including complete output, colours, cursor,
+source retention, and guards. See [field contract](../specs/REFERENCE_FIELDS.md).
+
+Native-specific drafts are needed for the incompatible reference slots: `119C`
+and `27C0` (carp streamers, not Harvest Festival), `11AC` and `180B` (moon viewing,
+not meteor showers), `11F1` and `14FE` (native advice, not GameCube tailor shops),
+and `0945`, `1BD3`, and `1BD4` (native Controller Pak travel/storage rules).
+`147F/14CF` are native post-wait conversation messages, not GameCube town-entry
+farewells. Blank native records remain separate flow-review items.
+
+Catchphrase `1C` receives the message's actor at window offset `20`; its caller
+identity still requires a distinct check before added-field permission. Its
+read-only semantic audit finds viable native errand/reward and ordinary resident
+conversation matches, but also changed choices, actor sequences, blank records,
+and different topics. Do not import all forty as one unrestricted class.
+Twenty-seven meaning-reviewed candidates pass the remaining flow and expansion
+comparison after setting aside only the added catchphrase: `036A`, `039A`,
+`03BB`, `03BF`, `0428`, `042D`, `0439`, `0524`, `084A`, `0AE2`, `0F30`, `129D`,
+`16CA`, `1AEC`, `1E24`, `1F6F`, `202D`, `2227`, `258B`, `25B9`, `25BA`, `25BC`,
+`2610`, `2703`, `271F`, `282B`, and `2840`. This is a next-audit list, not an
+enabled field permission or a claim of passed ordinary gameplay.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |

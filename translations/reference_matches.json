@@ -1,5 +1,343 @@
 [
   {
+    "id": "message:01A3",
+    "source_sha256": "933d13d01018e66055ea0f38905fefd8cee72e2aab9eb31bd1418a86bc340529",
+    "reference_id": "message:01A3",
+    "reference_sha256": "99597ec9435713ca05ed82dce841e04800cc5eb1b7a6544d5e5a1ea63c4febfe",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "206c1fa8005415fd46b01d94f827d3f6de139d2237db74b88216dd97ed88d422"
+    },
+    "evidence": "Agreement to deliver a forgotten item to another villager by train; the added player name addresses the current helper, and the separate destination field stays intact. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:020C",
+    "source_sha256": "f855d9baaa892eca213f356b3c0b54534fd6ede28bca1a42fa81c2ceefb37408",
+    "reference_id": "message:020C",
+    "reference_sha256": "a422ade2f6c08e1fe6ce9c90278ec09987f4e0fe1af77483756da93c3b04d2ec",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "68ba29c2cc6f827992ec4d8ac780dd0b48c40c5474f5b096d1676cf3a8235f8f"
+    },
+    "evidence": "Returning a borrowed item to a villager who no longer lives in the current town; the native text explicitly says this village. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0215",
+    "source_sha256": "808b76602019f7c5fe9886e98cc2bd2e8ff3ec8a434fdeb05c815ea9464e2c13",
+    "reference_id": "message:0215",
+    "reference_sha256": "6781c809e61471be66d073ad4d998b0af079d8f1cdf83c3b3121aab423e607b0",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "6781c809e61471be66d073ad4d998b0af079d8f1cdf83c3b3121aab423e607b0"
+    },
+    "evidence": "Finding the departed villager to return a borrowed item; the current town is the place being searched, not the destination town. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:02C5",
+    "source_sha256": "57c35b3961e1584add2d076d050d7cf3ecd730e6d26dc64b738e56bc818b06fc",
+    "reference_id": "message:02C5",
+    "reference_sha256": "40c80345f0ecb84dd1a3455587ad36533810cf1996b33145c5c6758155067a9c",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "40c80345f0ecb84dd1a3455587ad36533810cf1996b33145c5c6758155067a9c"
+    },
+    "evidence": "Loss of faith after the player fails a simple task; the English town name is a rhetorical addition, not a task destination. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:03DC",
+    "source_sha256": "fd93cc2930c03e8c5bc020eb9867ae9ace582cdb80632f9b8f787587db812bf6",
+    "reference_id": "message:03DC",
+    "reference_sha256": "b5fddfe4862feca23ea574af2a6422525abf5261581f0632b18e3caf49629180",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "ad1dccbf3ca50748ae86d03bf11d87535ec3e09dd2dc225d0bf20ef213884691"
+    },
+    "evidence": "Reminder to recover a borrowed item from a villager who still lives in the current town. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:04C6",
+    "source_sha256": "db65504e84eb93c5d8919d93524aa58c74cf4ce5ec4c8987982b0761a20ac21a",
+    "reference_id": "message:04C6",
+    "reference_sha256": "fdbc65b1bdd0b0adda2472ea07955400cdfc215fa1e529f2fe92ba67844fb60e",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "fdbc65b1bdd0b0adda2472ea07955400cdfc215fa1e529f2fe92ba67844fb60e"
+    },
+    "evidence": "A nighttime first introduction contrasts the unexpected stranger with the safety of the current village. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0845",
+    "source_sha256": "750e0785b2f5add76d300a4a5fee27c78acc60ec14a4d7d81207b59dd2a3db92",
+    "reference_id": "message:0845",
+    "reference_sha256": "e544be1bc876f5247bfa53f8e0f594a1b6abc6be7823812b33d1c9016edfa14d",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "e544be1bc876f5247bfa53f8e0f594a1b6abc6be7823812b33d1c9016edfa14d"
+    },
+    "evidence": "Post-office letters and enclosing presents through the item screen and A button; both versions describe the same native actions. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0865",
+    "source_sha256": "f633e74b7fc37ba67e2d43648a5180bc36bdc90da01125d457ef0c3b67b1a115",
+    "reference_id": "message:0865",
+    "reference_sha256": "ee55c057321c8360151420536bce4e013bd714613b4d5fd6126483295f00b965",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "ee55c057321c8360151420536bce4e013bd714613b4d5fd6126483295f00b965"
+    },
+    "evidence": "Inviting more player residents into the empty houses and exchanging letters or house visits. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0879",
+    "source_sha256": "720e2ed1a0534d9f7b04acc92c6e06a16519ac6cab54ba7dcf8d18b136a1f6fa",
+    "reference_id": "message:0879",
+    "reference_sha256": "28c22566b1147817acbedbd8f7d7c17d303cb5047e868992b90fadac9bea6b51",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "28c22566b1147817acbedbd8f7d7c17d303cb5047e868992b90fadac9bea6b51"
+    },
+    "evidence": "Inviting friends to occupy the player houses; native second-row/third-column address corresponds to English Acre B-3. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0908",
+    "source_sha256": "17280067454cd4a03cdd721b4eec5ee0f5b62c545ab74c55d661e7938eb4709e",
+    "reference_id": "message:0908",
+    "reference_sha256": "e9f5a37fe431178b11bf6cb70934b0fbe4fb0ebe6efbf779c8e74af21755fc7b",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "e9f5a37fe431178b11bf6cb70934b0fbe4fb0ebe6efbf779c8e74af21755fc7b"
+    },
+    "evidence": "Villagers keep received letters and can show them to others, including after moving; the current-town name identifies where the speaker lives now. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0C8A",
+    "source_sha256": "ce0d4fb9b4a76b9e53cfedf9caa19138f0291ec0b6a1a7ff8dd812abe1e1773f",
+    "reference_id": "message:0C8A",
+    "reference_sha256": "4c8544a51550b52561ab94e88b78e8d0983d4f86b0461712030f434fc3a81165",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "4c8544a51550b52561ab94e88b78e8d0983d4f86b0461712030f434fc3a81165"
+    },
+    "evidence": "A winter afternoon greeting jokes that the player claims not to be cold despite a dripping nose. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0D4E",
+    "source_sha256": "0f534d62dce3504afa4e47080aef66ab4cce35fd92e0edee265e57783a558bba",
+    "reference_id": "message:0D4E",
+    "reference_sha256": "e08256e1a9ef7defcb9030ec67e5b2e083d5f53b4494be9fc3ac68b5d629ec37",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "e08256e1a9ef7defcb9030ec67e5b2e083d5f53b4494be9fc3ac68b5d629ec37"
+    },
+    "evidence": "Valuing an old friend, recalling a former town, and playing the remembered town tune; added current-player address does not replace the distinct saved friend/town fields. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:0E49",
+    "source_sha256": "1bf7b546ac77c7713255ddf308716d2cb3fbb39874f5096bf4d0634efeae38df",
+    "reference_id": "message:0E49",
+    "reference_sha256": "fce2c42d000cd772c59dd6f2e74e7a312bec6ae2311f67d47f90428d4193a6e1",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "fce2c42d000cd772c59dd6f2e74e7a312bec6ae2311f67d47f90428d4193a6e1"
+    },
+    "evidence": "A villager thanks the current player for a cute snowman and offers the reward; the native continuing terminator is retained. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1145",
+    "source_sha256": "4cb23443b17a487adb95f7cfa8220b429bb6dd3cc9430340bd5fa907159b729b",
+    "reference_id": "message:1145",
+    "reference_sha256": "8f31590f58b2feab38d9df82b6a9970188ea2ba03d3b24294cff5e9a84f0cf83",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "c0f6ee92f19b3a351f5511905a3329f8dfecbbf0cb76864b9ac1d66c40efb24d"
+    },
+    "evidence": "A different player brought the speaker a fruit that is scarce in the current village. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1546",
+    "source_sha256": "292e7cf074b0afb8e0d11d3f53d4484ac7524d810e575e9d52613e96b7264a45",
+    "reference_id": "message:1546",
+    "reference_sha256": "b94bc4fb56120f6d527a5e80ad5614566f34f1b23ea34657f91c84e4d1f0c169",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "b94bc4fb56120f6d527a5e80ad5614566f34f1b23ea34657f91c84e4d1f0c169"
+    },
+    "evidence": "A villager praises another player who supplied a fish; the new current-player address remains distinct from the existing other-player field. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:16A3",
+    "source_sha256": "c3f3a7a974d8b7124a3c395cf8defb26428b75fb27e236fb24809dc08a728f4c",
+    "reference_id": "message:16A3",
+    "reference_sha256": "3d7bcf44758912575f56b902180971edfc2ab24476961e74d85b081dc9c48281",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "3d7bcf44758912575f56b902180971edfc2ab24476961e74d85b081dc9c48281"
+    },
+    "evidence": "The speaker objects to being expected to provide endless conversational entertainment. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1811",
+    "source_sha256": "70d872049d5f52f4e0885f3ce7c1629456f27a239ae5690e93af85fbf798cf21",
+    "reference_id": "message:1811",
+    "reference_sha256": "7e7bbca2d8d87650ee5d97bbf0f5f3f097c80afd938f389e286d5c64ff60c278",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "7e7bbca2d8d87650ee5d97bbf0f5f3f097c80afd938f389e286d5c64ff60c278"
+    },
+    "evidence": "Mushrooms appear in limited numbers each day during their season and should be sought early; the current-player address adds no new event or date. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1816",
+    "source_sha256": "1984153fcc41b7abdc5e1ec97550c020002eba56ba34a3bae9caadb1e9d6090e",
+    "reference_id": "message:1816",
+    "reference_sha256": "9b3efbe39ea1e85b24a3fcc6587387bce1faa8f4be34d7cafd0f550f3202094d",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "9b3efbe39ea1e85b24a3fcc6587387bce1faa8f4be34d7cafd0f550f3202094d"
+    },
+    "evidence": "October 31 Halloween, pumpkin masks, and the unusual visitor; both native and English records refer to the same event, unlike the remapped harvest/moon-viewing slots. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:182E",
+    "source_sha256": "f04e653183010bd4ab24214ddf8363b960b4f1c86d9e3e5a72d51d507af27e8b",
+    "reference_id": "message:182E",
+    "reference_sha256": "5da25b3ec1fcfb5b9e91a91b06615b064da83330b825b43b9110f08faafb7167",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "5da25b3ec1fcfb5b9e91a91b06615b064da83330b825b43b9110f08faafb7167"
+    },
+    "evidence": "Sarcastic rejection of the claim that fireworks happen every day; the statement remains a joke and correction, not a changed calendar rule. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1B57",
+    "source_sha256": "90bc1c1df5ae52326940f6676241ef8c7e94b021b0d6cb920a4725077ef3b102",
+    "reference_id": "message:1B57",
+    "reference_sha256": "6f556e17ea4ebd38d9bc6fd966eff343762d4fe2b29c586a7e281ed454a215c0",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "6f556e17ea4ebd38d9bc6fd966eff343762d4fe2b29c586a7e281ed454a215c0"
+    },
+    "evidence": "A peppy villager mocks the current player after a bee sting; Halloween is a mask joke, not a date/event condition. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1B5C",
+    "source_sha256": "8801da0e7255409a0063feb917e28b5d3427039db0ba1111007c7bfb4f60cb03",
+    "reference_id": "message:1B5C",
+    "reference_sha256": "0875027c3786d2be13170520ac4ed4a79de9c345655dcf6251d78983628c2f35",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "0875027c3786d2be13170520ac4ed4a79de9c345655dcf6251d78983628c2f35"
+    },
+    "evidence": "A peppy villager sympathizes with a bee sting and resolves to be careful. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:1B8D",
+    "source_sha256": "a6092b8187ac2d29482265551803da2879560c7dc1c6a2b06468f269d0037107",
+    "reference_id": "message:1B8D",
+    "reference_sha256": "ba1a1c2245b5d75839eb7a3a357dfc995d25c311ef7e0f343e20a7b4b4cdd165",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "ba1a1c2245b5d75839eb7a3a357dfc995d25c311ef7e0f343e20a7b4b4cdd165"
+    },
+    "evidence": "A snooty villager barely recognizes the bee-stung player at night and advises going home. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2496",
+    "source_sha256": "febbab7341e03230aa32a86edfa3c61da35710bddc0d8ebf35666dec70ad8535",
+    "reference_id": "message:2496",
+    "reference_sha256": "845c02d0d76bba2939b47e408b9740cc11df00d9fbfff495873bccd3350358d4",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "67960f6b5373f048895d52a2a5b77af1916c202f8abf90fbbfd7cf0262879ee4"
+    },
+    "evidence": "The named fruit grows locally, making the answer predictable; the native phrase explicitly says this village. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:271E",
+    "source_sha256": "1f0e06419b6c377cb3f72555e93d5ee51d2fd8c59a81be27112b093f17ccc165",
+    "reference_id": "message:271E",
+    "reference_sha256": "0b3f3f9cc3c672385cab531b287731d455e7856e7bf43b31e0e9f5dfbb341bf2",
+    "available_fields": {
+      "commands": [
+        "1A"
+      ],
+      "adapted_sha256": "0b3f3f9cc3c672385cab531b287731d455e7856e7bf43b31e0e9f5dfbb341bf2"
+    },
+    "evidence": "Invitation to the New Year countdown beside the lake; native location and event intent are retained. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2BE4",
+    "source_sha256": "45550540612b539d66c0f08db4c2f579c8fd83900b93c5e3072da5d577d02903",
+    "reference_id": "message:2BE4",
+    "reference_sha256": "730a9176f4bd52e171727e9083aed3b143a6d9fb4e9d629cb32df142b5f29368",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "730a9176f4bd52e171727e9083aed3b143a6d9fb4e9d629cb32df142b5f29368"
+    },
+    "evidence": "Morning first introduction by a resident who asks and repeats the current player name and admits possibly forgetting it. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:2D4D",
+    "source_sha256": "45550540612b539d66c0f08db4c2f579c8fd83900b93c5e3072da5d577d02903",
+    "reference_id": "message:2D4D",
+    "reference_sha256": "730a9176f4bd52e171727e9083aed3b143a6d9fb4e9d629cb32df142b5f29368",
+    "available_fields": {
+      "commands": [
+        "2F"
+      ],
+      "adapted_sha256": "730a9176f4bd52e171727e9083aed3b143a6d9fb4e9d629cb32df142b5f29368"
+    },
+    "evidence": "Morning first introduction by a resident who asks and repeats the current player name and admits possibly forgetting it. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is an in-town resident conversation with a current player and loaded village. Native 1A reads the current-player name through 80136FD8; 2F reads the current town through 800950D8, not an actor-prepared free string. Preserve complete reference layout/timing and normal native actor/flow/capacity checks. See specs/REFERENCE_FIELDS.md. Ordinary traversal and final wording review remain."
+  },
+  {
     "id": "message:02B8",
     "source_sha256": "fd1ef67211ea50746ff5ca5d5868e48149a16c872d959672ccce98a8d937f4b1",
     "reference_id": "message:02B8",

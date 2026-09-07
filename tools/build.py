@@ -28,6 +28,7 @@ from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 from reference_choices import validate_choice_candidate
 from reference_actor_requests import validate_actor_request_candidate
+from reference_fields import field_permit
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -77,7 +78,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 validate_actor_request_candidate(edit["id"], original, replacement, matches)
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
-                               resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]))
+                               resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]),
+                               field_permit=field_permit(edit["id"], original, replacement, matches))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:

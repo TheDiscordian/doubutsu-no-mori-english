@@ -20,6 +20,7 @@ from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 from reference_choices import adapt_choice_reference, validate_choice_candidate
 from reference_actor_requests import adapt_actor_request_reference, validate_actor_request_candidate
+from reference_fields import field_permit, verify_field_reference
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 
@@ -128,16 +129,19 @@ def main():
                             {**reference, "text": reference_text}, original, matches.get(id), info)
                         reference_text, controller_edits = adapt_controller_reference(
                             {**reference, "text": reference_text}, original, matches.get(id), info)
-                        policy = "presentation"
+                        added_fields = matches.get(id, {}).get("available_fields")
+                        verify_field_reference(reference, original, matches.get(id), info)
+                        policy = "reference_layout" if added_fields else "presentation"
                         try:
-                            text, adaptations = adapt_reference(reference_text, original, info,
+                            text, adaptations = adapt_reference(reference_text, original, info, policy,
                                                                 resident_runtime=bool(args.runtime_module))
                             candidate = encode(text, info)
                             validate_entry(original, candidate, info, name, policy,
                                            choice_bytes=choice_bytes,
-                                           resident_runtime=bool(args.runtime_module))
+                                           resident_runtime=bool(args.runtime_module),
+                                           field_permit=field_permit(id, original, candidate, matches))
                         except ValueError as exc:
-                            if name != "message" or str(exc) != "Control signature changed":
+                            if added_fields or name != "message" or str(exc) != "Control signature changed":
                                 raise
                             for policy in ("reference_text", "reference_delivery", "reference_layout"):
                                 try:
@@ -155,6 +159,9 @@ def main():
                         validate_choice_candidate(id, original, candidate, matches)
                         validate_actor_request_candidate(id, original, candidate, matches)
                         adaptations = actor_edits+choice_edits+controller_edits+adaptations
+                        if added_fields:
+                            adaptations.append({"operation": "use_reviewed_current_player_town_fields",
+                                                "commands": added_fields["commands"]})
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

@@ -3,6 +3,7 @@
 from textcodec import LATIN, tokenize
 from aflib import sha256
 from reference_sequences import SequencePermit
+from reference_fields import ReferenceFieldPermit
 from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
@@ -61,9 +62,16 @@ def expanded_bound(data, info):
 
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
-                   sequence_permit=None):
+                   sequence_permit=None, field_permit=None):
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
+    if field_permit is not None:
+        if (not isinstance(field_permit, ReferenceFieldPermit) or bank != "message"
+                or policy != "reference_layout" or not resident_runtime
+                or field_permit.source_sha256 != sha256(original)
+                or field_permit.encoded_sha256 != sha256(replacement)
+                or not field_permit.fields or not field_permit.fields <= {0x1A, 0x2F}):
+            raise ValueError("Additional fields require a complete reviewed player/town-field permit")
     if bank in MAIL_BANKS:
         validate_mail_tokens(tokenize(replacement, info))
     for token in tokenize(replacement, info):
@@ -91,6 +99,10 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
             available |= DATE_FIELDS
         if resident_runtime and 0x21 in available:
             available.add(0x76)
+        if field_permit is not None:
+            if fields(replacement)-available != field_permit.fields:
+                raise ValueError("Additional fields differ from the exact reviewed player/town set")
+            available |= field_permit.fields
         if not fields(replacement) <= available:
             raise ValueError("Reference requests a text field absent from the N64 message")
     if policy == "reviewed_sequence":

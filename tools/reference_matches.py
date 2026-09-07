@@ -8,6 +8,7 @@ from gc_text import plain
 from controller_adaptations import validate_approval
 from reference_choices import validate_choice_approval
 from reference_actor_requests import validate_actor_request_approval
+from reference_fields import validate_field_approval
 
 
 def load_matches(path):
@@ -35,6 +36,7 @@ def load_matches(path):
         validate_approval(record)
         validate_choice_approval(record)
         validate_actor_request_approval(record)
+        validate_field_approval(record)
         result[record["id"]] = record
     return result
 
