@@ -1111,6 +1111,55 @@
   same ROM and UPS hashes, using the independently rebuilt module artifacts.
   Generation hooks, immutable catalogs and identity review, native full-text
   readers, editing, delivery, real saving, and original hardware remain required.
+- `smoke-mail-runtime-items-01` passes the existing wider-item consumer regression
+  against the new module and alias resource: 429 native calls, 998 assertions,
+  and 1,629 recorded steps in four minutes 44.208 seconds. All five main-message
+  fields, the item-ID wrapper, actual DMA, capitalization, exact output limits,
+  fallback, and guards pass. The machine checkpoint is restored. This verifies
+  that moving the linked code/BSS and isolated fixtures preserves these callers;
+  it does not approve the other direct item-name destinations.
+- `smoke-mail-runtime-display-01` passes 37 native calls, 98 assertions, and 228
+  steps in 43.487 seconds. Complete main-message/nameplate output, centering,
+  eight rendered character quads, exact message limits, and stack/graphics/module
+  guards pass with the expanded module. The machine checkpoint is restored, and
+  FlashRAM remains blank.
+- `smoke-mail-runtime-full-02` reaches live `07DD` at recorded steps 201 and 204,
+  but the retained fixed press sequence closes it before the appended arrival
+  action begins. That action correctly refuses the stale, closed message and
+  exhausts its limit; the run fails after eight minutes 3.732 seconds. This is a
+  test-sequencing failure, not a passing full run or a demonstrated ROM crash.
+  The fixed post-town loop is replaced by the observed arrival helper itself.
+  It may choose the first option only in the four observed train prompts
+  `2AE4`, `2ACB`, `2ACC`, and `2AD1`, with a live message and cursor zero. It stops
+  at arrival before another press. Five synthetic tests cover bounds, explicit
+  choice permission, unexpected prompts/cursors, and stale loaded state.
+- The full suite with explicit train-choice permissions passes 211 tests in
+  88.746 seconds. The emulator runner changes no gameplay code, saved data,
+  reference line breaks, or dialogue timing.
+- Extended the native viewer audit to its five-entry state table, read-wait,
+  edit-acceptance, end-callback, dispatcher, and destructor functions. State two
+  handles A/B/START through a shared transition callback; state three performs
+  the persistent mail copy and header/footer preference writes. The destructor
+  only clears the board pointer. Instruction and state-table mutation tests now
+  bypass the full hash deliberately to verify the individual guards themselves.
+  Shared submenu callback effects and opening callers remain unapproved; these
+  observations do not install a snapshot viewer or authorize saved-record tags.
+- `smoke-mail-runtime-catchphrases-01` passes all 261 native calls, 501 assertions,
+  and 1,505 steps in four minutes 16.955 seconds. All 216 default rows, wider main
+  insertion, unchanged four-byte saved/custom values, ambiguous-default fallback,
+  capitalization, exact limits, and guards retain their previous behaviour with
+  the expanded module. The checkpoint is restored. The viewer audit's three
+  targeted tests also pass in 12.625 seconds, and its local report is regenerated.
+- `smoke-mail-runtime-full-03` passes the fresh complete train-to-town regression
+  in six minutes 1.620 seconds: 188 recorded steps, all ten independent acceptance
+  checks, and all seven memory assertions. The observed post-town sequence uses
+  thirty ordinary presses, accepts only the four expected first choices, and
+  stops on live `07DD`. The actual malloc arena starts at `8019C8E0`; four-MiB
+  size, reduced heap size, ready/header values, and `AF32C0DE` guards all pass.
+  The smaller step count removes fixed-loop screenshot records, not acceptance
+  checks. The checkpoint belongs to the new ROM and ends at arrival; FlashRAM
+  is still blank. This is not game-save/reload or hardware validation.
+  GitHub confirms `TheDiscordian/doubutsu-no-mori-english` remains private.
 
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in

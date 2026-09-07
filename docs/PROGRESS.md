@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 209 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 211 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -63,7 +63,9 @@ user's direction. The production build retains the approved spacing metrics.
   radio aside, repeated native emotions, and unchanged outgoing explanation link.
 - Experimental resident runtime module with a verified new DMA entry, 32 KiB
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
-  Four-MiB boot and the complete train-to-town regression pass with intact guards.
+  Four-MiB boot and the complete train-to-town regression pass with intact guards,
+  including the actual malloc arena start. The observed-arrival scenario passes
+  188 recorded steps and all ten acceptance checks on the mail-runtime build.
 - Seven English message date/time substitutions, including full month/weekday
   names, ordinal days, twelve-hour time, and zero-padded minutes/seconds. Portable
   exhaustive tests and native MIPS insertion calls pass. Other UI callers remain.
@@ -186,8 +188,12 @@ user's direction. The production build retains the approved spacing metrics.
   integration remain.
 - The native mail-viewer audit verifies the board object's complete layout,
   field scans, read-mode branch, header-split clamp, and six-line/sixteen-character
-  body limits against the actual overlay. Full-text viewer integration must
-  decode before native normalization and preserve GameCube newline/width intent.
+  body limits against the actual overlay. It also distinguishes the read-wait
+  handler and pointer-clearing destructor from the edit-acceptance path that
+  copies mail and header/footer preferences back into persistent destinations.
+  Shared callbacks and opening callers remain under review. Full-text viewer
+  integration must decode before native normalization and preserve GameCube
+  newline/width intent.
 - Full-letter assembly in Python and resident C preserves complete template
   wording, explicit line breaks, header-name placement, and captured substitutions
   and articles. Thirteen actual English executable routines are hash-guarded;
@@ -210,7 +216,8 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot contains 10,405 edits, including
+The current experimental resident-module pilot in `build/mail-runtime-pilot/`
+contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592
 records without candidates; the classification and remaining restrictions are

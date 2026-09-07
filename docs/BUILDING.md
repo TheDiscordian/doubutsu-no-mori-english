@@ -104,11 +104,13 @@ The `format` suite covers complete assembly, every opcode, rejection, and guards
 All three require the matching module manifest (`--module` when not using the
 default directory). These tests do not enable gameplay mail generation or viewing.
 
-The full runtime-choice scenario finishes with a bounded `advance_to_message`
-action for arrival record `07DD`. The action observes a live message and stops
-before pressing again; unexpected active choices or an exhausted press limit
-fail. It uses only ordinary button input and does not change text pacing or
-gameplay state directly. `tools/validate_runtime_smoke.py <test-directory>`
+After town entry, the full runtime-choice scenario uses a bounded
+`advance_to_message` action for arrival record `07DD`. It observes each live
+message and stops before pressing past arrival. Only the first choice in four
+explicitly named train messages is accepted; unknown prompts, a different
+cursor, and an exhausted press limit fail. It uses ordinary button input and
+does not change text pacing or gameplay state directly.
+`tools/validate_runtime_smoke.py <test-directory>`
 independently requires arrival and all other recorded acceptance checks;
 a runner exit code alone is not a full regression pass.
 

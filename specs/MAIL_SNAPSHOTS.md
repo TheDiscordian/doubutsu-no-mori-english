@@ -139,8 +139,21 @@ pointer is at submenu overlay offset `106E4`.
 | Footer renderer | `808899E4` | Right positioning uses the native sixteen-cell geometry |
 
 The read-only open mode is one; the initializer selects wait state two for that
-mode. Other modes may enter an editor. Exit/writeback paths and every caller's
-mode still need validation before treating a generated-letter view as read-only.
+mode. The verified five-entry state table at `8088ABA4` maps state two to
+`8088913C` and edit acceptance state three to `80889288`. The wait handler checks
+the `D000` A/B/START trigger mask and calls the shared transition callback at
+submenu offset `106B0`, requesting transition four. The wait handler itself
+does not access letter contents. The end handler delegates through offset
+`106AC`; the board destructor at `8088A77C` only clears the board pointer.
+
+Edit acceptance is a separate path. Its copy at `80889324` writes the embedded
+mail back through the persistent pointer at board offset `AC`, then normalizes
+the footer and copies header/footer preferences into the current player record.
+Snapshots must not enter that path as ordinary text. The complete board overlay,
+individual instructions, and all five state-table entries are guarded; mutation
+tests exercise the instruction/table guards independently of the file hash.
+Shared callback effects and every caller's open mode still need independent
+validation before declaring a complete generated-letter read path safe.
 
 A header-split flag would be erased by the current initializer's clamp. A
 decoder must run before any such normalization, and opaque bytes must never be

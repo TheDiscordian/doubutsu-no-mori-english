@@ -44,3 +44,22 @@ class AdvanceMessageTests(unittest.TestCase):
                         {'message_id': '07DD', 'settle_seconds': 0}):
             with self.assertRaises(ValueError):
                 self.run_messages([], options)
+
+    def test_only_explicit_live_first_choices_are_selected(self):
+        options = {'message_id': '07DD', 'choose_first_in': ['2AE4']}
+        pending = {'message_id': '2AE4', 'loaded': 1}
+        target = {'message_id': '07DD', 'loaded': 1}
+        choice = {'choice_state': 2, 'choice_count': 2, 'choice_cursor': 0}
+        calls, records = self.run_messages([pending, target], options, [choice, choice])
+        self.assertEqual(calls, [('a', 0.08)])
+        self.assertIn({'choose_first_in_message': '2AE4'}, records)
+        for message, current in (({**pending, 'loaded': 0}, choice),
+                                  (pending, {**choice, 'choice_cursor': 1}),
+                                  ({**pending, 'message_id': '2ACC'}, choice)):
+            with self.assertRaisesRegex(ValueError, 'active choice'):
+                self.run_messages([message], options, [current])
+
+    def test_bad_choice_permissions_fail_before_input(self):
+        for choices in ('2AE4', [None], [0x2AE4], ['2AE4', '2AE4'], ['2ae4'], ['2AE4']*17):
+            with self.assertRaisesRegex(ValueError, 'first-choice message list'):
+                self.run_messages([], {'message_id': '07DD', 'choose_first_in': choices})

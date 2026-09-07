@@ -11,6 +11,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom
 from audit_mail import CAPACITY_GUARDS, audit, capacity_evidence
 from test_retail import ROM_PATH
 from mail_viewer import GUARDS as VIEWER_GUARDS, RAM as VIEWER_RAM, VROM as VIEWER_VROM, evidence as viewer_evidence
+from mail_viewer import STATE_TABLE_RAM, STATE_HANDLERS, FILE_SHA256 as VIEWER_SHA256
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Native mail code is a local-only input")
@@ -21,6 +22,10 @@ class MailAuditTests(unittest.TestCase):
         self.assertEqual(result["embedded_mail_offset"]+164, result["persistent_mail_pointer_offset"])
         self.assertEqual(result["text_offsets"], {"header": 50, "body": 60, "footer": 156})
         self.assertEqual((result["line_character_limit"], result["body_lines"]), (16, 6))
+        self.assertEqual(result['state_handlers']['2'], '8088913C')
+        self.assertEqual(result['state_handlers']['3'], '80889288')
+        self.assertEqual(result['read_close_trigger_mask'], 'D000')
+        self.assertEqual(result['functions']['destruct']['end'], '8088A794')
         data = bytearray(by_vrom(rom)[VIEWER_VROM].extract(rom))
         class Entry:
             def extract(self, ignored):
@@ -30,7 +35,19 @@ class MailAuditTests(unittest.TestCase):
             with patch("mail_viewer.by_vrom", return_value={VIEWER_VROM: Entry()}):
                 with self.assertRaisesRegex(ValueError, "mail-viewer"):
                     viewer_evidence(rom)
+                # Instruction checks also fail independently of the full hash.
+                with patch('mail_viewer.sha256', return_value=VIEWER_SHA256):
+                    with self.assertRaisesRegex(ValueError, 'instruction guard'):
+                        viewer_evidence(rom)
             data[address-VIEWER_RAM+3] ^= 1
+        for index in range(len(STATE_HANDLERS)):
+            offset = STATE_TABLE_RAM-VIEWER_RAM+index*4+3
+            data[offset] ^= 1
+            with patch('mail_viewer.by_vrom', return_value={VIEWER_VROM: Entry()}), \
+                 patch('mail_viewer.sha256', return_value=VIEWER_SHA256):
+                with self.assertRaisesRegex(ValueError, 'state table'):
+                    viewer_evidence(rom)
+            data[offset] ^= 1
 
     def test_native_mail_size_and_every_instruction_guard(self):
         rom = ROM_PATH.read_bytes()

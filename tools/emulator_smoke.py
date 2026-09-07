@@ -536,12 +536,18 @@ def advance_to_message(debug, keyboard, options, record, pause=time.sleep):
     target = options.get("message_id")
     maximum = options.get("max_presses", 30)
     settle = options.get("settle_seconds", 3)
+    choose_first = options.get("choose_first_in", [])
     if not isinstance(target, str) or len(target) != 4 or any(c not in "0123456789ABCDEF" for c in target):
         raise ValueError("Target message must be four uppercase hexadecimal digits")
     if type(maximum) is not int or not 0 <= maximum <= 100:
         raise ValueError("Invalid advance-to-message press limit")
     if type(settle) not in (int, float) or not 0.1 <= settle <= 10:
         raise ValueError("Invalid advance-to-message settling time")
+    if (not isinstance(choose_first, list) or len(choose_first) > 16
+            or any(not isinstance(value, str) or len(value) != 4
+                   or any(c not in "0123456789ABCDEF" for c in value) for value in choose_first)
+            or len(set(choose_first)) != len(choose_first)):
+        raise ValueError("Invalid explicit first-choice message list")
     for pressed in range(maximum+1):
         pause(settle)
         message = message_snapshot(debug)
@@ -552,7 +558,11 @@ def advance_to_message(debug, keyboard, options, record, pause=time.sleep):
             record({"advanced_to_message": target, "presses": pressed})
             return
         if choice["choice_state"] == 2 and choice["choice_count"] > 0:
-            raise ValueError("Unexpected active choice before target message")
+            if (message.get("loaded") != 1 or message.get("message_id") not in choose_first
+                    or choice.get("choice_cursor") != 0):
+                raise ValueError("Unexpected active choice before target message")
+            if pressed < maximum:
+                record({"choose_first_in_message": message["message_id"]})
         if pressed < maximum:
             keyboard.press("a", 0.08)
     raise ValueError("Target message not reached within the declared press limit")

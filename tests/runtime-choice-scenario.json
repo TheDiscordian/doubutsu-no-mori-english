@@ -33,14 +33,8 @@
   {"snapshot_keyboard": true, "expect_keyboard": {"length": 6, "text_hex": "414141414141"}},
   {"key": "Return", "duration": 0.04},
   {"wait": 5},
-  {"repeat": 35, "actions": [
-    {"key": "a", "duration": 0.08},
-    {"wait": 3},
-    {"snapshot_message": true},
-    {"snapshot_choices": true},
-    {"capture": "town-choice-{index:02d}.png"}
-  ]},
-  {"advance_to_message": {"message_id": "07DD", "max_presses": 30, "settle_seconds": 3}},
+  {"advance_to_message": {"message_id": "07DD", "max_presses": 60, "settle_seconds": 3,
+                          "choose_first_in": ["2AE4", "2ACB", "2ACC", "2AD1"]}},
   {"read": ["80000318", 4], "expect": "00400000"},
   {"save_state": true}
 ]
