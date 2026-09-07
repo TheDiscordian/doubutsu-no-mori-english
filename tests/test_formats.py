@@ -143,7 +143,9 @@ class TextTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "signature"):
             validate_entry(b"\x7f\x30"+original, replacement, self.info, "message", "reference_text")
         with self.assertRaisesRegex(ValueError, "only audited"):
-            validate_entry(original, replacement, self.info, "mail", "reference_text")
+            # Valid mail bytes isolate the policy restriction from mail's
+            # independent command-capability check.
+            validate_entry(b"Hello", b"Hello", self.info, "mail", "reference_text")
 
     def test_demo_adapter_preserves_n64_arguments_and_gamecube_delivery(self):
         self.info[9] = (5, 0)

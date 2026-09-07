@@ -146,6 +146,9 @@ name-cursor patch against its assembly source using the pinned Docker toolchain.
 complete DMA caller and reclaimed-code reference scan.
 `tools/audit_string_callers.py --rom '<retail-ROM-path>'` records the direct
 general-string callers and their immediate argument hints for capacity review.
+`tools/audit_mail.py --rom '<retail-ROM-path>'` repeats the instruction-guarded
+mail-layout and reference inventory using local GameCube text metadata. Its size
+counts are evidence, not approval to expand saved mail fields.
 
 For module tests, append `--post-scenario tests/runtime-module-memory-scenario.json`
 to verify heap bounds and guards after any scenario. The dedicated

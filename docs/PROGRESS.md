@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 171 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 177 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -164,19 +164,29 @@ user's direction. The production build retains the approved spacing metrics.
 - Exact debugger reads account for one-, two-, four-, and eight-byte access
   alignment, including cached reads. Writes preserve neighbouring bytes.
   Incremental result files are atomically replaced for concurrent observers.
+- The mail audit verifies the 164-byte native record and contiguous 10/96/16-byte
+  header/body/footer fields against actual instructions. Ten routine inventories
+  cover assembly, free strings, excerpts, clearing, and copying; eight bank-size
+  reports distinguish shared numeric IDs from GameCube-only records. Complete
+  command-table validation rejects unsupported mail opcodes independently of
+  main-dialogue capabilities, preventing unsupported-token conversion stalls.
+  This withholds one previously accepted composite-mail candidate. Complete
+  English mail still requires a lossless storage/display/editor design and
+  delivery/save validation. See [mail requirements](../specs/MAIL.md).
 
 ## Current reference candidates
 
-The current experimental resident-module pilot contains 10,406 edits, including
+The current experimental resident-module pilot contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,353 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/catchphrase-candidates/` and `build/intro-jobs-coverage/`. The candidate text
-is unchanged from the intro-jobs set; only its layout warnings account for the
-wider catchphrase display.
+`build/mail-audit-candidates/` and `build/intro-jobs-coverage/`. The independent
+mail control gate withholds `mailb:00BB` until native mail supports its
+capitalization command. Main-dialogue candidates are unchanged; layout warnings
+account for the wider catchphrase display.
 
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, and catchphrase resources are not
@@ -185,7 +195,7 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,406 edits, including
+The separate resident-module experiment contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 and the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's

@@ -3,6 +3,7 @@
 from textcodec import LATIN, tokenize
 from aflib import sha256
 from reference_sequences import SequencePermit
+from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -63,6 +64,8 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                    sequence_permit=None):
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
+    if bank in MAIL_BANKS:
+        validate_mail_tokens(tokenize(replacement, info))
     for token in tokenize(replacement, info):
         if token.kind == "cmd":
             if token.data[1] == 0x53 and token.data[2] > 2:

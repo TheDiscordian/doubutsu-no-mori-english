@@ -900,6 +900,47 @@
   introductions and later introductory jobs remain. Atomic result publication
   prevents live observers from reading a partially serialized JSON document.
 
+### Mail representation and consumer audit
+
+- Added a repeatable mail audit with eight exact capacity-instruction guards.
+  Clear/copy use 164-byte records; header/body/footer are ten, 96, and sixteen
+  bytes at offsets `2A`, `34`, and `94`. This corrects reliance on misleading
+  larger offsets in some native header comments without changing game code.
+- Inventoried ten loader/assembly/setter/clear/copy targets across every
+  executable segment and aligned literal data. Direct counts are 17 classic
+  letter assemblers, three explicit-edge-size assemblers, two each header/footer/
+  body loaders, one composite assembler, 54 free-string setters, two message
+  excerpt setters, 39 clear calls, and 30 copy calls. No literal pointers to
+  those targets are found; inline copies and remaining consumers are not covered.
+- Compared raw text sizes across eight mail banks. Of the 544 shared numeric IDs,
+  170 English headers, 490 bodies, and 251 footers exceed their native destination.
+  All 982 English reference records are retained separately from the native-ID
+  subset. Numeric identity and raw byte size are explicitly not semantic or
+  dynamic-expansion approval. Two new audit tests pass, including mutation of
+  every capacity instruction. `specs/MAIL.md` records the complete text, editing,
+  delivery, persistence, and reader requirements for the forthcoming design.
+- Verified the independent twenty-handler mail command table and the native
+  conversion loops' lack of cursor advancement for unsupported commands. The
+  build now rejects main-dialogue-only opcodes in all eight mail banks. Candidate
+  regeneration withholds `mailb:00BB`, whose capitalization command is not
+  implemented by native mail. This prevents that candidate from reaching a
+  stalled conversion path; it is not an attribution of reported legacy crashes.
+- The initial 175-test run has one assertion failure: the existing dialogue-policy
+  restriction test supplied invalid mail commands and consequently reached the
+  new capability guard first. The fixture now uses valid plain mail bytes to
+  test the same policy restriction independently; the new opcode matrix retains
+  the separate rejection coverage.
+- The complete rerun passes 177 tests, including the independently committed
+  Xvfb display-allocation tests. The rebuilt `mail-audit-pilot` contains 10,405
+  edits, with unchanged main-dialogue candidates and module code. ROM SHA-256:
+  `9e1c51f79eb629d56dc2950c13f22364f1407f5f12fafe0e3c724b69a9c659f2`.
+  UPS SHA-256:
+  `e735de312089ecc613b1550224977152c53e4daf7c77738b96c504ccafe84336`.
+  Candidate SHA-256:
+  `7569be729af655f5c196c0f4ed4daac5e778710cca81280f5ea0568b784d73b8`.
+  This build still requires its own gameplay regression and does not imply that
+  English mail assembly, delivery, or saving is implemented.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
