@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
     unsigned short catalog;
     unsigned char kind;
-    unsigned char reserved;
+    unsigned char flags; /* Bit zero: initial sticky capitalization; others zero. */
     unsigned int field_mask;
     unsigned short templates[5];
     AfMailField fields[AF_MAIL_FIELD_COUNT];

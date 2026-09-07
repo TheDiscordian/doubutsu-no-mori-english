@@ -96,8 +96,11 @@ and persistence support them.
 The [generated-letter snapshot prototype](MAIL_SNAPSHOTS.md) stores immutable
 template IDs and literal substitution snapshots within the native 122-byte text
 area. The Python and portable C codecs pass lossless and rejection tests, and
-native copying preserves complete envelopes. This is not installed in the game;
-the discriminator, catalog, full-text readers, editing, and persistence remain.
+native copying preserves complete envelopes. The standalone
+[full-letter assembler](MAIL_FORMAT.md) reconstructs complete text and its
+captured capitalization/article state. These components are not installed in
+the game; the discriminator, approved catalog, full-text readers, editing,
+and persistence remain.
 A display cache alone cannot preserve edited or delivered letters across saving,
 moving, and restarting. No old letter may regenerate different random words or
 current names when read. Custom editor storage remains unresolved separately.

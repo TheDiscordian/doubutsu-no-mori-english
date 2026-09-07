@@ -23,7 +23,7 @@ int af_mail_record_pack(unsigned char *output, unsigned int capacity, const AfMa
     unsigned char data[AF_MAIL_RECORD_BYTES];
     unsigned int i, j, parts, pos;
     if (!output || !record || capacity < AF_MAIL_RECORD_BYTES || !record->catalog
-        || record->kind > 1 || record->reserved || record->field_mask >> AF_MAIL_FIELD_COUNT)
+        || record->kind > 1 || record->flags > 1 || record->field_mask >> AF_MAIL_FIELD_COUNT)
         return 0;
     parts = record->kind ? 5u : 1u;
     pos = 8 + 2*parts;
@@ -40,10 +40,10 @@ int af_mail_record_pack(unsigned char *output, unsigned int capacity, const AfMa
     for (i = 0; i < AF_MAIL_RECORD_BYTES; ++i)
         data[i] = 0;
     data[0] = 0xAF;
-    data[1] = (unsigned char)(0x10u | record->kind);
+    data[1] = (unsigned char)(0x20u | record->kind);
     data[2] = (unsigned char)(pos + 2);
     put16(data + 3, record->catalog);
-    data[5] = (unsigned char)(record->field_mask >> 16);
+    data[5] = (unsigned char)((record->field_mask >> 16) | (record->flags << 4));
     data[6] = (unsigned char)(record->field_mask >> 8);
     data[7] = (unsigned char)record->field_mask;
     pos = 8;
@@ -73,11 +73,11 @@ int af_mail_record_unpack(AfMailRecord *record, const unsigned char *input,
     unsigned char *value_bytes = (unsigned char *)&value;
     if (!record || !input || size != AF_MAIL_RECORD_BYTES || !expected_catalog
         || expected_catalog > 0xFFFFu || input[0] != 0xAF
-        || (input[1] != 0x10 && input[1] != 0x11))
+        || (input[1] != 0x20 && input[1] != 0x21))
         return 0;
     used = input[2];
-    parts = input[1] == 0x11 ? 5u : 1u;
-    if (used < 10 + 2*parts || used > AF_MAIL_RECORD_BYTES || (input[5] & 0xF0)
+    parts = input[1] == 0x21 ? 5u : 1u;
+    if (used < 10 + 2*parts || used > AF_MAIL_RECORD_BYTES || (input[5] & 0xE0)
         || get16(input + 3) != expected_catalog)
         return 0;
     for (i = used; i < AF_MAIL_RECORD_BYTES; ++i)
@@ -88,8 +88,9 @@ int af_mail_record_unpack(AfMailRecord *record, const unsigned char *input,
     for (i = 0; i < sizeof(value); ++i)
         value_bytes[i] = 0;
     value.kind = input[1] & 1;
+    value.flags = (input[5] >> 4) & 1;
     value.catalog = (unsigned short)expected_catalog;
-    value.field_mask = ((unsigned int)input[5] << 16) | ((unsigned int)input[6] << 8) | input[7];
+    value.field_mask = ((unsigned int)(input[5] & 15) << 16) | ((unsigned int)input[6] << 8) | input[7];
     pos = 8;
     for (i = 0; i < parts; ++i) {
         value.templates[i] = (unsigned short)get16(input + pos);

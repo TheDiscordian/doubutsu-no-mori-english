@@ -4,12 +4,15 @@
 
 This is a lossless storage prototype for generated letters. The Python reference
 codec is `tools/mail_record.py`; the freestanding C implementation is
-`runtime/mail/record.c`. The C file is deliberately outside the resident module's
-top-level source list and is not installed in a playable ROM.
+`runtime/mail/record.c`. Full-letter assembly is implemented separately in
+`tools/mail_format.py` and `runtime/mail/format.c`. Both C files are deliberately
+outside the resident module's top-level source list and are not installed in a
+playable ROM. See [assembly semantics](MAIL_FORMAT.md).
 
-The snapshot stores immutable template identities plus the exact substitutions
-and article choices captured when a letter is created. Reading an old letter
-must not draw new random words, obtain current town names, or select a different
+The snapshot stores immutable template identities plus the exact substitutions,
+article choices, and initial capitalization state captured when a letter is
+created. Reading an old letter must not draw new random words, obtain current
+town names, or select a different
 template. Native recipient/sender identities, gifts, stationery, and other
 metadata remain separate. No template IDs are approved semantic matches merely
 because they share a number with a GameCube record.
@@ -29,14 +32,20 @@ are relative to that text area. Multibyte integers are big-endian.
 | Offset | Bytes | Meaning |
 | --- | --- | --- |
 | `00` | 1 | Magic `AF` |
-| `01` | 1 | Version one in the high nibble; kind in the low nibble |
+| `01` | 1 | Version two in the high nibble; kind in the low nibble |
 | `02` | 1 | Used bytes, including checksum, at most 122 |
 | `03` | 2 | Nonzero immutable catalog identity |
-| `05` | 3 | Twenty-field presence bitmap; upper four bits must be zero |
+| `05` | 3 | Twenty-field presence bitmap; bit 20 captures initial capitalization; upper three bits must be zero |
 | `08` | 2 or 10 | One classic letter ID, or five composite part IDs |
 | variable | variable | Present fields, in ascending index order |
 | used minus 2 | 2 | CRC-16/CCITT-FALSE of all preceding used bytes |
 | used | remaining | Zero padding to 122 bytes |
+
+Version two is the current uninstalled prototype. Version-one envelopes are
+rejected; no version-one catalog or generated-mail save format is released.
+The initial-capital bit preserves GAFE01's actual sticky capitalization state
+without making an existing letter depend on global state when reopened. It does
+not increase the record's storage requirement.
 
 Kind zero has one ID naming a header/body/footer triple. Kind one has five IDs
 in `superz`, `maila`, `mailb`, `mailc`, `psz` order. Every ID is sixteen bits;
@@ -64,7 +73,8 @@ rendering semantics. Updating wording requires a new identity, retaining support
 for existing saved catalogs or a verified migration. Catalog numbers must not be
 reused or derived by truncating a hash. The resource builder must validate full
 content hashes, and readers must reject unavailable catalog identities. Test
-catalog number one is synthetic; no release catalog is assigned by this codec.
+catalog numbers one and `FFFF` are test-only; no release catalog is assigned by
+this codec or the local reference preparation tool.
 
 The magic byte is not sufficient to distinguish snapshots from native text.
 Native letters can contain arbitrary font bytes. A verified external record
@@ -72,9 +82,9 @@ discriminator and complete reader audit are required before installation. No
 native `font`, `mailType`, or other metadata bit is currently assigned for this
 purpose. Passing a snapshot to the native text renderer is forbidden.
 
-The codec treats field bytes as literal data. A future formatter must separately
-validate its glyph/control domain and never recursively execute arbitrary field
-bytes as mail commands. Codec acceptance alone does not approve text rendering.
+The codec treats field bytes as literal data. The standalone formatter separately
+validates its glyph/control domain and never recursively executes arbitrary
+field bytes as mail commands. Codec acceptance alone does not approve rendering.
 
 ## Exact capacity evidence
 
@@ -150,8 +160,9 @@ by this audit.
    complete wording, original line breaks, and frozen substitution semantics.
 3. Expand mail free-string sources with exact source identity and article data,
    capturing only used fields without losing original random selections.
-4. Implement bounded full-text assembly, including header-name placement,
-   capitalization/article behaviour, and all display/excerpt readers.
+4. Integrate the bounded full-text assembler with header-name placement and
+   all display/excerpt readers. Preserve its captured capitalization/article
+   behaviour without changing generation state when reading existing letters.
 5. Implement lossless editing and conversion between generated and custom mail,
    including villager mail grading and quest checks.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save

@@ -48,7 +48,7 @@ class MailRecordTests(unittest.TestCase):
         for _ in range(1000):
             slots = sorted(rng.sample(range(20), rng.randrange(7)))
             fields = tuple((i, Field(rng.randbytes(rng.randrange(17)), rng.randrange(5))) for i in slots)
-            self.roundtrip(self.record(rng.randrange(2), fields))
+            self.roundtrip(replace(self.record(rng.randrange(2), fields), initial_capital=bool(rng.randrange(2))))
 
     def test_all_single_bit_corruptions_and_wrong_catalog_are_rejected(self):
         record = self.record(1, ((0, Field(b"town ")), (19, Field(b"an item", 2))))
@@ -74,7 +74,8 @@ class MailRecordTests(unittest.TestCase):
             changed[size-2:size] = binascii.crc_hqx(changed[:size-2], 0xFFFF).to_bytes(2, "big")
             with self.assertRaises(ValueError):
                 unpack(bytes(changed), expected_catalog=1)
-        mutate(5, 0x10)  # Reserved upper field bit.
+        mutate(5, 0x20)  # Reserved upper field bit, above the capital-state bit.
+        mutate(1, 0x10)  # Unreleased version one did not capture capital state.
         mutate(7, 3)    # Claims a second field without a second payload.
         mutate(7, 0)    # Leaves an unclaimed payload.
         mutate(10, 17)  # Exceeds the sixteen-byte field contract.
@@ -85,6 +86,7 @@ class MailRecordTests(unittest.TestCase):
         base = self.record()
         bad = [replace(base, catalog=value) for value in (0, 65536, True)]
         bad += [replace(base, kind=value) for value in (-1, 2, True)]
+        bad += [replace(base, initial_capital=value) for value in (0, 1, None)]
         bad += [replace(base, templates=value) for value in ((), (1, 2), (-1,), (65536,), (True,))]
         for fields in (((20, Field(b"x")),), ((0, Field(b"x"*17)),),
                        ((0, Field(b"x", 5)),), ((0, Field(b"x", True)),),

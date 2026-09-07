@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 191 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 199 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -182,11 +182,26 @@ user's direction. The production build retains the approved spacing metrics.
   the remaining record requiring actual source bounds. All 287 native command/
   copy calls pass, including complete ordinary/villager mail record copying.
   The codec is not installed in the resident module. Record discrimination,
-  full-text assembly/readers, custom editing, and save integration remain.
+  full-text reader integration, custom editing, and save integration remain.
 - The native mail-viewer audit verifies the board object's complete layout,
   field scans, read-mode branch, header-split clamp, and six-line/sixteen-character
   body limits against the actual overlay. Full-text viewer integration must
   decode before native normalization and preserve GameCube newline/width intent.
+- Standalone full-letter assembly in Python and C preserves complete template
+  wording, explicit line breaks, header-name placement, and captured substitutions
+  and articles. Thirteen actual English executable routines are hash-guarded;
+  the supplied GameCube release's sticky capitalization is captured in snapshot
+  version two, so rereading a letter cannot change its case. Python, C, and an
+  independent in-place reference model agree on 6,398 retail-template probes,
+  all field/length/article/state combinations, malformed input, and guarded
+  output tests. The reference preparation tool converts 4,807 of 4,866 mail
+  parts; 59 require glyph support and remain rejected. Two probes of classic
+  `0001` still require actual source-width evidence. Both C files cross-compile
+  for VR4300 with no undefined symbols or mutable globals. All 287 native
+  command/copy calls also pass with version-two envelopes and captured capital
+  state; the machine checkpoint is restored. The new C code is not yet
+  installed or executed as MIPS code; module/test-memory changes, catalog
+  identity review, generation/viewer hooks, and save validation remain.
 
 ## Current reference candidates
 

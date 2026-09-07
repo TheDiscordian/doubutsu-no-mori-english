@@ -20,7 +20,7 @@ class CField(C.Structure):
 
 
 class CRecord(C.Structure):
-    _fields_ = [("catalog", C.c_ushort), ("kind", C.c_ubyte), ("reserved", C.c_ubyte),
+    _fields_ = [("catalog", C.c_ushort), ("kind", C.c_ubyte), ("flags", C.c_ubyte),
                 ("field_mask", C.c_uint), ("templates", C.c_ushort*5), ("fields", CField*20)]
 
 
@@ -41,7 +41,7 @@ class MailRecordCTests(unittest.TestCase):
         cls.temporary.cleanup()
 
     def native(self, record):
-        value = CRecord(catalog=record.catalog, kind=record.kind)
+        value = CRecord(catalog=record.catalog, kind=record.kind, flags=record.initial_capital)
         for i, template in enumerate(record.templates):
             value.templates[i] = template
         for index, field in record.fields:
@@ -73,7 +73,8 @@ class MailRecordCTests(unittest.TestCase):
         for _ in range(500):
             slots = sorted(rng.sample(range(20), rng.randrange(7)))
             fields = tuple((i, Field(rng.randbytes(rng.randrange(17)), rng.randrange(5))) for i in slots)
-            self.roundtrip(Record(rng.randrange(1, 65536), 1, tuple(rng.randrange(65536) for _ in range(5)), fields))
+            self.roundtrip(Record(rng.randrange(1, 65536), 1, tuple(rng.randrange(65536) for _ in range(5)), fields,
+                                  bool(rng.randrange(2))))
         self.roundtrip(Record(1, 1, (0, 1, 2, 3, 383), tuple((i, Field(bytes(range(16)), 4)) for i in range(6))))
 
     def reject(self, data, catalog=1, size=122):
@@ -94,7 +95,7 @@ class MailRecordCTests(unittest.TestCase):
         for size in (0, 121, 123, 0xFFFFFFFF):
             self.reject(data, size=size)
         self.reject(None)
-        for offset, value in ((5, 16), (7, 0), (7, 3), (10, 17), (10, 0xA4), (10, 16)):
+        for offset, value in ((5, 32), (1, 0x10), (7, 0), (7, 3), (10, 17), (10, 0xA4), (10, 16)):
             changed = bytearray(data)
             changed[offset] = value
             used = changed[2]
@@ -108,7 +109,7 @@ class MailRecordCTests(unittest.TestCase):
         for capacity in (0, 121):
             self.assertEqual(self.lib.af_mail_record_pack(output, capacity, C.byref(native)), 0)
             self.assertEqual(output.raw, b"!"*128)
-        for attr, value in (("catalog", 0), ("kind", 2), ("reserved", 1), ("field_mask", 0x100000), ("field_mask", 127)):
+        for attr, value in (("catalog", 0), ("kind", 2), ("flags", 2), ("field_mask", 0x100000), ("field_mask", 127)):
             old = getattr(native, attr)
             setattr(native, attr, value)
             self.assertEqual(self.lib.af_mail_record_pack(output, 122, C.byref(native)), 0)

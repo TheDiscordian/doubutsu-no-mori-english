@@ -991,6 +991,57 @@
   71.417 seconds. No playable-ROM or saved-record bytes change in this viewer
   audit; its next implementation step remains the decoder/viewer integration.
 
+### Full generated-letter assembly and captured capitalization
+
+- Verified thirteen complete mail-related functions in the supplied GAFE01
+  executable. Both article-clear and capital-clear routines are identical and
+  reset only the article override. The actual release therefore retains capital
+  state between insertions and letters, unlike the source's optional bug fix.
+  Snapshot version two captures initial capitalization in an unused bitmap bit,
+  retaining the same 122-byte size and all literal field data. Version one is an
+  uninstalled prototype and is rejected rather than reinterpreted as version two.
+- Implemented full-letter assembly in Python and freestanding C, with exact
+  classic/composite processing order, article suppression, sticky capitalization,
+  empty insertion behaviour, header split adjustment, and all explicit template
+  spaces/newlines. The output holds up to 1,024 bytes and rejects overflow,
+  missing fields, unsupported commands, and unsafe literal field bytes without
+  partially overwriting the destination. Source buffers are not modified.
+- Added a source-verified reference preparation tool with hashes for all eight
+  mail banks, the decoder, thirteen executable functions, and the general-string
+  article bank. It prepares 4,807 of 4,866 parts without changing glyph identity;
+  59 remain explicitly rejected. The output is an ignored local reference
+  bundle, not a release catalog or approved native/reference mapping.
+- Python, C, and an independent in-place model agree on 6,398 retail-template
+  probes and the synthetic field/length/article/capitalization matrix. The probes
+  cover classic triples, diagonal composites, each native reply part selection,
+  largest-field-union witnesses, and both initial states, not every composite
+  combination. Fifty-eight requested combinations encounter rejected glyph rows.
+  Two classic `0001` probes use ten-byte fields for formatter testing only; actual
+  source bounds remain unresolved. Observed maximum header/body/footer lengths
+  are 22/228/51 bytes, with a 255-byte largest aggregate result. No wording is
+  shortened to the native or GameCube body storage capacity.
+- The combined C implementation cross-compiles with pinned GCC 14.2.0 for
+  big-endian VR4300/o32. The relocatable object has no undefined symbols or
+  mutable global data/BSS; GNU size reports 2,851 text-category bytes. Object
+  SHA-256: `e234b7b47461c8ed5caa48b40e6aabec7522587f2bd371803faa567c47b08d05`.
+  The formatter's compiler-reported frame is 1,224 bytes; nested pack and expand
+  frames are 152 and 64 bytes. This code is not installed or executed on MIPS.
+- The complete local suite passes 199 tests in 77.636 seconds. Production ROM,
+  font metrics/assets, and candidate imports are unchanged. The next integration
+  step is the resident-module/test-memory layout, followed by actual C execution,
+  immutable catalog resources, and native generator/viewer connections.
+- `smoke-mail-native-v2-01` passes all 878 steps, 287 native calls, and 293 memory
+  assertions in three minutes fourteen seconds. The ordinary and villager-mail
+  conversions preserve version-two envelopes with initial capitalization set,
+  including the fully occupied 122-byte case. Memory guards pass and the machine
+  checkpoint is restored. The unchanged blank FlashRAM hash is
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+  This exercises native copying, not the C formatter or actual save/reload.
+- Local reference-bundle SHA-256:
+  `f8fa5d0c766dfa7fd520c6e051b66c5a7cf077d06777acf841211a647b94565b`.
+  Native version-two scenario SHA-256:
+  `8db1073fe6738a2ade24acbfc4f75074ec3ddacb11b96dadb8f9cd8f8001a937`.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -57,9 +57,9 @@ def scenario(rom, module):
     read(text-16, guard+expected.ljust(96, b" ")+guard)
     read(split-16, guard+struct.pack(">I", 11)+guard)
     records = [Record(1, 0, (543,), ()),
-               Record(1, 0, (10,), ((0, Field(b"town  ")), (19, Field(b"some item", 4)))),
+               Record(1, 0, (10,), ((0, Field(b"town  ")), (19, Field(b"some item", 4))), True),
                Record(1, 1, (0, 32, 64, 96, 383),
-                      tuple((i*3, Field(bytes(range(i*16, (i+1)*16)), i % 5)) for i in range(6)))]
+                      tuple((i*3, Field(bytes(range(i*16, (i+1)*16)), i % 5)) for i in range(6)), True)]
     for record in records:
         envelope = pack(record)
         value = bytearray(b"M"*164)

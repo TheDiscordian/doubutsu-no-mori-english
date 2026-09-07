@@ -9,7 +9,7 @@ from dataclasses import dataclass
 import binascii
 
 RECORD_BYTES = 122
-VERSION = 1
+VERSION = 2
 MAGIC = 0xAF
 FIELD_COUNT = 20
 FIELD_BYTES = 16
@@ -28,6 +28,7 @@ class Record:
     kind: int
     templates: tuple[int, ...]
     fields: tuple[tuple[int, Field], ...]
+    initial_capital: bool = False
 
 
 def integer(value, lo, hi, description):
@@ -52,6 +53,8 @@ def pack(record):
         raise ValueError("Expected a mail snapshot record")
     integer(record.catalog, 1, 0xFFFF, "catalog identity")
     integer(record.kind, 0, 1, "template kind")
+    if type(record.initial_capital) is not bool:
+        raise ValueError("Invalid mail initial capitalization state")
     if len(record.templates) != PARTS[record.kind]:
         raise ValueError("Wrong mail template count")
     for template in record.templates:
@@ -74,7 +77,7 @@ def pack(record):
         raise ValueError("Mail snapshot exceeds native text storage")
     data = bytearray((MAGIC, (VERSION << 4) | record.kind, size))
     data.extend(record.catalog.to_bytes(2, "big"))
-    data.extend(mask.to_bytes(3, "big"))
+    data.extend((mask | (int(record.initial_capital) << FIELD_COUNT)).to_bytes(3, "big"))
     for template in record.templates:
         data.extend(template.to_bytes(2, "big"))
     data.extend(payload)
@@ -105,8 +108,10 @@ def unpack(data, *, expected_catalog):
     if catalog != expected_catalog:
         raise ValueError("Mail snapshot requires a different immutable catalog")
     mask = int.from_bytes(data[5:8], "big")
-    if mask >> FIELD_COUNT:
+    if mask >> (FIELD_COUNT+1):
         raise ValueError("Reserved mail field bits are set")
+    initial_capital = bool(mask & (1 << FIELD_COUNT))
+    mask &= (1 << FIELD_COUNT)-1
     pos = 8
     templates = tuple(int.from_bytes(data[pos+2*i:pos+2*i+2], "big") for i in range(PARTS[kind]))
     pos += 2*PARTS[kind]
@@ -123,4 +128,4 @@ def unpack(data, *, expected_catalog):
             pos += width
     if pos != size-2:
         raise ValueError("Extra mail snapshot payload")
-    return Record(catalog, kind, templates, tuple(fields))
+    return Record(catalog, kind, templates, tuple(fields), initial_capital)
