@@ -58,6 +58,16 @@ includes parent-menu interaction, complete pointer ownership, generation status
 assignments, and normal custom editing. These checks do not enable generation
 or establish full menu gameplay.
 
+The [whole-letter generation transaction](../specs/MAIL_GENERATION.md) now passes
+all 6,398 supported host reference assembly cases and 53 native generation cases,
+plus 42 native field-capture cases. It preserves complete saved metadata and
+rejects missing fields, overflow, and unavailable resources before publication.
+This code is an isolated heap-loaded probe, not an installed gameplay overlay.
+Next generation work connects approved field/template sources and complete
+native creator boundaries, with bounded loading and failure propagation through
+delivery. Keep ordinary gameplay generation disabled while those checks and
+remaining reader/editor/normal-interaction requirements are incomplete.
+
 ## Main translation and runtime
 
 | ID | Task | Status | Acceptance/evidence |

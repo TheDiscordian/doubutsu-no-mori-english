@@ -2116,6 +2116,56 @@
   read or copy letter text. The board's saved parent-move callback remains an
   explicit ordinary-interaction check, not an inferred passing gameplay test.
 
+### Whole-letter generation transaction development
+
+- Implemented caller-owned complete field capture, immutable-selection field
+  pruning, and atomic 164-byte letter publication in a separate generation
+  source directory. Complete English restoration must succeed before the
+  snapshot marker/text or transient capital state is published. Missing or
+  invalid fields, unavailable catalog parts, and overflow retain the old letter.
+  Failed field replacement invalidates its slot rather than reusing old text.
+- The first host test run exposed an incorrect fixture assumption: classic
+  `0000` has no substitutions, so it cannot test a missing required field.
+  Changed that test to `0002`. The deliberate `0001` overflow fixture now uses
+  its actual required slots ten through nineteen and independently asserts
+  that packing exceeds capacity. The first log remains at
+  `build/tests-mail-generate-targeted.log` (five pass, one fixture failure).
+- Replaced C structure assignments with explicit staged byte copies after the
+  VR4300 compiler emitted unresolved `memcpy` references. The corrected probe
+  compiles to 1,380 bytes without mutable data or unresolved symbols. Its three
+  entry points require zero, thirty-two, and 216 bytes of direct stack, before
+  nested resident calls. SHA-256:
+  `7760f4d3dcaa1402318e2a6fc882d5803599357d259e0c55667873bdfc96313d`.
+  Source/build hashes, imports, relocation audit, and disassembly are recorded
+  under `build/mail-generation-probe/`.
+- The corrected six-test host run passes in 1.177 seconds, including all 6,398
+  supported reference assembly cases and unchanged source/destination guards.
+  Reference parsing is shared within the bulk test rather than repeated for
+  every case. Additional stale-replacement and late-failure capitalization
+  checks also pass in `build/tests-mail-generate-targeted-03.log` (1.196 seconds).
+- `build/smoke-mail-generation-01` passes 1,149 recorded steps, 99 native calls,
+  and all 719 memory assertions. It covers 46 complete English reference cases,
+  seven rejected generation cases, 42 capture cases, complete capture reset,
+  and an additional disabled-resource rejection. Complete generated text,
+  snapshots, metadata, capture state, immutable inputs/code, live-save payload,
+  heap/stack/module guards, allocation free, checkpoint restoration, and graceful
+  shutdown pass. The 8,192-byte fixture is private native-allocated heap memory;
+  the new C code uses actual cartridge DMA and existing resident restoration.
+  Blank FlashRAM and the empty Controller Pak remain unchanged.
+- Six probe-loader tests pass for source/build/import hashes, exported entries,
+  exact internal-jump relocation, immutable external calls, stale or altered
+  inputs, invalid relocation inventories, reserved memory, alignment, and the
+  four-MiB boundary. The twelve combined generator/probe tests pass in 1.156
+  seconds at `build/tests-mail-generation-probe.log`.
+- Ordinary gameplay generation remains disabled. The production module, ROM,
+  font, and candidate texts are unchanged. Native creator bindings, field-source
+  identities, production loading, and failure propagation remain required;
+  see `specs/MAIL_GENERATION.md`.
+- The complete regression suite passes 326 tests in 165.498 seconds at
+  `build/tests-mail-generation-full.log`. Python compilation and whitespace
+  checks pass. The production ROM still has SHA-256
+  `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

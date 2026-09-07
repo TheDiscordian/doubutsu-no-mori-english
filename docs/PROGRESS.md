@@ -41,7 +41,16 @@ native length calls; that shared text helper is not a snapshot reader. Received
 letters select Read, while player-written drafts select Rewrite. Normal UI
 transitions, generated status assignments, and custom editing remain separate
 requirements. See [menu evidence](../specs/MAIL_MENU.md).
-Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
+The isolated whole-letter generation API passes all 6,398 supported host
+reference assembly cases. Native calls pass 46 complete English reference cases,
+seven rejected generations, and 42 capture cases, with complete save retention
+and intact guards. Publication changes only validated text/split bytes and the
+transient capital state. The 1,380-byte generation probe is separate from the
+resident image, which has only 96 linked bytes free. Native creator bindings,
+complete English field sources, on-demand loading, failure propagation, and
+semantic template approval remain. Ordinary gameplay snapshot generation stays
+disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
+[receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -75,7 +84,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 314 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 326 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
