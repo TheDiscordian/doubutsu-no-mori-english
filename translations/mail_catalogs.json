@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "catalogs": [
+    {
+      "catalog": 2,
+      "format": 1,
+      "semantics": 1,
+      "bytes": 319344,
+      "sha256": "d77591525d105391cf8190257b8ea768f521810d4ae5a36d27bcca991442a5e1",
+      "payload_sha256": "a042bd72f6158472722717dd3f19e761ea693ce632ae51acc9aca26c4d99c385",
+      "counts": [982, 982, 982, 384, 384, 384, 384, 384],
+      "unavailable": {
+        "super": [43],
+        "mail": [43, 61, 192, 193, 194, 195, 196, 246, 310, 425, 427, 428, 429, 431, 432, 435, 436, 438, 440, 442, 443, 445, 446, 447, 449, 450, 453, 458, 498, 503, 504, 508, 510, 512, 515, 516, 517, 518, 519, 520, 521, 522, 523, 599, 605, 609, 808, 851, 922, 947, 965],
+        "ps": [43, 114, 115, 116, 156, 955],
+        "superz": [],
+        "maila": [],
+        "mailb": [],
+        "mailc": [],
+        "psz": [77]
+      },
+      "source": "User-supplied GAFE01 revision zero, source-verified by mail_reference.py",
+      "status": "Frozen reference-only catalog; native semantic matches and gameplay integration remain",
+      "encoding": "Existing supported N64 glyph identities; unsupported rows remain unavailable",
+      "assembly": "Semantics one, snapshot version two, captured sticky capitalization and articles",
+      "change_policy": "Never change an assigned identity's content; add a new ID and preserve existing saved catalogs"
+    }
+  ]
+}

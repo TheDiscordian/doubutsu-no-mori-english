@@ -31,9 +31,10 @@ def main():
              '-mno-abicalls', '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common',
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
-    for name in ('record', 'format'):
+    sources = ('record', 'format', 'catalog')
+    for name in sources:
         run('gcc', *flags, '/source/'+name+'.c', '-o', name+'.o')
-    run('ld', '-EB', '-r', '-o', 'mail.o', 'record.o', 'format.o')
+    run('ld', '-EB', '-r', '-o', 'mail.o', *(name+'.o' for name in sources))
     undefined = run('nm', '--undefined-only', 'mail.o')
     if undefined.strip():
         raise ValueError('Unexpected mail runtime dependency: '+undefined)
@@ -48,9 +49,9 @@ def main():
               'source_sha256': {path.name: sha256(path.read_bytes()) for path in sorted(source.iterdir()) if path.is_file()},
               'object_sha256': sha256((out/'mail.o').read_bytes()),
               'object_size': run('size', 'mail.o'), 'sections': sections,
-              'stack_usage': {name: (out/(name+'.su')).read_text() for name in ('record', 'format')},
+              'stack_usage': {name: (out/(name+'.su')).read_text() for name in sources},
               'undefined_symbols': [],
-              'status': 'Cross-compilation only; not installed or executed on MIPS'}
+              'status': 'Compilation and stack evidence only; native execution is recorded by separate emulator scenarios'}
     (out/'mail.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))
 

@@ -75,8 +75,9 @@ rendering semantics. Updating wording requires a new identity, retaining support
 for existing saved catalogs or a verified migration. Catalog numbers must not be
 reused or derived by truncating a hash. The resource builder must validate full
 content hashes, and readers must reject unavailable catalog identities. Test
-catalog numbers one and `FFFF` are test-only; no release catalog is assigned by
-this codec or the local reference preparation tool.
+catalog numbers one and `FFFF` are test-only. [Catalog two](MAIL_CATALOG.md) is
+registered as an immutable experimental GAFE01 reference resource, not a release
+approval or permission to reuse matching numeric IDs as native translations.
 
 The magic byte is not sufficient to distinguish snapshots from native text.
 Native letters can contain arbitrary font bytes. A verified external record
@@ -171,8 +172,8 @@ by this audit.
 
 1. Define a collision-free native record discriminator after auditing every
    metadata reader, copying operation, and persistent destination.
-2. Build immutable, source-verified template catalogs with reviewed identities,
-   complete wording, original line breaks, and frozen substitution semantics.
+2. Complete semantic identity review and missing glyph support for the immutable,
+   source-verified catalog; preserve original line breaks and frozen semantics.
 3. Expand mail free-string sources with exact source identity and article data,
    capturing only used fields without losing original random selections.
 4. Integrate the bounded full-text assembler with header-name placement and
@@ -183,7 +184,7 @@ by this audit.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save
    behaviour, catalog upgrades, and original-hardware operation.
 
-The resident module uses 10,336 linked bytes within a 32 KiB reservation. The
+The resident module uses 11,872 linked bytes within a 32 KiB reservation. The
 linker limits code/data/BSS to the first 24 KiB; isolated native-call fixtures
 and stack use the separate final 8 KiB. Actual codec, formatter, and selected
 English reference tests pass with complete output and memory/stack guard checks.

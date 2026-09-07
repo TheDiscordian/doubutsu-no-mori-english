@@ -91,6 +91,21 @@ All three resource options may be supplied together to a resident-module build.
 See [catchphrase design](../specs/CATCHPHRASES.md) for ambiguous borrowed phrases
 and the remaining editor/mail/save work.
 
+`tools/mail_catalog.py --rom <native-ROM>` builds the source-verified catalog in
+`build/mail-catalog/`. Pass that directory to `tools/build.py --mail-catalog`
+after rebuilding the resident module. The registry in
+`translations/mail_catalogs.json` freezes complete resource hashes; changed
+content cannot retain an assigned catalog ID. The proposal option produces
+local review output only and does not authorize installation. The current
+catalog retains all eight reference bank indices, with 59 unavailable glyph rows
+explicitly rejected. Generation, viewing, editing, and saving remain separate
+integration work; this resource is not an approval of semantic matches.
+
+`tools/mail_catalog_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates complete snapshot-to-letter tests using actual cartridge DMA. The
+caller-owned workspace is separate from both output and the saved snapshot.
+The scenario preserves guards, checks full output, and restores its checkpoint.
+
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under

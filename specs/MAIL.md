@@ -98,10 +98,11 @@ template IDs and literal substitution snapshots within the native 122-byte text
 area. The Python and portable C codecs pass lossless and rejection tests, and
 native copying preserves complete envelopes. The
 [full-letter assembler](MAIL_FORMAT.md) reconstructs complete text and its
-captured capitalization/article state. Both APIs are installed in the resident
-module and pass isolated N64 CPU tests, but native gameplay does not call them.
-The discriminator, approved catalog, full-text readers, editing, and persistence
-remain.
+captured capitalization/article state. The [immutable cartridge catalog](MAIL_CATALOG.md)
+connects saved snapshots to complete template data through guarded DMA reads.
+These APIs are installed in the resident module and pass isolated N64 CPU tests,
+but native gameplay does not call them. The discriminator, semantic catalog
+approval, full-text readers, editing, and persistence remain.
 A display cache alone cannot preserve edited or delivered letters across saving,
 moving, and restarting. No old letter may regenerate different random words or
 current names when read. Custom editor storage remains unresolved separately.

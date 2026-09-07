@@ -57,7 +57,7 @@ def verify_test_module(rom, report):
     module = bytearray(files[MODULE_VROM].extract(rom))
     if len(module) != RESERVATION or struct.unpack_from(">3I", module) != (0x41465254, 1, RESERVATION):
         raise ValueError("Native test module has an incompatible memory reservation")
-    for offset, expected in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000)):
+    for offset, expected in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000), (68, 0x03000000)):
         value = struct.unpack_from(">I", module, offset)[0]
         if value and (value != expected or value not in files):
             raise ValueError("Unexpected native test resource configuration")

@@ -18,6 +18,7 @@ from reference_sequences import validate_sequences
 from extended_items import install as install_extended_items
 from display_names import install as install_display_names
 from catchphrases import install as install_catchphrases
+from mail_catalog import install as install_mail_catalog
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -107,6 +108,7 @@ def main():
     parser.add_argument("--extended-items", type=Path, help="Directory containing names.bin and names.json for the sixteen-byte item resource")
     parser.add_argument("--display-names", type=Path, help="Directory containing names.bin and names.json for the eight-byte display-name resource")
     parser.add_argument("--catchphrases", type=Path, help="Directory containing the full default catchphrase display resource")
+    parser.add_argument("--mail-catalog", type=Path, help="Directory containing the registered immutable English mail catalog")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -133,6 +135,8 @@ def main():
         report["display_names"] = install_display_names(rom, additions, report.get("runtime_module"), args.display_names)
     if args.catchphrases:
         report["catchphrases"] = install_catchphrases(rom, additions, report.get("runtime_module"), args.catchphrases, replacements)
+    if args.mail_catalog:
+        report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'), args.mail_catalog)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():

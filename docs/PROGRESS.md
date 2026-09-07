@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 211 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 219 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -65,7 +65,7 @@ user's direction. The production build retains the approved spacing metrics.
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
   Four-MiB boot and the complete train-to-town regression pass with intact guards,
   including the actual malloc arena start. The observed-arrival scenario passes
-  188 recorded steps and all ten acceptance checks on the mail-runtime build.
+  190 recorded steps and all ten acceptance checks on the mail-catalog build.
 - Seven English message date/time substitutions, including full month/weekday
   names, ordinal days, twelve-hour time, and zero-padded minutes/seconds. Portable
   exhaustive tests and native MIPS insertion calls pass. Other UI callers remain.
@@ -210,13 +210,23 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  occupies 10,336 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  occupies 11,872 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain; gameplay does not yet call these APIs.
+- An immutable cartridge mail catalog contains 4,807 complete reference parts
+  with all 4,866 original indices preserved; 59 unavailable glyph rows remain
+  explicit failures. Its 319,344-byte content is registered by complete hashes.
+  The restoration API connects snapshot decoding, actual cartridge reads, and
+  full-letter assembly without changing the saved record or publishing partial
+  output. Host execution agrees on all 6,398 reference probes. Targeted N64 CPU
+  tests pass 84 calls and 259 assertions, including 46 English reference cases,
+  disabled resources, malformed headers, and guards. Catalog identities are
+  immutable storage identities, not native semantic-match approvals. Generation,
+  record discrimination, the full-text viewer/editor, and saving remain.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-runtime-pilot/`
+The current experimental resident-module pilot in `build/mail-catalog-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592
@@ -230,7 +240,7 @@ capitalization command. Main-dialogue candidates are unchanged; layout warnings
 account for the wider catchphrase display.
 
 General strings, mail, saved names, dates, and item names have separate caller
-restrictions. The independent wider item, display-name, and catchphrase resources are not
+restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
 gameplay destination uses its wider names.
 

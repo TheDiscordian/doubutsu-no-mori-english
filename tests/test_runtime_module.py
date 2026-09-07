@@ -32,7 +32,7 @@ class TestModuleConfigurationTests(unittest.TestCase):
         files = {MODULE_VROM: Entry()}
         with patch("runtime_module.by_vrom", return_value=files):
             verify_test_module(b"synthetic", report)
-            for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000)):
+            for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000), (68, 0x03000000)):
                 struct.pack_into(">I", module, offset, vrom)
                 with self.assertRaisesRegex(ValueError, "configuration"):
                     verify_test_module(b"synthetic", report)
@@ -49,7 +49,7 @@ class TestModuleConfigurationTests(unittest.TestCase):
             for size in (0x1000, LINKED_LIMIT+4):
                 with self.assertRaisesRegex(ValueError, "symbols or scratch"):
                     verify_test_module(b"synthetic", {**report, "linked_bytes": size})
-            for offset in (56, 60, 64):
+            for offset in (56, 60, 64, 68):
                 struct.pack_into(">I", module, offset, 0)
             struct.pack_into(">I", module, 12, LINKED_LIMIT)
             verify_test_module(b"synthetic", {"module_sha256": sha256(module), "linked_bytes": LINKED_LIMIT})

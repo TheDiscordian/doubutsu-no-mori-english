@@ -16,6 +16,11 @@ VR4300/o32 Docker toolchain and records object/source hashes, undefined symbols,
 sections, and compiler-reported stack usage. Compilation is not MIPS execution.
 `tools/mail_runtime_test_scenario.py` separately executes the installed functions
 with big-endian o32 structures, guarded buffers, and complete checkpoint restore.
+`af_mail_restore` connects snapshot decoding, cartridge template loading, and
+complete assembly using a separate caller-owned workspace. The
+[catalog contract](MAIL_CATALOG.md) fixes template identities and validates
+individual source parts before publication. Gameplay creation/viewer hooks
+remain separate from this restoration API.
 
 ## Reference semantics
 
@@ -134,8 +139,8 @@ do not establish gameplay mail integration or hardware compatibility.
 
 ## Integration remaining
 
-1. Build immutable catalog resources, review native/reference identities, retain
-   complete source hashes, and resolve the rejected glyph rows.
+1. Review native/reference identities in the immutable catalog and resolve the
+   rejected glyph rows without changing an existing catalog's saved meaning.
 2. Capture wider actual fields, articles, template selections, and initial
    capitalization during generation; choose a verified record discriminator.
 3. Decode before native viewer normalization; connect complete header/body/footer

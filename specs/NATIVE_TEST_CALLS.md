@@ -44,6 +44,13 @@ has four KiB available above that guard. The independent high-stack guard is at
 `8019C8B0`. All pointer-bearing structures use the actual big-endian o32 layout,
 not the host's pointer widths.
 
+The cartridge-catalog restoration scenario uses a separate layout: wire at
+`8019A8F0` plus alignment skew, the 3,552-byte o32 workspace at `8019AA00`, and
+complete output at `8019B800`. The low-stack guard is at `8019BE80`, leaving
+2,560 bytes below the test stack top; the high-stack and module guards remain
+unchanged. It checks full output against the reference and never supplies host
+pointers as cartridge template descriptors.
+
 No running-thread pointer, native scheduling field, or gameplay progression value
 is edited to obtain this context. The existing socket and process time bounds
 limit a missing frame breakpoint. Native behaviour and real hardware still need

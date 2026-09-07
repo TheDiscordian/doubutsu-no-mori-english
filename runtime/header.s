@@ -18,3 +18,4 @@
 .word 0          # Optional verified extended item-resource VROM, configured by builder
 .word 0          # Optional verified eight-byte display-name resource VROM
 .word 0          # Optional verified default catchphrase display-resource VROM
+.word 0          # Optional immutable mail-template catalog VROM

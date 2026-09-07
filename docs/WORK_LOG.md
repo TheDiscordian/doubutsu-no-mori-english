@@ -1161,6 +1161,71 @@
   is still blank. This is not game-save/reload or hardware validation.
   GitHub confirms `TheDiscordian/doubutsu-no-mori-english` remains private.
 
+### Immutable cartridge catalog and complete letter restoration
+
+- Registered experimental catalog two with immutable format/assembly semantics,
+  complete resource/payload hashes, all eight original bank counts, and explicit
+  unavailable indices. The local builder preserves all 4,866 indices and 4,807
+  complete available parts; 59 parts still require glyph support. Proposed or
+  changed catalogs cannot be installed. Registration does not approve native
+  semantic matches, and future wording/encoding changes require a new identity.
+  The resource is 319,344 bytes. Complete SHA-256:
+  `d77591525d105391cf8190257b8ea768f521810d4ae5a36d27bcca991442a5e1`.
+  Payload SHA-256:
+  `a042bd72f6158472722717dd3f19e761ea693ce632ae51acc9aca26c4d99c385`.
+  Independent catalog builds compare equal.
+- Added the optional VROM `03000000` resource and resident configuration word
+  `44`, preserving the other three configured resources and verifying the
+  complete module before installation. The reader validates the saved envelope,
+  immutable header, selected directories/rows, DMA results, lengths, padding,
+  field masks, and CRCs before full-letter assembly. Failures leave the saved
+  envelope and published output unchanged. The caller-owned o32 workspace is
+  3,552 bytes, including 3,104 bytes for source text and DMA alignment gaps.
+- Host C restoration agrees with the independent reference model on 6,398
+  probes, including both capitalization states. Fault tests cover each selected
+  DMA failure, damaged tables/data, missing fields, unavailable IDs, malformed
+  headers, aliasing, alignment, and disabled resources. The complete suite passes
+  219 tests in 88.720 seconds. A subsequent strict snapshot-kind validation check
+  passes the eight targeted catalog tests in 2.846 seconds. The final full suite,
+  including catalog source/symbol inventory checks, passes all 219 tests in
+  78.362 seconds; the four targeted runtime-layout checks also pass.
+- `smoke-mail-catalog-native-01` passes 84 actual N64 CPU calls, 259 assertions,
+  and 540 recorded steps in one minute 24.602 seconds. Forty-six verified
+  English reference cases restore through real cartridge reads, including both
+  captured capitalization states and unaligned envelopes. Unknown/unavailable
+  identities, disabled configuration, every header-word mutation, complete
+  output, and source/stack/module guards are checked. The checkpoint is restored;
+  FlashRAM remains blank. This does not exercise ordinary mail generation or
+  saving. Scenario SHA-256:
+  `934f4e2e7e0d42ff8b0cbb91860c234bd73c3d2ab88ed736586bc3a2166bdbb1`.
+- The three freestanding mail objects cross-compile without undefined symbols,
+  data, or BSS, with 4,403 text-category bytes. Combined object SHA-256:
+  `8d0ea79219509c9f34a0c122572e701161eca4dd6706c35dcfa7193c860ed68d`.
+  Compiler stack frames are restoration 256, DMA wrapper 24, assembly 1,224,
+  packing 152, and unpacking 408 bytes. Real gameplay caller depth still needs
+  validation; the workspace must not be allocated on a small nested stack.
+- The resident module occupies 11,872 linked bytes within the unchanged 32 KiB
+  reservation. Independent builds compare equal for both module and bootstrap.
+  Module SHA-256:
+  `f3ed2863d70ea86fd9ebdb4fad41b7abdc89d777bcf03093c0dd57e7a1dc6467`.
+  Bootstrap SHA-256:
+  `f38de0d2f252c4b9c4e596d85f5ae3f66f9ac27a680d30e874d2f6f476a4cb92`.
+  The preceding module remains in `build/runtime-module-pre-catalog-7BtqxP/`.
+- `build/mail-catalog-pilot/` preserves the 10,405 candidate edits, approved
+  font/metrics, reference layout, and all three wider-name resources. ROM SHA-256:
+  `4142659eaba13e2b18b74ddbdafbe9658a8320182f310e51db7b50c79fe4f3d1`.
+  UPS SHA-256:
+  `9fc78e0a78b444b15fec8046643b549dc8ba415f56438ab3ac74325da66c13ac`.
+  The independent build in `build/mail-catalog-repeat-pilot/`, using independently
+  rebuilt module and catalog artifacts, produces identical ROM and UPS contents.
+- `smoke-mail-catalog-full-01` passes the fresh train-to-town regression in six
+  minutes 4.839 seconds: 190 recorded steps and all ten independent acceptance
+  checks. Four-MiB memory, the real reduced malloc arena, and runtime guards pass.
+  The checkpoint belongs to this ROM and reaches live arrival dialogue `07DD`.
+  Game-save/reload and original hardware remain unvalidated. Native mail
+  discrimination, semantic matches, generation, full-text viewing, editing, and
+  persistence remain required; gameplay does not yet call the restoration API.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
