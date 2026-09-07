@@ -99,7 +99,8 @@ class ReferenceChoiceTests(unittest.TestCase):
             def choices(data):
                 return [t.data for t in tokenize(data, info) if t.kind == "cmd" and 0x16 <= t.data[1] <= 0x18]
             self.assertEqual(choices(output), choices(source))
-        edits = json.loads((ROOT/"translations/n64-shop-menus.json").read_text())
+        edits = [r for r in json.loads((ROOT/"translations/n64-shop-menus.json").read_text())
+                 if r["id"].startswith("select:")]
         self.assertEqual([r["id"] for r in edits], ["select:0009"])
         source = source_banks["select"][9]
         self.assertEqual(edits[0]["source_sha256"], sha256(source))
@@ -112,6 +113,24 @@ class ReferenceChoiceTests(unittest.TestCase):
                                          "translation": refs[record["id"]]["text"], "control_policy": "reference_layout"}]))
             with self.assertRaisesRegex(ValueError, "Native-choice candidate"):
                 apply_translations(rom, {}, path)
+
+    @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM remains a local test input")
+    def test_native_shop_drafts_preserve_all_commands_and_purchase_exits(self):
+        rom = ROM_PATH.read_bytes()
+        info = module_command_info(rom)
+        source = next(b for b in banks(rom) if b.name == "message").entries()
+        edits = [r for r in json.loads((ROOT/"translations/n64-shop-menus.json").read_text())
+                 if r["id"].startswith("message:")]
+        self.assertEqual({r["id"].split(":")[1] for r in edits},
+                         {"02DD", "02E0", "02E1", "02E2", "02E3", "02E4", "02EB", "02EC", "02EE", "02EF", "02F0"})
+        for edit in edits:
+            native = source[int(edit["id"].split(":")[1], 16)]
+            self.assertEqual(sha256(native), edit["source_sha256"])
+            payload = encode(edit["translation"], info)
+            validate_entry(native, payload, info, "message", "exact", resident_runtime=True)
+            if edit["id"] in ("message:02E4", "message:02EF", "message:02F0"):
+                self.assertIn(bytes.fromhex("7F0F02E6"), payload)
+                self.assertIn(bytes.fromhex("7F1002E5"), payload)
 
 
 if __name__ == "__main__":

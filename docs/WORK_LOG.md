@@ -2607,6 +2607,40 @@
   static text. There are 1,365 conservative layout warnings. Detailed reports
   remain in `build/shop-menu-candidates/` and `build/shop-menu-coverage/`.
 
+### Earlier N64 shop text and human-playthrough handoff requirements
+
+- Filled the sixteen remaining records in the native `02DC..02F0` shop range.
+  Five reviewed cross-ID matches use complete later English shop responses;
+  eleven original drafts preserve every native command/argument and all purchase
+  exits. The GameCube same-ID slots are empty. Reachability remains unestablished,
+  so these are text-coverage additions, not newly proven gameplay interactions.
+  Existing candidates and reserve records `02F1..02F4` are unchanged.
+- The combined reference batch passes 33 tests in 4.485 seconds at
+  `build/tests-native-shop-reference-batch-01.log`. Native-command-preserving
+  draft checks include both `02E6/02E5` purchase exits. No new runtime or font
+  code is required; no full-suite or full intro repetition is needed for this
+  content-only batch.
+- All sixteen complete native cartridge loads pass in
+  `build/smoke-native-shop-01`: 89 recorded steps, sixteen native calls, and fifty
+  memory assertions. Buffer/module guards, complete checkpoint restoration, and
+  graceful shutdown pass. FlashRAM remains blank and the Pak unchanged. Ordinary
+  caller progression and final wording/layout review remain separate checks.
+- `build/native-shop-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `1a3609f102134c048a6f825f5d80c28bbfa2c86c32599d645bcf225e46d08535`;
+  its verified round-trip UPS has SHA-256
+  `294e248e74aded61b659f7e3b1a4472989f3f1de534639e5f7d42809a36af495`.
+  The candidate file has 10,457 edits: 9,191 reference dialogue candidates,
+  21 original dialogue drafts, and all 460 choices among the covered banks.
+  The original main-bank audit leaves 2,540 records without candidates, including
+  1,609 with Japanese static text. Reference layout warnings remain 1,365;
+  original drafts still need their separate presentation review. Reports remain
+  local in `build/native-shop-candidates/` and `build/native-shop-coverage/`.
+- Added `docs/PLAYTESTING.md` for the final human test-build handoff, concise bug
+  reports, save-backup discipline, and batched fixes. It does not require the user
+  to act during development, schedule a playthrough now, or count planned tests
+  as completed evidence. The validation matrix's choice row now reflects the
+  existing twenty-byte and native four-row/cancellation evidence.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

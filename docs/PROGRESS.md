@@ -452,17 +452,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/shop-menu-pilot/`
-contains 10,441 edits, including
-9,186 reference dialogue candidates, all 460 choices, and ten original dialogue
+The current experimental resident-module pilot in `build/native-shop-pilot/`
+contains 10,457 edits, including
+9,191 reference dialogue candidates, all 460 choices, and 21 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,556
+still require review. The original main-bank audit leaves 2,540
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,365 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/shop-menu-candidates/` and `build/shop-menu-coverage/`. The independent
+`build/native-shop-candidates/` and `build/native-shop-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -493,6 +493,16 @@ new native-choice tests. See [native choice contract](../specs/REFERENCE_CHOICES
 Ordinary selection, selling/ordering, echo rendering, and line-width warnings
 remain gameplay and human-playthrough checks.
 
+The earlier N64 shop range `02DC..02F0` also has candidates throughout. Five
+cross-ID GameCube matches and eleven native-command-preserving original drafts
+cover its remaining text. The draft purchase prompts retain exits `02E6/02E5`;
+the three-choice service menu gains no catalog action. Existing candidates stay
+unchanged. These records have unestablished reachability and are counted as
+text coverage, not additional proven gameplay interactions. The 33-test reference
+batch and all sixteen complete native cartridge loads pass, with buffer/module
+guards and checkpoint restoration. Original draft layout/presentation review remains separate from
+the reference-candidate warning count.
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -500,14 +510,14 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,441 edits, including
-9,186 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,457 edits, including
+9,191 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
-and four other introductory drafts. It retains the GameCube calendar wording in Rover's
+four other introductory drafts, and eleven earlier-shop drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,557 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,556 main records without
-candidates: 1,625 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,541 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,540 main records without
+candidates: 1,609 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

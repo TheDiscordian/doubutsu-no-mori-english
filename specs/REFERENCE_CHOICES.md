@@ -42,6 +42,24 @@ The twins' `172A` and `1737` remain withheld: even after their choice correction
 their speaker/echo control sequences differ. This approval does not relax those
 controls. Other menu families require their own source and action review.
 
+## Earlier native shop records
+
+The native `02DC..02F0` shop range has English candidates throughout. The
+GameCube's same-ID slots are empty, so five individually reviewed cross-ID
+matches use later English shop responses for calling the shopkeeper, turnip
+prices, a declined purchase, thanking the buyer, and receiving payment. The
+normal adapter retains corresponding native actor arguments and complete
+GameCube wording/layout. These are semantic matches, not identical-native-record
+aliases or proof that the earlier records are reachable.
+
+Eleven original drafts cover the remaining service, sale, price, purchase,
+special-event, bagged-money, and preview records. They preserve every original
+native command and argument in order, including the three-choice service menu,
+item/price fields, and purchase exits `02E6/02E5`. They do not inherit the later
+GameCube catalog action, extra choice, actor handoff, or continuation target.
+Shop reserve slots `02F1..02F4` remain untouched. Caller reachability, ordinary
+gameplay, and final wording/presentation review remain separate requirements.
+
 ## Validation
 
 Portable tests cover exact replacement, changed sources/references, missing or

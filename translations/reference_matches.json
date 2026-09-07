@@ -1,5 +1,40 @@
 [
   {
+    "id": "message:02DE",
+    "source_sha256": "806f84bcf7e362a11f4629965a4fd0251126730ac16cdbbd404114743f900dcf",
+    "reference_id": "message:1093",
+    "reference_sha256": "72b970f183fcfacaaba5b9c30da7200db6c8139ba85428ee399850f5355e4c34",
+    "evidence": "The native shop record and this supplied English shop record both acknowledge that no further service is needed and ask the player to call when needed. The GameCube same-ID slot for the native record is empty. This is a reviewed semantic identity, not a claim that the two native records are identical. Keep complete GameCube wording, lines, pages, and timing; the normal adapter restores any corresponding native actor arguments. Final termination, available fields, gameplay controls, and capacity retain their normal checks. Reachability and ordinary caller gameplay remain unestablished."
+  },
+  {
+    "id": "message:02DF",
+    "source_sha256": "1455684db1f922f5c3299f6884170f044a6ef94c40410caa7f6cd322bc56fb92",
+    "reference_id": "message:1094",
+    "reference_sha256": "9689c4637b94e9bb1642ffe60830b1b4dd65db48cac2dcc4666803801f61c748",
+    "evidence": "The native shop record and this supplied English shop record both quote today's turnip buying price using the same native price field 25. The GameCube same-ID slot for the native record is empty. This is a reviewed semantic identity, not a claim that the two native records are identical. Keep complete GameCube wording, lines, pages, and timing; the normal adapter restores any corresponding native actor arguments. Final termination, available fields, gameplay controls, and capacity retain their normal checks. Reachability and ordinary caller gameplay remain unestablished."
+  },
+  {
+    "id": "message:02E5",
+    "source_sha256": "1a48810456cfbce2cefbebb7e71497a543c3c2466506b5d25bd5b87c4334d3da",
+    "reference_id": "message:109A",
+    "reference_sha256": "0db34119748477063efbe260cca4bf63817755f1ccefbd9a9438ce58bc223b51",
+    "evidence": "The native shop record and this supplied English shop record both acknowledge a declined purchase and invite the player to keep browsing. The GameCube same-ID slot for the native record is empty. This is a reviewed semantic identity, not a claim that the two native records are identical. Keep complete GameCube wording, lines, pages, and timing; the normal adapter restores any corresponding native actor arguments. Final termination, available fields, gameplay controls, and capacity retain their normal checks. Reachability and ordinary caller gameplay remain unestablished."
+  },
+  {
+    "id": "message:02E6",
+    "source_sha256": "a91937f896a818dee12372ea0dc9d6fc8e2be2346a8387e0f8ef36f975d64e91",
+    "reference_id": "message:109B",
+    "reference_sha256": "ec2ddd5f0a50747b755765ad102fc40eb274f72cf46153ab0759a7d688c76edd",
+    "evidence": "The native shop record and this supplied English shop record both thank the player for the purchase and continue through the native actor command. The GameCube same-ID slot for the native record is empty. This is a reviewed semantic identity, not a claim that the two native records are identical. Keep complete GameCube wording, lines, pages, and timing; the normal adapter restores any corresponding native actor arguments. Final termination, available fields, gameplay controls, and capacity retain their normal checks. Reachability and ordinary caller gameplay remain unestablished."
+  },
+  {
+    "id": "message:02E8",
+    "source_sha256": "4c3229e008b29affecc2d1f19d3b1f1bf75a2b33e44ef1f9fab934f718cd979d",
+    "reference_id": "message:109D",
+    "reference_sha256": "2748374c154ecaa04d2485ed4947b7f88aed440f489c62b668352954f92fdd0e",
+    "evidence": "The native shop record and this supplied English shop record both acknowledge receiving the payment held in native field 28. The GameCube same-ID slot for the native record is empty. This is a reviewed semantic identity, not a claim that the two native records are identical. Keep complete GameCube wording, lines, pages, and timing; the normal adapter restores any corresponding native actor arguments. Final termination, available fields, gameplay controls, and capacity retain their normal checks. Reachability and ordinary caller gameplay remain unestablished."
+  },
+  {
     "id": "message:1092",
     "source_sha256": "af43a0329ab0a72b9af33cd82880903826cb26a222e6768bbc518f3f83288f5c",
     "reference_id": "message:1092",

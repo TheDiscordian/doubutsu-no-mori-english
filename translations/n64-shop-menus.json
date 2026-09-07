@@ -1,5 +1,93 @@
 [
   {
+    "id": "message:02DD",
+    "source_sha256": "2c6c8c0d28f628a3afbb7994df6f1767e6338d61a7215acc186b3ce428d76302",
+    "translation": "Yes, yes!{cmd:7F0308}\nWhat can I do for you, hm?\n{cmd:7F170009000A000B}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02E0",
+    "source_sha256": "141ff490e887a31638cfd324c7dac98c9180f3ed26a5201127063c534f126373",
+    "translation": "Then,{cmd:7F0308} choose what\nyou'd like to sell, hm!\n{cmd:7F09000001}\n{cmd:7F04}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02E1",
+    "source_sha256": "667c0e2443b378b5082e9ea92869f6c3846521e5d6acaa2853c476a6ccd694be",
+    "translation": "For that,{cmd:7F0306} I can pay\n{cmd:7F26} Bells.{cmd:7F0308}\nWill you sell it?{cmd:7F16000C000D}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02E2",
+    "source_sha256": "9c3dbada965e305faf9ceeb80837669162a0e5c897d9ca5c59d143ee91de35f6",
+    "translation": "Thank you!{cmd:7F030C}\nAnything else I can\ndo for you, hm?{cmd:7F170009000A000B}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02E3",
+    "source_sha256": "5a8df1182c0b16668ae0a69e8d8d4b516c1ebacd90cc99fc5c4cff0963c118a7",
+    "translation": "What a shame.{cmd:7F030C}\nAnything else I can\ndo for you, hm?{cmd:7F170009000A000B}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02E4",
+    "source_sha256": "b48575fdaab9ec862af5ceacb66971f15936f8b9ecb795aa294bd9fd0fa80b17",
+    "translation": "This is\n{cmd:7F31}.{cmd:7F030C}\nThe price is\n{cmd:7F28} Bells.\n{cmd:7F04}\n{cmd:7F02}It's a good deal!{cmd:7F09000001}\nWould you like to buy it?{cmd:7F16000E000D}{cmd:7F04}{cmd:7F0D}\n{cmd:7F0F02E6}{cmd:7F1002E5}{cmd:7F0301}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02EB",
+    "source_sha256": "abe161976afc9053c03d51eca024b2bf79a0353861180d9a6d021b8210cf91bf",
+    "translation": "Welcome!{cmd:7F030C}\nIt's a special event today!{cmd:7F0308}\nWe've plenty of bargains\nfor you, hm!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02EC",
+    "source_sha256": "4de0d86e78cab1c1d043c5ea48010f6a7b7c6d22236ce7f99608f0d7f5d92dab",
+    "translation": "You can't carry that money!{cmd:7F030C}\nI'll put the money\ninto bags for you.{cmd:7F0308}\nIt's fine{cmd:7F0302}, really.{cmd:7F0304}\nIt's part of the service, hm!!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02EE",
+    "source_sha256": "499faf37647ce0ae6503886ab5703c6a08f818ed3bd6e3579566d05ee54f6174",
+    "translation": "That's\n{cmd:7F31}.{cmd:7F0308}\nIt's very nice, hm.{cmd:7F0308}\nWould you like a look?{cmd:7F16000F0010}{cmd:7F04}{cmd:7F0D}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02EF",
+    "source_sha256": "0eea1d1618166be9f1f0ee4f1699b202538ebae5406c116370d47855270997df",
+    "translation": "Well?{cmd:7F0306} Do you like it?{cmd:7F0308}\nIt costs\n{cmd:7F28} Bells.\n{cmd:7F04}\n{cmd:7F02}A fine bargain, hm!{cmd:7F09000001}{cmd:7F0306}\nWill you buy it?{cmd:7F16000E000D}{cmd:7F04}{cmd:7F0D}\n{cmd:7F0F02E6}{cmd:7F1002E5}{cmd:7F0301}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
+    "id": "message:02F0",
+    "source_sha256": "ce80be04af548df06791682ebd0060fd112f11a811e4871e79fc4b13d32c943a",
+    "translation": "No look, then.{cmd:7F0308}\nThat's quite all right.{cmd:7F0308}\nIt costs\n{cmd:7F28} Bells.\n{cmd:7F04}\n{cmd:7F02}A good price, hm?{cmd:7F09000001}{cmd:7F0306}\nWill you buy it?{cmd:7F16000E000D}{cmd:7F04}{cmd:7F0D}\n{cmd:7F0F02E6}{cmd:7F1002E5}{cmd:7F0301}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 shop entry",
+    "status": "draft",
+    "notes": "The GameCube same-ID record is empty. Related later shop dialogue has different choices, actor operations, pages, or gameplay links, so this translation retains every original N64 command and argument in order. Preserve the native purchase exits and available item/price fields. Record reachability and ordinary caller gameplay remain unestablished; this is text coverage, not a claim that a new shop interaction is implemented."
+  },
+  {
     "id": "select:0009",
     "source_sha256": "3b109665a0ba757cc86930e1021a645693a57f3bd26e998a86b7a07929fdf50f",
     "translation": "Turnip prices?",

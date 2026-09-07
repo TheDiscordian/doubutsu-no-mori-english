@@ -20,6 +20,8 @@ bugs for the final fix and polish pass. Prepare a broadly complete playable buil
 with known issues and untested areas listed. Automated checks focus on crashes,
 save corruption, broken text, and obvious regressions. Neither planned manual
 testing nor passing narrow fixtures proves full gameplay or hardware acceptance.
+The [human playthrough guide](PLAYTESTING.md) defines the final test handoff and
+the information needed to turn observations into reproducible bug reports.
 
 ## Emulator matrix
 
@@ -38,7 +40,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
 | Name limits | Six-character player/town, four-character catchphrase, ten-character request | Player and town limits runtime-tested; others have static invariants |
 | Saved text | Enter names/mail/board text, save, restart, recover correctly | Native FlashRAM round trip passes 192 synthetic stored-letter slots in both banks and full English reconstruction in a fresh process; normal entry/save-menu/post-load gameplay remains |
-| Choice menus | All lengths, four entries, cancellation, branch outcome | Sixteen-byte rows, selected text, and three long choices tested; four active rows, cancellation, and actor paths outstanding |
+| Choice menus | All lengths, four entries, cancellation, branch outcome | Twenty-byte capacity, thirteen long reference loads, four rows, selected text, and cancellation pass isolated native tests; corrected shop labels and messages pass cartridge loads; ordinary actor-specific selection remains outstanding |
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
