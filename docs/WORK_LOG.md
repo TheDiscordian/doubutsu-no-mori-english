@@ -2056,6 +2056,24 @@
   storage-menu operation, error progression, editing, remaining metadata/readers,
   semantic template approval, generation, delivery, and original hardware remain.
 
+### Shared text-reader follow-up
+
+- Disassembled the remaining inventory, editor, recipient-selector, number-label,
+  map, noticeboard, and Pak-directory overlays into ignored audit directories.
+  Traced their shared text-length call inputs against native instructions.
+  The six-byte player/town/recipient names, five-byte formatted number, and
+  sixteen-byte Pak directory game name are not snapshot-envelope readers.
+- The 96-byte call at `8089571C` reads the distinct noticeboard table at
+  `Save+2F6A+index*68`, not a letter body. The English GameCube noticeboard source
+  supports the semantic match; its larger record is not substituted for the
+  native one. Documented these input regions in `specs/MAIL_STORAGE.md`.
+- Kept generic editor-input ownership, editor acceptance reachability, and
+  tag-option pointer-array provenance as explicit remaining checks. The
+  pre-scan snapshot-copy hook covers the board initializer's ordinary text
+  scans, but this does not establish every editor transition or computed-pointer
+  consumer. No production code or test harness changes follow from this
+  additional source inspection; the passing 307-test checkpoint is unchanged.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

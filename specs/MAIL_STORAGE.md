@@ -109,6 +109,33 @@ resolver at `8086FBE4` selects player pockets, home mailboxes, or a Pak record a
 renderer at `8089BA58` draws that label, not a letter envelope. The
 [Pak format](PAK_MAIL.md) records those distinct regions and transport tests.
 
+Additional shared-helper inputs are separate from stored letter text:
+
+| Native call | Input established by the caller |
+| --- | --- |
+| `800A5E20`, `8088E5CC` | Six-byte town name at `80129E00` |
+| `800CC338` | Ten-byte item-label text |
+| `8087FC4C` | Six-byte current-player name at private offset `06` |
+| `8088B4E8` | Six-byte selected recipient name; the preceding helper copies its identity into the board letter |
+| `8088CCA4` | Five-byte unsigned-number output from `mFont_UnintToString`; this is the sole `mMl_strlen2` call |
+| `8089571C` | Ninety-six-byte noticeboard message at `Save+2F6A+index*68` |
+| `808A48D0` | Sixteen-byte Controller Pak directory game name copied from an `OSPfsState`, not a note's contents |
+
+Table addresses, offsets, and strides are hexadecimal. The noticeboard uses
+separate 104-byte records between land identity and homes; these do not overlap
+the native saved-letter arrays. The English GameCube noticeboard source confirms
+the matching semantic role, but its larger message capacity is not applied to
+the N64. Noticeboard translation and editing remain separate porting work.
+
+The editor's `8088590C` call scans its supplied text pointer using the product
+of its row and column limits. Its complete caller/pointer ownership needs review;
+the shared helper does not know whether that pointer belongs to mail. The board
+initializer's ordinary header/body/footer scans follow the installed snapshot
+copy hook, which blanks only its temporary ordinary fields and forces read mode.
+The separate editor-acceptance footer scan at `80889334` and generic tag-option
+pointer-array sizing at `8086FAC4` remain explicit control-flow/provenance checks,
+not automatically cleared by this inventory.
+
 ## Validation limits
 
 The selected native storage run passes 140 cases, 217 function calls, and 267
