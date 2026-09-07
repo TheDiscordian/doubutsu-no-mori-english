@@ -25,7 +25,7 @@ def scenario(rom, group_name="nook_home_explanation"):
     for member, number in zip(members, numbers):
         if sha256(entries[number]) != member["encoded_sha256"]:
             raise ValueError("Test ROM does not contain the approved sequence")
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     window, data, index = 0x80197000, 0x80197400, 0x80197380
 
     def write(address, value):

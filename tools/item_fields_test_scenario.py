@@ -9,7 +9,7 @@ import struct
 from aflib import by_vrom, sha256
 from extended_items import COUNTS, HEADER, VROM
 from item_names_test_scenario import ordinary_item
-from runtime_module import MODULE_VROM
+from runtime_module import MODULE_VROM, verify_test_module
 
 
 def scenario(rom, module, names):
@@ -19,13 +19,11 @@ def scenario(rom, module, names):
     if (resource[:32] != HEADER or sha256(resource) != names["data_sha256"]
             or struct.unpack_from(">I", configured, 56)[0] != VROM):
         raise ValueError("Unexpected native test resource")
-    configured[56:60] = bytes(4)
-    if sha256(configured) != module["module_sha256"]:
-        raise ValueError("Native test module symbols do not match the ROM")
+    verify_test_module(rom, module)
     symbols = module["symbols"]
     rows = int(symbols["item_rows"], 16)
     main, other, source, buffer, cursor = 0x80142410, 0x80197000, 0x80197340, 0x80197410, 0x80197300
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def write(address, data):
         actions.append({"write": [f"{address:08X}", data.hex()]})
     def read(address, data):

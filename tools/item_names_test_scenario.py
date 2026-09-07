@@ -27,7 +27,7 @@ def scenario(original, rom, only_items=None):
         if not only_items or len(only_items) != len(set(only_items)) or set(only_items)-set(items):
             raise ValueError("Requested native test items must be unique known cases")
         items = list(only_items)
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     for item in items:
         converted = ordinary_item(item)
         if converted == 0:

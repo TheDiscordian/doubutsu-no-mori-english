@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.07},
+  {"wait": 0.5},
+  {"key": "w", "duration": 0.18},
+  {"wait": 5},
+  {"capture": "greeting-door-aligned.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"save_state": true}
+]

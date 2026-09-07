@@ -22,7 +22,7 @@ def scenario(rom, edits, info, *, drafts=False):
                  "identical_complete_native_record_and_unanimous_reference_candidate"])
     if not selected or len({r["id"] for r in selected}) != len(selected):
         raise ValueError("Expected unique selected messages")
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     data = 0x80197400
     for edit in selected:
         if not edit["id"].startswith("message:"):

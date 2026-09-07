@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.32},
+  {"wait": 1},
+  {"key": "g", "duration": 0.14},
+  {"wait": 1},
+  {"key": "w", "duration": 0.14},
+  {"wait": 1},
+  {"key": "a", "duration": 0.08},
+  {"wait": 5},
+  {"capture": "greeting-home-door.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_villagers": true},
+  {"save_state": true}
+]

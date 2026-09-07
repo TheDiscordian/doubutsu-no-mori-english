@@ -14,7 +14,7 @@ def scenario(rom):
     if len(data) < 8+NPC_COUNT*6:
         raise ValueError("Truncated native villager-name file")
     entries = [data[8+i*6:14+i*6] for i in range(NPC_COUNT)]
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     destination = 0x80197010
     for index in [*range(NPC_COUNT), 0xFF]:
         expected = b"G"*16+(entries[index] if index != 0xFF else b"G"*6)+b"G"*16

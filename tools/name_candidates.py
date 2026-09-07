@@ -12,7 +12,9 @@ NPC_WIDTH = 6
 REFERENCE_WIDTH = 8
 
 
-def npc_candidates(bank, inventory, references, info, skip_ids=()):
+def npc_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=NPC_WIDTH):
+    if capacity not in (NPC_WIDTH, REFERENCE_WIDTH):
+        raise ValueError("Unsupported villager-name capacity")
     source = bank.entries()
     if bank.name != "npc_names" or bank.fixed_size != NPC_WIDTH or len(source) < NPC_COUNT:
         raise ValueError("Unexpected native villager-name layout")
@@ -44,13 +46,14 @@ def npc_candidates(bank, inventory, references, info, skip_ids=()):
                 raise ValueError("English villager-name reference hash mismatch")
             if any(t.kind != "text" or t.data[0] not in LATIN for t in tokenize(encoded, info)):
                 raise ValueError("Villager name must contain only supported plain Latin text")
-            if len(encoded) > NPC_WIDTH:
+            if len(encoded) > capacity:
                 reason = "full_reference_name_exceeds_native_six_bytes"
         if reason:
             counts["rejected"] += 1
             remaining.append({"id": id, "reason": reason})
             continue
-        validate_entry(source[index], encoded, info, "npc_names")
+        if capacity == NPC_WIDTH:
+            validate_entry(source[index], encoded, info, "npc_names")
         edit = {"id": id, "source_sha256": row["source_sha256"],
                 "translation": reference["text"], "control_policy": "exact",
                 "provenance": {"source": "user-supplied GAFE01 revision 0 disc",
@@ -60,7 +63,7 @@ def npc_candidates(bank, inventory, references, info, skip_ids=()):
         edits.append(edit)
         manifest = {k: v for k, v in edit.items() if k != "translation"}
         manifest.update(encoded_bytes=len(encoded), encoded_sha256=sha256(encoded),
-                        stored_bytes=NPC_WIDTH, stored_sha256=sha256(encoded.ljust(NPC_WIDTH, b" ")),
+                        stored_bytes=capacity, stored_sha256=sha256(encoded.ljust(capacity, b" ")),
                         layout_issues=[], expanded_bound=len(encoded))
         manifests.append(manifest)
         counts["accepted_candidates"] += 1

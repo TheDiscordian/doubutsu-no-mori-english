@@ -1,7 +1,7 @@
 [
   {"wait": 2},
   {"save_state": true},
-  {"command": "?"},
+  {"pause_game_thread": true},
   {"call": {"address": "80089440", "arguments": [2149150720, 2149150724, 1], "expect_return": 1}},
   {"read": ["80197000", 8]},
   {"call": {"address": "80089440", "arguments": [2149150720, 2149150724, 2], "expect_return": 1}},

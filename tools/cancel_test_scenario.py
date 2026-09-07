@@ -19,7 +19,7 @@ def scenario(rom):
     close = 0x80000000 | (hook & 0x3FFFFFF)*4
     if hook >> 26 != 3 or not MODULE_RAM+0x300 <= close < MODULE_RAM+used:
         raise ValueError("Missing resident choice-close hook")
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     window, choice, index = 0x80197000, 0x801971B0, 0x80197380
     global_flags = 0x8014269C
 

@@ -9,7 +9,7 @@ import struct
 from aflib import by_vrom, sha256
 from extended_items import COUNTS, HEADER, VROM
 from item_names_test_scenario import ordinary_item
-from runtime_module import MODULE_VROM
+from runtime_module import MODULE_VROM, verify_test_module
 
 
 def scenario(rom, module, names):
@@ -20,9 +20,7 @@ def scenario(rom, module, names):
     configured = bytearray(files[MODULE_VROM].extract(rom))
     if struct.unpack_from(">I", configured, 56)[0] != VROM:
         raise ValueError("Native test ROM has no enabled name resource")
-    configured[56:60] = bytes(4)
-    if sha256(configured) != module["module_sha256"]:
-        raise ValueError("Native test module symbols do not match the ROM")
+    verify_test_module(rom, module)
     loader = module["symbols"]["af_load_item_name"]
     header_check = module["symbols"]["af_item_header_valid"]
     indices, offset, items = {}, 0, []
@@ -39,7 +37,7 @@ def scenario(rom, module, names):
         seen.add(reference)
         bank, index = edit["id"].split(":")
         items.append((0x1000 if bank == "item_10" else int(bank.split("_")[1], 16) << 8)+int(index, 16))
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def test(item, capacity=16, enabled=True, null=False):
         index = indices.get(ordinary_item(item))
         valid = enabled and capacity >= 16 and not null and (item == 0 or index is not None)

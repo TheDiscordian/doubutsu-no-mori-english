@@ -6,17 +6,48 @@ import struct
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
-from aflib import CODE_RAM, CODE_VROM, DMA_START, by_vrom, dma_entries, replace_dma
+from aflib import CODE_RAM, CODE_VROM, DMA_START, by_vrom, dma_entries, replace_dma, sha256
 from runtime_module import (BOOTSTRAP_RAM, MODULE_RAM, MODULE_VROM, RESERVATION,
                             WATCHDOG_COPY, WATCHDOG_START, add_runtime_module,
                             audit_watchdog_references, module_command_info,
-                            verify_runtime_module, watchdog_bytes)
+                            verify_runtime_module, verify_test_module, watchdog_bytes)
 from textcodec import encode, tokenize
 from textvalidate import validate_entry
 from test_retail import ROM_PATH
+
+
+class TestModuleConfigurationTests(unittest.TestCase):
+    def test_only_known_optional_resources_may_change_module_configuration(self):
+        module = bytearray(0x4000)
+        struct.pack_into(">4I", module, 0, 0x41465254, 1, 0x4000, 0x1800)
+        report = {"module_sha256": sha256(module), "linked_bytes": 0x1800}
+        class Entry:
+            def extract(self, rom):
+                return bytes(module)
+        files = {MODULE_VROM: Entry()}
+        with patch("runtime_module.by_vrom", return_value=files):
+            verify_test_module(b"synthetic", report)
+            for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000)):
+                struct.pack_into(">I", module, offset, vrom)
+                with self.assertRaisesRegex(ValueError, "configuration"):
+                    verify_test_module(b"synthetic", report)
+                files[vrom] = Entry()
+                verify_test_module(b"synthetic", report)
+                struct.pack_into(">I", module, offset, vrom+16)
+                with self.assertRaisesRegex(ValueError, "configuration"):
+                    verify_test_module(b"synthetic", report)
+                struct.pack_into(">I", module, offset, vrom)
+            module[512] ^= 1
+            with self.assertRaisesRegex(ValueError, "symbols or scratch"):
+                verify_test_module(b"synthetic", report)
+            module[512] ^= 1
+            for size in (0x1000, 0x2100):
+                with self.assertRaisesRegex(ValueError, "symbols or scratch"):
+                    verify_test_module(b"synthetic", {**report, "linked_bytes": size})
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM is a local-only optional test input")

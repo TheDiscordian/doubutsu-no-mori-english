@@ -1,0 +1,6 @@
+[
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"save_state": true}
+]

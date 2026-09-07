@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"key": "f", "duration": 0.14},
+  {"wait": 0.5},
+  {"key": "s", "duration": 0.32},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"capture": "greeting-exit-align.png"},
+  {"save_state": true}
+]

@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.51},
+  {"wait": 0.5},
+  {"key": "s", "duration": 0.43},
+  {"wait": 1},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"capture": "greeting-cousteau-outdoor.png"},
+  {"save_state": true}
+]

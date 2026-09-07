@@ -16,7 +16,7 @@ def scenario(rom):
     entries = Bank("message", 0x02000000, 0x00CF9000,
                    files[0x02000000].extract(rom), files[0x00CF9000].extract(rom)).entries()
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     window, data, cursor = 0x80197000, 0x80197400, 0x80197380
     def write(address, value):
         actions.append({"write": [f"{address:08X}", value.hex()]})

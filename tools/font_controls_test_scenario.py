@@ -8,7 +8,7 @@ import struct
 
 
 def scenario(include_space=False):
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     sentence, text, graph, gfx_pp, gfx = 0x80197000, 0x80197200, 0x80197300, 0x80197310, 0x80197400
     char = sentence+0x48
     guard = b"FONT"*4

@@ -1,7 +1,7 @@
 [
   {"wait": 8},
   {"save_state": true},
-  {"command": "?"},
+  {"pause_game_thread": true},
   {"write": ["80136FBC", "3B070015030907D0"]},
   {"write": ["801986C0", "ABCDEF01ABCDEF01ABCDEF01ABCDEF01"]},
   {"write": ["80196900", "41207F1D205A7F00"]},

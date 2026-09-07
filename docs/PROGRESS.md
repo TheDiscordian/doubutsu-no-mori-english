@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 139 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 150 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -127,25 +127,31 @@ user's direction. The production build retains the approved spacing metrics.
   Native loading tests pass; English ordinary actor traversal remains.
 - Read-only village records expose home coordinates and recorded NPC positions
   for normal navigation, without changing greetings, schedules, or progression.
+- A separate eight-byte display-name resource contains all 216 confirmed villager
+  names and 64 special-actor rows covering 23 distinct names. All native ID and
+  real-DMA row tests pass, including unaligned destinations, rejected inputs,
+  disabled resources, malformed-header checks, and adjacent/module guards.
+  The standalone API does not yet redirect dialogue or saved-name consumers.
+- Injected native tests now require the verified graph-thread frame boundary.
+  Arbitrary idle-thread injection can block the scheduler's idle fallback and
+  caused a display-name test stop. The guarded-context run passes all 1,204 steps;
+  prior item-batch failure attribution and repeatability remain under review.
+  Read-only live NPC actor observations support outdoor navigation.
 
 ## Current reference candidates
 
-The generated pilot contains 9,127 edits. These are candidates, not a claim of
-reviewed translation coverage. Accepted reference imports comprise 8,301 dialogue
-entries, 446 choices, and 376 string/mail-component entries, plus four original
-introductory drafts. Three draft IDs override reference selection.
+The current experimental resident-module pilot contains 10,406 edits, including
+9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
+drafts. Candidates still require review. Its final main-bank audit leaves 2,592
+records without candidates; the classification and remaining restrictions are
+listed below. The 1,312 conservative layout warnings do not trigger automatic
+reflow. Detailed candidate, rejection, and coverage reports remain local in
+`build/intro-jobs-candidates/` and `build/intro-jobs-coverage/`.
 
-Main dialogue still has 3,448 rejected entries. Principal reasons are unconfirmed
-same-ID matching (1,854), flow/control mismatches (1,251), new text fields (143),
-unsupported GameCube commands, and two expansion-bound failures. Another 996
-accepted dialogue candidates have conservative layout warnings. Entry-level
-rejection and adaptation reports are generated in `build/candidates/`.
-
-Thirteen English reference choices exceed sixteen bytes and one lacks the
-same-ID legacy match.
-Those fourteen remain withheld. General strings, mail, saved names, dates, and
-item names have separate restrictions. Legacy item references have verified
-  storage mappings; English item identities and destination capacities still gate import.
+General strings, mail, saved names, dates, and item names have separate caller
+restrictions. The independent wider item and display-name resources are not
+additional ordinary-bank edits, and an API resource does not imply that every
+gameplay destination uses its wider names.
 
 ## Validation and release status
 

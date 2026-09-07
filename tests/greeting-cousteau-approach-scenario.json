@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.50},
+  {"wait": 0.2},
+  {"key": "w", "duration": 0.14},
+  {"wait": 0.3},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"snapshot_message": true},
+  {"capture": "greeting-cousteau-approach.png"},
+  {"save_state": true}
+]

@@ -23,7 +23,7 @@ def scenario(rom):
     entries = bank.entries()
     if len(entries) != 460 or any(len(entry) > 20 for entry in entries):
         raise ValueError("Unexpected expanded choice bank")
-    actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
+    actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def write(address, data):
         actions.append({"write": [f"{address:08X}", data.hex()]})
     def read(address, data):

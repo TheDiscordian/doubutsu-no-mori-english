@@ -16,6 +16,7 @@ from english_runtime import ChoiceLayout, make_english_runtime, verify_english_r
 from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
 from reference_sequences import validate_sequences
 from extended_items import install as install_extended_items
+from display_names import install as install_display_names
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -103,6 +104,7 @@ def main():
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
     parser.add_argument("--extended-items", type=Path, help="Directory containing names.bin and names.json for the sixteen-byte item resource")
+    parser.add_argument("--display-names", type=Path, help="Directory containing names.bin and names.json for the eight-byte display-name resource")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -125,6 +127,8 @@ def main():
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.extended_items:
         report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
+    if args.display_names:
+        report["display_names"] = install_display_names(rom, additions, report.get("runtime_module"), args.display_names)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():

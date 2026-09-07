@@ -71,6 +71,43 @@ class RSP:
                 raise ValueError("Debugger rejected test RAM write")
             offset += count
 
+    def thread_snapshot(self):
+        pointer = struct.unpack(">I", self.read_memory(0x8003CE30, 4))[0]
+        if pointer % 8 or not 0x80000000 <= pointer <= 0x80400000-0x1B0:
+            raise ValueError("Invalid running-thread pointer")
+        data = self.read_memory(pointer, 24)
+        return {"pointer": f"{pointer:08X}", "state": struct.unpack_from(">H", data, 16)[0],
+                "id": struct.unpack_from(">I", data, 20)[0]}
+
+    def pause_game_thread(self):
+        """Stop at the graph thread's frame entry before constructing fixtures.
+
+        Arbitrary pause usually lands in the idle loop. Injecting a synchronous
+        DMA there can block the sole idle thread and empty the run queue.
+        """
+        self.command("?")
+        before = self.command("g")
+        if len(before) != 71*16:
+            raise ValueError("Unknown debugger bulk register layout")
+        origin = {"pc": before[37*16:38*16], "thread": self.thread_snapshot()}
+        if self.read_memory(0x800D334C, 4) != bytes.fromhex("27BDFFE0"):
+            raise ValueError("Native game-frame entry guard does not match")
+        breakpoint = "0,800d334c,4"
+        if self.command("Z"+breakpoint) != "OK":
+            raise ValueError("Debugger rejected game-thread breakpoint")
+        try:
+            stopped = self.command("c")
+            registers = self.command("g")
+            thread = self.thread_snapshot()
+            if (stopped[:3] not in ("T05", "S05") or len(registers) != 71*16
+                    or int(registers[37*16:38*16], 16) & 0xFFFFFFFF != 0x800D334C
+                    or thread != {"pointer": "80145630", "state": 4, "id": 4}):
+                raise ValueError("Could not establish the native graph-thread test context")
+            return {"test_call_context": "native_graph_frame_entry", "pc": "800D334C",
+                    "thread": thread, "previous_context": origin}
+        finally:
+            self.command("z"+breakpoint)
+
     def call(self, address, arguments):
         """Test-only o32 call in module scratch RAM; leaves the game paused.
 
@@ -92,6 +129,10 @@ class RSP:
         if len(before) != 71*16 or int(before[:16], 16):
             raise ValueError("Unknown debugger bulk register layout")
         registers = [int(before[i:i+16], 16) for i in range(0, len(before), 16)]
+        thread = self.thread_snapshot()
+        if (registers[37] & 0xFFFFFFFF != 0x800D334C
+                or thread != {"pointer": "80145630", "state": 4, "id": 4}):
+            raise ValueError("Native calls require pause_game_thread before test fixture writes")
         stack = 0x80198880
         expected = dict(zip(range(4, 8), arguments[:4]))
         expected.update({29: stack, 31: 0x801968E0, 37: address})
@@ -122,7 +163,7 @@ class RSP:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
                     "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": "801968E0",
-                    "stack_restored": True, "requires_checkpoint_restore": True}
+                    "stack_restored": True, "requires_checkpoint_restore": True, "thread": thread}
         finally:
             self.command("z"+breakpoint)
             self.command("G"+before)
@@ -264,6 +305,43 @@ def villagers_snapshot(debug):
         residents.append(resident)
     return {"villagers": residents, "population_limit": maximum, "read_only": True,
             "position_source": "native NpcList; not a guarantee of current on-screen actor position"}
+
+
+def npc_actors_snapshot(debug):
+    """Read live NPC actors for navigation; no actor or schedule mutations."""
+    def read(address, size):
+        if address % 4 or not 0x80000000 <= address <= 0x80400000-size:
+            raise ValueError("Invalid live NPC/game address")
+        data = debug.read_memory(address, size)
+        if len(data) != size:
+            raise ValueError("Truncated live NPC read")
+        return data
+    game = struct.unpack(">I", read(0x8010EF90, 4))[0]
+    count, actor = struct.unpack_from(">2I", read(game, 0x1C9C), 0x1C94)
+    if count > 32:
+        raise ValueError("Invalid live NPC actor count")
+    seen, result = set(), []
+    while actor:
+        if actor in seen or len(seen) >= 32:
+            raise ValueError("Cyclic or excessive live NPC actor list")
+        seen.add(actor)
+        data = read(actor, 0x178)
+        if data[2] != 3:
+            raise ValueError("Non-NPC actor in live NPC list")
+        coordinates = struct.unpack_from(">3f", data, 0x28)
+        if not all(math.isfinite(value) for value in coordinates):
+            raise ValueError("Invalid live NPC coordinates")
+        animal = struct.unpack_from(">I", data, 0x174)[0]
+        row = {"actor_pointer": f"{actor:08X}", "fg_name": f"{struct.unpack_from('>H', data, 6)[0]:04X}",
+               "world_position": dict(zip(("x", "y", "z"), coordinates)), "is_drawn": data[0xB5],
+               "update_function": f"{struct.unpack_from('>I', data, 0x164)[0]:08X}"}
+        if animal:
+            row["animal_id"] = f"{struct.unpack_from('>H', read(animal, 12))[0]:04X}"
+        result.append(row)
+        actor = struct.unpack_from(">I", data, 0x158)[0]
+    if len(result) != count:
+        raise ValueError("Live NPC list count does not match traversal")
+    return {"live_npc_actors": result, "read_only": True}
 
 
 def keyboard_snapshot(debug):
@@ -483,6 +561,8 @@ def main():
                                 "assertion": "passed" if "expect" in action else "not_requested"})
             if "command" in action:
                 results.append({"command": action["command"], "result": debug.command(action["command"])})
+            if action.get("pause_game_thread"):
+                results.append(debug.pause_game_thread())
             if "write" in action:
                 address, value = action["write"]
                 data = bytes.fromhex(value)
@@ -517,6 +597,8 @@ def main():
                         raise ValueError(f"Inventory {field}: {snapshot.get(field)!r}, expected {expected!r}")
             if action.get("snapshot_villagers"):
                 results.append(villagers_snapshot(debug))
+            if action.get("snapshot_npc_actors"):
+                results.append(npc_actors_snapshot(debug))
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 results.append(snapshot)

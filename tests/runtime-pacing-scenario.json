@@ -1,7 +1,7 @@
 [
   {"wait": 8},
   {"save_state": true},
-  {"command": "?"},
+  {"pause_game_thread": true},
   {"write": ["80104F94", "00000000"]},
   {"write": ["8010EF90", "80197C00"]},
   {"write": ["80197C20", "4000"]},

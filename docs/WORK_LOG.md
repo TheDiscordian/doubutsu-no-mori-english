@@ -745,6 +745,52 @@
   asserted to be live on-screen actors; no schedule, greeting, or position is
   edited. Meeting villagers and actual FlashRAM saving remain open.
 
+### Complete display-name API and verified native test thread
+
+- Added the independent eight-byte name resource: 216 villager rows and 64 native
+  special-actor rows representing 23 distinct names. Every identity agrees with
+  the supplied English disc and legacy reference; complete source/reference and
+  native table hashes guard generation. Its 2,272 bytes have SHA-256
+  `261078b6c8bec7f974255ddffba8c2a570b4a2a0526ea699a3cc62ffc2b4e974`.
+  VROM is `02C00000`; module header offset `3C` is independent of item offset
+  `38`. Existing six-byte name APIs and saved records remain unchanged.
+- The original bounded runtime loads aligned sixteen-byte row pairs, validates
+  the header, and copies exactly eight bytes into caller storage. Portable tests
+  cover every sixteen-bit ID, the actual special table, capacities, disabled and
+  malformed resources, and adjacent guards. The module uses 5,664 bytes;
+  unconfigured SHA-256 is
+  `790c096f8280f362caa26b0c68dccb2dea0fc40e746d27224ecffda391bb599a`.
+- `display-api-pilot` retains 10,406 ordinary edits and the 649-slot extended
+  item resource. ROM SHA-256:
+  `c4ca5e832a096e1bb43c6846111a887c1b395197903ca2dc2f2b67259b15872b`.
+  UPS SHA-256:
+  `fdf54bf80bfe547ae904c5f6738a177bbf10d16e4738b9e7976c9ed18df29c75`.
+- `smoke-display-api-native-01` stops during a test-only synchronous load for
+  actor `A00F`, with PC `20202020`. The captured pre-call PC is `80026084`, inside
+  the native idle loop. Blocking that thread removes the scheduler's idle
+  fallback. No normal gameplay name call is implicated by that injection.
+  The older item-batch stop resembles it, but lacks the same saved register
+  evidence and is not retroactively declared fully diagnosed.
+- Added `pause_game_thread` and mandatory per-call context checks. The runner
+  reaches the unmodified `game_main` entry on graph thread four using a temporary
+  breakpoint before any fixture writes. It never edits thread queues or IDs to
+  obtain that state. All original native-call generators and static fixtures use
+  this action. Context failure tests reject arbitrary threads and changed entry
+  instructions. See `specs/NATIVE_TEST_CALLS.md`.
+- `smoke-display-api-native-02` passes all 1,204 recorded steps in five minutes
+  thirty-three seconds: 280 native ID lookups and row loads, invalid capacities
+  and IDs, null/disabled resources, header checks, guards, and checkpoint
+  restoration. The initial pause happened on thread five; the runner recorded
+  its transition to verified graph thread four. FlashRAM remains blank.
+- Read-only live NPC traversal validates list count, cycles, actor part, pointers,
+  and finite positions. Normal navigation enters and leaves Cousteau's house;
+  its interior actor reports world origin rather than an approachable position.
+  Outside, `smoke-space-greeting-exit-align-01` locates Cousteau near
+  `(2980, 160, 1699)` and the player at `(2700, 160, 1480)`. No greeting has yet
+  been claimed. All positions and schedules remain unedited.
+- All 150 local tests pass. The guarded-thread repeat of the previously failing
+  451-case native item batch is running; wider display consumers remain planned.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

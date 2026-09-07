@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.67},
+  {"wait": 0.5},
+  {"key": "g", "duration": 0.39},
+  {"wait": 0.5},
+  {"key": "s", "duration": 0.45},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"snapshot_message": true},
+  {"capture": "greeting-leave-home.png"},
+  {"save_state": true}
+]

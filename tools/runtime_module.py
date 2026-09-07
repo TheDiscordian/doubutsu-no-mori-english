@@ -51,6 +51,20 @@ def module_command_info(rom):
     return info
 
 
+def verify_test_module(rom, report):
+    """Bind native test symbols to the ROM, allowing only known resource words."""
+    files = by_vrom(rom)
+    module = bytearray(files[MODULE_VROM].extract(rom))
+    for offset, expected in ((56, 0x02A00000), (60, 0x02C00000)):
+        value = struct.unpack_from(">I", module, offset)[0]
+        if value and (value != expected or value not in files):
+            raise ValueError("Unexpected native test resource configuration")
+        module[offset:offset+4] = bytes(4)
+    if (sha256(module) != report["module_sha256"] or report["linked_bytes"] > 0x2000
+            or struct.unpack_from(">I", module, 12)[0] != report["linked_bytes"]):
+        raise ValueError("Native test symbols or scratch-space boundaries do not match the module")
+
+
 def watchdog_bytes(rom):
     code = by_vrom(rom)[CODE_VROM].extract(rom)
     if sha256(code) != SOURCE_HASHES[CODE_VROM]:
