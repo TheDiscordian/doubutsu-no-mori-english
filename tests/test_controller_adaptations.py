@@ -15,6 +15,7 @@ from controller_adaptations import (AFTER, BEFORE, OPERATION, adapt_controller_r
                                     validate_approval, validate_controller_candidate)
 from gc_adapter import adapt_reference
 from reference_matches import load_matches
+from runtime_module import module_command_info
 from textbanks import banks
 from textcodec import command_info, decode, encode
 from textvalidate import validate_entry
@@ -95,6 +96,25 @@ class ControllerAdaptationTests(unittest.TestCase):
                                          "translation": reference["text"], "control_policy": "reference_layout"}]))
             with self.assertRaisesRegex(ValueError, "Controller-text candidate"):
                 apply_translations(rom, {}, path)
+
+    @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
+                         "Retail and English-reference inputs remain local")
+    def test_retail_planting_instruction_keeps_pixel_spaces(self):
+        rom = ROM_PATH.read_bytes()
+        info = module_command_info(rom)
+        source = next(b for b in banks(rom) if b.name == "message").entries()[0x07F8]
+        reference = next(r for r in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())
+                         if r["id"] == "message:07F8")
+        matches = load_matches(ROOT/"translations/reference_matches.json")
+        text, _ = adapt_controller_reference(reference, source, matches[reference["id"]], info)
+        text, _ = adapt_reference(text, source, info, "reference_layout", resident_runtime=True)
+        output = encode(text, info)
+        validate_controller_candidate(reference["id"], source, output, matches)
+        validate_entry(source, output, info, "message", "reference_layout", resident_runtime=True)
+        raw = encode(reference["text"], info)
+        self.assertEqual(output, raw[:80]+AFTER+raw[80+len(BEFORE):])
+        self.assertEqual(len(output), 438)
+        self.assertEqual(output.count(bytes.fromhex("7F670A")), 2)
 
 
 if __name__ == "__main__":

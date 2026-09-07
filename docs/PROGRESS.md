@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 125 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 132 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -107,9 +107,14 @@ user's direction. The production build retains the approved spacing metrics.
   The full train-to-town regression passes all 225 steps and ten acceptance checks.
 - Hash-bound controller-text adaptations preserve the English reference except
   for individually approved button spans. Nook's clothing reminder uses START
-  instead of GameCube Y, with the highlighted span length corrected and all
+  instead of GameCube Y, as does the unfinished-planting reminder. The highlighted
+  span lengths are corrected and all
   surrounding GameCube layout/timing preserved. Portable and native DMA/end
-  tests pass; ordinary gameplay of the adapted reminder remains.
+  tests pass; ordinary gameplay of the adapted reminders remains.
+- Token-aware coverage classification for all 29 native banks. Command-only
+  records, exact placeholder labels, visible kana, Latin text, unknown glyphs,
+  and candidate presence stay distinct. Source hashes and unique IDs are checked;
+  candidate presence never implies review or unreachable code.
 
 ## Current reference candidates
 
@@ -132,12 +137,18 @@ item names have separate restrictions. Legacy item references have verified
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,361 edits, including
-9,108 reference dialogue candidates, all 460 choices, 178 villager names,
+The separate resident-module experiment contains 10,362 edits, including
+9,109 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, and four N64-specific
 exercise drafts alongside the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its remaining main-dialogue count is 2,638; matching, actor fields, flow controls,
+Its reference generator rejects 2,637 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,636 main records without
+candidates: 1,691 with Japanese text, 23 exact placeholders, 919 with no static
+text, one with Latin text, and two with only numbers/symbols. Ten command-only
+records contain dynamic insertions. All 919 retain their control-flow review
+requirement; none is deemed unreachable from this classification.
+Matching, actor fields, flow controls,
 and review are still required. This experimental count does not replace the
 ordinary pilot's coverage or establish translation completion.
 The final choice identity is individually reviewed and hash-bound; complete
@@ -178,8 +189,10 @@ the English purchase confirmation and all four home-explanation records.
 The exercise drafts retain every native command; seasonal-event testing remains.
 Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
 The uniform is equipped through the inventory, acknowledged by Nook, and confirmed
-by the native clothing item ID. The English planting-job instructions complete;
-the planting work and subsequent jobs remain in progress.
+by the native clothing item ID. The English planting-job instructions complete.
+Three supplied flowers are planted through normal inventory actions, with native
+pocket consumption checked. The remaining planting work and subsequent jobs
+remain in progress.
 The following clothing reminder has an approved GameCube Y-to-N64-START button
 adaptation in the controller build. Read-only player coordinates support navigation
 without position edits. START opens the inventory during the normal shop test.

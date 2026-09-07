@@ -1,0 +1,8 @@
+[
+  {"wait": 2},
+  {"key": "a", "duration": 0.08},
+  {"wait": 2},
+  {"capture": "plant-action-menu.png"},
+  {"snapshot_inventory": true},
+  {"save_state": true}
+]

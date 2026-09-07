@@ -1,0 +1,20 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.09},
+  {"wait": 0.5},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 2},
+  {"key": "g", "duration": 0.04},
+  {"wait": 0.5},
+  {"capture": "next-flower-selected.png"},
+  {"key": "a", "duration": 0.08},
+  {"wait": 1},
+  {"key": "s", "duration": 0.03},
+  {"wait": 0.5},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "next-flower-planted.png"},
+  {"snapshot_inventory": true},
+  {"snapshot_player": true},
+  {"save_state": true}
+]

@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.03},
+  {"wait": 0.5},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "first-flower-planted.png"},
+  {"snapshot_inventory": true},
+  {"snapshot_player": true},
+  {"save_state": true}
+]

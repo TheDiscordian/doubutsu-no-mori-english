@@ -57,7 +57,7 @@ the required resources earlier.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| P01 | Complete coverage report | pending | No unclassified or unreviewed required text/assets; intentional exceptions explicit |
+| P01 | Complete coverage report | active | Token-aware inventory covers 29 banks and distinguishes candidate presence from review; embedded UI/assets, wider resources, and complete review remain |
 | P02 | Provenance and redistribution review | pending | Nintendo inputs remain local; legacy permissions assessed; patch-only package |
 | P03 | Reproducible release artifacts and instructions | pending | Source-hash rejection, verified patch application, checksums, install and compatibility notes |
 | P04 | Final acceptance | pending | Main work, stretch goals, regression matrix, and required external validation complete |

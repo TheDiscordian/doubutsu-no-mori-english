@@ -644,6 +644,41 @@
   equipped item `2410`, the previous shirt in pocket zero, and ten planting
   items in pockets one through ten. The actual planting/save work remains.
 
+### Planting instructions and token-aware coverage
+
+- Added the individually approved START-button span for Nook's planting reminder
+  `07F8`, at encoded offset 80. The 438-byte result retains both GameCube
+  pixel-space commands and every surrounding line/page break and pause.
+  `smoke-planting-native-01` passes 38 recorded steps covering both approved
+  controller messages, real DMA, native termination, guards, and restoration.
+- The planting build contains 10,362 edits and 9,109 reference dialogue records;
+  its separate wider item resource remains 649 slots. ROM SHA-256:
+  `7e28ccd4227a9b3308d5940c3a5f03dffcd4ad15bfbac5099a33be1bf2fe64f4`.
+  UPS SHA-256:
+  `e317149fdc02183a364e7cec556753773e6b7f66baaf423987f191d224028ea1`.
+  The reminder's reference layout has a conservative warning; it is not reflowed.
+- The new coverage inventory checks all native bank records against an explicit
+  final candidate file. It rejects stale/duplicate/unknown edits and retains raw
+  or unmapped glyphs as review needs. Main records without candidates comprise
+  1,691 Japanese texts, 23 exact placeholders, 919 without static text, one Latin
+  text, and two number/symbol records. Ten of the 919 have dynamic insertions.
+  No command-only record is marked unreachable or complete. All 9,116 main
+  candidates still require review; 83 use the shared Japanese dash glyph in
+  otherwise Latin text, which is listed for punctuation review, not reclassified
+  as Japanese words. One original fallback draft explains the difference between
+  2,637 reference rejections and 2,636 records absent from the final candidate file.
+- All 132 tests pass. Normal space-build gameplay plants the first three flowers
+  in `smoke-space-first-flower-01`, `second-flower-01`, and `third-flower-01`.
+  Reopening inventory resets its cursor to pocket zero; `next-flower-01` records
+  that observation and opens a seed menu, without consuming another item.
+  The third-flower run explicitly asserts the full pocket array.
+- The remaining-plant generator uses only controller input and read-only pocket
+  assertions. A first southward attempt reaches occupied ground and the native
+  cannot-plant warning; its item-consumption assertion correctly fails. The next
+  route moves east from the preceding successful checkpoint. No item, quest,
+  or player-position data is edited. Successful individual plants receive their
+  own emulator checkpoints; those are not FlashRAM save evidence.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

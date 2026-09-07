@@ -1,5 +1,17 @@
 [
   {
+    "id": "message:07F8",
+    "source_sha256": "7c9d1d27c5c3c5e6c871a7a72ebd038ccee9a1c7ef49cf82ed45ed400c4466a6",
+    "reference_id": "message:07F8",
+    "reference_sha256": "c08f758ad744eacc11a232de68ee8ad86eb870f6a467eae3540c9cd82415d49e",
+    "controller": {
+      "operation": "inventory_y_to_start",
+      "offset": 80,
+      "adapted_sha256": "5db66f332f236ff11e0faf8b4e9bf2a4f59c17eb3d8c08b3b3441b5899814000"
+    },
+    "evidence": "Both records are Nook's unfinished-planting-job reminder: open inventory, select seeds or saplings, plant outside, and avoid occupied ground. The native Japanese explicitly uses START; the English reference uses Y for that same inventory action. Normal N64 gameplay confirms START opens inventory and the planting action consumes a supplied seed. Replace only the approved highlighted button span and its length. Retain all GameCube line/page breaks, two pixel-space commands, pauses, colour, and actor commands. The planting reminder itself still requires ordinary actor traversal."
+  },
+  {
     "id": "message:07F3",
     "source_sha256": "51f4d22c4e07aad374c4e7c6aa90ae587c44c86cb7c4752d8d226692fcf59a0b",
     "reference_id": "message:07F3",
