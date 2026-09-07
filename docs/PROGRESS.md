@@ -21,6 +21,10 @@ All 216 names pass host checks; eight native letter windows pass complete text,
 page, glyph, source-retention, and preference checks. The ordinary-header native
 regression also passes ten header cases, body/footer rendering, and non-read
 mode forwarding across 1,010 recorded steps.
+The three native NPC letter-show paths also pass nine complete isolated window
+cases, including unknown sender handling. No additional production patch is
+needed for these callers. Normal actor interactions, post-office progression,
+remaining inline readers/metadata, and actual save/reload remain.
 Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -55,7 +59,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 294 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 296 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -333,8 +337,19 @@ user's direction. The production build retains the approved spacing metrics.
   The ordinary-header regression passes ten cases, body/footer glyph checks,
   and all non-read-mode forwarding checks: 36 calls and 842 memory assertions
   across 1,010 steps, with checkpoint restoration and blank FlashRAM.
-  The 188-step town regression and all ten acceptance checks pass. Broader NPC
-  caller execution, ordinary gameplay, save/reload, and hardware remain.
+  The 188-step town regression and all ten acceptance checks pass. Ordinary
+  gameplay, save/reload, and hardware remain.
+- All three direct NPC stored-letter show paths pass isolated native execution:
+  first-job, ordinary known-sender, and ordinary unknown-sender. Nine windows
+  cover ordinary letters and both snapshot kinds; six snapshot windows verify
+  twelve pages, 1,713 glyphs, and 6,852 vertex positions. The 510-step run passes
+  45 native calls and 151 assertions, checking complete native overlay relocation,
+  zeroed BSS, source retention, unchanged player/NPC data during calls, and safe
+  allocation lifetime through window close. Ordinary windows reach all three
+  draw hooks with complete retained records and expected text lengths. All
+  allocations are freed after close; checkpoint restoration and blank FlashRAM
+  pass. No production change to these callers is needed. Normal actor gameplay,
+  inline/computed-pointer readers, travel, editing, and saving remain.
 
 ## Current reference candidates
 

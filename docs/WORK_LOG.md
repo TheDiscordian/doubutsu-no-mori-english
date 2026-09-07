@@ -1873,6 +1873,53 @@
   and original hardware remain required. Ordinary-header cartridge lookup
   timing also remains unverified on hardware.
 
+### Actual NPC stored-letter show caller validation
+
+- Added a relocation model restricted to the original first-job and ordinary
+  NPC dialogue overlays. Both file hashes, relocation hashes, section sizes,
+  and all memory bounds are required. The model includes BSS address targets
+  and the original loader's reused HI-register behaviour; Pelly's no-BSS model
+  is not reused. Two host tests cover both layouts at several heap bases,
+  complete pointer relocation, unchanged non-relocated bytes, BSS, and rejection
+  of altered inputs or invalid destinations. Eleven debugger tests also pass.
+- Added a silent bounded caller harness that loads both overlays through native
+  `LoadImpl` and compares every relocated file byte and the zeroed BSS before
+  execution. Each synthetic manager/client/sender-memory fixture is privately
+  allocated and guarded. Every overlay stays allocated until its last window
+  closes. Native handlers, clear/conversion functions, and submenu-opening
+  calls execute unchanged; no production patch to either overlay is necessary.
+- `build/smoke-npc-mail-show-01` passes all nine cases: classic, composite, and
+  ordinary letters through first-job, known-sender, and unknown-sender paths.
+  The actual handler-generated temporary letter matches the complete native
+  conversion baseline, including the unknown sender's six cleared name bytes.
+  Complete source letters, compact sender memory, saved player state, and saved
+  NPC population remain unchanged during each caller invocation. Source letters
+  and saved header/footer preferences also remain unchanged through window close.
+  Ordinary frame updates are not compared against stale NPC data snapshots.
+- Six snapshot windows pass twelve complete pages, 1,713 rendered glyphs, and
+  6,852 vertex positions. All three ordinary windows preserve their complete
+  source and expected text lengths and reach the installed header, body, and
+  footer hooks. Full ordinary glyph-position coverage comes from the separate
+  passing `smoke-mail-names-view-01` regression, not from these hook-entry checks.
+- The caller run totals 510 recorded steps, 45 native calls, 151 assertions,
+  three complete relocated/BSS checks, nine ordinary draw-hook observations,
+  and three successful frees after close. The complete checkpoint is restored;
+  the emulator remains alive and exits gracefully. FlashRAM stays blank with
+  SHA-256 `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- The final full suite passes 296 tests in 174.206 seconds, recorded in
+  `build/tests-npc-mail-show-full.log`. The runtime and ROM remain unchanged
+  from the committed header-name build: the caller scenarios run
+  `build/mail-names-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`,
+  using its own town checkpoint. No cross-ROM checkpoint is used.
+- These results complete isolated validation of the three direct reverse-
+  conversion callers, not ordinary NPC actor interaction or save compatibility.
+  Remaining mail work includes normal post-office hand-back/error progression,
+  inline/computed-pointer readers and metadata, travel, semantic identities,
+  missing glyphs, generation, lossless editing, delivery, and actual save/reload.
+  Snapshot generation remains disabled. No font, candidate translation, source
+  asset, memory reservation, saved record, or public-release setting is changed.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

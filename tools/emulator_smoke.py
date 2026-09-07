@@ -795,6 +795,12 @@ def main():
                     raise ValueError('Pelly receipt probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_pelly_receipt'],record))
+            if 'test_npc_mail_show' in action:
+                from npc_mail_show_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('NPC letter-show probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,keyboard,action['test_npc_mail_show'],record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():

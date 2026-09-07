@@ -19,15 +19,23 @@ initializers but do not establish normal animation or subsequent player input.
 See [receipt evidence](../specs/PELLY_RECEIPT.md).
 Keep generation disabled.
 
-Next reader targets include the first-job and ordinary NPC letter-show handlers
-in overlays `00814FA0` and `00815B70`. Their three reverse-conversion calls lead
-to board read mode one; complete caller-level native validation remains. Their
-instruction, BSS-lifetime, and relocation contracts are recorded in
-[NPC letter-show design](../specs/NPC_MAIL_SHOW.md).
+The first-job and ordinary NPC letter-show handlers in overlays `00814FA0` and
+`00815B70` pass isolated native caller-level validation. Their three
+reverse-conversion paths preserve complete ordinary/snapshot letters and reach
+board read mode one. Instruction, BSS-lifetime, relocation, and execution
+contracts are recorded in [NPC letter-show design](../specs/NPC_MAIL_SHOW.md).
 Read-only letter headers now resolve complete English villager names using the
 existing saved identity. Host tests cover all 216 villagers and fallbacks;
 eight full native windows and ten ordinary-header cases pass. No saved
 name capacity, source letter, font metric, or reference line break is changed.
+The NPC caller harness passes all nine windows. It uses both original overlays,
+independently checks their relocated file/BSS image, and keeps the temporary
+letter allocated through close. Nine window cases cover all three caller
+branches with ordinary letters and both snapshot kinds. The complete run and
+checkpoint restoration pass. Normal actor interaction remains distinct from
+these isolated calls. Next R05 work covers ordinary post-office hand-back/error
+progression and the remaining inline metadata/excerpt, travel, and editor paths;
+the direct reverse-conversion callers are no longer an untested-reader item.
 
 ## Main translation and runtime
 

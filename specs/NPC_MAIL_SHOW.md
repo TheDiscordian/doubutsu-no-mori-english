@@ -4,7 +4,7 @@
 
 Three direct calls to the native compact-letter reverse converter lead to the
 letter window from NPC dialogue. The first-job handler and the two branches of
-the ordinary handler require complete caller-level validation. The standalone
+the ordinary handler pass isolated caller-level native validation. The standalone
 reverse-conversion tests establish preservation of the compact text and metadata,
 not successful execution of these callers or normal NPC interaction.
 
@@ -88,3 +88,43 @@ full decoded output, all rendered pages, and successful window close.
 Keep the overlay allocation alive until close, then free it and restore the
 complete checkpoint. Normal actor selection, animations, subsequent dialogue,
 delivery, game saves, and hardware still require their own validation.
+
+## Isolated caller harness
+
+`npc_mail_show_test_scenario.py` verifies the installed full reader and selects
+one long classic letter, one long composite letter, and an ordinary synthetic
+letter. `npc_mail_show_smoke.py` executes all three through each caller branch.
+It does not replace the handlers or their conversion/window-opening calls.
+
+The heap fixture contains the complete overlay and BSS, relocation scratch,
+manager, client, NPC identity, sender memory, compact letter, and guarded full
+letter comparison buffers. The independent relocation model accepts only the
+two exact original overlay/relocation pairs and permits targets within their
+file-plus-BSS bounds. The native loader must match that complete expected image
+before any handler call. Host tests cover several heap bases, unchanged
+non-relocated bytes, complete pointer relocation, zeroed BSS, rejected altered
+files/tables, and invalid or out-of-bounds destinations.
+
+The handler's full temporary letter is compared with a separately executed
+native conversion, including the unknown-sender name clearing. Compact source,
+player state, and saved NPC population must remain unchanged during the call.
+After live rendering and close, source letters and saved header/footer
+preferences must remain unchanged. Normal frame updates are not misclassified
+as caller mutations of unrelated saved NPC state.
+
+Snapshot cases verify every page and glyph position in the real window.
+Ordinary cases verify complete source retention, body/footer lengths, and
+entry into each installed header/body/footer hook; the separate ordinary-view
+regression supplies full glyph-position checks. Each overlay allocation is
+freed only after its last window closes. A complete emulator checkpoint restores
+the machine after the full run. Passing these isolated calls is not a normal
+NPC actor interaction, save/reload, or hardware result.
+
+The complete native run passes nine windows: ordinary letters and both
+snapshot kinds through each of the three branches. It records 45 native calls,
+151 memory assertions, three complete relocated/BSS images, and three frees
+after window close. Six snapshot windows cover twelve pages, 1,713 glyphs, and
+6,852 vertex positions. The ordinary windows reach all three installed draw
+hooks with complete retained source records and expected body/footer lengths.
+All 510 steps finish with checkpoint restoration, blank FlashRAM, and graceful
+shutdown. No production patch to either NPC show overlay is required.

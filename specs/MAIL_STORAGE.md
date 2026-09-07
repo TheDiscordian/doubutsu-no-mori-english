@@ -28,6 +28,14 @@ mail-type byte and only sets identities when supplied explicit identity inputs.
 Callers still own those fields. The compact record's trailing date/padding is
 not written by these conversion routines.
 
+All three direct reverse-conversion callers also pass isolated native execution:
+the first-job handler and ordinary known/unknown-sender branches open all nine
+ordinary/classic/composite test letters through the real window. Both original
+overlays, their relocation, BSS lifetime, complete source retention, and saved
+player/NPC data during calls are checked. Full snapshot pages render before
+close. See [NPC caller evidence](NPC_MAIL_SHOW.md); normal actor interaction
+and game saving remain separate.
+
 The native post-office queue begins at `80135E0C` with five 164-byte records.
 The keep helper at `800B67C0` copies to the first free slot and clears its source
 only on success. A full queue leaves the source intact. This helper alone does
