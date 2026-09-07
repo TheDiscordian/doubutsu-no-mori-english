@@ -454,17 +454,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/global-field-pilot/`
-contains 10,508 edits, including
-9,242 reference dialogue candidates, all 460 choices, and 21 original dialogue
+The current experimental resident-module pilot in `build/native-advice-pilot/`
+contains 10,515 edits, including
+9,242 reference dialogue candidates, all 460 choices, and 28 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,489
+still require review. The original main-bank audit leaves 2,482
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,382 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/global-field-candidates/` and `build/global-field-coverage/`. The independent
+`build/native-advice-candidates/` and `build/native-advice-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -532,6 +532,16 @@ The complete 406-test suite passes with the shared validation changes.
 Different GameCube festival, tailor, and travel-rule records stay withheld for
 native-specific translation. See [reviewed field contract](../specs/REFERENCE_FIELDS.md).
 
+Seven [original N64-specific drafts](../specs/NATIVE_ADVICE_TRAVEL.md) cover
+errand notes, telling time by sunlight, post-wait conversations, the travel
+record-erasure warning, and both post-office original-Pak requirements.
+All native commands/arguments are preserved except seven explicitly checked
+colour-span lengths for the full term `Controller Pak`. The warning retains
+its original choices, branches, and clear erasure wording. The 52-test reference
+batch passes, and all seven complete native cartridge loads pass with guards
+and checkpoint restoration. Ordinary travel/post-office actions and draft
+presentation review remain. Existing candidates and production code are unchanged.
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -539,14 +549,15 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,508 edits, including
+The resident-module experiment contains 10,515 edits, including
 9,242 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
-four other introductory drafts, and eleven earlier-shop drafts. It retains the GameCube calendar wording in Rover's
+four other introductory drafts, eleven earlier-shop drafts, and seven native
+advice/travel drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,490 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,489 main records without
-candidates: 1,558 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,483 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,482 main records without
+candidates: 1,551 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

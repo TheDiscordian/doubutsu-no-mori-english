@@ -116,8 +116,8 @@ and native request dispatches pass, including complete order-table and memory
 guards. See [request semantics and scope](../specs/ACTOR_REQUESTS.md). Normal
 subsequent actor actions and quest traversal remain gameplay/playthrough checks.
 
-The 114 missing-field rejections include forty catchphrase-only (`1C`), sixteen
-player-name-only (`1A`), and ten town-name-only (`2F`) cases, plus mixed and
+The 107 missing-field rejections include forty catchphrase-only (`1C`), twelve
+player-name-only (`1A`), and eight town-name-only (`2F`) cases, plus mixed and
 other fields. Audit the actual insertion consumers and caller context rather
 than assuming that a field absent from a native message is available globally.
 Do not weaken field/actor guards simply to reduce rejection counts. These audits
@@ -131,12 +131,14 @@ the current town through `800950D8` and `8009F428`. All 26 complete cartridge
 loads and 27 native insertions pass, including complete output, colours, cursor,
 source retention, and guards. See [field contract](../specs/REFERENCE_FIELDS.md).
 
-Native-specific drafts are needed for the incompatible reference slots: `119C`
-and `27C0` (carp streamers, not Harvest Festival), `11AC` and `180B` (moon viewing,
-not meteor showers), `11F1` and `14FE` (native advice, not GameCube tailor shops),
-and `0945`, `1BD3`, and `1BD4` (native Controller Pak travel/storage rules).
-`147F/14CF` are native post-wait conversation messages, not GameCube town-entry
-farewells. Blank native records remain separate flow-review items.
+Native-specific drafts are needed for the incompatible festival references:
+`119C` and `27C0` (carp streamers, not Harvest Festival), and `11AC` and `180B`
+(moon viewing, not meteor showers). Verify their dynamic date/choice fields
+alongside the native wording. Seven original advice/travel drafts cover
+`11F1`, `14FE`, `0945`, `1BD3`, `1BD4`, and the native post-wait conversations
+`147F/14CF`. All seven complete cartridge loads and the 52-test reference batch
+pass. See [draft contract](../specs/NATIVE_ADVICE_TRAVEL.md). Ordinary actions,
+draft wording/layout review, and blank native-record flow review remain.
 
 Catchphrase `1C` receives the message's actor at window offset `20`; its caller
 identity still requires a distinct check before added-field permission. Its

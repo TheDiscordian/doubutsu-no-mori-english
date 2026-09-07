@@ -73,8 +73,10 @@ Reference field availability does not establish semantic identity. `119C` and
 `11AC` and `180B` replace native moon-viewing content with meteor showers.
 `11F1` and `14FE` replace unrelated native advice with GameCube tailor features.
 `0945`, `1BD3`, and `1BD4` have different travel/storage rules or actions.
-These need native-specific translations, not added-field permissions. Blank
-native slots and messages with other changed controls remain withheld as well.
+Those five records and the post-wait conversations `147F/14CF` have
+[original native-specific drafts](NATIVE_ADVICE_TRAVEL.md), not added-field
+permissions. The festival references still need native-specific translation.
+Blank native slots and messages with other changed controls remain withheld.
 
 ## Batched validation
 

@@ -1,0 +1,61 @@
+[
+  {
+    "id": "message:0945",
+    "source_sha256": "76b508246a2e3dbcca4a15757deb4d2d7470af77a287e396edb881f3f9ad7174",
+    "translation": "This {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nalready holds a record\nfor {cmd:7F25}, eek eek.{cmd:7F04}\n{cmd:7F02}If you go ahead,{cmd:7F0308}\nthe record on this\n{cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nfor {cmd:7F25} will be erased.{cmd:7F04}\n{cmd:7F02}Do you still want\nto travel, eek eek?{cmd:7F1600290062}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0946}{cmd:7F100947}{cmd:7F19}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Warn that travelling erases the existing named Controller Pak record. The GameCube same-ID message instead concerns missing town data and has different actions. Retain native choices 0029/0062 and branches 0946/0947, all pauses/pages, and every other command; only the two colour-span lengths change from nine to fourteen for Controller Pak. The existing labels mean Maybe not... and Taking a trip!, in that native order. Ordinary travel and final presentation remain validation."
+  },
+  {
+    "id": "message:11F1",
+    "source_sha256": "c52ddee23d24ace633c3bb5dc864f0af6bb406f85a3adcf60026938d470699ef",
+    "translation": "{cmd:7F090000FF}I always{cmd:7F0306}\nmake a note when someone\nasks me to run an errand.{cmd:7F04}\n{cmd:7F02}Who asked,{cmd:7F0306}\nwho it's for,{cmd:7F0306}\nand what to deliver{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Write those things down,{cmd:7F0306}\nthen cross them off\nas you finish,{cmd:7F0308} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}One or two errands are easy,{cmd:7F0306}\nbut if you agree to lots\nat once, it's easy\nto get mixed up!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "A resident recommends taking notes about errands and crossing completed tasks off. The GameCube same-ID tailor-shop advice is unrelated. Preserve the complete native command sequence, pauses, pages, and catchphrase field."
+  },
+  {
+    "id": "message:147F",
+    "source_sha256": "946d696bf7924f858a0efa916937901b697eafc5677c393bd5a31ca19cb4c3eb",
+    "translation": "Sorry to keep you waiting!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Now,{cmd:7F0304} let's have\na good chat today!{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native resident resumes conversation after a wait, rather than giving the GameCube town-entry farewell. Preserve every native command, pause, page, and catchphrase field."
+  },
+  {
+    "id": "message:14CF",
+    "source_sha256": "dc8b6fd666594ec44e672dd77b51e5c559e4ac81b7b59f18643ceead23b7bf33",
+    "translation": "Thanks for waiting.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Hmhm.\nI'd like to sit and have\na good chat,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native resident wants a relaxed chat after a wait, not the GameCube wish for a pleasant town visit. Preserve every native command, pause, page, and catchphrase field."
+  },
+  {
+    "id": "message:14FE",
+    "source_sha256": "c936c9ee44192d02ec5eb3983db5ad06415078891a966fb81dfd207b2fc791a7",
+    "translation": "{cmd:7F09000016}How do you{cmd:7F0306} tell the time\nwithout a clock nearby,{cmd:7F0308}\n{cmd:7F1C}?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I look at the sunlight\ncoming into my house!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}The sun rises in the east,\npasses through the south,{cmd:7F0306}\nand sets in the west!{cmd:7F04}\n{cmd:7F02}Once you know that,{cmd:7F0306}\nyou can work out\nthe time pretty well!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}Of course,{cmd:7F0306}\nthat trick won't work\nonce it gets dark.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "A resident estimates the time from sunlight entering the house, then notes that the method fails at night. The GameCube sewing-equipment dialogue, new choices, and branches are unrelated and are not imported. Preserve every native command, pause, page, and field."
+  },
+  {
+    "id": "message:1BD3",
+    "source_sha256": "f114205b51c35199635b1ac767de1dc19d8299316ef069d9c7b5f6ff808d39af",
+    "translation": "{cmd:7F090000FF}If you want to leave letters\nwith us while visiting\nanother town,{cmd:7F04}\n{cmd:7F02}you need the same\n{cmd:7F09000017}{cmd:7F50198CDC0E}Controller Pak\nyou used to get here.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}I'm very sorry,{cmd:7F0308}\nbut please insert the correct\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F09000015}{cmd:7F0308}\nthen come back and see us.\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Pelly requires the same Controller Pak used for the visit before accepting the traveller's letters. Do not import the GameCube blanket refusal of traveller letters. Preserve every native command and argument except the two colour-span lengths, which become fourteen for Controller Pak. Native pages, pauses, and continuing terminator remain."
+  },
+  {
+    "id": "message:1BD4",
+    "source_sha256": "ac89f9fc06d8de4cb2df2461d6eab11a2e68f3911ff7262145abf2d6598f9a3e",
+    "translation": "{cmd:7F0900000F}Oh,{cmd:7F0308} that's a different\n{cmd:7F50198CDC0E}Controller Pak{cmd:7F0304} you've put in.{cmd:7F0310}\nNope.{cmd:7F0306} Can't do it.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}If you want to leave letters\nwith us while you're\nvisiting another town,{cmd:7F04}\n{cmd:7F02}you have to use the\n{cmd:7F50198CDC0E}Controller Pak\nyou arrived with.{cmd:7F04}\n{cmd:7F02}Put in the right\n{cmd:7F50198CDC0E}Controller Pak,\nthen{cmd:7F0308} come back, OK?{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Sorry for{cmd:7F0306} the trouble.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(Honestly, it's common sense!){cmd:7F5101}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis requests the traveller's original Controller Pak, unlike the GameCube blanket refusal of traveller letter storage. Preserve every native command and argument except the three colour-span lengths, which become fourteen for Controller Pak. Native pages, pauses, muted aside, and continuing terminator remain."
+  }
+]

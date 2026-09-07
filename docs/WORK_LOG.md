@@ -2731,6 +2731,44 @@
   Runtime code, font assets/metrics, saved layouts, and generation settings stay
   unchanged; all candidates still require final review.
 
+### Original N64 advice and Controller Pak dialogue
+
+- Added seven original drafts for `0945`, `11F1`, `147F`, `14CF`, `14FE`,
+  `1BD3`, and `1BD4`. They translate native errand-note advice, sunlight/time
+  advice, post-wait conversations, the named-record erasure warning, and both
+  post-office original-Pak requirements. The incompatible GameCube tailor,
+  town-entry farewell, missing-town-data warning, and blanket traveller-letter
+  refusal are not imported.
+- Every native command and argument remains except seven colour-span lengths
+  changed from nine to fourteen for the full English term `Controller Pak`.
+  The new focused test verifies complete command sequences and each highlighted
+  term. The erasure warning keeps choice IDs `0029/0062`, branches `0946/0947`,
+  and explicit data-loss wording. Phyllis retains the muted aside. No saved
+  structures, actions, runtime code, or font metrics/assets change.
+- The combined reference batch passes 52 tests in 5.544 seconds at
+  `build/tests-native-advice-reference-batch-01.log`, including the new draft
+  test. The 406-test full-suite baseline from the shared-field batch remains
+  available; the content-only additions do not repeat the full suite or intro.
+- `build/smoke-native-advice-01` passes all seven complete native cartridge
+  message loads: 44 recorded steps, seven native calls, and 23 assertions.
+  Buffer/module guards, checkpoint restoration, and graceful shutdown pass.
+  FlashRAM remains blank and the Pak unchanged. The batch does not execute
+  a passport overwrite, ordinary travel, or post-office storage actions.
+  Those interactions and final original-draft presentation remain for gameplay
+  and human-playthrough review.
+- `build/native-advice-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `dae1b056ad8bc26e793067b8bd2a1866bfc1e6767e34de25c1bc87c73b2cb5b4`;
+  its verified round-trip UPS has SHA-256
+  `9f0f151995e3a05cb47b95b7ba116a79f6203f8ec572d306ecf032e96c57f6ef`.
+  The candidate file contains 10,515 edits: 9,242 reference dialogue candidates,
+  28 original dialogue drafts, and all 460 choices among the covered banks.
+  All 10,508 existing edits are unchanged. The original main-bank audit leaves
+  2,482 records without candidates, including 1,551 with Japanese static text.
+  Reference-layout warnings remain 1,382; original draft presentation is tracked
+  separately. Detailed reports remain local in `build/native-advice-candidates/`
+  and `build/native-advice-coverage/`. The next queue retains native festival
+  drafts, their dynamic fields, and the separately reviewed catchphrase batch.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

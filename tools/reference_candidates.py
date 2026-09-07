@@ -85,7 +85,8 @@ def main():
     source_banks = {bank.name: bank for bank in banks(rom)}
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
                                        Path("translations/n64-intro-jobs.json"),
-                                       Path("translations/n64-shop-menus.json")])
+                                       Path("translations/n64-shop-menus.json"),
+                                       Path("translations/n64-advice-travel.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     matches = load_matches(args.matches)
     verify_native_equivalents(matches, source_banks)
