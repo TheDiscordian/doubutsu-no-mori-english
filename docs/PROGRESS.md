@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 457 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 477 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -459,17 +459,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/resident-conversations-pilot/`
-contains 10,657 edits, including
-9,354 reference dialogue candidates, all 460 choices, and 58 original dialogue
+The current experimental resident-module pilot in `build/native-context-pilot/`
+contains 10,880 edits, including
+9,543 reference dialogue candidates, all 460 choices, and 92 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,340
+still require review. The original main-bank audit leaves 2,117
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,403 conservative layout warnings include full default
+listed below. The 1,435 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/resident-conversations-candidates/` and `build/resident-conversations-coverage/`. The independent
+`build/native-context-candidates/` and `build/native-context-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -634,6 +634,24 @@ special-actor, sleeping-resident, and title-menu comparisons; these contexts
 are not covered by the standing-resident permission. Other identity, field,
 control, overflow, gameplay, and final review work remain active.
 
+The [native-context batch](../specs/NATIVE_CONTEXT_REFERENCES.md) adds 73 more
+messages: 64 individually bound references, Copper's R-button map instruction,
+and eight native originals. Local wording spans correct shrine venues, native
+sports dates, Controller Pak instructions, cartridge warnings, and absent GC
+actors while retaining complete reference newline/page/pause sequences. Native
+drafts retain actual travel rules, October Sports Day, and Nook loan advice.
+All 73 complete cartridge loads pass with 221 assertions across 374 recorded
+steps, unchanged adjacent/module guards, checkpoint restoration, and blank
+FlashRAM. All earlier candidate edits and executable/font/resource data remain
+unchanged. These loader checks do not execute erasure, travel, seasonal events,
+map handoffs, Resetti animations, or normal saves.
+The complete 477-test regression suite passes. Basic generation admits 72 of
+the new messages and correctly withholds `16A5` without capitalization command
+`75`; all eight native-context drafts remain available.
+The read-only unconfirmed same-ID comparison pool is empty under the existing
+rules; broader matching and incompatible topics/fields/controls remain. The
+reference typos in `0670/08BF` remain explicit wording-polish tasks.
+
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
 becomes two bounds of 773 and 419 by splitting only at the existing page break
@@ -652,17 +670,17 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,807 edits, including
-9,478 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,880 edits, including
+9,543 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, and seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, and eighteen native
-community drafts. It retains the GameCube calendar wording in Rover's opening
+community drafts, and eight native-context drafts. It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,191 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,190 main records without
-candidates: 1,259 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,118 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,117 main records without
+candidates: 1,186 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

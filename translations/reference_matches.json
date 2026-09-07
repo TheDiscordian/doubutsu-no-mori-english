@@ -3654,5 +3654,1116 @@
       "adapted_sha256": "81dd9093d887124f4bda977956590db3e95cc943a4d613c996ba378bee37e80d"
     },
     "evidence": "Six-in-the-morning conversation about sunrise and early breakfast. Both complete records are reviewed for the native meaning, and the supplied legacy independently confirms the English wording. This is resident-spoken dialogue, not an actorless system message. Native talk retains its actor through window request +2E0 and client +20; the installed 1C reader resolves that actor's saved catchphrase without changing it. Only the added catchphrase is permitted. Preserve complete reference layout/timing and normal flow/actor/capacity checks. See specs/REFERENCE_CATCHPHRASES.md. Ordinary traversal and final wording review remain."
+  },
+  {
+    "id": "message:050B",
+    "source_sha256": "06b76c2fe7c0ca0f29da5a59845b0018f342d6e50e457d2cb7a025fa45fb94af",
+    "reference_id": "message:050B",
+    "reference_sha256": "d5c5fceb381c232e55fbee66212628cc70d7330a9eca0501cb7b02b079b5fc37",
+    "complete_reference": {
+      "adapted_sha256": "d5c5fceb381c232e55fbee66212628cc70d7330a9eca0501cb7b02b079b5fc37"
+    },
+    "evidence": "Evening greeting asks where the player has been all day; the NES aside localises the native Famicom game feature. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0670",
+    "source_sha256": "50a5effb39b127142a495a25acbfe0611548b9c0bf3b894e8b3088b9d7885108",
+    "reference_id": "message:0670",
+    "reference_sha256": "1c1d8ae92c6635af74a9b63f8f574412bec8169c70873907ff4e91b071645bdc",
+    "complete_reference": {
+      "adapted_sha256": "1c1d8ae92c6635af74a9b63f8f574412bec8169c70873907ff4e91b071645bdc"
+    },
+    "evidence": "Afternoon reunion expresses concern after a long absence; the optional repeated player name is omitted in the reference. The reference typo 'seen' remains for the final wording pass. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:08BF",
+    "source_sha256": "e04dd8d691514dc41f48ededf07601dcb1653ec7d1cd016ba8ef804053a5d594",
+    "reference_id": "message:08BF",
+    "reference_sha256": "9e3c88b282337c6c5b7fda63f4ef348406ae69a60bbe606c1b40f1936a8a7883",
+    "complete_reference": {
+      "adapted_sha256": "9e3c88b282337c6c5b7fda63f4ef348406ae69a60bbe606c1b40f1936a8a7883"
+    },
+    "evidence": "Pete admires Phyllis, distinguishes Pelly, and identifies the older sister's night shift. All special-actor requests remain native; no standing-resident permission. The reference 'She so dreamy' typo stays visible for polish. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0963",
+    "source_sha256": "976bac9e952c9598dcde60592947ebe33e9860f3b7162727f7b77897bb3ae998",
+    "reference_id": "message:0963",
+    "reference_sha256": "0ebe412383c50d5e4fd08aed449e42c6f37204612eee6213d530cd1792bcba3b",
+    "complete_reference": {
+      "adapted_sha256": "195811449998c41db2e0982db8fc2152d992d9664b3c423099daa6b90839585d",
+      "spans": [
+        {
+          "offset": 93,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 300,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        }
+      ]
+    },
+    "evidence": "Porter warns against removing the Controller Pak during departure and requests reinsertion before trying again; two highlighted device names are corrected. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0ADE",
+    "source_sha256": "bfafd0618383301f4f3b6138df9f86ad82238df4f7ce697601a6647e195a4c43",
+    "reference_id": "message:0ADE",
+    "reference_sha256": "031b7df9f29ae1f7245a9e386082f424cadc64f0ffb1aea5b2e3b571c3fe787e",
+    "complete_reference": {
+      "adapted_sha256": "5a4fae956d004646b5f730416296e710e32d7d37175a7b655d1902c9805b3ee8",
+      "spans": [
+        {
+          "offset": 39,
+          "before": "{cmd:7F504BA0000C}wishing well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Event-location quiz retains choices 00B9/00BF/00BE, responses 0AE8/0AE9/0AEA, and native flow; only the venue becomes shrine plaza. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0AE8",
+    "source_sha256": "f840c425bac4c6c4f287482f8823ce795879ffde570a23ea23018f05ff1312ea",
+    "reference_id": "message:0AE8",
+    "reference_sha256": "590cd93670dd1a2e24d0ea8f2bb9ed217c61c22a34b09995ae07178c814b5870",
+    "complete_reference": {
+      "adapted_sha256": "01aeca0514396655eba4ab5da6f530dda06fa267097c0a9d8b94623d712e4645",
+      "spans": [
+        {
+          "offset": 91,
+          "before": "{cmd:7F504BA0000C}wishing well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Correct cherry-blossom quiz response returns to 0AE1; reference omits the sacred-tree detail but names the correct shrine-plaza venue. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0B91",
+    "source_sha256": "4aac794ab4dcb9132d05d865b9bee5688bb77600d3cca397249d8d08c6227aa2",
+    "reference_id": "message:0B91",
+    "reference_sha256": "8f0e49020434759f5e109a4222b702f517936c2a1d8608c4cdef5bfa32149653",
+    "complete_reference": {
+      "adapted_sha256": "c4268268af4c2201a94c52bc1c361c15fd78f03afc0c5eba55dc5ed53a78b726",
+      "spans": [
+        {
+          "offset": 446,
+          "before": "{cmd:7F504BA0000C}wishing well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "One-week blossoms and flower-viewing on the fifth through seventh retain their dates and shrine-plaza venue. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:0B9E",
+    "source_sha256": "4a4454c86bc75b74b92afbd732ed91c91770b93c4d46688d8fb0701f0bafcc59",
+    "reference_id": "message:0B9E",
+    "reference_sha256": "c89cacfcaf665ee9d1b715c0dbb2199f4342acadf797f0bbd4aab87eee5a78ad",
+    "complete_reference": {
+      "adapted_sha256": "89dd041184cedbd708c4a30a045dd99c7141a5f95880e8f4f4d348be79820a01",
+      "spans": [
+        {
+          "offset": 42,
+          "before": "{cmd:7F504BA00012}wishing well plaza",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "July 25th, daily 6:00 exercise invitation and the reluctant sleeper joke retain the native shrine-plaza venue. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1124",
+    "source_sha256": "c33482b13348d439500c11e73098a313dedfaf65977aef20a044031716baaf38",
+    "reference_id": "message:1124",
+    "reference_sha256": "edfd4a2070c5ea9d89a79ba4de3e0f8ae8212af40be0657e628babe8d11fff47",
+    "complete_reference": {
+      "adapted_sha256": "40753e64591c178b97dfcd4748cd74807305006f2d713971383fb19c74eab904",
+      "spans": [
+        {
+          "offset": 60,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Shrine interaction menu retains town field, special actor slot nine, all four choice IDs, and targets 2C45/1127/1126/1125. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1126",
+    "source_sha256": "4c88dc927efa1baadaf5edb19e6668f73f72fea4c6d11beb620345895f3298bd",
+    "reference_id": "message:1126",
+    "reference_sha256": "d73d2a1f4ea4407157c513551c21de66d6d8ce16edb4a82e34b2c38ae541a988",
+    "complete_reference": {
+      "adapted_sha256": "816460c3dc387b325bfa632deac55776aad0dc437061ee1d002a9a9af52fc058",
+      "spans": [
+        {
+          "offset": 55,
+          "before": "wishing well",
+          "after": "shrine"
+        },
+        {
+          "offset": 412,
+          "before": "wisdom in this well",
+          "after": "wisdom in this shrine"
+        },
+        {
+          "offset": 734,
+          "before": "well to apologize",
+          "after": "shrine to apologize"
+        }
+      ]
+    },
+    "evidence": "Shrine explains town status, visitor attraction, and apologising with undeliverable/unreturnable entrusted items; all references to the speaking well become shrine. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:118E",
+    "source_sha256": "d59fce957533bdd7310a507a12a1f964b00681bedfa5b2ae392436854e10ed8a",
+    "reference_id": "message:118E",
+    "reference_sha256": "106fa6e50256c32457059dd4ed5c829c099502dfa3bf22c76b8dff75c6fe55c1",
+    "complete_reference": {
+      "adapted_sha256": "b32a6e4da0cc4688304902dbc5c312ed8b5c8d7a66b9bf611c7702889c7a98b6",
+      "spans": [
+        {
+          "offset": 169,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Annual New Year's shrine visit, upcoming holiday, and friendly good-year wish retain the native event; reference invitation is compatible flavour. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:118F",
+    "source_sha256": "05c19b1213553aa3e21776fe4f184f79628228e45dfc5e104ce46036176ab4d3",
+    "reference_id": "message:118F",
+    "reference_sha256": "b8952bf3c7aaf8a54b9d007ff23ed23f7c2a19203d5150c955b22f740c5b2085",
+    "complete_reference": {
+      "adapted_sha256": "3a350f0e22fa43c9ef9c78643112945fedd153a0b9dfaa113fbf7c9a0231b7c2",
+      "spans": [
+        {
+          "offset": 138,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Year-end reminder to visit the shrine on January 1st and wish for a good year. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:119A",
+    "source_sha256": "20956230fe25784574816e01e7e263f2f90a9d8c7d043c41c1436fc65ddef7e7",
+    "reference_id": "message:119A",
+    "reference_sha256": "0ee464c4a63a1f77d9e4cf743769e4507250a1dcd9cafdb6ba351c328fb56041",
+    "complete_reference": {
+      "adapted_sha256": "1b9557849d653780aa88462613a9fd59dd32c22bf078eddc57f38c90ca217d1e",
+      "spans": [
+        {
+          "offset": 74,
+          "before": "wishing well plaza",
+          "after": "shrine plaza"
+        },
+        {
+          "offset": 105,
+          "before": "later\nthis month",
+          "after": "on the 20th\nof this month"
+        }
+      ]
+    },
+    "evidence": "Spring sports announcement retains the native 20th of the current month and shrine plaza; speaker enjoys the atmosphere but not participating. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:11A5",
+    "source_sha256": "5660783d583cc6119acf1533c551909d8c61c43055d62483dc6fdfcffe75bd3f",
+    "reference_id": "message:11A5",
+    "reference_sha256": "a0a820d1639aba98795f8dd65ef63d8c86ec5672feff0cc18971f72f0fcff6a6",
+    "complete_reference": {
+      "adapted_sha256": "47612d6c4a7773131b76899915604b591277cbd466a543c2756f834cd5b2b2b0",
+      "spans": [
+        {
+          "offset": 44,
+          "before": "wishing well plaza",
+          "after": "shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Daily exercise begins July 25th at 6:00 at the shrine plaza; keeps the accusation that the player plans to skip it. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:11A7",
+    "source_sha256": "3330fbc57b7333029c83bed4b4312e74fd2f9e78b409f1e616e1efc131dedde7",
+    "reference_id": "message:11A7",
+    "reference_sha256": "78d864d74137eef301aeba8702458f93afa5996322fad3acf5627d09c932780b",
+    "complete_reference": {
+      "adapted_sha256": "af20323c429f80dc76a6b94dc8588e7b96451d8c07f99d0134836ae91093e718",
+      "spans": [
+        {
+          "offset": 172,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Morning aerobics, 6:00, summer, and the shrine-adjacent plaza agree with native instructions; English Copper mention names the existing native leader. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:11B0",
+    "source_sha256": "d9a51cca5f529bc437da32c6592698c0ec393c8e11419cc4fa77d21cab587e81",
+    "reference_id": "message:11B0",
+    "reference_sha256": "b6c6b955de9f90734c102857cf01af383c268c9413f20f9c2e71bdd4471f669a",
+    "complete_reference": {
+      "adapted_sha256": "0a413e50e403a18b5120bdb89aaf8e19e39034245c12b8f25ca676c66304be4c",
+      "spans": [
+        {
+          "offset": 306,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Fall Sports Fair stress relief shares the spring venue at the shrine plaza and leaves the speaker pleasantly sore. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:13FC",
+    "source_sha256": "80c14129547af226e27680b761116ee5a6890e2689546d5aa89f2a33c396257f",
+    "reference_id": "message:13FC",
+    "reference_sha256": "562c9876e6001d5c1dcda4f98af2a998ebbd1671ca378b1a458dc52c96e1ea0a",
+    "complete_reference": {
+      "adapted_sha256": "f2233c841b0e72e31a0e80feef6ec4c9217f2f7f3e80464b72c8eab077af9c02",
+      "spans": [
+        {
+          "offset": 221,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1400",
+    "source_sha256": "f50b4cf84016c2bcfa599380b089949f1ac2bfd7a93ccdbafa1523c4f76e1181",
+    "reference_id": "message:1400",
+    "reference_sha256": "f0ecf8824288a6da5a932c573bd283a82dfced79167912453c38dc0d549235c6",
+    "complete_reference": {
+      "adapted_sha256": "c155cb3b33a16963e10946b6aef9685f39ed85993ded2555ee7319b901c9dfaf",
+      "spans": [
+        {
+          "offset": 268,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1406",
+    "source_sha256": "858b13b69debe8ce277e9ed47bd5fb3a24247965c73f4fb7c0911d618d3f207c",
+    "reference_id": "message:1406",
+    "reference_sha256": "b4badeb41a7bc453de230538bcc73fb9ec1906cf6eda864312cd555646ea4869",
+    "complete_reference": {
+      "adapted_sha256": "a771619255117016c7df09a891dd64277967be330cfc8559437958dc777868a7",
+      "spans": [
+        {
+          "offset": 95,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 307,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1424",
+    "source_sha256": "ced9b0cce03b74c4f2135ad18ef9d31b0a5af7119c3026976eb139200a463d6a",
+    "reference_id": "message:1424",
+    "reference_sha256": "e3921fea72a8f1703ea7b4188fcefd127de768ee7d89aec7fd4d6d863930f987",
+    "complete_reference": {
+      "adapted_sha256": "629aeee9321b3c1d3ca5ad4902e65d21834203700fe2ca6489aca560e1d67f2d",
+      "spans": [
+        {
+          "offset": 214,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1428",
+    "source_sha256": "6d7836af2e38030850d02f9c51e688d61ef324477cad0aa8116b5ae74d8af1bb",
+    "reference_id": "message:1428",
+    "reference_sha256": "483d3946f62b20a2bd4ce2033d72a794fe0c280c85b2df8caa83ca841f6fc4b6",
+    "complete_reference": {
+      "adapted_sha256": "ec86e8e0bfd4b85a31e3d31e6cc0c7886419f6610fc9d262ebbf73b73f9e1e19",
+      "spans": [
+        {
+          "offset": 268,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:142E",
+    "source_sha256": "8573dca6a89fd73ab21afcbf30172d935858dab5f01f1a00a04e189ebc4b8a21",
+    "reference_id": "message:142E",
+    "reference_sha256": "85e25dbc2a956b42128981174d78dc8388b884ba743d3d9aecf282f85d4448ed",
+    "complete_reference": {
+      "adapted_sha256": "9d987cd70978587c539d92e5f03482fe5bae6fb2d1cefd9043625a10c9f765a6",
+      "spans": [
+        {
+          "offset": 80,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 304,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:144C",
+    "source_sha256": "293acf21ecec82826d26f7623050a60471448ef03fa8610b094d841a4c9eef4f",
+    "reference_id": "message:144C",
+    "reference_sha256": "25f03ee852ae41202442efff9f2a7f883f5f5ac59d073175d77c60f072231fe4",
+    "complete_reference": {
+      "adapted_sha256": "274ccc4fbc55ab92b37bdb54886559461742f3e8ab90db04ee9aac1fa8c46075",
+      "spans": [
+        {
+          "offset": 213,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1450",
+    "source_sha256": "bd884334857aaee1669b5eb4718ffc9861d3a49e9ebbbd5793f9319b2c7b7725",
+    "reference_id": "message:1450",
+    "reference_sha256": "d81c5acc3a8a3efd6d39f2c2d7a2c1eaeab53e7df7b1fbafd1b3d751fbbae13e",
+    "complete_reference": {
+      "adapted_sha256": "fcc78eec0fff79349a771b64cb1f9e8ac5b984024f07127c74b355bc15b7a1e6",
+      "spans": [
+        {
+          "offset": 262,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1456",
+    "source_sha256": "e03cdddda4d9ed7f5c370136fda7eb9a2d398f79c09d5fd7f1d53fea277c8617",
+    "reference_id": "message:1456",
+    "reference_sha256": "c888daac06cb477a0484b40fdd6807d33a708ad02c45a807c94c441d856da61c",
+    "complete_reference": {
+      "adapted_sha256": "b230327d565bfb45b71853caf130bb01d823c18f475b9744bfc8671e0d01d40d",
+      "spans": [
+        {
+          "offset": 88,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 247,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1474",
+    "source_sha256": "601dab5deef3dbe97e75ca6302933d48b6e6f80ede558a1a98c1312d76089e35",
+    "reference_id": "message:1474",
+    "reference_sha256": "d61954d729c100ab0127bf1fd4632eedc85c99ee83c06a908b795bc474161b41",
+    "complete_reference": {
+      "adapted_sha256": "5905cb94174bc4da24d92e8ea1bd4580a010485c7183c7dd22672fd0ed32c363",
+      "spans": [
+        {
+          "offset": 224,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1478",
+    "source_sha256": "9310da7815b5477db7865e67227c123ab40bf6774bd2a3236f3fe84ad590780b",
+    "reference_id": "message:1478",
+    "reference_sha256": "45b5bae908e993ef28224176aca11d7c5030c7dfc5af0707a07e6d5ff19cbf0b",
+    "complete_reference": {
+      "adapted_sha256": "8ee60e42a796c58f060e92b9a5fafd451eb44bcc60cd45b90400f7f39890773c",
+      "spans": [
+        {
+          "offset": 254,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:147E",
+    "source_sha256": "65a08bd22a345e650d91c234b94d4715a96de5098e5ffd54b52d20a6ab637a74",
+    "reference_id": "message:147E",
+    "reference_sha256": "02674524033657cbcb73781dd0768fedca8397b434f61d7f52cba76a254b1acf",
+    "complete_reference": {
+      "adapted_sha256": "52ecbd6a948335445d8a865cae5c98e88c1cb7ab0e8cb479532364756b880fa2",
+      "spans": [
+        {
+          "offset": 80,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 271,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:149C",
+    "source_sha256": "ffb5de082d9e2b07e275a23740639b8e6cf1dcc8de8f1fa2d7d52e1c09ae4a4b",
+    "reference_id": "message:149C",
+    "reference_sha256": "b0a187c795a7916d41f9edf5c42a88431930418d358a4720ecee9333b548ceb4",
+    "complete_reference": {
+      "adapted_sha256": "f2ae8fd220d087cfa290af1e160f7ddbacce68fafc1ee760f399ce31e45c5dce",
+      "spans": [
+        {
+          "offset": 217,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14A0",
+    "source_sha256": "95e99cc891f65fe63671136ef5c645f57b1af58623bc6fb1868e8459fd6fa8b3",
+    "reference_id": "message:14A0",
+    "reference_sha256": "9051e84ea35fd2073f8fc424002675d78b911f2a5b0a983873fafdcf468ef185",
+    "complete_reference": {
+      "adapted_sha256": "3ae8327e42898529c942222c48fe1728405924c53fa851794b18dde8cc4c92b2",
+      "spans": [
+        {
+          "offset": 242,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14A6",
+    "source_sha256": "3288632bd4ddb5b7adb96dd1e114624903c233a5ff736f52bfbee75269f559fc",
+    "reference_id": "message:14A6",
+    "reference_sha256": "cee3eb5ecd294d34fefbe72a1a0e70f1e47a5bffc20a09a6654b94cabb0ecda5",
+    "complete_reference": {
+      "adapted_sha256": "6aa41d6e4e711eb0a3b17dfe60cccd8ec06b353c7c36b8ab669ab26ef6fe04f6",
+      "spans": [
+        {
+          "offset": 85,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 315,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14C4",
+    "source_sha256": "7abf0bde7c2c6634e1dbe8f8b0381e3c809a979cdb04a5519b5733608838713b",
+    "reference_id": "message:14C4",
+    "reference_sha256": "50cdf146b29937fc7b5006328d8e4ef934d3d5f39673d51e7b98ee53126cf379",
+    "complete_reference": {
+      "adapted_sha256": "6cae0a204ef9cc905e0c0fc463a671e1f658c0d5e57f7361fc3da1bbc631f5ee",
+      "spans": [
+        {
+          "offset": 224,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "House demolition notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14C8",
+    "source_sha256": "c0de43aa033d529a054d257eb13ff70517407808afde6fd1b0f7037cca2c535c",
+    "reference_id": "message:14C8",
+    "reference_sha256": "0d4f913052216e476b3417cb6ce668622d3641861c3624c11055598d1de01d14",
+    "complete_reference": {
+      "adapted_sha256": "cc8d6981d90637776fafc9d5dd6f9264d0b04628eaf223997db613638adfbbed",
+      "spans": [
+        {
+          "offset": 254,
+          "before": "Memory Card",
+          "after": "Game Pak"
+        }
+      ]
+    },
+    "evidence": "Town erasure notice preserves native 59:03, special actor 09:09:0001, and its exact outgoing successor. The reference power-off/removal warning names the N64 Game Pak holding cartridge save data, not a GameCube Memory Card. No actual deletion is exercised by the content-load test. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14CE",
+    "source_sha256": "eb8502d25f52bd4116d950566c5fa156e1698cbf309b9628a26e611e3c5052cf",
+    "reference_id": "message:14CE",
+    "reference_sha256": "5b57e984221fe879bfe4fc183ec40a8cdc58e92dc6e9b13ba68b93bcf5d955cd",
+    "complete_reference": {
+      "adapted_sha256": "1d37caa0b01531397933006a7af5cc52212b249ccc936fc302299a950cc13440",
+      "spans": [
+        {
+          "offset": 83,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        },
+        {
+          "offset": 294,
+          "before": "Insert the {cmd:7F50198CDC0B}Memory Card\ninto {cmd:7F50198CDC06}Slot A or {cmd:7F50198CDC06}Slot B on\nthe {cmd:7F50198CDC11}Nintendo GameCube system.",
+          "after": "Insert the {cmd:7F50198CDC0E}Controller Pak\ninto your {cmd:7F50198CDC0A}controller if\nyou wish to use one."
+        }
+      ]
+    },
+    "evidence": "Title-menu Pak-removal error retains this personality's complete native expression/action sequence and exact retry branch. Correct Memory Card/GC slots to Controller Pak/controller and retain the native optional-use instruction, A Button, and all English page/pause/line boundaries. Only local colour spans change. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:14DB",
+    "source_sha256": "b7b3c39ba68d1cd8f4fd812edafefee4410bf6b37e10e06f7ad4c1098e2b8c6b",
+    "reference_id": "message:14DB",
+    "reference_sha256": "0dc183750b79c110104158722fbb5c59ac84b1fd8845184e50499e32a9c56fb6",
+    "complete_reference": {
+      "adapted_sha256": "381efc294e8b6121849ce396e1a46f607e6fa401381cc33d646ffbd6f19732aa",
+      "spans": [
+        {
+          "offset": 40,
+          "before": "load from or save to",
+          "after": "save to"
+        },
+        {
+          "offset": 77,
+          "before": "your Memory Card",
+          "after": "your Controller Pak"
+        },
+        {
+          "offset": 206,
+          "before": "{cmd:7F50198CDC0B}Memory Card",
+          "after": "{cmd:7F50198CDC0E}Controller Pak"
+        }
+      ]
+    },
+    "evidence": "Title-menu Controller Pak write failure returns to the title screen and asks for a connection check. It says save, not the GameCube's added load-or-save claim. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:16A4",
+    "source_sha256": "b67bf50686674a36442e80f8977671c5ce7d03b471cfe0724d22bc4dd79b1960",
+    "reference_id": "message:16A4",
+    "reference_sha256": "6921c84629cfd9228a1e26f070b7fc41f0bdfb2983b3b60ce02487938606a532",
+    "complete_reference": {
+      "adapted_sha256": "6921c84629cfd9228a1e26f070b7fc41f0bdfb2983b3b60ce02487938606a532"
+    },
+    "evidence": "Games-enthusiast response retains sneaking into the named neighbour's house to play Famicom/NES and getting caught; Copper's scolding and the possessive joke are reference flavour, not new gameplay. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:16A5",
+    "source_sha256": "f9b37451a003e36bc71b8d8c88616db1a5f5425d2977483046a8b01c71e1ea0e",
+    "reference_id": "message:16A5",
+    "reference_sha256": "0d0cb786843688fe742aeb2c28f89685d87b1ddcdf5a6070ca8c6b886edef489",
+    "complete_reference": {
+      "adapted_sha256": "0d0cb786843688fe742aeb2c28f89685d87b1ddcdf5a6070ca8c6b886edef489"
+    },
+    "evidence": "Disbelieving games response asks whether the player owns Famicom/NES; native choices 001D/0012 and branches 16AB/16AC stay exact. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:1749",
+    "source_sha256": "1626967def48fcfc8eb31de25bad511e0cd35c045ad1d11d3f75b3d321dade8d",
+    "reference_id": "message:1749",
+    "reference_sha256": "7651b5e851b589c3191324b1a80c559573500921a385c09fd3e8141caeca1f6e",
+    "complete_reference": {
+      "adapted_sha256": "42a731e35cfe7ee0f809052614b1a02f53306778f726cb47e80d76f71aca799e",
+      "spans": [
+        {
+          "offset": 199,
+          "before": "wishing well",
+          "after": "shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Native timed morning-exercise announcement points to shrine plaza; existing 58:50 ending remains unchanged. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:174D",
+    "source_sha256": "a74d3115beb6618747c7d8f8435b74e03ba8274322caa5d9d37f85771e400ef4",
+    "reference_id": "message:174D",
+    "reference_sha256": "b7cd0b5c498d67be2cb76597f65ae20b4ca577c1b6044332ecdfb49ab311283b",
+    "complete_reference": {
+      "adapted_sha256": "ff08b14b01f38d365b8c6e7fe6be17b04334172c6fa4ba0819136a4928ded849",
+      "spans": [
+        {
+          "offset": 37,
+          "before": "{cmd:7F509114A507}wishing\n{cmd:7F05282D5A}{cmd:7F509114A504}well",
+          "after": "{cmd:7F509114A506}shrine\n{cmd:7F05282D5A}{cmd:7F509114A505}plaza"
+        }
+      ]
+    },
+    "evidence": "New Year's shrine-visit announcement replaces the split highlighted wishing-well label with shrine/plaza, preserving both reference lines and timing. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:17AF",
+    "source_sha256": "d2bedd82920c2318ecb2e6a7c1058cebfecc1787df00a800917eb65b49e99435",
+    "reference_id": "message:17AF",
+    "reference_sha256": "db6e24d81ea72f7ff8a1632de755ed7245312715503fd5bc79d69029f78f5629",
+    "complete_reference": {
+      "adapted_sha256": "db6e24d81ea72f7ff8a1632de755ed7245312715503fd5bc79d69029f78f5629"
+    },
+    "evidence": "Actorless dug-up-item announcement retains item field 31 and the final native terminator. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:17B5",
+    "source_sha256": "1296db3dcf4804657b6024077ed84bc48744128d2b5ab53f7c40e208ab0d1368",
+    "reference_id": "message:17B5",
+    "reference_sha256": "cf2d33a1ab58341999d6ca8e3ed08c7131fbdf2d708a00144808daa07dfa4069",
+    "complete_reference": {
+      "adapted_sha256": "cf2d33a1ab58341999d6ca8e3ed08c7131fbdf2d708a00144808daa07dfa4069"
+    },
+    "evidence": "Native Famicom exit instructions require L and R held with Z; the complete English L/R/Z instruction describes the same combination. No controller substitution. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:17ED",
+    "source_sha256": "e3b5e6084634be2ab2d6fab2e30f14cc2a18fccfe1b1062a6c25accbdf2e8256",
+    "reference_id": "message:17ED",
+    "reference_sha256": "b03464dac68c8f5a7d7b01822d6ea1a8ff133cfc1ca96d4f9955d3a2befef8ae",
+    "complete_reference": {
+      "adapted_sha256": "d81ffdd8a54a9f95976e8a5518bf734b4fad126370c2026f0ae9c3343c7d132b",
+      "spans": [
+        {
+          "offset": 234,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Year-end reminder retains year field 1D and January 1st shrine visit. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:17EE",
+    "source_sha256": "7865c5af80e47ab23673d60d20f96c484dbec291671a11de5912f99bebcbf1e7",
+    "reference_id": "message:17EE",
+    "reference_sha256": "798c6b57d408b2e7f412e6b1dd79f19d4061e8ef1651ebf2837f44c9b8bc8a2e",
+    "complete_reference": {
+      "adapted_sha256": "2c32b9195ff46127a08ebb74b69792681d4368309b35e1b7d77b717fd3b11d38",
+      "spans": [
+        {
+          "offset": 59,
+          "before": "wishing well",
+          "after": "shrine"
+        },
+        {
+          "offset": 252,
+          "before": "well,",
+          "after": "shrine,"
+        }
+      ]
+    },
+    "evidence": "Annual New Year's shrine-visit habit is not especially fun; both references to the well become shrine. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:17FA",
+    "source_sha256": "6086051832ac7cc9ef656857e052cb102167c05de931e7f5c031b5c22441e42d",
+    "reference_id": "message:17FA",
+    "reference_sha256": "464205563313d1feddc3faa15120fddbb712a65cbdada85c367e6c05aadeb40d",
+    "complete_reference": {
+      "adapted_sha256": "b2978e92ac09b3ee9089c2f6810f3b7554a8b9f4766c7bf82e4cb0a683f3d8b5",
+      "spans": [
+        {
+          "offset": 358,
+          "before": "a wishing\nwell plaza",
+          "after": "the shrine\nplaza"
+        }
+      ]
+    },
+    "evidence": "Spring fitness encouragement advertises the upcoming native sports fair at the shrine plaza; reference omits the exact 20th rather than asserting a different day. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:20A8",
+    "source_sha256": "cdedc3c2a5e4630508a1be572233ef9366874843cbee8d98c44b15b77eccce15",
+    "reference_id": "message:20A8",
+    "reference_sha256": "853784a0129840649687554a9e6ffa29469b5371dcba32e207f2ca68ee3ea59c",
+    "complete_reference": {
+      "adapted_sha256": "853784a0129840649687554a9e6ffa29469b5371dcba32e207f2ca68ee3ea59c"
+    },
+    "evidence": "Resident recommends Famicom/NES for passing time; reference favourite-games flavour replaces the native simple-rules aside. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:20B0",
+    "source_sha256": "124a13ab88a20482e545522bfe9c4ae5f798be268427bc0d3ed4b0a1b11a6f6c",
+    "reference_id": "message:20B0",
+    "reference_sha256": "4c1096bb384887c59d30bfb661a67d662e597f0ab41c1cc12c8aaec637009d14",
+    "complete_reference": {
+      "adapted_sha256": "4c1096bb384887c59d30bfb661a67d662e597f0ab41c1cc12c8aaec637009d14"
+    },
+    "evidence": "Rainy-day advice discourages staying inside playing Famicom/NES and recommends fishing instead. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2360",
+    "source_sha256": "a9458d227d8897b9bc226622f82c4a0860676f44fd59b63f7ff6ccf728b58a0f",
+    "reference_id": "message:2360",
+    "reference_sha256": "f4442af9247139e5bfe26d225eb27dea50a211d330964cc41e3df8ee1132fd29",
+    "complete_reference": {
+      "adapted_sha256": "10de775303f3ddb4524319d5a02f91feecde55f4f767ffbb0342f398c63a10cc",
+      "spans": [
+        {
+          "offset": 148,
+          "before": "Blathers",
+          "after": "Booker"
+        },
+        {
+          "offset": 172,
+          "before": "the mayor",
+          "after": "Tom Nook"
+        }
+      ]
+    },
+    "evidence": "Resetti's repeated-reset reprimand retains all native special-actor/shake/mode/branch controls and full English delivery. Its comparison uses existing Booker and Tom Nook instead of absent Blathers and mayor. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:23E6",
+    "source_sha256": "f90a6318ae0c087b554bdc8495b67447ebdc4345d2b5341a4542f922087e4be3",
+    "reference_id": "message:23E6",
+    "reference_sha256": "b56fee6d085954f4d731dcb0dca32ea8c00bf100ff83c0c0112f3187f2c7318c",
+    "complete_reference": {
+      "adapted_sha256": "b56fee6d085954f4d731dcb0dca32ea8c00bf100ff83c0c0112f3187f2c7318c"
+    },
+    "evidence": "Resetti's angry reset warning retains every actor request, shake request, opening mode command, and branch 23E7/19/01. Complete English enlarged emphasis, anchors, line offsets, pages, and pauses use existing checked layout rules, not resident-expression permission. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:26EE",
+    "source_sha256": "6998fc64fc50441173f488199ec63aa35d480454c3c371ba9091798163a56778",
+    "reference_id": "message:26EE",
+    "reference_sha256": "a4ef274d7df3aa617c19025adf7f98293cda118234a2693548b43b8e3f6cf8de",
+    "complete_reference": {
+      "adapted_sha256": "8036abde359562e95f24c288394e505ae3e55b052c34eef2dcb14b40f642a878",
+      "spans": [
+        {
+          "offset": 114,
+          "before": "Wishing\nWell",
+          "after": "shrine\nplaza"
+        },
+        {
+          "offset": 226,
+          "before": "Wishing\nWell",
+          "after": "shrine\nplaza"
+        },
+        {
+          "offset": 432,
+          "before": "Wishing\nWell",
+          "after": "shrine\nplaza"
+        }
+      ]
+    },
+    "evidence": "New Year's shrine visit has priority over other annual events; all three split venue mentions retain reference line boundaries. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:26EF",
+    "source_sha256": "8c7ffad193e179d6140378be81ba2984eb33e04f789e7e7ceb60c77d2f63622a",
+    "reference_id": "message:26EF",
+    "reference_sha256": "9b948b8cb6595715c7b82ae6498e3d2e88ca75e716d09dc7229b7d64b71e32b5",
+    "complete_reference": {
+      "adapted_sha256": "fb9bf6bffdd8e012fce132860ef17a936368d0c8d8fb96ca8b870ecef1762e23",
+      "spans": [
+        {
+          "offset": 326,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "New Year's resolutions and the year's tone lead to the annual shrine visit. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:26F8",
+    "source_sha256": "8e572892765d5385edb7e31666df1f8e69ca272260529daed23dc4dd6530e598",
+    "reference_id": "message:26F8",
+    "reference_sha256": "f92a257c7ab0ef5bab8e3f0699758c5ea302de21c26e21ec86ae1da70dd18a4c",
+    "complete_reference": {
+      "adapted_sha256": "259fb283d3122ff5a869c59146b84601d190708b901cfd48deec5edb1f12d14a",
+      "spans": [
+        {
+          "offset": 334,
+          "before": "{cmd:7F504BA0000C}Wishing Well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "One-week blossoms and fifth/sixth/seventh festival invitation retain the native shrine-plaza location and dates. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:26F9",
+    "source_sha256": "2ee370d23dadcd7b8dc5b23bce059f1afd80d63bd93a1d4d8422f9bb482ec6a9",
+    "reference_id": "message:26F9",
+    "reference_sha256": "697f0e7bdf1499dcf02ca918f253c9c2a2ac35672ecd394764ed87c7cafb5c3b",
+    "complete_reference": {
+      "adapted_sha256": "c4f39eba79cec021273ed87d836bc47c3c980119ac9ae0245d1edc5e4d742019",
+      "spans": [
+        {
+          "offset": 315,
+          "before": "{cmd:7F504BA0000C}Wishing Well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Cherry Blossom Festival starts on the fifth and lasts three days at the shrine plaza. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2705",
+    "source_sha256": "9b1c6216e7548011d91dc618994da533bb1d1e6bd2f78c2785d8b941686329e8",
+    "reference_id": "message:2705",
+    "reference_sha256": "c58da04b323f3c694de73e7b0c23ce16071ae0af83717a8bb255ee97adc9971c",
+    "complete_reference": {
+      "adapted_sha256": "c9ff7c8c0bf53e9b66def79ebb5033e10d89b51a944429621b5aca85e3d09ae4",
+      "spans": [
+        {
+          "offset": 184,
+          "before": "{cmd:7F504BA0000C}wishing well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Daily six-o'clock exercise except on rainy days remains at the shrine plaza; reference omits the native start/end dates without inventing different ones. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:27B2",
+    "source_sha256": "7098dcbe1d9c0cdde14fbc9e1863e67281f661cc7fcf1ab64c9e7fd8798c6e8d",
+    "reference_id": "message:27B2",
+    "reference_sha256": "e22564091ab390bf9694570644f23f1809dc91eaa08006c3a676c70a2151f0ef",
+    "complete_reference": {
+      "adapted_sha256": "32522a53931c20d229abb5dd025332cec673ff2be726884a05d583f0da77d710",
+      "spans": [
+        {
+          "offset": 285,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Upcoming New Year's visit leads to thinking of wishes; uses the native shrine, not an absent wishing well. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:27BA",
+    "source_sha256": "2e189c56ddea51ada1cda90f7e22bc669ec5566f492f4e6f6112df457d1c2574",
+    "reference_id": "message:27BA",
+    "reference_sha256": "f390d08174abedaaabe78fc2bd303f9030aea8e66be4f9fbf4855ee35f0d108f",
+    "complete_reference": {
+      "adapted_sha256": "b8e238f9dc00687ac8611a70e4474c9a0bcc4396c955d45d259fdc431d1ee10c",
+      "spans": [
+        {
+          "offset": 489,
+          "before": "wishing well plaza",
+          "after": "shrine plaza"
+        }
+      ]
+    },
+    "evidence": "March warming leads to the coming Cherry Blossom Festival at shrine plaza; reference omits the native dango wordplay. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:27BE",
+    "source_sha256": "c8c7a4bc4426575d404b3224a7fb1dbcc9f5344710dc9620d71754ea468068d0",
+    "reference_id": "message:27BE",
+    "reference_sha256": "15b0f8118101d2a6d360a879bbdd58d483a2561ddcdfb6f031ba441b78b27f02",
+    "complete_reference": {
+      "adapted_sha256": "379f506ecc46aced962bc1b7a7c1b39b9454f3a4e4d60d508077cd8d7cc20b61",
+      "spans": [
+        {
+          "offset": 125,
+          "before": "wishing well",
+          "after": "shrine"
+        },
+        {
+          "offset": 538,
+          "before": "It'll be here soon",
+          "after": "April 20th"
+        }
+      ]
+    },
+    "evidence": "Spring sports fair has no food-eating race, so the speaker anticipates the picnic. Reference pie contest localises the native absent bread race; native April 20th is retained. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:27E6",
+    "source_sha256": "9b18115e5bb6767f457051e6e842aa1cb3107f544a8e64373880f47f01f6e98f",
+    "reference_id": "message:27E6",
+    "reference_sha256": "b8f0d59bfab36bca4ddf73d46ee6808a03e1e743304026952ce39e9587589ced",
+    "complete_reference": {
+      "adapted_sha256": "a5c8b3d307b7f76657306624a166109f77cae90cd29b6236e4a415b99ba3f770",
+      "spans": [
+        {
+          "offset": 201,
+          "before": "wishing well\nplaza",
+          "after": "shrine\nplaza"
+        }
+      ]
+    },
+    "evidence": "Response to blossom question 27BD admits not knowing the schedule and proposes following the player to shrine plaza. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2806",
+    "source_sha256": "ea5d7c80d8b0dfe1d1029587d9ccde09ea6a11004b68205b0c7c4e99a2afa189",
+    "reference_id": "message:2806",
+    "reference_sha256": "257fc8131b97065f099d03f22253c867575728f0f5bd961d809ed7364271737d",
+    "complete_reference": {
+      "adapted_sha256": "0345160d8feda7190aa7dfeb844cbdd2cbafe3526465d6f733d582502375293b",
+      "spans": [
+        {
+          "offset": 357,
+          "before": "wishing well",
+          "after": "shrine"
+        },
+        {
+          "offset": 605,
+          "before": "wishing\nwell",
+          "after": "shrine\nplaza"
+        }
+      ]
+    },
+    "evidence": "Year-end wish planning and the joke about visiting early retain the shrine and January 1st context. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2807",
+    "source_sha256": "85af67d1c4cd62ce02e8f9f4569b556666ad10153f0c8bdb4ab5209a6a34f4a9",
+    "reference_id": "message:2807",
+    "reference_sha256": "b547e21544e720697f7051224490df1d7f80d217c0c7903aac7b2ad01f3bd544",
+    "complete_reference": {
+      "adapted_sha256": "f8e8d03bc49c712ad12f6d709f7974038a2fe79276dcb389f2f7adadf565ef03",
+      "spans": [
+        {
+          "offset": 503,
+          "before": "wishing well",
+          "after": "shrine"
+        }
+      ]
+    },
+    "evidence": "Winter festivities lead to an early January 1st shrine visit and invitation to the named player. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2812",
+    "source_sha256": "e7c82e479714cf302e2bfecd6dfd0c31ad874e8ce3c3b8e5f529cfc1566fafe8",
+    "reference_id": "message:2812",
+    "reference_sha256": "95360d3d9a08404569811502b0030744b1117a5ec12f01a9119844ba15c7c8ba",
+    "complete_reference": {
+      "adapted_sha256": "b5ac033b367d5db94236d51abb2fe6fcaa8639ca9f9329152b4cc0a9ba4972c6",
+      "spans": [
+        {
+          "offset": 415,
+          "before": "wishing well",
+          "after": "shrine plaza"
+        },
+        {
+          "offset": 440,
+          "before": "when the\nequinox rolls around",
+          "after": "on\nApril 20th"
+        }
+      ]
+    },
+    "evidence": "Spring sports invitation retains native April 20th at shrine plaza, not the GameCube equinox. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:287D",
+    "source_sha256": "8696cbb66c6cc7ca3e1b53a7f178e12aa063d2d59cfc459203d7a4871d70cbee",
+    "reference_id": "message:287D",
+    "reference_sha256": "ac904768d8e8f1da13b083c6acdaf624b8be6c997eb9785291a50bf477f0ea50",
+    "complete_reference": {
+      "adapted_sha256": "970f69ebdddc62a163810f241ef34cecbd4f6043010ba83220c15bd144cd94f5",
+      "spans": [
+        {
+          "offset": 156,
+          "before": "{cmd:7F504BA0000C}wishing well",
+          "after": "{cmd:7F504BA0000C}shrine plaza"
+        }
+      ]
+    },
+    "evidence": "Wrong blossom-venue quiz response points to shrine plaza and retains branch 2871. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2AE7",
+    "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+    "reference_id": "message:2AE7",
+    "reference_sha256": "caf0ad524c17a27a0abe8485e09aba9e0817d93459e5e1a59daee9241401efad",
+    "complete_reference": {
+      "adapted_sha256": "caf0ad524c17a27a0abe8485e09aba9e0817d93459e5e1a59daee9241401efad"
+    },
+    "evidence": "Native train-demo extra-area placeholder has the exact English placeholder reference. This translates a label without establishing reachability. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2AE8",
+    "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+    "reference_id": "message:2AE8",
+    "reference_sha256": "caf0ad524c17a27a0abe8485e09aba9e0817d93459e5e1a59daee9241401efad",
+    "complete_reference": {
+      "adapted_sha256": "caf0ad524c17a27a0abe8485e09aba9e0817d93459e5e1a59daee9241401efad"
+    },
+    "evidence": "Second native train-demo extra-area placeholder has the exact English placeholder reference. This translates a label without establishing reachability. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:2B69",
+    "source_sha256": "27a4c7e7c54f9d411d36942dc2c50f716fa1f9872a87431fb7d95d3fd64b4350",
+    "reference_id": "message:2B69",
+    "reference_sha256": "2179ea36f9a6358e3969647676da53b276f29fce8ca37016d600b9cfbc299025",
+    "complete_reference": {
+      "adapted_sha256": "8d767d8a8ba0e35bbda8195085c2df9267163d1a6f1be20697b59d6e72fe031c",
+      "spans": [
+        {
+          "offset": 35,
+          "before": "{cmd:7F50324BE103}NES",
+          "after": "{cmd:7F50324BE10B}Disk System"
+        }
+      ]
+    },
+    "evidence": "The native Disk System has no software to play; correct the reference NES object name to Disk System, including the highlighted character count. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
+  },
+  {
+    "id": "message:18CA",
+    "reference_id": "message:18CA",
+    "source_sha256": "7cd5f9a23959beab75d481561b03bae8708a97f06bc16a90d38b6e98fb63a201",
+    "reference_sha256": "4428363f60feba412b24aae96d69326d011dca2faa0d994d456b8bce830625f7",
+    "controller": {
+      "operation": "map_x_to_r",
+      "offset": 81,
+      "adapted_sha256": "afde6916c99dd4849009e2351b1dcfdabb15e71c404a8412d404068cfdd6c90d"
+    },
+    "evidence": "Copper gives map item 251D and explains native R Button viewing, not GameCube X. Preserve full English wording/layout except the individually located X/R button span. Existing adapter restores the complete native 0A:02:0001 argument; item request, actor sequence, 0A:01:0007, expressions, and final terminator remain exact. See specs/NATIVE_CONTEXT_REFERENCES.md. No new actor/field permission; normal handoff and map UI remain gameplay checks."
   }
 ]

@@ -31,6 +31,7 @@ from reference_actor_requests import validate_actor_request_candidate
 from reference_fields import field_permit, catchphrase_permit
 from dialogue_dates import install as install_dialogue_dates, verify_requirements
 from reference_animations import animation_permit, verify_native_consumer
+from reference_content import validate_content_candidate
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -83,6 +84,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 validate_controller_candidate(edit["id"], original, replacement, matches)
                 validate_choice_candidate(edit["id"], original, replacement, matches)
                 validate_actor_request_candidate(edit["id"], original, replacement, matches)
+                validate_content_candidate(edit["id"], original, replacement, matches)
                 validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]),

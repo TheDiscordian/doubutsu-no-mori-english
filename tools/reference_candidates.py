@@ -26,6 +26,7 @@ from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 from dialogue_dates import requires_dialogue_dates
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
+from reference_content import adapt_content_reference, validate_content_candidate
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -109,7 +110,8 @@ def main():
                                        Path("translations/n64-festivals.json"),
                                        Path("translations/n64-seasonal-conversations.json"),
                                        Path("translations/n64-town-advice.json"),
-                                       Path("translations/n64-community-conversations.json")])
+                                       Path("translations/n64-community-conversations.json"),
+                                       Path("translations/n64-native-context.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates)
     matches = load_matches(args.matches)
@@ -163,6 +165,8 @@ def main():
                         verify_field_reference(reference, original, matches.get(id), info)
                         verify_catchphrase_reference(reference, original, matches.get(id), info)
                         verify_animation_reference(reference, original, matches.get(id), info)
+                        reference_text, content_edits = adapt_content_reference(
+                            {**reference, 'text': reference_text}, original, matches.get(id), info)
                         policy = "reference_layout" if added_fields or added_catchphrase or animations else "presentation"
                         try:
                             text, adaptations = adapt_reference(reference_text, original, info, policy,
@@ -193,7 +197,8 @@ def main():
                         validate_controller_candidate(id, original, candidate, matches)
                         validate_choice_candidate(id, original, candidate, matches)
                         validate_actor_request_candidate(id, original, candidate, matches)
-                        adaptations = actor_edits+choice_edits+controller_edits+adaptations
+                        validate_content_candidate(id, original, candidate, matches)
+                        adaptations = actor_edits+choice_edits+controller_edits+content_edits+adaptations
                         if added_fields:
                             adaptations.append({"operation": "use_reviewed_current_player_town_fields",
                                                 "commands": added_fields["commands"]})

@@ -1,0 +1,71 @@
+[
+  {
+    "id": "message:0852",
+    "source_sha256": "5704457c926383d928169bd44ccd639f456ce57e4709ecf95994f1a7882d0a01",
+    "translation": "To visit another town,{cmd:7F0306}\nyou need to take the train.{cmd:7F04}\nHead to the {cmd:7F504BA00007}station,{cmd:7F0304}\nand hop aboard,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}But hey,{cmd:7F0306}\nwithout a {cmd:7F50198CDC0E}Controller Pak,\nthey won't{cmd:7F0304}\nlet you ride,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}Don't forget\nto bring one,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}When you visit another town,{cmd:7F0306}\nsend letters{cmd:7F0304}\nto the people living there!{cmd:7F030C}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Got secrets you can't put\non the {cmd:7F504BA0000E}bulletin board?{cmd:7F0306}\nThen{cmd:7F0308} write a letter,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}I wonder{cmd:7F0304}\n{cmd:7F09000014}if I'll get any letters{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Train travel requires a Controller Pak, not a destination-town Memory Card or the GameCube alternate travel-card rules. Retain station advice, sending letters to locals, private secrets, and hoping for personal mail. Only the station, Controller Pak, and bulletin-board colour counts change."
+  },
+  {
+    "id": "message:085C",
+    "source_sha256": "a70ded181699e783b7835fc9a94d1a0fd00ab223ab2cc50b43e5e96aa58a8dab",
+    "translation": "{cmd:7F090000FF}Do any of your friends{cmd:7F0306}\nlive outside {cmd:7F2F},{cmd:7F0304}\nin some other town{cmd:7F0304}?\n{cmd:7F0900000B}Well,{cmd:7F0306} {cmd:7F1C}?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}If they do,{cmd:7F0308}\nyou can visit{cmd:7F0304}\nyour friend's town\nfor a change!{cmd:7F04}\n{cmd:7F02}Or{cmd:7F0306} your friend can\ncome to {cmd:7F2F}\nand visit you,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}When you want to\nvisit another town,{cmd:7F04}\nhead to the {cmd:7F504BA00007}station{cmd:7F0304}\nand take the train,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}Buu{cmd:7F0304}uu{cmd:7F0304}ut,{cmd:7F0308}\nyou need a {cmd:7F50198CDC0E}Controller Pak\nor they won't{cmd:7F0304}\nlet you ride,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}I guess{cmd:7F0308}\nit's sort of like\na ticket,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Friends in different towns can visit in either direction by train. Keep both native town fields, the Controller Pak requirement, and ticket comparison; do not import the GameCube two-card alternatives. Only the station and Controller Pak colour counts change."
+  },
+  {
+    "id": "message:0962",
+    "source_sha256": "1d6e2952a25c227a6187a933aeb936422318d9b89fe132415b74876b872ba321",
+    "translation": "You need the Pak you used\nto come to {cmd:7F2F},{cmd:7F0306}\nwith the {cmd:7F50C35F0010}same travel data\non that {cmd:7F50198CDC0E}Controller Pak!{cmd:7F04}\n{cmd:7F02}Otherwise,{cmd:7F0306}\nI can't let you leave town!\nEek!{cmd:7F04}\n{cmd:7F02}I can't save to a different\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F0306}\nor to a {cmd:7F50198CDC0E}Controller Pak\nthat's been saved over!{cmd:7F0308}{cmd:7F04}\n{cmd:7F02}Why, you ask?{cmd:7F0308}\nIt's my job to\nprevent {cmd:7F509114A509}smuggling!\nEek!{cmd:7F04}\n{cmd:7F02}Connect the proper\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F0308}\nthen come see me again.\nEek{cmd:7F0302} ee{cmd:7F0302}eek!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Porter's return-travel data check requires the original unchanged Controller Pak, rejects a different or overwritten Pak, explains smuggling prevention, and requests reconnection. Keep all native fields, pauses, pages, and terminator; change only explicitly named colour counts."
+  },
+  {
+    "id": "message:0BAA",
+    "source_sha256": "58b2e282d8480b94cea05c77450889877b36b637eeb7423b5d630ea9c483e541",
+    "translation": "{cmd:7F090000FF}Do you know what falls\non the second Monday\nof October{cmd:7F0308}?\nWhat {cmd:7F0900000B}day is it?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Of course you know.{cmd:7F0308}\nYou never miss a holiday!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Oh, excuse me.{cmd:7F0308}\nThat's not what\nI meant to say,{cmd:7F030C}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}It's Sports Day,\nisn't it?{cmd:7F030F}\nThere's a sports fair in\n{cmd:7F2F} too,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}It's at the {cmd:7F504BA0000C}shrine plaza,\nso{cmd:7F030F} why not\ncome take a look,\n{cmd:7F1A}?{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}I'm sure you'll see\nsomething entertaining,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Sports Day is the second Monday of October, not the GameCube September event. Retain knowing holidays, the speaker's correction, town and player fields, shrine-plaza invitation, and all native commands except the venue colour count."
+  },
+  {
+    "id": "message:11CD",
+    "source_sha256": "75884a23f55b946f20c5705284a41f2435faf5e4160a52100d236d125d8a0b91",
+    "translation": "{cmd:7F09000015}I knew you'd know!{cmd:7F030F}\nThat's right,{cmd:7F0306}\nit's Sports Day,\n{cmd:7F0308}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}The Fall Sports Fair\nis that day!{cmd:7F030C}\nIt starts at 9:00 a.m.{cmd:7F0304}\nat the shrine plaza.{cmd:7F04}\n{cmd:7F02}Of course,{cmd:7F0306}\nyou'll be taking part,\nwon't you?{cmd:7F0308}\n{cmd:7F1C}!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct Sports Day response retains the native holiday, 9:00 a.m. start, shrine plaza, and participation question. The GameCube autumnal-equinox reference is not the N64 calendar. Preserve every native command and argument."
+  },
+  {
+    "id": "message:2711",
+    "source_sha256": "e6d47216a2d722cac39c4ce17b1a1f059e3e7aa3222069f20e9df00dd58c2fd7",
+    "translation": "{cmd:7F090000FF}Sports Day used to fall\non{cmd:7F0302} October 10th,{cmd:7F0304}\nbut now{cmd:7F0304}{cmd:7F030C} it's October's\nsecond Monday.{cmd:7F0304}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well,{cmd:7F0304} that's the day\nwe hold our sports fair.{cmd:7F0314}\nThat takes care of\nautumn exercise,{cmd:7F0308} eh?{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}It's at the {cmd:7F504BA0000C}shrine plaza,{cmd:7F0304}\nall day long,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Retain the native explanation that Sports Day changes from October 10th to the second Monday of October, followed by the all-day shrine-plaza sports fair. The reference skiing aside omits that useful date explanation. Only the venue colour count changes."
+  },
+  {
+    "id": "message:27D5",
+    "source_sha256": "9d39a52ac3491846b8b8e1dd1ae56e87c736c39d616cceb420285b9b488019cd",
+    "translation": "{cmd:7F090000FF}The second Monday\nin October...{cmd:7F0306}\n{cmd:7F0900000F}{cmd:7F0317}I don't know what date\nthat is{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Anyway,{cmd:7F030C}\ncome to the shrine plaza\nat least once that day,\n{cmd:7F0308}{cmd:7F1A}.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Then you'll see\nhow cool I can be,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F0310}\n{cmd:7F09000017}Probably{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Fall sports invitation retains October's second Monday, uncertainty about the numeric date, shrine-plaza venue, player name, and hesitant boast. The GameCube September wording is incompatible. Preserve every native command and argument."
+  },
+  {
+    "id": "message:285C",
+    "source_sha256": "69a71708b7f17a55e3bdc3cd5b3348685c47d7166d37ff98773173af97c327e1",
+    "translation": "{cmd:7F090000FF}Hey,{cmd:7F0308} are you\npaying back{cmd:7F0304}\nwhat you owe Tom Nook?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Even a little at a time\nhelps.{cmd:7F0308} Otherwise,{cmd:7F0304}\nyour house will stay\ntiny forever,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native reminder to repay Tom Nook's loan to enlarge the house. The GameCube events/Tortimer/free-gifts topic is unrelated. Preserve every native command and argument."
+  }
+]

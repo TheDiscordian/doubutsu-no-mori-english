@@ -1,0 +1,81 @@
+"""Complete reference/output bindings without new command or runtime permissions."""
+
+import re
+
+from aflib import sha256
+from textcodec import encode, tokenize
+
+
+def validate_content_approval(record):
+    if 'complete_reference' not in record:
+        return
+    rule = record['complete_reference']
+    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans'}
+            or 'adapted_sha256' not in rule
+            or not record['id'].startswith('message:')
+            or any(key in record for key in ('controller', 'native_choices', 'native_actor_request',
+                                             'available_fields', 'speaker_catchphrase',
+                                             'native_equivalent_id', 'resident_animations'))
+            or not isinstance(rule['adapted_sha256'], str)
+            or not re.fullmatch(r'[0-9a-f]{64}', rule['adapted_sha256'])):
+        raise ValueError('Invalid complete-reference approval')
+    if 'spans' in rule:
+        if not isinstance(rule['spans'], list) or not rule['spans']:
+            raise ValueError('Invalid complete-reference spans')
+        for span in rule['spans']:
+            if (not isinstance(span, dict) or set(span) != {'offset', 'before', 'after'}
+                    or type(span['offset']) is not int or not 0 <= span['offset'] < 4096
+                    or not isinstance(span['before'], str) or not span['before']
+                    or not isinstance(span['after'], str) or not span['after']
+                    or span['before'] == span['after']):
+                raise ValueError('Invalid complete-reference span')
+
+
+def verify_content_reference(reference, source, record, info):
+    if not record or 'complete_reference' not in record:
+        return
+    validate_content_approval(record)
+    reference_info = list(info)+[(0, 0)]*max(0, 0x75-len(info))
+    reference_info[0x74] = (2, 0)
+    if (sha256(source) != record['source_sha256'] or reference['id'] != record['reference_id']
+            or reference['sha256'] != record['reference_sha256']
+            or sha256(encode(reference['text'], reference_info)) != record['reference_sha256']):
+        raise ValueError('Stale complete-reference source or reference')
+
+
+def adapt_content_reference(reference, source, record, info):
+    """Apply only explicit source-bound wording spans, without moving delivery."""
+    if not record or 'complete_reference' not in record:
+        return reference['text'], []
+    verify_content_reference(reference, source, record, info)
+    text = reference['text']
+    previous_end = 0
+    parts, changes = [], []
+    for span in record['complete_reference'].get('spans', []):
+        start, before, after = span['offset'], span['before'], span['after']
+        # Offsets count characters in the decoded reference, not glyph bytes.
+        if start < previous_end or text[start:start+len(before)] != before:
+            raise ValueError('Complete-reference span does not match its approval')
+        # Colour span counts may change with a translated term. All other
+        # commands and manual line/page/wait/pause order remain untouched.
+        delivery = lambda value: [t.data for t in tokenize(encode(value, info), info)
+                                  if (t.kind == 'cmd' and t.data[1] != 0x50)
+                                  or (t.kind == 'text' and t.data == b'\xcd')]
+        if delivery(before) != delivery(after):
+            raise ValueError('Complete-reference span changes delivery or non-colour controls')
+        parts.extend((text[previous_end:start], after))
+        previous_end = start+len(before)
+        changes.append({'operation': 'reviewed_native_wording_span', 'character_offset': start,
+                        'before_sha256': sha256(before.encode()), 'after_sha256': sha256(after.encode())})
+    parts.append(text[previous_end:])
+    return ''.join(parts), changes
+
+
+def validate_content_candidate(id, source, candidate, matches):
+    record = matches.get(id)
+    if not record or 'complete_reference' not in record:
+        return
+    validate_content_approval(record)
+    if (sha256(source) != record['source_sha256']
+            or sha256(candidate) != record['complete_reference']['adapted_sha256']):
+        raise ValueError('Complete-reference output differs from its reviewed payload')

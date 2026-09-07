@@ -3256,6 +3256,98 @@
   overflow queue, general strings and other destinations, normal gameplay,
   saves, final review, patch-only release, and stretch work remain active.
 
+## 2026-09-07 — Native-context references, travel, and sports dates
+
+- Revalidated the worktree at `4dab47c` and resumed the pending identity-review
+  tooling. Fixed its legitimate original-fallback/reference-rejection collision
+  for `09C7` without allowing ordinary stale collisions or stale source hashes.
+- Added read-only `tools/identity_review_queue.py` and seven tests. It exposes
+  complete comparisons under the unchanged policy ladder without installable
+  translation fields or approvals. The initial pool contains 73 records out of
+  1,794 unconfirmed references. All 73 receive individual native/topic review;
+  same command compatibility alone does not establish matching meaning.
+- Added `complete_reference` source/reference/output bindings and eight tests.
+  Explicit decoded-text spans must match exact ordered positions, cannot
+  overlap, and preserve the combined newline/non-colour-command sequence.
+  Only local colour counts may change. Generator and builder independently
+  check complete payloads; all existing field, action, flow, and buffer guards
+  still apply. Combined special permissions are rejected.
+- Added 64 individual bindings: twelve retain the complete reference unchanged;
+  52 use bounded native-context wording changes. They cover shrine menus,
+  blossoms, sports/exercise, New Year's visits, cartridge/Pak messages,
+  greetings, game advice, Resetti, Disk System, and development labels. Exact
+  IDs, native/reference hashes, local spans, final hashes, and review notes are
+  in `translations/reference_matches.json`; the contract is documented in
+  `specs/NATIVE_CONTEXT_REFERENCES.md`.
+- Preserved the native shrine/plaza, July 25th and 6:00 exercise schedule,
+  April 20th spring sports where stated, January 1st visits, native menu/quiz
+  branches, and native Pak connection instructions. The twelve deletion
+  notices retain all actual native actions and exact successors; the English
+  power/removal warning refers to the cartridge Game Pak. These messages are
+  loaded as data for testing, not executed as deletion actions.
+- `2360` uses native Booker/Tom Nook instead of absent Blathers/mayor in its
+  reference aside. `23E6` retains full enlarged English emphasis and original
+  special-actor/shake/mode/branch commands under existing layout checks. Neither
+  gets a standing-resident expression exception. `0670` and `08BF` retain two
+  explicit reference typos for the final wording pass.
+- Added `18CA` under the existing `map_x_to_r` controller contract. Copper's
+  item `251D` and native action arguments stay exact, including the existing
+  adapter's restoration of `0A:02:0001` from reference `0000`. All English
+  wording except X/R and all presentation commands remain.
+- Added eight original drafts in `translations/n64-native-context.json`:
+  `0852 085C 0962 0BAA 11CD 2711 27D5 285C`. These retain actual Controller
+  Pak travel/return rules, private-letter advice, October's second Monday
+  Sports Day, the former October 10th date, the 9:00 a.m. start, and Nook's
+  loan/enlargement reminder. The incompatible GC two-card travel, September/
+  equinox, skiing, and mayor-gift topics are not imported.
+- All native original commands and arguments remain exact except five tested
+  sets of named colour-count corrections. Initial layout checking identified
+  two five-line draft pages; corrected their original English line divisions
+  without changing any native command. Final expansion bounds in file order:
+  `650 694 473 620 292 316 331 206`. Generic town-width warnings remain; a
+  separate six-fullwidth-cell native-town limit check passes every draft.
+- Basic candidate generation completes with 10,196 edits and admits 72 of the
+  73 additions. `16A5` correctly remains withheld for unsupported `75` without
+  the complete runtime. All eight native-context drafts are available; the
+  existing five converted-date drafts remain withheld without their patch.
+- All 477 tests pass in 205.285 seconds in
+  `build/tests-native-context-full-01.log`, including the 20 new queue, binding,
+  and native-context tests. Focused runs also pass all seven queue tests,
+  eight binding tests, and five native-draft tests.
+- `build/smoke-native-context-01/` passes all 73 complete cartridge-loader calls
+  with 221 assertions over 374 recorded steps. Full headers/text, adjacent and
+  module guards, checkpoint restoration, graceful shutdown, disabled audio,
+  no Expansion Pak, and blank 131,072-byte FlashRAM are verified. This is a
+  fresh isolated four-MiB run. It does not execute deletion actions, travel,
+  normal saving, seasonal selection, map handoffs, or Resetti animation.
+  No unchanged train, mail, or resident-selector batch is repeated.
+- Final ROM `build/native-context-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `98f735c4e907929cb24c29f4671421eb6d4a96599d709e4151cbe43128a709e5`.
+  UPS SHA-256 is
+  `5da21e7d0081e2f4e3b48c6944370c99fff71bb404167dc7ec2c6d5625afc5a4`;
+  applying it to the verified original reconstructs the complete new ROM.
+  All previous 10,807 candidate edits are identical. Every DMA file is
+  compared: changes are confined to main text `02000000`, pointers `00CF9000`,
+  and the DMA directory rows. The directory container's other bytes, all code,
+  fonts, overlays, runtime, resources, and save layouts remain unchanged.
+- The candidate file contains 10,880 edits: 9,543 reference main candidates
+  and 92 original main drafts give 9,635 main candidates. The 2,117 unfilled
+  main records include 1,186 with Japanese static text, nine placeholders,
+  919 without static text, one Latin record, and two number/symbol records.
+  Ten command-only records have dynamic insertions. The reference queue has
+  1,721 unconfirmed identities, 322 control differences, 69 missing fields,
+  and six overflows. There are 1,435 conservative reference-layout warnings,
+  41 native aliases, and 68 alias conflicts. These are candidate counts, not
+  final review or whole-game acceptance.
+- The updated read-only same-ID comparison pool is empty. Its unresolved
+  unconfirmed records are routed as 1,512 without visible same-ID English,
+  102 requiring fields, 38 with control differences, eight overflows,
+  36 native non-static records, 24 glyph failures, and one encoding/hash
+  uncertainty. The separate fourteen-expression pool remains unapproved.
+  Next work remains cross-ID/native-only matching, field/control/overflow
+  batches, other string/name/mail destinations, normal gameplay and saves,
+  final wording/layout, patch-only release, and artwork/keyboard stretch work.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
