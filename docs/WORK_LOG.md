@@ -3515,6 +3515,103 @@
   content, fields/controls, destinations, normal gameplay/save validation,
   final review, patch-only release, and image/keyboard stretch goals remain.
 
+## 2026-09-07 — Native service menus, travel conditions, and save dialogue
+
+- Revalidated clean `24e34c2` and continued the bulk native-content work. Added
+  `translations/n64-service-save-dialogue.json` with 47 original drafts: ten
+  post-office records, four home-gyroid records, fifteen station/Pak records,
+  and eighteen six-personality save-question/acknowledgement records. The
+  default generator includes the file. No existing candidate is replaced.
+  Scope and exact message lists are in `specs/SERVICE_SAVE_DIALOGUE.md`.
+- Preserved the separate three- and four-service post-office menus and every
+  original choice index/target. The GameCube e-Reader action is not imported.
+  Native `08DE` keeps storage target `1BE7`, not the legacy's `1BE8` change.
+  `08B2` keeps the native debt-payment option and its complete longer greeting.
+  `08D3/08D4` keep amount fields `25/26` and the original `04/19/01` hand-back
+  boundary rather than importing the GC `55` command.
+- Added native-complete Phyllis `08B0/08B2` without any special-actor expression
+  permission. Her queue-full response retains four grey inner remarks, asking
+  Pete for an extra delivery, the refusal, and farewell. Every original native
+  expression, voice command, and pause remains. These fill two records from
+  the previously unapproved fourteen-expression comparison pool.
+- Home-gyroid menus keep native Revise/Store an item/Save/Never mind choices
+  and their actual `0927/0927/092D/0926` targets. The proceeds acknowledgement
+  retains its sound. `0932` is translated as native saving, not the unrelated
+  GameCube door menu. Existing connected gyroid candidates fit native topics
+  and remain unchanged. Diagnostic `092F/0930/0931` and blank `0933` are not
+  given GameCube gameplay actions and remain in coverage/flow review.
+- Station drafts correct the native conditions without modifying any action:
+  refusal/acceptance of erasing the named existing traveller, free bytes versus
+  note slots, organisation/refusal, player/town saving, damaged-Pak repair,
+  declined/successful/failed repair, removal, boarding requirements, and write
+  failure. The legacy confuses several of these conditions. In particular,
+  `0954` incorrectly says repair succeeded after refusal, `0955` describes a
+  save instead of completed repair, `0956` describes formatting instead of a
+  repair retry, and `0967` describes changed town data instead of write failure.
+  The original error/repair branches and `094B` continuations remain intact.
+- All six native question/quit/continue triples in `2B09..2B1A` retain choices
+  `01AE/01AF`, exact successors, power-off warnings before the save request,
+  the wait before completion, expressions, and final `00`. Farewell and
+  continued-play wording remain distinct. No GC card-location or save-error
+  dialogue is imported into these same-numbered native records.
+- Complete native-command comparison permits only 30 exact colour-count
+  corrections: fifteen Controller Pak spans, fourteen town-data spans, and
+  one station span. All other commands and arguments are exact. Twenty-three
+  drafts use the existing layout policy for those counts; 24 use `exact`.
+  No new runtime permission, code, buffer, font, or saved-format change occurs.
+  Initial layout checks identified a five-line payment page and one overwide
+  Phyllis aside; adjusted only original English wording/line divisions without
+  changing any command. The two generic payment amount-field width warnings
+  remain visible; actual amount preparation/rendering remains unverified.
+- Final expansion bounds in draft-file order are
+  `94 94 180 180 276 281 97 112 130 114 149 138 169 172 212 123 89
+  293 189 258 157 149 121 155 187 186 174 64 225 241 60 218 222 56
+  216 242 56 209 228 58 222 243 64 220 242 452 186`.
+  All fit the unchanged limit. Nine focused tests pass in 0.244 seconds.
+  The complete suite passes 503 tests in 200.909 seconds in
+  `build/tests-service-save-full-01.log`.
+- Basic generation completes with 10,301 edits and every new draft. All
+  earlier basic edits remain identical; existing runtime/date gates still
+  apply. The full candidate file contains 10,987 edits and retains all
+  previous 10,940 edits unchanged.
+- `build/smoke-service-save-01/` passes all 64 complete cartridge-loader calls
+  with 194 assertions across 329 recorded steps: all 47 drafts plus seventeen
+  connected unchanged messages. Complete headers/text, adjacent/module guards,
+  checkpoint restoration, and graceful shutdown pass. The fresh four-MiB
+  process has disabled audio, no seed saves, both test write permissions false,
+  and blank 131,072-byte FlashRAM. The only injected function is `8009E558`.
+  This test does not execute menu selection, payment, repair, data management,
+  normal saving, actor actions, or original-hardware checks. No unchanged
+  train, mail, or resident-selector batch is repeated.
+- Final ROM `build/service-save-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `bb5a04efc85d70ccfb22cbc663b49f5604a1ff2301f65472d17d63967e10ac61`.
+  UPS SHA-256 is
+  `0199e8a54aa97163ecfeec0dffa94567db4932c1e659c51ca058a8a1c5e1c35c`;
+  applying it to the verified original reconstructs the complete new ROM.
+  Comparing every extracted DMA file against the long-advice pilot finds
+  changes only in main text `02000000`, pointers `00CF9000`, and DMA directory
+  rows. Other directory-container bytes, all executable code, overlays, fonts,
+  runtime resources, and save structures remain unchanged.
+- Coverage now has 9,552 reference main candidates plus 190 original drafts,
+  giving 9,742 main candidates. The 2,010 unfilled records include 1,079 with
+  Japanese static text, nine placeholders, 919 without static text, one Latin
+  record, and two number/symbol records. Ten command-only records contain
+  dynamic insertions. The 2,011 reference rejections contain 1,634 unconfirmed
+  identities, 306 control differences, 69 missing fields, and two overflows.
+  There are 1,437 reference-layout warnings, 41 aliases, and 65 conflicts.
+  Original-draft amount warnings remain separately tracked; none of these
+  counts establishes complete review, reachability, or gameplay acceptance.
+- Regenerated coverage and both review queues under `build/service-save-*`.
+  The unconfirmed same-ID pool remains empty, routing 1,461 without visible
+  same-ID English, 74 requiring fields, 31 control differences, seven overflows,
+  36 native non-static records, 24 glyph failures, one encoding/hash uncertainty,
+  and the separately classified original fallback. The expression queue now
+  contains twelve special-context records; Phyllis's two originals remove her
+  entries without broadening expression permissions. Broader content and
+  field/control work, other destinations, normal gameplay/saves, final review,
+  patch-only release, and both stretch goals remain active. The legacy audit
+  now records verified static message mismatches, not reproduced crash fixes.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 494 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 503 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -459,17 +459,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/long-advice-pilot/`
-contains 10,940 edits, including
-9,552 reference dialogue candidates, all 460 choices, and 143 original dialogue
+The current experimental resident-module pilot in `build/service-save-pilot/`
+contains 10,987 edits, including
+9,552 reference dialogue candidates, all 460 choices, and 190 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,057
+still require review. The original main-bank audit leaves 2,010
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,437 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/long-advice-candidates/` and `build/long-advice-coverage/`. The independent
+`build/service-save-candidates/` and `build/service-save-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -629,7 +629,7 @@ shrine venue, home creature care, moon viewing, the countdown invitation, and
 Nook's self-made free monument. All 93 complete cartridge loads pass with 281
 assertions and 474 recorded steps; all 457 host tests pass. Code, fonts, runtime
 bindings, saved layouts, and all earlier candidate edits remain unchanged.
-The read-only expression-difference queue contains fourteen remaining
+The read-only expression-difference queue contains twelve remaining
 special-actor, sleeping-resident, and title-menu comparisons; these contexts
 are not covered by the standing-resident permission. Other identity, field,
 control, overflow, gameplay, and final review work remain active.
@@ -685,6 +685,24 @@ code/font/save resources remain unchanged. Two conservative layout-warning
 records remain for polish. Ordinary conversation, phone animation, furniture
 handoffs, and rendered presentation remain gameplay/playthrough work.
 
+The [native service/save batch](../specs/SERVICE_SAVE_DIALOGUE.md) supplies 47
+original drafts: ten post-office messages, four gyroid messages, fifteen station
+and Pak messages, and eighteen save-question/acknowledgement variants. Native
+three- and four-service menus retain their actual choices and targets. Phyllis's
+queue-full response and greeting keep every original expression and muted aside.
+Repair refusal, success, failure, write failure, free space, and note slots stay
+distinct; power/removal/data-loss warnings retain their native placement. The
+six save pairs distinguish quitting from continuing. Every original command
+remains except exact highlight lengths for Controller Pak, town data, and station.
+All nine focused checks and all 503 regression tests pass. All 64 complete
+cartridge loads pass with 194 assertions over 329 recorded steps, including
+seventeen connected unchanged messages, guards, restored checkpoint, and blank
+FlashRAM. This test loads text only, without performing saving or repair.
+Basic generation admits all 47 drafts. Every earlier candidate, code/font/runtime resource, and
+save structure remains unchanged, and the UPS round trip passes. Payment amount
+width warnings remain explicit; ordinary menus, payments, repair, saving, dynamic
+rendering, and final draft review remain gameplay/playthrough requirements.
+
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
 becomes two bounds of 773 and 419 by splitting only at the existing page break
@@ -703,18 +721,18 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,940 edits, including
+The resident-module experiment contains 10,987 edits, including
 9,552 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, eighteen native
-community drafts, eight native-context drafts, 26 Pak drafts, and 25 carp/fireworks
-drafts. It retains the GameCube calendar wording in Rover's opening
+community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
+drafts, and 47 native service/save drafts. It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,058 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,057 main records without
-candidates: 1,126 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,011 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,010 main records without
+candidates: 1,079 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

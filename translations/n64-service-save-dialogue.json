@@ -1,0 +1,401 @@
+[
+  {
+    "id": "message:08CF",
+    "source_sha256": "bf0ca4a26d7895d78244b97ae48f7150f3b4bba26d10e309268acf0c42d5b1a2",
+    "translation": "{cmd:7F09000015}Welcome.{cmd:7F0310}\n{cmd:7F0900000B}How may I help you?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08AF}{cmd:7F101BE7}{cmd:7F1108B3}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native three-service menu, cancellation, original mail/storage/leave targets, and actor requests. No GameCube e-Reader action."
+  },
+  {
+    "id": "message:08D1",
+    "source_sha256": "574b9a4a9a5a34ffc9e847642adb668bfe3c79d1b61549b3e1aab0882ed52a5d",
+    "translation": "{cmd:7F09000015}Welcome.{cmd:7F0310}\n{cmd:7F0900000B}How may I help you?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B5}{cmd:7F101BE7}{cmd:7F1108B3}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native three-service menu, cancellation, original mail/storage/leave targets, and actor requests. No GameCube e-Reader action."
+  },
+  {
+    "id": "message:08D0",
+    "source_sha256": "d97d060410a09b5b58e5a089560889fa1f1c966bbba68bcc671df1d78bd90a23",
+    "translation": "{cmd:7F09000016}Hm{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F030C}{cmd:7F0900000F}Huh?{cmd:7F0314}\n{cmd:7F05969696}{cmd:7F5100}(Tch! A customer...){cmd:7F5101}{cmd:7F0310}\n{cmd:7F090000FF}Oh,{cmd:7F0306} wel{cmd:7F0302}come.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}So,{cmd:7F0308} what do you want?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B0}{cmd:7F101BE8}{cmd:7F1108B4}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis's reluctant welcome and muted aside; retain the native expression, all timings, three service choices, and original branch targets."
+  },
+  {
+    "id": "message:08D2",
+    "source_sha256": "6f674609bc928c45927a3c8d8931f88e679a96836ee704a0b36d721a3e05c12d",
+    "translation": "{cmd:7F09000016}Hm{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F030C}{cmd:7F0900000F}Huh?{cmd:7F0314}\n{cmd:7F05969696}{cmd:7F5100}(Tch! A customer...){cmd:7F5101}{cmd:7F0310}\n{cmd:7F090000FF}Oh,{cmd:7F0306} wel{cmd:7F0302}come.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}So,{cmd:7F0308} what do you want?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B6}{cmd:7F101BE8}{cmd:7F1108B4}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis's reluctant welcome and muted aside; retain the native expression, all timings, three service choices, and original branch targets."
+  },
+  {
+    "id": "message:08D3",
+    "source_sha256": "a5ffa9faaaac333da8fb4b8a5e3220367e2ebe3276c6714c00600991263a8c4a",
+    "translation": "{cmd:7F090000FF}Yes,{cmd:7F0308}\n{cmd:7F09000015}a payment to{cmd:7F0302} Tom Nook's{cmd:7F0306}\nshop,{cmd:7F0302} I see.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}You still owe{cmd:7F0306}\n{cmd:7F0302}{cmd:7F25}{cmd:7F26} Bells,{cmd:7F0308}\naccording to the bill.{cmd:7F04}\n{cmd:7F0900000B}How much would you like to pay?\n{cmd:7F04}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain both native amount fields, every original pause, the button wait before returning to the actor, and continuing end. Do not import the GameCube 55 input command."
+  },
+  {
+    "id": "message:08D4",
+    "source_sha256": "7ce9516af985e30db3c3979612834d2e72941c19ea0702b48fb113b817a5e9e1",
+    "translation": "{cmd:7F090000FF}Yes,{cmd:7F0302} yes,{cmd:7F0308}\n{cmd:7F09000016}a payment to Nook.{cmd:7F030A}\n{cmd:7F05969696}{cmd:7F5100}(You're actually paying him?!){cmd:7F5101}{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}You still owe{cmd:7F0306}\n{cmd:7F0302}{cmd:7F25}{cmd:7F26} Bells,{cmd:7F0308}\nit says.{cmd:7F04}\n{cmd:7F0900000B}How much are you paying?\n{cmd:7F04}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis retains her muted disbelief, both native amount fields, complete pause/action sequence, and the native wait rather than the GameCube 55 command."
+  },
+  {
+    "id": "message:08DD",
+    "source_sha256": "ee906df0381584598a8f3a5252b334dc50a2b57af6336b8819361443ef989c6c",
+    "translation": "{cmd:7F090000FF}Can I help you with\n{cmd:7F0900000B}anything else?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08AF}{cmd:7F101BE7}{cmd:7F1108B3}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain native Mail a letter, Save a letter, and Never mind choices, original Pelly branches, and cancellation."
+  },
+  {
+    "id": "message:08DE",
+    "source_sha256": "cafe913dcf2278eabee66b6559675472e06f0a27ca45160751fd3ad4d1a598d9",
+    "translation": "{cmd:7F09000016}Anything{cmd:7F0302} else?{cmd:7F030A}\n{cmd:7F05969696}{cmd:7F5100}(Hurry up and finish!){cmd:7F5101}{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B0}{cmd:7F101BE7}{cmd:7F1108B4}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Phyllis's muted remark, three services, and actual native storage target 1BE7. The legacy substitutes 1BE8; this text edit does not change the native flow."
+  },
+  {
+    "id": "message:0925",
+    "source_sha256": "5e2ae4bfff3fe3778705e45d9665caf8b990698ba93565bcc02af8e92f5fcc84",
+    "translation": "Welcome home,\n{cmd:7F1A}!{cmd:7F0308}\nHow may I assist you?{cmd:7F09090001}{cmd:7F1800130014005E0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0927}{cmd:7F100927}{cmd:7F11092D}{cmd:7F120926}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native home-gyroid menu: Revise, Store an item, Save, Never mind. Preserve original indices and targets; do not import GameCube house options or its different saving route."
+  },
+  {
+    "id": "message:0927",
+    "source_sha256": "be7d70705f60c3f4faa451f56ec414897da10e9130592796436bb2a85354b236",
+    "translation": "Request processed.{cmd:7F0314}\nMay I be of further{cmd:7F0308}\nassistance?{cmd:7F09090001}{cmd:7F1800130014005E0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0927}{cmd:7F100927}{cmd:7F11092D}{cmd:7F120926}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native repeated home-gyroid menu retains Revise/Store an item/Save/Never mind, all branches, and actor request."
+  },
+  {
+    "id": "message:0932",
+    "source_sha256": "eba8ed4d839ecc122659eb5554ee21e0b68fe60dacad19742d53a36dcb0c8d48",
+    "translation": "I shall now save the {cmd:7F50E11ED709}town data.{cmd:7F030C}\nPlease wait a moment.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native gyroid saving notice, not the GameCube door-management menu. Preserve the power warning, save request, and continuing end; only town-data colour length changes from six to nine.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0936",
+    "source_sha256": "ebaf8e575fd2574ada3d286fa6b6789fc2e607d21ac305965a02e84546e17d40",
+    "translation": "I shall add this{cmd:7F0304}\nto the Bells you carry.{cmd:7F5900}{cmd:7F04}\n{cmd:7F02}Now,{cmd:7F0302} how may I\nassist you?{cmd:7F09090001}{cmd:7F1800130014005E0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0927}{cmd:7F100927}{cmd:7F11092D}{cmd:7F120926}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain receipt of gyroid-sale proceeds, original sound, and original four-service menu and branches, not GameCube house options."
+  },
+  {
+    "id": "message:0946",
+    "source_sha256": "ba709bc605d299527b05074041facd916e9fea5ac987c0bbab0b670958dc3456",
+    "translation": "All right.{cmd:7F0304}\nYou won't go ahead.{cmd:7F04}\n{cmd:7F02}If you'd like to leave now,{cmd:7F0308}\nconnect another {cmd:7F50198CDC0E}Controller Pak.{cmd:7F04}\n{cmd:7F02}Then{cmd:7F0304} come and speak\nto me again, eek!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Response to declining travel-data erasure at 0945: connect another Pak if departing now. This is not a missing-Pak error or a page/note capacity requirement.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0947",
+    "source_sha256": "1881f925b64d1b2083acd0d2f700def7380751c8eced1ed11c04cfb325fdf146",
+    "translation": "{cmd:7F25}'s record{cmd:7F0308}\nwill be erased.\nYou're sure that's all right?{cmd:7F04}\n{cmd:7F02}Then{cmd:7F0306} I'll continue\nyour departure preparations.{cmd:7F0E094B}{cmd:7F04}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acceptance of the explicit erasure choice at 0945, naming the existing record owner through native field 25. Preserve actual erasure meaning and continuation 094B, not a missing-town-data message."
+  },
+  {
+    "id": "message:0948",
+    "source_sha256": "2102408ee5b9e8abf259b3172db67d75234abddd4932f58799196f23b77f6f93",
+    "translation": "{cmd:7F09000017}For this trip,{cmd:7F0308}\nyour {cmd:7F50198CDC0E}Controller Pak\ndoesn't have{cmd:7F0306}\nenough free space, eek.{cmd:7F04}\n{cmd:7F02}For the {cmd:7F50198CDC0E}Controller Pak,{cmd:7F0304}{cmd:7F0900000B}{cmd:7F0302}\nshall I organise its contents?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F094D}{cmd:7F10094C}\n{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native insufficient free-byte capacity, distinct from note-directory slots at 0951. Preserve original organise/refuse choices, cancellation, and branches 094D/094C; adjust only Pak colour counts.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:094C",
+    "source_sha256": "03dddf5c5d5514a016cac7c8b723c9ae75f354cace9abcbed7fe6f8590546088",
+    "translation": "Then{cmd:7F0304} I'm afraid{cmd:7F0306}\nyou won't be able\nto travel, eek.{cmd:7F04}\n{cmd:7F02}Please come back another time.{cmd:7F0308}\nEek{cmd:7F0304} eek!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Cannot proceed with travel after the native capacity-management refusal. Preserve all native pauses, pages, and ending; no new storage requirements."
+  },
+  {
+    "id": "message:094D",
+    "source_sha256": "97ede773093408cdd4f6ea75529f85fdea1fa4fb9dc54166f008201d20c992cf",
+    "translation": "You've tried it, eek?{cmd:7F030C}\nThen please wait\na moment{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0E094B}{cmd:7F04}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Acknowledge trying Pak organisation and continue to native departure preparation 094B. This is not the GameCube read-error message."
+  },
+  {
+    "id": "message:094F",
+    "source_sha256": "ff6ce382fa3fc081a8748b672f3d76398b42b26fbe50283e9b70631e7b03c720",
+    "translation": "Now I'll save {cmd:7F1A}\nto the {cmd:7F50198CDC0E}Controller Pak.{cmd:7F04}\n{cmd:7F02}I'll also{cmd:7F0308} update the {cmd:7F50E11ED709}town data.{cmd:7F0306}\nPlease wait a moment, eek!{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Saving your data now...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Save the player to the Controller Pak and update native town data. Retain both power-off and Pak-removal warnings, all pages/pauses, original save request, and continuing end. Do not import GC two-card locations or extra GC travel pages; only Pak/town-data colour lengths change.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0951",
+    "source_sha256": "a5481b7ed3e842cedbbffdf1fbfd3e5092a01462eaabfc12f1f2232dee92262d",
+    "translation": "{cmd:7F09000017}Your {cmd:7F50198CDC0E}Controller Pak\nis out of{cmd:7F0306} free note slots, eek.{cmd:7F04}\n{cmd:7F02}For the {cmd:7F50198CDC0E}Controller Pak,{cmd:7F0304}{cmd:7F0900000B}{cmd:7F0302}\nshall I organise its contents?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F094D}{cmd:7F10094C}\n{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native note-directory capacity failure, not a connection check or free-byte amount. Keep original organise/refuse choices and 094D/094C branches; change only Pak colour counts.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0952",
+    "source_sha256": "54ff10dd759890f019cf0365eaec4f9fe4a7363f22d8c73984ceb8c20351c6ee",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Eek eek!!{cmd:7F0314}{cmd:7F090000FF}\nYour {cmd:7F50198CDC0E}Controller Pak\nappears to be damaged!{cmd:7F04}\n{cmd:7F02}Repairing the {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nmay cause saved data\nto be lost.{cmd:7F04}\n{cmd:7F02}Should I try to repair your\n{cmd:7F50198CDC0E}Controller Pak?{cmd:7F0306}\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0953}{cmd:7F100954}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Damaged-Pak repair confirmation, not a report of failed repair. Explicit saved-data-loss warning precedes the native Yes/Never mind choices, 0953/0954 branches, and original actor requests.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0953",
+    "source_sha256": "f2333625c6178bf7ac05f4a15a57ca880076a1cc92a1b5e3b4dc8b61a8ec5604",
+    "translation": "I'll try to repair it now.\nPlease wait a moment, eek!{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}      Repairing...{cmd:7F0308}\n\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native repair-in-progress notice with the complete Pak-removal warning and unchanged save-operation/actor controls and continuing end."
+  },
+  {
+    "id": "message:0954",
+    "source_sha256": "0a0436dc85a42caf01f903360941fd3801e87ddc78b36ce3a5ee58ac51c88e63",
+    "translation": "All right, eek.{cmd:7F04}\n{cmd:7F02}I'm sorry, but{cmd:7F0308}\nplease connect another\n{cmd:7F50198CDC0E}Controller Pak.{cmd:7F04}\n{cmd:7F02}Then come back again.{cmd:7F030A}\nEek{cmd:7F0304} ee{cmd:7F0302}e{cmd:7F0302}ek!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Repair declined: request a different Pak and return later. The legacy wrongly says repair succeeded; retain the actual native refusal meaning and ending.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0955",
+    "source_sha256": "ac4b322d706833f25db984fec74e8edb250b7102a22fbea1e4ce2f3336abaaea",
+    "translation": "Repairs are complete.{cmd:7F04}\n{cmd:7F02}Now,{cmd:7F0306}\nI'll continue preparing\nyour departure, eek{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0E094B}{cmd:7F04}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Successful repair resumes departure through native 094B, not the GameCube town-save message. Keep the whole native continuation and actor sequence."
+  },
+  {
+    "id": "message:0956",
+    "source_sha256": "bfbba4008e4d3ee7c50bb96016e229de931caa3c674759fa438bcb12b1469b0a",
+    "translation": "I'm afraid I couldn't\nrepair it.{cmd:7F04}\n{cmd:7F02}Shall I try repairing\nthe {cmd:7F50198CDC0E}Controller Pak again,{cmd:7F0306}{cmd:7F0900000B}\neek?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0953}{cmd:7F100954}{cmd:7F19}{cmd:7F090000FF}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Failed repair offers the original retry/refuse pair and exact 0953/0954 targets. Do not replace it with a GameCube formatting or region-mismatch operation.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0957",
+    "source_sha256": "d0a5f405b2de717621f198a733bf2141aece86195b3dec0f69f25424b1d2134b",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Eek!!!{cmd:7F0314}{cmd:7F09000016}\nDon't remove the\n{cmd:7F50198CDC0E}Controller Pak\nwhile we're{cmd:7F0306} using it!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Please reconnect it\nproperly,{cmd:7F0308}\nthen come back again.{cmd:7F030A}\nEek ee{cmd:7F0302}e{cmd:7F0302}ek!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Mid-operation Controller Pak removal, retaining the native warning, reconnection request, expressions, and pauses.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:095E",
+    "source_sha256": "42c0e0ded4c3006001b972b5c5dfb258726a9e227cc536aad16f652289aa0298",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Eek eek!!{cmd:7F0314}{cmd:7F090000FF}\nUnless you connect a\n{cmd:7F50198CDC0E}Controller Pak{cmd:7F04}\n{cmd:7F02}you can't board\nthe train, eek!{cmd:7F04}\n{cmd:7F02}That's{cmd:7F0304} this {cmd:7F504BA00007}station's\nrule, eek!{cmd:7F0308}\nI'm very sorry.{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "A connected Controller Pak is required to board. Do not import the GameCube stored-travel-data erasure prompt or the legacy read-error wording. Change only Pak/station colour lengths.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:0967",
+    "source_sha256": "73d1ba6d24bf53352cb5d237b65e9216d62e1cea0e1d5433c3be0066adc50b49",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Eek!!!{cmd:7F0314}{cmd:7F09000016}\nI couldn't write to\nthe {cmd:7F50198CDC0E}Controller Pak.{cmd:7F04}\n{cmd:7F02}Reconnect the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F0308}\nthen come back again.{cmd:7F030A}\nEek{cmd:7F0304} ee{cmd:7F0302}e{cmd:7F0302}ek!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Actual native Controller Pak write failure. Retain the reconnection/retry request rather than the mismatched-town-data or smuggling explanation at a different native ID.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B09",
+    "source_sha256": "6526c9e68142661040b8517e4a3777165af2c240be19421244e6d8405fe9e5a6",
+    "translation": "Are you finished playing?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B0A}{cmd:7F102B0B}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B0A",
+    "source_sha256": "cda3f4fd8f59ddb0f74bbcdabe53e2462c11c4e686d3a642e9c0f38e2f76e408",
+    "translation": "All right,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F0308}\n{cmd:7F09000015}Please come and play again.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B0B",
+    "source_sha256": "d7a63aed14d87d5402be66044d01dbe39f10609bfb02a5be53c48157b1477550",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F0308}\n{cmd:7F09000015}Please keep{cmd:7F0304}\nenjoying yourself.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B0C",
+    "source_sha256": "458ddb6896bfb0ae2f84eead36f4450f0951304ad820662f28d13fe33b0230d3",
+    "translation": "Are you done for now?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B0D}{cmd:7F102B0E}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B0D",
+    "source_sha256": "1c4f96f460d47a71a1865e37eb1adddcca7f176de52dc34583cf52ec9434a00f",
+    "translation": "All right,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nJust wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F0308}\n{cmd:7F09000015}Come and play again soon!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B0E",
+    "source_sha256": "ac8959b344c9169d5be5c97aff73ccb4855b08916d7e1b63d9128a48c3192df4",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nJust wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F0308}\n{cmd:7F09000015}Keep{cmd:7F0304}\nhaving fun!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B0F",
+    "source_sha256": "773e00a6a13d192e3a5550f82a224ccaf024dbd2a066de146b3cdf903a4a16b3",
+    "translation": "Are you all done?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B10}{cmd:7F102B11}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B10",
+    "source_sha256": "ab14a7c7ad609fc8377b16476dc4ea14bfa305b9cd67a99d7646a84793e06ea8",
+    "translation": "Well then,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nWait a little while, OK?{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F0308}\n{cmd:7F09000015}See you next time!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B11",
+    "source_sha256": "d3e5e2f909c03fd705b230bea909c4329d90c62e8d90cb016c3fed53cc0f505b",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nWait a little while, OK?{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting.{cmd:7F0308}\n{cmd:7F09000015}Stay and{cmd:7F0304}\nrelax a little longer.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B12",
+    "source_sha256": "e0f4187d15e3d4827b5d313cee118c4dc3555a0d175c36be0951b319979c1046",
+    "translation": "Calling it a day?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B13}{cmd:7F102B14}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B13",
+    "source_sha256": "fc7cf397752c8b4ab560a92d5b1132699a70038c8730e767f595a0404b6d006d",
+    "translation": "OK, then,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nJust give me a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F0308}\n{cmd:7F09000015}See you again!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B14",
+    "source_sha256": "6f1cdb3f9277ce30a1f53edbdeaabd82b8dbeb1b4dc2b4c64552681fc33f2754",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nJust give me a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thanks for waiting!{cmd:7F0308}\n{cmd:7F09000015}Keep on{cmd:7F0304}\nhaving fun!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B15",
+    "source_sha256": "bc5c92b4cbc71d24c9d67d6555c3a2d01051ae238bc5f2429332ab1680a8b0b9",
+    "translation": "Finished for today?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B16}{cmd:7F102B17}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B16",
+    "source_sha256": "002d33ec0346fd107136c220a5054407040c5901377f1407ff5f56be18427421",
+    "translation": "All right, then,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Sorry to keep you waiting.{cmd:7F0308}\n{cmd:7F09000015}Come back again!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B17",
+    "source_sha256": "5d8fcbb377f6756992dfb08d4b618a99aa30206326a34400ec4139dca5e1e409",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nWait here a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Sorry to keep you waiting.{cmd:7F0308}\n{cmd:7F09000015}Stay and{cmd:7F0304}\nplay a little longer!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B18",
+    "source_sha256": "4dbec5200ef97752cf2cf017316e957a9e5df7602b32929c2f40c35c87c57d09",
+    "translation": "Are you finished for now?{cmd:7F1601AE01AF}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2B19}{cmd:7F102B1A}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Save & Quit / Save & Continue choices and the exact two following branch targets. Do not substitute GameCube Memory Card error dialogue."
+  },
+  {
+    "id": "message:2B19",
+    "source_sha256": "3b2f3531eda72c3e9df461d3890d3fcb83ee8038097bb7c3b633cd1011053030",
+    "translation": "Very well,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F0308}\n{cmd:7F09000015}Let's play again soon.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-quit acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct farewell wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:2B1A",
+    "source_sha256": "bfd0f2af1ece73284d0c384240f863159444ad26ea7e612735c07eb0ed9b97dd",
+    "translation": "Before you carry on,{cmd:7F0304}\nI'll save the {cmd:7F50E11ED709}town data.{cmd:7F0308}\nPlease wait a moment.{cmd:7F031E}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F05C35F00}       Saving...\n\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F04}\n{cmd:7F02}Thank you for waiting.{cmd:7F0308}\n{cmd:7F09000015}Stay and{cmd:7F0304}\nrelax a little longer.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native save-and-continue acknowledgement. Retain the power-off warning before the native save request, the wait before completion, the correct continued-play wording, every actor/timing command, and final end. Only town-data colour length changes from six to nine; no GameCube card locations or save errors.",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:08B0",
+    "source_sha256": "90fc68ff5d1a2db09fc5e4efd42216746c56e8dc8b881925bbcd0c8862dd594e",
+    "translation": "{cmd:7F0900000F}Sending something?{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(Ugh, more work. Tch!){cmd:7F5101}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}Oh{cmd:7F0302}!{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(We're already booked solid!){cmd:7F5101}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Nope,{cmd:7F0306} sorry,{cmd:7F030A}\nyou'll have to come back later.{cmd:7F030A}\n{cmd:7F0900000F}{cmd:7F05969696}{cmd:7F5100}(I'll have to ask Pete for\n{cmd:7F05969696}an extra delivery.{cmd:7F0308} What a pain.){cmd:7F5101}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}I{cmd:7F0306}{cmd:7F090000FF} said{cmd:7F0306}{cmd:7F09000016} NO!{cmd:7F0306}{cmd:7F09000001}{cmd:7F0308}\nI can't take it right now!{cmd:7F0308}{cmd:7F090000FF}{cmd:7F0308}{cmd:7F09000001}\nUnderstand?!{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Buh{cmd:7F0302}bye.{cmd:7F0314}\n{cmd:7F09000016}{cmd:7F05969696}{cmd:7F5100}(Just get out already!){cmd:7F5101}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis's full outgoing-mail queue refusal: keep the need to ask Pete for an extra delivery, all grey inner remarks, and every native expression/pause/voice command. No standing-resident animation permission is given to Phyllis."
+  },
+  {
+    "id": "message:08B2",
+    "source_sha256": "1269d7f94a4cb4d3485821d963f62dcb71be25a2cb51b738650ace6988350646",
+    "translation": "{cmd:7F09000016}Hm{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0306}{cmd:7F0900000F}Huh?{cmd:7F030A}\n{cmd:7F05969696}{cmd:7F5100}(Tch! A customer...){cmd:7F5101}{cmd:7F0314}\n{cmd:7F090000FF}Oh,{cmd:7F0306} wel{cmd:7F0302}come.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}So,{cmd:7F0308} what do you want?{cmd:7F09090001}{cmd:7F18005B005D009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B6}{cmd:7F1008D4}{cmd:7F111BE8}{cmd:7F1208B4}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis's four-service menu includes the native debt-payment option, unlike the separate three-service variants. Preserve the complete native greeting, inner voice, actor commands, choices 005B/005D/009D/0015, and exact branch mapping without new expression permissions."
+  }
+]
