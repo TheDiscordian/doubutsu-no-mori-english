@@ -1,5 +1,34 @@
 [
   {
+    "id": "resident_late_night_introduction",
+    "requires_resident_runtime": true,
+    "evidence": "Native and GameCube 04F7 both introduce the startled late-night resident, complain about the current time, reconsider the friendship request, and give the speaker's name. Preserve the complete English reference, all native actor argument tuples, speaker fields, clock reads, pauses, and manual layout. The conservative expanded bound is 1174 bytes, so split only at the existing wait/newline/page-clear span [480,485) after the clock aside. Native 083E is an opening-reserve placeholder with no incoming native message-script branch and no matching immediate in the pinned native executable sections. The only aligned non-executable 083E halfword is part of the arctangent table, not a dialogue pointer. Each complete output hash is approved; all members install together. The existing English hour formatter supplies AM/PM only after an hour field in the same record, requiring the verified resident runtime. No actor argument, choice, quest action, or final termination is added. Normal resident progression and visual review remain separate from native loader/continuation tests.",
+    "members": [
+      {
+        "id": "message:04F7",
+        "source_sha256": "cbd659623396b525342da475154c2b5039dba5a6043f2eadce33e9af776c1961",
+        "reference_sha256": "e5c30ac10951a00e3ae4ebaaba4ac9c002cdfcf89a4ad11baa01cb74f874e3e6",
+        "reference_id": "message:04F7",
+        "reference_slice": [
+          0,
+          480
+        ],
+        "encoded_sha256": "88012a769824301359b2e1fc4afd59e75a4b44b7790a7c2011cdc7dcb597b9a1"
+      },
+      {
+        "id": "message:083E",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "e5c30ac10951a00e3ae4ebaaba4ac9c002cdfcf89a4ad11baa01cb74f874e3e6",
+        "reference_id": "message:04F7",
+        "reference_slice": [
+          485,
+          798
+        ],
+        "encoded_sha256": "f9360652dfc3478c1cf1fca626190f3e89f17129b5ad6aa8bf5c5c61f065ea17"
+      }
+    ]
+  },
+  {
     "id": "nook_letter_wage",
     "evidence": "Both records acknowledge the sent letter, deduct the same 130-Bell wage from the mortgage, and stress learning to write letters. Retain the complete English reference and end 01. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
     "members": [

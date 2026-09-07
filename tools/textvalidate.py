@@ -4,6 +4,7 @@ from textcodec import LATIN, tokenize
 from aflib import sha256
 from reference_sequences import SequencePermit
 from reference_fields import ReferenceFieldPermit, SpeakerCatchphrasePermit
+from reference_animations import ResidentAnimationPermit, is_resident_animation, verify_animation_values
 from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
@@ -62,9 +63,18 @@ def expanded_bound(data, info):
 
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
-                   sequence_permit=None, field_permit=None, catchphrase_permit=None):
+                   sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None):
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
+    if animation_permit is not None:
+        if (not isinstance(animation_permit, ResidentAnimationPermit) or bank != 'message'
+                or policy != 'reference_layout' or not resident_runtime
+                or any(p is not None for p in (sequence_permit, field_permit, catchphrase_permit))
+                or animation_permit.source_sha256 != sha256(original)
+                or animation_permit.encoded_sha256 != sha256(replacement)
+                or animation_permit.context != 'native_resident_talk'):
+            raise ValueError('Animations require a complete reviewed resident-context permit')
+        verify_animation_values(original, replacement, info)
     if field_permit is not None:
         if (not isinstance(field_permit, ReferenceFieldPermit) or bank != "message"
                 or policy != "reference_layout" or not resident_runtime
@@ -122,8 +132,14 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                 or sequence_permit.source_sha256 != sha256(original)
                 or sequence_permit.encoded_sha256 != sha256(replacement)):
             raise ValueError("Reviewed sequence requires complete hash-bound approval")
-    elif signature(original, info, policy, resident_runtime) != signature(replacement, info, policy, resident_runtime):
-        raise ValueError("Control signature changed")
+    else:
+        before = signature(original, info, policy, resident_runtime)
+        after = signature(replacement, info, policy, resident_runtime)
+        if animation_permit is not None:
+            before = [c for c in before if not is_resident_animation(c)]
+            after = [c for c in after if not is_resident_animation(c)]
+        if before != after:
+            raise ValueError("Control signature changed")
     if bank == "message":
         if expanded_bound(replacement, info) > 1024:
             raise ValueError("Expanded message bound exceeds 1024 bytes")

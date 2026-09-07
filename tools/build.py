@@ -30,6 +30,7 @@ from reference_choices import validate_choice_candidate
 from reference_actor_requests import validate_actor_request_candidate
 from reference_fields import field_permit, catchphrase_permit
 from dialogue_dates import install as install_dialogue_dates, verify_requirements
+from reference_animations import animation_permit, verify_native_consumer
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -53,7 +54,10 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     verify_requirements(edits, rom, replacements, module_additions, module_report)
     source_banks = banks(rom)
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
-    permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info)
+    if any('resident_animations' in matches.get(edit['id'], {}) for edit in edits):
+        verify_native_consumer(rom, replacements)
+    permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info,
+                                 resident_runtime=bool(runtime_module))
     grouped, seen = {}, set()
     for edit in edits:
         bank, index = edit["id"].split(":")
@@ -83,7 +87,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                choice_bytes=layout.capacity if english_runtime else 10,
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]),
                                field_permit=field_permit(edit["id"], original, replacement, matches),
-                               catchphrase_permit=catchphrase_permit(edit["id"], original, replacement, matches))
+                               catchphrase_permit=catchphrase_permit(edit["id"], original, replacement, matches),
+                               animation_permit=animation_permit(edit['id'], original, replacement, matches))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:

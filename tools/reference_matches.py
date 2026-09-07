@@ -9,6 +9,7 @@ from controller_adaptations import validate_approval
 from reference_choices import validate_choice_approval
 from reference_actor_requests import validate_actor_request_approval
 from reference_fields import validate_field_approval, validate_catchphrase_approval
+from reference_animations import validate_animation_approval
 
 
 def load_matches(path):
@@ -38,6 +39,7 @@ def load_matches(path):
         validate_actor_request_approval(record)
         validate_field_approval(record)
         validate_catchphrase_approval(record)
+        validate_animation_approval(record)
         result[record["id"]] = record
     return result
 

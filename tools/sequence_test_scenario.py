@@ -8,19 +8,27 @@ import struct
 
 from aflib import CODE_VROM, by_vrom, sha256
 from reference_sequences import load_sequences
+from runtime_module import module_command_info, verify_test_module
 from textbanks import Bank
 from textcodec import command_info, tokenize
 
 
-def scenario(rom, group_name="nook_home_explanation"):
+def scenario(rom, group_name="nook_home_explanation", module=None):
     files = by_vrom(rom)
     info = command_info(files[CODE_VROM].extract(rom))
     bank = Bank("message", 0x02000000, 0x00CF9000,
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
-    if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete"):
+    if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
+                          "resident_late_night_introduction"):
         raise ValueError("No native scenario exists for this sequence")
-    members = load_sequences()[group_name]["members"]
+    group = load_sequences()[group_name]
+    if group.get('requires_resident_runtime', False):
+        if module is None:
+            raise ValueError('Sequence test requires the verified resident module')
+        verify_test_module(rom, module)
+        info = module_command_info(rom)
+    members = group["members"]
     numbers = [int(member["id"].split(":")[1], 16) for member in members]
     for member, number in zip(members, numbers):
         if sha256(entries[number]) != member["encoded_sha256"]:
@@ -105,9 +113,10 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sequence", default="nook_home_explanation")
+    parser.add_argument('--module', type=Path)
     args = parser.parse_args()
     rom = args.rom.read_bytes()
-    actions = scenario(rom, args.sequence)
+    actions = scenario(rom, args.sequence, json.loads(args.module.read_text()) if args.module else None)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"rom_sha256": sha256(rom), "actions": len(actions), "output": str(args.output)}))

@@ -891,6 +891,12 @@ def main():
                     raise ValueError('Dialogue date probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_dialogue_dates'],record))
+            if 'test_resident_animations' in action:
+                from resident_animations_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Resident animation probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_resident_animations'], record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():

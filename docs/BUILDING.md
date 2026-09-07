@@ -47,6 +47,28 @@ edits, unknown commands, and unsafe expansion fail the build.
 
 ## Silent emulator tests
 
+Reviewed long dialogue can span linked native records without increasing the
+1,024-byte buffer. Runtime-dependent groups, including the late-night resident
+introduction and its AM/PM field, are included only when candidate generation
+and building both use `--runtime-module`. The group installs all members
+together. See [sequence contracts](../specs/REFERENCE_SEQUENCES.md).
+
+The isolated late-introduction check uses the actual built ROM and its bound
+module report:
+
+```sh
+python3 tools/sequence_test_scenario.py \
+  --rom build/late-intro-pilot/animal-forest-halfwidth.z64 \
+  --module build/late-intro-pilot/runtime-module.json \
+  --sequence resident_late_night_introduction \
+  --output build/late-intro-scenario.json
+```
+
+Run the resulting scenario through the silent emulator runner described below.
+This checks cartridge loading and native continuation, not a rendered resident
+conversation. Animation-selection testing likewise records its deliberate
+initializer boundary; see [animation evidence](../specs/RESIDENT_ANIMATIONS.md).
+
 The experimental resident-module build uses the existing pinned Docker compiler:
 
 ```sh

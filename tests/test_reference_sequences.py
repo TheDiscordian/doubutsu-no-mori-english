@@ -16,6 +16,8 @@ from textbanks import banks
 from textcodec import command_info, encode
 from textvalidate import validate_entry
 from gc_adapter import adapt_reference
+from runtime_module import module_command_info
+from textvalidate import expanded_bound
 from test_retail import ROM_PATH
 
 
@@ -97,6 +99,84 @@ class ReferenceSequenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "1024"):
             validate_entry(self.source[0], encode(edits[0]["translation"], self.info), self.info,
                            "message", "reviewed_sequence", sequence_permit=permits["message:0000"])
+
+    def test_sequence_runtime_requirement_is_not_edit_metadata(self):
+        groups = deepcopy(self.groups)
+        groups['test_sequence']['requires_resident_runtime'] = True
+        self.assertEqual(reference_sequence_edits({}, self.source, self.info, groups), ([], {}))
+        with self.assertRaisesRegex(ValueError, 'requires the resident runtime'):
+            validate_sequences(self.edits, self.source, self.info, groups)
+        edits, permits = reference_sequence_edits(self.references, self.source, self.info, groups,
+                                                  resident_runtime=True)
+        self.assertEqual(edits, self.edits)
+        self.assertEqual(permits, self.permits)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/'sequences.json'
+            groups['test_sequence']['requires_resident_runtime'] = 'true'
+            path.write_text(json.dumps(list(groups.values())))
+            with self.assertRaisesRegex(ValueError, 'runtime requirement'):
+                load_sequences(path)
+
+    def test_sequence_ampm_requires_native_hour_and_same_part_preparation(self):
+        info = self.info+[(0, 0)]*(0x77-len(self.info))
+        info[0x76] = (2, 2)
+        native = b'Time\x7f\x21\x7f\x00'
+        first = b'Clock\x7f\x21\x7f\x76\x7f\x0e\x00\x01\xcd\x7f\x01'
+        last = b'Done\x7f\x00'
+        audit_sequence(native, [first, last], [0, 1], info, resident_runtime=True)
+        for root, parts, runtime, error in (
+                (native, [first, last], False, 'unavailable text field'),
+                (b'Time\x7f\x00', [first, last], True, 'unavailable text field'),
+                (native, [first.replace(b'\x7f\x21\x7f\x76', b'\x7f\x76\x7f\x21'), last],
+                 True, 'preceding hour'),
+                (native, [first.replace(b'\x7f\x76', b''), b'\x7f\x76'+last], True, 'preceding hour'),
+                (native, [first.replace(b'\x7f\x76', b'\x7f\x1b'), last], True, 'unavailable text field')):
+            with self.assertRaisesRegex(ValueError, error):
+                audit_sequence(root, parts, [0, 1], info, resident_runtime=runtime)
+
+    @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/gamecube/text/message.jsonl').is_file(),
+                         'Retail ROM and English text extraction are local-only test inputs')
+    def test_complete_late_night_reference_split_and_unchanged_reserve(self):
+        rom = ROM_PATH.read_bytes()
+        info = module_command_info(rom)
+        source = next(b for b in banks(rom) if b.name == 'message').entries()
+        refs = {r['id']: r for r in map(json.loads, (ROOT/'build/gamecube/text/message.jsonl').read_text().splitlines())}
+        name = 'resident_late_night_introduction'
+        group = load_sequences()[name]
+        edits, permits = reference_sequence_edits(refs, source, info, {name: group}, resident_runtime=True)
+        parts = [encode(e['translation'], info) for e in edits]
+        whole = encode(refs['message:04F7']['text'], info)
+        self.assertEqual(expanded_bound(whole, info), 1174)
+        self.assertEqual([expanded_bound(part, info) for part in parts], [773, 419])
+        self.assertEqual(parts[0][-7:], bytes.fromhex('7F0E083ECD7F01'))
+        self.assertEqual(parts[0][:-7]+bytes.fromhex('7F04CD7F02')+parts[1], whole)
+        for edit, payload in zip(edits, parts):
+            native = source[int(edit['id'].split(':')[1], 16)]
+            validate_entry(native, payload, info, 'message', 'reviewed_sequence',
+                           resident_runtime=True, sequence_permit=permits[edit['id']])
+        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 22)
+        with self.assertRaisesRegex(ValueError, 'Partial'):
+            validate_sequences(edits[:1], source, info, {name: group}, resident_runtime=True)
+        # Scan the pinned executable/data section inventory, not arbitrary ROM
+        # pixels or compressed bytes. This is evidence for this exact slot only.
+        import struct
+        from code_sections import code_segments
+        files = by_vrom(rom)
+        immediates, data_hits = [], []
+        for vrom, segment in code_segments()[0].items():
+            if vrom not in files:
+                continue
+            data = files[vrom].extract(rom)
+            for offset in range(0, len(data)-3, 4):
+                word = struct.unpack_from('>I', data, offset)[0]
+                if (segment.is_text(offset) and word & 0xffff == 0x083e
+                        and word >> 26 in (8, 9, 10, 11, 12, 13, 14)):
+                    immediates.append((segment.name, segment.ram+offset))
+            for offset in range(0, len(data)-1, 2):
+                if not segment.is_text(offset) and data[offset:offset+2] == b'\x08\x3e':
+                    data_hits.append((segment.name, segment.ram+offset))
+        self.assertEqual(immediates, [])
+        self.assertEqual(data_hits, [('code', 0x8010F664)])
 
     def test_additional_speaker_emotion_requires_exact_native_evidence(self):
         groups, edits = deepcopy(self.groups), deepcopy(self.edits)

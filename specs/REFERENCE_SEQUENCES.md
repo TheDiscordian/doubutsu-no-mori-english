@@ -111,6 +111,46 @@ an automatic cross-actor search. Only opcode `09`, speaker index `0000`, and an
 explicit existing emotion are eligible. Actor handoffs, other demo operations,
 gameplay controls, and dynamic fields are never inherited through this mechanism.
 
+## Late-night resident introduction
+
+The complete GameCube `04F7` is 798 encoded bytes but has a conservative expanded
+bound of 1,174 bytes after reserving space for speaker/catchphrase and clock
+fields. This is a build-time capacity rejection, not an observed in-game crash.
+Adding page-clear commands within that same record would not lower its bound.
+
+Use `04F7 → 083E`, replacing the existing wait/newline/page-clear span `[480,485)`
+after the clock aside with one continuing-record boundary. Part one contains
+reference bytes `[0,480)` plus `0E 083E`, newline, and end `01`. Part two contains
+`[485,798)`, including the original final end `00`. Expanded bounds are 773 and
+419 bytes. Every English text byte, manual line break, pause, clock read, and
+other page boundary remains unchanged. The complete clock joke stays in part
+one; part two begins the friendship exchange.
+
+Native `083E` is a source-hash-bound opening-reserve placeholder without an
+incoming message-script target. Scanning the pinned executable sections finds
+no arithmetic/comparison/logical immediate `083E`; the sole aligned halfword
+match in their non-executable sections belongs to the arctangent data table at
+`8010F664`. This is slot-specific supporting evidence, not a general permission
+to reuse seemingly empty records.
+
+The group requires the verified resident runtime. Its existing English hour
+formatter prepares AM/PM (`76`) after hour field `21`. The sequence audit allows
+this derived field only when the native root supplies an hour, and requires a
+preceding hour within the same replacement record. A previous record's hour
+cannot satisfy that requirement. Basic builds omit the whole group; manually
+requesting any member without its runtime or other members fails. All actor
+argument tuples already occur in native `04F7`; no extra actor approval is used.
+
+All sixteen sequence tests pass, including exact reconstruction of the complete
+English record, both capacity bounds, runtime requirements, same-record clock
+preparation, unchanged reserve identity, and rejection of partial installation.
+The native batch in `build/smoke-late-intro-01/` passes both complete cartridge
+loads, the `083E` continuation target, both phases of continuing/final
+termination, adjacent/module guards, and checkpoint restoration: seven native
+calls and fifteen assertions across forty recorded steps. It does not exercise
+normal resident progression, clock insertion during rendered playback, or final
+visual review. These remain in the combined gameplay/playthrough pass.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English

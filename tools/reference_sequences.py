@@ -32,6 +32,8 @@ def load_sequences(path=APPROVALS):
                 or record["id"] in result or not record.get("evidence", "").strip()):
             raise ValueError("Duplicate, invalid, or unexplained reference sequence")
         members = record.get("members")
+        if type(record.get('requires_resident_runtime', False)) is not bool:
+            raise ValueError('Invalid sequence resident-runtime requirement')
         if not isinstance(members, list) or not 1 <= len(members) <= 16:
             raise ValueError("Reference sequence requires one to sixteen members")
         for member in members:
@@ -91,12 +93,16 @@ def normalize_assignments(cmds):
     return result
 
 
-def audit_sequence(original, replacements, member_numbers, info, extra_actor=()):
+def audit_sequence(original, replacements, member_numbers, info, extra_actor=(), *, resident_runtime=False):
     """Check semantics independently of the approved payload hashes."""
     root = commands(original, info)
     if original[-2:] not in (b"\x7f\x00", b"\x7f\x01") or sum(c[1] in (0, 1) for c in root) != 1:
         raise ValueError("Sequence root must have one final terminator")
     available_fields = {c[1] for c in root if c[1] in FIELDS}
+    # The existing English hour formatter prepares AM/PM for this same record.
+    # No actor-prepared field or cross-record clock state is inherited here.
+    if resident_runtime and 0x21 in available_fields:
+        available_fields.add(0x76)
     available_actor = {c for c in root if c[1] in ACTOR} | set(extra_actor)
     translated = []
     for index, data in enumerate(replacements):
@@ -111,6 +117,12 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=())
             raise ValueError("Sequence continuation link changed")
         if any(c[1] in FIELDS and c[1] not in available_fields for c in part):
             raise ValueError("Sequence requests an unavailable text field")
+        hour_seen = False
+        for command in part:
+            if command[1] == 0x21:
+                hour_seen = True
+            elif command[1] == 0x76 and (not resident_runtime or not hour_seen):
+                raise ValueError('Sequence AM/PM requires a preceding hour in the same resident-runtime record')
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
         translated.extend(c for c in part if c[1] != 0x0E or index+1 == len(replacements))
@@ -121,7 +133,7 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=())
         raise ValueError("Sequence gameplay commands changed")
 
 
-def validate_sequences(edits, source, info, groups=None):
+def validate_sequences(edits, source, info, groups=None, *, resident_runtime=False):
     """Builder authority comes from repository approvals, never edit metadata."""
     groups = load_sequences() if groups is None else groups
     selected = {}
@@ -137,6 +149,8 @@ def validate_sequences(edits, source, info, groups=None):
     permits = {}
     for name in used:
         group = groups[name]
+        if group.get('requires_resident_runtime', False) and not resident_runtime:
+            raise ValueError('Reviewed sequence requires the resident runtime')
         members = group["members"]
         ids = {member["id"] for member in members}
         if ids != {id for id, edit in selected.items() if edit["reference_sequence"] == name}:
@@ -171,7 +185,8 @@ def validate_sequences(edits, source, info, groups=None):
                 if command not in supplied:
                     raise ValueError('Additional actor command is absent from its native source')
                 extra_actor.add(command)
-        audit_sequence(source[numbers[0]], replacements, numbers, info, extra_actor)
+        audit_sequence(source[numbers[0]], replacements, numbers, info, extra_actor,
+                       resident_runtime=resident_runtime)
         for member in members:
             permits[member["id"]] = SequencePermit(name, member["source_sha256"], member["encoded_sha256"])
     return permits
@@ -226,10 +241,12 @@ def reference_payloads(group, references, info):
     return payloads
 
 
-def reference_sequence_edits(references, source, info, groups=None):
+def reference_sequence_edits(references, source, info, groups=None, *, resident_runtime=False):
     groups = load_sequences() if groups is None else groups
     edits = []
     for name, group in groups.items():
+        if group.get('requires_resident_runtime', False) and not resident_runtime:
+            continue
         payloads = reference_payloads(group, references, info)
         for member, payload in zip(group["members"], payloads):
             reference = references[member.get("reference_id", member["id"])]
@@ -244,4 +261,4 @@ def reference_sequence_edits(references, source, info, groups=None):
                           "adaptations": [{"kind": "reviewed_multi_message_sequence", "sequence": name}]})
             if "reference_slice" in member:
                 edits[-1]["provenance"]["reference_slice"] = member["reference_slice"]
-    return edits, validate_sequences(edits, source, info, groups)
+    return edits, validate_sequences(edits, source, info, groups, resident_runtime=resident_runtime)

@@ -25,6 +25,7 @@ from reference_fields import (field_permit, verify_field_reference, catchphrase_
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 from dialogue_dates import requires_dialogue_dates
+from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -110,6 +111,8 @@ def main():
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates)
     matches = load_matches(args.matches)
+    if any('resident_animations' in record for record in matches.values()):
+        verify_native_consumer(rom)
     verify_native_equivalents(matches, source_banks)
     visited_matches = set()
     if override_ids & matches.keys():
@@ -119,7 +122,8 @@ def main():
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
         inventory = [json.loads(line) for line in (args.inventory/(name+".jsonl")).read_text().splitlines()]
         source = source_banks[name].entries()
-        sequence_edits, permits = reference_sequence_edits(gc, source, info) if name == "message" else ([], {})
+        sequence_edits, permits = (reference_sequence_edits(gc, source, info,
+                                  resident_runtime=bool(args.runtime_module)) if name == "message" else ([], {}))
         sequences = {edit["id"]: edit for edit in sequence_edits}
         if sequences.keys() & (override_ids | matches.keys()):
             raise ValueError("Reviewed sequence conflicts with a draft or identity override")
@@ -153,20 +157,24 @@ def main():
                             {**reference, "text": reference_text}, original, matches.get(id), info)
                         added_fields = matches.get(id, {}).get("available_fields")
                         added_catchphrase = matches.get(id, {}).get("speaker_catchphrase")
+                        animations = matches.get(id, {}).get('resident_animations')
                         verify_field_reference(reference, original, matches.get(id), info)
                         verify_catchphrase_reference(reference, original, matches.get(id), info)
-                        policy = "reference_layout" if added_fields or added_catchphrase else "presentation"
+                        verify_animation_reference(reference, original, matches.get(id), info)
+                        policy = "reference_layout" if added_fields or added_catchphrase or animations else "presentation"
                         try:
                             text, adaptations = adapt_reference(reference_text, original, info, policy,
-                                                                resident_runtime=bool(args.runtime_module))
+                                                                resident_runtime=bool(args.runtime_module),
+                                                                retain_resident_animations=bool(animations))
                             candidate = encode(text, info)
                             validate_entry(original, candidate, info, name, policy,
                                            choice_bytes=choice_bytes,
                                            resident_runtime=bool(args.runtime_module),
                                            field_permit=field_permit(id, original, candidate, matches),
-                                           catchphrase_permit=catchphrase_permit(id, original, candidate, matches))
+                                           catchphrase_permit=catchphrase_permit(id, original, candidate, matches),
+                                           animation_permit=animation_permit(id, original, candidate, matches))
                         except ValueError as exc:
-                            if added_fields or added_catchphrase or name != "message" or str(exc) != "Control signature changed":
+                            if added_fields or added_catchphrase or animations or name != "message" or str(exc) != "Control signature changed":
                                 raise
                             for policy in ("reference_text", "reference_delivery", "reference_layout"):
                                 try:
@@ -190,6 +198,9 @@ def main():
                         if added_catchphrase:
                             adaptations.append({"operation": "use_reviewed_resident_catchphrase",
                                                 "context": added_catchphrase["context"], "commands": ["1C"]})
+                        if animations:
+                            adaptations.append({'operation': 'retain_reviewed_resident_animations',
+                                                'context': animations['context'], 'command': '7F0900'})
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

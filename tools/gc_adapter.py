@@ -24,7 +24,7 @@ def remove_redundant_article_suppression(text):
     return pattern.sub(replace, text), edits
 
 
-def adapt_reference(text, source, info, policy="presentation", resident_runtime=False):
+def adapt_reference(text, source, info, policy="presentation", resident_runtime=False, *, retain_resident_animations=False):
     text, edits = remove_redundant_article_suppression(text)
     candidate = encode(text, info)
     ignored = compared_commands(policy, resident_runtime)
@@ -54,7 +54,8 @@ def adapt_reference(text, source, info, policy="presentation", resident_runtime=
                 return match[0]
             original = old[index]
             index += 1
-            if 0x08 <= data[1] <= 0x0C and data != original:
+            retain_animation = retain_resident_animations and len(data) == 5 and data[:3] == bytes.fromhex('7F0900')
+            if 0x08 <= data[1] <= 0x0C and data != original and not retain_animation:
                 edits.append({"operation": "preserve_n64_demo_arguments", "command_index": index-1,
                               "gamecube": data.hex().upper(), "n64": original.hex().upper()})
                 return "{cmd:"+original.hex().upper()+"}"

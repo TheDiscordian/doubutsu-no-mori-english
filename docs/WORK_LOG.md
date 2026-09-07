@@ -2931,6 +2931,82 @@
   animation selection; this alone is not proof of N64 values or consumer
   bounds and does not authorize relaxing the current command guard.
 
+## 2026-09-07: resident expressions and complete late-night introduction
+
+- Audited native NPC0 slot-zero animation selection in shared overlay `008681F0`
+  and its six 42-entry primary/secondary tables. Added eighteen individual
+  source/reference/output-bound approvals for complete GameCube introductions,
+  moon conversations, a secret spot, dusk-road fear, the heat challenge, and an
+  interrupted home visit. Other actor requests, fields, gameplay controls, and
+  buffer limits remain guarded. The adapter's ordinary defaults are unchanged;
+  the independent builder rejects modified approved text. A wider 255-record
+  expression-only mismatch pool is a review queue, not blanket approval.
+- Extracted the existing strict native relocation model as a shared helper.
+  This fully verified NPC overlay uses two explicit source constants: an
+  indexed item-table base and the exclusive BSS end. Ordinary mail callers keep
+  their original outside-pointer rejection. Host checks cover two relocation
+  bases; actual native loading independently matches the full relocated file
+  and zeroed BSS. No production loader or animation code changes.
+- `build/smoke-resident-animation-01/` passes 213 native selection cases,
+  eighteen complete cartridge loads, and 88 native expression dispatches:
+  322 calls, 654 assertions, and 1,616 recorded steps. Whole actor/order outputs,
+  saved data, allocation/stack/module guards, restored code/order pointer,
+  heap release, checkpoint restoration, and blank FlashRAM pass. The private
+  test overlay records calls at the animation-initializer boundary; rendered
+  poses and normal resident conversation are explicitly not tested.
+  Its ROM hash is
+  `3658860fe57f4e63eb188e43028a157eb58701cd3791790797d4415bef3d9d5e`.
+- The user asked whether the long late-night introduction could gain pages.
+  Implemented complete `04F7 → 083E` using the existing sequence framework.
+  The original English record is 798 bytes, with a conservative expanded bound
+  of 1,174. Split only its existing wait/newline/page-clear span `[480,485)`
+  after the clock joke; resulting bounds are 773 and 419. Preserve all English
+  wording, clock reads, pauses, manual lines, remaining page boundaries, native
+  actor argument tuples, and final end. No truncation or buffer increase.
+  This resolves a build-time capacity rejection, not a reproduced crash.
+- Source-hash-bound reserve `083E` has no incoming native message target. The
+  pinned executable-section scan finds no matching arithmetic/comparison/
+  logical immediate; the only aligned data halfword belongs to the arctangent
+  table. The group requires the resident module. AM/PM derives only from an
+  available native hour field and a preceding hour in the same replacement
+  record, never previous-record state. Basic generation finishes with 10,320
+  edits and withholds the complete runtime-dependent group. Partial/manual
+  installation without the verified runtime fails.
+- `build/smoke-late-intro-01/` passes both complete native cartridge loads,
+  the continuation target, both phases of continuing/final termination, buffer
+  and module guards, and checkpoint restoration: seven calls, fifteen
+  assertions, and forty recorded steps. Normal conversation, rendered clock
+  insertion, final layout, ordinary saving, and hardware validation remain.
+- All sixteen sequence tests pass. The initial animation host batch passed
+  435 complete-suite tests; after the sequence/runtime and independent builder
+  checks, `build/tests-late-intro-full-01.log` passes all 439 tests in 183.228
+  seconds. Tests include portable native-model/sanitizer checks and local-input
+  retail/reference coverage. No repeated train or mail-window batch is needed:
+  all production code, runtime bindings, font data/metrics, and saved layouts
+  remain unchanged.
+- Final build `build/late-intro-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `75af44a629c16bd9aa971056c079f417000522d8480eb2bf2dab00feb6b1c84b`;
+  its verified round-trip UPS has SHA-256
+  `679fb8c2fbe7334488ed67ad13384580104c10a6a8f978e97fd0a8990b402bbf`.
+  It contains 10,587 edits: 9,289 reference main candidates, 53 original main
+  drafts, and all 460 choice candidates. All previous 10,567 edits remain
+  identical. The twenty added main-bank records represent nineteen complete
+  English conversations and one continuation slot. Comparing all extracted
+  DMA files finds changes only in main text, its pointer table, and the DMA
+  directory container. The eighteen animation-test payloads are also unchanged
+  in this final ROM; their isolated native proof belongs to the earlier hash
+  above, while the continuation test uses this final ROM.
+- `build/late-intro-coverage/` records 9,342 main candidates and 2,410 records
+  without candidates: 1,479 Japanese static records, nine exact placeholders,
+  919 without static text, one Latin record, and two number/symbol records.
+  Ten command-only records have dynamic insertions. The reference queue has
+  1,796 unconfirmed identities, 540 control-signature mismatches, 69 missing
+  fields, and six expansion overflows. Its 1,390 conservative layout warnings
+  remain for review without automatic reflow. Continue bounded expression/
+  field/topic review and page-boundary splitting where applicable; fishing
+  advice `2008` needs native-content review before approval. Full gameplay,
+  saves, the later human playthrough, and release/stretch work remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

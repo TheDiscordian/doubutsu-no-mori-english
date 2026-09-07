@@ -61,6 +61,11 @@ def relocated(spec,data,reloc,base):
     native loading, cache maintenance, and BSS clearing require emulator tests.
     """
     verify(spec,data,reloc)
+    return relocate_verified_data(spec, data, reloc, base)
+
+
+def relocate_verified_data(spec, data, reloc, base, *, address_constants=()):
+    """Relocate caller-verified native files; callers must first bind full hashes."""
     if type(base) is not int or base & 15 or not MODULE_RAM+RESERVATION <= base <= 0x80400000-spec.resident_bytes:
         raise ValueError('Invalid NPC show relocation base')
     text,writable,rodata,bss,count = spec.sections
@@ -68,7 +73,7 @@ def relocated(spec,data,reloc,base):
     starts,sizes = (0,0,text,text+writable),(0,text,writable,rodata)
     def store(at,value): struct.pack_into('>I',result,at,value&0xFFFFFFFF)
     def target(value):
-        if not spec.ram <= value < spec.ram+spec.resident_bytes:
+        if not spec.ram <= value < spec.ram+spec.resident_bytes and value not in address_constants:
             raise ValueError('NPC show relocation points outside its file and BSS')
         return base+value-spec.ram
     for (entry,) in struct.iter_unpack('>I',reloc[20:20+count*4]):

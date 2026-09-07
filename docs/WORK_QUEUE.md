@@ -108,6 +108,29 @@ four-MiB town arrival, and all eight complete native letter windows pass.
 ## Main translation and runtime
 
 Next content audits target the remaining inserted-text and actor-command gaps.
+The [resident-animation permission](../specs/RESIDENT_ANIMATIONS.md) admits
+eighteen reviewed complete English records while keeping all non-expression
+actor commands, fields, flow, and capacity guarded. Its native batch passes
+213 selections, eighteen loads, and 88 dispatches. Actual pose initialization
+and normal resident playback remain gameplay checks, not reasons to repeat the
+isolated selection batch. The wider expression-only mismatch pool still needs
+individual topic/actor review; special actors and new values are not approved.
+
+The complete [late-night introduction](../specs/REFERENCE_SEQUENCES.md) uses
+`04F7 → 083E`, split only at its existing GameCube page boundary after the clock
+joke. Both complete records fit and pass native load/continuation/termination
+checks. Basic builds omit the runtime-dependent group. Keep the original
+wording, pauses, and manual layout; normal conversation and rendered clock
+checks belong in the combined gameplay/playthrough pass.
+
+Current main-bank coverage is 9,342 candidates; 2,410 records remain without
+candidates, including 1,479 containing Japanese static text. The reference
+rejection queue contains 1,796 unconfirmed identities, 540 control-signature
+differences, 69 missing-field records, and six expansion overflows. These are
+candidate counts, not completed semantic or gameplay review. Other overlong
+records may use existing page-boundary splitting after their complete native
+gameplay/field meaning and unused continuation slots have been established.
+
 Twenty-five favour/task-response messages have individually approved native
 actor requests. Native `09` writes NPC0 row four; `0C` writes quest row nine.
 The adaptation retains the original `09`, slot five, and exact native value,
@@ -158,10 +181,7 @@ choices `011E/0128`, both branches, and quest values. All original commands,
 fields, pauses, and pages are preserved. No reference permissions or production
 runtime changes are needed. All 21 complete cartridge loads pass in one native
 batch, with 65 assertions, adjacent/module guards, and checkpoint restoration;
-the full 428-test suite passes. Final native wording/layout and gameplay remain.
-Further moon-viewing references `1EA2/1EDD/1EE7` and the secret-spot joke `1F09`
-have broadly matching meaning but different actor controls; review a scoped
-reference adaptation rather than replacing them with unrelated dialogue.
+the full 439-test suite passes. Final native wording/layout and gameplay remain.
 Birthday fields `34/35` are separate item
 slots, not these free fields. Other date preparers and native calendar years
 outside 2000–2032 require their own audit.

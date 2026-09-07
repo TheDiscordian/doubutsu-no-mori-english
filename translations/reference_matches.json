@@ -1,5 +1,203 @@
 [
   {
+    "id": "message:2104",
+    "reference_id": "message:2104",
+    "source_sha256": "cbdd26c77d2ffe0c1809137ccfc39840da0cd8c4e41d36b0e95d16527fc059da",
+    "reference_sha256": "4fb0c264a5b449b6cde2fe51766e5322dab1efd06a884df0ef7518fad8841fba",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "4fb0c264a5b449b6cde2fe51766e5322dab1efd06a884df0ef7518fad8841fba"
+    },
+    "evidence": "Native cranky resident wakes, angrily challenges an uninvited visitor, introduces the resident, and dismisses the player's friendship greeting. English retains the same hostile morning introduction. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04D3",
+    "reference_id": "message:04D3",
+    "source_sha256": "eb0bca4f4b6e233b408dd80b0382a45b8ac1747d5a9a3f9df11306f045e7244b",
+    "reference_sha256": "9422799838ab208dbe10ce7427e68c338132046b3c67d7c7afffc7453c546e3e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9422799838ab208dbe10ce7427e68c338132046b3c67d7c7afffc7453c546e3e"
+    },
+    "evidence": "Native peppy resident introduction at an awkwardly early hour: greet, recognise a stranger, exchange names, and accept friendship. English retains the same introduction and all native initial mood requests. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04D8",
+    "reference_id": "message:04D8",
+    "source_sha256": "b16ca59aacd8cc143f2fd0735b99f4a8fcf8f0754ed83fbebff18070118f90e1",
+    "reference_sha256": "6c4624a36c49076516d9665b94724cd2e5a5008e4b861d8a4936f8b9130e0b39",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "6c4624a36c49076516d9665b94724cd2e5a5008e4b861d8a4936f8b9130e0b39"
+    },
+    "evidence": "Native shy resident introduction: first meeting, own name, nearby home, and invitation to stop by. English keeps that complete interaction; added talk reset is standing animation only. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04E3",
+    "reference_id": "message:04E3",
+    "source_sha256": "1c02a4e85086e028dbdda1cffc0fdee3cd0f8e1b02529ab928ca0f2cb7d5c390",
+    "reference_sha256": "2f5d7367c9e15255af43e11e23f1dbce76c7a207133ee8f4c3f5d442055dfc68",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "2f5d7367c9e15255af43e11e23f1dbce76c7a207133ee8f4c3f5d442055dfc68"
+    },
+    "evidence": "Native jock early-morning introduction with name exchange and early-riser camaraderie. English retains the same resident introduction and morning/exercise characterisation. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04EA",
+    "reference_id": "message:04EA",
+    "source_sha256": "52078af776aba56e9d28a1a3cc9145147398a9eb51b02a19b84e85d4fe43ce46",
+    "reference_sha256": "d391f7721162b27cd0cba85d66b65d3118324f3b422b33bc8034c1d28b70b46d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "d391f7721162b27cd0cba85d66b65d3118324f3b422b33bc8034c1d28b70b46d"
+    },
+    "evidence": "Native jock evening introduction: shush the player, realise the resident is shouting, and explain nighttime energy. English preserves the joke and native initial mood requests. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04EF",
+    "reference_id": "message:04EF",
+    "source_sha256": "c563af7e4e8ba5831207adb0798cc689adc0d0f4523b15ffb27d1aea89c10c93",
+    "reference_sha256": "52ab51d330170f8c7cb5a72a37c80e6c5565df02d784ad697aa26746aeec8b61",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "52ab51d330170f8c7cb5a72a37c80e6c5565df02d784ad697aa26746aeec8b61"
+    },
+    "evidence": "Native cranky introduction: complain about noise, ask the player's identity, exchange names, and reluctantly accept friendship. English retains that interaction and its final reluctant greeting. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04F0",
+    "reference_id": "message:04F0",
+    "source_sha256": "f025b6a8c9c6f53e4a70cf1323d3038b46cf3ef8b919d647fda644d2de19dc35",
+    "reference_sha256": "a0273c0d05777b850d31bc05744ab542434682b805af262f392bcd2702c82b5a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a0273c0d05777b850d31bc05744ab542434682b805af262f392bcd2702c82b5a"
+    },
+    "evidence": "Native cranky afternoon introduction: criticise idle chatting, apologise for meddling, suggest a destined meeting, and give the resident's name. English keeps the same introduction without adding gameplay actions. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04F6",
+    "reference_id": "message:04F6",
+    "source_sha256": "eb0a64459868ffe9e51c72b945fc8ea31b4408150cde0d7a26b3874304791cb2",
+    "reference_sha256": "7107035c267c4fe0d0503255dd550d115fe48011e110047516ecb9d847a8c6d2",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "7107035c267c4fe0d0503255dd550d115fe48011e110047516ecb9d847a8c6d2"
+    },
+    "evidence": "Native cranky nighttime introduction: apologise for being rude to a stranger, learn the player's name, then use the new acquaintance as an excuse to tell the player to go to bed. English retains the complete joke. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04FE",
+    "reference_id": "message:04FE",
+    "source_sha256": "c14c201c6d7bad1ae31594aec02cb8a8f90c26dac9185e3f4c0267ada06fd993",
+    "reference_sha256": "93bc041fee53ded5236a71fd460ec85fb325e5e2850892eda8c7395c6a7b14b5",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "93bc041fee53ded5236a71fd460ec85fb325e5e2850892eda8c7395c6a7b14b5"
+    },
+    "evidence": "Native snooty introduction: complain about the player's volume, mock the name, apologise, and praise the resident's own name before greeting. English retains the interaction and native initial mood requests. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:04FF",
+    "reference_id": "message:04FF",
+    "source_sha256": "7cda214837ac847ecdafaaf5989c9a8a7b2de3a26d50d0b5ced5aaa031fb32a6",
+    "reference_sha256": "f3b8d8ca05b85cecadefb6d419a07f3bfd6379754b3dd4720b0379485364a69d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "f3b8d8ca05b85cecadefb6d419a07f3bfd6379754b3dd4720b0379485364a69d"
+    },
+    "evidence": "Native snooty introduction mistakes the player for a newspaper seller, then agrees to friendship and introduces the resident. English preserves the same misunderstanding and invitation. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:0519",
+    "reference_id": "message:0519",
+    "source_sha256": "959fb6575da27a8555be219d999005f658f95582063d675e167fcab5dc945710",
+    "reference_sha256": "1cc0fc67c4e8af62da959ac48dfdc5654a8653d15f8b2c96ec905f4887f859c2",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1cc0fc67c4e8af62da959ac48dfdc5654a8653d15f8b2c96ec905f4887f859c2"
+    },
+    "evidence": "Native peppy collision-near-miss response: boast about reflexes, recognise the player, and ask for more care. English retains the original continuing terminator and no new gameplay orders. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:1EA2",
+    "reference_id": "message:1EA2",
+    "source_sha256": "675d85e7ad3f4901c154327d08552d18c2e33b78ec67469274476d681e0abc7b",
+    "reference_sha256": "07e01fe87f8e6393edd9c85bf05f1cae878b8e9c10afc7a55ec4ba7130c73215",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "07e01fe87f8e6393edd9c85bf05f1cae878b8e9c10afc7a55ec4ba7130c73215"
+    },
+    "evidence": "Native lazy resident feels the moon calling to an empty stomach. The English low-tide hunger joke retains the same moon-viewing appetite context. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:1EDD",
+    "reference_id": "message:1EDD",
+    "source_sha256": "55b7b13fed6859f78313516ddfb2020478b3a4ed420d2a47421bdf40a7b975f6",
+    "reference_sha256": "c5b44b82d4d7eaed14d10e61b765a454f558de5320c906242c8c24e4cf82e041",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c5b44b82d4d7eaed14d10e61b765a454f558de5320c906242c8c24e4cf82e041"
+    },
+    "evidence": "Native cranky resident feels unexpectedly calm while looking at the full moon. English expands the same realisation into naming the feeling as tranquil. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:1EE7",
+    "reference_id": "message:1EE7",
+    "source_sha256": "a683a466d07ba07cbe841e39a4325b1b0242f44db48ddf143ba13997697c8e0f",
+    "reference_sha256": "baa8fdd3a04f7cc0c52db10895857297f498da3c4f79d1a9a28d662fa2b0f995",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "baa8fdd3a04f7cc0c52db10895857297f498da3c4f79d1a9a28d662fa2b0f995"
+    },
+    "evidence": "Native cranky resident's blood stirs at the moon, ending in a howl. English preserves the same moon/werewolf joke and manual page boundary. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:1F09",
+    "reference_id": "message:1F09",
+    "source_sha256": "3c406e992ffe46c3dc3a92196f7ac574d286e85bc22249a5b475de31fdf731fd",
+    "reference_sha256": "9f20e9f3625eeb54f550022e2f80a1e87bee4d745607baeda94ae3fb66f2de70",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9f20e9f3625eeb54f550022e2f80a1e87bee4d745607baeda94ae3fb66f2de70"
+    },
+    "evidence": "Native lazy resident boasts of a secret spot and then realises the player discovered it. English retains the same joke and player-name source. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:1FF5",
+    "reference_id": "message:1FF5",
+    "source_sha256": "fa8fd2e47880b34ad5263922deef637aa170218e819c54de9dbc5c7caecd79c4",
+    "reference_sha256": "623068e4073c8741512f28baca8d92d14c838aef264f14d9c3812e1d0dad23ed",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "623068e4073c8741512f28baca8d92d14c838aef264f14d9c3812e1d0dad23ed"
+    },
+    "evidence": "Native normal resident says the evening is still light enough to walk, then admits disliking dark roads. English keeps both parts and the native catchphrase field. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:20AE",
+    "reference_id": "message:20AE",
+    "source_sha256": "80f400c47254f4502624b7acc99333b49cb528561dd8808f8607e4cf66bd8ce1",
+    "reference_sha256": "25a1524867ec5dba496d1c1ebb426592cf0123df67057402a9e3dd3ea6e6ff24",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "25a1524867ec5dba496d1c1ebb426592cf0123df67057402a9e3dd3ea6e6ff24"
+    },
+    "evidence": "Native jock answers a sunny hot day by competing with the sun's heat. English preserves the energetic heat challenge, adding a characterful superpower punchline without gameplay changes. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
+    "id": "message:20D7",
+    "reference_id": "message:20D7",
+    "source_sha256": "0e8026738eb5597d6a653fae77e75e297ee96441a48af01ef3d431b629d7ff01",
+    "reference_sha256": "fb6873d6b6db21844180cb9e29dfffe297b1df5a89d3f086e9457a433875de9e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fb6873d6b6db21844180cb9e29dfffe297b1df5a89d3f086e9457a433875de9e"
+    },
+    "evidence": "Native normal resident mistakes a home visitor for a thief, learns the player wants friendship, introduces the resident, and suggests chatting outdoors at this hour. English retains that complete introduction. Individually retain the complete English reference, manual layout, and timing; only NPC0 index-zero standing-expression delivery may differ. All other actor requests, fields, flow controls, and capacity limits remain checked."
+  },
+  {
     "id": "message:01A3",
     "source_sha256": "933d13d01018e66055ea0f38905fefd8cee72e2aab9eb31bd1418a86bc340529",
     "reference_id": "message:01A3",
