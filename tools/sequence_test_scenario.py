@@ -18,7 +18,7 @@ def scenario(rom, group_name="nook_home_explanation"):
     bank = Bank("message", 0x02000000, 0x00CF9000,
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
-    if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase"):
+    if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete"):
         raise ValueError("No native scenario exists for this sequence")
     members = load_sequences()[group_name]["members"]
     numbers = [int(member["id"].split(":")[1], 16) for member in members]
@@ -78,8 +78,9 @@ def scenario(rom, group_name="nook_home_explanation"):
                         dispatch(token)
                 read(window+0x2C4, struct.pack(">I", target))
         else:
-            if commands[-1].data != b"\x7f\x00":
-                raise ValueError("Work-offer sequence must finish with the native final terminator")
+            expected_end = b"\x7f\x01" if group_name == "nook_planting_complete" else b"\x7f\x00"
+            if commands[-1].data != expected_end:
+                raise ValueError("Sequence must finish with its approved native terminator")
             write(window+0x28C, bytes(4))
             dispatch(commands[-1], 2)
             read(window+0x28C, struct.pack(">I", 8))

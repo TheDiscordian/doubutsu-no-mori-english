@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"repeat": 3, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 3},
+    {"snapshot_message": true}
+  ]},
+  {"key": "s", "duration": 0.42},
+  {"wait": 5},
+  {"capture": "greeting-break-outside.png"},
+  {"snapshot_message": true},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"snapshot_villagers": true},
+  {"save_state": true}
+]

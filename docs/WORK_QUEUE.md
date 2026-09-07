@@ -31,7 +31,7 @@ its acceptance checks pass, not when a candidate or specification exists.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
-| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, house purchase, both explanation choices, English work offer, shop entry, uniform equipment/acknowledgement, and all ten supplied plants pass; normal save and subsequent introductory jobs remain |
+| V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, house purchase, both explanation choices, English work offer, uniform equipment, and planting completion/acknowledgement pass; meeting villagers, later jobs, and normal save remain |
 | V03 | Save/reload and long names | pending | Isolated FlashRAM, RTC, no lost/truncated text, restart across sessions |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "message:0821",
+    "source_sha256": "afe5a78804742eb3068e465c0acfd7780b93e096a807ed5f1636e5b1b19ac589",
+    "translation": "Wait a moment{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F1A},{cmd:7F030C}\nyou've only just moved to\n{cmd:7F2F}.{cmd:7F04}\n{cmd:7F02}And the people of {cmd:7F2F}{cmd:7F0308}?\n{cmd:7F0900000B}{cmd:7F0305}Have you said hello to them?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}I'll give you{cmd:7F0304}\na short break,{cmd:7F0308} so go and\nintroduce yourself to\neveryone in town.{cmd:7F04}\n{cmd:7F02}Off you go,{cmd:7F0304} then.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native instruction asks the player to introduce themselves to the townsfolk. The same-ID GameCube record adds a mayor and wishing-well detour absent from this instruction; the legacy substitutes a shrine. Preserve every native control, field, pause, and page transition. Do not import either platform-specific detour. Normal native progression reaches this entry after the planting wage; English actor traversal remains required."
+  },
+  {
+    "id": "message:0822",
+    "source_sha256": "a71836e0c97b3dd03b9ffda2dd15b7420fc30e9034c8d44789a994946d48ef20",
+    "translation": "{cmd:7F0900000B}{cmd:7F030A}Hm?{cmd:7F030C}\nHave you introduced yourself\nto everyone?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}It looks as though there's\nsomeone you haven't met yet.{cmd:7F04}\n{cmd:7F02}Go and say hello to\neveryone, hm?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native reminder only asks the player to greet the remaining townsfolk. The GameCube mayor requirement and legacy shrine wording are absent from the source. Keep every original command and the three native pages. Normal native gameplay reaches this reminder before all villagers are met; English actor traversal remains required."
+  }
+]

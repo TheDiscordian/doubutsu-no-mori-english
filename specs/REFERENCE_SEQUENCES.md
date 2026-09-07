@@ -64,6 +64,17 @@ An external continuation is permitted only in the final member and must match
 the original root's complete outgoing-link list and gameplay-command order.
 No new target or omitted original link is accepted.
 
+## Planting-job completion
+
+The one-record `nook_planting_complete` approval retains the complete English
+`07F9`. Both games acknowledge the planting, give the same eighty-Bell wage
+toward the mortgage, and continue to the next task with native end `01`. Normal
+N64 progression reaches the source record after all ten supplied plants are used.
+The GameCube repeats the already-present emotion tuples `000015` and `0000FF`
+during its mortgage aside; no new actor argument or gameplay action is introduced.
+Retain its entire text, manual line/page breaks, and pauses. Its 644 encoded bytes
+fit the native message buffer with the normal expansion reserve.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English

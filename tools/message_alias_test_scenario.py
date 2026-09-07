@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify every generated native message alias through the real cartridge loader."""
+"""Verify native message aliases or original drafts through the cartridge loader."""
 
 import argparse
 import json
@@ -12,22 +12,25 @@ from textbanks import Bank
 from textcodec import encode
 
 
-def scenario(rom, edits, info):
+def scenario(rom, edits, info, *, drafts=False):
     files = by_vrom(rom)
     entries = Bank("message", 0x02000000, 0x00CF9000,
                    files[0x02000000].extract(rom), files[0x00CF9000].extract(rom)).entries()
-    selected = [edit for edit in edits if isinstance(edit.get("provenance"), dict) and
-                edit["provenance"].get("match_basis") ==
-                "identical_complete_native_record_and_unanimous_reference_candidate"]
+    selected = ([edit for edit in edits if edit.get("status") == "draft"] if drafts else
+                [edit for edit in edits if isinstance(edit.get("provenance"), dict) and
+                 edit["provenance"].get("match_basis") ==
+                 "identical_complete_native_record_and_unanimous_reference_candidate"])
     if not selected or len({r["id"] for r in selected}) != len(selected):
-        raise ValueError("Expected unique native message aliases")
+        raise ValueError("Expected unique selected messages")
     actions = [{"wait": 8}, {"save_state": True}, {"command": "?"}]
     data = 0x80197400
     for edit in selected:
+        if not edit["id"].startswith("message:"):
+            raise ValueError("Native message test cannot load another bank")
         number = int(edit["id"].split(":")[1], 16)
         entry = entries[number]
         if entry != encode(edit["translation"], info) or len(entry) > 0x400:
-            raise ValueError("Built ROM differs from its complete message alias candidate")
+            raise ValueError("Built ROM differs from its complete selected message")
         actions += [{"write": [f"{data-16:08X}", (b"G"*0x440).hex()]},
                     {"call": {"address": "8009E558", "arguments": [data, number, 0], "expect_return": 1}},
                     {"read": [f"{data:08X}", 16+len(entry)],
@@ -45,10 +48,11 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--source-rom", type=Path, default=Path("local/rom/Doubutsu no Mori (Japan).z64"))
     parser.add_argument("--translations", type=Path, required=True)
+    parser.add_argument("--drafts", action="store_true", help="Test original drafts instead of native aliases")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     info = module_command_info(verified_rom(args.source_rom.read_bytes()))
-    actions = scenario(args.rom.read_bytes(), json.loads(args.translations.read_text()), info)
+    actions = scenario(args.rom.read_bytes(), json.loads(args.translations.read_text()), info, drafts=args.drafts)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"actions": len(actions), "output": str(args.output)}))

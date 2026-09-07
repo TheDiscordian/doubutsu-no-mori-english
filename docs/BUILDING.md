@@ -85,8 +85,9 @@ See [coverage classification](../specs/TEXT_COVERAGE.md).
 Reviewed reference identities live in `translations/reference_matches.json`.
 The candidate generator's `--matches` option selects another explicit record
 file when needed. Identity overrides do not bypass runtime or control checks.
-The default original edits comprise `translations/opening.json` and
-`translations/n64-exercise.json`. Repeat `--drafts <file>` to select a different
+The default original edits comprise `translations/opening.json`,
+`translations/n64-exercise.json`, and `translations/n64-intro-jobs.json`.
+Repeat `--drafts <file>` to select a different
 explicit set; duplicate IDs fail instead of silently overwriting each other.
 
 `tools/emulator_smoke.py` requires ares, Xvfb, FFmpeg, X11, and XTest. Pass an

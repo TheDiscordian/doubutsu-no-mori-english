@@ -1,0 +1,13 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.45},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"key": "s", "duration": 0.75},
+  {"wait": 4},
+  {"capture": "greeting-nearest-home.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_villagers": true},
+  {"save_state": true}
+]

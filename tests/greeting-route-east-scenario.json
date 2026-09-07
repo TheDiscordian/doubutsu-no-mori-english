@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.16},
+  {"wait": 1},
+  {"key": "g", "duration": 0.95},
+  {"wait": 4},
+  {"capture": "greeting-east-first-acre.png"},
+  {"snapshot_player": true},
+  {"key": "g", "duration": 0.95},
+  {"wait": 4},
+  {"capture": "greeting-east-second-acre.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_villagers": true},
+  {"save_state": true}
+]

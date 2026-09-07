@@ -1,5 +1,17 @@
 [
   {
+    "id": "nook_planting_complete",
+    "evidence": "Native and GameCube 07F9 acknowledge the finished planting job, comment on the player's planting choices, assign the same 80-Bell wage toward the mortgage, and consider the next task. Normal native gameplay reaches this exact record after all seven supplied flower seeds and three saplings are consumed. The English reference repeats the existing 09 emotion tuples 000015 and 0000FF during the mortgage-payment aside; it adds no new actor argument or gameplay command. Keep the complete GameCube text, line/page breaks, pauses, and native end 01. Do not weaken the general command policy for other records. Native loading and ordinary traversal of the English record remain required.",
+    "members": [
+      {
+        "id": "message:07F9",
+        "source_sha256": "a9811d970685623f1b11504038a21aebcbd1e68a7289346d08e03665231702ff",
+        "reference_sha256": "43a0fe5f0d163141fe495c45781720734d1af2eef1efd96bc666d997f591ff65",
+        "encoded_sha256": "43a0fe5f0d163141fe495c45781720734d1af2eef1efd96bc666d997f591ff65"
+      }
+    ]
+  },
+  {
     "id": "nook_home_explanation",
     "evidence": "The Japanese root includes the complete home, gyroid, and save explanation. The GameCube splits the equivalent explanation into three N64 opening-reserve slots. Keep the exact GameCube presentation and the original final choice-index mapping. Actor emotion argument tuples remain drawn from the original root. See specs/REFERENCE_SEQUENCES.md; runtime traversal and both choice paths remain required.",
     "members": [

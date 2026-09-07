@@ -708,6 +708,43 @@
   work uniform remains equipped. The player returns toward Nook through normal
   movement. FlashRAM save/reload and subsequent jobs remain unverified.
 
+### Planting acknowledgement and native greeting-job instructions
+
+- `smoke-message-alias-full-01` passes all 225 recorded steps and all ten
+  train-to-town acceptance checks in six minutes twenty seconds. Memory guards
+  remain intact and cartridge FlashRAM remains blank; this is not save evidence.
+- Normal space-build gameplay re-enters Nook's shop and reaches planting
+  acknowledgement `07F9`, followed by greeting request `0821` and reminder
+  `0822`. The first is confirmed equivalent to the GameCube record apart from
+  repeated existing actor-emotion tuples. Its one-record approval preserves the
+  entire English reference, all page breaks/pauses, and native continuing end.
+  `smoke-plant-complete-native-01` passes 28 loading/termination/guard steps.
+  That intermediate ROM SHA-256 is
+  `1ba37819abf26f457aa98166853da239e5d0567c7b0bd69441e090da7da2febc`;
+  its UPS SHA-256 is
+  `02adf10b989990ad2952b0a25b7e9d96ee0b7bacf16099955e1581027713b16c`.
+- Added original N64-specific drafts for `0821` and `0822`. The GameCube text
+  adds mayor/wishing-well instructions, and the legacy substitutes shrine wording;
+  neither occurs in the native source instructions. The drafts preserve every
+  native command, field, pause, page transition, and ending. Full English actor
+  traversal remains. These drafts join the default candidate inputs.
+- The intro-jobs build contains 10,406 edits, including 9,151 reference dialogue
+  candidates and nine original dialogue drafts. Its final main-bank audit finds
+  2,592 records without candidates, including 1,661 Japanese texts. The resident
+  module and 649-slot item resource are unchanged. ROM SHA-256:
+  `ea018a215c2ab7c58b1c1bb3def18cf1d481adf8c6cb53b097204ae0ddc48060`.
+  UPS SHA-256:
+  `5d890fc786e35b35ea7cee38217d9144d77d2cf3a7f46f52fa23f110cebdd316`.
+  `smoke-intro-jobs-native-01` passes 59 recorded steps, loading all nine original
+  drafts with complete-content and adjacent/module guards. All 139 tests pass.
+- Added read-only native resident/home observations with population, ID,
+  duplicate, finite-coordinate, and complete-read guards. The isolated town has
+  six villagers. `smoke-space-greeting-outside-01` exits the shop and records
+  all six homes in 13 steps. `smoke-space-greeting-east-01` records eleven
+  navigation steps toward the nearest home. Recorded list positions are not
+  asserted to be live on-screen actors; no schedule, greeting, or position is
+  edited. Meeting villagers and actual FlashRAM saving remain open.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

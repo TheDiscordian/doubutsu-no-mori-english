@@ -80,7 +80,8 @@ def main():
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
-    drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json")])
+    drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
+                                       Path("translations/n64-intro-jobs.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     matches = load_matches(args.matches)
     verify_native_equivalents(matches, source_banks)

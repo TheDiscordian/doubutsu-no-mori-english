@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"key": "w", "duration": 0.12},
+  {"wait": 1},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"capture": "planting-report.png"},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true}
+]

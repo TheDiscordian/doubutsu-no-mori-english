@@ -48,3 +48,18 @@ The snapshot reports IDs, conditions, and balances only. It does not create item
 change clothes, reduce the loan, or write save data. Scenario assertions can verify
 these observations after actual controller actions, including uniform selection
 and planting. Emulator checkpoints are still distinct from FlashRAM saves.
+
+## Read-only village records
+
+`snapshot_villagers` reads the population limit at common offset `18`, fifteen
+`Animal_c` records at `9F18` with stride `528`, and fifteen `NpcList` records at
+`10160` with stride `38`. The pinned headers and native animal lookup/list
+construction define these offsets. Report each populated villager ID, name ID,
+personality, home acre/unit coordinates, and home/move-in flags. Matching list
+records add home and recorded world positions. Reject impossible population
+limits, duplicate/out-of-range villager IDs, nonfinite coordinates, and short
+reads. Non-villager slots are ignored.
+
+Recorded `NpcList` positions can differ from currently visible actor positions;
+they guide navigation but do not prove an actor is present. The observation does
+not change greetings, friendship, schedules, homes, or progression flags.

@@ -175,7 +175,7 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 7)
+        self.assertEqual(len(edits), 8)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",

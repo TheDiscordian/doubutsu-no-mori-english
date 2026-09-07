@@ -231,6 +231,41 @@ def inventory_snapshot(debug):
             "cloth_item": f"{cloth_item:04X}", "read_only": True}
 
 
+def villagers_snapshot(debug):
+    """Observe native village/home records; never mark greetings or move actors."""
+    common = 0x80126EA0
+    maximum = debug.read_memory(common+0x18, 1)[0]
+    if maximum > 15:
+        raise ValueError("Invalid native village population limit")
+    animals = debug.read_memory(common+0x9F18, 15*0x528)
+    listing = debug.read_memory(common+0x10160, 15*0x38)
+    residents, seen = [], set()
+    for slot in range(15):
+        at, live = slot*0x528, slot*0x38
+        npc = struct.unpack_from(">H", animals, at)[0]
+        if npc >> 12 != 0xE:
+            continue
+        if npc & 0xFFF >= 216 or npc in seen:
+            raise ValueError("Invalid or duplicate native villager ID")
+        seen.add(npc)
+        home = animals[at+0x4E0:at+0x4E5]
+        resident = {"slot": slot, "npc_id": f"{npc:04X}", "name_id": animals[at+0x0A],
+                    "personality": animals[at+0x0B],
+                    "home": dict(zip(("type", "acre_x", "acre_z", "unit_x", "unit_z"), home)),
+                    "is_home": animals[at+0x524], "moved_in": animals[at+0x525]}
+        listed_npc, field = struct.unpack_from(">2H", listing, live)
+        if listed_npc == npc:
+            coordinates = struct.unpack_from(">6f", listing, live+4)
+            if not all(math.isfinite(value) for value in coordinates):
+                raise ValueError("Invalid recorded villager coordinates")
+            resident.update(home_position=dict(zip(("x", "y", "z"), coordinates[:3])),
+                            recorded_position=dict(zip(("x", "y", "z"), coordinates[3:])),
+                            field_id=f"{field:04X}", appear_flag=listing[live+0x1C])
+        residents.append(resident)
+    return {"villagers": residents, "population_limit": maximum, "read_only": True,
+            "position_source": "native NpcList; not a guarantee of current on-screen actor position"}
+
+
 def keyboard_snapshot(debug):
     """Locate the English-first overlay in four-MiB RAM and read its state."""
     marker = bytes.fromhex("A0660000A0660001A060000224190300A4790004A4780006")
@@ -480,6 +515,8 @@ def main():
                 for field, expected in action.get("expect_inventory", {}).items():
                     if snapshot.get(field) != expected:
                         raise ValueError(f"Inventory {field}: {snapshot.get(field)!r}, expected {expected!r}")
+            if action.get("snapshot_villagers"):
+                results.append(villagers_snapshot(debug))
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 results.append(snapshot)
