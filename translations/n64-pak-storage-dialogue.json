@@ -1,0 +1,228 @@
+[
+  {
+    "id": "message:08DF",
+    "source_sha256": "beff67ffde72eef973655f889a689080b3d97febeef410d448d9baba3af8d28f",
+    "translation": "{cmd:7F090000FF}Is there anything else\n{cmd:7F0900000B}I can help you with?{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B5}{cmd:7F101BE7}{cmd:7F1108B3}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Pelly follow-up retains the native three choices and exact branches; do not add the GameCube e-Reader service. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08E0",
+    "source_sha256": "94c273f0883795a3c0f58f493685168b7c4b569f148e20062a1b3bbbff4faab6",
+    "translation": "{cmd:7F09000016}So,{cmd:7F0302} anything else?{cmd:7F030A}\n{cmd:7F05969696}{cmd:7F5100}(Hurry up, will you!){cmd:7F5101}{cmd:7F09090001}{cmd:7F17005B009D0015}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08B6}{cmd:7F101BE7}{cmd:7F1108B4}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis follow-up retains three choices, inner voice, and the native 1BE7 target. The supplied legacy changes that target to 1BE8; this draft does not change native flow or add the GameCube fourth service. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08E7",
+    "source_sha256": "a20dd6b0a10a1134a98e91ef1fc69219859cb49a587fd918eb6c72974b43f0c5",
+    "translation": "{cmd:7F090000FF}To store your letters,{cmd:7F0308}\n{cmd:7F09000017}you need a {cmd:7F50198CDC0E}Controller Pak.\nI'm sorry.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Please{cmd:7F0308}\nconnect a {cmd:7F50198CDC0E}Controller Pak,\nthen{cmd:7F09000015}{cmd:7F0308}\ncome see me again.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Missing-Pak instruction, not read failure or corrupt data. The legacy English wrongly implies unreadable/corrupt storage. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08E8",
+    "source_sha256": "4eb37bb16da90d6908bb3469461b3c436d8a253655ef87c5ee52e4fb146a5514",
+    "translation": "{cmd:7F0900000F}Hey,{cmd:7F0308} your {cmd:7F50198CDC0E}Controller Pak{cmd:7F0304}\nisn't plugged in!{cmd:7F0310}\nNo, no.{cmd:7F0306} I can't do this.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}If you want to store mail,{cmd:7F030C}\nconnect a {cmd:7F50198CDC0E}Controller Pak,\nthen{cmd:7F0308}\ncome back, all right?{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Sorry{cmd:7F0306}\nfor the trouble.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(It's common sense!){cmd:7F5101}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis missing-Pak error retains the common-sense inner remark; do not confuse absent storage with an unreadable Pak. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08EB",
+    "source_sha256": "30c0111c7b86ec82978b2cbaa1587338f009d7d72d1a4620515e0d8f8baea0ef",
+    "translation": "{cmd:7F09000017}There isn't enough space{cmd:7F0308}\nto save your letters.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}Would you like to manage\nyour {cmd:7F50198CDC0E}Controller Pak data{cmd:7F0308}\nto make some room?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BE7}{cmd:7F1008ED}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Not enough free data space; retain Yes/Never mind and native 1BE7/08ED targets. Keep this distinct from the separate full-note-directory error. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08EC",
+    "source_sha256": "89f2ae6a186f9ff6f6cc95c75181b0a365013320f07be08f13c27d46253c1c92",
+    "translation": "{cmd:7F0900000F}Oh, great.{cmd:7F0306}\n{cmd:7F05969696}{cmd:7F5100}(Tch!){cmd:7F5101}{cmd:7F030E}\nThere isn't enough space{cmd:7F0308}\nto save your letters.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}This won't work.{cmd:7F030C}\nWhat'll it be?{cmd:7F0308}\n{cmd:7F0900000B}Manage your {cmd:7F50198CDC0E}Controller Pak\ndata{cmd:7F0308} to make some room?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BE8}{cmd:7F1008EE}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis insufficient-capacity error retains the inner voice, choice IDs, and exact 1BE8/08EE targets. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08ED",
+    "source_sha256": "b1bc2734c8ad74f74b5c7ff371adf099c73472da28053baefd16fd230fabba7a",
+    "translation": "{cmd:7F09000017}Unfortunately,{cmd:7F0308}\n{cmd:7F090000FF}I can't store them like this.{cmd:7F0308}\n{cmd:7F09000015}Please come back later.{cmd:7F0308}\nI'm sorry.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Pelly cannot store letters in the current condition and asks the player to return; preserve the native ending and expression sequence. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:08EE",
+    "source_sha256": "a0a297a451cf62e26da36c5a6fbeca63940076f1b5c04707bbb945846f6e97bf",
+    "translation": "{cmd:7F09000016}I can't store your letters{cmd:7F0304}\nlike this.{cmd:7F0308} Sorry,\nbut come back later.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(Get it together!){cmd:7F5101}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis refusal retains the native get-it-together inner remark and exact commands, unlike the altered legacy expression/scale sequence. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BD5",
+    "source_sha256": "2c25c1abd1c28e7b9d2d2812ac94183c5c4db1c64f707ac42f853c83604fd1f8",
+    "translation": "{cmd:7F09000017}I'm sorry,{cmd:7F0308}\nbut your {cmd:7F50198CDC0E}Controller Pak\n{cmd:7F090000FF}couldn't be read.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Please{cmd:7F0306}\ncheck the connection{cmd:7F0308}\nand try again.{cmd:7F0308}\nI'm very sorry.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly read failure, not absent-Pak or capacity failure; the legacy replaces this native message with a bare terminator. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BD6",
+    "source_sha256": "d942b3994afb6fd9ae28620679624f95e2007080fe091aef974f26651ceaf9d1",
+    "translation": "{cmd:7F09000016}Well,{cmd:7F0304} your {cmd:7F50198CDC0E}Controller Pak\ncouldn't be read.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Sorry,{cmd:7F0306}\nbut check the connection\nand try again.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(It's not my fault!){cmd:7F5101}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis read failure with the not-my-fault inner voice; restores a native message absent from the legacy English. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BD9",
+    "source_sha256": "cbd7fa567d20e10263b54fcd0ab60dde59431a98dc583f85741dc9ec1a13bab2",
+    "translation": "{cmd:7F09000017}Your {cmd:7F50198CDC0E}Controller Pak{cmd:7F0308}\nhas no free note slots.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}Would you like to manage\nyour {cmd:7F50198CDC0E}Controller Pak data{cmd:7F0308}\nto free a note slot?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08E9}{cmd:7F1008ED}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Full note directory, distinct from free-byte capacity. Preserve the native 08E9 acceptance and 08ED cancellation targets. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDA",
+    "source_sha256": "ea60f77819c174a009d80e394a581f7fc5e18552d18c0af6ccbd8dcce00b1fd1",
+    "translation": "{cmd:7F0900000F}Oh, great.{cmd:7F0306}{cmd:7F05969696}{cmd:7F5100}(Tch!){cmd:7F5101}{cmd:7F030E}\nYour {cmd:7F50198CDC0E}Controller Pak{cmd:7F0308}\ncan't hold any more notes.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}This won't work.{cmd:7F030C}\nWhat'll it be?{cmd:7F0308}\n{cmd:7F0900000B}Manage your {cmd:7F50198CDC0E}Controller Pak\ndata{cmd:7F0308} to free a note slot?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F08EA}{cmd:7F1008EE}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis cannot create another Pak note; retain native 08EA/08EE choices and inner voice. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDB",
+    "source_sha256": "a6166c6f55bed7e5d3da5800ad6ccb461f95e97ddfc565f913353e557e40b75a",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Oh, dear!{cmd:7F0314}{cmd:7F090000FF}\nYour {cmd:7F50198CDC0E}Controller Pak\nappears to be damaged.{cmd:7F04}\n{cmd:7F02}Repairing the {cmd:7F50198CDC0E}Controller Pak\ncould{cmd:7F0306}\ncause saved data\nto be lost.{cmd:7F04}\n{cmd:7F02}Would you like to repair\nthe {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nanyway?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BDD}{cmd:7F101BDF}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly repair confirmation explicitly warns that saved data may be lost, before the existing Yes/Never mind choices. No repair action is added or executed by the translation test. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDC",
+    "source_sha256": "5a282b7b4ccf03ab2bf413eae42effc9a2f351adde8fc59d0c289c4a39db1d21",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Oh,{cmd:7F0304} great!{cmd:7F0314}{cmd:7F090000FF}\nThis {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nlooks damaged!{cmd:7F04}\n{cmd:7F02}Repairing the {cmd:7F50198CDC0E}Controller Pak\nmight{cmd:7F0306}\nmake some of your\nsaved data disappear.{cmd:7F04}\n{cmd:7F02}Shall I try repairing\nthe {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}\nanyway{cmd:7F0306}?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BDE}{cmd:7F101BE0}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis repair confirmation retains the saved-data-loss warning and exact native repair/refusal branches. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDD",
+    "source_sha256": "e9c07ffc41c810c2e114b7d55f5d6ade8494f2fc6ce8b1ca5d4798af814894de",
+    "translation": "All right.{cmd:7F0304}\nPlease wait while\nI try to repair it.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Repairing...{cmd:7F0308}\n\n{cmd:7F05C35F00}Do not remove\n{cmd:7F05C35F00}the Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Pelly repair-in-progress notice keeps the device-removal warning, native 59:04 and actor row-nine action, and final return. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDE",
+    "source_sha256": "c282523686f577c17701df9c104a7865955ee1314361e26b155715449ed665b0",
+    "translation": "All right,{cmd:7F0308}\nwait here while\nI try to repair it.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Repairing...{cmd:7F0308}\n\n{cmd:7F05C35F00}Do not remove\n{cmd:7F05C35F00}the Controller Pak!{cmd:7F5904}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis repair-in-progress notice preserves all original actions, timing, and the no-removal warning. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BDF",
+    "source_sha256": "b7131160dadb0f4f3d9efc06bf106ca3d0dbbcc33a78e4a6f7b712483507ebd6",
+    "translation": "I understand.{cmd:7F04}\n{cmd:7F02}I'm sorry,{cmd:7F0308}\nbut please connect\nanother {cmd:7F50198CDC0E}Controller Pak,\nthen{cmd:7F09000015}{cmd:7F0308} come see me again.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly repair refusal requests another Pak and another visit; no format/delete action or implicit approval is added. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE0",
+    "source_sha256": "b347a4a1ec259c4176530f7d12b965e8748c659d5dcb5b3e3575e83729e0be6d",
+    "translation": "Oh,{cmd:7F0306} all right.{cmd:7F04}\n{cmd:7F02}Then, sorry,{cmd:7F0308}\nbut connect another\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F0308}\nand come back again.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis repair refusal requests a different Pak and a later visit. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE1",
+    "source_sha256": "db7bec856506295436297424e6346a2d594733b50b799b55a4b2b0546e75dabd",
+    "translation": "{cmd:7F09000015}The repair is complete.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Now,{cmd:7F0306}\nlet's continue.{cmd:7F04}{cmd:7F09090001}{cmd:7F0E08E9}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Pelly repair success continues through the exact native actor request and branch 08E9. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE2",
+    "source_sha256": "b0d7c8edae654fa3855ec7890f660b175146bf75de84f3730042453e6f281aab",
+    "translation": "{cmd:7F09000015}The repair{cmd:7F0308} is done.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Now,{cmd:7F0306}\nlet's get on with it.{cmd:7F04}{cmd:7F09090001}{cmd:7F0E08EA}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Phyllis repair success continues through the exact native actor request and branch 08EA. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE3",
+    "source_sha256": "0dfab3ce963d936e6aa6e61ff07fefa2754b6cb7ac942d0ec46aab0ad4653042",
+    "translation": "{cmd:7F09000017}Unfortunately,{cmd:7F0308}\nyour {cmd:7F50198CDC0E}Controller Pak\n{cmd:7F090000FF}couldn't be repaired.{cmd:7F04}\n{cmd:7F02}Would you like to try\nrepairing the\n{cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}{cmd:7F0900000B}\nagain?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BDD}{cmd:7F101BDF}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly failed repair offers the same native retry/refusal branches; no false claim that data was restored. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE4",
+    "source_sha256": "8a2d3981f337af1a3d8e69b585ef0a120503776a4c84cb859cb349748b24b067",
+    "translation": "{cmd:7F09000016}Well,{cmd:7F0304} the {cmd:7F50198CDC0E}Controller Pak\nrepair{cmd:7F030C}\ndidn't work.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(It's not my fault!){cmd:7F5101}{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}What now?{cmd:7F030C}\nShall I try repairing\nthe {cmd:7F50198CDC0E}Controller Pak{cmd:7F0306}{cmd:7F0900000B}\nagain?\n{cmd:7F160003000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1BDE}{cmd:7F101BE0}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis failed repair preserves the inner remark and original retry/refusal choices. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE5",
+    "source_sha256": "e5d17c3d4639b0f9b1de68d204fa20848c380a47506c798678e151114bf57397",
+    "translation": "{cmd:7F09000017}Please don't remove\nthe {cmd:7F50198CDC0E}Controller Pak\n{cmd:7F090000FF}while I'm using it.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Please{cmd:7F0306}\ncheck the connection{cmd:7F0308}\nand try again.{cmd:7F0308}\nI'm sorry.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly mid-operation removal error, not an ordinary absent or damaged Pak; requests checking the connection and retrying. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE6",
+    "source_sha256": "5a97f062ef7c4de988414e42c073bfbc03042c601ae71f3f2e436ca797f8d069",
+    "translation": "{cmd:7F09000016}Hey!{cmd:7F0304} Don't remove\nthe {cmd:7F50198CDC0E}Controller Pak\nwhile I'm using it!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Sorry,{cmd:7F0306}\nbut check the connection\nand try again.{cmd:7F0308}\n{cmd:7F05969696}{cmd:7F5100}(Do it properly!){cmd:7F5101}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis mid-operation removal error retains the inner remark, connection advice, and native return. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE7",
+    "source_sha256": "8d1ca4cbb96654777ba27ed9d20dc9c665a7eed79320b74675ac1fbda7ef4342",
+    "translation": "{cmd:7F09000015}All right,{cmd:7F0304} I'll check\nyour {cmd:7F50198CDC0E}Controller Pak.{cmd:7F0304}\nPlease wait a moment.{cmd:7F09090001}{cmd:7F04}{cmd:7F09090002}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Pelly Pak-check notice retains both row-nine actions, wait, and script return. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  },
+  {
+    "id": "message:1BE8",
+    "source_sha256": "8140669cd7f09d44c612052308e7498ac282419f2e293fdf7b942f2f0ae2d461",
+    "translation": "{cmd:7F090000FF}All right,{cmd:7F0304} let me look\nat your {cmd:7F50198CDC0E}Controller Pak.{cmd:7F0304}\nJust wait here.{cmd:7F09090001}{cmd:7F04}{cmd:7F09090002}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Phyllis Pak-check notice retains both row-nine actions, wait, and script return. Preserve every native command and argument, except Controller Pak colour counts change from nine Japanese glyphs to fourteen English letters/spaces where present."
+  }
+]

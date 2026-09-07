@@ -3348,6 +3348,83 @@
   batches, other string/name/mail destinations, normal gameplay and saves,
   final wording/layout, patch-only release, and artwork/keyboard stretch work.
 
+## 2026-09-07 — Native Pak storage and carp/fireworks dialogue
+
+- Added 26 original post-office/Pak drafts and 25 carp/fireworks drafts in
+  `translations/n64-pak-storage-dialogue.json` and
+  `translations/n64-carp-fireworks.json`. Fifty fill missing messages; `0BC4`
+  deliberately corrects an existing English candidate with the wrong topic.
+  All other 10,879 previous edits remain unchanged. The precise message lists,
+  retained meanings, and test boundaries are in `specs/PAK_FESTIVAL_DIALOGUE.md`.
+- The legacy `08E7/08E8` confuses an absent Pak with unreadable/corrupt storage;
+  several later errors are bare terminators. The new drafts distinguish absent
+  hardware, read failure, free-byte capacity, note-directory slots, removal,
+  repair confirmation/progress/success/failure, and checking. Data-loss warnings
+  precede the original repair choices. The service menus keep three choices,
+  both native `1BE7` storage targets, and no GC-only fourth action. Phyllis's
+  grey inner voice and all native repair/continuation requests remain.
+- The only changed control arguments are exact colour counts from nine glyphs
+  to fourteen for `Controller Pak`. Every other original command and argument
+  stays exact. Final Pak expansion bounds in draft-file order are
+  `106 115 181 280 184 244 122 128 167 170 189 251 263 273 149 147
+  131 122 91 96 198 227 165 180 114 112`. All fit without layout warnings.
+- Carp drafts preserve the father/mother complaint, waterfall symbolism,
+  storage-space remarks, inedible streamers, hungry Tango/Dango confusion, and
+  backbone joke. `0B98` retains its tunnel-game choices and both branches;
+  corrected `0BC4` restores entering the tail, appearing from the mouth, and
+  the grown-up joke while retaining native quest request `0C:05:0066`.
+  Existing `0BC3`, fireworks replies `182F/1830`, and Pak continuations
+  `08E9/08EA` are reviewed and left unchanged.
+- Fireworks drafts preserve August, weekly Saturdays, 7:00 p.m., and the pond
+  wherever native text states them. Native `2823` explicitly describes viewing
+  from the shrine plaza; that distinction remains. All festival commands and
+  arguments are exact. Focused layout validation caught an overwide new line
+  in `119E`; shortened that original draft line without changing any command.
+  Generic town-width warnings in `27C2/2816` stay visible. Separate checks using
+  the native six-fullwidth-cell town limit pass every draft; no reflow or
+  warning suppression is introduced.
+- All eight focused tests pass. The complete suite passes 485 tests in
+  198.850 seconds in `build/tests-pak-festivals-full-01.log`. Basic candidate
+  generation completes with 10,246 edits and all 51 new/corrected drafts;
+  the five existing date-dependent drafts remain appropriately withheld.
+- `build/smoke-pak-festivals-01/` passes 56 complete cartridge-loader calls,
+  170 assertions, and 289 recorded steps in a fresh silent four-MiB process.
+  The run includes every edited record and the five connected unchanged
+  replies above. Complete headers/text, adjacent/module guards, checkpoint
+  restoration, graceful shutdown, and blank 131,072-byte FlashRAM pass.
+  Both test save-write permissions are false. These calls only load text;
+  they do not execute repair, deletion, storage menus, seasonal selection,
+  normal actions, normal saves, or real-console tests. No unchanged train,
+  resident-selector, or mail batch is repeated.
+- Final ROM `build/pak-festivals-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `3705072e0d6ce916d7ec812fedaf02fb22f18989d3c44c99077695bad1fc6b85`.
+  UPS SHA-256 is
+  `7d86d9589d9203b02d5266fd4586414814cbeb60c043db4bf41fe0c1faf9e9df`;
+  applying it to the verified original reconstructs the complete new ROM.
+  Comparison of every extracted DMA file against the native-context pilot
+  finds changes only in main text `02000000`, pointers `00CF9000`, and DMA
+  directory rows. The directory container's other bytes, executable code,
+  overlays, fonts, runtime resources, and save structures remain unchanged.
+- The candidate file contains 10,930 edits: 9,542 reference main candidates
+  plus 143 original main drafts give 9,685 main candidates. The 2,067 unfilled
+  records comprise 1,136 Japanese static records, nine placeholders, 919
+  without static text, one Latin record, and two number/symbol records.
+  Ten command-only records contain dynamic insertions. The 2,068 reference
+  rejections contain 1,673 unconfirmed identities, 320 control differences,
+  69 missing fields, and six overflows. There are 1,435 conservative reference
+  layout warnings, 41 aliases, and 68 alias conflicts. None of these counts
+  establishes final semantic review, reachability, or gameplay acceptance.
+- Regenerated both read-only review queues against the new candidate file.
+  The same-ID comparison pool remains empty, with 1,466 lacking visible
+  same-ID English, 102 requiring fields, 36 control differences, eight
+  overflows, 36 native non-static records, 24 glyph failures, one encoding/hash
+  uncertainty, and the separately classified original fallback. The expression
+  pool still contains fourteen unapproved special-context messages. Reports
+  are in `build/pak-festivals-{identity,expression}-review/`; coverage is in
+  `build/pak-festivals-coverage/`. Native-only/cross-ID content, control/field
+  work, wider destinations, normal gameplay/save validation, final review,
+  release preparation, and both stretch goals remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

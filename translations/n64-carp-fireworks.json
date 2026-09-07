@@ -1,0 +1,202 @@
+[
+  {
+    "id": "message:0B97",
+    "source_sha256": "18d86666504fb9259a117f43d55afe49ab7c4a5ad5e51a5a5e4a33e48f6fd91b",
+    "translation": "{cmd:7F0900000B}Seen them?{cmd:7F0308} The carp streamers!{cmd:7F04}{cmd:7F09000014}{cmd:7F030F}\nThey're magnificent{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}But{cmd:7F0304} in the streamer song,{cmd:7F0308}\nthere's a father,\nbut there's no mother,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000002}{cmd:7F0308}Discrimination!{cmd:7F0306}\nThat's discrimination!{cmd:7F030C}\n{cmd:7F09000016}Don't you agree?{cmd:7F04}\n{cmd:7F02}Whose conspiracy\nis this, anyway?{cmd:7F0308}\nI won't stand for it!{cmd:7F0306}\n{cmd:7F1C}!!!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Carp-streamer song mentions a father but no mother; retain the speaker's discrimination/conspiracy complaint without quoting or replacing the song. Preserve every native command and argument."
+  },
+  {
+    "id": "message:0B98",
+    "source_sha256": "55dddb250b7226f1b9aadb7bdfad125ac66710c4aa02e4355861eeed090be170",
+    "translation": "{cmd:7F090000FF}Ever crawled inside\na carp streamer{cmd:7F030C}\n{cmd:7F0900000E}and played tunnels?{cmd:7F030C}{cmd:7F0900000B}\nWell,{cmd:7F0306} {cmd:7F1C}?{cmd:7F1600DC00DB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0BC3}{cmd:7F100BC4}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the carp-streamer tunnel question, native choices 00DC/00DB, and branches 0BC3/0BC4. The negative response is corrected in this same batch. Preserve every native command and argument."
+  },
+  {
+    "id": "message:0BA3",
+    "source_sha256": "d982ec8d5fa53a390ee34b9e4b3fcd4d9d95db6a99a7469e29f8c2a4581bb026",
+    "translation": "{cmd:7F090000FF}Flowers blooming\nin the summer night sky!{cmd:7F04}\n{cmd:7F09000014}Fireworks are gorgeous,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}{cmd:7F0900000F}\n{cmd:7F02}I wonder{cmd:7F0308}\nhow much each one\nof those costs?{cmd:7F04}{cmd:7F09000016}\n{cmd:7F02}No, that's not{cmd:7F0308}\nwhat you should be thinking\nabout while you watch!{cmd:7F0304}\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Fireworks as flowers in the summer sky, a moment of wondering their cost, and a correction that price is not what to think about while watching. Preserve every native command and argument."
+  },
+  {
+    "id": "message:0BA4",
+    "source_sha256": "4bedeb4046cb5855b785a8866aff719e52c3c57e087cc012fa69139651ceb188",
+    "translation": "{cmd:7F090000FF}Morning aerobics\nwear me out,{cmd:7F04}\n{cmd:7F09000015}but I can't be sleepy\nwhen there's a fireworks show!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}This Saturday,{cmd:7F0308}\nit starts at 7:00 p.m.\nbeside the pond,{cmd:7F0308}\nso come along,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}{cmd:7F09000012}\n{cmd:7F02}Or, {cmd:7F1A},{cmd:7F0308}\nare you too busy\nwith a Saturday-night date?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Heh.{cmd:7F030C}\nAs if that would happen.{cmd:7F0308}\nNo need to pretend,\n{cmd:7F030C}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain morning-aerobics fatigue, Saturday 7:00 p.m. fireworks beside the pond, and the teasing date invitation. Preserve every native command and argument."
+  },
+  {
+    "id": "message:119E",
+    "source_sha256": "a5fcb6b7ec684e2eb7e67fb12708860b5ad2d41c04c139a006b45a2c22241099",
+    "translation": "{cmd:7F09000015}Seen the carp streamers yet?{cmd:7F04}\nI've already\nbeen to see them,{cmd:7F0306}\nand they look wonderful!{cmd:7F04}\n{cmd:7F02}You really should\ngo and have a look!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Speaker has seen the impressive carp streamers and encourages the player to visit them. Preserve every native command and argument."
+  },
+  {
+    "id": "message:119F",
+    "source_sha256": "4e18047cd54067179c5cc1a4e0ba0e601cbff48c427294890866cee442abd312",
+    "translation": "{cmd:7F09000004}{cmd:7F0314}Oh, by the way,{cmd:7F0306}\nthe carp streamers\nare up already,{cmd:7F0308} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I looked it up.{cmd:7F0306} Carp swimming\nup waterfalls{cmd:7F0308}\nsymbolise rising in the world.\nThat's why we put them up!{cmd:7F04}\n{cmd:7F02}I had no idea{cmd:7F0306}\nthe streamers had\nthat kind of meaning!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native explanation of carp ascending waterfalls as a symbol of advancement and the speaker's surprise at the streamers' meaning. Preserve every native command and argument."
+  },
+  {
+    "id": "message:11AA",
+    "source_sha256": "b3eeb755831f665d556211e7e59010b9d9037c9ce43486d936de8f427cb3fd96",
+    "translation": "{cmd:7F0900000A}It's finally started!{cmd:7F030C}\nThe fireworks show!{cmd:7F04}\nWe can see it every week{cmd:7F0306}\nfor the rest of this month!{cmd:7F04}\n{cmd:7F02}From now on,{cmd:7F0306}\nwe'll all meet by the pond\non Saturdays,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Weekly fireworks throughout the current month, with Saturday gatherings by the pond; no July 4-only replacement. Preserve every native command and argument."
+  },
+  {
+    "id": "message:11AB",
+    "source_sha256": "2c2b7e09f42e7b589114943e7a0836488714bf3bb507ff2305cf12d303d9ed47",
+    "translation": "{cmd:7F090000FF}Fireworks are amazing!{cmd:7F04}\n{cmd:7F09000017}They're so huge,{cmd:7F0306} yet they\nsoar up and bloom in the sky,\n{cmd:7F0308}{cmd:7F1C}.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Gunpowder can cause\nterrible injuries,{cmd:7F0306}\nyet it can make art\nlike fireworks, too!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Ah,{cmd:7F0306} just talking about it{cmd:7F0304}\nmakes me wish Saturday's\nfireworks show would hurry\nup,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain fireworks' size and beauty, gunpowder's injury risk versus artistic use, and anticipation of Saturday's show. Preserve every native command and argument."
+  },
+  {
+    "id": "message:17FD",
+    "source_sha256": "38767ec392c4e9959141903ad2f22bcbfa38a6de232a7b6e67958c4b1c38083b",
+    "translation": "{cmd:7F090000FF}Hey, hey!{cmd:7F030A}\nHave you {cmd:7F0900000B}seen\nthe carp streamers yet,\n{cmd:7F0308}{cmd:7F1C}?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}They look great\nwaving in the breeze,{cmd:7F0306}\nso go take a look\nif you've got time!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Peppy invitation to see the carp streamers waving in the breeze. Preserve every native command and argument."
+  },
+  {
+    "id": "message:17FE",
+    "source_sha256": "cba652bef0015b548a2ac938a2269571c3cc39730aff1e6d03fe60ddfc94d253",
+    "translation": "{cmd:7F0900000F}Lots of things get used\nonly once a year,{cmd:7F0306}\nbut carp streamers\nare such a waste.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}My place is already\nfull of furniture.{cmd:7F0306}\nWhere would I put them,\n{cmd:7F0308}{cmd:7F1C}?{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Well,{cmd:7F0306} as long as\nthey're displayed outside,\nI don't mind.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Once-yearly streamers seem wasteful and leave no indoor storage space, but outdoor display is acceptable; retain the native furniture-space complaint. Preserve every native command and argument."
+  },
+  {
+    "id": "message:1809",
+    "source_sha256": "3c16ddc85218ba673eaf0f68ef81171cc872a6d1aff6d886ca559cc391de2504",
+    "translation": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F0306}\nhave you ever\n{cmd:7F0900000B}seen the fireworks show?\nWell,{cmd:7F0308} {cmd:7F1C}?{cmd:7F16004C0052}{cmd:7F04}{cmd:7F0D}{cmd:7F0F182F}{cmd:7F101830}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Fireworks attendance question retains native choices 004C/0052 and branches 182F/1830. Existing responses about pond reflections and festival stalls are reviewed and retained. Preserve every native command and argument."
+  },
+  {
+    "id": "message:180A",
+    "source_sha256": "89cc6c31ecc85f9b2993ba742fcd127e4a4f90706ff4eab7432596cc22bc4d30",
+    "translation": "{cmd:7F09000015}This year's fireworks{cmd:7F0306}\nare supposed to be\neven prettier than last year's,\n{cmd:7F0308}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}If you haven't seen them,{cmd:7F0306}\nyou absolutely\nhave to go!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "This year's fireworks are reportedly more beautiful than last year's; encourage attendance. Preserve every native command and argument."
+  },
+  {
+    "id": "message:26FE",
+    "source_sha256": "49119d5b7f890e9bdd38ecabe44619b038c1683b7bcfe2a7f27910c8f8c74097",
+    "translation": "{cmd:7F090000FF}Seen the carp streamers yet?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Same as every year,{cmd:7F0308}\nthey look mighty impressive{cmd:7F0304}\nwaving gracefully up there.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Cranky admiration of the streamers' graceful annual display. Preserve every native command and argument."
+  },
+  {
+    "id": "message:26FF",
+    "source_sha256": "eb217af4fe3d5a4c90d1ff506e007102608bc15f3501c4f1f265e9f89218ba68",
+    "translation": "{cmd:7F090000FF}The carp streamers are up.{cmd:7F0310}\n{cmd:7F09000015}They look like they're\nhaving fun swimming up there.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Carp streamers appear to swim happily in the air. Preserve every native command and argument."
+  },
+  {
+    "id": "message:270A",
+    "source_sha256": "6e5bb601f797efe2f13168cd8736f6de4dd305faee175c7169fddeeba7d26a08",
+    "translation": "{cmd:7F09000015}Fireworks,{cmd:7F0304} fireworks!{cmd:7F0310}\nForget everything else.{cmd:7F0304}\nFireworks come first!{cmd:7F0314}\nAugust means{cmd:7F0304} fireworks!{cmd:7F04}\n{cmd:7F02}I can't wait{cmd:7F0308}\nfor every Saturday!{cmd:7F0314}\n{cmd:7F09000016}I can't{cmd:7F0304} concentrate{cmd:7F0308}\non work or anything else!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain August and every Saturday, with the speaker too excited about fireworks to concentrate on work. Preserve every native command and argument."
+  },
+  {
+    "id": "message:270B",
+    "source_sha256": "da6d408efde8b958454798121c2fa1bd70264405118857c14e7e62f7142bd2fb",
+    "translation": "{cmd:7F090000FF}Hey,{cmd:7F0304} this Saturday,{cmd:7F0308}\nare you going{cmd:7F0304} to the show?{cmd:7F04}\n{cmd:7F02}Same time as always,{cmd:7F0304}\n7:00 p.m.,{cmd:7F0308}\nbeside the pond.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Of course I'm going!{cmd:7F0310}\nNot to brag,{cmd:7F0304}\nbut I've never missed one!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Saturday, 7:00 p.m., pond location, and the boast of never missing a fireworks show. Preserve every native command and argument."
+  },
+  {
+    "id": "message:27C2",
+    "source_sha256": "e555be6cb3c2e8b052cdd5a76d189a7e92b2989facd02e76cc51d6e6f51e3d3f",
+    "translation": "{cmd:7F09000017}I heard {cmd:7F2F}{cmd:7F030C}\nwas getting some huge carp,{cmd:7F030C}\nand I was really\nlooking forward to it.{cmd:7F04}\n{cmd:7F02}But{cmd:7F0306} those carp{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000010}{cmd:7F031E}They weren't the kind\nyou can eat,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Still,{cmd:7F0306}\nthey were big and beautiful,{cmd:7F0306}\nso I didn't really mind,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Town-name field and the hungry resident's carp/streamer misunderstanding remain; the inedible carp are still beautiful. Preserve every native command and argument."
+  },
+  {
+    "id": "message:27C3",
+    "source_sha256": "3240797a2da5ce859b9566b4c960a798040f983d662b90a3f8d60625230e380a",
+    "translation": "{cmd:7F09020003}{cmd:7F09080001}{cmd:7F09000004}{cmd:7F0305}Speaking of that,{cmd:7F0310}\n{cmd:7F09000017}when do we get dumplings?{cmd:7F030C}\nIt's the Dumpling Festival{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the hungry character's deliberate Tango/Dango festival-name confusion as Dumpling Festival, not a real added food event. Preserve both non-expression actor requests. Preserve every native command and argument."
+  },
+  {
+    "id": "message:27CE",
+    "source_sha256": "ed8ef245bb1a06b9cf5f86336f72d7e497c6c4ac24f795f834c00329f822d295",
+    "translation": "{cmd:7F09000015}We get to see fireworks\nevery Saturday night,{cmd:7F0308}\nso{cmd:7F04}\n{cmd:7F02}all through August,{cmd:7F0306}\nI sleep so well,{cmd:7F0306}\nI even have dreams!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}But for some reason,{cmd:7F030C}\nI'm always dreaming\nabout morning aerobics{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "August Saturday fireworks lead to sound sleep, but the dreams are inexplicably always about morning aerobics. Preserve every native command and argument."
+  },
+  {
+    "id": "message:27CF",
+    "source_sha256": "037cf9203f19d9de46b5f5f80ddb607d64dea4756702405991c6a669b101d0e0",
+    "translation": "{cmd:7F090000FF}Fireworks are amazing.{cmd:7F030C}\nJust watching them{cmd:7F0306}\ntakes all my stress away{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Thanks to that,{cmd:7F0308}\nI sleep so well afterward,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}{cmd:7F0308}For a while,{cmd:7F0306}\nthe pond on Saturday nights{cmd:7F030E}\nis my little oasis.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Fireworks relieve stress and improve sleep; the pond on Saturday nights is the speaker's oasis. Preserve every native command and argument."
+  },
+  {
+    "id": "message:2816",
+    "source_sha256": "5ed6c7290f2b737fa5eaf8473bee9872929713e08e1053312ba852d34978b8c2",
+    "translation": "{cmd:7F09000015}The carp streamers\nhave finally come\nto {cmd:7F2F},{cmd:7F0306}\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}They're not food,{cmd:7F0306}\nso don't try eating them!{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Arrival of the town's carp streamers and a joking warning to the named player not to eat them. Preserve every native command and argument."
+  },
+  {
+    "id": "message:2817",
+    "source_sha256": "6ac788663b2643687889a3c139841a891e534d0c31245d567e1735e72ca18e05",
+    "translation": "{cmd:7F090000FF}Have you seen them?{cmd:7F030C}\n{cmd:7F09000015}The carp streamers!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}All that wind,{cmd:7F0306}\nand they don't blow away!{cmd:7F030C}\nThey've really\ngot some backbone!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}All right!{cmd:7F0306}\nI'm going to have\neven more backbone{cmd:7F030C}\nthan a carp streamer!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The streamers' resistance to wind inspires the sporty resident to gain more backbone; retain the fish/backbone joke. Preserve every native command and argument."
+  },
+  {
+    "id": "message:2822",
+    "source_sha256": "b66d0cd77b2f4f0aec7af7f935abaf2e9c6500e4c0195430e2ec2f952950e3fa",
+    "translation": "{cmd:7F09000015}The fireworks show\nI've been waiting for{cmd:7F0306}\nis this month,{cmd:7F0308}\nso I'm excited every day!{cmd:7F04}\n{cmd:7F02}It's on Saturday nights,{cmd:7F0308}\n{cmd:7F0900000E}so every Friday{cmd:7F0306}\nwill feel like a holiday,\n{cmd:7F0306}{cmd:7F1A}!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}{cmd:7F0308}Now{cmd:7F0306}\nI can't wait\nfor Fridays either{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain anticipation of the current month's Saturday fireworks and happy Fridays beforehand; the native hanakin expression is localised as Fridays feeling like a holiday. Preserve every native command and argument."
+  },
+  {
+    "id": "message:2823",
+    "source_sha256": "7fb9c17ba0c8246c6ad9f2408e261f87f2fe2373102a27ae1202944d179a3bd7",
+    "translation": "{cmd:7F09000015}On Saturday nights,{cmd:7F0306}\nI'm hooked on fireworks,{cmd:7F0308}\n{cmd:7F1A}!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}How can I put it{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000007}{cmd:7F0305}They're so energetic,{cmd:7F0303}\neven I'm jealous,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}This Saturday,{cmd:7F030A}\nyou can see them\nfrom the shrine plaza, too.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Go see for yourself!{cmd:7F030C}\nThey're incredible!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the sporty resident's envy and the native shrine-plaza viewing location. Other speakers name the pond; this source specifically says shrine plaza, so its vantage-point wording is not silently replaced. Preserve every native command and argument."
+  },
+  {
+    "id": "message:0BC4",
+    "source_sha256": "694b3f635aeb0e634750727486c0d3b21efccbd9bae9b49e620cdb5a43f0dc42",
+    "translation": "{cmd:7F0C050066}{cmd:7F09000001}Oh, really?{cmd:7F0308}\n{cmd:7F09000016}{cmd:7F1A},\nyou're no fun,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Everyone else{cmd:7F0308}\nclimbs in through the tail\nand pokes their head\nout of the mouth!{cmd:7F04}\n{cmd:7F02}Yoo-hoo!{cmd:7F0308}\nThat's what you say,\n{cmd:7F0308}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}You can't call yourself\na proper grown-up\nuntil you've tried it!{cmd:7F04}{cmd:7F09000016}\n{cmd:7F02}Go on, give it a try!{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing English social-calling response: native 0B98 asks about crawling through a carp streamer, so retain entering the tail, showing the head through the mouth, the shout, and the grown-up joke. All native quest, expression, page, pause, and field commands remain exact. Preserve every native command and argument."
+  }
+]
