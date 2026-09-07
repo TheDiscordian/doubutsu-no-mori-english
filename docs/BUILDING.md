@@ -151,6 +151,13 @@ Tests set controlled in-memory NPC/player/quest state and temporarily clear the
 first-job event; the complete checkpoint must be restored. They do not complete
 introductory jobs or validate FlashRAM saves. See [send integration](../specs/MAIL_NPC_SEND.md).
 
+`tools/audit_mail_storage.py --rom <native-ROM>` records selected status/storage
+functions and Pelly's outstanding failure path. `tools/mail_storage_test_scenario.py
+--rom <built-ROM> --output <ignored-json>` generates isolated metadata, NPC-copy,
+queue, leaflet, and all-home-mailbox probes for a matching-ROM town checkpoint.
+These tests restore all touched storage and the complete checkpoint; they do
+not execute normal inventory interactions or actual saving.
+
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under

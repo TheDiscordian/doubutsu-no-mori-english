@@ -1630,6 +1630,56 @@
   normal delivery, actual save/reload, and original hardware remain required.
   The repository remains private; no ROM, reference asset, or patch is published.
 
+### Native mail metadata/storage validation and Pelly failure audit
+
+- Added a reproducible audit of eight complete native functions: slot occupancy,
+  send/gift predicates, both NPC record conversions, receipt dispatch, queue
+  storage, and home-mailbox copying. Direct-call counts are respectively
+  twenty-six, five, three, one, three, twelve, one, and four. No aligned literal
+  pointers match these selected targets. The audit does not cover every inline
+  metadata access or exclude computed indirect references.
+- `smoke-mail-storage-native-01` passes 140 controlled cases, 217 actual N64
+  calls, 267 assertions, and 656 recorded steps on the unchanged final NPC pilot
+  ROM `ea1129ef7c189c5eecff727a611503c5f37608bb5f2f8143d71e4e2dacdce960`.
+  The matching town checkpoint comes from `smoke-mail-npc-post-full-01`.
+  Both classic and composite letters are restored successfully from the immutable
+  catalog while preparing their source fixtures.
+- The storage cases compare all three native metadata predicates for nine
+  font/status values and ordinary/snapshot split values. They check complete
+  NPC conversion and reverse conversion, including the fact that mail type
+  and absent identity arguments do not transfer from the compact record.
+  The native code retains every envelope byte and the split/status/gift/paper
+  fields without interpreting text.
+- Both leaflet modes preserve their source and update only the selected record
+  and delivery flag. Every one of the five queue positions accepts a complete
+  record and clears its source; a full queue rejects without consuming it.
+  All ten mailbox slots in all four homes accept complete records and retain
+  their source; all four full-mailbox failures preserve their sources/arrays.
+  Neighbouring memory, unrelated post-office fields, and stack/module guards
+  pass. All touched arrays and neighbours are restored locally, then the complete
+  checkpoint is restored. The emulator exits cleanly; FlashRAM remains blank.
+- Traced the actual Pelly actor overlay, not only the English source. Its
+  receive-menu handler at `809C471C..809C4884` calls the receipt function at
+  `809C47C0`, ignores failure, unconditionally selects successful receipt, and
+  clears the staged letter at `809C4828`. Therefore the preceding lower-level
+  failure guard does not establish end-to-end loss prevention. This is a newly
+  identified required fix, not a passing normal-UI result.
+- The existing refusal path copies the staged letter back into the selected
+  player slot at `809C480C`, using submenu slot byte `DF` and current-private
+  mail offset `40A`. A fix must preserve original pocket ownership, return a
+  failed letter, choose an accurate failure message/state, and retain success
+  behaviour. Simply routing corruption to the full-mailbox or unknown-recipient
+  refusal would give a false explanation. Generation remains disabled.
+- Recorded Pelly's complete handler hash
+  `c29e3901cf539f63a16043228bccc787ec14fbf4a58613db350a06f9618b0e73`
+  and overlay hash
+  `a2fe6daee4180fd7fdcbe04cb62e514a8d88067b74bf7e43506f17986c204db6`.
+  Mutation tests preserve the unfixed-failure evidence explicitly. Three targeted
+  tests pass in 0.187 seconds. The initial complete suite passes 283 tests in
+  158.222 seconds before the additional Pelly audit test. The final complete
+  suite passes 284 tests in 155.951 seconds. Detailed inventory,
+  native traces, extracted instructions, and fixture text remain ignored.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -10,6 +10,12 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+Immediate R05 task: fix Pelly's menu-level receipt-failure path without losing
+the staged/player letter or reporting success. The lower-level guard preserves
+its source, but the actor still ignores failure and clears it afterwards.
+The selected native storage paths pass; the normal UI path does not yet.
+See [storage evidence](../specs/MAIL_STORAGE.md). Keep generation disabled.
+
 ## Main translation and runtime
 
 | ID | Task | Status | Acceptance/evidence |

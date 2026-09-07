@@ -764,6 +764,12 @@ def main():
                     raise ValueError('NPC send probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_npc_mail_sends'],record))
+            if 'test_mail_storage' in action:
+                from mail_storage_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Mail storage probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_mail_storage'],record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():

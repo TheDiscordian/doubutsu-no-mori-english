@@ -9,6 +9,11 @@ and the general-string/name/mail destinations. Candidate review remains required
 The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
 
+The immediate mail safety task is Pelly's menu-level failure handling: it ignores
+the receipt result and clears the staged letter even after lower-level rejection.
+The receipt guard alone does not fix that normal UI path. Snapshot generation
+remains disabled. See [storage and failure-path evidence](../specs/MAIL_STORAGE.md).
+
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
 polish follows translation and command handling. The reported atlas-edge defect
@@ -41,7 +46,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 281 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 284 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -289,6 +294,14 @@ user's direction. The production build retains the approved spacing metrics.
   These tests restore isolated checkpoints; normal Pelly interaction, actual
   saving, complete metadata handling, semantic approvals, generation, and lossless
   editing remain. See [complete-letter sending](../specs/MAIL_NPC_SEND.md).
+- Selected metadata and storage paths pass 140 isolated N64 cases, 217 native
+  calls, and 267 assertions. Snapshot markers do not affect slot/send/gift
+  predicates. Both record kinds retain complete contents through NPC conversion,
+  both leaflet slots, all five post-office queue positions, and all ten slots
+  in each of four home mailboxes. Full-storage failures retain their source;
+  leaflet flags, neighbouring memory, and guards pass. The arrays and full
+  checkpoint are restored. These checks do not establish ordinary delivery or
+  save/reload, and Pelly's separate failure path remains unfixed.
 
 ## Current reference candidates
 
