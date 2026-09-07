@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 511 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 519 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -459,17 +459,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/seasonal-topics-pilot/`
-contains 11,013 edits, including
-9,549 reference dialogue candidates, all 460 choices, and 219 original dialogue
+The current experimental resident-module pilot in `build/startup-pak-pilot/`
+contains 11,048 edits, including
+9,549 reference dialogue candidates, all 460 choices, and 254 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,984
+still require review. The original main-bank audit leaves 1,949
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,436 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/seasonal-topics-candidates/` and `build/seasonal-topics-coverage/`. The independent
+`build/startup-pak-candidates/` and `build/startup-pak-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -719,6 +719,18 @@ resources, saved layouts, and event schedules remain unchanged. Ordinary event
 selection, date rendering, shared choice-label wording, and full draft review
 remain gameplay/playthrough work.
 
+The [startup/Pak batch](../specs/STARTUP_PAK_DIALOGUE.md) adds 35 original drafts
+for capacity, write failure, duplicate returns, accepted transfers, cancellation,
+and mid-operation removal. The native overwrite warning stays before confirmation;
+power/removal warnings stay before transfer requests. Start and post-transfer
+targets remain exact. Only five explicit hardware/button highlight lengths
+change. All 519 regression tests and 48 complete cartridge loads pass, including
+thirteen connected unchanged messages, with 146 assertions and checkpoint
+restoration. All new drafts fit without layout warnings in both full and basic
+generation. Every earlier candidate remains unchanged. No storage operation is
+executed by the test; actual startup/travel, confirmation/cancellation, dynamic
+warning rendering, storage recovery, and final wording remain acceptance work.
+
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
 becomes two bounds of 773 and 419 by splitting only at the existing page break
@@ -737,18 +749,19 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 11,013 edits, including
+The resident-module experiment contains 11,048 edits, including
 9,549 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, eighteen native
 community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
-drafts, 47 native service/save drafts, and 29 seasonal-topic drafts. It retains the GameCube calendar wording in Rover's opening
+drafts, 47 native service/save drafts, 29 seasonal-topic drafts, and 35 startup/Pak
+drafts. It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 1,985 main records; one receives an original
-fallback draft. The final candidate-file audit finds 1,984 main records without
-candidates: 1,053 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 1,950 main records; one receives an original
+fallback draft. The final candidate-file audit finds 1,949 main records without
+candidates: 1,018 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

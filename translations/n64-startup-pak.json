@@ -1,0 +1,317 @@
+[
+  {
+    "id": "message:140C",
+    "source_sha256": "3c902d87c76c6eb841e56f050d7369be17593a495c10888f65f509b5a0d7f5b3",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E13F4}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1413",
+    "source_sha256": "f34b9f70be4142836b340745907f4738dd39bcfdcbaa0e9c380c85063b978ed4",
+    "translation": "{cmd:7F09000017}{cmd:7F05C35F00}Unable to write to the\n{cmd:7F05C35F00}Controller Pak.{cmd:7F04}\n{cmd:7F02}We'll return to the title screen.{cmd:7F04}\n{cmd:7F02}Check that the\n{cmd:7F50198CDC0E}Controller Pak is connected\nproperly,{cmd:7F0308}\nPlease try again from the start.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native write failure, not an added GameCube read failure or card-slot request: return to the title screen, check the Controller Pak connection, and restart. Keep both original 05 formatting controls and the native expression. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1415",
+    "source_sha256": "16cc8aadf98029591a905cd9762414f4cb18a0d966a46ca112964081ef0b2d9c",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}Huh?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}Is that all right?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1416}{cmd:7F101417}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1416",
+    "source_sha256": "3d4de799523c8b7c5954acf5d618d73f638ccb0bcf17874b533cf3f342cd15f4",
+    "translation": "All right.{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nPlease wait a moment.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E1407}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1417",
+    "source_sha256": "ba0970770e4cd4ff868a84c5a37f31a55bb3af736b2096e4942209c868da4634",
+    "translation": "So you've changed your mind?{cmd:7F04}\n{cmd:7F02}Please remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E13F4}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1418",
+    "source_sha256": "2d2cc3a963dde7ef7b0a0337e2d3470eaa7abb84b5032957f16fdc083c063876",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Oh!{cmd:7F0312}\n{cmd:7F09000016}Please don't remove the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}Otherwise,{cmd:7F0306}\nI won't be able to tell\nwhat's going on!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}We'll return to the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen try again from the start.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1434",
+    "source_sha256": "e0143199aa8525a1b26b3389852a8b494050837ae59939fece1dd0980465e432",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E141C}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:143B",
+    "source_sha256": "50b035481812829bba7ae9e38310617d6b86725c21f704a6caf9551e49911a5a",
+    "translation": "{cmd:7F09000017}{cmd:7F05C35F00}Unable to write to the\n{cmd:7F05C35F00}Controller Pak.{cmd:7F04}\n{cmd:7F02}I'll send you to the title screen.{cmd:7F04}\n{cmd:7F02}Check that the\n{cmd:7F50198CDC0E}Controller Pak is connected\nproperly,{cmd:7F0308}\nThen try again from the start.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native write failure, not an added GameCube read failure or card-slot request: return to the title screen, check the Controller Pak connection, and restart. Keep both original 05 formatting controls and the native expression. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:143D",
+    "source_sha256": "5dbbc2cba2c2cfb3bbe4614787176513666028415406dd666018bc271aac5991",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}Huh?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}Are you still OK with that?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F143E}{cmd:7F10143F}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:143E",
+    "source_sha256": "3717389efb43b0e83767034a974cb7bf68ada07140a6ebb0689a36ccf53af8ef",
+    "translation": "OK!{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nJust wait a little, OK?{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E142F}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:143F",
+    "source_sha256": "dab601d406c90954e17b6ace2ad50919f2abf71a6fb419b1ef4f00448af5413b",
+    "translation": "So you're changing your mind?{cmd:7F04}\n{cmd:7F02}Then remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E141C}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1440",
+    "source_sha256": "3d10c25a684f1e115a0b0110914f431ecaa664394787719bf00b37acd97f1aff",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Oh!{cmd:7F0312}\n{cmd:7F09000016}Don't remove the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}It would be awful{cmd:7F0308}\nif your precious record\nwere lost!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}I'll send you to the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen try again from the start!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:145C",
+    "source_sha256": "fd903a979795214f62b3a77e2e7b8f917c14061387bdff82843cb6dd8e16cc57",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E1444}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1463",
+    "source_sha256": "76fd43b7650e099e5b7674788a4ffc17f6398b3823390a42ff9560e0fa09ab3f",
+    "translation": "{cmd:7F09000017}{cmd:7F05C35F00}Unable to write to the\n{cmd:7F05C35F00}Controller Pak.{cmd:7F04}\n{cmd:7F02}We'll go back{cmd:7F0308}\nto the title screen for now.{cmd:7F04}\n{cmd:7F02}Check that the\n{cmd:7F50198CDC0E}Controller Pak is connected\nproperly,{cmd:7F0308}\nTry again from the beginning.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native write failure, not an added GameCube read failure or card-slot request: return to the title screen, check the Controller Pak connection, and restart. Keep both original 05 formatting controls and the native expression. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1465",
+    "source_sha256": "5ae1d8bfcea203a9d42ab0bc0a9167403f6a035dc6487f0f07ad713fbd894c86",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}Huh?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}Is that still OK with you?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1466}{cmd:7F101467}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1466",
+    "source_sha256": "858e450a77a3cad735304b5944eecc5a68772b4cc810508834599e4a16022a01",
+    "translation": "Well, if that's what you want.{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nWait here a little while.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E1457}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1467",
+    "source_sha256": "9f2cb4e014250774971c67b66d7db08bc74cd7ecfca90579eaabe312b78616e1",
+    "translation": "So you'd rather not, huh?{cmd:7F04}\n{cmd:7F02}Please remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E1444}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1468",
+    "source_sha256": "4eaaa14231d789cdc37515c3cc40088c9a3ae6c060bab0a5dbb8f38ea85db928",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Oh!{cmd:7F0312}\n{cmd:7F09000016}Please don't pull out the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}I won't know{cmd:7F0306}\nhow far we'd got!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}We'll go back to the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen try again\nfrom the beginning.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1484",
+    "source_sha256": "9468b731b518315befbcda7650cf8e6f1d7d16f1762e011814cfee006a0c3849",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E146C}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:148B",
+    "source_sha256": "c12751613b8a668b12fcf5efb095db9b7e3653df3097d6ed425cb0830d28de84",
+    "translation": "{cmd:7F09000017}{cmd:7F05C35F00}Unable to write to the\n{cmd:7F05C35F00}Controller Pak.{cmd:7F04}\n{cmd:7F02}We're heading back\nto the title screen.{cmd:7F04}\n{cmd:7F02}Check that the\n{cmd:7F50198CDC0E}Controller Pak is connected\nproperly,{cmd:7F0308}\nThen start over, OK?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native write failure, not an added GameCube read failure or card-slot request: return to the title screen, check the Controller Pak connection, and restart. Keep both original 05 formatting controls and the native expression. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:148D",
+    "source_sha256": "bf6721f024226be6b99b0b5c526ef7385aaef771c4e0f2c9db3f6997e33bedb7",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}What's this?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}You're still OK with that?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F148E}{cmd:7F10148F}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:148E",
+    "source_sha256": "df0cca340f87d0379cba79392a9c65cca7220206b1f9f4e0857439d420d72e18",
+    "translation": "All right!{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nHold on a moment!{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E147F}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:148F",
+    "source_sha256": "556a52a4a873fedba668b61be2d5dc60f2aac5fe481d601af91dad38bd9e6d66",
+    "translation": "So you're not going ahead?{cmd:7F04}\n{cmd:7F02}Then remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E146C}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:1490",
+    "source_sha256": "0034b00f9d7da3db2e6c59d9c3545d46cdf04a8d5d888ab4ac13c4ec2ab2fd10",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Hey!{cmd:7F0312}\n{cmd:7F09000016}Don't pull out the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}I won't know\nwhat's going on!{cmd:7F030C}\n{cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}We're going to the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen start over, OK?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14AC",
+    "source_sha256": "aaf4d64daa58c96f756c44cf6fcf2ab50d3a7fc57fc92c440db4ea56bb8ec9f7",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E1494}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B3",
+    "source_sha256": "7c77136424c77a95db67fd27b5036b4244c3f4995ad37b0c1f78ccf0d6c4aa6a",
+    "translation": "{cmd:7F09000017}{cmd:7F05C35F00}Unable to write to the\n{cmd:7F05C35F00}Controller Pak.{cmd:7F04}\n{cmd:7F02}We're going back\nto the title screen.{cmd:7F04}\n{cmd:7F02}Check that the\n{cmd:7F50198CDC0E}Controller Pak is connected\nproperly,{cmd:7F0308}\nThen try again from the start.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native write failure, not an added GameCube read failure or card-slot request: return to the title screen, check the Controller Pak connection, and restart. Keep both original 05 formatting controls and the native expression. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B5",
+    "source_sha256": "411730b00b0db5f5979af2b3641d526bc88fb705b85eff71f1b89010ea3801cb",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}What's going on?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}You're sure that's all right?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F14B6}{cmd:7F1014B7}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B6",
+    "source_sha256": "e2e78923fee20ed8eb03f13294e9f025bba97325f110222c1ffd3ce9d5f0f6c9",
+    "translation": "All right, I understand.{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nJust wait a moment!{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E14A7}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B7",
+    "source_sha256": "bf732cee68019ffa762a35b9086c9d4ab42798fc6e86290f0e595618118790fe",
+    "translation": "So you're backing out?{cmd:7F04}\n{cmd:7F02}Then remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E1494}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14B8",
+    "source_sha256": "4abd9fedec0cddc67d4fe1218c8ef5c7a887edb84badde0e1d932417f3d65922",
+    "translation": "{cmd:7F09000002}{cmd:7F0308}Hey, you!{cmd:7F0312}\n{cmd:7F09000016}Don't pull out the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}Otherwise,{cmd:7F0306}\nI won't know\nwhat's going on!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}We're going back\nto the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen try again from the start.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14D4",
+    "source_sha256": "ef343a5bf3e320abd499a207fc8b2b8d4db50c473670fcbc142a5519f9d5bf9c",
+    "translation": "{cmd:7F50198CDC0E}Controller Pak space\nis insufficient.{cmd:7F04}\nIf you want to use this\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}{cmd:7F50198CDC0E}Controller Pak:\ndelete any data\nyou no longer need,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Hold down the {cmd:7F50BE2D2D0C}START button\nand reset your {cmd:7F50198CDC03}N64.{cmd:7F04}\n{cmd:7F02}This opens the special\nscreen used to delete\nsaved data.{cmd:7F04}\n{cmd:7F02}If you don't want to use a\n{cmd:7F50198CDC0E}Controller Pak,\nremove it from your\n{cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E14BC}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native insufficient-capacity instructions, not a GameCube rumble setting: delete unneeded Pak data through the N64 START/reset manager, or remove the unused Pak, then press A and return to the original start prompt. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14DD",
+    "source_sha256": "5da58dfd8a05b8271756d372f502aea2d120c4760662fd011690c193509c9601",
+    "translation": ".{cmd:7F0304}{cmd:7F0900000B}.{cmd:7F0304}.{cmd:7F0304}Oh, really?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F26} has\nalready come home,{cmd:7F0308}\nyet here's another return!{cmd:7F04}\n{cmd:7F02}If we start with the record\non this {cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}the record for\n{cmd:7F26}\nfrom the earlier return\nwill be erased.{cmd:7F04}\n{cmd:7F02}Are you sure you don't mind?{cmd:7F5E}{cmd:7F160066003D}{cmd:7F04}{cmd:7F0D}{cmd:7F0F14DE}{cmd:7F1014DF}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native duplicate returning player warning: using the Pak record erases the existing record from that player's earlier return. Keep both free-field 26 insertions, the warning before 5E and choices 0066/003D, both native branches, and the 09/9/0001 request. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14DE",
+    "source_sha256": "3675cce363b484c54ec0f9b304ad7056f9a29cf9778f930a18d0824d508f73e2",
+    "translation": "Well, if you're sure.{cmd:7F0308}\nI'll copy the record from your\n{cmd:7F50198CDC0E}Controller Pak to the {cmd:7F50198CDC09}cartridge.\nWait here a moment.{cmd:7F031E}\n{cmd:7F02}{cmd:7F05C35F00}Copying your record...{cmd:7F0308}\n{cmd:7F05C35F00}Do not turn the power off!{cmd:7F0306}\n{cmd:7F05C35F00}Do not remove the\n{cmd:7F05C35F00}Controller Pak!{cmd:7F5904}{cmd:7F09090001}{cmd:7F0E14CF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native accepted transfer copies the record from Controller Pak to cartridge. Keep all four 05 warning controls, the power-off/removal warnings before 59/04 and 09/9/0001, and the original post-transfer continuation. Do not substitute GameCube source/destination-card fields. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14DF",
+    "source_sha256": "f4eb768abd0b153d7f6460bb58acb4a40979ce92dcf04367b6c7a443ba1584dc",
+    "translation": "So you've changed your mind?{cmd:7F04}\n{cmd:7F02}Please remove the {cmd:7F50198CDC0E}Controller Pak\nfrom your {cmd:7F50198CDC0A}controller.{cmd:7F04}\n{cmd:7F02}When you're ready,\npress the {cmd:7F50324BE108}A Button,{cmd:7F030C}\n{cmd:7F1C}!\n{cmd:7F0E14BC}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native declined duplicate return: remove the Controller Pak from the controller, then press A and return to the original start prompt. Do not substitute GameCube slot names. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  },
+  {
+    "id": "message:14E0",
+    "source_sha256": "b99da817370d02a04e5b28fb5e95f1e806947a383598790b9f9c1b5fc6ccda83",
+    "translation": "{cmd:7F09000002}Hey!{cmd:7F0312}\n{cmd:7F09000016}Don't remove the{cmd:7F0306}\n{cmd:7F50198CDC0E}Controller Pak\nduring an operation!{cmd:7F04}\n{cmd:7F02}Otherwise,{cmd:7F0306}\nhow am I to know what's going on?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}I'll return you\nto the title screen,{cmd:7F0308}\nIf you want to use the\n{cmd:7F50198CDC0E}Controller Pak,{cmd:7F04}\n{cmd:7F02}insert it into your {cmd:7F50198CDC0A}controller,{cmd:7F0308}\nthen try again\nfrom the beginning.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native Pak removal during an operation, not a GameCube missing-town-card error. Retain the speaker's original explanation, return to title, reinsert the Pak into the controller, and restart. No removal, erasure, or other storage operation is executed by this text edit. Preserve every other native command and argument, page, pause, field, and terminator. Only explicit highlight lengths change for full English hardware/button names. Final wording/layout and ordinary title/travel/save behaviour remain review."
+  }
+]

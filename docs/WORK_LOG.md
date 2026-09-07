@@ -3703,6 +3703,80 @@
   basis for the claimed less-than-one-point change. Chat reporting now
   distinguishes actual candidate changes from unmeasured overall estimates.
 
+## 2026-09-07 — Startup travel and Controller Pak warning translation
+
+- Added `translations/n64-startup-pak.json` with 35 original drafts across the
+  six native startup speakers: six capacity warnings, five write errors, six
+  duplicate-return confirmations, six accepted-copy notices, six cancellations,
+  and six mid-operation removal errors. The sixth write error `14DB` already
+  has suitable English and remains unchanged. Added the default candidate input,
+  eight focused tests, and `specs/STARTUP_PAK_DIALOGUE.md`.
+- Capacity messages retain the native START/reset data-deletion instructions,
+  removal of an unused Pak, A-button acknowledgement, and six actual start
+  targets. No same-ID GameCube rumble menu is imported. Write errors describe
+  writing, not an added read failure. All original `05` formatting controls
+  remain, without borrowing GameCube card-slot fields.
+- All six duplicate-return prompts retain both field-26 insertions and warn
+  that the earlier returned player's record will be erased before `5E` and
+  choices `0066/003D`. Both successors and request `09/9/0001` stay exact.
+  Accepted copies name Controller Pak as the source and cartridge as the
+  destination; power/removal warnings remain before `59:04` and `09/9/0001`.
+  All six post-transfer continuations remain. Cancelled returns instead ask
+  for Pak removal and an A press before the native start prompt.
+- Mid-operation removal keeps each native explanation, including concern for
+  the precious record in `1440`, losing track of progress in `1468`, the extra
+  catchphrase in `1490`, and no extra initial pause in `14E0`. These messages
+  do not become GameCube missing-town-card errors. They keep return-to-title,
+  reinsertion, and restart instructions, not a new runtime recovery routine.
+- All commands are exact except 101 highlight counts: 59 Controller Pak,
+  eighteen controller, six START button, twelve A Button, and six cartridge
+  spans. The six N64 spans stay unchanged. Tests check the complete command
+  stream with only these substitutions and each full following term. Initial
+  original-draft line-width findings were resolved by splitting only those
+  draft lines; all 35 final layouts have no warning, and every expansion fits
+  the unchanged 1,024-byte buffer. No font metric or GameCube line is changed.
+- Eight focused tests pass in 0.228 seconds. The complete suite passes
+  519 tests in 200.333 seconds in `build/tests-startup-pak-full-01.log`.
+  Full generation has 11,048 edits and basic generation has 10,356. Every
+  new draft is present in both; all 11,013 and 10,321 earlier edits respectively
+  remain identical. No optional runtime requirement or approval is added.
+- `build/smoke-startup-pak-01/` passes 48 complete cartridge loads, 146
+  assertions, and 249 recorded steps. It includes all 35 drafts and thirteen
+  unchanged messages: six start prompts, six post-transfer continuations,
+  and `14DB`. Complete headers/text, adjacent/module guards, restored
+  checkpoint, and graceful shutdown pass. The fresh four-MiB process has
+  audio disabled, no seed saves, and both test save-write permissions false.
+  Its 131,072-byte FlashRAM stays erased. The only injected function is
+  `8009E558`; no erasure, transfer, real confirmation/cancellation, title-menu
+  traversal, warning rendering, saving, or original-hardware test is performed.
+- Scenario SHA-256 is
+  `b57a34866b0270078ad37cf78a2a20a7683214ffc0a938619b83fddf1ed5f8eb`.
+  ROM `build/startup-pak-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `0a880b8701776e0553c1b6c99851e3a754659bde188ad7ff14f198dd5e51cb0f`.
+  UPS SHA-256 is
+  `0e748d78717c02eff2e48bae3536cb81804c9795102051b9aa7b6cafe5b190af`;
+  applying it to the verified original reconstructs the complete ROM.
+  Comparing every extracted DMA file against the seasonal-topics pilot shows
+  only main text `02000000`, pointers `00CF9000`, and DMA directory rows change.
+  Other directory-container bytes, executable code, overlays, fonts, runtime
+  resources, and saved formats remain unchanged.
+- Coverage has 9,549 reference candidates plus 254 original drafts, giving
+  9,803 main candidates. The 1,949 unfilled records include 1,018 with Japanese
+  static text, nine placeholders, 919 without static text, one Latin record,
+  and two number/symbol records. Ten command-only records contain dynamic
+  insertions. The 1,950 reference rejections comprise 1,608 unconfirmed IDs,
+  293 control differences, 47 missing-field records, and two overflows. The
+  original fallback fills one rejection. Reference layout warnings stay at
+  1,436, with 41 aliases and 65 conflicts.
+- Regenerated coverage and both queues in `build/startup-pak-*`. The
+  unconfirmed same-ID pool is empty, with 1,461 lacking visible same-ID
+  English, 49 requiring fields, 31 control differences, seven overflows,
+  36 native non-static entries, 24 glyph failures, one encoding/hash review,
+  and one original fallback. Twelve special-context expression records remain
+  unapproved, including title-menu `14A2/14D9`. Missing startup greetings,
+  preparation and menu variants, broader text destinations, ordinary storage
+  and gameplay, full review, patch-only release, and both stretch goals remain.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
