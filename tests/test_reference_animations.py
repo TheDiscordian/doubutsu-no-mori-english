@@ -10,7 +10,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import sha256, CODE_VROM
-from gc_adapter import adapt_reference
+from gc_adapter import adapt_reference, remove_redundant_article_suppression
 from reference_animations import (ResidentAnimationPermit, animation_permit, verify_animation_reference,
                                   validate_animation_approval, verify_native_consumer, NPC_VROM,
                                   NPC_RELOCATION, ALLOWED_VALUES)
@@ -128,7 +128,8 @@ class RetailAnimationApprovalTests(unittest.TestCase):
         gc = {r['id']: r for r in map(json.loads, gc_path.read_text().splitlines())}
         matches = load_matches(ROOT/'translations/reference_matches.json')
         approved = [r for r in matches.values() if 'resident_animations' in r]
-        self.assertEqual(len(approved), 18)
+        self.assertEqual(len(approved), 83)
+        article_adaptations = set()
         for record in approved:
             original = source[int(record['id'][8:], 16)]
             reference = gc[record['reference_id']]
@@ -136,9 +137,12 @@ class RetailAnimationApprovalTests(unittest.TestCase):
             text, _ = adapt_reference(reference['text'], original, info, 'reference_layout', True,
                                       retain_resident_animations=True)
             output = encode(text, info)
-            self.assertEqual(text, reference['text'], record['id'])
+            self.assertEqual(text, remove_redundant_article_suppression(reference['text'])[0], record['id'])
+            if text != reference['text']:
+                article_adaptations.add(record['id'])
             validate_entry(original, output, info, 'message', 'reference_layout', resident_runtime=True,
                            animation_permit=animation_permit(record['id'], original, output, matches))
+        self.assertEqual(article_adaptations, {'message:0156', 'message:0158', 'message:2373', 'message:2580'})
 
     def test_native_consumer_tables_and_installed_source_are_unchanged(self):
         import struct

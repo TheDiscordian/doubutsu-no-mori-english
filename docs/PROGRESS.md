@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 439 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 440 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -459,17 +459,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/late-intro-pilot/`
-contains 10,587 edits, including
-9,289 reference dialogue candidates, all 460 choices, and 53 original dialogue
+The current experimental resident-module pilot in `build/resident-conversations-pilot/`
+contains 10,657 edits, including
+9,354 reference dialogue candidates, all 460 choices, and 58 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,410
+still require review. The original main-bank audit leaves 2,340
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,390 conservative layout warnings include full default
+listed below. The 1,403 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/late-intro-candidates/` and `build/late-intro-coverage/`. The independent
+`build/resident-conversations-candidates/` and `build/resident-conversations-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -534,7 +534,7 @@ complete resulting text/headers, player-name colour spans, cursor positions,
 unchanged source names, buffer/module guards, and checkpoint restoration.
 Existing candidates and production runtime/font/save structures are unchanged.
 Seventeen additional conservative layout-warning records remain for polish.
-The complete 439-test suite passes with the shared validation changes.
+The complete 440-test suite passes with the shared validation changes.
 Different GameCube festival, tailor, and travel-rule records stay withheld for
 native-specific translation. See [reviewed field contract](../specs/REFERENCE_FIELDS.md).
 
@@ -558,7 +558,7 @@ appearance requests, complete initializer/DMA loads, and catchphrase dispatch.
 The batch includes two distinct ten-character defaults, custom input, and a null
 request clearing the previous client: 91 native calls and 432 assertions pass.
 Complete actor/animal sources, message/window/stack/module guards, and checkpoint
-restoration pass. The full 439-test regression suite passes. All existing 10,515
+restoration pass. The full 440-test regression suite passes. All existing 10,515
 edits remain unchanged, as do production runtime, font, and saved structures.
 Ordinary NPC traversal and final dialogue/presentation review remain.
 
@@ -572,7 +572,7 @@ cartridge overlay loader, 53 preparations, thirteen conversions across six
 years and a leap month, six message loads, and eight date insertions pass:
 102 native calls and 184 assertions, with full save retention and guards.
 The resident-date build passes all ten train-to-town checks over 188 steps.
-The complete 439-test suite passes. The resident image remains 22,720 linked bytes
+The complete 440-test suite passes. The resident image remains 22,720 linked bytes
 with 1,856 bytes free. Final draft review and normal seasonal gameplay remain.
 
 Twenty-one [native seasonal conversations](../specs/NATIVE_SEASONAL_CONVERSATIONS.md)
@@ -588,8 +588,20 @@ actions and final draft wording/layout remain for the combined gameplay and
 human-playthrough review. No additional train or mail-window run is needed for
 this text-only batch.
 
-Eighteen [resident-animation approvals](../specs/RESIDENT_ANIMATIONS.md) retain
-complete English introductions, moon conversations, and other resident exchanges.
+Eighty-three [resident-animation approvals](../specs/RESIDENT_ANIMATIONS.md) retain
+complete English introductions, moon conversations, clothing errands, and other
+resident exchanges. The [broader conversation batch](../specs/RESIDENT_CONVERSATIONS.md)
+covers 65 complete references, including clothes-delivery requests, recipients
+trying on clothes, failed-errand returns, and furniture/roof-colour responses.
+Four references remove only a redundant pre-field article-suppression command;
+all English wording and presentation remain. Five original drafts retain the
+complete fishing tip, winter flowers, March 14 White Day, and May carp streamers
+where the English reference omits instructions or describes a different event.
+All seventy new complete cartridge loads pass in one four-MiB batch: seventy
+calls, 212 assertions, and 359 recorded steps, with adjacent/module guards,
+checkpoint restoration, and blank FlashRAM. All 440 host tests pass. Ordinary
+clothing handoff/animation/return, sale/painting actions, dynamic-field display,
+and final wording/layout remain in the gameplay/playthrough queue.
 Only reviewed NPC0 slot-zero expression delivery differs; fields, other actor
 requests, gameplay decisions, source identity, and complete payloads remain
 guarded. The native batch passes 213 expression-selection cases, eighteen
@@ -617,16 +629,16 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,587 edits, including
-9,289 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,657 edits, including
+9,354 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, and seven native
-advice/travel drafts, four native festival drafts, and 21 native seasonal
+advice/travel drafts, four native festival drafts, and 26 native seasonal
 conversation drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,411 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,410 main records without
-candidates: 1,479 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,341 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,340 main records without
+candidates: 1,409 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

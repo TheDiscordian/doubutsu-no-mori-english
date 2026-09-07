@@ -1,5 +1,45 @@
 [
   {
+    "id": "message:2008",
+    "source_sha256": "a72710b39760925811b64dba1cc4fd517969c9ba760d678bf5060bf05a1895eb",
+    "translation": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F030C}\nif you're out fishing{cmd:7F0306}\n{cmd:7F09000017}and can't seem to catch\nanything at all,\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}look for the black shadows\nmoving in the water{cmd:7F0308},\nokay,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Those shadows{cmd:7F0306}\nare actually{cmd:7F0308}\nfish,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Then{cmd:7F0308}\ncast your float where\nthe fish can see it,{cmd:7F0306}\n{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}Otherwise,\nthe fish will ignore you!{cmd:7F030E}\nYou won't catch anything\nlike that!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Once you've done that,{cmd:7F030C}\nall that's left is\ngetting the timing right\nwhen you reel it in.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}I haven't quite\nfigured that part out,{cmd:7F0308}\nso you'll have to find\nthe trick yourself!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the complete native fishing advice: find fish shadows, cast where the fish can see the float, avoid being ignored, and learn the reeling timing. The GameCube record omits the last two native pages about timing and discovering the trick; do not drop them. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:252D",
+    "source_sha256": "ccc57663631c843f05e9af48d1043d57ca78a54ec86c232b586f22beae249b34",
+    "translation": "They're full of life{cmd:7F0304}\nwhen you first plant them,{cmd:7F04}{cmd:7F09000017}\n{cmd:7F02}but it's so cold{cmd:7F0306}\nthat they soon lose\ntheir sparkle,{cmd:7F0304} {cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}They'll bloom again{cmd:7F0304}\nwhen it gets warmer,{cmd:7F0308}\nso plant{cmd:7F0304} plenty now,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native flowers-in-cold-weather conversation and advice to plant for warmer weather. The English same-ID reference instead complains about weeding and chapped hands. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:26F4",
+    "source_sha256": "69356254f8c7a8512220f79f7064bf2731e3a5bce6469e9aa778c66435e2f791",
+    "translation": "{cmd:7F090000FF}White Day's coming up.{cmd:7F0314}\nThe guys have it tough,{cmd:7F0310}\nbuying gifts in return{cmd:7F0308}\nfor their Valentine's gifts.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}Huh?{cmd:7F0308} Me?{cmd:7F030C}\nDon't I need to buy any?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Pipe down!{cmd:7F0308} Never mind\nwhat I'm doing!{cmd:7F0310}\nJust leave me alone!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain native White Day and the joke about having no Valentine's gifts to return. Do not import GameCube Groundhog Day, Resetti, or its different date/event. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:26F5",
+    "source_sha256": "53832101200f50229242997f3f1ae53282c9dd34037eb6b36b68c1236d51f012",
+    "translation": "{cmd:7F090000FF}March 14 is White Day.{cmd:7F04}\n{cmd:7F02}On Valentine's Day,{cmd:7F0308}\npeople seem to like\nhomemade presents.{cmd:7F04}\n{cmd:7F02}But on White Day,{cmd:7F0308}\nyou don't hear that{cmd:7F0304}\nquite so often.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the explicit native March 14 White Day date and comparison with homemade Valentine's presents, not the GameCube February 2 Groundhog Day conversation. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:26FD",
+    "source_sha256": "4f33af94d5fc537dc801fd37f953eff8f32b9adb61547986cb28a09c44657d44",
+    "translation": "{cmd:7F09000015}Once May comes around,{cmd:7F0308}\nyou'll see the carp streamers!{cmd:7F04}\n{cmd:7F02}Ha!{cmd:7F0306} From that look,{cmd:7F0308}\nyou'd rather have rice cakes\nin oak leaves than streamers!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the native May carp streamers and the food joke about kashiwa mochi, described as rice cakes in oak leaves. Do not substitute autumn or the GameCube Harvest Festival feast. Preserve every native command and argument, pause, page, field, and terminator; final wording/layout and ordinary gameplay remain review."
+  },
+  {
     "id": "message:1E09",
     "source_sha256": "5fc249083d641775991943dfd1e4d5a154dd8bbd558a35368090d64ba3799ca3",
     "translation": "{cmd:7F09000017}With only one shrine in town,\nit's no wonder{cmd:7F0306}\nthere's a queue like this,\n{cmd:7F0308}{cmd:7F1C}.\n{cmd:7F00}",

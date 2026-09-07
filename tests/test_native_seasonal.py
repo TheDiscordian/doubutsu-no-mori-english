@@ -27,7 +27,8 @@ class NativeSeasonalTests(unittest.TestCase):
 
     def test_complete_native_commands_fields_pages_and_source_hashes(self):
         expected = set('1E09 1E17 1E2A 1E2B 1E3E 1E4E 1EAF 1EB7 1ECB 1EE9 1EEA '
-                       '1EF7 1EF8 1EF9 1F55 1F6B 1F76 1F77 1F78 2600 285A'.split())
+                       '1EF7 1EF8 1EF9 1F55 1F6B 1F76 1F77 1F78 2600 285A '
+                       '2008 252D 26F4 26F5 26FD'.split())
         self.assertEqual({r['id'][8:] for r in self.drafts}, expected)
         self.assertEqual(len(self.drafts), len(expected))
         for draft in self.drafts:
@@ -65,6 +66,22 @@ class NativeSeasonalTests(unittest.TestCase):
         self.assertIn(b'to the test', by_id['1F78'])
         self.assertIn(bytes.fromhex('7F26'), by_id['1EB7'])
         self.assertNotIn(bytes.fromhex('7F1A'), by_id['1EB7'])
+
+    def test_complete_fishing_tip_and_native_holiday_meanings(self):
+        drafts = {r['id'][8:]: r['translation'] for r in self.drafts}
+        for phrase in ('black shadows', 'the fish can see it', 'timing right',
+                       'reel it in', 'the trick yourself'):
+            self.assertIn(phrase, drafts['2008'])
+        self.assertEqual(drafts['2008'].count('{cmd:7F02}'), 6)
+        self.assertIn('bloom again', drafts['252D'])
+        self.assertIn('White Day', drafts['26F4'])
+        self.assertIn('March 14 is White Day', drafts['26F5'])
+        self.assertIn('May comes around', drafts['26FD'])
+        self.assertIn('carp streamers', drafts['26FD'])
+        self.assertIn('rice cakes\nin oak leaves', drafts['26FD'])
+        for key in ('26F4', '26F5', '26FD'):
+            self.assertNotIn('Groundhog', drafts[key])
+            self.assertNotIn('Harvest Festival', drafts[key])
 
 
 if __name__ == '__main__':

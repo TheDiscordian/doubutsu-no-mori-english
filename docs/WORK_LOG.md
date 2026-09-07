@@ -3007,6 +3007,71 @@
   advice `2008` needs native-content review before approval. Full gameplay,
   saves, the later human playthrough, and release/stretch work remain active.
 
+## 2026-09-07: seventy resident and clothing-errand records
+
+- Reviewed and added 65 complete GameCube reference approvals under the existing
+  resident-animation contract. Forty cover moving/home/reunion greetings,
+  weather, friendship, NPC rumours, furniture rewards/sale, roof colour,
+  guessing, collecting, and eyesight. Twenty-five cover clothes-delivery
+  requests/reminders, recipients trying on clothes, and failed-delivery returns.
+  Each independently binds the original source, complete supplied English
+  reference, and final output, retaining every non-expression actor request,
+  native field availability, gameplay command order, and expansion guard.
+- All wording, manual lines/pages, emphasis, and pauses remain. Four records
+  (`0156/0158/2373/2580`) remove only the existing redundant pre-field
+  CUTARTICLE command; full English source hashes are checked before adaptation.
+  No article text or other English wording is dropped. Native expression codes
+  stay inside the already-verified standing-expression set. Special-actor
+  Gracie/Booker/Redd/Jingle/Gulliver records are withheld for their own caller
+  review, even where the broad signature check appears compatible.
+- Added five original drafts to the native seasonal/advice file. `2008` keeps
+  all seven fishing pages, including finding shadows, casting where fish can
+  see the float, correct reeling timing, and discovering the trick. The English
+  reference lacks the last two native instructions. `252D` keeps winter flowers
+  rather than the unrelated English weeding complaint. `26F4/26F5` keep White
+  Day and March 14, not Groundhog Day/February 2. `26FD` keeps May carp streamers
+  and rice cakes in oak leaves, not the autumn Harvest Festival.
+  All five preserve every native command and argument exactly and have no
+  conservative layout warning. Their expanded bounds are 704, 287, 254, 176,
+  and 169 bytes; none requires a split or buffer change. White Day wording
+  explicitly describes buying reciprocal gifts, not returning received items.
+- `build/tests-resident-conversations-full-01.log` passes all 440 tests in
+  181.607 seconds. The final native-draft check passes all four tests, including
+  complete command/source identity, layout, native fishing/holiday meanings,
+  and the existing spring choice/quest mapping. The final eight-test animation
+  check verifies all 83 approved complete references and exactly the four
+  declared article adaptations. Logs stay in ignored `build/`.
+- `build/smoke-resident-conversations-01/` passes all seventy complete native
+  cartridge loads in one fresh four-MiB process: seventy calls, 212 assertions,
+  and 359 recorded steps. Complete message headers/text, adjacent/module
+  guards, checkpoint restoration, blank FlashRAM, and graceful shutdown pass.
+  No expression-selector, train, or mail-window batch is repeated because
+  all production code and runtime bindings are unchanged. Normal clothing
+  handoff/try-on/return, sale/painting actions, prepared-field display, final
+  wording/layout, ordinary saving, and hardware acceptance remain unverified.
+- Final ROM `build/resident-conversations-pilot/animal-forest-halfwidth.z64`
+  has SHA-256
+  `d91e7bba012d28102ed0457e8adb62420a2ad574de49bd4ca2bd769bcee71e83`;
+  its verified round-trip UPS has SHA-256
+  `1988d69289bb89fee5cd4b2b6b148b73b8743be7f37aeb7c7228e7b26744bc09`.
+  Comparing every extracted DMA file with the late-introduction build finds
+  changes only in main text, its pointer table, and the DMA directory rows.
+  All code, overlays, fonts, resource files, and the directory container's
+  non-directory prefix remain unchanged. All previous 10,587 candidate edits,
+  including the complete late-night split and all 460 choices, remain identical.
+- The candidate file contains 10,657 edits: 9,354 reference main candidates and
+  58 original main drafts. The main bank has 9,412 candidates and 2,340 records
+  without candidates, including 1,409 with Japanese static text. The other
+  classifications remain nine exact placeholders, 919 without static text,
+  one Latin record, two number/symbol records, and ten dynamic-only records.
+  The reference queue has 1,796 unconfirmed identities, 470 control-signature
+  differences, 69 unavailable fields, and six expansion overflows. Its 1,403
+  conservative layout warnings remain for later review without reflow.
+  Reports are in `build/resident-conversations-candidates/` and
+  `build/resident-conversations-coverage/`. Continue individual early parcel/
+  favour conversation review and the broader field/topic/overflow queue;
+  gameplay, saves, human playthrough, release, and stretch work remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

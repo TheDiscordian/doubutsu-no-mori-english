@@ -109,12 +109,22 @@ four-MiB town arrival, and all eight complete native letter windows pass.
 
 Next content audits target the remaining inserted-text and actor-command gaps.
 The [resident-animation permission](../specs/RESIDENT_ANIMATIONS.md) admits
-eighteen reviewed complete English records while keeping all non-expression
+83 reviewed complete English records while keeping all non-expression
 actor commands, fields, flow, and capacity guarded. Its native batch passes
-213 selections, eighteen loads, and 88 dispatches. Actual pose initialization
+213 selections, eighteen initial loads, and 88 dispatches. Actual pose initialization
 and normal resident playback remain gameplay checks, not reasons to repeat the
 isolated selection batch. The wider expression-only mismatch pool still needs
 individual topic/actor review; special actors and new values are not approved.
+The [resident conversation batch](../specs/RESIDENT_CONVERSATIONS.md) supplies
+65 additional references, including the clothing request/try-on/failed-return
+conversations `0152..0198`, plus five native-complete fishing, flower, White Day,
+and May festival drafts. All seventy complete cartridge loads pass with guards
+and checkpoint restoration; 440 host tests pass. Normal clothing handoffs,
+outfit animations, inventory returns, and sale/painting actions remain gameplay
+checks. English same-ID references with changed native topics
+remain unsuitable even where their command signatures match. More early
+parcel/favour conversations are available for individual expression/meaning
+review; continue that queue without re-running the unchanged selector batch.
 
 The complete [late-night introduction](../specs/REFERENCE_SEQUENCES.md) uses
 `04F7 → 083E`, split only at its existing GameCube page boundary after the clock
@@ -123,9 +133,9 @@ checks. Basic builds omit the runtime-dependent group. Keep the original
 wording, pauses, and manual layout; normal conversation and rendered clock
 checks belong in the combined gameplay/playthrough pass.
 
-Current main-bank coverage is 9,342 candidates; 2,410 records remain without
-candidates, including 1,479 containing Japanese static text. The reference
-rejection queue contains 1,796 unconfirmed identities, 540 control-signature
+Current main-bank coverage is 9,412 candidates; 2,340 records remain without
+candidates, including 1,409 containing Japanese static text. The reference
+rejection queue contains 1,796 unconfirmed identities, 470 control-signature
 differences, 69 missing-field records, and six expansion overflows. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -181,7 +191,7 @@ choices `011E/0128`, both branches, and quest values. All original commands,
 fields, pauses, and pages are preserved. No reference permissions or production
 runtime changes are needed. All 21 complete cartridge loads pass in one native
 batch, with 65 assertions, adjacent/module guards, and checkpoint restoration;
-the full 439-test suite passes. Final native wording/layout and gameplay remain.
+the full 440-test suite passes. Final native wording/layout and gameplay remain.
 Birthday fields `34/35` are separate item
 slots, not these free fields. Other date preparers and native calendar years
 outside 2000–2032 require their own audit.
