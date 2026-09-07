@@ -7,12 +7,14 @@ codec is `tools/mail_record.py`; the freestanding C implementation is
 `runtime/mail/record.c`. Full-letter assembly is implemented separately in
 `tools/mail_format.py` and `runtime/mail/format.c`. Both C files are linked into
 the experimental resident module and pass isolated N64 CPU calls. Native
-generation, editing, and persistence are not connected to these APIs. The
+generation and editing are not connected to these APIs. The
 separately enabled [experimental full reader](MAIL_READER.md) connects them to
 the native letter window for isolated snapshot probes. With English grading,
 the [whole-record send wrapper](MAIL_NPC_SEND.md) also supplies complete decoded
 body scores to ordinary replies and letter quests, preserving rejected letters
-at the post-office receipt boundary.
+at the post-office receipt boundary. The separate [native FlashRAM test](FLASH_MAIL.md)
+passes opaque storage of all 192 saved-letter slots and complete reconstruction
+in a fresh process; normal save-menu/post-load gameplay remains unverified.
 See [assembly semantics and executed coverage](MAIL_FORMAT.md).
 
 The snapshot stores immutable template identities plus the exact substitutions,

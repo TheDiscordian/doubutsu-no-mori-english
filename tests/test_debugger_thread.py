@@ -29,7 +29,7 @@ class ThreadDebugger(RSP):
         if address == self.pointer:
             return bytes(16)+struct.pack(">HHI", 4, 0, self.thread_id)
         if address == 0x800D334C:
-            return self.entry
+            return self.entry if size == 4 else self.entry+bytes.fromhex('AFB00014')
         if address == 0x801948E0:
             return struct.pack(">5I", 0x41465254, 1, self.reserved, self.used, 1)
         raise AssertionError((address, size))
@@ -60,6 +60,32 @@ class ThreadDebugger(RSP):
 
 
 class DebuggerThreadTests(unittest.TestCase):
+    def test_frame_advancement_executes_past_the_current_breakpoint_before_returning(self):
+        debug = ThreadDebugger()
+        with self.assertRaisesRegex(ValueError,'observed PC'):
+            debug.advance_game_frame()
+        debug.pause_game_thread()
+        debug.commands.clear()
+        result = debug.advance_game_frame()
+        self.assertTrue(result['advanced_native_graph_frame'])
+        self.assertEqual(result['previous_context']['pc'],'ffffffff800d3350')
+        stops = [command for command in debug.commands if command.startswith(('Z','z'))]
+        self.assertEqual(stops,['Z0,800d3350,4','z0,800d3350,4','Z0,800d334c,4','z0,800d334c,4'])
+        self.assertFalse(any(command.startswith('G') for command in debug.commands))
+        self.assertIsNone(debug.breakpoint)
+
+    def test_frame_advancement_rejects_wrong_thread_and_changed_instructions(self):
+        debug = ThreadDebugger()
+        debug.pause_game_thread()
+        debug.thread_id = 1
+        with self.assertRaisesRegex(ValueError,'graph thread'):
+            debug.advance_game_frame()
+        debug.thread_id = 4
+        debug.entry = bytes(4)
+        with self.assertRaisesRegex(ValueError,'instruction guard'):
+            debug.advance_game_frame()
+        self.assertIsNone(debug.breakpoint)
+
     def test_verified_overlay_calls_require_complete_matching_bounded_code(self):
         debug = ThreadDebugger()
         debug.pause_game_thread()

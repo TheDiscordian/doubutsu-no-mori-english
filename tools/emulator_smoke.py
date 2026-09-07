@@ -155,12 +155,38 @@ class RSP:
         finally:
             self.command("z"+breakpoint)
 
+    def advance_game_frame(self):
+        """Execute past the current entry before waiting for the next frame.
+
+        Installing the entry breakpoint while already stopped there can stop
+        immediately again. The second instruction provides a guarded waypoint;
+        no register, instruction, or game-state writes simulate frame progress.
+        """
+        self.command('?')
+        require_program_counter(self.command('g'),'800D334C')
+        if self.thread_snapshot() != {'pointer':'80145630','state':4,'id':4}:
+            raise ValueError('Frame advancement requires the native graph thread')
+        if self.read_memory(0x800D334C,8) != bytes.fromhex('27BDFFE0AFB00014'):
+            raise ValueError('Native frame advancement instruction guard does not match')
+        breakpoint = '0,800d3350,4'
+        if self.command('Z'+breakpoint) != 'OK':
+            raise ValueError('Debugger rejected frame advancement breakpoint')
+        try:
+            stopped = self.command('c')
+            if stopped[:3] not in ('T05','S05'):
+                raise ValueError('Native frame advancement stopped unexpectedly')
+            require_program_counter(self.command('g'),'800D3350')
+        finally:
+            self.command('z'+breakpoint)
+        return {'advanced_native_graph_frame':True,**self.pause_game_thread()}
+
     def call(self, address, arguments, *, return_address=TEST_RETURN, verified_code=None):
         """Test-only o32 call in module scratch RAM; leaves the game paused.
 
         A checkpoint must restore the complete emulated machine afterwards.
         Bulk register packets avoid the scalar-register indexing discrepancy in
-        the installed ares build. No game save is used or modified by this API.
+        the installed ares build. Save-writing scenarios additionally require an
+        isolated blank cartridge and explicit runner opt-in before invoking I/O.
         """
         address = int(address, 16)
         if isinstance(return_address, str):
@@ -613,6 +639,8 @@ def main():
     parser.add_argument("--port", type=int, default=19264)
     parser.add_argument("--seed-save", type=Path, help="Copy this isolated test directory's cartridge saves")
     parser.add_argument("--seed-state", type=Path, help="Resume this isolated test directory's matching-ROM state")
+    parser.add_argument('--allow-test-flash-write',action='store_true',
+                        help='Permit the native save fixture to write an otherwise blank isolated FlashRAM chip')
     args = parser.parse_args()
     if args.seed_save and args.seed_state:
         parser.error("choose cartridge saves or a matching-ROM state, not both")
@@ -626,6 +654,7 @@ def main():
     shutil.copyfile(args.rom, rom)
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
     provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False,
+                  "allow_test_flash_write": args.allow_test_flash_write,
                   "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   "scenario_sha256": hashlib.sha256(args.scenario.read_bytes()).hexdigest() if args.scenario else None,
                   "post_scenario_sha256": hashlib.sha256(args.post_scenario.read_bytes()).hexdigest()
@@ -795,6 +824,17 @@ def main():
                     raise ValueError('Pelly receipt probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_pelly_receipt'],record))
+            if 'test_native_flash_mail_save' in action or 'test_native_flash_mail_read' in action:
+                from flash_mail_smoke import exercise
+                writing = 'test_native_flash_mail_save' in action
+                if not (out/'test.bs1').is_file() or writing and not args.allow_test_flash_write:
+                    raise ValueError('Native FlashRAM fixtures require a checkpoint and explicit write opt-in')
+                if not writing and (not args.seed_save or args.seed_state):
+                    raise ValueError('Native FlashRAM readback requires a fresh start from cartridge saves only')
+                needs_checkpoint_restore = True
+                request = action['test_native_flash_mail_save' if writing else 'test_native_flash_mail_read']
+                results.append(exercise(debug,request,record,
+                    export_directory=out/'exported-save' if writing else None))
             if 'test_npc_mail_show' in action:
                 from npc_mail_show_smoke import exercise
                 if not (out/'test.bs1').is_file():

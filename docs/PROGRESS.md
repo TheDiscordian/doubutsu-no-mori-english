@@ -24,7 +24,12 @@ mode forwarding across 1,010 recorded steps.
 The three native NPC letter-show paths also pass nine complete isolated window
 cases, including unknown sender handling. No additional production patch is
 needed for these callers. Normal actor interactions, post-office progression,
-remaining inline readers/metadata, and actual save/reload remain.
+remaining inline readers/metadata, and ordinary save-menu/post-load gameplay remain.
+The isolated native FlashRAM round trip passes all 192 stored letter slots in
+both save banks. A separate fresh process reads only the cartridge save and
+reconstructs complete English letters from both formats and both record layouts.
+This does not establish normal saving, edited-letter persistence, or hardware
+compatibility. See [persistence scope](../specs/FLASH_MAIL.md).
 Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -59,7 +64,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 296 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 301 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -349,7 +354,19 @@ user's direction. The production build retains the approved spacing metrics.
   draw hooks with complete retained records and expected text lengths. All
   allocations are freed after close; checkpoint restoration and blank FlashRAM
   pass. No production change to these callers is needed. Normal actor gameplay,
-  inline/computed-pointer readers, travel, editing, and saving remain.
+  inline/computed-pointer readers, travel, editing, and normal saving remain.
+- Native FlashRAM persistence passes with synthetic classic/composite snapshots
+  in all 192 saved mail slots: forty player pockets, forty home-mailbox slots,
+  five post-office records, two leaflets, and 105 NPC compact letters. The
+  original asynchronous save pipeline writes and verifies both complete banks.
+  A separate fresh emulator process receives only that cartridge save, verifies
+  both native reads/checksums/town identities and all 384 complete stored
+  records, and reconstructs full English output in eight native decoder calls.
+  Memory guards, restored checkpoints, and graceful shutdown pass. The writer
+  requires an entirely blank isolated chip and explicit opt-in; existing user
+  saves are untouched. This is not ordinary save-menu/post-load gameplay,
+  custom editing, travel, or original-hardware validation. No production code,
+  saved record size, font, candidate translation, or generation setting changes.
 
 ## Current reference candidates
 

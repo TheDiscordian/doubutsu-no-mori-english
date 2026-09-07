@@ -36,6 +36,11 @@ checkpoint restoration pass. Normal actor interaction remains distinct from
 these isolated calls. Next R05 work covers ordinary post-office hand-back/error
 progression and the remaining inline metadata/excerpt, travel, and editor paths;
 the direct reverse-conversion callers are no longer an untested-reader item.
+The isolated [native FlashRAM persistence test](../specs/FLASH_MAIL.md) passes
+all 192 saved mail slots in both native save banks. A separate fresh process
+receives only the exported cartridge save and passes all 384 complete-record
+checks and eight complete English reconstructions. This is not normal save-menu
+or post-load gameplay validation; generation remains disabled.
 
 ## Main translation and runtime
 
@@ -59,7 +64,7 @@ the direct reverse-conversion callers are no longer an untested-reader item.
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
 | V02 | New-town creation through normal gameplay | active | Name/town entry, arrival, house purchase, both explanation choices, English work offer, uniform equipment, and planting completion/acknowledgement pass; meeting villagers, later jobs, and normal save remain |
-| V03 | Save/reload and long names | pending | Isolated FlashRAM, RTC, no lost/truncated text, restart across sessions |
+| V03 | Save/reload and long names | active | Native two-bank FlashRAM writing and fresh-process reading pass all 192 synthetic stored-letter slots, complete records, and English reconstruction; normal save-menu/post-load gameplay, custom editing, longer names, and RTC remain |
 | V04 | Keyboard callers beyond player/town names | pending | Catchphrases, apology, song request, mail, and board |
 | V05 | Dialogues and menus across progression | pending | All control families, four-choice menus, inventory, shops, item displays |
 | V06 | Travel and Controller Pak | pending | Export/import, error paths, different towns, saved names |

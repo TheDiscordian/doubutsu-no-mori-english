@@ -204,6 +204,18 @@ the source directory stays unchanged. `--seed-state <test-directory>` resumes
 an emulator checkpoint only when its recorded ROM matches the tested ROM.
 Checkpoints are not FlashRAM save/reload validation.
 
+`tools/flash_mail_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates the isolated native FlashRAM writer test. Run its scenario on a
+matching-ROM town checkpoint using `--allow-test-flash-write`; the harness also
+requires a completely blank isolated chip before writing. It exports the
+native-read cartridge contents and manifest to the run's `exported-save/`.
+Generate the read scenario with the same tool plus
+`--export <writer-output>/exported-save/manifest.json`, then run a separate
+emulator with `--seed-save <writer-output>/exported-save`, without `--seed-state`
+or the write opt-in. Both runs need fresh output directories. This validates
+the native two-bank writer and fresh-process reader with synthetic stored
+letters, not normal save-menu gameplay. See [scope and guards](../specs/FLASH_MAIL.md).
+
 `tools/gyroid_message_test_scenario.py --rom <built-ROM> --output <ignored-json>`
 generates native entry/insertion tests for measured home-gyroid message wrapping.
 It verifies the installed hook, uses the actual native text insertion routine,

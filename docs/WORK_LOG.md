@@ -1920,6 +1920,74 @@
   Snapshot generation remains disabled. No font, candidate translation, source
   asset, memory reservation, saved record, or public-release setting is changed.
 
+### Native FlashRAM write and fresh-process letter persistence
+
+- Added a source-guarded N64 flash model and a complete 192-slot saved-letter
+  inventory: forty player records, forty home-mailbox records, five queued
+  post-office letters, two leaflet records, and 105 compact NPC letters.
+  The native payload is 63,872 bytes in each of two 65,536-byte banks. Both
+  signatures, town IDs, payload checksums, and complete payload equality are
+  required. The 1,664 padding bytes in each bank are not interpreted as mail
+  or required to be zero. Complete native flash/worker code and the seven-entry
+  state table are hash-guarded and covered by mutation tests.
+- Distinguished the English GameCube debug save-data checker from the actual
+  N64 flash module. The former is not evidence that N64 saving rejects the
+  experimental header-split marker. Other N64 metadata readers still require
+  their own audits. The native saver obtains a temporarily reserved framebuffer
+  through the graph/framebuffer-retirement handshake, not ordinary heap malloc.
+- The first fixture, `smoke-flash-mail-save-01`, failed safely because its
+  135,744-byte temporary heap allocation returned null. It never reached any
+  flash-writing call. Reduced the writer to a 16 KiB streaming chip-read buffer
+  plus separate decoder storage; the fresh reader reuses one 64 KiB bank buffer.
+  No production memory reservation or allocation policy changed.
+- `smoke-flash-mail-save-02` reached the native save allocator but exhausted
+  its eleven native allocation attempts without advancing out of state zero.
+  The harness was resetting a breakpoint at the frame entry where execution
+  was already stopped. Added guarded `advance_game_frame`, which executes the
+  native prologue instruction before waiting for the next real frame entry.
+  It does not write registers, instructions, or framebuffer ownership to fake
+  progress. Thirteen debugger tests pass, including the two new frame-advance
+  guard/order tests. Both unsuccessful runs remain recorded; neither reached
+  a native flash write or changed a user save.
+- `build/smoke-flash-mail-save-03` passes the actual native save pipeline in
+  138 recorded steps: 44 native calls, 27 assertions, 25 save dispatches, and
+  24 real frame advances. Both snapshot kinds populate every native letter
+  array. All 192 complete records match the native prepared payload before
+  writing, including retained identities, gift fields, and compact date/padding.
+  Both complete banks read back through the native flash API and match that
+  payload. The native state machine verifies both banks and clears its state;
+  its framebuffer request also returns to zero. The original live save payload
+  and complete machine checkpoint are restored, and ares exits gracefully.
+- `build/smoke-flash-mail-read-01` starts a separate ares process seeded only
+  with the exported `test.flash`; no emulator checkpoint, RTC, or RAM image is
+  supplied from the writer. It passes 448 recorded steps, 19 native calls, and
+  406 assertions. Native bank reads, both native checksum/identity checks,
+  all 384 complete stored-record comparisons, and eight full English decoder
+  outputs pass. Those decodes cover both classic/composite formats and both
+  full/compact source layouts in each bank. Heap, stack, and module guards,
+  that process's own checkpoint restoration, and graceful shutdown pass.
+- The native-read export, writer's flushed cartridge save, and reader's
+  flushed cartridge save have the same SHA-256:
+  `a67bf983a3e7f8640de3a3fa57c153caadb7e8de1bb7d39c8c53957546fc047d`.
+  Both logical payloads have SHA-256:
+  `540e9afff587bfa8e3e88b47f1acc0ce934a45d50cae8ee454f0cebf74b5d082`.
+  The isolated fixture town ID is `3069`. The save contains synthetic test
+  letters and remains ignored under `build/`; it is not a user-play save.
+- The final full suite passes 301 tests in 163.759 seconds, recorded in
+  `build/tests-flash-mail-final.log`. The earlier complete run also passed
+  299 tests before the two frame-advance tests were added. Python compilation
+  and whitespace checks pass. The tested runtime, candidate file, and ROM are
+  unchanged: `build/mail-names-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`.
+- Documented the exact isolation and acceptance contract in
+  `specs/FLASH_MAIL.md`, added repeatable writer/fresh-reader scenario generation,
+  and recorded explicit flash-write opt-in in runner provenance. The writer
+  refuses a nonblank isolated chip. The reader refuses a checkpoint-seeded run.
+  Normal save-menu/post-load gameplay, user-created or edited letters, remaining
+  readers/metadata, semantic identities, missing glyphs, generation, delivery,
+  travel, and original hardware remain required. Generation stays disabled;
+  no production code, text, font, saved record size, or release setting changes.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

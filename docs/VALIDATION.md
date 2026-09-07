@@ -29,12 +29,12 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | Tested with memory assertions in ares 148 |
 | Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
 | Name limits | Six-character player/town, four-character catchphrase, ten-character request | Player and town limits runtime-tested; others have static invariants |
-| Saved text | Enter names/mail/board text, save, restart, recover correctly | Outstanding |
+| Saved text | Enter names/mail/board text, save, restart, recover correctly | Native FlashRAM round trip passes 192 synthetic stored-letter slots in both banks and full English reconstruction in a fresh process; normal entry/save-menu/post-load gameplay remains |
 | Choice menus | All lengths, four entries, cancellation, branch outcome | Sixteen-byte rows, selected text, and three long choices tested; four active rows, cancellation, and actor paths outstanding |
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
-| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Outstanding |
+| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM mail persistence passes; normal saving, travel, RTC, and calendar remain |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
 
 The smoke runner's XTest mappings are A=`a`, B=`b`, Start=`Return`, Z=`z`,

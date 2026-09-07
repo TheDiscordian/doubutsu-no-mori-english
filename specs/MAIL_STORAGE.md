@@ -88,6 +88,9 @@ The selected native storage run passes 140 cases, 217 function calls, and 267
 assertions. It checks complete copied fields, source ownership, selected slots,
 post-office flags, neighbouring memory, and stack/module guards. It restores
 all touched storage arrays locally and then restores the complete machine
-checkpoint. FlashRAM stays blank. Actual save/reload, Controller Pak travel,
-normal inventory/storage interactions, other readers, and original hardware
-remain required. Exact run identifiers and hashes belong in the work log.
+checkpoint. FlashRAM stays blank in those storage-helper probes. A separate
+[native FlashRAM round trip](FLASH_MAIL.md) passes all 192 saved-letter slots
+in both banks and complete English reconstruction in a fresh process seeded
+only with the cartridge save. Normal save-menu/post-load gameplay, Controller
+Pak travel, inventory/storage interactions, other readers, and original
+hardware remain required. Exact run identifiers and hashes belong in the work log.
