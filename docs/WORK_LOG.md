@@ -2283,6 +2283,49 @@
   because the scenario output was a JSON file rather than a directory; the
   corrected launch uses that actual file. Both logs remain local.
 
+### Native NPC creation-failure submission gate
+
+- Implemented the exact three-instruction submission patch as a guarded helper.
+  It verifies the complete original function, rejects unsupported target
+  addresses, retains native argument setup/receipt/epilogue, and returns zero
+  directly after creator failure rather than copying stale `v1`.
+- Added a bounded native harness with a heap-owned copy of the wrapper and a
+  64-byte test creator. The creator logs all six o32 arguments, returns a
+  configured complete-letter pointer or zero, and poisons `v1`. The actual native
+  counter, recipient, receipt, capacity, queue copy, and clear routines execute;
+  no production submission instruction is modified.
+- The initial scenario preparation correctly rejected a changed helper range:
+  the combined pilot already contains the approved NPC-send result shim at
+  `800B69BC`. Preparation now reconstructs that one expected call from the
+  verified module, checks the complete shim, and continues to reject any other
+  changed instruction. The player-receipt path in these tests does not enter
+  the NPC-send branch.
+- `build/smoke-npc-mail-delivery-01` passes all 41 cases, 44 native calls, and
+  224 memory assertions across 578 steps. Cases include eight counter pairs,
+  creator rejection, both snapshot kinds and origin arguments, every queue slot,
+  full queues, invalid recipients, and a full home mailbox. Twenty cases reach
+  successful native receipt. The old staging letter is never submitted; the
+  returned source is cleared only after receipt succeeds. All six creator
+  arguments and the low-byte origin conversion pass.
+- Full save comparisons permit only the expected queue/counter/recipient-flag
+  writes on success and no changes on failure. Complete original save/staging
+  restoration, unchanged resident instructions, heap/stack/module guards,
+  allocation free, machine checkpoint restoration, and graceful shutdown pass.
+  FlashRAM remains blank and the Controller Pak unchanged.
+- Three targeted host tests pass, including mutation rejection at every byte
+  of the original function. Independent VR4300 assembly in the existing pinned
+  Docker toolchain verifies all three patch words and the entire test creator.
+  Assembly report and disassembly are in `build/npc-mail-delivery-assembly/`.
+  Fixture SHA-256 at test log address `802F8010` is
+  `1a2afee67ea73126dcda09a17378adda66263fe4c2b19a1304c8831e20393962`.
+- The real creator, native full-source capture, pending-reply loop, and normal
+  gameplay are not exercised by the controlled creator. Production generation
+  and gate installation remain disabled. The existing ROM, module, font,
+  candidate translations, and saved formats are unchanged.
+- The full regression suite passes 353 tests in 167.739 seconds at
+  `build/tests-npc-mail-delivery-full-01.log`. Python compilation and whitespace
+  checks pass.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

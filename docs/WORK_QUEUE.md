@@ -71,9 +71,12 @@ The [NPC creator binding contract](../specs/NPC_MAIL_GENERATION.md) verifies
 complete native/reference functions and selection tables. All available reply
 parts have supplied source slots across 24 group/gift contexts and 36 classic
 selections. One composite footer remains unavailable. Original creation failure
-is not propagated to submission; an uninstalled failure-return gate is specified.
-Complete English word/name capture, runtime ownership, and native gate validation
-remain the next implementation steps.
+is not propagated to submission. The guarded failure-return gate passes 41
+isolated native cases, including twenty actual queue receipts, rejected creation,
+both counter components, every queue slot, invalid recipients, and full home
+mailboxes. Its creator is a controlled fixture, and the production hook remains
+uninstalled. Next steps connect complete word/name capture and runtime ownership
+to the real creator, then test creator failures and the pending-reply loop.
 The [complete word source resource](../specs/NPC_MAIL_WORDS.md) verifies all 352
 phrases against the actual source banks and records full source/reference IDs.
 All 83 phrases beyond ten bytes are retained within sixteen bytes. Connect this

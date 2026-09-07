@@ -55,8 +55,12 @@ The [NPC creator binding audit](../specs/NPC_MAIL_GENERATION.md) checks seven
 native functions, six native tables, and corresponding English executable
 evidence. All 24 composite group/gift contexts and 36 classic reply selections
 use supplied source slots; composite footer `psz:004D` remains unavailable.
-The native caller ignores assembly failure, so a specified submission gate must
-also be implemented and tested. This source audit does not establish delivery.
+The native caller ignores assembly failure. A source-guarded submission gate
+passes 41 isolated native cases using actual receipt/copy/capacity routines and
+a controlled creator fixture. Twenty cases deliver complete records into the
+native queue; rejected cases retain all save data and never use older staging
+text. The gate remains uninstalled until the real creator is connected and
+validated. This is not normal NPC reply generation or pending-loop validation.
 The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
 352 complete phrases with exact legacy/English agreement and explicit native
 ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
@@ -70,6 +74,10 @@ a snapshot. Its complete 2,236-byte display cache remains resident; the 32 KiB
 reservation and heap boundary are unchanged. Host allocation/error tests, the
 four-MiB train-to-town run, and all eight native letter windows pass. Independent
 module, ROM, and patch builds match.
+Current implementation work connects the verified full word/name resources to
+native generation-time capture and creator ownership. The tested failure gate
+provides the required return boundary; it does not replace source or semantic
+review, normal reader/editor interactions, or save/hardware acceptance.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -103,7 +111,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 350 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 353 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

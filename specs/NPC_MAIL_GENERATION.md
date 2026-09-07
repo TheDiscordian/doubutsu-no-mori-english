@@ -44,7 +44,7 @@ Received status zero agrees with the native menu's Read path, but does not prove
 that every other creator uses the same status.
 
 Post-office submission uses the static whole record at `80142F80`. It checks the
-five-letter queue capacity before calling metadata setup at `800A915C`, then
+sum of the native received-mail counters against five before calling metadata setup at `800A915C`, then
 unconditionally submits to `800B6A3C` at `800A916C`. Unlike the English reference
 wrapper, this native wrapper does not clear the staging letter first. A failed
 new assembler must not expose the staging letter's older or partial text to
@@ -55,14 +55,15 @@ bit at `800A92E0`. The visitor path checks at `800A9324` before clearing its rep
 structure. Returning failure from submission preserves the native pending state.
 This is an instruction-level contract, not a passing normal-delivery test.
 
-## Proposed failure-return boundary
+## Guarded failure-return boundary
 
-A new creator entry can take the existing six arguments and return the complete
-staging-letter pointer on success, zero on failure. At the original submission
-wrapper, the following guarded changes would propagate failure without replacing
-the native receipt procedure:
+A new creator entry must take the existing six arguments and return a complete
+letter pointer on success, zero on failure. `tools/npc_mail_delivery.py` checks
+the complete original submission function and produces three guarded instruction
+changes. The caller remains responsible for binding the target to the verified
+creator implementation. The helper does not enable gameplay generation.
 
-| Address | Proposed instruction | Effect |
+| Address | Instruction | Effect |
 | --- | --- | --- |
 | `800A915C` | Call the new creator | Existing stack argument in the delay slot stays unchanged |
 | `800A9164` | `beq v0, zero, 800A917C` | A failed creator skips receipt and the later result copy |
@@ -71,9 +72,35 @@ the native receipt procedure:
 The original call at `800A916C`, send-type-zero delay slot, success-result copies,
 and epilogue remain intact. The failure branch must target `800A917C`, not
 `800A9178`: the latter would replace failure zero with stale register `v1`.
-These instructions are a design only. Source-bound assembly, native calls,
-allocation/loader failures, queue-full behaviour, unchanged pending state, and
-ordinary delivery must pass before installing the gate.
+Independent VR4300 assembly verifies all three encoded instructions and the
+test-only creator's six-argument o32 implementation. Three host tests check
+exact edits, every original instruction byte, target bounds, stack argument
+encoding, and the poisoned `v1` failure witness.
+
+The native harness executes the patched wrapper in its own heap allocation;
+the original resident submission function remains unchanged. Only the creator
+is a controlled fixture. The native counter lookup, recipient matching, capacity
+checks, receipt, complete queue copy, and source clear run their installed code.
+The existing post-office NPC-send result shim is explicitly checked; no arbitrary
+changed instruction is admitted by the source guards.
+
+All 41 cases pass: eight received-counter combinations with successful/rejected
+creation, both record kinds and both origin arguments at every queue position,
+full queues, invalid recipients, and a full home mailbox. Twenty cases reach
+successful native receipt. The returned pointer identifies a separate complete
+letter, proving that the old global staging record is not submitted. All six
+creator arguments are checked, including the original low-byte conversion of
+the origin argument. A rejected creator deliberately leaves `v1` nonzero, while
+the wrapper still returns zero. Full save comparisons restrict changes to the
+expected queue slot, received counter, and recipient flag on success; failure
+retains all save data. Source clearing happens only after successful receipt.
+
+The native run passes 44 calls and 224 memory assertions across 578 steps,
+including complete save/staging restoration, unchanged production instructions,
+heap/stack/module guards, allocation free, and checkpoint restoration. This
+does not run the pending-reply loop or a real complete creator. Native capture,
+creator allocation/loader failures, normal delivery, and pending-loop integration
+remain requirements before installing the gate.
 
 ## Capture ownership and selected fields
 
@@ -141,6 +168,7 @@ cartesian combination of selected parts.
    changing existing catalog identities or shortening text.
 3. Implement bounded loading and whole-record staging with explicit error returns;
    retain gift, RNG, paper, pending state, and queue-capacity behaviour.
-4. Execute the failure gate and actual creator-to-receipt-to-reader path, including
-   queue-full, unavailable resources, allocation failure, and repeated generation.
+4. Connect the tested failure gate to the actual creator-to-receipt-to-reader
+   path and pending-reply loop, including unavailable resources, allocation
+   failure, queue capacity, and repeated generation.
 5. Validate normal play, saves/travel, old letters, and original hardware.

@@ -861,6 +861,12 @@ def main():
                     raise ValueError('Native mail-menu probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_mail_menu'],record))
+            if 'test_npc_mail_delivery' in action:
+                from npc_mail_delivery_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('NPC delivery gate probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_npc_mail_delivery'],record))
             if 'test_npc_mail_show' in action:
                 from npc_mail_show_smoke import exercise
                 if not (out/'test.bs1').is_file():
