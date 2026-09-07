@@ -38,7 +38,7 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0),
                 (0x8009D308, 0x8009D3B4), (0x800A2BB0, 0x800A2C4C),
                 (0x800A10D8, 0x800A1124), (0x800A1124, 0x800A1170),
-                (0x8009DA94, 0x8009DBA4))
+                (0x8009DA94, 0x8009DBA4), (0x800A86C4, 0x800A86E8))
 
 
 def module_command_info(rom):

@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 252 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 269 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -211,7 +211,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 23,104 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 23,424 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -263,10 +263,21 @@ user's direction. The production build retains the approved spacing metrics.
   stored-letter consumers; separate NPC reply and letter-quest grading paths
   still require complete-text handling. See [gyroid display](../specs/GYROID_MESSAGE.md)
   and [NPC letter readers](../specs/MAIL_NPC.md).
+- Optional English ordinary-letter grading uses the GameCube's seven-rule
+  scorer, with bounded English prefix tables in the original on-demand overlay
+  allocation. The distinct native letter-quest length/rate path is retained.
+  All 776 prefixes, 3,000 independent GameCube C comparisons, exact rank
+  boundaries, sanitizer checks through 1,024 bytes, and installer/relocation
+  rejection tests pass. Native tests pass 91 calls and 157 assertions, including
+  actual cartridge loading, quest gifts/ranks, and local reply flags. The
+  combined build passes train-to-town and all six complete-letter reader probes.
+  Native bodies remain ninety-six bytes; the complete-body API does not yet
+  connect snapshots to reply/quest consumers. Generation, visitor outcomes,
+  normal delivery, and saving remain. See [English grading](../specs/MAIL_GRADING.md).
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/gyroid-message-pilot/`
+The current experimental resident-module pilot in `build/mail-grading-final-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592

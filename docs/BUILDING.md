@@ -126,6 +126,22 @@ generates long classic/composite snapshot-window probes for an identical-ROM
 town checkpoint. All pages, actual glyph vertices, graphics bounds, and unchanged
 source/preferences are checked. See [full reader](../specs/MAIL_READER.md).
 
+`tools/build_mail_grading.py --rom <native-ROM> --output build/mail-grading`
+builds the on-demand English scoring overlay. It extracts verified English
+prefix tables locally, builds the provided Fado relocation tool without a
+system installation, and uses the pinned Docker MIPS compiler. Rebuild the
+resident module, then pass `--english-mail-grading build/mail-grading` to the
+ROM builder. This optional patch changes ordinary reply scoring and the quest
+word tables; it does not decode snapshots or enable generated delivery.
+See [grading design](../specs/MAIL_GRADING.md).
+
+`tools/mail_grade_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates ordinary reply, complete-body, and native quest calls with memory
+guards. It accepts `--module <module.json>` and `--overlay <overlay.json>` for
+non-default builds. Run it in a fresh silent emulator instance; it establishes
+and restores its own checkpoint. `tools/audit_mail_grading.py --rom <native-ROM>`
+reproduces the direct-call and aligned-pointer inventory independently.
+
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under

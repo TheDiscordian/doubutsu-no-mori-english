@@ -29,6 +29,7 @@ recorded tests. An emulator boot does not establish hardware compatibility.
 ## Project map
 
 - `tools/`: original extraction, validation, build, and test tooling.
+- `runtime/` and `overlays/`: bounded resident code and on-demand native overlays.
 - `translations/`: translation edits and review state.
 - `specs/`: verified formats and implementation design.
 - `docs/`: current progress, source provenance, and validation requirements.

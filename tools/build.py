@@ -20,6 +20,7 @@ from display_names import install as install_display_names
 from catchphrases import install as install_catchphrases
 from mail_catalog import install as install_mail_catalog
 from mail_view_patch import install as install_mail_view
+from mail_grading import install as install_mail_grading
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -112,6 +113,7 @@ def main():
     parser.add_argument("--mail-catalog", type=Path, help="Directory containing the registered immutable English mail catalog")
     parser.add_argument("--english-mail-layout", action="store_true", help="Experimental pixel-width body/footer in read mode; native editor and saved fields unchanged")
     parser.add_argument("--english-mail-snapshots", action="store_true", help="Experimental full-letter reader and paging; requires mail layout/catalog; no generated records or save approval")
+    parser.add_argument('--english-mail-grading', type=Path, help='Directory containing the source-verified on-demand English mail-scoring overlay')
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -137,6 +139,8 @@ def main():
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
+    if args.english_mail_grading:
+        report['mail_grading'] = install_mail_grading(rom,replacements,additions,report.get('runtime_module'),args.english_mail_grading)
     if args.extended_items:
         report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
     if args.display_names:

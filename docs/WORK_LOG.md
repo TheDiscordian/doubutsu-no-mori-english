@@ -1464,6 +1464,88 @@
   native snapshot generation remains disabled. Normal delivery, lossless editing,
   saving, the longer gyroid default, and hardware validation remain required.
 
+### English ordinary reply scoring and bounded letter-quest word tables
+
+- Ported the seven-rule GAFE01 ordinary reply scorer and retained the separate
+  native letter-quest length/rate/repetition/rank path. The source-verified
+  prefix extraction includes all 776 pairs in twenty-six explicitly bounded
+  tables, preventing reads into adjacent tables. Extracted data remains local.
+  Native ninety-six-byte bodies receive virtual 192-byte space padding; a
+  separate complete-body API accepts up to 1,024 ordinary text bytes. No
+  snapshot decoder or generated-mail delivery hook is enabled by this change.
+- The new overlay uses the original 5,808-byte mail-check allocation and
+  592-byte relocation allocation. It occupies 4,064 linked bytes without BSS.
+  The original two-argument loader entry remains at linked `80A94D0C`.
+  Twenty-four Fado relocation entries use 128 bytes before padding. Compiler
+  flags enforce compatible high/low address pairs, and the linker explicitly
+  aligns each object's sections. The host model checks entry jumps, pairs,
+  section sizes, padding, targets, order, and four-MiB placement.
+- Initial overlay extraction exposed a non-allocatable `.ovl` section and an
+  unaligned text-to-rodata gap. Explicit objcopy section flags and per-object
+  linker alignment corrected those build failures before native execution.
+  The pinned Fado tool is built locally from the existing submodule without
+  editing or installing tool sources. Reports include C, header, and included
+  data/version-source hashes.
+- The resident adapter adds 320 bytes, for 23,424 linked bytes within the
+  unchanged 32 KiB reservation and separate 8 KiB test area. Its checked
+  allocation includes both overlay and relocation workspace, avoiding a second
+  unchecked allocation in the native loader. It invokes the native DMA,
+  relocation, and cache-maintenance path, frees temporary storage, and returns
+  neutral on allocation failure or an absent English overlay. The old quest
+  loader retains its original allocation behaviour.
+- All seven score components and the separate legacy grade agree with 3,000
+  independent host executions of pinned GameCube C. The reference fixture
+  uses its `BUGFIXES` bounds, one pointer-width portability adjustment, and an
+  explicit terminator for `x`: the source's existing fix still permits `Xen`
+  to spill into the `y` table otherwise. Empty input receives a safe preceding
+  space in the reference fixture; the port does not read before the body.
+  These are host reference comparisons, not GameCube CPU execution.
+- All 776 prefixes in both permitted first-letter cases, 1,000 varied-length
+  Python-model comparisons, exact 49/50/99/100 rank thresholds, source/output
+  guards, invalid arguments, and allocation ownership pass. AddressSanitizer
+  and UndefinedBehaviourSanitizer pass eight patterns for every length from
+  zero through 1,024 using exact-sized heap allocations. Relocation/installer
+  mutations reject stale artifacts and sources, missing or malformed entries,
+  wrong ABI, bad module targets, and overlaps without publishing partial edits.
+  The targeted suite passes seventeen tests in 2.442 seconds. The complete
+  suite passes 269 tests in 74.071 seconds.
+- `smoke-mail-grading-native-01` passes 327 recorded steps, ninety-one actual
+  N64 calls, and 157 memory assertions. It exercises the installed ordinary
+  grader, complete-body API, unchanged native word-loader entry, native length
+  grader, quest rank with/without gifts, and local reply condition flags.
+  Complete sources, stack guards, module guards, and output buffers pass.
+  It uses isolated test memory and restores its fresh-boot checkpoint.
+- `smoke-mail-grading-full-01` passes 188 train-to-town steps and all ten
+  acceptance checks, including four-MiB configuration, long choices, arrival,
+  and memory guards. This is the matching-ROM town checkpoint.
+  `smoke-mail-grading-reader-01` passes 156 steps, six full-letter windows,
+  ten pages, 1,134 glyphs, and 4,536 vertex coordinates. All six source letters
+  and preferences remain unchanged. Both native and window tests shut down
+  cleanly. All FlashRAM files remain blank, not actual save/reload evidence.
+- The original, repeated, and final pilot builds retain 10,405 candidate edits,
+  all four optional resources, approved font/metrics, and full snapshot reader.
+  Independent overlay, relocation, module, ROM, and UPS outputs match.
+  The current source-bound reports are in `build/mail-grading/`,
+  `build/runtime-module/`, and `build/mail-grading-final-pilot/`.
+  The previous resident module remains in `build/runtime-module-gyroid/`.
+  Artifact SHA-256 values:
+
+  - Prefix blob: `ea42bb88f4d8b0649550fc90923cfa8f2862311501168c6e9a6f954b578b6ae7`.
+  - Overlay: `ad74645e6ea19f864e697db220e614194eb01e52ceacdc90e3cce77722f80513`.
+  - Relocations: `00a5eb11061a591500e06b884e6516dc226307837835b3ff2332f268b9f03421`.
+  - Resident module: `ed322b018b368ae591ec8ce77f04d30485365643862fa2798e2505e1061d34d3`.
+  - ROM: `3b3bf194d3eef069e1c87678881342b9db444b1a27f77a4318515f4828389bf1`.
+  - UPS: `15d168ce73eaf975c3bc0c12122f49789ff5f86d10d9d6ce33a58af2e6077cc4`.
+- Reproduced the direct-call inventory: ordinary entry at two local/visitor
+  callers; length grade at the old ordinary entry and separate quest helper;
+  word-rate loader only inside the length grader. No aligned literal pointers
+  match these three targets. The guarded audit is reproducible through
+  `tools/audit_mail_grading.py`; computed pointers remain a separate audit.
+  Native generation stays disabled until complete-record discrimination and
+  reply/quest decoding are safe. Visitor outcomes, actual delivery/friendship,
+  semantic template approvals, custom editing, saving, hardware validation,
+  and the remaining translation work are not marked complete.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

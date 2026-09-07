@@ -25,7 +25,7 @@ ordinary body-only grader at `800A86C4`; local handling also records the letter
 date, and a non-neutral result updates reply condition flags. The send routine
 uses that result, and whether a gift is attached, to adjust friendship.
 
-The native normal grader calls `mNpc_CheckNormalMail_length` at `800A8614`.
+The unmodified normal grader calls `mNpc_CheckNormalMail_length` at `800A8614`.
 It combines the overlay-based word-hit result, a 96-byte repetition scan, and
 non-space length. These operations cannot receive the binary body portion of
 a snapshot. Do not recover a whole-record pointer by subtracting an offset
@@ -51,14 +51,37 @@ In the supplied GAFE01 release, ordinary NPC reply grading instead calls
 `mMck_check_key_hit_nes` scorer. Scores below fifty are bad, scores of at least
 one hundred are good, and intermediate scores are neutral. The checks include
 punctuation/capitalization, three-letter matches, repetition, spacing, and long
-sentences. This English reply algorithm is not installed in the N64 runtime.
+sentences. The optional English grading patch installs this algorithm for
+ordinary ninety-six-byte native bodies, using virtual space padding to the
+reference's 192-byte capacity. The complete-body API supports up to 1,024 bytes,
+but no snapshot-decoding hook is installed at these body-only consumers.
 
 GAFE01's letter-quest rank helper still calls `mNpc_CheckNormalMail_length`.
 It does not use the ordinary reply scorer. The two reference paths must remain
-distinct during the port. The local reference source also identifies missing
-terminators in the three-letter tables; a safe bounded lookup and verification
-against the supplied executable are required before importing that path.
+distinct in the port. The optional patch replaces the on-demand word checker
+with bounded English tables while preserving its original entry point and
+the native quest length/repetition/rank routine. All 776 pairs come from the
+hash-verified supplied executable. Per-letter bounds prevent the reference's
+unterminated tables from reading into the next table.
 Source comments alone do not establish a reported translation crash's cause.
+See [English grading](MAIL_GRADING.md) for the implementation and test contract.
+
+## Direct-call inventory
+
+`tools/audit_mail_grading.py` verifies these original-ROM references across all
+extracted DMA files:
+
+| Callee | Direct call sites |
+| --- | --- |
+| Ordinary reply, `800A86C4` | `800A8718`, `800A8770` |
+| Length/quest grade, `800A8614` | `800A86D0`, `800BBACC` |
+| Overlay word rate, `8009C900` | `800A8634` |
+
+No aligned literal pointers match these three entries. This does not prove
+the absence of computed indirect references. The old ordinary grader's call
+at `800A86D0` is bypassed when the optional entry hook is installed. The quest
+call remains active and distinct. Neither inventory nor ordinary-body grading
+authorizes treating snapshot bytes as text or enabling generated delivery.
 
 ## Source evidence
 
