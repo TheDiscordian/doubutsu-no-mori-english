@@ -3157,6 +3157,105 @@
   normal gameplay, saves, final review, patch-only release, and stretch goals
   remain in scope.
 
+## 2026-09-07: ninety-three community conversations and event details
+
+- Verified the previous goal turn as progress: commit `775bb0b` contains the
+  completed 57-message parcel/advice batch, its tests, source evidence, and
+  updated queue. Continued from a clean matching private-repository checkpoint.
+- Reviewed the remaining 107 expression-difference comparisons in full.
+  Approved 75 matching standing-resident references with complete independent
+  source/reference/output hashes. Topics cover introductions, trades, gifts,
+  reward/game outcomes, fishing, Gracie/Redd/Katrina, weather, reading, letters,
+  bee stings, turnips, and matching seasonal remarks. The complete context/ID
+  inventory is in `specs/COMMUNITY_CONVERSATIONS.md`; each approval records its
+  individual semantic evidence in `translations/reference_matches.json`.
+  The permission now covers 207 records and still changes no native consumers.
+- All 75 references preserve their complete supplied English wording, manual
+  lines, pages, emphasis, and pauses. Nine redundant `CUTARTICLE` commands are
+  removed through the existing adapter in seven records: `15F6`, `15FF`,
+  `16CC`, `16CE`, `1869` (two), `18DE`, and `2C94` (two). Across the project,
+  fourteen approved records use this adaptation. No English word is removed.
+  Non-expression actor requests, fields, gameplay commands, capacity, and full
+  hashes remain guarded; no combined permission is introduced.
+- Checked connected native context before approving ambiguous responses.
+  `18A3` selects `18B0` through its third option `00A2`, whose existing English
+  label is `Orange`; the response concerns the letter's impression, not a roof
+  colour. Native `186F` supplies fruit field `34` and recommends planting it,
+  while `1870` describes catching the wanted creature, confirming `1869`'s
+  fruit-for-creature exchange. Installed parent `207A` and sibling `2771`
+  use the same English girls/fluffy-snow joke as `2772`.
+  Trade, zodiac, outfit, weight, fishing, and game-result decisions remain
+  native. The 1,000-Bell carpet and dynamic price/payment/item fields remain.
+- Added eighteen source-hashed originals in
+  `translations/n64-community-conversations.json`. White Day and Valentine's
+  records retain giving chocolates, reciprocal gifts, cookies, the white-
+  chocolate misunderstanding, and March 14. `17FB/1D43` retain the Children's
+  Day/Doll Festival/May contrast. `1808` keeps next month's fireworks, not
+  July 4. `2811` retains the 6th/7th and remembered 5th, the shrine plaza,
+  and the miso-soup comparison. `1689` retains both traditional fireworks
+  calls and asking the player's father what they mean.
+- `11F3` keeps fish/insects in the player's room without food or tank supplies;
+  it does not invent the GameCube museum/Blathers donation feature. `1084`
+  keeps Nook's mock sculptor fee, self-made monument, no charge, and thanks
+  for the player's custom. All seven native pages remain; Nook receives no
+  resident-expression permission. `2837` keeps the countdown invitation and
+  finishing year-end cleaning early rather than replacing the ending with
+  next-day sports viewing. `27D2` keeps the bitten-moon/Thirteenth Night joke.
+- Every original command and argument remains exact. Initial focused validation
+  caught a misplaced name/pause in `1084` and a player-field/pause order in
+  `2837`; corrected the English placement without changing native controls.
+  Final conservative expansion bounds, in draft-file order, are
+  `450 237 352 390 130 236 311 164 225 161 192 122 340 300 272 399 490 360`.
+  No truncation, split, formatting exception, larger buffer, or runtime patch
+  is needed. The original drafts remain marked for final wording/layout review.
+- Moon-viewing `180C/2825` retain the annually converted date in fields `3C/3D`
+  and require the complete ordinary-dialogue date patch. Both generic free-
+  field layout warnings stay visible; the longest English month/day values
+  fit with the approved advances. Existing native eighth-month day-15
+  preparation tests apply to the unchanged date code; this batch does not
+  claim new ordinary seasonal selection or rendered insertion checks.
+  Basic candidate generation completes with 10,124 edits, admits the sixteen
+  unconditional drafts, and withholds all five date-dependent drafts.
+- `build/tests-community-conversations-full-01.log` passes all 457 tests in
+  186.203 seconds. Focused checks also pass six original-community tests and
+  all eight animation tests covering 207 references and exactly fourteen
+  article-adapted records. Complete native controls, source identity, layout,
+  meanings, dependency selection, and independent builder guards pass.
+- `build/smoke-community-conversations-01/` passes all 93 new complete cartridge
+  loads in one fresh silent four-MiB process: 93 calls, 281 assertions, and
+  474 recorded steps. Full headers/text, adjacent/module guards, checkpoint
+  restoration, blank 131,072-byte FlashRAM, and graceful shutdown pass.
+  No unchanged train, expression-selector, or mail batch is repeated.
+  Ordinary trades/payouts, letter replies, moving, bee escape, seasons, poses,
+  saving, and original hardware remain gameplay/playthrough acceptance work.
+- Final ROM `build/community-conversations-pilot/animal-forest-halfwidth.z64`
+  has SHA-256
+  `e1bc1d345c503f1e9eb429154649644bbea20389c5a49182e6e3f541bc147033`;
+  its independently verified UPS round trip has patch SHA-256
+  `579a6be7c03a7afc79ce503fefae66f88794044e3ccde5d99c16c3531b0038ae`.
+  All previous 10,714 candidate edits remain identical. A comparison of every
+  extracted DMA file finds changes only in main text, its pointer table, and
+  the DMA directory rows; the directory container's other bytes are unchanged.
+  All executable code, overlays, fonts, spacing, runtime, and resources remain.
+- The candidate file contains 10,807 edits: 9,478 reference main candidates
+  plus 84 original main drafts, giving 9,562 main candidates. The 2,190 main
+  records without candidates include 1,259 with Japanese static text, nine
+  placeholders, 919 without static text, one Latin record, and two number/
+  symbol records. Ten command-only records contain dynamic insertions.
+  The rejection queue has 1,794 unconfirmed identities, 322 control-signature
+  differences, 69 missing fields, and six overflows. There are 1,424 conservative
+  reference-layout warnings, 41 confirmed native aliases, and 70 alias conflicts.
+  These counts do not establish final translation or gameplay review.
+- Regenerated review output in `build/community-conversations-review/` contains
+  fourteen comparisons: Rover `0467`, Gracie `0723`, Booker `0785`, Redd `0789`,
+  Jingle `07AA`, Phyllis `08B0/08B2`, sleeping resident `0D3F`, title-menu
+  `14A2/14D9`, and Gulliver `2403/240A/240B/240D`. Their actor/state consumers
+  need separate review. Reports and coverage are in
+  `build/community-conversations-candidates/` and
+  `build/community-conversations-coverage/`. The broader identity/field/control/
+  overflow queue, general strings and other destinations, normal gameplay,
+  saves, final review, patch-only release, and stretch work remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

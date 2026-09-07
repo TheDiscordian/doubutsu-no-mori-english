@@ -1,5 +1,830 @@
 [
   {
+    "id": "message:1143",
+    "reference_id": "message:1143",
+    "source_sha256": "580b5e4595842c84d31582c42be397c9f99e0776325ffff9fb5a15a941e44267",
+    "reference_sha256": "cf5e9878b4c674c9df046235ef0f10f56ecd804835d0dc44fe843f6520909003",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "cf5e9878b4c674c9df046235ef0f10f56ecd804835d0dc44fe843f6520909003"
+    },
+    "evidence": "Snooty resident praises the person in field 38 for supplying the craved fruit in field 26 and tells the current player to learn from that kindness. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1175",
+    "reference_id": "message:1175",
+    "source_sha256": "e65bf3851f8ed4da2b8bf66c638b09e2e24f300e2f012634d00793d141ccbc75",
+    "reference_sha256": "e78accab96a26f27f4e75da53d5931f8fce1ec76d7bba29df27c97eb8d132e44",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e78accab96a26f27f4e75da53d5931f8fce1ec76d7bba29df27c97eb8d132e44"
+    },
+    "evidence": "Jock offers the native amount in field 2D as a reward and responds to possible disappointment; the English cash-on-hand joke does not change the reward. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1252",
+    "reference_id": "message:1252",
+    "source_sha256": "0f1212287cade9be3205d5f8f348c949c035121ac7fd68a662eb3fb325339fd5",
+    "reference_sha256": "97cf6623c81ffe38a116a8fe3dc15ad41afa6ddfd3e341caf3bb2afa3f90958b",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "97cf6623c81ffe38a116a8fe3dc15ad41afa6ddfd3e341caf3bb2afa3f90958b"
+    },
+    "evidence": "Jock's late-night first meeting retains the laughing introduction, resident name, catchphrase, and reassurance about the unusual mood. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1256",
+    "reference_id": "message:1256",
+    "source_sha256": "aae280084bc8f7082feba87d632a2ff986bb416d5edbbbaf9d003bec5cd794ca",
+    "reference_sha256": "03fccf13749c309502c76cf5dbb77744dcf55cf45c41422f070ed24373820d2a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "03fccf13749c309502c76cf5dbb77744dcf55cf45c41422f070ed24373820d2a"
+    },
+    "evidence": "Cranky morning introduction retains the happy-hello joke, self-introduction, player name, and closing greeting; English adds the dismissive aside. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1257",
+    "reference_id": "message:1257",
+    "source_sha256": "2f3991b1160f140fffb8c52c09bb03c1fdad75cc4806e0f5f025e0c9acababcc",
+    "reference_sha256": "46829ec36db25ed347b9e12291de714111182a54668b17b53a3db2bbae7033fe",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "46829ec36db25ed347b9e12291de714111182a54668b17b53a3db2bbae7033fe"
+    },
+    "evidence": "Cranky first meeting retains laughter, the player's introduction, and approval of polite manners. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1528",
+    "reference_id": "message:1528",
+    "source_sha256": "810612d97357ed69d178b9db1f90561bd3ccaefb31e980679d1e381e9b3e97ec",
+    "reference_sha256": "710cdb907fe47a61fedf3a5c3647d366df110d4e1746b284334d6300b7ee55d7",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "710cdb907fe47a61fedf3a5c3647d366df110d4e1746b284334d6300b7ee55d7"
+    },
+    "evidence": "Normal resident asks about the player's fishing experience. Native choices 00EF/0054 and branches 1532/1533 remain; river/beach wording does not introduce another activity. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1529",
+    "reference_id": "message:1529",
+    "source_sha256": "da21334a320158a13939a45c75e85a483e9235915e938c5e92023f8faab05a9c",
+    "reference_sha256": "fffcf42d665d23bc1e926a2662462143b9a10d8b01d1c99e78f377afbcff3223",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fffcf42d665d23bc1e926a2662462143b9a10d8b01d1c99e78f377afbcff3223"
+    },
+    "evidence": "Normal resident recommends the reading item in field 33 obtained from person 39. Native request 0C/9/3 and the player/catchphrase fields remain unchanged. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1815",
+    "reference_id": "message:1815",
+    "source_sha256": "fbcc049c6106f401309b4a387195de1ce6855e70483a9fb260973579e2649d4a",
+    "reference_sha256": "9e3f85e52e29075c4b57e111811045b0504859d13c4139ab7c2d4f1e6c3e8138",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9e3f85e52e29075c4b57e111811045b0504859d13c4139ab7c2d4f1e6c3e8138"
+    },
+    "evidence": "Peppy resident warns the player to stock Halloween candy and hints at consequences without it; the English sweet-deal joke retains that warning. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1869",
+    "reference_id": "message:1869",
+    "source_sha256": "fa027599f57632b17d97464f7abaf32317fd3ff8a7847d1795fabff017f64b49",
+    "reference_sha256": "63360bdb05916fe5605db2456b9f354afd3e86f11f16d7908e6570971d035673",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "83fe68d80a805084d5a7075f869329bd59fdb87d8ad35985e9e93b369ce8b0f3"
+    },
+    "evidence": "Lazy resident proposes trading fruit in field 34 for the creature in field 31. Native request 0C/2/7, choices 0043/0034, and branches 186F/1870 remain. Native acceptance 186F supplies field 34 and recommends planting it; refusal 1870 describes catching the creature. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:2772",
+    "reference_id": "message:2772",
+    "source_sha256": "70b5e9111f51b370562613c41c3d5c682a26f012fea1bfcab0c13fd22e7f9b5e",
+    "reference_sha256": "c5584b84a0eb1baa4f50ed3b2de0eb525f6489b8a597ff85008e6558f7691bed",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c5584b84a0eb1baa4f50ed3b2de0eb525f6489b8a597ff85008e6558f7691bed"
+    },
+    "evidence": "Lazy resident disputes the player's rejection of the girls/snow comparison. English fluffy-snow wordplay matches the installed English parent 207A and sibling 2771; native refusal request 0C/5/0066 remains. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2799",
+    "reference_id": "message:2799",
+    "source_sha256": "c1e2c32ee45cd877ffb456fe496e8eab3bee2bd38cc4e8592fac0891911c7f07",
+    "reference_sha256": "73cea906d01fe0a37271ed071fbf808638566d9df73c80f705d429dfd2e14d53",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "73cea906d01fe0a37271ed071fbf808638566d9df73c80f705d429dfd2e14d53"
+    },
+    "evidence": "Jock's secret for staying dry is to remain indoors, though that does not suit the speaker; request 0C/5/2 and the secrecy joke remain. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:0BE8",
+    "reference_id": "message:0BE8",
+    "source_sha256": "f726605940f8a63c4304e1fa7c78d4a417f7da82a4368487ca88e09ac55d9fc0",
+    "reference_sha256": "6421d381d7dbf67d30d9dbefe53a7f5bb565c3b60c7e58c2f0d8764b881524dd",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "6421d381d7dbf67d30d9dbefe53a7f5bb565c3b60c7e58c2f0d8764b881524dd"
+    },
+    "evidence": "Peppy resident greets the player at night and describes fear of rain sounds in the darkness; the shivering English elaboration retains the native weather and continuing conversation. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:117A",
+    "reference_id": "message:117A",
+    "source_sha256": "f60907ca9844b916f6befa74045414d820c8e2caa93112ce78cb1fd227f5426e",
+    "reference_sha256": "9c6abecab415996ed03965ad4a60a0947c4ec26e409ced8892ea46df38d73037",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9c6abecab415996ed03965ad4a60a0947c4ec26e409ced8892ea46df38d73037"
+    },
+    "evidence": "Snooty resident pays amount 2D rather than accepting an item for free, and compares the payment with the shop's price; English adds romantic gossip without changing the transaction. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:11D0",
+    "reference_id": "message:11D0",
+    "source_sha256": "d65202cc7c5a4247aa4fdf4aadc77880d7dfaf553965db485e54fd5a84a990e0",
+    "reference_sha256": "1f173e069fff35ca2f7ca37c20a55b8c01c67ff96a35fa870bdcd6068c7eb75f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1f173e069fff35ca2f7ca37c20a55b8c01c67ff96a35fa870bdcd6068c7eb75f"
+    },
+    "evidence": "Normal resident hints that big fish can be found beneath the waterfall, tries to retract the secret, and warns that a large catch is not guaranteed every time. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:11E1",
+    "reference_id": "message:11E1",
+    "source_sha256": "928777e4609da2fbf6b2ee8782fe97511ad8d6ee6e1e5a94dda60c5a1f595304",
+    "reference_sha256": "f0fa181d592178220b0bb02d48240532648beaf641d37e2b809515e253d803c5",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "f0fa181d592178220b0bb02d48240532648beaf641d37e2b809515e253d803c5"
+    },
+    "evidence": "Normal resident is tempted by Redd's advertisement but disappointed by ordinary furniture; English adds price commentary while retaining that warning. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:11E8",
+    "reference_id": "message:11E8",
+    "source_sha256": "65c495618f3e4aadffd766bc8d9e8777def1a912c00e0d4ed2a6fcafda28d3d8",
+    "reference_sha256": "b36780c96f130806c376ed69bca398524423c5263605e3ddaf49759836a9a010",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b36780c96f130806c376ed69bca398524423c5263605e3ddaf49759836a9a010"
+    },
+    "evidence": "Normal resident describes disappointment with Katrina's uncertain predictions; English localises the scepticism as a complaint, without promising a gameplay effect or requesting an action. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:12C4",
+    "reference_id": "message:12C4",
+    "source_sha256": "1556295109a767ffde7c2420801a17567ae0b289b1d5aae12b7ff15987e03fe0",
+    "reference_sha256": "de08a6249d659a96c9508d99313f9754aeb1b2c5f71646c67c762ee59f04f9d2",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "de08a6249d659a96c9508d99313f9754aeb1b2c5f71646c67c762ee59f04f9d2"
+    },
+    "evidence": "Happy resident describes becoming giggly while talking; the added laugh remains ordinary resident expression delivery. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:13C8",
+    "reference_id": "message:13C8",
+    "source_sha256": "a6722ae680ad2cc82b704459fd04e341936d31df1d70c745fdfc1edca635bc28",
+    "reference_sha256": "da35aa314b47f25529bd39dba1bcca7ee600392e1a99859bc6332ab87f17d191",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "da35aa314b47f25529bd39dba1bcca7ee600392e1a99859bc6332ab87f17d191"
+    },
+    "evidence": "Normal resident asks to buy or trade for item 31 after previously being unable to afford it. Choices 00AD/00AE/00B0 and branches 13CD/13CE/13CF retain their native order, with requests 09/2/5, 09/8/0, and 0C/2/1. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:13E5",
+    "reference_id": "message:13E5",
+    "source_sha256": "49df71bc9a33e5e5cf5d5c7f3e826fbb1b8c2eb258ed51f149c7839b6208b9bd",
+    "reference_sha256": "8feafc2c51c9b80767a289ef1b727ac3569b7dc34609ab0b480b0f51d02ee9d9",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "8feafc2c51c9b80767a289ef1b727ac3569b7dc34609ab0b480b0f51d02ee9d9"
+    },
+    "evidence": "Normal resident objects to refusal of a used carpet priced at exactly 1000 Bells. The refusal request 0C/5/0066 and final warning remain. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:14E6",
+    "reference_id": "message:14E6",
+    "source_sha256": "bcdc794c33afdf62b1bbe9185a575ebf7cfa86cfa2f876692025bacff67f43d0",
+    "reference_sha256": "da1f02e91635cfe64b1e368b23fc59171f2da55f32ee578d7bbe01f7282e9e09",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "da1f02e91635cfe64b1e368b23fc59171f2da55f32ee578d7bbe01f7282e9e09"
+    },
+    "evidence": "Snooty resident discusses Gracie's fashionable clothes and dirty sports car. The complete English localisation uses Gracie's English character presentation, without changing the native car-washing activity. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:14E7",
+    "reference_id": "message:14E7",
+    "source_sha256": "8a983ccbf394402f8303cecb2896dc98d8df2b506ecc3964a957b4c1db03a889",
+    "reference_sha256": "b5a8f2b8ddabe667b18813f72baee3c8d55d1f0c795580774522a37254e6fa01",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b5a8f2b8ddabe667b18813f72baee3c8d55d1f0c795580774522a37254e6fa01"
+    },
+    "evidence": "Peppy resident resents Gracie's criticism of the resident's outfit; English jealousy and self-confidence jokes retain the encounter and outcome. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:150C",
+    "reference_id": "message:150C",
+    "source_sha256": "3b53a5487de84e125955c2ebf5ee1f140d0ac4f1ca37dc60e56e88ca67b958d5",
+    "reference_sha256": "2f74d2229133d38ca188108c39430e8ade811ff1b1dd477d8521bf2781923033",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "2f74d2229133d38ca188108c39430e8ade811ff1b1dd477d8521bf2781923033"
+    },
+    "evidence": "Peppy resident asks whether the outfits look good. Native request 0C/2/7, choices 004C/0052, and branches 1511/1512 remain exact. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:157C",
+    "reference_id": "message:157C",
+    "source_sha256": "1a7fe80a24aadd7c60d04ae648a7cfa6dd8581d7e926a6f7d655d7e3c544fba6",
+    "reference_sha256": "980fd915ac9e3cf210e841d1f801d6022b6fddc898afa60853c469be1c690f94",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "980fd915ac9e3cf210e841d1f801d6022b6fddc898afa60853c469be1c690f94"
+    },
+    "evidence": "Normal resident offers item 31 and hopes the player likes it; the continuing reward boundary remains. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:15CA",
+    "reference_id": "message:15CA",
+    "source_sha256": "3dae44e98c8c880489c56555d37998cbb0a5b45bc951ab041aee1746911a2561",
+    "reference_sha256": "4633ed2f294524f80799b77134ebb32496d25e9a8f2dd69b0fdb7960044d3524",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "4633ed2f294524f80799b77134ebb32496d25e9a8f2dd69b0fdb7960044d3524"
+    },
+    "evidence": "Lazy resident praises person 38 for catching a bug when friendship depended on it. English elaborates the deception joke while retaining the helper and result. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:15F6",
+    "reference_id": "message:15F6",
+    "source_sha256": "f60129a533a7a68014c209d99de7b26e6b3f0ffeb4f9cb9e2fefc245854bec71",
+    "reference_sha256": "da668269bffc1b2071608bc0d7c014e8117f0e1855f2e0a2527c429b5af3ea70",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "d56f7f6332092dc3706b6362d0f3e5760fe53ad4cf92e93383df13819913b68f"
+    },
+    "evidence": "Snooty resident offers item 31 originally bought for a boyfriend; no new recipient or item action is introduced. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:15FF",
+    "reference_id": "message:15FF",
+    "source_sha256": "4980735255dc79c04d1cf921e78a1aabc6f92513409d3ba368762793bdec821a",
+    "reference_sha256": "cc2f595c958e6332d41e49e9f0b73266a6b4f35ee11f57bc29083a18e6e66540",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "98156837fe51009ac300b65d327e95070e365d0724f6bf50f219f1852d0701b4"
+    },
+    "evidence": "Lazy resident gives item 31 for the player's home and hopes it will be displayed there. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:16AC",
+    "reference_id": "message:16AC",
+    "source_sha256": "7dadb17cca0933ead87f175f426cb6a38c0c6a11e6c67c8822ac2f688c7be29d",
+    "reference_sha256": "29f9d7158ccafb07ea0a6baf4006b8c53ac75163ccb4efe4db3bd607b129894d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "29f9d7158ccafb07ea0a6baf4006b8c53ac75163ccb4efe4db3bd607b129894d"
+    },
+    "evidence": "Snooty resident first accuses the player of lying, then decides to trust the player this time; English combines the same conclusion into fewer pages. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:16B3",
+    "reference_id": "message:16B3",
+    "source_sha256": "51f45470eb89857bcdd9111f38d5f4e54298020c96d744fadeed734ad7576a71",
+    "reference_sha256": "9dda2802fab82826a713edcea5379c7a75867debfc24542ef847db8036dced94",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9dda2802fab82826a713edcea5379c7a75867debfc24542ef847db8036dced94"
+    },
+    "evidence": "Snooty resident was only asking and advises earning a wanted item by helping others; no item grant is promised. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:16C3",
+    "reference_id": "message:16C3",
+    "source_sha256": "d5b440e1404f591ec109f85185ba68d7c886959534f984e0ec4f9668a2e0fe9b",
+    "reference_sha256": "adfb3699f05822bb7ed2e89574928b8860c52e88b573189c4c0157b0bbcd7d50",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "adfb3699f05822bb7ed2e89574928b8860c52e88b573189c4c0157b0bbcd7d50"
+    },
+    "evidence": "Lazy resident asks whether the player has gained weight, retaining choices 011E/001A and branches 16D5/16D6. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:16CC",
+    "reference_id": "message:16CC",
+    "source_sha256": "aa5c4267d8fc11f98961a0463fcb23c21d8c4792c53510bf2dbb8cde57c713c3",
+    "reference_sha256": "0290da59f852af33c9781a33990efa730a687c9b038ac148ca2547a4d6359946",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "db4338a70b69f79b1edaea53d497707e071bc7f11adb898774d30ba4cb9cec53"
+    },
+    "evidence": "Lazy resident guesses the player's zodiac year from reading habits. Native requests 0C/5/2 and 0C/9/4, field 31, choices 00C3/00C4, and branches 16CE/16CF remain. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:16CE",
+    "reference_id": "message:16CE",
+    "source_sha256": "751bac17ac3abfe19db55c791c0440b0dcd71f4a4cb437d06754f4319863d6e7",
+    "reference_sha256": "225dd5a15576975f58db9d2d59337f2f88a68bccdd6001037abce40355f7c9c4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "35947edc419bb36167acfc17e2f3f4d500940cc3092c0ae949c043001bd78c47"
+    },
+    "evidence": "Correct zodiac guess retains request 0C/5/2, the supplied zodiac field 31, and the connection with reading difficult material; English omits the repeated closing surprise without changing the response. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:17F8",
+    "reference_id": "message:17F8",
+    "source_sha256": "9d90211257939ac9bb7d8b89aadb898f19379c593c3b2c067ff9f6d2d64f1d90",
+    "reference_sha256": "de971bf3b1a9935ba31068fef27c1308199f3ad38d371ca153c81469b99b3e51",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "de971bf3b1a9935ba31068fef27c1308199f3ad38d371ca153c81469b99b3e51"
+    },
+    "evidence": "Peppy resident admires spring blossoms and anticipates the native cherry-blossom gathering; English falling-petal imagery and Cherry Festival wording refer to the same event, without changing a date or venue. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:181E",
+    "reference_id": "message:181E",
+    "source_sha256": "1211ffcc95ad2598352c8e969687b0923658ded7c6a870ae0057b3f2f007641e",
+    "reference_sha256": "7eefde7671729be72f287bbeeb1f3215e908f6e25e2d7e66f94a206402cfe75d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "7eefde7671729be72f287bbeeb1f3215e908f6e25e2d7e66f94a206402cfe75d"
+    },
+    "evidence": "Peppy resident invites the player to the pond/lake on New Year's Eve and insists on meeting there to welcome the new year. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:182A",
+    "reference_id": "message:182A",
+    "source_sha256": "214b13f1d9b159132a9e30d2bd4f23fffd39a1355ddfbbe6534c30150254e6af",
+    "reference_sha256": "9b7cbfa2d9273dd5266412b432563f109ec247eae35de7542c29e644e0ecc62e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9b7cbfa2d9273dd5266412b432563f109ec247eae35de7542c29e644e0ecc62e"
+    },
+    "evidence": "Peppy resident expresses disappointment that the player cannot feel the seasonal atmosphere; no new action or event is introduced. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:188F",
+    "reference_id": "message:188F",
+    "source_sha256": "34f8ffd3967d8346e5ea0fb59361c131f7a74b93a67bcb4da2b6d94df717ed9c",
+    "reference_sha256": "798aab6b63da3735774857b9509c4f65ab3d74d461ac7068afb2aee19ccfe6f5",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "798aab6b63da3735774857b9509c4f65ab3d74d461ac7068afb2aee19ccfe6f5"
+    },
+    "evidence": "Lazy resident reports the hungry artist who supplies special wallpaper in exchange for food; English worldly-possessions commentary retains the native artist and exchange. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:18B0",
+    "reference_id": "message:18B0",
+    "source_sha256": "452a096ca643bc49e3e611f15db47895d8233c3e39ca24f3493204e2a22fd761",
+    "reference_sha256": "e3d2d734a470de14d77f53d8313a3d541fc678696abb458a3c64ff1d0809ffa8",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e3d2d734a470de14d77f53d8313a3d541fc678696abb458a3c64ff1d0809ffa8"
+    },
+    "evidence": "Lazy resident responds to the orange impression of a letter, then becomes hungry. Native parent 18A3 retains the third choice 00A2 and branch 18B0; request 0C/5/3 remains. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:18BD",
+    "reference_id": "message:18BD",
+    "source_sha256": "27b4edee0f5b56a38d2d909df2f7e96cfd0747fa125d8979ccaae8ad9594f849",
+    "reference_sha256": "ed6d9b357deb620bd05c4c6da2ecd20d141f71c9e26f82459ce33657b60c8833",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "ed6d9b357deb620bd05c4c6da2ecd20d141f71c9e26f82459ce33657b60c8833"
+    },
+    "evidence": "Lazy resident wonders what former friend 3B is eating and corrects a fighting claim into having talked together; English preserves that correction and prepared identity. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:18C0",
+    "reference_id": "message:18C0",
+    "source_sha256": "efc3073dfe439fd0bee1dc6a229349d6ce9afe85c7666c70270bec3a31c2d5d7",
+    "reference_sha256": "c767e7f6683d40a1e71a243c415116f1ab51a3a882fd9674f8bda167c12e5538",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c767e7f6683d40a1e71a243c415116f1ab51a3a882fd9674f8bda167c12e5538"
+    },
+    "evidence": "Lazy resident comments on an out-of-town visitor leaving a letter, then becomes hungry. English replaces the Japanese diligence/bean pun; native letter-related requests 09/2/2 and 09/8/1 remain unchanged. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:18DE",
+    "reference_id": "message:18DE",
+    "source_sha256": "27e26eae3997d5cc3aabb0614c4a6e9a1c6db159d213e2a444ae298a32a05708",
+    "reference_sha256": "6d9ad933eda1f6b64a0640f12136c6598490efa9ba31b71f6547c60d9ed78d0a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "827bda6698e8ceaa258b4d3de2bc3f025540a043791b45adcbdb14987f3316f9"
+    },
+    "evidence": "Successful guessing retains psychic-powers praise, protecting the current town, and the promised reward in field 35 through request 0C/3/4. English changes only the personal embarrassment joke. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:1AF1",
+    "reference_id": "message:1AF1",
+    "source_sha256": "d1e79bb6fbe66f167d1d3d7b75aa21c4521b3fd51898283d2dcffb098f74e620",
+    "reference_sha256": "2dfee345f10a6bd0335582e3b609dcc5a1c0224dea810b27f1e3092a7162efb1",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "2dfee345f10a6bd0335582e3b609dcc5a1c0224dea810b27f1e3092a7162efb1"
+    },
+    "evidence": "Snooty resident receives boyfriend letters, denies lacking friends, and wishes other people would write too. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1B16",
+    "reference_id": "message:1B16",
+    "source_sha256": "7dedc1a69440c443d41071de8104cc62f9551ff2c71e59dfe65f4d346dd73baf",
+    "reference_sha256": "187fd3c225766b5a3379ec5ab75949d3e0866688330c64269071675d0f8370b4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "187fd3c225766b5a3379ec5ab75949d3e0866688330c64269071675d0f8370b4"
+    },
+    "evidence": "Snooty resident thanks the player for a letter but cannot send a reply and complains about being left carrying it; English preserves the native undeliverable-reply situation. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1B26",
+    "reference_id": "message:1B26",
+    "source_sha256": "23eaa35d3338c5b55c111a1f41dd5f61b7b17cbc1e345792fffa6ecf8311cb68",
+    "reference_sha256": "021bbf368e2de5d64060053e2e700b32a1d7c8aa63834b99cfefa0fc7b5c6587",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "021bbf368e2de5d64060053e2e700b32a1d7c8aa63834b99cfefa0fc7b5c6587"
+    },
+    "evidence": "Snooty resident acknowledges the player's letter, says a reply was sent promptly, and keeps its contents secret. English omits the repeated mailbox-location instruction but retains the delivered-reply claim and all gameplay controls. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1B69",
+    "reference_id": "message:1B69",
+    "source_sha256": "3862172c8cee896bdbceba0a3661778ac489e5c24dd9deb466bcbe0976db2803",
+    "reference_sha256": "9ad6f66f53c727b9626d1e82712e95501ba80b0ed439d48b261f6d2b5481dbf0",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9ad6f66f53c727b9626d1e82712e95501ba80b0ed439d48b261f6d2b5481dbf0"
+    },
+    "evidence": "Lazy resident reacts to bee stings, asks whether the player ran, and discourages trying to catch bees. The English admonition is the character's reaction, not a new restriction on the catching mechanic. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1B8A",
+    "reference_id": "message:1B8A",
+    "source_sha256": "fbdcd67cf915694aaea2aa150d6e024b0ca140bd1652ce2a96b8458056264e74",
+    "reference_sha256": "782ab0093f0259c59413cb8ab7d0e28ddac56aa705e9d3dfe6032053ec06d03a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "782ab0093f0259c59413cb8ab7d0e28ddac56aa705e9d3dfe6032053ec06d03a"
+    },
+    "evidence": "Snooty resident reacts to bee stings and recommends escaping into the nearest house/building; English boasting retains the native escape advice. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1C6D",
+    "reference_id": "message:1C6D",
+    "source_sha256": "a3f593e79c2adf21cc6f598d35177159710fc2b09f0ff1868cf698d272f3bc34",
+    "reference_sha256": "13fa76bf8bd5671c75a8d50dc3f2849af687ed6e665a5198a2367d4b35051480",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "13fa76bf8bd5671c75a8d50dc3f2849af687ed6e665a5198a2367d4b35051480"
+    },
+    "evidence": "Jock is embarrassed by friend 3B's sentimental letter but happy to receive it. Native requests 09/2/1 and 09/8/1 remain, along with the current player field. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1C70",
+    "reference_id": "message:1C70",
+    "source_sha256": "995216e6c327d61470daa5e5cd27fa4a10a1ba00397ca9b78648c822b364e950",
+    "reference_sha256": "64ebef6ddb9705307a0fcd98f11579dad0fc8ed9227682cdeb2e0a19179b0dbb",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "64ebef6ddb9705307a0fcd98f11579dad0fc8ed9227682cdeb2e0a19179b0dbb"
+    },
+    "evidence": "Jock is impressed that the player understood the letter; English adds a rhetorical request for an explanation without changing native request 0C/5/5 or adding a choice. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1CAB",
+    "reference_id": "message:1CAB",
+    "source_sha256": "30a170edd316627caa8fa5a29b501cf7c261ce7e42092d022d9014bda412eb9a",
+    "reference_sha256": "5b8707e653fc23fb5da03d0fbf8751c85839597505b5f5eab5b964029733f672",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "5b8707e653fc23fb5da03d0fbf8751c85839597505b5f5eab5b964029733f672"
+    },
+    "evidence": "Jock resents a refused trade and calls the player stubborn. Native refusal request 0C/5/0068 remains; English changes the complaint, not the refused transaction. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1CF3",
+    "reference_id": "message:1CF3",
+    "source_sha256": "6228190b9d87fa40e5323ff96543084cb84553f4015d1bf18aba4a980ea241a0",
+    "reference_sha256": "e87d1430bc27dcf0c4fa198fa19ff1eae46084a2cafeaae34093b6bbafbcb58a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e87d1430bc27dcf0c4fa198fa19ff1eae46084a2cafeaae34093b6bbafbcb58a"
+    },
+    "evidence": "Jock praises traveller 3B for visiting the current town and leaving a letter, then asks the player to write more letters too. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1D3A",
+    "reference_id": "message:1D3A",
+    "source_sha256": "1bcf2aa3229fa9d8ed7f7a3a452c7843e1e8f1941e5f40ef3452e17ad84c4e42",
+    "reference_sha256": "14f384c3698054d649cd89c738d2220f8dab6e2c00352a3cf84bfa850a57424d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "14f384c3698054d649cd89c738d2220f8dab6e2c00352a3cf84bfa850a57424d"
+    },
+    "evidence": "Snooty resident agrees that the weather is already cold and complains about snow. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:1D6D",
+    "reference_id": "message:1D6D",
+    "source_sha256": "e4971a717bfe6ba653d03cbe3abeb1ea5ea7993f803da76f02f46d57ed478de6",
+    "reference_sha256": "cceba729c734543faf59fe18575e3921bb4798f6920233fe85c863d3fa9a3813",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "cceba729c734543faf59fe18575e3921bb4798f6920233fe85c863d3fa9a3813"
+    },
+    "evidence": "Normal resident asks whether the current year was good for the player. Current-player/year insertions and native continuation control 5832 remain unchanged. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:27DB",
+    "reference_id": "message:27DB",
+    "source_sha256": "3efed0b3f52e637dc264233d55cd8bc49e6fb446109d1bdd5e65984ed175448c",
+    "reference_sha256": "88cd0f4c3754b7a60802f92cfe7bac95811b970a67b7be0b357adc92c35e7854",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "88cd0f4c3754b7a60802f92cfe7bac95811b970a67b7be0b357adc92c35e7854"
+    },
+    "evidence": "Lazy resident describes the unknown Halloween visitor who gives presents and may therefore be friendly; current-town identity and event remain unchanged. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:27F0",
+    "reference_id": "message:27F0",
+    "source_sha256": "464abfa9986d30e0a4ab1feb2f769e85aba8837a1cfa0bd539a8296db70839be",
+    "reference_sha256": "ea9a52e35dde2901b7dfcf0a4c5ac799125e03014b41fa14b7279a2823d2a190",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "ea9a52e35dde2901b7dfcf0a4c5ac799125e03014b41fa14b7279a2823d2a190"
+    },
+    "evidence": "Lazy resident agrees about local mushrooms and notes that they are scarce and difficult to find. English expert-finder wordplay replaces the native delicious-matsutake emphasis without changing request 0C/5/1 or mushroom availability. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:285D",
+    "reference_id": "message:285D",
+    "source_sha256": "9d64fbeae83422c4fb2b940ab155c0a0a6549977a7202cb205e90b1bce3ab95b",
+    "reference_sha256": "adbc685e7d76a22facb1962a005d224b485962abf9225873c4674f92612583bd",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "adbc685e7d76a22facb1962a005d224b485962abf9225873c4674f92612583bd"
+    },
+    "evidence": "Cranky resident loses money trying to grow Joan's turnips as trees. English retains that turnips cannot be grown like fruit and the resulting loss. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:28D6",
+    "reference_id": "message:28D6",
+    "source_sha256": "2cfcdb7500367b657fe5bf69ddc37db85e9d973e1bb0076925e1a5d61e6de1cd",
+    "reference_sha256": "7fa1c1cd434bf33c686494cc0404c6f108acf24219356660e523b996c17285f4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "7fa1c1cd434bf33c686494cc0404c6f108acf24219356660e523b996c17285f4"
+    },
+    "evidence": "Cranky resident objects to a refusal and decides to obtain the wanted item independently. Native refusal request 0C/5/0066 remains. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2A1A",
+    "reference_id": "message:2A1A",
+    "source_sha256": "8c462bbf11cf6ca88e6ea97a25c187e6f32a84daf233314a8a61fb6d37ab7e44",
+    "reference_sha256": "c1b0ea9aaa1622df872ae4516332c72ac14b31cb9ff9b357bd2ddb1988c82e50",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c1b0ea9aaa1622df872ae4516332c72ac14b31cb9ff9b357bd2ddb1988c82e50"
+    },
+    "evidence": "Cranky autumn remark ends with a warning not to overeat. English condenses the food/sport/reading contrast without changing any activity, event, or action. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2A3B",
+    "reference_id": "message:2A3B",
+    "source_sha256": "292611ad61c3893e1ffd84d8f2324bac9473388abfa3e91a8bc685b39c784ca6",
+    "reference_sha256": "168a2293c5d546e0fb301522188a33affdc76eff576bef6dbcb8be68de92d949",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "168a2293c5d546e0fb301522188a33affdc76eff576bef6dbcb8be68de92d949"
+    },
+    "evidence": "Cranky resident feels pressured to do too much work on sunny days and cannot relax; English retains the native weather and frustration. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2A46",
+    "reference_id": "message:2A46",
+    "source_sha256": "965c48a1e82dc088d6741c41119890f21cc7e6c20effab16d3f1ffa9cb7812e1",
+    "reference_sha256": "169e9a8ea41b6d51bc50888e9040616e1b33445085a6f96c587c891191b957c4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "169e9a8ea41b6d51bc50888e9040616e1b33445085a6f96c587c891191b957c4"
+    },
+    "evidence": "Cranky resident prefers staying indoors in cold weather, eating field 34 and reading field 33. English omits the kotatsu aside; native preparation requests 0C/2/7 and 0C/9/3 remain. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2AAB",
+    "reference_id": "message:2AAB",
+    "source_sha256": "42a540855d39739ed7d96cce58d2e98cee8ff89736c5f001ce7f663a823bf960",
+    "reference_sha256": "d15ab8daa0fddd34001cdb7caad0824d4418ce6173dc4ac3014798f70bf53163",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "d15ab8daa0fddd34001cdb7caad0824d4418ce6173dc4ac3014798f70bf53163"
+    },
+    "evidence": "Cranky resident recommends staying home on a cold night, drinking field 35, and listening to music. Native drink preparation request 0C/9/1 remains. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BB0",
+    "reference_id": "message:2BB0",
+    "source_sha256": "c26c4b703b7bf32eb3b455c5cb8b69af2d6ce96e31ab86b089b53cb98e92d8b2",
+    "reference_sha256": "1510217474ec0af687a2fe39da7a0855ad98d3a87039a33765f97f7054b36a00",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1510217474ec0af687a2fe39da7a0855ad98d3a87039a33765f97f7054b36a00"
+    },
+    "evidence": "Jock's first meeting retains resident name, former town 36, and the habit of repeating the catchphrase; native introductory requests 09/2/5 and 09/8/0 remain. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BBB",
+    "reference_id": "message:2BBB",
+    "source_sha256": "636949e4933754a84772a1eda19a15c66a45774d536c4af6845e49aa0a61463c",
+    "reference_sha256": "a58ab71632e5870e56f80348771e3cb736ae5bfb3169a9da74da706657e9ac8d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a58ab71632e5870e56f80348771e3cb736ae5bfb3169a9da74da706657e9ac8d"
+    },
+    "evidence": "Cranky's first meeting retains self-introduction, apparent hostility, and reassurance; native introductory requests remain unchanged. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BBC",
+    "reference_id": "message:2BBC",
+    "source_sha256": "c7e23020639cd27c76a64dcc13b6f8cbaa630487c0ffbad8c1fb98d83a3773da",
+    "reference_sha256": "8800a22c11658b779d5deefaa6bcf15feee8e262e861ffc83b46d48dffd918fc",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "8800a22c11658b779d5deefaa6bcf15feee8e262e861ffc83b46d48dffd918fc"
+    },
+    "evidence": "Cranky's first meeting retains player and resident names and former town 36. English elaborates the sudden move without changing the prepared town identity or native introductory requests. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BBD",
+    "reference_id": "message:2BBD",
+    "source_sha256": "b5100b35310ec75f4d6d3459981efdc872882a05153f95a998bb4f6940f5165e",
+    "reference_sha256": "1fdb65d12ba7a8892eb8287a36ddcfa5f7cddf3e7f4898536d121fe2a583017d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1fdb65d12ba7a8892eb8287a36ddcfa5f7cddf3e7f4898536d121fe2a583017d"
+    },
+    "evidence": "Cranky's late first meeting retains the abrupt outburst, apology, self-introduction, and former town 36; English quiet-town jokes do not change the introductory requests. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BC4",
+    "reference_id": "message:2BC4",
+    "source_sha256": "c9bf3e4a97241b54d70bfde2deef5855a587fd324c945424d6fb8492c4fce6b2",
+    "reference_sha256": "8415c3156036195c69e6b91ee4dd8b9123d4c7fe7f165b5eeba54d70df93ad86",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "8415c3156036195c69e6b91ee4dd8b9123d4c7fe7f165b5eeba54d70df93ad86"
+    },
+    "evidence": "Snooty first meeting retains both introductions and native introductory requests. English name-teasing replaces the simpler native greeting and does not use the optional former-town field 36; no replacement town is invented. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BC6",
+    "reference_id": "message:2BC6",
+    "source_sha256": "c9bf3e4a97241b54d70bfde2deef5855a587fd324c945424d6fb8492c4fce6b2",
+    "reference_sha256": "80aac1f401678a1bcd246315d287155a5cba1ccb6b649203cc0d4b6ab428d1e6",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "80aac1f401678a1bcd246315d287155a5cba1ccb6b649203cc0d4b6ab428d1e6"
+    },
+    "evidence": "Snooty first meeting retains both introductions and native introductory requests, with an invitation to talk again. English does not use the optional former-town field 36 and does not invent a replacement town. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2BE3",
+    "reference_id": "message:2BE3",
+    "source_sha256": "8a30a99f1e40bec811830cb577c3d49c413eba2548cecd3d85278f2a54dc0c27",
+    "reference_sha256": "31d65fb35f3c837d9adbeb439521c5b0db0f0ab80fe3c3411ed9991c24593627",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "31d65fb35f3c837d9adbeb439521c5b0db0f0ab80fe3c3411ed9991c24593627"
+    },
+    "evidence": "Peppy's very-early first meeting retains confusion about whether it is morning, both introductions, and native introductory requests. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2C0B",
+    "reference_id": "message:2C0B",
+    "source_sha256": "29072578a9ad3404ef243d12318cb345db809f1ba002ca85bc5e02d0f4f3cb06",
+    "reference_sha256": "fe0cb58ba71ba6c72aba99b000ca702cf5e893da05a7ec6cd3aeca1ffdc47572",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fe0cb58ba71ba6c72aba99b000ca702cf5e893da05a7ec6cd3aeca1ffdc47572"
+    },
+    "evidence": "Snooty first meeting retains both introductions and native introductory requests; English movie-star vanity expands the native greeting without changing the encounter. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2C94",
+    "reference_id": "message:2C94",
+    "source_sha256": "febaee4434407e9928a5f654ba4432478c25c3510a7974026fe8211d2758bcc0",
+    "reference_sha256": "2a3473ff15d7c26e8ab5a22dfa16fc614dbe90306ce1d3583655fdd5cc4d1c4e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1fe5dbd1dfa13459a2703d1cee15d3aa4a023515d1ee77a88636008c6387b79f"
+    },
+    "evidence": "Matching-guess result retains purchase price 3F, item 32, transfer request 0C/3/0012, and completion request 0C/3/9. English preserves the compulsory purchase and subsequent invitation to play. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded. Remove only redundant pre-field CUTARTICLE through the existing adapter; native insertion does not supply an article."
+  },
+  {
+    "id": "message:2CDF",
+    "reference_id": "message:2CDF",
+    "source_sha256": "cf5d6ca8340606ad6a60930ac1e55dd38cca9f8798824083f37bdf410caaf4d0",
+    "reference_sha256": "bc468430d38c328024803a1bf6f99708a4ff7bf5ea6934b7bb71bb32122a6a21",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "bc468430d38c328024803a1bf6f99708a4ff7bf5ea6934b7bb71bb32122a6a21"
+    },
+    "evidence": "Lazy resident stops the game and concedes defeat. Native payment/completion requests 0C/3/0016 and 0C/3/000D remain; English adds the gambling joke without another wager. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2D05",
+    "reference_id": "message:2D05",
+    "source_sha256": "a40c435e387d1b469407973afcc5f842519298a4e2b30dcc913171e92bba0c60",
+    "reference_sha256": "c2c3bd93b26e838b3ea7716bf1f4d328069daf85ea6e9d5e66aed424130b0725",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c2c3bd93b26e838b3ea7716bf1f4d328069daf85ea6e9d5e66aed424130b0725"
+    },
+    "evidence": "Cranky resident reacts to an immediate wrong guess and pays amount 3F through request 0C/3/0016, then invites another attempt. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2D1A",
+    "reference_id": "message:2D1A",
+    "source_sha256": "0990e4c09ed54b1a2398b4410a5ca81484086484319d6f0013c567ee94683866",
+    "reference_sha256": "c68a4dfc1e4b82853ccba4a2939e7fdda5a0a6211e692da1101ae1ec7c25ef95",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c68a4dfc1e4b82853ccba4a2939e7fdda5a0a6211e692da1101ae1ec7c25ef95"
+    },
+    "evidence": "Cranky resident admits supervising while neighbours built the object; English expands the bossy-supervisor joke without claiming the speaker made it alone. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2D4C",
+    "reference_id": "message:2D4C",
+    "source_sha256": "8a30a99f1e40bec811830cb577c3d49c413eba2548cecd3d85278f2a54dc0c27",
+    "reference_sha256": "9239d18ae2cbfbebfdf0b3e592a6d7c6c0a49250f261c4bbfdd42cb2cba28782",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9239d18ae2cbfbebfdf0b3e592a6d7c6c0a49250f261c4bbfdd42cb2cba28782"
+    },
+    "evidence": "Peppy's very-early first meeting retains the morning confusion, both introductions, and native introductory requests; this exact English variant is reviewed separately from 2BE3. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2D75",
+    "reference_id": "message:2D75",
+    "source_sha256": "29072578a9ad3404ef243d12318cb345db809f1ba002ca85bc5e02d0f4f3cb06",
+    "reference_sha256": "fe0cb58ba71ba6c72aba99b000ca702cf5e893da05a7ec6cd3aeca1ffdc47572",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fe0cb58ba71ba6c72aba99b000ca702cf5e893da05a7ec6cd3aeca1ffdc47572"
+    },
+    "evidence": "Snooty first meeting retains both introductions and native introductory requests; the complete movie-star-vanity English variant is separately bound to this source. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2DBD",
+    "reference_id": "message:2DBD",
+    "source_sha256": "c26c4b703b7bf32eb3b455c5cb8b69af2d6ce96e31ab86b089b53cb98e92d8b2",
+    "reference_sha256": "1510217474ec0af687a2fe39da7a0855ad98d3a87039a33765f97f7054b36a00",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1510217474ec0af687a2fe39da7a0855ad98d3a87039a33765f97f7054b36a00"
+    },
+    "evidence": "Jock's first meeting retains name, former town 36, repeated catchphrase, and native introductory requests; this duplicate native record has its own full reference approval. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2DC8",
+    "reference_id": "message:2DC8",
+    "source_sha256": "636949e4933754a84772a1eda19a15c66a45774d536c4af6845e49aa0a61463c",
+    "reference_sha256": "a58ab71632e5870e56f80348771e3cb736ae5bfb3169a9da74da706657e9ac8d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a58ab71632e5870e56f80348771e3cb736ae5bfb3169a9da74da706657e9ac8d"
+    },
+    "evidence": "Cranky's first meeting retains name, hostile-sounding greeting, reassurance, and native introductory requests; this exact source/reference pair is individually bound. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
+    "id": "message:2DC9",
+    "reference_id": "message:2DC9",
+    "source_sha256": "c7e23020639cd27c76a64dcc13b6f8cbaa630487c0ffbad8c1fb98d83a3773da",
+    "reference_sha256": "8800a22c11658b779d5deefaa6bcf15feee8e262e861ffc83b46d48dffd918fc",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "8800a22c11658b779d5deefaa6bcf15feee8e262e861ffc83b46d48dffd918fc"
+    },
+    "evidence": "Cranky's first meeting retains both names, former town 36, the sudden-move English elaboration, and native introductory requests. Preserve the complete supplied English wording, manual lines, pages, emphasis, and pauses. Only reviewed NPC0 slot-zero standing expressions may differ; native non-expression actor requests, field availability, gameplay commands, capacity, and all complete hashes remain guarded."
+  },
+  {
     "id": "message:019C",
     "reference_id": "message:019C",
     "source_sha256": "324228eb0d19fe3efe8fa39100402939e24728941259d044f93cc5f1dd531c63",

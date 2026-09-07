@@ -1,0 +1,152 @@
+[
+  {
+    "id": "message:1084",
+    "source_sha256": "b9b435987885dc1564033ab837ab1b4c06b72722201de20f6243aeeb7acbccce",
+    "translation": "Welcome!{cmd:7F0308}\n{cmd:7F1A}, did you see\nyour monument{cmd:7F0306}?{cmd:7F04}\n{cmd:7F02}I commissioned{cmd:7F0306}\na famous artist,\nso it was{cmd:7F0308}\nquite expensive, yes!{cmd:7F04}\n{cmd:7F02}Now then,{cmd:7F0306}\nthe sculpting fee{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0319}{cmd:7F04}\n{cmd:7F02}Only{cmd:7F0304} joking!{cmd:7F04}\n{cmd:7F02}I made it myself.{cmd:7F0308}\nYou don't owe me a Bell!{cmd:7F04}\n{cmd:7F02}It's my way of{cmd:7F0304} thanking\nyou for doing so much\nbusiness with me,{cmd:7F0306} hm?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I hope you'll{cmd:7F0304} continue\nto favour my shop{cmd:7F0306}\nfor all your needs,{cmd:7F0304} yes!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Nook's monument, the mock artist's fee, the revelation that Nook made it personally, no charge, and thanks for the player's custom. GameCube says Nook ordered the monument instead. Keep every native command and argument; no resident-animation permission applies to Nook. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1194",
+    "source_sha256": "29f3ceb552d2e7d6d2d2552cdaf56361fb4668ed100ba600a8be97d3399af0ae",
+    "translation": "{cmd:7F090000FF}White Day is when{cmd:7F0306}\nboys return the favour\nfor Valentine's gifts,\nisn't it,{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}{cmd:7F0308}But{cmd:7F0306} I don't give out\ncourtesy chocolates,\nso I won't be getting\nanything in return.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain White Day, reciprocal Valentine's gifts, and not receiving a return gift after giving no courtesy chocolates; do not import the unrelated Groundhog Day weather topic. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1195",
+    "source_sha256": "7b0602cc86dcc2d27a57cbcb0d1b66af884e7e1e688d1ff596cc5ecc26644db7",
+    "translation": "{cmd:7F09000017}For me,{cmd:7F0306}\nit makes no difference\nwhether White Day exists,\n{cmd:7F0308}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}You see,{cmd:7F0306} every year\nI fail to give my chocolates\nto anyone,{cmd:7F0306} so I can't\nexpect a gift in return{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Next year I'll give\nsomeone my chocolates,{cmd:7F0304}\nthen enjoy White Day,{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the resident's inability to give Valentine's chocolates and hope of enjoying reciprocal White Day gifts next year. The GameCube mayor/Groundhog Day complaint is unrelated. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:11F3",
+    "source_sha256": "362b05629fea213c0f7d356da31a1eb2441189022c0c8a5cb42008a02715ce48",
+    "translation": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F0306}\nwhat do you do with\nthe fish and insects\nyou catch?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Knowing you,\nI'm sure you release\nthem straight away.\n{cmd:7F04}\n{cmd:7F02}Keeping them in your room\nis rather nice, too!{cmd:7F030F}\nYou don't even need to\nprepare food or a tank!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000012}Surely{cmd:7F0306} you wouldn't\nsell them at Tom Nook's\nshop,{cmd:7F0308} would you,\n{cmd:7F1C}!?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain releasing fish/insects, keeping them in the room without supplying food or tanks, and the speaker's disapproval of selling them. GameCube museum/Blathers donation advice does not describe this N64 feature set. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1689",
+    "source_sha256": "165f89d5674dbe353b8688a842b4116901118624c162c0ee9b66d4cf61571bce",
+    "translation": "{cmd:7F09000003}Ta{cmd:7F0302}ma{cmd:7F0301}ya{cmd:7F0301}a{cmd:7F0301}a{cmd:7F0301}!{cmd:7F030C}\nKa{cmd:7F0302}gi{cmd:7F0301}ya{cmd:7F0301}a{cmd:7F0301}a{cmd:7F0301}!{cmd:7F030C}\n{cmd:7F090000FF}Hm?{cmd:7F030A} Ask your dad{cmd:7F0306}\nwhat those calls mean.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the two traditional fireworks calls, Tamaya and Kagiya, and the instruction to ask the player's father for their meaning. GameCube's short cheering text omits that ending. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:17F2",
+    "source_sha256": "5f1f87b7eb5693a45ded5f9d8131f9745abe5706155125380b0a7573d75584a9",
+    "translation": "{cmd:7F09000017}Valentine's Day is near,{cmd:7F0306}\nbut maybe I won't bother\nwith chocolates this year.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}If I had someone special,{cmd:7F0306}\nI'd put all my effort\ninto homemade chocolates\nfor them,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the speaker considering whether to give chocolates and wanting to make them for someone special. Do not replace giving handmade chocolates with the GameCube wish to receive furniture. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:17F3",
+    "source_sha256": "db40d9aa8532c109af7f3918db41ca30b9d953a3e6bda759404526887684c4ef",
+    "translation": "{cmd:7F09000015}Chocolate or cookies?{cmd:7F0306}\nI'd pick cookies\nevery single time!\n{cmd:7F04}\n{cmd:7F02}It's just my taste,{cmd:7F0306}\nbut White Day makes me\nglad I was born a girl,\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F1A}, can you\nunderstand{cmd:7F0306}\n{cmd:7F0900000B}how I feel?{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain preference for cookies over chocolate and the speaker's enjoyment of White Day return gifts as a girl. The GameCube cold-weather/Groundhog Day discussion is unrelated. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:17F4",
+    "source_sha256": "10e3d4827e81e0c20e861fa320decb101d4962521adff4d15fa8cf00df13c409",
+    "translation": "{cmd:7F09000002}Oh,{cmd:7F0306} that reminds me!\nWhite Day's coming up!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}I wonder what return gifts\nI'll get this year,{cmd:7F0308}\n{cmd:7F1C}?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain anticipation of White Day return gifts, not the GameCube complaint about Resetti on Groundhog Day. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:17FB",
+    "source_sha256": "e18271746c3b13c6a9ef0b1dcf3e67530f5079d553612a362e1e220afa7de12d",
+    "translation": "{cmd:7F09000017}We fly carp streamers\nfor Children's Day,{cmd:7F0306}\nbut don't do anything\nfor the Doll Festival.\n{cmd:7F04}\n{cmd:7F02}It seems unfair,{cmd:7F0306}\nbut I suppose I'll\njust have to put up\nwith it,{cmd:7F0308} {cmd:7F1C}...\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the contrast between Children's Day carp streamers and no local Doll Festival celebration, with the speaker's complaint about unfairness. Do not introduce the GameCube Harvest Festival feast menu. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:1808",
+    "source_sha256": "ce1c181c04e46ea402fec737c95f90dd0af6bf2c5c910ce6a1bbe31382860554",
+    "translation": "{cmd:7F0900000E}The fireworks show\nto blow away this heat{cmd:7F0306}\nis finally coming\nnext month!\n{cmd:7F04}\n{cmd:7F02}I'm already excited,\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the approaching fireworks show next month during summer heat. The GameCube July 4 date is not the native event schedule and must not be imported. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:180C",
+    "source_sha256": "950e71311bd07f3940e582b0368ec6346caa10b2d6210d08c4adf370c3563e43",
+    "translation": "{cmd:7F09000015}I love a big,\nround moon!\n{cmd:7F04}\n{cmd:7F02}So,{cmd:7F0306} on\n{cmd:7F3C} {cmd:7F3D},\nlet's meet by the pond!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full moon and invitation to the pond on this year's converted lunar eighth-month day 15, supplied in free fields 16/17. GameCube shooting-star wishes and meteor showers describe a different event. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review.",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ]
+  },
+  {
+    "id": "message:1D43",
+    "source_sha256": "7ce581fd40743e183ba041e02e127d2309ecfed4d987fb3d9d2d1f428249ff51",
+    "translation": "{cmd:7F0900000F}May{cmd:7F0306}\ndoesn't offer much\nexcitement for us girls,\n{cmd:7F0308}{cmd:7F1C}{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the speaker's complaint that May offers little for girls, not the GameCube question about who puts up windsocks. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:27B9",
+    "source_sha256": "8d0e335bc72ddd9ab18bf2c57a72a83b7898b2fe77a6eacc0f3a703d9af7546d",
+    "translation": "{cmd:7F090000FF}I thought White Day{cmd:7F030C}\nwas a day when you\ngot white chocolate,{cmd:7F0306}\nbut it turns out...\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}...it's when boys\ngive girls presents{cmd:7F030C}\nin return for Valentine's\ngifts,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000012}{cmd:7F0314}{cmd:7F1A}, do you\nhave someone{cmd:7F030C}\nto give a return gift to{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the white-chocolate misunderstanding, the reciprocal Valentine's gift explanation, and teasing the player about a recipient. Do not import Groundhog Day or thawing-weather text. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:27D2",
+    "source_sha256": "e14c1051fd9947031582e9cb2260345bed4d83caa0bfd909729931cea6affd53",
+    "translation": "{cmd:7F090000FF}I hear the moon on\nThirteenth Night{cmd:7F030C}\nwill have a little bit\nmissing,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}It must have looked\nso tasty{cmd:7F030C}\non the night of\nthe full moon...\n{cmd:7F04}\n{cmd:7F02}...that somebody\ntook a little bite\nout of it!{cmd:7F030C}\n{cmd:7F0900000F}{cmd:7F0317}But I held back{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the slightly incomplete Thirteenth Night moon, the joke that someone bit the full moon, and the speaker's restraint. GameCube Harvest Festival feast anticipation is unrelated. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:280D",
+    "source_sha256": "cdb78597e9ab86a0fb2639af7d872de4a95badf25cdf8e77f44c3488a894468a",
+    "translation": "{cmd:7F090000FF}March 14{cmd:7F030C}\nis the day to give girls\npresents in return{cmd:7F0306}\nfor Valentine's gifts.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}Girls seem different{cmd:7F030A}\non that day.\nSomehow,{cmd:7F0306} it makes\nme feel all shy!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}It's like{cmd:7F0306}\nthey have an aura!{cmd:7F0310}\n{cmd:7F0900000B}{cmd:7F0304}Or am I imagining things?\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain March 14 reciprocal Valentine's gifts and feeling shy around girls, not GameCube Groundhog Day, melting snow, or the mole. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:2811",
+    "source_sha256": "4a97f661198289674271c07322f7e052ed06c34c4e28e47c50e4842e44c5adeb",
+    "translation": "{cmd:7F09000016}It's almost here!{cmd:7F030C}\nThe 6th and 7th{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000004}{cmd:7F0305}Oh,{cmd:7F0306}{cmd:7F09000016} and the 5th{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Cherry-blossom viewing\nat the shrine plaza!{cmd:7F0306}\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Without blossom viewing,{cmd:7F030C}\nit just wouldn't\nfeel like spring!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}It'd be like{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000015}miso soup with nothing\nin it,{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the 6th/7th and the remembered 5th, the shrine plaza, cherry-blossom viewing, and empty miso-soup comparison. GameCube only names the 5th and relocates the meeting to its wishing well. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  },
+  {
+    "id": "message:2825",
+    "source_sha256": "abddf93c5ac9b3ec65a201a037154c789c7a199e1143d1ac1e01de2d0d74d852",
+    "translation": "{cmd:7F09000015}The harvest moon\nwill be so round,{cmd:7F030C}\n{cmd:7F09000007}{cmd:7F0305}it'll make me{cmd:7F0306}\nfeel all shy!\n{cmd:7F04}\n{cmd:7F02}It puts me{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000014}{cmd:7F0312}in a moonlit mood,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}That's{cmd:7F0306}\nthe best part\nof moon viewing!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000006}{cmd:7F031E}{cmd:7F090000FF}Anyway, on\n{cmd:7F3C} {cmd:7F3D},{cmd:7F030C}\nwe'll be watching\nby the pond.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Come along!{cmd:7F030C}\nThe moon will be happier{cmd:7F0306}\nwith everyone watching,\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the round harvest moon, the moonlit mood, the annually converted date in free fields 16/17, and invitation to the pond. GameCube meteor showers and calendar/board advice are not substituted. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review.",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ]
+  },
+  {
+    "id": "message:2837",
+    "source_sha256": "ed233fbb963bdf0ddce992877fdf1ea6d010f784305ca699506c9117451e2d8b",
+    "translation": "{cmd:7F0900000A}{cmd:7F0308}Ah{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nI've waited so long,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F030C}\nThe countdown is almost here{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Even the early sleepers{cmd:7F0308}\nwill stay up late,\nso it'll be a blast!{cmd:7F030A}\n{cmd:7F0306}{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}On New Year's Eve,{cmd:7F0308}\nfinish your year-end\ncleaning early{cmd:7F030C}\nand come to the party!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the coming countdown, early sleepers staying up late, and invitation to finish year-end cleaning early and attend. The GameCube next-day sports-viewing ending omits that native invitation. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and ordinary gameplay remain review."
+  }
+]

@@ -93,7 +93,7 @@ source hashes, mismatched reference IDs, and duplicate reference IDs fail.
 Focused tests verify every native source and complete command stream, the single
 colour exception, dates and dependency selection, native topics/actions/fee,
 expansion bounds, and layout with the approved font. Reference tests check all
-132 complete resident approvals and their seven declared article adaptations.
+207 complete resident approvals and their fourteen declared article-adapted records.
 Five synthetic queue tests verify that reports cannot silently approve text.
 
 All 451 host tests pass. The silent four-MiB batch in
