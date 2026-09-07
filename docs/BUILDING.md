@@ -66,6 +66,13 @@ Generate module-aware candidates with `tools/reference_candidates.py`, passing
 and the verified `--rom`. Use that directory's `translations.json` in the module
 build to include the implemented GameCube commands and bounded calendar fields.
 The build verifies the entire module capability before accepting those edits.
+Pass `--english-dialogue-dates` to both the candidate generator and ROM builder
+to include the native moon-viewing drafts and English resident-date preparation.
+Both commands require `--runtime-module`. Without that option, dependent drafts
+stay out of the candidate file and appear in `drafts-withheld.json`; basic builds
+remain supported. The ROM builder independently verifies the complete installed
+overlay and relocation files before accepting dependent edits. See
+[date preparation](../specs/DIALOGUE_DATES.md).
 The resident variant also enables twenty-character choices. Generate its native
 four-row and DMA test with `tools/choice_test_scenario.py --rom <built-ROM>
 --output <ignored-scenario.json>`, then pass that scenario to the test runner.
@@ -207,7 +214,9 @@ Reviewed reference identities live in `translations/reference_matches.json`.
 The candidate generator's `--matches` option selects another explicit record
 file when needed. Identity overrides do not bypass runtime or control checks.
 The default original edits comprise `translations/opening.json`,
-`translations/n64-exercise.json`, and `translations/n64-intro-jobs.json`.
+`translations/n64-exercise.json`, `translations/n64-intro-jobs.json`,
+`translations/n64-shop-menus.json`, `translations/n64-advice-travel.json`,
+and `translations/n64-festivals.json`, subject to declared runtime requirements.
 Repeat `--drafts <file>` to select a different
 explicit set; duplicate IDs fail instead of silently overwriting each other.
 

@@ -40,6 +40,9 @@ class DateFormatTests(unittest.TestCase):
         for year in range(65536):
             self.check(0, year, str(year if 1901 <= year <= 2099 else 2000), 6)
 
+    def test_leap_month_is_a_complete_ten_byte_game_field(self):
+        self.assertEqual(bytes((ctypes.c_ubyte*10).in_dll(self.lib, 'af_leap_month')), b'leap month')
+
     def test_all_byte_inputs_and_ordinal_exceptions(self):
         days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
         for value in range(256):

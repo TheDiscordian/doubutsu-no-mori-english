@@ -1,6 +1,9 @@
 /* English calendar forms matching the English GameCube message formatters. */
 #include "dateformat.h"
 
+/* Ordinary NPC calendar preparation has a separate native leap-month branch. */
+const unsigned char af_leap_month[10] = {'l', 'e', 'a', 'p', ' ', 'm', 'o', 'n', 't', 'h'};
+
 static const char months[12][10] = {
     "January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"

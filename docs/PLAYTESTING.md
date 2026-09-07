@@ -21,6 +21,11 @@ dates, visitors, and events; seasonal coverage and Controller Pak travel remain
 separate matrix items when the ordinary playthrough does not encounter them.
 An emulator session and an original-console session are distinct evidence.
 
+Seasonal conversations retain N64 events: carp streamers and moon viewing by the
+pond, not the GameCube Harvest Festival or meteor shower. Moon-viewing reminders
+must show the date calculated for the town's current year. Calendar dates outside
+the native 2000–2032 conversion table remain a known boundary-audit item.
+
 One report per issue is easiest to fix. Include whatever is available:
 
 - Build revision or patched-ROM checksum; console or emulator, RAM size, and

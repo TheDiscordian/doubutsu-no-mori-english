@@ -1,0 +1,36 @@
+[
+  {
+    "id": "message:119C",
+    "source_sha256": "cfc9c5045907975e63adb8569cc74ed6c7a327c0d9646a7b5013cc7f487e9c82",
+    "translation": "{cmd:7F09000015}Just a little longer,{cmd:7F0306}\nand we'll see carp streamers!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0314}But why{cmd:7F0304}\ncarp, of all fish?{cmd:7F04}\nSea bream would seem\nmore festive to me.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the approaching carp streamers and sea-bream comparison, not the GameCube Harvest Festival question. The native sea-bream/festive wordplay is conveyed as the comparison rather than inventing an unrelated joke. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and normal event progression remain review."
+  },
+  {
+    "id": "message:27C0",
+    "source_sha256": "b1a4a09506b38d2c552f1da633bd49ddb4ce02058d060af313e0c406284cae74",
+    "translation": "{cmd:7F090000FF}I hear some really big carp\nare coming to {cmd:7F2F},{cmd:7F0308}\nbefore long...\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}{cmd:7F0308}Do you think\nI can eat one{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F1600100018}{cmd:7F04}{cmd:7F0D}{cmd:7F0F27E8}{cmd:7F1027E9}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The lazy resident mistakes the approaching carp streamers for edible fish. Retain choices 0010/0018 and branches 27E8/27E9; the existing responses fit this native joke. Do not import the GameCube pie question or choice 0066. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and normal event progression remain review."
+  },
+  {
+    "id": "message:11AC",
+    "runtime_requirements": ["ordinary_dialogue_dates"],
+    "source_sha256": "5e5df50fb62a081c0c7450a7469de3d21b6bd11024e17ca29384f76423a2d4c1",
+    "translation": "{cmd:7F090000FF}The 15th of the eighth lunar\nmonth is{cmd:7F030A} {cmd:7F3C} {cmd:7F3D}.\nDid you know we go\nmoon viewing then,{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}The harvest moon{cmd:7F0306}\nis supposed to be\nthe year's most beautiful!{cmd:7F0306}\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}We'll be by the pond\nagain this year,{cmd:7F0306}\nso please come along!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve lunar eighth-month day 15, its annually converted date in free fields 16/17, the harvest moon, and the pond gathering. The GameCube meteor-shower conversation is a different event. Full English dynamic dates require the separately guarded ordinary-NPC date-preparation patch. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and normal event progression remain review."
+  },
+  {
+    "id": "message:180B",
+    "runtime_requirements": ["ordinary_dialogue_dates"],
+    "source_sha256": "8a5155936d2d2aa4f81cfbadcbe20e28a4673bfdc35044f4d0035e333e68083c",
+    "translation": "{cmd:7F090000FF}Did you know{cmd:7F0306}\nwe go moon viewing twice\na year,{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F04}\n{cmd:7F02}Someone told me{cmd:7F0306}\nthis year's harvest moon\nfalls on {cmd:7F3C} {cmd:7F3D}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}You'll have to look up{cmd:7F0306}\nthe date of the second\nviewing, Thirteenth Night,\nyourself!{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the two moon-viewing nights, this year's first date, and the suggestion to look up Thirteenth Night separately. Do not substitute the annual GameCube meteor shower. Full English dynamic dates require the separately guarded ordinary-NPC date-preparation patch. Preserve every native command, argument, pause, page, field, and terminator. Final wording/layout and normal event progression remain review."
+  }
+]

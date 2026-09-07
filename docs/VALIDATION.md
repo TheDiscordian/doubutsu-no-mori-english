@@ -34,6 +34,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Four-MiB memory | `osMemSize` at `0x80000318` equals `0x00400000` | Tested |
 | Resident module | Startup identity, reduced heap bounds, guards through gameplay | Tested through town arrival; wider allocation and hardware coverage outstanding |
 | English date fields | Month/weekday expansion, ordinal day, twelve-hour time, padded minutes/seconds | Seven native insertion calls and exhaustive portable format tests pass; other UI outstanding |
+| Prepared resident dates | Real overlay loading, ten-byte fields, native lunar conversion, leap month, and source retention | 53 preparations, thirteen conversions across six years and a leap month, six festival-message loads, and eight insertions pass; 102 native calls and 184 assertions; normal seasonal gameplay, birthday item fields, other actors, and years outside the native table remain |
 | English command extensions | Latched AM/PM, one-shot capitals, protected pacing | Targeted MIPS tests pass; full actor/control coverage outstanding |
 | Name-entry opening | Fresh-town intro reaches the native editor | Tested |
 | English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | Tested with memory assertions in ares 148 |

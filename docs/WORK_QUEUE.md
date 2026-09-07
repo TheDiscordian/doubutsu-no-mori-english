@@ -116,9 +116,9 @@ and native request dispatches pass, including complete order-table and memory
 guards. See [request semantics and scope](../specs/ACTOR_REQUESTS.md). Normal
 subsequent actor actions and quest traversal remain gameplay/playthrough checks.
 
-The 107 missing-field rejections include forty catchphrase-only (`1C`), twelve
-player-name-only (`1A`), and eight town-name-only (`2F`) cases, plus mixed and
-other fields. Audit the actual insertion consumers and caller context rather
+The 76 missing-field rejections include remaining catchphrases (`1C`), player
+names (`1A`), town names (`2F`), mixed fields, and incompatible native topics.
+Audit the actual insertion consumers and caller context rather
 than assuming that a field absent from a native message is available globally.
 Do not weaken field/actor guards simply to reduce rejection counts. These audits
 must proceed in bounded content batches, without returning to repeated isolated
@@ -131,10 +131,10 @@ the current town through `800950D8` and `8009F428`. All 26 complete cartridge
 loads and 27 native insertions pass, including complete output, colours, cursor,
 source retention, and guards. See [field contract](../specs/REFERENCE_FIELDS.md).
 
-Native-specific drafts are needed for the incompatible festival references:
-`119C` and `27C0` (carp streamers, not Harvest Festival), and `11AC` and `180B`
-(moon viewing, not meteor showers). Verify their dynamic date/choice fields
-alongside the native wording. Seven original advice/travel drafts cover
+Four native festival drafts cover `119C/27C0` (carp streamers, not Harvest
+Festival) and `11AC/180B` (moon viewing, not meteor showers). Complete native
+commands and arguments are preserved. See [festival wording](../specs/NATIVE_FESTIVALS.md).
+Seven original advice/travel drafts cover
 `11F1`, `14FE`, `0945`, `1BD3`, `1BD4`, and the native post-wait conversations
 `147F/14CF`. All seven complete cartridge loads and the 52-test reference batch
 pass. See [draft contract](../specs/NATIVE_ADVICE_TRAVEL.md). Ordinary actions,
@@ -144,9 +144,16 @@ The carp reminder `27C0` retains native choices `0010/0018`, not the reference's
 `0066/0018`, and branches to `27E8/27E9`. Both response candidates already fit
 the native eating/refusal joke and preserve its complete actor/flow commands;
 do not replace them solely because the GameCube preceding question mentions pies.
-Moon-viewing drafts `11AC/180B` require preparation checks for free fields
-`3C/3D`; these are not automatically covered by the existing direct date-format
-commands. Complete the native wording alongside that source audit.
+Moon-viewing drafts `11AC/180B` require the complete English ordinary-dialogue
+date patch. Native tests pass 53 preparations, thirteen actual calendar
+conversions, six message loads, and eight date insertions with unchanged saves
+and field bounds. Free fields `3C/3D` retain the year's converted event dates,
+not the current date. See [date preparation](../specs/DIALOGUE_DATES.md).
+Normal seasonal selection/rendering and final wording/layout review remain.
+Next native-specific audits include moon-viewing `1EB7/1EF9`, spring `1F77`,
+and visiting-town advice `285A`. Birthday fields `34/35` are separate item
+slots, not these free fields. Other date preparers and native calendar years
+outside 2000–2032 require their own audit.
 
 Twenty-seven individually approved resident conversations add the speaker's
 catchphrase under a separate [hash-bound contract](../specs/REFERENCE_CATCHPHRASES.md).
@@ -157,11 +164,11 @@ source retention, and guards. This is not ordinary NPC traversal or final review
 The remaining thirteen catchphrase-only rejections have changed choices/actor
 commands, blank native records, or different topics; do not import them as an
 unrestricted class. Broader missing-field, control-signature, and unconfirmed
-identity batches remain, alongside the native festival drafts above.
+identity batches remain, alongside final native festival review and gameplay.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, and AM/PM pass; other UI callers remain |
+| R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, and ordinary resident year/month/day/leap-month preparation pass; birthday item fields, other UI callers, and out-of-table native calendar dates remain |
 | R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; native turnip-price label corrected, and 22 shop messages retain native action order; their complete messages and six referenced labels pass batched native loads; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; full review and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; ten-byte default catchphrase display passes all 216 default loads and main insertion with unchanged saved bytes; gyroid owner-message pixel wrapping and native insertion pass with unchanged saved/editor limits; longer gyroid default/custom storage, ambiguous borrowed phrases, shared choices, mail, and shop destinations remain |
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 107 item reference IDs occupy 231 ten-byte slots; all 4,547 item-ID cases have passing runs, with one initial stop retained; sixteen-byte main item fields, one item-ID wrapper, and a confirmed clothing alias pass native tests; other destinations and identities remain |

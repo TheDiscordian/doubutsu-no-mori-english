@@ -29,6 +29,7 @@ from controller_adaptations import validate_controller_candidate
 from reference_choices import validate_choice_candidate
 from reference_actor_requests import validate_actor_request_candidate
 from reference_fields import field_permit, catchphrase_permit
+from dialogue_dates import install as install_dialogue_dates, verify_requirements
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -38,6 +39,7 @@ RELOCATED_BANKS = {
 
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None):
     layout = ChoiceLayout()
+    module_report = None
     if runtime_module:
         verify_runtime_module(rom, replacements, module_additions, runtime_module)
         _, module_report = add_runtime_module(rom, {}, runtime_module)
@@ -48,6 +50,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     if english_runtime:
         verify_english_runtime(rom, replacements, layout)
     edits = json.loads(path.read_text()) if path else []
+    verify_requirements(edits, rom, replacements, module_additions, module_report)
     source_banks = banks(rom)
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info)
@@ -117,6 +120,8 @@ def main():
     parser.add_argument("--english-keyboard", action="store_true")
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
+    parser.add_argument('--english-dialogue-dates', action='store_true',
+                        help='English dates prepared by ordinary resident conversations; requires the resident module')
     parser.add_argument("--extended-items", type=Path, help="Directory containing names.bin and names.json for the sixteen-byte item resource")
     parser.add_argument("--display-names", type=Path, help="Directory containing names.bin and names.json for the eight-byte display-name resource")
     parser.add_argument("--catchphrases", type=Path, help="Directory containing the full default catchphrase display resource")
@@ -127,6 +132,8 @@ def main():
     parser.add_argument('--npc-mail-generation', type=Path, help='Experimental complete NPC creator overlay directory; enables guarded cartridge loading and delivery; gameplay/save acceptance remains')
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
+    if args.english_dialogue_dates and not args.runtime_module:
+        parser.error('--english-dialogue-dates requires --runtime-module')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
         parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
     if args.npc_mail_generation and not (args.runtime_module and args.english_runtime
@@ -146,6 +153,8 @@ def main():
     if args.english_runtime:
         runtime, report["english_runtime"] = make_english_runtime(rom, replacements, layout)
         replacements.update(runtime)
+    if args.english_dialogue_dates:
+        report['dialogue_dates'] = install_dialogue_dates(rom, replacements, additions, report['runtime_module'])
     report["translation_edits"], relocations = apply_translations(
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions)

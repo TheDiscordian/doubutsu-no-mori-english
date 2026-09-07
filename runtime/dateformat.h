@@ -15,5 +15,6 @@ int af_format_day(unsigned char *out, unsigned value);
 int af_format_hour(unsigned char *out, unsigned value);
 int af_format_minute(unsigned char *out, unsigned value);
 int af_format_second(unsigned char *out, unsigned value);
+extern const unsigned char af_leap_month[10];
 
 #endif

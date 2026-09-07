@@ -885,6 +885,12 @@ def main():
                     raise ValueError('NPC letter-show probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,keyboard,action['test_npc_mail_show'],record))
+            if 'test_dialogue_dates' in action:
+                from dialogue_dates_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Dialogue date probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_dialogue_dates'],record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():

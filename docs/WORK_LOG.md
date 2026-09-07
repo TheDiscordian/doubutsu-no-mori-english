@@ -2816,6 +2816,71 @@
   `build/resident-catchphrase-coverage/`. Font/runtime/save structures and optional
   generation settings remain unchanged. Final candidate review is still required.
 
+### Native festivals and ordinary resident date preparation
+
+- Added original drafts `119C`, `27C0`, `11AC`, and `180B` for the N64 carp
+  streamers and moon-viewing events. Complete native commands and arguments,
+  actor requests, pauses/pages, choice IDs, branches, and terminators remain
+  unchanged. The existing eating/refusal responses `27E8/27E9` fit the native
+  carp joke and remain unchanged. These are drafts, not final reviewed text.
+- Added the optional `--english-dialogue-dates` patch for the ordinary resident
+  overlay. Three native year/month/day preparation calls use the existing
+  English formatters within the unchanged ten-byte fields. The leap-month branch
+  uses a complete ten-byte resident literal and removes only its obsolete HI/LO
+  relocations. Six instructions and two relocation entries change; overlay,
+  BSS, field, save, and resident reservation sizes are unchanged. Native calendar
+  conversion and schedules remain intact. Full source/module/literal guards and
+  exact installed-file dependencies protect the dated drafts. Basic candidate
+  builds explicitly withhold dependent drafts without the option.
+- The native table covers 2000–2032; dates outside that table and failed-conversion
+  handling remain separate audit items. Birthday `34/35` insert item fields,
+  not the moon-viewing free fields `3C/3D`, and are not claimed fixed here.
+- Independent resident builds match SHA-256
+  `bc3ea5e77daba273146d4ea6a858b4e5e4b604ae14b5b20e9db9d5dca5f14f22`.
+  Linked size remains 22,720 bytes with 1,856 free; public function/storage
+  addresses remain unchanged. Module-bound creator and generation-test artifacts
+  are rebuilt. The first host regression finds a host-only nonterminated-string
+  warning and two stale generated artifact bindings. An explicit ten-character
+  initializer and refreshed artifacts resolve them; MIPS output is unchanged.
+  The corrected 423-test suite passes in 196.205 seconds at
+  `build/tests-dialogue-dates-full-02.log`. The basic-candidate compatibility fix
+  also passes nine focused date tests, including two new selection tests.
+  The final complete suite passes all 425 tests in 175.706 seconds at
+  `build/tests-dialogue-dates-full-03.log`. The basic non-module candidate set
+  and ROM also build successfully at `build/native-festival-basic-candidates/`
+  and `build/native-festival-basic-pilot/`, withholding only the two dated drafts.
+  The full candidate set regenerates unchanged with explicit date support.
+  The NPC letter-show scenario generator verifies the exact combined overlay
+  and prepares all nine window cases; those windows are not rerun in this batch.
+- `build/smoke-native-festival-01` passes 442 steps, 102 native calls, and
+  184 assertions. The real cartridge overlay loader performs relocation and
+  clears BSS. Fifty-three preparations cover years, all months/days, and bounds;
+  thirteen native conversions cover both moon dates in 2000, 2001, 2004, 2026,
+  2030, and 2032, plus the 2001 leap month. Six full message loads and eight
+  actual insertions cover all four drafts and different years. Complete saves,
+  RTC restoration, other fields, heap/stack/module guards, allocation release,
+  checkpoint restoration, blank FlashRAM, unchanged Pak, and graceful shutdown
+  pass. This is not ordinary seasonal selection or hardware acceptance.
+- `build/native-festival-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `88fa0d72f415661660d1b00ee9f4023beb010f42715edb323e15b392167dd3d7`;
+  its verified round-trip UPS has SHA-256
+  `367ca386877eedb42c6068f15e048da63bc1e00b3fc684e942fed6f1c8bc088d`.
+  Overlay SHA-256 is `512686b2e4d74e6b1fead4c72e2eab09ac17ab406361c67449a34903963eb3c8`;
+  relocation SHA-256 is `8f1a312b27e72fcc3be0f01110d6e76fc17e5e8529f7270120cb486648de597d`.
+  `build/smoke-festival-full-01` passes all ten independently checked four-MiB
+  train-to-town tests across 188 steps, including module-memory guards.
+- The full candidate file contains 10,546 edits: 9,269 reference main candidates
+  and 32 original main drafts, with all 460 choices unchanged. All previous
+  10,542 edits remain unchanged. The native main-bank audit leaves 2,451 records
+  without candidates, including 1,520 with Japanese static text. Reference
+  rejections comprise 1,800 unconfirmed identities, 570 control-signature
+  differences, 76 unavailable-field references, and six expansion overflows.
+  The 1,388 reference-layout warnings are unchanged. Reports remain local in
+  `build/native-festival-candidates/` and `build/native-festival-coverage/`.
+  Optional generation settings and approved font assets/metrics are unchanged.
+  Normal seasonal gameplay and final draft review remain for the combined
+  gameplay and human-playthrough passes.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

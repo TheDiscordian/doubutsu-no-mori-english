@@ -3,8 +3,10 @@
 ## Scope
 
 The resident module replaces the seven formatter calls inside the native message
-field-copy routines. Other UI and actor callers retain their native formatters
-until their own destination capacities and surrounding punctuation are verified.
+field-copy routines. The separate [ordinary resident preparation](DIALOGUE_DATES.md)
+also uses the year/month/day formatters in verified ten-byte fields. Other UI
+and actor callers retain their native formatters until their destination
+capacities and surrounding punctuation are verified.
 No RTC representation, game clock, event scheduling, or saved date changes.
 
 | Message field | Native call | English destination | Result |

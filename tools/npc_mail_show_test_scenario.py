@@ -15,6 +15,7 @@ from mail_record import pack
 from mail_runtime_test_scenario import reference_fixtures
 from mail_reader_test_scenario import scenario as reader_scenario
 from npc_mail_show import OVERLAYS, source, relocated
+from dialogue_dates import patch as date_patch, relocated as dates_relocated
 
 
 def scenario(rom,native,module,fixtures):
@@ -52,10 +53,19 @@ def scenario(rom,native,module,fixtures):
     mail[52:148],mail[148:] = body.ljust(96,b' '),footer.ljust(16,b' ')
     cases.append({'label':'ordinary','mail':mail.hex(),'snapshot':False,
                   'body':body.hex(),'footer':footer.hex()})
-    overlays = {}
+    overlays, date_module = {}, None
     for key,spec in OVERLAYS.items():
-        data,reloc = source(rom,key)
-        for base in (0x801A0000,0x802F8010): relocated(spec,data,reloc,base)
+        data,reloc = source(native,key)
+        actual = (files[spec.vrom].extract(rom),files[spec.relocation].extract(rom))
+        if actual != (data,reloc):
+            if key != 'ordinary' or actual != date_patch(data,reloc,module):
+                raise ValueError('NPC show overlay differs beyond the approved date preparation')
+            date_module = module
+        for base in (0x801A0000,0x802F8010):
+            if key == 'ordinary' and date_module:
+                dates_relocated(data,reloc,module,base)
+            else:
+                relocated(spec,data,reloc,base)
         overlays[key] = {'data':data.hex(),'relocation':reloc.hex()}
     loader = native[0x800262D0-0x80025C60+0x1060:0x800263C0-0x80025C60+0x1060]
     if sha256(loader) != '2c3176abe096fa667cd77599844acff5e0f46507ddbe1e95bbc1caf90a7d2b00':
@@ -64,7 +74,7 @@ def scenario(rom,native,module,fixtures):
     guards = {f'{start:08X}':code[start-CODE_RAM:end-CODE_RAM].hex() for start,end in (
         (0x8009C384,0x8009C414),(0x8009C70C,0x8009C80C),
         (0x800A82C8,0x800A83F0),(0x800C4DB0,0x800C4E00))}
-    request = {'overlays':overlays,'cases':cases,'loader':loader.hex(),'guards':guards,
+    request = {'overlays':overlays,'date_module':date_module,'cases':cases,'loader':loader.hex(),'guards':guards,
                'identity':struct.pack('>HH6sBB',0xE000+name_index,0xEAAA,b'OLDTWN',3,0).hex(),
                'reader':module['symbols']['af_mail_reader'],
                'hooks':{key:module['symbols'][key] for key in ('af_mail_header_hook','af_mail_body_hook','af_mail_footer_hook')}}

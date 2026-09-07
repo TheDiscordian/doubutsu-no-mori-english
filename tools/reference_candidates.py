@@ -24,6 +24,7 @@ from reference_fields import (field_permit, verify_field_reference, catchphrase_
                               verify_catchphrase_reference)
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
+from dialogue_dates import requires_dialogue_dates
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -40,6 +41,18 @@ def load_drafts(paths):
     if len(ids) != len(set(ids)):
         raise ValueError("Duplicate original translation ID")
     return drafts
+
+
+def select_drafts(drafts, *, english_dialogue_dates=False):
+    selected, withheld = [], []
+    for edit in drafts:
+        needs_dates = requires_dialogue_dates(edit)
+        if needs_dates and not english_dialogue_dates:
+            withheld.append({'id': edit['id'], 'reason': 'runtime_requirement_unavailable',
+                             'runtime_requirements': edit['runtime_requirements']})
+        else:
+            selected.append(edit)
+    return selected, withheld
 
 
 def record_candidate(edit, info, advances, name, edits, manifests, counts, *, resident_runtime=False):
@@ -72,7 +85,11 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path)
+    parser.add_argument('--english-dialogue-dates', action='store_true',
+                        help='Include drafts requiring English resident-date preparation')
     args = parser.parse_args()
+    if args.english_dialogue_dates and not args.runtime_module:
+        parser.error('--english-dialogue-dates requires --runtime-module')
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     choice_bytes = 16 if args.english_runtime else 10
@@ -87,8 +104,10 @@ def main():
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
                                        Path("translations/n64-intro-jobs.json"),
                                        Path("translations/n64-shop-menus.json"),
-                                       Path("translations/n64-advice-travel.json")])
+                                       Path("translations/n64-advice-travel.json"),
+                                       Path("translations/n64-festivals.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
+    drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates)
     matches = load_matches(args.matches)
     verify_native_equivalents(matches, source_banks)
     visited_matches = set()
@@ -239,6 +258,7 @@ def main():
     selected = {edit["id"] for edit in edits}
     edits += [edit for edit in drafts if edit["id"] not in selected]
     (args.output/"translations.json").write_text(json.dumps(edits, ensure_ascii=False, indent=2)+"\n")
+    (args.output/'drafts-withheld.json').write_text(json.dumps(withheld_drafts, indent=2)+'\n')
     (args.output/"manifest.json").write_text(json.dumps(manifests, indent=2)+"\n")
     (args.output/"summary.json").write_text(json.dumps(reports, indent=2)+"\n")
     print(json.dumps(reports, indent=2))

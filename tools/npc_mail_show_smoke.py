@@ -7,6 +7,7 @@ from aflib import sha256
 from mail_reader_smoke import all_pages
 from mail_view_smoke import pointer, snapshot
 from npc_mail_show import OVERLAYS, relocated
+from dialogue_dates import relocated as dates_relocated
 from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK, GUARD_ADDRESS, GUARD_WORD
 
 EDGE = b'EDGE'*4
@@ -69,7 +70,8 @@ def exercise(debug,keyboard,request,record):
         call(0x800262D0,[spec.vrom,spec.vrom+spec.file_bytes,spec.ram,
              spec.ram+spec.resident_bytes,base,base+spec.resident_bytes,len(reloc)],
              proof=(0x800262D0,bytes.fromhex(request['loader'])))
-        overlay = relocated(spec,data,reloc,base)
+        overlay = (dates_relocated(data,reloc,request['date_module'],base)
+                   if key == 'ordinary' and request.get('date_module') else relocated(spec,data,reloc,base))
         check('complete native relocation and zeroed BSS',base,overlay)
         proof = (base,overlay[:spec.sections[0]])
         letter = base+spec.letter-spec.ram
