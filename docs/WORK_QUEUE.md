@@ -67,6 +67,13 @@ Next generation work connects approved field/template sources and complete
 native creator boundaries, with bounded loading and failure propagation through
 delivery. Keep ordinary gameplay generation disabled while those checks and
 remaining reader/editor/normal-interaction requirements are incomplete.
+The [NPC creator binding contract](../specs/NPC_MAIL_GENERATION.md) verifies
+complete native/reference functions and selection tables. All available reply
+parts have supplied source slots across 24 group/gift contexts and 36 classic
+selections. One composite footer remains unavailable. Original creation failure
+is not propagated to submission; an uninstalled failure-return gate is specified.
+Complete English word/name capture, runtime ownership, and native gate validation
+remain the next implementation steps.
 
 ## Main translation and runtime
 

@@ -2166,6 +2166,37 @@
   checks pass. The production ROM still has SHA-256
   `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`.
 
+### NPC creator, failure-return, and source-slot bindings
+
+- Added exact source guards for seven native reply functions and six native
+  tables, including staging, metadata, post-office submission, and pending-state
+  processing. Also verified five English executable functions and five tables
+  directly from the supplied decoded REL and pinned symbol definitions.
+- Traced the unpropagated assembler failure through good/bad creation and
+  unconditional receipt. The native submission wrapper reuses staging at
+  `80142F80` without first clearing it. Specified a complete-pointer/zero return
+  gate at `800A9164` which skips receipt and the stale `v1` result copy on
+  creation failure. This is an uninstalled design, not a passing native gate.
+- Source-slot coverage passes all 24 composite group/gift contexts and all 36
+  classic bad-reply selections. No available template needs an uncaptured slot;
+  the existing unavailable composite footer is `psz:004D`. Selection helpers
+  retain original offsets, reject invalid origins/personalities/gift gates,
+  preserve body-B gift halves, and never issue random choices.
+- Nine targeted tests pass in 0.229 seconds at
+  `build/tests-npc-mail-generation.log`, including complete function/table
+  mutation rejection, all part ranges, gap exclusion, and source-hole fixtures.
+  The local source report is `build/audits/npc-mail-generation.json`.
+- Compared all eleven selected word families directly from native, legacy, and
+  English banks. All 352 complete legacy values equal their transcoded English
+  references, including the first 32 entries of the relocated/expanded fish and
+  insect families. Eighty-three values exceed ten bytes; all fit sixteen bytes.
+  This observation does not install word capture or approve every letter's
+  meaning. A guarded source-mapping implementation remains next.
+- The full regression suite passes 335 tests in 165.222 seconds at
+  `build/tests-npc-mail-generation-full.log`. Python compilation and whitespace
+  checks pass. No production ROM/module, save, font, or translation candidate
+  changes accompany this binding audit.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

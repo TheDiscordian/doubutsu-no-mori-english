@@ -51,6 +51,12 @@ complete English field sources, on-demand loading, failure propagation, and
 semantic template approval remain. Ordinary gameplay snapshot generation stays
 disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
 [receipt evidence](../specs/PELLY_RECEIPT.md).
+The [NPC creator binding audit](../specs/NPC_MAIL_GENERATION.md) checks seven
+native functions, six native tables, and corresponding English executable
+evidence. All 24 composite group/gift contexts and 36 classic reply selections
+use supplied source slots; composite footer `psz:004D` remains unavailable.
+The native caller ignores assembly failure, so a specified submission gate must
+also be implemented and tested. This source audit does not establish delivery.
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -84,7 +90,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 326 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 335 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.

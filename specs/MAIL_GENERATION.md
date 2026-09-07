@@ -90,6 +90,11 @@ IDs and complete English replacements must be captured at this stage; the
 generation transaction must not make new random choices. All addresses in this
 section are native linked addresses inspected against the original ROM, not
 live overlay addresses or implemented production hooks.
+The [NPC generation bindings](NPC_MAIL_GENERATION.md) record the complete reply
+and submission boundaries, pending-state failure checks, source-slot coverage,
+and the unequal fish/insect reference ranges. The original submission wrapper
+does not propagate assembly failure; a whole-letter transaction alone does not
+fix that caller.
 
 ## Verification and integration queue
 
