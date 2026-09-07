@@ -42,7 +42,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Saved text | Enter names/mail/board text, save, restart, recover correctly | Native FlashRAM round trip passes 192 synthetic stored-letter slots in both banks and full English reconstruction in a fresh process; normal entry/save-menu/post-load gameplay remains |
 | Choice menus | All lengths, four entries, cancellation, branch outcome | Twenty-byte capacity, thirteen long reference loads, four rows, selected text, and cancellation pass isolated native tests; corrected shop labels and messages pass cartridge loads; ordinary actor-specific selection remains outstanding |
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
-| Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage |
+| Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage; 25 approved task-response messages pass complete cartridge loads and actual native actor-request dispatch with exact values/destinations; subsequent ordinary actor progression remains |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
 | Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM and both Controller Pak letter-file persistence tests pass fresh-process reads; normal saving, travel/storage UI, RTC, and calendar remain |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |

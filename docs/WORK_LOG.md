@@ -2641,6 +2641,49 @@
   as completed evidence. The validation matrix's choice row now reflects the
   existing twenty-byte and native four-row/cancellation evidence.
 
+### Favour/task responses with original native actor requests
+
+- Added 25 complete English dialogue candidates covering failed-favour reactions,
+  apologies/reassurance, and a rejected-advice response. Reviewed IDs and original
+  request values are in `specs/ACTOR_REQUESTS.md` and the source/reference/payload-
+  bound approval records. All 10,457 existing edits remain unchanged; the only
+  candidate-file difference is these 25 additions.
+- Verified native `09` and `0C` wrappers, shared parser, order setter, and dispatch
+  table against the original code. `09` writes NPC0 row four and `0C` quest row
+  nine, at `object + 0x10 + 20*row + 2*index`. They are not interchangeable
+  presentation commands. Each approval restores the original N64 slot-five
+  request and exact value while retaining the complete native actor-command
+  sequence and English wording/layout. No general opcode conversion is enabled.
+- Added five host tests covering exact replacement, stale evidence, bad offsets,
+  values and schemas, duplicate/changed actor requests, all 25 retail records,
+  and the independent builder payload guard. The combined 44-test reference
+  batch passes in 5.128 seconds at
+  `build/tests-actor-request-reference-batch-01.log`. The complete prior 389-test
+  baseline is not repeated for this content-only batch; shared reference groups
+  and the whole-content build are checked together.
+- `build/smoke-actor-request-01` passes 267 recorded steps, fifty native calls,
+  and 132 assertions in a fresh four-MiB process. Each complete English message
+  loads from the cartridge, then its actual native request is dispatched into
+  an isolated order table. Only the original row-four/index-five value changes;
+  all other entries, including quest row nine, and adjacent/module guards match.
+  Complete checkpoint restoration and graceful shutdown pass; FlashRAM remains
+  blank and the Pak unchanged. Subsequent actor actions, animation, friendship,
+  and quest traversal remain combined gameplay/human-playthrough checks.
+- `build/actor-request-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `cd4502abb05beb489a1f9642b315081f1d2301a1c3fa772e7e93d8fb94fa5870`;
+  its verified round-trip UPS has SHA-256
+  `34c86ccca585c1e945e4ec9b79b0160ed43514f78cad3522d15ee4acc4a98785`.
+  The candidate file has 10,482 edits: 9,216 reference dialogue candidates,
+  21 original dialogue drafts, and all 460 choices among the covered banks.
+  The original main-bank audit leaves 2,515 records without candidates, including
+  1,584 with Japanese static text. Reference layout warnings remain 1,365.
+  Candidate/rejection/coverage details remain local in
+  `build/actor-request-candidates/` and `build/actor-request-coverage/`.
+- Runtime code, approved font metrics/assets, saved structures, and opt-in mail
+  generation settings remain unchanged. Follow-up read-only field inspection
+  identifies the actual player/town-name consumers and their global sources;
+  no added-field permission is enabled without individual meaning/context review.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -452,17 +452,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/native-shop-pilot/`
-contains 10,457 edits, including
-9,191 reference dialogue candidates, all 460 choices, and 21 original dialogue
+The current experimental resident-module pilot in `build/actor-request-pilot/`
+contains 10,482 edits, including
+9,216 reference dialogue candidates, all 460 choices, and 21 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,540
+still require review. The original main-bank audit leaves 2,515
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,365 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/native-shop-candidates/` and `build/native-shop-coverage/`. The independent
+`build/actor-request-candidates/` and `build/actor-request-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -503,6 +503,19 @@ batch and all sixteen complete native cartridge loads pass, with buffer/module
 guards and checkpoint restoration. Original draft layout/presentation review remains separate from
 the reference-candidate warning count.
 
+Twenty-five favour/task-response messages retain the original native actor
+request destination and value through individually hash-bound approvals. The
+GameCube quest-row command is not imported into the native NPC0 actor row.
+Complete native actor-command sequences, surrounding English wording/layout,
+and normal field/flow/capacity checks remain enforced. All 25 complete cartridge
+loads and actual request dispatches pass in one fresh four-MiB batch: fifty
+native calls and 132 assertions. Complete order tables, adjacent/module guards,
+and checkpoint restoration pass; the separate quest row remains unchanged.
+All 44 reference-group tests pass. Existing candidates, font metrics, runtime,
+and saved layouts are unchanged. Ordinary NPC actions and quest progression
+remain combined gameplay/human-playthrough work. See
+[native actor-request contract](../specs/ACTOR_REQUESTS.md).
+
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
 additional ordinary-bank edits, and an API resource does not imply that every
@@ -510,14 +523,14 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,457 edits, including
-9,191 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,482 edits, including
+9,216 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, and eleven earlier-shop drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,541 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,540 main records without
-candidates: 1,609 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,516 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,515 main records without
+candidates: 1,584 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

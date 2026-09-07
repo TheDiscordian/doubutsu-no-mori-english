@@ -19,6 +19,7 @@ from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 from reference_choices import adapt_choice_reference, validate_choice_candidate
+from reference_actor_requests import adapt_actor_request_reference, validate_actor_request_candidate
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
 
@@ -122,7 +123,9 @@ def main():
                     visited_matches.add(id)
                 if reason is None:
                     try:
-                        reference_text, choice_edits = adapt_choice_reference(reference, original, matches.get(id), info)
+                        reference_text, actor_edits = adapt_actor_request_reference(reference, original, matches.get(id), info)
+                        reference_text, choice_edits = adapt_choice_reference(
+                            {**reference, "text": reference_text}, original, matches.get(id), info)
                         reference_text, controller_edits = adapt_controller_reference(
                             {**reference, "text": reference_text}, original, matches.get(id), info)
                         policy = "presentation"
@@ -150,7 +153,8 @@ def main():
                                         raise
                         validate_controller_candidate(id, original, candidate, matches)
                         validate_choice_candidate(id, original, candidate, matches)
-                        adaptations = choice_edits+controller_edits+adaptations
+                        validate_actor_request_candidate(id, original, candidate, matches)
+                        adaptations = actor_edits+choice_edits+controller_edits+adaptations
                     except ValueError as exc:
                         reason = str(exc)
                 if reason:

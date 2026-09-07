@@ -1,5 +1,330 @@
 [
   {
+    "id": "message:02B8",
+    "source_sha256": "fd1ef67211ea50746ff5ca5d5868e48149a16c872d959672ccce98a8d937f4b1",
+    "reference_id": "message:02B8",
+    "reference_sha256": "9b7ddd78a840b0e3ec2c1dcdd2470875795c8dae4b5304099d221e0d872a8122",
+    "native_actor_request": {
+      "reference_command": "7F0C050068",
+      "native_command": "7F09050069",
+      "offset": 0,
+      "adapted_sha256": "1c99c487b290b2f9edbd1e41e96196905cdbd4fca6e4342d8c34895d949a1a76"
+    },
+    "evidence": "Both native and supplied English records express disappointment that a modest favour was not completed. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02B9",
+    "source_sha256": "429f83530b99680adbc361668aace3ea8964db05922c467dc30b33f4bf96800b",
+    "reference_id": "message:02B9",
+    "reference_sha256": "832902cecd6c8c678eb2b1d43b2e69f4a6c1ed96e2bd149105173cb6b9e5f265",
+    "native_actor_request": {
+      "reference_command": "7F0C050069",
+      "native_command": "7F0905006E",
+      "offset": 0,
+      "adapted_sha256": "d2ce3c323a3d6b5c16d0956f2cdebd747f1f45b9892bef1970b0fa9d33cd52a4"
+    },
+    "evidence": "Both native and supplied English records say that failure to complete a simple favour lowers the speaker's opinion of the player. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02BA",
+    "source_sha256": "9a1bb02017c0e4261ad5a370213ca921917b35d30dde5e644da7d1b12177fb80",
+    "reference_id": "message:02BA",
+    "reference_sha256": "c7b0fd010cb3bf67ce3de66672de7b1414bd513537a4999a21b6015718a7dc8e",
+    "native_actor_request": {
+      "reference_command": "7F0C050068",
+      "native_command": "7F0905006B",
+      "offset": 0,
+      "adapted_sha256": "44b70c89c98aa4610ce2d1090bfaf4377a190c5f57083a283c379d119da44360"
+    },
+    "evidence": "Both native and supplied English records regret relying on the player instead of doing the task personally. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02BC",
+    "source_sha256": "055e2f687665040d5b2d24d1cc8460851be768637eeebb2c27e707a238cb6dbe",
+    "reference_id": "message:02BC",
+    "reference_sha256": "d999749aba074762f89f3662b11ce9a0bda5eac8af875872ffdad6ab73ae9815",
+    "native_actor_request": {
+      "reference_command": "7F0C050068",
+      "native_command": "7F0905006E",
+      "offset": 0,
+      "adapted_sha256": "0e5f67cc6416ead424d37b960276bbcf2fc6ef896fbcb493fe79072143fba586"
+    },
+    "evidence": "Both native and supplied English records express anger that the player cannot be relied on for the task. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02BE",
+    "source_sha256": "0fe2e15fce873015ed9fe48e69c339d626dca5cde15d2a88b2e4fd028025e861",
+    "reference_id": "message:02BE",
+    "reference_sha256": "3357b338d9e1702dac93393a047a65f6bafb1fdee7ba66b05182f7f4ac28e3c2",
+    "native_actor_request": {
+      "reference_command": "7F0C050069",
+      "native_command": "7F09050069",
+      "offset": 0,
+      "adapted_sha256": "d732aab5b27f24d379a81650cba07b8ea4abdbe7f382068e171ebb60de74ad05"
+    },
+    "evidence": "Both native and supplied English records regret expecting the player to complete the favour. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02BF",
+    "source_sha256": "74506c491e50796b218fdcc2e802371fa1d48483f6f553293106cfc9b3a68a08",
+    "reference_id": "message:02BF",
+    "reference_sha256": "9e7538e396b34b338562a85a46ccaf73568cc434b1d3420f8c1a8307815dd7c7",
+    "native_actor_request": {
+      "reference_command": "7F0C050068",
+      "native_command": "7F0905006E",
+      "offset": 0,
+      "adapted_sha256": "8e89ab4c993895f745c2b9d79d7257c1fa971a08f8659fac355266804fa41b4b"
+    },
+    "evidence": "Both native and supplied English records say the speaker expected the player to manage a simple task. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02C0",
+    "source_sha256": "403f0365e45c474fe39d7ea95e50aa93ee46eb9628b75e2e0b8b4d55b40f5f3e",
+    "reference_id": "message:02C0",
+    "reference_sha256": "f7a6337c9d4d700fa2f5be5266fc9f1ac026a1601f752f576afe1f2005807765",
+    "native_actor_request": {
+      "reference_command": "7F0C050068",
+      "native_command": "7F0905006B",
+      "offset": 0,
+      "adapted_sha256": "442a961228c0fa8872c3f2359828503d67bcfbbda6fa49a0a89e4a08b11ac4e9"
+    },
+    "evidence": "Both native and supplied English records wish the speaker had done the easy task personally. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02CA",
+    "source_sha256": "222a0eb45ce4d779f92a62e20a7fc4e26a652f58c15f65f1a7a06093610e5e6f",
+    "reference_id": "message:02CA",
+    "reference_sha256": "06eb6963964fb095cf1179c979cab521b4b9ed643c98c9e1e8542065ddd47066",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "238fa8e83d09339c07e6f38267700cdae016a67c5df903813ebd3a8b13c3f1a5"
+    },
+    "evidence": "Both native and supplied English records reassure the player because the task was difficult. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02CB",
+    "source_sha256": "86cb73b4ff75cc6a19fd219b78ebb19376a67416e1da29f025790ffe656f89b6",
+    "reference_id": "message:02CB",
+    "reference_sha256": "8de598dcebfc4d0cc6a3002b36e8c7b4016961a1bed755beb6b22fdb3f1f657f",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "ed72dd5964773e93461713e35e81b16a2d8819d0e39a384843ce1f3d2aaef2d2"
+    },
+    "evidence": "Both native and supplied English records accept the player's concern as sufficient apology. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02CD",
+    "source_sha256": "36ec3399cb8a5edea335b42f4fd13385e961fa2868f5ac7230b91aee1e240d6e",
+    "reference_id": "message:02CD",
+    "reference_sha256": "da09528ed1a41c880ed5a71822ee5e592dee78cc43c52919240e2efe170f841e",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "70bcbf6642270d8300cdf1c5f587fb2c7e810f30e8edc57457f0fa93dd10c624"
+    },
+    "evidence": "Both native and supplied English records reassure the player that trying their best is enough. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02CE",
+    "source_sha256": "42bedecbddbfab2b969cdab43ef11cc99ab5a2c28be7c707a314ba974e927cfd",
+    "reference_id": "message:02CE",
+    "reference_sha256": "557fa293c0ea23e786e19cd1536aabd90dbcbbc2073eb68e41f5ee315218e449",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "737bb4277013692138b6dec779a4dc949c3982193c7727c8b071bd9b0176a59f"
+    },
+    "evidence": "Both native and supplied English records acknowledge that the task would have been difficult for anyone. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02CF",
+    "source_sha256": "fd28ba077796a618fb96d03ece5c78f34240de775c272f691778909e32d3e585",
+    "reference_id": "message:02CF",
+    "reference_sha256": "d1277a2d7e6953c0a4d96b9561558b13648cd41f94a6532c3bae590070edf598",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "64d9abee3cacaa1c355d5202c6f724a1b8fe66ba5a390c8a66bd6f9643eade10"
+    },
+    "evidence": "Both native and supplied English records reassure the player that nobody can do everything. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02D0",
+    "source_sha256": "477b6591ecbbbbf6f7d9371f0a78af34070e1af0ae3ed79566325c713350b2e6",
+    "reference_id": "message:02D0",
+    "reference_sha256": "fbeb161b86227a024b29dcb158ab717a9783a4b95f0186a297318e4315134d72",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "7ea3fb037dc66e107b46d826646e86c1044f39d543901153a27d26319bd30a55"
+    },
+    "evidence": "Both native and supplied English records encourage the player after the failed favour and look forward to another chance. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02D1",
+    "source_sha256": "c9fbcdec0b96b32930aa14adfb7c0f92b6239954c3f657d7df0e6c3375270c06",
+    "reference_id": "message:02D1",
+    "reference_sha256": "c0dd161457a43137eced0906e038647b59ca3175a2e0f8a6d46fac19f2cd3cb2",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "294fcdabf86ccf45e91a127f3e45993a1e8ffb0409362a2186ed02b3ff42cf5f"
+    },
+    "evidence": "Both native and supplied English records acknowledge the player's best effort and encourage the player. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:02D2",
+    "source_sha256": "28f987cb5ae96d3adeccf6d250a335ea7ae471ee560c904a5af04898bb6bf36d",
+    "reference_id": "message:02D2",
+    "reference_sha256": "f8fe162bdda9d6ed212283ec96c972eb7eeea19897a286804a26f2cd94941cbb",
+    "native_actor_request": {
+      "reference_command": "7F0C050065",
+      "native_command": "7F09050065",
+      "offset": 0,
+      "adapted_sha256": "17b90b29a08cd7fdbc9ec743ef65698f83b65121e9213ef368b9479b25edd388"
+    },
+    "evidence": "Both native and supplied English records acknowledge that the favour was too difficult. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0452",
+    "source_sha256": "6970b2c200db4536b4a2ee94ebc40d69f4a879eea16380c86d62311809dce9e2",
+    "reference_id": "message:0452",
+    "reference_sha256": "0b8ed00433746b83619090df31ddee8768035be9a1c52a99b37a86f6c2a2c976",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050068",
+      "offset": 0,
+      "adapted_sha256": "d05ccdad35987610097183ffd8eb8c2b7daa4734de34f8d956c3fb39c88ec960"
+    },
+    "evidence": "Both native and supplied English records accept that the failed errand cannot be helped. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0453",
+    "source_sha256": "7f63b3cb70e2a74972d72b98fb7de88b19403dc8363836a1c50c2cb4eb3cd720",
+    "reference_id": "message:0453",
+    "reference_sha256": "2e03e7fa6c08da45cca0861b352fdccfe1c1dc448624312051737155f085e616",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050067",
+      "offset": 0,
+      "adapted_sha256": "31ba4ed73c1f46aa3c1d3b04027803f1d924e9f6421685f201a37ae8f10baa62"
+    },
+    "evidence": "Both native and supplied English records reassure the player that the errand was not very important. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0454",
+    "source_sha256": "6da2e334dda378d5f35a0042d8f929d5524664e191f1008d235d1be5391f71be",
+    "reference_id": "message:0454",
+    "reference_sha256": "8f9d65494a6a4799fde076b4d234f5626b08448eb6cce56958fe6e9f1c55c926",
+    "native_actor_request": {
+      "reference_command": "7F0C050066",
+      "native_command": "7F09050066",
+      "offset": 0,
+      "adapted_sha256": "6aced6db225a6fb33d06fb516eab3acb2b0c0e672751f72b9db761c5c319442c"
+    },
+    "evidence": "Both native and supplied English records ask the player to help again despite this failure. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0455",
+    "source_sha256": "d82aed63976099365be1a6a9ca00ceade2be213daa13d9c612778717c9d071a0",
+    "reference_id": "message:0455",
+    "reference_sha256": "7776520af98c1f112cf1c565f514aa27ffff5ea765a61fdd70577c6d1d305d55",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050067",
+      "offset": 0,
+      "adapted_sha256": "dd72ed7752809aebfb5b1118de2540ae0e1563d2b20ccc516efd5b132776f4e4"
+    },
+    "evidence": "Both native and supplied English records acknowledge that the request was difficult. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0456",
+    "source_sha256": "df87cef8d2b44dc392712c29b6f3346de7c82d17c8e24423347b9475d008d9cf",
+    "reference_id": "message:0456",
+    "reference_sha256": "c6116783342bf3ec336cef746c584bac8dbbadac5af1425b6fb3fbae3b239c00",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050068",
+      "offset": 0,
+      "adapted_sha256": "ce3e19dcbba897acc4e52c08c49212f7dc37cf29143cd2de9059bde58c36246c"
+    },
+    "evidence": "Both native and supplied English records question whether the speaker expected too much of the player. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0457",
+    "source_sha256": "c2598d30e8ca6d367c50836c74b2aefb391a5d816da6925403b8231e19dfd145",
+    "reference_id": "message:0457",
+    "reference_sha256": "4a979c72e8479ae177686d8b9590738441b7635a217031f3b79821027c8fd99f",
+    "native_actor_request": {
+      "reference_command": "7F0C050066",
+      "native_command": "7F09050066",
+      "offset": 0,
+      "adapted_sha256": "572cfb1d4b2c97486a655b8d07cbe84204ff6130ee861835fcac886a68f80ce6"
+    },
+    "evidence": "Both native and supplied English records reassure the player that nobody can do everything. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0458",
+    "source_sha256": "54135411519129e52b1896c15f31212532b5dceb92350f985307f09c1662cabd",
+    "reference_id": "message:0458",
+    "reference_sha256": "aebbedf40ff085f38ed608953ecc179eef3207338a0480208e7c6b887605ccb4",
+    "native_actor_request": {
+      "reference_command": "7F0C050066",
+      "native_command": "7F09050066",
+      "offset": 0,
+      "adapted_sha256": "eae2fda7e05dee71c5d9e4c5d7a796ef02e7568c3d208761463f621ce9e4e496"
+    },
+    "evidence": "Both native and supplied English records encourage the player not to dwell on a failed task. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:0459",
+    "source_sha256": "7b7283d11e8b625d20867c3f3c230829ecfe4b2d3acf78a559ea4b18dc3e8305",
+    "reference_id": "message:0459",
+    "reference_sha256": "37114ab0a6aaf2cfaa38be920813a6d3e0f33d12f7dbafe40b1b41222289bb5d",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050068",
+      "offset": 0,
+      "adapted_sha256": "ee570b93d7d49b8f324a1b97d389c4b4fa1995a79d8896bdb0575f276fae7df9"
+    },
+    "evidence": "Both native and supplied English records accept that plans sometimes fail. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:045A",
+    "source_sha256": "7917bb0ee37b7b735cd9103fa451b8584efe0d15d514f0570af034317768ec9e",
+    "reference_id": "message:045A",
+    "reference_sha256": "1202d97f4f2d1e4bc0841769cfbe4f721ee72838f44f33df644ef7178aed6270",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050067",
+      "offset": 0,
+      "adapted_sha256": "514833489d92937f8acec594d0c6e853b4d22ef3cac783ca02029c431bf05ad4"
+    },
+    "evidence": "Both native and supplied English records reassure the player that another task will come along. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
+    "id": "message:11D1",
+    "source_sha256": "3488d0742f78405a3098484b7fac7de40f6ef9ff60114c2aa5ce904dbd887a8c",
+    "reference_id": "message:11D1",
+    "reference_sha256": "753f1b05c85ab00911a847664842ca535fb60a1a3cc2b6113c8fa6526642e836",
+    "native_actor_request": {
+      "reference_command": "7F0C050067",
+      "native_command": "7F09050067",
+      "offset": 116,
+      "adapted_sha256": "c57194f2d467d466372452190da13baf377f2feb6e0156fe18d62ac2f427cbfb"
+    },
+    "evidence": "Both native and supplied English records end an angry exchange after the player rejects the speaker's advice. The complete English wording is independently confirmed by the legacy reference. Preserve the exact original NPC0 order-slot-five request and value: native 09 writes actor-order row four, while 0C writes the separate quest row nine. These commands are not interchangeable. Replace only the approved GameCube request span; the complete native actor-command sequence must then match. English lines, pages, pauses, and remaining wording are retained, with normal field, flow, and capacity checks. See specs/ACTOR_REQUESTS.md. Ordinary quest/actor progression remains validation."
+  },
+  {
     "id": "message:02DE",
     "source_sha256": "806f84bcf7e362a11f4629965a4fd0251126730ac16cdbbd404114743f900dcf",
     "reference_id": "message:1093",

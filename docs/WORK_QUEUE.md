@@ -107,13 +107,14 @@ four-MiB town arrival, and all eight complete native letter windows pass.
 
 ## Main translation and runtime
 
-Next content audits target the remaining actor-command and inserted-text gaps.
-A read-only comparison identifies 25 reference-confirmed messages whose aligned
-non-presentation differences are entirely native `09` versus GameCube `0C` actor
-requests. Retaining the native requests makes their existing command/capacity
-checks pass, but this is not an approved import rule yet. Start with the
-errand/apology family around `02B8..02D2`; inspect the native/English request
-semantics and preserve original native arguments before enabling any adaptation.
+Next content audits target the remaining inserted-text and actor-command gaps.
+Twenty-five favour/task-response messages have individually approved native
+actor requests. Native `09` writes NPC0 row four; `0C` writes quest row nine.
+The adaptation retains the original `09`, slot five, and exact native value,
+with complete actor-sequence and payload guards. All 25 full cartridge loads
+and native request dispatches pass, including complete order-table and memory
+guards. See [request semantics and scope](../specs/ACTOR_REQUESTS.md). Normal
+subsequent actor actions and quest traversal remain gameplay/playthrough checks.
 
 The 140 missing-field rejections include forty catchphrase-only (`1C`), twenty-eight
 player-name-only (`1A`), and twenty-four town-name-only (`2F`) cases, plus mixed and
@@ -122,6 +123,15 @@ than assuming that a field absent from a native message is available globally.
 Do not weaken field/actor guards simply to reduce rejection counts. These audits
 must proceed in bounded content batches, without returning to repeated isolated
 mail tests while broader implementation remains.
+
+Native `1A` reads the current-player pointer at `80136FD8` through `8009EBB0`
+and `8009EC88`; `2F` reads the current town through `800950D8` (fixed address
+`80129E00`) and `8009F428`. These are not actor-prepared free-string slots.
+Their initialization/caller context and each message's meaning still need review
+before approving added fields. In particular, GameCube tailor/event descriptions
+must not be admitted solely because the name field is available. Catchphrase
+`1C` instead receives the message's actor at window offset `20`, so its caller
+identity requires a distinct check. No new field allowance is enabled yet.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
