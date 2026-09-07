@@ -977,6 +977,19 @@
   catalog construction and identity review, full-text assembly, and lossless
   editor/save integration. `specs/MAIL_SNAPSHOTS.md` documents the exact format,
   scope, unresolved record, and prohibition on rendering an envelope as text.
+- Disassembled and audited the native mail viewer at VROM `007908A0`. Fifteen
+  instruction guards and the complete overlay hash bind its 192-byte board
+  object, embedded 164-byte mail, field offsets, read-mode branch, 10/96/16-byte
+  length scans, sixteen-character/six-line body renderer, and header-split clamp.
+  The clamp would erase a proposed split-byte tag before later rendering, and
+  footer normalization must not consume opaque snapshot bytes. The `font` byte
+  also controls empty/send/attachment state; no metadata tag is assigned yet.
+  `specs/MAIL_SNAPSHOTS.md` records these integration constraints and linked
+  renderer addresses without claiming a working wider viewer.
+- Regenerated `build/audits/mail.json` with the complete guarded viewer and
+  independent mail command table. The final full suite passes all 191 tests in
+  71.417 seconds. No playable-ROM or saved-record bytes change in this viewer
+  audit; its next implementation step remains the decoder/viewer integration.
 
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in

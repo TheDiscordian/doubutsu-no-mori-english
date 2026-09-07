@@ -10,6 +10,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom
 from audit_display_names import audit as reference_audit
 from textbanks import banks
 from mail_controls import TABLE_RAM, TABLE_SHA256, native_handlers
+from mail_viewer import evidence as viewer_evidence
 
 TARGETS = {"load_letter": 0x80093F04, "load_letter_sized_edges": 0x80093F54,
            "load_header": 0x80093B28, "load_footer": 0x80093C98, "load_body": 0x80093DA8,
@@ -65,6 +66,7 @@ def audit(rom, reference_directory):
     result["controls"] = {"table_ram": f"{TABLE_RAM:08X}", "table_sha256": TABLE_SHA256,
                           "handlers": {f"{opcode:02X}": f"{address:08X}" for opcode, address in native_handlers(rom).items()},
                           "unsupported_code_behaviour": "No replacement and no cursor advance; the native assembly loop can stall"}
+    result["viewer"] = viewer_evidence(rom)
     for report in result["references"].values():
         report["status"] = "Native mail references; no destination or save expansion is approved by this inventory"
     return result
@@ -80,6 +82,7 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2)+"\n")
     print(json.dumps({"layout": report["layout"], "banks": report["banks"],
+        "controls": report["controls"], "viewer": report["viewer"],
         "calls": {name: len(r["callers"]) for name, r in report["references"].items()},
         "literal_pointers": {name: len(r["literal_pointers"]) for name, r in report["references"].items()}}, indent=2))
 

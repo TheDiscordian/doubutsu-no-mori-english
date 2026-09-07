@@ -104,6 +104,46 @@ rendering. Generated detailed evidence stays in `build/audits/mail-templates.jso
 
 ## Required integration work
 
+### Native viewer constraints
+
+`tools/mail_viewer.py`, included in the mail audit, verifies the complete native
+`board_ovl` at VROM `007908A0`, linked RAM `80888E90`, 7,536 bytes. SHA-256:
+`abade0c99f31b39b2a2b0b80c3ad1557ba5d9aadf1b10b512a662a4b76b3cbad`.
+These are linked overlay addresses, not permission to call those addresses in a
+live emulator without resolving the loaded overlay.
+
+The native board object is `C0` bytes. Its embedded `Mail_c` begins at `08`,
+with text fields at `32`, `3C`, and `9C`; its source/destination pointer is at
+`AC`. Three one-byte lengths live at offsets `05`, `06`, and `07`. The board
+pointer is at submenu overlay offset `106E4`.
+
+| Consumer | Linked address | Verified constraint |
+| --- | --- | --- |
+| Initial copy | `8088A47C` | Copies an existing native record into the board object |
+| Initialization | `8088A2D0` | Scans 10/96/16-byte fields and normalizes footer padding |
+| Header split clamp | `8088A538` | Clamps values above ten and writes the clamped byte at `8088A54C` |
+| Body renderer | `80889A9C` | Six lines, sixteen characters per line, explicit `CD` newlines |
+| Header renderer | `80889CD8` | Local header assembly, native name insertion, and special mail-type cases |
+| Footer renderer | `808899E4` | Right positioning uses the native sixteen-cell geometry |
+
+The read-only open mode is one; the initializer selects wait state two for that
+mode. Other modes may enter an editor. Exit/writeback paths and every caller's
+mode still need validation before treating a generated-letter view as read-only.
+
+A header-split flag would be erased by the current initializer's clamp. A
+decoder must run before any such normalization, and opaque bytes must never be
+passed through the native body/footer length and rendering paths. Full English
+rendering must preserve reference newlines and use verified pixel widths; merely
+doubling the sixteen-character limit is not proof of matching GameCube layout.
+
+The field named `font` in the native decompilation also controls mail behaviour:
+`FF` means an unused slot, the send check at `8009C89C` accepts value one, and
+the attachment check at `8009C8C0` accepts one, three, or four. That byte is not
+an available tag without updating its consumers. No discriminator is assigned
+by this audit.
+
+### Remaining implementation
+
 1. Define a collision-free native record discriminator after auditing every
    metadata reader, copying operation, and persistent destination.
 2. Build immutable, source-verified template catalogs with reviewed identities,

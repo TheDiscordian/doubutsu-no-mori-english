@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 190 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 191 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -183,6 +183,10 @@ user's direction. The production build retains the approved spacing metrics.
   copy calls pass, including complete ordinary/villager mail record copying.
   The codec is not installed in the resident module. Record discrimination,
   full-text assembly/readers, custom editing, and save integration remain.
+- The native mail-viewer audit verifies the board object's complete layout,
+  field scans, read-mode branch, header-split clamp, and six-line/sixteen-character
+  body limits against the actual overlay. Full-text viewer integration must
+  decode before native normalization and preserve GameCube newline/width intent.
 
 ## Current reference candidates
 

@@ -10,10 +10,28 @@ sys.path.insert(0, str(ROOT/"tools"))
 from aflib import CODE_RAM, CODE_VROM, by_vrom
 from audit_mail import CAPACITY_GUARDS, audit, capacity_evidence
 from test_retail import ROM_PATH
+from mail_viewer import GUARDS as VIEWER_GUARDS, RAM as VIEWER_RAM, VROM as VIEWER_VROM, evidence as viewer_evidence
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Native mail code is a local-only input")
 class MailAuditTests(unittest.TestCase):
+    def test_native_viewer_limits_and_mutation_guards(self):
+        rom = ROM_PATH.read_bytes()
+        result = viewer_evidence(rom)
+        self.assertEqual(result["embedded_mail_offset"]+164, result["persistent_mail_pointer_offset"])
+        self.assertEqual(result["text_offsets"], {"header": 50, "body": 60, "footer": 156})
+        self.assertEqual((result["line_character_limit"], result["body_lines"]), (16, 6))
+        data = bytearray(by_vrom(rom)[VIEWER_VROM].extract(rom))
+        class Entry:
+            def extract(self, ignored):
+                return data
+        for address in VIEWER_GUARDS:
+            data[address-VIEWER_RAM+3] ^= 1
+            with patch("mail_viewer.by_vrom", return_value={VIEWER_VROM: Entry()}):
+                with self.assertRaisesRegex(ValueError, "mail-viewer"):
+                    viewer_evidence(rom)
+            data[address-VIEWER_RAM+3] ^= 1
+
     def test_native_mail_size_and_every_instruction_guard(self):
         rom = ROM_PATH.read_bytes()
         result = capacity_evidence(rom)
