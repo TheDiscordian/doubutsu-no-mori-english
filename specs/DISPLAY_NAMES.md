@@ -4,10 +4,17 @@
 
 The separate resource and `af_load_display_name` API provide complete GameCube
 villager and special-character names. The resident module integrates these at
-two nameplate call sites and the main-message talk-name insertion. These changes
+two nameplate call sites, the main-message talk-name insertion, and read-only
+NPC recipient names in letter headers. These changes
 remain experimental pending broader conversation, save, and hardware validation.
 Six-byte saved names, identity structures, catchphrases, the shared dynamic-choice
 insertion, and unrelated name-loader callers remain unchanged.
+
+Letter headers use the existing packed villager identity only when the native
+recipient type is one and the index is below 216. Player names and unsupported
+or unavailable-resource cases retain their saved names. Ordinary and snapshot
+readers share the lookup; editors and saved records retain native capacities.
+See [letter header rules](MAIL_READER.md#recipient-display-names).
 
 ## Native consumers
 
@@ -87,5 +94,5 @@ Test every villager, every special actor mapping, unsupported IDs, nulls,
 resource disabling, malformed headers, aligned DMA, and adjacent stack guards.
 Native tests must exercise client-name setup, talk-name insertion and exact
 message limits, and the draw consumer. Normal conversations must show full names
-and retain page/timing behaviour. Other dynamic-name fields, house signs, mail,
-and saved-name consumers remain separate work.
+and retain page/timing behaviour. Other dynamic-name fields, house signs, mail
+editors, and saved-name consumers remain separate work.

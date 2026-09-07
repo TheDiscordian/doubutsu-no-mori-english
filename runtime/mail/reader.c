@@ -1,5 +1,6 @@
 #include "reader.h"
 #include "view.h"
+#include "../display_name.h"
 
 AfMailReader af_mail_reader;
 
@@ -40,6 +41,21 @@ static int active(const void *state) {
     return state && af_mail_reader.status && af_mail_reader.owner == state;
 }
 
+/* The native mail identity packs the villager index into byte 0C and its
+ * palette into 0D. Only recipient type one uses that representation. Resolve
+ * the immutable English name for display; never rewrite the saved identity.
+ */
+static unsigned int header_name(unsigned char *destination, const unsigned char *mail, unsigned int length) {
+    unsigned int i;
+    if (mail[0x10] == 1u && mail[0x0C] < AF_VILLAGER_COUNT &&
+            af_load_display_name(destination, AF_DISPLAY_NAME_WIDTH, 0xE000u|mail[0x0C]))
+        length = AF_DISPLAY_NAME_WIDTH;
+    else
+        for (i = 0; i < length; ++i) destination[i] = mail[i];
+    while (length && destination[length-1u] == ' ') --length;
+    return length;
+}
+
 static int select_page(unsigned int number) {
     AfMailReader *r = &af_mail_reader;
     const unsigned char *parts[3] = {r->header, r->letter.text+r->letter.offsets[1],
@@ -66,7 +82,7 @@ static void error_letter(void) {
 
 void af_mail_reader_copy(unsigned char *destination, const unsigned char *source, void *menu) {
     AfMailReader *r = &af_mail_reader;
-    unsigned int i, name = 6, split, length, type;
+    unsigned int i, name, split, length, type;
     if (!destination || !source || !menu)
         return;
     r->status = r->page = r->total = 0;
@@ -83,20 +99,15 @@ void af_mail_reader_copy(unsigned char *destination, const unsigned char *source
     if (source[0x26] == 255u || !af_mail_restore(&r->letter, source+0x2A, 122, &r->workspace)) {
         error_letter();
     } else {
-        while (name && source[name-1u] == ' ')
-            --name;
         type = source[0x28];
-        if (type == 2u || type == 3u || type == 5u)
-            name = 0;
         length = r->letter.lengths[0];
         split = r->letter.header_split;
-        if (split > length || length+name > sizeof(r->header)) {
+        if (split > length || length+AF_DISPLAY_NAME_WIDTH > sizeof(r->header)) {
             error_letter();
         } else {
+            name = (type == 2u || type == 3u || type == 5u) ? 0u : header_name(r->header+split,source,6);
             for (i = 0; i < split; ++i)
                 r->header[i] = r->letter.text[r->letter.offsets[0]+i];
-            for (i = 0; i < name; ++i)
-                r->header[split+i] = source[i];
             for (i = split; i < length; ++i)
                 r->header[name+i] = r->letter.text[r->letter.offsets[0]+i];
             r->lengths[0] = length+name;
@@ -138,7 +149,7 @@ static unsigned int decimal(unsigned char *destination, unsigned int number) {
 
 void af_mail_snapshot_header(void *submenu, void *game, void *menu, float x,
                              float y, const unsigned char *colour) {
-    unsigned char *state, header[16], hint[24];
+    unsigned char *state, header[18], hint[24];
     unsigned int i, j, split, name, length, pixels;
     const unsigned char *text;
     AfMailReader *r = &af_mail_reader;
@@ -158,8 +169,8 @@ void af_mail_snapshot_header(void *submenu, void *game, void *menu, float x,
             draw(game, state+0x32, 10, x, y, colour);
             return;
         }
+        name = header_name(header+split,state+8,name);
         for (i = 0; i < split; ++i) header[i] = state[0x32+i];
-        for (i = 0; i < name; ++i) header[split+i] = state[8+i];
         for (i = split; i < length; ++i) header[name+i] = state[0x32+i];
         if (length+name) draw(game, header, length+name, x, y, colour);
         return;

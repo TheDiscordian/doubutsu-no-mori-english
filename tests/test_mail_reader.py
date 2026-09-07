@@ -25,7 +25,7 @@ CATALOG = ROOT/'build/mail-catalog/catalog.bin'
 
 class Reader(C.Structure):
     _fields_ = [('owner',C.c_void_p),('status',C.c_uint),('page',C.c_uint),('total',C.c_uint),
-                ('lengths',C.c_uint*3),('layout',Page),('header',C.c_ubyte*1030)]
+                ('lengths',C.c_uint*3),('layout',Page),('header',C.c_ubyte*1032)]
 
 
 @unittest.skipUnless(CATALOG.is_file() and shutil.which('gcc'), 'Registered local catalog and host GCC required')
@@ -37,6 +37,8 @@ class MailReaderTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory()
         library = Path(cls.temporary.name)/'mail-reader.so'
         subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
+                        '-I'+str(ROOT/'runtime'),str(ROOT/'runtime/display_name.c'),
+                        str(ROOT/'tests/display_name_mock.c'),
                         *(str(ROOT/'runtime/mail'/name) for name in ('record.c','format.c','catalog.c','view.c','page.c','reader.c')),
                         *(str(ROOT/'tests'/name) for name in ('mail_catalog_mock.c','mail_view_mock.c','mail_reader_mock.c')),
                         '-o',str(library)],capture_output=True,check=True)
@@ -53,6 +55,10 @@ class MailReaderTests(unittest.TestCase):
 
     def setUp(self):
         self.lib.af_mail_reader_test_reset()
+        C.c_uint.in_dll(self.lib,'af_display_enabled').value = 1
+        (C.c_uint*8).in_dll(self.lib,'af_display_header')[:] = (0x41464E4E,1,8,280,216,64,0,0)
+        C.c_uint.in_dll(self.lib,'af_display_dma_calls').value = 0
+        C.c_uint.in_dll(self.lib,'af_display_dma_error').value = 0
         self.state = Reader.in_dll(self.lib,'af_mail_reader')
         self.board = (C.c_ubyte*192).in_dll(self.lib,'af_mail_view_board')
         self.board[:] = b'!'*192
@@ -78,10 +84,11 @@ class MailReaderTests(unittest.TestCase):
         mask = set().union(*(template_fields(part) for part in parts.parts))
         return replace(record,fields=tuple((i,Field(b'x'*16,4)) for i in sorted(mask)))
 
-    def open(self,record,*,wire=None,marker=0x80,kind=4):
+    def open(self,record,*,wire=None,marker=0x80,kind=4,recipient_type=0,recipient_index=0):
         source = bytearray(164)
         source[:6] = b'READER'
         source[0x12:0x18] = b'WRITER'
+        source[0x10],source[0x0C] = recipient_type,recipient_index
         source[0x26:0x2A] = bytes([0,marker,kind,0])
         source[0x2A:] = pack(record) if wire is None else wire
         buffer = C.create_string_buffer(bytes(source),164)
@@ -95,6 +102,41 @@ class MailReaderTests(unittest.TestCase):
         else:
             self.assertEqual(bytes(self.board[8:172]),bytes(source))
         return source
+
+    def test_all_villager_header_names_use_eight_bytes_in_snapshot_and_ordinary_readers(self):
+        record = self.record(0)
+        letter = format_letter(record,templates(self.catalog,record))
+        for index in range(216):
+            self.board[:8] = b'!'*8
+            name = bytes(32+(index*8+i)%95 for i in range(8)).rstrip(b' ')
+            source = self.open(record,recipient_type=1,recipient_index=index)
+            expected = letter.header[:letter.header_split]+name+letter.header[letter.header_split:]
+            self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),expected)
+            self.assertEqual(source[:6],b'READER')
+            self.open(record,wire=b' '*122,marker=3,recipient_type=1,recipient_index=index)
+            self.board[3],self.board[5],self.board[0x2F] = 6,3,3
+            self.board[0x32:0x35] = b'To '
+            self.assertEqual(self.draw(),[(b'To '+name,64,36)])
+        self.assertEqual(C.c_uint.in_dll(self.lib,'af_display_dma_error').value,0)
+
+    def test_mail_name_fallbacks_and_suppressed_types_do_not_reinterpret_player_identities(self):
+        record = self.record(0)
+        letter = format_letter(record,templates(self.catalog,record))
+        expected = letter.header[:letter.header_split]+b'READER'+letter.header[letter.header_split:]
+        for recipient_type,index in ((0,0),(2,0),(255,0),(1,216),(1,255)):
+            self.open(record,recipient_type=recipient_type,recipient_index=index)
+            self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),expected)
+        self.assertEqual(C.c_uint.in_dll(self.lib,'af_display_dma_calls').value,0)
+        C.c_uint.in_dll(self.lib,'af_display_enabled').value = 0
+        self.open(record,recipient_type=1)
+        self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),expected)
+        C.c_uint.in_dll(self.lib,'af_display_enabled').value = 1
+        (C.c_uint*8).in_dll(self.lib,'af_display_header')[0] = 0
+        self.open(record,recipient_type=1)
+        self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),expected)
+        for kind in (2,3,5):
+            self.open(record,kind=kind,recipient_type=1)
+            self.assertEqual(bytes(self.state.header[:self.state.lengths[0]]),letter.header)
 
     def draw(self):
         self.calls.value = 0

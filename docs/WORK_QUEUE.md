@@ -21,7 +21,13 @@ Keep generation disabled.
 
 Next reader targets include the first-job and ordinary NPC letter-show handlers
 in overlays `00814FA0` and `00815B70`. Their three reverse-conversion calls lead
-to board read mode one; complete caller-level native validation remains.
+to board read mode one; complete caller-level native validation remains. Their
+instruction, BSS-lifetime, and relocation contracts are recorded in
+[NPC letter-show design](../specs/NPC_MAIL_SHOW.md).
+Read-only letter headers now resolve complete English villager names using the
+existing saved identity. Host tests cover all 216 villagers and fallbacks;
+eight full native windows and ten ordinary-header cases pass. No saved
+name capacity, source letter, font metric, or reference line break is changed.
 
 ## Main translation and runtime
 

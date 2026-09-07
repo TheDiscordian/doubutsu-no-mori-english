@@ -14,7 +14,7 @@ typedef struct {
     unsigned int status, page, total;
     unsigned int lengths[3];
     AfMailPage layout;
-    unsigned char header[1030];
+    unsigned char header[1032];
     AfMailText letter;
     AfMailWorkspace workspace;
 } AfMailReader;

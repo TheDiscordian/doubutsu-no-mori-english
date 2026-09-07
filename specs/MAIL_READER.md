@@ -42,6 +42,36 @@ This prevents lossy native editing; it is not the completed English editor.
 Malformed or unavailable snapshots show an explicit English error message.
 Neither a successful decode nor an error changes the original letter.
 
+## Recipient display names
+
+Read-mode headers resolve complete eight-byte English villager names from the
+optional display-name resource. This applies to ordinary letters and decoded
+snapshots, not to saved identity fields or the editor. The native name setter
+at `8009C70C` stores recipient type one at mail offset `10`, the villager index
+at `0C`, and the palette at `0D`. The reverse setter at `8009C780` reconstructs
+the NPC ID as `E000 | index`. Offsets and addresses are hexadecimal.
+
+Only type one and indices below 216 use this lookup. Player names, other types,
+unsupported indices, and unavailable or invalid resources retain the saved
+name. Indices 216 through 255 do not alias special-character rows. Header types
+two, three, and five retain their native recipient-name suppression. Trailing
+name padding is trimmed; header text, explicit spacing, and the insertion split
+are unchanged. No recipient, sender, town, or saved text bytes are rewritten.
+
+The snapshot header capacity is 1,032 bytes: 1,024 formatted bytes plus the full
+eight-byte display name. Its two additional bytes occupy existing structure
+padding, so the resident cache remains 5,792 bytes. The formatted-letter member
+begins at offset 1,196; the decoder workspace remains at offset 2,236. Ordinary
+headers use an eighteen-byte stack buffer for the native ten-byte header plus
+the display name. Snapshot names load once on open; ordinary read-mode headers
+resolve the name during drawing. Hardware timing remains unverified.
+
+The original identity setter range `8009C70C..8009C780` has SHA-256
+`e4eaf965033e414fe876b90d236a6ae9e79199171b8601270dc4798d7008d07d`;
+the reverse range `8009C780..8009C80C` has SHA-256
+`d6543275f47092b0c2de962c849e4ed26e5af909c402d21984e9b263866744bf`.
+Window fixtures guard and execute the original setter to construct NPC names.
+
 ## Complete pages
 
 The page builder measures the approved font's actual advances against a
@@ -107,13 +137,16 @@ in both directions, and checks unchanged source letters and saved preferences.
 The complete emulator checkpoint must be restored afterwards. Test records and
 reference wording stay in ignored output directories.
 
-The final native run passes four long reference letters and two rejected
-snapshots across ten pages, 1,134 glyphs, and 4,536 vertex positions. All six
-source/preference checks pass. The fourth reference letter requests edit-open
+The full native run passes six long reference letters and two rejected
+snapshots across fourteen pages, 1,705 glyphs, and 6,820 vertex positions. All eight
+source/preference checks pass. Two reference probes use the native NPC identity
+setter and complete eight-byte English recipient names. The fourth reference letter requests edit-open
 mode two and reaches read-only mode one without rewriting its source. A corrupt
 checksum and an unknown catalog each display the error message through the real
-font renderer. Separate ordinary-letter and header/tail-forwarding regressions
-also pass. Both complete machine checkpoints and blank FlashRAM status are
+font renderer. A separate ordinary-header/body/footer regression passes ten
+header cases, full glyph positions, memory guards, and non-read-mode forwarding:
+36 calls and 842 assertions across 1,010 steps. Complete machine checkpoint
+restoration and blank FlashRAM status are
 retained in local evidence; this remains distinct from actual game saving.
 
 Ordinary generation, semantic template matches, missing glyph support, complete

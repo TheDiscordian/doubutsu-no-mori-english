@@ -29,14 +29,14 @@ class ReaderSmokeTests(unittest.TestCase):
         debug.write(address,struct.pack('>7I',0x803B9B40,1,0,1,3,4,3))
         debug.write(address+28,struct.pack('>2I',1,3)+struct.pack('>12I',0,0,3,0,1,0,4,28,2,0,3,136))
         debug.write(address+164,b'To ')
-        debug.write(address+1194,struct.pack('>6H',0,3,7,3,4,3)+bytes(4)+b'HDRBODYEnd')
+        debug.write(address+1196,struct.pack('>6H',0,3,7,3,4,3)+bytes(4)+b'HDRBODYEnd')
         result = snapshot(debug,address)
         self.assertEqual(tuple(bytes.fromhex(result[f]) for f in ('header','body','footer')),(b'To ',b'BODY',b'End'))
         self.assertEqual([s['y'] for s in result['spans']],[0,28,136])
         self.assertEqual(result['owner'],'803B9B40')
-        for offset,value in ((4,struct.pack('>I',3)),(12,bytes(4)),(16,struct.pack('>I',1031)),
+        for offset,value in ((4,struct.pack('>I',3)),(12,bytes(4)),(16,struct.pack('>I',1033)),
                               (32,struct.pack('>I',9)),(36,struct.pack('>I',3)),
-                              (1196,struct.pack('>H',1023)),(1194+16+3,b'\xcd')):
+                              (1198,struct.pack('>H',1023)),(1196+16+3,b'\xcd')):
             before = debug.read_memory(address+offset,len(value))
             debug.write(address+offset,value)
             with self.assertRaises(ValueError): snapshot(debug,address)

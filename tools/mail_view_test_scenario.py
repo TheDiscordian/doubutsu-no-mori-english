@@ -9,10 +9,11 @@ import struct
 from aflib import by_vrom, sha256
 from font import WIDTH_TABLE
 from aflib import CODE_VROM
+from display_names import HEADER as NAME_HEADER, VROM as NAME_VROM
 from mail_view_patch import CALLS
 from mail_viewer import RAM, VROM
 from runtime_layout import TEST_RETURN, TEST_STACK, GUARD_ADDRESS, GUARD_WORD
-from runtime_module import verify_test_module
+from runtime_module import MODULE_RAM, verify_test_module
 
 SUBMENU, COLOUR, GAME = TEST_RETURN+0x20, TEST_RETURN+0x58, TEST_RETURN+0x60
 LINE, POS, GRAPH = TEST_RETURN+0x80, TEST_RETURN+0x100, TEST_RETURN+0x180
@@ -140,18 +141,38 @@ def scenario(rom, module):
 
     # The full reader also replaces ordinary read-mode headers. Name insertion
     # and special no-name types must retain the native semantics.
-    for kind in (4,3):
+    names = files[NAME_VROM].extract(rom)
+    if len(names) != 2272 or names[:32] != NAME_HEADER:
+        raise ValueError('Ordinary NPC headers require the complete display-name resource')
+    rows = [names[32+i*8:40+i*8].rstrip(b' ') for i in range(216)]
+    longest = [i for i,row in enumerate(rows) if len(row) == 8]
+    if len(longest) < 2:
+        raise ValueError('Missing full-width NPC header witnesses')
+    shortest = min(range(216),key=lambda i:len(rows[i]))
+    name_configuration = MODULE_RAM+0x3C
+    cases = [(4,0,0,True),(3,0,0,True)]
+    cases += [(4,1,i,True) for i in (longest[0],longest[-1],shortest,216)]
+    cases += [(4,0,longest[0],True),(4,2,longest[0],True),
+              (4,1,longest[0],False),(3,1,longest[0],True)]
+    for kind,recipient_type,npc_index,enabled in cases:
         value = bytearray(192)
         value[3],value[5],value[0x2F],value[0x30] = 6,5,3,kind
         value[8:14] = b'READER'
+        value[8+0x0C],value[8+0x10] = npc_index,recipient_type
         value[0x32:0x3C] = b'To ! '.ljust(10,b' ')
-        text = b'To READER! ' if kind == 4 else bytes(value[0x32:0x3C])
+        name = rows[npc_index] if enabled and recipient_type == 1 and npc_index < 216 else b'READER'
+        text = b'To '+name+b'! ' if kind == 4 else bytes(value[0x32:0x3C])
+        read(name_configuration,struct.pack('>I',NAME_VROM))
+        if not enabled:
+            write(name_configuration,bytes(4))
         write(BOARD,bytes(value))
         graphics()
         call('af_mail_header_hook',[SUBMENU,GAME,MENU,fword(64),fword(36),COLOUR])
         read(BOARD,bytes(value))
         guards(len(text),1)
         vertices([(0,text)],64,36)
+        if not enabled:
+            write(name_configuration,struct.pack('>I',NAME_VROM))
 
     # Emulate distinct loaded overlay bases through a return address inside
     # isolated scratch. Only the original target is replaced by a test stub;

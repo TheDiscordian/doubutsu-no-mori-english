@@ -1811,6 +1811,68 @@
   Complete caller-level native execution remains required; these observations
   do not establish generation or save compatibility.
 
+### Complete English NPC names in read-only letter headers
+
+- Traced the native NPC mail identity setter `8009C70C..8009C780` and reverse
+  setter `8009C780..8009C80C`. Type one identifies NPC recipients; byte `0C`
+  stores the villager index, while `0D` stores palette. Added read-only lookup
+  of the complete eight-byte English name for indices zero through 215 in
+  ordinary and snapshot headers. Player names and unsupported identities retain
+  saved text; missing or malformed resources fall back without source changes.
+  Header types two, three, and five retain recipient suppression.
+- Expanded the snapshot header to 1,032 bytes and the ordinary stack buffer to
+  eighteen bytes. Existing padding absorbs the snapshot's two additional bytes,
+  leaving its cache at 5,792 bytes. Updated native cache observations to the
+  formatted-letter offset 1,196; workspace offset 2,236 is unchanged. The native
+  compiler reports a 32-byte helper frame, a 40-byte copy-wrapper frame, and a
+  120-byte header-renderer frame. `build/mail-assembly-names/` passes standalone
+  MIPS compilation, symbol resolution, stack reporting, and mutable-state checks.
+- Host tests exercise every one of the 216 villager indices in both reader
+  branches, resource and identity fallbacks, and the widened header boundary.
+  The first all-villager run found a test-fixture guard reset missing between
+  ordinary and snapshot iterations; resetting the guard before each iteration
+  corrected the fixture. No runtime change was needed for that failure.
+  The full suite passes 294 tests in 176.546 seconds, recorded in
+  `build/tests-mail-names-full.log`.
+- `smoke-mail-names-reader-01` passes eight windows and fourteen pages across
+  218 steps. It verifies 1,705 glyphs and 6,820 vertex positions, both directions
+  of paging, six complete long reference letters, two explicit error windows,
+  and eight unchanged-source/preference checks. Two letters call the guarded
+  original NPC identity setter before opening and render full eight-byte names.
+  The fourth reference probe still redirects edit-open mode two to read-only
+  mode one without rewriting the original snapshot.
+- `smoke-mail-names-view-01` passes all ten ordinary-header cases, body/footer
+  rendering, complete glyph vertices, and non-read-mode forwarding, with
+  36 native calls and 842 assertions across 1,010 steps. Header cases cover
+  the first and last eight-byte villager-name witnesses, the shortest name,
+  unsupported index 216, player/other recipient types, disabled display-name
+  resource, and suppressed-name types. Both native scenarios restore complete
+  machine checkpoints and exit normally. FlashRAM remains 131,072 blank bytes,
+  SHA-256 `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- The new build's `smoke-mail-names-full-01` passes 188 train-to-town steps and
+  all ten runtime acceptance checks. The independent builds in
+  `build/runtime-module-mail-names/` and `build/runtime-module/` produce the
+  same module; `build/mail-names-pilot/` and `build/mail-names-repeat-pilot/`
+  produce the same ROM and UPS. Linked size is 24,480 bytes, leaving 96 bytes
+  before the unchanged linked limit; reservation remains 32 KiB. Further
+  runtime additions must respect this budget or provide a verified layout change.
+  Module SHA-256:
+  `173ea820b693bdc4faf014f4ce0be20106967deb448110f724e70715ca363a23`.
+  ROM SHA-256:
+  `00b1d985277d4a4600f6c4855344280e28c0c42ee5145e6fe5f537750058bf0f`.
+  UPS SHA-256:
+  `22e4e639a48c2a8e587625f106d47c5707e0602600f4c870627edfec4083789c`.
+- Recorded the three remaining NPC show callers' exact instruction contracts,
+  complete overlay and relocation hashes, BSS sizes, sender handling, and
+  window ownership in `specs/NPC_MAIL_SHOW.md`. These are audit findings, not
+  caller-level execution results. That execution remains the next reader task.
+- All 10,405 candidate edits, approved font metrics, explicit reference layout,
+  saved identity formats, and snapshot generation settings are unchanged.
+  Generation stays disabled. Normal post-office animation/error progression,
+  remaining readers, lossless editing, ordinary delivery, actual save/reload,
+  and original hardware remain required. Ordinary-header cartridge lookup
+  timing also remains unverified on hardware.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

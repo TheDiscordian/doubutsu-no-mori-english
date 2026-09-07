@@ -61,7 +61,7 @@ class MailPageTests(unittest.TestCase):
         self.assertEqual(self.page(parts)[1], [(0,0,1,0),(1,0,3,28),(1,4,0,44),(1,5,2,60),(2,0,7,136)])
 
     def test_long_headers_and_footers_remain_complete(self):
-        parts = (b'h'*1030, b'b'*1024, b'f'*1024)
+        parts = (b'h'*1032, b'b'*1024, b'f'*1024)
         total = self.page(parts)[0]
         collected = [bytearray(), bytearray(), bytearray()]
         for number in range(total):
@@ -112,7 +112,7 @@ class MailPageTests(unittest.TestCase):
                 (C.byref(page),None,lengths,0),(C.byref(page),sections,None,0),
                 (C.byref(page),sections,lengths,1),(C.byref(page),sections,lengths,1030)):
             self.assertEqual(self.lib.af_mail_page(out,pointers,sizes,number),0)
-        for values in ((1031,0,0),(1,1025,0),(1,0,1)):
+        for values in ((1033,0,0),(1,1025,0),(1,0,1)):
             self.assertEqual(self.lib.af_mail_page(C.byref(page),sections,(C.c_uint*3)(*values),0),0)
         self.assertEqual(bytes(page),before)
         self.assertEqual(self.page((b'',b'',b'')),(1,[]))

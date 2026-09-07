@@ -27,7 +27,7 @@ int af_mail_page(AfMailPage *out, const unsigned char *const sections[3],
         ((unsigned char *)&chosen)[i] = 0;
     }
     for (i = 0; i < 3u; ++i)
-        if ((!sections[i] && lengths[i]) || lengths[i] > (i ? 1024u : 1030u))
+        if ((!sections[i] && lengths[i]) || lengths[i] > (i ? 1024u : 1032u))
             return 0;
     if (lengths[0]) {
         if (!scan(&first, sections[0], lengths[0]))

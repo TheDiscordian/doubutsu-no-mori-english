@@ -19,7 +19,7 @@ def main():
     source = Path(__file__).resolve().parents[1]/'runtime/mail'
     out.mkdir(parents=True, exist_ok=True)
     common = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
-              '-v', f'{source}:/source:ro', '-v', f'{out}:/out', '-w', '/out', '--entrypoint']
+              '-v', f'{source.parent}:/source:ro', '-v', f'{out}:/out', '-w', '/out', '--entrypoint']
     def run(tool, *arguments):
         result = subprocess.run(common+['/n64_toolchain/bin/mips64-elf-'+tool, IMAGE, *arguments],
                                 capture_output=True, text=True, timeout=60)
@@ -33,8 +33,9 @@ def main():
              '-Wall', '-Wextra', '-Werror']
     sources = ('record', 'format', 'catalog', 'view', 'page', 'reader')
     for name in sources:
-        run('gcc', *flags, '/source/'+name+'.c', '-o', name+'.o')
-    run('ld', '-EB', '-r', '-o', 'mail.o', *(name+'.o' for name in sources))
+        run('gcc', *flags, '/source/mail/'+name+'.c', '-o', name+'.o')
+    run('gcc', *flags, '/source/display_name.c', '-o', 'display_name.o')
+    run('ld', '-EB', '-r', '-o', 'mail.o', *(name+'.o' for name in sources), 'display_name.o')
     undefined = run('nm', '--undefined-only', 'mail.o')
     if undefined.strip():
         raise ValueError('Unexpected mail runtime dependency: '+undefined)
@@ -49,10 +50,12 @@ def main():
     assembly = run('objdump', '-d', 'mail.o')
     (out/'mail.asm').write_text(assembly)
     report = {'compiler': compiler, 'toolchain_image': IMAGE, 'compiler_flags': flags,
-              'source_sha256': {path.name: sha256(path.read_bytes()) for path in sorted(source.iterdir()) if path.is_file()},
+              'source_sha256': {path.relative_to(source.parent).as_posix(): sha256(path.read_bytes())
+                               for path in sorted(source.iterdir())+[source.parent/'display_name.c',source.parent/'display_name.h']
+                               if path.is_file()},
               'object_sha256': sha256((out/'mail.o').read_bytes()),
               'object_size': run('size', 'mail.o'), 'sections': sections,
-              'stack_usage': {name: (out/(name+'.su')).read_text() for name in sources},
+              'stack_usage': {name: (out/(name+'.su')).read_text() for name in (*sources,'display_name')},
               'undefined_symbols': [],
               'mutable_sections': mutable,
               'status': 'Compilation and stack evidence only; native execution is recorded by separate emulator scenarios'}

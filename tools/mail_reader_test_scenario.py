@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import struct
 
-from aflib import by_vrom, sha256
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from mail_catalog import VROM as CATALOG_VROM, CONFIG_OFFSET, templates, verify_registered
 from mail_format import format_letter
 from mail_record import pack
@@ -45,23 +45,40 @@ def scenario(rom,module,cases):
         raise ValueError('Unexpected full-letter witness selection')
     actions = [{'wait':2},{'save_state':True}]
     source = TEST_RETURN+0x200
-    probes = [(label,record,letter,None) for label,record,letter in selected.values()]
+    probes = [(label,record,letter,None,None) for label,record,letter in selected.values()]
+    # Use the original name/identity setter, not a guessed saved name. The
+    # recipient's complete display name comes from the installed English bank.
+    names = files[0x02C00000].extract(rom)
+    if len(names) != 2272 or names[:32] != struct.pack('>8I',0x41464E4E,1,8,280,216,64,0,0):
+        raise ValueError('NPC letter windows require the complete display-name resource')
+    name_ids = [index for index in range(216) if len(names[32+index*8:40+index*8].rstrip(b' ')) == 8]
+    if len(name_ids) < 2: raise ValueError('Missing eight-byte villager-name witnesses')
+    for npc_index,(label,record,letter) in zip((name_ids[0],name_ids[-1]),(picked[('body',0)][1],picked[('body',1)][1])):
+        probes.append(('npc:'+label,record,letter,None,npc_index))
     first = next(iter(selected.values()))
-    probes += [('bad_checksum',first[1],None,'checksum'),
-               ('unknown_catalog',replace(first[1],catalog=3),None,'catalog')]
-    for index,(label,record,letter,error) in enumerate(probes):
+    probes += [('bad_checksum',first[1],None,'checksum',None),
+               ('unknown_catalog',replace(first[1],catalog=3),None,'catalog',None)]
+    for index,(label,record,letter,error,npc_index) in enumerate(probes):
         mail = bytearray(164)
         mail[:6] = b'READER'
         mail[0x12:0x18] = b'WRITER'
         mail[0x26:0x2A] = bytes([0,128,4,0])
         mail[0x2A:] = pack(record)
         if error == 'checksum': mail[0x32] ^= 1
-        header = b'' if error else letter.header[:letter.header_split]+b'READER'+letter.header[letter.header_split:]
+        name = b'READER' if npc_index is None else names[32+npc_index*8:40+npc_index*8].rstrip(b' ')
+        header = b'' if error else letter.header[:letter.header_split]+name+letter.header[letter.header_split:]
         body = b'Unable to read this letter.' if error else letter.body
         footer = b'' if error else letter.footer
         actions += [{'pause_game_thread':True},
                     {'snapshot_submenu':True,'expect_submenu':{'program':0,'move_index':0}},
-                    {'write':[f'{source:08X}',mail.hex()]},
+                    {'write':[f'{source:08X}',mail.hex()]}]
+        if npc_index is not None:
+            identity = struct.pack('>HH6sBB',0xE000+npc_index,0xEAAA,b'OLDTWN',3,0)
+            native = files[CODE_VROM].extract(rom)
+            actions += [{'read':['8009C70C',0x74],'expect':native[0x8009C70C-CODE_RAM:0x8009C780-CODE_RAM].hex()},
+                        {'write':[f'{TEST_RETURN+0x100:08X}',identity.hex()]},
+                        {'call':{'address':'8009C70C','arguments':[source,TEST_RETURN+0x100]}}]
+        actions += [
                     {'open_test_mail':f'{source:08X}','snapshot_probe':True,'mail_open_mode':2 if index == 3 else 1},
                     {'resume':True},{'wait':8},
                     {'snapshot_submenu':True,'expect_submenu':{'program':12,'move_index':3,'board_state':2,

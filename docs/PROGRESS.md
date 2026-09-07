@@ -15,7 +15,12 @@ hand-back initializer cases, sixteen refusal selectors, and ten index boundaries
 The tests use the actual action initializers and cover both reason-indexed
 message lookups. Normal animation, subsequent input, and rendered error
 progression remain unverified. Immediate mail work covers those interactions
-and remaining readers/metadata before generation.
+and remaining readers/metadata before generation. Read-only letter headers
+resolve complete English villager names without changing saved identities.
+All 216 names pass host checks; eight native letter windows pass complete text,
+page, glyph, source-retention, and preference checks. The ordinary-header native
+regression also passes ten header cases, body/footer rendering, and non-read
+mode forwarding across 1,010 recorded steps.
 Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
@@ -50,7 +55,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 292 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 294 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -317,10 +322,23 @@ user's direction. The production build retains the approved spacing metrics.
   The fixture runs actual action initializers but does not run the normal
   hand-back animation. The build also passes the 188-step town regression and
   all ten acceptance checks; independent module, ROM, and patch builds match.
+- Read-only ordinary and snapshot letter headers resolve complete eight-byte
+  English villager names from native saved identities. All 216 villagers pass
+  host tests; player names, unsupported identities, disabled/bad resources, and
+  suppressed-name header types retain their intended fallback behaviour.
+  Native windows pass eight letters across fourteen pages, checking 1,705
+  glyphs, 6,820 vertex positions, and all source/preference guards. Two probes
+  use the original native NPC identity setter. The cache remains 5,792 bytes;
+  saved names, source records, font metrics, and reference layout are unchanged.
+  The ordinary-header regression passes ten cases, body/footer glyph checks,
+  and all non-read-mode forwarding checks: 36 calls and 842 memory assertions
+  across 1,010 steps, with checkpoint restoration and blank FlashRAM.
+  The 188-step town regression and all ten acceptance checks pass. Broader NPC
+  caller execution, ordinary gameplay, save/reload, and hardware remain.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/pelly-handback-repeat-pilot/`
+The current experimental resident-module pilot in `build/mail-names-repeat-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank

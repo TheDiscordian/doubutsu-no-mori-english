@@ -13,13 +13,13 @@ def snapshot(debug, address):
     if address & 15 or not MODULE_RAM+0x300 <= address <= TEST_RETURN-5792:
         raise ValueError('Snapshot reader cache must remain inside linked module RAM')
     owner,status,page,total,h,b,f = struct.unpack('>7I',debug.read_memory(address,28))
-    if status not in (1,2) or not 0 <= page < total <= 1029 or h > 1030 or b > 1024 or f > 1024:
+    if status not in (1,2) or not 0 <= page < total <= 1029 or h > 1032 or b > 1024 or f > 1024:
         raise ValueError('Invalid active snapshot-reader cache')
     layout = debug.read_memory(address+28,136)
     pages,count = struct.unpack_from('>2I',layout)
     if pages != total or count > 8:
         raise ValueError('Invalid snapshot page layout')
-    letter = debug.read_memory(address+1194,1040)
+    letter = debug.read_memory(address+1196,1040)
     offsets = struct.unpack_from('>3H',letter)
     if offsets[1]+b > 1024 or offsets[2]+f > 1024:
         raise ValueError('Invalid snapshot text offsets')
