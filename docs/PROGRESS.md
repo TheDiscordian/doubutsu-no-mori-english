@@ -3,8 +3,8 @@
 ## Active work
 
 Complete the main translation/runtime port, then the matching GameCube image
-replacements and GameCube-style keyboard. Immediate work covers the remaining
-introductory dialogue, normal gameplay/save validation, unsupported text controls,
+replacements and GameCube-style keyboard. Immediate work covers broader missing
+dialogue, normal gameplay/save validation, unsupported text controls,
 and the general-string/name/mail destinations. Candidate review remains required.
 The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
@@ -19,7 +19,7 @@ and selects accurate English errors. Native tests pass 48 receipt cases, eight
 hand-back initializer cases, sixteen refusal selectors, and ten index boundaries.
 The tests use the actual action initializers and cover both reason-indexed
 message lookups. Normal animation, subsequent input, and rendered error
-progression remain unverified. Immediate mail work covers those interactions
+progression remain unverified. Follow-up mail work covers those interactions
 and remaining readers/metadata before generation. Read-only letter headers
 resolve complete English villager names without changing saved identities.
 All 216 names pass host checks; eight native letter windows pass complete text,
@@ -105,9 +105,8 @@ code/resources. Whole-letter reconstruction, original metadata/RNG, shared
 capitalization, heap release, full save retention, and checkpoint restoration
 pass. The optional generation ROM also passes all ten four-MiB train-to-town
 checks. Independent module and creator builds match. Thirteen loader/installer
-tests and the seven loader sanitizer tests pass. The complete 385-test run has
-one stale generated-probe failure; rebuilding that module-bound probe makes
-all six affected test cases pass. Main work now returns to missing dialogue and
+tests and the seven loader sanitizer tests pass. The complete 389-test regression
+suite passes, including the rebuilt module-bound generation probe. Main work covers missing dialogue and
 normal-play coverage; remaining delivery and edge cases are tracked for batching.
 All eight letter windows pass the capture-module regression across fourteen pages, including
 1,705 glyphs and 6,820 vertex positions. The tested failure gate
@@ -146,8 +145,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 385 portable-C, synthetic, and retail-input tests; the full run's stale-probe
-  failure passes after rebuilding and rerunning its six-test group. Retail tests require
+- 389 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -454,20 +452,32 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/npc-capture-repeat-pilot/`
-contains 10,405 edits, including
-9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
+The current experimental resident-module pilot in `build/nook-jobs-complete-pilot/`
+contains 10,419 edits, including
+9,164 reference dialogue candidates, all 460 choices, and ten original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 2,592
+still require review. The original main-bank audit leaves 2,578
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,353 conservative layout warnings include full default
+listed below. The 1,354 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/mail-audit-candidates/` and `build/intro-jobs-coverage/`. The independent
+`build/nook-jobs-complete-candidates/` and `build/nook-jobs-complete-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
-capitalization command. Main-dialogue candidates are unchanged; layout warnings
-account for the wider catchphrase display.
+capitalization command. Layout warnings account for the wider catchphrase display.
+
+All functional records in Nook's introductory range `07E0..083D` have English
+candidates. Fourteen added records close ten functional gaps and provide four
+reserved continuation slots. The complete job-ending speech and HRA explanation
+retain GameCube wording, manual layout, and pauses, splitting only at existing
+page transitions. The map handoff names the native R button. The short debt
+insistence uses an original translation with all native commands unchanged.
+Only the opening-reserve placeholders `083E/083F` lack candidates in this range.
+All fourteen complete cartridge message loads pass in one fresh four-MiB run,
+including buffer/module guards and checkpoint restoration. Ordinary job
+traversal, HRA choices, and the HRA invitation's line-width warning remain queued
+for the combined gameplay and human bug/polish passes. Existing candidates,
+font assets/metrics, and saved structures are unchanged by this batch.
 
 General strings, mail, saved names, dates, and item names have separate caller
 restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
@@ -476,14 +486,14 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The separate resident-module experiment contains 10,405 edits, including
-9,151 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,419 edits, including
+9,164 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
-and the three remaining introductory drafts. It retains the GameCube calendar wording in Rover's
+and four other introductory drafts. It retains the GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,593 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,592 main records without
-candidates: 1,661 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,579 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,578 main records without
+candidates: 1,647 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

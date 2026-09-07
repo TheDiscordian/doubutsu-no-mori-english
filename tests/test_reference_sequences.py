@@ -98,6 +98,35 @@ class ReferenceSequenceTests(unittest.TestCase):
             validate_entry(self.source[0], encode(edits[0]["translation"], self.info), self.info,
                            "message", "reviewed_sequence", sequence_permit=permits["message:0000"])
 
+    def test_additional_speaker_emotion_requires_exact_native_evidence(self):
+        groups, edits = deepcopy(self.groups), deepcopy(self.edits)
+        edits[1]["translation"] = edits[1]["translation"].replace("7F09000003", "7F09000007")
+        groups["test_sequence"]["members"][1]["encoded_sha256"] = sha256(encode(edits[1]["translation"], self.info))
+        source = [*self.source, b"Speaker\x7f\x09\x00\x00\x07\x7f\x00"]
+        approval = {"id": "message:0002", "source_sha256": sha256(source[2]),
+                    "commands": ["7F09000007"]}
+        with self.assertRaisesRegex(ValueError, "actor argument"):
+            validate_sequences(edits, source, self.info, groups)
+        groups["test_sequence"]["actor_sources"] = [approval]
+        self.assertEqual(len(validate_sequences(edits, source, self.info, groups)), 2)
+        for change, error in (({"source_sha256": "0"*64}, "Stale"),
+                              ({"id": "message:0003"}, "Stale"),
+                              ({"commands": ["7F09000008"]}, "absent"),
+                              ({"commands": ["7F09090001"]}, "speaker emotion"),
+                              ({"commands": ["7F0E0001"]}, "speaker emotion")):
+            altered = deepcopy(groups)
+            altered["test_sequence"]["actor_sources"][0].update(change)
+            with self.assertRaisesRegex(ValueError, error):
+                validate_sequences(edits, source, self.info, altered)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory)/"sequences.json"
+            path.write_text(json.dumps(list(groups.values())))
+            self.assertEqual(load_sequences(path), groups)
+            groups["test_sequence"]["actor_sources"][0]["commands"] = ["7F09090001"]
+            path.write_text(json.dumps(list(groups.values())))
+            with self.assertRaisesRegex(ValueError, "speaker emotion"):
+                load_sequences(path)
+
     def test_single_record_keeps_external_link_and_original_actor_tuples(self):
         native = self.original[:-2]+b"\x7f\x0e\x00\x09\x7f\x01"
         translated = native.replace(b"A", b"English\x7f\x09\x00\x00\x03")
@@ -175,8 +204,33 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 8)
+        self.assertEqual(len(edits), 20)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",
                            sequence_permit=permits[edit["id"]])
+
+    def test_complete_reference_then_fully_covering_split_reference(self):
+        texts = ["Opening{cmd:7F0E0001}{cmd:7F01}",
+                 "Second{cmd:7F04}\n{cmd:7F02}Third{cmd:7F00}"]
+        refs = {f"message:{i:04X}": {"text": text, "sha256": sha256(encode(text, self.info))}
+                for i, text in enumerate(texts)}
+        group = {"members": [
+            {"id": "message:0000", "reference_sha256": refs["message:0000"]["sha256"]},
+            {"id": "message:0001", "reference_sha256": refs["message:0001"]["sha256"],
+             "reference_slice": [0, 6]},
+            {"id": "message:0002", "reference_id": "message:0001",
+             "reference_sha256": refs["message:0001"]["sha256"],
+             "reference_slice": [11, len(encode(texts[1], self.info))]}]}
+        parts = reference_payloads(group, refs, self.info)
+        self.assertEqual(parts, [encode(texts[0], self.info),
+                                b"Second\x7f\x0e\x00\x02\xcd\x7f\x01", b"Third\x7f\x00"])
+        audit_sequence(b"Original\x7f\x00", parts, [0, 1, 2], self.info)
+        incomplete = deepcopy(group)
+        incomplete["members"].pop()
+        with self.assertRaisesRegex(ValueError, "complete reference"):
+            reference_payloads(incomplete, refs, self.info)
+        repeated = deepcopy(group)
+        repeated["members"].append(deepcopy(group["members"][0]))
+        with self.assertRaisesRegex(ValueError, "repeated"):
+            reference_payloads(repeated, refs, self.info)

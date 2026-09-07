@@ -12,16 +12,29 @@ from textbanks import Bank
 from textcodec import encode
 
 
-def scenario(rom, edits, info, *, drafts=False):
+def select_messages(edits, *, drafts=False, message_ids=None):
+    if message_ids is not None:
+        if drafts or not message_ids or len(set(message_ids)) != len(message_ids):
+            raise ValueError("Explicit message IDs must be unique and cannot select drafts implicitly")
+        selected = [edit for edit in edits if edit["id"] in message_ids]
+        if {edit["id"] for edit in selected} != set(message_ids):
+            raise ValueError("A requested message is absent from the translation batch")
+    else:
+        selected = ([edit for edit in edits if edit.get("status") == "draft"] if drafts else
+                    [edit for edit in edits if isinstance(edit.get("provenance"), dict) and
+                     edit["provenance"].get("match_basis") ==
+                     "identical_complete_native_record_and_unanimous_reference_candidate"])
+    if (not selected or len({r["id"] for r in selected}) != len(selected)
+            or any(not r["id"].startswith("message:") for r in selected)):
+        raise ValueError("Expected unique selected messages")
+    return selected
+
+
+def scenario(rom, edits, info, *, drafts=False, message_ids=None):
     files = by_vrom(rom)
     entries = Bank("message", 0x02000000, 0x00CF9000,
                    files[0x02000000].extract(rom), files[0x00CF9000].extract(rom)).entries()
-    selected = ([edit for edit in edits if edit.get("status") == "draft"] if drafts else
-                [edit for edit in edits if isinstance(edit.get("provenance"), dict) and
-                 edit["provenance"].get("match_basis") ==
-                 "identical_complete_native_record_and_unanimous_reference_candidate"])
-    if not selected or len({r["id"] for r in selected}) != len(selected):
-        raise ValueError("Expected unique selected messages")
+    selected = select_messages(edits, drafts=drafts, message_ids=message_ids)
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     data = 0x8019B400
     for edit in selected:
@@ -49,10 +62,12 @@ def main():
     parser.add_argument("--source-rom", type=Path, default=Path("local/rom/Doubutsu no Mori (Japan).z64"))
     parser.add_argument("--translations", type=Path, required=True)
     parser.add_argument("--drafts", action="store_true", help="Test original drafts instead of native aliases")
+    parser.add_argument("--message-id", action="append", help="Repeat to load an explicit batch of translated message IDs")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     info = module_command_info(verified_rom(args.source_rom.read_bytes()))
-    actions = scenario(args.rom.read_bytes(), json.loads(args.translations.read_text()), info, drafts=args.drafts)
+    actions = scenario(args.rom.read_bytes(), json.loads(args.translations.read_text()), info,
+                       drafts=args.drafts, message_ids=args.message_id)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"actions": len(actions), "output": str(args.output)}))

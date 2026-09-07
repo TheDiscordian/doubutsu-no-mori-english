@@ -1,5 +1,17 @@
 [
   {
+    "id": "message:0801",
+    "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+    "reference_id": "message:0801",
+    "reference_sha256": "70441e1dd78c1b54b0efcc54bac9d7639123eaab60471bdfdeb4dfa0358a6027",
+    "controller": {
+      "operation": "map_x_to_r",
+      "offset": 541,
+      "adapted_sha256": "fb796a1f94342f45866b4a63903a38b73039e8627c159b65e34edbd6586257e2"
+    },
+    "evidence": "Both records acknowledge the furniture delivery and the same 230-Bell wage, then give the player a town map. The native Japanese instruction explicitly names R; the English GameCube uses X for the same map action. Change only that approved highlighted button span. Retain the complete English wording, manual lines/pages, pauses, colour count, native actor commands, and map-handoff operation. Ordinary map input and actor traversal remain validation requirements."
+  },
+  {
     "id": "message:07F8",
     "source_sha256": "7c9d1d27c5c3c5e6c871a7a72ebd038ccee9a1c7ef49cf82ed45ed400c4466a6",
     "reference_id": "message:07F8",

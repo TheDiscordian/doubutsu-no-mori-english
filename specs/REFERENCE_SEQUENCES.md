@@ -75,20 +75,57 @@ during its mortgage aside; no new actor argument or gameplay action is introduce
 Retain its entire text, manual line/page breaks, and pauses. Its 644 encoded bytes
 fit the native message buffer with the normal expansion reserve.
 
+## Introductory-job coverage
+
+Six one-record approvals retain the complete GameCube letter wage (`080B`),
+delivery/reporting reminders (`080E`, `0815`), package-wait instruction (`0827`),
+Happy Room Academy invitation (`082A`), and work reminder (`0836`). Their expanded
+bounds are 317, 273, 299, 465, 774, and 109 bytes. The invitation retains choices
+`0065/0045/004E` and branches `082E/082B/082C` without changing their selection
+indices. Its second-page width warning remains queued for presentation review;
+the importer does not reflow the reference to suppress that warning.
+
+The complete employment-ending explanation uses
+`081A → 083B → 083C → 083D`. The first two GameCube records remain complete;
+the long final GameCube `083C` is split into `[0,574)` and `[579,1047)` at its
+existing wait/newline/page-clear boundary after the tax-purpose aside. Expanded
+bounds are 357, 466, 597, and 484 bytes. The native opening-reserve slots are
+source-hash checked and have no incoming native message-script branches. The
+final end remains `00`. Wages, remaining debt, weekly-payment suggestion, earning
+money, post-office payments, remodelling, and the farewell remain complete.
+
+The HRA explanation uses `082E → 2AEA`. The complete GameCube `082E` contributes
+`[0,598)` and `[603,1200)`, split at its existing wait/page boundary after the
+important-matters passage. Expanded bounds are 621 and 643 bytes. The train-demo
+reserve is source-hash checked and has no incoming native message-script branch.
+The final choices `0045/004E`, branches `082B/082C`, and end `01` remain intact.
+Each reference in a mixed complete/sliced sequence contributes one complete
+record or one contiguous group of fully covering slices; repeated references
+outside that group, omitted text, and arbitrary separator gaps are rejected.
+
+These Nook approvals also identify exact native supporting speaker emotions:
+`0801` supplies `15`, `16`, and `FF`; `0829` supplies `17`; and `07EC` supplies
+`03`. Each use lists only the required command tuples and binds the supporting
+native record's hash. These are Nook's own mortgage/work dialogue contexts, not
+an automatic cross-actor search. Only opcode `09`, speaker index `0000`, and an
+explicit existing emotion are eligible. Actor handoffs, other demo operations,
+gameplay controls, and dynamic fields are never inherited through this mechanism.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English
 encoded hash, with reference provenance and an explanation of the adaptation.
 Every member must be installed together. Unknown sequences, partial installation,
-changed source slots, changed translated bytes, new external branches, new actor
-arguments, unavailable dynamic fields, and overlong parts fail the build.
+changed source slots, changed translated bytes, new external branches, unapproved
+actor arguments, unavailable dynamic fields, and overlong parts fail the build.
 
 Only reviewed presentation differences are permitted. Gameplay commands remain
 ordered after removing the explicitly declared internal continuation links.
 Adjacent conditional-branch assignments are compared by branch opcode rather
 than textual order. The original choice labels and exit mapping remain intact.
-Actor-animation commands may reuse only argument tuples present in the source
-message; their placement follows the approved GameCube text. Display colour spans,
+Actor-animation commands reuse argument tuples present in the source message or
+the exact hash-bound supporting speaker-emotion approvals described above.
+Their placement follows the approved GameCube text. Display colour spans,
 page divisions, and pauses follow the approved reference exactly.
 
 Reserved continuation slots require their expected placeholder hashes and no

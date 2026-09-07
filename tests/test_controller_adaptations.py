@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import CODE_VROM, by_vrom, sha256
 from build import apply_translations
-from controller_adaptations import (AFTER, BEFORE, OPERATION, adapt_controller_reference,
+from controller_adaptations import (AFTER, BEFORE, OPERATION, OPERATIONS, adapt_controller_reference,
                                     validate_approval, validate_controller_candidate)
 from gc_adapter import adapt_reference
 from reference_matches import load_matches
@@ -62,7 +62,7 @@ class ControllerAdaptationTests(unittest.TestCase):
                                               {self.record["id"]: self.record})
 
     def test_unknown_operations_and_malformed_approvals_fail(self):
-        for change in ({"operation": "global_replace"}, {"offset": -1}, {"offset": True},
+        for change in ({"operation": "global_replace"}, {"operation": []}, {"offset": -1}, {"offset": True},
                        {"offset": 1024}, {"adapted_sha256": "bad"}, {"adapted_sha256": None},
                        {"extra": "unexpected"}):
             record = copy.deepcopy(self.record)
@@ -72,6 +72,25 @@ class ControllerAdaptationTests(unittest.TestCase):
         for rule in (None, [], "bad"):
             with self.assertRaises(ValueError):
                 validate_approval({**self.record, "controller": rule})
+
+    @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
+                         "Retail and English-reference inputs remain local")
+    def test_retail_map_instruction_changes_only_x_to_r(self):
+        rom = ROM_PATH.read_bytes()
+        info = module_command_info(rom)
+        source = next(b for b in banks(rom) if b.name == "message").entries()[0x0801]
+        reference = next(r for r in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())
+                         if r["id"] == "message:0801")
+        matches = load_matches(ROOT/"translations/reference_matches.json")
+        text, changes = adapt_controller_reference(reference, source, matches[reference["id"]], info)
+        text, _ = adapt_reference(text, source, info, "reference_layout", resident_runtime=True)
+        output, raw = encode(text, info), encode(reference["text"], info)
+        before, after = OPERATIONS["map_x_to_r"]
+        self.assertEqual(output, raw[:541]+after+raw[541+len(before):])
+        self.assertEqual(len(output), len(raw))
+        self.assertEqual(changes[0]["operation"], "map_x_to_r")
+        validate_controller_candidate(reference["id"], source, output, matches)
+        validate_entry(source, output, info, "message", "reference_layout", resident_runtime=True)
 
     @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
                          "Retail and English-reference inputs remain local")

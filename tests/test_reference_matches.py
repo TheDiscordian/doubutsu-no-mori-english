@@ -108,13 +108,13 @@ class ReferenceMatchTests(unittest.TestCase):
         info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
         entries = next(bank for bank in banks(rom) if bank.name == "message").entries()
         edits = load_drafts([ROOT/"translations/n64-intro-jobs.json"])
-        self.assertEqual({r["id"] for r in edits}, {"message:0821", "message:0822"})
+        self.assertEqual({r["id"] for r in edits}, {"message:07EB", "message:0821", "message:0822"})
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             self.assertEqual(sha256(original), edit["source_sha256"])
             translated = encode(edit["translation"], info)
             validate_entry(original, translated, info, "message")
             self.assertEqual(translated.count(b"\x7f\x02"), original.count(b"\x7f\x02"))
-            self.assertTrue(translated.endswith(b"\x7f\x00"))
+            self.assertEqual(translated[-2:], original[-2:])
             for unsupported in ("mayor", "wishing well", "shrine"):
                 self.assertNotIn(unsupported, edit["translation"].lower())

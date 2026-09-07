@@ -2522,6 +2522,50 @@
   Font metrics/assets, reference layout, saved formats, and repository privacy
   remain unchanged.
 
+### Introductory-job text batch
+
+- Closed all ten functional text gaps in Nook's `07E0..083D` introductory range
+  with fourteen added records: thirteen complete/reference-derived candidates
+  and one original native-command-preserving debt reminder. Four additions are
+  reserved continuation slots, not separate gameplay conversations. No existing
+  candidate changed. Only the opening-reserve `083E/083F` placeholders remain
+  without candidates in the wider range.
+- Added exact source/reference/payload approvals for six wage/reminder/HRA
+  records, the complete four-part employment-ending speech, and the two-part HRA
+  explanation. Splits replace only existing GameCube wait/page separators and
+  retain complete wording, layout, pauses, choices, and final termination.
+  Supporting Nook speaker emotions require individually listed existing native
+  tuples and source hashes; other actor operations and gameplay controls cannot
+  inherit approval. Mixed whole/sliced reference groups require complete ordered
+  coverage. The map instruction changes only X to the native R button.
+- Added explicit batch-ID selection to the existing native cartridge-load test
+  generator. One fresh four-MiB run loads all fourteen complete messages,
+  checks all adjacent buffer/module guards, restores its checkpoint, and exits
+  gracefully: `build/smoke-nook-jobs-complete-01`, 79 recorded steps and 44 memory
+  assertions. FlashRAM remains blank and the Pak unchanged. This is message-load
+  validation, not ordinary job traversal or final HRA-choice gameplay.
+- All 389 tests pass in 175.996 seconds, recorded at
+  `build/tests-nook-jobs-complete-full-01.log`. The new sequence, controller,
+  original-draft, and explicit-batch groups also pass separately. An initial
+  targeted draft test needed its expected ID set and final-terminator assertion
+  updated for the new native `01` record; the corrected group and full suite pass.
+- `build/nook-jobs-complete-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `cda1ed232c0be2e854ce70c550efecf622ec3808f4bba534e5a4ec387ed545c9`;
+  its round-trip-verified UPS has SHA-256
+  `607f9adbfc3de01224b8882ad0093f88e034da53da5fd8c288f192bf55feb49a`.
+  The current candidate file has 10,419 edits, including 9,164 reference dialogue
+  candidates and ten original dialogue drafts. The original-bank audit leaves
+  2,578 records without candidates, including 1,647 with Japanese static text.
+  Wider resources and embedded UI remain outside those counts. All candidates
+  retain their review status. Detailed reports are in
+  `build/nook-jobs-complete-candidates/` and `build/nook-jobs-complete-coverage/`.
+- The HRA invitation contributes one conservative line-width warning; it is
+  queued for polish without altering the GameCube line layout. Ordinary job
+  progression and new continuation/choice traversal remain combined gameplay
+  checks. No new full train-to-town repetition is required for this text-only
+  batch. Font assets/metrics, runtime code, saved layouts, and opt-in generation
+  settings remain unchanged. Broader missing dialogue is the next content task.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -49,9 +49,17 @@ def load_sequences(path=APPROVALS):
                 if not re.fullmatch(r"[0-9a-f]{64}", member.get(key, "")):
                     raise ValueError("Invalid reference sequence hash")
             seen.add(member["id"])
-        sliced = ["reference_slice" in member for member in members]
-        if any(sliced) and not all(sliced):
-            raise ValueError("Sequence cannot mix sliced and complete reference records")
+        actor_sources = record.get('actor_sources',[])
+        if not isinstance(actor_sources,list) or len(actor_sources) > 8:
+            raise ValueError('Invalid additional actor-source approvals')
+        for actor_source in actor_sources:
+            if (not isinstance(actor_source,dict) or set(actor_source) != {'id','source_sha256','commands'}
+                    or not re.fullmatch(r'message:[0-9A-F]{4}',actor_source.get('id',''))
+                    or not re.fullmatch(r'[0-9a-f]{64}',actor_source.get('source_sha256',''))
+                    or not isinstance(actor_source.get('commands'),list) or not actor_source['commands']
+                    or any(not isinstance(c,str) or not re.fullmatch(r'7F090000[0-9A-F]{2}',c)
+                           for c in actor_source['commands'])):
+                raise ValueError('Additional actor approvals require exact native speaker emotion commands')
         result[record["id"]] = record
     return result
 
@@ -83,13 +91,13 @@ def normalize_assignments(cmds):
     return result
 
 
-def audit_sequence(original, replacements, member_numbers, info):
+def audit_sequence(original, replacements, member_numbers, info, extra_actor=()):
     """Check semantics independently of the approved payload hashes."""
     root = commands(original, info)
     if original[-2:] not in (b"\x7f\x00", b"\x7f\x01") or sum(c[1] in (0, 1) for c in root) != 1:
         raise ValueError("Sequence root must have one final terminator")
     available_fields = {c[1] for c in root if c[1] in FIELDS}
-    available_actor = {c for c in root if c[1] in ACTOR}
+    available_actor = {c for c in root if c[1] in ACTOR} | set(extra_actor)
     translated = []
     for index, data in enumerate(replacements):
         part = commands(data, info)
@@ -150,7 +158,20 @@ def validate_sequences(edits, source, info, groups=None):
         for number, data in enumerate(source):
             if reserved.intersection(message_targets(data, info)):
                 raise ValueError(f"Native message {number:04X} targets a reserved sequence slot")
-        audit_sequence(source[numbers[0]], replacements, numbers, info)
+        extra_actor = set()
+        for approval in group.get('actor_sources',[]):
+            index = int(approval['id'].split(':')[1],16)
+            if index >= len(source) or sha256(source[index]) != approval['source_sha256']:
+                raise ValueError('Stale additional native actor source')
+            supplied = commands(source[index],info)
+            for value in approval['commands']:
+                if not isinstance(value,str) or not re.fullmatch(r'7F090000[0-9A-F]{2}',value):
+                    raise ValueError('Additional actor approval is not a native speaker emotion')
+                command = bytes.fromhex(value)
+                if command not in supplied:
+                    raise ValueError('Additional actor command is absent from its native source')
+                extra_actor.add(command)
+        audit_sequence(source[numbers[0]], replacements, numbers, info, extra_actor)
         for member in members:
             permits[member["id"]] = SequencePermit(name, member["source_sha256"], member["encoded_sha256"])
     return permits
@@ -164,29 +185,44 @@ def reference_payloads(group, references, info):
         if not reference or reference.get("sha256") != member["reference_sha256"]:
             raise ValueError("Stale reviewed sequence reference")
         encoded_references.append(encode(reference["text"], info))
-    if "reference_slice" not in members[0]:
-        return encoded_references
-    encoded = encoded_references[0]
-    if (len({member.get("reference_id", member["id"]) for member in members}) != 1
-            or any(data != encoded for data in encoded_references)
-            or any(member["reference_sha256"] != sha256(encoded) for member in members)):
-        raise ValueError("Sliced sequence requires the exact complete encoded reference")
-    boundaries = {t.offset for t in tokenize(encoded, info)} | {len(encoded)}
-    if members[0]["reference_slice"][0] != 0 or members[-1]["reference_slice"][1] != len(encoded):
-        raise ValueError("Sequence slices do not cover the complete reference")
-    for index, member in enumerate(members):
-        start, end = member["reference_slice"]
-        if start not in boundaries or end not in boundaries or not start < end:
-            raise ValueError("Sequence slice cuts a reference token")
-        part = encoded[start:end]
-        if index+1 < len(members):
-            following = members[index+1]
-            next_start = following["reference_slice"][0]
-            if next_start <= end or encoded[end:next_start] != b"\x7f\x04\xcd\x7f\x02":
-                raise ValueError("Sequence slice gap must be exactly one native wait/page boundary")
-            number = int(following["id"].split(":")[1], 16)
-            part += b"\x7f\x0e"+number.to_bytes(2, "big")+b"\xcd\x7f\x01"
-        payloads.append(part)
+    # Each reference may contribute one complete record or a contiguous group
+    # of fully covering slices. This also handles a long final record after
+    # earlier complete GameCube continuation records without dropping wording.
+    used, index = set(), 0
+    while index < len(members):
+        first = members[index]
+        reference_id = first.get('reference_id',first['id'])
+        encoded = encoded_references[index]
+        if reference_id in used:
+            raise ValueError('Sequence reference is repeated outside its contiguous slices')
+        used.add(reference_id)
+        if 'reference_slice' not in first:
+            payloads.append(encoded);index += 1;continue
+        last = index+1
+        while last < len(members) and members[last].get('reference_id',members[last]['id']) == reference_id:
+            last += 1
+        selected = members[index:last]
+        if (any('reference_slice' not in member for member in selected)
+                or any(data != encoded for data in encoded_references[index:last])
+                or any(member['reference_sha256'] != sha256(encoded) for member in selected)):
+            raise ValueError('Sliced sequence requires the exact complete encoded reference')
+        boundaries = {t.offset for t in tokenize(encoded,info)} | {len(encoded)}
+        if selected[0]['reference_slice'][0] != 0 or selected[-1]['reference_slice'][1] != len(encoded):
+            raise ValueError('Sequence slices do not cover the complete reference')
+        for part_index,member in enumerate(selected):
+            start,end = member['reference_slice']
+            if start not in boundaries or end not in boundaries or not start < end:
+                raise ValueError('Sequence slice cuts a reference token')
+            part = encoded[start:end]
+            if part_index+1 < len(selected):
+                following = selected[part_index+1]
+                next_start = following['reference_slice'][0]
+                if next_start <= end or encoded[end:next_start] != b'\x7f\x04\xcd\x7f\x02':
+                    raise ValueError('Sequence slice gap must be exactly one native wait/page boundary')
+                number = int(following['id'].split(':')[1],16)
+                part += b'\x7f\x0e'+number.to_bytes(2,'big')+b'\xcd\x7f\x01'
+            payloads.append(part)
+        index = last
     return payloads
 
 

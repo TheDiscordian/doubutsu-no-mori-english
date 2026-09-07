@@ -8,6 +8,9 @@ from textcodec import decode, encode
 OPERATION = "inventory_y_to_start"
 BEFORE = bytes.fromhex("7F505F7D9B08")+b"Y Button"
 AFTER = bytes.fromhex("7F505F7D9B0C")+b"START Button"
+OPERATIONS = {OPERATION:(BEFORE,AFTER),
+              'map_x_to_r':(bytes.fromhex('7F505F7D9B08')+b'X Button',
+                            bytes.fromhex('7F505F7D9B08')+b'R Button')}
 
 
 def validate_approval(record):
@@ -15,7 +18,8 @@ def validate_approval(record):
         return
     rule = record["controller"]
     if (not isinstance(rule, dict) or set(rule) != {"operation", "offset", "adapted_sha256"}
-            or rule["operation"] != OPERATION or not record["id"].startswith("message:")
+            or not isinstance(rule["operation"], str) or rule["operation"] not in OPERATIONS
+            or not record["id"].startswith("message:")
             or type(rule["offset"]) is not int or not 0 <= rule["offset"] < 1024
             or not isinstance(rule["adapted_sha256"], str)
             or not re.fullmatch(r"[0-9a-f]{64}", rule["adapted_sha256"])):
@@ -32,11 +36,13 @@ def adapt_controller_reference(reference, source, record, info):
             or sha256(raw) != record["reference_sha256"]):
         raise ValueError("Stale controller-text reference")
     offset = record["controller"]["offset"]
-    if raw[offset:offset+len(BEFORE)] != BEFORE:
+    operation = record['controller']['operation']
+    before,after = OPERATIONS[operation]
+    if raw[offset:offset+len(before)] != before:
         raise ValueError("Controller-text span does not match its approval")
-    result = raw[:offset]+AFTER+raw[offset+len(BEFORE):]
-    return decode(result, info), [{"operation": OPERATION, "byte_offset": offset,
-                                  "before_sha256": sha256(BEFORE), "after_sha256": sha256(AFTER)}]
+    result = raw[:offset]+after+raw[offset+len(before):]
+    return decode(result, info), [{"operation": operation, "byte_offset": offset,
+                                  "before_sha256": sha256(before), "after_sha256": sha256(after)}]
 
 
 def validate_controller_candidate(id, source, candidate, matches):

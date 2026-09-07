@@ -1,5 +1,13 @@
 [
   {
+    "id": "message:07EB",
+    "source_sha256": "4ce1fc8a2edee3341ae094399c9d73abd22d2cdb0dc1f2b96e973546725cb271",
+    "translation": "You have to {cmd:7F0304}pay it all back{cmd:7F0304}!!!{cmd:7F55}\n{cmd:7F09090001}{cmd:7F0E07EC}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Nook insists that the whole debt must be repaid. Preserve every native command, including the single 55 command and outgoing work-offer link 07EC. The GameCube record repeats 55 and is not imported by weakening the general control policy. Normal actor traversal remains required."
+  },
+  {
     "id": "message:0821",
     "source_sha256": "afe5a78804742eb3068e465c0acfd7780b93e096a807ed5f1636e5b1b19ac589",
     "translation": "Wait a moment{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F1A},{cmd:7F030C}\nyou've only just moved to\n{cmd:7F2F}.{cmd:7F04}\n{cmd:7F02}And the people of {cmd:7F2F}{cmd:7F0308}?\n{cmd:7F0900000B}{cmd:7F0305}Have you said hello to them?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}I'll give you{cmd:7F0304}\na short break,{cmd:7F0308} so go and\nintroduce yourself to\neveryone in town.{cmd:7F04}\n{cmd:7F02}Off you go,{cmd:7F0304} then.\n{cmd:7F00}",

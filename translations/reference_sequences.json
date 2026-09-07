@@ -1,5 +1,213 @@
 [
   {
+    "id": "nook_letter_wage",
+    "evidence": "Both records acknowledge the sent letter, deduct the same 130-Bell wage from the mortgage, and stress learning to write letters. Retain the complete English reference and end 01. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:080B",
+        "source_sha256": "ef33cb0dcada1b34f5f51c9d81842025088fc8b03a7ffc2cd8903cf3af56831d",
+        "reference_sha256": "6c3c4c23c409578edb590395ae38ce4c34d8fc926ccc5e697425a648e2f07afb",
+        "encoded_sha256": "6c3c4c23c409578edb590395ae38ce4c34d8fc926ccc5e697425a648e2f07afb"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0801",
+        "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+        "commands": [
+          "7F09000015",
+          "7F090000FF"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_delivery_reporting",
+    "evidence": "Both records ask the player to finish the delivery and report back because Nook cannot track it from the shop. Retain the complete English reference and end 00. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:080E",
+        "source_sha256": "726dcc5781212f82a765d575498b51e9aceae9ab9ea7b99242077dcefd18e22f",
+        "reference_sha256": "4464a4ff76635a351c057518913b001499678716b4a0231e4c3cdd554f7104a8",
+        "encoded_sha256": "4464a4ff76635a351c057518913b001499678716b4a0231e4c3cdd554f7104a8"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0801",
+        "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+        "commands": [
+          "7F09000015",
+          "7F09000016",
+          "7F090000FF"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_delivery_hurry",
+    "evidence": "Both records remind the player to finish the delivery and explain that delaying work will not pay off the house. Retain the complete English reference and end 00. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:0815",
+        "source_sha256": "e2b52775af05d66185c2932934fefa15b05903547a1af1eecc5a6ea532cb11f2",
+        "reference_sha256": "4594d7aa19b6406dbb568e49af3322f3e6746c0dfb0286dc607e18150ed758ff",
+        "encoded_sha256": "4594d7aa19b6406dbb568e49af3322f3e6746c0dfb0286dc607e18150ed758ff"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0801",
+        "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+        "commands": [
+          "7F09000016",
+          "7F090000FF"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_package_wait",
+    "evidence": "Both records explain that the next package is not ready, suggest helping the villagers while waiting, and ask the player to return soon. Supporting native 0829 repeats that same instruction in the same job context. Retain the complete English reference and end 00. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:0827",
+        "source_sha256": "3c5c119ad9e19ab6c53dd379cac804c32f5bf73b5f53a9332e9516a0c444e480",
+        "reference_sha256": "6a0627fd94da7c5f5a3cdbaf73f48dd5bf0e9422221279a31a66531f1ae0b1f5",
+        "encoded_sha256": "6a0627fd94da7c5f5a3cdbaf73f48dd5bf0e9422221279a31a66531f1ae0b1f5"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0829",
+        "source_sha256": "daac0dba9743366a577e1e93ab809ec707720ce8148353dbe13497c2102b01f2",
+        "commands": [
+          "7F09000017"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_hra_invitation",
+    "evidence": "Both records invite the player to the Happy Room Academy, explain ratings by mail, and encourage improving the house. Preserve the native three choices 0065/0045/004E and branch mapping 082E/082B/082C, along with the complete English presentation and end 01. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:082A",
+        "source_sha256": "b0aba29162e1f068b6eefa555f9292e7e6926ee5099f670d77e1e71092ae125b",
+        "reference_sha256": "f7e21afcc739e91e3f6d3b70748ac817b201d27349191ecc0da039a16471a2b8",
+        "encoded_sha256": "f7e21afcc739e91e3f6d3b70748ac817b201d27349191ecc0da039a16471a2b8"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0801",
+        "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+        "commands": [
+          "7F09000015",
+          "7F090000FF"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_work_hurry",
+    "evidence": "Both records urge the player to stop wasting time and get to work. Retain the complete English reference, its explicit pause, and native end 00. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:0836",
+        "source_sha256": "d744b6a2ab258ea1b84576606b474f91fd216da8939fbcf214ea5ecd67177595",
+        "reference_sha256": "e0c5ef6a9b14fd6ac1ed92df922b649f2480ea7ac4ee890b08447c74f4a2dcb2",
+        "encoded_sha256": "e0c5ef6a9b14fd6ac1ed92df922b649f2480ea7ac4ee890b08447c74f4a2dcb2"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0801",
+        "source_sha256": "93befe99f4fcfc03e157d25ae1c35ac6396ae615cdb3b4f2a716bf84682afc80",
+        "commands": [
+          "7F09000016"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_employment_complete",
+    "evidence": "Native 081A contains the complete end-of-employment explanation represented by GameCube 081A, 083B, and 083C. Both retain the 1400-Bell wage, 17400-Bell remaining debt, other ways to earn money, post-office payments, suggested weekly 1000 Bells, remodelling, and shop farewell. Native 083B/083C/083D are hash-bound opening-reserve slots without incoming native message branches. Split only the final reference at its existing wait/page boundary after the tax-purpose aside. Native 07EC supplies Nook's emotion 03 in the same mortgage/work discussion. Preserve all wording and presentation outside that one continuation separator and retain final end 00. Additional speaker emotions are individually limited to exact 09/0000 tuples present in the cited native Nook dialogue; no other actor or gameplay command is inherited. Native loading and ordinary traversal remain separate validation.",
+    "members": [
+      {
+        "id": "message:081A",
+        "source_sha256": "4faaf221c1ea57a4f81f11c682d8f0b1fd54ff31a623fc5faa0d936383edac0f",
+        "reference_sha256": "b00573f6e2be1641cfed77168918225858833d3891639020fc0d093ed929565f",
+        "encoded_sha256": "b00573f6e2be1641cfed77168918225858833d3891639020fc0d093ed929565f"
+      },
+      {
+        "id": "message:083B",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "9a748be32774413893c73092129ef44a0e264d05b128d70d3b85091cfb464582",
+        "encoded_sha256": "9a748be32774413893c73092129ef44a0e264d05b128d70d3b85091cfb464582"
+      },
+      {
+        "id": "message:083C",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "dfff00d902d0cad10759a0571955549c071105c3699fa0b2df76ce920fb58e40",
+        "reference_id": "message:083C",
+        "reference_slice": [
+          0,
+          574
+        ],
+        "encoded_sha256": "501516be04d7e39107f03697ff170878fe22a002af686db9ea062828c999a326"
+      },
+      {
+        "id": "message:083D",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_sha256": "dfff00d902d0cad10759a0571955549c071105c3699fa0b2df76ce920fb58e40",
+        "reference_id": "message:083C",
+        "reference_slice": [
+          579,
+          1047
+        ],
+        "encoded_sha256": "faac285827755524ba84f289860362896a3bd40c8a124b710dabee23b6e6ccd0"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:07EC",
+        "source_sha256": "8848a8cd66a7227dcb0059efedc79489602f31230fa95c003f37dd34b0c54fe1",
+        "commands": [
+          "7F09000003"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nook_hra_explanation",
+    "evidence": "Both records explain the Happy Room Academy's interior-decorating research, difficult ratings, the town's low standing, and the villagers' reluctance, then ask the player to participate. Native 2AEA is the hash-bound train-demo reserve also used by the legacy for this continuation; it has no incoming native message branch. Split the complete English reference only at the existing wait/page boundary after the important-matters passage. Preserve the native yes/no choices 0045/004E, branch mapping 082B/082C, all actor commands, and final end 01.",
+    "members": [
+      {
+        "id": "message:082E",
+        "source_sha256": "3135f81c56244dcf3b24b3c6fdeac4bcf936ad9a6ae6cd6c1a77a457eb1c00e3",
+        "reference_sha256": "49d0533acb566afba9a2b5e8e9013ba025c14b4071c2def728b3c493224dc062",
+        "reference_id": "message:082E",
+        "reference_slice": [
+          0,
+          598
+        ],
+        "encoded_sha256": "9492d01e8a208fed14ee0734b39a07b27e2cda00014114258ed9d56988298077"
+      },
+      {
+        "id": "message:2AEA",
+        "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+        "reference_sha256": "49d0533acb566afba9a2b5e8e9013ba025c14b4071c2def728b3c493224dc062",
+        "reference_id": "message:082E",
+        "reference_slice": [
+          603,
+          1200
+        ],
+        "encoded_sha256": "8412a7cd971a02d275ae489bb59274c0a5e2f9945090cbd22d14127a6b0daa3e"
+      }
+    ]
+  },
+  {
     "id": "nook_planting_complete",
     "evidence": "Native and GameCube 07F9 acknowledge the finished planting job, comment on the player's planting choices, assign the same 80-Bell wage toward the mortgage, and consider the next task. Normal native gameplay reaches this exact record after all seven supplied flower seeds and three saplings are consumed. The English reference repeats the existing 09 emotion tuples 000015 and 0000FF during the mortgage-payment aside; it adds no new actor argument or gameplay command. Keep the complete GameCube text, line/page breaks, pauses, and native end 01. Do not weaken the general command policy for other records. Native loading and ordinary traversal of the English record remain required.",
     "members": [

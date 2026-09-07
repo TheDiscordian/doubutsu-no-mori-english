@@ -27,7 +27,8 @@ def scenario(rom):
             continue
         number = int(record["id"].split(":")[1], 16)
         entry = entries[number]
-        if sha256(entry) != record["controller"]["adapted_sha256"] or not entry.endswith(b"\x7f\x00"):
+        if (sha256(entry) != record["controller"]["adapted_sha256"]
+                or entry[-2:] not in (b"\x7f\x00", b"\x7f\x01")):
             raise ValueError("ROM lacks the complete approved controller message")
         write(window, bytes(0x330))
         write(window+12, struct.pack(">I", data))

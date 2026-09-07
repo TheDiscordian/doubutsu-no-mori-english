@@ -16,6 +16,14 @@ inventory. Their approvals use encoded offsets 84 and 80 respectively. The
 planting reminder also retains both GameCube pixel-space commands; it requires
 the resident runtime that implements that command.
 
+The `map_x_to_r` operation changes only the highlighted `X Button` span to
+`R Button` in Nook's map handoff (`0801`, encoded offset 541). Both labels contain
+eight characters, so the colour-span length is unchanged. The native source
+explicitly names R. The surrounding furniture-delivery wage, map handoff,
+line/page breaks, pauses, and actor commands remain complete. This record ends
+with native `01`; controller-message testing accepts either source-approved
+final terminator, not only `00`.
+
 An approval records the complete native-source hash, GameCube-reference hash,
 encoded span offset, final adapted-text hash, and reviewed reason. Candidate
 generation verifies the source and reference, requires the exact old span at the
@@ -33,5 +41,5 @@ Further button operations require their own implementation and tests.
 Test wrong IDs, source/reference hashes, offsets, span bytes, operation names,
 and final payloads. Confirm that only the approved span changes and that every
 following line break, page break, and timing token remains in order. Verify native
-message loading and ordinary clothing/planting/inventory gameplay before calling the
+message loading and ordinary clothing/planting/inventory/map gameplay before calling the
 instructions complete. No controller mapping or save structure changes here.
