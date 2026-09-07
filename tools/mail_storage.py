@@ -17,6 +17,8 @@ LEAFLETS, LEAFLET_FLAGS = (0x80136140,0x801361E4),0x80136288
 HOME_MAILBOX, HOME_STRIDE, HOME_COUNT = 0x8012A8A0,0xB48,10
 PELLY_VROM, PELLY_RAM = 0x008A6C10,0x809C3420
 PELLY_RECEIVE = (0x809C471C,0x809C4884,'c29e3901cf539f63a16043228bccc787ec14fbf4a58613db350a06f9618b0e73')
+TAG_VROM, TAG_RAM = 0x00777AE0,0x8086F310
+TAG_SEND = (0x808725C8,0x80872684,'7145ad292f25dcaf9e67d4c8f26368eda658627dd747e52f5f1cfc9e8110f47b')
 
 
 def pelly_evidence(rom):
@@ -28,7 +30,18 @@ def pelly_evidence(rom):
             'file_sha256':sha256(data),'receive_sha256':digest,
             'receipt_call':'809C47C0','unconditional_clear':'809C4828',
             'return_copy_call':'809C480C','private_mail_offset':0x40A,'selected_slot_submenu_offset':0xDF,
-            'status':'UNFIXED: UI ignores receipt failure, takes success path, and clears staged letter; existing refusal path returns it to the selected player slot'}
+            'status':'Native source ignores receipt failure, takes success path, and clears staged letter; existing refusal path returns it to the selected player slot'}
+
+
+def pocket_send_evidence(rom):
+    data = by_vrom(rom)[TAG_VROM].extract(rom)
+    start,end,digest = TAG_SEND
+    if sha256(data[start-TAG_RAM:end-TAG_RAM]) != digest:
+        raise ValueError('Unexpected native pocket-send handler')
+    return {'vrom':f'{TAG_VROM:08X}','ram':f'{TAG_RAM:08X}','send_sha256':digest,
+            'range':[f'{start:08X}',f'{end:08X}'],'staged_font':0,
+            'copy_call':'80872624','pocket_clear_call':'8087262C','selected_slot_store':'8087265C',
+            'ownership':'Native menu stages the entire letter, clears its player pocket, and remembers that slot; refusal restores status one'}
 
 
 def evidence(rom):

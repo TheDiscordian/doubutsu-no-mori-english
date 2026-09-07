@@ -88,7 +88,8 @@ neutral. Native DMA, relocation, and instruction/data-cache maintenance remain
 in use. The old quest word-rate loader remains unchanged, including its original
 allocation behaviour; this patch does not claim to harden that allocator path.
 
-Resident code and data occupy 24,256 bytes with the complete-record send hooks.
+Resident code and data occupy 24,352 bytes with the complete-record send and
+Pelly receipt hooks.
 The 32 KiB reservation, heap start, and final 8 KiB test area are
 unchanged. The main scoring function has an eighty-byte compiler stack frame;
 its callees use additional small frames. Native tests check stack guards.

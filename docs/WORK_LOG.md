@@ -1680,6 +1680,137 @@
   suite passes 284 tests in 155.951 seconds. Detailed inventory,
   native traces, extracted instructions, and fixture text remain ignored.
 
+### Pelly receipt rollback and accurate English failure messages
+
+- Fixed the menu-level unconditional clear following a failed receipt. A
+  thirty-two-byte resident shim sends failure through the existing native
+  pocket-return path with a distinct reason four; success keeps action three,
+  next action five, and the original message/clear path. A twenty-four-byte
+  index shim reuses the neutral hand-back introduction while retaining every
+  original refusal index. No original animation handler was replaced.
+- Verified the N64 inventory send function at `808725C8..80872684`, SHA-256
+  `7145ad292f25dcaf9e67d4c8f26368eda658627dd747e52f5f1cfc9e8110f47b`.
+  It stages status zero, copies the full letter, clears the selected player
+  pocket, and remembers that slot. The native status differs from the assumed
+  GameCube numeric value; the actual N64 instruction determines the fixtures.
+  Rejected letters return as native sendable status one with all other bytes
+  retained. The discarded tag disassembly used a base 0x400 too high; it was
+  regenerated at the verified `8086F310` base before recording these addresses.
+- Added original English errors at `2DE8/2DE9`, with native order-nine/continue
+  controls. All existing 11,752 records remain unchanged by this extension.
+  Both count bounds become 11,754, the table uses two spare end words, and its
+  terminator/length remain intact. A pinned-executable-section scan finds only
+  the two patched immediate bounds at the native count or its adjacent values.
+  The new selector preserves all ordinary refusal messages and does not label
+  corrupted mail as an unknown recipient or a full mailbox.
+- The initial build guard rejected a mistyped expected instruction for the
+  return-address adjustment (`27EF000C` instead of assembled `27FF000C`). The
+  expected-byte guard was corrected; no output ROM was published from that
+  failed build. All shim words, table words, target ranges, required lower-level
+  hooks, message counts, and ownership overlaps have mutation rejection tests.
+- Added a bounded native-call proof for Python test helpers. Heap overlay and
+  boot-loader calls require complete expected resident instructions, remain
+  within four-MiB RAM, cannot overlap module/test RAM, and retain the verified
+  graph-thread requirement. Ordinary JSON targets are not broadened. The native
+  loader performs DMA, relocation, and cache maintenance; an independent model
+  of Pelly's exact relocation list checks all loaded text and data.
+- `build/smoke-pelly-receipt-native-01` passes 48 receipt cases, 16 refusal
+  selectors, 351 native calls, 720 memory assertions, and 104 complete message
+  checks across 1,933 steps. Eight accepted cases cover both snapshot kinds,
+  both sisters, and first/last pockets; forty rejected cases cover both kinds
+  and all ten pockets for both sisters. Player state, NPC population, counters,
+  staged clearing, returned complete records, actor choices, and memory guards
+  pass. The action callback records its argument instead of starting animation
+  on the synthetic actor. This is not a normal post-office gameplay test.
+- The complete machine checkpoint is restored and the emulator exits normally.
+  FlashRAM remains 131,072 blank bytes, SHA-256
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+  The separate `smoke-pelly-receipt-full-01` passes 188 train-to-town steps and
+  all ten acceptance checks. No hardware or game-save compatibility is claimed.
+- `smoke-pelly-receipt-indices-02` separately passes ten native index-boundary
+  calls across seventeen recorded steps, preserving the original `reason+1`
+  result except reason four's index two. The first supplemental run checked
+  `v0`, but this call-site shim intentionally outputs `v1`; that test failed
+  before any game change. The debugger now records both result registers, and
+  the corrected assertions check `v1`. Production instructions are unchanged.
+  The corrected run restores its checkpoint and exits with blank FlashRAM.
+- Six targeted patch/relocation/ownership tests pass in 4.051 seconds. The
+  complete suite passes 291 tests in 162.894 seconds, recorded in
+  `build/tests-pelly-receipt-final-full.log`. The first complete run passed 289
+  tests before the two ownership/relocation tests were added.
+- Independent `build/runtime-module-pelly-repeat/` and
+  `build/pelly-receipt-repeat-pilot/` reproduce the module, ROM, and UPS from
+  `build/runtime-module/` and `build/pelly-receipt-pilot/`. The module occupies
+  24,320 bytes with the unchanged 32 KiB reservation and 256 bytes left before
+  the linked-code limit. Module SHA-256:
+  `8cd34afd054df1f4e69f291f7966487e958da8bd59d27bf12ed193e79c443675`.
+  ROM SHA-256:
+  `3dc3f15dbb4f010510bda6217fcdc304928e078688604a7899b6442276b0e0e5`.
+  UPS SHA-256:
+  `8cc4916623c667c639899f586e926e00afa18502eb4ad208025ed12a76194abc`.
+  The patched Pelly overlay remains 7,680 bytes, SHA-256
+  `2edef515242f5833eb983ac56ba40db086e4600f2017b61fa84c03852740831b`.
+  Its original 624-byte relocation file is unchanged, SHA-256
+  `ac371d4f4c5d0c87f2ffb3d56bbddfdd7f1384ecca4cca5d3e769e4306241d2f`.
+- The private GitHub repository remains private. All 10,405 existing candidate
+  edits, approved font metrics, GameCube layout/timing, and save formats are
+  unchanged. Snapshot generation remains disabled. Ordinary post-office
+  animation and error progression, remaining metadata/readers, lossless editing,
+  normal saving/reloading, semantic approval, and original hardware remain.
+
+### State-eight hand-back review and follow-up validation
+
+- Final direct-field review finds a second read of actor offset `949` at
+  `809C4A98`. The state-eight initializer indexes its introduction table by the
+  refusal reason; reason four would select the unrelated following table's
+  `08DF` message. The earlier native fixture replaces setup with a recording
+  callback, so its passing receive/selector cases do not exercise this lookup.
+  The initial receipt pilot is not sufficient for the full hand-back sequence.
+- Added a separate twenty-four-byte index shim at that lookup, retaining all
+  original reasons and mapping reason four to the same neutral `08E1/08E2`
+  introduction as reason one. The native initializer's complete source range
+  `809C4A74..809C4AD4` has SHA-256
+  `e725bc1f15690888bddd4a338ce85e5aeea42d39e1893a06801bdabdd989ecf5`.
+  Its high/low table-address relocations remain unchanged.
+- Expanded the fixture to use the real native setup function and initializers
+  for actions three, six, eight, and ten. It tests state eight for every failed
+  receipt and all four supported reasons for both sisters. Animation itself
+  remains outside this fixture. All three original direct reason-byte accesses
+  are now inventoried, and an additional/changed access fails installation.
+- `smoke-pelly-handback-native-01` passes all 48 receipt cases, eight hand-back
+  initializer cases, sixteen refusal selectors, and ten index boundaries. The
+  407 native calls, 760 memory assertions, and 152 complete-message checks span
+  2,084 recorded steps. The actual state-eight initializer is checked after all
+  forty rejected receipts as well as for all supported reasons independently.
+  The real state-ten initializer also executes. The checkpoint is restored,
+  FlashRAM remains blank, and the emulator exits normally. This supersedes the
+  earlier callback-only fixture for handler validation, not for normal gameplay.
+- The corrected build's `smoke-pelly-handback-full-01` passes all 188 town steps
+  and ten acceptance checks. Seven targeted guard/relocation tests pass in
+  6.252 seconds. The final full suite passes 292 tests in 161.961 seconds,
+  recorded in `build/tests-pelly-handback-final-full.log`.
+- Independent module and pilot builds reproduce identical artifacts in
+  `build/runtime-module-pelly-handback-repeat/` and
+  `build/pelly-handback-repeat-pilot/`. The current linked size is 24,352 bytes,
+  leaving 224 bytes within the same reservation/test layout. Module SHA-256:
+  `8cd9e5419d8b1872a4bd1d983a1727035a57d6f5bbc449667004479fd0a8cac4`.
+  ROM SHA-256:
+  `db00d1c5d9335f5f3ace810ac9479faa335c99a3ca92732516bd338aedbd345a`.
+  UPS SHA-256:
+  `42f0a8c2a480a0c5cd78b9714cdb7d665b400e130d3801459fddabf825836974`.
+  The Pelly overlay is still 7,680 bytes, SHA-256
+  `6b90728930fe6009a700947d3d459e630a140a02f7dc1ec6bac62eb8f6a20048`.
+  Its relocation file remains unchanged. The source and repeated pilots live
+  in `build/pelly-handback-pilot/` and `build/pelly-handback-repeat-pilot/`.
+- Prepared the next reader investigation while the native run completed.
+  The first-job reverse-conversion call at `8091D428` and normal NPC calls at
+  `80921678/80921690` lead to native board-read mode one at `8091D448` and
+  `809216CC`. The normal unknown-sender path clears six sender-name bytes, not
+  snapshot text. Source-matched disassemblies are retained in
+  `build/disassembly/first-job-mail/` and `build/disassembly/normal-npc-mail/`.
+  Complete caller-level native execution remains required; these observations
+  do not establish generation or save compatibility.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

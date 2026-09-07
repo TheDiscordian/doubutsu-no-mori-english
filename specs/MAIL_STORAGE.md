@@ -43,7 +43,7 @@ free slot, retains the source, and returns failure without changes when full.
 Native tests cover every slot and the full condition for all four homes.
 These are bounded native helper calls, not actual timed delivery or UI storage.
 
-## Required Pelly failure handling
+## Pelly failure handling
 
 The lower-level [NPC receipt guard](MAIL_NPC_SEND.md) does not complete the
 normal post-office interaction. The actor overlay at VROM `008A6C10`, linked
@@ -59,18 +59,20 @@ back to the selected player slot before clearing the staged copy. Its slot byte
 is at submenu offset `DF`; the player-mail array is at current-private offset
 `40A`. It resets status to one but does not normalize the split or text.
 
-This failure path is **unfixed**. A complete fix must return a rejected staged
-letter safely, propagate failure into the actor's state/message choice, and
-retain the successful receipt behaviour. It must not misreport a corrupt letter
-as a full mailbox or a missing recipient merely to reuse an existing refusal.
-Normal player-pocket removal and rollback ownership require verification too.
-Native snapshot generation must remain disabled while this path is unresolved.
+The [Pelly receipt patch](PELLY_RECEIPT.md) checks the receipt return, restores a
+rejected letter through the original pocket-copy path, and selects an accurate
+new English error. All 48 isolated native receive cases, eight hand-back
+initializer cases, sixteen refusal selectors, and ten index boundaries pass.
+The original inventory handler's pocket removal and saved-slot
+ownership are verified against its native instructions. Normal post-office
+animation, player input, and error-message progression still require gameplay
+validation. Snapshot generation remains disabled pending the wider mail work.
 
 The complete receive-handler range `809C471C..809C4884` has SHA-256
 `c29e3901cf539f63a16043228bccc787ec14fbf4a58613db350a06f9618b0e73`.
 The source overlay has SHA-256
 `a2fe6daee4180fd7fdcbe04cb62e514a8d88067b74bf7e43506f17986c204db6`.
-The audit and mutation tests retain this outstanding requirement explicitly.
+The audit and mutation tests retain these original-source checks explicitly.
 
 ## Validation limits
 

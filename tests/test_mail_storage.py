@@ -38,9 +38,9 @@ class MailStorageTests(unittest.TestCase):
                     with self.assertRaisesRegex(ValueError,name): evidence(rom)
                 code[offset+3] ^= 1
 
-    def test_pelly_unhandled_failure_path_is_retained_as_a_required_fix(self):
+    def test_pelly_original_failure_path_is_bound_to_the_native_instructions(self):
         rom = ROM_PATH.read_bytes()
-        self.assertIn('UNFIXED',pelly_evidence(rom)['status'])
+        self.assertIn('ignores receipt failure',pelly_evidence(rom)['status'])
         code = bytearray(by_vrom(rom)[PELLY_VROM].extract(rom))
         class Entry:
             def extract(self,ignored): return code

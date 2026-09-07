@@ -63,10 +63,11 @@ original stack and saved registers. Player and museum paths remain unchanged.
 The public receipt entry at `800B6A3C`, send type zero, forwards this result;
 other receipt modes and the full Pelly interaction still need gameplay checks.
 
-The actor's menu handler independently ignores this result and clears its staged
-letter. That unfixed path can still lose failed mail during normal gameplay;
-see [Pelly failure handling](MAIL_STORAGE.md). The lower-level tests do not
-establish end-to-end failure preservation. Receipt modes one and two pass the
+The actor's original menu handler independently ignores this result and clears
+its staged letter. The [Pelly receipt patch](PELLY_RECEIPT.md) restores rejected
+letters to their original pockets, retains successful behaviour, and selects
+accurate English errors. Isolated native actor tests pass; the full animation
+and normal interaction remain unverified. Receipt modes one and two pass the
 separate isolated storage checks, without establishing normal UI delivery.
 
 The native receipt-function SHA-256 is
@@ -77,8 +78,8 @@ overlaps before publishing any changed code.
 
 ## Memory and validation contract
 
-The resident module uses 24,256 bytes of its unchanged 32 KiB reservation.
-Only 320 bytes remain before the final 8 KiB native-test area. Compiler stack
+The resident module uses 24,352 bytes of its unchanged 32 KiB reservation.
+Only 224 bytes remain before the final 8 KiB native-test area. Compiler stack
 frames are: send wrapper 96 bytes, restoration 256, formatting 1,224, expansion
 64, and unpacking 408. Unpacking finishes before formatting. These individual
 frames do not establish a whole-game maximum; native tests also check a guard

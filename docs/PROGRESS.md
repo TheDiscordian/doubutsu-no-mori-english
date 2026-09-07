@@ -9,10 +9,14 @@ and the general-string/name/mail destinations. Candidate review remains required
 The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
 
-The immediate mail safety task is Pelly's menu-level failure handling: it ignores
-the receipt result and clears the staged letter even after lower-level rejection.
-The receipt guard alone does not fix that normal UI path. Snapshot generation
-remains disabled. See [storage and failure-path evidence](../specs/MAIL_STORAGE.md).
+Pelly's receipt-failure patch returns rejected letters to their original pockets
+and selects accurate English errors. Native tests pass 48 receipt cases, eight
+hand-back initializer cases, sixteen refusal selectors, and ten index boundaries.
+The tests use the actual action initializers and cover both reason-indexed
+message lookups. Normal animation, subsequent input, and rendered error
+progression remain unverified. Immediate mail work covers those interactions
+and remaining readers/metadata before generation.
+Snapshot generation remains disabled. See [receipt evidence](../specs/PELLY_RECEIPT.md).
 
 GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
 reference. Do not automatically reflow text to fill a bubble. Deliberate layout
@@ -46,7 +50,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 284 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 292 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -216,7 +220,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 24,256 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 24,352 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -301,14 +305,27 @@ user's direction. The production build retains the approved spacing metrics.
   in each of four home mailboxes. Full-storage failures retain their source;
   leaflet flags, neighbouring memory, and guards pass. The arrays and full
   checkpoint are restored. These checks do not establish ordinary delivery or
-  save/reload, and Pelly's separate failure path remains unfixed.
+  save/reload; the actor-specific checks are described separately below.
+- Pelly/Phyllis receipt failures use the native pocket-return flow and two new
+  original English errors without changing any existing message or its pacing.
+  Forty-eight native receipt cases pass, covering both record kinds, both
+  sisters, successful delivery, and rejection across every player pocket.
+  Eight hand-back initializer cases, sixteen refusal selectors, ten index
+  boundaries, and 152 complete loaded-message checks pass. The native loader's
+  complete relocated overlay, 407 function calls, 760 memory assertions, and
+  2,084 recorded steps pass with checkpoint restoration and blank FlashRAM.
+  The fixture runs actual action initializers but does not run the normal
+  hand-back animation. The build also passes the 188-step town regression and
+  all ten acceptance checks; independent module, ROM, and patch builds match.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-npc-post-pilot/`
+The current experimental resident-module pilot in `build/pelly-handback-repeat-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
-drafts. Candidates still require review. Its final main-bank audit leaves 2,592
+drafts. Two additional original Pelly/Phyllis error messages extend the main bank
+to 11,754 records; they do not change the existing candidate counts. Candidates
+still require review. The original main-bank audit leaves 2,592
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,353 conservative layout warnings include full default
 catchphrase width and do not trigger automatic

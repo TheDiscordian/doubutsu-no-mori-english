@@ -19,8 +19,11 @@ class ThreadDebugger(RSP):
         self.reserved, self.used = RESERVATION, 0x1800
         self.entry = bytes.fromhex("27BDFFE0")
         self.breakpoint, self.commands = None, []
+        self.code_base, self.code_bytes = 0x80200000, bytes.fromhex('03E0000800000000')
 
     def read_memory(self, address, size):
+        if address == self.code_base and size == len(self.code_bytes):
+            return self.code_bytes
         if address == 0x8003CE30:
             return struct.pack(">I", self.pointer)
         if address == self.pointer:
@@ -57,6 +60,27 @@ class ThreadDebugger(RSP):
 
 
 class DebuggerThreadTests(unittest.TestCase):
+    def test_verified_overlay_calls_require_complete_matching_bounded_code(self):
+        debug = ThreadDebugger()
+        debug.pause_game_thread()
+        before = list(debug.registers)
+        proof = (debug.code_base,debug.code_bytes)
+        with self.assertRaisesRegex(ValueError,'Invalid test function'):
+            debug.call('80200000',[])
+        self.assertEqual(debug.call('80200000',[],verified_code=proof)['return_value'],55)
+        self.assertEqual(debug.registers,before)
+        with self.assertRaisesRegex(ValueError,'differs from resident'):
+            debug.call('80200000',[],verified_code=(debug.code_base,b'\0'*8))
+        for base,data in ((0,bytes(8)),(0x80200001,bytes(8)),(0x803FFFFC,bytes(8)),
+                          (0x801948E0,bytes(8)),(0x80200000,bytes(3)),
+                          (0x80200000,bytes(0x20004)),(0x80200000,bytearray(8))):
+            debug.commands.clear()
+            with self.assertRaisesRegex(ValueError,'code range'):
+                debug.call(f'{base&~3:08X}',[],verified_code=(base,data))
+            self.assertFalse(any(command.startswith('G') for command in debug.commands))
+        with self.assertRaisesRegex(ValueError,'code range'):
+            debug.call('80200008',[],verified_code=proof)
+
     def test_observed_pc_requires_complete_registers_and_exact_target(self):
         registers = [0]*71
         registers[37] = 0xFFFFFFFF80194C5C
@@ -76,6 +100,7 @@ class DebuggerThreadTests(unittest.TestCase):
         before = list(debug.registers)
         result = debug.call("80096740", [0x8019B000, 0x2200])
         self.assertEqual(result["return_value"], 55)
+        self.assertEqual(result['return_value_v1'],0)
         self.assertEqual(result["return_breakpoint"], "8019A8E0")
         self.assertEqual(result["thread"]["id"], 4)
         self.assertEqual(debug.registers, before)

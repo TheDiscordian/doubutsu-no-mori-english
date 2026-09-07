@@ -10,11 +10,18 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
-Immediate R05 task: fix Pelly's menu-level receipt-failure path without losing
-the staged/player letter or reporting success. The lower-level guard preserves
-its source, but the actor still ignores failure and clears it afterwards.
-The selected native storage paths pass; the normal UI path does not yet.
-See [storage evidence](../specs/MAIL_STORAGE.md). Keep generation disabled.
+Immediate R05 tasks: validate the ordinary post-office hand-back/error flow and
+finish remaining readers/metadata before enabling generation. The Pelly patch
+passes 48 native actor receipt cases, eight hand-back initializer cases, sixteen
+refusal selectors, and ten index boundaries. Failed letters return to their
+original pockets without reporting success. The fixtures run actual action
+initializers but do not establish normal animation or subsequent player input.
+See [receipt evidence](../specs/PELLY_RECEIPT.md).
+Keep generation disabled.
+
+Next reader targets include the first-job and ordinary NPC letter-show handlers
+in overlays `00814FA0` and `00815B70`. Their three reverse-conversion calls lead
+to board read mode one; complete caller-level native validation remains.
 
 ## Main translation and runtime
 

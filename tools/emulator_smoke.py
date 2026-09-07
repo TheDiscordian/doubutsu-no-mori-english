@@ -155,7 +155,7 @@ class RSP:
         finally:
             self.command("z"+breakpoint)
 
-    def call(self, address, arguments, *, return_address=TEST_RETURN):
+    def call(self, address, arguments, *, return_address=TEST_RETURN, verified_code=None):
         """Test-only o32 call in module scratch RAM; leaves the game paused.
 
         A checkpoint must restore the complete emulated machine afterwards.
@@ -169,16 +169,32 @@ class RSP:
                 or not TEST_RETURN <= return_address <= TEST_STACK-0x100):
             raise ValueError('Test return breakpoint must remain inside isolated scratch RAM')
         arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
-        if (address % 4 or not 0x80051A80 <= address < TEST_RETURN or len(arguments) > 9
+        if (address % 4 or len(arguments) > 9
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
             raise ValueError("Invalid test function or o32 arguments")
+        if verified_code is None:
+            if not 0x80051A80 <= address < TEST_RETURN:
+                raise ValueError('Invalid test function or o32 arguments')
+        else:
+            # Only Python fixture helpers can supply this proof. Ordinary JSON
+            # calls retain their original target restrictions. Compare complete
+            # independently expected code, not a caller-supplied address alone.
+            base, expected_code = verified_code
+            if (type(base) is not int or base & 3 or type(expected_code) is not bytes
+                    or not 4 <= len(expected_code) <= 0x20000 or len(expected_code) & 3
+                    or not 0x80000400 <= base <= 0x80400000-len(expected_code)
+                    or not base <= address <= base+len(expected_code)-4
+                    or (base < MODULE_RAM+RESERVATION and base+len(expected_code) > MODULE_RAM)):
+                raise ValueError('Invalid verified native code range')
         self.command("?")
         header = self.read_memory(MODULE_RAM, 20)
         magic, abi, reserved, used, ready = struct.unpack(">5I", header)
         if (magic, abi, reserved, ready) != (0x41465254, 1, RESERVATION, 1) or not 0x300 <= used <= LINKED_LIMIT:
             raise ValueError("Module does not provide the required unused test scratch RAM")
-        if address >= MODULE_RAM+used:
+        if verified_code is None and address >= MODULE_RAM+used:
             raise ValueError("Native test target is outside linked module code")
+        if verified_code is not None and self.read_memory(base,len(expected_code)) != expected_code:
+            raise ValueError('Verified native code differs from resident instructions')
         before = self.command("g")
         if len(before) != 71*16 or int(before[:16], 16):
             raise ValueError("Unknown debugger bulk register layout")
@@ -216,7 +232,8 @@ class RSP:
             if values[29] & 0xFFFFFFFF != stack:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
-                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": f"{return_address:08X}",
+                    "return_value": values[2] & 0xFFFFFFFF, "return_value_v1": values[3] & 0xFFFFFFFF,
+                    "return_breakpoint": f"{return_address:08X}",
                     "stack_restored": True, "requires_checkpoint_restore": True, "thread": thread}
         finally:
             self.command("z"+breakpoint)
@@ -758,6 +775,8 @@ def main():
                 results.append(result)
                 if "expect_return" in call and result["return_value"] != call["expect_return"]:
                     raise ValueError(f"Unexpected function return: {result['return_value']}")
+                if 'expect_return_v1' in call and result['return_value_v1'] != call['expect_return_v1']:
+                    raise ValueError(f"Unexpected v1 result: {result['return_value_v1']}")
             if 'test_npc_mail_sends' in action:
                 from mail_npc_smoke import exercise
                 if not (out/'test.bs1').is_file():
@@ -770,6 +789,12 @@ def main():
                     raise ValueError('Mail storage probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_mail_storage'],record))
+            if 'test_pelly_receipt' in action:
+                from pelly_receipt_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Pelly receipt probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_pelly_receipt'],record))
             if 'open_test_mail' in action:
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():
