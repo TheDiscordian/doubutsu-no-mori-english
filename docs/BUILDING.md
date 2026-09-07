@@ -56,8 +56,9 @@ python3 tools/build.py --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --english-runtime --runtime-module build/runtime-module --output build/module-pilot
 ```
 
-Module source changes require rebuilding its artifacts. The linker limits the
-complete code/data/BSS reservation to sixteen KiB. The normal pilot does not yet
+Module source changes, including nested mail files, require rebuilding its
+artifacts. The 32 KiB reservation contains at most 24 KiB of linked code/data/BSS
+and a separate 8 KiB native-test area. The ordinary non-module pilot does not
 enable the module. See [module design](../specs/RUNTIME_MODULE.md).
 
 Generate module-aware candidates with `tools/reference_candidates.py`, passing
@@ -95,6 +96,21 @@ and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under
 `build/`. Native calls run only at the verified graph-thread boundary and must
 restore the complete checkpoint; see [test-call contract](../specs/NATIVE_TEST_CALLS.md).
+
+`tools/mail_runtime_test_scenario.py --rom <built-ROM> --suite codec
+--output <ignored-scenario.json>` generates direct resident snapshot tests.
+The `format` suite covers complete assembly, every opcode, rejection, and guards;
+`reference` uses 46 selected cases from the verified English disc extraction.
+All three require the matching module manifest (`--module` when not using the
+default directory). These tests do not enable gameplay mail generation or viewing.
+
+The full runtime-choice scenario finishes with a bounded `advance_to_message`
+action for arrival record `07DD`. The action observes a live message and stops
+before pressing again; unexpected active choices or an exhausted press limit
+fail. It uses only ordinary button input and does not change text pacing or
+gameplay state directly. `tools/validate_runtime_smoke.py <test-directory>`
+independently requires arrival and all other recorded acceptance checks;
+a runner exit code alone is not a full regression pass.
 
 `tools/text_coverage.py --rom <native-ROM> --translations <candidates.json>
 --output build/coverage` audits final candidate presence across all 29 native

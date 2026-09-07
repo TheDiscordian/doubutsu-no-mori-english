@@ -13,7 +13,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
-from aflib import sha256
+from aflib import sha256, replace_dma
 from catchphrases import HEADER, VROM, candidates, install, native_table, resource, validate_saved_defaults
 from runtime_module import MODULE_VROM, add_runtime_module
 from textbanks import banks
@@ -212,17 +212,22 @@ class CatchphraseResourceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complete verified default"):
             validate_saved_defaults(self.rom, {bank.data_vrom: data, bank.table_vrom: table}, self.edits)
 
-    @unittest.skipUnless((ROOT/"build/catchphrase-pilot/animal-forest-halfwidth.z64").is_file(),
+    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file()
+                         and (ROOT/"build/catchphrases/catchphrases.json").is_file(),
                          "Native-call scenarios bind to the local experimental ROM")
     def test_native_scenario_uses_unsigned_o32_arguments_and_restores_checkpoint(self):
         from catchphrase_test_scenario import scenario
-        module = json.loads((ROOT/"build/runtime-module/module.json").read_text())
+        replacements = {}
+        additions, module = add_runtime_module(self.rom, replacements, ROOT/"build/runtime-module")
         reference = json.loads((ROOT/"build/catchphrases/catchphrases.json").read_text())
-        actions = scenario((ROOT/"build/catchphrase-pilot/animal-forest-halfwidth.z64").read_bytes(), module, reference)
+        install(self.rom, additions, module, ROOT/"build/catchphrases")
+        # Bind the current source-built module and resource together; a historical
+        # pilot ROM must not accidentally provide stale symbols for this test.
+        actions = scenario(replace_dma(self.rom, replacements, additions=additions), module, reference)
         calls = [a["call"] for a in actions if "call" in a]
         self.assertGreaterEqual(len(calls), 216)
         for call in calls:
-            self.assertTrue(0x80051A80 <= int(call["address"], 16) <= 0x801968E0)
+            self.assertTrue(0x80051A80 <= int(call["address"], 16) <= 0x8019A8E0)
             self.assertTrue(all(type(value) is int and 0 <= value <= 0xFFFFFFFF for value in call["arguments"]))
         self.assertTrue(any(0xFFFFFFFF in call["arguments"] for call in calls))
         self.assertTrue(any(a.get("load_state") for a in actions))

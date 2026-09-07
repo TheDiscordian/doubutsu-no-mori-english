@@ -17,7 +17,7 @@ def scenario(rom):
                    files[0x02000000].extract(rom), files[0x00CF9000].extract(rom)).entries()
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    window, data, cursor = 0x80197000, 0x80197400, 0x80197380
+    window, data, cursor = 0x8019B000, 0x8019B400, 0x8019B380
     def write(address, value):
         actions.append({"write": [f"{address:08X}", value.hex()]})
     def read(address, value):
@@ -40,7 +40,7 @@ def scenario(rom):
         for expected, flags in ((2, 8), (1, 0)):
             actions.append({"call": {"address": "800A21C0", "arguments": [window, cursor], "expect_return": expected}})
             read(window+0x28C, struct.pack(">I", flags))
-    read(0x801988D0, bytes.fromhex("AF16C0DE"*4))
+    read(0x8019C8D0, bytes.fromhex("AF32C0DE"*4))
     actions += [{"load_state": True}, {"resume": True}, {"wait": 2}]
     read(window, bytes(4))
     return actions

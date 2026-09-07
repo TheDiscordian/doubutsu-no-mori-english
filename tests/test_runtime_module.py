@@ -15,6 +15,7 @@ from runtime_module import (BOOTSTRAP_RAM, MODULE_RAM, MODULE_VROM, RESERVATION,
                             WATCHDOG_COPY, WATCHDOG_START, add_runtime_module,
                             audit_watchdog_references, module_command_info,
                             verify_runtime_module, verify_test_module, watchdog_bytes)
+from runtime_layout import LINKED_LIMIT
 from textcodec import encode, tokenize
 from textvalidate import validate_entry
 from test_retail import ROM_PATH
@@ -22,8 +23,8 @@ from test_retail import ROM_PATH
 
 class TestModuleConfigurationTests(unittest.TestCase):
     def test_only_known_optional_resources_may_change_module_configuration(self):
-        module = bytearray(0x4000)
-        struct.pack_into(">4I", module, 0, 0x41465254, 1, 0x4000, 0x1800)
+        module = bytearray(RESERVATION)
+        struct.pack_into(">4I", module, 0, 0x41465254, 1, RESERVATION, 0x1800)
         report = {"module_sha256": sha256(module), "linked_bytes": 0x1800}
         class Entry:
             def extract(self, rom):
@@ -45,9 +46,20 @@ class TestModuleConfigurationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "symbols or scratch"):
                 verify_test_module(b"synthetic", report)
             module[512] ^= 1
-            for size in (0x1000, 0x2100):
+            for size in (0x1000, LINKED_LIMIT+4):
                 with self.assertRaisesRegex(ValueError, "symbols or scratch"):
                     verify_test_module(b"synthetic", {**report, "linked_bytes": size})
+            for offset in (56, 60, 64):
+                struct.pack_into(">I", module, offset, 0)
+            struct.pack_into(">I", module, 12, LINKED_LIMIT)
+            verify_test_module(b"synthetic", {"module_sha256": sha256(module), "linked_bytes": LINKED_LIMIT})
+            for size in (0, 0x2FF, LINKED_LIMIT+4):
+                struct.pack_into(">I", module, 12, size)
+                with self.assertRaisesRegex(ValueError, "symbols or scratch"):
+                    verify_test_module(b"synthetic", {"module_sha256": sha256(module), "linked_bytes": size})
+            struct.pack_into(">I", module, 8, 0x4000)
+            with self.assertRaisesRegex(ValueError, "memory reservation"):
+                verify_test_module(b"synthetic", report)
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Retail ROM is a local-only optional test input")
@@ -162,10 +174,16 @@ class ModuleRetailTests(unittest.TestCase):
             for name in ("module.json", "module.bin", "bootstrap.bin"):
                 (copy/name).write_bytes((directory/name).read_bytes())
             manifest = json.loads((copy/"module.json").read_text())
-            manifest["runtime_sources"].pop("module.c")
-            (copy/"module.json").write_text(json.dumps(manifest))
-            with self.assertRaisesRegex(ValueError, "source inventory"):
-                add_runtime_module(self.rom, {}, copy)
+            for name in ("module.c", "mail/record.c", "mail/format.c", "mail/format.h"):
+                original_hash = manifest["runtime_sources"].pop(name)
+                (copy/"module.json").write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "source inventory"):
+                    add_runtime_module(self.rom, {}, copy)
+                manifest["runtime_sources"][name] = "0"*64
+                (copy/"module.json").write_text(json.dumps(manifest))
+                with self.assertRaisesRegex(ValueError, "sources changed"):
+                    add_runtime_module(self.rom, {}, copy)
+                manifest["runtime_sources"][name] = original_hash
             (copy/"module.json").write_bytes((directory/"module.json").read_bytes())
             (copy/"bootstrap.bin").write_bytes(b"corrupt")
             with self.assertRaisesRegex(ValueError, "Stale or corrupt"):

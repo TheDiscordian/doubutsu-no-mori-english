@@ -61,7 +61,7 @@ class RuntimeGuardTests(unittest.TestCase):
 
     def test_invalid_resident_layouts(self):
         for values in ((20, 20, 0x80196000, 0x80196080), (20, 32, 0x80196001, 0x80196081),
-                       (20, 32, 0x80198840, 0x801988C0), (20, 32, 0x80096000, 0x80096080)):
+                       (20, 32, 0x8019C840, 0x8019C8C0), (20, 32, 0x80096000, 0x80096080)):
             with self.assertRaisesRegex(ValueError, "layout"):
                 ChoiceLayout(*values)
 

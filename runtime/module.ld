@@ -17,6 +17,6 @@ SECTIONS
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
     __module_end = .;
     __module_used = __module_end - __module_start;
-    ASSERT(__module_end <= __module_start + 0x3FF0, "Translation module exceeds its RAM budget")
+    ASSERT(__module_end <= __module_start + 0x6000, "Translation module reaches native-test scratch RAM")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

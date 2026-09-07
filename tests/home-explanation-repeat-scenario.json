@@ -11,6 +11,6 @@
   {"snapshot_message": true, "expect_message": "083A"},
   {"snapshot_choices": true, "expect_choices": {"choice_count": 2, "choice_state": 2, "choice_cursor": 0}},
   {"capture": "explanation-repeated.png"},
-  {"read": ["801988D0", 16], "expect": "AF16C0DEAF16C0DEAF16C0DEAF16C0DE"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
   {"save_state": true}
 ]

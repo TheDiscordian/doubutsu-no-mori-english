@@ -15,15 +15,15 @@ def scenario(rom):
         raise ValueError("Truncated native villager-name file")
     entries = [data[8+i*6:14+i*6] for i in range(NPC_COUNT)]
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    destination = 0x80197010
+    destination = 0x8019B010
     for index in [*range(NPC_COUNT), 0xFF]:
         expected = b"G"*16+(entries[index] if index != 0xFF else b"G"*6)+b"G"*16
-        actions += [{"write": ["80197000", (b"G"*38).hex()]},
+        actions += [{"write": ["8019B000", (b"G"*38).hex()]},
                     {"call": {"address": "800ACC38", "arguments": [destination, index]}},
-                    {"read": ["80197000", 38], "expect": expected.hex()}]
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+                    {"read": ["8019B000", 38], "expect": expected.hex()}]
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

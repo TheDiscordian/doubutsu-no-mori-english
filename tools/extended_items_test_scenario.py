@@ -44,10 +44,10 @@ def scenario(rom, module, names):
         expected = data[32+index*16:48+index*16] if valid and item else b" "*16
         guard = b"G"*72
         actions.extend([
-            {"write": ["80197000", guard.hex()]},
-            {"call": {"address": loader, "arguments": [0 if null else 0x80197011, capacity, item],
+            {"write": ["8019B000", guard.hex()]},
+            {"call": {"address": loader, "arguments": [0 if null else 0x8019B011, capacity, item],
                       "expect_return": int(valid)}},
-            {"read": ["80197000", len(guard)],
+            {"read": ["8019B000", len(guard)],
              "expect": (guard[:17]+expected+guard[33:] if valid else guard).hex()}])
     for item in sorted(set(items+[0, 0x3000, 0xFFFF, 0x12200, 0x17AC, 0x1BA7, 0x1BA8,
                                    0x1C27, 0x1C28, 0x1CA7, 0x1CA8, 0x1D27])):
@@ -62,14 +62,14 @@ def scenario(rom, module, names):
     for index in range(8):
         damaged = bytearray(HEADER)
         damaged[index*4+3] ^= 1
-        actions += [{"write": ["80197200", damaged.hex()]},
-                    {"call": {"address": header_check, "arguments": [0x80197200], "expect_return": 0}}]
-    actions += [{"write": ["80197200", HEADER.hex()]},
-                {"call": {"address": header_check, "arguments": [0x80197200], "expect_return": 1}},
+        actions += [{"write": ["8019B200", damaged.hex()]},
+                    {"call": {"address": header_check, "arguments": [0x8019B200], "expect_return": 0}}]
+    actions += [{"write": ["8019B200", HEADER.hex()]},
+                {"call": {"address": header_check, "arguments": [0x8019B200], "expect_return": 1}},
                 {"call": {"address": header_check, "arguments": [0], "expect_return": 0}},
-                {"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+                {"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

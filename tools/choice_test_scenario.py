@@ -33,7 +33,7 @@ def scenario(rom):
         if result is not None:
             value["expect_return"] = result
         actions.append({"call": value})
-    window, choice, buffer = 0x80197000, 0x801971B0, 0x80197800
+    window, choice, buffer = 0x8019B000, 0x8019B1B0, 0x8019B800
     # Real cartridge DMA, including every long entry and its actual alignment.
     tested = []
     for index, entry in enumerate(entries):
@@ -67,13 +67,13 @@ def scenario(rom):
         length = len(payload.rstrip())
         read(choice+0x78, struct.pack(">3I", length, 4, index))
         read(layout.selected, payload[:length]+b"G"*(32-length))
-        write(0x80197A00, b"X\x7f\x2eY"+b" "*60)
-        call(0x8009F3A8, [window, 0x80197A00, 1, 4], length+2)
-        read(0x80197A00, b"X"+payload[:length]+b"Y")
+        write(0x8019BA00, b"X\x7f\x2eY"+b" "*60)
+        call(0x8009F3A8, [window, 0x8019BA00, 1, 4], length+2)
+        read(0x8019BA00, b"X"+payload[:length]+b"Y")
     read(layout.rows, expected_rows)
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions, tested
 
 

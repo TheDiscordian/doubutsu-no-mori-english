@@ -26,7 +26,7 @@ def scenario(rom, group_name="nook_home_explanation"):
         if sha256(entries[number]) != member["encoded_sha256"]:
             raise ValueError("Test ROM does not contain the approved sequence")
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    window, data, index = 0x80197000, 0x80197400, 0x80197380
+    window, data, index = 0x8019B000, 0x8019B400, 0x8019B380
 
     def write(address, value):
         actions.append({"write": [f"{address:08X}", value.hex()]})
@@ -94,9 +94,9 @@ def scenario(rom, group_name="nook_home_explanation"):
             raise ValueError("Native repeat response no longer returns to the root")
         dispatch(repeat[0])
         read(window+0x2C4, struct.pack(">I", 0x07EA))
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

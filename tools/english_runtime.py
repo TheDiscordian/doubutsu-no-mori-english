@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
+from runtime_layout import MODULE_RAM, LINKED_LIMIT
 
 CHOICE_BYTES = 16
 CHOICE_ROWS = 0x8009F4B8
@@ -35,7 +36,7 @@ class ChoiceLayout:
             return
         if (self.capacity != 20 or self.stride != 32 or self.rows % 32
                 or not 0x80194BE0 <= self.rows < self.selected
-                or self.selected != self.rows+128 or self.selected+32 > 0x801988D0):
+                or self.selected != self.rows+128 or self.selected+32 > MODULE_RAM+LINKED_LIMIT):
             raise ValueError("Unsupported English choice storage layout")
 
 

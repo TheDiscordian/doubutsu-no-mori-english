@@ -8,10 +8,8 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, dma_entries, sha256
 from english_runtime import ChoiceLayout, GuardedCode, SOURCE_HASHES
 from textcodec import command_info
 from code_sections import code_segments
+from runtime_layout import MODULE_RAM, MODULE_VROM, RESERVATION, LINKED_LIMIT
 
-MODULE_RAM = 0x801948E0
-MODULE_VROM = 0x02800000
-RESERVATION = 0x4000
 WATCHDOG_START, WATCHDOG_END = 0x800D64E0, 0x800D66D0
 BOOTSTRAP_RAM = WATCHDOG_START+16
 WATCHDOG_COPY = MODULE_RAM+0x100
@@ -57,12 +55,14 @@ def verify_test_module(rom, report):
     """Bind native test symbols to the ROM, allowing only known resource words."""
     files = by_vrom(rom)
     module = bytearray(files[MODULE_VROM].extract(rom))
+    if len(module) != RESERVATION or struct.unpack_from(">3I", module) != (0x41465254, 1, RESERVATION):
+        raise ValueError("Native test module has an incompatible memory reservation")
     for offset, expected in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000)):
         value = struct.unpack_from(">I", module, offset)[0]
         if value and (value != expected or value not in files):
             raise ValueError("Unexpected native test resource configuration")
         module[offset:offset+4] = bytes(4)
-    if (sha256(module) != report["module_sha256"] or report["linked_bytes"] > 0x2000
+    if (sha256(module) != report["module_sha256"] or not 0x300 <= report["linked_bytes"] <= LINKED_LIMIT
             or struct.unpack_from(">I", module, 12)[0] != report["linked_bytes"]):
         raise ValueError("Native test symbols or scratch-space boundaries do not match the module")
 
@@ -126,6 +126,12 @@ def audit_watchdog_references(rom):
             "executable_segments": len(executable), "definition_sha256": definitions}
 
 
+def runtime_source_hashes(source):
+    """Include every nested source/header; no untracked compilation inputs."""
+    return {p.relative_to(source).as_posix(): sha256(p.read_bytes())
+            for p in sorted(source.rglob('*')) if p.is_file()}
+
+
 def add_runtime_module(rom, replacements, directory):
     report = json.loads((directory/"module.json").read_text())
     data = (directory/"module.bin").read_bytes()
@@ -134,15 +140,15 @@ def add_runtime_module(rom, replacements, directory):
             or report["bootstrap_sha256"] != sha256(bootstrap)):
         raise ValueError("Stale or corrupt resident-module artifacts")
     source = Path(__file__).resolve().parents[1]/"runtime"
-    if set(report["runtime_sources"]) != {p.name for p in source.iterdir() if p.is_file()}:
+    hashes = runtime_source_hashes(source)
+    if set(report["runtime_sources"]) != set(hashes):
         raise ValueError("Runtime module source inventory changed; rebuild the module")
-    for name, digest in report["runtime_sources"].items():
-        if Path(name).name != name or sha256((source/name).read_bytes()) != digest:
-            raise ValueError("Runtime module sources changed; rebuild the module")
+    if report["runtime_sources"] != hashes:
+        raise ValueError("Runtime module sources changed; rebuild the module")
     if len(data) != RESERVATION or not 0 < len(bootstrap) <= WATCHDOG_END-BOOTSTRAP_RAM:
         raise ValueError("Resident module/bootstrap exceeds its reserved region")
     magic, abi, reserved, used = struct.unpack_from(">4I", data)
-    if (magic, abi, reserved) != (0x41465254, 1, RESERVATION) or not 0x300 <= used <= RESERVATION-16:
+    if (magic, abi, reserved) != (0x41465254, 1, RESERVATION) or not 0x300 <= used <= LINKED_LIMIT:
         raise ValueError("Invalid resident-module header")
     if used != report["linked_bytes"] or data[used:] != bytes(RESERVATION-used):
         raise ValueError("Invalid resident-module linked size or zero padding")

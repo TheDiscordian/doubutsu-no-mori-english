@@ -20,7 +20,7 @@ def scenario(rom):
     if hook >> 26 != 3 or not MODULE_RAM+0x300 <= close < MODULE_RAM+used:
         raise ValueError("Missing resident choice-close hook")
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    window, choice, index = 0x80197000, 0x801971B0, 0x80197380
+    window, choice, index = 0x8019B000, 0x8019B1B0, 0x8019B380
     global_flags = 0x8014269C
 
     def write(address, value):
@@ -36,8 +36,8 @@ def scenario(rom):
         actions.append({"call": value})
 
     write(window, bytes(0x330))
-    write(window+12, struct.pack(">I", 0x80197400))
-    write(0x80197400, struct.pack(">4I", 1, 1, 4, 0)+b"\x7f\x62\x7f\x00")
+    write(window+12, struct.pack(">I", 0x8019B400))
+    write(0x8019B400, struct.pack(">4I", 1, 1, 4, 0)+b"\x7f\x62\x7f\x00")
     write(choice+0xB7, b"G"*5)
     write(index, bytes(4))
     call(0x800A21C0, [window, index], 0)
@@ -48,9 +48,9 @@ def scenario(rom):
 
     # Exercise the actual native controller path, not just a simulated outcome.
     write(0x80104F94, bytes(4))
-    write(0x8010EF90, struct.pack(">I", 0x80197C00))
-    write(0x80197C00, bytes(0x100))
-    write(0x80197C20, b"\x40\x00")  # B trigger.
+    write(0x8010EF90, struct.pack(">I", 0x8019BC00))
+    write(0x8019BC00, bytes(0x100))
+    write(0x8019BC20, b"\x40\x00")  # B trigger.
     write(choice+0xB8, b"\x01\x01")
     write(choice+0x7C, struct.pack(">3I", 4, 0, 1))
     call(0x80066194, [choice, 0], 1)
@@ -59,7 +59,7 @@ def scenario(rom):
     write(choice+0x80, struct.pack(">2I", 1, 1))
     call(0x80066194, [choice, 0], 0)
     read(choice+0x80, struct.pack(">2I", 1, 1))
-    write(0x80197C20, b"\x80\x00")  # A chooses the current row.
+    write(0x8019BC20, b"\x80\x00")  # A chooses the current row.
     call(0x80066194, [choice, 0], 1)
     read(choice+0x80, struct.pack(">2I", 1, 1))
 
@@ -102,9 +102,9 @@ def scenario(rom):
     call(0x8009E6F8, [0])
     read(global_flags, struct.pack(">I", 0x30000))
 
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

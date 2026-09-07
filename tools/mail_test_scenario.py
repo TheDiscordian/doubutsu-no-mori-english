@@ -14,8 +14,8 @@ from runtime_module import verify_test_module
 def scenario(rom, module):
     verify_test_module(rom, module)
     native_handlers(rom)
-    text, source, split = 0x80197010, 0x80197110, 0x80197210
-    mail, animal, copied = 0x80197410, 0x80197510, 0x80197610
+    text, source, split = 0x8019B010, 0x8019B110, 0x8019B210
+    mail, animal, copied = 0x8019B410, 0x8019B510, 0x8019B610
     guard = b"EDGE"*4
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def write(address, value):
@@ -80,7 +80,7 @@ def scenario(rom, module):
         restored = b"!"*0x24+bytes.fromhex("12340002")+b"!"+bytes([4])+envelope
         read(copied-16, guard+restored+guard)
         read(mail-16, guard+value+guard)
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
                 {"read": [f"{text:08X}", 4], "expect": "00000000"}]
     return actions

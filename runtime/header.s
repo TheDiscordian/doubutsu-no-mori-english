@@ -3,7 +3,7 @@
 .balign 4
 .word 0x41465254 # AFRT
 .word 1          # ABI version
-.word 0x4000     # Reserved RAM
+.word 0x8000     # Reserved RAM, including separate native-test scratch
 .word __module_used
 .word 0          # Ready flag
 .word 0          # Original heap base

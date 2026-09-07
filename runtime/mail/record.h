@@ -1,7 +1,7 @@
 #ifndef AF_MAIL_RECORD_H
 #define AF_MAIL_RECORD_H
 
-/* Standalone generated-mail prototype. Not linked into the resident module. */
+/* Generated-mail snapshot codec. Native creation/save hooks are separate. */
 #define AF_MAIL_RECORD_BYTES 122u
 #define AF_MAIL_FIELD_COUNT 20u
 #define AF_MAIL_FIELD_BYTES 16u

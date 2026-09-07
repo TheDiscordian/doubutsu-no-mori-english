@@ -42,12 +42,12 @@ def scenario(original, rom, only_items=None):
                 raise ValueError("Converted item index exceeds its native bank")
             offset = bank.data_offset+index*10
             expected = data[offset:offset+10]
-        actions += [{"write": ["80197000", (b"G"*42).hex()]},
-                    {"call": {"address": "80096740", "arguments": [0x80197010, item]}},
-                    {"read": ["80197000", 42], "expect": (b"G"*16+expected+b"G"*16).hex()}]
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+        actions += [{"write": ["8019B000", (b"G"*42).hex()]},
+                    {"call": {"address": "80096740", "arguments": [0x8019B010, item]}},
+                    {"read": ["8019B000", 42], "expect": (b"G"*16+expected+b"G"*16).hex()}]
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

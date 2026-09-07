@@ -24,8 +24,8 @@ def scenario(rom, module, reference):
     groups = defaultdict(list)
     for row in rows:
         groups[row[:4]].append(row)
-    actor, output, cursor, animal = 0x80197000, 0x80197190, 0x801971C0, 0x80197200
-    saved, text, window, header = animal+0x4E5, 0x80197810, 0x80197D00, 0x80198020
+    actor, output, cursor, animal = 0x8019B000, 0x8019B190, 0x8019B1C0, 0x8019B200
+    saved, text, window, header = animal+0x4E5, 0x8019B810, 0x8019BD00, 0x8019C020
     guard = b"EDGE"*4
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def write(address, value):
@@ -137,7 +137,7 @@ def scenario(rom, module, reference):
         write(header, damaged)
         call("af_catchphrase_header_valid", [header], 0)
     call("af_catchphrase_header_valid", [0], 0)
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
                 {"read": [f"{actor:08X}", 4], "expect": "00000000"}]
     return actions

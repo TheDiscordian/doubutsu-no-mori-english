@@ -23,7 +23,7 @@ def scenario(rom, edits, info, *, drafts=False):
     if not selected or len({r["id"] for r in selected}) != len(selected):
         raise ValueError("Expected unique selected messages")
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    data = 0x80197400
+    data = 0x8019B400
     for edit in selected:
         if not edit["id"].startswith("message:"):
             raise ValueError("Native message test cannot load another bank")
@@ -37,7 +37,7 @@ def scenario(rom, edits, info, *, drafts=False):
                      "expect": (struct.pack(">4I", 1, number, len(entry), 0)+entry).hex()},
                     {"read": [f"{data-16:08X}", 16], "expect": (b"G"*16).hex()},
                     {"read": [f"{data+0x410:08X}", 32], "expect": (b"G"*32).hex()}]
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
                 {"read": [f"{data:08X}", 4], "expect": "00000000"}]
     return actions

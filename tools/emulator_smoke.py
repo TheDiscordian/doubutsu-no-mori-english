@@ -16,6 +16,7 @@ import socket
 import subprocess
 import struct
 import time
+from runtime_layout import MODULE_RAM, RESERVATION, LINKED_LIMIT, TEST_RETURN, TEST_STACK
 
 
 @contextmanager
@@ -45,10 +46,14 @@ def write_results(directory, results):
 
 
 class RSP:
-    def __init__(self, port):
-        self.sock = socket.create_connection(("127.0.0.1", port), timeout=5)
+    def __init__(self, port, timeout=5):
+        self.sock = socket.create_connection(("127.0.0.1", port), timeout=timeout)
         self.buf = b""
-        self.sock.sendall(b"+")  # ares TCP security handshake requires this first.
+        try:
+            self.sock.sendall(b"+")  # ares TCP security handshake requires this first.
+        except OSError:
+            self.sock.close()
+            raise
 
     def send(self, text):
         data = text.encode()
@@ -148,14 +153,16 @@ class RSP:
         """
         address = int(address, 16)
         arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
-        if (address % 4 or not 0x80051A80 <= address < 0x801968E0 or len(arguments) > 9
+        if (address % 4 or not 0x80051A80 <= address < TEST_RETURN or len(arguments) > 9
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
             raise ValueError("Invalid test function or o32 arguments")
         self.command("?")
-        header = self.read_memory(0x801948E0, 20)
+        header = self.read_memory(MODULE_RAM, 20)
         magic, abi, reserved, used, ready = struct.unpack(">5I", header)
-        if (magic, abi, reserved, ready) != (0x41465254, 1, 0x4000, 1) or used > 0x2000:
+        if (magic, abi, reserved, ready) != (0x41465254, 1, RESERVATION, 1) or not 0x300 <= used <= LINKED_LIMIT:
             raise ValueError("Module does not provide the required unused test scratch RAM")
+        if address >= MODULE_RAM+used:
+            raise ValueError("Native test target is outside linked module code")
         before = self.command("g")
         if len(before) != 71*16 or int(before[:16], 16):
             raise ValueError("Unknown debugger bulk register layout")
@@ -164,15 +171,15 @@ class RSP:
         if (registers[37] & 0xFFFFFFFF != 0x800D334C
                 or thread != {"pointer": "80145630", "state": 4, "id": 4}):
             raise ValueError("Native calls require pause_game_thread before test fixture writes")
-        stack = 0x80198880
+        stack = TEST_STACK
         expected = dict(zip(range(4, 8), arguments[:4]))
-        expected.update({29: stack, 31: 0x801968E0, 37: address})
+        expected.update({29: stack, 31: TEST_RETURN, 37: address})
         if len(arguments) > 4:
             outgoing = b"".join(struct.pack(">I", value) for value in arguments[4:])
             self.write_memory(stack+16, outgoing)
         for index, value in expected.items():
             registers[index] = value | (0xFFFFFFFF00000000 if value & 0x80000000 else 0)
-        breakpoint = "0,801968e0,4"
+        breakpoint = f"0,{TEST_RETURN:x},4"
         if self.command("Z"+breakpoint) != "OK":
             raise ValueError("Debugger rejected test return breakpoint")
         try:
@@ -184,7 +191,7 @@ class RSP:
             stopped = self.command("c")
             after = self.command("g")
             values = [int(after[i:i+16], 16) for i in range(0, len(after), 16)]
-            if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != 0x801968E0:
+            if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != TEST_RETURN:
                 stack_dump = self.read_memory(stack-0x100, 0x180).hex()
                 raise ValueError(f"Test function stopped unexpectedly: {stopped}, "
                                  f"PC={values[37]:016X}, SP={values[29]:016X}, RA={values[31]:016X}, "
@@ -193,11 +200,32 @@ class RSP:
             if values[29] & 0xFFFFFFFF != stack:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
-                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": "801968E0",
+                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": f"{TEST_RETURN:08X}",
                     "stack_restored": True, "requires_checkpoint_restore": True, "thread": thread}
         finally:
             self.command("z"+breakpoint)
             self.command("G"+before)
+
+
+def connect_debugger(process, port, seconds=15, *, connect=RSP, now=time.monotonic, pause=time.sleep):
+    """Wait for this live emulator's debugger socket, never restart the process."""
+    deadline = now()+seconds
+    last_error = None
+    while True:
+        status = process.poll()
+        if status is not None:
+            raise RuntimeError(f"Emulator exited before debugger connection: {status}")
+        remaining = deadline-now()
+        if remaining <= 0:
+            raise TimeoutError("Emulator debugger did not become ready") from last_error
+        try:
+            result = connect(port, timeout=min(1, remaining))
+            # The connection budget must not become the later command timeout.
+            result.sock.settimeout(5)
+            return result
+        except (ConnectionRefusedError, ConnectionResetError, TimeoutError) as error:
+            last_error = error
+            pause(min(0.1, max(0, deadline-now())))
 
 
 class Keyboard:
@@ -503,6 +531,33 @@ def advance_to_choice(debug, keyboard, options, record, pause=time.sleep, *, sto
     raise ValueError("No active choice within the declared page-advance limit")
 
 
+def advance_to_message(debug, keyboard, options, record, pause=time.sleep):
+    """Use bounded ordinary input until a named live message is observed."""
+    target = options.get("message_id")
+    maximum = options.get("max_presses", 30)
+    settle = options.get("settle_seconds", 3)
+    if not isinstance(target, str) or len(target) != 4 or any(c not in "0123456789ABCDEF" for c in target):
+        raise ValueError("Target message must be four uppercase hexadecimal digits")
+    if type(maximum) is not int or not 0 <= maximum <= 100:
+        raise ValueError("Invalid advance-to-message press limit")
+    if type(settle) not in (int, float) or not 0.1 <= settle <= 10:
+        raise ValueError("Invalid advance-to-message settling time")
+    for pressed in range(maximum+1):
+        pause(settle)
+        message = message_snapshot(debug)
+        choice = choice_snapshot(debug)
+        record(message)
+        record(choice)
+        if message.get("loaded") == 1 and message.get("message_id") == target:
+            record({"advanced_to_message": target, "presses": pressed})
+            return
+        if choice["choice_state"] == 2 and choice["choice_count"] > 0:
+            raise ValueError("Unexpected active choice before target message")
+        if pressed < maximum:
+            keyboard.press("a", 0.08)
+    raise ValueError("Target message not reached within the declared press limit")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
@@ -609,7 +664,7 @@ def main():
         subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
                         "-video_size", "800x640", "-i", display, "-frames:v", "1", str(out / "initial.png")],
                        env=env, check=True, timeout=15, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
-        debug = RSP(args.port)
+        debug = connect_debugger(ares, args.port)
         results.append({"debug_features": debug.command("qSupported:multiprocess+")})
         keyboard = Keyboard(display)
         actions = json.loads(args.scenario.read_text()) if args.scenario else [
@@ -631,6 +686,8 @@ def main():
                 advance_to_choice(debug, keyboard, action["advance_to_choice"], record)
             if "advance_dialogue" in action:
                 advance_to_choice(debug, keyboard, action["advance_dialogue"], record, stop_when_closed=True)
+            if "advance_to_message" in action:
+                advance_to_message(debug, keyboard, action["advance_to_message"], record)
             if "read" in action:
                 address, length = action["read"]
                 data = debug.read_memory(int(address, 16), length).hex()

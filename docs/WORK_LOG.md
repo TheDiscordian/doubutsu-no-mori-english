@@ -1042,6 +1042,76 @@
   Native version-two scenario SHA-256:
   `8db1073fe6738a2ade24acbfc4f75074ec3ddacb11b96dadb8f9cd8f8001a937`.
 
+### Resident mail execution and separated test memory
+
+- Expanded the resident reservation to 32 KiB with a linker-enforced 24 KiB
+  code/data/BSS limit and a separate final 8 KiB test area. Every fixture pointer,
+  embedded pointer, decimal argument, return breakpoint, and stack guard moves
+  together. The bootstrap loads `8000` with unsigned `ori` instructions and uses
+  register addition/subtraction for the heap, avoiding signed immediate overflow.
+  The heap starts at `8019C8E0`, size `00263720`, and still ends at `80400000`.
+  Checks cover both startup observations and the real malloc arena start pointer.
+- The builder compiles nested mail C files, hashes every nested source/header,
+  rejects changed sources during compilation, and verifies no undefined symbols.
+  Linked size is 10,336 bytes. Independent builds in `build/runtime-module/` and
+  `build/runtime-module-mail-repeat/` produce identical module and bootstrap
+  contents. Module SHA-256:
+  `5c3736861c76183b592f260463234d77da0f73c064241387a4d060f41d586c69`.
+  Bootstrap SHA-256:
+  `f38de0d2f252c4b9c4e596d85f5ae3f66f9ac27a680d30e874d2f6f476a4cb92`.
+  The previous module artifacts remain in `build/runtime-module-16k-5jmxzF/`;
+  old-ROM checkpoints are not compatible with the new build.
+- `build/mail-runtime-pilot/` retains 10,405 candidate edits and all three wider
+  resources, with unchanged production font assets/metrics and reference layout.
+  ROM SHA-256:
+  `f23a5d8efafafe5ed1e29cd6ae0df896d68da56b4410d1378630c10dbe276779`.
+  UPS SHA-256:
+  `bfb45be1798d1767811323db2a3526e65538e5b6b57219ac076bbecb7949489c`.
+  The independent mail import gate still withholds `mailb:00BB`: installed APIs
+  do not make the native mail generator call them.
+- Added big-endian o32 fixture serializers for the 380-byte decoded record,
+  68-byte pointer-bearing template structure, and 1,040-byte complete output.
+  `smoke-mail-codec-native-01` passes 215 resident calls, 303 memory assertions,
+  and 779 steps in two minutes 44.265 seconds. It tests every slot, all field
+  lengths, unaligned wire buffers, full envelopes, per-byte corruption, rejected
+  capacities/catalogs, unchanged failure output, and overlapping buffers.
+- `smoke-mail-format-native-01` passes 350 resident calls, 544 assertions, and
+  1,652 steps in four minutes 36.453 seconds. Complete assembly preserves exact
+  header/body/footer contents and layout metadata, including all 256 opcodes,
+  captured capitalization/articles, explicit newlines, rejection, and aliasing.
+  Source, output, low/high stack, and module guards pass.
+- `smoke-mail-reference-native-01` passes 92 resident calls, 280 assertions, and
+  611 steps in one minute 33.137 seconds. The 46 source-verified English cases
+  cover output-length witnesses, all twelve native reply groups, both capital
+  states, and two classic `0001` probes whose actual field-width bounds remain
+  unresolved. These are isolated API calls, not real generated/read/saved mail.
+  All three native API runs restore the machine checkpoint, with blank FlashRAM
+  SHA-256 `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- The first boot attempt fails at the debugger connection before CPU assertions,
+  with a still-starting emulator. A bounded socket-readiness wait now retries
+  only while that exact process remains live, without restarting it. Synthetic
+  tests cover delay, process exit, deadline, and unexpected protocol failures.
+  `smoke-mail-runtime-boot-02` passes 13 steps in 28.687 seconds.
+- The initial full run, `smoke-mail-runtime-full-01`, exits normally after 226
+  steps in six minutes 28.159 seconds, with all memory assertions passing, but
+  fails the independent arrival acceptance check. Its fixed button sequence
+  ends during `2AD2`, before town arrival. An initial chat update prematurely
+  called this a full pass; the subsequent correction distinguishes process
+  survival from acceptance. The matching-ROM checkpoint continuation,
+  `smoke-mail-runtime-arrival-01`, reaches live `07DD` after five ordinary button
+  presses, with all seven memory assertions passing across 25 steps in 26.216
+  seconds. The earlier chat's four-press count was incorrect.
+- The full scenario now ends with a bounded, observed arrival action. It never
+  presses past the target message, rejects unexpected active choices, and fails
+  when its press limit is exhausted. Three synthetic tests cover these cases and
+  invalid limits. The independent ten-check acceptance validator is unchanged.
+- The first complete layout test run passes 206 tests in 156.703 seconds.
+  The complete rerun with the arrival helper passes 209 tests in 92.703 seconds.
+  An independent full-ROM rebuild in `build/mail-runtime-repeat/` produces the
+  same ROM and UPS hashes, using the independently rebuilt module artifacts.
+  Generation hooks, immutable catalogs and identity review, native full-text
+  readers, editing, delivery, real saving, and original hardware remain required.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

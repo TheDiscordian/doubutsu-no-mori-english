@@ -32,10 +32,10 @@ def scenario(rom, native, module, names):
         if valid:
             expected = guard[:17]+data[32+index*8:40+index*8]+guard[25:]
         actions.extend([
-            {"write": ["80197000", guard.hex()]},
+            {"write": ["8019B000", guard.hex()]},
             {"call": {"address": symbols["af_load_display_name"],
-                      "arguments": [0 if null else 0x80197011, capacity, npc], "expect_return": int(valid)}},
-            {"read": ["80197000", len(guard)], "expect": expected.hex()}])
+                      "arguments": [0 if null else 0x8019B011, capacity, npc], "expect_return": int(valid)}},
+            {"read": ["8019B000", len(guard)], "expect": expected.hex()}])
     for npc, index in sorted(indices.items()):
         actions.append({"call": {"address": symbols["af_display_name_index"],
                                   "arguments": [npc], "expect_return": index}})
@@ -52,16 +52,16 @@ def scenario(rom, native, module, names):
     for index in range(8):
         damaged = bytearray(HEADER)
         damaged[index*4+3] ^= 1
-        actions.extend([{"write": ["80197200", damaged.hex()]},
+        actions.extend([{"write": ["8019B200", damaged.hex()]},
                         {"call": {"address": symbols["af_display_name_header_valid"],
-                                  "arguments": [0x80197200], "expect_return": 0}}])
+                                  "arguments": [0x8019B200], "expect_return": 0}}])
     actions.extend([
-        {"write": ["80197200", HEADER.hex()]},
-        {"call": {"address": symbols["af_display_name_header_valid"], "arguments": [0x80197200], "expect_return": 1}},
+        {"write": ["8019B200", HEADER.hex()]},
+        {"call": {"address": symbols["af_display_name_header_valid"], "arguments": [0x8019B200], "expect_return": 1}},
         {"call": {"address": symbols["af_display_name_header_valid"], "arguments": [0], "expect_return": 0}},
-        {"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+        {"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
         {"load_state": True}, {"resume": True}, {"wait": 2},
-        {"read": ["80197000", 4], "expect": "00000000"}])
+        {"read": ["8019B000", 4], "expect": "00000000"}])
     return actions
 
 

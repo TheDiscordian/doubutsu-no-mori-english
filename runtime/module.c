@@ -2,8 +2,8 @@
 typedef unsigned int u32;
 
 #define MODULE_RAM 0x801948E0u
-#define RESERVATION 0x4000u
-#define GUARD_VALUE 0xAF16C0DEu
+#define RESERVATION 0x8000u
+#define GUARD_VALUE 0xAF32C0DEu
 
 struct ModuleHeader {
     u32 magic, abi, reserved_bytes, linked_bytes;

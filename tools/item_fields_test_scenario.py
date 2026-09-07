@@ -22,7 +22,7 @@ def scenario(rom, module, names):
     verify_test_module(rom, module)
     symbols = module["symbols"]
     rows = int(symbols["item_rows"], 16)
-    main, other, source, buffer, cursor = 0x80142410, 0x80197000, 0x80197340, 0x80197410, 0x80197300
+    main, other, source, buffer, cursor = 0x80142410, 0x8019B000, 0x8019B340, 0x8019B410, 0x8019B300
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
     def write(address, data):
         actions.append({"write": [f"{address:08X}", data.hex()]})
@@ -134,7 +134,7 @@ def scenario(rom, module, names):
     for item, slot in ((0, 4), (0xFFFF, 4), (0x2200, 5), (0x2200, 0xFFFFFFFF)):
         call("800BB6A0", [item, slot])
         read(rows+64, expected+b" "*6)
-    read(0x801988D0, bytes.fromhex("AF16C0DE"*4))
+    read(0x8019C8D0, bytes.fromhex("AF32C0DE"*4))
     actions += [{"load_state": True}, {"resume": True}, {"wait": 2}]
     read(source, bytes(4))
     return actions

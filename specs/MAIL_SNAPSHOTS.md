@@ -5,9 +5,10 @@
 This is a lossless storage prototype for generated letters. The Python reference
 codec is `tools/mail_record.py`; the freestanding C implementation is
 `runtime/mail/record.c`. Full-letter assembly is implemented separately in
-`tools/mail_format.py` and `runtime/mail/format.c`. Both C files are deliberately
-outside the resident module's top-level source list and are not installed in a
-playable ROM. See [assembly semantics](MAIL_FORMAT.md).
+`tools/mail_format.py` and `runtime/mail/format.c`. Both C files are linked into
+the experimental resident module and pass isolated N64 CPU calls. Native
+generation, readers, editing, and persistence are not connected to these APIs.
+See [assembly semantics and executed coverage](MAIL_FORMAT.md).
 
 The snapshot stores immutable template identities plus the exact substitutions,
 article choices, and initial capitalization state captured when a letter is
@@ -41,7 +42,8 @@ are relative to that text area. Multibyte integers are big-endian.
 | used minus 2 | 2 | CRC-16/CCITT-FALSE of all preceding used bytes |
 | used | remaining | Zero padding to 122 bytes |
 
-Version two is the current uninstalled prototype. Version-one envelopes are
+Version two is the current prototype; gameplay does not generate these records.
+Version-one envelopes are
 rejected; no version-one catalog or generated-mail save format is released.
 The initial-capital bit preserves GAFE01's actual sticky capitalization state
 without making an existing letter depend on global state when reopened. It does
@@ -168,7 +170,9 @@ by this audit.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save
    behaviour, catalog upgrades, and original-hardware operation.
 
-The current resident module uses 7,488 bytes. Its native test fixtures reserve
-addresses beyond the first 8,192 bytes, so adding the codec requires a reviewed
-module/test-memory layout change. The standalone MIPS object has no undefined
-symbols or persistent data; compiling it does not prove runtime integration.
+The resident module uses 10,336 linked bytes within a 32 KiB reservation. The
+linker limits code/data/BSS to the first 24 KiB; isolated native-call fixtures
+and stack use the separate final 8 KiB. Actual codec, formatter, and selected
+English reference tests pass with complete output and memory/stack guard checks.
+The source inventory includes nested mail files and rejects stale artifacts.
+Neither compilation nor isolated API execution proves gameplay or save integration.

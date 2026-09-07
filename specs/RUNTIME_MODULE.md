@@ -14,8 +14,10 @@ selectable while module features are developed. The module includes bounded
 The retail `mainproc` calls `SystemHeap_Init(801948E0, 0026B720)` at RAM
 `800D6720`. The heap begins immediately after the static buffers segment and
 ends at `80400000`. The DMA manager is already running; no system-heap allocation
-has occurred. The module reserves the first `4000` hexadecimal bytes (sixteen
-KiB), then initialises the original heap at `801988E0`, size `00267720`.
+has occurred. The module reserves the first `8000` hexadecimal bytes (32 KiB),
+then initialises the original heap at `8019C8E0`, size `00263720`. The linker
+allows at most `6000` bytes for code/data/BSS, leaving a separate 8 KiB native-test
+area. `tools/runtime_layout.py` shares these bounds among host-side consumers.
 
 `osMemSize` stays four MiB. The game heap, framebuffers, and dynamic overlays
 continue to use the original allocators. Their allocations may move, so overlay
@@ -26,11 +28,12 @@ framebuffer at the top of RAM does not overlap this bottom-of-heap reservation.
 | --- | --- |
 | `801948E0..801949DF` | Versioned module header and startup observations |
 | `801949E0..80194BCF` | Relocated original watchdog, 496 bytes |
-| `80194BE0` onward | Original translation runtime code and data |
-| `801988D0..801988DF` | Four-word end guard, outside linked code/data/BSS |
-| `801988E0..803FFFFF` | Original system heap, reduced by sixteen KiB |
+| `80194BE0..8019A8DF` | Original translation runtime code and data, ending at its linked bound |
+| `8019A8E0..8019C8CF` | Zero-initialized isolated native-test area, outside linked code/data/BSS |
+| `8019C8D0..8019C8DF` | Four-word `AF32C0DE` end guard |
+| `8019C8E0..803FFFFF` | Original system heap, reduced by 32 KiB |
 
-The linker rejects code, constants, or BSS reaching the guard. The DMA file is
+The linker rejects code, constants, or BSS entering the test area. The DMA file is
 zero-padded to the entire reservation, so BSS starts cleared. Runtime startup
 records the old/new heap bounds and guard values for debugger assertions.
 Its header also describes the linked twenty-byte choice capacity and thirty-two
@@ -67,12 +70,18 @@ calls the module's startup function, updates `gSystemHeapSize`, and invokes the
 original `SystemHeap_Init` with the reduced region. A startup error stops before
 executing an incomplete module or creating an overlapping heap.
 
+The 32 KiB size is loaded with `ori`, not a signed `addiu` immediate. Heap
+adjustments use explicit unsigned-sized register addition/subtraction. The
+assembled instruction tests cover both DMA/cache lengths and heap arithmetic;
+runtime assertions check the recorded bounds, `gSystemHeapSize`, and the actual
+malloc arena's start pointer independently.
+
 The watchdog's normal caller runs only after module startup. Neither the
 watchdog nor the fault handler is removed.
 
 ## ROM contract
 
-The new uncompressed file uses VROM `02800000..02803FFF`. The retail DMA table
+The new uncompressed file uses VROM `02800000..02807FFF`. The retail DMA table
 contains 3,374 entries and sixteen zero rows within its loaded allocation.
 Adding one entry and preserving the following zero terminator does not enlarge
 the table. DMA initialisation counts entries until the terminator.
@@ -82,6 +91,12 @@ bounds, source/patch hashes, re-extracted contents, CIC checksums, and UPS
 application. Source ROM files are never modified. Module artifacts remain in
 ignored build output; the runtime source, linker script, and build tool are
 versioned.
+
+The source inventory and compiler input list include nested C files and headers,
+including `runtime/mail/`. Source changes during compilation reject the build.
+The linked mail codec and full-letter assembler are callable APIs only: linking
+them does not install native mail creation/viewer/save hooks or enable wider
+mail-bank candidates.
 
 ## Validation
 

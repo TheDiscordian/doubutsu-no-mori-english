@@ -9,7 +9,7 @@ import struct
 
 def scenario(include_space=False):
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    sentence, text, graph, gfx_pp, gfx = 0x80197000, 0x80197200, 0x80197300, 0x80197310, 0x80197400
+    sentence, text, graph, gfx_pp, gfx = 0x8019B000, 0x8019B200, 0x8019B300, 0x8019B310, 0x8019B400
     char = sentence+0x48
     guard = b"FONT"*4
 
@@ -98,7 +98,7 @@ def scenario(include_space=False):
             call(0x800919D0, [command], address)
         for argument in (0, 7, 255):
             dispatch(bytes([0x7F, 0x67, argument]), 11+argument*0.5)
-        window, data, index = 0x80197800, 0x80197C00, 0x80197B80
+        window, data, index = 0x8019B800, 0x8019BC00, 0x8019BB80
         write(window, bytes(0x330))
         write(window+12, struct.pack(">I", data))
         write(data-16, guard)
@@ -114,9 +114,9 @@ def scenario(include_space=False):
         read(data+0x410, guard)
     read(gfx-16, guard)
     read(gfx+64, guard)
-    actions += [{"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+    actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 

@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 199 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 209 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -61,7 +61,7 @@ user's direction. The production build retains the approved spacing metrics.
   complete reference coverage and the native final terminator are checked.
   The purchase confirmation has a one-record approval preserving its small-print
   radio aside, repeated native emotions, and unchanged outgoing explanation link.
-- Experimental resident runtime module with a verified new DMA entry, sixteen-KiB
+- Experimental resident runtime module with a verified new DMA entry, 32 KiB
   heap reservation, preserved watchdog, source/build guards, and linker bounds.
   Four-MiB boot and the complete train-to-town regression pass with intact guards.
 - Seven English message date/time substitutions, including full month/weekday
@@ -181,13 +181,14 @@ user's direction. The production build retains the approved spacing metrics.
   classic English records fit the conservative sixteen-byte field bound, with
   the remaining record requiring actual source bounds. All 287 native command/
   copy calls pass, including complete ordinary/villager mail record copying.
-  The codec is not installed in the resident module. Record discrimination,
-  full-text reader integration, custom editing, and save integration remain.
+  The codec is linked into the resident module and passes isolated N64 CPU calls.
+  Record discrimination, full-text reader integration, custom editing, and save
+  integration remain.
 - The native mail-viewer audit verifies the board object's complete layout,
   field scans, read-mode branch, header-split clamp, and six-line/sixteen-character
   body limits against the actual overlay. Full-text viewer integration must
   decode before native normalization and preserve GameCube newline/width intent.
-- Standalone full-letter assembly in Python and C preserves complete template
+- Full-letter assembly in Python and resident C preserves complete template
   wording, explicit line breaks, header-name placement, and captured substitutions
   and articles. Thirteen actual English executable routines are hash-guarded;
   the supplied GameCube release's sticky capitalization is captured in snapshot
@@ -199,9 +200,13 @@ user's direction. The production build retains the approved spacing metrics.
   `0001` still require actual source-width evidence. Both C files cross-compile
   for VR4300 with no undefined symbols or mutable globals. All 287 native
   command/copy calls also pass with version-two envelopes and captured capital
-  state; the machine checkpoint is restored. The new C code is not yet
-  installed or executed as MIPS code; module/test-memory changes, catalog
-  identity review, generation/viewer hooks, and save validation remain.
+  state; the machine checkpoint is restored. The installed codec passes 215
+  N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
+  544 assertions, including every opcode and complete output. A separate run
+  passes 92 calls and 280 assertions for 46 English reference cases. Linked code
+  occupies 10,336 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  area and intact stack guards. Catalog identity review, generation/viewer hooks,
+  editing, and save validation remain; gameplay does not yet call these APIs.
 
 ## Current reference candidates
 

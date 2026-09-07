@@ -27,13 +27,32 @@ Offsets are hexadecimal. Every injected call checks this context again before
 changing registers. Unknown register layouts, thread pointers, IDs/states,
 entry instructions, and program counters fail. The record retains the original
 pause context and the verified test thread. Function return uses the temporary
-breakpoint at `801968E0`; the test stack starts at `80198880` and must be restored.
+breakpoint at `8019A8E0`; the test stack starts at `8019C880` and must be restored.
 Call failures retain the before/after registers and scratch stack for diagnosis.
+
+The module reserves 32 KiB; linked code/data/BSS may occupy at most 24 KiB.
+Native-call verification rejects smaller/older reservations, overlapping linked
+sizes, and module targets beyond the linked end. Fixture addresses and embedded
+pointers live in the separate final 8 KiB. Static JSON fixtures and generators
+are checked for obsolete test-region addresses, including decimal arguments.
+Emulator checkpoints from another ROM remain invalid after a layout change.
+
+Mail API tests place decoded records at `8019AA00`, wire envelopes at `8019AC00`,
+template descriptors at `8019AD00`, text sources at `8019AE00`, and full output
+at `8019B400`. Output ends before the low-stack guard at `8019B880`; the stack
+has four KiB available above that guard. The independent high-stack guard is at
+`8019C8B0`. All pointer-bearing structures use the actual big-endian o32 layout,
+not the host's pointer widths.
 
 No running-thread pointer, native scheduling field, or gameplay progression value
 is edited to obtain this context. The existing socket and process time bounds
 limit a missing frame breakpoint. Native behaviour and real hardware still need
 independent validation.
+
+Debugger socket startup has a bounded readiness wait while the exact emulator
+process remains live. A slow connection does not restart the emulator. Confirmed
+process exit, an expired readiness deadline, and unexpected protocol errors fail
+the test and preserve its logs.
 
 ## Exact debugger memory access
 

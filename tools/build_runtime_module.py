@@ -10,7 +10,8 @@ import subprocess
 from aflib import sha256, verified_rom
 from check_keyboard_assembly import IMAGE
 from runtime_module import (MODULE_INIT, MODULE_RAM, MODULE_VROM, RESERVATION,
-                            audit_watchdog_references, watchdog_bytes)
+                            audit_watchdog_references, watchdog_bytes, runtime_source_hashes)
+from runtime_layout import LINKED_LIMIT
 
 
 def main():
@@ -21,6 +22,7 @@ def main():
     rom = verified_rom(args.rom.read_bytes())
     audit = audit_watchdog_references(rom)
     out, source = args.output.resolve(), Path(__file__).resolve().parents[1]/"runtime"
+    source_hashes = runtime_source_hashes(source)
     out.mkdir(parents=True, exist_ok=True)
     (out/"watchdog.bin").write_bytes(watchdog_bytes(rom))
     common = ["docker", "run", "--rm", "--network", "none", "--user", f"{os.getuid()}:{os.getgid()}",
@@ -33,12 +35,14 @@ def main():
         return result.stdout
     compiler = run("gcc", "--version").splitlines()[0]
     c_objects = []
-    for path in sorted(source.glob("*.c")):
-        name = path.stem+".o"
+    for path in sorted(source.rglob("*.c")):
+        relative = path.relative_to(source)
+        name = relative.with_suffix('.o').as_posix()
+        (out/relative.parent).mkdir(parents=True, exist_ok=True)
         run("gcc", "-c", "-Os", "-EB", "-mabi=32", "-march=vr4300", "-mfix4300", "-G0",
             "-mno-abicalls", "-fno-pic", "-ffreestanding", "-fno-builtin", "-fno-common",
             "-fno-stack-protector", "-ffunction-sections", "-fdata-sections", "-Wall", "-Wextra", "-Werror",
-            "-I/source", "/source/"+path.name, "-o", name)
+            "-I/source", "/source/"+relative.as_posix(), "-o", name)
         c_objects.append(name)
     for name in ("header", "watchdog", "bootstrap"):
         run("as", "-EB", "-mabi=32", "-march=vr4300", "-I", "/out", "-o", name+".o", "/source/"+name+".s")
@@ -53,17 +57,22 @@ def main():
     if symbols.get("af_runtime_init") != MODULE_INIT or symbols.get("__module_start") != MODULE_RAM:
         raise ValueError("Runtime module link addresses do not match the bootstrap")
     binary = (out/"module.bin").read_bytes()
-    if len(binary) > RESERVATION-16 or symbols["__module_end"] > MODULE_RAM+RESERVATION-16:
+    if len(binary) > LINKED_LIMIT or symbols["__module_end"] > MODULE_RAM+LINKED_LIMIT:
         raise ValueError("Runtime module exceeds reserved RAM")
+    undefined = run("nm", "--undefined-only", "module.elf")
+    if undefined.strip():
+        raise ValueError("Runtime module has undefined symbols: "+undefined)
     binary = binary.ljust(RESERVATION, b"\0")
     (out/"module.bin").write_bytes(binary)
     (out/"module.asm").write_text(run("objdump", "-d", "module.elf"))
     (out/"bootstrap.asm").write_text(run("objdump", "-d", "-j", ".bootstrap", "bootstrap.o"))
+    if runtime_source_hashes(source) != source_hashes:
+        raise ValueError("Runtime sources changed during compilation; rebuild the module")
     report = {"source_sha256": sha256(rom), "module_sha256": sha256(binary),
               "bootstrap_sha256": sha256((out/"bootstrap.bin").read_bytes()),
               "ram": f"{MODULE_RAM:08X}", "vrom": f"{MODULE_VROM:08X}", "reserved_bytes": RESERVATION,
               "linked_bytes": symbols["__module_end"]-MODULE_RAM, "compiler": compiler, "toolchain_image": IMAGE,
-              "runtime_sources": {p.name: sha256(p.read_bytes()) for p in sorted(source.iterdir()) if p.is_file()},
+              "runtime_sources": source_hashes,
               "symbols": {name: f"{value:08X}" for name, value in sorted(symbols.items())}, "audit": audit,
               "status": "experimental; boot, heap, gameplay, and hardware validation required"}
     (out/"module.json").write_text(json.dumps(report, indent=2)+"\n")

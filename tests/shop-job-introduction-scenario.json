@@ -7,6 +7,6 @@
     {"snapshot_choices": true},
     {"capture": "job-introduction-{index:02d}.png"}
   ]},
-  {"read": ["801988D0", 16], "expect": "AF16C0DEAF16C0DEAF16C0DEAF16C0DE"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
   {"save_state": true}
 ]

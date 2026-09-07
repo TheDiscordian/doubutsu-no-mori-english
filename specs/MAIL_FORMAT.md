@@ -5,8 +5,8 @@
 `tools/mail_format.py` and `runtime/mail/format.c` assemble complete header,
 body, and footer text from a decoded snapshot and explicitly identified template
 parts. The C formatter is freestanding and has no mutable global state. It is
-not linked into the resident module or connected to native mail creation,
-viewing, editing, excerpts, or saves.
+linked into the resident module and passes isolated N64 CPU calls. Native mail
+creation, viewing, editing, excerpts, and saves are not yet connected to it.
 
 `tools/mail_reference.py` prepares source-verified local references from the
 supplied English disc. It does not assign release catalog identities, approve
@@ -14,6 +14,8 @@ native/GameCube semantic matches, or enable wider ordinary-bank imports.
 `tools/check_mail_assembly.py` cross-compiles both C files with the pinned
 VR4300/o32 Docker toolchain and records object/source hashes, undefined symbols,
 sections, and compiler-reported stack usage. Compilation is not MIPS execution.
+`tools/mail_runtime_test_scenario.py` separately executes the installed functions
+with big-endian o32 structures, guarded buffers, and complete checkpoint restore.
 
 ## Reference semantics
 
@@ -115,15 +117,28 @@ longer than the reference storage capacity is preserved for subsequent layout
 review, not silently shortened. The separate exact field-union audit covers
 snapshot storage feasibility, not every rendered line width.
 
+### Resident N64 CPU coverage
+
+The resident codec passes 215 calls and 303 memory assertions across 779 recorded
+steps, including all field slots, lengths, unaligned envelopes, exact capacity,
+corruption, rejection, and aliasing. The resident formatter passes 350 calls and
+544 assertions across 1,652 steps, including every opcode and complete output.
+A separate source-verified run passes 92 calls and 280 assertions across 611
+steps for 46 selected English reference cases. Those selections include long
+outputs, all twelve native reply groups, both capitalization states, and two
+classic `0001` probes whose actual source-width limits remain unresolved.
+
+The module reserves 32 KiB, with a linker-enforced 24 KiB code/data/BSS bound and
+a separate 8 KiB test area. Stack and buffer guards pass; these isolated calls
+do not establish gameplay mail integration or hardware compatibility.
+
 ## Integration remaining
 
-1. Extend and verify resident-module/test memory layout, then execute the C
-   snapshot codec and formatter on the N64 CPU path.
-2. Build immutable catalog resources, review native/reference identities, retain
+1. Build immutable catalog resources, review native/reference identities, retain
    complete source hashes, and resolve the rejected glyph rows.
-3. Capture wider actual fields, articles, template selections, and initial
+2. Capture wider actual fields, articles, template selections, and initial
    capitalization during generation; choose a verified record discriminator.
-4. Decode before native viewer normalization; connect complete header/body/footer
+3. Decode before native viewer normalization; connect complete header/body/footer
    drawing and every excerpt, editing, grading, and delivery consumer.
-5. Verify real save/reload, existing saves, gifts, storage, travel, upgrades, and
-   original hardware. The standalone formatter proves none of these by itself.
+4. Verify real save/reload, existing saves, gifts, storage, travel, upgrades, and
+   original hardware. Isolated formatter calls prove none of these by themselves.

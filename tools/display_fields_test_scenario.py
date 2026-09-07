@@ -21,9 +21,9 @@ def scenario(rom, native, module, names, advances):
     indices = {0xE000+i: i for i in range(216)}
     indices.update({r[0]: 216+i for i, r in enumerate(special_table(native))})
     actions = [{"wait": 8}, {"save_state": True}, {"pause_game_thread": True}]
-    actor, animal, window = 0x80197000, 0x80197180, 0x80197200
-    output, cursor, text = 0x801971C0, 0x801971A0, 0x80197610
-    game, graph, gfx = 0x80197A40, 0x80197A60, 0x80197D80
+    actor, animal, window = 0x8019B000, 0x8019B180, 0x8019B200
+    output, cursor, text = 0x8019B1C0, 0x8019B1A0, 0x8019B610
+    game, graph, gfx = 0x8019BA40, 0x8019BA60, 0x8019BD80
     guard = b"EDGE"*4
     def write(address, value):
         actions.append({"write": [f"{address:08X}", value.hex()]})
@@ -52,13 +52,13 @@ def scenario(rom, native, module, names, advances):
         read(output-16, guard+expected+guard)
     def setup(expected):
         write(window-16, guard+bytes(0x300)+guard)
-        write(0x80198874, b"EDGE")
+        write(0x8019C874, b"EDGE")
         call(0x8009D308, [window, actor, 1])
         name = expected.rstrip(b" ")
         width = sum(advances[f"{c:02X}"] for c in name)
         width += width % 2
         read(window+0x20, struct.pack(">IIIff", actor, 1, len(name), 61+(72-width)/2, 64))
-        read(0x8019886C, expected+b"EDGE")
+        read(0x8019C86C, expected+b"EDGE")
         read(window-16, guard)
         read(window+0x300, guard)
     def insertion(expected, index=0, suffix=b"tail", pointer=actor, entry="af_copy_talk_name"):
@@ -126,17 +126,17 @@ def scenario(rom, native, module, names, advances):
     # descending data pointer as well as appending display-list commands.
     write(graph+0x290, struct.pack(">4I", 1536, gfx, gfx, gfx+1536))
     write(gfx-16, guard+bytes(1536)+guard)
-    write(0x80198880, b"EDGE")
+    write(0x8019C880, b"EDGE")
     call(0x800A2BB0, [window, game, 0])
-    read(0x80198878, name+b"EDGE")
+    read(0x8019C878, name+b"EDGE")
     read(gfx-16, guard)
     read(gfx+1536, guard)
     read(graph+0x29C, struct.pack(">I", gfx+1536-8*64))
     read(graph+0x298, struct.pack(">I", gfx+24+8*72))
     actions += [{"read": [f"{gfx:08X}", 1536]},
-                {"read": ["801988D0", 16], "expect": "AF16C0DE"*4},
+                {"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
-                {"read": ["80197000", 4], "expect": "00000000"}]
+                {"read": ["8019B000", 4], "expect": "00000000"}]
     return actions
 
 
