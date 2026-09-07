@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 245 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 252 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -168,7 +168,8 @@ user's direction. The production build retains the approved spacing metrics.
   Incremental result files are atomically replaced for concurrent observers.
 - The mail audit verifies the 164-byte native record and contiguous 10/96/16-byte
   header/body/footer fields against actual instructions. Ten routine inventories
-  cover assembly, free strings, excerpts, clearing, and copying; eight bank-size
+  cover assembly, free strings, the separate gyroid/demo message setter,
+  clearing, and copying; eight bank-size
   reports distinguish shared numeric IDs from GameCube-only records. Complete
   command-table validation rejects unsupported mail opcodes independently of
   main-dialogue capabilities, preventing unsupported-token conversion stalls.
@@ -210,7 +211,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 22,688 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 23,104 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -249,10 +250,23 @@ user's direction. The production build retains the approved spacing metrics.
   drawing, and non-read forwarding regressions also pass. The experimental split marker is not a released
   save format: generation, all other readers, editing, delivery, and persistence
   remain. See [full reader design](../specs/MAIL_READER.md).
+- Home-gyroid owner-message display uses GameCube-style measured wrapping in
+  its unchanged sixty-eight-byte temporary field. Explicit newlines and spaces
+  remain, the original sixty-four-byte saved/editor limit is unchanged, and
+  overlapping source/destination is safe. Three thousand host cases match the
+  pinned English formatter with the native capacity. Native tests pass 47 calls
+  and 165 assertions, including real dialogue insertion at the exact message
+  limit, source preservation, and stack/module guards. The new build passes
+  train-to-town and the complete snapshot-reader and ordinary-layout regressions.
+  Ordinary other-owner interaction, the longer English default, and wider custom
+  storage/editing remain. The audit distinguishes this routine from actual
+  stored-letter consumers; separate NPC reply and letter-quest grading paths
+  still require complete-text handling. See [gyroid display](../specs/GYROID_MESSAGE.md)
+  and [NPC letter readers](../specs/MAIL_NPC.md).
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-reader-final-pilot/`
+The current experimental resident-module pilot in `build/gyroid-message-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592

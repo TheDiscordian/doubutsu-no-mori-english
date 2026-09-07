@@ -154,7 +154,8 @@ class ModuleRetailTests(unittest.TestCase):
         for address, size in ((0x800919D0, 8), (0x8009D88C, 8),
                               (0x800BB6A0, 8), (0x800A1820, 4),
                               (0x8009D324, 4), (0x800A2BCC, 4),
-                              (0x8009D334, 4), (0x800A1100, 4), (0x800A114C, 4)):
+                              (0x8009D334, 4), (0x800A1100, 4), (0x800A114C, 4),
+                              (0x8009DA94, 8)):
             broken = dict(replacements)
             partial = bytearray(code)
             partial[address-CODE_RAM:address-CODE_RAM+size] = bytes(size)

@@ -77,6 +77,8 @@ class MailAuditTests(unittest.TestCase):
                              ("set_free_string", 54), ("clear_mail", 39), ("copy_mail", 30)):
             self.assertEqual(len(result["references"][name]["callers"]), count)
         self.assertTrue(all(not r["literal_pointers"] for r in result["references"].values()))
+        self.assertEqual(result['gyroid_message']['saved_source_bytes'], 64)
+        self.assertIn('neither identified caller', result['references']['set_message_mail']['status'])
         for name in ("super", "mail", "ps"):
             bank = result["banks"][name]
             self.assertEqual((bank["native_records"], bank["reference_records"]), (544, 982))

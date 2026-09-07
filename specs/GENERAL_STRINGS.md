@@ -42,6 +42,11 @@ starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,
 `03D4`, `03F4`, and `03B4`. These are handbill fields, not the message window's
 similarly named free-string storage.
 
+The gyroid's other-owner display setter uses measured pixel wrapping while
+preserving manual newlines and its native 68-byte temporary field. It still
+receives the original 64-byte saved message; the full English default and wider
+custom editing remain unimplemented. See [gyroid message](GYROID_MESSAGE.md).
+
 ## Acceptance
 
 Do not globally raise string capacity or import every longer entry. Each group

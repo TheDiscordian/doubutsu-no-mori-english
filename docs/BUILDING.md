@@ -172,6 +172,14 @@ the source directory stays unchanged. `--seed-state <test-directory>` resumes
 an emulator checkpoint only when its recorded ROM matches the tested ROM.
 Checkpoints are not FlashRAM save/reload validation.
 
+`tools/gyroid_message_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates native entry/insertion tests for measured home-gyroid message wrapping.
+It verifies the installed hook, uses the actual native text insertion routine,
+checks full source/destination and stack guards, and restores its checkpoint.
+Its `--module` option selects the matching module manifest when not using
+`build/runtime-module/module.json`. This tests the existing saved-message
+capacity; it does not install the longer English default or a wider editor.
+
 Use `--scenario tests/english-keyboard-scenario.json --seconds 410` for the
 English-entry sequence. Generated `results.json` records ROM hash, message
 snapshots, memory assertions, and captures. The controller test mapping is in

@@ -9,6 +9,7 @@ from english_runtime import ChoiceLayout, GuardedCode, SOURCE_HASHES
 from textcodec import command_info
 from code_sections import code_segments
 from runtime_layout import MODULE_RAM, MODULE_VROM, RESERVATION, LINKED_LIMIT
+from gyroid_message import evidence as gyroid_evidence
 
 WATCHDOG_START, WATCHDOG_END = 0x800D64E0, 0x800D66D0
 BOOTSTRAP_RAM = WATCHDOG_START+16
@@ -28,7 +29,7 @@ COMMAND_HOOKS = {0x8009034C: "af_code_size", 0x800903CC: "af_code_attribute",
                  0x800A21C0: "af_dispatch_command", 0x800A054C: "af_cancel_order",
                  0x8009FA18: "af_message_close_short", 0x8009FA38: "af_message_close_long",
                  0x800A28D4: "af_message_wait_clear", 0x8009D88C: "af_set_item_str",
-                 0x800BB6A0: "af_quest_set_item"}
+                 0x800BB6A0: "af_quest_set_item", 0x8009DA94: "af_set_gyroid_message"}
 HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800903CC, 0x800903E4), (0x800A21C0, 0x800A223C),
                 (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C),
@@ -36,7 +37,8 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18),
                 (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0),
                 (0x8009D308, 0x8009D3B4), (0x800A2BB0, 0x800A2C4C),
-                (0x800A10D8, 0x800A1124), (0x800A1124, 0x800A1170))
+                (0x800A10D8, 0x800A1124), (0x800A1124, 0x800A1170),
+                (0x8009DA94, 0x8009DBA4))
 
 
 def module_command_info(rom):
@@ -133,6 +135,7 @@ def runtime_source_hashes(source):
 
 
 def add_runtime_module(rom, replacements, directory):
+    gyroid = gyroid_evidence(rom)
     report = json.loads((directory/"module.json").read_text())
     data = (directory/"module.bin").read_bytes()
     bootstrap = (directory/"bootstrap.bin").read_bytes()
@@ -213,6 +216,8 @@ def add_runtime_module(rom, replacements, directory):
     report["date_scope"] = "Seven message substitutions; other UI formatter callers remain native"
     report["display_name_scope"] = "Two nameplate consumers and bounded main-message insertion; shared choice and saved-name APIs remain native"
     report["catchphrase_scope"] = "Main-message default display only; shared choices and four-byte saved fields remain native"
+    report["gyroid_message"] = {**gyroid, 'wrap_threshold_pixels': 186,
+                                'status': 'Measured display wrapping; native saved message/editor capacity unchanged'}
     report["code_changes"] = code.changes
     return {MODULE_VROM: data}, report
 

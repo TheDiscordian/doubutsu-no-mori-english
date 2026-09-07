@@ -1396,6 +1396,74 @@
   handling, native generation, lossless editing, delivery, actual saving,
   original hardware, and public release preparation remain required.
 
+### Gyroid owner-message wrapping and actual NPC letter-reader distinction
+
+- Traced both `mMsg_Set_mail_str` callers through their actual MIPS arguments.
+  The sample actor supplies static sixty-four-byte text; the home gyroid supplies
+  its saved owner message, not `Mail_c` text. Added complete caller-file and
+  instruction guards, corrected the mail-audit classification, and documented
+  the still-separate saved-message/editor capacity. No snapshot decoder is
+  installed at this unrelated routine.
+- Implemented the English reference's after-glyph `width > 186` wrapping rule
+  using the actual native font width routine. Manual/blank lines and spaces stay
+  intact. The destination remains sixty-eight bytes and both callers still
+  supply sixty-four saved/static bytes. Output staging preserves overlapping
+  source/destination and rejects invalid widths without partial output. The
+  original row limit is retained; no wider default/custom text is imported.
+- Disassembled the supplied 300-byte PowerPC formatter to verify capacity,
+  proportional width mode, strict threshold, and row limits. Host comparisons
+  execute the unchanged pinned reference C function with the native destination
+  layout/capacity. All 3,000 varied-width cases agree. All 256 byte values,
+  lengths through sixty-eight, explicit newlines, boundary widths, invalid
+  inputs, and source overlaps pass separate tests. Instruction mutations fail
+  independently of the containing hashes. An initial reference compilation
+  rejected its `for (dst; ...)` no-effect expression under `-Werror`; only that
+  warning is permitted for the unchanged local reference, not production code.
+- The new N64 function is 400 bytes, with a 128-byte frame, no undefined
+  symbols, and no mutable globals. Linked module size is 23,104 bytes, an
+  increase of 416 including alignment; the 32 KiB reservation and final 8 KiB
+  test area remain unchanged. Independent module builds match. Module SHA-256:
+  `bbf7b6cabd88d9558c499656c629d978d995c8240c493d7522415b538ad0343a`.
+  Bootstrap SHA-256 remains
+  `f38de0d2f252c4b9c4e596d85f5ae3f66f9ac27a680d30e874d2f6f476a4cb92`.
+  The default module artifacts match `build/runtime-module-gyroid/`; the
+  previous reader module remains in `build/runtime-module-reader-repeat/`.
+- `build/gyroid-message-pilot/` retains all 10,405 edits, four optional resources,
+  approved font/metrics, and full snapshot reader. ROM SHA-256:
+  `1e008a8e6da7f3b800c16b2d777ca2003a618c084e785d68af626b1345833f1a`.
+  UPS SHA-256:
+  `e2309bae9e124ed3a7bb24a7d01bec47fb6d3f142aa83038b777859ea47c2fca`.
+  The independent `build/gyroid-message-repeat-pilot/` has identical artifacts.
+- `smoke-gyroid-message-full-01` passes 188 recorded train-to-town steps and all
+  ten acceptance checks. Four-MiB memory, module readiness, actual reduced malloc
+  arena, and module guards pass. This is the matching-ROM town checkpoint;
+  FlashRAM remains blank, not a validated game save.
+- `smoke-gyroid-message-native-01` passes 297 steps: thirty-eight installed
+  setter calls and nine actual native dialogue-insertion calls, with 165
+  assertions. Exact 1,024-byte message insertion, every output/source byte,
+  overlapping sources, negative/oversized lengths, invalid pointers/slots, and
+  stack/module guards pass. This run starts fresh, pauses the verified graph
+  thread, uses isolated fixtures, and restores its checkpoint. It does not
+  simulate a normal visit to another player's home gyroid.
+- `smoke-gyroid-message-reader-01` passes all six real letter-window probes
+  across 156 steps, including full-reference pagination, corrupt-record errors,
+  unchanged sources/preferences, and the read-only edit-open safeguard.
+  `smoke-gyroid-message-layout-01` passes 554 steps, twenty-eight native calls,
+  and 436 assertions covering ordinary headers, measured body/footer vertices,
+  non-read forwarding, and stack/graphics/module guards. Both restore the
+  matching town checkpoint and leave FlashRAM blank.
+- The initial complete host suite passes 251 tests in 79.119 seconds. The
+  additional native-scenario mutation guard also passes with all six gyroid
+  tests, for seven targeted tests in 3.220 seconds.
+  The final full suite passes 252 tests in 71.214 seconds.
+- Traced actual NPC letter consumption independently: the send path passes
+  `Mail_c+34` to reply grading and later to letter-quest scoring. The GameCube
+  ordinary reply uses its seven-check English scorer, but its quest helper still
+  uses the separate length/word-hit grader. Recorded function hashes and call
+  sites in `specs/MAIL_NPC.md`. Neither path is ported or snapshot-aware yet;
+  native snapshot generation remains disabled. Normal delivery, lossless editing,
+  saving, the longer gyroid default, and hardware validation remain required.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

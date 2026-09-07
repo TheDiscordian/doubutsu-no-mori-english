@@ -6,8 +6,8 @@ Preserve complete English GameCube letter wording and intentional line breaks,
 with correct recipients, senders, substitutions, gifts, delivery, storage,
 editing, and save/reload. Shortening letters or truncating expanded text is not
 the storage solution. Default letters, assembled villager replies, player-written
-letters, NPC saved letter bodies, post-office storage, and message-dialogue
-excerpts all require coverage.
+letters, NPC saved letter bodies, post-office storage, and any dialogue
+consumers all require coverage.
 
 ## Verified native record
 
@@ -29,8 +29,10 @@ field offsets; do not use those comments as native layout evidence.
 
 The English GameCube capacities are defined by the pinned `m_mail.h` and used
 through `mHandbill_Load_HandbillFromRom`. They do not imply that the N64 record
-can accept larger text. The native `mMsg_Set_mail_str` has a separate 68-byte
-message excerpt, while NPC-owned saved letters also copy 96-byte bodies.
+can accept larger text. NPC-owned saved letters also copy 96-byte bodies.
+The separately named `mMsg_Set_mail_str` writes a 68-byte gyroid/demo message
+field; neither identified caller supplies stored letter text. See
+[gyroid-message evidence](GYROID_MESSAGE.md).
 
 ## Native reference inventory
 
@@ -46,7 +48,7 @@ It records full source hashes, call addresses, and surrounding instructions:
 | Body loader | `80093DA8` | 2 |
 | Composite NPC letter assembly | `800944B8` | 1 |
 | Handbill free-string setter | `80092D10` | 54 |
-| Message mail excerpt setter | `8009DA94` | 2 |
+| Gyroid/demo message setter, not stored letters | `8009DA94` | 2 |
 | Mail clear | `8009C384` | 39 |
 | Mail copy | `8009C67C` | 30 |
 
@@ -54,6 +56,9 @@ No aligned literal pointers to these ten routines are found. This is not an
 inventory of every inline field access or structure copy. Calls to the shared
 memory routines, stack/static/persistent allocations, rendering, and editor
 destinations still need their own proofs before changing the representation.
+The [NPC reader investigation](MAIL_NPC.md) distinguishes ordinary reply grading
+from the separate letter-quest score path; both consume the native body pointer
+and require complete-text handling before snapshot generation is enabled.
 
 ## Text-bank evidence
 
