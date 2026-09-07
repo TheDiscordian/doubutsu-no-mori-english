@@ -19,6 +19,7 @@ from extended_items import install as install_extended_items
 from display_names import install as install_display_names
 from catchphrases import install as install_catchphrases
 from mail_catalog import install as install_mail_catalog
+from mail_view_patch import install as install_mail_view
 from reference_matches import load_matches
 from controller_adaptations import validate_controller_candidate
 
@@ -109,6 +110,7 @@ def main():
     parser.add_argument("--display-names", type=Path, help="Directory containing names.bin and names.json for the eight-byte display-name resource")
     parser.add_argument("--catchphrases", type=Path, help="Directory containing the full default catchphrase display resource")
     parser.add_argument("--mail-catalog", type=Path, help="Directory containing the registered immutable English mail catalog")
+    parser.add_argument("--english-mail-layout", action="store_true", help="Experimental pixel-width body/footer in read mode; native editor and saved fields unchanged")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
@@ -129,6 +131,8 @@ def main():
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
+    if args.english_mail_layout:
+        report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'))
     if args.extended_items:
         report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
     if args.display_names:

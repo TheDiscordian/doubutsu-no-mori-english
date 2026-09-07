@@ -1226,6 +1226,82 @@
   discrimination, semantic matches, generation, full-text viewing, editing, and
   persistence remain required; gameplay does not yet call the restoration API.
 
+### Read-only English mail layout and actual letter-window checks
+
+- Added an optional read-only body/footer renderer using the approved native
+  proportional advances. It preserves explicit newlines, blank lines, spaces,
+  six lines, sixteen-pixel line spacing, and the 192-pixel paper width. The
+  footer aligns using its complete measured width. No font pixels, metrics,
+  reference wording, editor fields, or saved representation change. The actual
+  English executable's line/body/footer routines and width helper were checked
+  against the reference source; their hashes are recorded in `MAIL_VIEW.md`.
+- Only two native board JALs change. Their two obsolete `R_MIPS_26` entries are
+  removed, with the other fifty relocation entries, section sizes, file length,
+  and trailing size word preserved. Original overlay and relocation hashes,
+  exact calls, linked targets, and source-matched module bytes gate installation.
+  Read-open mode one selects the new functions; other modes tail-call the
+  unchanged original functions using the loaded caller's return address.
+- The four mail objects cross-compile without undefined symbols, mutable data,
+  or BSS. Combined object SHA-256:
+  `609b168d01685d3ced2e7bf4342f576dfff8577b29d2c8334a040e72904a44c8`.
+  Text-category size is 5,615 bytes. Compiler stack frames for drawing, line
+  scanning, body, and footer are 64, 48, 192, and 72 bytes. This is not a whole
+  gameplay call-stack high-water measurement. An initial host-test adapter macro
+  collided with the line structure's width member and was renamed. The stale
+  module/source guard correctly rejected installation until the module rebuilt.
+- `smoke-mail-view-native-02` passes 22 N64 CPU calls, 328 memory assertions,
+  and 425 recorded steps. It executes the real font renderer and verifies 264
+  vertex coordinates across 66 glyphs, graphics bounds, source preservation,
+  and stack/module guards. Cases include 33 Latin characters continuing onto
+  another line, narrow text remaining together, explicit blank lines/spaces,
+  and the footer's exact right edge. Eight non-read shim probes forward the
+  arguments to isolated recorder stubs; those probes do not execute the native
+  editor itself. The complete machine checkpoint is restored.
+- `smoke-mail-view-open-01` opened and closed a synthetic ordinary letter through
+  the actual submenu loader and observed unchanged letter/preference bytes.
+  However, its loose breakpoint logging allowed out-of-order stop responses;
+  that run is not accepted as proof of execution at the new hooks. The stricter
+  `open-02` run rejected an invalid bulk-register response. Installing a hook
+  breakpoint while the game was running allowed a stop before the next continue
+  packet, leaving another stop response queued. The test now pauses at the
+  verified graph-frame entry first, checks every breakpoint reply and exact
+  program counter, and records raw replies before validating them. No ROM change
+  was needed for this test-protocol correction.
+- `smoke-mail-view-open-03` passes 56 recorded steps. Three separate ordinary
+  synthetic letters open through native `800C4DD8`, use the actual loaded and
+  relocated submenu/board overlays, and reach both resident hook PCs each time:
+  `80194C5C` and `80194C80`. A, B, and START each close the window. All three
+  checks preserve the complete 164-byte source letter and the player's 28-byte
+  header/footer preferences. Wait state two, read mode one, source pointers,
+  full field lengths, and installed JALs are verified. The matching-ROM machine
+  checkpoint is restored; FlashRAM remains blank. This is an injected open
+  request, not ordinary delivery, inventory selection, saving, or hardware proof.
+- The module occupies 13,184 linked bytes within the unchanged 32 KiB
+  reservation, with eight KiB separately reserved for tests. Independent module
+  and bootstrap builds compare equal. Module SHA-256:
+  `8259c1571e5ab0034358c14b7aeadb8742868ee92b4da6a8710a81d0908969a1`.
+  Bootstrap SHA-256:
+  `f38de0d2f252c4b9c4e596d85f5ae3f66f9ac27a680d30e874d2f6f476a4cb92`.
+  The previous module remains in `build/runtime-module-pre-view-qNB74J/`.
+- `build/mail-view-pilot/` retains 10,405 candidate edits and all four optional
+  resources. ROM SHA-256:
+  `7e99d9e4e4e5799a7533d432dbf11619bba99941afd7aeeb74dba85c80423532`.
+  UPS SHA-256:
+  `176d5639344ab11ac11e120ff4ae8df906053bce5e157096d410c711970f7ba8`.
+  Independent builds in `build/mail-view-repeat-pilot/` compare equal. The fresh
+  `smoke-mail-view-full-01` train-to-town run passes 188 recorded steps and all
+  ten independent acceptance checks. Four-MiB memory, actual reduced malloc
+  arena, module readiness, and guards pass. Its matching checkpoint ends on
+  live arrival dialogue `07DD`; game-save/reload remains unvalidated.
+- The layout hooks still read native 96/16-byte body/footer fields. Full snapshot
+  decoding before normalization, a validated record discriminator, semantic
+  template matches, generation, longer-text viewing, custom editing, delivery,
+  and persistence remain required. This milestone does not complete mail or the
+  translation project.
+- The final full host suite passes 231 tests in 63.066 seconds, including the
+  three-button scenario's paused-breakpoint ordering and strict reply checks.
+  Earlier 226- and 230-test runs also passed before the final probe additions.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

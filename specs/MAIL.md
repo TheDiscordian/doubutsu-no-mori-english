@@ -103,6 +103,10 @@ connects saved snapshots to complete template data through guarded DMA reads.
 These APIs are installed in the resident module and pass isolated N64 CPU tests,
 but native gameplay does not call them. The discriminator, semantic catalog
 approval, full-text readers, editing, and persistence remain.
+The [read-layout hooks](MAIL_VIEW.md) provide measured body lines and footer
+alignment in read mode, with unchanged native editor paths. They pass actual
+letter-window opening and closing with a synthetic native record but do not
+yet decode snapshots or expand the stored body/footer fields.
 A display cache alone cannot preserve edited or delivered letters across saving,
 moving, and restarting. No old letter may regenerate different random words or
 current names when read. Custom editor storage remains unresolved separately.

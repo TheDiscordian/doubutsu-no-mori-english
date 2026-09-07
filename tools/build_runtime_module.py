@@ -44,9 +44,9 @@ def main():
             "-fno-stack-protector", "-ffunction-sections", "-fdata-sections", "-Wall", "-Wextra", "-Werror",
             "-I/source", "/source/"+relative.as_posix(), "-o", name)
         c_objects.append(name)
-    for name in ("header", "watchdog", "bootstrap"):
+    for name in ("header", "watchdog", "bootstrap", "mail_view_hooks"):
         run("as", "-EB", "-mabi=32", "-march=vr4300", "-I", "/out", "-o", name+".o", "/source/"+name+".s")
-    run("ld", "-EB", "-T", "/source/module.ld", "-Map=module.map", "-o", "module.elf", "header.o", "watchdog.o", *c_objects)
+    run("ld", "-EB", "-T", "/source/module.ld", "-Map=module.map", "-o", "module.elf", "header.o", "watchdog.o", "mail_view_hooks.o", *c_objects)
     run("objcopy", "-O", "binary", "module.elf", "module.bin")
     run("objcopy", "-O", "binary", "-j", ".bootstrap", "bootstrap.o", "bootstrap.bin")
     symbols = {}

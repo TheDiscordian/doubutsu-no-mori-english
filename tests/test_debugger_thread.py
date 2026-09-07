@@ -6,8 +6,8 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"tools"))
-from emulator_smoke import RSP
-from runtime_layout import RESERVATION
+from emulator_smoke import RSP, require_program_counter
+from runtime_layout import RESERVATION, TEST_RETURN, TEST_STACK
 
 
 class ThreadDebugger(RSP):
@@ -50,13 +50,24 @@ class ThreadDebugger(RSP):
             self.registers[37] = 0xFFFFFFFF00000000 | self.breakpoint
             if self.breakpoint == 0x800D334C and not self.force_wrong_thread:
                 self.pointer, self.thread_id = 0x80145630, 4
-            if self.breakpoint == 0x8019A8E0:
+            if TEST_RETURN <= self.breakpoint <= TEST_STACK-0x100:
                 self.registers[2] = 55
             return "S05"
         raise AssertionError(command)
 
 
 class DebuggerThreadTests(unittest.TestCase):
+    def test_observed_pc_requires_complete_registers_and_exact_target(self):
+        registers = [0]*71
+        registers[37] = 0xFFFFFFFF80194C5C
+        reply = ''.join(f'{v:016x}' for v in registers)
+        self.assertEqual(require_program_counter(reply,'80194C5C'),'80194C5C')
+        for value in ('S05',reply[:-1],'Z'+reply[1:]):
+            with self.assertRaisesRegex(ValueError,'register layout'):
+                require_program_counter(value,'80194C5C')
+        with self.assertRaisesRegex(ValueError,'observed PC'):
+            require_program_counter(reply,'80194C80')
+
     def test_frame_entry_records_origin_and_calls_restore_registers(self):
         debug = ThreadDebugger()
         record = debug.pause_game_thread()
@@ -83,6 +94,20 @@ class DebuggerThreadTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "graph-thread"):
             debug.pause_game_thread()
         self.assertIsNone(debug.breakpoint)
+
+    def test_alternate_return_is_bounded_and_restores_the_original_context(self):
+        debug = ThreadDebugger()
+        debug.pause_game_thread()
+        before = list(debug.registers)
+        result = debug.call('80096740', [], return_address=f'{TEST_RETURN+0x900:08X}')
+        self.assertEqual(result['return_value'], 55)
+        self.assertEqual(result['return_breakpoint'], f'{TEST_RETURN+0x900:08X}')
+        self.assertEqual(debug.registers, before)
+        for address in (0, TEST_RETURN-4, TEST_RETURN+1, TEST_STACK-0xFC, 0x80400000, True):
+            debug.commands.clear()
+            with self.assertRaisesRegex(ValueError, 'return breakpoint'):
+                debug.call('80096740', [], return_address=address)
+            self.assertEqual(debug.commands, [])
 
     def test_bad_running_thread_pointer_fails(self):
         for pointer in (0, 0x80300001, 0x803FFFF0):

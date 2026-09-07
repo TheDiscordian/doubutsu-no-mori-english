@@ -27,7 +27,10 @@ Offsets are hexadecimal. Every injected call checks this context again before
 changing registers. Unknown register layouts, thread pointers, IDs/states,
 entry instructions, and program counters fail. The record retains the original
 pause context and the verified test thread. Function return uses the temporary
-breakpoint at `8019A8E0`; the test stack starts at `8019C880` and must be restored.
+breakpoint at `8019A8E0`; an explicit test-only `return_address` may select an
+aligned address within the isolated test region, at most `8019C780`. This allows
+call-site tail shims to exercise relocated return-address arithmetic without
+writing outside test RAM. The test stack starts at `8019C880` and must be restored.
 Call failures retain the before/after registers and scratch stack for diagnosis.
 
 The module reserves 32 KiB; linked code/data/BSS may occupy at most 24 KiB.
@@ -51,6 +54,14 @@ complete output at `8019B800`. The low-stack guard is at `8019BE80`, leaving
 unchanged. It checks full output against the reference and never supplies host
 pointers as cartridge template descriptors.
 
+The read-layout scenario uses a 4,608-byte isolated graphics arena at `8019AEE0`
+and a low-stack guard at `8019C120`. It executes the real native font renderer
+and checks every vertex position as well as both arena pointers. A sparse fake
+submenu supplies only the board and menu-state offsets read by the hooks; it
+does not represent an allocated live submenu. The non-read tail-call probes use
+return breakpoint `8019B1E0` and small argument-recording targets inside the same
+test region. The original board code is not called by those forwarding probes.
+
 No running-thread pointer, native scheduling field, or gameplay progression value
 is edited to obtain this context. The existing socket and process time bounds
 limit a missing frame breakpoint. Native behaviour and real hardware still need
@@ -60,6 +71,15 @@ Debugger socket startup has a bounded readiness wait while the exact emulator
 process remains live. A slow connection does not restart the emulator. Confirmed
 process exit, an expired readiness deadline, and unexpected protocol errors fail
 the test and preserve its logs.
+
+Execution-observation breakpoints must be installed while paused. Installing one
+while running can produce a stop before the next continue command, then another
+stop on that continue, shifting later responses. The mail-window scenario uses
+the verified frame entry before installing its read-hook breakpoints. Generic
+commands support exact `expect_result` replies, and bulk `g` supports `expect_pc`
+against the complete 71-register packet. Replies are recorded before validation,
+including malformed or out-of-order replies; no such reply counts as execution
+evidence.
 
 ## Exact debugger memory access
 

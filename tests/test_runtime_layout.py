@@ -53,7 +53,8 @@ class RuntimeLayoutTests(unittest.TestCase):
     def test_nested_mail_sources_are_part_of_module_inventory(self):
         sources = runtime_source_hashes(ROOT/'runtime')
         for name in ('mail/record.c', 'mail/record.h', 'mail/format.c', 'mail/format.h',
-                     'mail/catalog.c', 'mail/catalog.h'):
+                     'mail/catalog.c', 'mail/catalog.h', 'mail/view.c', 'mail/view.h',
+                     'mail_view_hooks.s'):
             self.assertIn(name, sources)
 
     @unittest.skipUnless((ROOT/'build/runtime-module/bootstrap.bin').is_file(), 'Build the resident module first')
@@ -74,6 +75,7 @@ class RuntimeLayoutTests(unittest.TestCase):
         self.assertLessEqual(report['linked_bytes'], LINKED_LIMIT)
         self.assertFalse(any(module[LINKED_LIMIT:]))
         for name in ('af_mail_record_pack', 'af_mail_record_unpack', 'af_mail_format',
-                     'af_mail_restore', 'af_mail_catalog_header_valid'):
+                     'af_mail_restore', 'af_mail_catalog_header_valid', 'af_mail_next_line',
+                     'af_mail_body_hook', 'af_mail_footer_hook', 'af_mail_read_body', 'af_mail_read_footer'):
             address = int(report['symbols'][name], 16)
             self.assertTrue(MODULE_RAM+0x300 <= address < MODULE_RAM+report['linked_bytes'])

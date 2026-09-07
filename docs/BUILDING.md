@@ -106,6 +106,18 @@ generates complete snapshot-to-letter tests using actual cartridge DMA. The
 caller-owned workspace is separate from both output and the saved snapshot.
 The scenario preserves guards, checks full output, and restores its checkpoint.
 
+`--english-mail-layout` optionally enables measured-width body lines and footer
+alignment for native read mode only. It requires a rebuilt resident module and
+retains the native editor, saved field sizes, header, and explicit newlines.
+It does not yet decode generated snapshots. See [reader design](../specs/MAIL_VIEW.md).
+`tools/mail_view_test_scenario.py --rom <built-ROM> --output <ignored-json>` checks
+the compiled read hooks, actual font vertices, graphics bounds, and editor-mode
+argument forwarding. `tools/mail_open_test_scenario.py` generates a separate
+synthetic letter-open probe for a matching-ROM town checkpoint. It uses the
+actual submenu/board loader, verifies resident hook execution, exercises the
+three close buttons, checks unchanged letter/preferences, and restores the
+checkpoint. This is not ordinary mail delivery or a game-save test.
+
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under

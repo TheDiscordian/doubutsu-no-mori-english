@@ -184,7 +184,7 @@ by this audit.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save
    behaviour, catalog upgrades, and original-hardware operation.
 
-The resident module uses 11,872 linked bytes within a 32 KiB reservation. The
+The resident module uses 13,184 linked bytes within a 32 KiB reservation. The
 linker limits code/data/BSS to the first 24 KiB; isolated native-call fixtures
 and stack use the separate final 8 KiB. Actual codec, formatter, and selected
 English reference tests pass with complete output and memory/stack guard checks.

@@ -45,6 +45,17 @@ def write_results(directory, results):
     temporary.replace(directory/"results.json")
 
 
+def require_program_counter(registers, expected):
+    if (not isinstance(registers,str) or len(registers) != 71*16
+            or any(c not in '0123456789abcdefABCDEF' for c in registers)):
+        raise ValueError('Unknown debugger bulk register layout for PC assertion')
+    target = int(expected,16)
+    actual = int(registers[37*16:38*16],16)&0xFFFFFFFF
+    if actual != target:
+        raise ValueError(f'Unexpected observed PC: {actual:08X}, expected {target:08X}')
+    return f'{actual:08X}'
+
+
 class RSP:
     def __init__(self, port, timeout=5):
         self.sock = socket.create_connection(("127.0.0.1", port), timeout=timeout)
@@ -144,7 +155,7 @@ class RSP:
         finally:
             self.command("z"+breakpoint)
 
-    def call(self, address, arguments):
+    def call(self, address, arguments, *, return_address=TEST_RETURN):
         """Test-only o32 call in module scratch RAM; leaves the game paused.
 
         A checkpoint must restore the complete emulated machine afterwards.
@@ -152,6 +163,11 @@ class RSP:
         the installed ares build. No game save is used or modified by this API.
         """
         address = int(address, 16)
+        if isinstance(return_address, str):
+            return_address = int(return_address, 16)
+        if (type(return_address) is not int or return_address % 4
+                or not TEST_RETURN <= return_address <= TEST_STACK-0x100):
+            raise ValueError('Test return breakpoint must remain inside isolated scratch RAM')
         arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
         if (address % 4 or not 0x80051A80 <= address < TEST_RETURN or len(arguments) > 9
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
@@ -173,13 +189,13 @@ class RSP:
             raise ValueError("Native calls require pause_game_thread before test fixture writes")
         stack = TEST_STACK
         expected = dict(zip(range(4, 8), arguments[:4]))
-        expected.update({29: stack, 31: TEST_RETURN, 37: address})
+        expected.update({29: stack, 31: return_address, 37: address})
         if len(arguments) > 4:
             outgoing = b"".join(struct.pack(">I", value) for value in arguments[4:])
             self.write_memory(stack+16, outgoing)
         for index, value in expected.items():
             registers[index] = value | (0xFFFFFFFF00000000 if value & 0x80000000 else 0)
-        breakpoint = f"0,{TEST_RETURN:x},4"
+        breakpoint = f"0,{return_address:x},4"
         if self.command("Z"+breakpoint) != "OK":
             raise ValueError("Debugger rejected test return breakpoint")
         try:
@@ -191,7 +207,7 @@ class RSP:
             stopped = self.command("c")
             after = self.command("g")
             values = [int(after[i:i+16], 16) for i in range(0, len(after), 16)]
-            if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != TEST_RETURN:
+            if stopped[:3] not in ("T05", "S05") or values[37] & 0xFFFFFFFF != return_address:
                 stack_dump = self.read_memory(stack-0x100, 0x180).hex()
                 raise ValueError(f"Test function stopped unexpectedly: {stopped}, "
                                  f"PC={values[37]:016X}, SP={values[29]:016X}, RA={values[31]:016X}, "
@@ -200,7 +216,7 @@ class RSP:
             if values[29] & 0xFFFFFFFF != stack:
                 raise ValueError("Test function did not restore its stack")
             return {"test_only_function_call": f"{address:08X}", "arguments": arguments,
-                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": f"{TEST_RETURN:08X}",
+                    "return_value": values[2] & 0xFFFFFFFF, "return_breakpoint": f"{return_address:08X}",
                     "stack_restored": True, "requires_checkpoint_restore": True, "thread": thread}
         finally:
             self.command("z"+breakpoint)
@@ -684,6 +700,7 @@ def main():
         if args.post_scenario:
             actions += json.loads(args.post_scenario.read_text())
         needs_checkpoint_restore = False
+        test_mail_open = None
         def record(snapshot):
             results.append(snapshot)
             write_results(out, results)
@@ -708,7 +725,17 @@ def main():
                 results.append({"read": action["read"], "data": data,
                                 "assertion": "passed" if "expect" in action else "not_requested"})
             if "command" in action:
-                results.append({"command": action["command"], "result": debug.command(action["command"])})
+                result = {'command':action['command'],'result':debug.command(action['command'])}
+                # Keep malformed or out-of-order replies as failure evidence.
+                results.append(result)
+                write_results(out, results)
+                if 'expect_result' in action and result['result'] != action['expect_result']:
+                    raise ValueError(f"Unexpected debugger reply: {result!r}, "
+                                     f"expected {action['expect_result']!r}")
+                if 'expect_pc' in action:
+                    if action['command'] != 'g':
+                        raise ValueError('A PC assertion requires the bulk register command')
+                    result['verified_pc'] = require_program_counter(result['result'],action['expect_pc'])
             if action.get("pause_game_thread"):
                 results.append(debug.pause_game_thread())
             if "write" in action:
@@ -725,11 +752,29 @@ def main():
                 if not (out/"test.bs1").is_file():
                     raise ValueError("Test function calls require a saved emulator checkpoint")
                 call = action["call"]
-                result = debug.call(call["address"], call.get("arguments", []))
+                result = debug.call(call["address"], call.get("arguments", []),
+                                    return_address=call.get('return_address', TEST_RETURN))
                 needs_checkpoint_restore = True
                 results.append(result)
                 if "expect_return" in call and result["return_value"] != call["expect_return"]:
                     raise ValueError(f"Unexpected function return: {result['return_value']}")
+            if 'open_test_mail' in action:
+                from mail_view_smoke import open_test_mail
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native mail-open probes require a saved emulator checkpoint')
+                test_mail_open = open_test_mail(debug,action['open_test_mail'])
+                needs_checkpoint_restore = True
+                results.append(test_mail_open)
+            if action.get('snapshot_submenu'):
+                from mail_view_smoke import snapshot as submenu_snapshot
+                snapshot = submenu_snapshot(debug)
+                results.append({'submenu_snapshot':snapshot})
+                for field,expected in action.get('expect_submenu',{}).items():
+                    if snapshot.get(field) != expected:
+                        raise ValueError(f'Submenu {field}: {snapshot.get(field)!r}, expected {expected!r}')
+            if action.get('assert_test_mail_unchanged'):
+                from mail_view_smoke import verify_unchanged
+                results.append(verify_unchanged(debug,test_mail_open))
             if action.get("snapshot_message"):
                 snapshot = message_snapshot(debug)
                 results.append(snapshot)

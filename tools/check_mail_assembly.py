@@ -31,7 +31,7 @@ def main():
              '-mno-abicalls', '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common',
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
-    sources = ('record', 'format', 'catalog')
+    sources = ('record', 'format', 'catalog', 'view')
     for name in sources:
         run('gcc', *flags, '/source/'+name+'.c', '-o', name+'.o')
     run('ld', '-EB', '-r', '-o', 'mail.o', *(name+'.o' for name in sources))
