@@ -1,0 +1,252 @@
+[
+  {
+    "id": "message:0B9C",
+    "source_sha256": "665eedab27d470125b696909b62f9979d4301e9fc9a54d09b5f19b25f424b17e",
+    "translation": "{cmd:7F090000FF}There's a fishing tourney\nevery Sunday,{cmd:7F030C}\nbut do you know\n{cmd:7F0900000B}the rules?{cmd:7F16002F0069}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0BC5}{cmd:7F100BC6}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain weekly Sunday tournaments and the native tips/known-rules choices 002F/0069 with branches 0BC5/0BC6. The reference changes the second choice; do not import it. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:0BA7",
+    "source_sha256": "35407295161289e8427cea909b425d96dd8f0fe505802ed6f04a9541b6db3b40",
+    "translation": "{cmd:7F090000FF}Have you heard of\n{cmd:7F0900000B}Thirteenth Night?{cmd:7F0306} {cmd:7F1C}?{cmd:7F04}{cmd:7F090000FF}\nThe Fifteenth Night moon\nis perfectly round,{cmd:7F04}\n{cmd:7F02}but on Thirteenth Night,{cmd:7F0308}\nit's just a little\nless than full,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}Still,{cmd:7F0306} that slight\nlack of symmetry{cmd:7F0308}\n{cmd:7F09000014}makes it so dreamy\nand mysterious,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Hee hee.{cmd:7F030C}\nI wonder if you appreciate{cmd:7F0308}\nsuch subtle beauty,\n{cmd:7F1A},{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the contrast between full Fifteenth Night and nearly full Thirteenth Night, the mysterious asymmetry, and the sophistication joke. Do not substitute the reference's invitation or its added first-moon date fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:0BC5",
+    "source_sha256": "6f3e22cc06efc681f732e9a05f7ff93669f3b21f46634fdcc2209a82ea0042c4",
+    "translation": "{cmd:7F09000015}Well, well,{cmd:7F0308} the rules\naren't difficult,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\nCatch a big fish\nand show it to the judge.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}If it's bigger than\nany caught so far,{cmd:7F0308}\nyou'll get a prize,\n{cmd:7F030C}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}Don't think about anything.\nJust keep fishing.{cmd:7F0308}\n{cmd:7F09000015}Perfect rules for you,\n{cmd:7F1A},{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing reference's prize-at-the-end-of-the-day claim to the native comparison with fish caught so far. Keep the complete simple-rules explanation, the final teasing remark, and every native command. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:11A2",
+    "source_sha256": "df4aebc9f46c669b076662385ba424e353ee3b79fe19e4ddad1699e87aff7f4f",
+    "translation": "{cmd:7F090000FF}There's a fishing tourney\nevery Sunday in June.{cmd:7F0306}\nDo you know the rules?{cmd:7F16002F0069}{cmd:7F04}{cmd:7F0D}{cmd:7F0F11CA}{cmd:7F1011CB}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain every Sunday in June, choices 002F/0069, and branches 11CA/11CB. Do not add the reference catchphrase or change the known-rules choice. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:11A4",
+    "source_sha256": "71b13da2e3c3a66181e3e111889e47b953e0bea43c2d585df0bd3e7575934641",
+    "translation": "{cmd:7F09000007}Ah,{cmd:7F0306} morning aerobics\nwill be starting soon,\nwon't they,{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F160003004E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F11D4}{cmd:7F1011D5}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the approaching morning aerobics, agreement/refusal choices 0003/004E, and replies 11D4/11D5. The GameCube refusal ID differs. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:11AE",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "3082e486d396c7964a52968a8255f8acb4faccf220dc80e3d8dd63c87bc81bb5",
+    "translation": "{cmd:7F090000FF}We go moon viewing{cmd:7F0306}\ntwice a year, you know.{cmd:7F04}\nFirst comes the harvest moon,{cmd:7F030A}\nthen Thirteenth Night.\n{cmd:7F04}\n{cmd:7F02}This year's second viewing\nfalls on {cmd:7F3E} {cmd:7F3F}.{cmd:7F0306}\n{cmd:7F0900000B}You'll be coming, of course?{cmd:7F0308}\n{cmd:7F1C}?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}The moon won't be\nquite full this time,{cmd:7F0306}\nbut I think that gives it\nits own charm,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain both moon-viewing events, this year's converted second date in fields 18/19, the invitation, and the appeal of a nearly full moon. The reference substitutes the first event and an approaching Harvest Festival. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:11AF",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "4f08c8937d2b4ec024975762b30281257841899de26b1b1e3ab967dbcaca7ddc",
+    "translation": "{cmd:7F090000FF}On {cmd:7F3E} {cmd:7F3F},{cmd:7F0306}\nplease come to the pond,\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}We'll go moon viewing\nfrom six in the evening.{cmd:7F0306}\nThat night is Thirteenth Night.\n{cmd:7F0900000B}Did you know that?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}A moon that's just\na little less than full{cmd:7F0306}\nis very popular with\nmoon-viewing fans!{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}You really ought\nto see it for yourself!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the converted Thirteenth Night date in 3E/3F, pond gathering at 6 p.m., and admiration for the nearly full moon. Do not import the first-moon 3C/3D reference. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:11B1",
+    "source_sha256": "4940a871141de187bad7f133c403015e30612fc01257f9d8b99af263b2839bcf",
+    "translation": "{cmd:7F090000FF}The second Monday\nin October...{cmd:7F0306}\nDo you {cmd:7F0900000B}know what day that is?{cmd:7F0308}\n{cmd:7F1C}?{cmd:7F16002F0069}{cmd:7F04}{cmd:7F0D}{cmd:7F0F11CC}{cmd:7F1011CD}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native second Monday in October, not the reference autumnal equinox. Preserve choices 002F/0069 and replies 11CC/11CD; the existing native 11CD draft identifies Sports Day, the 9 a.m. start, and shrine plaza. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:1800",
+    "source_sha256": "c4f208519b8916a6311d9a052e46fb1bf96669a01ed8b3e117eb13e5728b3ff3",
+    "translation": "{cmd:7F09000016}Hold on!{cmd:7F0306} Have you ever\nentered a fishing tourney,\n{cmd:7F0308}{cmd:7F1C}?\n{cmd:7F16004C0052}{cmd:7F04}{cmd:7F0D}{cmd:7F0F182B}{cmd:7F10182C}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native fishing-experience question and choices 004C/0052 leading to 182B/182C. Do not replace the second native choice with GameCube 006C or add its separate demand page. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:180D",
+    "source_sha256": "dc321808dadb896212349e7d844047ceb772a199b33a2e8f38f02b67f3fd0f03",
+    "translation": "{cmd:7F090000FF}Thirteenth Night may sound\na little odd,{cmd:7F0306} but its\nnearly full moon is so cute!\nIt has plenty of fans!\n{cmd:7F04}\n{cmd:7F02}If you missed\nthe harvest moon,{cmd:7F0306}\nyou simply MUST see this one!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Thirteenth Night and a second opportunity after missing the harvest moon. The GameCube record instead discusses blue moons and adds a first-moon date. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:180E",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "c2799cbd67610dd34c58d53a6c426c96787ab268bb190b525751170432e0039c",
+    "translation": "{cmd:7F09000006}{cmd:7F0314}Come to think of it,{cmd:7F0306}\nisn't Thirteenth Night\ncoming up soon?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It's lunar month nine, day 13,{cmd:7F0306}\nso this year that means\n{cmd:7F3E} {cmd:7F3F},\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}If you're free,\nyou should go and see it,\n{cmd:7F1A}!{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain lunar ninth-month day 13 and the corresponding calculated second-moon date, followed by encouragement to attend. Keep native player/catchphrase order; do not import the first-moon date or extra reference pauses. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:270E",
+    "source_sha256": "1c648b128e861135201d74dc07c22cbaf6226fd08c58f891b58b1978393c1441",
+    "translation": "{cmd:7F090000FF}There's more moon viewing.{cmd:7F0310}\nLast month was Fifteenth Night.{cmd:7F0308}\nthis time it's Thirteenth Night.{cmd:7F04}\n{cmd:7F02}The Thirteenth Night moon{cmd:7F0304}\nisn't perfectly round.{cmd:7F030C}\nIt's just a little short of full,{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}but that's what gives it{cmd:7F0304}\nsuch understated charm!{cmd:7F0314}\nOnce you appreciate that,{cmd:7F0304}\nyou can call yourself a grown-up.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the second moon-viewing event after last month's Fifteenth Night, its nearly full moon, and the grown-up appreciation joke. The reference substitutes harvest timing and a first-moon date. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:270F",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "d0663ef431c4c0fe3613d86bf4e91275af67a1a440134e12e1fbbe9f5fcc3ac5",
+    "translation": "{cmd:7F090000FF}Ever{cmd:7F0304} heard of\nthe old lunar calendar?{cmd:7F0308}\n{cmd:7F1C}?{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}People didn't always{cmd:7F0304}\nuse the calendar we have now.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}We use the modern one,{cmd:7F0308}\nbut back when samurai\nhad topknots,{cmd:7F0304} people used\nthe lunar calendar{cmd:7F0304} instead.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Now,{cmd:7F0306} lunar month nine, day 13{cmd:7F0304}\nis Thirteenth Night.{cmd:7F0310}\nWe go moon viewing then, too.{cmd:7F04}\n{cmd:7F02}On our modern calendar,{cmd:7F0308}\nthis year it's\n{cmd:7F3E} {cmd:7F3F}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native old/modern calendar explanation, samurai-era comparison, lunar ninth-month day 13, and actual converted Thirteenth Night date. Do not replace it with the reference crop-harvesting/farmer story. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:27BC",
+    "source_sha256": "fed2bfc340cf71cab028940a0d15ee221ce807ecd9e8020dfdc1546165d332fd",
+    "translation": "{cmd:7F0900000A}{cmd:7F0308}Wow{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nSo many blossoms{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nIt's spring.{cmd:7F0306}\nSpring is really here.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}With all these flowers,{cmd:7F030C}\nthe cherry-blossom viewing\non the 6th{cmd:7F0308}\nis sure to be wonderful.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}{cmd:7F0305}Huh?{cmd:7F030C}{cmd:7F0900000B}{cmd:7F0304} Was it the 7th?{cmd:7F0310}\n{cmd:7F09000016}No, maybe the 5th?{cmd:7F0310}\n{cmd:7F0900000F}{cmd:7F0317}Hmm{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Well, going to the shrine{cmd:7F0306}\nall three days is a sure bet.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native spring reaction, uncertainty between the 6th, 7th, and 5th, and visiting the shrine on all three days. Do not add the reference literary aside, wishing well, catchphrase, or additional pages/pauses. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27D0",
+    "source_sha256": "e588d09181c781e92a9300540e9080880d33b4634fc1887dd1107236474f812d",
+    "translation": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F030C}\nthe 15th of the eighth\nlunar month...{cmd:7F0308}\n{cmd:7F0900000B}{cmd:7F0303}When is that this year?{cmd:7F1600690161}{cmd:7F04}{cmd:7F0D}{cmd:7F0F27EE}{cmd:7F1027EF}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the lunar eighth-month day 15 question and native choices 0069/0161 leading to 27EE/27EF. Replace the connected meteor-shower reference replies with native moon-viewing drafts. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27D3",
+    "source_sha256": "742af283b33011f328d93ae982928113d2b938c2d0d8ce86fc847f329c93aaa5",
+    "translation": "{cmd:7F090000FF}When we go moon viewing,{cmd:7F030C}\nthere are always dumplings\nright beside us,\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}so we'd better{cmd:7F0306}\nbe careful not to eat\nthe moon by mistake,\n{cmd:7F0306}{cmd:7F1A}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the dumplings-versus-moon food joke and native player field. The reference replaces this entire exchange with crop-harvesting exposition and added date/catchphrase fields. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27D6",
+    "source_sha256": "f57246feac3f25b657d73dc02193b2e83c10eb865e5de4fd3b9c82cb39588577",
+    "translation": "{cmd:7F09000015}So, are you\nreally into{cmd:7F030C}\nmatsutake mushrooms?{cmd:7F1600EF0162}{cmd:7F04}{cmd:7F0D}{cmd:7F0F27F0}{cmd:7F1027F1}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native question about liking matsutake, choices 00EF/0162, and replies 27F0/27F1. The existing approved GameCube 27F0 finder wordplay and 27F1 local-flavour reply remain unchanged; do not change the second choice to GameCube 0065. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27E2",
+    "source_sha256": "ba8e0e670561df8144d1e54921235f6ebb4ddd47ffc81d7096b1052a970cf2bc",
+    "translation": "{cmd:7F0900000E}At last, it's nearly\nNew Year's Eve,{cmd:7F0308}\nand the countdown\nI've waited for,{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}That feeling just before\nthe year changes{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nTo experience it again,\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09020001}{cmd:7F09080001}{cmd:7F0900000A}{cmd:7F0308}I've waited a whole year{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nWhat a long time\nit's been{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the New Year's Eve anticipation, the year-long wait joke, all native pauses, and the paired NPC0 row-two/row-eight requests omitted from the GameCube reference. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27E3",
+    "source_sha256": "4563c5c33d416588c93d59796d40474e8a1c4cb0126b9efe991e3713a1e4b17f",
+    "translation": "{cmd:7F090000FF}My favourite event,\nthe New Year's countdown,{cmd:7F0308}\nis nearly here{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}I can't wait!{cmd:7F030C}\nI want to count down{cmd:7F030C}\nto the New Year's Eve\ncountdown itself!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09020001}{cmd:7F09080002}{cmd:7F0900000A}5{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n4{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n3{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000014}{cmd:7F0312}Oh,{cmd:7F0306} it's so hard to wait{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the countdown-to-the-countdown joke, all three counted numbers and slow punctuation, and native requests 09/2/0001 and 09/8/0002. Do not omit them to match the reference. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27EE",
+    "source_sha256": "8f286b9f6fb8332ee865538fe2667c43bd2ae6412831f7efa65b51b4f356a039",
+    "translation": "{cmd:7F0C050001}{cmd:7F090000FF}I hear that night{cmd:7F030C}\nthere's moon viewing\nby the pond.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It's already {cmd:7F1E},{cmd:7F0306}\nso let's admire the moon{cmd:7F0310}\n{cmd:7F0900000E}and enjoy a long\nautumn night,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing meteor-shower/summer reply to the native pond moon viewing and long autumn evening. Keep quest request 0C/5/0001 and native current-month command 1E; this is not a substituted upcoming-event date. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27EF",
+    "source_sha256": "c27033cafdf3a54507bc45e3d5a6d405f7ec81efeed2f14ccb590ff5c36f8b61",
+    "translation": "{cmd:7F0C050066}{cmd:7F0900000F}{cmd:7F0317}Sorry,{cmd:7F0306} {cmd:7F1A}.{cmd:7F030C}\nI don't actually know\neither,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}But on lunar month eight,\nday 15,{cmd:7F0308}\nwe'll be eating dumplings\nby the pond,{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}and watching the moon.\nThat much I'm sure of,{cmd:7F030C}\nso try asking\nsomeone else,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing meteor-shower reply to the native lunar eighth-month day 15, dumplings, and pond moon viewing. Keep the speaker admitting ignorance, suggestion to ask others, and quest request 0C/5/0066. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:27F2",
+    "source_sha256": "c796710af9e4f7ba6f0f0a87716f197371c668a910507684fc65953dbd605ec1",
+    "translation": "{cmd:7F0C050002}{cmd:7F0900000F}{cmd:7F0317}Hmm{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306} No wonder.{cmd:7F030C}\nEveryone wants matsutake,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F030C}\nThey disappear so quickly.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Matsutake are early risers,{cmd:7F030C}\nso try your best{cmd:7F0304}\nto get up early, too.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It makes me terribly sleepy,{cmd:7F030C}\nbut I make the effort\nto get up early,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep native scarcity, early-rising advice, the speaker making the same effort despite sleepiness, and quest request 0C/5/0002. Preserve both catchphrases and pauses, not the reference sleeping-all-day substitute. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:281D",
+    "source_sha256": "cc64fe6ee3f28cc69720f2372b90a8cd6ca254999484691032a5fb1b505cecac",
+    "translation": "{cmd:7F09020001}{cmd:7F09080001}{cmd:7F09000015}Whenever I bring this up,{cmd:7F030C}\nnearly everyone pulls a face.{cmd:7F030C}\nMorning aerobics!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}It's funny to watch,{cmd:7F0310}\n{cmd:7F09000017}but sadly,{cmd:7F0306}\naerobics get cancelled\non rainy days,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}I wouldn't mind{cmd:7F030C}\ndoing them in the rain,\nthough!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native paired NPC requests, funny reactions to morning aerobics, actual rain cancellation, and willingness to exercise anyway. Do not drop the requests or original pauses for the reference. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:2824",
+    "source_sha256": "19f545d3f038c9481b7fcfdd79ff30364e45e9d26e6418ee28774c6cf98f78f3",
+    "translation": "The moon on lunar month eight,\nday 15{cmd:7F0308}\nis called{cmd:7F030C} the harvest moon,\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}To put it simply{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F09000015}it's a really nice moon.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}By the way,{cmd:7F0306}\nthe 15th of lunar month eight...{cmd:7F0308}\nWhen does that fall this year?\n{cmd:7F0900000B}{cmd:7F0306}Do you know?{cmd:7F160069017F}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2841}{cmd:7F102842}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the harvest moon's native lunar date, plain explanation joke, and date question with choices 0069/017F and replies 2841/2842. The existing generic viewing reply and calculated-date reply fit; do not import meteor showers or choice 0044. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:2826",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "69c9c2213e9ba7ffee3b7ffc39eac3d8b39ada3f8821ef7724c3348f6b6cc997",
+    "translation": "{cmd:7F09000015}Well,{cmd:7F030C}\nlast month's moon\nwas pretty great,\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}but on {cmd:7F3E} {cmd:7F3F},{cmd:7F0306}\nthere'll be another\ngreat moon to see!{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}That's{cmd:7F030C}\nthe Thirteenth Night moon!\n{cmd:7F0308}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}It's a little less full\nthan the last one,{cmd:7F030C}\nbut if you're generous,\nyou could call it full.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}{cmd:7F0317}As for me,{cmd:7F0306}\nif I had to pick{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F030C}\n{cmd:7F0900000E}I like the SUN best!\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the second-moon converted date, Thirteenth Night, nearly full comparison, and complete final preference-for-the-sun joke omitted from the reference. Do not change native 3E/3F to first-moon 3C/3D. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:2827",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "source_sha256": "c2bd35a2ef7a58b4292fa6ae01af6bec791b9688286c0edfc05a9a337e47def3",
+    "translation": "{cmd:7F09000015}On a long autumn night,\nsome moon viewing{cmd:7F030C}\ncan put you in\na mellow mood,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000A}{cmd:7F0308}Last month's\nFifteenth Night moon{cmd:7F030C}\nwas incredible,\n{cmd:7F0308}{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}On {cmd:7F3E} {cmd:7F3F},{cmd:7F030C}\nwe'll be moon viewing\nby the pond again,{cmd:7F030E}\nso come and join us!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}The moon will be\na little less full this time.{cmd:7F0310}\n{cmd:7F0900000E}But don't let that bother you!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain autumn evening mood, last month's full moon, this year's second-moon date, and the pond invitation. The reference moves pages and substitutes meteor showers and crop feasting. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review. Full English converted dates require the guarded ordinary-dialogue date-preparation patch."
+  },
+  {
+    "id": "message:2829",
+    "source_sha256": "e4830f23fff377c57853f1e76aa01c4709c34ff1b8f35fb2a2e2e4990363f82d",
+    "translation": "{cmd:7F0900000E}The Fall Sports Fair\nis coming up soon!{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}We had one in spring, too,{cmd:7F030C}\nbut we have two sports fairs\nevery year,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}At the sports fair,{cmd:7F030C}\nthere are aerobics,{cmd:7F0308}\nfootraces,{cmd:7F0308}\nball tosses{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}All sorts of events,{cmd:7F030C}\nbut my favourite\nhas to be{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0308}\n{cmd:7F0900000E}aerobics!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Everyone makes fun of them,{cmd:7F030C}\nbut they're the foundation\nof all exercise!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09020001}{cmd:7F09080001}{cmd:7F0900000A}{cmd:7F0308}Just thinking about it\ngets me all excited!{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain spring and autumn sports fairs, native ball toss rather than the reference tug-of-war substitution, aerobics enthusiasm, and paired native final-page requests. Do not drop requests for reference expression delivery. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:2833",
+    "source_sha256": "a5e6b3ab15cf691d45d9d3bee04b95398c9be885c0ff65312f875a2f122345c7",
+    "translation": "{cmd:7F09000015}How's it going, {cmd:7F1A}?{cmd:7F030C}\nHow's the fishing {cmd:7F0900000B}tourney\ntreating you?\n{cmd:7F160044003B}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2845}{cmd:7F102846}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the fishing-progress question and native choices 0044/003B leading to 2845/2846. The reference swaps the first choice to 018A. Existing generic labels Sure!/It's OK, I guess. need contextual wording review, not a global label rewrite in this batch. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  },
+  {
+    "id": "message:2834",
+    "source_sha256": "36595dff34f20639fdcb9a6dbfb938ccef6f43351157429920a00969d32dad7c",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Oh, right!{cmd:7F0308}\n{cmd:7F090000FF}Christmas is coming,{cmd:7F030C}\nbut to get any presents,\nyou need THAT,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}Do you{cmd:7F0308}\n{cmd:7F0900000B}{cmd:7F0305}know what THAT is?\n{cmd:7F16004C0161}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2847}{cmd:7F102848}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the native Christmas gift question, choices 004C/0161, and replies 2847/2848, including the existing English small aside. Do not substitute GameCube choice 00EE or add timing commands. Preserve every native command and argument, page, pause, field, choice, branch, and terminator. Final wording/layout and ordinary seasonal gameplay remain review."
+  }
+]

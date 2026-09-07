@@ -114,7 +114,8 @@ def main():
                                        Path("translations/n64-native-context.json"),
                                        Path("translations/n64-pak-storage-dialogue.json"),
                                        Path("translations/n64-carp-fireworks.json"),
-                                       Path("translations/n64-service-save-dialogue.json")])
+                                       Path("translations/n64-service-save-dialogue.json"),
+                                       Path("translations/n64-seasonal-topics.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates)
     matches = load_matches(args.matches)

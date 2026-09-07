@@ -3612,6 +3612,97 @@
   patch-only release, and both stretch goals remain active. The legacy audit
   now records verified static message mismatches, not reproduced crash fixes.
 
+## 2026-09-07 — Native seasonal questions, dates, and connected replies
+
+- Added `translations/n64-seasonal-topics.json` with 29 complete original
+  drafts: 26 missing conversations and three corrections to existing reference
+  replies. Added eight focused tests, the default candidate input, and
+  `specs/SEASONAL_TOPICS.md`. Every native command and argument remains exact;
+  no expression permission, gameplay request, field, page, pause, choice,
+  branch, or terminator is added, removed, or reordered.
+- Translated the two moon-viewing events and their nearly-full versus full
+  moon distinction, the samurai-era lunar-calendar explanation, and the
+  complete preference-for-the-sun joke. Six converted second-moon date drafts
+  (`11AE 11AF 180E 270F 2826 2827`) require the existing guarded ordinary-date
+  patch. The pond gathering at 6 p.m. remains. No calendar code, RTC value,
+  event schedule, or conversion table changes.
+- Also covered native Sunday/June fishing questions, morning aerobics and
+  rain cancellation, second-Monday-in-October Sports Day, ball tosses, shrine
+  blossom viewing, matsutake scarcity, countdown jokes, and Christmas gifts.
+  Ten questions retain their complete native choice/reply order. The four
+  paired NPC0 row-two/row-eight request sequences remain, including `0002`
+  on row eight for the counted-down numbers in `27E3`.
+- Corrected `0BC5` to the native fish-size comparison against fish caught so
+  far, without the reference end-of-day prize claim. Corrected `27EE/27EF`
+  from meteor showers/summer to pond moon viewing, an autumn evening, lunar
+  month eight/day 15, dumplings, and asking someone else for the date.
+  Current-month `1E` and native quest requests stay unchanged. Seventeen
+  connected existing replies remain exact, including approved `27F0` mushroom
+  wordplay, native `11CD` Sports Day details, and the `2847` small aside.
+  Shared `2833` choice-label wording remains a contextual polish item.
+- The final draft layouts retain seven conservative date-width warning
+  records: the six converted-date messages and current-month reply `27EE`.
+  Independent host layout checks substitute all twelve English months and
+  31 ordinal days, checking 372 combinations for each of those seven drafts.
+  All fit without reducing other dynamic-field bounds or suppressing generic
+  warnings. This checks width, not native runtime insertion or seasonal
+  selection. Every draft fits the unchanged 1,024-byte expansion limit.
+  A first draft's unsupported semicolon and five-line fishing page were
+  corrected before the final build, without changing native commands.
+- Eight focused tests pass in 0.621 seconds. The complete suite passes
+  511 tests in 202.944 seconds in `build/tests-seasonal-topics-full-01.log`.
+  Basic generation has 10,321 edits: twenty newly filled entries and all
+  three reply corrections, with six new date drafts correctly withheld.
+  The full candidate file has 11,013 edits: 26 newly filled entries and the
+  three corrections. All other 10,984 earlier edits remain identical; no
+  earlier candidate disappears from either build.
+- `build/smoke-seasonal-topics-01/` passes 46 complete native cartridge loads,
+  140 assertions, and 239 recorded steps: all 29 drafts plus seventeen
+  connected unchanged replies. Complete headers/text, adjacent/module guards,
+  restored checkpoint, and graceful shutdown pass. The process is silent,
+  fresh, and four-MiB, with no seed saves and both test save-write permissions
+  false. FlashRAM remains 131,072 erased bytes. The only injected function
+  is `8009E558`; no choice, actor-request dispatch, event, prize award,
+  date insertion, save action, or hardware gameplay is executed. The existing
+  train, mail, resident selector, and calendar-native batches are not repeated.
+- Scenario SHA-256 is
+  `bb8fcad93d0b01724c7e9d775a130f691feb62050b4dfcb1e867dae1dad7a2ae`.
+  ROM `build/seasonal-topics-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `f319afaa06827f7962b922becabc124106a67ad2fef6001508543a77ac15532c`.
+  UPS SHA-256 is
+  `87d635f9781b17139cf19843f340ceb3d1ecb3b3717a7625c34c791a6ebb239c`;
+  applying it to the verified original reconstructs the complete ROM.
+  Every extracted DMA file was compared with the service/save pilot: only
+  main text `02000000`, pointers `00CF9000`, and DMA directory rows differ.
+  Other directory-container bytes, executable code, fonts, overlays, runtime
+  resources, and saved structures remain unchanged.
+- Main coverage is 9,549 reference candidates plus 219 original drafts,
+  giving 9,768 candidates. The 1,984 unfilled records include 1,053 with
+  Japanese static text, nine placeholders, 919 without static text, one Latin
+  record, and two number/symbol records. Ten command-only records contain
+  dynamic insertions. Reference rejections number 1,985, including 1,632
+  unconfirmed identities, 293 control differences, 58 missing fields, and
+  two overflows. There are 1,436 reference-layout warnings, 41 aliases, and
+  65 conflicts. The original fallback fills one reference rejection.
+- Regenerated coverage and review queues under `build/seasonal-topics-*`.
+  The unconfirmed same-ID comparison pool is empty: 1,461 lack visible
+  same-ID English, 73 need fields, 31 differ in controls, seven overflow,
+  36 are native non-static records, 24 fail glyph encoding, one needs
+  encoding/hash review, and one has an original fallback. The twelve
+  special-context expression records remain unapproved. These counts do
+  not establish reviewed translation, unreachable records, or gameplay
+  acceptance. Remaining content, other text destinations, ordinary events,
+  dynamic rendering, normal saving, final review, patch-only release, and
+  both stretch goals remain active.
+- Audited the three-hour progress report against the repository after the
+  user challenged the repeated rough percentage. At the 15:14 checkpoint
+  `11685fb`, main candidates numbered 9,342; the committed service/save
+  checkpoint has 9,742, and this batch has 9,768. The interval therefore
+  added 400 committed candidates and 26 pending this checkpoint, not merely
+  the last 26-message batch. The repeated overall estimate had no measured
+  basis for the claimed less-than-one-point change. Chat reporting now
+  distinguishes actual candidate changes from unmeasured overall estimates.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
