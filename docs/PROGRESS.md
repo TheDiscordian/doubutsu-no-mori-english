@@ -147,7 +147,9 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 527 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 537 passing portable-C, synthetic, and retail-input regression tests, plus the
+  additional opening-clock builder-rejection check in the eleven-test focused run.
+  Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -459,17 +461,17 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/startup-greetings-pilot/`
-contains 11,098 edits, including
-9,549 reference dialogue candidates, all 460 choices, and 304 original dialogue
+The current experimental resident-module pilot in `build/startup-clocks-pilot/`
+contains 11,104 edits, including
+9,555 reference dialogue candidates, all 460 choices, and 304 original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,899
+still require review. The original main-bank audit leaves 1,893
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,436 conservative layout warnings include full default
+listed below. The 1,442 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/startup-greetings-candidates/` and `build/startup-greetings-coverage/`. The independent
+`build/startup-clocks-candidates/` and `build/startup-clocks-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -742,10 +744,22 @@ pass, with 278 assertions and checkpoint restoration, covering all new messages
 and 42 unchanged connected candidates. Seventeen generic town-width warnings
 remain; all fifty drafts fit when checked with the native six-fullwidth-cell
 town limit. Every earlier candidate and runtime/font/save resource remains
-unchanged. Only the six opening clock greetings retain Japanese static text
-within `13F2..14E1`; their GameCube storage-field removal and original-draft
-module gating remain next. Actual startup, storage actions, dynamic rendering,
-and final review remain gameplay/playthrough requirements.
+unchanged. Actual startup, storage actions, dynamic rendering, and final review
+remain gameplay/playthrough requirements.
+
+The six [opening clock references](../specs/STARTUP_CLOCKS.md) close the remaining
+Japanese-static-text candidate gaps within `13F2..14E1`. They retain GameCube
+greetings, calendar order, AM/PM, all manual lines/pages/pauses, and native
+continuations, omitting only each unavailable storage-location clause. Full
+source/reference/output hashes and exact allowed spans guard this narrow change.
+All twelve cartridge loads pass for the greetings and their unchanged successors,
+with 38 assertions, intact guards, restored checkpoint, and blank isolated saves.
+All earlier candidates remain identical. Six new records have conservative
+field-width warnings for presentation review; they do not trigger automatic reflow. Basic generation
+withholds all six runtime-dependent references, and original-draft selection
+also withholds actual module tokens without the module. Production runtime,
+fonts, and saved structures remain unchanged. Normal startup selection, live
+date rendering, full presentation review, and hardware acceptance remain.
 
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
@@ -765,8 +779,8 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 11,098 edits, including
-9,549 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 11,104 edits, including
+9,555 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
@@ -775,9 +789,9 @@ community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
 drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
 drafts, and fifty startup-greeting drafts. It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 1,900 main records; one receives an original
-fallback draft. The final candidate-file audit finds 1,899 main records without
-candidates: 968 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 1,894 main records; one receives an original
+fallback draft. The final candidate-file audit finds 1,893 main records without
+candidates: 962 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

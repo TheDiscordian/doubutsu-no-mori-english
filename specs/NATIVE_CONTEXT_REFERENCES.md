@@ -33,6 +33,10 @@ checks still run. This contract grants no additional runtime permission and
 cannot combine with animation, actor, choice, controller, field, catchphrase,
 sequence, or native-alias exceptions.
 
+The separately approved [six opening clock greetings](STARTUP_CLOCKS.md) have
+an exact, restricted storage-location omission. That permission does not change
+the wording-only rules or the sixty-four approvals described here.
+
 Twelve of the 64 records need no wording changes. Fifty-two use local spans;
 their remaining English text is unchanged. Individual source hashes, spans,
 output hashes, and meaning notes are versioned with each record.

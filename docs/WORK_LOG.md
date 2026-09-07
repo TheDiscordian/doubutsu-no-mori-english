@@ -3870,6 +3870,83 @@
   final review, hardware acceptance, patch-only release, and stretch goals
   remain active.
 
+## 2026-09-07 — Complete opening clock references and draft runtime selection
+
+- Added six complete-reference approvals for `13F2/141A/1442/146A/1492/14BA`.
+  Native sources already supply catchphrase, town, year/month/day/hour/minute;
+  GameCube storage-location field `28` is absent. Each approval removes only
+  that exact highlighted device/possessive clause, retaining `in` and every
+  surrounding English word, space, punctuation mark, newline, page, wait,
+  pause, calendar order, and successor. AM/PM remains after the hour field.
+  Native successors are `13F4/141C/1444/146C/1494/14BC`. No actor, expression,
+  available-field, gameplay, buffer, font, or saved-format permission is added.
+- Extended the complete-reference schema with a strict boolean
+  `omit_startup_storage_location`, limited to those six same-ID records and
+  one fixed before/after span each. Full native/reference/output hashes,
+  original decoded offsets, required native fields, no native storage field,
+  exactly one reference storage field, and unchanged remaining delivery are
+  enforced. The independent builder retains its complete-output hash check.
+  The original sixty-four wording-only references retain their exact delivery
+  tests and fifty-two changed-span count. Added `specs/STARTUP_CLOCKS.md`.
+- Shared the existing six implemented extension descriptors between runtime
+  command-table construction and original-draft selection. Drafts using actual
+  `62/67/72/73/75/76` tokens are withheld without the resident runtime; native
+  arguments and glyphs are not mistaken for commands. Unsupported/wrong-size
+  extensions fail. Ordinary resident-date requirements remain independent.
+  This changes host selection only, not production MIPS code or capabilities.
+- All eleven focused tests pass in 1.470 seconds in
+  `build/tests-startup-clocks-focused-01.log`. They include every complete retail
+  reference and continuation, runtime gating, invalid flags/IDs/spans, duplicate
+  storage fields, changed source/output hashes, and independent-builder rejection
+  for all six altered payloads and all six missing-runtime attempts. The full
+  run passes 537 tests in 205.724 seconds in
+  `build/tests-startup-clocks-full-01.log`; that run was started before the extra
+  builder-rejection method was added, which is covered by the focused run.
+  All eight existing reference-content tests and nine ordinary-date tests pass.
+- Full generation contains 11,104 edits, six more than the startup-greetings
+  checkpoint. Every earlier edit is identical. Basic generation retains all
+  10,406 previous edits and withholds all six new references. The six conservative
+  expansion bounds are `373 361 377 396 343 371`; all fit the unchanged limit.
+  Each has generic field-width warnings, increasing the reference warning-bearing
+  record count from 1,436 to 1,442. No warning is hidden and no line is reflowed.
+- `build/smoke-startup-clocks-01/` passes twelve complete cartridge-loader calls,
+  38 assertions, and 69 recorded steps: the six greetings plus their six unchanged
+  next messages. Complete headers/text, adjacent/module guards, checkpoint
+  restoration, and graceful shutdown pass. The fresh four-MiB process is silent,
+  has no seed saves, and has both test save-write permissions false. FlashRAM is
+  131,072 blank bytes and the Pak is 32,768 blank bytes. The only injected call
+  target is `8009E558`. This is not startup selection, live clock insertion,
+  normal saving, final rendered presentation, or hardware validation.
+- Scenario `build/startup-clocks-scenario.json` SHA-256 is
+  `3a821c2f3eda82c0f843d010e9a23262e535cdc01b86cb12d9f15a800ecbc631`.
+  ROM `build/startup-clocks-pilot/animal-forest-halfwidth.z64` SHA-256 is
+  `5b6a48a30acf578dc07eaf4b93cbd14a7ca8b9e0a3693439b68678a2fd24d885`.
+  UPS SHA-256 is
+  `f96d48296fed65fadfead4a01f0b6dc7e93817a12f7cde1ee20a6305786afbb9`.
+  Applying the UPS to the verified retail ROM reconstructs the complete build.
+  Comparing every extracted DMA file against the previous pilot changes only
+  main text `02000000`, pointers `00CF9000`, and DMA directory rows in `00019D40`.
+  All directory-container bytes outside the table, code, fonts, overlays,
+  resident resources, save structures, and other text banks remain unchanged.
+- Main coverage is 9,859 candidates: 9,555 reference-based and 304 original
+  drafts. Of 1,893 records without candidates, 962 contain Japanese static text,
+  nine are placeholders, 919 contain no static text, one is Latin, and two are
+  number/symbol records; ten command-only records have dynamic fields. The 1,894
+  reference rejections are 1,572 unconfirmed identities, 273 control differences,
+  47 missing fields, and two overflows; one rejection has an original fallback.
+  There are 41 aliases and 65 conflicts. No Japanese static text remains without
+  a candidate in the inspected startup range `13F2..14E1`.
+- Regenerated coverage and both review queues. The unconfirmed same-ID comparison
+  pool remains empty, with 1,461 lacking visible same-ID English, 27 requiring
+  fields, seventeen control differences, seven overflows, 36 native non-static
+  records, 24 glyph failures, one encoding/hash review, and one fallback. The
+  ten special-context expression comparisons remain unchanged and unapproved.
+  Inspected further missing native topics: `087B/1506` describe moving through
+  player travel; `2A43` describes winter flowers; `2BC3/2BC5/2BC7/2BC9` are native
+  introductions with no previous-town field. Those remain queued, alongside
+  broader content, other text destinations, normal gameplay/saves, complete
+  review, hardware acceptance, patch-only release, and both stretch goals.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

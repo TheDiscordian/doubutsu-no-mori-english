@@ -66,7 +66,7 @@ The six clock acknowledgements retain `04`, their native clock-setting successor
 `19`, and `01`, without the extra GameCube `5B` command. They are not the separate
 opening greetings that display the current date and time.
 
-## Verification and remaining opening clocks
+## Verification and separate opening clocks
 
 Eight focused tests and all 527 regression tests pass. They check all fifty
 complete source hashes, exact commands and twelve colour corrections, complete
@@ -84,15 +84,13 @@ blank FlashRAM, and graceful shutdown. It calls only `8009E558`, with no save
 write permission. It does not execute startup selection, erasure, preparation,
 travel, date insertion, warning rendering, or original-hardware gameplay.
 
-Only `13F2/141A/1442/146A/1492/14BA` retain Japanese static text in the inspected
-startup range `13F2..14E1`. Their GameCube references add storage-location field
-`28` and its colour/possessive clause, while reordering the calendar and adding
-AM/PM command `76`. That extra storage field is unavailable in the native
-messages. Keep the GameCube calendar and timing intent, without assuming a
-Memory Card or importing an unprepared field. The ordinary draft generator must
-also withhold module-command drafts from basic builds before these are added;
-the full builder already verifies installed module hooks and rejects unknown
-commands. No unsupported clock candidate is installed by this batch.
+The separate [opening clock references](STARTUP_CLOCKS.md) cover
+`13F2/141A/1442/146A/1492/14BA`, completing Japanese-static-text candidate coverage
+in the inspected startup range `13F2..14E1`. They preserve GameCube calendar and
+timing intent while omitting only the unavailable storage-location clause.
+They require the resident AM/PM runtime and remain withheld from basic builds.
+Original-draft selection also withholds module-command drafts when that runtime
+is absent; the full builder independently verifies installed hooks and commands.
 
 Normal gameplay, complete wording and layout review, actual warning/field
 rendering, startup/storage acceptance, and hardware remain requirements.

@@ -107,7 +107,8 @@ class RetailContentApprovalTests(unittest.TestCase):
         if not path.is_file(): self.skipTest('English disc extraction stays local')
         gc = {r['id']: r for r in map(json.loads, path.read_text().splitlines())}
         matches = load_matches(ROOT/'translations/reference_matches.json')
-        approved = [r for r in matches.values() if 'complete_reference' in r]
+        approved = [r for r in matches.values() if 'complete_reference' in r
+                    and not r['complete_reference'].get('omit_startup_storage_location')]
         self.assertEqual({r['id'][8:] for r in approved}, IDS)
         changed = 0
         for record in approved:

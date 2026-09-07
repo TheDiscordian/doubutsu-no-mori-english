@@ -10,9 +10,9 @@ from aflib import CODE_VROM, by_vrom, sha256, verified_rom
 from font import make_halfwidth
 from gc_adapter import adapt_reference
 from textbanks import banks
-from textcodec import command_info, encode
+from textcodec import TAG, command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
-from runtime_module import add_runtime_module, module_command_info
+from runtime_module import MODULE_COMMANDS, add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import reference_sequence_edits
 from name_candidates import npc_candidates
@@ -45,13 +45,33 @@ def load_drafts(paths):
     return drafts
 
 
-def select_drafts(drafts, *, english_dialogue_dates=False):
+def draft_module_commands(text):
+    """Recognise actual extension tokens, rejecting unsupported or malformed ones."""
+    info = [(0, 0)] * 0x77
+    for code, descriptor in MODULE_COMMANDS.items():
+        info[code] = descriptor
+    commands = set()
+    for match in TAG.finditer(text):
+        if match[1] != 'cmd':
+            continue
+        data = bytes.fromhex(match[2])
+        if len(data) >= 2 and data[0] == 0x7f and data[1] > 0x60:
+            encode(match[0], info)
+            commands.add(f'7F{data[1]:02X}')
+    return sorted(commands)
+
+
+def select_drafts(drafts, *, english_dialogue_dates=False, resident_runtime=False):
     selected, withheld = [], []
     for edit in drafts:
         needs_dates = requires_dialogue_dates(edit)
+        commands = draft_module_commands(edit['translation'])
         if needs_dates and not english_dialogue_dates:
             withheld.append({'id': edit['id'], 'reason': 'runtime_requirement_unavailable',
                              'runtime_requirements': edit['runtime_requirements']})
+        elif commands and not resident_runtime:
+            withheld.append({'id': edit['id'], 'reason': 'resident_runtime_unavailable',
+                             'module_commands': commands})
         else:
             selected.append(edit)
     return selected, withheld
@@ -119,7 +139,8 @@ def main():
                                        Path("translations/n64-startup-pak.json"),
                                        Path("translations/n64-startup-greetings.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
-    drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates)
+    drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
+                                           resident_runtime=bool(args.runtime_module))
     matches = load_matches(args.matches)
     if any('resident_animations' in record for record in matches.values()):
         verify_native_consumer(rom)

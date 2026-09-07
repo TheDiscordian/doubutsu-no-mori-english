@@ -51,6 +51,12 @@ and the exact added DMA file before enabling extended tokens. A command-line
 flag alone cannot relax the validator. Existing sixteen-byte choices retain
 their separate complete-patch verification.
 
+Original-draft selection recognises implemented extension tokens from the shared
+command descriptors and withholds dependent drafts without the resident module.
+Unknown or wrong-size extensions fail. This selection safeguard does not replace
+the builder's complete installed-runtime verification. The six
+[opening clock references](STARTUP_CLOCKS.md) also remain withheld without AM/PM.
+
 Under the explicit resident-module reference policy, a source message already
 using an RTC field may import the other seven RTC components. All use the same
 verified clock object and bounded formatters; this permits GameCube's weekday

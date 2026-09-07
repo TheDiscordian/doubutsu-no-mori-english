@@ -5,12 +5,21 @@ import re
 from aflib import sha256
 from textcodec import encode, tokenize
 
+STARTUP_STORAGE_SPANS = {
+    'message:13F2': ("in {cmd:7F50198CDC08}{cmd:7F28}'s", 'in'),
+    'message:141A': ('in {cmd:7F50198CDC06}{cmd:7F28} ', 'in '),
+    'message:1442': ("in {cmd:7F50198CDC08}{cmd:7F28}'s", 'in'),
+    'message:146A': ("in {cmd:7F50198CDC08}{cmd:7F28}'s ", 'in '),
+    'message:1492': ("in {cmd:7F50198CDC08}{cmd:7F28}'s ", 'in '),
+    'message:14BA': ("in {cmd:7F50198CDC08}{cmd:7F28}'s", 'in'),
+}
+
 
 def validate_content_approval(record):
     if 'complete_reference' not in record:
         return
     rule = record['complete_reference']
-    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans'}
+    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location'}
             or 'adapted_sha256' not in rule
             or not record['id'].startswith('message:')
             or any(key in record for key in ('controller', 'native_choices', 'native_actor_request',
@@ -29,6 +38,14 @@ def validate_content_approval(record):
                     or not isinstance(span['after'], str) or not span['after']
                     or span['before'] == span['after']):
                 raise ValueError('Invalid complete-reference span')
+    if 'omit_startup_storage_location' in rule:
+        spans = rule.get('spans', [])
+        if (rule['omit_startup_storage_location'] is not True
+                or record['id'] not in STARTUP_STORAGE_SPANS
+                or record.get('reference_id') != record['id']
+                or len(spans) != 1
+                or (spans[0]['before'], spans[0]['after']) != STARTUP_STORAGE_SPANS[record['id']]):
+            raise ValueError('Invalid startup storage-location omission')
 
 
 def verify_content_reference(reference, source, record, info):
@@ -41,6 +58,13 @@ def verify_content_reference(reference, source, record, info):
             or reference['sha256'] != record['reference_sha256']
             or sha256(encode(reference['text'], reference_info)) != record['reference_sha256']):
         raise ValueError('Stale complete-reference source or reference')
+    if record['complete_reference'].get('omit_startup_storage_location'):
+        native = [t.data for t in tokenize(source, info) if t.kind == 'cmd']
+        commands = [t.data for t in tokenize(encode(reference['text'], info), info) if t.kind == 'cmd']
+        if (b'\x7f\x28' in native or commands.count(b'\x7f\x28') != 1
+                or not all(bytes((0x7f, code)) in native
+                           for code in (0x1c, 0x2f, 0x1d, 0x1e, 0x20, 0x21, 0x22))):
+            raise ValueError('Startup storage-location omission requires native clock fields and no storage field')
 
 
 def adapt_content_reference(reference, source, record, info):
@@ -58,14 +82,21 @@ def adapt_content_reference(reference, source, record, info):
             raise ValueError('Complete-reference span does not match its approval')
         # Colour span counts may change with a translated term. All other
         # commands and manual line/page/wait/pause order remain untouched.
+        # Six individually bound clock greetings may omit exactly their GC-only
+        # storage-location clause; the schema fixes its entire before/after text.
         delivery = lambda value: [t.data for t in tokenize(encode(value, info), info)
                                   if (t.kind == 'cmd' and t.data[1] != 0x50)
                                   or (t.kind == 'text' and t.data == b'\xcd')]
-        if delivery(before) != delivery(after):
+        before_delivery = delivery(before)
+        omit_storage = record['complete_reference'].get('omit_startup_storage_location', False)
+        if omit_storage:
+            before_delivery = [command for command in before_delivery if command != b'\x7f\x28']
+        if before_delivery != delivery(after):
             raise ValueError('Complete-reference span changes delivery or non-colour controls')
         parts.extend((text[previous_end:start], after))
         previous_end = start+len(before)
-        changes.append({'operation': 'reviewed_native_wording_span', 'character_offset': start,
+        changes.append({'operation': ('omit_startup_storage_location' if omit_storage
+                                      else 'reviewed_native_wording_span'), 'character_offset': start,
                         'before_sha256': sha256(before.encode()), 'after_sha256': sha256(after.encode())})
     parts.append(text[previous_end:])
     return ''.join(parts), changes

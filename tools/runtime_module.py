@@ -42,15 +42,16 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800A8614, 0x800A86C4), (0x800A8868, 0x800A8AB4))
 
 
+MODULE_COMMANDS = {0x62: (2, 0), 0x67: (3, 4), 0x72: (2, 0),
+                   0x73: (2, 0), 0x75: (2, 0), 0x76: (2, 2)}
+
+
 def module_command_info(rom):
     """Only implemented extension codes are tokenizable; gaps remain invalid."""
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     info += [(0, 0)]*(0x77-len(info))
-    info[0x62] = (2, 0)
-    info[0x67] = (3, 4)
-    info[0x72] = info[0x73] = (2, 0)
-    info[0x75] = (2, 0)
-    info[0x76] = (2, 2)
+    for code, descriptor in MODULE_COMMANDS.items():
+        info[code] = descriptor
     return info
 
 

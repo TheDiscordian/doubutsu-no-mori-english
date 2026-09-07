@@ -4755,6 +4755,114 @@
     "evidence": "The native Disk System has no software to play; correct the reference NES object name to Disk System, including the highlighted character count. Complete native/reference meaning and all unchanged commands reviewed; no new field, actor, flow, or buffer permission. See specs/NATIVE_CONTEXT_REFERENCES.md. Normal gameplay and final layout review remain."
   },
   {
+    "id": "message:13F2",
+    "source_sha256": "b36dbee964ba5cfb0bde9546355e4c19673f2ade0e811f244f9631e0392d7774",
+    "reference_id": "message:13F2",
+    "reference_sha256": "c8aa2de8c39587354fffba4df17a5e573a6d3d6dd86a5e8e1a9391c53d3ea2d6",
+    "complete_reference": {
+      "adapted_sha256": "2c198150a058ce07c69607c5d93cd32f76fd278d5fae666234fcbb6032bdd6c2",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 193,
+          "before": "in {cmd:7F50198CDC08}{cmd:7F28}'s",
+          "after": "in"
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 13F4. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
+    "id": "message:141A",
+    "source_sha256": "58a5b6b2f112b00dabb5f269d0b3dee72fa1c03f1db8181523c98e1706b18691",
+    "reference_id": "message:141A",
+    "reference_sha256": "81617e1e7f7cac8c365b7368daf7cddb58c9e84fcf4f94b654c116b877e60b6f",
+    "complete_reference": {
+      "adapted_sha256": "8399bbfdaf6824ea2673ef42cf7b02297d3bd66f3e253913b155a042c53d88c0",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 181,
+          "before": "in {cmd:7F50198CDC06}{cmd:7F28} ",
+          "after": "in "
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 141C. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
+    "id": "message:1442",
+    "source_sha256": "5ab600039e5fdf80e9446398b5240f8ad99b00a30059c3efeeaa73c85c4a126f",
+    "reference_id": "message:1442",
+    "reference_sha256": "f992c06824d252c234a9496be6820b1eba636373edfe190be0187b846d5cc885",
+    "complete_reference": {
+      "adapted_sha256": "4ede4d53b0f6fedf6f4aa3a632e565f6d84c8e74c1b8db8bfed845bc5decd067",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 119,
+          "before": "in {cmd:7F50198CDC08}{cmd:7F28}'s",
+          "after": "in"
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 1444. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
+    "id": "message:146A",
+    "source_sha256": "ce84a0a18013ebf29bf4c6b896fba7014992d24ffa53b1269f272f6b62de92f5",
+    "reference_id": "message:146A",
+    "reference_sha256": "2a85b00f0345a7e1a28e97bd32c24346ce34151e3bc462963981386d7ede46a1",
+    "complete_reference": {
+      "adapted_sha256": "636c364b36c0fef8ea2124e7f71b5789453c782ff79189a7c0e40ebcf477f826",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 216,
+          "before": "in {cmd:7F50198CDC08}{cmd:7F28}'s ",
+          "after": "in "
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 146C. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
+    "id": "message:1492",
+    "source_sha256": "be1d19d612ec7faa0f2d5b072503028465b9f5c850ed27481b7d76089cdec5e3",
+    "reference_id": "message:1492",
+    "reference_sha256": "f0666aa0aa0067f840a527949fd1f3956c0faf68da0f3f5a09ddc4bcba3d56c5",
+    "complete_reference": {
+      "adapted_sha256": "363f7a49228348069706e9ef0d2e09870ca229c0e06e681011bae305959a65c6",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 169,
+          "before": "in {cmd:7F50198CDC08}{cmd:7F28}'s ",
+          "after": "in "
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 1494. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
+    "id": "message:14BA",
+    "source_sha256": "6081346d2e0a9cd88dc3a486198d77e5047112fa0d1a98cff3aa11f7dfaf49b9",
+    "reference_id": "message:14BA",
+    "reference_sha256": "2564f25d45fa0b3ebd775edde8cd89691bcc4d00efbdd9ec05b7bb9e8ab30472",
+    "complete_reference": {
+      "adapted_sha256": "c0d845c3f689e0cdc79356b258b2367fedaeebb9a4abe0a301fa9d77c13999aa",
+      "omit_startup_storage_location": true,
+      "spans": [
+        {
+          "offset": 113,
+          "before": "in {cmd:7F50198CDC08}{cmd:7F28}'s",
+          "after": "in"
+        }
+      ]
+    },
+    "evidence": "Native opening greeting names the current town and displays year/month/day/hour/minute, then continues to 14BC. Preserve the complete GameCube greeting, calendar order, manual lines/pages, pauses, catchphrase, and continuation. Remove only the GC storage-location field 28 with its colour/possessive clause: the N64 source supplies no such location. AM/PM requires the verified resident clock runtime. No added actor field, action, save change, or expression permission. See specs/STARTUP_CLOCKS.md. Normal startup and final presentation review remain."
+  },
+  {
     "id": "message:18CA",
     "reference_id": "message:18CA",
     "source_sha256": "7cd5f9a23959beab75d481561b03bae8708a97f06bc16a90d38b6e98fb63a201",
