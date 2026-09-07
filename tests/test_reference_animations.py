@@ -128,7 +128,7 @@ class RetailAnimationApprovalTests(unittest.TestCase):
         gc = {r['id']: r for r in map(json.loads, gc_path.read_text().splitlines())}
         matches = load_matches(ROOT/'translations/reference_matches.json')
         approved = [r for r in matches.values() if 'resident_animations' in r]
-        self.assertEqual(len(approved), 83)
+        self.assertEqual(len(approved), 132)
         article_adaptations = set()
         for record in approved:
             original = source[int(record['id'][8:], 16)]
@@ -142,7 +142,9 @@ class RetailAnimationApprovalTests(unittest.TestCase):
                 article_adaptations.add(record['id'])
             validate_entry(original, output, info, 'message', 'reference_layout', resident_runtime=True,
                            animation_permit=animation_permit(record['id'], original, output, matches))
-        self.assertEqual(article_adaptations, {'message:0156', 'message:0158', 'message:2373', 'message:2580'})
+        self.assertEqual(article_adaptations, {'message:0156', 'message:0158', 'message:0212',
+                                               'message:0240', 'message:0246', 'message:2373',
+                                               'message:2580'})
 
     def test_native_consumer_tables_and_installed_source_are_unchanged(self):
         import struct

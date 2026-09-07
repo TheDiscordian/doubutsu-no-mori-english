@@ -1,5 +1,544 @@
 [
   {
+    "id": "message:019C",
+    "reference_id": "message:019C",
+    "source_sha256": "324228eb0d19fe3efe8fa39100402939e24728941259d044f93cc5f1dd531c63",
+    "reference_sha256": "0d3f07f76aaf0de142f12f443b93cc5c54053df34a573641db6cf8a1df6c3ed9",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "0d3f07f76aaf0de142f12f443b93cc5c54053df34a573641db6cf8a1df6c3ed9"
+    },
+    "evidence": "Peppy resident asks the player to carry a parcel to the selected resident in the selected other town. English localises the reason for retaining the parcel, while preserving hand delivery, recipient 25, destination 27, and the native request ending. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0209",
+    "reference_id": "message:0209",
+    "source_sha256": "8392c68d80f63c5f766281f3ce86bff19fd77d0fd5a401548d8d5001832e9e30",
+    "reference_sha256": "b5f3d1aaff5bb77b593aaba8eabf1a50f1ab3a4eb80eafcbca21394e964ca920",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b5f3d1aaff5bb77b593aaba8eabf1a50f1ab3a4eb80eafcbca21394e964ca920"
+    },
+    "evidence": "Peppy resident wants a borrowed item returned to a resident who moved away and asks the well-travelled player to find the owner. Item 26 and recipient 25 retain their native roles and the request remains unresolved, not completed. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0212",
+    "reference_id": "message:0212",
+    "source_sha256": "3422af835d0d69b501057ef530c3c6ed4671b7288c3593caff74bab0236cdda9",
+    "reference_sha256": "72d1f5483c3f566a62e7846e09b35869aa4aa575ecddda91e3d2b0cbf06cbd14",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c4ba643448eaeee0571f1d6cbf19fbc0cfe42486757534ba9b74320e6175a7ee"
+    },
+    "evidence": "Cranky resident admits that a borrowed item was not returned before the owner moved away and asks the player to locate the owner and return it. All native item/recipient fields and acceptance controls remain unchanged. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required. Remove only redundant pre-field CUTARTICLE through the existing audited adapter; native insertion never prepends that article."
+  },
+  {
+    "id": "message:0240",
+    "reference_id": "message:0240",
+    "source_sha256": "60e31feaf06b37bbcfe6a94944b5b5d12056c06328a32c4d63dcc98994d8f392",
+    "reference_sha256": "59472924cfcaeffd761bfd125e0079ac3515d2535a9f55963f9d8a2e76407c21",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "08cd83532e68c67f0806e49759816807771296f9cc195c84b5a598f28147ab98"
+    },
+    "evidence": "Lazy resident has located the missing owner, cancels the player's search, and requests the borrowed item back to handle the return personally. The native cancellation/return ending is preserved. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required. Remove only redundant pre-field CUTARTICLE through the existing audited adapter; native insertion never prepends that article."
+  },
+  {
+    "id": "message:0246",
+    "reference_id": "message:0246",
+    "source_sha256": "2b0843ec8c9df2726af708f5dd94d55851b89aad11ffdbd37d7ac7fdd325150e",
+    "reference_sha256": "24827c77158f5421a33cbbe9e5671aec852907d73ba2029ce0ad471e049445e4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "05d37fc05a768dddfb7232b0174f512e45b5db34ae2c17fc2c2fc04e37d259bf"
+    },
+    "evidence": "Cranky resident abandons the unsuccessful missing-owner search, jokes about the player's detective ability, and asks for the borrowed item back. English retains the native cancelled-search outcome. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required. Remove only redundant pre-field CUTARTICLE through the existing audited adapter; native insertion never prepends that article."
+  },
+  {
+    "id": "message:0260",
+    "reference_id": "message:0260",
+    "source_sha256": "55fbcaeda1565d93b85acb709a9f59723a8506df3fd221c678bce90cc81e611f",
+    "reference_sha256": "79c01fc531651850957c05b92d9372243a8964fcdb426d52f6c24691ca6eea7c",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "79c01fc531651850957c05b92d9372243a8964fcdb426d52f6c24691ca6eea7c"
+    },
+    "evidence": "Normal resident accepts the player's refusal of the favour and leaves open a future request. No new job or successful action is implied. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:02C2",
+    "reference_id": "message:02C2",
+    "source_sha256": "792d05e94ca58d05e58fda4437d715d1b6e72e17cd5ba8c18c48a6ff1dc980e4",
+    "reference_sha256": "a8d97330a837777d33e7a8b9526f160ba9783fb760d8cb1b0168f6382dc6356d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a8d97330a837777d33e7a8b9526f160ba9783fb760d8cb1b0168f6382dc6356d"
+    },
+    "evidence": "Jock expresses disappointment about a failed favour despite not knowing the full circumstances. The complete English response preserves the native disappointment outcome. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:033A",
+    "reference_id": "message:033A",
+    "source_sha256": "15b61c1bbb5b3c23f0e4fb8eec2b1dd04710bf231c9260219e411da7d0e9c46e",
+    "reference_sha256": "6079dac46cd3109c094cf25a542637dd46c1aaf5362a30e491c5eeb6ea9f948f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "6079dac46cd3109c094cf25a542637dd46c1aaf5362a30e491c5eeb6ea9f948f"
+    },
+    "evidence": "Normal resident observes that the player's pockets are still full and asks for another inventory check. The same capacity gate remains native. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:034B",
+    "reference_id": "message:034B",
+    "source_sha256": "02c6552a1ddf5d4c86da0250547f4d4809124a7911f03ef94aa497e92c9856d2",
+    "reference_sha256": "5f6cc620774db74dfb166bcf5a5753302570845105e15fae8382db2bdc557381",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "5f6cc620774db74dfb166bcf5a5753302570845105e15fae8382db2bdc557381"
+    },
+    "evidence": "Peppy resident cannot hand over the reward until the player reduces the carried items. English preserves the repeated full-pocket warning. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0373",
+    "reference_id": "message:0373",
+    "source_sha256": "040812e398ab6566d34a6e75b602fad55c1cdf9938f275417b4e732df089cb73",
+    "reference_sha256": "b12f5faa9d7257847ede08b76e592fa4e7291a6028575dfc402f0a4e05a695e9",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b12f5faa9d7257847ede08b76e592fa4e7291a6028575dfc402f0a4e05a695e9"
+    },
+    "evidence": "Peppy resident wants to give thanks but cannot supply the reward while the player's pockets are full. The native deferred handoff remains unchanged. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0441",
+    "reference_id": "message:0441",
+    "source_sha256": "8f7e0905dd925f0bb04517e49c584dd611ecdc045f4e0fbc1b5b04b0e1b054b3",
+    "reference_sha256": "6016aa0d9f247527b4a4b111d9ee6f2629f4ddd53d0905a21ba024f9e58fe2a0",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "6016aa0d9f247527b4a4b111d9ee6f2629f4ddd53d0905a21ba024f9e58fe2a0"
+    },
+    "evidence": "Normal resident cannot entrust an errand to the player with full pockets and asks the player to inspect the carried items. The same request/capacity outcome is retained. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0847",
+    "reference_id": "message:0847",
+    "source_sha256": "dcf72f579a9983d691b5195f2ac25eccfac680f5b9a78114ecf94e50dc7c6e76",
+    "reference_sha256": "479382cccab0bee8080295bc7069665fe04a269bf70e0023a5a59efd7b0cf929",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "479382cccab0bee8080295bc7069665fe04a269bf70e0023a5a59efd7b0cf929"
+    },
+    "evidence": "Normal resident explains that three additional friends or family members can live in the town alongside the player. English retains the four-player total and the invitation to bring more residents. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:084B",
+    "reference_id": "message:084B",
+    "source_sha256": "233d349e0a511df21cdce88e2146b79b143a93cb554c205b6aa8e1c5e41b5c09",
+    "reference_sha256": "b7e182696f7fd5a50acc4a4f6092d493061373814aa296e8ca6fbb5a3765e6e7",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b7e182696f7fd5a50acc4a4f6092d493061373814aa296e8ca6fbb5a3765e6e7"
+    },
+    "evidence": "Peppy resident explains facing and shaking fruit trees with A, selling fruit to Nook, and planting fruit to grow more trees. Native town/catchphrase fields and the A-button instruction remain correct. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:084E",
+    "reference_id": "message:084E",
+    "source_sha256": "4fe2f9189c5ea5243962136dc000962eaa27d186cf7957821ce597cc32dcd11a",
+    "reference_sha256": "af44c62823a5d2f5925160980b772d0f04a0af0bf6729b88fcd9837027400a57",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "af44c62823a5d2f5925160980b772d0f04a0af0bf6729b88fcd9837027400a57"
+    },
+    "evidence": "Peppy resident discusses Nook's ambition to enlarge the store and encourages purchases to increase its sales. English retains the same shop-expansion advice. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0857",
+    "reference_id": "message:0857",
+    "source_sha256": "a298022b39ea92bc5052c1032fac7879e9edfce4ca97a34f75deddaa85ca8843",
+    "reference_sha256": "8b13919dd0281f0e826b8058979459e645b8f33ff16936294c9eb5295739946a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "8b13919dd0281f0e826b8058979459e645b8f33ff16936294c9eb5295739946a"
+    },
+    "evidence": "Lazy resident explains earning money for tools by gathering unwanted things and selling them to Nook. The English humour retains the same practical money-making advice. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0859",
+    "reference_id": "message:0859",
+    "source_sha256": "2259bd3eebf835429d3b8120840d870d776c56d8c55b088b7ad07ea4a740e699",
+    "reference_sha256": "854c931527831055bd093c17ebc5aebcd58f0d15fdd58fa76c1a237523a5d7f0",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "854c931527831055bd093c17ebc5aebcd58f0d15fdd58fa76c1a237523a5d7f0"
+    },
+    "evidence": "Lazy resident describes posting letters to villagers, replies, and attaching a present by moving an inventory item to a letter and pressing A. All native mailing and gift-attachment instructions remain. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:085B",
+    "reference_id": "message:085B",
+    "source_sha256": "dcdf3ed3f2f15a334dab93e022cbeb2dc05811c751872c5bdd1b2480d3a3cbb1",
+    "reference_sha256": "fc6d0da97b76ff554274e636fa3884b0c39638f7ed69af51e7ebc72bc0858288",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fc6d0da97b76ff554274e636fa3884b0c39638f7ed69af51e7ebc72bc0858288"
+    },
+    "evidence": "Lazy resident encourages friends and family to move into neighbouring player houses and exchange letters or bulletin-board messages. English retains the shared-town and social features without promising additional house slots. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:085D",
+    "reference_id": "message:085D",
+    "source_sha256": "537497de422ce318421ae0bdc6d3067ff5f09096ca890c337d1b7055c27f6049",
+    "reference_sha256": "ccf847f80135623c3f1faefafce6e6f0bfaef11a8b1644da3f8e77801f3d7c6e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "ccf847f80135623c3f1faefafce6e6f0bfaef11a8b1644da3f8e77801f3d7c6e"
+    },
+    "evidence": "Lazy resident discusses possibly moving away, remembering the player, keeping received letters, and meeting again in another town. This remains speculation, not a new immediate moving action. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0864",
+    "reference_id": "message:0864",
+    "source_sha256": "d6782de52e9f75366ad2c62a3ced8dc52987d3e60f9debb23cab2aef02c6bf44",
+    "reference_sha256": "150eb9f244e8e23935b7ccc37075b33411e5c6b96f6de7a16e9726dd86fa7079",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "150eb9f244e8e23935b7ccc37075b33411e5c6b96f6de7a16e9726dd86fa7079"
+    },
+    "evidence": "Jock explains editing the town tune at the post-office board and checking the separate board near player houses for events. English preserves both locations and distinct board functions. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0869",
+    "reference_id": "message:0869",
+    "source_sha256": "56e36f92762a30dad9d46b8cc143833dfc81b350b0320c5327b6519388389927",
+    "reference_sha256": "487e19ae9c7409f6aaa96b2efe066efa29dc2d2578dea1ad2d2bc3ffee6ea0e5",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "487e19ae9c7409f6aaa96b2efe066efa29dc2d2578dea1ad2d2bc3ffee6ea0e5"
+    },
+    "evidence": "Cranky resident explains shaking fruit trees with A, selling fruit, and planting an orchard, then demands a share of the harvest. The English private-orchard boast is dialogue, not a new ownership restriction. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:086B",
+    "reference_id": "message:086B",
+    "source_sha256": "b64b752b0b900d81093236476cf6ba0229890022ba00429e86b40087e9f374d5",
+    "reference_sha256": "bba00c5c96ae8e54c27da29631216f9042980d62c9ac2ec5ad91ed69420a6a75",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "bba00c5c96ae8e54c27da29631216f9042980d62c9ac2ec5ad91ed69420a6a75"
+    },
+    "evidence": "Cranky resident explains selling unwanted items to Nook to fund purchases. English's fishing-pole example preserves the native earning-and-buying advice without a new quest. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:086D",
+    "reference_id": "message:086D",
+    "source_sha256": "7c7791de5df244c83aef89e70dd4ea4aea5debc881c5528d9b542dd963945eaa",
+    "reference_sha256": "1e79e169d0718a3612e23b53353ecdfce63e985d4b40f1a64f045b8af4f1c4ae",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1e79e169d0718a3612e23b53353ecdfce63e985d4b40f1a64f045b8af4f1c4ae"
+    },
+    "evidence": "Cranky resident explains mailing letters and attaching inventory gifts with A, then denies asking for gifts personally. Native post-office and attachment instructions remain correct. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:086F",
+    "reference_id": "message:086F",
+    "source_sha256": "a89adb240294eb4929bb81e26c1d22a689c46802ed1fe28d98f8a595bf5ed638",
+    "reference_sha256": "c71fa88bc2aeb68f2af470685f7732cc3c6ac9d032ceb7cdff4f69b46489ed5e",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "c71fa88bc2aeb68f2af470685f7732cc3c6ac9d032ceb7cdff4f69b46489ed5e"
+    },
+    "evidence": "Cranky resident explains that four human players can live in the town and encourages the player to invite friends. English retains the native four-player limit. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0876",
+    "reference_id": "message:0876",
+    "source_sha256": "201d50e4988c8f95a7806761fa6ed6cb7d2d54b10acdd8e3e0a065eef8df52fe",
+    "reference_sha256": "fbaad5a9befc74905a4d2f0f9feedfe9bdaf346912aceea8cee0d4686f664312",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fbaad5a9befc74905a4d2f0f9feedfe9bdaf346912aceea8cee0d4686f664312"
+    },
+    "evidence": "Snooty resident encourages purchases to help Nook expand the store and increase available stock. The English request retains the native sales/expansion relationship. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0877",
+    "reference_id": "message:0877",
+    "source_sha256": "f254e7e317f20627a82d8149e449f4d7459121347cc13a9e605a4193acc916c0",
+    "reference_sha256": "24d342c6e90188bfcb704a09a7706e8b357f44028f908dece978c48a7fa0c28d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "24d342c6e90188bfcb704a09a7706e8b357f44028f908dece978c48a7fa0c28d"
+    },
+    "evidence": "Snooty resident requests letters, describes replies and attaching gifts with A, and speculates about sending a gift in return. No new delivery or reward condition replaces native commands. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:090C",
+    "reference_id": "message:090C",
+    "source_sha256": "4f58dba0a444d53943c6845ed7111615faebed9c6326a288e162fc0802c57ac3",
+    "reference_sha256": "4978ac6bb915074e64792c89da8b168bbce9740275566217df27f989a636986f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "4978ac6bb915074e64792c89da8b168bbce9740275566217df27f989a636986f"
+    },
+    "evidence": "Lazy resident explains retaining letters, showing them to friends, carrying them when moving, and sharing them in the new town. The warning to write considerate letters remains complete. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0911",
+    "reference_id": "message:0911",
+    "source_sha256": "2e70509b75532442759e61a913136e3fcb87438b83e3d82e3ff5ff69f8a6b31b",
+    "reference_sha256": "06b842fd763456dae1aff6713e29c3cbcc061dc5c5679dcb5cae13ff4195806f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "06b842fd763456dae1aff6713e29c3cbcc061dc5c5679dcb5cae13ff4195806f"
+    },
+    "evidence": "Snooty resident thanks the working courier, teases the player's delivery job, and asks whether the delivered letter was written by the player. The native letter/job context remains unchanged. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0A69",
+    "reference_id": "message:0A69",
+    "source_sha256": "cd8a23fe9be1d895927a1346bc553e6509a0c0c6068de33f36422b80b863aac0",
+    "reference_sha256": "617fe935e588ca3cc39fb40510775e0a8ccb6cf94597fe76eb9197ed8b2e0780",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "617fe935e588ca3cc39fb40510775e0a8ccb6cf94597fe76eb9197ed8b2e0780"
+    },
+    "evidence": "Cranky resident objects to repeated visits and suggests the player is deliberately irritating the speaker. English localises the same unwelcome-repeat-visit complaint. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0AC4",
+    "reference_id": "message:0AC4",
+    "source_sha256": "b4350d648f41cee9a63cd1813873563de22a4e6f8adda2351113f114e2ef68f5",
+    "reference_sha256": "1a489f482b26953824d46a081135fc3eb7b48974d9bec434b9ac35bebd415be9",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "1a489f482b26953824d46a081135fc3eb7b48974d9bec434b9ac35bebd415be9"
+    },
+    "evidence": "Snooty resident accepts a refusal while criticising attachment to possessions. English's possessiveness joke leaves the same native refusal and does not add an inventory operation. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0B9D",
+    "reference_id": "message:0B9D",
+    "source_sha256": "8f37d609fb09bab385b1cdda04bf7c0f208a5c442280fb7b4c6cb828e62cc466",
+    "reference_sha256": "ae1492107e67116151828b6e918b6f487102232a8bfcc53dc8b77423e8d9a5c1",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "ae1492107e67116151828b6e918b6f487102232a8bfcc53dc8b77423e8d9a5c1"
+    },
+    "evidence": "Snooty resident jokes about difficulty waking for morning exercise. The native taisou wordplay is localised as an exercise-in-futility joke; the morning exercise event remains the same. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0BB8",
+    "reference_id": "message:0BB8",
+    "source_sha256": "704c3e2a6dd495e2f471b1407f7a95f3237fbd30762972051828cceffb057b5f",
+    "reference_sha256": "217e38230ab6716d6ed782eeb3d43e447d1586297bc5514e47ce49bf110d1fab",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "217e38230ab6716d6ed782eeb3d43e447d1586297bc5514e47ce49bf110d1fab"
+    },
+    "evidence": "Snooty resident invites the player to the New Year's Eve countdown while teasing the player about being too young to stay awake. English preserves the event and exaggerated baby talk. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0D67",
+    "reference_id": "message:0D67",
+    "source_sha256": "b0ac4cc41df687a6b25172400c6f3667b31b2a5834cad80fa6a8d8faba5094ed",
+    "reference_sha256": "b6ce914ac815983a1df73e8a1c3a8d9131cadbd0db1d411298f3b5c83967b391",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b6ce914ac815983a1df73e8a1c3a8d9131cadbd0db1d411298f3b5c83967b391"
+    },
+    "evidence": "Snooty resident discusses Redd's furniture flyer, occasional unique goods, and inflated prices on ordinary furniture. English retains the same travelling merchant and warning about value. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0E8F",
+    "reference_id": "message:0E8F",
+    "source_sha256": "3609678eb7381708a5139ff4f02a7b191b54681680c628f00339d1a3c8d9ab80",
+    "reference_sha256": "a2844c54ec7f77291b76bcabcc2609e596e00104b91a61fc9decd0eff771ef17",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "a2844c54ec7f77291b76bcabcc2609e596e00104b91a61fc9decd0eff771ef17"
+    },
+    "evidence": "Normal resident promises to care for the snowman and worries about it melting. English retains the same snowman outcome and speaker catchphrase. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EA9",
+    "reference_id": "message:0EA9",
+    "source_sha256": "8f0398954a2753c4c2a648ec20c92b07b05cd78c7decc17580d8203ee5c348de",
+    "reference_sha256": "7fb3fa4702f16f315db4d6d5738fe91a1b0dbe38b1372933f9211f031193496a",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "7fb3fa4702f16f315db4d6d5738fe91a1b0dbe38b1372933f9211f031193496a"
+    },
+    "evidence": "Jock defers a prize because the player's pockets are full and asks the player to make room before returning. Native capacity and deferred-prize controls remain unchanged. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EAA",
+    "reference_id": "message:0EAA",
+    "source_sha256": "c51336cbb90fa6951d539f204eb2401e325c2394eaffb46fab255d7ba00e383b",
+    "reference_sha256": "e5ed0fa69e568e0b579ad102e81ee4d54335605466fb9c1e04f81ba57eb65918",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e5ed0fa69e568e0b579ad102e81ee4d54335605466fb9c1e04f81ba57eb65918"
+    },
+    "evidence": "Jock cannot hand over a prize while the player's pockets are full and demands that something be removed. The English full-pocket refusal preserves the native deferred handoff. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EAC",
+    "reference_id": "message:0EAC",
+    "source_sha256": "5e4f2ef79a7e0ad024d1e885a3a82c1903545ca3b44cadac3041495686cec523",
+    "reference_sha256": "967552f7c7e92f0d2913d68e50fa249153f524d63b83387b387ec5af239f2696",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "967552f7c7e92f0d2913d68e50fa249153f524d63b83387b387ec5af239f2696"
+    },
+    "evidence": "Cranky resident cannot supply a prize until the player has carrying space. English retains the native full-pocket condition and later handoff. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EAD",
+    "reference_id": "message:0EAD",
+    "source_sha256": "1c6a5346ff9931b994be5c7b5d98f46381ab93efb89088e19dd0592b1abc031e",
+    "reference_sha256": "dee8c67158802a4f5f93079c319acabad9937d6474b74237703bb097ef9f3fca",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "dee8c67158802a4f5f93079c319acabad9937d6474b74237703bb097ef9f3fca"
+    },
+    "evidence": "Cranky resident complains about cluttered pockets and withholds the prize until inventory space is available. The native capacity condition and deferred-reward outcome remain. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EB0",
+    "reference_id": "message:0EB0",
+    "source_sha256": "ae5817d868d34fae0154d4ea6220814182a820fb48547c8c32d8be28d6007a41",
+    "reference_sha256": "9a7c4930dc8451d4b631adc9b0a48b6f15cb39962dd5853226908bc191f4ecd1",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9a7c4930dc8451d4b631adc9b0a48b6f15cb39962dd5853226908bc191f4ecd1"
+    },
+    "evidence": "Snooty resident is frustrated that the player's full pockets prevent a gift handoff and warns about forgetting the reward. The English warning localises the native impatient return request without changing the gate. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0EE7",
+    "reference_id": "message:0EE7",
+    "source_sha256": "38a525f6d7ef98b78270b422bb09a2fce3f938fe0a8733048ac8e87f759b3e66",
+    "reference_sha256": "b6cfe1a0d9d3183c6625e87ae020c4213b891a1fc411ce252e4fb999ab7292c0",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b6cfe1a0d9d3183c6625e87ae020c4213b891a1fc411ce252e4fb999ab7292c0"
+    },
+    "evidence": "Snooty resident objects to the player's unexpected phrase, quoting the exact native prepared text in field 2E. English preserves the quoted-field reaction. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0FC4",
+    "reference_id": "message:0FC4",
+    "source_sha256": "ae99e9d057d35d259d478c332479ed5a702c0a198749d7a89a8cf850c982a5c7",
+    "reference_sha256": "129b3bbb07ef6495626918b689b17cf96fda047ec1ef4d2b7283530d601df4f4",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "129b3bbb07ef6495626918b689b17cf96fda047ec1ef4d2b7283530d601df4f4"
+    },
+    "evidence": "Snooty resident likes beautiful gardens but dislikes getting dirty and wants someone else to garden. English retains the same request and speaker/player/catchphrase fields. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0FC5",
+    "reference_id": "message:0FC5",
+    "source_sha256": "61fabd076fcba7dd80f9c4f3fd85dc2ca7017de1dd3f565440e4f3278d7ec159",
+    "reference_sha256": "154c16f850f9c846de466e4bb6662f553fd5c4a79e4985129729b2426cd4e45f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "154c16f850f9c846de466e4bb6662f553fd5c4a79e4985129729b2426cd4e45f"
+    },
+    "evidence": "Snooty resident asks the mud-loving player to garden around the speaker's house so the speaker's clothes stay clean. Native gardening request and outcomes remain unchanged. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:0FFB",
+    "reference_id": "message:0FFB",
+    "source_sha256": "a4bd32242274d1e38b1190dca9db14811054414f1caf5bf052d9e421664ee94a",
+    "reference_sha256": "10b58a591c7d13b3712e176b3849957ec85fc076349a3d4861acd605b4438773",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "10b58a591c7d13b3712e176b3849957ec85fc076349a3d4861acd605b4438773"
+    },
+    "evidence": "Snooty resident offers the native selected item in field 31 while mocking the player's room. No item identity or reward operation changes. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:1013",
+    "reference_id": "message:1013",
+    "source_sha256": "c332e6fa8029115baa9eb4d57e5ecf0b8e19c748a07db68eaf3054fffea16798",
+    "reference_sha256": "3172764d0e62474c77095fa2b71b6141aefa68a574cb64f4ff347dba8e9e349f",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "3172764d0e62474c77095fa2b71b6141aefa68a574cb64f4ff347dba8e9e349f"
+    },
+    "evidence": "Snooty resident celebrates the improved area around the speaker's house and proposes beautifying the rest of the current town. Town field 2F retains its original source. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:102B",
+    "reference_id": "message:102B",
+    "source_sha256": "6281e113ad95efd0483e213845ba14c65b0d3dceb4b554b19ea2dadc1efbe4e4",
+    "reference_sha256": "fec737bbc09bc2d3095a4adf5e5b6c75076c4e675e94ac0cf9fd57d8938e3b5d",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "fec737bbc09bc2d3095a4adf5e5b6c75076c4e675e94ac0cf9fd57d8938e3b5d"
+    },
+    "evidence": "Jock defers a thank-you reward because the player's pockets are full and asks for space before returning. Preserve this separate gardening/reward record and its native controls. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:102C",
+    "reference_id": "message:102C",
+    "source_sha256": "7b4927e4a3059680c66948890f41ea1c76c740732d92332a73ade2e4d4bcfd9c",
+    "reference_sha256": "e5ed0fa69e568e0b579ad102e81ee4d54335605466fb9c1e04f81ba57eb65918",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "e5ed0fa69e568e0b579ad102e81ee4d54335605466fb9c1e04f81ba57eb65918"
+    },
+    "evidence": "Jock cannot hand over the thank-you reward because the player's pockets are full. English retains the native capacity refusal rather than granting the item. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:102E",
+    "reference_id": "message:102E",
+    "source_sha256": "5e4f2ef79a7e0ad024d1e885a3a82c1903545ca3b44cadac3041495686cec523",
+    "reference_sha256": "69b6d198fae14a20e23d092e38bd0e92190019e5a9703293eb09d6f9eb1a0413",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "69b6d198fae14a20e23d092e38bd0e92190019e5a9703293eb09d6f9eb1a0413"
+    },
+    "evidence": "Cranky resident defers the thank-you reward until the player can carry it. This separate native record retains its original capacity gate and actor controls. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:102F",
+    "reference_id": "message:102F",
+    "source_sha256": "1c6a5346ff9931b994be5c7b5d98f46381ab93efb89088e19dd0592b1abc031e",
+    "reference_sha256": "dee8c67158802a4f5f93079c319acabad9937d6474b74237703bb097ef9f3fca",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "dee8c67158802a4f5f93079c319acabad9937d6474b74237703bb097ef9f3fca"
+    },
+    "evidence": "Cranky resident withholds a thank-you reward until the player's cluttered pockets have space. English preserves the native deferred-reward outcome. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:1032",
+    "reference_id": "message:1032",
+    "source_sha256": "2f25278b8d68fbb3d0f691aec17907a71b7c51aebbf5a22e977ad32c239e9a4a",
+    "reference_sha256": "9a7c4930dc8451d4b631adc9b0a48b6f15cb39962dd5853226908bc191f4ecd1",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "9a7c4930dc8451d4b631adc9b0a48b6f15cb39962dd5853226908bc191f4ecd1"
+    },
+    "evidence": "Snooty resident cannot give the thank-you gift because of full pockets and warns about forgetting it. The same native deferred handoff remains. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
+    "id": "message:1042",
+    "reference_id": "message:1042",
+    "source_sha256": "d10afe97042b6cbb8394fa382fae676d6eac87da43e2695102b745635acc5f29",
+    "reference_sha256": "b76f51f17c48639a1468cb391e28100f6a50134c1db117bfbf5884380b164748",
+    "resident_animations": {
+      "context": "native_resident_talk",
+      "adapted_sha256": "b76f51f17c48639a1468cb391e28100f6a50134c1db117bfbf5884380b164748"
+    },
+    "evidence": "Snooty resident acknowledges the pending reward and hands it over as thanks. English retains the successful reward handoff, distinct from the neighbouring full-pocket refusals. Preserve the complete English wording, manual layout, pages, and timing. Only reviewed NPC0 slot-zero standing expressions may differ; exact native non-expression actor requests, field availability, gameplay controls, capacity, and full source/reference/output hashes remain required."
+  },
+  {
     "id": "message:0152",
     "reference_id": "message:0152",
     "source_sha256": "a930809e1748bb0637f8fc602165f87fdc0ca6163c78f2c158699c785fb145a2",

@@ -69,7 +69,7 @@ shared helper does not generally allow arbitrary relocation targets.
 
 ## Approved content
 
-Eighty-three complete references have individual approvals. Eighteen cover resident introductions, the hungry/peaceful/
+132 complete references have individual approvals. Eighteen cover resident introductions, the hungry/peaceful/
 howling moon conversations, a secret spot, dusk-road fear, the heat challenge,
 and an interrupted home visit:
 
@@ -77,13 +77,13 @@ and an interrupted home visit:
 1F09 1FF5 20AE 20D7 2104`.
 
 The [resident conversation and clothing-errand batch](RESIDENT_CONVERSATIONS.md)
-covers the other 65 records. All retain complete supplied English wording and
-presentation. Four remove only a redundant pre-field `CUTARTICLE` using the
-existing adapter; no English text is removed. A read-only
-classification identifies 255 reference-rejection records whose non-expression
-signatures agree; this is a review pool, not 255 approved translations. Different
-topics, special actors, unapproved values, and other semantic differences still
-require review. The long `04F7` introduction uses its separate
+covers 65 records; the [parcel and town-advice batch](PARCELS_TOWN_ADVICE.md)
+covers another 49. All retain complete supplied English wording and presentation.
+Seven remove only a redundant pre-field `CUTARTICLE` using the existing adapter;
+no English text is removed. The read-only review queue exposes 107 remaining
+command-compatible comparisons. Different topics, special actors, unapproved
+values, and other semantic differences still require individual review; the
+queue itself approves nothing. The long `04F7` introduction uses its separate
 [complete linked-record approval](REFERENCE_SEQUENCES.md), not this permission.
 Fishing advice `2008` has an original native-complete draft because the reference
 omits the final timing instruction.
@@ -91,7 +91,7 @@ omits the final timing instruction.
 ## Verification and limits
 
 Eight host tests cover exact command scope, value/context/hash guards,
-incompatible combined permissions, unchanged adapter defaults, all 83
+incompatible combined permissions, unchanged adapter defaults, all 132
 complete references, actual consumer tables, two relocation bases, unchanged
 installed consumers, and independent builder rejection of tampered text.
 

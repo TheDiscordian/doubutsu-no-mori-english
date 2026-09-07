@@ -3072,6 +3072,91 @@
   favour conversation review and the broader field/topic/overflow queue;
   gameplay, saves, human playthrough, release, and stretch work remain active.
 
+## 2026-09-07: fifty-seven parcel, town-advice, and native event records
+
+- The status-only interruption changed no project state. Resumed the pending
+  parcel batch from the authoritative worktree and completed its original
+  drafts, verification, and durable checkpoint. The complete translation goal
+  remains active; this batch is progress, not project completion.
+- Added the read-only `tools/resident_review_queue.py` with five synthetic tests.
+  It verifies the native ROM/consumer and complete reference hashes, excludes
+  existing candidates and incompatible commands/fields/values/capacity, and
+  emits explicitly unapproved comparison rows. It does not write translation
+  approvals or install text. A full-hash mismatch in `14FD` was traced to
+  reference re-encoding uncertainty; that record is withheld rather than
+  accepted by partial wording. Reports retain complete local comparison text
+  under ignored `build/`, not committed extracted assets.
+- The initial queue contained 164 comparisons. Individually reviewed 49 matching
+  resident references: parcels and borrowed items for moved-away owners,
+  cancelled searches, refusal/disappointment, pocket capacity, four-player town
+  sharing, fruit, Nook's business, selling, mail/boards, friendship, exercise,
+  New Year's Eve, Redd's value warning, snowmen, gardens, and deferred/successful
+  rewards. Each full source/reference/output hash is bound independently.
+  The complete ID/context list is in `specs/PARCELS_TOWN_ADVICE.md`; detailed
+  per-record evidence is in `translations/reference_matches.json`.
+- The resident-expression permission now has 132 complete approvals. The 49
+  references retain all supplied English wording, lines, pages, emphasis, and
+  pauses. Exactly `0212`, `0240`, and `0246` remove the existing redundant
+  pre-field `CUTARTICLE`, giving seven such adaptations across all approvals.
+  Other actor requests, fields, quest/choice/branch commands, and buffer guards
+  remain enforced. Special actors are not granted this permission.
+- Added eight original drafts in `translations/n64-town-advice.json`.
+  `0B8D` retains White Day return gifts, and `0B96` retains May carp streamers
+  and the verb-choice joke. `0BA8` retains Thirteenth Night and the annually
+  converted lunar ninth-month day 13 in fields `3E/3F`. `0BC9` retains black-bass
+  size and the hint not to show catches immediately, not GameCube weight wording.
+  `0F35` retains rain, `0F42` yellow-green leftover paint, and `0FA9` the player's
+  slightly dissatisfied town rating. `1082` retains Nook's 498,000-Bell final
+  renovation, instalments, no further house growth, and the debt obligation;
+  the 398,000-Bell English reference is unsuitable.
+- All original commands and arguments remain exact except one colour length
+  in `1082`, seven to eleven for the complete term `post office`. Its focused
+  test admits only that precise change. All twelve Nook pages, original waits,
+  pauses, expression requests, and final end remain. Original draft bounds are
+  314, 400, 486, 609, 308, 138, 321, and 703 bytes, respectively.
+  No split, truncation, buffer increase, or new runtime patch is needed.
+- The first layout check flagged the generic ten-fullwidth-cell bounds for
+  both free date fields and a prefixed town name. Moved the town-name prefix
+  to the preceding English line within its existing page. The date warnings
+  remain visible; substituting the longest English month/day proves the guarded
+  values fit. The date draft requires the existing complete ordinary-dialogue
+  date patch. Its ninth-month day-13 preparation is covered by existing native
+  conversion tests; this batch does not claim new rendered date-insertion tests.
+  Basic generation completes with 10,108 edits, withholds all three dependent
+  moon-viewing drafts, and includes the other seven town-advice drafts.
+- `build/tests-parcel-advice-full-01.log` passes all 451 tests in 190.909 seconds.
+  The focused runs also pass six original-draft tests, eight animation approval
+  tests covering all 132 references, and five read-only queue tests.
+- `build/smoke-parcel-advice-01/` passes all 57 new complete cartridge loads in
+  one fresh silent four-MiB process: 57 calls, 173 assertions, and 294 recorded
+  steps. Complete headers/text, adjacent/module guards, checkpoint restoration,
+  blank 131,072-byte FlashRAM, and graceful shutdown pass. No unchanged train,
+  expression-selector, or mail test batch is repeated. This does not execute
+  ordinary parcels, searches, rewards, painting, seasonal conversations, debt
+  repayment, saving, or hardware play.
+- The final ROM `build/parcel-advice-pilot/animal-forest-halfwidth.z64` has SHA-256
+  `975f9e08554faaaef08a201fc6cb67fae35eea696340384ab44a926c5d450bf1`.
+  Its UPS has SHA-256
+  `2ee23f1dea971a06f9b7c123c232e90723bb8d6448778d701d9939134b873606`.
+  The builder verifies the complete patch round trip. All previous 10,657 edits
+  remain identical. Independent comparison of every extracted DMA file finds
+  changes only in main text, its pointer table, and the directory rows; the
+  directory container's other bytes remain unchanged. All code, overlays,
+  fonts, metrics, resident runtime, and resources retain their prior contents.
+- Coverage is 10,714 total edits, including 9,403 reference main candidates and
+  66 original main drafts: 9,469 main candidates and 2,283 without candidates.
+  The latter include 1,352 with Japanese static text, nine placeholders, 919
+  without static text, one Latin record, and two number/symbol records. Ten
+  command-only records contain dynamic insertions. The reference queue contains
+  1,796 unconfirmed identities, 413 control-signature differences, 69 missing
+  fields, and six overflows. Its 1,410 reference-layout warnings remain for
+  review without automatic reflow. The regenerated expression-difference queue
+  contains 107 unapproved comparisons. Reports are in
+  `build/parcel-advice-candidates/`, `build/parcel-advice-coverage/`, and
+  `build/parcel-advice-review/`. Continue these and broader text/runtime work;
+  normal gameplay, saves, final review, patch-only release, and stretch goals
+  remain in scope.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

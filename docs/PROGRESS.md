@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 440 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 451 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -588,7 +588,7 @@ actions and final draft wording/layout remain for the combined gameplay and
 human-playthrough review. No additional train or mail-window run is needed for
 this text-only batch.
 
-Eighty-three [resident-animation approvals](../specs/RESIDENT_ANIMATIONS.md) retain
+132 [resident-animation approvals](../specs/RESIDENT_ANIMATIONS.md) retain
 complete English introductions, moon conversations, clothing errands, and other
 resident exchanges. The [broader conversation batch](../specs/RESIDENT_CONVERSATIONS.md)
 covers 65 complete references, including clothes-delivery requests, recipients
@@ -597,9 +597,9 @@ Four references remove only a redundant pre-field article-suppression command;
 all English wording and presentation remain. Five original drafts retain the
 complete fishing tip, winter flowers, March 14 White Day, and May carp streamers
 where the English reference omits instructions or describes a different event.
-All seventy new complete cartridge loads pass in one four-MiB batch: seventy
+All seventy complete cartridge loads pass in one four-MiB batch: seventy
 calls, 212 assertions, and 359 recorded steps, with adjacent/module guards,
-checkpoint restoration, and blank FlashRAM. All 440 host tests pass. Ordinary
+checkpoint restoration, and blank FlashRAM. All 451 host tests pass. Ordinary
 clothing handoff/animation/return, sale/painting actions, dynamic-field display,
 and final wording/layout remain in the gameplay/playthrough queue.
 Only reviewed NPC0 slot-zero expression delivery differs; fields, other actor
@@ -610,6 +610,17 @@ complete save retention, allocation/stack/module guards, and restored checkpoint
 The test records calls at the animation-initializer boundary, so actual poses
 and normal resident playback remain gameplay checks. Production animation code,
 font data/metrics, and saved layouts are unchanged.
+
+The [parcel and town-advice batch](../specs/PARCELS_TOWN_ADVICE.md) supplies
+49 more complete English references and eight native-specific drafts. These
+retain borrowed-item returns, cancelled searches, deferred rewards, shared-town
+advice, White Day/May/Thirteenth Night, rain, native paint colour, and Nook's
+498,000-Bell final renovation. All 57 complete cartridge loads pass with 173
+assertions and 294 recorded steps; all 451 host tests pass. Every previous
+candidate edit and all executable/font/runtime resources remain unchanged.
+Normal handoffs, actions, dates, debt payment, final wording/layout, saves, and
+hardware acceptance remain. A read-only queue exposes 107 remaining expression-
+difference comparisons for actor/topic review; it cannot approve or install text.
 
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
@@ -629,16 +640,17 @@ gameplay destination uses its wider names.
 
 ## Validation and release status
 
-The resident-module experiment contains 10,657 edits, including
-9,354 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 10,714 edits, including
+9,403 reference dialogue candidates, all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, and seven native
-advice/travel drafts, four native festival drafts, and 26 native seasonal
-conversation drafts. It retains the GameCube calendar wording in Rover's
+advice/travel drafts, four native festival drafts, 26 native seasonal
+conversation drafts, and eight native town-advice drafts. It retains the
+GameCube calendar wording in Rover's
 opening question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 2,341 main records; one receives an original
-fallback draft. The final candidate-file audit finds 2,340 main records without
-candidates: 1,409 with Japanese text, nine exact placeholders, 919 with no static
+Its reference generator rejects 2,284 main records; one receives an original
+fallback draft. The final candidate-file audit finds 2,283 main records without
+candidates: 1,352 with Japanese text, nine exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

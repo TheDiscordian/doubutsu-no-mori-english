@@ -109,7 +109,7 @@ four-MiB town arrival, and all eight complete native letter windows pass.
 
 Next content audits target the remaining inserted-text and actor-command gaps.
 The [resident-animation permission](../specs/RESIDENT_ANIMATIONS.md) admits
-83 reviewed complete English records while keeping all non-expression
+132 reviewed complete English records while keeping all non-expression
 actor commands, fields, flow, and capacity guarded. Its native batch passes
 213 selections, eighteen initial loads, and 88 dispatches. Actual pose initialization
 and normal resident playback remain gameplay checks, not reasons to repeat the
@@ -119,12 +119,26 @@ The [resident conversation batch](../specs/RESIDENT_CONVERSATIONS.md) supplies
 65 additional references, including the clothing request/try-on/failed-return
 conversations `0152..0198`, plus five native-complete fishing, flower, White Day,
 and May festival drafts. All seventy complete cartridge loads pass with guards
-and checkpoint restoration; 440 host tests pass. Normal clothing handoffs,
+and checkpoint restoration; 451 host tests pass. Normal clothing handoffs,
 outfit animations, inventory returns, and sale/painting actions remain gameplay
-checks. English same-ID references with changed native topics
-remain unsuitable even where their command signatures match. More early
-parcel/favour conversations are available for individual expression/meaning
-review; continue that queue without re-running the unchanged selector batch.
+checks. English same-ID references with changed native topics remain unsuitable
+even where their command signatures match.
+
+The [parcel and town-advice batch](../specs/PARCELS_TOWN_ADVICE.md) supplies 49
+complete English references and eight native-specific drafts. All 57 complete
+cartridge loads pass with 173 assertions, guards, and checkpoint restoration.
+Native topics include White Day, May streamers, Thirteenth Night, rainy reading,
+yellow-green paint, town dissatisfaction, size-based fishing advice, and Nook's
+498,000-Bell final house expansion. Ordinary item/quest/debt/event actions remain
+gameplay checks. The date-dependent draft is withheld without the complete date
+patch; the other seven remain available in basic generation.
+
+Continue the 107 comparisons in `build/parcel-advice-review/queue.jsonl`, generated
+by `tools/resident_review_queue.py` from the current candidate file. Every row is
+explicitly unapproved; special actors and changed topics require separate work.
+Regenerate the queue as candidates change. Continue matching resident exchanges,
+native-topic corrections, and the wider field/identity/overflow work without
+re-running the unchanged expression-selector batch.
 
 The complete [late-night introduction](../specs/REFERENCE_SEQUENCES.md) uses
 `04F7 → 083E`, split only at its existing GameCube page boundary after the clock
@@ -133,9 +147,9 @@ checks. Basic builds omit the runtime-dependent group. Keep the original
 wording, pauses, and manual layout; normal conversation and rendered clock
 checks belong in the combined gameplay/playthrough pass.
 
-Current main-bank coverage is 9,412 candidates; 2,340 records remain without
-candidates, including 1,409 containing Japanese static text. The reference
-rejection queue contains 1,796 unconfirmed identities, 470 control-signature
+Current main-bank coverage is 9,469 candidates; 2,283 records remain without
+candidates, including 1,352 containing Japanese static text. The reference
+rejection queue contains 1,796 unconfirmed identities, 413 control-signature
 differences, 69 missing-field records, and six expansion overflows. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native

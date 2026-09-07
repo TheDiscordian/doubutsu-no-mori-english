@@ -1,0 +1,70 @@
+[
+  {
+    "id": "message:0B8D",
+    "source_sha256": "cb9f0212dc41d4652d4d9e417c61a81fbdde720e7948e0d5a63e1bb1ef1bd10f",
+    "translation": "{cmd:7F0900000F}I've only just\nworked it out.{cmd:7F04}\n{cmd:7F02}People give courtesy\nchocolates on Valentine's\nDay{cmd:7F0308} because they expect\ngifts back on White Day!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}As for me,{cmd:7F0308}\nI get all sorts of gifts\nwithout having to do\nanything at all.{cmd:7F04}\n{cmd:7F02}So I never{cmd:7F0308} even{cmd:7F0308}\nnoticed,{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the explanation of courtesy Valentine's chocolates and White Day return gifts, followed by the speaker's boast about receiving gifts without effort. The GameCube Groundhog Day topic does not fit. Preserve every native command and argument."
+  },
+  {
+    "id": "message:0B96",
+    "source_sha256": "d9aeac67ba3e83b0af43d16dd77486cb730a5d8956f51cce87287cdad9e98af1",
+    "translation": "{cmd:7F090000FF}When May comes around,{cmd:7F0308}\nwe put up carp streamers\nall over town, don't we?{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}{cmd:7F030A}Wait...{cmd:7F030F}\nDo we say we put up\ncarp streamers?{cmd:7F0308}\nOr display them?{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}Make them climb{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F030F}\nNo, that can't be right.{cmd:7F030F}\nMake them swim, perhaps?{cmd:7F04}{cmd:7F09000016}\n{cmd:7F02}Hey, {cmd:7F1A}!{cmd:7F0308}\nMake up your mind!{cmd:7F030F}\nHow irresponsible!{cmd:7F0306}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain May carp streamers and the speaker's increasingly confused choice of verb, ending by blaming the player. The GameCube Harvest Festival pumpkin topic is unrelated. Preserve all native pauses, expressions, pages, and fields."
+  },
+  {
+    "id": "message:0BA8",
+    "source_sha256": "65f655059b60ca62ea81a2661b3b02d9721a949e5aee076d77365686c7691eb6",
+    "translation": "{cmd:7F090000FF}Lunar month nine, day 13{cmd:7F0306}\nis Thirteenth Night.{cmd:7F04}\nTrue moon-viewing fans go\nthen too,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Of course, I'm a true fan,{cmd:7F0308}\nso I'll be by the pond\nadmiring the moon,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}In case you don't know,\nI'll tell you the date.{cmd:7F04}\n{cmd:7F02}This year's 13th day\nof lunar month nine{cmd:7F0308}\nfalls on{cmd:7F0304} {cmd:7F3E} {cmd:7F3F},{cmd:7F0306}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Thirteenth Night, lunar ninth-month day 13, the pond, and this year's converted date in free fields 18/19. The GameCube event is not substituted. Require the existing English ordinary-resident date patch; preserve all native commands and pauses, including the wait without page clear.",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ]
+  },
+  {
+    "id": "message:0BC9",
+    "source_sha256": "25b736c6b31927b692fd52bb27678f021589fa070b82caf5f54e7f5bab924308",
+    "translation": "{cmd:7F0C050001}{cmd:7F09000015}Hmhm.{cmd:7F0306}\nIt's sweet of you to listen.{cmd:7F0308}\nI'll tell you,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}In the fishing tourney,{cmd:7F0308}\nrecords are set by the size\nof the black bass you catch.\n{cmd:7F0900000B}You know that, right?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}But did you know{cmd:7F0308}\nyou can judge a black bass's\nsize just by looking\nat it{cmd:7F0308}?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}You're clever,\n{cmd:7F1A}.\nYou've worked it out,\nhaven't you?{cmd:7F04}\n{cmd:7F02}Just because you catch one,{cmd:7F0308}\ndon't rush to show it\nto the person in charge!{cmd:7F04}\n{cmd:7F02}That's the trick,{cmd:7F0308}\nso go and win yourself\nplenty of prizes,{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the fishing tournament's size-based black-bass records, visible size clue, instruction not to show every catch immediately, and multiple prizes. Do not use the GameCube weight wording or omit the native hint. Preserve quest request 0C/5/0001 and all other native commands."
+  },
+  {
+    "id": "message:0F35",
+    "source_sha256": "1ecd898e87159c719397e92be8ea28ae74c1dc02b3d09dc4347744ae1727fe47",
+    "translation": "{cmd:7F090000FF}When it's raining,{cmd:7F0304}\nyou could at least stay\nquietly at home,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}{cmd:7F0C090003}Spend some time{cmd:7F0304}\nreading {cmd:7F33}\nor something else{cmd:7F0304} in print.{cmd:7F04}\n{cmd:7F02}It's important to learn\na little, too,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain rainy-weather advice to stay home and read the supplied item or other printed material. The GameCube sunshine complaint reverses the native weather condition. Preserve item field 33, quest request 0C/9/0003, and every native command."
+  },
+  {
+    "id": "message:0F42",
+    "source_sha256": "b646839ceed7ab4f8f0e70073fb04562e04897b52d8451456513005298ce97a4",
+    "translation": "For now,{cmd:7F0304} I've made it\nyellow-green.{cmd:7F0308}\n{cmd:7F09000012}{cmd:7F0305}I had some paint left over,{cmd:7F0305}\n{cmd:7F1C}.{cmd:7F0C000004}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native yellow-green paint and leftover-paint explanation, not the GameCube kelly-green shade. Preserve the paint action 0C/0/0004 and every native command and pause."
+  },
+  {
+    "id": "message:0FA9",
+    "source_sha256": "90b37c2bd560b2b64b3f31f6669c62ea100c83fac1d257a68126477b3a1339a6",
+    "translation": "{cmd:7F09000001}What{cmd:7F0302} do you{cmd:7F0306} mean,{cmd:7F0304}\n\"slightly dissatisfied\"{cmd:7F0306}?!{cmd:7F04}{cmd:7F09000005}\n{cmd:7F02}It's because you don't\nmake an effort{cmd:7F0308} that\n{cmd:7F2F}\nis in this state!{cmd:7F04}{cmd:7F09000016}\n{cmd:7F02}Pull yourself together!{cmd:7F0308}\nThink of me! I've lived\nhere all this time!{cmd:7F09000001}{cmd:7F0304} Honestly!{cmd:7F0308}\n{cmd:7F1C}!!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the response to the player's slightly dissatisfied town rating and criticism of the player's effort. The GameCube moving-away response is not equivalent. Preserve town and catchphrase fields, emphasis pauses, and the complete native command sequence."
+  },
+  {
+    "id": "message:1082",
+    "source_sha256": "59f479caced0b2d38eee71c1bf9e06d6d2d56f000f461336cb354ec0fd0ac2e6",
+    "translation": "Welcome!{cmd:7F04}\n{cmd:7F02}Your house renovations\nare finished!\nYou've had a look, yes?{cmd:7F04}\n{cmd:7F02}The room is so spacious\nnow,{cmd:7F0308} you can fit\nall sorts of furniture\nin there!{cmd:7F04}\n{cmd:7F02}Now then,{cmd:7F0304}\nthe renovation fee{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F04}\n{cmd:7F02}That will be\n498,000 Bells, please!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}{cmd:7F0305}Oh, I'm sure you know,{cmd:7F0308}{cmd:7F090000FF}\nbut you don't have to\npay it all right now.{cmd:7F04}\n{cmd:7F02}Please send your payments\nthrough the {cmd:7F504BA0000B}post office.{cmd:7F04}\n{cmd:7F02}And,{cmd:7F030C}\njust to be certain,\nlet me remind you...{cmd:7F04}\n{cmd:7F02}Your house can't get{cmd:7F0306}\nany bigger than this.{cmd:7F04}\n{cmd:7F02}Even so,{cmd:7F0306} you still\nhave to pay{cmd:7F0308}\nfor what you've bought.\nIn full,{cmd:7F0304} yes?{cmd:7F04}\n{cmd:7F02}That's how{cmd:7F0304}\nsociety works,{cmd:7F0304} hm?{cmd:7F04}\n{cmd:7F02}In any case,{cmd:7F0306}{cmd:7F09000015}\nI look forward to your\ncontinued patronage!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Nook's native 498000-Bell final renovation, more furniture space, instalments through the post office, no further house growth, and the obligation to pay the debt anyway. The GameCube 398000-Bell reference is incompatible and omits the final-size/payment explanation. Preserve every native command and argument except the post office colour-span length, seven to eleven. No resident-animation permission is used for Nook.",
+    "control_policy": "reference_layout"
+  }
+]
