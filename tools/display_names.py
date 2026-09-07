@@ -98,7 +98,7 @@ def install(rom, additions, module_report, directory):
             "vrom": f"{VROM:08X}", "width": WIDTH, "entries": NPC_COUNT+SPECIAL_COUNT,
             "bytes": len(data), "module_configuration_ram": f"{MODULE_RAM+60:08X}",
             "configured_module_sha256": sha256(module),
-            "status": "experimental display-name API; native six-byte callers remain unchanged"}
+            "status": "experimental main-dialogue and nameplate names; saved and unrelated native callers remain six bytes"}
 
 
 def candidates(rom, inventory, gc_names, gc_text):

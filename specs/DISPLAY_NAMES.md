@@ -2,10 +2,12 @@
 
 ## Scope
 
-The standalone resource and `af_load_display_name` API provide complete GameCube
-villager and special-character names. Native display/insertion integration remains
-planned; the API does not redirect existing callers. Keep six-byte saved names, identity structures,
-catchphrases, and unrelated name-loader callers unchanged.
+The separate resource and `af_load_display_name` API provide complete GameCube
+villager and special-character names. The resident module integrates these at
+two nameplate call sites and the main-message talk-name insertion. These changes
+remain experimental pending broader conversation, save, and hardware validation.
+Six-byte saved names, identity structures, catchphrases, the shared dynamic-choice
+insertion, and unrelated name-loader callers remain unchanged.
 
 ## Native consumers
 
@@ -17,31 +19,39 @@ The main code has three direct calls to `mNpc_GetNpcWorldName` (`800ACDF8`):
 | `8009ED48` | `mMsg_CopyTalkName`, function `8009ED14` | Six bytes at `sp+2C` in a `38`-byte frame | Ends exactly before the size temporary at `sp+34` |
 | `800A2BCC` | Client-name draw, function `800A2BB0` | Six bytes at `sp+50` in a `58`-byte frame | Ends exactly at the frame boundary |
 
-Offsets and frame sizes in this table are hexadecimal. Length calls at
-`8009D334` and `8009ED58` currently pass six. The draw function reads the length
+Offsets and frame sizes in this table are hexadecimal. The length argument at
+`8009D334` is widened to eight; `8009ED58` remains six. The draw function reads the length
 stored in the window at `28`. Client-name setup retains a seventy-two-pixel
 centering span; eight approved Latin glyphs fit within it without a font or
-nameplate texture change. Every instruction replacement still needs exact source
-guards and complete-capability checks.
+nameplate texture change. Every instruction replacement has exact source guards
+and complete-capability checks. An all-DMA reference scan rejects external jumps
+or literal pointers into the changed nameplate/message-handler interiors.
 
 Executable-segment auditing also finds calls in `ovl_Tukimi_Npc0` at `809DFF2C`,
 `ovl_Tukimi_Npc1` at `809E0788`, and `ovl_Turi_Npc0` at `809E3230`.
 Those overlay destinations remain native. `mMsg_CopyTalkName` itself serves both
 the main message handler (`800A1100`) and dynamic choices (`800656B0`). The latter
-does not have an approved widened destination. Integrate a separately bounded
-main-message insertion at its caller, leaving the shared six-byte function and
-its choice caller unchanged. The existing move routine can report an oversized
-result without moving the suffix; replacement insertion must reject expansion
-beyond 1024 bytes before calling it or copying the name.
+does not have an approved widened destination. A separately bounded main-message
+insertion at its caller leaves the shared six-byte function and its choice caller
+unchanged. The existing move routine can report an oversized result without
+moving the suffix; replacement insertion rejects expansion beyond 1024 bytes
+before calling it or copying the name.
 
 The native name resolver checks actor part byte `2` against NPC part three.
 For NPC actors, the animal pointer is at actor offset `174`; an available animal
 supplies the native ID at offset zero. Other cases use actor `fgName` at offset
-`6` and the
-special-name table. The planned wider resolver must preserve these distinctions,
-handle unsupported/null inputs safely, and retain an explicitly padded native
-fallback when its optional resource is disabled. It must not globally redirect
-the six-byte resolver.
+`6` and the special-name table. `af_get_display_name` preserves these distinctions:
+an animal pointer can resolve only villager identities, whereas an absent animal
+pointer uses only special actor identities. Unsupported/null actor inputs and a
+disabled resource fall back to the unchanged native resolver with two padding
+spaces. A null destination causes no write. The six-byte resolver itself is not
+redirected.
+
+`af_copy_talk_name` replaces only the main-message call. It checks cursor/length
+bounds and complete command size, stages the eight-byte name, trims trailing
+padding, and rejects expansion beyond the 1024-byte message buffer. A null actor
+inserts zero bytes, matching the original insertion behaviour. The surrounding
+native command handler retains its header update and capitalization dispatch.
 
 ## Reference resource
 
@@ -68,10 +78,11 @@ copies exactly eight bytes to the possibly unaligned caller destination. Native
 special-actor lookup uses the guarded original table, not a guessed sequential ID
 range. Villager IDs are limited to `E000..E0D7`.
 
-## Acceptance before enabling
+## Validation requirements
 
 Audit literal and executable references to the affected routines and calls.
-Verify the complete eight-byte temporary boundaries and both length consumers.
+Verify the complete eight-byte nameplate temporaries, the widened setup length,
+and unchanged shared insertion/choice lengths.
 Test every villager, every special actor mapping, unsupported IDs, nulls,
 resource disabling, malformed headers, aligned DMA, and adjacent stack guards.
 Native tests must exercise client-name setup, talk-name insertion and exact

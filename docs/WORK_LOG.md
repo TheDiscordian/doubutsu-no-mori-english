@@ -791,6 +791,61 @@
 - All 150 local tests pass. The guarded-thread repeat of the previously failing
   451-case native item batch is running; wider display consumers remain planned.
 
+### Full dialogue names and native nameplate consumers
+
+- `smoke-display-native-items-8-01` repeats all 451 loads from the previously
+  failing native item batch using the verified graph-thread context. All 1,362
+  recorded steps pass in five minutes forty-five seconds, including first item
+  `1D0C`, guards, and checkpoint restoration. The older failure remains qualified
+  by the absence of its pre-call thread/register evidence.
+- Added `af_get_display_name`, preserving native animal-versus-special-actor
+  resolution, and `af_copy_talk_name`, with complete command/cursor/1024-byte
+  destination checks. Two nameplate calls and only the main-message talk-name
+  call are redirected. The shared six-byte insertion and its dynamic-choice
+  caller remain unchanged. Full-region external-interior-reference checks and
+  per-instruction source guards cover the changed consumers. The audit also
+  records all three event-overlay world-name callers, which remain native.
+- The 6,240-byte module has unconfigured SHA-256
+  `9ee268fbadb7d4f04a86cb0975fa52477d6ce835aa32ed0c1b2223a2790c26ab`.
+  `display-pilot` retains 10,406 ordinary edits and both independent name resources.
+  ROM SHA-256:
+  `f15af4049e166dac689d5c3b6a57d411b3ae01a8230832b1b48c3fbcec4747f8`.
+  UPS SHA-256:
+  `705072e7c9af17901a478224f23f911fdc33bd7bcad429bfa8a6a7d8c160b719`.
+- The first consumer run passes resolver, insertion, and nameplate setup tests,
+  then exposes an incomplete synthetic graphics fixture: its descending vertex
+  allocation pointer is zero. The native draw routine correctly tries to allocate
+  from that supplied pointer and faults at `80090848`. The fixture now supplies
+  a complete 1,536-byte two-ended graphics arena. No game-code change addresses
+  that test-fixture error.
+- `smoke-display-fields-native-02` and `03` each pass 222 recorded steps. The
+  real nameplate renderer preserves all eight bytes of `Cousteau`, emits eight
+  four-vertex loads, uses 600 display-list bytes and 512 vertex bytes, and retains
+  adjacent stack and graphics-arena guards. The regions do not overlap.
+  `smoke-display-fields-native-04` passes 228 steps, adding the actual `7F1B`
+  command dispatch and capitalization-latch consumption. Six-byte shared choice
+  insertion, disabled-resource native fallback, and exact message limits pass.
+- `smoke-display-full-01` passes all 225 train-to-town steps and all ten acceptance
+  checks in six minutes twenty seconds. The following arrival continuation is
+  stable but stays on the platform without movement; it is not an additional
+  dialogue-coverage claim. FlashRAM remains blank.
+- `smoke-display-item-fields-01` passes 429 native calls, 998 memory assertions,
+  and 1,629 recorded steps on the combined module in four minutes forty-three
+  seconds. The full checkpoint is restored after the injected tests.
+- `smoke-display-station-path-01` leaves the platform through normal controller
+  movement and reaches Nook's English arrival dialogue, including `07DF` and
+  `07E0`. Its final isolated capture shows the complete eight-character
+  `Tom Nook` label. This checks an ordinary special-NPC nameplate, not all
+  conversations or save compatibility. All 36 recorded steps complete;
+  FlashRAM remains blank.
+- Bounded adaptive controller navigation follows read-only player/NPC coordinates
+  and stops on active dialogue, missing targets, stalled movement, or its fixed
+  step limit. `smoke-space-greeting-cousteau-track-01` reaches the English first
+  introduction `04E7` in sixteen movement steps. This older normal-gameplay ROM
+  still has the native six-byte name and Japanese catchphrase; the latter is a
+  separate general-string/field task. No actor position, schedule, or greeting
+  data is written to reach the conversation. All 157 local tests pass.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

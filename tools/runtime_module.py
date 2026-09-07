@@ -36,7 +36,9 @@ HOOK_REGIONS = ((WATCHDOG_START, WATCHDOG_END), (0x8009034C, 0x800903A8),
                 (0x800A054C, 0x800A05A8), (0x800A22A4, 0x800A231C),
                 (0x8009FA18, 0x8009FA38), (0x8009FA38, 0x8009FA58),
                 (0x800A28D4, 0x800A28DC), (0x800919D0, 0x80091A18),
-                (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0))
+                (0x8009D88C, 0x8009D9A4), (0x800BB6A0, 0x800BB6F0),
+                (0x8009D308, 0x8009D3B4), (0x800A2BB0, 0x800A2C4C),
+                (0x800A10D8, 0x800A1124))
 
 
 def module_command_info(rom):
@@ -193,8 +195,16 @@ def add_runtime_module(rom, replacements, directory):
     # Dialogue gets complete item values. The separate dynamic-choice caller
     # keeps its native ten-byte API pending its own expansion proof.
     code.instruction(0x800A1820, 0x0C027D6D, call("af_copy_item_string"))
+    # Nameplate temporaries have eight proven bytes. The shared six-byte talk
+    # insertion and its dynamic-choice caller stay native; only the main-message
+    # handler uses the separately bounded eight-byte insertion.
+    for address in (0x8009D324, 0x800A2BCC):
+        code.instruction(address, 0x0C02B37E, call("af_get_display_name"))
+    code.instruction(0x8009D334, 0x24050006, 0x24050008)
+    code.instruction(0x800A1100, 0x0C027B45, call("af_copy_talk_name"))
     replacements[CODE_VROM] = bytes(code.data)
     report["date_scope"] = "Seven message substitutions; other UI formatter callers remain native"
+    report["display_name_scope"] = "Two nameplate consumers and bounded main-message insertion; shared choice and saved-name APIs remain native"
     report["code_changes"] = code.changes
     return {MODULE_VROM: data}, report
 

@@ -1,0 +1,13 @@
+[
+  {"wait": 2},
+  {"repeat": 8, "actions": [
+    {"key": "a", "duration": 0.08},
+    {"wait": 2},
+    {"snapshot_message": true},
+    {"snapshot_choices": true}
+  ]},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"capture": "greeting-finish-conversation.png"},
+  {"save_state": true}
+]

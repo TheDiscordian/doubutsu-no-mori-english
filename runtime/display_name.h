@@ -10,5 +10,7 @@
 int af_display_name_index(unsigned int npc);
 int af_display_name_header_valid(const unsigned int *header);
 int af_load_display_name(unsigned char *destination, unsigned int capacity, unsigned int npc);
+void af_get_display_name(unsigned char *destination, const unsigned char *actor);
+int af_copy_talk_name(const unsigned char *actor, unsigned char *data, int index, int length);
 
 #endif

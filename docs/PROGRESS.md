@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 150 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 157 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -131,12 +131,22 @@ user's direction. The production build retains the approved spacing metrics.
   names and 64 special-actor rows covering 23 distinct names. All native ID and
   real-DMA row tests pass, including unaligned destinations, rejected inputs,
   disabled resources, malformed-header checks, and adjacent/module guards.
-  The standalone API does not yet redirect dialogue or saved-name consumers.
+  Two nameplate consumers and the main-dialogue insertion now use the complete
+  names. Native consumer tests cover full output, centering, stack guards, exact
+  message limits, capitalization dispatch, and all eight rendered character quads.
+  The combined build passes all 225 train-to-town steps and ten acceptance checks. Shared
+  choice insertion and saved-name consumers retain six-byte formats.
 - Injected native tests now require the verified graph-thread frame boundary.
   Arbitrary idle-thread injection can block the scheduler's idle fallback and
   caused a display-name test stop. The guarded-context run passes all 1,204 steps;
-  prior item-batch failure attribution and repeatability remain under review.
+  The previously failing 451-case item batch also passes in this context;
+  attribution of that older failure remains qualified by its missing register log.
   Read-only live NPC actor observations support outdoor navigation.
+- Bounded controller navigation approaches a moving NPC from observed actor and
+  player coordinates, without position, schedule, or greeting writes. It stops
+  when dialogue opens, a target disappears, the route stalls, or its step limit
+  is reached. Normal gameplay reaches Cousteau's English introduction at `04E7`;
+  the native catchphrase remains Japanese pending its separate field expansion.
 
 ## Current reference candidates
 

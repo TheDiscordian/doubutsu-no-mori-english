@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"approach_npc": "E052", "max_steps": 80},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"capture": "greeting-cousteau-track.png"},
+  {"save_state": true}
+]

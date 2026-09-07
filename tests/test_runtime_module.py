@@ -140,13 +140,19 @@ class ModuleRetailTests(unittest.TestCase):
         self.assertEqual(report["ram"], f"{MODULE_RAM:08X}")
         verify_runtime_module(self.rom, replacements, additions, directory)
         for address, size in ((0x800919D0, 8), (0x8009D88C, 8),
-                              (0x800BB6A0, 8), (0x800A1820, 4)):
+                              (0x800BB6A0, 8), (0x800A1820, 4),
+                              (0x8009D324, 4), (0x800A2BCC, 4),
+                              (0x8009D334, 4), (0x800A1100, 4)):
             broken = dict(replacements)
             partial = bytearray(code)
             partial[address-CODE_RAM:address-CODE_RAM+size] = bytes(size)
             broken[CODE_VROM] = bytes(partial)
             with self.assertRaisesRegex(ValueError, "Missing resident module patch"):
                 verify_runtime_module(self.rom, broken, additions, directory)
+        original = by_vrom(self.rom)[CODE_VROM].extract(self.rom)
+        for address in (0x8009ED48, 0x8009ED58, 0x800656B0):
+            offset = address-CODE_RAM
+            self.assertEqual(code[offset:offset+4], original[offset:offset+4])
         with self.assertRaisesRegex(ValueError, "complete resident"):
             verify_runtime_module(self.rom, replacements, {}, directory)
         with self.assertRaisesRegex(ValueError, "instruction guard"):

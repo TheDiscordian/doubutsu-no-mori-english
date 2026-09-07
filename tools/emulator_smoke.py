@@ -344,6 +344,46 @@ def npc_actors_snapshot(debug):
     return {"live_npc_actors": result, "read_only": True}
 
 
+def approach_npc(debug, keyboard, npc_id, max_steps=80):
+    """Bounded controller navigation using observations, never position writes."""
+    if not isinstance(npc_id, str) or len(npc_id) != 4 or not 1 <= max_steps <= 120:
+        raise ValueError("Invalid controller-navigation target or step limit")
+    target = f"{int(npc_id, 16):04X}"
+    observations, positions = [], []
+    outcome = "step_limit"
+    for step in range(max_steps):
+        message = message_snapshot(debug)
+        if message.get("loaded"):
+            outcome = "dialogue_active"
+            observations.append({"message": message})
+            break
+        player = player_snapshot(debug)["world_position"]
+        actors = npc_actors_snapshot(debug)["live_npc_actors"]
+        matches = [a for a in actors if a.get("animal_id", a["fg_name"]) == target]
+        if len(matches) != 1:
+            outcome = "target_not_uniquely_loaded"
+            break
+        npc = matches[0]["world_position"]
+        dx, dz = npc["x"]-player["x"], npc["z"]-player["z"]
+        distance = math.hypot(dx, dz)
+        positions.append((player["x"], player["z"]))
+        if len(positions) >= 9 and math.dist(positions[-1], positions[-9]) < 4:
+            outcome = "navigation_stalled"
+            break
+        key = ("g" if dx > 0 else "f") if abs(dx) >= abs(dz) else ("s" if dz > 0 else "w")
+        duration = 0.025 if distance < 48 else 0.06
+        observations.append({"step": step, "player": player, "target": npc,
+                             "distance": distance, "key": key, "duration": duration})
+        keyboard.press(key, duration)
+        if distance < 48:
+            keyboard.press("a", 0.06)
+            time.sleep(0.5)
+        else:
+            time.sleep(0.12)
+    return {"normal_controller_navigation": target, "outcome": outcome,
+            "observations": observations, "position_or_schedule_writes": False}
+
+
 def keyboard_snapshot(debug):
     """Locate the English-first overlay in four-MiB RAM and read its state."""
     marker = bytes.fromhex("A0660000A0660001A060000224190300A4790004A4780006")
@@ -599,6 +639,8 @@ def main():
                 results.append(villagers_snapshot(debug))
             if action.get("snapshot_npc_actors"):
                 results.append(npc_actors_snapshot(debug))
+            if "approach_npc" in action:
+                results.append(approach_npc(debug, keyboard, action["approach_npc"], action.get("max_steps", 80)))
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
                 results.append(snapshot)

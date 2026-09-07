@@ -7,11 +7,21 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/"tools"))
 from audit_name_callers import name_audit
+from audit_display_names import audit as display_audit
 from test_retail import ROM_PATH
 
 
 @unittest.skipUnless(ROM_PATH.is_file(), "Original ROM is a local-only test input")
 class NameCallerTests(unittest.TestCase):
+    def test_display_consumers_include_event_overlays_and_shared_choice_caller(self):
+        result = display_audit(ROM_PATH.read_bytes())
+        self.assertEqual({r["call_ram"] for r in result["world_name"]["callers"]},
+                         {"8009D324", "8009ED48", "800A2BCC", "809DFF2C", "809E0788", "809E3230"})
+        self.assertEqual({r["call_ram"] for r in result["talk_name"]["callers"]}, {"800656B0", "800A1100"})
+        self.assertEqual(len(result["nameplate_setup"]["callers"]), 1)
+        self.assertEqual(len(result["nameplate_draw"]["callers"]), 2)
+        self.assertTrue(all(not r["literal_pointers"] for r in result.values()))
+
     def test_retail_direct_targets_and_counts(self):
         result = name_audit(ROM_PATH.read_bytes())
         for name, address, count, width in (("item_name", "80096740", 35, 10),
