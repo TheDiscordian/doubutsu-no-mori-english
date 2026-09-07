@@ -28,6 +28,15 @@ COUNT,ROW_BYTES,HEADER_BYTES = 352,32,64
 RESOURCE_BYTES = HEADER_BYTES+COUNT*ROW_BYTES
 HEADER = struct.pack('>8I',0x41464E57,1,COUNT,ROW_BYTES,HEADER_BYTES,11,16,0)
 SETTER_SHA256 = '1d6b2bef84d1cd4d296852a60df2951382d796cfa9a99e84233dd4fb41b2d62b'
+LOADER_SHA256 = '073c6d7c33f95f476ae33b691b6510a84c23eb6839effac3407effd558d11977'
+
+
+def field_source_evidence(rel,symbols):
+    expected = {'mHandbill_Set_free_str':SETTER_SHA256,'mString_Load_StringFromRom':LOADER_SHA256}
+    for name,digest in expected.items():
+        if sha256(symbol_data(rel,symbols,name)) != digest:
+            raise ValueError('Changed English reply-field source: '+name)
+    return expected
 
 
 @dataclass(frozen=True)
@@ -134,8 +143,7 @@ def main():
     rel = args.rel.read_bytes()
     symbols = (args.decomp/'config/GAFE01_00/foresta/symbols.txt').read_text()
     reference = reference_evidence(rel,symbols)
-    if sha256(symbol_data(rel,symbols,'mHandbill_Set_free_str')) != SETTER_SHA256:
-        raise ValueError('Changed English reply-field setter')
+    field_sources = field_source_evidence(rel,symbols)
     decoder = args.decomp/'tools/msg_tool.py'
     if sha256(decoder.read_bytes()) != DECODER_SHA256: raise ValueError('Changed English decoder source')
     sources = [next(bank for bank in banks(data,legacy=old) if bank.name == 'string')
@@ -144,7 +152,7 @@ def main():
                         (args.gc_data/'string_data_table.bin').read_bytes()))
     resource,report = prepare(*sources,decoder_tables(decoder))
     report.update(native_code=native,reference_code=reference,decoder_sha256=DECODER_SHA256,
-                  reference_setter_sha256=SETTER_SHA256)
+                  reference_setter_sha256=SETTER_SHA256,reference_field_sources=field_sources)
     args.output.mkdir(parents=True,exist_ok=True)
     (args.output/'words.bin').write_bytes(resource)
     (args.output/'words.json').write_text(json.dumps(report,indent=2)+'\n')

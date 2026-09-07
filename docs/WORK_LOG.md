@@ -2326,6 +2326,87 @@
   `build/tests-npc-mail-delivery-full-01.log`. Python compilation and whitespace
   checks pass.
 
+### Complete sources captured beside real native NPC reply creation
+
+- Implemented scoped resident adapters at eight guarded original call sites.
+  Inactive adapters forward all original arguments/results. Active preparation
+  still runs every original name lookup, other-villager selection, random word
+  load, and ten-byte setter. Full English values are captured from verified
+  identities and already selected IDs; the native RNG algorithm is unchanged.
+- Implemented the bounded callback state machine and immutable full-resource
+  validation. It recovers all 216 complete English names from 394 exact saved
+  keys and retains all 352 phrases with the English loader's sixteen-byte space
+  padding. Unknown names, wrong source families, reordered/missing events,
+  incomplete preparation, and invalid template groups reject the session.
+  Complete word/name resources stay local, and saved identity widths do not grow.
+- Added original freestanding SHA-256 with host `hashlib` comparisons at every
+  short padding boundary, unaligned inputs, whole resource sizes, and one MiB.
+  Both complete English string-loader and handbill-setter routines are now
+  guarded. Independent word preparation with this source evidence produces
+  the same resource digest. The first native digest build exposed an unwanted
+  compiler-generated `memcpy`; explicit scalar state initialization removes it.
+  One initial host fixture restored its own deliberately changed header digest;
+  the corrected mutation fixture passes without weakening source checks.
+- Built the complete capture/generation overlay using the existing pinned GCC
+  14.2 VR4300 container and the pinned project's Fado tool. Its image is 23,280
+  bytes: 5,168 text and 18,112 read-only data, with no writable/BSS section.
+  The 160-byte native relocation table has 33 entries and agrees with the
+  independent linked-ELF inventory. Image SHA-256 is
+  `20485485c3e08170f57d3cacbfff5fbb4c7900b1c0291485613486dc48e62f75`;
+  relocation SHA-256 is
+  `2ecc4a40aae21de8f10077ecb78f7353826b87a67b56f9613ef6ac5c6f031e23`.
+- The resident adapters add 736 linked bytes. The module occupies 21,664 bytes,
+  leaving 2,912 before the separate native-test area; the 32 KiB reservation and
+  original heap boundary stay unchanged. Module SHA-256 is
+  `9db4b422849fdee0f438dcf5e71ec260a02c50551f9efc1ae064724b044c0979`.
+  Independent module, ROM, and UPS builds match. ROM SHA-256 is
+  `c7e76de3ad4ccfc03c125566cd9c072a5ff8d7b61ef6c2074ce260053105dc9b`;
+  UPS SHA-256 is
+  `d11959db1b02ae2ef7e01b1077b11291206f13ff5ab56d5b9f04b7e5460bf222`.
+  `build/smoke-npc-capture-full-01` passes 188 train-to-town steps and all ten
+  acceptance checks in four MiB.
+- `build/smoke-npc-mail-capture-04` passes all 48 real-creator comparisons:
+  both origins, good/bad replies, six personalities, and both initial capital
+  states. Original and captured creators start with identical seeds and end
+  with identical RNG state, native free strings, identities, gifts, status,
+  type, and stationery. All 48 produce complete matching English snapshots;
+  thirteen original gifts are retained. Selected fields and template IDs are
+  checked without substituting a native random, gift, or metadata routine.
+- The native capture run passes 197 calls and 721 memory assertions in 1,813
+  recorded steps. It checks complete relocation, actual source integrity,
+  complete-name and word-family boundaries, unknown-key rejection, full save
+  retention, complete code/resource retention, instruction/global restoration,
+  allocation free, memory guards, checkpoint restoration, and graceful shutdown.
+  FlashRAM stays blank; the Controller Pak is unchanged. The isolated fixture
+  writes code/resources into owned heap memory, not the cartridge loader.
+- Earlier native attempts remain in the local logs. One invocation supplied a
+  state file where the runner requires its isolated directory. The first live
+  loader run omitted native cache maintenance and stopped at source validation.
+  Adding the original writeback/invalidate sequence allowed execution. A later
+  alternating-hook run passed 29 cases before rejecting a fresh session with
+  phase zero. The final harness completes all original baselines first, installs
+  hooks once, performs explicit cache maintenance, and restores/flushes them
+  after capture; all 48 cases and restoration pass. These are fixture changes,
+  not unexplained successes from rerunning the same stalled process.
+- Twelve capture/relocation/hook tests and eight word-source tests pass. The
+  complete suite passes 366 tests in 169.271 seconds at
+  `build/tests-npc-mail-capture-full-02.log`. Python compilation and whitespace
+  checks pass. The unavailable composite footer is not selected by this native
+  sample, and source/range checks do not approve every possible letter's meaning.
+- Independent capture-overlay and relocation builds also match.
+  `build/smoke-npc-capture-reader-02` passes the full eight-letter/fourteen-page
+  reader regression on the new resident module: 1,705 glyphs and 6,820 vertex
+  positions, source/preference retention, module guard, checkpoint restoration,
+  and graceful shutdown across 218 steps. The first reader launch passed a
+  directory-style path for a generated JSON file and failed before emulator
+  startup; the corrected invocation uses the actual scenario file.
+- Ordinary gameplay generation stays disabled. Whole-creator allocation and
+  ownership, actual cartridge loading/failures, sticky capital across successful
+  creations, the tested submission gate's real creator binding, pending-loop
+  validation, normal delivery/save/editor flows, semantic review, and hardware
+  acceptance remain. Font assets/metrics, candidate wording, explicit reference
+  layout, and native saved record formats are unchanged.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

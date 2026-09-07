@@ -3,6 +3,7 @@
 from copy import deepcopy
 from dataclasses import replace
 from pathlib import Path
+from unittest.mock import patch
 import sys
 import unittest
 
@@ -13,7 +14,7 @@ from gc_text import decoder_tables
 from mail_record import Record,pack,unpack
 from mail_reference import transcode
 from npc_mail_words import (Word,COUNT,RESOURCE_BYTES,HEADER_BYTES,ROW_BYTES,
-    WORD_BASES,REFERENCE_BASES,identity,pack_words,unpack_words,lookup,prepare)
+    WORD_BASES,REFERENCE_BASES,identity,pack_words,unpack_words,lookup,prepare,field_source_evidence)
 from textbanks import Bank,banks
 from test_retail import ROM_PATH
 
@@ -122,6 +123,23 @@ class RetailNpcMailWordTests(unittest.TestCase):
         tables['CHAR_MAP'][ord('f')] = 'x'
         with self.assertRaisesRegex(ValueError,'not confirmed'):
             prepare(*self.sources,tables)
+
+    def test_complete_reference_loader_and_setter_are_hash_guarded(self):
+        from gc_names import symbol_data
+        rel_path = ROOT/'build/gamecube/files/foresta.rel.szs.decoded'
+        symbols_path = ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt'
+        if not rel_path.is_file() or not symbols_path.is_file(): self.skipTest('Local English executable required')
+        rel,symbols = rel_path.read_bytes(),symbols_path.read_text()
+        evidence = field_source_evidence(rel,symbols)
+        self.assertEqual(set(evidence),{'mHandbill_Set_free_str','mString_Load_StringFromRom'})
+        for changed_name in evidence:
+            original = symbol_data(rel,symbols,changed_name)
+            for offset in (0,len(original)-1):
+                altered = bytearray(original);altered[offset] ^= 1
+                def source(data,table,name):
+                    return bytes(altered) if name == changed_name else symbol_data(data,table,name)
+                with patch('npc_mail_words.symbol_data',side_effect=source),self.assertRaises(ValueError):
+                    field_source_evidence(rel,symbols)
 
 
 if __name__ == '__main__': unittest.main()

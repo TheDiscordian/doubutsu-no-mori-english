@@ -5,7 +5,7 @@
 `tools/npc_mail_words.py` prepares 352 complete English phrases for the eleven
 native randomized reply-word families. It verifies the original and legacy
 string-bank data/tables, the supplied English string bank, the native/reference
-creator contracts, the English field setter, and the decoder source.
+creator contracts, the English string loader and field setter, and the decoder source.
 
 Every selected English phrase exactly equals the complete transcoded legacy
 value for the native-selected ID. This comparison does not trim spaces, fold
@@ -35,6 +35,13 @@ zero: the English NPC preparation uses `mHandbill_Set_free_str`, whose actual
 instructions clear the corresponding article word after setting the string.
 Template-directed article suppression and sticky capitalization remain the
 existing formatter's responsibility.
+
+The compact resource and Python `lookup` preserve literal lengths. The actual
+English loader space-pads the sixteen-byte temporary before the setter receives
+it, so the [native capture consumer](NPC_MAIL_CAPTURE.md) captures length sixteen
+and preserves that padding. Only formatting omits trailing padding from display.
+Both complete English executable routines are hash-guarded; a changed loader or
+setter is rejected even if the extracted string bank itself is unchanged.
 
 This source mapping is mechanically verified. It is not approval of every
 containing letter's meaning or evidence that normal gameplay captures these
@@ -83,10 +90,10 @@ distinguish these two checks.
 
 ## Verification and next integration
 
-Seven tests cover every row and lookup, snapshot field round trips, all native
+Eight tests cover every row and lookup, snapshot field round trips, all native
 family boundaries, record order, field/article/glyph constraints, padding,
 header/payload corruption, bound content hashes, all three source banks/tables,
-and changed decoder output. Retail checks verify all 352 full phrases directly
+changed decoder output, and both complete executable source routines. Retail checks verify all 352 full phrases directly
 against both English and legacy sources, not an editable inventory file.
 
 The runtime consumer must validate its source and row before publishing a field,

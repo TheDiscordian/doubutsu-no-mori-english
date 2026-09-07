@@ -82,9 +82,14 @@ phrases against the actual source banks and records full source/reference IDs.
 All 83 phrases beyond ten bytes are retained within sixteen bytes. Connect this
 resource before native truncation. The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md)
 supplies all 216 full names from 394 exact original/short-English keys, without
-guessing unknown identities. Both resources still need native loading and capture.
-The reader's temporary decode allocation leaves 3,648 linked bytes available
-inside the unchanged 32 KiB reservation. Allocation/error ownership tests,
+guessing unknown identities. The scoped source/capture implementation passes
+complete host coverage and cross-compiles as a bounded relocatable image.
+All 48 original-versus-captured native creator comparisons pass, including full
+English generation with unchanged RNG state, gifts, stationery, native fields,
+and saved data. Cartridge loading, whole-creator ownership, and publication
+through the tested failure gate remain.
+The resident capture adapters leave 2,912 linked bytes available inside the
+unchanged 32 KiB reservation. Allocation/error ownership tests,
 four-MiB town arrival, and all eight complete native letter windows pass.
 
 ## Main translation and runtime

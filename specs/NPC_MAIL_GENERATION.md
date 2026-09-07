@@ -12,12 +12,14 @@ and publication; these bindings identify where that API must be connected.
 The source checks and selection/coverage tests pass. A separate
 [complete word resource](NPC_MAIL_WORDS.md) verifies all 352 randomized phrases
 against the supplied English and legacy sources. No ordinary NPC creator
-currently generates English snapshot letters. Native word capture, complete
-name capture, semantic template approval, loading/lifetime, and delivery
-integration remain required.
+currently generates English snapshot letters. Scoped full-word/name capture
+passes 48 isolated real-creator comparisons and complete English generation;
+semantic template approval, cartridge loading/lifetime, and delivery integration
+remain required. See [capture evidence](NPC_MAIL_CAPTURE.md).
 An [exact saved-name mapping](NPC_MAIL_NAMES.md) supplies full names for both
 known native Japanese and fitting English saved-name forms. Unknown names remain
-unresolved; this source resource still needs native lookup and capture bindings.
+unresolved; native lookup and capture pass isolated execution, but ordinary
+gameplay loading and ownership remain uninstalled.
 
 ## Whole-record boundaries
 
@@ -98,8 +100,9 @@ retains all save data. Source clearing happens only after successful receipt.
 The native run passes 44 calls and 224 memory assertions across 578 steps,
 including complete save/staging restoration, unchanged production instructions,
 heap/stack/module guards, allocation free, and checkpoint restoration. This
-does not run the pending-reply loop or a real complete creator. Native capture,
-creator allocation/loader failures, normal delivery, and pending-loop integration
+does not run the pending-reply loop or a real complete creator. Separate scoped
+capture tests exercise the real creators; creator allocation/loader failures,
+normal delivery, and pending-loop integration
 remain requirements before installing the gate.
 
 ## Capture ownership and selected fields
@@ -107,7 +110,7 @@ remain requirements before installing the gate.
 | Slot, decimal | Local reply source | Visitor reply source |
 | --- | --- | --- |
 | 0 | Player's saved six-byte name | Same |
-| 1 | Complete display name of sender NPC | Exact saved-name recovery from reply `+4`; native lookup remains unimplemented |
+| 1 | Complete display name of sender NPC | Exact saved-name recovery from reply `+4` |
 | 2 | Name of the native-selected other NPC | Name of the native-selected local NPC |
 | 3–13 | Eleven selected general-string values | Same families |
 | 14 | Not supplied | Foreign town's saved six-byte name at reply `+A` |
@@ -150,7 +153,8 @@ families retain the same base and size. Fish (slot six) moves from `0219` to
 through exact full-value legacy agreement, including the first 32 fish/insect
 entries. Its explicit slot/native-ID lookup preserves the selected creature;
 it does not draw a replacement or use the eight added English entries. This
-mapping still needs native capture integration and review in complete letters.
+mapping passes scoped native capture. Gameplay integration and semantic review
+in complete letters remain.
 
 All available selectable reference parts use only fields provided by the
 corresponding local or visitor preparation path. The coverage check includes
@@ -162,8 +166,8 @@ cartesian combination of selected parts.
 
 ## Remaining acceptance
 
-1. Connect the verified full-word mappings and resolve complete captured names,
-   including stable foreign NPC identity recovery.
+1. Connect the tested scoped full-word/name capture to whole-creator ownership
+   and cartridge loading, including repeated and failed sessions.
 2. Approve selected template meanings and support the unavailable footer without
    changing existing catalog identities or shortening text.
 3. Implement bounded loading and whole-record staging with explicit error returns;

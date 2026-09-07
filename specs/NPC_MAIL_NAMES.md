@@ -60,6 +60,10 @@ and cross-language collisions, ordering, complete identity coverage, malformed
 names, resource changes, altered source edits, and a modified display-name blob
 with a recalculated manifest hash.
 
-Native lookup, resource loading, capture lifetime, unresolved-name failure
-propagation, and actual local/visitor reply creation remain required. The alias
-resource does not independently establish normal travel or old-save compatibility.
+The [scoped capture consumer](NPC_MAIL_CAPTURE.md) validates the complete resource
+and resolves full names during isolated native local/visitor reply creation.
+Its host tests cover all 394 aliases, and native tests cover complete-name lookup,
+unknown-key rejection, and real creator-selected names. Cartridge loading,
+whole-creator ownership, and unresolved-name failure propagation through actual
+delivery remain. The resource does not establish normal travel or old-save
+compatibility.

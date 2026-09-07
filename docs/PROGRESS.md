@@ -46,8 +46,8 @@ reference assembly cases. Native calls pass 46 complete English reference cases,
 seven rejected generations, and 42 capture cases, with complete save retention
 and intact guards. Publication changes only validated text/split bytes and the
 transient capital state. The 1,380-byte generation probe is separate from the
-resident image, which has 3,648 linked bytes free. Native creator bindings,
-complete English field sources, on-demand loading, failure propagation, and
+resident image, which has 2,912 linked bytes free. Whole-creator ownership,
+on-demand loading, failure propagation, and
 semantic template approval remain. Ordinary gameplay snapshot generation stays
 disabled. See [generation contract](../specs/MAIL_GENERATION.md) and
 [receipt evidence](../specs/PELLY_RECEIPT.md).
@@ -64,18 +64,31 @@ validated. This is not normal NPC reply generation or pending-loop validation.
 The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
 352 complete phrases with exact legacy/English agreement and explicit native
 ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
-The resource is verified locally but not installed or connected to capture.
+The resource is connected to the scoped capture implementation, but is not yet
+loaded from the cartridge by ordinary gameplay.
 The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md) recovers full English
 names for all 216 villagers from 394 exact known saved-name keys. It rejects
-ambiguous mappings and leaves unknown names unresolved. Native lookup and
-generation-time capture remain uninstalled.
+ambiguous mappings and leaves unknown names unresolved. Complete native lookup
+and generation-time capture are implemented; gameplay installation remains.
 The reader releases its 3,552-byte decode workspace immediately after opening
 a snapshot. Its complete 2,236-byte display cache remains resident; the 32 KiB
 reservation and heap boundary are unchanged. Host allocation/error tests, the
 four-MiB train-to-town run, and all eight native letter windows pass. Independent
 module, ROM, and patch builds match.
-Current implementation work connects the verified full word/name resources to
-native generation-time capture and creator ownership. The tested failure gate
+The [scoped capture implementation](../specs/NPC_MAIL_CAPTURE.md) retains full
+English source values beside the original native preparation calls. Host tests
+cover all 352 phrases and 394 saved-name aliases, ordered capture, unchanged
+native temporary fields, and failure rejection. The relocatable code builds with
+the existing VR4300 toolchain; the resident image uses 21,664 linked bytes.
+The new module passes the four-MiB train-to-town regression, and independent
+module, ROM, and patch builds match. All 48 native creator comparisons pass,
+including complete English generation, unchanged random state and native fields,
+all six personalities, both reply types/origins, thirteen retained gifts, and
+complete save retention. The 197-call run also checks source validation, native
+relocation/cache maintenance, guards, and checkpoint restoration. Cartridge
+loading, whole-creator ownership, and ordinary delivery remain. All eight letter
+windows also pass the new-module regression across fourteen pages, including
+1,705 glyphs and 6,820 vertex positions. The tested failure gate
 provides the required return boundary; it does not replace source or semantic
 review, normal reader/editor interactions, or save/hardware acceptance.
 
@@ -111,7 +124,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 353 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 366 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -281,7 +294,7 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  and display state occupy 20,928 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 21,664 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
   editing, and save validation remain. Native generation does not emit snapshots;
   the optional full reader calls restoration for isolated tagged-record probes.
@@ -418,7 +431,7 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/reader-scratch-repeat-pilot/`
+The current experimental resident-module pilot in `build/npc-capture-repeat-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Two additional original Pelly/Phyllis error messages extend the main bank
