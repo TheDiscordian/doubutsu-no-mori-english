@@ -10,26 +10,30 @@ RELOC_VROM = 0x00792610
 RELOC_SHA256 = 'cb3f980f865ca0b9fad1c82c88280ce83080a9ff8ae1c38075990cf492589b68'
 CALLS = ((0x8088A0A0, 0x80889A9C, 'af_mail_body_hook'),
          (0x8088A0D4, 0x808899E4, 'af_mail_footer_hook'))
+SNAPSHOT_CALLS = ((0x8088A034, 0x80889CD8, 'af_mail_header_hook'),
+                  (0x8088A47C, 0x8009C67C, 'af_mail_copy_hook'),
+                  (0x8088914C, 0x80078DF4, 'af_mail_reader_trigger'))
 
 
-def remove_call_relocations(data):
+def remove_call_relocations(data, *, snapshots=False):
     if len(data) != 240 or sha256(data) != RELOC_SHA256:
         raise ValueError('Unexpected native board relocation file')
     if struct.unpack_from('>5I', data) != (0x1910, 0x430, 0x30, 0xC0, 52):
         raise ValueError('Unexpected native board relocation header')
     records = list(struct.unpack_from('>52I', data, 20))
-    for address, _, _ in CALLS:
+    calls = CALLS+(SNAPSHOT_CALLS[:1] if snapshots else ())
+    for address, _, _ in calls:
         expected = 0x44000000 | (address-RAM)
         if records.count(expected) != 1:
             raise ValueError('Missing or duplicated board call relocation')
         records.remove(expected)
     result = bytearray(data)
     struct.pack_into('>I', result, 16, len(records))
-    result[20:-4] = struct.pack('>50I', *records)+bytes(len(data)-24-50*4)
+    result[20:-4] = struct.pack('>'+str(len(records))+'I', *records)+bytes(len(data)-24-len(records)*4)
     return bytes(result)
 
 
-def install(rom, replacements, additions, module):
+def install(rom, replacements, additions, module, *, snapshots=False):
     native = evidence(rom)
     if not module or MODULE_VROM not in additions:
         raise ValueError('Mail read layout requires the resident module')
@@ -42,7 +46,12 @@ def install(rom, replacements, additions, module):
     files = by_vrom(rom)
     data = bytearray(files[VROM].extract(rom))
     targets = {}
-    for address, old, symbol in CALLS:
+    if snapshots:
+        if struct.unpack_from('>I',data,0x8088A480-RAM)[0] != 0xAFA3005C:
+            raise ValueError('Snapshot copy shim requires the native saved menu pointer')
+        if struct.unpack_from('>2I',data,0x80889144-RAM) != (0xAFA40018,0xAFA5001C):
+            raise ValueError('Snapshot trigger hook requires unchanged submenu/menu arguments')
+    for address, old, symbol in CALLS+(SNAPSHOT_CALLS if snapshots else ()):
         target = int(module.get('symbols', {}).get(symbol, '0'), 16)
         if not MODULE_RAM+0x300 <= target < MODULE_RAM+min(module['linked_bytes'], LINKED_LIMIT) or target & 3:
             raise ValueError('Mail read-layout hook is outside the linked module')
@@ -51,10 +60,12 @@ def install(rom, replacements, additions, module):
             raise ValueError('Unexpected native board draw call')
         struct.pack_into('>I', data, offset, 0x0C000000 | ((target & 0x0FFFFFFF) >> 2))
         targets[symbol] = f'{target:08X}'
-    relocations = remove_call_relocations(files[RELOC_VROM].extract(rom))
+    relocations = remove_call_relocations(files[RELOC_VROM].extract(rom),snapshots=snapshots)
     replacements.update({VROM: bytes(data), RELOC_VROM: relocations})
     return {'source_viewer_sha256': native['file_sha256'], 'read_mode': 1,
             'body_pixel_width': 192, 'body_lines': 6,
             'viewer_sha256': sha256(data), 'relocations_sha256': sha256(relocations),
             'hook_targets': targets, 'saved_format_changed': False,
-            'status': 'Experimental read-only native fields; full snapshot viewer and wider editing remain'}
+            'snapshot_reader': snapshots, 'experimental_snapshot_split': 128 if snapshots else None,
+            'status': ('Experimental snapshot reader; no native generation or release/save approval'
+                       if snapshots else 'Experimental read-only native fields; wider editing remains')}

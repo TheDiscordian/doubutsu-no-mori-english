@@ -7,7 +7,9 @@ codec is `tools/mail_record.py`; the freestanding C implementation is
 `runtime/mail/record.c`. Full-letter assembly is implemented separately in
 `tools/mail_format.py` and `runtime/mail/format.c`. Both C files are linked into
 the experimental resident module and pass isolated N64 CPU calls. Native
-generation, readers, editing, and persistence are not connected to these APIs.
+generation, editing, and persistence are not connected to these APIs. The
+separately enabled [experimental full reader](MAIL_READER.md) connects them to
+the native letter window for isolated snapshot probes.
 See [assembly semantics and executed coverage](MAIL_FORMAT.md).
 
 The snapshot stores immutable template identities plus the exact substitutions,
@@ -80,10 +82,12 @@ registered as an immutable experimental GAFE01 reference resource, not a release
 approval or permission to reuse matching numeric IDs as native translations.
 
 The magic byte is not sufficient to distinguish snapshots from native text.
-Native letters can contain arbitrary font bytes. A verified external record
-discriminator and complete reader audit are required before installation. No
-native `font`, `mailType`, or other metadata bit is currently assigned for this
-purpose. Passing a snapshot to the native text renderer is forbidden.
+Native letters can contain arbitrary font bytes. The experimental full reader
+uses split value `80` only for isolated tagged probes and decodes before native
+normalization. This is not a released discriminator assignment. A complete
+metadata/reader audit remains required before native generation or save/release
+approval. No `font` or `mailType` bit is repurposed. Passing a snapshot to the
+native text renderer is forbidden.
 
 The codec treats field bytes as literal data. The standalone formatter separately
 validates its glyph/control domain and never recursively executes arbitrary
@@ -184,7 +188,7 @@ by this audit.
 6. Prove delivery, gifts, post-office storage, travel, actual save/reload, old-save
    behaviour, catalog upgrades, and original-hardware operation.
 
-The resident module uses 13,184 linked bytes within a 32 KiB reservation. The
+The resident module keeps linked code and display state within a 32 KiB reservation. The
 linker limits code/data/BSS to the first 24 KiB; isolated native-call fixtures
 and stack use the separate final 8 KiB. Actual codec, formatter, and selected
 English reference tests pass with complete output and memory/stack guard checks.

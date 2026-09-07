@@ -41,7 +41,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 231 passing portable-C, synthetic, and retail-input tests. Retail tests require
+- 245 passing portable-C, synthetic, and retail-input tests. Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
   labels, with per-entry source hashes and verified texture formats/dimensions.
@@ -210,9 +210,10 @@ user's direction. The production build retains the approved spacing metrics.
   N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
   544 assertions, including every opcode and complete output. A separate run
   passes 92 calls and 280 assertions for 46 English reference cases. Linked code
-  occupies 13,184 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  and display state occupy 22,688 bytes within a 32 KiB reservation, with a separate 8 KiB test
   area and intact stack guards. Catalog identity review, generation/viewer hooks,
-  editing, and save validation remain; gameplay does not yet call these APIs.
+  editing, and save validation remain. Native generation does not emit snapshots;
+  the optional full reader calls restoration for isolated tagged-record probes.
 - An immutable cartridge mail catalog contains 4,807 complete reference parts
   with all 4,866 original indices preserved; 59 unavailable glyph rows remain
   explicit failures. Its 319,344-byte content is registered by complete hashes.
@@ -235,10 +236,23 @@ user's direction. The production build retains the approved spacing metrics.
   also passes. These hooks still read native 96/16-byte fields; snapshot decoding,
   longer generated letters, pagination where required, and editing remain.
   See [mail reader design](../specs/MAIL_VIEW.md).
+- The separately enabled full snapshot reader decodes before native scans and
+  normalization, preserving the source letter and clearing only its temporary
+  display copy. A bounded resident cache holds full text, recipient placement,
+  and complete pages. Explicit newlines/spaces remain; long bodies and signatures
+  continue without truncation. Left/Right changes pages; A/B/START retain closing.
+  Corrupt snapshots show an English error. Generated snapshots cannot enter the
+  lossy native editor. Host tests pass, and four long classic/composite reference
+  letters and two rejected snapshots pass actual window drawing across ten
+  pages, including 1,134 glyphs and 4,536 vertex coordinates. An edit-open request
+  safely becomes read-only. Ordinary letter opening/closing, ordinary header
+  drawing, and non-read forwarding regressions also pass. The experimental split marker is not a released
+  save format: generation, all other readers, editing, delivery, and persistence
+  remain. See [full reader design](../specs/MAIL_READER.md).
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mail-view-pilot/`
+The current experimental resident-module pilot in `build/mail-reader-final-pilot/`
 contains 10,405 edits, including
 9,151 reference dialogue candidates, all 460 choices, and nine original dialogue
 drafts. Candidates still require review. Its final main-bank audit leaves 2,592

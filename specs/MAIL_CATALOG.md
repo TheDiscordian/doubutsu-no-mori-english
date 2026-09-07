@@ -86,4 +86,6 @@ padding, workspace aliasing, and immutable registry/installer rejection.
 The o32 workspace is 3,552 bytes and remains caller-owned. Compiler-reported
 stack frames are 256 bytes for restoration, 1,224 for assembly, 152 for nested
 packing, and 408 for unpacking; the complete call paths must still be checked in
-real gameplay callers. These APIs introduce no mutable global data or BSS.
+real gameplay callers. The catalog/codec APIs introduce no mutable global data
+or BSS. The separately enabled full reader owns a bounded display cache and
+workspace, described in [its integration contract](MAIL_READER.md).

@@ -100,9 +100,11 @@ native copying preserves complete envelopes. The
 [full-letter assembler](MAIL_FORMAT.md) reconstructs complete text and its
 captured capitalization/article state. The [immutable cartridge catalog](MAIL_CATALOG.md)
 connects saved snapshots to complete template data through guarded DMA reads.
-These APIs are installed in the resident module and pass isolated N64 CPU tests,
-but native gameplay does not call them. The discriminator, semantic catalog
-approval, full-text readers, editing, and persistence remain.
+These APIs are installed in the resident module and pass isolated N64 CPU tests.
+Native generation does not emit snapshots; the optional
+[full reader](MAIL_READER.md) connects catalog restoration to the actual letter
+window for isolated tagged-record probes. Complete discriminator/other-reader
+validation, semantic catalog approval, editing, and persistence remain.
 The [read-layout hooks](MAIL_VIEW.md) provide measured body lines and footer
 alignment in read mode, with unchanged native editor paths. They pass actual
 letter-window opening and closing with a synthetic native record but do not

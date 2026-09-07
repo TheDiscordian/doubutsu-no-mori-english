@@ -15,7 +15,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import by_vrom, sha256
-from mail_view_patch import RELOC_VROM, RELOC_SHA256, CALLS, remove_call_relocations, install
+from mail_view_patch import RELOC_VROM, RELOC_SHA256, CALLS, SNAPSHOT_CALLS, remove_call_relocations, install
 from mail_viewer import RAM, VROM
 from test_retail import ROM_PATH
 
@@ -140,6 +140,29 @@ class MailViewTests(unittest.TestCase):
 
 @unittest.skipUnless(ROM_PATH.is_file(), 'Local native ROM required')
 class MailViewPatchTests(unittest.TestCase):
+    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(), 'Build resident module first')
+    def test_snapshot_option_changes_only_five_calls_and_three_relocations(self):
+        from runtime_module import MODULE_VROM
+        rom = ROM_PATH.read_bytes()
+        files = by_vrom(rom)
+        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
+        additions = {MODULE_VROM:(ROOT/'build/runtime-module/module.bin').read_bytes()}
+        replacements = {}
+        report = install(rom,replacements,additions,module,snapshots=True)
+        self.assertTrue(report['snapshot_reader'])
+        restored = bytearray(replacements[VROM])
+        for address,old,symbol in CALLS+SNAPSHOT_CALLS:
+            target = int(module['symbols'][symbol],16)
+            self.assertEqual(struct.unpack_from('>I',restored,address-RAM)[0],0x0C000000|((target&0x0FFFFFFF)>>2))
+            struct.pack_into('>I',restored,address-RAM,0x0C000000|((old&0x0FFFFFFF)>>2))
+        self.assertEqual(restored,files[VROM].extract(rom))
+        before = files[RELOC_VROM].extract(rom)
+        after = replacements[RELOC_VROM]
+        self.assertEqual(struct.unpack_from('>I',after,16)[0],49)
+        self.assertEqual(list(struct.unpack_from('>49I',after,20)),
+                         [v for v in struct.unpack_from('>52I',before,20) if v not in (0x440011A4,0x44001210,0x44001244)])
+        self.assertEqual((len(after),after[:16],after[-4:]),(len(before),before[:16],before[-4:]))
+
     def test_relocation_removes_only_two_calls_and_rejects_mutations(self):
         data = by_vrom(ROM_PATH.read_bytes())[RELOC_VROM].extract(ROM_PATH.read_bytes())
         changed = remove_call_relocations(data)

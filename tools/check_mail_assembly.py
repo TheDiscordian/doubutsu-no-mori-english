@@ -31,7 +31,7 @@ def main():
              '-mno-abicalls', '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common',
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
-    sources = ('record', 'format', 'catalog', 'view')
+    sources = ('record', 'format', 'catalog', 'view', 'page', 'reader')
     for name in sources:
         run('gcc', *flags, '/source/'+name+'.c', '-o', name+'.o')
     run('ld', '-EB', '-r', '-o', 'mail.o', *(name+'.o' for name in sources))
@@ -39,10 +39,13 @@ def main():
     if undefined.strip():
         raise ValueError('Unexpected mail runtime dependency: '+undefined)
     sections = run('size', '-A', 'mail.o')
+    mutable = {}
     for line in sections.splitlines():
         columns = line.split()
         if len(columns) >= 2 and columns[0].startswith(('.data', '.bss', '.sdata', '.sbss')) and int(columns[1]):
-            raise ValueError('Mail implementation unexpectedly retains mutable global state')
+            mutable[columns[0]] = int(columns[1])
+    if mutable != {'.bss.af_mail_reader': 5792}:
+        raise ValueError('Unexpected mail display cache layout: '+repr(mutable))
     assembly = run('objdump', '-d', 'mail.o')
     (out/'mail.asm').write_text(assembly)
     report = {'compiler': compiler, 'toolchain_image': IMAGE, 'compiler_flags': flags,
@@ -51,6 +54,7 @@ def main():
               'object_size': run('size', 'mail.o'), 'sections': sections,
               'stack_usage': {name: (out/(name+'.su')).read_text() for name in sources},
               'undefined_symbols': [],
+              'mutable_sections': mutable,
               'status': 'Compilation and stack evidence only; native execution is recorded by separate emulator scenarios'}
     (out/'mail.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))

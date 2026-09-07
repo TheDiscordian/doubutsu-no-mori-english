@@ -16,7 +16,7 @@ af_mail_body_hook:
     jr      $t9
     nop
 1:
-    j       af_mail_read_body
+    j       af_mail_snapshot_body
     nop
 .end af_mail_body_hook
 
@@ -34,6 +34,30 @@ af_mail_footer_hook:
     jr      $t9
     nop
 2:
-    j       af_mail_read_footer
+    j       af_mail_snapshot_footer
     nop
 .end af_mail_footer_hook
+
+.globl af_mail_header_hook
+.ent af_mail_header_hook
+af_mail_header_hook:
+    lw      $t0, 0x38($a2)
+    addiu   $t1, $zero, 1
+    beq     $t0, $t1, 3f
+    nop
+    addiu   $t9, $ra, -0x364
+    jr      $t9
+    nop
+3:
+    j       af_mail_snapshot_header
+    nop
+.end af_mail_header_hook
+
+.globl af_mail_copy_hook
+.ent af_mail_copy_hook
+af_mail_copy_hook:
+    # The guarded call's delay slot stores its menu pointer at 5C(sp).
+    lw      $a2, 0x5C($sp)
+    j       af_mail_reader_copy
+    nop
+.end af_mail_copy_hook

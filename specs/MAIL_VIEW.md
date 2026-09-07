@@ -6,9 +6,10 @@
 native board overlay. This is part of the full English reader work, not a full
 snapshot viewer. Current hooks still consume the native 96-byte body and
 sixteen-byte footer. Full snapshot decoding before normalization, longer text,
-pagination where required, discriminator validation, and editor integration
-remain required. No text is rewritten, no source newline is removed, and no
-saved representation changes.
+and pagination are provided separately by the opt-in
+[full snapshot reader](MAIL_READER.md).
+Generation, complete discriminator/reader validation, and editor integration
+remain required. No source text or newline is rewritten by these layout hooks.
 
 The approved font and advance metrics remain unchanged. Layout measures those
 actual rendered advances, rather than treating each Latin character as a

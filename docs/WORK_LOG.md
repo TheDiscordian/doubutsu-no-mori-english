@@ -1302,6 +1302,100 @@
   three-button scenario's paused-breakpoint ordering and strict reply checks.
   Earlier 226- and 230-test runs also passed before the final probe additions.
 
+### Complete snapshot-letter reading and pagination
+
+- Connected catalog restoration to the native board copy at `8088A47C`, before
+  native field scanning, split clamping, or footer normalization. The guarded
+  delay slot supplies the real menu pointer. A separately enabled experimental
+  reader recognizes split marker `80`, decodes into resident display state, and
+  blanks only the temporary board text fields. Source metadata, the complete
+  snapshot, and saved header/footer preferences remain unchanged. No native
+  generator emits this marker; other-reader/discriminator and save approval
+  remain required before release. Generated snapshots are read-only pending
+  lossless editor integration; invalid snapshots show an explicit error.
+- Added complete measured-width pagination without word reflow or whitespace
+  trimming. A one-line header repeats; longer headers continue before the body.
+  Body rows retain the native six-line geometry. Complete signatures wrap,
+  right-align, and move to continuation pages when necessary. D-pad Left/Right
+  changes pages without fresh DMA. A/B/START preserve native closing and take
+  priority over simultaneous page input. The input hook verifies the active
+  cached board and read-open mode, preventing an old cache from taking page input.
+- Checked 6,398 reference assembly probes for layout pressure: no header exceeds
+  192 pixels with the six-byte test recipient; 2,322 bodies and 754 signatures
+  contain a wider line before pixel wrapping. Maximum observed line widths are
+  162, 424, and 304 pixels for header/body/footer. These are probe observations,
+  not semantic-match approvals or exhaustive dynamic-field combinations. Classic
+  `0001` retains its explicitly limited ten-byte probe and actual-source-bound
+  requirement. The full host reader preserves every body/signature character in
+  all 6,398 probes, including both captured capitalization states and all pages.
+- Added the native header and trigger calls alongside the copy hook. Exactly
+  five board JALs change. Only three local-call relocation entries are removed;
+  the other forty-nine, file lengths, original functions, and delay slots remain.
+  A separate installer test restores the five original calls and compares the
+  complete overlay, while also checking every retained relocation entry.
+- The first native compile exposed compiler-generated `memset`/`memcpy`
+  dependencies from aggregate initialization/assignment in the page builder.
+  Explicit bounded byte loops replace those operations. The final six mail
+  objects compile without undefined symbols or mutable globals other than the
+  exact 5,792-byte reader cache. Combined object SHA-256:
+  `30599b8be50a2ed3c896aa795421796f0520c265c5aa8b3a47741674c4ee548d`.
+  Text-category size is 9,308 bytes. Compiler frames include page construction
+  496, reader copy 40, page selection 48, header drawing 120, trigger 32, and
+  font adapter 64 bytes. The 3,552-byte DMA workspace is in the cache, not a
+  nested native stack. This is not a measured whole-game stack high-water bound.
+- `smoke-mail-reader-open-01` passes four actual long-reference window opens,
+  eight pages, 1,080 glyphs, 4,320 vertex positions, all forward/backward page
+  checks, and four unchanged source/preference checks across 120 recorded steps.
+  Bodies contain 228, 174, 199, and 159 bytes; signatures contain 22, 51, 26,
+  and 37 bytes. The decoder is called by actual native initialization, and
+  entry/return breakpoints enclose real font drawing. The observed font arena
+  retains at least 59,808 free bytes after those complete page draws. This run
+  precedes the additional active-board input guard, which is revalidated on its
+  own freshly built ROM and matching checkpoint.
+- The final resident module occupies 22,688 linked bytes including display BSS,
+  within the unchanged 32 KiB reservation and separate final eight-KiB test area.
+  Independent module/bootstrap builds compare equal. Module SHA-256:
+  `fa77b89c90a26cc4651de0f8635a7b1849c335580cb6a78d3ab27ff388806ebd`.
+  Bootstrap SHA-256:
+  `f38de0d2f252c4b9c4e596d85f5ae3f66f9ac27a680d30e874d2f6f476a4cb92`.
+  The previous experimental module remains in `build/runtime-module-pre-reader-UppdtK/`.
+- `build/mail-reader-final-pilot/` retains the 10,405 candidate edits, approved
+  font/metrics, and all four optional resources. ROM SHA-256:
+  `344e91d72b3b62f16ea97b076486e24471b1c039be0b0ee0f7c4984b98658e0e`.
+  UPS SHA-256:
+  `bce41a957f88bbc04791049573f3039cdbfc7dd75ea7c5aeb6d009a3ed2665bc`.
+  Independent module and ROM builds in `build/runtime-module-reader-repeat/`
+  and `build/mail-reader-repeat-pilot/` produce identical artifacts.
+- Both fresh `smoke-mail-reader-full-01` and `full-02` train-to-town runs pass
+  188 recorded steps and all ten acceptance checks on their respective ROMs.
+  The final-ROM checkpoint belongs only to `full-02`. Four-MiB size, actual
+  reduced malloc arena, module header/readiness, and guards pass. FlashRAM is
+  blank; these checkpoints are not game-save/reload validation.
+- The initial complete host suites pass 239 tests in 70.789 seconds and 244
+  tests in 72.293 seconds. The additional all-reference reader test passes with
+  the four other reader tests in 1.149 seconds. Tests of cache ABI/bounds,
+  incomplete page traversal, ordinary-record fallback, explicit tag permission,
+  and snapshot-only edit-open permission also pass.
+- `smoke-mail-reader-open-02` passes on the final ROM: 156 recorded steps,
+  six window opens, ten pages, 1,134 glyphs, and 4,536 vertex positions. All four
+  complete reference letters remain intact across paging. The fourth requests
+  edit-open mode two and reaches read-only mode one safely. A bad checksum and
+  an unknown catalog display the real error glyphs without rendering snapshot
+  bytes. All six source/preference checks pass, the checkpoint is restored,
+  and FlashRAM remains blank. The minimum observed free graphics gap is 59,808
+  bytes after a complete page draw. This is not delivery or game-save evidence.
+- `smoke-mail-reader-ordinary-01` passes all three ordinary letter open/close
+  cycles in 56 recorded steps, including actual body/footer hook PCs, A/B/START,
+  unchanged source/preferences, and checkpoint restoration. The separate layout
+  regression in `smoke-mail-reader-layout-01` passes 554 steps and 28 native
+  calls, extending previous body/footer checks with ordinary recipient insertion,
+  special no-recipient headers, and all three non-read tail shims. Every new
+  header glyph quad and the complete stack/graphics/module guards pass.
+- The final full suite passes 245 tests in 69.848 seconds. The optional reader
+  remains experimental: semantic identity review, full metadata/other-reader
+  handling, native generation, lossless editing, delivery, actual saving,
+  original hardware, and public release preparation remain required.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

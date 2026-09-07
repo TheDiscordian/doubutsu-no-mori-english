@@ -138,12 +138,28 @@ def scenario(rom, module):
     vertices([(0,text)],256-sum(12-cuts[code] for code in text),172)
     actions.append({'read':[f'{GFX:08X}',GFX_BYTES]})
 
+    # The full reader also replaces ordinary read-mode headers. Name insertion
+    # and special no-name types must retain the native semantics.
+    for kind in (4,3):
+        value = bytearray(192)
+        value[3],value[5],value[0x2F],value[0x30] = 6,5,3,kind
+        value[8:14] = b'READER'
+        value[0x32:0x3C] = b'To ! '.ljust(10,b' ')
+        text = b'To READER! ' if kind == 4 else bytes(value[0x32:0x3C])
+        write(BOARD,bytes(value))
+        graphics()
+        call('af_mail_header_hook',[SUBMENU,GAME,MENU,fword(64),fword(36),COLOUR])
+        read(BOARD,bytes(value))
+        guards(len(text),1)
+        vertices([(0,text)],64,36)
+
     # Emulate distinct loaded overlay bases through a return address inside
     # isolated scratch. Only the original target is replaced by a test stub;
     # every hook instruction executes unchanged. Stubs preserve all arguments.
     for symbol,delta,token,args in (
             ('af_mail_body_hook',0x60C,0xB0,[SUBMENU,MENU,GAME,fword(64),POS,POS+4,POS+8,COLOUR]),
-            ('af_mail_footer_hook',0x6F8,0xF0,[SUBMENU,GAME,fword(64),fword(172),COLOUR])):
+            ('af_mail_footer_hook',0x6F8,0xF0,[SUBMENU,GAME,fword(64),fword(172),COLOUR]),
+            ('af_mail_header_hook',0x364,0xA0,[SUBMENU,GAME,MENU,fword(64),fword(36),COLOUR])):
         stub = [0x3C0A0000|(POS>>16),0x354A0000|(POS&0xFFFF)]
         stub += [0xAD400000|(reg<<16)|(index*4) for index,reg in enumerate(range(4,8))]
         stub += [0x24020000|token,0x03E00008,0]

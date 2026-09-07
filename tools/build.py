@@ -111,8 +111,11 @@ def main():
     parser.add_argument("--catchphrases", type=Path, help="Directory containing the full default catchphrase display resource")
     parser.add_argument("--mail-catalog", type=Path, help="Directory containing the registered immutable English mail catalog")
     parser.add_argument("--english-mail-layout", action="store_true", help="Experimental pixel-width body/footer in read mode; native editor and saved fields unchanged")
+    parser.add_argument("--english-mail-snapshots", action="store_true", help="Experimental full-letter reader and paging; requires mail layout/catalog; no generated records or save approval")
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
+    if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
+        parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
     rom = verified_rom(args.rom.read_bytes())
     replacements, report = make_halfwidth(rom)
     if args.english_keyboard:
@@ -132,7 +135,8 @@ def main():
         runtime_module=args.runtime_module, module_additions=additions)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
-        report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'))
+        report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
+                                              snapshots=args.english_mail_snapshots)
     if args.extended_items:
         report["extended_items"] = install_extended_items(rom, additions, report.get("runtime_module"), args.extended_items)
     if args.display_names:

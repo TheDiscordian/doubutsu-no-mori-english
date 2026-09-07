@@ -62,6 +62,17 @@ does not represent an allocated live submenu. The non-read tail-call probes use
 return breakpoint `8019B1E0` and small argument-recording targets inside the same
 test region. The original board code is not called by those forwarding probes.
 
+The full-reader window probes instead place a 164-byte tagged letter at
+`8019AAE0` and call the guarded native submenu-open routine. They do not inject a
+saved inventory item or change progression. The optional reader's 5,792-byte
+cache lives entirely in linked module RAM, before the isolated test region.
+Native entry/return breakpoints bracket the complete header/body/footer drawing
+in the actual graphics arena. Bulk vertex reads check every emitted quad and
+the arena's front/back bounds. Explicit snapshot probes may request open mode
+two solely to verify conversion to read-only mode before native editing begins.
+Normal probes reject tagged records unless that test-only option is supplied.
+Every such probe checks unchanged source/preferences and restores its checkpoint.
+
 No running-thread pointer, native scheduling field, or gameplay progression value
 is edited to obtain this context. The existing socket and process time bounds
 limit a missing frame breakpoint. Native behaviour and real hardware still need

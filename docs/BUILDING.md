@@ -118,6 +118,14 @@ actual submenu/board loader, verifies resident hook execution, exercises the
 three close buttons, checks unchanged letter/preferences, and restores the
 checkpoint. This is not ordinary mail delivery or a game-save test.
 
+`--english-mail-snapshots` additionally enables the experimental complete-letter
+cache and reader, requiring both `--english-mail-layout` and `--mail-catalog`.
+It does not enable native snapshot generation or establish save compatibility.
+`tools/mail_reader_test_scenario.py --rom <built-ROM> --output <ignored-json>`
+generates long classic/composite snapshot-window probes for an identical-ROM
+town checkpoint. All pages, actual glyph vertices, graphics bounds, and unchanged
+source/preferences are checked. See [full reader](../specs/MAIL_READER.md).
+
 The corresponding native-call generators are `tools/display_fields_test_scenario.py`
 and `tools/catchphrase_test_scenario.py`. Both require the exact built ROM and
 matching module/resource manifests. Generated fixtures remain local under

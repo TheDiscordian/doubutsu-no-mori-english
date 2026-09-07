@@ -42,25 +42,27 @@ def snapshot(debug):
     return result
 
 
-def open_test_mail(debug,address):
+def open_test_mail(debug,address,*,snapshot_probe=False,open_mode=1):
     address = int(address,16) if isinstance(address,str) else address
     if type(address) is not int or address & 3 or not TEST_RETURN+16 <= address <= TEST_STACK-0x800-164:
         raise ValueError('Test mail must be inside isolated fixture RAM')
+    if type(open_mode) is not int or (open_mode != 1 and not (snapshot_probe and open_mode == 2)):
+        raise ValueError('Only an explicit snapshot probe may request edit-open mode two')
     state = snapshot(debug)
     if state['program'] != 0 or state['move_index'] != 0:
         raise ValueError('Native mail-open probe requires a closed submenu')
     mail = debug.read_memory(address,164)
-    if mail[0x26] == 255 or mail[0x27] > 10 or mail[0x29] >= 64:
+    if mail[0x26] == 255 or (mail[0x27] > 10 and not (snapshot_probe and mail[0x27] == 128)) or mail[0x29] >= 64:
         raise ValueError('Mail-open probe requires an ordinary valid native letter')
     if debug.read_memory(OPEN,len(OPEN_BYTES)) != OPEN_BYTES:
         raise ValueError('Native submenu-open instruction guard failed')
     private = pointer(debug,0x80136FD8,0x40A)
     preference = private+0x3EE
     before = debug.read_memory(preference,28)
-    called = debug.call(f'{OPEN:08X}',[int(state['submenu'],16),12,1,0,address,0])
+    called = debug.call(f'{OPEN:08X}',[int(state['submenu'],16),12,open_mode,0,address,0])
     return {'test_only_mail_open':True,'source':f'{address:08X}','mail':mail.hex(),
             'preference':f'{preference:08X}','preference_bytes':before.hex(),
-            'before':state,'call':called,'requires_checkpoint_restore':True}
+            'before':state,'call':called,'requested_open_mode':open_mode,'requires_checkpoint_restore':True}
 
 
 def verify_unchanged(debug,opened):

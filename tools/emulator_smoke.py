@@ -762,7 +762,9 @@ def main():
                 from mail_view_smoke import open_test_mail
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Native mail-open probes require a saved emulator checkpoint')
-                test_mail_open = open_test_mail(debug,action['open_test_mail'])
+                test_mail_open = open_test_mail(debug,action['open_test_mail'],
+                                                snapshot_probe=action.get('snapshot_probe',False),
+                                                open_mode=action.get('mail_open_mode',1))
                 needs_checkpoint_restore = True
                 results.append(test_mail_open)
             if action.get('snapshot_submenu'):
@@ -775,6 +777,11 @@ def main():
             if action.get('assert_test_mail_unchanged'):
                 from mail_view_smoke import verify_unchanged
                 results.append(verify_unchanged(debug,test_mail_open))
+            if 'read_all_mail_pages' in action:
+                from mail_reader_smoke import all_pages
+                if not needs_checkpoint_restore or not test_mail_open:
+                    raise ValueError('Complete mail-page probes require an isolated open and checkpoint')
+                all_pages(debug,keyboard,action['read_all_mail_pages'],record)
             if action.get("snapshot_message"):
                 snapshot = message_snapshot(debug)
                 results.append(snapshot)

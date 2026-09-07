@@ -87,6 +87,22 @@ class MailWindowProbeTests(unittest.TestCase):
             with self.assertRaises(ValueError): open_test_mail(debug,source)
             self.assertFalse(debug.calls)
 
+    def test_snapshot_tag_requires_an_explicit_isolated_probe(self):
+        debug = Debugger()
+        source = TEST_RETURN+0x200
+        debug.put(source+0x27,b'\x80')
+        with self.assertRaises(ValueError): open_test_mail(debug,source)
+        self.assertFalse(debug.calls)
+        open_test_mail(debug,source,snapshot_probe=True)
+        self.assertEqual(len(debug.calls),1)
+        with self.assertRaises(ValueError): open_test_mail(debug,source,open_mode=2)
+        open_test_mail(debug,source,snapshot_probe=True,open_mode=2)
+        self.assertEqual(debug.calls[-1][1][2],2)
+        for mode in (0,3,True):
+            with self.assertRaises(ValueError): open_test_mail(debug,source,snapshot_probe=True,open_mode=mode)
+        debug.put(source+0x27,b'\x81')
+        with self.assertRaises(ValueError): open_test_mail(debug,source,snapshot_probe=True)
+
     def test_live_board_snapshot_reads_actual_loaded_call_words(self):
         debug = Debugger()
         submenu,overlay,board = 0x80201CBC,0x80210000,0x80230000
