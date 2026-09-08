@@ -16,9 +16,10 @@ Ordinary groups retain their actual legacy donor ID even when an explicit
 approval names a different English reference index. References stay in the same
 name family; placed-object aliases use their separate native conversion proof.
 
-## Reviewed furniture batch
+## Reviewed furniture groups
 
-The batch contains 179 new name identities from the first 300 furniture groups.
+The registry contains 487 furniture identities and two ordinary clothing-name
+approvals. Of the furniture identities, 179 cover the first 300 groups.
 It covers wardrobes/dressers/cabinets, furniture-series pieces, household and
 school objects, instruments, recognisable plants/bonsai, and outdoor/construction
 objects whose native names agree with the selected English identity. Exact
@@ -41,13 +42,23 @@ objects needing a visual/model identity check. Names that omit the native
 unusable prefix do not receive approvals. No artwork identity, asset replacement,
 or reachability is inferred from the name review.
 
+The [mapped-name groups](MAPPED_ITEM_NAMES.md) supply 308 further identities,
+including 170 explicit cross-index matches after inserted English entries.
+Two direct ordinary approvals handle explicitly reviewed carried-name spelling
+variants without relaxing exact-source alias matching.
+The mapped groups retain native creatures, object types, fossil parts, and chess pieces,
+not the unrelated names at equal table indices. Gyroids, changed species and
+designs, numbered-shirt filler, and native game slots still require review.
+
 ## Two unchanged capacities
 
-All 179 complete names fit the existing sixteen-byte resource: 716 rotation
-slots. Only 53 fit the unchanged ten-byte native fields: 212 slots. The other
-126 names remain complete in the separately installed resource and withheld
+All 487 complete furniture names fit the existing sixteen-byte resource: 1,948 rotation
+slots. Only 134 fit the unchanged ten-byte native fields: 536 slots. The other
+353 names remain complete in the separately installed resource and withheld
 from ten-byte storage. No abbreviations, removed suffixes, punctuation changes,
 or rotation-dependent names are introduced to fit a smaller destination.
+The two ordinary clothing approvals also fit sixteen bytes; bear shirt fits
+ten bytes, while winter sweater stays complete in the wider resource.
 
 The shared `item_candidates` importer accepts an explicit match map. Its ordinary
 legacy path remains unchanged for unapproved IDs. Native source spelling/hash,

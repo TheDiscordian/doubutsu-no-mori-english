@@ -16,6 +16,9 @@ bank's generated remaining report.
 
 Individually [reviewed native identities](ITEM_REFERENCE_MATCHES.md) provide a
 separate hash-bound path where the legacy wording differs or remains Japanese.
+The [mapped-name review](MAPPED_ITEM_NAMES.md) also supplies explicit cross-index
+matches where the supplied English table inserts unrelated entries. Native
+Japanese part names take precedence over swapped legacy fossil/chess glosses.
 The native name, reference, four furniture rotations, complete output, and
 capacity are independently checked. Unapproved legacy mismatches stay withheld.
 

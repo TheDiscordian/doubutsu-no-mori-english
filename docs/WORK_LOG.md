@@ -5222,6 +5222,109 @@
   This establishes cartridge loading and order dispatch, not normal resident
   mood/timer progression, rendered conversations, saving, or hardware acceptance.
 
+## 2026-09-08 — Shifted item-name identities and carried spelling variants
+
+- Reviewed and added 308 furniture-name approvals outside the first 300 groups:
+  138 individually matched shared indices and 170 explicit cross-index matches.
+  English table insertions shift selected insect/fish/umbrella/later-furniture
+  groups by 8/16/24/44 entries. Those differences are recorded per approval,
+  not installed as a blanket index rule. Complete native names, source hashes,
+  all four rotations, supplied English names/hashes, and families are checked.
+  Japanese queen/king, tail/torso, and right/left-wing words select correct
+  English parts where the legacy wording swaps them. Unreviewed gyroids,
+  changed species/designs, native game slots, and filler remain withheld.
+- The initial 308-name resource adds 1,232 furniture slots and 114 exact-source
+  ordinary aliases; 324 furniture slots and eleven aliases fit ten bytes.
+  All previous candidates remain unchanged. Full/basic generation contains
+  12,509/11,799 ordinary edits; the initial wide resource has 2,711 slots and
+  769 reference IDs. The first eleven focused checks pass, followed by fourteen
+  checks including shifted blocks, withheld cases, and actual placed conversion.
+  The initial full suite passes all 674 tests in 224.795 seconds.
+- The independent converted-name audit catches two genuine display gaps:
+  placed `ゆきぐにニット` versus carried `ゆきぐになニット`, and placed `くまのふく`
+  versus carried `クマのふく`. The exact-source alias guard correctly leaves those
+  carried fields native. Added independent ordinary approvals `item_24:006D/0078`
+  for complete winter sweater and bear shirt references, with their actual
+  native/English hashes. No general kana or particle normalisation is added.
+  Both fit sixteen bytes; only bear shirt fits ten. The final audit proves that
+  every selected wide name remains complete after actual native conversion.
+- The final registry contains 489 approvals: 487 furniture and two ordinary.
+  The batch adds 1,348 wide slots and 336 ordinary edits. Final full/basic
+  generation contains 12,510/11,800 edits. Native item storage has 779 slots from
+  242 reference IDs, including 700 furniture slots from 175 identities. The wide
+  resource has 2,713 slots from 771 reference IDs, including 2,436 furniture
+  slots from 609 identities. Counts distinguish references, rotations, aliases,
+  and storage capacities; longer names are never abbreviated.
+- The final fifteen focused checks pass in 1.112 seconds in
+  `build/tests-mapped-items-focused-03.log`. The complete final suite passes
+  all 675 tests in 226.977 seconds in `build/tests-mapped-items-full-02.log`.
+  All main dialogue and choices remain unchanged: 10,717 main candidates,
+  113 Japanese-static gaps, and the same rejection/warning/alias counts as the
+  mood checkpoint. Fresh final identity/expression queues retain zero
+  current-rule admissions and ten unapproved special contexts. Source-volume
+  coverage gains 1,865 characters to 636,778 of the same 746,978 denominator.
+- Final ROM `build/mapped-items-final-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `041abc6ba98c662c48078848b5d882e3e201b681009992887ae1f95f7bb37871`.
+  UPS SHA-256:
+  `26c8bf9927ff56a12960802078a6e2e585d8f34e26d610a582d329290e8cb0ef`.
+  Candidate SHA-256:
+  `a8663840811a20f3549f365130984e0ab9de834844789018ffe6206e0551e048`.
+  Wide-resource SHA-256:
+  `12325054543aa6a610fe4525f915a8ea563e40cd2d5cb2d570edafed6db208b5`.
+  `build/mapped-items-final-artifact-audit.log` verifies all 12,510 installed
+  payloads, whole-ROM UPS application, full resource reconstruction, and all
+  2,713 converted full-name expectations. Only `010F4000` and `02A00000` differ
+  from the mood pilot; every DMA entry, code/font/message/name/mail resource
+  outside those two files, and saved structure remains unchanged.
+- An initial combined 1,185-call fixture was generated. The runner rejects
+  a requested 900-second allowance before launching because its existing limit
+  is 600 seconds. Kept that safety limit and split the checks into separate
+  wider and original-width batches. No game failure is implied by this preflight
+  rejection. `build/smoke-mapped-items-wide-01/` passes 850 calls/expected returns,
+  842 memory assertions, and 2,550 steps. `build/smoke-mapped-items-native-01/`
+  passes all 335 new original-width loads, 337 memory assertions, and 1,014 steps.
+  The native void-return path is checked by complete output/guards, not an
+  invented expected return. Both processes restore their checkpoints and shut
+  down gracefully.
+- The final clothing refinement changes only the carried bear-shirt ten-byte
+  field and two sixteen-byte fields. All other bytes tested by the two larger
+  runs remain unchanged. `build/smoke-mapped-items-spelling-01/` checks the final
+  ROM through four full-width carried/placed loads and ten native-width loads,
+  covering both carried items and all four placed rotations: fourteen calls,
+  four expected-return checks, sixteen memory assertions, and 51 steps. Exact
+  complete English wide names, the deliberately unexpanded winter ten-byte
+  fallback, guards, restored state, and graceful shutdown pass. No additional
+  full-size emulator rerun is needed for these three explicitly checked fields.
+- `build/mapped-items-native-results-audit.log` independently compares every
+  call/address/argument, applicable return, complete read, restored stack, and
+  checkpoint with all three scenarios. Scenario SHA-256 values:
+  wide `a65fb2e92ee6518ce41904396fce89c870d3c4affaf3eb56b9ed70564034c1b6`;
+  native `5ee3f6a91f4e61d61fa5a1db538ed407769acc7bc8b31eff7498675b5856a8fe`;
+  spelling `92dc9bd801b7106d0953da912de5ec80fd9ee703625b969ada3905e1b59cbd2a`.
+  All three runs are silent, four MiB, have no seeds, and disable both save-write
+  permissions. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  Normal inventory/catalogue/catch/gift display, every wider destination, final
+  wording/design identity, saving, and hardware remain separate acceptance work.
+
+## 2026-09-08 — Title-screen source route
+
+- While item checks ran, located the supplied English title's three animated
+  letter groups, four background pieces, trademark, and two separate Press
+  Start tiles in the local decompilation/model/symbol inventory. Verified the
+  complete supplied REL hash and the 60,600-byte title-related data region.
+  Also verified the native logo overlay and relocation files. Scoped local
+  palette/letter names repeat, so a first-symbol-name lookup is insufficient.
+  `specs/TITLE_ASSETS.md` records exact source/destination locations, hashes,
+  source-described formats, and remaining implementation/acceptance checks.
+- This is source discovery, not a title replacement, asset conversion, or
+  native drawing verification. No image or font changes. The main logo is
+  animated textured geometry, not the separate Press Start image. Preserve
+  native title/menu, clock, save-data, and player-selection transitions during
+  the later drawing integration. Title artwork remains first in the image pass;
+  broader main-port work and all other completion requirements remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

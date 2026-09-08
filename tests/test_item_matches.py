@@ -15,6 +15,7 @@ from extended_items import resource
 from extended_items_test_scenario import combine_load_scenarios
 from item_candidates import item_candidates
 from item_matches import identity_key, load_matches, validate_candidate, verify_source
+from item_aliases import confirmed_aliases
 from runtime_module import module_command_info
 from textbanks import Bank, banks
 from textcodec import encode
@@ -155,17 +156,25 @@ class ItemMatchRetailTests(unittest.TestCase):
         cls.refs = list(map(json.loads, (ROOT/'build/gamecube/names/furniture.jsonl').read_text().splitlines()))
 
     def test_all_reviewed_names_rotations_hashes_and_precise_capacity_totals(self):
-        self.assertEqual(len(self.matches), 179)
-        refs = {r['id']: r for r in self.refs}
+        self.assertEqual(len(self.matches), 489)
+        ordinary = list(map(json.loads, (ROOT/'build/gamecube/names/item_24.jsonl').read_text().splitlines()))
+        refs = {r['id']: r for r in self.refs+ordinary}
         for key, match in self.matches.items():
+            bank = key.split(':')[0]
             first = int(key.split(':')[1], 16)
-            self.assertEqual(first % 4, 0)
-            self.assertEqual(match['reference_id'], f'furniture:{first//4:04X}')
-            verify_source(match, self.source['item_10'][first], self.info)
-            self.assertEqual(self.source['item_10'][first:first+4], [self.source['item_10'][first]]*4)
+            if bank == 'item_10':
+                self.assertEqual(first % 4, 0)
+                group = first//4
+                delta = 8 if 746 <= group < 778 else 16 if 778 <= group < 810 else 24 if 810 <= group < 842 else 44 if group >= 850 else 0
+                self.assertEqual(match['reference_id'], f'furniture:{group+delta:04X}')
+                self.assertEqual(self.source[bank][first:first+4], [self.source[bank][first]]*4)
+            else:
+                self.assertIn(key, ('item_24:006D', 'item_24:0078'))
+                self.assertEqual(match['reference_id'], key)
+            verify_source(match, self.source[bank][first], self.info)
             reference = refs[match['reference_id']]
             self.assertEqual(sha256(encode(reference['text'], self.info).ljust(16, b' ')), match['reference_sha256'])
-        for width, delta in ((10, 212), (16, 716)):
+        for width, delta in ((10, 536), (16, 1948)):
             old = item_candidates(self.banks['item_10'], self.rows, self.refs, self.info, capacity=width)[0]
             new, _, remaining, report = item_candidates(self.banks['item_10'], self.rows, self.refs,
                                                        self.info, capacity=width, matches=self.matches)
@@ -175,6 +184,7 @@ class ItemMatchRetailTests(unittest.TestCase):
             self.assertEqual(report['reviewed_identity_candidates'], delta)
             for edit in new: validate_candidate(edit, self.source, self.info, self.matches)
             for match in self.matches.values():
+                if not match['id'].startswith('item_10:'): continue
                 short = len(refs[match['reference_id']]['text']) <= width
                 first = int(match['id'].split(':')[1], 16)
                 self.assertEqual([f'item_10:{first+i:04X}' in by_id for i in range(4)], [short]*4)
@@ -202,6 +212,54 @@ class ItemMatchRetailTests(unittest.TestCase):
                 path.write_text(json.dumps([altered]))
                 with self.assertRaisesRegex(ValueError, 'complete exact'):
                     apply_translations(self.rom, {}, path)
+
+    def test_shifted_blocks_keep_native_objects_and_correct_fossil_chess_parts(self):
+        refs = {r['id']: r['text'] for r in self.refs}
+        expected = {746: 'common butterfly', 778: 'crucian carp', 811: 'daffodil parasol',
+                    850: 'phonograph', 889: 'white queen', 893: 'white king',
+                    903: 'kiddie couch', 912: 'tricera tail', 913: 'tricera torso',
+                    924: 'ptera right wing', 925: 'ptera left wing', 942: 'Snowman sofa'}
+        for group, name in expected.items():
+            match = self.matches[f'item_10:{group*4:04X}']
+            self.assertEqual(refs[match['reference_id']], name)
+            self.assertNotEqual(match['reference_id'], f'furniture:{group:04X}')
+            self.assertNotEqual(refs[f'furniture:{group:04X}'], name)
+
+    def test_unreviewed_gyroids_species_design_changes_and_game_slots_stay_withheld(self):
+        excluded = {*range(364, 491), *range(663, 670), *range(842, 850),
+                    314, 320, 511, 512, 517, 518, 682, 694, 751, 779,
+                    810, 814, 827, 836, 838, 866, 871, 876, 877, 879}
+        self.assertTrue(all(f'item_10:{i*4:04X}' not in self.matches for i in excluded))
+
+    def test_exact_placed_conversions_retain_full_cross_index_reference_names(self):
+        edits = item_candidates(self.banks['item_10'], self.rows, self.refs, self.info,
+                                capacity=16, matches=self.matches)[0]
+        aliases = {r['id']: r for r in confirmed_aliases(self.banks, edits, self.info, capacity=16)}
+        for id, group, text in (('item_24:0000', 491, 'flame shirt'),
+                                ('item_2D:0000', 746, 'common butterfly'),
+                                ('item_23:0000', 778, 'crucian carp'),
+                                ('item_22:0005', 811, 'daffodil parasol')):
+            edit = aliases[id]
+            self.assertEqual(edit['translation'], text)
+            self.assertEqual(edit['item_reference_match'], f'item_10:{group*4:04X}')
+            self.assertGreater(len(encode(text, self.info)), 10)
+            validate_candidate(edit, self.source, self.info, self.matches)
+
+    def test_carried_spelling_variants_have_separate_complete_native_approvals(self):
+        rows = list(map(json.loads, (ROOT/'build/inventory/item_24.jsonl').read_text().splitlines()))
+        refs = list(map(json.loads, (ROOT/'build/gamecube/names/item_24.jsonl').read_text().splitlines()))
+        short = {r['id']: r for r in item_candidates(self.banks['item_24'], rows, refs, self.info,
+                                                   matches=self.matches)[0]}
+        wide = {r['id']: r for r in item_candidates(self.banks['item_24'], rows, refs, self.info,
+                                                  capacity=16, matches=self.matches)[0]}
+        for key, group, text in (('item_24:006D', 600, 'winter sweater'),
+                                 ('item_24:0078', 611, 'bear shirt')):
+            index = int(key.split(':')[1], 16)
+            self.assertNotEqual(self.source['item_24'][index], self.source['item_10'][group*4])
+            self.assertEqual(wide[key]['translation'], text)
+            validate_candidate(wide[key], self.source, self.info, self.matches)
+        self.assertNotIn('item_24:006D', short)
+        self.assertEqual(short['item_24:0078']['translation'], 'bear shirt')
 
     def test_full_resource_retains_long_names_and_rejects_rehashed_shortening(self):
         edits = item_candidates(self.banks['item_10'], self.rows, self.refs, self.info,

@@ -147,9 +147,9 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 671 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 675 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
-  The suite includes all eleven item-identity/scenario-composition checks and
+  The suite includes all fifteen item-identity/scenario-composition checks and
   five cartridge-clock/town-data error checks, and eleven native-mood reference checks.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
@@ -203,7 +203,7 @@ user's direction. The production build retains the approved spacing metrics.
 - Legacy item references recovered from the shipped loader's verified tables.
   All seventeen banks reconstruct unchanged, and 947 furniture groups map to
   their four native rotation slots. These are references, not approved imports.
-- 160 distinct reference IDs for complete English item-name candidates in 443 native storage
+- 242 distinct reference IDs for complete English item-name candidates in 779 native storage
   slots, retaining GameCube spelling/case and the original ten-byte fields.
   Thirty-five direct item-loader calls and their contexts are inventoried.
   Wider imports remain gated on name, message, handbill, and UI destinations.
@@ -211,7 +211,7 @@ user's direction. The production build retains the approved spacing metrics.
   All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
   DMA tests cover every confirmed reference identity, group boundaries, invalid
   inputs, unaligned destinations, resource disabling, and header validation.
-  The resource has 461 candidate reference IDs in 1,365 slots. This API alone does
+  The resource has 771 candidate reference IDs in 2,713 slots. This API alone does
   not enable wider names at a destination. A verified placed-clothing alias fills
   its ordinary-name destination; direct loading and all four rotations pass.
 - Sixteen-byte main-message item fields with unchanged native structure/save
@@ -464,8 +464,8 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/native-mood-pilot/`
-contains 12,174 edits, including
+The current experimental resident-module pilot in `build/mapped-items-final-pilot/`
+contains 12,510 edits, including
 9,755 reference main-bank candidates, all 460 choices, 572 original dialogue
 drafts, one original-dialogue continuation, 290 original development-label drafts,
 and 99 complete diagnostic drafts.
@@ -477,7 +477,7 @@ records without candidates; the classification and remaining restrictions are
 listed below. The 1,471 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/native-mood-candidates/` and `build/native-mood-coverage/`. The independent
+`build/mapped-items-final-candidates/` and `build/mapped-items-final-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -1030,27 +1030,46 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,174 edits; basic generation has 11,464, including both startup-error drafts
+12,510 edits; basic generation has 11,800, including both startup-error drafts
 and all nineteen mood-preserving references.
 All earlier candidates remain unchanged.
-Ordinary item storage contains 443 slots from 160 distinct references; the wide
-resource contains 1,365 slots from 461 references. Four rotations are one name,
+Ordinary item storage contains 779 slots from 242 distinct references; the wide
+resource contains 2,713 slots from 771 references. Four rotations are one name,
 not four distinct translations. The 126 new names longer than ten bytes remain
 complete in the wide resource, not shortened for unexpanded callers.
 
-All 12,174 actual installed edits, source/candidate/build hashes, the complete
+All 12,510 actual installed edits, source/candidate/build hashes, the complete
 wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
 changes only the native item-name file and the existing wide-name resource
 relative to the travel pilot; their dimensions and DMA entries remain unchanged.
 Runtime code, main text,
 fonts, save structures, and caller capacities are unchanged by the name edits.
-The 671-test suite includes all eleven item checks. The combined native loader
+The 675-test suite includes all fifteen item checks. The first-300-group native loader
 batch passes 757 calls and 749 memory assertions over 2,271 steps, including all
 461 wider-name reference identities and all 212 new ten-byte slots. Complete
 names, unaligned wide destinations, capacity/header failures, guards, and restored
 state pass. The earlier shorter-time-limit run remains recorded as incomplete.
 Normal item display and remaining wider destinations still need their own
 integration and gameplay checks.
+
+The [mapped-name review](../specs/MAPPED_ITEM_NAMES.md) supplies 308 additional
+furniture identities, including 170 explicit cross-index matches. English table
+insertions do not replace native insects with mannequins or fossils with clocks.
+Japanese queen/king, tail/torso, and right/left-wing names select the correct
+English parts where legacy glosses disagree. Full names and exact native
+conversions supply 1,348 additional wide slots and 336 ordinary edits, including
+two independently approved carried-clothing spelling variants. The complete
+registry has 487 furniture and two ordinary approvals.
+
+The native batches pass 850 wider-loader/header calls and 335 original-width
+loads; a fourteen-call final refinement covers both clothing variants in carried
+and placed form. All three checkpoints restore with intact guards and blank
+isolated saves. The final refinement changes only one original-width name and
+two wider fields; every other tested byte remains unchanged. All 2,713 wider
+slots resolve to their complete selected English name after the native conversion.
+The full 675-test suite and all 12,510 installed ordinary payloads pass. Gyroids,
+changed species/designs, game slots, remaining identities, and all unexpanded
+destinations stay in the completion queue.
 
 ## Native startup errors
 
@@ -1062,7 +1081,7 @@ original request and normal ending, without adding erasure or card-slot choices.
 Every native command remains except the exact highlighted booklet-name length.
 Both complete drafts fit at 361 and 178 expanded bytes with no layout warnings.
 
-All five focused checks and the 671-test full suite pass. One silent four-MiB
+All five focused checks and the 675-test full suite pass. One silent four-MiB
 native batch passes the two drafts and three connected messages: five complete
 loads, seventeen memory assertions, guards, and restored state. The final ROM
 retains every earlier edit, all name resources, code, fonts, and saved structures.
@@ -1079,17 +1098,18 @@ clear, not the third native page clear. The approval requires complete original
 actor-command order before adaptation and the unchanged native mood consumer.
 No gameplay code, saved structure, font, or buffer capacity changes.
 
-All eleven focused tests and the 671-test full suite pass. The silent four-MiB
+All eleven focused tests and the 675-test full suite pass. The silent four-MiB
 native batch passes nineteen complete cartridge loads and 38 actual order
 dispatches: 57 calls, 140 memory assertions, guards, and restored state. All
-12,174 installed edits and the UPS reconstruction pass; every earlier candidate
-and every resource outside the main text/table remain unchanged. Normal resident
+12,510 installed edits and the UPS reconstruction pass. The mood import preserves
+earlier candidates and resources outside the main text/table; the separate item-name
+checks above cover the current name changes. Normal resident
 mood progression, rendered conversation, final wording, saving, and original
 hardware remain separate acceptance requirements.
 
 ## Text-volume measurement
 
-The generated coverage report measures 634,913 covered source characters out of
+The generated coverage report measures 636,778 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1109,11 +1129,11 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,174 edits, including
+The resident-module experiment contains 12,510 edits, including
 9,755 reference main-bank candidates, 290 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
-443 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
+779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, eighteen native
@@ -1208,6 +1228,12 @@ Catchphrase, song, mail, and board editor callers also need their own regression
 The GameCube-style grid is a separate implementation task; the current keyboard
 still uses the N64 radial layout. See [keyboard design](../specs/KEYBOARD.md),
 [validation](VALIDATION.md), and [build instructions](BUILDING.md).
+
+The [title asset route](../specs/TITLE_ASSETS.md) identifies the supplied English
+logo's three animated letter groups, background, trademark, and separate Press
+Start tiles, with native-overlay and English-data hashes. These are source
+locations, not an installed replacement. The title screen remains the first
+image priority; native drawing integration and graphics/hardware checks remain.
 
 Public release requires completed translation review, stability testing,
 original-hardware results, and third-party provenance review. Only patches and
