@@ -6759,5 +6759,290 @@
       "adapted_sha256": "afde6916c99dd4849009e2351b1dcfdabb15e71c404a8412d404068cfdd6c90d"
     },
     "evidence": "Copper gives map item 251D and explains native R Button viewing, not GameCube X. Preserve full English wording/layout except the individually located X/R button span. Existing adapter restores the complete native 0A:02:0001 argument; item request, actor sequence, 0A:01:0007, expressions, and final terminator remain exact. See specs/NATIVE_CONTEXT_REFERENCES.md. No new actor/field permission; normal handoff and map UI remain gameplay checks."
+  },
+  {
+    "id": "message:1788",
+    "source_sha256": "67ee0862d6dd58103341249ca74b8410bf397502d684c78875f3ffaaad269953",
+    "reference_id": "message:1788",
+    "reference_sha256": "5a39f558d7285e24e8d50c7ccd6c7c6cfe5eb38c4d594196ae3edd094d64782f",
+    "complete_reference": {
+      "adapted_sha256": "e18c8722529514c728239e770a9ccf2a209f4428cdd8240e9ac5e0dcd29e7b16",
+      "native_mood": {
+        "source_offset": 63,
+        "reference_offset": 187,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Prize awarded before the caution about using it properly. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:1F88",
+    "source_sha256": "a3dc4c1813e51563f59a86e825683147315acf5075f4599eeaa6a1a188fbfa49",
+    "reference_id": "message:1F88",
+    "reference_sha256": "5c9f021ec2d59249c8f330830ec32819e4aa113b31cbf01de1b987671bc24134",
+    "complete_reference": {
+      "adapted_sha256": "68d9dbe0050796e6f752b7b24e38765752d23c5c6a076b992d73de51da2417c9",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial sunny-weather observation. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:1FAD",
+    "source_sha256": "45dddb47b031066b7a75acc461052add34122011618d9c0116a178adbb6c4c41",
+    "reference_id": "message:1FAD",
+    "reference_sha256": "592a9494f0290fd6bbc86d24715e93930599ec4fd02cda5a2595cd7377cf8895",
+    "complete_reference": {
+      "adapted_sha256": "7e8990897d9c325441857a400836e5336408d59392b721abe9e9864607a27406",
+      "native_mood": {
+        "source_offset": 148,
+        "reference_offset": 508,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Final victory claim after the sun goes home; English adds an earlier page, so use its fourth clear, not its third. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:1FB6",
+    "source_sha256": "1e0dec6852d6328bc6cdfe7e29c343a411a6e491753520d2f3cc90811309bc1f",
+    "reference_id": "message:1FB6",
+    "reference_sha256": "2344df177f99f7aa1cf347464c8dd269f3be5fd20e7ad8937a2d2a0560fd4c5c",
+    "complete_reference": {
+      "adapted_sha256": "510a4febc548ccc886bb5afc20d3305ef5f6bcb5e6f7db324d0f14414b359b63",
+      "native_mood": {
+        "source_offset": 67,
+        "reference_offset": 186,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The challenge to stay awake later on a snowy night. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2067",
+    "source_sha256": "13093efb17592b50b21cc732018f19a56ec2af182a6127885fc2056b9fee92ac",
+    "reference_id": "message:2067",
+    "reference_sha256": "9823fce7ec9319dd712cc22cfcd4064cb8c99a31eee8131cfdb96ee9ca79e6fa",
+    "complete_reference": {
+      "adapted_sha256": "a3b5aa7a71f41808c76690139da07a9431c46d232634b2dfdd9230d997a095d6",
+      "native_mood": {
+        "source_offset": 55,
+        "reference_offset": 176,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. After both native trade requests, before the closing comment about the surprise trade. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:207D",
+    "source_sha256": "9533c786155fb40e9db6458417a04f4829e69ecabb277744fe5bf1726595a085",
+    "reference_id": "message:207D",
+    "reference_sha256": "b940cb0aad8cfc219a7a87a4877b2af40d7b8e6cc3e7ded3ddc71315805e96de",
+    "complete_reference": {
+      "adapted_sha256": "b4c8695eb15ce8e1a2e94326091a359f6c8ff8b19b301266291abcdf94980b88",
+      "native_mood": {
+        "source_offset": 80,
+        "reference_offset": 214,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Resignation about carrying an unneeded umbrella in good weather. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:25E0",
+    "source_sha256": "71a67a620fa1e706996b6ef3b145720acc87c903ac8aba36ba532efdc6c66766",
+    "reference_id": "message:25E0",
+    "reference_sha256": "91e638c1a645b4d620c25ed523c884c6d380219981fce957d2f987a852eb0f10",
+    "complete_reference": {
+      "adapted_sha256": "bc44877dabb7b7eca7f84f4b704e07fdacde034fafd08c6eca8a8c43d3720ecd",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial comment about weather suitable for the prepared activity. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:25EA",
+    "source_sha256": "a63314fb7d7151ff38f9c10599919fccafc9fee9944594ee0f6ed7f080894b92",
+    "reference_id": "message:25EA",
+    "reference_sha256": "a765c1272fc078b7bb385895b39d49a2fa7cfeaff7a3b389e6820a74d870d8cb",
+    "complete_reference": {
+      "adapted_sha256": "6abd34c03a3cd7dcd7763b6597f2f3fa31ee7d629b125e6b7ee93d90c6a2ef09",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial observation about the player's outdoor gyroid working in snow. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:25F4",
+    "source_sha256": "0cff3d2c95c134ee693c7b5aef1080fdc1639a6746653c1750d6de5e972077e8",
+    "reference_id": "message:25F4",
+    "reference_sha256": "6df3196e64100de768bd06296820ea40fbf42433dbecd505e6aec9010bed6143",
+    "complete_reference": {
+      "adapted_sha256": "8c230f19673f58c90e6cd6b7d60b130b7ed673531966a059e4f3b6a86e34e062",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial compliment about the player being unbothered by rain. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:25F6",
+    "source_sha256": "853ca1fabd4cf176bfa65b62465d1c07f07b1aede0e877e1aac4a3f0f4650614",
+    "reference_id": "message:25F6",
+    "reference_sha256": "53cbc333bebbfae00afdad40e7986855c7fd134819e17a0e6455787eb9d1aa7f",
+    "complete_reference": {
+      "adapted_sha256": "bb7e93ede9efd52f4ab76dc187d9d91850efe5dd59d00bedff616867390ccd12",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial warm-drink and early-bedtime advice. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2621",
+    "source_sha256": "85e7a050676d52cd5614d8513a1dd52b3206ec18e28d4a1800fb210126bc88c5",
+    "reference_id": "message:2621",
+    "reference_sha256": "01630a97d7c1348f4796e76bd53e342e7790585e88ed59b083d9cc6f3127288c",
+    "complete_reference": {
+      "adapted_sha256": "47581b0d6af761fc18603316a7619bf104980c262c80c992146a70f9f6e73dc7",
+      "native_mood": {
+        "source_offset": 95,
+        "reference_offset": 264,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The final declaration that the speaker can do something. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2623",
+    "source_sha256": "ecbb3539c20663e45f8be21d50ab16f9e5306b818f3e477d81e5b4bedd6f277a",
+    "reference_id": "message:2623",
+    "reference_sha256": "f855265b27c9e7e3c8cfe1a5ac0130128558dbfcee1747d969b5e15ab64231dd",
+    "complete_reference": {
+      "adapted_sha256": "d64c7b70dcd5293915c1c0ecece29378993fd226d01cad0e4901a075c68705b7",
+      "native_mood": {
+        "source_offset": 48,
+        "reference_offset": 171,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The last-page demand for pouring rain. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2628",
+    "source_sha256": "c672184a2c23044d95113bb2035f5b6266a1581bac709317e5b129347985911d",
+    "reference_id": "message:2628",
+    "reference_sha256": "6d55ea1628dca117bcdc34c09ee8b8dea9ebc5f8682696d821c7cb94495f69f7",
+    "complete_reference": {
+      "adapted_sha256": "b806272dfe38d4846fb256bc97f5a4d5038db7ac6785f0325a2a0b1ae3cdb4b0",
+      "native_mood": {
+        "source_offset": 47,
+        "reference_offset": 168,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The second-page claim to play regardless of weather. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2630",
+    "source_sha256": "b8f00082e7b67c72af145bed90d31a5e8b3eeafd96be40d6a8d443c27827e758",
+    "reference_id": "message:2630",
+    "reference_sha256": "c2aae93c91e92f6dbdeab300c5d9c8789a3b511f857dd46e4ebf1223a4e0ae2d",
+    "complete_reference": {
+      "adapted_sha256": "70decb6756a4835c44d13f4f84e75662442d91216cf2f42e422c466571726c92",
+      "native_mood": {
+        "source_offset": 119,
+        "reference_offset": 273,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Thanks to the player after recalling the speaker's sporting days. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2634",
+    "source_sha256": "40106a64e20f7585f2a8b7f2a7204f74c32093b951b8aee4b3cc7df1835c31e9",
+    "reference_id": "message:2634",
+    "reference_sha256": "a877fa72d9429eca7cb4e44ac9d85a9154606b5bb21da880b2f436180a25896f",
+    "complete_reference": {
+      "adapted_sha256": "3dcb9585ab14efa00ba6a90a787c5b74fe99dc922a4c2dc242c7478fc8135d12",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial late-night activity question and sleep advice. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:263C",
+    "source_sha256": "7681a496ea5225b4e6b2511c332931361732460b58da8a7c3637d8086a61ea53",
+    "reference_id": "message:263C",
+    "reference_sha256": "186632df17e1cd4126ec5d11cca5f3f88d5730c17fc52910ea796f57a072606c",
+    "complete_reference": {
+      "adapted_sha256": "aca491747f0a5a02ef76e79a5d3a2385f37741af1770258d7308a9e23dbb8f96",
+      "native_mood": {
+        "source_offset": 0,
+        "reference_offset": 0,
+        "commands": "7F090200017F09080002"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. Initial acknowledgement that the invitation was only an idea. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:264F",
+    "source_sha256": "24c64a0a28dbf06dd1ef33fca4613627741ecb352245a5b76af88b51dd122165",
+    "reference_id": "message:264F",
+    "reference_sha256": "f31013c09411e871fbb98ecad7ed77599931a36c194222b31a08982a88c2a2a9",
+    "complete_reference": {
+      "adapted_sha256": "3fbe777e1234f49dc0ed41d0a6c465b842bd76071de513c7d8e9d038a28b4ce1",
+      "native_mood": {
+        "source_offset": 113,
+        "reference_offset": 331,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The final acceptance of the staying-awake challenge. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:2655",
+    "source_sha256": "61dc37d8a8a48c3fd4703a5e5f6a21e626cb27e1d342604a21c66b6641d32aa0",
+    "reference_id": "message:2655",
+    "reference_sha256": "db961a823883435aeab56e60944c8e147ba81362c7479dfbd8c5df34ed06c625",
+    "complete_reference": {
+      "adapted_sha256": "30c19e92bea950e7f411b1b3a6954b7b149f06e7eee77ab660b4c79094f9c248",
+      "native_mood": {
+        "source_offset": 62,
+        "reference_offset": 203,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The second-page warning not to overdo things. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:27B5",
+    "source_sha256": "f6475f9c204b271c872b4baa7c3641b0432bbd1c0524c516fa85c06645958f80",
+    "reference_id": "message:27B5",
+    "reference_sha256": "069b48f3caba2841193e0ffe3f81352296ae9bd151d7be826ae4c6ea89978f6e",
+    "complete_reference": {
+      "adapted_sha256": "a815b515881fc7d1a74b79c460420799de0d8cfac45cf020f7363cb1320575b0",
+      "native_mood": {
+        "source_offset": 114,
+        "reference_offset": 294,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English topics and actor actions. The last-page admission of getting too comfortable in the igloo. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
   }
 ]

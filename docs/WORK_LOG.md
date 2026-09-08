@@ -5152,6 +5152,76 @@
   stretch work ahead of the main port. All broader completion-queue requirements
   remain active, and font-atlas-edge investigation remains paused.
 
+## 2026-09-08 — Complete references with original resident mood effects
+
+- Added nineteen individually reviewed `complete_reference.native_mood`
+  approvals and `tools/reference_mood.py`. Each restores the complete original
+  `09:02:0001` mood plus `09:08:0001/0002` duration pair at its corresponding
+  English page, retaining all supplied words, newlines, pages, pauses, and fields.
+  `1FAD` needs the fourth English page clear, not the third native page clear;
+  its final victory claim supplies the semantic match. `263C` retains duration
+  two. Only `2067` removes two already-supported redundant article controls.
+- Verified native mood reader `80976588..80976604` and setter
+  `80978800..80978874` against the actual cartridge overlay. These commands
+  change resident mood and its duration, not merely facial expression. The
+  reader consumes only NPC0 row-four slots two/eight; the setter uses animal
+  `51E` and actor `804`, with duration scaling and the existing cap. Generation
+  and installation require the unchanged pinned overlay, relocations, core
+  getter/setter, parser, and dispatch. No production actor or saved-layout changes.
+- The rule checks exact pairs/offsets, native/reference page starts, absence of
+  duplicate mood orders, complete actor order before normal adaptation, and
+  native/reference/final hashes. Wrong-page insertion cannot be hidden by the
+  ordinary demo-argument adapter. Mid-page cases and changed-topic `2773` remain
+  withheld; no new field, expression, gameplay, or random-branch permission.
+  Contract and consumer evidence are in `specs/NATIVE_MOOD_REFERENCES.md`.
+- Eleven focused checks pass in `build/tests-native-mood-focused-04.log`
+  (2.131 seconds). The new positive builder test initially omitted the original
+  code replacement required by the existing relocation API, causing a fixture
+  `KeyError`; the corrected fixture supplies that code. The initial full suite
+  recorded that one fixture error. The final full run,
+  `build/tests-native-mood-full-02.log`, passes all 671 tests in 222.352 seconds.
+  No production workaround is introduced for the fixture error.
+- Full/basic generation adds exactly the nineteen approvals, preserves every
+  earlier candidate, and produces 12,174/11,464 ordinary edits. Main candidates
+  total 10,717, including 9,755 references. Original draft counts remain unchanged.
+  Main rejections are 1,036: 929 unconfirmed, 81 control differences, 24 field
+  differences, and two direct overflows. One original fallback leaves 1,035
+  final gaps: 113 Japanese-static, 919 non-static, one Latin, and two symbols.
+  Ten non-static records have fields; no reachability is inferred. Warning
+  records total 1,471, with no automatic reflow. Aliases remain 41, conflicts zero.
+  Fresh identity/expression queues have zero current-rule admissions and ten
+  unapproved special contexts. Reports are under `build/native-mood-*`.
+- ROM `build/native-mood-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `c5b1f9414fa1a0c727b08b327b4a6226d33a550730d9891cf97e8ce120ea752d`.
+  UPS SHA-256:
+  `220094fbbc29ff571efd7ed4a506d744948d8e8d2414ff41347662e33ea6fe00`.
+  Candidate SHA-256:
+  `62053eaa67bb0bc1d3dbcbacdc7592483c3174c88b5ffd2674182b4481c78645`.
+  All 12,174 installed payloads, source/build hashes, and whole-ROM UPS
+  reconstruction pass. Only `02000000`, `00CF9000`, and DMA container `00019D40`
+  change relative to the startup-error pilot. The container remains unchanged
+  outside the DMA table. An initial read-only audit assumed the wrong container
+  ID; the exact actual-file audit passes in `native-mood-artifact-audit-02.log`.
+  Fonts, code, choices, item/name/mail resources, and saved structures remain
+  unchanged. Covered source volume gains 1,136 characters to 634,913 of the
+  unchanged 746,978-character denominator; this is not project completion.
+- Extended the existing native actor-request scenario with `--native-mood`.
+  The original twenty-five-request scenario is independently compared with the
+  committed implementation and remains identical. The new batch loads every
+  complete approved message, dispatches both original mood orders, and checks
+  cumulative row-four changes, all other rows, cursors, and adjacent/module
+  guards. `build/smoke-native-mood-01/` passes 57 calls, 57 expected returns,
+  140 memory assertions, and 283 recorded steps, with one restored checkpoint
+  and graceful shutdown. Each call/argument/return and every complete read is
+  independently compared with the scenario in `native-mood-native-audit.log`.
+  Scenario SHA-256:
+  `510d4ea19b85c8336f79c01f3d9e6831225f61849a85aab3eeee9d506287ff95`.
+  The isolated four-MiB run has no seeds, audio, or save-write permissions.
+  FlashRAM remains `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  This establishes cartridge loading and order dispatch, not normal resident
+  mood/timer progression, rendered conversations, saving, or hardware acceptance.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

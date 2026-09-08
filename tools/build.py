@@ -65,7 +65,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     source_labels = next(b for b in source_banks if b.name == 'select').entries()
     fragment_matches = load_fragment_matches()
     fragment_sources = {b.name: b.entries() for b in source_banks if b.name in ('maila', 'mailb', 'mailc')}
-    if any('resident_animations' in matches.get(edit['id'], {}) for edit in edits):
+    if any('resident_animations' in matches.get(edit['id'], {})
+           or 'native_mood' in matches.get(edit['id'], {}).get('complete_reference', {}) for edit in edits):
         verify_native_consumer(rom, replacements)
     permits = validate_sequences(edits, next(b for b in source_banks if b.name == "message").entries(), info,
                                  resident_runtime=bool(runtime_module))

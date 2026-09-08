@@ -185,7 +185,8 @@ def main():
     sequence_members = {m['id'] for group in load_sequences().values() for m in group['members']}
     if fragments.keys() & (override_ids | matches.keys() | sequence_members):
         raise ValueError('Mail-fragment reference conflicts with another approval or draft')
-    if any('resident_animations' in record for record in matches.values()):
+    if any('resident_animations' in record or 'native_mood' in record.get('complete_reference', {})
+           for record in matches.values()):
         verify_native_consumer(rom)
     verify_native_equivalents(matches, source_banks)
     visited_matches = set()

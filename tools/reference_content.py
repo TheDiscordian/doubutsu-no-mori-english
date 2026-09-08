@@ -4,6 +4,7 @@ import re
 
 from aflib import sha256
 from textcodec import encode, tokenize
+from reference_mood import validate_rule as validate_mood_rule, restore as restore_native_mood
 
 STARTUP_STORAGE_SPANS = {
     'message:13F2': ("in {cmd:7F50198CDC08}{cmd:7F28}'s", 'in'),
@@ -19,7 +20,7 @@ def validate_content_approval(record):
     if 'complete_reference' not in record:
         return
     rule = record['complete_reference']
-    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location'}
+    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location', 'native_mood'}
             or 'adapted_sha256' not in rule
             or not record['id'].startswith('message:')
             or any(key in record for key in ('controller', 'native_choices', 'native_actor_request',
@@ -28,6 +29,10 @@ def validate_content_approval(record):
             or not isinstance(rule['adapted_sha256'], str)
             or not re.fullmatch(r'[0-9a-f]{64}', rule['adapted_sha256'])):
         raise ValueError('Invalid complete-reference approval')
+    if 'native_mood' in rule:
+        if 'spans' in rule or 'omit_startup_storage_location' in rule or record.get('reference_id') != record['id']:
+            raise ValueError('Native mood restoration cannot combine with wording or storage adaptations')
+        validate_mood_rule(rule['native_mood'])
     if 'spans' in rule:
         if not isinstance(rule['spans'], list) or not rule['spans']:
             raise ValueError('Invalid complete-reference spans')
@@ -72,6 +77,8 @@ def adapt_content_reference(reference, source, record, info):
     if not record or 'complete_reference' not in record:
         return reference['text'], []
     verify_content_reference(reference, source, record, info)
+    if 'native_mood' in record['complete_reference']:
+        return restore_native_mood(reference['text'], source, record['complete_reference']['native_mood'], info)
     text = reference['text']
     previous_end = 0
     parts, changes = [], []
