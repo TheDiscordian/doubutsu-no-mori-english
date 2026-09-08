@@ -5452,3 +5452,111 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   route is recorded, but no replacement is installed. Broader dialogue, remaining
   destinations, gameplay/save validation, image/keyboard work, final review, and
   patch-only release acceptance remain required.
+
+## 2026-09-08 — Complete native topics, connected replies, and combined validation
+
+- Added ten original drafts in `translations/n64-topic-gaps.json`: `0B69`,
+  `11FC`, `1D47`, `2006`, `2018`, `204B`, `246C`, `25E6`, `25EB`, and `25FD`.
+  Nine fill missing messages; `25FD` replaces an existing incompatible reference
+  reply. The native sign claim, train-dependent moving, seasonal romance, net
+  technique, shovel-hole warning, positive item-attachment question, ocean
+  row-six quiz, and complete meal-greeting jokes retain original actions and
+  answer order. The native map/sign artwork and seasonal selector are not
+  claimed inspected or translated; no explicit September or F-row label is
+  invented. Expanded bounds in file order are
+  `117 340 153 209 361 267 106 211 228 235` bytes.
+- Kept the complete shouts Let's eat! and Thanks for the meal!, with ten and
+  twenty English characters respectively, original RGB `E1 1E D7`, and native
+  `54 2D` scale before every character, including spaces and punctuation. Only
+  exact colour counts and per-character scale repetitions change. Every other
+  native command remains exact. Both full scaled phrases fit the approved glyph
+  widths. The initial test caught a nineteen-versus-twenty character colour count;
+  that draft was corrected before the successful build. Eight drafts have no
+  warning; the two shouts retain explicit-formatting review warnings.
+- Added two explicit `native_original` contextual-choice approvals. `0B69`
+  displays `0025/0026`; `246C` displays `0025/0051`. Native answer indices and
+  success/failure destinations remain. Canonical original payloads must retain
+  every source command and argument; original approvals cannot collide with
+  reference parents. Source/canonical/display hashes, unique menu offsets, exact
+  menu bytes, and complete label dependencies remain bound in both generator and
+  builder. Shared Circle/X labels are unchanged. The registry contains twenty-one
+  mappings: nineteen references and two originals. Basic generation retains three
+  mappings and withholds eighteen whose complete labels are unavailable.
+- Corrected candidate-report accounting for original contextual drafts. Their
+  existing original-draft count remains; reference counters change only for
+  existing reference manifests. Withholding an original removes its draft count,
+  not unrelated reference credit. Original edits without an explicit policy use
+  the established `exact` default. Initial generation attempts exposed the
+  missing-policy assumption and original-report path before a ROM was built;
+  dedicated tests cover both successful and withheld original accounting.
+- Added complete GC `2773` after reviewing native `207A` and all three connected
+  replies. Already installed GC `207A/2771/2772` consistently use the girls and
+  fluffy-snow joke, so mixing in an original snow-makeup ending would break the
+  English conversation. `2773` retains every English word, line, page, pause,
+  field, actor order, and ending. The native mood-one/duration-one pair is restored
+  at the final page's matching `0A`, binding native offset 64 and reference offset
+  192. Its expanded bound is 281 bytes. The registry now has twenty-five mood
+  approvals: twenty page anchors and five phrase anchors. No new runtime policy
+  or blanket changed-topic approval is introduced.
+- Added `tools/topic_gap_test_scenario.py` to combine the contextual-answer,
+  complete-message, and mood fixtures into one checkpoint. All body assertions
+  and guards remain. Composition requires matching setup/restore structure and
+  rejects differing restore bytes, including partially overlapping windows and
+  declared-length mismatches. Only one final restore runs. Nine topic tests pass
+  in 0.567 seconds (`build/tests-topic-gaps-native-05.log`); twelve contextual
+  tests pass in 0.941 seconds (`build/tests-topic-gaps-context-02.log`); 96 reference
+  tests, including thirteen mood checks, pass in 18.291 seconds
+  (`build/tests-topic-gaps-reference-01.log`); seven native-menu checks pass in
+  1.986 seconds and seven coverage checks in 0.003 seconds. These are 131 focused
+  tests, not a new full-suite claim. Runtime/C code retains the 675-test checkpoint
+  in `build/tests-mapped-items-full-02.log`.
+- Successful full/basic candidates are in `build/topic-gaps-ready-candidates/`
+  and `build/topic-gaps-ready-basic-candidates/`, with 12,528/11,816 ordinary
+  edits. Only ten absent main IDs are added; only existing `25FD` changes.
+  Main coverage is 10,735: 9,762 references, 584 original dialogue drafts, one
+  original continuation, 289 development labels, and 99 diagnostics. All 460
+  choices remain unchanged. The 1,017 gaps comprise 95 Japanese-static records,
+  919 nonstatic records, one Latin record, and two symbol records. Ten nonstatic
+  records have dynamic insertions; none is deemed unreachable. Main rejections
+  total 1,018: 926 unconfirmed, 66 control differences, 24 missing fields, and
+  two overflows; one receives an original fallback. Fresh identity review admits
+  zero records under existing rules; ten special expression contexts remain
+  unapproved. Reference/label-manifest warnings remain 1,472, separately from
+  the two original shout warnings. Covered source weight is 638,075/746,978,
+  not a semantic-review, gameplay, or project-completion claim.
+- `build/topic-gaps-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `b7d5ecb7b4a78f71df8ddd0f18108763d780409a9adb7473e82825423b612179`.
+  UPS SHA-256:
+  `757fa3c145b97bd11a14e0ea40a513da8e9e85b1f91c72d9a1e5d0a5c63bbfbf`.
+  Candidate SHA-256:
+  `fbb0989fa59604098382cb8d5236b3ed374cd334806979cc5b6f41a332c641d1`.
+  `build/topic-gaps-artifact-audit.log` checks all 12,528 actual ROM payloads,
+  source/build/candidate/patch hashes, original-context accounting, and complete
+  UPS reconstruction. Relative to the renovation pilot, only `00019D40`,
+  `00CF9000`, and `02000000` differ. The DMA container is unchanged outside its
+  table. All runtime/font/name/item/mail resources and saved layouts remain.
+- `build/smoke-topic-gaps-01/` passes 1,754 recorded steps: 423 native calls,
+  309 explicit return assertions, and 763 memory assertions. Coverage includes
+  107 actual cartridge message loads, all 46 selected-label/insertion cases,
+  all 42 contextual branch cases, and all 25 mood messages/50 order dispatches.
+  Shape selection is checked without executing or claiming its random outcomes.
+  `build/topic-gaps-native-audit.log` independently verifies every call/address/
+  argument, each declared expected return, restored stacks, and complete memory
+  reads. Regenerating the strengthened fixture reproduces the executed scenario.
+  Scenario SHA-256:
+  `d3eed654b998c2a27e09f4e5a21083f94f4a8b281c6d201eca04f67912be59ed`.
+  Guards, the single checkpoint restore, and graceful shutdown pass. The isolated
+  run is silent, four MiB, has no seeds, and disables both save-write flags.
+  FlashRAM SHA-256 remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak SHA-256 remains
+  `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+- Recorded the full contracts and current queue. Remaining native-menu cases are
+  `088B/2586` birthday fields and `246D` old-calendar preparation, with separate
+  `1C6F` letter-reaction/label work. Native disassembly locates the calendar-order body at
+  `80920F20`: request value one converts current RTC month/day using `800D6218`
+  through `8091EBB8` into free fields 15/16, distinct from the earlier reminder
+  callers. This is a next-step source finding, not a new runtime approval or test.
+  Ordinary topic/answer actions, rewards, shout rendering, calendar selection,
+  saves, final wording, artwork, hardware, and patch-only release remain. The
+  title screen is the first image priority; no title replacement is installed.

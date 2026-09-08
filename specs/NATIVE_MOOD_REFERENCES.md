@@ -62,22 +62,22 @@ field, flow, capacity, and formatting validation remains mandatory.
 Generation and installation require the pinned unchanged resident overlay,
 relocations, core order getter/setter, parser, and dispatch table through the
 existing native-consumer guard. No animation-value, actor-field, random-branch,
-or additional insertion permission is granted. Unreviewed pairs and changed
-topics remain outside this contract and require their own review.
+or additional insertion permission is granted. Unreviewed pairs and unreviewed
+changed topics remain outside this contract and require their own review.
 
 ## Acceptance
 
-Twenty-four complete references have individual approvals. Nineteen use page starts:
+Twenty-five complete references have individual approvals. Twenty use page starts:
 
 `1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 2628
-2630 2634 263C 264F 2655 27B5`.
+2630 2634 263C 264F 2655 27B5 2773`.
 
 Their reviewed pages cover a prize handoff, sunny weather, the sun contest,
 staying awake, completed trades, umbrella/weather acceptance, outdoor activity,
 snow and gyroids, rain advice, thanks, and an igloo conversation. In `1FAD`,
 the native effect follows the third page clear but belongs after the fourth
 English page clear, at the final victory claim. Matching page counts would put
-it too early. `263C` retains duration two; the other eighteen retain duration
+it too early. `263C` retains duration two; the other nineteen retain duration
 one. Five more retain the original pair at reviewed phrase boundaries:
 
 `203A 262B 2637 264B 266B`.
@@ -89,6 +89,13 @@ complete final sunny-weather theory. Only `266B` uses the final-ending anchor.
 Every English word, newline, page, and pause remains intact. Only `2067` removes
 two redundant article-suppression controls through the
 existing adapter; no English text or delivery is removed.
+
+`2773` follows a complete [connected snow-conversation review](NATIVE_TOPIC_GAPS.md).
+The installed English `207A/2771/2772` already use the GameCube fluffy-snow/girls
+joke. Its third reply keeps that same complete localisation and restores the
+original happy mood at the concluding admiration of snow. The native parent
+answer indices and all three reply contexts remain consistent. This individual
+review does not approve arbitrary changed topics.
 
 Approval review must identify the corresponding semantic page or phrase and retain the
 native mood effect at that point. Tests cover exact pairs and offsets, missing

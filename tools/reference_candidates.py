@@ -83,7 +83,7 @@ def select_drafts(drafts, *, english_dialogue_dates=False, resident_runtime=Fals
 
 def record_candidate(edit, info, advances, name, edits, manifests, counts, *, resident_runtime=False):
     candidate = encode(edit["translation"], info)
-    policy = edit["control_policy"]
+    policy = edit.get("control_policy", "exact")
     issues = layout_issues(candidate, info, advances, resident_runtime=resident_runtime) if name == "message" else []
     manifest = {k: v for k, v in edit.items() if k != "translation"}
     manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
@@ -98,6 +98,34 @@ def record_candidate(edit, info, advances, name, edits, manifests, counts, *, re
     counts["reference_layout_candidates"] += policy == "reference_layout"
     counts["reviewed_sequence_candidates"] += policy == "reviewed_sequence"
     counts["layout_review_required"] += bool(issues)
+
+
+def record_contextual_candidates(before, edits, context_ids, withheld_ids, info, advances,
+                                 manifests, counts, *, resident_runtime=False):
+    """Original drafts retain draft accounting when only their labels change."""
+    counted = {m['id'] for m in manifests}
+    affected = set(context_ids) | set(withheld_ids)
+    result = [m for m in manifests if m['id'] not in affected]
+    for id in sorted(affected):
+        if id not in counted:
+            if id in withheld_ids:
+                counts['original_draft_override'] -= 1
+            continue
+        previous = Counter()
+        record_candidate(before[id], info, advances, 'message', [], [], previous,
+                         resident_runtime=resident_runtime)
+        counts.subtract(previous)
+    for edit in edits:
+        if edit['id'] not in context_ids:
+            continue
+        current = Counter()
+        record_candidate(edit, info, advances, 'message', [], result, current,
+                         resident_runtime=resident_runtime)
+        if edit['id'] in counted:
+            counts.update(current)
+    counts['contextual_choice_candidates'] = len(context_ids)
+    counts['contextual_original_draft_candidates'] = len(set(context_ids)-counted)
+    return result
 
 
 def native_placeholder_fallback(row, original, info, *, skip_ids):
@@ -168,7 +196,8 @@ def main():
                                        Path("translations/n64-diagnostic-labels.json"),
                                        Path("translations/n64-travel-advice.json"),
                                        Path("translations/n64-startup-errors.json"),
-                                       Path("translations/n64-renovations.json")])
+                                       Path("translations/n64-renovations.json"),
+                                       Path("translations/n64-topic-gaps.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
@@ -379,22 +408,10 @@ def main():
         edits, source_banks['message'].entries(), source_banks['select'].entries(),
         load_contextual_choices(matches), info)
     context_removed = {r['id'] for r in context_withheld}
-    contextual_ids = set(context_ids) | context_removed
-    manifests = [m for m in manifests if m['id'] not in contextual_ids]
-    for id in sorted(contextual_ids):
-        previous_counts = Counter()
-        record_candidate(before_context[id], info, advances, 'message', [], [], previous_counts,
-                         resident_runtime=bool(args.runtime_module))
-        for key, value in previous_counts.items():
-            reports['message'][key] -= value
-    for edit in edits:
-        if edit['id'] in context_ids:
-            current_counts = Counter()
-            record_candidate(edit, info, advances, 'message', [], manifests, current_counts,
-                             resident_runtime=bool(args.runtime_module))
-            for key, value in current_counts.items():
-                reports['message'][key] += value
-    reports['message']['contextual_choice_candidates'] = len(context_ids)
+    context_counts = Counter(reports['message'])
+    manifests = record_contextual_candidates(before_context, edits, context_ids, context_removed,
+        info, advances, manifests, context_counts, resident_runtime=bool(args.runtime_module))
+    reports['message'] = dict(context_counts)
     if context_withheld:
         remaining_path = args.output/'message-remaining.jsonl'
         remaining = list(map(json.loads, remaining_path.read_text().splitlines()))

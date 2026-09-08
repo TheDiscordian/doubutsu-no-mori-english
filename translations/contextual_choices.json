@@ -1,5 +1,51 @@
 [
   {
+    "id": "message:0B69",
+    "source_kind": "native_original",
+    "source_sha256": "255c3426599f09b2e9b30314fdc2ee00d50cc8e0e3f3e1648385e484d538fa88",
+    "candidate_sha256": "b2f6c5839753a1a920516d766dff16a0b3c2b0b938fe214ec316545febe74060",
+    "display_sha256": "af1acfe2854608db5c72b80b2858efa665b0fdb62297b513fa1b20a4fc479f3b",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 78,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "The complete original Pon Curry question preserves its false statement and native answer order: affirmative 0B65 is wrong and negative 0B64 wins. Display the established complete English right/wrong labels while retaining both original branch commands and all surrounding text and controls. This original-only approval checks every canonical native command and argument; no GameCube-reference identity or other control permission is granted. Shared Circle/X labels remain for shape games."
+  },
+  {
+    "id": "message:246C",
+    "source_kind": "native_original",
+    "source_sha256": "7d2c5e0c5da1686d856689369c11a821d0b3f388a66c9fca0ca411eca8eef918",
+    "candidate_sha256": "da7010561e2131a6bf22e3f7d01d643c37452f1ead034d86a2e044e507d55050",
+    "display_sha256": "de767c998cb1dd48c6feb1266d20567f50ab5c6a1696aa32def5fcd581dda1a0",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 67,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "The complete original row-six ocean question preserves its true statement and native answer order: affirmative 2472 wins and negative 2476 is wrong. Display the established complete English right/nope labels while retaining the original inverted branch-command order and all surrounding text and controls. This original-only approval checks every canonical native command and argument; no GameCube-reference identity or other control permission is granted. Shared Circle/X labels remain for shape games."
+  },
+  {
     "id": "message:0B67",
     "source_sha256": "d9d8c5814070db1ffd3ff4ee9940cf1a9ee3dcb3032c002bbce01f2e1eb70c4b",
     "candidate_sha256": "4c03fe2a1ada9f9d2d5fb2d5e9922d52cf15cb0c77e70f548a6eacc4305b40a7",

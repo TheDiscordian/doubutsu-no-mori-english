@@ -1,0 +1,84 @@
+[
+  {
+    "id": "message:0B69",
+    "source_sha256": "255c3426599f09b2e9b30314fdc2ee00d50cc8e0e3f3e1648385e484d538fa88",
+    "translation": "The sign on the side of\nTom Nook's shop says{cmd:7F0308}\n\"Pon Curry\".{cmd:7F0308}\nTrue or false?{cmd:7F1600CD00CE}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0B65}{cmd:7F100B64}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "The question quotes the native false claim about a Pon Curry sign, not the GameCube Hungry Raccoon Mix poster. Preserve both original pauses and false-answer success at 0B64, true-answer failure at 0B65. Contextual labels change only displayed answers; the shared Circle/X labels and native reward requests remain. Native sign-art readability remains image work."
+  },
+  {
+    "id": "message:11FC",
+    "source_sha256": "679766705ff78eeb7f0896ac3cf4854b2c0704f54d232c83b564736056b677bd",
+    "translation": "{cmd:7F090000FF}I've been thinking{cmd:7F0306}\nabout moving soon.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}But,{cmd:7F0306} you see,\nthere's nothing I can do\non my own,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}Even if I want to move,{cmd:7F0306}\nI can't go anywhere\nunless you take the train,\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}So please,{cmd:7F0306}\nfind some excuse\nto take a train ride!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain the desire to move, inability to do so alone, dependence on the player's train travel, and plea to take a trip. The GameCube asks whether the player would miss the speaker and adds a different menu. Every native command, pause, field, and normal ending remains."
+  },
+  {
+    "id": "message:1D47",
+    "source_sha256": "80ff6bf4da0a935562e203a980e5464a53bf41349f76608d2d23550ed99fc6d0",
+    "translation": "{cmd:7F09000012}Did you know?{cmd:7F0306} This season\nis when romance is most\nlikely to blossom,{cmd:7F0308} {cmd:7F1C}?\n{cmd:7F16004C0030}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1D4F}{cmd:7F101D50}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain this season without importing an unverified explicit September date. The original interest/know-already labels, explanatory 1D4F and dismissal 1D50 branches, catchphrase, pauses, and continuing ending remain. This draft does not establish the native date-selector range."
+  },
+  {
+    "id": "message:2006",
+    "source_sha256": "1a2663cdb21dd396ff0ca4aceb44a7df1bf3d5b737aa4bf34115e6432a0b0743",
+    "translation": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F0306}\nwhen you're holding a net,{cmd:7F0304}\ntry sneaking along.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}You'll look cool,\njust like a ninja!{cmd:7F030C}\nAnd cautious insects{cmd:7F0306}\nwill be easier to catch!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain carrying a net, sneaking, the ninja comparison, and catching wary insects. Do not import the GameCube-only Game Boy Advance ownership menu or its extra branches. Every native command and argument remains."
+  },
+  {
+    "id": "message:2018",
+    "source_sha256": "33e7f819366f524747957a8bb6bc812a75dd4a5ad7237aa20cc74a6e54eab051",
+    "translation": "{cmd:7F090000FF}If you leave\nholes you've dug{cmd:7F030A}\nwith your shovel,\npeople can't get past!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}So after digging,{cmd:7F0306}\nfill those holes back in,{cmd:7F0308}\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}The other day,{cmd:7F0308}\nbefore I knew it,{cmd:7F0306}\nI was surrounded\nby holes!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}I couldn't get{cmd:7F0306}\nback home\nall night long,{cmd:7F0306}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain impassable shovel holes, the instruction to refill them, becoming surrounded, and being unable to return home all night. The GameCube island-visit menu describes an absent platform feature. Every original field, page, pause, expression, and ending remains."
+  },
+  {
+    "id": "message:204B",
+    "source_sha256": "961fbce0202bbbef18f7020b2977a76141d4cdfcc2c51e77e45e1ce1abd6b19f",
+    "translation": "{cmd:7F0C050005}{cmd:7F0C020001}{cmd:7F09000004}{cmd:7F0305}Oh!{cmd:7F0310}\n{cmd:7F09000015}You have {cmd:7F31}!{cmd:7F030C}\nYou've got style!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Hey, {cmd:7F1A}.{cmd:7F030C}\nThat {cmd:7F31}...{cmd:7F0306}\n{cmd:7F0900000B}{cmd:7F0302}Is it really precious to you?\n{cmd:7F16011E0128}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2059}{cmd:7F102058}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "The native question asks positively whether the item is important. Maybe... retains the item through 2059; That's not true! denies attachment and leads to the existing 2058 trade. Keep both preparation requests, both item insertions, player name, exact controls, and branch order; do not pair the native denial label with the GameCube negative question."
+  },
+  {
+    "id": "message:246C",
+    "source_sha256": "7d2c5e0c5da1686d856689369c11a821d0b3f388a66c9fca0ca411eca8eef918",
+    "translation": "You can catch fish{cmd:7F0304}\nin the ocean along row six.{cmd:7F030C}\nTrue or false?{cmd:7F1600CD00CE}{cmd:7F04}{cmd:7F0D}{cmd:7F102476}{cmd:7F0F2472}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain the native sixth-row ocean claim and true-answer success at 2472, not an unverified F label on the N64 map. Contextual English answer labels retain the native order and inverted branch-command order. Future English map artwork must retain this numeric-row meaning or explicitly coordinate the wording."
+  },
+  {
+    "id": "message:25E6",
+    "source_sha256": "456130890246a738aee72d86569fe6398782b62c53e1e604c7f31d93d3f5fd8b",
+    "translation": "{cmd:7F0900000A}{cmd:7F0308}In weather like this,{cmd:7F0308}\neven someone shy like me{cmd:7F0306}\nfeels ready to give\na bold greeting{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000005}{cmd:7F030E}{cmd:7F50E11ED70A}{cmd:7F542D}L{cmd:7F542D}e{cmd:7F542D}t{cmd:7F542D}'{cmd:7F542D}s{cmd:7F542D} {cmd:7F542D}e{cmd:7F542D}a{cmd:7F542D}t{cmd:7F542D}!\n{cmd:7F16003F0167}{cmd:7F04}{cmd:7F0D}{cmd:7F0F25FD}{cmd:7F1025FE}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Retain the sunny-weather confidence, shy speaker, and intentionally wrong pre-meal greeting. Hi! corrects it at 25FD; It was delish! continues the food joke at 25FE. Preserve every non-formatting native command and all pauses. Apply the original 45/32 one-character scale and RGB to every character of the complete English Let's eat!, adjusting only scale repetitions and colour length; do not replace the food/greeting context with the GameCube self-affirmation."
+  },
+  {
+    "id": "message:25EB",
+    "source_sha256": "dd874f206a5734d32af4f416c9e29dd6ab1993328ee95584976ee5044ae40d64",
+    "translation": "{cmd:7F09000015}I want to get even{cmd:7F0306}\na simple greeting right,\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000005}{cmd:7F030E}{cmd:7F50E11ED714}{cmd:7F542D}T{cmd:7F542D}h{cmd:7F542D}a{cmd:7F542D}n{cmd:7F542D}k{cmd:7F542D}s{cmd:7F542D} {cmd:7F542D}f{cmd:7F542D}o{cmd:7F542D}r{cmd:7F542D} {cmd:7F542D}t{cmd:7F542D}h{cmd:7F542D}e{cmd:7F542D} {cmd:7F542D}m{cmd:7F542D}e{cmd:7F542D}a{cmd:7F542D}l{cmd:7F542D}!\n{cmd:7F1600400168}{cmd:7F04}{cmd:7F0D}{cmd:7F0F25FF}{cmd:7F102600}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Retain the desire to greet correctly and the mistaken post-meal thanks. Evenin'! corrects the greeting at 25FF; You're welcome! continues the meal joke at 2600. Apply original RGB and 45/32 scale to every character of complete Thanks for the meal!, adjusting only the colour length and one-character scale repetitions. All other commands, choices, branches, and pauses remain exact."
+  },
+  {
+    "id": "message:25FD",
+    "source_sha256": "f505361ec1a74afc6fd82eb49a7f56d75f2923f060e90f55cad0daa509197665",
+    "translation": "{cmd:7F0C050005}{cmd:7F09000004}{cmd:7F0305}Oh,{cmd:7F0306} that's right!{cmd:7F030C}\n{cmd:7F090000FF}At this time of day,{cmd:7F0306}\nI should say \"hello\",\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}I nearly forgot!{cmd:7F030C}\nThanks for reminding me,{cmd:7F0306}\n{cmd:7F1A}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Connected correction for 25E6: the resident remembers the proper daytime hello and thanks the player. The supplied GameCube supportive-friends/mother's encouragement response belongs to its changed self-affirmation joke. Retain every native command, request, expression, pause, field, page, and ending."
+  }
+]

@@ -1,5 +1,20 @@
 [
   {
+    "id": "message:2773",
+    "reference_id": "message:2773",
+    "source_sha256": "29aac53aa63f76a3b12ea183c86603b6ee388402473efaaca440823969d6d9a3",
+    "reference_sha256": "a8046b3cf2d34cfdc585926fa619700976217a45db93c3f5b8ba02d6074e7574",
+    "complete_reference": {
+      "adapted_sha256": "2ce9a8a3f847ad88ca5fde681f38a7d4c40eeac87ee627f139d53e254dd702c2",
+      "native_mood": {
+        "source_offset": 64,
+        "reference_offset": 192,
+        "commands": "7F090200017F09080001"
+      }
+    },
+    "evidence": "Complete connected-conversation review: native 207A asks whether girls use snow as makeup, then routes the three answers to 2771/2772/2773. The installed complete GameCube parent and first two replies already use its girls/fluffy-snow joke; 2772 has its own explicit complete standing-expression approval. Keep the same coherent GameCube localisation for the third, affirmative reply instead of mixing the native snow-makeup wording into that English conversation. Both versions conclude happily that snow is wonderful. Restore the original mood-one/duration-one pair at the start of the final English page, immediately before the same native admiring expression 0A. Retain every GameCube word, line, page, and pause and all original actor-command order, catchphrase, normal ending, and parent answer indices. No new actor or gameplay permission. See specs/NATIVE_TOPIC_GAPS.md; normal conversation selection and mood progression remain unverified."
+  },
+  {
     "id": "message:136E",
     "source_sha256": "00bf293db6b52753c671d330211ec30d30f6c38150d50ba87da05fa63f85b220",
     "reference_id": "message:136E",

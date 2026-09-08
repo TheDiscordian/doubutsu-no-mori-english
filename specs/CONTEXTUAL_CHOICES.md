@@ -25,15 +25,24 @@ capacity, command, runtime hook, or saved field.
 
 ## Two complete payload approvals
 
-`translations/contextual_choices.json` contains nineteen explicit approvals.
-Each requires a complete [native-menu reference approval](REFERENCE_CHOICES.md)
-and binds its original source hash, complete canonical English payload hash,
+`translations/contextual_choices.json` contains twenty-one explicit approvals.
+Nineteen require a complete [native-menu reference approval](REFERENCE_CHOICES.md).
+Two require the explicit original-draft contract below. Every approval binds
+its original source hash, complete canonical English payload hash,
 exact native menu, exact menu offset, replacement display menu, complete final
 payload hash, and every destination label's source and encoded-English hashes.
 There must be exactly one menu, with the same command kind and answer count.
 Only existing label IDs below 460 are allowed. Each review establishes the
 meaning of the question and each answer index; these are not automatic
 label substitutions based on English words.
+
+An explicit `source_kind: native_original` permits a complete original draft
+without a GameCube donor. It forbids a reference-approval collision and requires
+every canonical native command and argument to remain exact and ordered. The
+builder repeats that check through reverse validation, independently of edit
+metadata. All source/output hashes, menu uniqueness, label dependencies, and
+ordinary guards remain. Default and explicit `gamecube` kinds retain their
+complete-reference parent requirement; unknown kinds fail.
 
 The generator first performs all ordinary source/reference, native-menu,
 field, actor, layout, and capacity validation. After all bank edits are available,
@@ -71,6 +80,8 @@ it is not permission to ignore the English runtime's capacity requirements.
 | `1CE0` | `00DF/00DE`: PLEEEASE! / No! No! No! | Telling the resident to move versus asking the resident to stay. |
 | `1FAE` | `0051/0103`: Nope! / Somewhat. | No excitement versus qualified agreement about rainy nights. |
 | `20CA` | `0003/0004`: Yes. / No. | Knowing the music versus not knowing it, not cancelling the conversation. |
+| `0B69` | `0025/0026`: That's right! / That's wrong! | Original Pon Curry quiz; the negative answer wins. |
+| `246C` | `0025/0051`: That's right! / Nope! | Original row-six ocean quiz; the affirmative answer wins. |
 
 Eighteen menus use the complete supplied GameCube answer pairing. `1FAE`
 retains the original native moderate second answer using the independently
@@ -78,6 +89,9 @@ corrected shared `0103` label, rather than importing stronger agreement.
 The twelve distinct destination label records remain unchanged by this batch.
 Unmapped Circle/X shape-game messages retain their exact previous payloads
 and labels. Other contexts require their own approvals.
+The two [native-topic quiz originals](NATIVE_TOPIC_GAPS.md) preserve their
+question meanings and remain original drafts in candidate accounting. Missing
+English labels withhold those originals rather than miscounting references.
 
 ## Connected native replies
 
@@ -105,11 +119,14 @@ complete native-menu parent binding, both payload directions, exact label
 dependencies, source/layout/menu/action mutations, missing-label withholding,
 all nineteen retail-reference cases, unmapped shape games, the native moderate
 answer, builder rejection without metadata, and all four original replies.
+Two native-original fixtures additionally check absent/colliding parents and
+independent canonical-command rejection. Topic tests cover both real original
+quizzes, complete original accounting, and missing-label draft withholding.
 
 `tools/contextual_choice_test_scenario.py` uses real cartridge text and labels.
-It checks forty unique messages, including all changed/new messages, sixteen
-connected replies, and an unchanged four-choice shape game. The nineteen
-contextual menus supply 38 answer cases; the shape game supplies four more.
+It checks forty-two unique messages, including all changed/new messages, sixteen
+connected replies, and an unchanged four-choice shape game. The twenty-one
+contextual menus supply 42 answer cases; the shape game supplies four more.
 Actual native loaders, row setters, width calculation, determination, selected
 text insertion, and conditional handlers execute in one isolated checkpoint.
 Every selected answer is checked against its complete label, length, original

@@ -126,6 +126,30 @@ class ContextualChoiceTests(unittest.TestCase):
         self.assertEqual(native_choice_width(b'',advances),0)
         self.assertEqual(advances,{ord('A'):6,ord('.'):5,ord('i'):4})
 
+    def test_original_parent_requires_explicit_kind_and_no_reference_collision(self):
+        row = {**self.row, 'source_kind': 'native_original'}
+        self.assertEqual(self.load_rows([row], {}), {'message:0000': row})
+        with self.assertRaisesRegex(ValueError, 'cannot override'):
+            self.load_rows([row])
+        for kind in (None, '', 'draft', [], True):
+            with self.assertRaises(ValueError):
+                self.load_rows([{**row, 'source_kind': kind}], {})
+        self.assertEqual(self.load_rows([{**self.row, 'source_kind': 'gamecube'}])['message:0000']['source_kind'],
+                         'gamecube')
+
+    def test_original_parent_still_checks_every_native_command_independent_of_hashes(self):
+        row = {**self.row, 'source_kind': 'native_original'}
+        approvals = self.load_rows([row], {})
+        self.assertEqual(display_candidate('message:0000', self.source, self.base, approvals, self.info), self.final)
+        for base in (self.base.replace(bytes.fromhex('7F0F1234'), bytes.fromhex('7F0F1235')),
+                     self.base.replace(bytes.fromhex('7F01'), bytes.fromhex('7F00')),
+                     b'\x7f\x04'+self.base, self.base+b'\x7f\x1a'):
+            row = {**self.row, 'source_kind': 'native_original', 'candidate_sha256': sha256(base),
+                   'offset': unique_menu(base, self.info).offset}
+            approvals = self.load_rows([row], {})
+            with self.assertRaisesRegex(ValueError, 'changes a native command'):
+                display_candidate('message:0000', self.source, base, approvals, self.info)
+
 
 @unittest.skipUnless(ROM_PATH.is_file(),'Retail ROM remains local')
 class ContextualChoiceRetailTests(unittest.TestCase):
@@ -158,10 +182,13 @@ class ContextualChoiceRetailTests(unittest.TestCase):
         return source,encode(text,self.info)
 
     def test_all_nineteen_exact_display_labels_preserve_complete_base_and_actions(self):
-        self.assertEqual(len(self.approvals),19)
+        self.assertEqual(len(self.approvals),21)
         labels=self.reference_edits()
         self.assertEqual(len(labels),12)
-        for id,row in self.approvals.items():
+        reference_approvals = {id: row for id, row in self.approvals.items()
+                               if row.get('source_kind', 'gamecube') == 'gamecube'}
+        self.assertEqual(len(reference_approvals), 19)
+        for id,row in reference_approvals.items():
             source,base=self.reference_base(id)
             output=display_candidate(id,source,base,self.approvals,self.info)
             self.assertEqual(canonical_candidate(id,source,output,self.approvals,self.info),base)

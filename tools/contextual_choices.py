@@ -21,9 +21,11 @@ def load_contextual_choices(matches, path=APPROVALS):
         raise ValueError('Contextual choices must be a list')
     result = {}
     for row in rows:
-        if (not isinstance(row, dict) or set(row) != {
+        required = {
                 'id', 'source_sha256', 'candidate_sha256', 'display_sha256',
                 'native_command', 'display_command', 'offset', 'labels', 'evidence'}
+        if (not isinstance(row, dict) or not required <= set(row) <= required | {'source_kind'}
+                or row.get('source_kind', 'gamecube') not in ('gamecube', 'native_original')
                 or not isinstance(row.get('id'), str)
                 or not re.fullmatch(r'message:[0-9A-F]{4}', row['id'])
                 or row['id'] in result or not isinstance(row['evidence'], str)
@@ -37,7 +39,10 @@ def load_contextual_choices(matches, path=APPROVALS):
         if native == display or native[1] != display[1]:
             raise ValueError('Contextual choices must retain the number and order of answer slots')
         match = matches.get(row['id'], {})
-        if (match.get('source_sha256') != row['source_sha256']
+        if row.get('source_kind') == 'native_original':
+            if row['id'] in matches:
+                raise ValueError('Original contextual choices cannot override a reference approval')
+        elif (match.get('source_sha256') != row['source_sha256']
                 or match.get('native_choices', {}).get('native_command') != row['native_command']
                 or match.get('native_choices', {}).get('adapted_sha256') != row['candidate_sha256']):
             raise ValueError('Contextual choices require the complete native-menu approval')
@@ -96,6 +101,10 @@ def display_candidate(id, source, candidate, approvals, info):
     menu = unique_menu(candidate, info)
     if menu.offset != row['offset'] or menu.data != native:
         raise ValueError('Contextual-choice base menu differs from its approval')
+    if row.get('source_kind') == 'native_original':
+        controls = lambda data: [t.data for t in tokenize(data, info) if t.kind == 'cmd']
+        if controls(source) != controls(candidate):
+            raise ValueError('Original contextual-choice text changes a native command or argument')
     result = candidate[:menu.offset]+display+candidate[menu.offset+len(native):]
     if sha256(result) != row['display_sha256']:
         raise ValueError('Contextual-choice output differs from its complete approval')

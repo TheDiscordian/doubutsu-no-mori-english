@@ -23,7 +23,7 @@ from test_retail import ROM_PATH
 
 PAIR = '{cmd:7F09020001}{cmd:7F09080001}'
 IDS = set('1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 '
-          '2628 2630 2634 263C 264F 2655 27B5 203A 262B 2637 264B 266B'.split())
+          '2628 2630 2634 263C 264F 2655 27B5 203A 262B 2637 264B 266B 2773'.split())
 
 
 class NativeMoodTests(unittest.TestCase):
