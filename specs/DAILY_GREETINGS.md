@@ -59,7 +59,8 @@ All 610 full-suite regression tests pass, including eight daily-greeting tests.
 These checks do not establish the early records' actual callers, normal move
 or greeting selection, live old-town/month preparation, rendered names and
 catchphrases, final wording/presentation review, ordinary saving, or hardware
-compatibility. The wider introduction/reunion block `0013..005A`, the distinct
-development/control samples `0001..0012`, and other missing text remain work.
+compatibility. The wider introduction/reunion block `0013..005A` has a separate
+[complete draft contract](REUNION_GREETINGS.md). The distinct development/control
+samples `0001..0012` and other missing text remain work.
 Generated evidence stays ignored under `build/daily-greetings-*`; current
 results belong in `docs/PROGRESS.md`, and exact runs/hashes in `docs/WORK_LOG.md`.

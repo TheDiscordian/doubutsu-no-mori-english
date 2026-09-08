@@ -1,0 +1,578 @@
+[
+  {
+    "id": "message:0013",
+    "source_sha256": "e176d948394a83d007ab958ba4b65acb49eee29055b851c5f226eb31e67ef632",
+    "translation": "Good morning!\nMaking a new friend\nso early makes me happy,\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}My name is {cmd:7F1B}.\n{cmd:7F1A},\nI hope we'll become\ngood friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0014",
+    "source_sha256": "aeae16512bc81be2c919b3ea992c4b7a849d489e15792882be443100cf14e4bc",
+    "translation": "Hello there!\nThis is our first meeting,\nisn't it? I'm happy to have\nanother friend, {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}.\n{cmd:7F1A},\nI hope we'll stay friends\nforever, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0015",
+    "source_sha256": "723126d4d2198661b07fed200daaab53687a52f68beb764bb0a1e7b734a8abec",
+    "translation": "Good evening!\nOh, a stranger, {cmd:7F1C}!\nThat means, um...\nNice to meet you!\n{cmd:7F04}\n{cmd:7F02}My name is {cmd:7F1B}.\n{cmd:7F1A},\nI have a feeling we'll be\ngood friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0016",
+    "source_sha256": "0bc207d6ff13a313fbd258d084a369b83166fbb001988859d82b43bcd85f93b8",
+    "translation": "Meeting a stranger so late\nis a little frightening!\nBut I don't think there are\nany bad people here...\n{cmd:7F04}\n{cmd:7F02}Um, nice to meet you!\nI'm {cmd:7F1B}.\nI hope we'll get along,\n{cmd:7F1A}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0017",
+    "source_sha256": "9724d67fd99fdfee46427d4767299a0f15521dc3521d5cd90ebaee715c0b8874",
+    "translation": "Good morning!\nOh, someone I don't know!\nWe haven't met before,\nhave we?\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}.\nYou don't look like\na bad sort, so I'll be\nyour friend, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0018",
+    "source_sha256": "f2a6f9ef910e8d4c8d7b6017d4597dbbdae2b358ccd23c32b9f4c7714d01df69",
+    "translation": "Hello!\nWhy are you so nervous?\nDon't get nervous just\nbecause we've never met!\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}!\nI think we could be\nfriends, {cmd:7F1C}!\nNice to meet you, {cmd:7F1A}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0019",
+    "source_sha256": "2d0f5d674e3c423daafc2911ba5fc253412d2cd3fb46b08248db7dc8a3cd8c26",
+    "translation": "Good evening!\nWe haven't met, have we?\nMy name is {cmd:7F1B}.\nI live in that house there!\n{cmd:7F04}\n{cmd:7F02}Oh, so your name is\n{cmd:7F1A}!\nOK! Talk to me anytime!\nLet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001A",
+    "source_sha256": "66d82ffb3bacf5df03c989bb1d0eceb730fe62ecec9331631a9a19462d09a32f",
+    "translation": "What is it?!\nAt this time of night?!\nI'm sleepy!\nAnd we've never even met!\n{cmd:7F04}\n{cmd:7F02}Aren't you being a bit pushy?\nShow a little more restraint\nwhen talking to strangers!\nIt's the middle of the night!\n{cmd:7F04}\n{cmd:7F02}Oh, all right...\nMy name is {cmd:7F1B}.\nI'll forgive you this time!\nLet's get along, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001B",
+    "source_sha256": "4fb672f153c64ccf9bb8c2a47da1f1c3f1bc45fa6fbbd3415a8d8ec39c1a221b",
+    "translation": "Yaaawn... Good morning.\nWhat time is it? So sleepy...\nBy the way, who are you?\n\n{cmd:7F04}\n{cmd:7F02}Yaaawn... Nice to meet you.\nI hope we'll get along.\nOh, my name's {cmd:7F1B},\n{cmd:7F1C}...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001C",
+    "source_sha256": "ec62bef4364a6161165141cda5637ece28cb2102618e8e34811074249fadfac7",
+    "translation": "Hello there.\nWe've never met before,\nhave we? That means, um...\nN-nice to meet you!\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}, {cmd:7F1C}!\nI live very close by,\n{cmd:7F1C}. Come over\nand play again, {cmd:7F1C}.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001D",
+    "source_sha256": "95506452aa9707ea1bf1f3dfe4e29c34c4d3df179a32953b37b312f37dba8a7b",
+    "translation": "A new face, {cmd:7F1C}!\nBut you don't look like\na bad person. I'd better\nsay a proper hello...\n{cmd:7F04}\n{cmd:7F02}N-n-nice to meet you!\nI'm {cmd:7F1B}...\nI hope we'll stay\nfriends forever, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001E",
+    "source_sha256": "3cf32d98671b696ea4ce706021316500afb003a49afc674568aa502db96f4045",
+    "translation": "Yaaawn... I'm so sleepy...\nOh, we've never met before!\nNice to meet you!\nGood evening!\n{cmd:7F04}\n{cmd:7F02}I don't think\nmuch good comes from\nwandering around so late\nat night, {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}But that's\nup to you, isn't it?\nOh, my name's {cmd:7F1B}.\nLet's be friends.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:001F",
+    "source_sha256": "32ef7df94cea334a601dc47973e6f1cd5c9d0cde718502de6c9a0cc46523bf32",
+    "translation": "Hey, good morning!\nAnd nice to meet you, too!\nThey say the early bird\ncatches the worm, but...\n{cmd:7F04}\n{cmd:7F02}getting up early\nand making a new friend?\nYou couldn't get\nany luckier than that!\n{cmd:7F04}\n{cmd:7F02}Oh, my name is\n{cmd:7F1B}.\nNice to meet you, {cmd:7F1C}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0020",
+    "source_sha256": "99c32ea2cb5c4a3df6ef9f919de368e1be54f489fd7422f7c521f1ad8e1ce413",
+    "translation": "Hey! Nice to meet you!\nI'm {cmd:7F1B}.\nI live right nearby.\nLet's be friends!\n{cmd:7F04}\n{cmd:7F02}So you're {cmd:7F1A}.\nKind of a funny name!\nBut it's easy to remember,\nso that's good, {cmd:7F1C}.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0021",
+    "source_sha256": "387d29a2f56d177d6a71a84688f952870ccd463bde0aebdf1d918e4363480bc5",
+    "translation": "Hey, good evening.\nWe haven't met\nbefore, have we?\nTime for introductions!\n{cmd:7F04}\n{cmd:7F02}My name is\n{cmd:7F1B}!\nI keep saying {cmd:7F1C}.\nIt's a habit, {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}I try not to say it,\nbut it just slips out,\n{cmd:7F1C}. Bear with me,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0022",
+    "source_sha256": "7cf368bff0c64d4700b50ea0ae218c29624f65b3bd94be2a626be738d9d410c3",
+    "translation": "Yaaawn... So sleepy!\nGood evening!\nNice to meet you.\nI'm {cmd:7F1B}!\n{cmd:7F04}\n{cmd:7F02}We've only just met,\nbut wandering around outside\nin the middle of the night?\nYou're a funny one, {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}Still, I don't mind\nfunny people.\nLet's get along, {cmd:7F1C}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0023",
+    "source_sha256": "ecabbeb0c0c86de2caf2c7f44d91085b962b87d023f25696f268e7406539d51b",
+    "translation": "............\nKeep it down!\nI'm grumpy in the morning!\nGo away...\n{cmd:7F04}\n{cmd:7F02}Huh? I don't\nknow your face!\nSorry. You went out of your\nway to say hello, too.\n{cmd:7F04}\n{cmd:7F02}Well, let it slide.\nI'm {cmd:7F1B}.\nNice to meet you.\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0024",
+    "source_sha256": "0f14b052b7bca773085beca8b141fdd7c80faeacf75f116cac9db62af2bff9c0",
+    "translation": "Wandering around all day\ninstead of working!\nJust who are you, anyway?\n\n{cmd:7F04}\n{cmd:7F02}Whoops! I'd better stop\npoking my nose in.\nEveryone's got things\nthey don't want brought up...\n{cmd:7F04}\n{cmd:7F02}They say even brushing\nsleeves is a fated meeting.\nMaybe running into you\nwas meant to be, too.\n{cmd:7F04}\n{cmd:7F02}Well, I hope\nwe'll get along!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0025",
+    "source_sha256": "b4cf513e932d4980ee1ee14c3bc2ada397bb01d0700e856f883dfea26f8dad93",
+    "translation": "The night's only just begun,\nbut it's getting dark.\nLittle kids should head home!\n...\n{cmd:7F04}\n{cmd:7F02}Whoops! There I go,\nmeddling again. Whew...\nThat was rude to someone\nI've only just met.\n{cmd:7F04}\n{cmd:7F02}Heh heh! Let it slide\nfor today, will you?\nWe might be in for\na long friendship!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0026",
+    "source_sha256": "f5dfee6bbc7383053b7f73b5a0c3deffa9b5ccb30e0330dfe6e57fa9cd9f3e8f",
+    "translation": "Hey! It's long past\nthe time for respectable\nfolks to be out wandering!\nGet yourself home!\n{cmd:7F04}\n{cmd:7F02}...There I go again.\nIt's rude to say\nsomething like that\nto a stranger, isn't it?\n{cmd:7F04}\n{cmd:7F02}What's your name?\n...\nOh, {cmd:7F1A}, is it?\nWell, now you've told me,\n{cmd:7F04}\n{cmd:7F02}we're not strangers anymore!\nSo let me say this!\nGet yourself home,\nclimb into bed, and sleep!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0027",
+    "source_sha256": "de92acd732c7bb3789edc980f1f0455518ddd5b4e2ea87ac1523b84f41368f65",
+    "translation": "What is it so early?\nOh! Someone I don't know!\nWant to be friends?\n\n{cmd:7F04}\n{cmd:7F02}I'm always happy\nto have more friends!\nLet's get along!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0028",
+    "source_sha256": "0b01aaddffa405d96e9f83b21d57706369fe84fdec38ad93d45c2996a9ec2bef",
+    "translation": "Hm? What is it?\nIf you're trying to convert me\nto your religion, no thanks!\nHuh? You're not?\n{cmd:7F04}\n{cmd:7F02}Then say so sooner!\nOh, you want to be friends?\nOf course! You're welcome!\nMy name's {cmd:7F1B}.\n{cmd:7F04}\n{cmd:7F02}And you're {cmd:7F1A}.\nLet's be good friends!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0029",
+    "source_sha256": "12abb33f399f10bc6f09428bbd671b3867a8d59af642bb01621dba5662f0f96d",
+    "translation": "What is it? Want something?\nI already get the newspaper!\nNo? Then what is it?\n...\n{cmd:7F04}\n{cmd:7F02}Oh!\nYou want a friend!\nDon't you have many?\nWell, leave it to me!\n{cmd:7F04}\n{cmd:7F02}I'll be your friend!\nMy name's {cmd:7F1B}.\nCome and play anytime!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002A",
+    "source_sha256": "ab74854d2eac28ab5657152d6900d9f7ccfe9ea74699e1fb9780ac1c3c15a62f",
+    "translation": "Who is it at this hour?\nYou're awfully suspicious!\nMost people would be scared\nto be approached so late!\n{cmd:7F04}\n{cmd:7F02}Well, I'm used to it,\nso I'm fine. Who are you,\nanyway? You're not going\nto kidnap me, are you?\n{cmd:7F04}\n{cmd:7F02}You ARE dangerous!\n...Huh? You're not?\nThen you should have\nsaid that to begin with!\n{cmd:7F04}\n{cmd:7F02}I need time to prepare\nmyself, you know! So what?\nYou want to be friends?\nYou're strange. Oh, all right.\n{cmd:7F04}\n{cmd:7F02}My name's {cmd:7F1B}.\nCome over anytime\nyou feel lonely!\nDon't be shy!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific first introduction; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002B",
+    "source_sha256": "c9ef213ace6ea4c064f9b41ea293012d561a44a48dcf49125b39dcde544cd429",
+    "translation": "Good morn... Oh!\nIt's {cmd:7F1A}!\nDo you remember me?\n\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}!\nWe met when I lived in\n{cmd:7F2A}!\nThat brings back memories!\n{cmd:7F04}\n{cmd:7F02}Meeting you here again!\nWhat a coincidence, {cmd:7F1C}!\nLet's be friends again!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002C",
+    "source_sha256": "7578772eff8594abf51b53e6d51046b89d4caa9abe0d30cf9efe8d48f22edf2f",
+    "translation": "Hello... Oh!\nYou're {cmd:7F1A}, right?\nHave you forgotten me?\nIt's {cmd:7F1B}!\n{cmd:7F04}\n{cmd:7F02}We met when I lived in\n{cmd:7F2A}!\nBut you don't remember,\ndo you...\n{cmd:7F04}\n{cmd:7F02}Meeting you here again!\nGod must be playing tricks!\nLet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Only first-page lines change from five to four by combining the interrupted greeting; all wording and pauses remain. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002D",
+    "source_sha256": "a6f5173fe800ecbe88601af9811e3ac93d80b064bc19c86ac8ddcec56d75365c",
+    "translation": "Good even... Oh!\nIt's {cmd:7F1A}!\nIt's been such a long time!\n\n{cmd:7F04}\n{cmd:7F02}We met before, in\n{cmd:7F2A}.\nDon't you remember me?\nMy name is {cmd:7F1B}.\n{cmd:7F04}\n{cmd:7F02}No wonder you've forgotten.\nIt's been more than a month\nsince we last met!\nLet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002E",
+    "source_sha256": "e1fe0d80e6aadea832cd71129bc77b104e1131bb175e3b1fead557de3087d48d",
+    "translation": "Oh!\nI wondered who was out\nat this time of night!\nIt's {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}It's been such a long time!\nDo you remember me?\nHave you forgotten?\nIt's {cmd:7F1B}!\n{cmd:7F04}\n{cmd:7F02}We met when I lived in\n{cmd:7F2A}.\nLet's be friends like\nwe were before, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:002F",
+    "source_sha256": "77c4bb6ddfa03a4e5588149a2d0dc16757bda141efa59054b930a54c92caa6cc",
+    "translation": "Good morn... WOW!\n{cmd:7F1A}!\nThat brings back memories!\nHey, do you remember me?\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}!\nHave you forgotten?\nWe met when I lived in\n{cmd:7F2A}!\n{cmd:7F04}\n{cmd:7F02}Meeting you here again!\nWhat a coincidence!\nLet's be friends like\nwe were before, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0030",
+    "source_sha256": "8b37d4736482caaac674ec775e949bf9a34ee93af3b2ec45648faa7d4dd2e1df",
+    "translation": "Hello there... WHOA!\nIt's {cmd:7F1A}!\nWhat are you doing here?\nIt's me! ME!\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}! Remember?\nI can't blame you if not!\nWe last met more than\na month ago!\n{cmd:7F04}\n{cmd:7F02}And that was in\n{cmd:7F2A}! No wonder!\nBut I'm happy to see you!\nLet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0031",
+    "source_sha256": "71a55c8965c0dddfea9406f059cfa1d7d5c7303a9c1e9fdc1838055c581312c9",
+    "translation": "Good even-WHOA-WHOA-WHOA!\nYou startled me!\nIt's {cmd:7F1A}!\nLong time no see!\n{cmd:7F04}\n{cmd:7F02}You don't remember me?\nWe were friends back in\n{cmd:7F2A}. That makes\nme feel a little blue...\n{cmd:7F04}\n{cmd:7F02}I'm {cmd:7F1B}!\nRemember now?\nOh, well! Let's be friends\nlike before, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0032",
+    "source_sha256": "dd7ff84484f1102d0fd6f12bfb5dc680ca80868343ae22c87a0f3692a73b13d1",
+    "translation": "Wandering around so late!\nYou're a suspicious one!\nI've never seen you... Hm?\nYou DO look familiar...\n{cmd:7F04}\n{cmd:7F02}AAAAH! I remember!\nYou're {cmd:7F1A}!\nWhat are you doing here?!\nLong time no see!\n{cmd:7F04}\n{cmd:7F02}You don't remember me?\nBack in {cmd:7F2A},\nwe talked all the time!\nIt's {cmd:7F1B}! Remember!\n{cmd:7F04}\n{cmd:7F02}Meeting again in a place\nlike this is a miracle!\nLet's be friends\nlike before, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0033",
+    "source_sha256": "768c7e60387066263d4e04256c596cde69798617e05505a6eee15a9582b41eff",
+    "translation": "Yaaawn... So sleepy...\nGood morn...\nWAH! You woke me right up!\n\n{cmd:7F04}\n{cmd:7F02}I wondered who it was!\nIt's {cmd:7F1A}!\nNot since I was in\n{cmd:7F2A}...\n{cmd:7F04}\n{cmd:7F02}Whoa! It's been ages!\nI never even dreamed\nI'd see you here again!\nI'm so happy, {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}I hope we'll be\nfriends again, {cmd:7F1C}.\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0034",
+    "source_sha256": "a65e4c66ee1b5d4fd01b6c7379f4a399029a1c8a0fd6683f481bc448eb90d0f7",
+    "translation": "Hm? Huh?\nYou look sort of familiar...\nOr maybe not...\nWhere did we meet...?\n{cmd:7F04}\n{cmd:7F02}Oh! Hm? Hmm...\nOhhh, I remember!\nWe talked when I lived in\n{cmd:7F2A}, didn't we!\n{cmd:7F04}\n{cmd:7F02}Your name was, um...\n{cmd:7F1A}, right?\nIt is, isn't it!\nThat brings back memories!\n{cmd:7F04}\n{cmd:7F02}I've moved to\n{cmd:7F2F}.\nI don't know how long\nI'll be living here, but...\n{cmd:7F04}\n{cmd:7F02}I hope we'll be friends\nagain, {cmd:7F1C}!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0035",
+    "source_sha256": "820f30431b6c018500e025f57d282214ca5e9dbcb87f3e103ad5404292c6d771",
+    "translation": "Hello! Nice to meet you.\n...\nWait, have we met before?\nYou look familiar...\n{cmd:7F04}\n{cmd:7F02}Um, let me guess!\nDon't tell me...\nOh! I remember! When\nI lived in {cmd:7F2A},\n{cmd:7F04}\n{cmd:7F02}you were my friend, {cmd:7F1A}!\nI got it right, didn't I!\nThat brings back memories...\nLet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0036",
+    "source_sha256": "9440d0a4d13ca162c749c42424e5fd77d96ac22d83d2358bb398c1f6dd5963e8",
+    "translation": "Yaaawn... So sleepy...\nWho's out so late at night?\nNone of my friends would\nbe that inconsiderate...\n{cmd:7F04}\n{cmd:7F02}Well, there was ONE...\nBack in {cmd:7F2A},\nI had a friend\ncalled {cmd:7F1A}.\n{cmd:7F04}\n{cmd:7F02}I wonder what they're doing...\nWait! You're {cmd:7F1A},\n{cmd:7F1C}!\nWhat are you doing here?!\n{cmd:7F04}\n{cmd:7F02}Long time no see!\nHave you been well?\nI never thought we'd\nbe talking again like this!\n{cmd:7F04}\n{cmd:7F02}Can we be friends\nlike we were before?\nI hope so, {cmd:7F1C}!\nLet's get along, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0037",
+    "source_sha256": "9bd58d1a1e94b1d7865992a7e3ccac6d9a9643af48f51088571a145a45554df6",
+    "translation": "Another day's beginning,\n{cmd:7F1A}!\n...\nHuh? {cmd:7F1A}?\n{cmd:7F04}\n{cmd:7F02}WHAT?!\nYou're {cmd:7F1A}?!\nWhat happened to you?!\nLong time no see!\n{cmd:7F04}\n{cmd:7F02}Back in {cmd:7F2A},\n{cmd:7F2B} months ago!\nWe meet here, of all places!\nWe can't shake each other!\n{cmd:7F04}\n{cmd:7F02}Since we can't shake\neach other, let's keep\nhaving fun together!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0038",
+    "source_sha256": "f7e1bd4de92290602c1dccec7750742f8248d597fb791154752b2d2640e8dd07",
+    "translation": "Hey! Hello!\nNice to meet you...\n\n\n{cmd:7F04}\n{cmd:7F02}No, we've already met!\nYou're {cmd:7F1A}!\nIt's me!\n{cmd:7F1B}!\n{cmd:7F04}\n{cmd:7F02}Hey, come on!\nYou never come to see me!\nWhat have you been doing?!\nThis brings back memories!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2B} months ago,\nwe met in {cmd:7F2A}!\nDidn't you know\nI'd moved?\n{cmd:7F04}\n{cmd:7F02}Oh, well!\nWe've met again,\nso let's stay friends!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0039",
+    "source_sha256": "25cd2e8307f0ba97e69cf7e0bb9fadc61ef0f0fd37533d13d83d613b9be21ed8",
+    "translation": "Hey! Look who it is!\nIt's {cmd:7F1A}!\nIt's been ages!\n\n{cmd:7F04}\n{cmd:7F02}Last time we met, I still\nlived in {cmd:7F2A}!\nThat was\n{cmd:7F2B} months ago!\n{cmd:7F04}\n{cmd:7F02}Meeting you here again\nmust be fate!\nLet's be friends\nlike before! All right?\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003A",
+    "source_sha256": "974b5bff021736c16f2fca609f910625e47b0e260f0a3f354a558c5e0b093984",
+    "translation": "No decent person\nwould be wandering\naround here so late!\nOf course it's you, {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}It's me, {cmd:7F1B}!\nHave you forgotten?\nWe talked a lot back in\n{cmd:7F2A}!\n{cmd:7F04}\n{cmd:7F02}Well, I can't blame you\nfor forgetting. It's been\n{cmd:7F2B} months\nsince we last met, after all...\n{cmd:7F04}\n{cmd:7F02}I'd forgotten, too, until\nyou spoke! Hahahaha!\nWe're not strangers,\nso let's be friends again!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003B",
+    "source_sha256": "cab681b747079afe36c4de8e05d031f47fc97f91d5c539e3cfad24a2a37b17d4",
+    "translation": "Who's making\nall that racket\nso early in the morning?!\nHuh?\n{cmd:7F04}\n{cmd:7F02}Y-you're {cmd:7F1A}!\nWhere have you been?!\nIt's already been\n{cmd:7F2B} months!\n{cmd:7F04}\n{cmd:7F02}Since we met in\n{cmd:7F2A}, you've put\non weight! Haha! Just joking!\nYou haven't changed a bit!\n{cmd:7F04}\n{cmd:7F02}I'm a drifter.\nI don't know how long\nI'll be here, but\nlet's get along!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003C",
+    "source_sha256": "78269596674ade012e59aa3ce3a36ab3649142b57bc43786e080fe2cae49b5eb",
+    "translation": "Oh, it's you, {cmd:7F1A}!\nYou've really grown into\nsomething since I saw you!\nI'm the same as ever.\n{cmd:7F04}\n{cmd:7F02}We last met in\n{cmd:7F2A}, right...\nIt feels like ages ago...\nNo wonder. Come to think...\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2B} months\nsince I saw you!\nThis meeting must be fate.\nLet's get along again!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003D",
+    "source_sha256": "1272af89536cd4a276e4d31b5379047dc3adb785fc9bf9fe074eb58c995b8dbb",
+    "translation": "............!\nLook who it is!\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}It's been so long\nI couldn't get a word out!\nYou shouldn't give people\nsuch a fright!\n{cmd:7F04}\n{cmd:7F02}How long has it\nbeen since we met?\nHmm, not since\n{cmd:7F2A}...\n{cmd:7F04}\n{cmd:7F02}So it's been about\n{cmd:7F2B} months!\nMeeting here after all this time!\nMust be our special bond!\n{cmd:7F04}\n{cmd:7F02}Haaaahahahaha!\nI'm only joking!\nWhat are you blushing for?!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003E",
+    "source_sha256": "6b36c5cef18d16558107a61bfcbbcedde76c369d7639cb2a55261719554b1514",
+    "translation": "Who's out wandering\nat this time of night?!\nWhy, it's you,\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}Still haven't kicked\nthat late-night habit, eh!\nDon't blame me if some\ncarnivore eats you!\n{cmd:7F04}\n{cmd:7F02}It's been a long time!\nYou really helped me out\nback when I lived in\n{cmd:7F2A}!\n{cmd:7F04}\n{cmd:7F02}Seems you didn't know\nI'd moved here.\nI left without telling you\nwhere I was going...\n{cmd:7F04}\n{cmd:7F02}Meeting again like this\nmust mean we're tied by fate.\nCome and talk to me\nnow and then.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:003F",
+    "source_sha256": "204167478d13ca70d2ed34ef4481c9f39329b7e6ad5c22cbe5dc967c106cf555",
+    "translation": "Good morning!\n...You...\nYou're {cmd:7F1A}, aren't you!\nWhat are you doing here?!\n{cmd:7F04}\n{cmd:7F02}Oh! It's been ages!\nHow long has it been?\nWhat?!\n{cmd:7F2B} months?!\n{cmd:7F04}\n{cmd:7F02}We haven't seen\neach other for so long!\nLast time we met\nwas in {cmd:7F2A}...\n{cmd:7F04}\n{cmd:7F02}Running into an old friend\nagain by chance...\nThere's something\nrather lovely about it.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0040",
+    "source_sha256": "596862cef0c6fd2902dc3778264b943c77cfbee91e5846aa5c3aa79e007c0a15",
+    "translation": "Oh, you there!\nAren't you {cmd:7F1A}?\nI knew it!\nI thought you looked familiar!\n{cmd:7F04}\n{cmd:7F02}Do you remember me?\nBack in {cmd:7F2A},\nwe were good friends!\nHave you forgotten?!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F1B}! {cmd:7F1B}!\nForget again and\nyou'll be in trouble!\nBut for today...\n{cmd:7F04}\n{cmd:7F02}In honour of our reunion,\nI'll forgive you!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0041",
+    "source_sha256": "38046450b138791b7ec929fc5246e56420bd7637b72574f00454b0dd9ca17c7c",
+    "translation": "I thought I saw\nsomeone familiar\nwalking around...\nIt's {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}It's been so long!\n{cmd:7F2B} months!\nI almost forgot your face!\nHahaha!\n{cmd:7F04}\n{cmd:7F02}When I left {cmd:7F2A},\nI didn't say where\nI was moving, so I thought\nwe'd never meet again.\n{cmd:7F04}\n{cmd:7F02}That's why I'm so happy\nto see you again!\nLet's be friends\nagain! Please!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0042",
+    "source_sha256": "3f41d985c92f8cbc2a8f8cb08cc86f90d58aeb7a57bd6ec0d67db7b2c802e543",
+    "translation": "They say everyone has\nthree lookalikes in the world.\nI had a friend\nwho looked just like you.\n{cmd:7F04}\n{cmd:7F02}When I lived in\n{cmd:7F2A}, my good\nfriend was called {cmd:7F1A}.\nI wonder how they're doing...\n{cmd:7F04}\n{cmd:7F02}WHAT?!\nYou're {cmd:7F1A}?!\nNo! Really?!\nWhat are you doing here?!\n{cmd:7F04}\n{cmd:7F02}Oh! How have you been?!\nI've missed you! I thought\nI'd never see you again!\nI'm so happy!\n{cmd:7F04}\n{cmd:7F02}Let's be friends\nlike we were before!\nPromise me!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific long-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0043",
+    "source_sha256": "a512d7eb4ddaf7c193359324b7f21ace71a4e634d4b11fe351bec11129f5258b",
+    "translation": "Oh, it's {cmd:7F1A}!\nI moved to\n{cmd:7F2F}\na little while ago.\n{cmd:7F04}\n{cmd:7F02}Come over and play\nanytime, {cmd:7F1C}!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0044",
+    "source_sha256": "1f86236b49028848539c4772a8be1879361ea4c242d53a0c809925b45f417cab",
+    "translation": "Hello,\n{cmd:7F1A}!\nDid you know\nI'd moved here?\n{cmd:7F04}\n{cmd:7F02}Let's be friends again,\nlike when I lived in\n{cmd:7F2A},\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0045",
+    "source_sha256": "996c08e7d0c0ac96d3de9d4647ffe7fed2cc34a7db0ce3609c9d9d5507b81007",
+    "translation": "Oh, good evening,\n{cmd:7F1A}!\nI've recently moved to\n{cmd:7F2F}.\n{cmd:7F04}\n{cmd:7F02}I don't have many\nfriends yet, {cmd:7F1C}.\n{cmd:7F1A},\nlet's be friends, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0046",
+    "source_sha256": "449fddb3ee8e84e39cb6d6df6c49533c7b9a0edb025accd4b1181d7fee4356ba",
+    "translation": "Who's wandering around\noutside at this hour...?\nOf course it's\n{cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}I recently moved to\n{cmd:7F2F}.\n{cmd:7F1A},\ncome visit me, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0047",
+    "source_sha256": "dfbad792f802ea137a15ce078843576e7aca94680cefd82b5c50e63b322de750",
+    "translation": "Hi, {cmd:7F1A}!\nGood morning AND long time\nno see! I moved here\njust a little while ago!\n{cmd:7F04}\n{cmd:7F02}It's a pretty nice place!\nI really like it!\n{cmd:7F1A}, come and\nvisit sometime, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0048",
+    "source_sha256": "3a019cb0aecb26fed9d7be409d80bb510fa8d80b3b00273c4b2d5b57638b8e18",
+    "translation": "Hello, {cmd:7F1A}!\nWhen I left {cmd:7F2A},\nwere you upset?\nOr didn't you care?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2C} weeks\nto find me! Huh?\nYou weren't looking?!\nUgh! I'm not blue, I'm NAVY!\n{cmd:7F04}\n{cmd:7F02}Oh, well.\nCome over and play anytime.\nI'll be waiting, {cmd:7F1C}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0049",
+    "source_sha256": "2dd973e814958c6c4b99c793c732d924c993fe4bac5a616ae03a8f154e8061ae",
+    "translation": "Good evening, {cmd:7F1A}!\nIt's been a while!\nAfter all, we haven't met\nfor {cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}I've moved house\nsince then, you know!\nThat's why I'm here in\n{cmd:7F2F}.\n{cmd:7F04}\n{cmd:7F02}I used to live in\n{cmd:7F2A}, remember?\nCome over here and\nvisit sometimes, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004A",
+    "source_sha256": "9f1f572d3845358e3941c1e407251942e9e48bfc6c5aeac57bd8e38016e30b37",
+    "translation": "Oh! {cmd:7F1A}!\nLong time no see! About\n{cmd:7F2C} weeks,\nright?\n{cmd:7F04}\n{cmd:7F02}I just moved here\nthe other day!\nSo come over and\nplay anytime.\n{cmd:7F04}\n{cmd:7F02}Still, wandering around\noutside at this hour,\njust like always...\nYou're a delinquent, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004B",
+    "source_sha256": "c5dbbd9495da5ba186ce4e81687ffb42907de06bbbabdb96e089a73acab8f36e",
+    "translation": "Good morning... Oh, {cmd:7F1A}!\nLong time no see! About\n{cmd:7F2C} weeks,\nright?\n{cmd:7F04}\n{cmd:7F02}I moved to\n{cmd:7F2F}\na little while ago!\nDid you know that?\n{cmd:7F04}\n{cmd:7F02}Hey, {cmd:7F1A},\ncome over and\nplay sometimes!\nI'll be waiting, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004C",
+    "source_sha256": "75f7feb364e3866c79d17fe286f0ed4485c11171303ed4b2d591cf4a33d784e1",
+    "translation": "Hey, hey!\nHere's a face\nI haven't seen for a while!\nEh, {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}We last met in\n{cmd:7F2A}, before\nI moved here, so it's\nbeen {cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}I didn't think we'd\nmeet again after I moved!\nCome and play again!\nPromise, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004D",
+    "source_sha256": "885376cf7d13313e92165114a5923205199b578501c8cfbc86c50754bf144828",
+    "translation": "Good evening, {cmd:7F1A}!\nMeeting you here!\nWhat a coincidence!\nAfter we last met,\n{cmd:7F04}\n{cmd:7F02}I moved house!\nAnd we haven't met\nfor {cmd:7F2C} weeks,\nso I thought...\n{cmd:7F04}\n{cmd:7F02}you must not know\nwhere I'd moved to!\nBut I'm glad\nwe've met again!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004E",
+    "source_sha256": "09e802f6f294f3849cdb2596c3d13bf8c8678710b096df1633899261aa4b2ea0",
+    "translation": "Who's wandering around\noutside at this hour...?\nOf course it's {cmd:7F1A}!\nI thought it might be you!\n{cmd:7F04}\n{cmd:7F02}I just recently moved to\n{cmd:7F2F},\nbut I haven't made\nmany new friends yet, so...\n{cmd:7F04}\n{cmd:7F02}I've been lonely...\nBut now {cmd:7F1A}\nhas come to see me again!\nI'm so happy, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:004F",
+    "source_sha256": "7a89e5fb037e0eb02636c3632858142940e06c956c897b64dc82d6c93094c8c1",
+    "translation": "Oh, it's {cmd:7F1A}!\nGood morning! It's been\na while. About\n{cmd:7F2C} weeks?\n{cmd:7F04}\n{cmd:7F02}I left without telling you\nwhere I was moving to.\nI thought we'd never\nsee each other again!\n{cmd:7F04}\n{cmd:7F02}But meeting again\nin a different place?\nWe just can't shake\neach other! Hahahahaha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0050",
+    "source_sha256": "6579d380b69fbcfc6d8228ddacd04da1e8e77b129c0678d3b3e442fdabbbf7b5",
+    "translation": "Hey! It's {cmd:7F1A}!\n{cmd:7F2C} weeks!\nI moved here\na little while ago!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2A} was nice,\nbut so is {cmd:7F2F}!\nI like it quite a lot.\n\n{cmd:7F04}\n{cmd:7F02}And now {cmd:7F1A}\nhas come, it'll be\neven more fun here!\nI'm happy, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0051",
+    "source_sha256": "1a0dda791acbbb1519e689a384e519410c8dd6c293f92aba08979c046e6bed33",
+    "translation": "Long time no see, {cmd:7F1A}!\nWe last met in\n{cmd:7F2A},\n{cmd:7F2C} weeks ago!\n{cmd:7F04}\n{cmd:7F02}I've moved here to\n{cmd:7F2F}\nsince then!\n\n{cmd:7F04}\n{cmd:7F02}Come over and\nplay now and then!\nI'll always be waiting!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0052",
+    "source_sha256": "1833c58e84c8f2b1485fb2b005f03b71fc9b7ccdb093f4333070a534b6f3ecb6",
+    "translation": "It's you, {cmd:7F1A}!\nWandering around\nat this time of night!\nStill a handful, aren't you!\n{cmd:7F04}\n{cmd:7F02}This is the first time\nwe've met since I moved.\nI guess it's been about\n{cmd:7F2C} weeks.\n{cmd:7F04}\n{cmd:7F02}Well, we can't shake\neach other, so I knew\nwe'd meet again eventually!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0053",
+    "source_sha256": "5ba6b254f1e54298feba61b102fa3d3d7537880665f782a74df96b4de12a162c",
+    "translation": "It's you, {cmd:7F1A}!\nA rare face so early!\nHeh heh heh! That made\ngetting up early worthwhile!\n{cmd:7F04}\n{cmd:7F02}We last met in\n{cmd:7F2A}, so...\n{cmd:7F2C} weeks ago!\nIt's been a long time.\n{cmd:7F04}\n{cmd:7F02}Well, we've met again.\nNothing I can do about that!\nGuess I'll look after you\nagain! Hahahahaha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0054",
+    "source_sha256": "41fe35b1691b27b2c9bff3238e7b78eb61b4fe8b972911fca6bcf4f83846eb89",
+    "translation": "Hey, {cmd:7F1A}! I vanished\n{cmd:7F2C} weeks ago.\nYou didn't come looking\nfor me, did you?\n{cmd:7F04}\n{cmd:7F02}What? You didn't?\nYou got my hopes up!\nI was getting happy!\nJust kidding! Hahahahaha!\n{cmd:7F04}\n{cmd:7F02}Whoops! I'm being\nunusually talkative.\nGuess I'm a little\nexcited...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0055",
+    "source_sha256": "ed0329728604a93c8b9491ab9e923f344f91d521ca033b70823365ebfa12d417",
+    "translation": "I thought I saw someone\nwalking around looking glum.\nIt's you, {cmd:7F1A}.\nMeeting you here...\n{cmd:7F04}\n{cmd:7F02}What a coincidence. Heh heh.\nHow's business?\nHave you got your place\nlooking nice yet? Huh?\n{cmd:7F04}\n{cmd:7F02}Tch! You're a slowpoke.\nHurry up and find some\ngood furniture for your room!\nGet it looking nice! Keep at it!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0056",
+    "source_sha256": "57f5b4a46b693914af6ba768aa45d07e62a201c17282958a2849ccd8918c9c39",
+    "translation": "Wander around this late\nand I'll eat you up!\nHeh heh! Only joking!\n\n{cmd:7F04}\n{cmd:7F02}Why so scared? Can't you\ntake a joke? It's been\n{cmd:7F2C} weeks\nsince we met, after all...\n{cmd:7F04}\n{cmd:7F02}I was trying to\nbe considerate and\nliven things up\nwith a little joke!\n{cmd:7F04}\n{cmd:7F02}I'm not going\nto eat you.\nYou can relax.\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0057",
+    "source_sha256": "9a94d2d5d39f7a4b99cec5e0f120880832b992b8861cfa9e71c89509040be22f",
+    "translation": "Good morning!\nOh, it's {cmd:7F1A}!\nHow have you been?\nIt's been ages!\n{cmd:7F04}\n{cmd:7F02}We last met when\nI lived in {cmd:7F2A},\nso it's been\n{cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}I've recently moved to\n{cmd:7F2F}.\nIt's quite a nice place,\nand I like it here.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0058",
+    "source_sha256": "47f9af41705739de9009a1e594e8bde7603c7f36aedc592bd0d01a33c38f82aa",
+    "translation": "Oh, it's {cmd:7F1A}!\nIt's been a while.\nI didn't tell you I was\ncoming here before I moved,\n{cmd:7F04}\n{cmd:7F02}so I thought we'd never\nsee each other again! I don't\nknow how long I'll stay here,\nbut whenever you feel like it,\n{cmd:7F04}\n{cmd:7F02}come over and play.\nI'll be waiting.\n...\nI mean it!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0059",
+    "source_sha256": "13ae5fd0ba62fee33d001ab67fb447a8067b3349edb0e335fab6b243c0100b32",
+    "translation": "Good evening! ...Oh!\nI thought I saw\nsomeone familiar!\nIt's {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}How long? About\n{cmd:7F2C} weeks?\nWe haven't seen\neach other for quite a while.\n{cmd:7F04}\n{cmd:7F02}I've only just\nmoved here to\n{cmd:7F2F},\nso I haven't any friends yet...\n{cmd:7F04}\n{cmd:7F02}{cmd:7F1A},\nlet's be friends again!\nPlease!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  },
+  {
+    "id": "message:005A",
+    "source_sha256": "0332f55a87ff16f9dcef61ddffb9a316de28aa97382c0134618a2eeb5bdaa41a",
+    "translation": "Yaaawn... I'm sleepy...\nWho's out at this hour?\n\n\n{cmd:7F04}\n{cmd:7F02}Oh, {cmd:7F1A}!\nYou startled me wide awake!\nHow've you been? It's been\nabout {cmd:7F2C} weeks\n{cmd:7F04}\n{cmd:7F02}since we saw each other.\nIn that time, I've\nmoved from {cmd:7F2A}\nto {cmd:7F2F}.\n{cmd:7F04}\n{cmd:7F02}I thought we'd never\nmeet again, so I'm happy!\nCome over and play again.\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native-specific short-absence reunion; the supplied same-ID English slot is empty. Preserve every native command, field occurrence, page, and continuing ending. Actual caller selection, live fields, and final wording/presentation review remain."
+  }
+]

@@ -4705,6 +4705,92 @@
   patch-only release, and image/keyboard stretch goals remain active. The
   font-atlas-edge investigation stays paused.
 
+### 2026-09-07 — Complete native introductions and reunions
+
+- Added 72 original drafts in `translations/n64-reunion-greetings.json` for
+  `0013..005A`: 24 introductions, 24 long-absence reunions, and 24 short-absence
+  reunions. All supplied same-ID GameCube slots contain only termination, every
+  legacy/native Japanese pair agrees, and no identical visible native duplicate
+  exists after commands/whitespace are removed. No English donor, reference
+  permission, or unused-record status is invented.
+- Preserved every original command and argument, field occurrence/order/page,
+  wait, clear, page count, and continuing `01` ending. Only `002C` page zero
+  changes its five lines to four by combining the interrupted greeting and
+  surprise; all questions, names, meaning, and pauses remain. Month/week fields,
+  literal more-than-one-month remarks, repeated names/catchphrases, delayed
+  recognition, native jokes, and qualified friendship invitations remain.
+  The blue/gunjou joke uses navy blue as an original English colour escalation.
+  No actual GameCube reference is reflowed.
+- Added `specs/REUNION_GREETINGS.md` and ten focused tests for selection in both
+  runtime modes, source/control/ending/encoding/bounds, page and field sequences,
+  the one line-count exception, distinct units and fields, repetitions, native
+  topics, and supplied-source provenance. The focused run passes ten tests in
+  0.645 seconds. After a test-expression cleanup, the final full regression run
+  `build/tests-reunion-greetings-full-01.log` passes all 620 tests in 287.234
+  seconds, including the ten final reunion checks. No failed test, generation,
+  build, or cartridge run occurs in this batch.
+- All complete conservative expansion bounds fit at 148–620 bytes. Original
+  English line placement retains complete meanings and full absence/old-town
+  field bounds. Nine generic current-town width-warning records remain:
+  `0034/0045/0046/0049/004E/0050/0057/0059/005A`. Every draft fits when only
+  current-town `2F` is substituted with the verified six fullwidth cells; every
+  other field retains its conservative estimate. No global validator is
+  narrowed. These host checks do not establish live field preparation.
+- Full generation adds exactly 72 messages to 11,777, reaching 11,849 with no
+  earlier changes or removals. Main candidates number 10,604: 9,762 references,
+  551 original dialogue drafts, and 291 original development-label drafts.
+  All 460 choices remain unchanged. Basic generation adds the same 72 to its
+  previous 11,067, reaching 11,139 with all earlier edits unchanged. The complete
+  `0013..00D2` range now has 192 English drafts, not completed gameplay review.
+- Reference/label rejections number 1,149: 1,012 unconfirmed identities, 111
+  control differences, 24 field differences, and two overflows. One has an
+  original fallback, leaving 1,148 main gaps: 226 Japanese-static-text, 919
+  non-static, one Latin, and two number/symbol records. Ten non-static records
+  contain dynamic fields, with caller/control review retained. Reference warning
+  records remain 1,469, complete-native aliases 41, and conflicts zero.
+  Source-volume replacement coverage gains 8,762 characters, reaching 629,116
+  of the unchanged 746,978-character denominator. This is not semantic review,
+  gameplay acceptance, or an all-assets denominator.
+- `build/smoke-reunion-greetings-01/` passes all 72 complete cartridge message
+  loads through native `8009E558`, with 218 assertions and 369 recorded steps.
+  Full headers/text, adjacent/module guards, restored `test.bs1`, and graceful
+  shutdown pass. Scenario SHA-256:
+  `060b4a1f6c2900fef57f94b211eac0cf344134d7513905f0cddb7cb8929d7d08`.
+  The run has four MiB, no seeds, disabled audio, and both save-write permissions
+  false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  It does not execute actual introduction/reunion selection, live field
+  preparation, moving, ordinary saving, or hardware behaviour.
+- ROM `build/reunion-greetings-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `11c72c4fa4ff88df90d8ffc8a64c21c447416613e6feaffbb9df122ce2de3d2e`.
+  UPS SHA-256:
+  `77139c80afae970c7aacdf051fd0d9a7172b2c862a8a9aac48b4b6e44a7535c8`.
+  Candidate SHA-256:
+  `a3879d2436722f45746dd888d0ec9e86ddc0e403a4c54e10391796277b329b80`.
+  UPS application reconstructs the complete verified ROM; all 11,849 ordinary
+  edits match their complete actual built-bank entries. Against the daily build,
+  extracted changes are only main text `02000000`, its pointers `00CF9000`, and
+  DMA directory container `00019D40`. The container is unchanged outside the
+  directory table; all other code, fonts, runtime/name/mail/choice resources,
+  and saved layouts remain unchanged.
+- Regenerated final-hash coverage and both read-only queues under
+  `build/reunion-greetings-*`. Current-rule unconfirmed same-ID review remains
+  empty; no-visible-same-ID references decrease to 936. The ten unapproved
+  special-expression comparisons and distinct field/control/overflow/glyph
+  cases remain. The private remote is verified before checkpoint publication.
+- Read all eighteen `0001..0012` native samples and supplied same-ID references
+  for the next audit. These mix real personality descriptions (`0007/0008`)
+  with branching state, colour, position/scale, voice, and syllable timing
+  tests. Native `0004` is 694 stored bytes but already has a 1,314-byte
+  conservative expansion bound; `000F/0010` terminate through timed-close `58`.
+  Do not translate these as generic labels or discard their controls. Keep
+  this separate audit alongside broader remaining dialogue, not ahead of all
+  other content. Full wording/presentation review, live callers/fields, general
+  strings/names/mail, runtime controls, normal gameplay/save/hardware acceptance,
+  patch-only release, and image/keyboard stretch goals remain active. The
+  font-atlas-edge investigation remains paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
