@@ -110,6 +110,14 @@ undo the already revealed fortune. Preserve source
 identity and complete wording when
 mapping the remaining text; a same-ID GameCube row alone is not approval.
 
+The [leaflet/notice date design](../specs/LEAFLET_DATES.md) is the next grouped
+consumer task. Installed-instruction auditing finds ten English date calls and
+thirteen remaining native date/unit calls. Shop renewal, sale, and Redd leaflets
+need complete month/day/year/AM-PM fields and full publication; notice dates
+add a separating space and need fourteen-byte capture instead of the native
+ten-byte clamp. Three focused audit tests pass. No date replacement or text
+coverage increase is claimed from this inventory.
+
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch
 passes 48 native actor receipt cases, eight hand-back initializer cases, sixteen

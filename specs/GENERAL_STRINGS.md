@@ -80,6 +80,13 @@ and seven sites without a straight-line immediate length.
 | Fruit-box actor | Native performance credits, 110 rows, twenty-five-byte owned loader/drawer | Native batch passes every page and fade boundaries; normal K.K. performance, final presentation, and hardware remain |
 | Fortune-slip actor | All 68 complete sixteen-byte phrase/outcome values and three full templates through an owned snapshot creator | Native hand-off/readback and guarded payment recovery pass; normal interaction and scene cleanup remain gameplay checks |
 
+The [remaining date-consumer design](LEAFLET_DATES.md) distinguishes all 23 direct
+date/unit calls in the built cartridge: ten English replacements are installed,
+and thirteen retain native formatters. It records the shop/Redd scratch lifetimes,
+complete AM/PM requirement, notice month/day spacing and fourteen-byte output,
+and fishing-unit consumers. Target classification is not a capacity or gameplay
+completion claim.
+
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,
 `03D4`, `03F4`, and `03B4`. These are handbill fields, not the message window's
