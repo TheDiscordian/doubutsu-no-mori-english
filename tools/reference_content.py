@@ -21,7 +21,7 @@ def validate_content_approval(record):
     if 'complete_reference' not in record:
         return
     rule = record['complete_reference']
-    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location', 'native_mood', 'native_random'}
+    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location', 'native_mood', 'native_random', 'gamecube_plus_offsets'}
             or 'adapted_sha256' not in rule
             or not record['id'].startswith('message:')
             or any(key in record for key in ('controller', 'native_choices', 'native_actor_request',
@@ -38,6 +38,14 @@ def validate_content_approval(record):
         if set(rule) != {'adapted_sha256', 'native_random'} or record.get('reference_id') != record['id']:
             raise ValueError('Native random branches cannot combine with other content adaptations')
         validate_random_rule(rule['native_random'])
+    if 'gamecube_plus_offsets' in rule:
+        offsets = rule['gamecube_plus_offsets']
+        if (set(rule) != {'adapted_sha256', 'gamecube_plus_offsets'}
+                or record.get('reference_id') != record['id']
+                or not isinstance(offsets, list) or not offsets
+                or any(type(n) is not int or not 0 <= n < 1024 for n in offsets)
+                or offsets != sorted(set(offsets))):
+            raise ValueError('GameCube plus encoding requires unique ordered glyph offsets and no other adaptation')
     if 'spans' in rule:
         if not isinstance(rule['spans'], list) or not rule['spans']:
             raise ValueError('Invalid complete-reference spans')
@@ -64,9 +72,23 @@ def verify_content_reference(reference, source, record, info):
     validate_content_approval(record)
     reference_info = list(info)+[(0, 0)]*max(0, 0x75-len(info))
     reference_info[0x74] = (2, 0)
+    reference_bytes = encode(reference['text'], reference_info)
+    if 'gamecube_plus_offsets' in record['complete_reference']:
+        # GameCube B4 and native 5C both display '+'. Reconstruct only the
+        # individually approved source glyphs to check the actual English hash;
+        # the installed text still uses the unchanged native glyph and font.
+        glyph_offsets = {t.offset for t in tokenize(reference_bytes, reference_info)
+                         if t.kind == 'text' and t.data == b'\x5c'}
+        offsets = record['complete_reference']['gamecube_plus_offsets']
+        if not set(offsets) <= glyph_offsets:
+            raise ValueError('GameCube plus offset is not a complete native plus glyph')
+        restored = bytearray(reference_bytes)
+        for offset in offsets:
+            restored[offset] = 0xb4
+        reference_bytes = bytes(restored)
     if (sha256(source) != record['source_sha256'] or reference['id'] != record['reference_id']
             or reference['sha256'] != record['reference_sha256']
-            or sha256(encode(reference['text'], reference_info)) != record['reference_sha256']):
+            or sha256(reference_bytes) != record['reference_sha256']):
         raise ValueError('Stale complete-reference source or reference')
     if record['complete_reference'].get('omit_startup_storage_location'):
         native = [t.data for t in tokenize(source, info) if t.kind == 'cmd']

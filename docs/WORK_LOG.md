@@ -5953,3 +5953,63 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   gameplay, final semantic/presentation review, original hardware, and patch-only
   release remain. The title screen stays the first image priority. The complete
   project goal remains active.
+
+## 2026-09-08 — Preserve the complete English plus-glyph controller tip
+
+- Resolved the source-encoding rejection for `14FD` without changing a font.
+  The supplied GameCube raw message has 254 bytes and stores its plus at offset
+  112 as `B4`. The pinned English decoder identifies that character as +. The
+  existing native encoder/font uses `5C` for +. Direct raw-data/decoded-reference
+  comparison confirms this is the only difference between the complete English
+  and native encodings. GameCube `5C` is a different symbol; raw code copying
+  would be incorrect.
+- An explicit `complete_reference.gamecube_plus_offsets` rule reconstructs
+  exactly the approved English glyph bytes solely for original-reference hash
+  verification. Offsets must identify complete native plus text tokens, never
+  command arguments or other glyphs. Empty/duplicate/unsorted/malformed offsets,
+  stale full hashes, and combined adaptations fail. The installed payload keeps
+  the ordinary native encoding, with independent complete-output verification.
+  No general glyph substitution, unsupported-punctuation workaround, or font
+  investigation is introduced.
+- Complete NES advice retains + Control Pad and Control Stick, the two original
+  expressions, catchphrase, every English word, manual line/page, emphasis, and
+  pause. Its native output hash is
+  `d4d43dd7e725ea39d8fd2eeaf8171fdd04b19461e1a6d0e80d901af96682b01d`;
+  original English hash is
+  `477a33ac04951016bf03873c51cc0a555b21633d9182e3b48e75b693b897d453`.
+  Stored/expanded bounds are 254/300 bytes, valid in basic and full output.
+- All 109 reference tests pass in 18.534 seconds at
+  `build/tests-reference-plus-01.log`, including five new source-encoding checks
+  and the existing complete-content retail check covering this new approval.
+  The actual extracted English data and pinned decoder are checked, not just
+  a synthetic reconstructed fixture. No unchanged native batch is rerun for this
+  host-only encoding change; a dedicated `14FD` cartridge load is explicitly
+  queued with the next content batch. The existing 39-message/18-label native
+  checkpoint and full 714-test runtime checkpoint remain their own evidence,
+  not a claim that this specific conversation has been played.
+- `build/reference-plus-candidates/` has 12,558 ordinary edits; basic output has
+  11,815. Only `14FD` is added and every earlier full/basic edit object remains
+  unchanged. Main coverage is 10,765: 9,770 references, 606 original dialogue
+  drafts, one original continuation, 289 development labels, and 99 diagnostics.
+  The 987 gaps include 65 Japanese-static, 919 nonstatic, one Latin, and two
+  symbol records; ten nonstatic records contain dynamic fields. Rejections are
+  923 unconfirmed identities, forty control differences, 23 missing fields,
+  and two overflows, with one original fallback. Source weight is
+  639,709/746,978; main source weight is 629,377/637,761. These remain candidate
+  measurements, not semantic or project completion.
+- Pilot: `build/reference-plus-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `b4f88b4df100c8cb949a7b7bbdc4911ce525fe3aef3a5877490f9568f6e97839`.
+  UPS SHA-256:
+  `f916234078f467a36b8c352d8a85477cf4bcb41f91b359b44196eb9ecf43806e`.
+  Candidate SHA-256:
+  `09bcb8764061e8a7d3ebe4b3dd0199a16108ff95041b88bc3aad2d18aad08d6e`.
+  `build/reference-plus-artifact-audit.log` verifies all 12,558 actual installed
+  payloads, source/candidate/build hashes, complete UPS reconstruction, and
+  unchanged earlier full/basic edits. Only DMA files `00019D40`, `02000000`,
+  and `00CF9000` change; the container differs only in its table. Both font
+  atlases and every runtime/name/item/mail resource remain unchanged.
+- Updated the source-encoding contract, progress, and next-batch queue. Main
+  translation/integration, normal gameplay, final review, title-first images,
+  the GameCube-style keyboard, original hardware, and patch-only release remain.
+  The complete project goal stays active.

@@ -491,20 +491,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/connected-services-pilot/`
-contains 12,557 edits, including
-9,769 reference main-bank candidates, all 460 choices, 606 original dialogue
+The current experimental resident-module pilot in `build/reference-plus-pilot/`
+contains 12,558 edits, including
+9,770 reference main-bank candidates, all 460 choices, 606 original dialogue
 drafts, one original-dialogue continuation, 289 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 988
+still require review. The original main-bank audit leaves 987
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,475 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/connected-services-candidates/` and `build/connected-services-coverage/`.
+`build/reference-plus-candidates/` and `build/reference-plus-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1066,7 +1066,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,557 edits; basic generation has 11,814, including both startup-error drafts,
+12,558 edits; basic generation has 11,815, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1324,9 +1324,25 @@ silent graceful shutdown, and blank isolated FlashRAM/Pak pass. These are
 cartridge text loads, not executed trades, gifts, mood changes, random selections,
 editor input, normal saving, rendered twins, or hardware acceptance.
 
+## Complete controller tip and source glyph encoding
+
+The [source-encoding approval](../specs/REFERENCE_GLYPH_ENCODING.md) imports
+complete GameCube `14FD`. Its + Control Pad uses GameCube byte `B4`; the
+unchanged native plus glyph uses `5C`. A single token-aligned approval at byte
+112 reconstructs the actual English hash without installing the wrong native
+glyph. Full wording, manual layout, timing, expressions, and catchphrase remain.
+No font change or general missing-glyph permission is introduced.
+
+All 109 reference tests pass, including five dedicated encoding checks against
+the actual supplied English bytes. All earlier full/basic candidates are
+unchanged. The 254-byte record fits both configurations. Its cartridge-load
+check joins the next content batch; normal conversation/rendering remains
+playthrough work. Existing native runtime evidence is not a new test of this
+specific message.
+
 ## Text-volume measurement
 
-The generated coverage report measures 639,612 covered source characters out of
+The generated coverage report measures 639,709 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1346,8 +1362,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,557 edits, including
-9,769 reference main-bank candidates, 289 original development-label drafts,
+The resident-module experiment contains 12,558 edits, including
+9,770 reference main-bank candidates, 289 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1369,9 +1385,9 @@ native storage, raffle, and offering drafts, plus fifteen native connected
 service/reaction drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 989 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 988 main records without
-candidates: 66 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 988 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 987 main records without
+candidates: 65 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

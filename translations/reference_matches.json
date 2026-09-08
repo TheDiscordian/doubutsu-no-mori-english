@@ -1,5 +1,16 @@
 [
   {
+    "id": "message:14FD",
+    "source_sha256": "f20819c6d2e0deb60d0b40d720fd1c6cf05c42db6c72d05114f405cc966495da",
+    "reference_id": "message:14FD",
+    "reference_sha256": "477a33ac04951016bf03873c51cc0a555b21633d9182e3b48e75b693b897d453",
+    "complete_reference": {
+      "adapted_sha256": "d4d43dd7e725ea39d8fd2eeaf8171fdd04b19461e1a6d0e80d901af96682b01d",
+      "gamecube_plus_offsets": [112]
+    },
+    "evidence": "Complete supplied NES controller tip matches the native statement that both the directional pad and analog stick can control the game. Retain every English word, line, page, colour, and pause. Actual English data and the pinned decoder confirm plus at byte 112 is GameCube B4; the existing native plus glyph is 5C. Those 254-byte reference/native encodings differ only at that glyph, with complete hashes bound here. This changes no font or controller mapping. See REFERENCE_GLYPH_ENCODING.md."
+  },
+  {
     "id": "message:263E",
     "source_sha256": "87edb95a8c53d6d561821cd2db07f84baadb558612107795b6d2fdf0133cd3d0",
     "reference_id": "message:263E",
