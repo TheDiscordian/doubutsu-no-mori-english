@@ -6454,3 +6454,102 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   general strings, remaining mail glyphs/callers, semantic review, and normal
   gameplay. Title-first graphics, GameCube-style keyboard, hardware checks, and
   patch-only release remain. The complete project goal stays active.
+
+## 2026-09-08 — Startup-owned cartridge font and six complete dialogue imports
+
+- Implemented a persistent system-heap loader immediately after native heap
+  initialization and before graph/audio threads. Gameplay-arena cleanup cannot
+  release its allocation. The eight-word optional configuration binds VROM,
+  image/relocation/text sizes, zero entry, CRC32, and ABI. Disabled configuration
+  allocates nothing; malformed configuration, allocation/DMA/CRC/entry failures
+  reject startup and release owned memory. The bootstrap retains its failure
+  loop rather than running a configured build without the required font.
+- The resident image uses 24,192 linked bytes, leaving 384 within the unchanged
+  24 KiB limit and 32 KiB reservation. Module SHA-256:
+  `e0b58baada8a336d7f4bb7fbba6bf58ad7772eadd08d245d70d2ae62da97fa51`.
+  Bootstrap SHA-256:
+  `7f7e2328039febb22b6748f1458c85e2c7fca338dd5ffbbafa792daa52eb78b6`.
+  Rebuilt the module-bound NPC creator and generation probe; the default
+  artifacts now match the current runtime instead of their older checkpoints.
+- Added a 3,680-byte source-bound font image and 288-byte native relocation
+  table. Allocation including alignment is 3,983 bytes. The image contains
+  the exact separate source resource, native adapters, guarded installer, and
+  zero BSS; its assembly origin is not an execution address. Native relocation,
+  complete writeback, and instruction invalidation precede execution. Internal
+  pointers/jumps and signed high/low pairs are independently checked on the host.
+  Image SHA-256:
+  `fed1500af36ba09278a9b6ae79c30319923ec03bec9a0654770e2e887be5540d`.
+  Relocation SHA-256:
+  `d30e39f62143f67dde64ddd751c44892f7ecd5a5bf5f3f522bcf8e3fd76653c4`.
+- Five native entry hooks cover texture, character width, prefix measurement,
+  texture loading, and drawing. Ten guarded cursor instructions let known
+  pairs advance as one timed character while unknown tags retain native skip
+  behaviour. Existing atlas pixels and narrow-character widths do not change.
+  No saved format, editor token policy, or mail glyph permission changes.
+- Added explicit Unicode encoding, two-byte expansion budgets, and resource-width
+  layout accounting. Candidate generation and independent construction both
+  preflight the complete actual font installation; the builder repeats final
+  installation before writing the ROM/UPS. The six reference approvals check
+  every glyph-token offset and reconstruct the full original English stream by
+  removing only registered prefixes. Changed text, command arguments, glyph
+  offsets, unsupported pairs, missing resources, or stripped candidate metadata
+  cannot bypass complete payload or capability checks.
+- Imported `04D2/04FA/08A2/08A6/0A15/0E2A`: complete late-night/busy introductions,
+  snowman jokes/lament, letter-show invitation, and soccer dialogue. All English
+  words, manual lines, pages, pauses, native expressions/moods/fields/actions,
+  and endings remain. Encoded bytes are 431/378/376/217/103/371; expansion bounds
+  are 537/514/392/233/179/537. Exactly six IDs are added; no earlier edit changes.
+- `build/smoke-font-cartridge-town-01/` completes the controller-driven English
+  name/town entry and train dialogue through arrival record `07DD`, then passes
+  all 26 draws and five known-glyph cursor cases. Its post-test stops on the
+  unknown-tag case because the fixture expected flags `4100`, while native
+  voice scheduling correctly adds `0020` for the following ordinary character.
+  The native `8009F830` setter explains this difference. Only the test expectation
+  changes. This failed combined run is not claimed as a completed restored
+  runtime acceptance run or as ordinary outdoor-town progression.
+- `build/smoke-font-cartridge-dialogue-02/` passes the corrected combined native
+  batch: 596 recorded steps, 54 calls, 324 memory assertions, 26 actual draws,
+  eight cursor cases, and six complete cartridge-message loads. Startup owns the
+  font at `8019C8F0`; no font code/resource is uploaded by the debugger. Full
+  image/native-atlas/width/live-save retention, display lists, vertices, prefix
+  widths, protected waits, complete token indices, native voice flags, allocation
+  guards, fixture release, checkpoint restoration, and graceful shutdown pass.
+  Audio is disabled, RAM is four MiB, and blank isolated FlashRAM/Pak hashes
+  remain unchanged; no seed or save-write permission is used. Generated display
+  lists are inspected, not submitted to the GPU. Scenario SHA-256:
+  `17daec6e42869e9478f8ed33f406c3b5e4a08d59a8d6ac82b7d629d80e7d9dc8`.
+- All 792 host tests pass in 288.898 seconds, log
+  `build/tests-extended-glyph-full-02.log`. Seven focused import tests pass in
+  4.135 seconds; three cartridge tests include sanitizer checks for every byte
+  of the CRC fixture, all alignment/re-entry/failure cases, and ownership.
+  The first full run found three stale module-bound artifacts, two older
+  placeholder-allocation counts, and one changed validation-error ordering.
+  Rebuilt the artifacts, tied NPC installer tests to current default build paths,
+  audited all 68 sequence parts and 24 allocated native labels, and retained the
+  existing plain-choice error precedence. No validation guard is removed.
+- Full/basic candidates: 12,601/11,848. Main: 10,808 = 9,809 references + 618
+  original dialogue drafts + one original continuation + 281 development labels
+  + 99 diagnostics. Remaining: 944 = 22 Japanese-static + 919 nonstatic + one
+  Latin + two symbol records; ten nonstatic records contain dynamic insertions.
+  Rejections: 906 unconfirmed, fifteen control differences, 23 missing fields,
+  and one overflow, with one original fallback. Layout warnings: 1,491.
+  Candidate source weight: 645,894/746,978; main 635,562/637,761. Coverage counts
+  registered glyph candidates without crediting unknown tags or semantic review.
+- Pilot: `build/extended-glyph-dialogue-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `aa9a34c4464af3a87e2afd6b2fccbae92706568415dcea1e40248e33f65931fd`.
+  UPS SHA-256:
+  `9a91f6152e72b061b4aad70379077059d961df1f6ebdceb5f99d09b2362b22f3`.
+  Candidate SHA-256:
+  `f091294888ab11990cf9899f3009deec9a336178891ddc6ae89b69ab53b4038a`.
+  Independent module/font/ROM/patch builds match. Every one of 12,601 installed
+  edits, full resource/configuration hashes, and original-ROM UPS reconstruction
+  passes. The audit corrects its initial fixed-bank extraction slice to exclude
+  adjacent banks; no generated game bytes change.
+- Main work continues with `0912`, scoped number-game labels, twenty native
+  diagnostics, remaining general strings/names/mail, and ordinary gameplay.
+  Formatting spans and further consumers need audit before broader glyph use;
+  apology targets still need input/matching and coordinated rude-reply storage.
+  Title artwork is the first image task, followed by the other image inventory
+  and GameCube-style keyboard. Semantic review, human playthrough, hardware,
+  provenance, and patch-only release remain. The complete goal stays active.

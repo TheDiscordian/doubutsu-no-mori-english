@@ -94,6 +94,18 @@ class TextCoverageTests(unittest.TestCase):
         self.assertEqual(result['covered_source_characters'], 3)
         self.assertEqual(result['coverage_percent'], 50.0)
 
+    def test_known_dialogue_glyph_candidates_count_without_changing_native_classification(self):
+        source = encode('あいう{cmd:7F00}', self.info)
+        candidate = '☃Hello;{cmd:7F00}'
+        rows = coverage_rows('message', [source], {'message:0000': {
+            'source_sha256':sha256(source), 'translation':candidate}}, self.info)
+        self.assertEqual(rows[0]['candidate']['category'], 'latin_static_text')
+        self.assertEqual(text_volume(rows)['covered_source_characters'], 3)
+        self.assertFalse(rows[0]['review_complete'])
+        self.assertEqual(classify(b'\x80\xab',self.info)['category'], 'unmapped_visible_glyph_requires_review')
+        self.assertEqual(classify(b'\x80\x42',self.info,extended_glyphs=True)['category'],
+                         'unmapped_visible_glyph_requires_review')
+
 
 if __name__ == "__main__":
     unittest.main()

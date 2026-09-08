@@ -72,6 +72,12 @@ def verify_test_module(rom, report):
             raise ValueError('NPC creator configuration has no cartridge resource')
         verify_configuration(module,files[VROM].extract(rom),report)
         module[0x48:0x68] = bytes(32)
+    if any(module[0x68:0x88]) or report.get('extended_font'):
+        from extended_font_cartridge import VROM, verify_configuration
+        if VROM not in files:
+            raise ValueError('Persistent font configuration has no cartridge resource')
+        verify_configuration(module,files[VROM].extract(rom),report)
+        module[0x68:0x88] = bytes(32)
     if (sha256(module) != report["module_sha256"] or not 0x300 <= report["linked_bytes"] <= LINKED_LIMIT
             or struct.unpack_from(">I", module, 12)[0] != report["linked_bytes"]):
         raise ValueError("Native test symbols or scratch-space boundaries do not match the module")

@@ -7298,5 +7298,71 @@
       }
     },
     "evidence": "Complete furniture-sale reference retains surprise at the player money, the fish-scrubber part-time-job joke, the 1,000-Bell offer, and original choices/routes. Restore the exact native mood-one/duration-zero pair between initial quest 0C/02/0003 and surprise expression 02; do not invent a duration. Every English word and delivery command remains; only redundant article suppression before the already-native item field is removed by the established adapter. See NATIVE_MOOD_REFERENCES.md and NATIVE_SPECIAL_FOLLOWUPS.md."
+  },
+  {
+    "id": "message:04D2",
+    "source_sha256": "c1d36b4373b82a95bdd58a02261add5f065fe61b60988dcdcdc17978089f2946",
+    "reference_id": "message:04D2",
+    "reference_sha256": "c040582401f2d53c0346b79d3550e8dab8d4436cfb8bfef195aa6356a98ebb74",
+    "complete_reference": {
+      "adapted_sha256": "422bbcfdbdc9169812a5fa05fef66cb7ba33ecbdac260fd9d88b41b7696f5a62",
+      "gamecube_glyph_offsets": [380]
+    },
+    "evidence": "Late-night peppy introduction retains irritation, stranger etiquette, introduction, and forgiveness, with the exact native mood and expression sequence. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube semicolon code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:04FA",
+    "source_sha256": "aabfec48ff51268b2b0a3fe836fa3578fd051de25bf11d0d81bf757229b6451a",
+    "reference_id": "message:04FA",
+    "reference_sha256": "2994914e59827a509a9d05587ac0d5840894309639eb9496c1457a54c4114c85",
+    "complete_reference": {
+      "adapted_sha256": "7ff2e5a9fc6b676456dc3ec3b19eea9af3f3db238480562921a90084056996eb",
+      "gamecube_glyph_offsets": [289]
+    },
+    "evidence": "Busy snooty introduction retains the interrupted refusal, request for friendship, player name, agreement, and introduction, with the exact native mood and expression sequence. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube semicolon code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:08A2",
+    "source_sha256": "5ed1611dca5d9cf4f1f9f43e3eb63470846a929b69f1358ab8c21ba4c2af786e",
+    "reference_id": "message:08A2",
+    "reference_sha256": "5bf699f5172ffaf2ec1a72eb0978c79492802c76bc08b0c843fee3c6061280a6",
+    "complete_reference": {
+      "adapted_sha256": "5cc3bc1cb76e99b12e2221b94d99da2f88e615d983e7b88ccddc3f1f9618bdec",
+      "gamecube_glyph_offsets": [251]
+    },
+    "evidence": "Snowman conversation retains the complete stationary-lover joke and all three pages. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube semicolon code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:08A6",
+    "source_sha256": "22b2d3b819ed2c3501d6161efbf69f0c3d64865b1fef2c1a43727913250634a8",
+    "reference_id": "message:08A6",
+    "reference_sha256": "2e434723a3f09cce0c759e3ecbb1ff7dbf7fd9c90fd6d8defa227fe0d2877de0",
+    "complete_reference": {
+      "adapted_sha256": "94af89546864b7fb0c2b3a418f3376a0baee37f2eba6456af51a91ffa1058c4d",
+      "gamecube_glyph_offsets": [0, 6]
+    },
+    "evidence": "Snowman conversation retains both snowman symbols and the complete melting-without-love lament. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only registered separate-font prefixes are added to the original GameCube snowman codes; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:0A15",
+    "source_sha256": "396fefad562d6b511986df3fe159546df91491d8388c016b7b26d244bd42bb81",
+    "reference_id": "message:0A15",
+    "reference_sha256": "6c3ebb498bd7bd2c0fa0fbfef53619b6b1c9de5c3c9f5175b03413f664f6e1f1",
+    "complete_reference": {
+      "adapted_sha256": "68bb61ba9dcb897c37ba28bfcc592f9773cbcc3a1f3a0a386b54d7c894274423",
+      "gamecube_glyph_offsets": [45]
+    },
+    "evidence": "Letter-show invitation retains sender and catchphrase fields, 55, actor request 0C040001, continuation 0A21, and continuing terminator 01. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube semicolon code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:0E2A",
+    "source_sha256": "f1a7e78acb5afd7b92dfe929b5bbca15e14ff86fac7930399fcd4d2d06113abd",
+    "reference_id": "message:0E2A",
+    "reference_sha256": "21b9d13b104fcb65e4ae623c4cf3138511e2fdc1682c9d12b38468e4fe188e2d",
+    "complete_reference": {
+      "adapted_sha256": "20323f642b1db587efe8e00dc187d769870b42477d53e6a494ba1011e266d615",
+      "gamecube_glyph_offsets": [182]
+    },
+    "evidence": "Soccer conversation retains all four pages, the 24/7 expression, native actor expressions, and all supplied player, rival, and catchphrase fields. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube slash code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
   }
 ]

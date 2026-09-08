@@ -110,7 +110,8 @@ class RetailContentApprovalTests(unittest.TestCase):
         approved = [r for r in matches.values() if 'complete_reference' in r
                     and not r['complete_reference'].get('omit_startup_storage_location')
                     and not r['complete_reference'].get('native_mood')
-                    and not r['complete_reference'].get('native_random')]
+                    and not r['complete_reference'].get('native_random')
+                    and not r['complete_reference'].get('gamecube_glyph_offsets')]
         self.assertEqual({r['id'][8:] for r in approved}, IDS)
         changed = 0
         for record in approved:

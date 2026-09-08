@@ -48,6 +48,7 @@ version. Four-MiB RAM tests precede Expansion Pak tests.
 | Added current-player/town names | Correct source identity, complete insertion, colours, cursor, and memory bounds | 26 individually approved messages and all 27 added field occurrences pass native loads/dispatch; no generic free-string/catchphrase permission; ordinary traversal remains |
 | Added resident catchphrases | Native appearance actor binding, complete insertion, defaults/custom/null behaviour, source retention | 27 approved messages pass real requests and initializer/DMA loads; 30 insertions, 91 calls, and 432 assertions pass, including clearing an old client; no generic catchphrase permission or ordinary traversal claim |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
+| Separate English glyphs | Startup ownership, actual native drawing/reveal, complete source-bound imports | 26 draws, eight cursor cases, six complete message loads, and 324 assertions pass with no font-code upload; native atlas/widths/saves retained; ordinary glyph-bearing conversations, mail/editor consumers, and hardware remain |
 | Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM and both Controller Pak letter-file persistence tests pass fresh-process reads; normal saving, travel/storage UI, RTC, and calendar remain |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
 

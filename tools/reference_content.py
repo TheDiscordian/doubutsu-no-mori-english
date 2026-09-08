@@ -4,6 +4,7 @@ import re
 
 from aflib import sha256
 from textcodec import encode, tokenize
+from glyph_codes import WIDTHS as EXTENDED_WIDTHS
 from reference_mood import validate_rule as validate_mood_rule, restore as restore_native_mood
 from reference_random import validate_rule as validate_random_rule, restore as restore_native_random
 
@@ -21,7 +22,7 @@ def validate_content_approval(record):
     if 'complete_reference' not in record:
         return
     rule = record['complete_reference']
-    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location', 'native_mood', 'native_random', 'gamecube_plus_offsets'}
+    if (not isinstance(rule, dict) or set(rule)-{'adapted_sha256', 'spans', 'omit_startup_storage_location', 'native_mood', 'native_random', 'gamecube_plus_offsets', 'gamecube_glyph_offsets'}
             or 'adapted_sha256' not in rule
             or not record['id'].startswith('message:')
             or any(key in record for key in ('controller', 'native_choices', 'native_actor_request',
@@ -38,6 +39,14 @@ def validate_content_approval(record):
         if set(rule) != {'adapted_sha256', 'native_random'} or record.get('reference_id') != record['id']:
             raise ValueError('Native random branches cannot combine with other content adaptations')
         validate_random_rule(rule['native_random'])
+    if 'gamecube_glyph_offsets' in rule:
+        offsets = rule['gamecube_glyph_offsets']
+        if (set(rule) != {'adapted_sha256', 'gamecube_glyph_offsets'}
+                or record.get('reference_id') != record['id']
+                or not isinstance(offsets, list) or not offsets
+                or any(type(n) is not int or not 0 <= n < 1024 for n in offsets)
+                or offsets != sorted(set(offsets))):
+            raise ValueError('GameCube glyph encoding requires unique ordered offsets and no other adaptation')
     if 'gamecube_plus_offsets' in rule:
         offsets = rule['gamecube_plus_offsets']
         if (set(rule) != {'adapted_sha256', 'gamecube_plus_offsets'}
@@ -72,7 +81,17 @@ def verify_content_reference(reference, source, record, info):
     validate_content_approval(record)
     reference_info = list(info)+[(0, 0)]*max(0, 0x75-len(info))
     reference_info[0x74] = (2, 0)
-    reference_bytes = encode(reference['text'], reference_info)
+    extensions = 'gamecube_glyph_offsets' in record['complete_reference']
+    reference_bytes = encode(reference['text'], reference_info, extended_glyphs=extensions)
+    if extensions:
+        tokens = list(tokenize(reference_bytes, reference_info))
+        offsets = [t.offset for t in tokens if t.kind == 'glyph']
+        if (offsets != record['complete_reference']['gamecube_glyph_offsets']
+                or any(t.data not in EXTENDED_WIDTHS for t in tokens if t.kind == 'glyph')):
+            raise ValueError('GameCube glyph offsets differ from the complete registered tokens')
+        # Strip only registered token prefixes, never command arguments or
+        # ordinary bytes. The resulting complete stream must match the disc.
+        reference_bytes = b''.join(t.data[1:] if t.kind == 'glyph' else t.data for t in tokens)
     if 'gamecube_plus_offsets' in record['complete_reference']:
         # GameCube B4 and native 5C both display '+'. Reconstruct only the
         # individually approved source glyphs to check the actual English hash;
@@ -146,3 +165,13 @@ def validate_content_candidate(id, source, candidate, matches):
     if (sha256(source) != record['source_sha256']
             or sha256(candidate) != record['complete_reference']['adapted_sha256']):
         raise ValueError('Complete-reference output differs from its reviewed payload')
+
+
+def validate_glyph_candidate(id, source, candidate, matches, info):
+    """A font capability alone does not approve new reference identities."""
+    if not any(t.kind == 'glyph' for t in tokenize(candidate, info)):
+        return
+    rule = matches.get(id, {}).get('complete_reference', {})
+    if 'gamecube_glyph_offsets' not in rule:
+        raise ValueError('Extended dialogue glyphs require a complete source-bound reference')
+    validate_content_candidate(id, source, candidate, matches)

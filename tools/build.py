@@ -32,7 +32,7 @@ from reference_actor_requests import validate_actor_request_candidate
 from reference_fields import field_permit, catchphrase_permit
 from dialogue_dates import install as install_dialogue_dates, verify_requirements
 from reference_animations import animation_permit, verify_native_consumer
-from reference_content import validate_content_candidate
+from reference_content import validate_content_candidate, validate_glyph_candidate
 from reference_mail_fragments import load_fragment_matches, validate_fragment_candidate
 from contextual_choices import load_contextual_choices, canonical_candidate, validate_labels
 
@@ -42,7 +42,8 @@ RELOCATED_BANKS = {
 }
 
 
-def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None):
+def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
+                       extended_font=None):
     layout = ChoiceLayout()
     module_report = None
     if runtime_module:
@@ -54,6 +55,11 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     if english_runtime:
         verify_english_runtime(rom, replacements, layout)
+    if extended_font:
+        if not (runtime_module and english_runtime):
+            raise ValueError('Extended dialogue glyphs require the complete English runtime')
+        from extended_font_cartridge import planned_capability
+        planned_capability(rom,replacements,module_additions,module_report,extended_font)
     edits = json.loads(path.read_text()) if path else []
     source_banks = banks(rom)
     item_matches = load_item_matches()
@@ -90,7 +96,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             original = entries[index]
             if sha256(original) != edit["source_sha256"]:
                 raise ValueError(f"Stale translation: {edit['id']}")
-            replacement = encode(edit["translation"], info)
+            use_glyphs = bool(extended_font) and bank.name == 'message'
+            replacement = encode(edit["translation"], info, extended_glyphs=use_glyphs)
             try:
                 validate_item_candidate(edit, item_sources, info, item_matches)
                 checked = canonical_candidate(edit['id'], original, replacement, contextual, info)
@@ -100,6 +107,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 validate_choice_candidate(edit["id"], original, checked, matches)
                 validate_actor_request_candidate(edit["id"], original, checked, matches)
                 validate_content_candidate(edit["id"], original, checked, matches)
+                validate_glyph_candidate(edit['id'], original, checked, matches, info)
                 validate_fragment_candidate(edit['id'], original, checked, fragment_matches,
                                             fragment_sources, info, edit.get('control_policy', 'exact'))
                 validate_entry(original, checked, info, bank.name, edit.get("control_policy", "exact"),
@@ -107,7 +115,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]),
                                field_permit=field_permit(edit["id"], original, checked, matches),
                                catchphrase_permit=catchphrase_permit(edit["id"], original, checked, matches),
-                               animation_permit=animation_permit(edit['id'], original, checked, matches))
+                               animation_permit=animation_permit(edit['id'], original, checked, matches),
+                               extended_glyphs=use_glyphs)
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -144,6 +153,7 @@ def main():
     parser.add_argument("--english-keyboard", action="store_true")
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
+    parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
     parser.add_argument("--extended-items", type=Path, help="Directory containing names.bin and names.json for the sixteen-byte item resource")
@@ -158,6 +168,8 @@ def main():
     args = parser.parse_args()
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
+    if args.extended_font and not (args.runtime_module and args.english_runtime):
+        parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
         parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
     if args.npc_mail_generation and not (args.runtime_module and args.english_runtime
@@ -181,7 +193,7 @@ def main():
         report['dialogue_dates'] = install_dialogue_dates(rom, replacements, additions, report['runtime_module'])
     report["translation_edits"], relocations = apply_translations(
         rom, replacements, args.translations, english_runtime=args.english_runtime,
-        runtime_module=args.runtime_module, module_additions=additions)
+        runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
@@ -201,6 +213,9 @@ def main():
         report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'), args.mail_catalog)
     if args.npc_mail_generation:
         report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation)
+    if args.extended_font:
+        from extended_font_cartridge import install as install_font
+        report['extended_font'] = install_font(rom,replacements,additions,report.get('runtime_module'),args.extended_font)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():

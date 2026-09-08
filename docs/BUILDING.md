@@ -120,6 +120,26 @@ Changing the module source also requires rebuilding the module-bound NPC creator
 and generation probe using `tools/build_npc_mail_capture.py` and
 `tools/build_mail_generation.py`. Each report binds its imports to the exact
 compiled module; old reports must not be reused after symbol addresses change.
+
+The separate dialogue glyph feature uses source pixels from the supplied English
+disc. Generate `build/extended-glyphs/` with `tools/extended_glyphs.py --output
+build/extended-glyphs`, then build its cartridge image with
+`tools/build_extended_font_cartridge.py --output build/extended-font-cartridge`.
+Pass `--extended-font build/extended-font-cartridge` to both candidate generation
+and the ROM builder, alongside `--english-runtime --runtime-module
+build/runtime-module`. Unsupported builds withhold the dependent references.
+The builder verifies the complete resource and startup integration before
+publishing text that uses it. The allocation stays in the system heap across
+scene changes; the native atlas, saved formats, and test reservation stay intact.
+This capability is main-dialogue-only, not editor or mail support. See
+[glyph contracts and validation](../specs/EXTENDED_GLYPHS.md).
+
+`tools/extended_font_cartridge_scenario.py --rom <built-ROM> --module
+<configured-runtime-module.json> --translations <candidate-file> --output
+<ignored-scenario.json>` generates the combined cartridge draw/reveal/message
+batch. It uses startup-loaded font code and pixels, with no debugger upload.
+Its ordinary native calls still require an isolated checkpoint and restoration.
+
 The resident variant also enables twenty-character choices. Generate its native
 four-row and DMA test with `tools/choice_test_scenario.py --rom <built-ROM>
 --output <ignored-scenario.json>`, then pass that scenario to the test runner.

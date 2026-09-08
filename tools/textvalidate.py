@@ -1,6 +1,7 @@
 """Control preservation, expansion budgets, and conservative dialogue layout checks."""
 
 from textcodec import LATIN, tokenize
+from glyph_codes import WIDTHS as EXTENDED_WIDTHS
 from aflib import sha256
 from reference_sequences import SequencePermit
 from native_diagnostics import validate_diagnostic
@@ -47,7 +48,7 @@ def signature(data, info, policy="exact", resident_runtime=False):
             and token.data[1] not in ignored]
 
 
-def expanded_bound(data, info):
+def expanded_bound(data, info, *, extended_glyphs=False):
     """Upper bound for the unmodified retail substitution routines.
 
     Use 32 bytes per dynamic insertion (retail names 6, free/item strings 10,
@@ -57,7 +58,7 @@ def expanded_bound(data, info):
     """
     total = len(data)+16
     for token in tokenize(data, info):
-        if token.kind == "glyph":
+        if token.kind == "glyph" and not (extended_glyphs and token.data in EXTENDED_WIDTHS):
             raise ValueError("Two-byte message tags need explicit semantic review")
         if token.kind == "cmd" and (0x1A <= token.data[1] <= 0x40 or token.data[1] == 0x76):
             total += (96 if token.data[1] == 0x40 else 32)-len(token.data)
@@ -65,7 +66,10 @@ def expanded_bound(data, info):
 
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
-                   sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None):
+                   sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
+                   extended_glyphs=False):
+    if extended_glyphs and (bank != 'message' or not resident_runtime):
+        raise ValueError('Extended glyphs require the resident main-dialogue capability')
     if bank == 'message' and policy != 'reviewed_sequence':
         validate_placeholder(original, replacement, info)
         validate_diagnostic(original, replacement, info)
@@ -146,7 +150,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
         if before != after:
             raise ValueError("Control signature changed")
     if bank == "message":
-        if expanded_bound(replacement, info) > 1024:
+        if expanded_bound(replacement, info, extended_glyphs=extended_glyphs) > 1024:
             raise ValueError("Expanded message bound exceeds 1024 bytes")
     elif bank == "select":
         if len(replacement) > choice_bytes:
@@ -159,9 +163,12 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
             raise ValueError("Dynamic choice expansion requires review")
     elif len(replacement) > len(original):
         raise ValueError("Translation exceeds current entry budget")
+    if bank != 'message' and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
+        raise ValueError('Two-byte message tags need explicit semantic review')
 
 
-def layout_issues(data, info, advances, max_width=192, max_lines=4, *, resident_runtime=False):
+def layout_issues(data, info, advances, max_width=192, max_lines=4, *, resident_runtime=False,
+                  extended_glyphs=False):
     """Conservative retail-size bubble check; unknown dynamic layout is flagged."""
     x, line, issues, page = 0, 1, [], 0
     for token in tokenize(data, info):
@@ -171,7 +178,10 @@ def layout_issues(data, info, advances, max_width=192, max_lines=4, *, resident_
                 continue
             x += advances.get(token.data[0], 12)
         elif token.kind == "glyph":
-            issues.append("unknown_message_tag")
+            if extended_glyphs and token.data in EXTENDED_WIDTHS:
+                x += EXTENDED_WIDTHS[token.data]
+            else:
+                issues.append("unknown_message_tag")
         elif token.kind == "cmd":
             command = token.data[1]
             if command in (0x02,):

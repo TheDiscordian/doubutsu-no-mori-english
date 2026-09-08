@@ -24,9 +24,10 @@ def remove_redundant_article_suppression(text):
     return pattern.sub(replace, text), edits
 
 
-def adapt_reference(text, source, info, policy="presentation", resident_runtime=False, *, retain_resident_animations=False):
+def adapt_reference(text, source, info, policy="presentation", resident_runtime=False, *, retain_resident_animations=False,
+                    extended_glyphs=False):
     text, edits = remove_redundant_article_suppression(text)
-    candidate = encode(text, info)
+    candidate = encode(text, info, extended_glyphs=extended_glyphs)
     ignored = compared_commands(policy, resident_runtime)
     old = [t.data for t in tokenize(source, info) if t.kind == "cmd" and t.data[1] not in ignored]
     new = [t.data for t in tokenize(candidate, info) if t.kind == "cmd" and t.data[1] not in ignored]

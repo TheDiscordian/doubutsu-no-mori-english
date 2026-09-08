@@ -44,11 +44,10 @@ def main():
             "-fno-stack-protector", "-ffunction-sections", "-fdata-sections", "-fstack-usage", "-Wall", "-Wextra", "-Werror",
             "-I/source", "/source/"+relative.as_posix(), "-o", name)
         c_objects.append(name)
-    for name in ("header", "watchdog", "bootstrap", "mail_view_hooks", "mail_npc_hooks"):
+    for name in ("header", "watchdog", "mail_view_hooks", "mail_npc_hooks"):
         run("as", "-EB", "-mabi=32", "-march=vr4300", "-I", "/out", "-o", name+".o", "/source/"+name+".s")
     run("ld", "-EB", "-T", "/source/module.ld", "-Map=module.map", "-o", "module.elf", "header.o", "watchdog.o", "mail_view_hooks.o", "mail_npc_hooks.o", *c_objects)
     run("objcopy", "-O", "binary", "module.elf", "module.bin")
-    run("objcopy", "-O", "binary", "-j", ".bootstrap", "bootstrap.o", "bootstrap.bin")
     symbols = {}
     for line in run("nm", "--defined-only", "module.elf").splitlines():
         parts = line.split()
@@ -56,6 +55,12 @@ def main():
             symbols[parts[2]] = int(parts[0], 16)
     if symbols.get("af_runtime_init") != MODULE_INIT or symbols.get("__module_start") != MODULE_RAM:
         raise ValueError("Runtime module link addresses do not match the bootstrap")
+    font_init = symbols.get('af_extended_font_init',0)
+    if font_init&3 or not MODULE_INIT <= font_init < MODULE_RAM+LINKED_LIMIT:
+        raise ValueError('Persistent font initializer is outside resident code')
+    run('as','-EB','-mabi=32','-march=vr4300','--defsym',f'AF_FONT_INIT=0x{font_init:08X}',
+        '-o','bootstrap.o','/source/bootstrap.s')
+    run('objcopy','-O','binary','-j','.bootstrap','bootstrap.o','bootstrap.bin')
     binary = (out/"module.bin").read_bytes()
     if len(binary) > LINKED_LIMIT or symbols["__module_end"] > MODULE_RAM+LINKED_LIMIT:
         raise ValueError("Runtime module exceeds reserved RAM")

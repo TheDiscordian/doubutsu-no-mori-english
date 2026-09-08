@@ -4,14 +4,16 @@
 
 Five otherwise unrepresentable English reference characters have an exact-source
 resource, bounded C measurement/selection functions, and relocatable native draw
-adapters. Both original native drawing paths pass isolated execution. This is
-not a production installation: cartridge loading, message reveal, input/save
-acceptance, and translation-import permissions remain required.
+adapters. An opt-in cartridge installation owns the complete code and resource
+from startup, before rendering threads start. Both original drawing paths and
+the actual message cursor pass isolated execution. Six complete main-dialogue
+references use the new encodings. Editors, saved text, and mail remain outside
+this capability; ordinary glyph-bearing conversations and hardware need testing.
 
 The approved N64 atlas, Japanese cells, and existing Latin spacing stay unchanged.
 This work does not resume the paused atlas-edge investigation.
 
-| Character | Proposed two-byte encoding | Pixel advance |
+| Character | Two-byte encoding | Pixel advance |
 | --- | --- | ---: |
 | Semicolon | `80D0` | 3 |
 | Slash | `80AE` | 6 |
@@ -111,28 +113,109 @@ checkpoint, blank FlashRAM/Pak, disabled audio, and graceful shutdown pass.
 Logs and hashes are recorded in the work log. These are native drawing-command
 checks, not displayed gameplay, timing, input, saved-text, or hardware validation.
 
-## Required production integration
+## Cartridge installation and lifetime
 
-1. Provide cartridge code/texture resources, persistent allocation ownership,
-   source guards, cache maintenance, and failure handling. The resident image
-   has only 1,088 linked bytes free. Do not consume its separate test reservation
-   or assume an Expansion Pak; the fixture is not a cartridge loader.
-2. Integrate recognition into actual message reveal. Native `800A223C` skips all
-   `80` tags without ordinary character timing. The helper distinguishes pairs,
-   but its call site and full reveal/control interaction remain unimplemented.
-   Audit prefix widths, formatting spans, and truncated pairs at each consumer.
-3. Add explicit capability and source-encoding checks to the codec, generator,
-   independent builder, expansion bounds, and layout accounting. Unsupported
-   builds must keep rejecting these glyphs. Preserve full reference wording,
-   manual newlines, pages, and pauses.
-4. Import otherwise compatible main references `04D2/04FA/08A2/08A6/0A15/0E2A`
-   after those contracts pass. Re-audit unavailable mail parts; five glyphs do
-   not establish support for every missing mail glyph.
-5. Handle actual input before enabling apology targets `048E/0491`. The complete
-   sun/skull phrases fit ten encoded bytes, but movement, deletion, conversion,
-   padding, and matching must agree on token boundaries. The save-character
-   validator rejects `80`; do not globally weaken it or alter saved formats for
-   apology-only text. Keep the separate rude-reply detector/storage work queued.
-6. Batch ordinary dialogue/keyboard/mail checks after implementation, then the
-   human playthrough and hardware checks. Prototype success adds no translated
-   records and does not change the current production font or candidate counts.
+`runtime/extended_font_loader.c` runs immediately after native `SystemHeap_Init`
+and before graph/audio thread startup. It uses `SystemHeap_Malloc` at `8002BC60`,
+not the gameplay arena, which is destroyed by play cleanup. The allocation
+survives scene changes and remains owned until reset. No saved structure changes.
+The resident image occupies 24,192 linked bytes, leaving 384 within its existing
+24 KiB linked limit. Its 32 KiB reservation and separate test space do not grow.
+
+The optional eight-word header at module offset `68` contains VROM `03400000`,
+blob length, image length, relocation length, executable-text length, entry offset
+zero, whole-blob CRC32, and ABI `41464701`. All zeros disable the feature. Partial
+or invalid configuration fails. Configured startup failure enters the bootstrap's
+existing failure loop before rendering; it does not continue with missing glyphs.
+
+The position-adjustable image links at `80C00000` solely as a relocation origin.
+Its 3,680 image bytes include zero BSS. A separate 288-byte native overlay
+relocation table follows the image. The system allocation requests 3,983 bytes
+including alignment allowance; code, state, and pixels occupy persistent memory.
+The loader checks four-MiB bounds, DMA success, and complete CRC before invoking
+native relocation. It writes back the image, invalidates executable instructions,
+and runs the guarded installation entry. Failure releases the original allocation;
+success publishes its aligned pointer and repeated initialization retains it.
+
+Installation checks all replaced instructions before binding or writing any hook.
+Five entries redirect texture selection, character width, prefix width, texture
+loading, and character drawing. The native prefix API retains its explicit signed
+byte count and even-pixel rounding; it has no added 1,024-byte limit. Its known
+pairs count once, and ordinary/unknown bytes retain the approved width behaviour.
+Unlike the bounded prototype helper, this is the actual native prefix consumer.
+
+Ten instructions at `800A23C4..800A23EC` replace unconditional tag skipping with
+registered-pair recognition. Known pairs proceed through ordinary reveal timing;
+unknown tags retain the original two-byte skip. The cursor then processes the
+following character. Native voice classification remains unchanged: symbol pairs
+are silent, while ordinary fallback characters can set voice-queue flag `0020`.
+Installed instructions receive both data- and instruction-cache maintenance.
+
+## Import contract
+
+`--extended-font <directory>` is required by both candidate generation and the
+ROM builder. Each verifies the real current module, startup call, native consumer
+instructions, complete font source/image/relocations, widths, and available DMA
+space before accepting dependent text. Preflight uses copies; final installation
+is repeated on the actual cartridge before ROM or patch publication. A flag,
+Unicode text, or candidate metadata alone cannot bypass these checks.
+
+The codec explicitly opts into only five Unicode mappings. Expansion accounting
+includes both encoded bytes; layout uses the exact resource advances. Main
+dialogue alone receives this capability. Unknown/truncated pairs, choices,
+other banks, and unsupported builds remain rejected. Coverage recognises known
+candidate glyphs without changing native-source classification or implying review.
+
+Six identity approvals bind complete native, supplied-English, and final hashes.
+`gamecube_glyph_offsets` lists every registered token in the encoded reference.
+Only those prefix bytes are removed when reconstructing the actual disc stream;
+command arguments and all other bytes remain. Missing/extra/interior offsets,
+unknown pairs, other content adaptations, and changed full text fail validation.
+
+| Native record | English content | Stored bytes | Expansion bound |
+| --- | --- | ---: | ---: |
+| `04D2` | Late-night peppy introduction | 431 | 537 |
+| `04FA` | Busy snooty introduction | 378 | 514 |
+| `08A2` | Stationary snowman joke | 376 | 392 |
+| `08A6` | Snowman melting lament | 217 | 233 |
+| `0A15` | Letter-show invitation | 103 | 179 |
+| `0E2A` | Soccer conversation | 371 | 537 |
+
+Every GameCube word, manual line, page, pause, native actor command, field, branch,
+and ending remains. No paraphrase, truncation, or automatic reflow is introduced.
+
+## Cartridge validation and remaining work
+
+Portable loader tests cover allocation alignments, nested/repeated initialization,
+disabled/malformed configuration, DMA/CRC/entry failures, release, and retry with
+address/undefined-behaviour sanitizers. Host checks independently validate native
+relocation sections and signed-low-address boundaries, all six actual disc
+streams, complete output hashes, capability rejection, byte budgets, and widths.
+Independent module, font, ROM, and UPS builds match; every installed edit and
+the original-ROM UPS reconstruction pass.
+
+The combined silent four-MiB cartridge batch passes 26 actual native draws,
+eight actual cursor cases, and all six complete message loads: 54 native calls
+and 324 memory assertions across 596 recorded steps. The persistent image is
+loaded by startup at `8019C8F0`; the debugger uploads no font code or pixels.
+Tests check complete instructions/resources, display lists/vertices, prefix widths,
+two-frame protected waits, token advancement, voice flags, and allocation guards.
+The complete native font, approved widths, and live save payload remain intact.
+Fixture release, restored checkpoint, blank isolated FlashRAM/Pak, disabled audio,
+and graceful shutdown pass. Generated drawing commands are not submitted to the
+GPU; these tests do not establish ordinary visible conversations or hardware.
+
+Required follow-ups:
+
+- Audit formatting-span counts and other consumers before expanding imports.
+  Keep main `0912` continuation/commands, scoped number-game choices, and the
+  remaining native diagnostic records in the bulk-text queue.
+- Re-audit unavailable mail parts and reader consumers; five supported glyphs
+  do not enable every missing mail character or authorize changed catalog IDs.
+- Handle actual input before enabling apology targets `048E/0491`. Movement,
+  deletion, conversion, padding, and comparison must agree on token boundaries.
+  The save validator still rejects `80`; do not weaken it globally. Complete
+  rude-reply storage and its matching-length table together.
+- Batch ordinary dialogue, editor, mail, scene-change, and save checks alongside
+  further content work. Human playthrough and hardware acceptance remain required.
+  Title artwork stays the first image-replacement task after the main port.

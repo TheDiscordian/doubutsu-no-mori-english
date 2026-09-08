@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 import re
+from glyph_codes import ENCODINGS as EXTENDED_ENCODINGS
 
 from aflib import CODE_RAM
 
@@ -83,7 +84,7 @@ def decode(data, info, strict=True):
                    for t in tokenize(data, info, strict))
 
 
-def encode(text, info, allow_raw=False):
+def encode(text, info, allow_raw=False, *, extended_glyphs=False):
     out, pos = bytearray(), 0
     while pos < len(text):
         if text[pos] == "{":
@@ -102,6 +103,10 @@ def encode(text, info, allow_raw=False):
             pos = match.end()
         else:
             c = text[pos]
+            if extended_glyphs and c in EXTENDED_ENCODINGS:
+                out.extend(EXTENDED_ENCODINGS[c])
+                pos += 1
+                continue
             if c not in ENCODE:
                 raise ValueError(f"Unrepresentable character {c!r} (U+{ord(c):04X})")
             out.append(ENCODE[c])

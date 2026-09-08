@@ -815,6 +815,12 @@ def main():
                     raise ValueError('Native font probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_extended_font'],record))
+            if 'test_extended_font_cartridge' in action:
+                from extended_font_cartridge_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Cartridge font probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_extended_font_cartridge'],record))
             if 'test_npc_mail_sends' in action:
                 from mail_npc_smoke import exercise
                 if not (out/'test.bs1').is_file():

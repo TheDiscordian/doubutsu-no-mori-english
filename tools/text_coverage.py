@@ -10,17 +10,20 @@ from aflib import sha256, verified_rom
 from runtime_module import module_command_info
 from textbanks import banks
 from textcodec import GLYPHS, encode, tokenize
+from glyph_codes import ENCODINGS
 from placeholder_text import label
 
 
-def classify(data, info):
+def classify(data, info, *, extended_glyphs=False):
     tokens = list(tokenize(data, info, strict=False))
-    visible = "".join(GLYPHS[t.data[0]] for t in tokens if t.kind == "text")
+    extensions = {data:char for char,data in ENCODINGS.items()} if extended_glyphs else {}
+    visible = "".join(GLYPHS[t.data[0]] if t.kind == 'text' else extensions.get(t.data, '')
+                      for t in tokens if t.kind in ('text', 'glyph'))
     text = visible.strip()
     kinds = Counter(t.kind for t in tokens)
     if kinds["raw"]:
         category = "undecodable_requires_review"
-    elif kinds["glyph"]:
+    elif any(t.kind == 'glyph' and t.data not in extensions for t in tokens):
         category = "unmapped_visible_glyph_requires_review"
     elif not text:
         category = "no_visible_static_text"
@@ -37,7 +40,8 @@ def classify(data, info):
     return {"category": category, "static_characters": len(text),
             "non_whitespace_static_characters": sum(not c.isspace() for c in text),
             "non_ascii_static_codepoints": sorted({f"U+{ord(c):04X}" for c in text if not c.isascii()}),
-            "unmapped_glyphs": kinds["glyph"], "raw_tokens": kinds["raw"],
+            "unmapped_glyphs": sum(t.kind == 'glyph' and t.data not in extensions for t in tokens),
+            "raw_tokens": kinds["raw"],
             "command_counts": dict(sorted(commands.items())),
             "has_dynamic_insertions": any(0x1A <= int(code, 16) <= 0x3F for code in commands)}
 
@@ -67,8 +71,11 @@ def coverage_rows(name, entries, edits, info):
             edit = edits[id]
             if edit.get("source_sha256") != row["source_sha256"]:
                 raise ValueError(f"Stale candidate source: {id}")
-            candidate = encode(edit["translation"], info)
-            row.update(candidate_sha256=sha256(candidate), candidate=classify(candidate, info),
+            # Coverage describes candidate bytes, not installed runtime support.
+            # The independent ROM builder enforces the font capability and hashes.
+            use_glyphs = name == 'message'
+            candidate = encode(edit["translation"], info, extended_glyphs=use_glyphs)
+            row.update(candidate_sha256=sha256(candidate), candidate=classify(candidate, info, extended_glyphs=use_glyphs),
                        candidate_status=edit.get("status", "unspecified_requires_review"))
             provenance = edit.get("provenance")
             if isinstance(provenance, dict):

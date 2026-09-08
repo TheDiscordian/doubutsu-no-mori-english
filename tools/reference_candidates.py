@@ -28,7 +28,7 @@ from message_aliases import confirmed_message_aliases
 from dialogue_dates import REQUIREMENT, requires_dialogue_dates
 from birthday_fields import message_ids as birthday_message_ids
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
-from reference_content import adapt_content_reference, validate_content_candidate
+from reference_content import adapt_content_reference, validate_content_candidate, validate_glyph_candidate
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -82,14 +82,17 @@ def select_drafts(drafts, *, english_dialogue_dates=False, resident_runtime=Fals
     return selected, withheld
 
 
-def record_candidate(edit, info, advances, name, edits, manifests, counts, *, resident_runtime=False):
-    candidate = encode(edit["translation"], info)
+def record_candidate(edit, info, advances, name, edits, manifests, counts, *, resident_runtime=False,
+                     extended_glyphs=False):
+    use_glyphs = extended_glyphs and name == 'message'
+    candidate = encode(edit["translation"], info, extended_glyphs=use_glyphs)
     policy = edit.get("control_policy", "exact")
-    issues = layout_issues(candidate, info, advances, resident_runtime=resident_runtime) if name == "message" else []
+    issues = layout_issues(candidate, info, advances, resident_runtime=resident_runtime,
+                           extended_glyphs=use_glyphs) if name == "message" else []
     manifest = {k: v for k, v in edit.items() if k != "translation"}
     manifest.update(encoded_sha256=sha256(candidate), encoded_bytes=len(candidate),
                     layout_issues=issues,
-                    expanded_bound=expanded_bound(candidate, info) if name == "message" else len(candidate))
+                    expanded_bound=expanded_bound(candidate, info, extended_glyphs=use_glyphs) if name == "message" else len(candidate))
     edits.append(edit)
     manifests.append(manifest)
     counts["accepted_candidates"] += 1
@@ -152,11 +155,15 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("build/candidates"))
     parser.add_argument("--english-runtime", action="store_true")
     parser.add_argument("--runtime-module", type=Path)
+    parser.add_argument('--extended-font', type=Path,
+                        help='Include reviewed glyph references with this validated cartridge font')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='Include drafts requiring English resident-date preparation')
     args = parser.parse_args()
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
+    if args.extended_font and not (args.runtime_module and args.english_runtime):
+        parser.error('--extended-font requires the resident module and English runtime')
     rom = verified_rom(args.rom.read_bytes())
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     choice_bytes = 16 if args.english_runtime else 10
@@ -166,6 +173,14 @@ def main():
             choice_bytes = module_report["choice_layout"]["capacity"]
         info = module_command_info(rom)
     _, font_report = make_halfwidth(rom)
+    if args.extended_font:
+        from english_runtime import make_english_runtime, ChoiceLayout
+        from extended_font_cartridge import planned_capability
+        font_replacements, _ = make_halfwidth(rom)
+        additions, font_module = add_runtime_module(rom, font_replacements, args.runtime_module)
+        runtime, _ = make_english_runtime(rom, font_replacements, ChoiceLayout(**font_module['choice_layout']))
+        font_replacements.update(runtime)
+        planned_capability(rom,font_replacements,additions,font_module,args.extended_font)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
     birthday_ids = birthday_message_ids(rom)
@@ -236,6 +251,7 @@ def main():
         raise ValueError("Reviewed reference match conflicts with an original draft override")
     edits, manifests, reports = [], [], {}
     for name in REFERENCE_BANKS:
+        use_glyphs = bool(args.extended_font) and name == 'message'
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
         inventory = [json.loads(line) for line in (args.inventory/(name+".jsonl")).read_text().splitlines()]
         source = source_banks[name].entries()
@@ -293,25 +309,29 @@ def main():
                         try:
                             text, adaptations = adapt_reference(reference_text, original, info, policy,
                                                                 resident_runtime=bool(args.runtime_module),
-                                                                retain_resident_animations=bool(animations))
-                            candidate = encode(text, info)
+                                                                retain_resident_animations=bool(animations),
+                                                                extended_glyphs=use_glyphs)
+                            candidate = encode(text, info, extended_glyphs=use_glyphs)
                             validate_entry(original, candidate, info, name, policy,
                                            choice_bytes=choice_bytes,
                                            resident_runtime=bool(args.runtime_module),
                                            field_permit=field_permit(id, original, candidate, matches),
                                            catchphrase_permit=catchphrase_permit(id, original, candidate, matches),
-                                           animation_permit=animation_permit(id, original, candidate, matches))
+                                           animation_permit=animation_permit(id, original, candidate, matches),
+                                           extended_glyphs=use_glyphs)
                         except ValueError as exc:
                             if added_fields or added_catchphrase or animations or name != "message" or str(exc) != "Control signature changed":
                                 raise
                             for policy in ("reference_text", "reference_delivery", "reference_layout"):
                                 try:
                                     text, adaptations = adapt_reference(reference_text, original, info, policy,
-                                                                        resident_runtime=bool(args.runtime_module))
-                                    candidate = encode(text, info)
+                                                                        resident_runtime=bool(args.runtime_module),
+                                                                        extended_glyphs=use_glyphs)
+                                    candidate = encode(text, info, extended_glyphs=use_glyphs)
                                     validate_entry(original, candidate, info, name, policy,
                                                    choice_bytes=choice_bytes,
-                                                   resident_runtime=bool(args.runtime_module))
+                                                   resident_runtime=bool(args.runtime_module),
+                                                   extended_glyphs=use_glyphs)
                                     break
                                 except ValueError as exc:
                                     if policy == "reference_layout" or str(exc) != "Control signature changed":
@@ -320,6 +340,7 @@ def main():
                         validate_choice_candidate(id, original, candidate, matches)
                         validate_actor_request_candidate(id, original, candidate, matches)
                         validate_content_candidate(id, original, candidate, matches)
+                        validate_glyph_candidate(id, original, candidate, matches, info)
                         adaptations = actor_edits+choice_edits+controller_edits+content_edits+adaptations
                         if added_fields:
                             adaptations.append({"operation": "use_reviewed_current_player_town_fields",
@@ -344,7 +365,8 @@ def main():
                         "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
                 if requires_dialogue_dates(matches.get(id, {})) or id in birthday_ids:
                     edit['runtime_requirements'] = [REQUIREMENT]
-            record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
+            record_candidate(edit, info, advances, name, edits, manifests, counts,
+                             resident_runtime=bool(args.runtime_module),extended_glyphs=use_glyphs)
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
                 skip_ids=override_ids | matches.keys() | fragments.keys() | disabled_birthdays,

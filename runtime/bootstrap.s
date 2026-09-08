@@ -47,6 +47,10 @@
     sw $a1, 0x589c($t0) # gSystemHeapSize
     jal 0x8002bf78 # SystemHeap_Init
     nop
+    .word 0x0c000000 | ((AF_FONT_INIT & 0x0fffffff) >> 2)
+    nop
+    beq $v0, $zero, failed
+    nop
     lw $ra, 36($sp)
     lw $s0, 32($sp)
     lw $s1, 28($sp)

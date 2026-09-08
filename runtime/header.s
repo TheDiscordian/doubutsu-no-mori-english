@@ -20,3 +20,4 @@
 .word 0          # Optional verified default catchphrase display-resource VROM
 .word 0          # Optional immutable mail-template catalog VROM
 .space 32, 0     # Optional approved NPC creator blob: VROM/sizes/entry/text/CRC/ABI
+.space 32, 0     # Optional persistent English font: VROM/blob/image/reloc/text/entry/CRC/ABI
