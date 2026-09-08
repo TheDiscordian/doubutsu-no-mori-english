@@ -5,12 +5,12 @@ import argparse
 from collections import Counter
 import json
 from pathlib import Path
-import re
 
 from aflib import sha256, verified_rom
 from runtime_module import module_command_info
 from textbanks import banks
 from textcodec import GLYPHS, encode, tokenize
+from placeholder_text import label
 
 
 def classify(data, info):
@@ -24,7 +24,7 @@ def classify(data, info):
         category = "unmapped_visible_glyph_requires_review"
     elif not text:
         category = "no_visible_static_text"
-    elif re.fullmatch(r"ダミー\s*[0-9０-９]*", text):
+    elif label(text):
         category = "development_placeholder_text"
     elif any(0x3041 <= ord(c) <= 0x309F or 0x30A1 <= ord(c) <= 0x30FA
              or 0x30FD <= ord(c) <= 0x30FF for c in text):
@@ -35,6 +35,7 @@ def classify(data, info):
         category = "numbers_or_symbols_only"
     commands = Counter(f"{t.data[1]:02X}" for t in tokens if t.kind == "cmd")
     return {"category": category, "static_characters": len(text),
+            "non_whitespace_static_characters": sum(not c.isspace() for c in text),
             "non_ascii_static_codepoints": sorted({f"U+{ord(c):04X}" for c in text if not c.isascii()}),
             "unmapped_glyphs": kinds["glyph"], "raw_tokens": kinds["raw"],
             "command_counts": dict(sorted(commands.items())),
@@ -79,10 +80,24 @@ def coverage_rows(name, entries, edits, info):
     return result
 
 
+def text_volume(rows):
+    """Weight Japanese-source records by their visible text, not record count."""
+    native = [r for r in rows if r['source']['category'] == 'japanese_static_text']
+    english = [r for r in native if r['candidate_present']
+               and r['candidate']['category'] in ('latin_static_text', 'numbers_or_symbols_only')
+               and r['candidate']['non_whitespace_static_characters'] > 0]
+    total = sum(r['source']['non_whitespace_static_characters'] for r in native)
+    covered = sum(r['source']['non_whitespace_static_characters'] for r in english)
+    return {'japanese_source_records': len(native), 'english_candidate_records': len(english),
+            'total_source_characters': total, 'covered_source_characters': covered,
+            'coverage_percent': round(100*covered/total, 1) if total else None}
+
+
 def summarise(rows):
     present = [r for r in rows if r["candidate_present"]]
     absent = [r for r in rows if not r["candidate_present"]]
     return {"native_records": len(rows), "candidate_records": len(present),
+            "japanese_text_volume": text_volume(rows),
             "records_without_candidates": len(absent), "review_complete_records": 0,
             "source_categories": dict(sorted(Counter(r["source"]["category"] for r in rows).items())),
             "without_candidate_categories": dict(sorted(Counter(r["source"]["category"] for r in absent).items())),
@@ -108,6 +123,15 @@ def main():
     report = {"schema": 1, "rom_sha256": sha256(rom), "translations_sha256": sha256(raw_edits),
               "scope": "29 native banks and ordinary candidate edits; excludes separate wider-name resources and embedded UI/assets",
               "completion_claim": False, "banks": {name: summarise(rows) for name, rows in by_bank.items()}}
+    report['japanese_text_volume'] = text_volume([row for rows in by_bank.values() for row in rows])
+    report['text_volume_method'] = (
+        'Non-whitespace visible source characters in Japanese-static-text records across all 29 native banks. '
+        'A decoded Latin or punctuation/symbol candidate covers its complete source character weight, '
+        'independently of English length; this includes English letter-header punctuation. '
+        'Each native ID is counted separately. Commands, exact development labels, already-Latin records, '
+        'symbol-only records, and undecodable records are excluded. '
+        'Embedded UI and image text are outside this inventory; separate runtime resources receive no extra credit. '
+        'Candidate coverage is not semantic review, complete caller integration, gameplay, or project completion.')
     args.output.mkdir(parents=True, exist_ok=True)
     for name, rows in by_bank.items():
         (args.output/(name+".jsonl")).write_text("".join(json.dumps(r)+"\n" for r in rows))

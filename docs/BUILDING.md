@@ -45,6 +45,24 @@ The supported input ROM hash, relocation addresses, and command policies are in
 [the framework specification](../specs/TEXT_FRAMEWORK.md). Wrong inputs, stale
 edits, unknown commands, and unsafe expansion fail the build.
 
+Exact development labels are classified separately from missing dialogue.
+Candidate generation retains valid English reference labels and translates
+remaining recognised labels without allocating continuation pages. Existing
+sequence approvals remain protected even when their runtime is disabled.
+Audit a generated resident candidate set with:
+
+```sh
+python3 tools/audit_placeholders.py \
+  --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
+  --translations build/placeholder-candidates/translations.json \
+  --resident-runtime --output build/placeholder-audit
+```
+
+Omit `--resident-runtime` for a basic candidate set. The report retains source
+hashes, candidate validity, sequence allocations, and native script references;
+it does not establish unreachable code or gameplay completion. See
+[label contract](../specs/PLACEHOLDER_TEXT.md).
+
 ## Silent emulator tests
 
 Reviewed long dialogue can span linked native records without increasing the

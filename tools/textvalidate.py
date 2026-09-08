@@ -6,6 +6,7 @@ from reference_sequences import SequencePermit
 from reference_fields import ReferenceFieldPermit, SpeakerCatchphrasePermit
 from reference_animations import ResidentAnimationPermit, is_resident_animation, verify_animation_values
 from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
+from placeholder_text import validate_placeholder
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -64,6 +65,8 @@ def expanded_bound(data, info):
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None):
+    if bank == 'message' and policy != 'reviewed_sequence':
+        validate_placeholder(original, replacement, info)
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
     if animation_permit is not None:

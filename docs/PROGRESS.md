@@ -147,7 +147,8 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 546 passing portable-C, synthetic, and retail-input regression tests.
+- 557 passing portable-C, synthetic, and retail-input full-suite regression tests,
+  plus seven focused text-coverage checks for the volume report.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
@@ -229,9 +230,10 @@ user's direction. The production build retains the approved spacing metrics.
   records, exact placeholder labels, visible kana, Latin text, unknown glyphs,
   and candidate presence stay distinct. Source hashes and unique IDs are checked;
   candidate presence never implies review or unreachable code.
-- Complete-native-record alias matching adds 41 unambiguous dialogue candidates.
+- Complete-native-record alias matching supplies 41 unambiguous dialogue candidates.
   Source/reference hashes, the entire adapted output, and normal command/capacity
-  checks are retained. Seventy-nine conflicting groups remain withheld; drafts,
+  checks are retained. No unresolved alias conflicts remain after exact native
+  development labels are handled separately; drafts,
   special approvals, and sequence permissions do not transfer automatically.
   All 41 native DMA loads pass full-content and adjacent-guard checks.
 - The planting-job acknowledgement has a one-record, hash-bound GameCube
@@ -460,17 +462,18 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/resident-topics-pilot/`
-contains 11,126 edits, including
-9,559 reference dialogue candidates, all 460 choices, and 322 original dialogue
-drafts. Two additional original Pelly/Phyllis error messages extend the main bank
+The current experimental resident-module pilot in `build/placeholder-pilot/`
+contains 11,409 edits, including
+9,551 reference main-bank candidates, all 460 choices, 322 original dialogue
+drafts, and 291 original development-label drafts. Two additional original
+Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,871
+still require review. The original main-bank audit leaves 1,588
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,442 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/resident-topics-candidates/` and `build/resident-topics-coverage/`. The independent
+`build/placeholder-candidates/` and `build/placeholder-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -480,7 +483,7 @@ reserved continuation slots. The complete job-ending speech and HRA explanation
 retain GameCube wording, manual layout, and pauses, splitting only at existing
 page transitions. The map handoff names the native R button. The short debt
 insistence uses an original translation with all native commands unchanged.
-The remaining opening-reserve placeholder is `083F`; `083E` supplies the guarded
+Opening-reserve labels `083F/0840` have English label drafts; `083E` supplies the guarded
 late-night resident introduction continuation described below.
 All fourteen complete cartridge message loads pass in one fresh four-MiB run,
 including buffer/module guards and checkpoint restoration. Ordinary job
@@ -774,6 +777,17 @@ withholds the bedtime draft without its runtime. Five original drafts retain
 conservative width warnings. Normal actions, live fields, final wording/layout,
 saves, and hardware remain acceptance work.
 
+The [development-label batch](../specs/PLACEHOLDER_TEXT.md) covers all 360 exact
+native labels: 346 English label candidates and fourteen complete approved
+continuation pages. The label drafts add 283 missing entries and correct eight
+unrelated GameCube imports; all other existing edits remain unchanged. Exact
+recognition, source hashes, importer/builder guards, and protected sequence
+allocations prevent labels from becoming arbitrary gameplay dialogue. All 346
+unallocated labels fit with their native commands, endings, and expression resets.
+The 52-load native sample passes 158 assertions and checkpoint restoration;
+all 557 full-suite tests pass. No font/runtime/save change or new continuation
+allocation is made. Labels are not counted as additional gameplay conversations.
+
 The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
 English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
 becomes two bounds of 773 and 419 by splitting only at the existing page break
@@ -790,10 +804,31 @@ restrictions. The independent wider item, display-name, catchphrase, and mail-ca
 additional ordinary-bank edits, and an API resource does not imply that every
 gameplay destination uses its wider names.
 
+## Text-volume measurement
+
+The generated coverage report measures 603,067 covered source characters out of
+746,978 across all 29 native text banks. The denominator counts non-whitespace
+visible characters in Japanese-static-text records; each native record ID counts
+separately. Commands, exact development labels, already-English records, and
+symbol-only sources are excluded. The numerator uses the original source weight
+when a complete decoded Latin or punctuation/symbol candidate is installed;
+longer English wording does not earn extra weight. English letter-header commas
+and punctuation-only dynamic responses remain candidate replacements.
+
+`tools/text_coverage.py` writes both per-bank and aggregate volume values with
+the source/candidate hashes and measurement definition. Empty, still-Japanese,
+or undecodable replacements receive no credit. Separate runtime resources do
+not add credit for incompletely integrated destinations. Embedded UI strings
+and image text are outside the extracted-bank denominator. This is candidate
+replacement coverage, not semantic review, gameplay acceptance, total discovered
+asset coverage, or overall project completion. Report percentages only when
+explicitly requested, and retain this definition for comparable text measurements.
+
 ## Validation and release status
 
-The resident-module experiment contains 11,126 edits, including
-9,559 reference dialogue candidates, all 460 choices, 178 villager names,
+The resident-module experiment contains 11,409 edits, including
+9,551 reference main-bank candidates, 291 original development-label drafts,
+all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
@@ -803,9 +838,9 @@ drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
 drafts, fifty startup-greeting drafts, and eighteen resident-topic drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference generator rejects 1,872 main records; one receives an original
-fallback draft. The final candidate-file audit finds 1,871 main records without
-candidates: 940 with Japanese text, nine exact placeholders, 919 with no static
+Its reference/label generator rejects 1,589 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,588 main records without
+candidates: 666 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

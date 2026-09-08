@@ -4027,6 +4027,112 @@
   normal gameplay/saves, complete review, hardware, release, and stretch goals
   remain active.
 
+## 2026-09-07 — Complete native reserve-label audit and guarded English labels
+
+- Revalidated the pending placeholder work against `3c2beea` and the actual
+  source/candidate files. The percentage-explanation turn did not implement new
+  translation work; this continuation completed the pending importer guard,
+  fallback, classification, tests, build, and native verification.
+- `tools/placeholder_text.py` recognises complete native development labels,
+  not words merely containing `よび`. The verified inventory contains 360:
+  48 dummy, 207 fixed reserve, ten train-demo reserve, and 95 numbered reserve
+  records. Unknown data/glyphs remain review items. The shared importer/builder
+  guard rejects unrelated English dialogue or changed commands in these slots.
+- Fourteen slots already belong to approved complete sequences and remain
+  excluded from label fallback, including runtime-disabled groups. All 32
+  sequence payloads remain unchanged and pass their complete source/reference/
+  output and control checks. No new continuation slot is allocated.
+- Preserved 55 complete valid reference labels and their metadata, including
+  the event `extra` aliases and compact `Dummy7`. Original label fallback runs
+  after reference and alias validation. Its 291 drafts add 283 missing labels
+  and correct eight unrelated GC imports: `07DA`, `2AFF..2B04`, and `2B42`.
+  These native sources say only `よび`, not shop hours, sleep signs, or Game Boy
+  Advance dock instructions. Every other existing candidate remains identical.
+- All 346 unallocated labels fit the current font and capacity without layout
+  warnings. The 63 numbered normal/peppy labels retain their leading expression
+  reset; nine dummy and two trash-reserve records retain continuing end `01`.
+  An initial new test expected only nine continuing labels; inspection showed
+  native `19C3/19C4` also end in `01`. Corrected the test expectation, not the
+  retained native commands.
+- Added `tools/audit_placeholders.py` with per-record hashes, source categories,
+  native script references, sequence allocations, and independent candidate
+  validation. Auditing the previous checkpoint gives 55 valid English labels,
+  fourteen approved continuation members, 283 missing labels, and eight invalid
+  candidates. The new full audit gives 346 valid English labels and fourteen
+  approved members, with none missing or invalid. The basic audit preserves
+  twelve enabled continuation members and leaves the two runtime-disabled
+  members uninstalled instead of replacing them with labels.
+- All 360 labels have no incoming original message-script targets under the
+  `0E..15` argument scan. A separate executable/data scan for the eight corrected
+  IDs finds one instruction-immediate lead (`boot:8002E658`, word `24042B00`)
+  and 24 aligned data-halfword leads. These numerical matches are not established
+  message callers. No exhaustive reachability or free-slot claim is made.
+- Full generation in `build/placeholder-candidates/` contains 11,409 edits:
+  9,551 reference main-bank candidates, 322 original dialogue drafts, and 291
+  original label drafts give 10,164 main candidates. The 1,588 unfilled native
+  records contain 666 Japanese-static-text records, 919 command-only/non-static
+  records, one Latin record, and two symbol/number records. Ten non-static
+  records contain dynamic fields. Generator rejections total 1,589: 1,290
+  unconfirmed identities, 273 control differences, 24 missing fields, and two
+  overflows; one rejection still receives the existing original fallback.
+  Alias count remains 41, unresolved alias conflicts become zero, and reference
+  warning-bearing records remain 1,442. Label translation is not new gameplay
+  conversation coverage. Basic generation contains 10,710 edits, with exactly
+  the same 283 additions and eight corrections and no other changed edit.
+- `build/tests-placeholder-full-01.log` passes all 557 regression tests in
+  207.648 seconds, including eleven new placeholder/audit tests and independent
+  builder rejection of every unrelated sign. The subsequent reporting-only
+  volume addition passes all seven focused coverage tests in
+  `build/tests-placeholder-coverage-01.log`. The full suite is not described as
+  rerun after that reporting-only addition.
+- `build/smoke-placeholder-01/` passes 52 actual cartridge-loader calls and all
+  158 assertions over 269 recorded steps. The sample covers all 31 generated
+  label families, every corrected slot, both boundaries of each numbered reset
+  range, and all eleven continuing-ending labels. It calls only the native
+  loader at `8009E558`; complete headers/text, adjacent/module guards, checkpoint
+  restoration, and graceful shutdown pass. Four-MiB memory, disabled audio,
+  no seed saves, and both storage-write permissions false are recorded.
+  FlashRAM and Pak remain completely blank, with hashes
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`
+  and `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+- Final pilot: `build/placeholder-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `b097cf8e15ca8ababadd548d2faed38634bba7f65af4bfce90fa666b445bc409`.
+  UPS SHA-256:
+  `bbd307df37d24f77c7f5b113978f134afead7b8c25cd10a8b909d843dcd4bae9`.
+  Scenario `build/placeholder-scenario.json`, SHA-256
+  `7ac12344549d40efd10d23fd8ecf6d59a89aba9c83a7bf19950d2984630fca61`.
+  Candidate file SHA-256:
+  `d5a68906ec7732a9fb094d47477e7e2b26d0d6fb85e4f3f2231fe3f801c84432`.
+  The UPS reconstructs the complete ROM from the verified original. Comparing
+  all extracted DMA contents with the resident-topic pilot changes only message
+  bank `02000000`, pointer table `00CF9000`, and the directory container
+  `00019D40`; that container is unchanged outside the directory range. Code,
+  fonts/metrics, resident resources, and saved structures remain unchanged.
+- Refreshed both read-only review queues. The same-ID pool has no new compatible
+  unconfirmed candidate; its excluded routes are 1,214 with no visible same-ID
+  English, ten missing-field cases, twelve control cases, seven overflows,
+  36 native non-static records, ten unsupported-glyph cases, one encoding/hash
+  uncertainty, and the existing original fallback. Ten unapproved expression
+  comparisons remain in `build/placeholder-expression-review/queue.jsonl`.
+- At the user's explicit request, measured text volume across all 29 native
+  banks: 603,067 covered source characters out of 746,978 non-whitespace visible
+  characters in Japanese-static-text records, reported once as 80.7 percent.
+  This weights each translated native ID by its original text length, not its
+  English length, and excludes reserve labels, commands, and already-Latin or
+  symbol-only sources. It includes 101 English punctuation/dynamic-response
+  candidates covering 397 source characters, principally letter-header commas;
+  requiring a Latin letter in every English fragment would wrongly omit those
+  installed replacements. `text_coverage.py` now records the definition and
+  aggregate/per-bank values. Separate partially integrated runtime resources
+  receive no extra credit; embedded UI/image text is outside this inventory.
+  The measurement is candidate coverage, not final review or overall completion.
+- Continue the 666 untranslated Japanese-static-text records, broader native
+  field/control matching, all-bank destinations, normal gameplay/saves, review,
+  and stretch goals. The first missing gameplay/context candidates include
+  `02BD/02CC`, gyroid records `0382..038B`, and several introductions and
+  charm-state responses. Early `0001..0012` diagnostics retain separate control/
+  capacity concerns and must not be used to displace gameplay-content work.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

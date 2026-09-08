@@ -14,7 +14,7 @@ from textcodec import TAG, command_info, encode
 from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import MODULE_COMMANDS, add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
-from reference_sequences import reference_sequence_edits
+from reference_sequences import load_sequences, reference_sequence_edits
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
@@ -27,6 +27,7 @@ from message_aliases import confirmed_message_aliases
 from dialogue_dates import requires_dialogue_dates
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 from reference_content import adapt_content_reference, validate_content_candidate
+from placeholder_text import placeholder_edit
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -96,6 +97,18 @@ def record_candidate(edit, info, advances, name, edits, manifests, counts, *, re
     counts["layout_review_required"] += bool(issues)
 
 
+def native_placeholder_fallback(row, original, info, *, skip_ids):
+    """Explicit matches and complete sequences retain their own approval path."""
+    if row['id'] in skip_ids:
+        return None
+    edit = placeholder_edit(row['id'], original, info)
+    if edit is not None:
+        if row['source_sha256'] != edit['source_sha256']:
+            raise ValueError('Stale placeholder inventory')
+        validate_entry(original, encode(edit['translation'], info), info, 'message', 'exact')
+    return edit
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
@@ -143,6 +156,7 @@ def main():
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
     matches = load_matches(args.matches)
+    sequence_members = {m['id'] for group in load_sequences().values() for m in group['members']}
     if any('resident_animations' in record for record in matches.values()):
         verify_native_consumer(rom)
     verify_native_equivalents(matches, source_banks)
@@ -259,6 +273,25 @@ def main():
                 review.remove(rejected[0])
                 counts["rejected"] -= 1
                 record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
+            # Preserve valid English reference labels, including confirmed native
+            # aliases, before translating the remaining exact native labels.
+            inventory_by_id = {row['id']: row for row in inventory}
+            unresolved, placeholder_ids = [], set()
+            for rejected in review:
+                row = inventory_by_id[rejected['id']]
+                original = source[int(row['id'].split(':')[1], 16)]
+                fallback = native_placeholder_fallback(row, original, info,
+                           skip_ids=sequence_members | matches.keys())
+                if fallback is None:
+                    unresolved.append(rejected)
+                    continue
+                record_candidate(fallback, info, advances, name, edits, manifests, counts,
+                                 resident_runtime=bool(args.runtime_module))
+                counts['native_placeholder_labels'] += 1
+                counts['rejected'] -= 1
+                placeholder_ids.add(row['id'])
+            review = unresolved
+            conflicts = [row for row in conflicts if row['id'] not in placeholder_ids]
             counts["confirmed_native_aliases"] = len(aliases)
             counts["native_alias_conflicts"] = len(conflicts)
             args.output.mkdir(parents=True, exist_ok=True)
