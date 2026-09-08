@@ -23,7 +23,7 @@ from test_retail import ROM_PATH
 
 PAIR = '{cmd:7F09020001}{cmd:7F09080001}'
 IDS = set('1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 '
-          '2628 2630 2634 263C 264F 2655 27B5'.split())
+          '2628 2630 2634 263C 264F 2655 27B5 203A 262B 2637 264B 266B'.split())
 
 
 class NativeMoodTests(unittest.TestCase):
@@ -51,7 +51,8 @@ class NativeMoodTests(unittest.TestCase):
     def test_schema_rejects_other_orders_offsets_and_partial_pairs(self):
         for change in ({'commands': '7F09020001'}, {'commands': '7F090200027F09080001'},
                        {'commands': None}, {'source_offset': True}, {'reference_offset': -1},
-                       {'reference_offset': 8192}, {'extra': True}):
+                       {'reference_offset': 8192}, {'extra': True}, {'anchor': None},
+                       {'anchor': 'anywhere'}, {'anchor': []}, {'anchor': True}):
             with self.assertRaises(ValueError): validate_rule({**self.rule, **change})
 
     def test_missing_duplicate_or_stale_native_pair_fails(self):
@@ -98,6 +99,31 @@ class NativeMoodTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_content_approval({**record, 'reference_id': 'message:0001'})
 
+    def test_phrase_anchor_requires_the_same_immediate_native_expression(self):
+        prefix = 'First\n'; following = '{cmd:7F0900000E}Next{cmd:7F00}'
+        source = encode(prefix+PAIR+following, self.info)
+        rule = {**self.rule, 'source_offset': len(encode(prefix, self.info)),
+                'reference_offset': len(prefix), 'anchor': 'before_expression_0E'}
+        self.assertEqual(restore(prefix+following, source, rule, self.info)[0], prefix+PAIR+following)
+        for changed in ({**rule, 'reference_offset': len(prefix)+1},
+                        {k: v for k, v in rule.items() if k != 'anchor'}):
+            with self.assertRaises(ValueError): restore(prefix+following, source, changed, self.info)
+        for text, raw in ((prefix+' '+following, source),
+                          (prefix+following, source.replace(bytes.fromhex('7F0900000E'), bytes.fromhex('7F0900000A')))):
+            with self.assertRaisesRegex(ValueError, 'exact original expression'):
+                restore(text, raw, rule, self.info)
+
+    def test_final_anchor_keeps_every_word_and_the_exact_normal_ending(self):
+        source = encode('Native'+PAIR+'\n{cmd:7F00}', self.info)
+        text = 'Complete English\n{cmd:7F00}'
+        rule = {**self.rule, 'source_offset': 6, 'reference_offset': len('Complete English'),
+                'anchor': 'before_final_end'}
+        self.assertEqual(restore(text, source, rule, self.info)[0], 'Complete English'+PAIR+'\n{cmd:7F00}')
+        for changed in (text+'\n', text.replace('7F00', '7F01'), text.replace('\n', ' \n')):
+            with self.assertRaises(ValueError): restore(changed, source, rule, self.info)
+        with self.assertRaises(ValueError):
+            restore(text, source.replace(b'\x7f\x00', b'\x7f\x01'), rule, self.info)
+
 
 @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/gamecube/text/message.jsonl').is_file(),
                      'Retail native/English sources stay local')
@@ -110,7 +136,7 @@ class NativeMoodRetailTests(unittest.TestCase):
         cls.matches = load_matches(ROOT/'translations/reference_matches.json')
         cls.approved = [r for r in cls.matches.values() if 'native_mood' in r.get('complete_reference', {})]
 
-    def test_all_nineteen_complete_references_keep_original_actors_and_full_english(self):
+    def test_all_complete_references_keep_original_actors_and_full_english(self):
         self.assertEqual({r['id'][8:] for r in self.approved}, IDS)
         for record in self.approved:
             source = self.sources[int(record['id'][8:], 16)]; reference = self.refs[record['reference_id']]

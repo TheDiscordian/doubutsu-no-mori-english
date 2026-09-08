@@ -5325,6 +5325,61 @@
   the later drawing integration. Title artwork remains first in the image pass;
   broader main-port work and all other completion requirements remain active.
 
+## 2026-09-08 — Complete English mood effects at phrase boundaries
+
+- Added complete reference approvals `203A/262B/2637/264B/266B`. Their original
+  mood/timer pairs occur after quest preparation, at a mid-page phrase, or
+  immediately before the final newline/end. Each semantic position is reviewed
+  against the complete native and English text. Four rules require the exact
+  following original `09:00:000E` expression; `266B` requires only the original
+  final newline and normal `00` ending after the pair. Source/reference/final
+  hashes and complete actor order remain mandatory. Unanchored page rules stay
+  strict, and no English word, line, page, pause, field, or command is changed.
+- Two added unit tests cover phrase and final-ending anchors, incorrect positions,
+  changed/missing expressions, extra text, and alternate terminators. The first
+  thirteen-test run preceded saving the five registry entries and correctly
+  failed their presence assertion; all other checks passed. After the complete
+  approvals are installed, `build/tests-mood-phrases-reference-01.log` passes all
+  96 reference-group tests in 17.323 seconds, including thirteen mood tests and
+  independent builder/source-consumer checks. Seven text-coverage tests pass
+  in 0.002 seconds. No production runtime/C code changes, so the unchanged
+  components retain the 675-test full-suite checkpoint rather than another
+  full C regression for this import-only batch.
+- Both generation modes add exactly the five messages and preserve every prior
+  edit: 12,515 full and 11,805 basic. Main candidates total 10,722, including
+  9,760 references. Rejections total 1,031: 929 unconfirmed, 76 control,
+  24 fields, and two direct overflows. One fallback leaves 1,030 final gaps:
+  108 Japanese-static, 919 non-static, one Latin, and two symbol/numeric. Ten
+  non-static records have insertions; no reachability is inferred. Warning
+  records total 1,472, aliases remain 41, and conflicts remain zero. Fresh
+  identity/expression queues retain zero current-rule admissions and ten
+  unapproved special contexts. Source volume gains 277 characters to 637,055
+  of the unchanged 746,978-character denominator.
+- ROM `build/mood-phrases-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `25301e4aec42c8aa7edb1e43c4fc406b4b25db77c94e614530b443ea79872c92`.
+  UPS SHA-256:
+  `152ee654d30f1cbd76fee179b62e5bd3881360cc2d66955be9fe42f9bf8d87a9`.
+  Candidate SHA-256:
+  `fe660331b69cae1374d4927079014db4cf52f58e39a82efaf114eeb0510b11d0`.
+  `build/mood-phrases-artifact-audit.log` verifies all 12,515 installed edits,
+  source/build hashes, and complete UPS reconstruction. Only main text,
+  its pointer table, and the DMA directory container differ from the final
+  mapped-item pilot. The container is unchanged outside its table. Every item,
+  name, mail, font, runtime, and saved structure remains unchanged.
+- `build/smoke-mood-phrases-01/` passes the complete combined twenty-four-message
+  batch: 24 cartridge loads, 48 native mood/timer dispatches, 72 expected-return
+  checks, 175 memory assertions, and 353 steps. Complete text, exact cumulative
+  order tables, cursor advances, adjacent/module guards, stack restoration,
+  checkpoint restoration, and graceful shutdown pass. The independent audit
+  compares every call/argument/return and complete memory read with the scenario.
+  Scenario SHA-256:
+  `6ee50d80148ad552297362e69aace0fbc2453eaa823b759c7f969cf970d22788`.
+  The isolated run is silent, four MiB, has no seeds, and disables both save-write
+  permissions. FlashRAM and Pak retain the same blank hashes as the mapped-item
+  runs. This checks native loading and order dispatch, not ordinary mood/timer
+  progression, rendered conversations, saving, or original hardware. Those and
+  changed-topic `2773` remain in the completion queue.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -3,10 +3,10 @@
 ## Purpose
 
 Some native resident conversations set a persistent mood and its duration at
-a page boundary. Their complete GameCube counterparts omit that pair. Dropping
+a page or phrase boundary. Their complete GameCube counterparts omit that pair. Dropping
 the native pair would change gameplay state; treating it as an ordinary facial
 expression is incorrect. Restore the original pair at the individually reviewed
-corresponding English page without removing any reference words or delivery.
+corresponding English point without removing any reference words or delivery.
 
 ## Native behaviour
 
@@ -29,10 +29,27 @@ are the authority. Production actor code and saved structures remain unchanged.
 An individual `complete_reference.native_mood` rule binds the source byte offset,
 decoded-reference character offset, and complete original ten-byte pair. Only
 `09:02:0001` followed immediately by `09:08:0001` or `09:08:0002` is accepted.
-The native source must contain exactly those two mood/timer commands, together
-at a native page start. The English reference must contain no mood/timer command.
-Its insertion point is the start of the reference or immediately after an exact
-page-clear tag. English page numbers are not assumed to match native page numbers.
+The native source must contain exactly those two mood/timer commands together.
+The English reference must contain no mood/timer command. Without an explicit
+anchor, the native pair must start a page and its English insertion point is
+the reference start or immediately after an exact page-clear tag. English page
+numbers are not assumed to match native page numbers.
+
+Five independently reviewed phrase rules use one of two exact anchors:
+
+- `before_expression_0E`: the original pair must immediately precede native
+  `09:00:000E`, and the reference insertion must immediately precede that same
+  command. The complete actor sequence must agree before adaptation, preventing
+  insertion at a different occurrence. This includes an initial phrase after
+  unchanged quest preparation, not only phrases inside a page.
+- `before_final_end`: both sources must have only the final newline and normal
+  `00` ending after the insertion/pair. No continuation, extra text, trailing
+  token, or alternate terminator is permitted.
+
+Other anchor values, missing/changed expressions, and arbitrary mid-word points
+are rejected. Every phrase still requires its individually reviewed semantic
+position and complete source/reference/final hashes; the anchor is not permission
+to select an arbitrary phrase automatically. Unanchored page rules stay strict.
 
 The complete native source, supplied reference, and final output stay hash-bound.
 No wording/storage/other permission combines with this rule. The insertion
@@ -45,12 +62,12 @@ field, flow, capacity, and formatting validation remains mandatory.
 Generation and installation require the pinned unchanged resident overlay,
 relocations, core order getter/setter, parser, and dispatch table through the
 existing native-consumer guard. No animation-value, actor-field, random-branch,
-or additional insertion permission is granted. Mid-page pairs and changed
+or additional insertion permission is granted. Unreviewed pairs and changed
 topics remain outside this contract and require their own review.
 
 ## Acceptance
 
-Nineteen complete references have individual approvals:
+Twenty-four complete references have individual approvals. Nineteen use page starts:
 
 `1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 2628
 2630 2634 263C 264F 2655 27B5`.
@@ -61,10 +78,19 @@ snow and gyroids, rain advice, thanks, and an igloo conversation. In `1FAD`,
 the native effect follows the third page clear but belongs after the fourth
 English page clear, at the final victory claim. Matching page counts would put
 it too early. `263C` retains duration two; the other eighteen retain duration
-one. Only `2067` removes two redundant article-suppression controls through the
+one. Five more retain the original pair at reviewed phrase boundaries:
+
+`203A 262B 2637 264B 266B`.
+
+These cover the initial furniture-sale offer after quest preparation, the final
+any-position claim after a sports aside, the emphatic party-animal rating after
+its suspense, cheerful acceptance after an equipment acknowledgement, and the
+complete final sunny-weather theory. Only `266B` uses the final-ending anchor.
+Every English word, newline, page, and pause remains intact. Only `2067` removes
+two redundant article-suppression controls through the
 existing adapter; no English text or delivery is removed.
 
-Approval review must identify the corresponding semantic page and retain the
+Approval review must identify the corresponding semantic page or phrase and retain the
 native mood effect at that point. Tests cover exact pairs and offsets, missing
 or duplicated native commands, reference duplicates, page boundaries, actor
 order, complete English retention, source/reference/final hashes, and independent

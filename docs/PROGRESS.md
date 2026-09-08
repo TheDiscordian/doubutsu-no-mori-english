@@ -151,6 +151,10 @@ user's direction. The production build retains the approved spacing metrics.
   including the repeatable text-volume report.
   The suite includes all fifteen item-identity/scenario-composition checks and
   five cartridge-clock/town-data error checks, and eleven native-mood reference checks.
+  The current phrase-anchor extension additionally passes all 96 reference-group
+  tests, including thirteen mood checks, and seven text-coverage tests. Unchanged
+  runtime/C tests retain their full-suite checkpoint rather than being rerun for
+  this text-import-only change.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
@@ -464,20 +468,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mapped-items-final-pilot/`
-contains 12,510 edits, including
-9,755 reference main-bank candidates, all 460 choices, 572 original dialogue
+The current experimental resident-module pilot in `build/mood-phrases-pilot/`
+contains 12,515 edits, including
+9,760 reference main-bank candidates, all 460 choices, 572 original dialogue
 drafts, one original-dialogue continuation, 290 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,035
+still require review. The original main-bank audit leaves 1,030
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,471 conservative layout-warning records include full default
+listed below. The 1,472 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/mapped-items-final-candidates/` and `build/mapped-items-final-coverage/`. The independent
+`build/mood-phrases-candidates/` and `build/mood-phrases-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -1030,15 +1034,15 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,510 edits; basic generation has 11,800, including both startup-error drafts
-and all nineteen mood-preserving references.
+12,515 edits; basic generation has 11,805, including both startup-error drafts
+and all twenty-four mood-preserving references.
 All earlier candidates remain unchanged.
 Ordinary item storage contains 779 slots from 242 distinct references; the wide
 resource contains 2,713 slots from 771 references. Four rotations are one name,
 not four distinct translations. The 126 new names longer than ten bytes remain
 complete in the wide resource, not shortened for unexpanded callers.
 
-All 12,510 actual installed edits, source/candidate/build hashes, the complete
+All 12,515 actual installed edits, source/candidate/build hashes, the complete
 wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
 changes only the native item-name file and the existing wide-name resource
 relative to the travel pilot; their dimensions and DMA entries remain unchanged.
@@ -1067,7 +1071,7 @@ and placed form. All three checkpoints restore with intact guards and blank
 isolated saves. The final refinement changes only one original-width name and
 two wider fields; every other tested byte remains unchanged. All 2,713 wider
 slots resolve to their complete selected English name after the native conversion.
-The full 675-test suite and all 12,510 installed ordinary payloads pass. Gyroids,
+The full 675-test checkpoint and all 12,515 installed ordinary payloads pass. Gyroids,
 changed species/designs, game slots, remaining identities, and all unexpanded
 destinations stay in the completion queue.
 
@@ -1090,18 +1094,21 @@ original hardware remain separate acceptance requirements.
 
 ## Native mood effects in complete English references
 
-Nineteen [complete English conversations](../specs/NATIVE_MOOD_REFERENCES.md)
+Twenty-four [complete English conversations](../specs/NATIVE_MOOD_REFERENCES.md)
 retain the original resident mood and duration commands at individually reviewed
-corresponding pages. Every supplied English word, newline, page, and pause stays
+corresponding pages or phrases. Every supplied English word, newline, page, and pause stays
 intact. The sun-contest message places its effect after the fourth English page
 clear, not the third native page clear. The approval requires complete original
 actor-command order before adaptation and the unchanged native mood consumer.
+Five phrase rules require either the exact following original expression or
+only the final newline/normal ending. Unanchored page-start rules remain strict.
 No gameplay code, saved structure, font, or buffer capacity changes.
 
-All eleven focused tests and the 675-test full suite pass. The silent four-MiB
-native batch passes nineteen complete cartridge loads and 38 actual order
-dispatches: 57 calls, 140 memory assertions, guards, and restored state. All
-12,510 installed edits and the UPS reconstruction pass. The mood import preserves
+All thirteen mood tests pass within the 96-test reference batch; seven coverage
+checks also pass. The preceding full-suite checkpoint passes 675 tests. The silent
+four-MiB native batch passes twenty-four complete cartridge loads and 48 actual
+order dispatches: 72 calls, 175 memory assertions, guards, and restored state. All
+12,515 installed edits and the UPS reconstruction pass. The mood import preserves
 earlier candidates and resources outside the main text/table; the separate item-name
 checks above cover the current name changes. Normal resident
 mood progression, rendered conversation, final wording, saving, and original
@@ -1109,7 +1116,7 @@ hardware remain separate acceptance requirements.
 
 ## Text-volume measurement
 
-The generated coverage report measures 636,778 covered source characters out of
+The generated coverage report measures 637,055 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1129,8 +1136,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,510 edits, including
-9,755 reference main-bank candidates, 290 original development-label drafts,
+The resident-module experiment contains 12,515 edits, including
+9,760 reference main-bank candidates, 290 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1148,9 +1155,9 @@ eight native moving conversations, seven game-launch prompts, and four complete
 native travel explanations using five records, and two native startup errors.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,036 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,035 main records without
-candidates: 113 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,031 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,030 main records without
+candidates: 108 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

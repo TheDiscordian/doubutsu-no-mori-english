@@ -7044,5 +7044,85 @@
       }
     },
     "evidence": "Reviewed complete native and supplied English topics and actor actions. The last-page admission of getting too comfortable in the igloo. Restore only the original mood/timer pair at the corresponding English page. Preserve all supplied English wording, line/page/pause intent, native actor requests and arguments, fields, and flow. No new runtime permission or ordinary-play validation is implied."
+  },
+  {
+    "id": "message:203A",
+    "source_sha256": "1ee2610b709b50534835526bf515f1a3365a28f25fa1a3ea5c283b9224ad7016",
+    "reference_id": "message:203A",
+    "reference_sha256": "c67877028a16a60959c6d366de920e026fdebb0e5e9e17eb6d80ea51235937a9",
+    "complete_reference": {
+      "adapted_sha256": "ed2a72ceaaec8083c6ab64970ceb7a475b75d9d7b5269d7392e0b0e2d8c55cf2",
+      "native_mood": {
+        "source_offset": 5,
+        "reference_offset": 16,
+        "commands": "7F090200017F09080001",
+        "anchor": "before_expression_0E"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. At the initial offer, after the unchanged quest-row preparation and before the first spoken line. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
+  },
+  {
+    "id": "message:262B",
+    "source_sha256": "2fe489ea6f013ccc81e89c4685b6378e99448a234df50fe95182347c3b4b8e62",
+    "reference_id": "message:262B",
+    "reference_sha256": "bd794d01b3383ee4ce8b634e7aef785fdf0b5edcff8cdafa57245a0d7277b0a8",
+    "complete_reference": {
+      "adapted_sha256": "aadb84e44cc31f84fd3e1f11bab6d2013b860a753fb18b1ac4a302516217fc1b",
+      "native_mood": {
+        "source_offset": 133,
+        "reference_offset": 429,
+        "commands": "7F090200017F09080001",
+        "anchor": "before_expression_0E"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. After the mistaken-position aside and its pause, before reaffirming the ability to play any position. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
+  },
+  {
+    "id": "message:2637",
+    "source_sha256": "92b1e4772071e2d05df86cdfa6bdd43ed969153b372be28bc752e4b4e6ec7fbb",
+    "reference_id": "message:2637",
+    "reference_sha256": "14409dd08746c80016c56edacee2028fe3728d8fa572ac20269c7c9d7eca4c1f",
+    "complete_reference": {
+      "adapted_sha256": "7c8c7f89bd7b979af2392c001c83e6d1fe1f5a74f25666199ab804c2042e46fb",
+      "native_mood": {
+        "source_offset": 130,
+        "reference_offset": 338,
+        "commands": "7F090200017F09080001",
+        "anchor": "before_expression_0E"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. After the level-rating suspense, at the emphatic party-animal rating. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
+  },
+  {
+    "id": "message:264B",
+    "source_sha256": "35c7d21df4481cc9706f85d2a4d7361fea95db852f6c664fb01ceaf445ac90df",
+    "reference_id": "message:264B",
+    "reference_sha256": "fdb4f838fc0e01d94fd6720077db3be04e99eb7f34a7c5aad77ca172ced4507c",
+    "complete_reference": {
+      "adapted_sha256": "e035d4190c490c44024858440d0a2baae0949f48c692b72da23faaeb3737f971",
+      "native_mood": {
+        "source_offset": 30,
+        "reference_offset": 109,
+        "commands": "7F090200017F09080001",
+        "anchor": "before_expression_0E"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. After the shared lack-of-equipment acknowledgement, at its cheerful acceptance. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
+  },
+  {
+    "id": "message:266B",
+    "source_sha256": "1844de83b186765baff15f543600a73b993efcd777f6cd581bdaf98e1db25a21",
+    "reference_id": "message:266B",
+    "reference_sha256": "9c1672e6747920370fdfba5163acbe05b18a76b041878af98769677667de2422",
+    "complete_reference": {
+      "adapted_sha256": "677ba9ded4b1f0aac86265e68677ca8da3ad4867bbf5f1d050130b63525d7cf8",
+      "native_mood": {
+        "source_offset": 128,
+        "reference_offset": 324,
+        "commands": "7F090200017F09080001",
+        "anchor": "before_final_end"
+      }
+    },
+    "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. After the complete final English confidence claim and added closing aside, before the unchanged final newline and normal ending. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
   }
 ]
