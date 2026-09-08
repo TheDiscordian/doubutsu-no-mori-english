@@ -4534,6 +4534,88 @@
   neighbours. No reachability or hardware evidence is inferred. The font-atlas
   edge investigation stays paused.
 
+## 2026-09-07 — Complete native return greetings
+
+- Continued from the pushed contextual-menu checkpoint `50ae5d8`, with a clean
+  tracked worktree and the private remote verified. The preceding measurement
+  supplied new evidence that all 11,657 ordinary edits were present in the
+  actual ROM; it did not claim completion. This turn records the completed
+  contextual batch, then adds another content batch rather than repeating its
+  native selection test.
+- Added 35 original dialogue drafts in `translations/n64-return-greetings.json`
+  for `00B0..00D2`. All native and legacy sources retain Japanese; every supplied
+  same-ID GameCube entry contains only `7F00`. An independent native-prose
+  comparison ignoring whitespace and commands finds no identical second native
+  record for any of the 35. These remain native-specific drafts, not invented
+  reference matches or unreachable-code claims.
+- The complete translations retain the different friendly, energetic, sleepy,
+  gruff, and teasing voices; month/week absences; concern about illness; furniture
+  and decorating reminders; hot-spring wishes; debt-collector and raining-spears
+  jokes; late-night remarks; and each reassurance or reprimand. Every native
+  command/argument, per-page field sequence, catchphrase repetition, wait/clear,
+  total/per-page newline count, and continuing `01` ending remains exact. No
+  actor, action, field permission, reference layout, runtime, font, or save
+  format is changed.
+- Added `specs/RETURN_GREETINGS.md` and seven regression tests. Tests cover
+  complete source/control/ending equality, encoding, page/line/field structure,
+  month-versus-week identity, repeated catchphrases, native topics, empty donor
+  slots, absent exact native aliases, basic/full selection, and conservative
+  bounds/layout. The full expansion bounds range from 101 to 344 bytes. All
+  35 drafts fit without layout warnings using the unchanged conservative field
+  widths; no one-digit absence assumption is needed. Native-only lines were
+  adjusted within the original pages before building to fit those full bounds.
+- Focused `build/tests-return-greetings-focused-01.log` passes seven tests in
+  0.766 seconds. After the final wording adjustment, the complete
+  `build/tests-return-greetings-full-01.log` passes all 602 tests in 220.135 seconds,
+  including all seven new tests. Candidate generation, building, artifact
+  validation, and the native batch complete without a failed run.
+- Full generation contains 11,692 edits, adding exactly the 35 new messages
+  without changing or removing any of the preceding 11,657. Main candidates
+  total 10,447: 9,762 references, 394 original dialogue drafts, and 291 original
+  development labels. All 460 choices remain unchanged. Basic generation adds
+  the same 35 entries without changing/removing any of its preceding 10,947,
+  reaching 10,982. The contextual-label dependencies retain their previous gates.
+- The generator rejects 1,306 main records: 1,169 unconfirmed identities, 111
+  control differences, 24 field differences, and two direct overflows. One
+  receives an original fallback, leaving 1,305 final gaps: 383 Japanese-static,
+  919 non-static, one Latin, and two symbol/numeric entries. Ten non-static
+  records have dynamic fields. Reference warnings remain 1,469, aliases 41,
+  and conflicts zero. Source-volume coverage gains 2,779 characters to 615,795
+  of the unchanged 746,978-character denominator. No new percentage or overall
+  completion claim is made.
+- Reused the existing explicit-ID cartridge-load scenario for all 35 new
+  messages. `build/smoke-return-greetings-01/` passes 35 calls at `8009E558`,
+  107 assertions, and 184 recorded steps. Full headers/text, adjacent/module
+  guards, restored `test.bs1`, and graceful shutdown pass. Scenario SHA-256:
+  `d4aab5d201585c43bc882da3df3928707729da87541c9b4ac5a5c47c41c5c99b`.
+  The four-MiB run has no seeds, disabled audio, and both save-write permissions
+  false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  No ordinary greeting selection, field preparation, actor action, or saving is
+  executed by these calls.
+- ROM `build/return-greetings-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `4d7af4ec1b57aa0b72a59322abd3b04919751c26e40a3a17e82f3fbeae2941e1`.
+  UPS SHA-256:
+  `9b9cbeae8f7f78067a651b4a6d302fe95b9bd74c827089301d67a1351455859a`.
+  Candidate SHA-256:
+  `83d8522462dc9948a805c445d649b6fb41eec3332de6ff5542c8b39f2c633b2e`.
+  UPS application reconstructs the complete ROM from the verified original.
+  All 11,692 ordinary edits match their complete actual built-bank entries.
+  Only extracted `02000000`, `00CF9000`, and DMA directory container `00019D40`
+  differ from the contextual-choice pilot. The container is unchanged outside
+  its table; every code/font/runtime/name/mail/choice resource remains unchanged.
+- Regenerated final-hash coverage and both review queues under
+  `build/return-greetings-*`. The current-rule unconfirmed same-ID pool remains
+  empty, with 1,093 absent visible references and the separate field, control,
+  overflow, glyph, non-static, and encoding cases retained. Ten unapproved
+  special-expression comparisons remain. The adjacent `00A3..00AF` native
+  month-return conversations and broader earlier greetings/test messages remain
+  available content work. Normal caller selection, live fields, complete wording
+  and presentation review, save/hardware acceptance, general strings/names/mail,
+  patch-only release, and the image/keyboard stretch goals remain active.
+  The font-atlas-edge investigation stays paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

@@ -1,0 +1,282 @@
+[
+  {
+    "id": "message:00B0",
+    "source_sha256": "a1f2f81d04d92eef98dd862fabe06b651ada5748d0df9a7c8d24f5351aa9ac7c",
+    "translation": "Hey! Long time no see!\nHow long? About\n{cmd:7F2B} months...\nYou've been gone so long!\n{cmd:7F04}\n{cmd:7F02}Not even showing your face!\nI never knew you could be\nso cold-hearted...\nHeh! Just kidding!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B1",
+    "source_sha256": "dc92580959ad9c86ad4bc5af17e0982ca9dca8818790e16a9f9fe8d296487081",
+    "translation": "Hey, {cmd:7F1A}!\nHave you grown a little\nsince I last saw you?\nHuh? You haven't?\n{cmd:7F04}\n{cmd:7F02}Ha ha! I thought so,\n{cmd:7F1C}! Not much changes\nin just\n{cmd:7F2B} months!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B2",
+    "source_sha256": "48543a6cf19249f70c3361ec657ec6555c449548cef92a125f7524e99b2dd31a",
+    "translation": "Oh! It's you!\nWhat's going on?\nI haven't heard from you\nin such a long time!\n{cmd:7F04}\n{cmd:7F02}Did you sneak out of town\nto dodge debt collectors?\nAh ha ha ha ha ha!\nI'm kidding! Don't get mad!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B3",
+    "source_sha256": "6ff78b14aab986ceb591a6bbab8e2148f16b442758773ca66081138f1878c2eb",
+    "translation": "What? Keep it down!\nHuh? Isn't that {cmd:7F1A}?\nBeen a long time, eh?\nTo hear your voice so early!\n{cmd:7F04}\n{cmd:7F02}Well, would you believe it!\nAt this rate, we'll have\nspears raining from the sky\ntoday!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B4",
+    "source_sha256": "8b0f6eb66c44d88dc90af10010660a3b0306d705988746c335fd4536d78d3aaa",
+    "translation": "Hey, it's {cmd:7F1A}!\nHow's it going?\nYour room layout, I mean!\nDon't play dumb with me!\n{cmd:7F04}\n{cmd:7F02}That's what happens when\nyou leave it for so long!\nPut a little more effort\ninto it!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B5",
+    "source_sha256": "54157257f09f416720e0444760147a582cf59d34cea4e13435f952dd2198a21a",
+    "translation": "Well, well, well!\nNow there's a rare sight!\nWhere've you been hiding\nall this time?\n{cmd:7F04}\n{cmd:7F02}Knowing you, did you eat\nsomething off the ground,\nget a stomachache,\nand keel over?\n{cmd:7F04}\n{cmd:7F02}Wah ha ha ha ha!\nDon't get mad!\nI'm only joking!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B6",
+    "source_sha256": "a5df82ed17ca8ee4636138346516f31d6e1f82c5fbe94b0a574a5051da373675",
+    "translation": "Hey, {cmd:7F1A}!\nWhere've you been hiding?\nI haven't seen you in\n{cmd:7F2B} months!\n{cmd:7F04}\n{cmd:7F02}You sure left me alone\nfor a long time!\nI'll be paying you back\nfor that from now on!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B7",
+    "source_sha256": "8491394c52ff2a8530bfd9375c91e0f805c609da426e19265b2a97d32837329d",
+    "translation": "Oh, good morning!\nWhy, it's {cmd:7F1A}!\nYou haven't shown your face\nin such a long time!\n{cmd:7F04}\n{cmd:7F02}Have you been away?\nAs long as you're well!\nI was worried you might\nhave fallen ill!\n{cmd:7F04}\n{cmd:7F02}You look fit as a fiddle,\nthough! What a relief!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B8",
+    "source_sha256": "7f434a8432063390dbe814b1aadae5e9a3967dc7bcb72407e3a182715564e167",
+    "translation": "{cmd:7F2B} months!\nWhere have you been?\nYou disappeared so suddenly\nthat I started worrying!\n{cmd:7F04}\n{cmd:7F02}I thought you might've\nbeen in an accident!\nBut knowing you,\na little thing like that...\n{cmd:7F04}\n{cmd:7F02}wouldn't bother you\none bit!\nAh ha ha ha ha ha ha!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00B9",
+    "source_sha256": "0f07dc00b1cdff71b09c318f17fbc37fe89ae8b230fa8f5f4f0f574bdc19692e",
+    "translation": "Well, look who's here!\nIt's {cmd:7F1A}!\nWhat's been keeping you?\n{cmd:7F2B} months...\n{cmd:7F04}\n{cmd:7F02}Has your taste in clothes\ngone downhill since\nI last saw you?\nAh ha ha! Only joking!\n{cmd:7F04}\n{cmd:7F02}Don't worry! It suits you!\nStill, isn't it about time\nyou changed your clothes?\nHa ha! Another joke!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BA",
+    "source_sha256": "9b8b0dccb15185467b9b6cd1cbe574e3fd14e2febf09c06bb3efc0783527f4ee",
+    "translation": "At this hour of night...\nWhat a suspicious sort!\nOr so I thought,\nbut it's you, {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}You finally show up after\nall this time, and at\nan hour like this!\nWhat a surprise!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BB",
+    "source_sha256": "ff29d41d0bcff08bdb9daf7af819bf32a121fb1db3a8f91f2ef582a6f73d9ca0",
+    "translation": "Oh, good morning.\nI've really gotten into\ndieting lately.\n\n{cmd:7F04}\n{cmd:7F02}I wonder if there's\nan easy way\nto lose weight...\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BC",
+    "source_sha256": "f149d27eb3d1ef4ff0adbdd5dfd086e2bdfa09e4e50b4ca844cf82e2ecf380f1",
+    "translation": "Well, hello there.\nHow are you doing?\nNothing fun's happened\nlately. I'm so bored!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BD",
+    "source_sha256": "ea341c54904c0ba1284c4455dac4f17979f6d9c2b25462d04a84cf80194cd709",
+    "translation": "Evening, {cmd:7F1A}!\nLong time no see, {cmd:7F1C}.\nNot seeing you for\n{cmd:7F2C} weeks...\n{cmd:7F04}\n{cmd:7F02}It's a little lonely,\n{cmd:7F1C}. I'd like to\nchat with you every day,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BE",
+    "source_sha256": "1ef57a99432d21c2fea5645a7764ae871bc8dbdd03b331780501e1164ae212da",
+    "translation": "Good evening,\neven at this hour!\nI'm usually asleep by now,\nbut tonight I'm staying up.\n{cmd:7F04}\n{cmd:7F02}And I ran into {cmd:7F1A}!\nWhat a coincidence!\nWhat a lovely little bonus,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00BF",
+    "source_sha256": "70dd7c9fb01f42d349217b728dba1a8b363195cad75e51c98f79fc052a46e0dd",
+    "translation": "Hey! Good morning!\nWhen it's been a while,\neven seeing a close friend\nfeels fresh and new!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C0",
+    "source_sha256": "532a0eff8aea198127a0f641e4bf968f3dc7ae43e3e9e99e65ae4ef976f583fb",
+    "translation": "Hiya, {cmd:7F1A}!\n{cmd:7F2C} weeks?\nHave you been away somewhere?\n\n{cmd:7F04}\n{cmd:7F02}I'd love to get away\nsomewhere now and then too!\nSoak in a hot spring and\nunwind, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C1",
+    "source_sha256": "5677de6e06cdea8bb83310c14ba93d71fe702db90efb20f99ad3239414fb6cba",
+    "translation": "Ah! There you are!\n{cmd:7F1A}, I was just\nthinking I hadn't seen you\naround lately!\n{cmd:7F04}\n{cmd:7F02}I thought you might be\nsick in bed!\nI was worried about you,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C2",
+    "source_sha256": "ee498634a8546ab1d68f19616c371fb9959b0a18376652bddeb8be90444c3390",
+    "translation": "Good evening!\nWhat are you doing so late?\nWe finally get to see\neach other again, too...\n{cmd:7F04}\n{cmd:7F02}If we're going to meet,\nI'd rather it were out\nin the sunshine, {cmd:7F1C}!\nJust kidding!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C3",
+    "source_sha256": "658cd0716a9153a5d76162e9e1c4278f9fdffaf7f77c18d00e52401b05110cdc",
+    "translation": "Ah, good morning!\nIt's been a while!\n{cmd:7F2C} weeks?\n\n{cmd:7F04}\n{cmd:7F02}You've been asleep\nfor a really long time,\nhaven't you? Ah ha ha ha!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C4",
+    "source_sha256": "a775770ab69406b9c712eafa892350201dde186e1bb9b222940a5456109f8f90",
+    "translation": "Oh, hello there!\nWhat happened to you?\nYou haven't shown your face\nfor {cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}Oh! I know!\nYou ate too much and lay\nthere groaning with a\nstomachache! How lame!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C5",
+    "source_sha256": "cf9f4d2752b9fcae0a201261b36b89b7f548ac5e658f5a980bc5ce252bbe753f",
+    "translation": "Yoo-hoo! Good evening!\n{cmd:7F1A}, I missed you!\nYou never come over\nto play anymore!\n{cmd:7F04}\n{cmd:7F02}Leaving me all alone\nfor {cmd:7F2C} weeks!\nI'll turn into a delinquent!\nJust kidding!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C6",
+    "source_sha256": "a53ec54ea5a2472cb788cfac3ac15a623767915778cd8aaa16e1f79c528637c9",
+    "translation": "Hey, hey! Good evening!\nI haven't seen your face\nin such a long time!\nWhat've you been up to?\n{cmd:7F04}\n{cmd:7F02}Oh! You stayed out too late\nand got grounded,\ndidn't you? That's it!\nAh ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C7",
+    "source_sha256": "c39e72456de92a085008cfaed320d9248f3d17bbf2a15f076c737c2b47ae5dcb",
+    "translation": "Hey, {cmd:7F1A}!\nGood morning!\nI haven't seen you lately.\nWere you feeling ill?\n{cmd:7F04}\n{cmd:7F02}If you keep training\nyour body, sickness will\nrun away from you!\nWah ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C8",
+    "source_sha256": "33d689d182a5e1a45d78b817405f7f34d8073171204edee7b280aacf8831a967",
+    "translation": "Long time no see!\nHave you been well?\nYou've been slacking off\nfor {cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}Get back to working hard\nfrom today on!\nOh, none of my business?\nWah ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00C9",
+    "source_sha256": "acab6ea96a8d66538eff16a176cc8a74a5507f67486b2e0e9da3c7a37b496bd7",
+    "translation": "Hey, {cmd:7F1A}!\nWhat've you been doing\nfor {cmd:7F2C} weeks,\nnot showing your face?\n{cmd:7F04}\n{cmd:7F02}Everyone else is giving up\nsleep to go around\ncollecting furniture!\nYou've got to try harder!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CA",
+    "source_sha256": "4cd993d6d605653e6a36fc8c066c9cf4e3ddd4a49e9cb25d6a90978e0b318de4",
+    "translation": "Hey, hey! Who's wandering\naround outside\nat this hour?...\nOh! {cmd:7F1A}!\n{cmd:7F04}\n{cmd:7F02}What's up? Been a while!\nYou came back just for\nanother night out, huh?\nWah ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CB",
+    "source_sha256": "8e2cd569f4b8278839aec1429a6a649b61c1ea21dac734fc4bba7cffab2987b5",
+    "translation": "Keep it down! It's morning!\nI've told you I'm no good\nwith mornings!\nTalk more quietly!\n{cmd:7F04}\n{cmd:7F02}We haven't met for about\n{cmd:7F2C} weeks!\nWhat's the big deal?\nWhat are you, my wife?\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CC",
+    "source_sha256": "12bc385ed46fb24aac93a4cada33f0a42f0244b4db0ed6b3e2d79ed088b76ef6",
+    "translation": "Hey! It's {cmd:7F1A}!\nHaven't seen you in a while!\nHow's it going?\n\n{cmd:7F04}\n{cmd:7F02}Slack off too much,\nand everyone else\nwill snap up all\nthe good furniture!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CD",
+    "source_sha256": "c409b54b410636a210cd73d249fae58182c0ed2a8a46fc4b2847c617871a5676",
+    "translation": "Quiet! Stop pestering me!\nAll right, I get it!\nIt's been about\n{cmd:7F2C} weeks...\n{cmd:7F04}\n{cmd:7F02}So what if we didn't meet?\nIt's no big deal!\nUntil just recently, we'd\nnever even met at all!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CE",
+    "source_sha256": "6e2c01289eb24068b515f0f024ccc3fa0de2368fda58b99bab6f734950744171",
+    "translation": "Still love your nights out,\nhuh? You're about the only\none wandering around\nat an hour like this!\n{cmd:7F04}\n{cmd:7F02}I know it's been a while,\nbut stay out too late,\nand something might\ncome out and get you...!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00CF",
+    "source_sha256": "04a893da29a3c751bf2d1783cd5f44246a837de1cc61cc1745cbaff9acb45680",
+    "translation": "Good morning!\n{cmd:7F1A}!\nIt's been a while!\nHave you been away?\n{cmd:7F04}\n{cmd:7F02}Any souvenirs for me?\nNo? Not one?\nOh, you're such a cheapskate!\nHa ha ha! Just kidding!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00D0",
+    "source_sha256": "2e2d1eea614e8bd80aea0f6c28a6428ed652dda1003b761bb3b82b794dc50325",
+    "translation": "Ah, it's {cmd:7F1A}!\nYou haven't come to play\nfor {cmd:7F2C} weeks!\nWhat've you been doing?\n{cmd:7F04}\n{cmd:7F02}Without you around,\nI've been so bored\nI could die!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00D1",
+    "source_sha256": "0eec14e7b17a85b093781a65b076aa540cfacc8d4a25424bc836a7b5acbc2ff7",
+    "translation": "Hey, hey, {cmd:7F1A}!\nWhere've you been?\nWhat've you been doing for\n{cmd:7F2C} weeks?\n{cmd:7F04}\n{cmd:7F02}If you've had fun\nbehind my back,\nI won't let you off!\nHa ha! Just kidding!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  },
+  {
+    "id": "message:00D2",
+    "source_sha256": "f511c1fd672b8c2a5048d0caee46661b5e4ae57b635f04a9eac17122278a09fd",
+    "translation": "Hey, {cmd:7F1A}!\nWhat are you doing so late?\nYou've been away for\n{cmd:7F2C} weeks!\n{cmd:7F04}\n{cmd:7F02}All that slacking off!\nStarting tomorrow,\nyou'd better get back to\ndecorating your room!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native resident greeting or return conversation. Preserve every original control and argument, month/week field, catchphrase occurrence, page transition, and continuing ending. Same-ID GameCube record contains only termination; no complete cross-ID donor is established. Final wording, live fields, presentation, and caller/gameplay review remain."
+  }
+]
