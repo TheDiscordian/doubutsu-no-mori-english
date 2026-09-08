@@ -121,6 +121,16 @@ item sources and failure propagation at actual owner boundaries. Notice dates
 need their separating space and full fourteen-byte capture beyond the native
 ten-byte setter. Normal delivery, schedules, and hardware remain validation work.
 The [date work record](checkpoints/LEAFLET_DATES.md) pins current evidence.
+The [whole-letter creator](../specs/LEAFLET_LETTERS.md) covers all 22 native-selected
+templates and their 66 complete English parts. Seven focused tests and 77 native
+creation/readback cases pass, including the closed-day renewal date correction;
+the supplied native schedule itself remains unchanged. The creator is still an
+isolated callable, not an installed actor hook. Next bind the original reopening
+date, selected sale items, and Redd draw at the owner boundaries, condition renewal
+notification clearing on success, and preserve selected event state on failure.
+The mode-two saved event leaflet is distinct from the ordinary five-slot queue.
+Do not reroll or silently discard failed generation, and do not count this probe
+as ordinary delivered English mail.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch

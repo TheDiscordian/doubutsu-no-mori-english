@@ -14,6 +14,9 @@ The optional [fortune-slip actor](FORTUNE_SLIP_LETTERS.md) also uses it for comp
 pocket hand-off, retaining choices across failed attempts and guarding interrupted
 payment recovery. Its scoped native hand-off/readback tests pass; ordinary
 interaction and scene cleanup still require gameplay evidence.
+The [leaflet creator](LEAFLET_LETTERS.md) covers 22 complete renewal, sale, and Redd
+templates with validated date meaning and full selected-name inputs. Its portable
+and native creation/readback probes pass; native actor publication is not installed.
 
 Completing the remaining N64 creator bindings, English field sources, semantic
 template mappings, allocation lifetime, and failure propagation remains required.

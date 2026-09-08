@@ -123,6 +123,8 @@ The supplied English executable has these reference functions:
 2. Connect complete letter creation and publication at the actual owner boundaries.
    Generic classic loading into separate pointers cannot alone establish final
    snapshot ownership or protect against later native metadata/edge copies.
+   The [complete creator](LEAFLET_LETTERS.md) passes isolated creation/readback;
+   its native owner, item-source, and failure bindings remain uninstalled.
 3. Extend notice combined-date capture and output together, preserving the GC space
    and full fourteen-byte maximum; keep full shop-name capture in the same audit.
 4. Check fishing units against native measurements and the English reference.

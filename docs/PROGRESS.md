@@ -2,6 +2,21 @@
 
 ## Active work
 
+The [complete leaflet creator](../specs/LEAFLET_LETTERS.md) supports all 22 renewal,
+sale, and Redd templates, with all 66 source-bound English header/body/footer
+parts. It captures full dates and sixteen-byte selected item names and publishes
+only after complete snapshot creation and reader validation. Renewal wording
+names the closed day, so its text date is calculated from the original planned
+reopening date without changing event scheduling. Seven focused tests, six probe
+regressions, and ten fortune-creator regressions pass. The silent native batch
+passes 77 complete creations/readbacks, six rejected inputs, disabled-catalogue
+retention, 165 calls, and 1,418 memory assertions, with restored checkpoint,
+retained RNG/handbill/save/heap state, blank isolated saves, and graceful shutdown.
+Independent 3,100-byte builds agree. This creator is not yet connected to native
+actors: item lookup, allocation/owner lifetime, renewal notification failure,
+event registration, and normal delivery remain. The [creation work record](checkpoints/LEAFLET_LETTERS.md)
+pins the evidence and actual next integration boundaries.
+
 The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete
 month/day/year and AM/PM preparation for renewal, sale, and Redd letters. Seven
 call words, two Redd scratch pointers, and the original hour formatter change;
@@ -14,7 +29,7 @@ live save/heap accounting, blank isolated saves, and graceful shutdown. Independ
 hour builds and UPS/installed-text checks agree. Full letter creation/publication,
 wider sale-item capture, notice/fishing consumers, normal scheduling/delivery,
 and hardware remain. The [date work record](checkpoints/LEAFLET_DATES.md) tracks
-exact artifacts and test limits. Complete leaflet creation is the next task.
+exact artifacts and test limits. Native complete-leaflet publication is the next task.
 
 The [complete fortune-slip creator](../specs/FORTUNE_SLIP_LETTERS.md) preserves
 all 68 phrase/outcome values and all three English letter templates. The optional

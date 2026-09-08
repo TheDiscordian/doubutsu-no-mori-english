@@ -4,23 +4,26 @@ from pathlib import Path
 import struct
 
 from aflib import sha256
-from build_mail_generation import IMPORTS,SOURCES,FORTUNE_SOURCES
+from build_mail_generation import IMPORTS,SOURCES,FORTUNE_SOURCES,LEAFLET_IMPORTS,LEAFLET_SOURCES
 from runtime_layout import MODULE_RAM,RESERVATION
 
 
-def validate(code,report,module,*,fortune_slip=False):
+def validate(code,report,module,*,fortune_slip=False,leaflets=False):
     root = Path(__file__).resolve().parents[1]
-    sources = FORTUNE_SOURCES if fortune_slip else SOURCES
+    if fortune_slip and leaflets: raise ValueError('Select one generation probe variant')
+    sources = LEAFLET_SOURCES if leaflets else FORTUNE_SOURCES if fortune_slip else SOURCES
     if (report.get('version') != 1 or report.get('base') != 0x80200000
             or report.get('bytes') != len(code) or not 0 < len(code) <= 4096
             or len(code)&3 or report.get('sha256') != sha256(code)
             or report.get('sources') != {name:sha256((root/name).read_bytes()) for name in sources}
-            or report.get('variant') != ('fortune_slip' if fortune_slip else None)
+            or report.get('variant') != ('leaflets' if leaflets else 'fortune_slip' if fortune_slip else None)
             or report.get('module_sha256') != module['module_sha256']
-            or report.get('imports') != {name:int(module['symbols'][name],16) for name in IMPORTS}):
+            or report.get('imports') != {name:int(module['symbols'][name],16)
+                                         for name in (LEAFLET_IMPORTS if leaflets else IMPORTS)}):
         raise ValueError('Stale or altered native generation probe')
     required = ('af_mail_capture_reset','af_mail_capture_set','af_mail_generate')
     if fortune_slip: required += ('af_fortune_slip_create',)
+    if leaflets: required += ('af_leaflet_create','af_leaflet_hour')
     if set(report['symbols']) != set(required) or any(type(v) is not int or v&3 or not 0 <= v < len(code)
                                                      for v in report['symbols'].values()):
         raise ValueError('Invalid native generation entry points')
@@ -40,8 +43,8 @@ def validate(code,report,module,*,fortune_slip=False):
     if seen != set(relocs): raise ValueError('Generation internal jump inventory differs')
 
 
-def relocate(code,report,module,base,*,fortune_slip=False):
-    validate(code,report,module,fortune_slip=fortune_slip)
+def relocate(code,report,module,base,*,fortune_slip=False,leaflets=False):
+    validate(code,report,module,fortune_slip=fortune_slip,leaflets=leaflets)
     if type(base) is not int or base&15 or not MODULE_RAM+RESERVATION <= base <= 0x80400000-len(code):
         raise ValueError('Invalid native generation allocation base')
     output = bytearray(code)
