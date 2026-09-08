@@ -155,6 +155,8 @@ user's direction. The production build retains the approved spacing metrics.
   tests, including thirteen mood checks, and seven text-coverage tests. Unchanged
   runtime/C tests retain their full-suite checkpoint rather than being rerun for
   this text-import-only change.
+  The renovation sequence also passes eight numeric/source/draft checks, all 96
+  reference checks, eleven placeholder checks, and seven coverage checks.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
@@ -468,20 +470,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/mood-phrases-pilot/`
-contains 12,515 edits, including
-9,760 reference main-bank candidates, all 460 choices, 572 original dialogue
-drafts, one original-dialogue continuation, 290 original development-label drafts,
+The current experimental resident-module pilot in `build/nook-renovation-pilot/`
+contains 12,518 edits, including
+9,762 reference main-bank candidates, all 460 choices, 574 original dialogue
+drafts, one original-dialogue continuation, 289 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,030
+still require review. The original main-bank audit leaves 1,027
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,472 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/mood-phrases-candidates/` and `build/mood-phrases-coverage/`. The independent
+`build/nook-renovation-candidates/` and `build/nook-renovation-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -1034,15 +1036,15 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,515 edits; basic generation has 11,805, including both startup-error drafts
-and all twenty-four mood-preserving references.
-All earlier candidates remain unchanged.
+12,518 edits; basic generation has 11,808, including both startup-error drafts,
+all twenty-four mood-preserving references, and the later renovation dialogue.
+Name approvals leave unrelated dialogue unchanged.
 Ordinary item storage contains 779 slots from 242 distinct references; the wide
 resource contains 2,713 slots from 771 references. Four rotations are one name,
 not four distinct translations. The 126 new names longer than ten bytes remain
 complete in the wide resource, not shortened for unexpanded callers.
 
-All 12,515 actual installed edits, source/candidate/build hashes, the complete
+All 12,518 actual installed edits, source/candidate/build hashes, the complete
 wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
 changes only the native item-name file and the existing wide-name resource
 relative to the travel pilot; their dimensions and DMA entries remain unchanged.
@@ -1071,7 +1073,7 @@ and placed form. All three checkpoints restore with intact guards and blank
 isolated saves. The final refinement changes only one original-width name and
 two wider fields; every other tested byte remains unchanged. All 2,713 wider
 slots resolve to their complete selected English name after the native conversion.
-The full 675-test checkpoint and all 12,515 installed ordinary payloads pass. Gyroids,
+The full 675-test checkpoint and all 12,518 installed ordinary payloads pass. Gyroids,
 changed species/designs, game slots, remaining identities, and all unexpanded
 destinations stay in the completion queue.
 
@@ -1108,15 +1110,34 @@ All thirteen mood tests pass within the 96-test reference batch; seven coverage
 checks also pass. The preceding full-suite checkpoint passes 675 tests. The silent
 four-MiB native batch passes twenty-four complete cartridge loads and 48 actual
 order dispatches: 72 calls, 175 memory assertions, guards, and restored state. All
-12,515 installed edits and the UPS reconstruction pass. The mood import preserves
+12,518 installed edits and the UPS reconstruction pass. The mood import preserves
 earlier candidates and resources outside the main text/table; the separate item-name
 checks above cover the current name changes. Normal resident
 mood progression, rendered conversation, final wording, saving, and original
 hardware remain separate acceptance requirements.
 
+## Complete renovation invoice and native room choices
+
+The [first-enlargement invoice](../specs/NOOK_RENOVATIONS.md) preserves the complete
+GameCube reference with the native 49,800-Bell price, using `107E → 083F` at one
+existing page boundary. A numeric-only approval checks the original amount,
+complete corrected English, full slice coverage, and each final payload. The
+two parts fit at 574 and 483 expanded bytes. No buffer, font, save, or gameplay
+code change is needed.
+
+Two complete original drafts retain the native costly-enlargement agreement and
+refusal-to-roof-colour flow in `107F/1081`, without importing the GameCube basement
+choice. Every native control remains exact, with no draft layout warnings.
+Eight focused, 96 reference, eleven placeholder, and seven coverage checks pass.
+The silent four-MiB native run passes all four message loads, invoice continuation
+and termination, and six agreement/roof branch selections: 33 calls, 51 memory
+assertions, 142 steps, intact guards, restored checkpoint, and blank isolated
+saves. All installed payloads and patch reconstruction pass. Normal repayment,
+rendered choice selection, final wording, saving, and hardware remain unverified.
+
 ## Text-volume measurement
 
-The generated coverage report measures 637,055 covered source characters out of
+The generated coverage report measures 637,486 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1136,8 +1157,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,515 edits, including
-9,760 reference main-bank candidates, 290 original development-label drafts,
+The resident-module experiment contains 12,518 edits, including
+9,762 reference main-bank candidates, 289 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1152,12 +1173,13 @@ dialogue drafts (including five connected reply corrections), four
 contextual-menu reply drafts, 35 native return greetings, 85 native daily,
 move, repeat, and month-return greetings, 72 native introductions/reunions,
 eight native moving conversations, seven game-launch prompts, and four complete
-native travel explanations using five records, and two native startup errors.
+native travel explanations using five records, two native startup errors,
+and two native renovation drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,031 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,030 main records without
-candidates: 108 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,028 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,027 main records without
+candidates: 105 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

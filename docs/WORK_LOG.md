@@ -5383,3 +5383,72 @@
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
+
+## 2026-09-08 — Complete renovation invoice and original room choices
+
+- Added `nook_first_renovation_invoice`, preserving all supplied English `107E`
+  with only the native 49,800-Bell amount in place of 148,000. The complete
+  corrected record is 1,023 stored/1,039 expanded bytes. Its existing page
+  transition immediately after the bill becomes `107E → 083F`; resulting
+  expanded bounds are 574 and 483 bytes. Dry-rot, mammal-strike, payment,
+  debt-character, and farewell wording, manual lines, and pauses remain intact.
+- Added the narrow `native_price` sequence approval. It checks a complete numeric
+  reference span, the full corrected reference hash, exact native numeric text,
+  unchanged commands/newlines, complete slice coverage, and final payload hashes.
+  It cannot combine with native-original or article-removal adaptations. The
+  independent builder checks the native price as well as all source/output hashes.
+  Native `083F` has no incoming script branch or matching executable immediate.
+  Its sole non-executable aligned halfword match is inside libultra's sine table
+  at `8003C644`, not a dialogue pointer.
+- Added complete original `107F/1081` drafts for repayment, the expensive further
+  enlargement, refusal, and roof-colour choice. The GameCube basement action is
+  not native. Every source command and argument remains exact, including `5E`,
+  both agreement branches, all four roof branches, and continuing termination.
+  Expanded bounds are 421 and 322 bytes; both layouts pass without warnings.
+- Eight focused tests pass in 2.214 seconds
+  (`build/tests-nook-renovation-prices-03.log`). All 96 reference checks pass in
+  19.018 seconds, eleven placeholder checks in 13.907 seconds, and seven coverage
+  checks in 0.002 seconds. Early attempts exposed only a test error-message case
+  expectation and stale aggregate sequence counts; those fixtures were corrected,
+  and their full groups passed. Runtime/C code is unchanged and retains its
+  675-test full-suite checkpoint; no new full-suite run is claimed.
+- Full/basic candidates now contain 12,518/11,808 ordinary edits. Three previously
+  missing records gain text; `083F` changes from its reserve label to the complete
+  invoice continuation. All other candidates remain unchanged. Main coverage is
+  10,725 records: 9,762 references, 574 original dialogue drafts, one original
+  continuation, 289 development labels, and 99 diagnostics. All 460 choices
+  remain. The remaining main set is 1,027: 105 Japanese-static records, 919
+  nonstatic records, one Latin record, and two symbol records. Ten nonstatic
+  records have dynamic insertions; none is labelled unreachable. The reference
+  queue has 926 unconfirmed identities, 76 control differences, 24 missing-field
+  records, and two direct overflows, with one original fallback. Fresh identity
+  review admits no additional records under existing rules; the ten special
+  expression contexts stay unapproved. Layout warnings remain 1,472. Covered
+  source weight is 637,486/746,978 characters, not an overall completion claim.
+- `build/nook-renovation-pilot/` ROM SHA-256:
+  `80cff2f8cff769b9aae7d1f65184092196b838f272c7011625cbeebe4dc05f4b`.
+  UPS SHA-256:
+  `05da1b249d952a5ed2b977643f83489c3c8417311ff5cd6de12eb1b1a405d5fc`.
+  Candidate SHA-256:
+  `d45f11c5f8ec3ecf1790840a55a7a8964f5da5a5fc7195ea275a3daec7106aea`.
+  `build/nook-renovation-artifact-audit.log` checks every installed payload,
+  source/build hashes, the complete UPS reconstruction, and candidate differences.
+  Only `02000000`, `00CF9000`, and the DMA-directory container `00019D40`
+  differ from the mood-phrase pilot; the container is unchanged outside its
+  table. Runtime, font, all item/name/mail resources, and saved layouts remain.
+- `build/smoke-nook-renovation-01/` passes all four actual cartridge loads,
+  invoice continuation and both termination phases, both agreement outcomes,
+  and all four roof-branch selections. The complete run has 33 calls with exact
+  expected returns, 51 memory assertions, and 142 steps. The independent audit
+  verifies every call/argument/return, restored stack, and complete expected read.
+  Guards, checkpoint restoration, and graceful shutdown pass. The run is silent,
+  four MiB, has no seeds, and disables both save-write flags; cartridge/Pak hashes
+  remain blank. Scenario SHA-256:
+  `176e7ffb74444cdb23682120094043945f9dac70f01be0d1b0fa12b26762497c`.
+  This is injected native-handler validation, not ordinary repayment, roof-menu
+  input, rendered progression, saving, or original-hardware proof.
+- Updated the current progress, queue, and sequence/renovation specifications.
+  Title artwork remains the first image priority after the main port; its source
+  route is recorded, but no replacement is installed. Broader dialogue, remaining
+  destinations, gameplay/save validation, image/keyboard work, final review, and
+  patch-only release acceptance remain required.

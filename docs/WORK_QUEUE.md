@@ -428,21 +428,20 @@ addressing English capacity. `000F/0010` terminate through timed-close `58`;
 `0011` retains syllable pauses and sound variants. Do not flatten those controls
 or let this separate sample audit delay the broader dialogue/runtime work.
 
-Nook's later renovation block `107E/107F/1081` needs native pricing and actions.
-The complete supplied `107E` becomes 1,023 stored/1,039 expanded bytes when its
-148,000-Bell quote is replaced with the native 49,800-Bell quote; ordinary
-reference controls pass, but capacity correctly rejects it. Preserve the full
-English reference through an existing page-boundary split with an individually
-bound native-price wording change, not a shortened invoice or reduced reserve.
-`107F/1081` are a native expensive-room-enlargement agreement/refusal and roof
-colour flow, not the GameCube basement choice. Retain `00DF/000D`, `1080/1081`,
-the four roof choices, and `1085/1086`; those different actions need native-complete
-wording. Source and complete references are locally inventoried, with no approval
-or gameplay claim implied by this comparison.
+The [later renovation block](../specs/NOOK_RENOVATIONS.md) installs the complete
+English invoice as `107E → 083F`, changing only its price to the native 49,800
+Bells and splitting at an existing English page boundary. Individually bound
+native-price checks retain full wording and the 1,024-byte buffer limit.
+Original `107F/1081` drafts retain native expensive-room enlargement, agreement,
+refusal, and roof choices, not the GameCube basement actions. Eight focused,
+96 reference, eleven placeholder, and seven coverage checks pass. The native
+batch passes four complete loads, invoice continuation/termination, and all six
+agreement/roof branch selections: 33 calls, 51 assertions, and restored state.
+Normal repayment, roof selection, rendered progression, and hardware remain.
 
-Current main-bank coverage is 10,722 candidates; 1,030 records remain without
-candidates, including 108 containing Japanese static text. The reference
-rejection queue contains 929 unconfirmed identities, 76 control-signature
+Current main-bank coverage is 10,725 candidates; 1,027 records remain without
+candidates, including 105 containing Japanese static text. The reference
+rejection queue contains 926 unconfirmed identities, 76 control-signature
 differences, 24 missing-field records, and two expansion overflows. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -522,7 +521,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including fifteen guarded continuation allocations; 99 complete diagnostic labels covered; 108 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including sixteen guarded continuation allocations; 99 complete diagnostic labels covered; 105 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |

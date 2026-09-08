@@ -1,5 +1,40 @@
 [
   {
+    "id": "nook_first_renovation_invoice",
+    "evidence": "Native and GameCube 107E greet the customer, confirm the completed first enlargement, announce its bill, and explain gradual payment through the post office. Preserve the complete English reference, including the dry-rot and mammal-strike asides, changing only the price from 148,000 to the native 49,800 Bells. Split at its existing wait/newline/page-clear boundary immediately after the bill. Native 083F is an opening reserve with no incoming native message branch or matching arithmetic/comparison/logical executable immediate. Its sole aligned non-executable halfword match is in libultra's sine table at 8003C644. The complete reference, adapted reference, native slots, and final payloads are hash-bound. All original actor tuples and the native final end 00 remain. See specs/NOOK_RENOVATIONS.md; ordinary progression and hardware remain unverified.",
+    "native_price": {
+      "source_offset": 131,
+      "reference_offset": 755,
+      "before": "148,000",
+      "after": "49,800",
+      "adapted_reference_sha256": "0fcec1fb1314b7ce07996c2820402d5728b6754ac6de65ac34d4fdd78476de89"
+    },
+    "members": [
+      {
+        "id": "message:107E",
+        "source_sha256": "926f511dc59626e90a8b60a7af830f7cd13b1c2d4137bca6b467d11e3d038e4e",
+        "reference_id": "message:107E",
+        "reference_sha256": "80b92bf5a4f9cfa7c23873c3d1a8e41353c80a99e51438de1ebc80854536394b",
+        "reference_slice": [
+          0,
+          551
+        ],
+        "encoded_sha256": "274815ab7ee869c2fc1fb89d9a9f1c2aee34facb2c27e05d312f2212f0079a7d"
+      },
+      {
+        "id": "message:083F",
+        "source_sha256": "e53caebb1cb78719ce914b1c364c743040a60110efbfe5ca772b03b1168bea8d",
+        "reference_id": "message:107E",
+        "reference_sha256": "80b92bf5a4f9cfa7c23873c3d1a8e41353c80a99e51438de1ebc80854536394b",
+        "reference_slice": [
+          556,
+          1023
+        ],
+        "encoded_sha256": "01eb305a6f1c438c796e27805e4e0c23bd44a067ec42188aa88f826fbf04bece"
+      }
+    ]
+  },
+  {
     "id": "rover_repeat_phone",
     "evidence": "Both native and English Rover conversations call Nook for another player who needs a house, give the town and player names, and return to 046F. Retain the complete English conversation, actor requests, inner voice, and phone mode 06/07 pair. Split only at the existing page boundary [132,137) after the greeting, before 06, so the entire phone-mode span stays in the second record. Final 0E046F and continuing end 01 remain exact. The continuation is a source-hash-bound native reserve placeholder with no incoming native message-script target and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned section inventory. This is approval for this exact slot, not permission to reuse other blank/reserve records. All parts install together. Normal actor progression and rendered presentation remain separate gameplay checks.",
     "members": [

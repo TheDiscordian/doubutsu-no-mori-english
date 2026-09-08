@@ -169,6 +169,14 @@ before adaptation; slice coverage applies to the complete adapted result, and
 every final payload retains its own hash. All members using that reference must
 agree on adaptation. Unknown commands and unavailable native fields still fail.
 
+## Native invoice prices
+
+The [first-renovation invoice](NOOK_RENOVATIONS.md) uses `107E → 083F` and a
+separate numeric-only `native_price` approval. It retains the complete supplied
+English with the native 49,800-Bell amount. The original reference hash, corrected
+complete reference hash, native numeric text, fully covering slices, and each
+final payload are checked. This does not relax ordinary wording or command rules.
+
 ## Original native translations
 
 The [complete native travel sequence](NATIVE_TRAVEL_ADVICE.md) uses the same

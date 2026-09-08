@@ -8,6 +8,7 @@ import re
 from aflib import sha256
 from textcodec import decode, encode, tokenize
 from native_sequences import source_kind, validate_native_group, native_reference, audit_native_translation
+from sequence_prices import validate_price_group, audit_native_price, adapt_reference_price
 
 APPROVALS = Path(__file__).resolve().parents[1]/"translations/reference_sequences.json"
 # Native font consumers and argument constraints are audited in REFERENCE_LAYOUT.
@@ -66,6 +67,7 @@ def load_sequences(path=APPROVALS):
                            for c in actor_source['commands'])):
                 raise ValueError('Additional actor approvals require exact native speaker emotion commands')
         validate_native_group(record)
+        validate_price_group(record)
         result[record["id"]] = record
     return result
 
@@ -178,6 +180,7 @@ def validate_sequences(edits, source, info, groups=None, *, resident_runtime=Fal
             audit_native_translation(group, source[numbers[0]], info)
             if replacements != reference_payloads(group, {}, info):
                 raise ValueError('Native sequence parts do not reconstruct the complete original translation')
+        audit_native_price(group, source[numbers[0]], info)
         reserved = set(numbers[1:])
         for number, data in enumerate(source):
             if reserved.intersection(message_targets(data, info)):
@@ -222,6 +225,7 @@ def reference_payloads(group, references, info):
             reference_info[0x74] = (2, 0)
         if sha256(encode(text, reference_info)) != member['reference_sha256']:
             raise ValueError('Sequence requires the exact complete encoded reference')
+        text = adapt_reference_price(group, text, info)
         if remove_article:
             # Import at use time: the existing adapter also uses textvalidate,
             # whose sequence-permit type is defined in this module.
@@ -303,4 +307,7 @@ def reference_sequence_edits(references, source, info, groups=None, *, resident_
                 edits[-1]["provenance"]["draft_slice" if native else "reference_slice"] = member["reference_slice"]
             if member.get('remove_redundant_cutarticle', False):
                 edits[-1]['adaptations'].append({'kind': 'remove_redundant_cutarticle_before_string'})
+            if 'native_price' in group:
+                edits[-1]['adaptations'].append({'kind': 'reviewed_native_invoice_price',
+                                                **group['native_price']})
     return edits, validate_sequences(edits, source, info, groups, resident_runtime=resident_runtime)

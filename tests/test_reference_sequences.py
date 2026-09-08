@@ -154,7 +154,7 @@ class ReferenceSequenceTests(unittest.TestCase):
             native = source[int(edit['id'].split(':')[1], 16)]
             validate_entry(native, payload, info, 'message', 'reviewed_sequence',
                            resident_runtime=True, sequence_permit=permits[edit['id']])
-        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 34)
+        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 36)
         with self.assertRaisesRegex(ValueError, 'Partial'):
             validate_sequences(edits[:1], source, info, {name: group}, resident_runtime=True)
         # Scan the pinned executable/data section inventory, not arbitrary ROM
@@ -284,7 +284,7 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 30)
+        self.assertEqual(len(edits), 32)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",

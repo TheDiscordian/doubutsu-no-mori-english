@@ -10,7 +10,7 @@ from aflib import CODE_VROM, by_vrom, sha256
 from reference_sequences import load_sequences
 from runtime_module import module_command_info, verify_test_module
 from textbanks import Bank
-from textcodec import command_info, tokenize
+from textcodec import command_info, encode, tokenize
 
 LONG_ADVICE_GROUPS = ('rover_repeat_phone', 'resident_lazy_furniture_advice',
                       'resident_cranky_furniture_advice', 'resident_snooty_furniture_advice',
@@ -24,7 +24,8 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
-                          "resident_late_night_introduction", "native_normal_travel_advice", *LONG_ADVICE_GROUPS):
+                          "resident_late_night_introduction", "native_normal_travel_advice",
+                          "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):
@@ -109,6 +110,34 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
             raise ValueError("Native repeat response no longer returns to the root")
         dispatch(repeat[0])
         read(window+0x2C4, struct.pack(">I", 0x07EA))
+    if group_name == 'nook_first_renovation_invoice':
+        drafts = json.loads((Path(__file__).resolve().parents[1]/
+                             'translations/n64-renovations.json').read_text())
+        targets = {0x107F: (0x1080, 0x1081), 0x1081: (0x1085, 0x1085, 0x1085, 0x1086)}
+        if {int(draft['id'][8:], 16) for draft in drafts} != targets.keys():
+            raise ValueError('Renovation branch fixture requires its two native drafts')
+        for draft in drafts:
+            number = int(draft['id'][8:], 16)
+            if entries[number] != encode(draft['translation'], info):
+                raise ValueError('Test ROM differs from the complete native renovation draft')
+            load(number)
+            commands = [t for t in tokenize(entries[number], info) if t.kind == 'cmd']
+            branches = [t for t in commands if 0x0F <= t.data[1] <= 0x12]
+            expected = [bytes((0x7F, 0x0F+i))+target.to_bytes(2, 'big')
+                        for i, target in enumerate(targets[number])]
+            if [t.data for t in branches] != expected or commands[-1].data != b'\x7f\x01':
+                raise ValueError('Renovation draft changes its native branch choices or terminator')
+            for selection, target in enumerate(targets[number]):
+                write(0x80142640, struct.pack('>I', selection))
+                write(window+0x2C4, b'\xff'*4)
+                for token in branches:
+                    dispatch(token)
+                read(window+0x2C4, struct.pack('>I', target))
+            write(window+0x28C, bytes(4))
+            dispatch(commands[-1], 2)
+            read(window+0x28C, struct.pack('>I', 8))
+            dispatch(commands[-1], 1)
+            read(window+0x28C, bytes(4))
     actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
                 {"read": ["8019B000", 4], "expect": "00000000"}]

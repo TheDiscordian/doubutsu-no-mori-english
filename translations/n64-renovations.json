@@ -1,0 +1,18 @@
+[
+  {
+    "id": "message:107F",
+    "source_sha256": "29a79c86bc140fc7aa8cfc031854d8aa02e3c499586572979c7d60cdd112a89f",
+    "translation": "Thank you, thank you,{cmd:7F0306}\n{cmd:7F1A}!{cmd:7F04}\n{cmd:7F02}You've paid off{cmd:7F0306}\nyour entire renovation bill!{cmd:7F0304}\nThank you very much,{cmd:7F0308}\nhm!{cmd:7F04}\n{cmd:7F02}And since you've paid\nit all off,{cmd:7F0308}{cmd:7F09000015}\ndoes that mean...?{cmd:7F04}\n{cmd:7F02}You'd like an even\nbigger room,{cmd:7F0900000B}{cmd:7F0304} yes?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Making your house {cmd:7F0304}even bigger\nthan it is now{cmd:7F0306}\nwill cost quite a bit, hm.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}Is that all right with you?\n{cmd:7F1600DF000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1080}{cmd:7F101081}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 renovation entry",
+    "status": "draft",
+    "notes": "Thank the player for complete repayment, infer a wish for a still larger room, warn that further enlargement is expensive, and ask for agreement. The GameCube room-or-basement offer has different actions. Preserve every native command and argument, including 00DF/000D, 5E, branches 1080/1081, and continuing end 01."
+  },
+  {
+    "id": "message:1081",
+    "source_sha256": "1e2d4beb7d918da402f773186c2ff5427880ba7a4ffbff9595090d847184e9a8",
+    "translation": "{cmd:7F09090001}{cmd:7F090000FF}Oh, come now!{cmd:7F0306}\nYou don't mean that!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}You know I won't{cmd:7F0306}\nsay a word{cmd:7F0304}\neven if you don't pay\nthe renovation bill!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Don't hold back!{cmd:7F0306}\nLet's go ahead and remodel!{cmd:7F04}\n{cmd:7F02}So,{cmd:7F0308}\nfor your new house,\nwhat colour roof{cmd:7F0306}\nwould {cmd:7F0900000B}you like, hm?{cmd:7F1800A100A200A300E0}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1085}{cmd:7F101085}{cmd:7F111085}{cmd:7F121086}{cmd:7F19}{cmd:7F090000FF}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 renovation entry",
+    "status": "draft",
+    "notes": "Nook dismisses the refusal, reminds the player that nobody will complain even if the bill remains unpaid, proceeds with enlargement, and asks for a roof colour. This is not the GameCube basement explanation. Preserve every native command and argument, including 09:09:0001, all four choice IDs, branches 1085/1085/1085/1086, and continuing end 01."
+  }
+]
