@@ -16,6 +16,13 @@ the caller's buffer larger: silent truncation still loses translated text.
 
 ## Caller inventory
 
+The optional [Katrina integration](FORTUNE_STRINGS.md) supplies all 128 complete
+English fortune fragments in `0164..01E3`. Its caller grows from ten to sixteen
+bytes through seven guarded frame/length changes and uses the existing resident
+item fields. Enabled builds relocate general-string data to `02600000`, retaining
+the native table, entry count, sixty-four-byte getter, and every other caller's
+limits. Other IDs do not inherit the fortune group's capacity permission.
+
 `tools/audit_string_callers.py` scans pinned executable-segment definitions and
 records thirty-four direct J/JAL sites. It records nearby instructions, file
 hashes, linked addresses, and conservative immediate argument hints. Hints are
@@ -35,7 +42,8 @@ and seven sites without a straight-line immediate length.
 | `800A9F7C`, `800AA264` | Saved villager catchphrase at `Animal+4E5`, four bytes | Default main-dialogue display uses a separate ten-byte resource; custom editing, shared choices, mail, and save compatibility remain |
 | `800ACDC0` | Special-NPC name table, six-byte singleton then personal-name copy | Main dialogue/nameplates use the separate eight-byte display resource; other readers and identity storage remain native |
 | `800C40D4..800C43F4` | Native date/unit suffix formatters | Message date calls already use resident English formatters; other UI paths remain native |
-| Actor overlays | Shops, fortune-telling, fruit-box labels, and an unidentified overlay | Resolve ID tables, local frames, and downstream insertion/draw limits |
+| `809DC590` in `ovl_Ev_Gypsy` | Four 32-entry fortune families; scoped sixteen-byte local and resident item fields | Complete source-bound English group implemented; normal paid readings and luck effects remain gameplay checks |
+| Other actor overlays | Shops, fortune slips, fruit-box labels, and the ordinary resident overlay | Resolve ID tables, local frames, and downstream insertion/draw limits |
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,

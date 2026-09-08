@@ -9,6 +9,7 @@ from reference_fields import ReferenceFieldPermit, SpeakerCatchphrasePermit
 from reference_animations import ResidentAnimationPermit, is_resident_animation, verify_animation_values
 from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
 from placeholder_text import validate_placeholder
+from fortune_strings import FortunePermit
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -67,7 +68,13 @@ def expanded_bound(data, info, *, extended_glyphs=False):
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
-                   extended_glyphs=False):
+                   extended_glyphs=False, fortune_permit=None):
+    if fortune_permit is not None:
+        if (not isinstance(fortune_permit, FortunePermit) or bank != 'string' or not resident_runtime
+                or policy != 'exact' or fortune_permit.source_sha256 != sha256(original)
+                or fortune_permit.encoded_sha256 != sha256(replacement) or len(replacement) > 16
+                or any(t.kind != 'text' for t in tokenize(replacement, info))):
+            raise ValueError('Fortune capacity requires an exact complete resident string permit')
     if extended_glyphs and (bank != 'message' or not resident_runtime):
         raise ValueError('Extended glyphs require the resident main-dialogue capability')
     if bank == 'message' and policy != 'reviewed_sequence':
@@ -161,7 +168,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
         # complete expansion proof exists, dynamic edits may not grow.
         if any(t.kind == "cmd" for t in tokenize(replacement, info)) and len(replacement) > len(original):
             raise ValueError("Dynamic choice expansion requires review")
-    elif len(replacement) > len(original):
+    elif len(replacement) > len(original) and fortune_permit is None:
         raise ValueError("Translation exceeds current entry budget")
     if bank != 'message' and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
         raise ValueError('Two-byte message tags need explicit semantic review')

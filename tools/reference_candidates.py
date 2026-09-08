@@ -29,6 +29,7 @@ from dialogue_dates import REQUIREMENT, requires_dialogue_dates
 from birthday_fields import message_ids as birthday_message_ids
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 from reference_content import adapt_content_reference, validate_content_candidate, validate_glyph_candidate
+from fortune_strings import candidates as fortune_candidates, permits as fortune_permits
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -147,6 +148,7 @@ def native_placeholder_fallback(row, original, info, *, skip_ids):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--english-fortunes', action='store_true', help='Complete source-verified Katrina phrases; requires resident module')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -163,6 +165,8 @@ def main():
     args = parser.parse_args()
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
+    if args.english_fortunes and not args.runtime_module:
+        parser.error('--english-fortunes requires --runtime-module')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     rom = verified_rom(args.rom.read_bytes())
@@ -256,6 +260,11 @@ def main():
         gc = {row["id"]: row for row in map(json.loads, (args.gc_text/(name+".jsonl")).read_text().splitlines())}
         inventory = [json.loads(line) for line in (args.inventory/(name+".jsonl")).read_text().splitlines()]
         source = source_banks[name].entries()
+        fortunes = (fortune_candidates(rom, gc, {r['id']: r for r in inventory}, info)
+                    if name == 'string' and args.english_fortunes else {})
+        string_permits = fortune_permits(rom, list(fortunes.values()), info) if fortunes else {}
+        if fortunes.keys() & (override_ids | matches.keys()):
+            raise ValueError('Fortune group conflicts with a draft or identity override')
         sequence_edits, permits = (reference_sequence_edits(gc, source, info,
                                   resident_runtime=bool(args.runtime_module)) if name == "message" else ([], {}))
         sequences = {edit["id"]: edit for edit in sequence_edits}
@@ -272,7 +281,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in fragments:
+            if id in fortunes:
+                edit = fortunes[id]
+                validate_entry(original, encode(edit['translation'], info), info, name,
+                               resident_runtime=True, fortune_permit=string_permits[id])
+                counts['complete_fortune_phrases'] += 1
+            elif id in fragments:
                 edit = fragments[id]
                 if row['source_sha256'] != edit['source_sha256']:
                     raise ValueError('Stale mail-fragment main inventory')

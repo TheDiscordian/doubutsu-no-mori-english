@@ -6682,3 +6682,74 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Next content work includes general strings/callers, apology/editor matching,
   and the remaining native diagnostics. Title artwork stays first in the image
   queue after the main port. The full objective remains active, not complete.
+
+## 2026-09-08: complete all 128 Katrina fortune fragments and their native caller
+
+- Added the complete native fortune phrase group `string:0164..01E3`. Every
+  supplied GameCube phrase agrees with its complete legacy entry; all 128 fit
+  sixteen bytes. The native adjective/noun/activity/place bases remain
+  `01A4/01C4/0184/0164`. Generator and builder bind the original complete bank
+  and the length-prefixed complete English group, SHA-256
+  `482decf774ec977a2b13643c6998411a962a1a64438b11e68b8c54a74ec9de8d`.
+  Each capacity permit separately binds the original and final entry hashes.
+  Missing, duplicate, changed, shortened, non-text, and oversized values fail;
+  unrelated strings retain their original limits. No extracted phrases enter git.
+- `--english-fortunes` requires the verified resident module in both generation
+  and construction. Seven guarded instructions in `809DC590..809DC608` grow
+  its local from ten to sixteen bytes: the frame grows from 48 to 56 bytes,
+  and all three saved-argument references move from `sp+30` to `sp+38`.
+  The local stays at `sp+24`, the return address at `sp+14`, and both load/set
+  calls pass sixteen. Existing resident item fields carry complete values into
+  main dialogue. Original random selection, prices, effects, saved layouts,
+  font metrics, all forty relocations, actor file size, and BSS remain unchanged.
+  Patched actor SHA-256:
+  `557d824617900c6190890702bfbd66355b3cb220d9c39f498a7ff49f2bf801d1`.
+- Enabled builds relocate the general-string data to `02600000`, retaining the
+  cumulative table at `00D18000`. Only `800C3F1C/800C3F20` change in main code;
+  the 1,562-entry count, sixty-four-byte getter, eighty-byte DMA staging, and
+  other caller limits remain. The complete data file is 8,032 bytes and the ROM
+  stays 32 MiB. Exact base-address literal/nearby instruction-pair inventory
+  finds only the DMA entry and this guarded address pair.
+- Seven focused tests cover source/legacy/reference agreement, independent
+  builder installation, complete/partial/changed groups, unrelated capacity
+  rejection, seven-word frame reconstruction, unchanged relocation behaviour
+  at two bases, and all 32 inverse-LCG fixtures. The full host regression passes
+  **810 tests in 299.637 seconds**, `build/tests-fortunes-full.log`.
+- Full candidates increase by 108 to 12,711. Twenty existing fortune candidates
+  retain identical text with explicit group provenance; no existing entry
+  outside the group changes. Ordinary string candidates total 263, leaving
+  1,299 entries. The no-fortune generator reproduces the previous 12,603-edit
+  file exactly, `build/fortune-disabled-candidates/`. Basic remains 11,850.
+  Main remains 10,810 candidates and 942 records without candidates; layout
+  warnings remain 1,491. Source-character weights become 647,238/746,978 across
+  the native banks; main remains 636,025/637,761. Review-complete remains zero;
+  these are candidate inventories, not semantic/gameplay/project completion.
+- Pilot `build/fortune-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `b018dac674fabf35464fc242166a1bd935d6d6c3f7b39ae7adcc52a63b2ff928`.
+  UPS SHA-256:
+  `3acceea22219609304c5ac165f8b3d8d0ae882f9c68c3eb8731efe3f8328caf8`.
+  Candidates `build/fortune-candidates/translations.json`, SHA-256:
+  `909ca770ae8e0bdce41d0aa923a9c1d3cc7ef957860b733693fdca9d60d3b664`.
+  Coverage: `build/fortune-coverage/`. The independent installed audit checks
+  every candidate and unchanged general string, original-ROM UPS reconstruction,
+  the exact two main-code words, and seven actor words. Only those code files,
+  the string data/table, and DMA metadata differ from the number-game pilot.
+  All other assets/resources and the 24,192-byte resident image remain unchanged.
+- The first bounded silent batch `build/smoke-fortune-01/` passes 2,112 records,
+  459 native calls, and 888 memory assertions. It loads all 128 complete phrases,
+  executes all 128 native selections, compares 32 original RNG calls, loads
+  32 complete fortune readings, and inserts all 128 values with every surrounding
+  word/command retained. Eight native table boundaries pass. Complete stack
+  locals, unchanged neighbouring fields, complete saved memory, heap/stack/module
+  guards, exactly one saved/restored checkpoint, blank isolated FlashRAM/Pak,
+  process survival, and graceful shutdown pass. Audio is disabled and four-MiB
+  configuration is selected. The original loader loads and relocates the actual
+  cartridge actor; no actor code is uploaded. Independent scenario regeneration
+  and expected-output hashes check all loads, locals, random states, and complete
+  insertions. Scenario SHA-256:
+  `6befb89fe9170f87b42171a1154d3353b99ca9aa9153b23f7f27f61cf1303567`.
+- Normal paid readings, actual luck effects, visual presentation, ordinary
+  saves, and hardware remain gameplay/playthrough checks. Broader general
+  strings/callers, apology editor/matching, and twenty native diagnostic records
+  remain next content work. The title screen remains first in the image queue
+  after the main port. The full translation/review/release objective stays active.
