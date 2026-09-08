@@ -1,5 +1,1760 @@
 [
   {
+    "id": "message:087C",
+    "source_sha256": "912a5b40099078c06d8b2584ce4ee2fdef97a567b2c2a507bc80ad38c361a9be",
+    "reference_id": "message:087C",
+    "reference_sha256": "f72f16a328ca14c7e5c6278bc27615114c5124714aac7bfa370c1727e77c42c1",
+    "native_choices": {
+      "reference_command": "7F16001D0102",
+      "native_command": "7F1600280102",
+      "offset": 56,
+      "adapted_sha256": "524c98f983a1dfc4c9227a5e99deb43a5e3e39df19194e69bfbf500976f5985c"
+    },
+    "evidence": "Complete native and English sources were compared for the birthday gift offer. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:098B",
+    "source_sha256": "0a39d505529846563515664f46047dcf80e4a84eb8e1aa63b6d1ee47e7cf815f",
+    "reference_id": "message:098B",
+    "reference_sha256": "7765da67649feb1b48cd53117f609dd8d4c8ce6eaa5a50019254a38c2d3adde6",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 85,
+      "adapted_sha256": "cc0983c076d15d438178c21bd3c95a16ef89f15266cd94a2cb499c8585d2d6aa"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0991",
+    "source_sha256": "197c8badb80bdf0b84645e71d8b04de97db946b702487851a1e8ef70dab981e5",
+    "reference_id": "message:0991",
+    "reference_sha256": "b2f080b7c9475c715050ee7607ef042d88852968c1957952b420ead3e7d63c45",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 77,
+      "adapted_sha256": "f304c9efa13bd88b06d00dde3ebd2f60085c960e7ad4cdd0c3bb98b82a3ea2f2"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0997",
+    "source_sha256": "09ff859a67ef1ea6931834bcce2ddc1cf9a1b83886abb10b5f05bfaf1335cfe9",
+    "reference_id": "message:0997",
+    "reference_sha256": "c8fb4027af399c5afd9b1cb98710a78236203f71b3e3834527def411d25fc634",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 94,
+      "adapted_sha256": "1e68501ba210ca32dd3d18ce1ba82ddf7f43a9a1a2edc31878b70f002978783b"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:099D",
+    "source_sha256": "34f27d894450a223b709959246df057ce88ca46e11d637fe4283e12827b2d8a5",
+    "reference_id": "message:099D",
+    "reference_sha256": "2eeb030e6734876eb91aa9d95c7b4fc6450c4c48efe6688c1a3c2d9481ea9b18",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 149,
+      "adapted_sha256": "47cae7c7bc2c3d9cd1b6ce17742e05c120af72b9c150e22be50bf2320ebb0237"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:09A3",
+    "source_sha256": "2ca69b4373bacba05a80cb8c43267e5afffadd281879ed063d025db0ad1136be",
+    "reference_id": "message:09A3",
+    "reference_sha256": "5283ef919f15902c480069861f2cd1e3656e3d89ef94d5a1ab4283ffe20fd826",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 82,
+      "adapted_sha256": "a838637ae0b97f1d62d6a4d42092989b2cd8484d76ca97993238444f3477bd43"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:09A9",
+    "source_sha256": "4d59beab2f3a9ebb2b958388cb5ade820bec51b20c784f55f948bf92df1b91c5",
+    "reference_id": "message:09A9",
+    "reference_sha256": "72173d8e5d92863ab84d824c4cea6a0a74bedc3e2cd9eeb9258304e57f3438fc",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 103,
+      "adapted_sha256": "4dc25bd36508e6253c6e77454261521094c9450d69d85e576585edd311386f37"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:09B5",
+    "source_sha256": "8e7e2edc8be28689df533011da35b3c086b02b1f2cd93c5d92e544b0fd93b0bf",
+    "reference_id": "message:09B5",
+    "reference_sha256": "d74b6bbcfcb0e897e7ce1b36b731cc634bf658aa89fc64a2d1446bfbb3a7cd94",
+    "native_choices": {
+      "reference_command": "7F1600EF0012",
+      "native_command": "7F1600110018",
+      "offset": 175,
+      "adapted_sha256": "f4ac6fd9056fb8f25b76a6459fec4cbcb0b64d4a49659e276dd0cb072581b8bb"
+    },
+    "evidence": "Complete native and English sources were compared for the Halloween candy request and refusal. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0A0A",
+    "source_sha256": "06d1e361987bea741de2e83020527eab5824ebcd4e4e6252b32a5e408aae4f6e",
+    "reference_id": "message:0A0A",
+    "reference_sha256": "9cc2418ed475c180e15c77618fe4599e3061a040962c9ce70023fee07aec897a",
+    "native_choices": {
+      "reference_command": "7F16007D01AB",
+      "native_command": "7F16007D000D",
+      "offset": 70,
+      "adapted_sha256": "9f1770f6f7f4a54510808f6daf9d22d4b51d1c8d40c4b1941ebc9c207b88fa04"
+    },
+    "evidence": "Complete native and English sources were compared for the empty storage insertion question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0A14",
+    "source_sha256": "d9cc9b521ee1ed800defcbde172def5463c8113b251818020f3068cbbc5a4716",
+    "reference_id": "message:0A14",
+    "reference_sha256": "e3b71598fa6d0216d36728e9cbf32e9ae02c85258b64b95189f6a8e3bba02e52",
+    "native_choices": {
+      "reference_command": "7F16002F00F9",
+      "native_command": "7F16002F001E",
+      "offset": 93,
+      "adapted_sha256": "686148c51e867fa45726e643681b64e9fac8f1797d6c8baf30feb98b3dcd55a3"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0AD8",
+    "source_sha256": "f8d8564e07f7b42a609af1d722f08930fd6c395ef07264c57c08abf4bfcc8d44",
+    "reference_id": "message:0AD8",
+    "reference_sha256": "73f738f4d99231ada1929f6148a51aeefcd3b0a95080397d629c4c4861a0a071",
+    "native_choices": {
+      "reference_command": "7F1600C30004",
+      "native_command": "7F1600C300C4",
+      "offset": 77,
+      "adapted_sha256": "a1a1d6133a74ceca15343da88b386622f47bd7a86b3b0b60a54ab9fab6d7e65d"
+    },
+    "evidence": "Complete native and English sources were compared for the found-object ownership or caught-creature question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0AD9",
+    "source_sha256": "09975ff0dcf2d1d9594193c6f1b3222b90618bdcb087f54513dbf5007a73d58f",
+    "reference_id": "message:0AD9",
+    "reference_sha256": "c21c16fe99a70400a9d7aab67e841441f70a7ef9b55880319b9c4899a7b937a1",
+    "native_choices": {
+      "reference_command": "7F1600C6003B",
+      "native_command": "7F160044003B",
+      "offset": 52,
+      "adapted_sha256": "04ec6fa6f4b25adf926b43a2db5e5b6c07a6d6745f4befa8a20e5aad78899124"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0ADA",
+    "source_sha256": "e72aeec1ede389e1766857d956b57df31660c5910470d812f9e8e013441fd970",
+    "reference_id": "message:0ADA",
+    "reference_sha256": "0bf2314a2b5bb82b3ac4bf0a07804125d80557059551ef4ed798a4acb1e67d39",
+    "native_choices": {
+      "reference_command": "7F17001D001E00F9",
+      "native_command": "7F1700C6001E00C5",
+      "offset": 75,
+      "adapted_sha256": "0e590d834d71f274384a60dc3fef92cf309dd4f8a9ebb4b49a827f3ea93d6423"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0ADD",
+    "source_sha256": "1cbe34d97c1db8a021307d23ca05e34c649720e8d0b9f837608ce877bb21cf3e",
+    "reference_id": "message:0ADD",
+    "reference_sha256": "72716ab8bd2e703c539d294235c49542df5fd2be66ced7a334c5560190c80049",
+    "native_choices": {
+      "reference_command": "7F1700BF00BC00BD",
+      "native_command": "7F1700BE00BC00BD",
+      "offset": 34,
+      "adapted_sha256": "d996063769494e14ecf9aaf05c2bf24e29b3a604b4d2ef9a902d7e6e6743dc57"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0ADF",
+    "source_sha256": "bf7342514f822ea4efddfc82d4b3a8d9f019db1a5065d0f4045dd6f6c2b05c0c",
+    "reference_id": "message:0ADF",
+    "reference_sha256": "41220db51cc0198c100925db46c86d719193f2053f24094f96e0aa54b252cf28",
+    "native_choices": {
+      "reference_command": "7F1700C000BE00C2",
+      "native_command": "7F1700C000C100C2",
+      "offset": 49,
+      "adapted_sha256": "5bdbcdd4b358d82b933a64776697aadd57aae3c47557804a93120b897f364b8d"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B04",
+    "source_sha256": "4ddf8484bbcf5afc94e242702428758f14524a5c7a2e6b26a7698574f101c70b",
+    "reference_id": "message:0B04",
+    "reference_sha256": "0e7294fa8e982ad34877240077e7ae3d2b18da373e30b2106c4b9284e5fd1af3",
+    "native_choices": {
+      "reference_command": "7F1600440018",
+      "native_command": "7F1600440050",
+      "offset": 302,
+      "adapted_sha256": "fd52b9a38f963ab30d0caa8bd55c86586bd4a3509674cd7dcca4df7e396c7547"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B05",
+    "source_sha256": "7bc8fcbedcde2b8905aaecc9dc879548b804f8f36f3ec3b3f6a94c55ffed5e39",
+    "reference_id": "message:0B05",
+    "reference_sha256": "cc08e33d5a2d3feffdb2d533db9a58888ef52810ae5cdf7e95276787fde5aa69",
+    "native_choices": {
+      "reference_command": "7F160049001C",
+      "native_command": "7F16004C001C",
+      "offset": 403,
+      "adapted_sha256": "600c0d825b4b226ec176fa6d146c0f95820f9c3d3704c9381c4250bccd26e993"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B1E",
+    "source_sha256": "226f04eace9adfa9a2272af10902a458c9b8554093c4bd3fa1c80f1ab7074233",
+    "reference_id": "message:0B1E",
+    "reference_sha256": "eda87c0237b0a23c62c8cc537e5d3564167f1ecdb678b863180f21581c3b5014",
+    "native_choices": {
+      "reference_command": "7F16001D000D",
+      "native_command": "7F16000E000D",
+      "offset": 122,
+      "adapted_sha256": "68f3bce8fda14748e8502c2d5f32f69872624eaf79d6f3cb4976f23d5fce1736"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B1F",
+    "source_sha256": "b911d8cb5453a08b669b2bd9615db35a65a3a877b4f4de83cba9d874982e2064",
+    "reference_id": "message:0B1F",
+    "reference_sha256": "120a5492dbf2aafb53f69170fa40ac81be053c2d172c17987141b231278ea7b2",
+    "native_choices": {
+      "reference_command": "7F16001D000D",
+      "native_command": "7F16000E000D",
+      "offset": 122,
+      "adapted_sha256": "3e7915d7a7bf754028844c0e60dec3502a36eebb625e1123076a622650d934d5"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B20",
+    "source_sha256": "bccd1c608f9fc5149301382a8f9a66104dfd605f342336c539bcf45f626cd1f8",
+    "reference_id": "message:0B20",
+    "reference_sha256": "2c2cfe9c1c04341a8ecf8a7ff748669222557667f26c00a9b6d976dd508edb84",
+    "native_choices": {
+      "reference_command": "7F16001D000D",
+      "native_command": "7F16000E000D",
+      "offset": 124,
+      "adapted_sha256": "09b421379f3234cf50be11a19bbcebc3fea25a8b1bcafec856c50a46e964d80e"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B4D",
+    "source_sha256": "9004c86c3ad19485b98647442163fc37c5ecec1ea7ab822735ed26e4ee607377",
+    "reference_id": "message:0B4D",
+    "reference_sha256": "39602f156d4b7e79d906e896603922be07c45ade39fb5db1228870136faae68a",
+    "native_choices": {
+      "reference_command": "7F1600DC00B2",
+      "native_command": "7F16003600B2",
+      "offset": 156,
+      "adapted_sha256": "7810f2fe1d46e16ae2cbb30f46a2b8aa9e889c6da54de46df1e53c57c8f631e5"
+    },
+    "evidence": "Complete native and English sources were compared for the repeat or stop a native exchange or guess. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B4F",
+    "source_sha256": "58e0fbff1edf96b47c0964d8a4e255396f48425c362f19b743ea0532fed0c79c",
+    "reference_id": "message:0B4F",
+    "reference_sha256": "35eecec8ac486d40fffc3ef249724315844d1c4db7d7763724917b9298df84b7",
+    "native_choices": {
+      "reference_command": "7F16001D00B2",
+      "native_command": "7F16003600B2",
+      "offset": 121,
+      "adapted_sha256": "412d070b5a9fcd45c8e513df44e18568185e810f9cb89a76c51e604099431660"
+    },
+    "evidence": "Complete native and English sources were compared for the repeat or stop a native exchange or guess. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B67",
+    "source_sha256": "d9d8c5814070db1ffd3ff4ee9940cf1a9ee3dcb3032c002bbce01f2e1eb70c4b",
+    "reference_id": "message:0B67",
+    "reference_sha256": "19eb52eab7ba80c294c1567b22abd603ba33c4240b8d399d10644616cd98750d",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 84,
+      "adapted_sha256": "4c03fe2a1ada9f9d2d5fb2d5e9922d52cf15cb0c77e70f548a6eacc4305b40a7"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B68",
+    "source_sha256": "7dec48721cf449888e12f27e5bfe3e2e30fe82a7ad1a830c0dba7c15ce44fa81",
+    "reference_id": "message:0B68",
+    "reference_sha256": "7d6694ac2171358e5d1a6b6a878ea7b49a0454994f81c9bd9e29598408f3ab3c",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 55,
+      "adapted_sha256": "adb99aebfb4dcb66cc3a4fdf675ea93f36ad456423c8d0fd8b1e1704e14e5117"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B6A",
+    "source_sha256": "a8353315714f2143a127a4f3728f7f84b59cd3d2b3dbc78ceea72f25a3e01241",
+    "reference_id": "message:0B6A",
+    "reference_sha256": "a92673c309a600e90a5e3e1b8f73f63df299ce16ae9a9a66e049f1bd34eeb166",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 82,
+      "adapted_sha256": "867059c7f738afec46966de36689a12d86548be7f91021beb792f7eb9419dfce"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B6C",
+    "source_sha256": "0f35d3e8c0e2248d5f49705dde7d93e4db13cabe4ebcdc9e7dc27acc271bec6b",
+    "reference_id": "message:0B6C",
+    "reference_sha256": "70e6e9748d0ffb781482a67a54810fc995fd261683db14e95e16965cecbe325f",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 73,
+      "adapted_sha256": "cde9a6e283279ce37a3b1cf43edecc02ae07cdd001efef0c42f9380ad8227a55"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B6D",
+    "source_sha256": "10cc21603edaef6a8b87d17c35ff73daed4ca649cb06c4336e2c640d7e36c8ce",
+    "reference_id": "message:0B6D",
+    "reference_sha256": "374ff09b2bd23b8b93aef7a9984838fb4416ecb52e50d2e186995dcd2c141c51",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 80,
+      "adapted_sha256": "e18e73a691d8bf3308311a1a57b4e7e3bcdbb715a7a45d05d1109721168f6832"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B6E",
+    "source_sha256": "edaf7c6d3e2ecd48dab56baf3f904bc3b6489f0218f94238dd88e47306709a9f",
+    "reference_id": "message:0B6E",
+    "reference_sha256": "baf7d05d5aaf897fcdb833cbebbce5e0f68e092fa529e52b629ef2418340381e",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 81,
+      "adapted_sha256": "3ea5cd3f141bb01ae19fd400dcff8f99bc864741c096e4981bd311fe7f5dc890"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B6F",
+    "source_sha256": "a7f6227b22a98a4663161253997db4bc82260c1f230370e3eed4c3cc8276bdaf",
+    "reference_id": "message:0B6F",
+    "reference_sha256": "3ce8946ba49d07a49b5835858fcdc6060df52b68996d2e56ed245e9ce9bf9414",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 68,
+      "adapted_sha256": "d57612e33ff3d0ea76ee5c5061c562fcfad6eb211cf7fa42651543a6911ec997"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0B71",
+    "source_sha256": "6f61f86aa9e59f86f20ac24e353515e9eb4000232a58db4b64a9e96383cf2847",
+    "reference_id": "message:0B71",
+    "reference_sha256": "aa1597581ab5746b32a1cd1e7789e747ea6eefa133dfb933372fb888dc6a1c42",
+    "native_choices": {
+      "reference_command": "7F1600250026",
+      "native_command": "7F1600CD00CE",
+      "offset": 87,
+      "adapted_sha256": "4f16a2854ec5324e0437fb9e3a044abaa5745b02169f9e34b4d8bf12437b2719"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0EE8",
+    "source_sha256": "f2bdef47faa8f550f4d355fcb2a8aa98ae9b2984cae1edf9b30a0c21e003325f",
+    "reference_id": "message:0EE8",
+    "reference_sha256": "2d898f2ebd8a79d3883f2faeee8db986f3af624c14851d0a8275dd43ee7461d6",
+    "native_choices": {
+      "reference_command": "7F1700DC011E00DB",
+      "native_command": "7F1700DC001E00DB",
+      "offset": 106,
+      "adapted_sha256": "37f9e52cf9318640138a6830667f99e38cd470ee162d268e1e50daf6a30402bc"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0EE9",
+    "source_sha256": "ba958eb8a12e88777e89c333c0defb5fb514e07923e4883bf2b04cccd59e04e9",
+    "reference_id": "message:0EE9",
+    "reference_sha256": "e899a8c69cb0964be6cc107e4ff605ddeea8a2db55a8348c448d5f2fd5e756d0",
+    "native_choices": {
+      "reference_command": "7F1601000162",
+      "native_command": "7F16004400C5",
+      "offset": 90,
+      "adapted_sha256": "a9a771328ecc6417799205e1e371edaa12acc5b37011ca8cfa51f81023c17f3e"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0EEA",
+    "source_sha256": "8185935c36e0cee20aee9c9cf153b5758f89d1db5a771c2407cabfef6e9045a8",
+    "reference_id": "message:0EEA",
+    "reference_sha256": "ad58322297fa78766aab9f02fbfe88d57156205db71ae0d4be527feaf5f38b93",
+    "native_choices": {
+      "reference_command": "7F1600EF004E",
+      "native_command": "7F1600B1004E",
+      "offset": 210,
+      "adapted_sha256": "436561ae882e0a75fb8a9b884a1272bdf7f4edd62b52cba381e371695075feb3"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0EEE",
+    "source_sha256": "55e60bef06c261d470e9a22e293dea82a399161e8313b4a2ab3cfd087de7b7b1",
+    "reference_id": "message:0EEE",
+    "reference_sha256": "205dcd8e368e88b6a3325da9e53ffe4fe0ffad3bcc74407951dc15ec41b9252e",
+    "native_choices": {
+      "reference_command": "7F17019A012A0054",
+      "native_command": "7F1700C6010300C5",
+      "offset": 128,
+      "adapted_sha256": "bd23f967e9e8a00818f9ca8cccb6cdf3ca6db90563546646360acba1af0a8838"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F00",
+    "source_sha256": "9527a788a306a999905167c5ca99d78800d9ad43b784d2a36b43f52a8f4ea5b8",
+    "reference_id": "message:0F00",
+    "reference_sha256": "e4c4ccdac65f95b8745b585b72dd795edd427c47ac533846f1d9bd415f45c0c3",
+    "native_choices": {
+      "reference_command": "7F17004C011200E3",
+      "native_command": "7F170111011200E3",
+      "offset": 163,
+      "adapted_sha256": "f6fe79fffc99ae12f0ce9e9a393f72fe4374bc6cd0fb3c253ede339ace38c704"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F05",
+    "source_sha256": "7e74eefd97d646f7fd9ee048731983a096ffd02bfe234ea7851389e5abdbcff5",
+    "reference_id": "message:0F05",
+    "reference_sha256": "683d7203ff55fda8ac5b357d553882ac398bf470165bcb2ca113356c03c290f8",
+    "native_choices": {
+      "reference_command": "7F1601190162",
+      "native_command": "7F16011900ED",
+      "offset": 117,
+      "adapted_sha256": "bcfafed4640f4deb298d07b4b0d7d2de2ab0830f685cb423ebf961564c078506"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F0B",
+    "source_sha256": "17b7d8d9bd869d6e585e9732fd33956420db37feba71d0b00dbc94de2629b761",
+    "reference_id": "message:0F0B",
+    "reference_sha256": "c4918086337cf1bb00f02d5115dd60a4e35736c4962e629ade5e3613cfdb938d",
+    "native_choices": {
+      "reference_command": "7F16011900F9",
+      "native_command": "7F1601190110",
+      "offset": 105,
+      "adapted_sha256": "0532e9d5a3bbec88900c8b53d03b0468f75df38d37e9c996cb0df3aa563d59e3"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F0E",
+    "source_sha256": "e25a440c7ec6107b8ad8a225b816a5e1ff732249975029f840d9cfe4893b3f86",
+    "reference_id": "message:0F0E",
+    "reference_sha256": "35575ce2ac6a15ba140d7fc0d0e118186e7dc02d8134070d7d94f6a8cd6e8bad",
+    "native_choices": {
+      "reference_command": "7F17001D00E30065",
+      "native_command": "7F1700B100E30065",
+      "offset": 233,
+      "adapted_sha256": "42bcd9ace8251b846a6ab138f74fab0ecddbd3b49e7613d4f8f60d4f6e839f5d"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F16",
+    "source_sha256": "4040f3f3b7bde2d52dceb5d803d1094c15c0c4d430cb9bd8a106bdb2799016ce",
+    "reference_id": "message:0F16",
+    "reference_sha256": "b237540073b543df9da0fefeef857f053a0a128dd547854850867c6e2261cdd1",
+    "native_choices": {
+      "reference_command": "7F1600D90066",
+      "native_command": "7F1600D9012D",
+      "offset": 88,
+      "adapted_sha256": "94160c82737835f2ce335a36022bbe808981c0442dbd51c771ac44335b3120ed"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F2C",
+    "source_sha256": "c1fdc39b3e16a961de3979200675803e5d81a54ad1fe39e99013e727dbfc51d6",
+    "reference_id": "message:0F2C",
+    "reference_sha256": "afd8c50d6dfdf0293bfd33125a65a74daaf7a825c210665194b279beb09ca01c",
+    "native_choices": {
+      "reference_command": "7F16012E00F9",
+      "native_command": "7F16012E0010",
+      "offset": 208,
+      "adapted_sha256": "385adeb914deda072bc399d80e13a1df3528b35228edb4fc79a72a9cb77ca02f"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F36",
+    "source_sha256": "8730df2cd77d025eb6aff97d1780cd3b213111d80ab751790a800c7976e50c34",
+    "reference_id": "message:0F36",
+    "reference_sha256": "aa35245f3e680b02e1ca0a6f86d288b6988ba66147ec7bc54434e3fcb47fa1d9",
+    "native_choices": {
+      "reference_command": "7F160206019B",
+      "native_command": "7F16012F0130",
+      "offset": 254,
+      "adapted_sha256": "c0520d7c9830917bfbfe2ebd3a91e8379ea3250588554c9de0a2e50da15320c4"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F3A",
+    "source_sha256": "faf6884994821e062afdab325664e158d63826f519e4f2e0b940d997f8e5363a",
+    "reference_id": "message:0F3A",
+    "reference_sha256": "def24e55e71dbb5376fdf49b8c75e895024d3c1b42cd83f1f0e19af618664975",
+    "native_choices": {
+      "reference_command": "7F170127012A015F",
+      "native_command": "7F1700C6012000C5",
+      "offset": 88,
+      "adapted_sha256": "f076cef31f7bb7b0c18b593424f2fe9ea4318d527dfb38866ae474f17474ac25"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F51",
+    "source_sha256": "fb266c1890e80bb4c8658ac7d162f3ccca79ef5279f3f85f57666d92f2634847",
+    "reference_id": "message:0F51",
+    "reference_sha256": "de284e69fc7fcf2f8a94c0c298ce6589f63409687014d4a96f7a15e9df1e7429",
+    "native_choices": {
+      "reference_command": "7F1800BA00C0019001A9",
+      "native_command": "7F1800BA00C0019000F9",
+      "offset": 135,
+      "adapted_sha256": "da1bcb99a28ce1878fc1afb85f7ba76970f0788db436584372edfc6daf99b625"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F76",
+    "source_sha256": "00ebae6787ce0178375afe6e83a4b69855b17fac6c41b14a48b67156f786c783",
+    "reference_id": "message:0F76",
+    "reference_sha256": "2cf12100c52e4cf18232c0c625c07bcb6f9716897f43119bda90d7648879d871",
+    "native_choices": {
+      "reference_command": "7F1601290051",
+      "native_command": "7F1601290063",
+      "offset": 96,
+      "adapted_sha256": "76eebf5bf4723138f84bbafdf7f915d0cf39e975a73113a759cad674a3817652"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F8E",
+    "source_sha256": "60e2ea1ace6730a6cf329f30a8563b0254419de31596f42535ee9f43befb94e2",
+    "reference_id": "message:0F8E",
+    "reference_sha256": "5eb47b1726f1061c9c35515b348c515d4009aae3981915717f25c2a9358ee1f4",
+    "native_choices": {
+      "reference_command": "7F1600430010",
+      "native_command": "7F1600F80010",
+      "offset": 81,
+      "adapted_sha256": "dd81e168612f3b0ee15b4ca9f22d8ab279d440e63b0208c90acd04d64a762c06"
+    },
+    "evidence": "Complete native and English sources were compared for the song performance and repeat invitation. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F8F",
+    "source_sha256": "bdf2c02c954edaaf26b4072d834f68249899c369b73dfc62ac17177b4b5b79cf",
+    "reference_id": "message:0F8F",
+    "reference_sha256": "56cd7a2cfc44804dfbd31445cf41936553e59beea9e08880cad9807470ec95ce",
+    "native_choices": {
+      "reference_command": "7F16019A0101",
+      "native_command": "7F16019A019B",
+      "offset": 117,
+      "adapted_sha256": "7c8c273e956f64c8cf2008486a2e4b0a03964966ef59f6fa7099b1f32fee4660"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F90",
+    "source_sha256": "7e913f85c88908231977da52e5c93fd6de530a051f8cb3b037cb7ae2a71b1f35",
+    "reference_id": "message:0F90",
+    "reference_sha256": "c0fb46b10a1a5a17ac36846e0a8f05481a95d3e11b22d97676e4d2f1da8280f7",
+    "native_choices": {
+      "reference_command": "7F16011E0018",
+      "native_command": "7F16011E0128",
+      "offset": 97,
+      "adapted_sha256": "2a13a7dd463e79a8f951e77377f62b96ebf69f5053f99bfe4efd6fb8a33ab105"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:0F92",
+    "source_sha256": "bf81876e36dead558e404f9f6e6181d2cd6e8b57e7bdf511445e6ae2cbd9de71",
+    "reference_id": "message:0F92",
+    "reference_sha256": "3d5f7cb8268087996d4547694f39d303b4e72b5a14b0a3db27ac07a7ced69030",
+    "native_choices": {
+      "reference_command": "7F17019C00D4018C",
+      "native_command": "7F17019C00D4003B",
+      "offset": 104,
+      "adapted_sha256": "bf095895b70aed06c56e517c802613123a06e28a02b86aa85746823e0534d9bd"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:107B",
+    "source_sha256": "40b6bdede3b15d48b74da7b3b2bbc2711c01f743991f76ab4f01d37d9e4646d3",
+    "reference_id": "message:107B",
+    "reference_sha256": "454f16b2a0479dfb70e2d594d7aabfc5975dbf8441d1ecef04be25661fce9c23",
+    "native_choices": {
+      "reference_command": "7F1600DF002E",
+      "native_command": "7F1600DF000D",
+      "offset": 706,
+      "adapted_sha256": "673026a6907caa91415b51b8baf01e25995ae9de59d62803735248d74a3947bd"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:11F2",
+    "source_sha256": "3e06fdc2f3c1d3f9a60b7cdcf3f4080d4f0fe27302f2b32d467044e957cb0d89",
+    "reference_id": "message:11F2",
+    "reference_sha256": "718b63a52882a169be3062063bd1865db5b661026189949d471b11c348257d01",
+    "native_choices": {
+      "reference_command": "7F1600EF002F",
+      "native_command": "7F160069002F",
+      "offset": 94,
+      "adapted_sha256": "1e0710e487185452fb283a31b03aca6668e80f0b3ccf7be248d8f57e88eb757f"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:11F4",
+    "source_sha256": "2ba132384713490667ad8a6f7b4e1c3045af7d9755c45b0922cf5634a44d736c",
+    "reference_id": "message:11F4",
+    "reference_sha256": "cee944a13d182d8049539bdbb1319c8e2cc7c7d9edb03583836d03d20c53df81",
+    "native_choices": {
+      "reference_command": "7F1600C30018",
+      "native_command": "7F1600C300C4",
+      "offset": 92,
+      "adapted_sha256": "ef841b93706b35734f022e557e875f4adb1c10f28af2c37e4bbf6004849f4b04"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:11FB",
+    "source_sha256": "1b5e85c432622457df24fd3af41b3618731d4308e25066f6121aa026dc67c7ce",
+    "reference_id": "message:11FB",
+    "reference_sha256": "e9b92e2535aeb59a9856eb399df36e6cbab493b80d0cf0a0bf3be3d359703f13",
+    "native_choices": {
+      "reference_command": "7F16006B0054",
+      "native_command": "7F1600620052",
+      "offset": 73,
+      "adapted_sha256": "17ce354ad988dc2e3bc4ead43c8eefe94797f7439791306bea5dceb994a6c819"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1208",
+    "source_sha256": "2a466a8cdca4dc185e794c0eddcc73dd8771bd8ee47cee1ee9f571064acc4d22",
+    "reference_id": "message:1208",
+    "reference_sha256": "5da51041b5bf9a4d1c5dca94ed61e0f928b933e52ca5e738805e53ddf9079a40",
+    "native_choices": {
+      "reference_command": "7F1600C30051",
+      "native_command": "7F1600C300C4",
+      "offset": 67,
+      "adapted_sha256": "8412cd97bfa3e40d9e83fe5a88f4e72cd2ecbb0c07917addaaf70b1c30613991"
+    },
+    "evidence": "Complete native and English sources were compared for the found-object ownership or caught-creature question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1210",
+    "source_sha256": "0d45783854fa4a4ff9de33f3cac0e2e53c1e030e4de92c7b054afe8cd61d378e",
+    "reference_id": "message:1210",
+    "reference_sha256": "9c5044ec47518e4ad2bc502d7a194a227e79ef4977d31813a819b9341f3e2006",
+    "native_choices": {
+      "reference_command": "7F1600BC00BF",
+      "native_command": "7F1600BC00BE",
+      "offset": 67,
+      "adapted_sha256": "164f868550c5fa296573dd6221ed3b524d53373b9d055c2a67ed4aaf0f6ab701"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1217",
+    "source_sha256": "964d1cc207a9211648706c82a4b97854f358e67b5db2cff81cf876478806f708",
+    "reference_id": "message:1217",
+    "reference_sha256": "8f3f4d109fe4261cebd50caf88d2b55a446aa84e9abb44d22d92e092c425ae90",
+    "native_choices": {
+      "reference_command": "7F1700BA00BC00C0",
+      "native_command": "7F1700BA00BF00C0",
+      "offset": 57,
+      "adapted_sha256": "93727956fd55a6bc7d6fa1a11be95e12aaa562cba4ca454654ae40f9545af75d"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:12FE",
+    "source_sha256": "b5ea1eea68add63dc11a92890a547f1e44efb040add6f5f807ead6b31166690e",
+    "reference_id": "message:12FE",
+    "reference_sha256": "e97fbe28248d9fe9f1be705adacb37e45253d83f08b2bdbc5e976ef9c38935bf",
+    "native_choices": {
+      "reference_command": "7F160043004E",
+      "native_command": "7F160043000D",
+      "offset": 102,
+      "adapted_sha256": "10e94d3e035a1a20193a1cf31ddf1fb129b6c81ab53d73c74561cd14c8f0f901"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:139F",
+    "source_sha256": "4463bf5e3c5991cf1a62a4d69985f50f584c60ae79b1f59e16feb0b66f43361d",
+    "reference_id": "message:139F",
+    "reference_sha256": "ca6c886055275bf1f847523d1859fdd6d32d6f5d59c43929dd23b4d3bcd4fa9f",
+    "native_choices": {
+      "reference_command": "7F1600330034",
+      "native_command": "7F1600350034",
+      "offset": 220,
+      "adapted_sha256": "53c1774fca16ae91b0f215fe2c5f8bf799c8ff5cca484b8a2beba22dfca61166"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:13A8",
+    "source_sha256": "8b8acecddfb4e12d5061430eb2f19d097a8b4bee02dc2b5a1c04baeaaef62ade",
+    "reference_id": "message:13A8",
+    "reference_sha256": "eb638be02a26c15ec6f7c5e642ed160250f6d997c2f815bd00e4e6eb400344e9",
+    "native_choices": {
+      "reference_command": "7F160003002F",
+      "native_command": "7F160069002F",
+      "offset": 162,
+      "adapted_sha256": "b6324c446d63e20402d1e40ee6cb2940ce052339685f790b070146ec1c5c823a"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:13B0",
+    "source_sha256": "431e9f2ca7cef904a0d909c28aa8e2304b43d2715b5bcb9bff3e520e6cef7d7c",
+    "reference_id": "message:13B0",
+    "reference_sha256": "a79b6fe81d8fdcc951a44ec907972d79db26e6878608b1aaf7c15635e2e94733",
+    "native_choices": {
+      "reference_command": "7F16000400D9",
+      "native_command": "7F16004C00D9",
+      "offset": 93,
+      "adapted_sha256": "5e87f314b3077a29eb37da1ae2478d931d654440e9b2b023883ae3481449e2e5"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:13C7",
+    "source_sha256": "ab89560020a0125b7d69be0e1e0382f48f91ea14f719ebcceeadea0d5bfe550c",
+    "reference_id": "message:13C7",
+    "reference_sha256": "e3968e528ab9720babc61222a8b17acb54054c81974b5fa52eee484ebd7ab103",
+    "native_choices": {
+      "reference_command": "7F16000C002E",
+      "native_command": "7F16000C000D",
+      "offset": 187,
+      "adapted_sha256": "e6a031c1469b9bd0e39995ac74e73e7638b98c94f35f865a7f3f58b3cabce4c4"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:13DE",
+    "source_sha256": "7baa5b95b0f1758c848c7a71bbcc02aac83748414774b0f56e74ba76ff32aa77",
+    "reference_id": "message:13DE",
+    "reference_sha256": "9509e8f999d8fc93ffd92a0bd80d92d942a6a0c9c27c934a9dfb6d45d87ab332",
+    "native_choices": {
+      "reference_command": "7F16000E0018",
+      "native_command": "7F16000E000D",
+      "offset": 172,
+      "adapted_sha256": "963e58e662f21556a5aff206e40e580d3f31be87e09cd622b3bb62e6ac1ee809"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:13E1",
+    "source_sha256": "f65adfaec8e974b2d6e03b088ade52f497e9c86666cc2aa52566b5c3ab05c172",
+    "reference_id": "message:13E1",
+    "reference_sha256": "98444092f387c0943fc7e5d3cffec81bcccfd3a6517e3602d62d06e6f4cab24c",
+    "native_choices": {
+      "reference_command": "7F16001D0029",
+      "native_command": "7F1600280029",
+      "offset": 270,
+      "adapted_sha256": "80d2484e7c54eaca0d6cba63cab5475d6f0971100cf2896dba8e4614081b238f"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:14FA",
+    "source_sha256": "dd4380b998eded2ff7af4c05c97b0436a2b52471badd3ae545d3c2dc0908297e",
+    "reference_id": "message:14FA",
+    "reference_sha256": "f0ba1c388d1997627f1971341859be6fc8a7de97c0cfdbb98499c4d3116590ab",
+    "native_choices": {
+      "reference_command": "7F1600300010",
+      "native_command": "7F16002F0010",
+      "offset": 148,
+      "adapted_sha256": "7cc03178bcd3bda3630ddefcb8e07ca2a4c91e0c2d85955191594151c66ec0fb"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:150E",
+    "source_sha256": "2721ddd79d668880995228ad02da1b5ba2d114b6111a8d68785f633a44abb4f1",
+    "reference_id": "message:150E",
+    "reference_sha256": "239e6cb13fdc9eb40d652340f402f557f00f8d35e94b1987400c8e2d7d958664",
+    "native_choices": {
+      "reference_command": "7F1600430034",
+      "native_command": "7F16001E0034",
+      "offset": 209,
+      "adapted_sha256": "b0670a223a16e6ad9f153d20cbb4ec0353795c0de9d016648f818e61516e48d5"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:153F",
+    "source_sha256": "980d6fd47b08e24129ab1e9d80d526c0ec4f9eedd2b62e38f4f3817aca7e179c",
+    "reference_id": "message:153F",
+    "reference_sha256": "7dda28da27d3431a4f5c60571c6fb2e1c7bd785aa83293a05fe5c083e5d0187d",
+    "native_choices": {
+      "reference_command": "7F1600210051",
+      "native_command": "7F1600210052",
+      "offset": 90,
+      "adapted_sha256": "949636803e87a94349085e3c0a5b0359966b05970fa5373947ece894be5e61b0"
+    },
+    "evidence": "Complete native and English sources were compared for the zodiac guess using the existing native field. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:169C",
+    "source_sha256": "63544e23ed8c8b45c099c8bfc5dd90bb670f17de187e2d27aa347fc1def14b40",
+    "reference_id": "message:169C",
+    "reference_sha256": "ca464310c4a37829726981bf93019cf5553a86ff1cbb51f9eec63d3c6b394d12",
+    "native_choices": {
+      "reference_command": "7F160021006C",
+      "native_command": "7F1600C6002F",
+      "offset": 71,
+      "adapted_sha256": "fe0a193677139c08852b0dda9ae87c5151d3137deacc467565f449c14d991a8f"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:16BE",
+    "source_sha256": "6ead38ff38503275af6272969d1550fd8c4c68948064e5749ea44de01e071f35",
+    "reference_id": "message:16BE",
+    "reference_sha256": "b85e8f193be1bd5adda666d4b3e80f7a6df3fbde9e396ec0419204fb353b6e78",
+    "native_choices": {
+      "reference_command": "7F17025D00180125",
+      "native_command": "7F17016301260125",
+      "offset": 82,
+      "adapted_sha256": "8dbc5436b86b9b4ca9da7e398bb6eb90ea68266389adcc1f9639520dad206b94"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:16C1",
+    "source_sha256": "b23ec9d98e0a97cc54a27b6b2cc1f31267daae620ebdef0068b4c54bda488f4b",
+    "reference_id": "message:16C1",
+    "reference_sha256": "749ff7bb7224bf283a1da7d4bf9fe5a5aa7ca2e256b22b960b9b0487a0b35f4e",
+    "native_choices": {
+      "reference_command": "7F1700EF012800EC",
+      "native_command": "7F1700EF00ED00EC",
+      "offset": 294,
+      "adapted_sha256": "1608e27abb79a4847bc77edafd0fd0efbb1a03f03feaecee9fc9fef5ba4f3a63"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:16E2",
+    "source_sha256": "335d3e9f21315df3e931bb90443bc2d2e327b84cbb05d87533857c86a784bb5a",
+    "reference_id": "message:16E2",
+    "reference_sha256": "090105a1fffc3f9461400678ac337df1e672ac311df4b3e21fa6059b218f31db",
+    "native_choices": {
+      "reference_command": "7F17018301840054",
+      "native_command": "7F170183018400E3",
+      "offset": 77,
+      "adapted_sha256": "66c2d202ec83fed0cb353fa08785d6f0f8996f947c3fc76f23eed040a1f1c65f"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:16E4",
+    "source_sha256": "38a58718942f5f89b685169053c76145f215bbd7c66aa3ee7d9b3db9f6cb112f",
+    "reference_id": "message:16E4",
+    "reference_sha256": "fcd22a2bbc39ce0dafd988ecfb91bbab2a481b7f3bd6400e92e09178082418e3",
+    "native_choices": {
+      "reference_command": "7F17022C01860187",
+      "native_command": "7F17018501860187",
+      "offset": 53,
+      "adapted_sha256": "fd8612a33bed2e8f0c580a75fabd9ebb1ce31fe11bb062150193b628fec9a0ba"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:16E7",
+    "source_sha256": "8f45b621f18eb99979ab346ba56e0a2893052e5348f72a9166a80c43322d167b",
+    "reference_id": "message:16E7",
+    "reference_sha256": "1b1fb42b5e9312899edbfe3a6832e54055559a1002b5c16045f8a1a1a9dc3ce6",
+    "native_choices": {
+      "reference_command": "7F160021004D",
+      "native_command": "7F1600210128",
+      "offset": 67,
+      "adapted_sha256": "9b89556ba6226b1cb0f6749c8d1776208971038f1d238788107b19dbd996bcea"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1767",
+    "source_sha256": "e609cb99fde0e4484d5c1ce9268ec9cc3ebfbb93ce948619e6cc67c512b3e5c8",
+    "reference_id": "message:1767",
+    "reference_sha256": "d244cf4bca5de4a38df6659f87289046fbcff7585b086c40e3ff4166d2ff65d7",
+    "native_choices": {
+      "reference_command": "7F16001D0010",
+      "native_command": "7F16000F0010",
+      "offset": 60,
+      "adapted_sha256": "81c056d26fc656f32f74ed7b15a60f90a2c6a59b240f15311fe195b573ded0dd"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:177D",
+    "source_sha256": "80f60a270fe7051d101df8c9330084cfc1fc79b5ace4e5a7f89f624a97527083",
+    "reference_id": "message:177D",
+    "reference_sha256": "85c167af3876aaf63996634e86fe03e00bf234e621fd7431278ecb6da64d121f",
+    "native_choices": {
+      "reference_command": "7F1600EF0029",
+      "native_command": "7F1600EE00ED",
+      "offset": 57,
+      "adapted_sha256": "224bde698807b722d144193326bfb56f854afcb2e8da47a3d332a918aed35f0f"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:17CB",
+    "source_sha256": "bbf48b70e5f3ad81ea48a2ccf547ca73726a7b8dec9ac76f83eb24adcd51e5a0",
+    "reference_id": "message:17CB",
+    "reference_sha256": "6e0f05d65dd550c7103c7226e10323c115ed6fb8b1302537070f20b2166edaab",
+    "native_choices": {
+      "reference_command": "7F17000C002E0011",
+      "native_command": "7F17000C000D0011",
+      "offset": 354,
+      "adapted_sha256": "faec904e6a798267414728c041c159f0f3acdc4b75d98a2638051a6769f0f2b1"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:17D4",
+    "source_sha256": "3d14392b587a3c640b216d785e7fc0207c04c92dd5bbbc668ab5c9eaa1380c88",
+    "reference_id": "message:17D4",
+    "reference_sha256": "e67130fdc91d498db6edb86c1fab86fb707340339ec5e5507c9bbf9cbe3721d7",
+    "native_choices": {
+      "reference_command": "7F1700CB00CC00CA",
+      "native_command": "7F1700CA00CB00CC",
+      "offset": 121,
+      "adapted_sha256": "f1acc2edee5bd79d83915669c798f77e78e7aaad1ef37b8593d41b876b839a52"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:17DC",
+    "source_sha256": "bf5ab3d2bb05c3a01497e9258f6097e93b93efb7f6318d0cc357212019572dd9",
+    "reference_id": "message:17DC",
+    "reference_sha256": "270d309d3e8ef6e18664a529dd3a413b552c31a3b44b2cbd448986c1ef8b00c9",
+    "native_choices": {
+      "reference_command": "7F1800AD00AE00AF0015",
+      "native_command": "7F1800AD00AE00AF0029",
+      "offset": 182,
+      "adapted_sha256": "41b5175225be898565ce4169e0df68d1064501325a453cf99fcd1b9d441dd398"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1842",
+    "source_sha256": "4e9caf8c14d6ebf66af3fb5d4cd63992e05d87025e80362de0a3078208d9191b",
+    "reference_id": "message:1842",
+    "reference_sha256": "238d699c8089aeeda9b9be9d22c0011a869e9096a10cac6d404983d7d6cc2108",
+    "native_choices": {
+      "reference_command": "7F160034003D",
+      "native_command": "7F16003C003D",
+      "offset": 216,
+      "adapted_sha256": "6b266688c6dc8aa91a2370eeb024680d10aa9581c7b4484270b1cda3f1039eab"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:186B",
+    "source_sha256": "6f3776a2713fe35dd3c17dca3308212b3d026cacc468ae12c6ac4f679c229a6d",
+    "reference_id": "message:186B",
+    "reference_sha256": "68fba3d033c536940f038045ee53f76903ff4833749b97350e635c70ad96b3e5",
+    "native_choices": {
+      "reference_command": "7F16000C0056",
+      "native_command": "7F16004A0056",
+      "offset": 614,
+      "adapted_sha256": "eab3eacbfa2be676804effab0f2ab5383c34d4b964cf850a470583242f0f798e"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:18AE",
+    "source_sha256": "dedd65a2676d059237be68f90a5fe154e336acd924a9028c5e50e1feafb2c1a4",
+    "reference_id": "message:18AE",
+    "reference_sha256": "f88bfa3bff53c8cfdd24ffd949e56b4eb45b80e3628bd337cbb720f06f59896a",
+    "native_choices": {
+      "reference_command": "7F160021017F",
+      "native_command": "7F160103017F",
+      "offset": 67,
+      "adapted_sha256": "48bf37499b8a967cf0728c2bcdc00dcb12f2dc5271204493595613b26b6108da"
+    },
+    "evidence": "Complete native and English sources were compared for the letter impression, comprehension, or clothing-quantity response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1B94",
+    "source_sha256": "b2b9995f5f0c4060caf4171014a41f54f21d9adf0c929b1e853e159da1c44143",
+    "reference_id": "message:1B94",
+    "reference_sha256": "79606cf5191d49693f9b00dbee40a5ce91ea2d8c4efc18ea405c40a2b071e093",
+    "native_choices": {
+      "reference_command": "7F1600210010",
+      "native_command": "7F1600F80010",
+      "offset": 120,
+      "adapted_sha256": "062242f0ec2c631a0fd6c8006d4b552427defb066f92b5b0262124449a337682"
+    },
+    "evidence": "Complete native and English sources were compared for the song performance and repeat invitation. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1B95",
+    "source_sha256": "1dfa7ea1f0fb072691fef8126eb557623e28e03344244276a360c2e7a3c9b3ea",
+    "reference_id": "message:1B95",
+    "reference_sha256": "39ededb40fe5504801a1988a61a8cb9339d332066bfe79297f10fc7d21956ae8",
+    "native_choices": {
+      "reference_command": "7F1600210010",
+      "native_command": "7F1600F80010",
+      "offset": 136,
+      "adapted_sha256": "0a09fb0617a1902e07c8606e4091367ad47927843e6627d86949d74dcbfadb52"
+    },
+    "evidence": "Complete native and English sources were compared for the song performance and repeat invitation. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1BAC",
+    "source_sha256": "e864fd6585ea0907c922c35d8bd1907ee93db8966dcf424282bc1f176b72d886",
+    "reference_id": "message:1BAC",
+    "reference_sha256": "281d9120d90d1825a43eadf11db2feec84df36e9f3371279e479baf954a8b9f1",
+    "native_choices": {
+      "reference_command": "7F1600EF004E",
+      "native_command": "7F160046004E",
+      "offset": 255,
+      "adapted_sha256": "3faf409867638dcdfef1b41ebfefe62ccd243f10e6f6252f27fe703f085067ba"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1BC5",
+    "source_sha256": "9d0a0e07c6d3f43e95cb7dbf231fc6b4b24fb91c8c0f71801e5fb951d6f385c4",
+    "reference_id": "message:1BC5",
+    "reference_sha256": "8f0646dbdcf7f463b7a72e9c2113605150bc7bf82d2d5a6abdcd9839742fa8fd",
+    "native_choices": {
+      "reference_command": "7F1600330034",
+      "native_command": "7F16003A0034",
+      "offset": 152,
+      "adapted_sha256": "a8cb9c9123f658f45f164ec346f9f462306a8bcc48aca6f4fc4bf9686d8e6c6c"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1C88",
+    "source_sha256": "5456f9b48738ef4d375f48d216f9a522ed8d60593213f9f6e759d61d63e5f7d2",
+    "reference_id": "message:1C88",
+    "reference_sha256": "ba764179f9e178a95a0637d79c8deb2f3d6f9670913b37c4c06756f5c0419e34",
+    "native_choices": {
+      "reference_command": "7F16001D0237",
+      "native_command": "7F16001E0050",
+      "offset": 62,
+      "adapted_sha256": "ede31ba8df4184d91758ebed6eec598fb6fbcd1206c34b1c11667ebf586e7083"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1C8C",
+    "source_sha256": "47aa96a31b863226b35f3770ed59a5cdb85a891f06830e05a426911622962596",
+    "reference_id": "message:1C8C",
+    "reference_sha256": "80afaa83c2ba18145c28391aea346c6ed527f8529af6a9b5c923529c50da7378",
+    "native_choices": {
+      "reference_command": "7F1600C30051",
+      "native_command": "7F1600C300C4",
+      "offset": 53,
+      "adapted_sha256": "bb011fb1efbc5125d42a2db5fb740009a1eab7dddfa6cce751c11081b769ca6f"
+    },
+    "evidence": "Complete native and English sources were compared for the found-object ownership or caught-creature question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1C91",
+    "source_sha256": "83b0c863e20e07581d0d4771f21e4aac7eceb4a765f4b188b3f904f1fefdabc9",
+    "reference_id": "message:1C91",
+    "reference_sha256": "646a55ede90f6b3339398dd675c7aa998e775663f4e401303d66ed25fe0271ff",
+    "native_choices": {
+      "reference_command": "7F1600030004",
+      "native_command": "7F1600CD00CE",
+      "offset": 51,
+      "adapted_sha256": "41d706247f4ba93f0c5ca74c2fe247bbf48543fa5acedc9bf3fd89808cc070b3"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1CA6",
+    "source_sha256": "baac98a6d9f09ad66c4b883fec8765ebd4ce9af3fb7fbcf7bfcab863a7225b87",
+    "reference_id": "message:1CA6",
+    "reference_sha256": "c3c5a5409b18ca3cd77f44b9621e072c64c11870b41e171239f905436ae5b2ac",
+    "native_choices": {
+      "reference_command": "7F17000C00100011",
+      "native_command": "7F17000C000D0011",
+      "offset": 212,
+      "adapted_sha256": "0535b947fc49b1e6b609b0082a0a89ef89d12e9402b7443a5152f26e238c6d01"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1D1F",
+    "source_sha256": "dbc1d89ea5507fcf709780b925f1735b03a03bf2ab2022ccc21cbcf879deca6c",
+    "reference_id": "message:1D1F",
+    "reference_sha256": "c75bf18ff69a6c335649708ded6a2f0c663d517d767cb858b3bc21981adab703",
+    "native_choices": {
+      "reference_command": "7F1600030004",
+      "native_command": "7F1600690110",
+      "offset": 41,
+      "adapted_sha256": "af22ebf374b5ca5173196c76a8792761af4ee42c0b624a1245acb1064e37f1b6"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1D29",
+    "source_sha256": "5ff1c6f145713fd37838fd58e50572874a640f6227a3b528843da2af1842e8b1",
+    "reference_id": "message:1D29",
+    "reference_sha256": "5082a7f8c3dd986aea973e2aa45313ae2a1da724f6d6509ab43074111503e86c",
+    "native_choices": {
+      "reference_command": "7F1600C3001C",
+      "native_command": "7F160043001C",
+      "offset": 90,
+      "adapted_sha256": "6559060f6c546d14670dd88ad0fdd68824df490c46777faf1eb2e80ad68fbb62"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1D4B",
+    "source_sha256": "279b740ceffd6244bbf927b95a0f8bb4e004ca28e0f87fc3dd5d64dfde7d1490",
+    "reference_id": "message:1D4B",
+    "reference_sha256": "86daa1ec30112ef1dca1415c2067d9d375605054cb1ccaada647172bd77a1be7",
+    "native_choices": {
+      "reference_command": "7F1600670066",
+      "native_command": "7F1600670015",
+      "offset": 117,
+      "adapted_sha256": "53508c1fd66580aed0bfd22f3f252578955927908c2bf8527a0b8f990409e4d2"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1DD7",
+    "source_sha256": "3fbe88910e61d7ab6a4266444227da37541948a4ba5d54342ace178fdeb3c200",
+    "reference_id": "message:1DD7",
+    "reference_sha256": "81d8b794a26e9e7587dede417429e85e69bf41005047142aabdce6217707a186",
+    "native_choices": {
+      "reference_command": "7F16004301AB",
+      "native_command": "7F1601AA01AB",
+      "offset": 103,
+      "adapted_sha256": "fcf01f38cb3b5fa5a06e9e55c8cb3acb3364ef66d037ea297e6cfa842433bd08"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1F71",
+    "source_sha256": "469c13f67077147b95066224692473b3df9a1d74df1debeb049d88b4b631ddf4",
+    "reference_id": "message:1F71",
+    "reference_sha256": "eabf06e92feca2b5b3c6421265e7f27d17df1ac2a1634d0f197ce28cc91b3f37",
+    "native_choices": {
+      "reference_command": "7F1800B900C000BD00BC",
+      "native_command": "7F1800C100C000BD00BC",
+      "offset": 278,
+      "adapted_sha256": "0535ead66ba9c6393ca34e87a9b5d5bfaec8da606a42c4565b8d2c2b13b8bbf0"
+    },
+    "evidence": "Complete native and English sources were compared for the native event question with native option identities and reviewed linked replies. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1F89",
+    "source_sha256": "42f56c46f0b2a0ea23d0177ebb08da45b74fa83e9b18661bbb1782910f2ef3a7",
+    "reference_id": "message:1F89",
+    "reference_sha256": "17d9ffc6ec006f19102b17460a9442f64b267187427902eb3461ce8bc77a55c9",
+    "native_choices": {
+      "reference_command": "7F1600C30034",
+      "native_command": "7F1600C300C4",
+      "offset": 87,
+      "adapted_sha256": "fd6faba6cb4ddd560c5d07a85fdd6aa3d4a819e8b3b7924cf5f2e559862fa921"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1F97",
+    "source_sha256": "0065ac41261bc4f131cea6728c3943a7493ccffc7959b081ec5aa9c82bbe431e",
+    "reference_id": "message:1F97",
+    "reference_sha256": "6f6cdd9483c243408cd46a2d6314a7e7021880341684dd9e29f5738991305141",
+    "native_choices": {
+      "reference_command": "7F16017E00F9",
+      "native_command": "7F16017E015F",
+      "offset": 194,
+      "adapted_sha256": "9bfe8c4ef8f29c19785ecd22cbc6a2d6acc4ac93f59314d80f4b0f680423ea6b"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1F98",
+    "source_sha256": "b492522d7ee42cde211c2ce8317768efe79df08cb47d9ec6b060445b0a9cb3c1",
+    "reference_id": "message:1F98",
+    "reference_sha256": "2b730b013b6e2321e31f629f2a61289722caeea7e552b5e4c61085648056919c",
+    "native_choices": {
+      "reference_command": "7F1700F9011600D9",
+      "native_command": "7F17012D011600D9",
+      "offset": 59,
+      "adapted_sha256": "3c5d24be393ff084bd69cff41b24f28f3741ebdc3124bb1df03ead1f39662846"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:1FFE",
+    "source_sha256": "f320f80d573f07d2a20f90b53563fc58b55fae721e5e92ef0f62ea0773e8eef3",
+    "reference_id": "message:1FFE",
+    "reference_sha256": "3d93fca792963abcb37c3e3e38bfebbd94221c27968686eaca8c1e1b2ee33ff7",
+    "native_choices": {
+      "reference_command": "7F1600210103",
+      "native_command": "7F1600EF0103",
+      "offset": 95,
+      "adapted_sha256": "03d12918ae864affcbeb427db19fe3d924158b0f6b87109e08a7a7ea768db8f0"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2049",
+    "source_sha256": "b7eb0ee52f49652868501312db7eef10f57989bd0011b155ab5c7b44c73886b2",
+    "reference_id": "message:2049",
+    "reference_sha256": "f3b6cf2bebd85ca6e4d4355018c8328188866b42c40d6c89d34f5ad4289861ed",
+    "native_choices": {
+      "reference_command": "7F16000C002E",
+      "native_command": "7F16000C000D",
+      "offset": 298,
+      "adapted_sha256": "fa8f7f45a2bd1c30db06a48f92420b2a4b66fc7a49347a7edd300603450cc4cc"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:204D",
+    "source_sha256": "0668433c54253bfca7f4a9835dd7891e2931d7a91997f03d9bf654a92d6ae703",
+    "reference_id": "message:204D",
+    "reference_sha256": "7ca95696adf0d12b3943d63b4d0f6d05c6e4c5bbf4ea25d932e507e6999b6628",
+    "native_choices": {
+      "reference_command": "7F16000C002E",
+      "native_command": "7F16000C000D",
+      "offset": 122,
+      "adapted_sha256": "984e4a4e6d1159a9ed72ce4ee8ebf934487ed55dafbee0d63f585565f45da4c3"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2052",
+    "source_sha256": "f8d62e91d51bd769bd81ac3fde3460251f85e9d5943ed6012d1226c57ec297e5",
+    "reference_id": "message:2052",
+    "reference_sha256": "7ed5f173256e5e93fb4357d35064194bcd846c7a00781334343a233645563905",
+    "native_choices": {
+      "reference_command": "7F1600430043",
+      "native_command": "7F1600440044",
+      "offset": 312,
+      "adapted_sha256": "5a0ca1fc961603bcd4816742cc81b51ce3255bf07ba66679a70d8d4f4efa80ea"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2079",
+    "source_sha256": "4b29ada5d3f0a7ce78973bfbef86bbc5dd9bc9ecbf1b13aaa84aa4f804ca2310",
+    "reference_id": "message:2079",
+    "reference_sha256": "1dec0bbaa53edd2ffbd45a639d4bbfef7d8881bace9b83dde07be982d7ee57fb",
+    "native_choices": {
+      "reference_command": "7F17011E00C30161",
+      "native_command": "7F17017E01300161",
+      "offset": 154,
+      "adapted_sha256": "2ab3303695005f39dc22057793262c3c43c70117a6d8ea44cbc7d98f4d6d4f85"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2099",
+    "source_sha256": "6a408a290904cca4ee3243938f9b0d8adbae8c2ce4d9d148bdf1fec0a102b8c0",
+    "reference_id": "message:2099",
+    "reference_sha256": "5af2243b78f74f13dd895636dbde84a62dfadf9077d592381ddd828d46bf9357",
+    "native_choices": {
+      "reference_command": "7F1600EF004E",
+      "native_command": "7F1600EF00ED",
+      "offset": 156,
+      "adapted_sha256": "23bf2d8fb1298993a179896ac322b2fe57379c6a44ff8553c53d32951868d89e"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:209B",
+    "source_sha256": "cc2e6f89b0cebc7abce976cc5aa46e7378d55bd2ec398bb4942b8d0af9d9421f",
+    "reference_id": "message:209B",
+    "reference_sha256": "4f60645fd3720621eb30acc021e36a343e14cd3d9bbfc9219dc80f07c2a34dc2",
+    "native_choices": {
+      "reference_command": "7F1600DC00C5",
+      "native_command": "7F16001D0065",
+      "offset": 92,
+      "adapted_sha256": "e476a66e1189ece243d5030f8ed4ca5465c40c99c8664b9e13d310ccbdccfe3b"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:20C4",
+    "source_sha256": "b8835c80dc8efe56f6c6513bbdbd822251659cbaab9f185a3afc1befe717fa42",
+    "reference_id": "message:20C4",
+    "reference_sha256": "f5d6dc49384d5833fa57f02bcdd1649f57656a219af16c34d6580f792c1da6d8",
+    "native_choices": {
+      "reference_command": "7F17019B0125017F",
+      "native_command": "7F170103013F017F",
+      "offset": 61,
+      "adapted_sha256": "0e44e19ecdc2be6d3a611b7aabda356570d38e0106fb58ee2e147cb10759829e"
+    },
+    "evidence": "Complete native and English sources were compared for the letter impression, comprehension, or clothing-quantity response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:20C9",
+    "source_sha256": "ef8922caeea2c625b97f7a26c6926156b1daf09ea081a3acad0163f1b603eca3",
+    "reference_id": "message:20C9",
+    "reference_sha256": "5bad3d7e1064568e5f375330349525c1adf00ae4d113872eb2a204dd3e0e1fda",
+    "native_choices": {
+      "reference_command": "7F16013001C3",
+      "native_command": "7F160046004F",
+      "offset": 111,
+      "adapted_sha256": "d3aface22038d8f161c35f2c2c4eb15ae5f6f2b53188ecdacf2df3f73d84e664"
+    },
+    "evidence": "Complete native and English sources were compared for the native advice, knowledge, membership, or travel question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2378",
+    "source_sha256": "6692c13e78cd669bea64b124380370fe88929a5cf99b3a045a2a61a13c7b63b8",
+    "reference_id": "message:2378",
+    "reference_sha256": "4a4fd0ceda39f0cd0e365af291a63cdc19bcb61e678dbb1816ea56bd7b60d39b",
+    "native_choices": {
+      "reference_command": "7F160044004E",
+      "native_command": "7F160017003D",
+      "offset": 397,
+      "adapted_sha256": "9cd2631450b8dcd218e16763b36e8951b23d81ecd336acdee7f3d65ce514fa2c"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:23A1",
+    "source_sha256": "bb3613db8301ccd417a16ad440d7c0d0e9770c23f5f367543b7e25355e784223",
+    "reference_id": "message:23A1",
+    "reference_sha256": "889548253513bb94b56fc849790dbf9dd6de586e7042cdf048044985f73a66e7",
+    "native_choices": {
+      "reference_command": "7F1800C700C800B00018",
+      "native_command": "7F1800C700C800B0004D",
+      "offset": 109,
+      "adapted_sha256": "603ee398d918b52790f3eb7ff6506384eee2d93ccbaa6623bb06918ecea4ec7e"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:23D3",
+    "source_sha256": "ae7a1fd68c4b0ae9054e29a763c02baf09d15d0d03022e3105f8e585d14ca2f3",
+    "reference_id": "message:23D3",
+    "reference_sha256": "db251b5c14c2b40bb7db14d79fb78b3534f3a7aeec0c018e7348580e65726eac",
+    "native_choices": {
+      "reference_command": "7F16004C0026",
+      "native_command": "7F16004C0036",
+      "offset": 123,
+      "adapted_sha256": "608c60bb82464c3025256b5401f86555c2de28fb5596acf3676d550079bf3fbc"
+    },
+    "evidence": "Complete native and English sources were compared for the repeat or stop a native exchange or guess. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:23D5",
+    "source_sha256": "bf7c67a0b55b57ea84267a4b5faed1e749630acdf08148a62d6a5244adae5f02",
+    "reference_id": "message:23D5",
+    "reference_sha256": "d54c9178af4ab703be5b2336635b3eec3af756d37d9ed42ada91efedd3901802",
+    "native_choices": {
+      "reference_command": "7F1600C30056",
+      "native_command": "7F1600C30036",
+      "offset": 180,
+      "adapted_sha256": "30089e244c4f56678beb71fd02f66b0f67f4d6d46cdb02163811015bbf4d1ab9"
+    },
+    "evidence": "Complete native and English sources were compared for the repeat or stop a native exchange or guess. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2426",
+    "source_sha256": "870dc8a25cc358e00af9c23b04e5577ed2bcb2520c46a464cf96486fe0c6f498",
+    "reference_id": "message:2426",
+    "reference_sha256": "56822cb5aa0bd2da4aa4f007b355d6c33d34ea71baef252c04f5c563c3024fa3",
+    "native_choices": {
+      "reference_command": "7F1600030126",
+      "native_command": "7F1601110126",
+      "offset": 40,
+      "adapted_sha256": "076b5b6d72894f2475d371daa03d0d5db5cc5a70b5771c2086444f8e4a207216"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2427",
+    "source_sha256": "31587540b2a2c6f29e1111d969fc74e135dd09ffdd63f9042b19aa5cf2ec554c",
+    "reference_id": "message:2427",
+    "reference_sha256": "6e68a4e0ec784e1b27db4670e5e314db9051560267e670d8ca956cc11833dd5a",
+    "native_choices": {
+      "reference_command": "7F16004C004D",
+      "native_command": "7F1601110126",
+      "offset": 50,
+      "adapted_sha256": "4a982ccb3c689fa9bf82b4a6e7f8f6fb3555fc6ae9f9fb65463156b88864f0b2"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2428",
+    "source_sha256": "06e9e3301b16ce32a1b293b300a3e0bd36bc8fa01b0dc8a7df2e92efd2312465",
+    "reference_id": "message:2428",
+    "reference_sha256": "36201e210bd102fdbfc67219a02cf96d6feaa3e3249198d3cea493711cc53e5b",
+    "native_choices": {
+      "reference_command": "7F16004C004D",
+      "native_command": "7F1601110126",
+      "offset": 51,
+      "adapted_sha256": "b077d4b667b58e5ec07c944bf39404f402a33c77ca32ffd817ca37bd3b6512f4"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:246A",
+    "source_sha256": "885a113bf7b49d4f32685c6bc9e54235180dabe809b515fb008433531df4735d",
+    "reference_id": "message:246A",
+    "reference_sha256": "128a0d52a345d76aa102a0bb78e7d00635dd09d1e5185b139b4b7049efbfe573",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 71,
+      "adapted_sha256": "5fd955c2844944f6cec60a637a0b328caa86b8ca671275e8ae59917f0459623d"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:246B",
+    "source_sha256": "c45992694c4926f38bf6d3ba24898a35183712ac999a3f9caafb3be80f0847a2",
+    "reference_id": "message:246B",
+    "reference_sha256": "e0e3f7e650dadb9a05ca99b80a25aedf3e4d4ce02e01e94d34a89affb9c33f87",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 75,
+      "adapted_sha256": "105b77d8fe03a7754c32ccd2bf3d26379c31870b592ee3b5c81cc450557dcd9d"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:246E",
+    "source_sha256": "3c4c37502b00845ffe366d844c76cb791f31184f12b35d844c530eacf4560f3c",
+    "reference_id": "message:246E",
+    "reference_sha256": "ca38b680f4a26084c5d2a6aff1a8ae79bdf6e7fe9745cc9b71d0a3ba6a27998d",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 60,
+      "adapted_sha256": "22dd9fe34e68de21c1337a0247d34cca01e1f07b950d12a49a6ea6ab65733c98"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:246F",
+    "source_sha256": "c4b2dc079432727a65b428a4327f020db882f81e67909a010e66b65277404372",
+    "reference_id": "message:246F",
+    "reference_sha256": "142ba6961211891c1c57bf2b1f68ab3adfa272599821f52ca1df4d47ca92d2fc",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 40,
+      "adapted_sha256": "c8b0f98f481efd1af92ac2310af044e57c24e303f8c9502601b3a7bc4a484926"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2471",
+    "source_sha256": "cb9825ecd14c90d56dd9817b513d573b9ae53bde2d8cd808cbe0b4aaaae9e65c",
+    "reference_id": "message:2471",
+    "reference_sha256": "167a988e2fe13cf75cffc0c867266bbe33d2c6b47614f1aa477ae82ef495d5af",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 53,
+      "adapted_sha256": "fd0791b86c76e449784398a6d36251e65fb30cf9a0bfb56acb98b96e32246d93"
+    },
+    "evidence": "Complete native and English sources were compared for the native true/false quiz; shared Circle/X labels stay unchanged because symbol games also use them. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2525",
+    "source_sha256": "c48476fd0628d6b6bb2b5eeeeaa9d5c82ae99f7410851b024f3c2299f192fc9a",
+    "reference_id": "message:2525",
+    "reference_sha256": "da7e73bc42348debfa3d465647e75dfdaea16163e9d9f3e77026c5ee2a683f37",
+    "native_choices": {
+      "reference_command": "7F1600DC015F",
+      "native_command": "7F160130015F",
+      "offset": 254,
+      "adapted_sha256": "018e25a248fa9786bd19481f1d29925daac087e3e8baa010111c8ee8c3ce4625"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2582",
+    "source_sha256": "de45249179a3a3562a908601c248e2427f1454359cd61af998f4a2b4f58de4f4",
+    "reference_id": "message:2582",
+    "reference_sha256": "2e7200c7eec1052503ec07b84ee0479dd21f22ec66713f2ab2bd5ef0915f13af",
+    "native_choices": {
+      "reference_command": "7F16004C0004",
+      "native_command": "7F16004C0050",
+      "offset": 41,
+      "adapted_sha256": "bf93e13d028cba1a2847caf47aaf04de94537fb5e771ff213fc0df3eda3be6d4"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2597",
+    "source_sha256": "cf16060e7019d6bc785a1b987acdaea40275c585a706575dd68b571c5a76eea0",
+    "reference_id": "message:2597",
+    "reference_sha256": "cd9d1bd2f2215ce2234c8e8edcd145fcfd928c72e098bbd5a0ea697c07f5bad1",
+    "native_choices": {
+      "reference_command": "7F1700EF009B004D",
+      "native_command": "7F1700EF009B00C4",
+      "offset": 40,
+      "adapted_sha256": "d822a30d3a1bbb538eb1ccc1e18273266629850d6e348a0c3befbc4177f23f59"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:25F0",
+    "source_sha256": "94725e318597e9eb65cfbbef2c6f85dbca64c16424c768c35e1f960e7a6da6c6",
+    "reference_id": "message:25F0",
+    "reference_sha256": "ee20e1aeb13773e57eb6894b08f13a80720dc7dadd40e2cbff30604406d08eba",
+    "native_choices": {
+      "reference_command": "7F16010B010C",
+      "native_command": "7F16010B011F",
+      "offset": 126,
+      "adapted_sha256": "d6b33eedb7197b64d3bb072274f4a4f343a166a5f27563f8610c8028d416e246"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:25F5",
+    "source_sha256": "72277f164090b4aeec32bfdca8458f1a57fcef34d4d3b5ab12ab8f4c066a6660",
+    "reference_id": "message:25F5",
+    "reference_sha256": "e660d3aac188b19f422b8d5d95f449d8f0c94d04af9b6c687bca571de3c22af8",
+    "native_choices": {
+      "reference_command": "7F1600B1002E",
+      "native_command": "7F1600B1000D",
+      "offset": 92,
+      "adapted_sha256": "579cca7a32ee8aec0d14738a321beaac2b7e50773405f596426d91d113ca72a8"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:262A",
+    "source_sha256": "0d640ca169f8a2ab39283b58c3e54a05a107b7aacbdf4712907a99f945ec65e3",
+    "reference_id": "message:262A",
+    "reference_sha256": "f8b192ba29f6fdf9be27fef8795ef89b057eca2330ec7092b72e5e35435a339a",
+    "native_choices": {
+      "reference_command": "7F16011E004E",
+      "native_command": "7F16011E00ED",
+      "offset": 133,
+      "adapted_sha256": "970c560179be01343f897821bba5e206737b7428775304a46c918288b7d7bbb1"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:262D",
+    "source_sha256": "0a4f48f6c058330fd9fec1cdf47d1038049549e491299c79ed1567bdce67cda7",
+    "reference_id": "message:262D",
+    "reference_sha256": "51a90d69bad399a03f3929633b0d7474e5c667d9751dc6940bb8b858185e4639",
+    "native_choices": {
+      "reference_command": "7F160040003E",
+      "native_command": "7F160040003F",
+      "offset": 128,
+      "adapted_sha256": "c8d153de7679ea33943d6495ddb908621595ff6afdba76af7fc5e286401c0ac3"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2636",
+    "source_sha256": "9e0c33f7833452f495d2c771cec1e15e2088b6fe7b4c285b72f90ad51d387c84",
+    "reference_id": "message:2636",
+    "reference_sha256": "015e0f0bd8bee501468828b8d3a9ee9d211a2d1ebdf79a24e0190cabb2883706",
+    "native_choices": {
+      "reference_command": "7F1600C30004",
+      "native_command": "7F1600C300DE",
+      "offset": 96,
+      "adapted_sha256": "3ba3f34610a4cb86d559214508d3c349494629596ebc1b75b3c05409514d9ea2"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2648",
+    "source_sha256": "dc6a941099127fb9bc01aea2407464ae37a5266f76bf16d163a70fc94094df51",
+    "reference_id": "message:2648",
+    "reference_sha256": "12825a45edef34437ae1b331ca22588e2855b4c7f0d1935eb557ee02a19ace5a",
+    "native_choices": {
+      "reference_command": "7F160040003E",
+      "native_command": "7F160040003F",
+      "offset": 54,
+      "adapted_sha256": "b2d254aea7b44b457fb9f6007ffc59f448222606ec3ad8fad7a6488bb60ac202"
+    },
+    "evidence": "Complete native and English sources were compared for the native resident conversation, activity, or reaction. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2869",
+    "source_sha256": "2319c739b04aeee2bf346a871c5d4926ff95184394c3b06c351b0ba1694cf678",
+    "reference_id": "message:2869",
+    "reference_sha256": "d3cc5ae33bcf30adde8ad5770976efa46deb92c83f5d03ac531c53594e36f368",
+    "native_choices": {
+      "reference_command": "7F16000F0010",
+      "native_command": "7F16000F0102",
+      "offset": 227,
+      "adapted_sha256": "e4258f3306858826c2d2268a9832369f0e0cccd259bbb7de191a3bcdbb4cef61"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:286A",
+    "source_sha256": "e7e05dacb1899af964a4e98ce098c2e91f0cbdb467f4c9d77ab5a3452274c988",
+    "reference_id": "message:286A",
+    "reference_sha256": "d58ceb58f3422491cd46c7d824a55535e816a4a16edd11ed7fb59489dd3e6364",
+    "native_choices": {
+      "reference_command": "7F16004C0051",
+      "native_command": "7F1600C600C5",
+      "offset": 85,
+      "adapted_sha256": "b2fc84c3d36f9509f3b8f1b8705cef754d60d2c5043aedd2b26b41bfc190ec8d"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:286C",
+    "source_sha256": "51355df19f0f713b67f1eb54a82cd4f6bd0386bc327ed02aefefc073f649605f",
+    "reference_id": "message:286C",
+    "reference_sha256": "0b16a3c348e9d3e528724c1d1b765d36cb6bc56d68eca3b27db54142489ce226",
+    "native_choices": {
+      "reference_command": "7F16001D0018",
+      "native_command": "7F1600330034",
+      "offset": 292,
+      "adapted_sha256": "11e34079c14c71027c4c782bcc835a74881074f59f33282a222acdd2c7663a11"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2904",
+    "source_sha256": "f520050c834b26a5f505849bfa7a385901192092bc18a858c58bb84bbbaf96f0",
+    "reference_id": "message:2904",
+    "reference_sha256": "48533abccb610b6c3bd3698bb1921233d882e91ac63b8e56c1ca2a139282a421",
+    "native_choices": {
+      "reference_command": "7F1600C30051",
+      "native_command": "7F1600C300C4",
+      "offset": 95,
+      "adapted_sha256": "0f417e449f161a2a43c6a4f6c491419f12c8b158b269077304eaf9d15559a66d"
+    },
+    "evidence": "Complete native and English sources were compared for the found-object ownership or caught-creature question. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:292A",
+    "source_sha256": "ea0f4c19e681edffe63a6c926aee22e6807d7da4e4e0383fec1cf2e16d3018f6",
+    "reference_id": "message:292A",
+    "reference_sha256": "eaf092ffcb5f0c4cea138a85cc44d1431e6f06e952fb0519230e74754778860f",
+    "native_choices": {
+      "reference_command": "7F16011A012F",
+      "native_command": "7F16011A0114",
+      "offset": 254,
+      "adapted_sha256": "e3b5126a56144069d2f92ae94c1b6b757738a16e029bd3f0c0c823ec9b295ea1"
+    },
+    "evidence": "Complete native and English sources were compared for the letter impression, comprehension, or clothing-quantity response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2949",
+    "source_sha256": "11b90f7e6fef3d6e019bc978368f982dfe6fd242205b024e17af0c02d78788c1",
+    "reference_id": "message:2949",
+    "reference_sha256": "088352700e3e1df0314e766bbfc2707ac2d607152821f2d87e10b292fa11e42e",
+    "native_choices": {
+      "reference_command": "7F1700CA00CC00CB",
+      "native_command": "7F1700CA00CB00CC",
+      "offset": 330,
+      "adapted_sha256": "527162b815695694a168fdb5906e4aa19b6308d3cab0cba69c91b5716f6b0444"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2975",
+    "source_sha256": "8c5f0174feeaa153afdda34832938f1322d1eaa9d01fcb36387b45fb17f1293f",
+    "reference_id": "message:2975",
+    "reference_sha256": "ad88fbea7a594cc1453308737df107a888f5a14a0f2d7d9dc98687d97a93e42a",
+    "native_choices": {
+      "reference_command": "7F1700AE00AF0010",
+      "native_command": "7F1700AE00AF0050",
+      "offset": 317,
+      "adapted_sha256": "18cddfa5ff361a6b6fa375bb24472b91f0e6e5aad7721135cd4f615d6e7d16ee"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:29F4",
+    "source_sha256": "2d2b41a481a775927c3d79847ddd6651a157522bf54eae2f0e4a4515ad1da051",
+    "reference_id": "message:29F4",
+    "reference_sha256": "2ae44644d240d32836a27f648458723967e4d6299321580cb7da97ea0255c7c0",
+    "native_choices": {
+      "reference_command": "7F16018A018B",
+      "native_command": "7F16018A003B",
+      "offset": 117,
+      "adapted_sha256": "f1a1a3de4d9cd58f1b77e0d85ecef0009aac45fe814f8c4f3c90916bba7fda6f"
+    },
+    "evidence": "Complete native and English sources were compared for the appearance, room, collection, or opinion response. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2CB8",
+    "source_sha256": "b33377dc7f58d034821ae2fb62c0901d7fb47bf5635f410d1bc4d06e3a6f0485",
+    "reference_id": "message:2CB8",
+    "reference_sha256": "d4c0250fcfbe5e6c71871d05784ba73dc5c0ff4a07c2012c8f20639f7fc9fcaa",
+    "native_choices": {
+      "reference_command": "7F1600440018",
+      "native_command": "7F1600230018",
+      "offset": 166,
+      "adapted_sha256": "e5b2b72ceed0aa50add447530b0a5a4c7ce3ee6d88814cccfe8495d2e81a3c89"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
+    "id": "message:2CF4",
+    "source_sha256": "d4f4dcc585296fe2cca8c9a55fb4cad36fdb6e59da60f099981e6319f46d66e3",
+    "reference_id": "message:2CF4",
+    "reference_sha256": "9788376f3cae2f9da468239b8c7fd4d384ce41239d985a95d0f8e95c5aedffeb",
+    "native_choices": {
+      "reference_command": "7F1600330067",
+      "native_command": "7F1600280036",
+      "offset": 27,
+      "adapted_sha256": "c81713f711e63de80690deaf98defa525e0facdc567a54652e60d0fb51699fee"
+    },
+    "evidence": "Complete native and English sources were compared for the native buy, sell, give, trade, reward, or repeat decision. Preserve every English word, manual line, page, and pause while replacing only the menu span with the actual native choice IDs in their original order. Existing branch targets and actor requests remain guarded by normal validation; only redundant article suppression before an already-native field is removed by the shared adapter where present. Shared-label and connected-reply corrections are tracked in NATIVE_MENUS.md. Full presentation and ordinary gameplay acceptance remain."
+  },
+  {
     "id": "message:1143",
     "reference_id": "message:1143",
     "source_sha256": "580b5e4595842c84d31582c42be397c9f99e0776325ffff9fb5a15a941e44267",

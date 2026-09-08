@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Batch native cartridge loads for approved shop dialogue and its actual labels."""
+"""Batch native cartridge loads for selected dialogue and its actual menu labels."""
 
 import argparse
 import json
@@ -12,13 +12,13 @@ from message_alias_test_scenario import scenario as message_scenario
 from reference_matches import load_matches
 from runtime_module import MODULE_VROM, module_command_info
 from textbanks import Bank
-from textcodec import encode
+from textcodec import encode, tokenize
 
 
-def scenario(rom, edits, info):
+def scenario(rom, edits, info, *, message_ids=None):
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     reviewed = [r for r in matches.values() if "native_choices" in r]
-    ids = [r["id"] for r in reviewed]
+    ids = [r["id"] for r in reviewed] if message_ids is None else message_ids
     actions = message_scenario(rom, edits, info, message_ids=ids)
     files = by_vrom(rom)
     layout = ChoiceLayout(*struct.unpack_from(">4I", files[MODULE_VROM].extract(rom), 40))
@@ -26,11 +26,12 @@ def scenario(rom, edits, info):
         raise ValueError("Shop-label batch requires the approved twenty-byte runtime")
     labels = Bank("select", 0x02400000, 0x00D06000,
                   files[0x02400000].extract(rom), files[0x00D06000].extract(rom)).entries()
-    selected = sorted({int.from_bytes(command[offset:offset+2], "big")
-                       for r in reviewed
-                       for command in [bytes.fromhex(r["native_choices"]["native_command"])]
-                       for offset in range(2, len(command), 2)})
     by_id = {r["id"]: r for r in edits}
+    selected = sorted({int.from_bytes(token.data[offset:offset+2], "big")
+                       for id in ids
+                       for token in tokenize(encode(by_id[id]["translation"], info), info)
+                       if token.kind == "cmd" and 0x16 <= token.data[1] <= 0x18
+                       for offset in range(2, len(token.data), 2)})
     extra = []
     choice, buffer = 0x8019B1B0, 0x8019B800
     for index in selected:
@@ -50,11 +51,14 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--source-rom", type=Path, default=Path("local/rom/Doubutsu no Mori (Japan).z64"))
     parser.add_argument("--translations", type=Path, required=True)
+    parser.add_argument("--message-id", action="append",
+                        help="Repeat to select an explicit dialogue batch and all of its menu labels")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     rom = args.rom.read_bytes()
     info = module_command_info(verified_rom(args.source_rom.read_bytes()))
-    actions, ids, selected = scenario(rom, json.loads(args.translations.read_text()), info)
+    actions, ids, selected = scenario(rom, json.loads(args.translations.read_text()), info,
+                                      message_ids=args.message_id)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"rom_sha256": sha256(rom), "actions": len(actions), "messages": ids,

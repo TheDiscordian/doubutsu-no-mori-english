@@ -1,0 +1,146 @@
+[
+  {
+    "id": "message:077E",
+    "source_sha256": "f94f1c25c5bf582a0380662c6e065a3c86268ddacb4a0e1b8417fe658bf51737",
+    "translation": "{cmd:7F09000004}{cmd:7F0305}Oh,{cmd:7F0308} that's{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F09000007}{cmd:7F030A}\n{cmd:7F31},{cmd:7F030A}\n{cmd:7F5302}I {cmd:7F541E}t{cmd:7F541C}h{cmd:7F541A}i{cmd:7F5418}nk.\n{cmd:7F5302}{cmd:7F541C}M{cmd:7F5418}a{cmd:7F5414}ybe{cmd:7F0304}{cmd:7F5410}.{cmd:7F0304}{cmd:7F5410}.{cmd:7F0304}{cmd:7F5410}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}Would you like\nto take it home?\n{cmd:7F160033000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0780}{cmd:7F10077F}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Booker asks whether the player wants to take the item, not whether the item belongs to the player. Keep the complete hesitation, progressively smaller speech, item field, cancellation, and native take/refuse routes. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:152B",
+    "source_sha256": "97e3ac6c350199862b8fcf287b6c34e888cb6b03a0c73c33f41a738e07f2420f",
+    "translation": "{cmd:7F09000017}I don't mind{cmd:7F0306} digging\nholes to bury my things,\n{cmd:7F04}\n{cmd:7F02}but I soon forget\nwhere I buried them.\n{cmd:7F04}\n{cmd:7F02}No matter how often I check,\nI still forget.{cmd:7F0306}\n{cmd:7F0900000B}What should I do?{cmd:7F0308}\n{cmd:7F1C}?{cmd:7F1601300050}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1538}{cmd:7F101539}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete burying and forgetting problem and request for advice, not the reference question about the player having the same problem. Native reassurance/hesitation choices and all page boundaries remain. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:1784",
+    "source_sha256": "bc96e50b30d3c97d4db7cb0c8c114027dc62b6ca318d757b3e92f7716e51628c",
+    "translation": "{cmd:7F090000FF}Yesterday,{cmd:7F030C}\ndid I {cmd:7F0900000B}take a bath?\n{cmd:7F0306}{cmd:7F1C}?{cmd:7F1600EE00ED}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1785}{cmd:7F101787}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native quiz asks about bathing yesterday, not showering today. Preserve the native statement date, choices, expression, and answer destinations. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:1783",
+    "source_sha256": "be75b1194a971995331d3c2a21d757f7be740d107db0c5987af18ccb26248c55",
+    "translation": "{cmd:7F0C050067}{cmd:7F09000001}{cmd:7F030A}That's not true!\nHow rude of you,{cmd:7F0304} really!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Though, {cmd:7F0304}\nI do forget sometimes,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F0E1789}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the shared failed-answer reply reached through 1787. The reference invents a mint and THIS morning, which contradict the native bath-yesterday question. Retain the native general denial, offence, occasional forgetfulness, failed-answer request, and 1789 continuation. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:29B0",
+    "source_sha256": "38f2aaa068f990ae3c6577b78435bc2915261e46e42a289b1a6cba8d2cd578a3",
+    "translation": "{cmd:7F090000FF}That was just\na little joke.{cmd:7F04}\nNow for the real test.{cmd:7F0308}\nWell,{cmd:7F0304} what's this?{cmd:7F04}\n{cmd:7F02}   {cmd:7F528C}{cmd:7F5410}M{cmd:7F1801A301A401A501A6}{cmd:7F04}{cmd:7F0D}{cmd:7F1129B2}{cmd:7F0F29B1}{cmd:7F1029B1}{cmd:7F1229B1}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native correct answer is the third choice, Japanese me. Its existing English choice is M, so the eye chart must display M, not the GameCube A. Retain chart position/scale, all four choice IDs, and every branch in its original order. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:2CF3",
+    "source_sha256": "0414744ce07e7645a3298c16d6d497e682d93623c6be1cfb60f10025f5796771",
+    "translation": "{cmd:7F0900000F}{cmd:7F0317}Hmm{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F090000FF}At that price,{cmd:7F030C}\neven I could afford it.\n{cmd:7F1600280036}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2CFB}{cmd:7F102CFC}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native speaker can afford the offered price; the English same-ID reference says the opposite. Preserve agreement/retry choices and native actor/pause order. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:0AE5",
+    "source_sha256": "a5a72b14551d2e0d13975e78ef48f0994f35319e0a3ddeaba4ff5b868127f414",
+    "translation": "{cmd:7F09000016}BZZT! Wrong!{cmd:7F030C}\nBetter luck next time.{cmd:7F04}\n{cmd:7F02}Missing the fireworks\nwould be{cmd:7F0304}\nout of the question,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F0E0AE0}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing incompatible meteor-shower reply. Native 0ADD first choice is Fireworks Show; the reply reprimands missing the fireworks and returns through 0AE0. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:1212",
+    "source_sha256": "6546f01e5966d57af58f9935622be2565f6a6dc3a39ff7f6c958835c90a48191",
+    "translation": "{cmd:7F0C050001}{cmd:7F09000015}That's exactly right!{cmd:7F030C}\nSummer means{cmd:7F0304}\nfireworks,{cmd:7F0308}\n{cmd:7F1C}!{cmd:7F0E121C}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing meteor-shower reference. Native 1210 second choice is the August fireworks show; retain the successful quest request and 121C continuation. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:1218",
+    "source_sha256": "fa08ddf910580171b484933914c7689175ca70581dd0f652fa8db5e51773deff",
+    "translation": "{cmd:7F0C050065}{cmd:7F09000004}What?{cmd:7F0306} That's wrong!{cmd:7F030C}\nThe Sports Fair is held{cmd:7F0306}\ntwice, in April and October,\n{cmd:7F0308}{cmd:7F1C}!{cmd:7F0E121B}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing March/September reference. Native Sports Fairs occur twice, in April and October. Retain the failed-quiz request and 121B continuation. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "message:1219",
+    "source_sha256": "94ed177087f8ba0841254b79d158d05431f53a31bb4d75b15737252a20cf7dc8",
+    "translation": "{cmd:7F0C050065}{cmd:7F09000003}You fell for it!{cmd:7F030C}\nMoon viewing actually{cmd:7F0306}\nhappens twice a year!{cmd:7F0E121B}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Correct the existing fishing-tourney reference. Native 1217 second choice is moon viewing, with two annual viewings. Retain the failed-quiz request and 121B continuation. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:0036",
+    "source_sha256": "a175ea536b071359679eb4d0ab460fc5646b2ede409921eebdb071818a1df297",
+    "translation": "Again!",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native request to repeat. All nine main-message uses cover repeating an explanation, exchange, guess, or price round; avoid the narrower Tell me again wording. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:00C1",
+    "source_sha256": "251c0d1b4e073604ab8ae4ceff689f387d3625eeb993376c5325b1976cf136d3",
+    "translation": "Christmas Eve",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Restore the literal native event name across all three main-message menus, not the GameCube Winter Festival label. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:00BF",
+    "source_sha256": "1daff6fc6233b18be4b36c59250575752a937b8be670ca631f9f4a26a9aace97",
+    "translation": "Moon Viewing",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Restore the literal native event name across all four main-message menus, not the incompatible Meteor Shower label. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:002F",
+    "source_sha256": "0bfb702fb5d0691f345e5fef2ac169e738e5b82f3f716b85b1e6fb849f7db02d",
+    "translation": "Tell me!",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native request for information across 34 main-message menus; avoid restricting non-advice questions to Any tips. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:00F8",
+    "source_sha256": "3eca11d8f751c708d7fb7349716f678433c12f785964f27f076d587bcaa677b5",
+    "translation": "Play it!",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "All three native main-message uses request a song performance or encore, including both early K.K. invitations. Do not reverse the speaker with Listen. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:0103",
+    "source_sha256": "a1c6d482c581b67b82da231d355479829111f256396f1304451f3f96da2a4b3b",
+    "translation": "Somewhat.",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native qualified degree or moderate reaction in eight main-message contexts: room, town satisfaction, comprehension, excitement, snow, clothes, cramps, and sleeplessness; not a quantity-only Not many. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:0130",
+    "source_sha256": "9f07ac042b5493446e8877c2f89283c9ab3a3021c8fb522d1c38aec24c2b15ab",
+    "translation": "It's fine!",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Native reassurance in four main-message contexts: catchphrase, buried items, flowers, and friendship. Preserve reassurance rather than an ambiguous affirmative answer. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  },
+  {
+    "id": "select:011F",
+    "source_sha256": "0bdc3d543d2c13f948cd90f052b1a6a3b83c8358e2f0d926aacbb8ceac8aaada",
+    "translation": "Won't warm you!",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The sole main-message use, 25F0, rejects the proposed food as a way to warm up. Correct the unrelated I can't take it label. Original commands and arguments remain exact; final wording, rendering, and ordinary gameplay review remain."
+  }
+]

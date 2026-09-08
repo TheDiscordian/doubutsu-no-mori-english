@@ -35,22 +35,27 @@ def adapt_choice_reference(reference, source, record, info):
     if not record or "native_choices" not in record:
         return reference["text"], []
     validate_choice_approval(record)
-    raw = encode(reference["text"], info)
+    # CUTARTICLE belongs to the untouched English reference, not to the native
+    # command table. The ordinary adapter removes it only at an audited string
+    # insertion after this exact menu edit; do not enable it at runtime here.
+    reference_info = list(info)+[(0, 0)]*max(0, 0x75-len(info))
+    reference_info[0x74] = (2, 0)
+    raw = encode(reference["text"], reference_info)
     if (sha256(source) != record["source_sha256"] or reference["id"] != record["reference_id"]
             or reference["sha256"] != record["reference_sha256"]
             or sha256(raw) != record["reference_sha256"]):
         raise ValueError("Stale native-choice source or reference")
     rule = record["native_choices"]
     before, after = choice_command(rule["reference_command"]), choice_command(rule["native_command"])
-    def choices(data):
-        return [t for t in tokenize(data, info) if t.kind == "cmd" and 0x16 <= t.data[1] <= 0x18]
-    native, english = choices(source), choices(raw)
+    def choices(data, descriptors):
+        return [t for t in tokenize(data, descriptors) if t.kind == "cmd" and 0x16 <= t.data[1] <= 0x18]
+    native, english = choices(source, info), choices(raw, reference_info)
     if (len(native) != 1 or native[0].data != after or len(english) != 1
             or english[0].data != before or english[0].offset != rule["offset"]):
         raise ValueError("Approved choice span differs from the unique native/reference menu")
     offset = rule["offset"]
     adapted = raw[:offset]+after+raw[offset+len(before):]
-    return decode(adapted, info), [{"operation": "preserve_approved_native_choices",
+    return decode(adapted, reference_info), [{"operation": "preserve_approved_native_choices",
                                    "byte_offset": offset, "gamecube": before.hex().upper(),
                                    "n64": after.hex().upper()}]
 

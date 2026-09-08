@@ -79,6 +79,29 @@ class ReferenceChoiceTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             validate_choice_approval({**self.record, "controller": {}})
 
+    def test_reference_article_is_retained_until_the_existing_audited_adapter(self):
+        reference_info = self.info+[(0, 0)]*(0x75-len(self.info))
+        reference_info[0x74] = (2, 0)
+        source = b'Native \x7f\x31'+self.after+b'\x7f\x01'
+        raw = b'English \x7f\x74\x7f\x31'+self.before+b'\x7f\x01'
+        expected = b'English \x7f\x31'+self.after+b'\x7f\x01'
+        reference = {'id': self.record['id'], 'sha256': sha256(raw), 'text': decode(raw, reference_info)}
+        record = deepcopy(self.record)
+        record.update(source_sha256=sha256(source), reference_sha256=sha256(raw))
+        record['native_choices'].update(offset=raw.index(self.before), adapted_sha256=sha256(expected))
+        text, _ = adapt_choice_reference(reference, source, record, self.info)
+        self.assertIn('{cmd:7F74}{cmd:7F31}', text)
+        with self.assertRaisesRegex(ValueError, 'Unsupported command 7F74'):
+            encode(text, self.info)
+        text, changes = adapt_reference(text, source, self.info, 'reference_text')
+        self.assertEqual(encode(text, self.info), expected)
+        self.assertEqual([r['operation'] for r in changes], ['remove_redundant_cutarticle'])
+        validate_choice_candidate(record['id'], source, expected, {record['id']: record})
+        # Parsing the reference is not permission to erase arbitrary instances.
+        with self.assertRaisesRegex(ValueError, 'Unsupported command 7F74'):
+            adapt_reference(reference['text'].replace('{cmd:7F74}{cmd:7F31}',
+                '{cmd:7F74}A{cmd:7F31}'), source, self.info, 'reference_text')
+
     @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
                          "Retail and English reference inputs remain local")
     def test_all_approved_menu_records_and_native_price_label(self):
@@ -88,7 +111,7 @@ class ReferenceChoiceTests(unittest.TestCase):
         refs = {r["id"]: r for r in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         matches = load_matches(ROOT/"translations/reference_matches.json")
         approved = [r for r in matches.values() if "native_choices" in r]
-        self.assertEqual(len(approved), 24)
+        self.assertEqual(len(approved), 159)
         for record in approved:
             source = source_banks["message"][int(record["id"].split(":")[1], 16)]
             text, _ = adapt_choice_reference(refs[record["reference_id"]], source, record, info)

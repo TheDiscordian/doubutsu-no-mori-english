@@ -154,7 +154,8 @@ def main():
                                        Path("translations/n64-startup-greetings.json"),
                                        Path("translations/n64-resident-gaps.json"),
                                        Path("translations/n64-gyroid-charm-dialogue.json"),
-                                       Path("translations/n64-letter-fragments.json")])
+                                       Path("translations/n64-letter-fragments.json"),
+                                       Path("translations/n64-native-menus.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))

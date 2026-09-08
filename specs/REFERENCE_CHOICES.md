@@ -18,6 +18,10 @@ field, native actor-argument, and capacity checks still run after adaptation.
 The builder verifies the approved final hash independently of candidate metadata.
 Controller-text and native-choice adaptations cannot share an approval.
 
+The host parser recognises reference-only `74` without adding it to the native
+command table. The ordinary adapter still removes it only directly before an
+already supported native string insertion. Other occurrences remain rejected.
+
 ## Shop-service batch
 
 The approved Nook records are `1092`, `1097`, `1098`, `10A8..10AD`, and
@@ -75,11 +79,14 @@ See [complete content and verification scope](GYROID_CHARM_DIALOGUE.md).
 
 Portable tests cover exact replacement, changed sources/references, missing or
 duplicate menus, wrong offsets, changed action counts, unrelated controls, and
-the independent final-payload guard. Retail-input tests check all 24 approvals,
+the independent final-payload guard. Retail-input tests check all 159 approvals,
 their unchanged native choice commands, complete capacity validation, and the
-source-bound turnip-price label. The native batch generator loads every complete
-approved message and all six referenced labels from the actual cartridge, with
-buffer/module guards and full checkpoint restoration. Ordinary selection,
+source-bound original labels. The [broader native-menu batch](NATIVE_MENUS.md)
+supplies 135 approvals beyond the shop and police-station explanations, with
+native-specific questions and connected reply corrections where required.
+The native batch generator loads selected complete messages and all labels
+referenced by their decoded menus from the actual cartridge, with buffer/module
+guards and full checkpoint restoration. Ordinary selection,
 selling/ordering, the twins' echo rendering, and layout warnings remain combined
 gameplay and human-playthrough checks. The tool does not display reports or
 produce host audio.

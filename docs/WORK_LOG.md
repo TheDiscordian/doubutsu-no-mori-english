@@ -4318,6 +4318,115 @@
   generation/editor integration, public patch preparation, and stretch goals
   remain active. The font-atlas-edge investigation remains paused.
 
+## 2026-09-07 — Complete native menus and connected answer corrections
+
+- Reviewed 154 same-ID/legacy-agreeing menu references whose complete English
+  passes ordinary checks after substitution of the original native menu.
+  Approved 135 complete references, bringing native-choice approvals to 159.
+  Nineteen mechanically compatible donors were withheld for changed native
+  questions, topics, dates, labels, or field preparation. Five receive original
+  drafts; fourteen remain explicitly queued in `specs/NATIVE_MENUS.md`.
+  Local source/reference hashes and comparison routing are retained in
+  `build/native-menu-review.json`. No control-signature match was treated as
+  sufficient semantic approval.
+- Complete reference wording, manual lines/pages, emphasis, and pauses remain.
+  Every approval binds the full native/reference source, one menu offset/span,
+  exact original native command, and complete output hash. The host choice
+  parser recognises reference-only `74`, retaining it until the existing
+  direct-pre-field article adaptation. Native runtime descriptors remain
+  unchanged, and unrelated `74` use is still rejected. No extra actor/field,
+  gameplay, or buffer permission was added.
+- Added `translations/n64-native-menus.json`: five missing native questions,
+  five corrected existing replies, and eight shared labels. The original
+  questions preserve Booker's take-home meaning, burying/forgetting advice,
+  yesterday's bath, the actual third-answer M eye chart, and an affordable
+  price. Event replies `0AE5/1212/1218/1219` retain native fireworks,
+  April/October Sports Fairs, and two moon viewings. Connected-reply inspection
+  also found `1783` incorrectly referring to a mint and THIS morning after
+  the bath-yesterday question. Its original draft retains the general native
+  denial/forgetfulness and unchanged failure route. All ten dialogue drafts
+  preserve every native command/argument and fit the ordinary message buffer.
+  Only `077E/29B0` retain explicit-formatting warnings.
+- Eight shared labels retain their native meanings: `002F` Tell me!, `0036`
+  Again!, `00BF` Moon Viewing, `00C1` Christmas Eve, `00F8` Play it!, `0103`
+  Somewhat., `011F` Won't warm you!, and `0130` It's fine!. Their decoded native
+  main-bank occurrences total 66. All fit sixteen bytes; the full pilot retains
+  the existing twenty-byte implementation. The Circle/X labels remain unchanged
+  because 35 menus across 33 records share them between quizzes and shape games.
+  Context-specific truth labels and ambiguous none/pear or agreement/refusal
+  choices remain required, not globally replaced.
+- Added seven retail-input tests covering all 135 complete adaptations, exact
+  flow/presentation, builder mutation rejection without provenance, all ten
+  native drafts, connected replies, actual answer indices, all eight label
+  hashes/capacities/use counts, and the shared Circle/X constraint. The choice
+  adapter adds one reference-article test. Initial `tests-native-menus-full-01.log`
+  passes 585 tests in 208.798 seconds. After the connected `1783` correction,
+  `tests-native-menus-focused-02.log` passes seven tests in 1.787 seconds, and
+  `tests-native-menus-full-02.log` passes all 585 tests in 214.401 seconds.
+- Extended `tools/shop_menu_test_scenario.py` with repeatable explicit
+  `--message-id` selection. All referenced choice labels are derived from the
+  actual selected command streams; default selection still includes all
+  native-choice approvals. Full built payloads are checked before generation.
+  `build/native-menus-scenario.log` records every selected ID: 145 new/corrected
+  dialogue records, 23 unchanged connected records, and 126 actual labels,
+  including all eight label corrections. The scenario hash is
+  `fabeaa8c60f26eff3445587fa63ae069e2be6a53ea9c0e1b2a8b4759324e6b22`.
+- `build/smoke-native-menus-01/` passes all 168 native message loads at
+  `8009E558` and 126 native label loads at `80065D90`: 294 calls, 632 memory
+  assertions, and 1,353 recorded steps. Complete headers/text/labels, padding,
+  adjacent/module guards, checkpoint restoration, and graceful shutdown pass.
+  The run uses fresh four-MiB state, no save seeds, disabled audio, and both
+  FlashRAM/Pak write permissions false. Actual isolated saves remain blank:
+  FlashRAM `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`,
+  Pak `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  These loads do not execute item claims, quiz answers, trades, events, ordinary
+  menu progression, normal saving, or hardware tests.
+- Final full generation contains 11,648 edits, with 140 additions and exactly
+  thirteen deliberate changes to the previous 11,508 edits: the five connected
+  replies and eight labels above. No earlier entry is removed or otherwise
+  changed. The 10,403 main candidates comprise 9,757 reference candidates,
+  355 original dialogue drafts, and 291 original development-label drafts.
+  All 460 choices are present: 451 references and nine original labels.
+  Every candidate main/choice entry was compared with its complete built-bank
+  payload: all 10,403 messages and 460 labels match.
+- Basic generation contains 10,954 edits, adding 139 dialogue entries and six
+  choice entries to its previous 10,809, with seven existing entries deliberately
+  corrected and no removals. It admits 134 new reference approvals and all
+  eighteen original edits; `0A0A` is withheld without command `62`. Candidate
+  generation is not proof of a retail-capacity build: original labels beyond
+  ten bytes still require the English choice runtime.
+- Main records without candidates number 1,349: 427 Japanese-static,
+  919 non-static, one Latin, and two symbol/numeric records. Ten non-static
+  records contain dynamic insertions; all retain caller/control review.
+  The reference/label generator rejects 1,350 records, including one original
+  fallback: 1,204 unconfirmed identities, 120 control differences, 24 missing
+  fields, and two direct overflows. Reference warning-bearing records number
+  1,469; aliases remain 41, with zero conflicts. Source-volume coverage gains
+  6,116 characters, reaching 612,509 of the unchanged 746,978-character
+  denominator. This is replacement coverage, not semantic, gameplay, or project
+  completion. The requested one-time text measurement uses this definition.
+- Final ROM `build/native-menus-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `d974f891820e91fcf496b666990a45a32f5b8900da1345f1db46748857d02cb3`.
+  UPS SHA-256:
+  `c4a807ab441fc1bf22d44e2eda0c0d8f0953d0bbac36340675d657eb99dcf33e`.
+  Candidate SHA-256:
+  `88ef5a64189c71a909dcd26db169d37020a21e46284c4cc3f696b14d4d282710`.
+  UPS application reconstructs the complete ROM from the verified original.
+  Against the letter-fragment pilot, only extracted main text `02000000`,
+  choices `02400000`, their pointers `00CF9000/00D06000`, and directory
+  container `00019D40` differ. The directory container is unchanged outside
+  its table; code, font, runtime/name/mail resources, and saved structures
+  remain unchanged.
+- Regenerated final-hash coverage and both read-only review queues under
+  `build/native-menus-*`. The current-rule unconfirmed same-ID pool remains
+  empty, with 1,128 absent visible references and the separate field, control,
+  overflow, glyph, non-static, and encoding cases retained. Ten unapproved
+  expression comparisons remain. Main work continues with missing native
+  dialogue, contextual choices, remaining field/actor controls, name/string/mail
+  integration, review, saves, and patch-only release preparation, followed by
+  the image and keyboard stretch goals. Original hardware and human playthrough
+  remain unverified. The font-atlas-edge investigation remains paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
