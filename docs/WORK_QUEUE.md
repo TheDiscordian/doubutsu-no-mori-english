@@ -428,6 +428,18 @@ addressing English capacity. `000F/0010` terminate through timed-close `58`;
 `0011` retains syllable pauses and sound variants. Do not flatten those controls
 or let this separate sample audit delay the broader dialogue/runtime work.
 
+Nook's later renovation block `107E/107F/1081` needs native pricing and actions.
+The complete supplied `107E` becomes 1,023 stored/1,039 expanded bytes when its
+148,000-Bell quote is replaced with the native 49,800-Bell quote; ordinary
+reference controls pass, but capacity correctly rejects it. Preserve the full
+English reference through an existing page-boundary split with an individually
+bound native-price wording change, not a shortened invoice or reduced reserve.
+`107F/1081` are a native expensive-room-enlargement agreement/refusal and roof
+colour flow, not the GameCube basement choice. Retain `00DF/000D`, `1080/1081`,
+the four roof choices, and `1085/1086`; those different actions need native-complete
+wording. Source and complete references are locally inventoried, with no approval
+or gameplay claim implied by this comparison.
+
 Current main-bank coverage is 10,722 candidates; 1,030 records remain without
 candidates, including 108 containing Japanese static text. The reference
 rejection queue contains 929 unconfirmed identities, 76 control-signature
