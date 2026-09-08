@@ -41,12 +41,26 @@ The [Resetti dictionary integration](../specs/RESETTI_REPLIES.md) installs all
 32 complete English rude replies with their native substring lengths. Its
 silent batch passes 227 detector cases, fourteen English apology targets,
 thirty classifications, and 302 memory assertions with retained actor/save data.
+Fifteen [native engine-test/sample/label drafts](../specs/ENGINE_DIAGNOSTICS.md)
+retain every command, page, number, and menu target. All fifteen complete native
+loads and 47 memory assertions pass with a restored checkpoint and blank saves.
+Five larger Japanese test scripts remain: `0004/0005/000F/0010/0011`. Preserve
+their deliberate glyph/sound samples while translating instructions, and use
+approved page splits if complete English exceeds the buffer.
 Next work covers other general strings and their callers, apology input,
-and the twenty remaining native diagnostic records. Apology `048E/0491`
+and those five scripts. Apology `048E/0491`
 still requires editor/token/matching integration. Keep general strings, remaining mail
 glyphs, and ordinary gameplay moving alongside these consumers. Title artwork
 is the first image replacement after the main port. Do not resume the paused
 atlas-edge investigation.
+
+The next shared-string group is shop quantity units. The five shop actors have
+ten-byte loader calls and item-category/unit tables; verify their complete
+count arithmetic, mappings, local buffers, and free-string consumers before
+admitting longer English entries. The English source's count arithmetic differs
+in form, so shared IDs alone do not establish singular/plural selection.
+Unused/reserved unit rows and empty English counters need explicit handling,
+not blanket candidate credit.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch
@@ -600,9 +614,9 @@ complete loads, four labels, 52 order dispatches, and 237 memory assertions with
 restored checkpoint and blank saves. Sale outcomes, apology/editor integration,
 Gulliver gifts, reset outcomes, wording/layout, and hardware remain required.
 
-Current main-bank coverage is 10,810 candidates; 942 records remain without
-candidates, including 20 containing Japanese static text. The reference
-rejection queue contains 905 unconfirmed identities, fourteen control-signature
+Current main-bank coverage is 10,825 candidates; 927 records remain without
+candidates, including five containing Japanese static text. The reference
+rejection queue contains 890 unconfirmed identities, fourteen control-signature
 differences, 23 missing-field records, and one expansion overflow. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -682,7 +696,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, the complete snooty letter explanation, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, six separate-glyph references, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 25 guarded continuation allocations; 99 complete diagnostic labels covered; scoped three-round numeric answers complete; 20 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, the complete snooty letter explanation, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, six separate-glyph references, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 25 guarded continuation allocations; 114 complete diagnostic/sample drafts covered; scoped three-round numeric answers complete; five Japanese-static test-script gaps and broader caller/review work remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Missing punctuation/symbols and later layout polish | active | Startup-loaded five-glyph resource, native drawing/reveal, and gated main imports pass; six complete references installed; formatting spans, mail/editor/save consumers, and ordinary gameplay remain; preserve GameCube line/page/timing intent |

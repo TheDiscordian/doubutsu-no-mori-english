@@ -224,6 +224,7 @@ def main():
                                        Path("translations/n64-moving-conversations.json"),
                                        Path("translations/n64-nes-launch-prompts.json"),
                                        Path("translations/n64-diagnostic-labels.json"),
+                                       Path("translations/n64-engine-diagnostics.json"),
                                        Path("translations/n64-travel-advice.json"),
                                        Path("translations/n64-startup-errors.json"),
                                        Path("translations/n64-renovations.json"),

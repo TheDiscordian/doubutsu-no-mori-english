@@ -6826,3 +6826,77 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   remains active. Title artwork is still first in the image queue after the main
   port. Updated an obsolete number-game queue paragraph to reflect its already
   installed and tested scoped labels; no additional number-game changes.
+
+## 2026-09-08: native engine-test prose and shopping diagnostics
+
+- Committed and pushed the complete Resetti dictionary/matcher checkpoint as
+  `629638f`. Confirmed the private remote and exact local/remote HEAD agreement.
+  Collected the successful full regression process handle; all 817 tests pass.
+  The complete translation/review/release objective remains active. Title
+  artwork stays the main image task, using the supplied English GameCube assets
+  after the main text/runtime port. No display window, audio, or user-save access.
+- Added fifteen original drafts in `translations/n64-engine-diagnostics.json`:
+  `0001/0002/0003/0006/0007/0008/0009/000A/000B/000C/000D/000E/0012/1354/1355`.
+  Eleven describe native engine tests, two preserve complete personality
+  samples, and two preserve the normal-girl shopping labels. Every original
+  command, argument, per-page command order, choice ID, continuation target,
+  printed label, and ending remains. Both shopping labels retain part 1 and
+  their printed 4948/4949; the empty legacy entries are not treated as English.
+  The literal `%SFN%`, unlucky-state action, voice toggles, and mood-menu graph
+  remain. No runtime requirement, broader control policy, or production patch.
+- Five focused tests pass in 0.698 seconds,
+  `build/tests-engine-diagnostics-focused.log`. They verify all native hashes,
+  exact controls and per-page placement, full meanings and literal labels,
+  selection in both generation modes, encoded round trips, expansion limits,
+  and approved-metric layout. There are no new layout warnings. The existing
+  99 canonical diagnostic definitions and five larger glyph/sample scripts
+  remain unchanged. All **822 regression tests pass in 302.261 seconds**,
+  `build/tests-engine-diagnostics-full.log`.
+- Full/basic generation adds precisely fifteen candidates, reaching
+  12,757/11,896. Every earlier candidate and all metadata remain identical.
+  Main candidates total 10,825: 9,812 references, 618 original dialogue drafts,
+  one original continuation, 280 development-label drafts, and 114 diagnostic
+  or sample drafts. The final main gaps are 927: five Japanese-static scripts,
+  919 non-static records, one Latin record, and two symbol/numeric records.
+  Ten non-static records contain dynamic insertions; none is declared
+  unreachable. General strings remain 294/1,562, with 1,268 missing candidates.
+  Main rejections are 928: 890 unconfirmed, fourteen control differences,
+  23 missing-field cases, and one overflow, with one original fallback.
+  Reference layout warnings remain 1,491 and review-complete remains zero.
+  Source-character coverage is 647,719/746,978 across ordinary banks and
+  636,391/637,761 in the main bank. These inventories are not semantic,
+  caller, gameplay, original-hardware, or project-completion claims.
+- Pilot `build/engine-diagnostics-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `aa3b5bb5074783ccf2ef8fec703b4073b1f8e2cd6ccd755e5bc8c3593d3fbbfb`.
+  UPS SHA-256:
+  `fd5916ef7c4ce1d33a9fe23073b4ee43b993435c1d1b84779c1bfa8b2ef978c4`.
+  Candidate `build/engine-diagnostics-candidates/translations.json`, SHA-256:
+  `2e29cefa7046724c13d56a290f265bb728999f76b281cfb322738b4d4b7fe11e`.
+  Coverage: `build/engine-diagnostics-coverage/`. Independently reconstructed
+  all 12,757 installed candidates and the original-ROM UPS round trip. Relative
+  to the reply pilot, only main text `02000000`, offsets `00CF9000`, and DMA
+  metadata `00019D40` differ. Every other file, including code, fonts, resident
+  module, keyboard/title assets, choices, general strings, and mail, is unchanged.
+- The first silent native batch `build/smoke-engine-diagnostics-01/` passes
+  fifteen complete cartridge loads and 47 memory assertions in 84 recorded
+  steps. Complete headers/text, adjacent/module guards, stack restoration,
+  checkpoint restoration, blank isolated FlashRAM/Pak, and graceful shutdown
+  pass. Audio is disabled and four-MiB configuration is selected. Independently
+  regenerated the complete scenario and checked every loader return, requested
+  ID, assertion, and save digest. Scenario SHA-256:
+  `54f119c615c696914cd22052864967370b38ea6c3cd457c177251d45c5dea120`.
+  These loader calls do not execute the diagnostics' mood/luck/voice changes,
+  choices, ordinary callers, or saving, and do not establish hardware acceptance.
+- Remaining main Japanese scripts are `0004/0005/000F/0010/0011`. Their
+  instructional prose can be translated, but deliberate Japanese glyph/sound
+  examples must not be deleted simply to change the coverage category. Complete
+  longer English also needs the ordinary buffer/page-split checks. This does
+  not reopen the paused font-edge investigation.
+- Read the next shop quantity-unit group and existing direct-call evidence.
+  Five shop actors load ten bytes; the English common source uses sixteen.
+  Native base arithmetic visibly differs in form from the English expression,
+  so caller/count and category-table validation remains before admitting unit
+  strings or claiming singular/plural correctness. Empty counters and reserved
+  rows also require explicit treatment. No shop-unit implementation is included
+  in this checkpoint. All broader translation, review, save/gameplay, release,
+  original-hardware, title, and keyboard requirements remain active.

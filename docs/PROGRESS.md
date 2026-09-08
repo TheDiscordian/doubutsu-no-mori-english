@@ -2,16 +2,28 @@
 
 ## Active work
 
+Fifteen [native engine tests and shopping labels](../specs/ENGINE_DIAGNOSTICS.md)
+have complete English drafts with every native command, menu target, page,
+printed number, and ending retained. Five focused tests and fifteen complete
+native cartridge loads pass, including 47 memory assertions and restored blank
+isolated saves. Both generation modes add exactly fifteen records and retain all
+earlier edits unchanged. Full/basic candidates are 12,757/11,896, with 10,825
+main-bank candidates. The five remaining Japanese main-bank records are larger
+test scripts with deliberate glyph/sound samples; those samples need an explicit
+preservation policy, not deletion for coverage. Shared strings and their callers
+remain next; the title screen is the main image replacement after the main port.
+All 822 host regression tests pass.
+
 The [Resetti reply dictionary](../specs/RESETTI_REPLIES.md) installs all 32
 complete English rude replies with matching substring lengths. The unchanged
 ten-byte input needs only two actor-instruction changes and compact boundaries
 in the existing table. All 817 host tests pass. The silent native batch passes
 227 detector cases, fourteen installed English apology targets, thirty result
 classifications, and 302 memory assertions with restored checkpoint and blank
-saves. Full/basic candidates are 12,742/11,881; ordinary strings total 294.
+saves. Ordinary strings total 294.
 The two sun/skull apology targets and ordinary editor input/retry remain
 unimplemented or unverified. Broader shared strings, those editor consumers,
-and remaining native diagnostics are next; title artwork stays first after the
+and the five larger native test scripts remain; title artwork stays first after the
 main translation/runtime port.
 
 The [Katrina fortune integration](../specs/FORTUNE_STRINGS.md) installs all 128
@@ -44,7 +56,7 @@ at an existing page boundary. Both full cartridge loads, the continuation, both
 ending phases, and fifteen memory assertions pass in a silent restored
 checkpoint with blank isolated saves. Focused sequence and placeholder checks
 pass; normal first-job interaction and expression rendering remain playthrough
-checks. Current full/basic candidates are 12,742/11,881. All three number-game
+checks. Current full/basic candidates are 12,757/11,896. All three number-game
 questions use dedicated Less/More labels while the clothing menu's shared
 labels remain unchanged. Title artwork remains the first
 image replacement after the main text/runtime work.
@@ -57,8 +69,8 @@ The birthday preparer supplies full English animal/sign names, month names, and
 ordinal days to all 33 native request conversations. Its 24 native boundary cases,
 48 original RNG comparisons, 57 complete message loads, and 190 field insertions
 pass; normal birthday-entry, gift, and horoscope gameplay remain unverified.
-The complete 817-test host suite passes, including the cartridge-font,
-number-game, full-fortune, and Resetti-dictionary integrations. The final 26
+The complete 822-test host suite passes, including the cartridge-font,
+number-game, full-fortune, Resetti-dictionary, and engine-diagnostic integrations. The final 26
 choice tests and seven reply tests also pass.
 The silent birthday/date/choice batch
 passes 913 native calls and 1,588 memory assertions; the fresh train-to-town and
@@ -603,27 +615,27 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/resetti-replies-pilot/`
-contains 12,742 edits, including
+The current experimental resident-module pilot in `build/engine-diagnostics-pilot/`
+contains 12,757 edits, including
 9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
 drafts, one original-dialogue continuation, 280 original development-label drafts,
-and 99 complete diagnostic drafts.
+and 114 complete diagnostic/sample drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
 still require review. Two additional complete numeric labels extend the choice
 bank to 462 entries without increasing the native candidate count.
-The original main-bank audit leaves 942
+The original main-bank audit leaves 927
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,491 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/resetti-replies-candidates/` and `build/resetti-replies-coverage/`.
+`build/engine-diagnostics-candidates/` and `build/engine-diagnostics-coverage/`.
 The full pilot enables `--english-fortunes` and `--english-resetti-replies` in
 generation and construction. Basic generation enables the latter without a
 resident module. Their complete source-bound groups use the native general-string
-bank, not separately counted display resources. Disabling the reply option
-reproduces the full 12,711-edit fortune configuration exactly.
+bank, not separately counted display resources. The engine-test drafts require
+neither option; all fifteen retain the ordinary exact-control policy.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1185,7 +1197,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,742 edits; basic generation has 11,881, including both startup-error drafts,
+12,757 edits; basic generation has 11,896, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1515,9 +1527,9 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,742 edits, including
+The resident-module experiment contains 12,757 edits, including
 9,812 reference main-bank candidates, 280 original development-label drafts,
-99 original diagnostic drafts,
+114 original diagnostic/sample drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
@@ -1539,9 +1551,9 @@ service/reaction drafts, nine native menu/dialogue follow-ups, and three native
 special-dialogue follow-ups.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 943 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 942 main records without
-candidates: 20 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 928 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 927 main records without
+candidates: five with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

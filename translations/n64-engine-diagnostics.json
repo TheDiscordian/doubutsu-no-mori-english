@@ -1,0 +1,139 @@
+[
+  {
+    "id": "message:0001",
+    "source_sha256": "316ca2ee93760f6dc6fdb95865daa3d2ade9d2577f13e28be1a4d34d8f3b2405",
+    "translation": "Test message 1\nString \"{cmd:7F31}\"\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the printed test number, quoted item-string insertion, and normal ending. This is not an allocation or an unreachable-code claim."
+  },
+  {
+    "id": "message:0002",
+    "source_sha256": "85ececf92123cc59903f478dbae52186b4dfe7a502fc4fa6d0c1b279f81e5713",
+    "translation": "Set the player's state\nto unlucky.{cmd:7F44}{cmd:7F04}\n{cmd:7F02}This experiment makes\ncontinuation smoother after\nopening a choice window.\nIt uses %SFN%.{cmd:7F1600070008}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0FFFFF}{cmd:7F100004}{cmd:7F19}{cmd:7F5B}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the unlucky-state command, page boundary, literal %SFN% label, End/Continue menu, FFFF/0004 targets, voice-reset command, and continuing ending. Do not execute the diagnostic's state changes as part of a loader-only test."
+  },
+  {
+    "id": "message:0003",
+    "source_sha256": "798bbc40b44500d15e06c01f7c0b8954b38bdaf227ed228876a9701e628ec2f6",
+    "translation": "This tests message\ncontinuation.\nGo to the next message.\n{cmd:7F0E0002}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the native continuation to 0002 and continuing ending, without inventing another target."
+  },
+  {
+    "id": "message:0006",
+    "source_sha256": "9eb43571b20e8e3d57ac6ba496d5c3594f0b40fa46feef86d3e6f7ff3c533543",
+    "translation": "Standard voice.{cmd:7F04}\n{cmd:7F5D}Reverse the voice.{cmd:7F04}\n{cmd:7F5C}Restore the voice.{cmd:7F04}\n{cmd:7F5D}Reverse the voice.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain every voice-mode command and wait in order. Automated verification stays silent and does not claim audible presentation."
+  },
+  {
+    "id": "message:0007",
+    "source_sha256": "e2fa1482990fbbe05bdfaba62d07c6191b551dfc45f91e54ae732414f36295c9",
+    "translation": "A person who values\npeople they can trust\nmore than themselves.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 personality sample",
+    "status": "draft",
+    "diagnostic_kind": "personality_sample",
+    "notes": "Retain the complete description of valuing trusted people above oneself. Its position among test records is not proof that no gameplay caller exists."
+  },
+  {
+    "id": "message:0008",
+    "source_sha256": "efc2985608741b3778530baf2023f53b00611ccebc60c345764b087f5b033a35",
+    "translation": "A person who values humour\nand always likes to\nkeep things lively.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 personality sample",
+    "status": "draft",
+    "diagnostic_kind": "personality_sample",
+    "notes": "Retain both valuing humour and liking a lively atmosphere. Do not import an unrelated same-ID GameCube record."
+  },
+  {
+    "id": "message:0009",
+    "source_sha256": "68af8e3a688104365075e6af770c42a32a863a2d7c47fc7178db6d55cfd3f86b",
+    "translation": "Test: tell the sound system\nwhich mood the message uses.\nWhich will you choose?{cmd:7F1800D400D500D600B3}{cmd:7F04}{cmd:7F0D}{cmd:7F0F000A}{cmd:7F10000B}{cmd:7F11000C}{cmd:7F120012}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain all four menu IDs and corresponding normal/angry/sad/next-page targets. The menu entries are shared; no global label changes."
+  },
+  {
+    "id": "message:000A",
+    "source_sha256": "7d774d9e06367f72c00970ef74d44e1f62cf2497056cdfd07bc2e5079509bad9",
+    "translation": "Set the mood to normal.{cmd:7F4B}{cmd:7F0E0003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the normal-mood command and return through 0003."
+  },
+  {
+    "id": "message:000B",
+    "source_sha256": "42c508f90cda4497a13e01e3a8ee0a09e59416a22f615e41c2a3e923098a23e4",
+    "translation": "Set the mood to angry.{cmd:7F4C}{cmd:7F0E0003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the angry-mood command and return through 0003."
+  },
+  {
+    "id": "message:000C",
+    "source_sha256": "b5bdea665c1582cd90c3208de943e6e4c229d55d39102ddcd8fbbdc53f814ca3",
+    "translation": "Set the mood to sad.{cmd:7F4D}{cmd:7F0E0003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the sad-mood command and return through 0003."
+  },
+  {
+    "id": "message:000D",
+    "source_sha256": "c4d710fd828673b55e8a8403e9d3daf8f5f2a93094b6be9b67912571caeccad6",
+    "translation": "Set the mood to happy.{cmd:7F4E}{cmd:7F0E0003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the happy-mood command and return through 0003."
+  },
+  {
+    "id": "message:000E",
+    "source_sha256": "26ec14bfa527333f640a5a5814f3336e457c7ba8986dcdae5c02611de7f17f0c",
+    "translation": "Set the mood to sleepy.{cmd:7F4F}{cmd:7F0E0003}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the sleepy-mood command and return through 0003."
+  },
+  {
+    "id": "message:0012",
+    "source_sha256": "4d064a64393db998a00c74ba6e111dcd1884e74fcf6e6a5597457c7caa9cc390",
+    "translation": "Which will you choose?{cmd:7F1700D700D800B3}{cmd:7F04}{cmd:7F0D}{cmd:7F0F000D}{cmd:7F10000E}{cmd:7F110009}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 test message",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Retain the happy/sleepy/next menu and the exact 000D/000E/0009 destinations."
+  },
+  {
+    "id": "message:1354",
+    "source_sha256": "07e606027e396908105fe2ba08155850c19f7ec9458ef80c2359e7ff91e7b401",
+    "translation": "Normal girl\nShopping, part 1\n4948\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic label",
+    "status": "draft",
+    "diagnostic_kind": "shopping_label",
+    "printed_number": 4948,
+    "notes": "Retain the normal personality, shopping topic, native part 1, and printed 4948. The empty legacy entry is not a complete translation."
+  },
+  {
+    "id": "message:1355",
+    "source_sha256": "881f308ee4f607223a12de52dbfa83982b436611204d344f0f12b09e30334adc",
+    "translation": "Normal girl\nShopping, part 1\n4949\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic label",
+    "status": "draft",
+    "diagnostic_kind": "shopping_label",
+    "printed_number": 4949,
+    "notes": "Retain the native part 1 even though this follows 1354; do not renumber it to part 2. Preserve printed 4949 and the complete label rather than the empty legacy entry."
+  }
+]
