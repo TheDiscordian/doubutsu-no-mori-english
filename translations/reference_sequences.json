@@ -1,5 +1,193 @@
 [
   {
+    "id": "gracie_fashion_intro",
+    "members": [
+      {
+        "id": "message:0723",
+        "source_sha256": "a33932194bcfa4ad9ea76ad4e8dac13ae59301feed37d51d632334287693d9ec",
+        "reference_id": "message:0723",
+        "reference_sha256": "d463902dfd1c706f324a1d668ea5d5e02788a58a45ed83f9111b98f7b65acfca",
+        "encoded_sha256": "d463902dfd1c706f324a1d668ea5d5e02788a58a45ed83f9111b98f7b65acfca"
+      }
+    ],
+    "evidence": "Complete native and English introductions identify Gracie, praise the player's physique, criticise the clothes, distinguish simplicity from neglect, and continue to 072A. Every English word, page, colour, and pause remains. All referenced expression tuples occur in this native Gracie record; no standing-resident permission, new actor value, field, menu, or action is imported. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "redd_return_greeting",
+    "members": [
+      {
+        "id": "message:0789",
+        "source_sha256": "aa2b623576c9742bb1030c0c9dcf0a7e0e524dc3c01311f04452bb97074c911a",
+        "reference_id": "message:0789",
+        "reference_sha256": "7b93f33185fee8d27699f05191598bf1f3b3401035f713fd0f3986e6edce09b3",
+        "encoded_sha256": "7b93f33185fee8d27699f05191598bf1f3b3401035f713fd0f3986e6edce09b3"
+      }
+    ],
+    "evidence": "Complete native and English Redd return greetings welcome the customer back, praise that choice, advertise rare stock, warn against missing the opportunity, and urge a purchase. Retain all English words and presentation, including the small-print truck aside. Every requested expression tuple already occurs in this exact native Redd record; no other actor request or flow changes. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "redd_complaint_story",
+    "members": [
+      {
+        "id": "message:078D",
+        "source_sha256": "dcbc33798be469d210386a57a73143a0296a23d2e01ca2b87e114cc9e2fe3fd4",
+        "reference_id": "message:078D",
+        "reference_sha256": "16ccc3ef8e8735c091ca67d2e118389aac62b7f60232dbcc024a4c3f09ec0593",
+        "encoded_sha256": "cc8c6a5a1b02f1d77ac8a38545b2042de0681271dc2266b17f322b8872975613",
+        "reference_slice": [
+          0,
+          523
+        ]
+      },
+      {
+        "id": "message:2B02",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:078D",
+        "reference_sha256": "16ccc3ef8e8735c091ca67d2e118389aac62b7f60232dbcc024a4c3f09ec0593",
+        "encoded_sha256": "2bc1b03553bd2ec95d6ebfd790ebc93336a02010a56ef1076c2746d33e179922",
+        "reference_slice": [
+          528,
+          1051
+        ]
+      }
+    ],
+    "evidence": "Complete native and English Redd stories quote a complaint about an overpriced ordinary dresser, deny coercion, blame the buyer's judgement, flatter the current customer, and solicit a purchase. Split only at the existing English wait/page span [523,528), after the denial of forcing a purchase. All full English wording/presentation remains; no new actor tuple, action, or field is needed. The continuation is an exact native generic reserve with no incoming native script target, matching arithmetic/comparison/logical executable immediate, or aligned non-executable halfword in the pinned section inventory. All parts install together. This is slot-specific evidence, not an exhaustive indirect reachability proof. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "jingle_holiday_intro",
+    "members": [
+      {
+        "id": "message:07AA",
+        "source_sha256": "40d964207be6209b29fe1e6c16131bc10cab04284971691affee570eb9d8dbb2",
+        "reference_id": "message:07AA",
+        "reference_sha256": "3a2ac0f3986d04cc8204ed040f91928654b3e4df8f56943c6a5d2e0bef6748ea",
+        "encoded_sha256": "3a2ac0f3986d04cc8204ed040f91928654b3e4df8f56943c6a5d2e0bef6748ea"
+      }
+    ],
+    "evidence": "Complete native and English Jingle introductions identify the black-nosed reindeer, celebrate the snowy holiday, describe delivering gifts to good children and dreams to everyone, then excuse the speaker to finish tonight. Keep the complete supplied English localisation and its added laughter using expression 03 already in this native Jingle record. No event date, gift request, actor value, or scheduling change. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "sound_settings_complete",
+    "members": [
+      {
+        "id": "message:09C8",
+        "source_sha256": "3ddb3f8acf80b2e266f21c30b6f33622d18705fca2a5595c90d96061c4d18e4d",
+        "reference_id": "message:09C8",
+        "reference_sha256": "9c4050221de236159f2c70bf4867e9ed1c27b9bc6be02085fdcd42be91013423",
+        "encoded_sha256": "9c4050221de236159f2c70bf4867e9ed1c27b9bc6be02085fdcd42be91013423"
+      }
+    ],
+    "evidence": "Complete native and English sound-setting conversation retains original 0074/0075/0076 menu order, selection wait, original NPC0 slot-nine request 0001, selected-text field 2E, special native FD command, and continuation 09CA. The English omits ordinary expression 0B but adds no actor value or request. All English wording and presentation remain; saved sound settings and audio routines are unchanged. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "gulliver_squid_story",
+    "members": [
+      {
+        "id": "message:2401",
+        "source_sha256": "9141956c72979d8ae5543ed0fd734312b59ab5fe5708ab2f91a96aa49298f37c",
+        "reference_id": "message:2401",
+        "reference_sha256": "1b19c7aabc110fef99037a93bf60f1e86ec06823dd807a071318b71efecdf327",
+        "encoded_sha256": "d209161989aac70db24c7aa5397df70194d79475b6b6fb5997ef1fb12c4693df",
+        "reference_slice": [
+          0,
+          635
+        ]
+      },
+      {
+        "id": "message:2B03",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:2401",
+        "reference_sha256": "1b19c7aabc110fef99037a93bf60f1e86ec06823dd807a071318b71efecdf327",
+        "encoded_sha256": "da89308307dd0518c1470ea667e51f6dcca0963db7a1f3d9428f881b558faaaf",
+        "reference_slice": [
+          640,
+          1224
+        ]
+      }
+    ],
+    "evidence": "Complete native and English Gulliver tale covers the claimed giant squid attack, disbelief, denial of napping overboard, the face-mark explanation, and a thank-you gift. Retain the full supplied English Crusty Barnacle/jellyfish localisation and all existing expression tuples. Split only at [635,640), after the question about inventing the story. The final native 01 stays in the last part; no gift request or actor allocation changes. The continuation is an exact native generic reserve with no incoming native script target, matching arithmetic/comparison/logical executable immediate, or aligned non-executable halfword in the pinned section inventory. All parts install together. This is slot-specific evidence, not an exhaustive indirect reachability proof. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "gulliver_overseas_joke",
+    "members": [
+      {
+        "id": "message:2402",
+        "source_sha256": "08b91a7a2ec66d259639ef1367df5e1f807f15a9c337b9b5331802ec6672e54c",
+        "reference_id": "message:2402",
+        "reference_sha256": "cff7b1cc111d33d7bb55ae60934cec58fc298a7d6f4bbcd0b44f219e987660e8",
+        "encoded_sha256": "8ecfdc85a0d345366421cfe200d01e14b2addda401f1d6c56db3ed2d377ead40",
+        "reference_slice": [
+          0,
+          668
+        ]
+      },
+      {
+        "id": "message:2B07",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:2402",
+        "reference_sha256": "cff7b1cc111d33d7bb55ae60934cec58fc298a7d6f4bbcd0b44f219e987660e8",
+        "encoded_sha256": "780aab3e4465fda96428cc968902cf1aeb128b4fd059a4c8305ab13d072ea46d",
+        "reference_slice": [
+          673,
+          1032
+        ]
+      }
+    ],
+    "evidence": "Complete native and English Gulliver tale covers slipping from the deck, rescue, an overseas joke unsuited to the listener, laughter and its awkward response, and a thank-you gift. Retain the full supplied English unfinished duck/husky/cougar localisation, not a truncated joke. Split only at [668,673), after the duck begins speaking, before the age-related interruption. Every English word, line, pause, and original final 01 remains; all expression tuples occur in this native record. The continuation is an exact native generic reserve with no incoming native script target, matching arithmetic/comparison/logical executable immediate, or aligned non-executable halfword in the pinned section inventory. All parts install together. This is slot-specific evidence, not an exhaustive indirect reachability proof. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "gulliver_sailor_uniform",
+    "members": [
+      {
+        "id": "message:2403",
+        "source_sha256": "bb9a5c592747f5b81d2e71c91c818dd46ce8a48389a8d68b61ce8b9c24241006",
+        "reference_id": "message:2403",
+        "reference_sha256": "8b4df20210c05d03da16b05bfce50ef4ea84005dfdcb221dc091cc167824ebb7",
+        "encoded_sha256": "8b4df20210c05d03da16b05bfce50ef4ea84005dfdcb221dc091cc167824ebb7"
+      }
+    ],
+    "evidence": "Complete native and English Gulliver tale covers falling overboard, a challenge to his sailor identity/outfit, the uniform's seafaring tradition, accepting the apology, and thanking the rescuer. Retain the complete supplied English sailor/fashion localisation with every line and pause. All expression tuples occur in this exact native Gulliver record; no extra gift/action request or field is added, and final 01 remains. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "gulliver_life_at_sea",
+    "members": [
+      {
+        "id": "message:240B",
+        "source_sha256": "3af62ae7596daec21c2128c38859000fb53b068d7543c03e8a2c55292a9e1452",
+        "reference_id": "message:240B",
+        "reference_sha256": "8c6c4386c596294e8b9f19b4ac1d9b510409042194f55e1c4fae3a64a76680f1",
+        "encoded_sha256": "8c6c4386c596294e8b9f19b4ac1d9b510409042194f55e1c4fae3a64a76680f1"
+      }
+    ],
+    "evidence": "Both native and complete English Gulliver replies describe living at sea yet repeatedly ending up ashore. Retain all supplied English words and presentation. The English omits the final ordinary smile but introduces no actor tuple, gameplay request, field, or changed ending. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "rover_first_housing_offer",
+    "members": [
+      {
+        "id": "message:2ACF",
+        "source_sha256": "0e667cc48114ef03e4a9208c74ae6f5b9484d5d5f21d9738cd06e71c557b07e4",
+        "reference_id": "message:2ACF",
+        "reference_sha256": "9549c14188c1de3084831b61c8074f915a13613f1716228b7e3fa401cbe447ff",
+        "encoded_sha256": "9549c14188c1de3084831b61c8074f915a13613f1716228b7e3fa401cbe447ff"
+      }
+    ],
+    "evidence": "Complete native and English Rover conversation is surprised that the first new resident has no house, urges finding one, names the friend who runs the town shop, and asks the player to wait for a phone call. Keep all English wording, town field, manual lines/pages, and pauses. The omitted initial native expression introduces no new value; every remaining tuple occurs in this exact Rover record, with normal final 00 unchanged. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
+    "id": "rover_repeat_housing_offer",
+    "members": [
+      {
+        "id": "message:2ADD",
+        "source_sha256": "ecfb22872c6f2fb936ab4cf1ec481758962d5b37392ea70d66d5424bff3c5aa2",
+        "reference_id": "message:2ADD",
+        "reference_sha256": "ea7b447ad67fbd575181347f9086d0a9e8b094b4642a5921ecbc7a0de7470fa4",
+        "encoded_sha256": "ea7b447ad67fbd575181347f9086d0a9e8b094b4642a5921ecbc7a0de7470fa4"
+      }
+    ],
+    "evidence": "Complete native and English Rover conversation repeats the housing concern for a later resident, explicitly recalls the previous person, names the friend's shop in the destination town, and asks the player to wait for the call. Retain every English word, page, pause, and native town field. All expression tuples already occur in this exact native record; final 00 and other actor requests remain. Non-expression actor requests retain exact native order and multiplicity. See specs/SPECIAL_ACTOR_SEQUENCES.md; normal actor traversal, rendered presentation, and hardware remain separate requirements."
+  },
+  {
     "id": "nook_first_renovation_invoice",
     "evidence": "Native and GameCube 107E greet the customer, confirm the completed first enlargement, announce its bill, and explain gradual payment through the post office. Preserve the complete English reference, including the dry-rot and mammal-strike asides, changing only the price from 148,000 to the native 49,800 Bells. Split at its existing wait/newline/page-clear boundary immediately after the bill. Native 083F is an opening reserve with no incoming native message branch or matching arithmetic/comparison/logical executable immediate. Its sole aligned non-executable halfword match is in libultra's sine table at 8003C644. The complete reference, adapted reference, native slots, and final payloads are hash-bound. All original actor tuples and the native final end 00 remain. See specs/NOOK_RENOVATIONS.md; ordinary progression and hardware remain unverified.",
     "native_price": {

@@ -27,6 +27,11 @@ gift refusal, catchphrase advice, paint, and resident reactions. Five focused
 draft tests and all 104 reference tests pass. Normal actions remain unverified.
 The combined cartridge batch passes 39 complete messages, eighteen menu labels,
 and 137 memory assertions with restored checkpoint and blank isolated saves.
+Eleven complete special-actor conversations retain all GameCube wording and
+presentation; three use checked continuation slots at existing page breaks.
+Their silent cartridge batch passes eighteen message loads, eight choice labels,
+and 109 memory assertions, including the complete plus-glyph controller tip.
+Normal actor traversal and service/gift outcomes remain gameplay checks.
 
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
@@ -491,20 +496,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/reference-plus-pilot/`
-contains 12,558 edits, including
-9,770 reference main-bank candidates, all 460 choices, 606 original dialogue
-drafts, one original-dialogue continuation, 289 original development-label drafts,
+The current experimental resident-module pilot in `build/special-actors-pilot/`
+contains 12,569 edits, including
+9,784 reference main-bank candidates, all 460 choices, 606 original dialogue
+drafts, one original-dialogue continuation, 286 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 987
+still require review. The original main-bank audit leaves 976
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,475 conservative layout-warning records include full default
+listed below. The 1,478 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/reference-plus-candidates/` and `build/reference-plus-coverage/`.
+`build/special-actors-candidates/` and `build/special-actors-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1066,7 +1071,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,558 edits; basic generation has 11,815, including both startup-error drafts,
+12,569 edits; basic generation has 11,826, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1335,14 +1340,32 @@ No font change or general missing-glyph permission is introduced.
 
 All 109 reference tests pass, including five dedicated encoding checks against
 the actual supplied English bytes. All earlier full/basic candidates are
-unchanged. The 254-byte record fits both configurations. Its cartridge-load
-check joins the next content batch; normal conversation/rendering remains
-playthrough work. Existing native runtime evidence is not a new test of this
-specific message.
+unchanged by that import. The 254-byte record fits both configurations and
+passes its complete cartridge load in the special-actor batch. Normal
+conversation/rendering remains playthrough work.
+
+## Complete special-actor conversations
+
+Eleven [complete references](../specs/SPECIAL_ACTOR_SEQUENCES.md) cover Gracie,
+Redd, Jingle, Gulliver, Rover, and sound settings. Eight remain single records;
+Redd's complaint and two Gulliver stories split at existing English page breaks.
+Fourteen parts retain every English word, manual line, pause, and emphasis.
+Only existing speaker-zero expressions may repeat or move; all other actor
+requests retain exact native order and multiplicity across every approved group.
+Three checked reserve labels become continuations; no other existing candidate,
+runtime resource, font, caller allocation, or saved format changes.
+
+Five focused tests, 110 reference tests, and nine long-advice tests pass.
+The silent cartridge batch passes 59 native calls, 51 expected returns, eighteen
+complete message loads, eight menu labels, and 109 memory assertions. Internal
+and external links, both ending phases, full buffers, guards, restored checkpoint,
+and blank isolated FlashRAM/Pak pass. This also checks `14FD` and the original
+connected `072A/09CA` messages. Normal actor progression, gift/service outcomes,
+sound-setting UI, final presentation, saving, and original hardware remain.
 
 ## Text-volume measurement
 
-The generated coverage report measures 639,709 covered source characters out of
+The generated coverage report measures 642,350 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1362,8 +1385,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,558 edits, including
-9,770 reference main-bank candidates, 289 original development-label drafts,
+The resident-module experiment contains 12,569 edits, including
+9,784 reference main-bank candidates, 286 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1385,9 +1408,9 @@ native storage, raffle, and offering drafts, plus fifteen native connected
 service/reaction drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 988 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 987 main records without
-candidates: 65 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 977 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 976 main records without
+candidates: 54 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

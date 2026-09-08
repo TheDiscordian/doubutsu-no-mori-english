@@ -100,6 +100,20 @@ class ReferenceSequenceTests(unittest.TestCase):
             validate_entry(self.source[0], encode(edits[0]["translation"], self.info), self.info,
                            "message", "reviewed_sequence", sequence_permit=permits["message:0000"])
 
+    def test_non_expression_actor_requests_cannot_be_dropped_repeated_or_reordered(self):
+        info = list(self.info); info[0x0C] = (5, 0)
+        first, second = bytes.fromhex('7F0C030012'), bytes.fromhex('7F09090001')
+        native = first+second+b'Native\x7f\x00'
+        audit_sequence(native, [first+second+b'English\x7f\x00'], [0], info)
+        for requests in (first, second, first+first+second, second+first):
+            with self.assertRaisesRegex(ValueError, 'non-expression actor request'):
+                audit_sequence(native, [requests+b'English\x7f\x00'], [0], info)
+        mood, duration = bytes.fromhex('7F09020001'), bytes.fromhex('7F09080001')
+        native = mood+duration+b'Native\x7f\x00'
+        for requests in (mood, duration, mood+duration+mood, duration+mood):
+            with self.assertRaisesRegex(ValueError, 'non-expression actor request'):
+                audit_sequence(native, [requests+b'English\x7f\x00'], [0], info)
+
     def test_sequence_runtime_requirement_is_not_edit_metadata(self):
         groups = deepcopy(self.groups)
         groups['test_sequence']['requires_resident_runtime'] = True
@@ -154,7 +168,7 @@ class ReferenceSequenceTests(unittest.TestCase):
             native = source[int(edit['id'].split(':')[1], 16)]
             validate_entry(native, payload, info, 'message', 'reviewed_sequence',
                            resident_runtime=True, sequence_permit=permits[edit['id']])
-        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 36)
+        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 50)
         with self.assertRaisesRegex(ValueError, 'Partial'):
             validate_sequences(edits[:1], source, info, {name: group}, resident_runtime=True)
         # Scan the pinned executable/data section inventory, not arbitrary ROM
@@ -284,7 +298,7 @@ class ReferenceSequenceTests(unittest.TestCase):
         entries = next(b for b in banks(rom) if b.name == "message").entries()
         references = {row["id"]: row for row in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         edits, permits = reference_sequence_edits(references, entries, info)
-        self.assertEqual(len(edits), 32)
+        self.assertEqual(len(edits), 46)
         for edit in edits:
             original = entries[int(edit["id"].split(":")[1], 16)]
             validate_entry(original, encode(edit["translation"], info), info, "message", "reviewed_sequence",

@@ -15,6 +15,12 @@ from textcodec import command_info, encode, tokenize
 LONG_ADVICE_GROUPS = ('rover_repeat_phone', 'resident_lazy_furniture_advice',
                       'resident_cranky_furniture_advice', 'resident_snooty_furniture_advice',
                       'resident_cranky_letter_advice')
+SPECIAL_ACTOR_GROUPS = ('gracie_fashion_intro', 'redd_return_greeting', 'redd_complaint_story',
+                        'jingle_holiday_intro', 'sound_settings_complete', 'gulliver_squid_story',
+                        'gulliver_overseas_joke', 'gulliver_sailor_uniform', 'gulliver_life_at_sea',
+                        'rover_first_housing_offer', 'rover_repeat_housing_offer')
+CONTINUING_END_GROUPS = ('nook_planting_complete', 'gulliver_squid_story',
+                         'gulliver_overseas_joke', 'gulliver_sailor_uniform')
 
 
 def scenario(rom, group_name="nook_home_explanation", module=None):
@@ -25,7 +31,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
                           "resident_late_night_introduction", "native_normal_travel_advice",
-                          "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS):
+                          "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS, *SPECIAL_ACTOR_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):
@@ -94,7 +100,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                         dispatch(token)
                 read(window+0x2C4, struct.pack(">I", target))
         else:
-            expected_end = b"\x7f\x01" if group_name == "nook_planting_complete" else b"\x7f\x00"
+            expected_end = b"\x7f\x01" if group_name in CONTINUING_END_GROUPS else b"\x7f\x00"
             if commands[-1].data != expected_end:
                 raise ValueError("Sequence must finish with its approved native terminator")
             write(window+0x28C, bytes(4))

@@ -6013,3 +6013,75 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   translation/integration, normal gameplay, final review, title-first images,
   the GameCube-style keyboard, original hardware, and patch-only release remain.
   The complete project goal stays active.
+
+## 2026-09-08 — Complete eleven special-actor conversations
+
+- Imported eleven complete supplied English conversations: Gracie `0723`, Redd
+  `0789/078D`, Jingle `07AA`, sound settings `09C8`, Gulliver
+  `2401/2402/2403/240B`, and Rover `2ACF/2ADD`. Every word, manual line,
+  emphasis, and pause remains. Redd's complaint and two Gulliver stories use
+  existing English wait/newline/page-clear boundaries at `[523,528)`,
+  `[635,640)`, and `[668,673)`. Their full expanded lengths exceed the buffer;
+  fourteen complete parts fit without shortening text or expanding runtime RAM.
+- Bound the exact native reserve slots `2B02/2B03/2B07`, each with source hash
+  `b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c`.
+  Complete native-script and pinned executable/data-section scans find no
+  incoming target, relevant executable immediate, or aligned data halfword.
+  `2B08` has data matches and was not used; nearby save-menu records were
+  untouched. These three previously translated reserve labels intentionally
+  become continuations; every other earlier full/basic edit object is unchanged.
+- Strengthened independent sequence validation: only speaker-zero expression
+  requests may repeat, move, or disappear with English presentation. All other
+  actor requests retain exact native order and multiplicity. Every earlier
+  approved group passes without payload changes. New tests reject duplicated,
+  dropped, and reordered mood/duration and quest requests. All new expression
+  tuples already occur in their own native root, with no extra actor approvals.
+  Sound menu indices/actions, external `072A/09CA` links, and Gulliver's final
+  `01` endings remain native. The test does not change sound settings or play audio.
+- Five focused tests pass in 8.143 seconds, 110 reference tests in 26.098 seconds,
+  and nine long-advice tests in 5.821 seconds, in the three
+  `build/tests-special-actors-*-02.log`/`build/tests-special-actors-02.log` files.
+  The first reference run exposed two stale aggregate-count expectations
+  (`36/32` rather than `50/46`); those fixtures were updated for the fourteen
+  approved parts, and the complete relevant suites passed. No production
+  runtime or font changes were needed, and the unchanged 714-test full-runtime
+  checkpoint is separate evidence rather than a newly rerun suite.
+- `build/smoke-special-actors-01/` passes 278 recorded steps: 59 native calls,
+  51 checked returns, eighteen complete message loads, eight choice labels,
+  and 109 memory assertions. This includes all fourteen sequence parts,
+  the queued complete `14FD` plus-glyph tip, sound labels, and connected
+  `072A/09CA` messages. The independent audit regenerates the exact scenario
+  and checks every call/argument/return, restored stack, complete read/guard,
+  continuation and ending phase, one restored checkpoint, silent graceful
+  shutdown, and blank isolated FlashRAM/Pak. Four-MiB mode has no seeded saves
+  and both save-write permissions disabled. Scenario SHA-256:
+  `34ccbf1b06d7ea38f689e6a03c4e8ea940679cca8321f25368deb119b74c3b8c`.
+  This is not ordinary special-actor traversal, gift/service execution,
+  sound-setting UI, rendered expressions, normal saving, or hardware acceptance.
+- Full/basic generation has 12,569/11,826 edits. Main coverage is 10,776:
+  9,784 references, 606 original dialogue drafts, one original continuation,
+  286 development labels, and 99 diagnostics. The 976 gaps include 54
+  Japanese-static, 919 nonstatic, one Latin, and two symbol records; ten
+  nonstatic records insert dynamic fields. Rejections are 918 unconfirmed,
+  34 control differences, 23 missing fields, and two overflows, with one
+  original fallback. Source weight is 642,350/746,978, main 632,018/637,761.
+  The 1,478 reference/label layout warnings remain review tasks; no automatic
+  reflow is performed. These are candidate measurements, not project completion.
+- Pilot: `build/special-actors-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `9ce34b89eb67c03581357b1a7e6334b3edb7c8a2dee974f8cc92e2764da1856e`.
+  UPS SHA-256:
+  `93a9439a874b38c0c883c3f63daf89bf88f0ed3a36d5a6942d06be1f86737acb`.
+  Candidate SHA-256:
+  `40f07b36fcb5831aaa2f367e589dea6e19c33475d20a8c8996d946b4fd112661`.
+  `build/special-actors-artifact-audit.log` verifies every installed payload,
+  source/candidate/build hashes, UPS reconstruction, and exact old/new candidate
+  differences. Only DMA files `00019D40`, `02000000`, and `00CF9000` change;
+  the container differs only in its table. Both font atlases and all runtime,
+  name, item, and mail resources remain unchanged. The first audit asserted the
+  wrong label-policy name; inspection confirmed original `exact`/`reserved`
+  metadata, the assertion was corrected, and the full audit passed.
+- Updated the current progress, queue, and sequence contracts. Remaining main
+  dialogue, general/name/mail destinations, normal gameplay, final review,
+  title-first image replacements, GameCube-style keyboard, original hardware,
+  and patch-only release remain. The full project goal stays active.

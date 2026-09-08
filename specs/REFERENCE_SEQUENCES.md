@@ -206,6 +206,19 @@ the exact hash-bound supporting speaker-emotion approvals described above.
 Their placement follows the approved GameCube text. Display colour spans,
 page divisions, and pauses follow the approved reference exactly.
 
+Only `09`, speaker index zero, is eligible for expression repetition/repositioning.
+Every other actor request retains its complete native order and multiplicity
+across the entire sequence. This includes quests, persistent mood/duration,
+handoffs, and slot-nine requests. A tuple occurring in the native source is not
+permission to repeat or omit that action. All existing approved groups meet this
+stricter independent guard without changing their payloads.
+
+Eleven [special-actor conversations](SPECIAL_ACTOR_SEQUENCES.md) retain complete
+English Gracie, Redd, Jingle, Gulliver, Rover, and sound-setting text. Three use
+existing English page boundaries and individually checked generic reserves;
+the other eight remain complete single records. All expression tuples occur
+in each conversation's own native source, without supporting actor approvals.
+
 Reserved continuation slots require their expected placeholder hashes and no
 incoming native message-script branches. This does not grant general permission
 to reuse arbitrary message IDs. New sequence approvals require their own review.

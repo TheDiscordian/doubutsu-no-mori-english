@@ -132,6 +132,12 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
         translated.extend(c for c in part if c[1] != 0x0E or index+1 == len(replacements))
+    # Complete reference presentation may repeat/reposition only the speaker's
+    # existing expressions. Quest, mood, duration, handoff, and other actor
+    # requests must retain their exact original order and multiplicity.
+    actor_requests = lambda cmds: [c for c in cmds if c[1] in ACTOR and c[:3] != b'\x7f\x09\x00']
+    if actor_requests(root) != actor_requests(translated):
+        raise ValueError('Sequence changes a non-expression actor request')
     # This is the existing one-shot capitalization implementation, not a new
     # actor/flow permission. Exact complete payload approvals still apply.
     ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01} | ({0x75} if resident_runtime else set())
