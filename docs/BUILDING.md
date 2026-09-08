@@ -65,6 +65,13 @@ it does not establish unreachable code or gameplay completion. See
 
 ## Silent emulator tests
 
+Complete sale/Redd publication uses `tools/build_event_actor.py` and the builder's
+`--english-event-letters <compiled-actor-directory>` option. It requires complete
+item names, leaflet dates, and the full snapshot reader. The pending-selector
+flag extends saved semantics; this remains an experimental build. The
+[event work record](checkpoints/EVENT_LEAFLET_PUBLICATION.md) contains the complete
+integrated build command, source-bound scenario, and actual validation limits.
+
 Complete renewal mailbox publication uses `tools/build_renewal_actor.py` and
 the ROM builder's `--english-renewal-letters <compiled-actor-directory>` option.
 It requires `--english-leaflet-dates`, `--english-mail-snapshots`, the complete

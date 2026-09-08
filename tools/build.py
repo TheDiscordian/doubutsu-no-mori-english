@@ -207,6 +207,7 @@ def main():
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
     parser.add_argument('--english-renewal-letters', type=Path, help='Complete renewal mailbox publication actor; requires leaflet dates and the full snapshot reader')
+    parser.add_argument('--english-event-letters', type=Path, help='Experimental complete sale/Redd letters; requires leaflet dates, full item names, and the snapshot reader')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -226,6 +227,8 @@ def main():
         parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
     if args.english_renewal_letters and not (args.english_leaflet_dates and args.english_mail_snapshots):
         parser.error('--english-renewal-letters requires --english-leaflet-dates and --english-mail-snapshots')
+    if args.english_event_letters and not (args.english_leaflet_dates and args.english_mail_snapshots and args.extended_items):
+        parser.error('--english-event-letters requires --english-leaflet-dates, --english-mail-snapshots, and --extended-items')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -300,6 +303,10 @@ def main():
         from renewal_actor import install as install_renewal_actor
         report['renewal_actor'] = install_renewal_actor(rom,replacements,additions,relocations,
                                                        report.get('runtime_module'),args.english_renewal_letters)
+    if args.english_event_letters:
+        from event_actor import install as install_event_actor
+        report['event_actor'] = install_event_actor(rom,replacements,additions,relocations,
+                                                   report.get('runtime_module'),args.english_event_letters)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

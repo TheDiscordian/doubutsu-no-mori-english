@@ -1,59 +1,132 @@
-# Event leaflet integration checkpoint
+# Event leaflet integration work record
 
-The complete sale/Redd publication transaction is implemented, compiled, and
-host-tested. Native event-manager registration is the active next task, not
-another isolated-probe expansion. Its [specification](../../specs/EVENT_LEAFLET_PUBLICATION.md)
-and `tools/event_leaflet_sources.py` pin the source contracts.
+The optional event-manager owner installs all sixteen complete sale letters and
+three complete Redd letters. It preserves the selected native stock, count,
+template, and timestamp; English preparation finishes before native mode-two
+receipt. The [specification](../../specs/EVENT_LEAFLET_PUBLICATION.md) records the
+saved pending-selector extension and remaining normal-routing acceptance.
 
-## Current artifacts and verification
+## Built artifacts
 
-`build/event-leaflet-probe/generate.bin` is 3,716 bytes, with SHA-256
-`b2c6654aaf15a6a06d3245cbad2e7d6477555681f34cec941277484d3d37b99a`.
-The complete creator occupies the first 3,100 bytes; event publication starts at
-offset 3,100 and adds 616 bytes. The adapter frame is 72 bytes. Caller-owned work
-is 5,536 bytes, with explicit sixteen-byte alignment for the native mail object.
-The source/import manifest and complete jump relocations are beside the binary.
+- Integrated ROM: `build/event-actor-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `8c9174ea5bd93da12562571c7e11098e0cf236ce6ee4c34226288e02af8280fe`.
+- Original-ROM UPS patch SHA-256:
+  `0722c2d091c7a7e30575d611339f1c627c7b06c4fd383399aaf18aa7d2692656`.
+- Event actor: 38,112 bytes, SHA-256
+  `e8f2a91f82c8b6bac00595186fbb916553c10b0b05f5f6b393b6eecf6dcb7994`.
+- Relocations: 1,760 bytes, SHA-256
+  `d4e2f5ab1722814e0ee24e154e8c41904dd1a5277222fc9981c0f5ff653dda65`.
+- Embedded publication probe: 3,716 bytes, SHA-256
+  `b2c6654aaf15a6a06d3245cbad2e7d6477555681f34cec941277484d3d37b99a`.
+- Bound 78-case native scenario: `build/event-actor-scenario.json`, SHA-256
+  `ae68f202b0a20cfb6a78f2a2aba0604b73dbef24c4ac06788d6d11660109ac18`.
+- Passing native results: `build/smoke-event-actor-02/results.json`, SHA-256
+  `7780231b8c51bf0729db35e294ad094dd48ffdbbb547063562a93a9ecd97bc78`.
+- Native helper SHA-256:
+  `6b3ad04bb2743c429ddd546bc1b52feba889705860546b2f087f8100adb7a7ee`.
+- Silent runner SHA-256:
+  `e66abdb42d17c8136bebbb28734cea8680c578066d5ccc919342959e679d1739`.
 
-Five focused tests pass in 0.618 seconds, including 152 complete template/hour/
-capitalization cases, item-loader failure/retry, retained notice/capital on failed
-preparation, original source contracts, and compiled-variant/relocation checks.
-Six generic probe regressions pass in 0.006 seconds. Nine renewal adapter/installer
-regressions pass in 8.754 seconds after the probe-tool extension. The completed
-918-test full batch belongs to the renewal milestone, before this event work.
+`build/event-actor` and `build/event-actor-repro` agree on actor, relocations,
+and manifest. The original file/BSS consumes 27,568 bytes, the creator consumes
+3,716, and appended adapter code/padding ends at offset 32,384. Owned zero data
+fills the rest. Registration/retry frames are 24/40 bytes, and the publication
+frame is 72 bytes. No resident-module or saved-layout growth is introduced;
+the pending flag does extend saved semantics.
 
-No new ROM is built by this probe. The current integrated ROM remains
-`build/renewal-actor-pilot/animal-forest-halfwidth.z64`, SHA-256
-`7655a1cb1653a2535eebc6fe4addf290bdbd33c5ef9e4ef54114ba31713fb69f`.
-No actual event-manager invocation, native selected-item-to-event-receipt batch,
-normal delivery, or hardware test is claimed.
+## Executed checks
 
-## Exact integration points
+Four host owner tests pass in 0.651 seconds. They exercise every valid template,
+item count, and initial capitalization; complete production formatter output;
+retained failures; retries after clearing loaded cache; changed-event rejection;
+native save/destructor delegation; invalid pending markers; and non-letter
+initializer results. The native callbacks alone are isolated host equivalents.
 
-- Original registration is `8095B9CC..8095BA60`, called by sale at `8095C080`
-  and Redd at `8095BC48`. It uses the static native mail at `80962330`.
-- Sale field preparation is `8095BA60..8095BB80`; its input count is selected
-  before the call at `8095C05C`. Retain this actual count, not the number of
-  distinct item names or an inferred count from English text.
-- Redd selection is `8095BBFC..8095BC60`, including the original random draw at
-  `8095BC08`; retain its selected template without drawing again on retry.
-- The original 156-byte event save at `80135C44` contains scheduled Redd time at
-  zero, sale start time at 12, and sale item IDs at 28.
-- Sale and Redd initializers discard registration results at `8095C088` and
-  `8095C24C`. Parent special-event initialization discards its indirect child
-  return at `8095C494`. A return-value change at registration alone is insufficient.
-- Native receipt mode two copies a complete record to `801361E4`, clears exactly
-  two flag bytes at `8013628A`, and returns one. It does not use the ordinary
-  queue or allocate after writing. The source helper is fully hash-bound.
-- The actor has 27,264 file bytes plus 304 BSS bytes. Keep every original data,
-  BSS, profile, and relocation address when appending code. Original DMA rows
-  `00850680`/`00857100` must retain adjacency and ownership at `80101310`.
+Three host installer tests pass in 10.706 seconds. They check all original and
+appended relocations, profile/caller targets at three loaded bases, original BSS
+addresses, stale-source and malformed-inventory rejection, atomic failure, and
+independent reconstruction of the complete integrated ROM. Only event code,
+relocations, and event ownership metadata differ from the renewal pilot. All
+13,383 ordinary applied edits and earlier resource images remain unchanged.
 
-Choose and implement the actor's work ownership and failed-selection lifetime
-before installing the registration hooks. Avoid a new allocation after random
-selection where practical. A temporary pointer must never survive owner unload
-without an explicit owner; do not mistake actor-static retry state for saved
-state. Preserve the original stock, schedule, and selected template. Batch the
-actual constructor/registration/receipt/readback/failure checks once connected.
+`build/smoke-event-actor-01` completes all 78 letter combinations plus two
+cache-loss retries: 80 complete saved-letter readbacks and 1,291 memory
+assertions pass. Native cartridge loading, both actual registration JAL/delay
+slots with their original frames, the actual schedule pending gate, receipt,
+duplicate prevention, full-save comparisons, heap accounting, guards, source
+RNG retention, and live-save/global restoration pass. The runner records loading
+the checkpoint, then loses its debugger connection at its 250-second outer
+process bound before its final resumed-state check. This first run is **not**
+a passing end-to-end runner result.
 
-Remaining translation text, review, ordinary gameplay/save acceptance, title-first
-artwork, English grid keyboard, and patch-only release work remain active.
+The unchanged scenario passes completely with a 400-second bound in
+`build/smoke-event-actor-02`: 78 combinations, two cache-loss retries, 80 complete
+readbacks, 322 native calls, and 1,291 helper memory assertions. The additional
+post-restore assertion also passes, for 1,292 total. The checkpoint resumes and
+the emulator shuts down gracefully. FlashRAM remains all `FF`, and the Pak
+matches the independently retained blank fixture. Native code, save state, heap
+accounting, RNG, guards, and restored shared fields pass their specified checks.
+This is not an actual FlashRAM save/reload or normal event scheduling test.
+
+The full event regression batch passes 930 tests in 495.486 seconds, recorded
+in `build/tests-event-actor-regression.log`. It includes the current event owner,
+installer, and complete-publication tests. The older 918-test result belongs to
+renewal, not to this event installation.
+
+## Reproduction
+
+Build the event publication probe and owner using the pinned Docker compiler:
+
+```sh
+python3 tools/build_mail_generation.py --event-leaflets \
+  --module build/renewal-actor-pilot/runtime-module.json \
+  --output build/event-leaflet-probe
+python3 tools/build_event_actor.py \
+  --rom 'local/rom/Doubutsu no Mori (Japan).z64'
+python3 tools/build.py \
+  --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
+  --translations build/native-credits-candidates/translations.json \
+  --english-keyboard --english-runtime --runtime-module build/runtime-module \
+  --english-fortunes --english-resetti-replies --english-shop-units \
+  --english-resident-words --english-shared-npc-words --english-credits \
+  --english-dialogue-dates --extended-items build/mapped-items-final-resource \
+  --display-names build/display-names --catchphrases build/catchphrases \
+  --mail-catalog build/fortune-slip-resources \
+  --english-mail-layout --english-mail-snapshots \
+  --english-mail-grading build/mail-grading-npc \
+  --npc-mail-generation build/npc-mail-capture \
+  --extended-font build/extended-font-cartridge \
+  --english-fortune-slips build/fortune-recovery-actor \
+  --english-leaflet-dates build/leaflet-dates \
+  --english-renewal-letters build/renewal-actor \
+  --english-event-letters build/event-actor --output build/event-actor-pilot
+python3 tools/event_actor_scenario.py --output build/event-actor-scenario.json
+```
+
+The complete NPC creator is `build/npc-mail-capture`, and both catalogues are in
+`build/fortune-slip-resources`; older similarly named resource directories are
+not interchangeable. Run the scenario through `tools/emulator_smoke.py` with the
+pilot ROM, a fresh isolated output directory, the configured Xvfb binary, and
+`--seconds 400`. All game assets, ROMs, patches, and generated test records stay
+ignored. No user save or physical hardware is used.
+
+## Remaining acceptance and next work
+
+- Native selection routines are retained but not executed by this fixture.
+  Stock/date inputs and chosen templates are supplied at the registration
+  boundary. The schedule test uses an owned two-instruction exit before
+  unrelated event processing; it does not establish full schedule progression.
+- The pending flag survives simulated cache loss, not a tested FlashRAM reload.
+  Audit all native event/save writers, replacement while pending, actor removal,
+  and normal reload paths. Avoid associating an old selector with changed saved
+  event fields. Test the extended flag and existing full-letter records together.
+- Normal event-manager allocation, sale/Redd gameplay, home notice delivery,
+  visual review, and original hardware remain unverified.
+- Resume bulk remaining general text and letter consumers after this batch.
+  The general bank still contains native date/unit strings, custom catchphrase
+  and name storage, the gyroid default, apology targets, reserved labels, and
+  auxiliary word/name rows. Existing wide display/catalogue resources already
+  cover some of those source identities; do not count or rewrite them twice.
+- Complete ordinary gameplay/save acceptance, semantic review, the five native
+  sample scripts, title-first artwork, the English grid keyboard, and patch-only
+  release preparation. Do not resume the paused atlas-edge investigation.

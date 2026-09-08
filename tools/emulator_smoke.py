@@ -897,6 +897,12 @@ def main():
                     raise ValueError('Native renewal probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_renewal_actor'],record))
+            if 'test_event_actor' in action:
+                from event_actor_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native event probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_event_actor'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

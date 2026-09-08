@@ -3,8 +3,10 @@
 `af_event_leaflet_publish` resolves original selected item identities through the
 resident sixteen-byte name loader, captures the original saved event timestamp,
 creates the complete English letter, and calls the native mode-two receipt path.
-All sixteen sale templates and three Redd templates are supported. This routine
-is compiled and host-tested; its event-manager owner hooks are not installed.
+All sixteen sale templates and three Redd templates are supported. The optional
+`--english-event-letters` build installs this routine in the native event manager.
+The owner retains the original stock/date selection and the complete snapshot
+reader. Normal scheduling, save/reload, and hardware acceptance remain open.
 
 ## Source contracts
 
@@ -39,14 +41,50 @@ the ordinary five-slot queue or allocate after writing. Other letters/flags are
 outside the destination. Capitalization updates only after successful receipt.
 Failed preparation retains the previous saved notice and caller capitalization.
 
-Owner integration must retain the exact selected template/count and timestamp
-across failed attempts without rerolling stock or Redd wording. The sale and Redd
-initializers unconditionally return one; their parent at `8095C494` also discards
-the child result. Changing only the registration function's return cannot solve
-failure handling. Actor unload, scene transitions, save/reload, replaced events,
-and retries require an explicit ownership solution before this becomes a normal
-gameplay path. Do not publish an untracked pending heap pointer or silently
-overwrite an earlier failed selection.
+## Native event-manager owner
+
+`event_actor.c` owns aligned work and a 172-byte selected-input cache in the loaded
+singleton actor image. It allocates nothing during registration or retries.
+The installed image is 38,112 bytes, with 1,760 relocation bytes. Original
+27,264-byte file offsets and 304-byte BSS addresses remain intact; old BSS becomes
+zero-initialized file data. Native metadata at `80101310`, profile at `809622EC`,
+592-byte actor instance, and DMA-row adjacency remain. Only the save/destructor
+profile callbacks change; they retry before calling the original callbacks.
+The original constructor, movement callback, stock algorithms, and Redd random
+draw are retained. File/relocation VROMs move to `03800000`/`03810000`.
+
+The sale count is captured at the original field-preparation call. Both original
+registration JALs target the complete publisher. Three instructions that forced
+success in the sale, Redd, and parent initializers become NOPs. The schedule gate
+at `8096191C` processes any nonzero pending flag, and its unconditional flag clear
+is removed. The wrapper clears the flag only after successful publication.
+
+### Pending selector and save compatibility
+
+The existing saved byte at `80135CE1` retains native meanings zero (complete) and
+one (fresh initialization). Values 2..103 encode a selected template/count and
+initial capitalization, without adding bytes or pointers to the save:
+
+- Sale choice index: `(template - 2) * 3 + count - 1`.
+- Redd choice index: `48 + template - 49`, with count zero.
+- Pending byte: `2 + choice * 2 + initial_capitalization`.
+
+Unsupported sale count/template combinations and other flag values are rejected.
+The native 156-byte event record retains the selected stock and date. The pending
+byte is written before preparation. A loaded cache must still match that record;
+changed records are not overwritten with stale cached notices. When a normal
+new event sets flag one, fresh initialization replaces the old cache. With a
+retained pending byte but no loaded cache, the wrapper reconstructs the chosen
+inputs and retries without entering the native selection routine. Capitalization
+is sticky: a later letter's set bit is not cleared by an older pending zero.
+
+This is a saved-flag semantic extension, **not** proof of unchanged save
+compatibility. Host cache-loss tests do not prove real FlashRAM save/reload.
+Audit native schedule/save writers, event replacement while pending, scene
+removal, and loading a pending save through every normal entry path. The saved
+record could change while no cache exists; normal routing must prove that it
+does not silently associate an old selector with new stock/date. Downgrading to
+an unpatched ROM with a pending extended flag is not supported or validated.
 
 ## Build and evidence
 
@@ -69,6 +107,10 @@ These tests use an isolated receipt equivalent, not a production native actor.
 
 The code SHA-256 is
 `b2c6654aaf15a6a06d3245cbad2e7d6477555681f34cec941277484d3d37b99a`.
-Native owner/caller installation, actual selected-item-to-receipt readback,
-pending lifetime, normal delivery, and hardware remain. No new ROM or text
-coverage claim is made by compiling this probe.
+The probe alone does not install letters. The owner builder is
+`tools/build_event_actor.py`; `tools/event_actor.py` guards the full native prefix,
+profile/caller changes, fixed helpers, source hashes, embedded creator, owned
+objects, and merged relocation inventory. Its installation is atomic and requires
+the current full reader, catalogue, complete item resource, and date patches.
+The [work record](../docs/checkpoints/EVENT_LEAFLET_PUBLICATION.md) identifies
+the integrated ROM and the executed native test scope.

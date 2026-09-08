@@ -13,14 +13,21 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
-The [sale/Redd publication transaction](../specs/EVENT_LEAFLET_PUBLICATION.md)
-resolves full sixteen-byte selected item names, retains native event timestamps,
-and prepares complete letters before the mode-two saved-event receipt. Its
-3,716-byte MIPS probe and focused host tests cover all nineteen templates.
-The event-manager owner hooks and retained-failure lifetime remain to be
-connected; compiling the transaction does not install new letters in the ROM.
-The [integration checkpoint](checkpoints/EVENT_LEAFLET_PUBLICATION.md) records
-the exact native callers, ignored returns, source fields, and next steps.
+The [sale/Redd event-manager owner](../specs/EVENT_LEAFLET_PUBLICATION.md)
+installs all nineteen complete letter templates, resolves full sixteen-byte
+selected item names, and retains native event timestamps. It prepares the whole
+letter before the mode-two saved-event receipt and retains selected inputs on
+failure. Seven focused host owner/installer tests and all 930 regression tests
+pass; independent 38,112-byte actor builds agree. The silent native batch passes
+78 combinations, two cache-loss retries, 80 complete readbacks, 322 calls, and
+1,292 memory assertions including the post-restore check. Graceful shutdown and
+blank isolated saves pass. The integrated pilot preserves all 13,383 ordinary
+edits and earlier resources. Its saved pending flag uses additional values; real save/reload,
+normal scheduling, and event replacement remain unverified. The
+[integration checkpoint](checkpoints/EVENT_LEAFLET_PUBLICATION.md) records
+the native batch, exact artifacts, and remaining acceptance work. Remaining
+general text and letter consumers are next; defer broader edge-case acceptance
+to the batch/playthrough pass without claiming it complete.
 
 The [renewal delivery actor](../specs/RENEWAL_LETTERS.md) installs all three complete
 English renovation letters in eligible native home mailboxes. Preparation completes
@@ -33,7 +40,7 @@ checkpoint are restored, and isolated saves stay blank. The 7,472-byte actor kee
 native profile/DMA ownership and adds no resident or saved-layout growth. Normal
 scheduling, gameplay, and hardware remain unverified. The
 [work record](checkpoints/RENEWAL_LETTERS.md) pins artifacts and remaining work;
-event-manager sale/Redd publication is next.
+the event-manager sale/Redd owner above extends publication to those notices.
 
 The [complete leaflet creator](../specs/LEAFLET_LETTERS.md) supports all 22 renewal,
 sale, and Redd templates, with all 66 source-bound English header/body/footer
@@ -48,7 +55,9 @@ retained RNG/handbill/save/heap state, blank isolated saves, and graceful shutdo
 Independent 3,100-byte builds agree. The renewal actor uses this creator;
 sale/Redd item lookup, allocation/owner lifetime, event registration, and normal
 delivery remain. The [creation work record](checkpoints/LEAFLET_LETTERS.md)
-pins the evidence and actual next integration boundaries.
+pins the evidence and integration boundaries. The event-manager owner above
+now provides sale/Redd item lookup, publication, and selected-input retry;
+normal routing and save acceptance remain separate checks.
 
 The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete
 month/day/year and AM/PM preparation for renewal, sale, and Redd letters. Seven

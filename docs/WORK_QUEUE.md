@@ -20,12 +20,15 @@ The [renewal publication actor](../specs/RENEWAL_LETTERS.md) installs complete
 renovation notices with native mailbox ownership and retained failure. Nine
 focused host tests, the 918-test regression batch, and 24 complete native cases
 plus five eligibility cases pass. Normal scheduling and hardware remain.
-The next [sale/Redd transaction](../specs/EVENT_LEAFLET_PUBLICATION.md) resolves
-full selected names and complete event-letter publication, with a compiled
-3,716-byte probe and focused tests. Install its owner/caller hooks next, including
-retained choices, retries, actor lifetime, and save boundaries. The native parent
-initializer ignores child returns, so a changed registration return alone is
-insufficient. Do not turn this into repeated probe testing before integration.
+The [sale/Redd actor](../specs/EVENT_LEAFLET_PUBLICATION.md) installs full selected
+names and complete event-letter publication, including both registration calls,
+retained choices, and the pending flag gate. Seven focused host owner/installer
+tests and all 930 regression tests pass; independent actor builds agree.
+The silent native batch passes 78 combinations, two cache-loss retries, 80 complete
+readbacks, 322 calls, and 1,292 memory assertions with restored checkpoint and
+blank isolated saves. Its saved flag has extended retry meanings. Return to
+remaining general text. Real save/reload, event replacement, scene removal, normal scheduling, and
+hardware remain acceptance work, not grounds for repeated isolated test loops.
 
 The [separate English resource](../specs/EXTENDED_GLYPHS.md) has startup-owned
 cartridge loading, native drawing/prefix/reveal hooks, and independently checked

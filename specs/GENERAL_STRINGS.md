@@ -84,7 +84,9 @@ The [leaflet integration](LEAFLET_DATES.md) distinguishes all 23 direct date/uni
 calls in the built cartridge: seventeen use resident English formatters, two use
 the complete English hour at the original entry, and four retain native formatters.
 Shop/Redd field preparation passes scoped native execution with unchanged resident
-and saved sizes. Full letter publication, wider sale-item capture, notice
+and saved sizes. The optional [event owner](EVENT_LEAFLET_PUBLICATION.md) installs
+complete sale/Redd letter publication and sixteen-byte selected-item capture,
+with an extended pending flag and separate save/scheduling acceptance. Notice
 month/day spacing and fourteen-byte output, and fishing units remain. Target
 classification is not a capacity or gameplay completion claim.
 

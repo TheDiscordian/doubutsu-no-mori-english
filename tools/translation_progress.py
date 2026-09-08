@@ -152,7 +152,7 @@ def measure(native, built, report):
                 seen.add(actor)
                 ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases')
 
-        if any(report.get(key) for key in ('npc_mail_loader', 'fortune_actor', 'renewal_actor')):
+        if any(report.get(key) for key in ('npc_mail_loader', 'fortune_actor', 'renewal_actor', 'event_actor')):
             from mail_view_patch import install as install_reader
             baseline = bytearray(binary)
             baseline[56:0x88] = bytes(0x88-56)
@@ -196,7 +196,8 @@ def measure(native, built, report):
                          **{k: classic for k in ('super', 'mail', 'ps')}}, 'npc_letters')
 
         for key, vrom, numbers in (('fortune_actor', 0x03050000, (114, 115, 116)),
-                                   ('renewal_actor', 0x03000000, (24, 25, 26))):
+                                   ('renewal_actor', 0x03000000, (24, 25, 26)),
+                                   ('event_actor', 0x03000000, (*range(2, 18), 49, 50, 51))):
             if not report.get(key):
                 continue
             actor = report[key]
