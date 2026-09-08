@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 567 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 577 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
@@ -462,18 +462,18 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/gyroid-charm-pilot/`
-contains 11,432 edits, including
-9,553 reference main-bank candidates, all 460 choices, 343 original dialogue
+The current experimental resident-module pilot in `build/letter-fragments-pilot/`
+contains 11,508 edits, including
+9,627 reference main-bank candidates, all 460 choices, 345 original dialogue
 drafts, and 291 original development-label drafts. Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,565
+still require review. The original main-bank audit leaves 1,489
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,442 conservative layout warnings include full default
+listed below. The 1,450 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/gyroid-charm-candidates/` and `build/gyroid-charm-coverage/`. The independent
+`build/letter-fragments-candidates/` and `build/letter-fragments-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -818,9 +818,26 @@ One generic owner-message field-width warning remains; the actual custom-message
 formatter has its separate contract. Normal gyroid, saving, state transitions,
 police choices, final wording/layout, and hardware remain acceptance work.
 
+The [letter-message fragments](../specs/LETTER_MESSAGE_FRAGMENTS.md) supply 74
+complete GameCube references and two native originals across
+`1BFF..1C3E/1C53..1C5E`. Sixty-six Japanese bodies have exact cross-bank
+equivalents after only outer whitespace and dialogue-ending removal; eight
+source variations are individually reviewed. The separate importer and builder
+bind both native sources and the complete reference/output, permit no added
+fields, and append only the original ending. The originals preserve the actual
+writer field and a joke missing from the mail counterpart. Basic generation
+admits all 76 additions. All 577 full-suite tests pass before the final adjacent
+fragment addition; all ten focused tests pass on the complete final batch.
+All 76 final cartridge loads pass with 230 assertions, full guards, restored
+checkpoint, and blank saves. Every earlier candidate, production code, font,
+runtime resource, and saved layout remains unchanged. Eight generic field-width
+warning records and two explicit reference typos remain for polish. Normal
+callers, live fields, complete wording/layout review, and hardware remain;
+this main-bank work does not approve stored-mail generation or delivery.
+
 ## Text-volume measurement
 
-The generated coverage report measures 604,385 covered source characters out of
+The generated coverage report measures 606,393 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -840,8 +857,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 11,432 edits, including
-9,553 reference main-bank candidates, 291 original development-label drafts,
+The resident-module experiment contains 11,508 edits, including
+9,627 reference main-bank candidates, 291 original development-label drafts,
 all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
@@ -850,12 +867,12 @@ conversation drafts, eight native town-advice drafts, eighteen native
 community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
 drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
 drafts, fifty startup-greeting drafts, eighteen resident-topic drafts, and
-21 gyroid/resident-state drafts.
+21 gyroid/resident-state drafts, and two letter-fragment drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,566 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,565 main records without
-candidates: 643 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,490 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,489 main records without
+candidates: 567 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

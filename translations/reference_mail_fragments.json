@@ -1,0 +1,742 @@
+[
+  {
+    "id": "message:1BFF",
+    "reference_id": "maila:0020",
+    "source_sha256": "b592fd7cb20a16592fa3d959f05a243959df54966dc4edf12858c9088b13b7a6",
+    "native_reference_sha256": "6245ff2894540e7c15c6b2d343b7ff491bac1d250a94f1e688c05372e3c25fe3",
+    "reference_sha256": "3e32df56f0ad56f57c5439b4a89c044f2cde9a3322f42ac4d26cff207fff7727",
+    "encoded_sha256": "c28194a5ee9524d52fbf1e87fcc83056b6c578b9fac651e48b52ccec2a205f35",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals native maila:0020 after only removing final 7F00 and outer spaces/newlines. Both greet the recipient and acknowledge the letter. Full English reference and legacy text agree; preserve every reference character and the native dialogue ending."
+  },
+  {
+    "id": "message:1C00",
+    "reference_id": "maila:0021",
+    "source_sha256": "3f9bbf4dc981c6605106467dd07ce48fa5518a6e409bfa98befa4ba14a2bfba0",
+    "native_reference_sha256": "927c98b57172248bf2b15659a515599e6e09e45c9f9bcb8d9ca16ab8bd56eda8",
+    "reference_sha256": "2cebb5a14c743f672205f9e5c573d6c11049bbf46d8798a0713ab21bf4d6967d",
+    "encoded_sha256": "ac31767b3fb2e3219be3ed2b5a3e521062889c902d5fbfef5e7347a9e7401689",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0021 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C01",
+    "reference_id": "maila:0022",
+    "source_sha256": "1e53e67f3d2a7394bf67257721c374512f079ed691df0c3f121c5d3498047b72",
+    "native_reference_sha256": "ce4d491441e8ce51b333ac0ec814897861b9ab00793286ecbc1cd0d8b6d3119f",
+    "reference_sha256": "49657d287db01a704816582fbb446a1841ae24716202df3f765188e259fa273b",
+    "encoded_sha256": "018129b3de78e276e860d7e837f115f2ab6f7a9071de55e5aa5b7c4da4cb6cc3",
+    "comparison": "reviewed_native_variation",
+    "evidence": "Native dialogue asks politely how the recipient is; the mail source uses the shorter equivalent question and a manual line break. Both say the writer is very well. The complete English greeting uses no new field."
+  },
+  {
+    "id": "message:1C02",
+    "reference_id": "maila:0023",
+    "source_sha256": "f5e842cb1dc784d7eb77407898bee28bedc37a8a1f3cf1d9714f287fe07d3351",
+    "native_reference_sha256": "5a320e2297fad6545989cb575ba8ee8007beaf22d73337fc74e6a870ce68a933",
+    "reference_sha256": "5c187ec3b8f7b8d381049ff494c1c2303459ce42b4d73e90bf564fdb41c8e2e6",
+    "encoded_sha256": "59b328cd3308ac53797919c783f04b858b2d63d108500d7daaa50c30811aa690",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0023 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C03",
+    "reference_id": "maila:0024",
+    "source_sha256": "23a95465d31d42fd81f60a3e7278f0b8f9676c7b6cb3faaceaf05f34b7390c43",
+    "native_reference_sha256": "7ef8cb0e3b1f6bd9d15b5c8449e5481a88961a2eb6186779cd8605be518ce221",
+    "reference_sha256": "efebc017a2209535c322d304eb40f7dca132be2cd17493003eac16a477a36ba8",
+    "encoded_sha256": "3b2df8ab59364329526222fbca361ff29866a7e02697fbc0eab16dd97df3d0c1",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0024 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C04",
+    "reference_id": "maila:0025",
+    "source_sha256": "db024e626618bb28803b92f4274885da3d00efc2d74fd049fc9c35b6b2e1b8b4",
+    "native_reference_sha256": "3644aa446f0dd742e38494c14e0ec61939fbeb6fab4012ca6ac8c39367651666",
+    "reference_sha256": "6f6b1d0c800016e041bc291a2455744dff2907d84890c996d731c3b564ce09d7",
+    "encoded_sha256": "0998f8bc84f96acd2d19c704f3d6ac8a2f1e321866258c86c747f3c4f5d37fb1",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0025 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C05",
+    "reference_id": "maila:0026",
+    "source_sha256": "8336878d9360b06e5abcb45af969b2797f131a74c1118385111259437aa6a9c9",
+    "native_reference_sha256": "8ae83ec135c5a5a2ec610aa756d10e83e8919d122f8b4d9df9d2861be6091f40",
+    "reference_sha256": "fad15e10e136993a18953a0d09a029a0b6a5fd42f7100398fbe249e1c98dabae",
+    "encoded_sha256": "899af6494dbdcd330f25ceee61999768631d55f637d6ef74c2e27a4ffbc7f3a7",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0026 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C06",
+    "reference_id": "maila:0027",
+    "source_sha256": "bb9a878c72bd1cd3643963655c1e0a422d4017cb7df967c935badca9f2bae34b",
+    "native_reference_sha256": "ed5fa0f2ad3e26ad46edd42e0a152344c1be59efdf690751cb57166c1df81bf7",
+    "reference_sha256": "1cbdd5f9836d8987fc7ec7dd1316832dc1af261629c76110990bd28de72683d3",
+    "encoded_sha256": "dfb09198cb28f41c91543254eb69218e03eb9ac4a4766ea10849b619198bdb50",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0027 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C07",
+    "reference_id": "maila:0028",
+    "source_sha256": "13805d0759e1202b706b05bf45cdb03d8b6f87f82cd4c305c2c5a18f79303e6b",
+    "native_reference_sha256": "bf9dac931a1fea4b72a3626861ce1c3cd666a763e5ee0a5b81a0ef50d476bb17",
+    "reference_sha256": "44bc6b822d421353e05299a0f04867559cf8ee5ef7b992cec52033ff1f70059c",
+    "encoded_sha256": "e924968d490107bef33116d310e83abdb59ae8e12675d58002069eeedad928b9",
+    "comparison": "reviewed_native_variation",
+    "evidence": "Native dialogue has an extra malformed particle after the recipient name. Both native sources express anticipation of the recipient letters; their field sequence is identical."
+  },
+  {
+    "id": "message:1C08",
+    "reference_id": "maila:0029",
+    "source_sha256": "c54802e5ab64b66ba20632cafdd3499f6a24e0bf8f6aecebf1ba6aed2fcb1b5d",
+    "native_reference_sha256": "ccf15a1063818467102d8b84a606a40f342851f62421fde563359a3c36ba2c47",
+    "reference_sha256": "5353d5a73cb1a6c3930f3d712e00debddf0ed4ee0e3fcb216dad5968045f2eca",
+    "encoded_sha256": "512ac03f0db2a7862b9b9d3de3d15e57b9e4479bfe587caeb6e445983032132f",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0029 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C09",
+    "reference_id": "maila:002A",
+    "source_sha256": "161a3894daef88e6d20bd2028013df49e461311a0c39b3d8455ec13a516aee4c",
+    "native_reference_sha256": "66409a01d50d758cf147a73f5bb0fa7744e5ef02d03759b226dd24fa96ac95ca",
+    "reference_sha256": "d1d7f83fa5a2d507b527349429d6cba2b028bd731e72edadb790867bab9ca117",
+    "encoded_sha256": "591ca174dac73f1e2e7f1847a2d3afa238691794feea7477e176afcba954c50d",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002A fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0A",
+    "reference_id": "maila:002B",
+    "source_sha256": "0cc888ca688a7583a99e2790dd83781f6cf80f0cde8d47806358783a2bdd9bdc",
+    "native_reference_sha256": "a3d121eb9ec84debf37b6a9f7323818bf306e1e7411a80aeadf4a6d703c5125f",
+    "reference_sha256": "beed0dbfb539655f5125713ca7152e005f114bad64d728a93cf1f035044820ac",
+    "encoded_sha256": "3a296bd9b53a654751f18c865e7dc51fd05bdf3071415cfcba6508ee88917a3d",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002B fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0B",
+    "reference_id": "maila:002C",
+    "source_sha256": "2739b91c585fa2c42ab0c7ca63c446a58fb7ba62fc38868a02a0d0f79ef81d8c",
+    "native_reference_sha256": "912c8bf0058a4b8485bc7d782f9774b7a6df3397ea18783d2cc092a1b433893e",
+    "reference_sha256": "914e55082f7340c9ca373240f560acce2dc359bed8665d7cedf39956cb21dcd2",
+    "encoded_sha256": "54e708e71d74305cac3ff1392bcfb53b2ed7a8e6e65432d30cc3a6c4f07fe637",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002C fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0C",
+    "reference_id": "maila:002D",
+    "source_sha256": "2521d03cfc5b41ecf662f0f7ad542560d2a673d37c25a2370f03444217d709d6",
+    "native_reference_sha256": "0d81c0af74fffaa8c896bd6f882fe80fbd2c356127f7b970266da95dbaf47a2f",
+    "reference_sha256": "dcdf25deb70b2672d9a2cfe6d52c7d3b9cc85a9cb07c37bc0390dfca18881556",
+    "encoded_sha256": "09dc3c8d5a10feb57177d5ca3eb468d7233cf1d8f5857fe988cdde5947e83caf",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002D fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0D",
+    "reference_id": "maila:002E",
+    "source_sha256": "7277c7f353d4b5f1ad5b60359f5c6e36743720e041c9bd5da3ef3ededec1e237",
+    "native_reference_sha256": "ccf91092df6cc4c88b2d27875e1a291d111947035b1e949169cda728f6804622",
+    "reference_sha256": "dbeee3d4b51b0c5bb3566ea9833d793898488a83e230f44732abbeb05ac78a17",
+    "encoded_sha256": "08e7c45fb144236607200a5b056bb5b0263405476c0b2febd985e93431f50d7e",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002E fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0E",
+    "reference_id": "maila:002F",
+    "source_sha256": "8995e8b4630a35b903577f0beb8adbfbbf69f00fd8a6e24886d6f12fa31fa867",
+    "native_reference_sha256": "40825453d86f422a2efadb2292ba897f71a3e0d9ddd328afb4faee581f065b21",
+    "reference_sha256": "bffcbfe94257935a6d2eb36ba717b594972dfdbfc38816605c055ed92ed25951",
+    "encoded_sha256": "0020af338dc079910612e7c140114e9d9d9fa64cd26bdd80ca29b72450088c17",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:002F fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C0F",
+    "reference_id": "maila:0030",
+    "source_sha256": "f6462bc4e53813c11b66d304c35334213c54234aff595eb6b727f98de2877f52",
+    "native_reference_sha256": "329106fa9cdb8bfb22672f77fa33eabf74d9736cf9718057796ea55c9edb3483",
+    "reference_sha256": "05cda2431343d282ae014fcc65572dc09e4dea14f8ee83dfb7c21b17a8445ca7",
+    "encoded_sha256": "ae5ae307d3bc08b4665afdd90a15625d3dbe4e5cddc7a328461d5265f822d859",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0030 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C10",
+    "reference_id": "maila:0031",
+    "source_sha256": "db4d26cdb242eab297112cb44a67552e8fdcaafcd5bd713878d72f17637854d3",
+    "native_reference_sha256": "5869e7127ba04a8e20bdc90a8e854c2bdb2946ce91ac1d3cb06a9d6c1b2156d3",
+    "reference_sha256": "9620818b6857016d42aa9b32e3ef5ed5dfaaeec1c4546ddebe02937b13cf55fc",
+    "encoded_sha256": "3880b3bdc9b80b3532de381998f5014344d40792c0ff3f4614d6b501217e0e0a",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0031 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C11",
+    "reference_id": "maila:0032",
+    "source_sha256": "dc6bd9b65b2315bb0f2bd6cfb8b14f472481fc76f48243a6d9a6190c7f6b9bbc",
+    "native_reference_sha256": "5d07537c2f4e422a6a3872f070b86c423f9f14d4da915e179609f0b284af3c52",
+    "reference_sha256": "e66d540a1f0ea1c0df5d4b16a0b947556c3c0bd710de0f26218273aeaa4583a3",
+    "encoded_sha256": "8ef818668892fd78c016a998c56293920cd9ebf1ba5b156b4a1bca3645f9585a",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0032 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C12",
+    "reference_id": "maila:0033",
+    "source_sha256": "9afbd6472aaedc9bfbcdeccbe5a6526077c6e6ae141f66b1ad96c099f8f8166f",
+    "native_reference_sha256": "27d30170e53c63d6d863d7e686ad2ee704edb9bf36f3b8ee3c1b179c6f8da82b",
+    "reference_sha256": "37c3c474bcf0e0ffcc2d544854ec1f223aaec805b091618dabbf5146d12c564e",
+    "encoded_sha256": "24f35c539dc0be8773bfc18b9c5fe0c30ada2fb2c7c1266510cc0160fcb41049",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0033 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C13",
+    "reference_id": "maila:0034",
+    "source_sha256": "b77ae082283bfb657f2ca52b6d3929f1cf54eea0a5c9587e7626d62600d9835a",
+    "native_reference_sha256": "616e4bd381acb04a857050fa106a2bcae6e5d9ec03d39d2c5aed43c4ee70fb50",
+    "reference_sha256": "ae459f428beaceadec98843f02351a2feac1ffe51b027bb31144cdd7e0511109",
+    "encoded_sha256": "a2508d48a65205bf271cf8178d2b24d9430b7c30149f7ddbc06ad5eb0b5f5444",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0034 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C14",
+    "reference_id": "maila:0035",
+    "source_sha256": "496da28f3e508cd7fe6d09bea5971f239c6beb8dd383f3f4fcba5c57ef4eb672",
+    "native_reference_sha256": "f375e81a18b4457dbdd643392f8c044cf8a08ea97a010cf07e8d0f03de4096f5",
+    "reference_sha256": "1e91cb57776e72dc3a23cc86ded736b6ba00e74793492ee0ef16ef97626754dc",
+    "encoded_sha256": "1517c32f8b65ba6729ce2cc3d1c3015210c4f2537d3197725ba1d42bcb53be2f",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0035 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C15",
+    "reference_id": "maila:0036",
+    "source_sha256": "218328a64f87e00b2eb2ba7ef1147fb67bd93923372ae2f3ddf9006b8cb446a7",
+    "native_reference_sha256": "d0d89feb64f739ed620480378ed4aaed1fd0ae99694a9a901a82663551699a0a",
+    "reference_sha256": "8be6da97fdffa44d3f93cc0b5416b78b99cfe047f0c8330dc66c24d238655327",
+    "encoded_sha256": "55e6d81f09e023b74203cb0f7c18db88c66170efd5709afbd3424e0da94cdb31",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0036 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C16",
+    "reference_id": "maila:0037",
+    "source_sha256": "fe0a54d649a0935f54daabcfea3cbb40c0aa9263b2b5dcfbe09625af62231fc4",
+    "native_reference_sha256": "0e2d23dd8ed34cd3dbbfd887f4e4d6431ee4e54b83f0f02d04d316bba0d604f3",
+    "reference_sha256": "14501a38df7f6274bac6d22af03a70c1b8e6f8a0ac0565e96655b05e8ea4b638",
+    "encoded_sha256": "b2f10161b595b5488ee8670cdd39c55cdfc24a98d2211368bdeb65ee503e0a0a",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0037 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C17",
+    "reference_id": "maila:0038",
+    "source_sha256": "a8383ef890025ffae98decc85d85978f8cbd676f7cbca4a7565cf10c485fd80f",
+    "native_reference_sha256": "9ca32fd249ed2135b2ae04bb7dce6380381dfad1eba177842e343b742cfaf11f",
+    "reference_sha256": "fafdf63269a368d58cfe5b738c2d1a307e2227f34ee1a5bcadef20e06385daa2",
+    "encoded_sha256": "92e10a0f14b52dcec9224b387309b4faeebe90956f9b57b5c8fe1779323f7f72",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:0038 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C19",
+    "reference_id": "maila:003A",
+    "source_sha256": "736eedd1f73a28a00407e5b7e48ff5d2aa62f4426bfa16d6f0577c86b21a85f0",
+    "native_reference_sha256": "4b7a0d92a0bfd0bff2386b868590f76286112ce4a2fa9ccbc30877027ae027d5",
+    "reference_sha256": "03c3611e593c4b2e149b7501cbda26bfd576d19b8026d98052c05969c0224692",
+    "encoded_sha256": "7a004547173b9697b509a4d394ddf907a6a292b602f2f8689c8a89f3e204959a",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:003A fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C1A",
+    "reference_id": "maila:003B",
+    "source_sha256": "5b88677a4c1c8b52fd3439de4cd431ac943e385f92586f47ce771a68f77a4c19",
+    "native_reference_sha256": "81d728cacace5c3d21775e571bd982e1a952e5f507b02baca7dcfd51828d3f5c",
+    "reference_sha256": "0c7082b80c90f5b44788a50504586df92d7aadbb53f9513e65eeacbe45deeaa8",
+    "encoded_sha256": "ec2a7c6d1ec51e4ccfe8c425a6014369f6504f44634e505da46c1dbc1e818a92",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:003B fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C1B",
+    "reference_id": "maila:003C",
+    "source_sha256": "96faa240c970ab1004922f9fbb9d9a5e18e75eda69029657b9de94300e732596",
+    "native_reference_sha256": "61decc342871b41579beca9dc228e753d7b3da8d4d3dde31e7dfa7812218bade",
+    "reference_sha256": "0949669c0e56a9a998f289cfb8a9fe62cb30d0d6abcfb2e265d30a72f3662c86",
+    "encoded_sha256": "45da41ba2daa043d9a91d345391a7239232f992f2e8072fe2a6957f0f913e376",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:003C fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C1C",
+    "reference_id": "maila:003D",
+    "source_sha256": "cbe4a1b729cafbd4b83aee0cc5e73b88a8df4df65ebdd1c23abbe61b3942df15",
+    "native_reference_sha256": "ddaa2197c72d9d56f350a23125fe90fe6a21a5e6629dd8712668d0c053f8c22b",
+    "reference_sha256": "408622093202b0363fa6596cdbfb2764fec62048e3a0f477118780eb44e555cd",
+    "encoded_sha256": "2fe9b8be20003d8cddc6e7926e969a62b4bb1d8fdc0c399c32cf1c7638d8b05d",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:003D fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C1E",
+    "reference_id": "maila:003F",
+    "source_sha256": "f6791dc36a37390a42f1f6372039e21764d26312a2d1b0a49b629e3fc36ea209",
+    "native_reference_sha256": "66a7349c145ebbba260b1001bf61e8efd4c21964d0faade30260356e56186f75",
+    "reference_sha256": "999782f5b28ce254f9cfcc4134bdf970ec803e12ed17dc551abf070cbd07f6a3",
+    "encoded_sha256": "316237638c4ee78f3f2983a14c5923f363bb10149dc8d32c320a0be29010f967",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native maila:003F fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C1F",
+    "reference_id": "mailb:0020",
+    "source_sha256": "0046317a991454d68a60ac3d80c5e8f7562c3e837cf04eadd0ee1b53992eb583",
+    "native_reference_sha256": "83936c014f082843169bd6ce70a3fcb046bf22363436d4ccb4069ad1392ff8ab",
+    "reference_sha256": "2311a3b1b3e860ad70b6be048b29f907f472667f8cb8e48bed89bfafeef31a97",
+    "encoded_sha256": "8dbb98b32eab4410982fb76deea4a16f82592d7e39760cd44320d8704dd4d10e",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0020 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C20",
+    "reference_id": "mailb:0021",
+    "source_sha256": "cc9adc27324d4f743f348e9a205ead2823613f242cbd03f65257f82062cea80e",
+    "native_reference_sha256": "9ac7963dc5d30d40341e1c0b3743e797fa6f08507cff9da17c1c154dea906d0c",
+    "reference_sha256": "956ddf977eb1147c66f7ad141b70fafa25a4cfd4ba8b4bc745f9052093e231d2",
+    "encoded_sha256": "1bfcad5634015c08cb3eedd44bad5fc5b0905b0976f19aff4a296ebc15dc4d50",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0021 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C21",
+    "reference_id": "mailb:0022",
+    "source_sha256": "a964c31094507542fdbf2c1469e14ee3013d07376a641c424ca29be471b90c40",
+    "native_reference_sha256": "9acf0bad8c9ccfcaed82bddd71df23cb90dc13d217bbfca64a697d8cd31dc381",
+    "reference_sha256": "466383ea4a8aecffcad17bc5cd1d94cc8891644d64c83ac0c5b4250b32cfe0dd",
+    "encoded_sha256": "23f28206ce71bf1ff0d5a4e3d5a798e8c182b8b1811736fba95da7866b199530",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0022 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C22",
+    "reference_id": "mailb:0023",
+    "source_sha256": "184197e2d41ba5642d311b4def4fdcbcc62d901f00bd1079d578dd94403a9b62",
+    "native_reference_sha256": "6432e0df5bcca5d241b6cdfdb0dcc96261b99fc28c593bf57d96e9a722f68281",
+    "reference_sha256": "1a639bf91a6ceb268e03ee5f9880439acaa1dd5a9e22da33680b505331255e2b",
+    "encoded_sha256": "d4c8bc2d4c0afe6418ae5a434ac5c1453a1f7560306b33f57f216957c8d0d65e",
+    "comparison": "reviewed_native_variation",
+    "evidence": "The only internal native difference is the space before the gift-offer verb after field 24. Preserve complete English walking, found-item, and gift wording."
+  },
+  {
+    "id": "message:1C23",
+    "reference_id": "mailb:0024",
+    "source_sha256": "71b023d280b58a84ebd2bca19198d852973ed4be4035edf514d31390e235d990",
+    "native_reference_sha256": "6c70de6b13770b9d09d907f5e81ab4c5aeae79f195c54c312e5f9483fa8eb8ff",
+    "reference_sha256": "44c6e59d1468821424120df87e8d4819e703accebc33affa91fc30bffbf6482a",
+    "encoded_sha256": "b3713468fb714845d6ee0517a7702c54c6e84e9312074b051c2f9c1863c6c535",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0024 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C24",
+    "reference_id": "mailb:0025",
+    "source_sha256": "73c0cc4e61e8ddb53f15cec5885afb859e2997ef07a5eed2c1e6791e390ce07f",
+    "native_reference_sha256": "3f940fababbf5ea0c08d470160cf545d7793fdb95e14ceab0dec093f47dbdf13",
+    "reference_sha256": "8e71fd17192e31f581e773c0db7f5a3a6f2893603cc2e42b5bebb17d9b7e619e",
+    "encoded_sha256": "e66adff14ae9cd5f9b79ff8ad4b44e371b63dbd7c93ecb3c78bd47d1afb875e1",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0025 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C25",
+    "reference_id": "mailb:0026",
+    "source_sha256": "fa45789ab01c3d7c00df632999bb14cd08d3b3c498f38ce7332ff07c89dd5ab4",
+    "native_reference_sha256": "394f9f26fca8fc2a9c2bca3c222636d5a9dd35fd40a4d8842ab4681c7771dd6f",
+    "reference_sha256": "84a937c624ddebee205fdcf92c30bb69e39bc08216f576c326ab28a1831c5a79",
+    "encoded_sha256": "d2efcf576513bc0c9ed087c5732d81c01280f49bca99952b5f5f88029ecd6160",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0026 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C26",
+    "reference_id": "mailb:0027",
+    "source_sha256": "ccbea1b36450d4384354825cb47681afdae86a66788a6bf9bdf1bca97e45d96a",
+    "native_reference_sha256": "14a80a5da2a4c49de4057718ec497d54d3c2d83ab1a41487adeab7c4c3a8033e",
+    "reference_sha256": "c10d03435325d2698dea0eae00e2dea3a481bae74c583ed5f6c2f5a7f53713a1",
+    "encoded_sha256": "6bd41d6f7a30e8d5cb59f58c026617ae3c976025ba9810b5b78768f27d002a47",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0027 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C27",
+    "reference_id": "mailb:0028",
+    "source_sha256": "f77a309c817355e63b88a10c9de55ecb24f4d2f78796fbbdc70bc56f0c1704f3",
+    "native_reference_sha256": "81cf7d697a3913dc67fda69b59bf26f271b8973d3ed9a076997cc0693c730a6c",
+    "reference_sha256": "fc06cdf73198cb9005b96e44bf4b608c177ca9a3e5fe3bedbd9229f47ff4e89f",
+    "encoded_sha256": "7dacb97509b30ac05e1eba1ac8027caecc4b04ca8908ac7a5e47d77006879727",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0028 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C28",
+    "reference_id": "mailb:0029",
+    "source_sha256": "7d1078104ba0e0d1899bfb1c27f250acf024cf86d5767dbde97b6bd6db914159",
+    "native_reference_sha256": "d4c8403976bfc6fee3f7981dfc7d3ef87a414317b266bc8ec64e1ef61cf70952",
+    "reference_sha256": "964ca114fd2a138cf049ce30429bda0b922a365e72ffb9adc1ec5483d75bfb20",
+    "encoded_sha256": "c745884badb8cc8ae0aca6c27f6771e3f721169383761c8047b7d98fe867bd41",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0029 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C29",
+    "reference_id": "mailb:002A",
+    "source_sha256": "9ffdc82335c1ee56ccdcddd1ba9d43fb11f9b24559d9d3ec2bf52c5d06d31258",
+    "native_reference_sha256": "47532d814f1246d7e60b4577477480a0b9c04ab41f16f2fb16fac13fa30ada16",
+    "reference_sha256": "a61b4766c64137987cab3670894a45e29b055a516504af09b0b9fa39b1a0569a",
+    "encoded_sha256": "1c049b6b7b3940889d8628fbcd4f0c04118f6f99bfc808fb24b9841f029739e3",
+    "comparison": "reviewed_native_variation",
+    "evidence": "The only internal native difference is the space before the gift-offer verb after field 24. Both retain giver field 26 followed by recipient field 24."
+  },
+  {
+    "id": "message:1C2A",
+    "reference_id": "mailb:002B",
+    "source_sha256": "c23edc3058265be349f75bda8e7f31cef19784ba1e2206130ea280a3548824f8",
+    "native_reference_sha256": "ee51369f973f7dfa427a6196c0eadaba1dd6aec98037d96af7f1430f9b550b73",
+    "reference_sha256": "a014e7c87e16cb6a9d2d5c78dba9b7f0c08737545b91cd7096452b8230d632cd",
+    "encoded_sha256": "26e76ec825547b19b835df20c87ac6534ce9a658514308f21f1043c046b600d9",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:002B fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C2B",
+    "reference_id": "mailb:002C",
+    "source_sha256": "8e765b74990902b8483911ae8c5e0ffe9ceaeec679b17798785f3be755f97ad3",
+    "native_reference_sha256": "931e88ec58abb9fe6706dd5f35cd0284609207e703c4dfdd5ab2dd742e916ad3",
+    "reference_sha256": "237b8363dab6b33e4b6c67ddb437e73623249c1517431fdbe7b93d6242040091",
+    "encoded_sha256": "fdaae2f79c9466c9dc81e9f084501cfd83993fd826031b13d76576cbb72841ab",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:002C fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C2C",
+    "reference_id": "mailb:002D",
+    "source_sha256": "b5ef7f27b4d4e6e741b6aa3ae3daa8c7a6a0298be6090afdec619ad372d9d652",
+    "native_reference_sha256": "041970844f60f6d87aa3a0704ac06493202a2ed17cc71b2a3418c246cdc69e1f",
+    "reference_sha256": "36295afe29a3947fff3359ec03d8f5e08ca5bd0a76a5ded303cc8452b6b4b9dc",
+    "encoded_sha256": "4f7e484df9c72e46c879ca9043bcaef948d77824ee5df1a2c7e6ea34f3c4ac61",
+    "comparison": "reviewed_native_variation",
+    "evidence": "The only internal native difference is the space before the gift-offer verb after field 24. Both describe a recent purchase no longer needed. The English reference has a missing need typo queued for wording review."
+  },
+  {
+    "id": "message:1C2D",
+    "reference_id": "mailb:002E",
+    "source_sha256": "f645f77117b8997daf0ee8f27ce5a02ad59c74297a20e6c1f392aaaa634b609d",
+    "native_reference_sha256": "7fa208f2cae1fd6e67fe8192272cd2b29a3e01a52826c749929d48123c1c33c7",
+    "reference_sha256": "9461e7d1f26cf2347a9aad5e4f62b48fa6174c861395bfec40a37a7ef0cb4af7",
+    "encoded_sha256": "2b3c6ad9a1aeaace58ad4fbaebf4e03b46672a9b3297e14f3513760d4804dba3",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:002E fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C2E",
+    "reference_id": "mailb:002F",
+    "source_sha256": "571179d8bb8b3a1c9c36834f2334db2db399fc4a972071711a19b39a045a0f5a",
+    "native_reference_sha256": "3018898a414af15284e5377564edfdbd4b0bd3052fa5c4548fcd5910a5f13486",
+    "reference_sha256": "072bf993be5434d3372b399238e6fd348c51edec2f93724973ca90f7d51c4fbe",
+    "encoded_sha256": "ba56fb7b435dfebba52f56a3f8e7f16dd1682c0ef278c3b5d4ff6d27a6c6b119",
+    "comparison": "reviewed_native_variation",
+    "evidence": "The only internal native difference is a newline before recipient field 24. Both describe an unfamiliar seller and giving away a creepy purchase."
+  },
+  {
+    "id": "message:1C2F",
+    "reference_id": "mailb:0030",
+    "source_sha256": "1d113fa005eab404aeb41927614be5a6a65e5ef5aee056fdfd47732faec57d3e",
+    "native_reference_sha256": "765bd503dd327693c2229658caa30768d75d04edba1c261ae69be905b76f6061",
+    "reference_sha256": "40777b216d3abea7b78491efcb066437ab3673836c17341b36f81e1bf49f386a",
+    "encoded_sha256": "32323c9eca61c092ad1e6ed0add11d45da5aed45803a221ad09a57062bf12091",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0030 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C30",
+    "reference_id": "mailb:0031",
+    "source_sha256": "7a678e3cb5eea4fbff19297e15a1366d28831b6c7e37464f2c4266983e10e1c9",
+    "native_reference_sha256": "ce519590d76c0929df5b61983014d607a2e52380ed80d02f39466d7d4cd865ec",
+    "reference_sha256": "68e315c71d1ff78fb44314429fa1bb7542f8871a963736837cff87f8214fdf37",
+    "encoded_sha256": "803a43ff9607d16dfc71730ea2fb823d1761821cb0861e87ead61d48405842de",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0031 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C31",
+    "reference_id": "mailb:0032",
+    "source_sha256": "da16fb2e695ff69a2836624cb89513d2e01b5fb8e3a28c7ab6cee0c080c65c7b",
+    "native_reference_sha256": "134993e3e86776b0ed27c7bc0170a96d9d71fa0351b3f87f48991192179c87da",
+    "reference_sha256": "bd5c184d663458725561dbca28f0c0b7065269a6537fb3551972c3274553b9a4",
+    "encoded_sha256": "eba3a0d1627cfa93e155243d8d02129feadbecabb2eb70bfdffc73554eeb34f0",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0032 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C32",
+    "reference_id": "mailb:0033",
+    "source_sha256": "73a8e3d5a3affb625e9ff436a96386371017f41802b8598d201a7f13aaa0a88e",
+    "native_reference_sha256": "749cf1f3a3aef2043d74270ddaab26b54fc0598cdfd1d415ff74425aa09b861d",
+    "reference_sha256": "425529d548fcfb8a3bcfba5652dfeb1348aec1a5d54c6e29456abb8d9bbd797d",
+    "encoded_sha256": "6b51e2f862f0bf2e3ef04c2056974599884bb8402c05740f62198467628389ec",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0033 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C33",
+    "reference_id": "mailb:0034",
+    "source_sha256": "9f3fb2a48b7d05ec9f6508de4cef52c0bc42424bf27f7af3b5ef14442f2e2ebd",
+    "native_reference_sha256": "508b31494c2fed3ac78e91cca98e72ce56f79c5ec80b2fefbeef4b7f04dd10bd",
+    "reference_sha256": "783b46205b7ce1a246184a2207908ec7128eb275c8cf93bdaa695a230e0fbc0a",
+    "encoded_sha256": "40808a34d4417e63d256deb3a66aa89288750fbf74eb51fdf63f7f02e2b0bc09",
+    "comparison": "reviewed_native_variation",
+    "evidence": "Native dialogue lacks the small doubled-consonant kana in delicious and adds the final full stop. Both describe successfully cooking field 27 yesterday."
+  },
+  {
+    "id": "message:1C34",
+    "reference_id": "mailb:0035",
+    "source_sha256": "8d3871ec0722033171faa390fdb843b82cf10dd3ea98553864163c8384884c1f",
+    "native_reference_sha256": "9fe614c3d207dec13e52e89cd3e3c476ce87bacbcf57aaa4bc7c70347a32cec8",
+    "reference_sha256": "31a39e8e4ce42deda15a3138e884b1bab8a878b6c8b6ab41259787a338596a5b",
+    "encoded_sha256": "6ba5edd00ac39633c49c151658e866322e0bb9cb8f6687355dc1a5f44183c8f9",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0035 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C35",
+    "reference_id": "mailb:0036",
+    "source_sha256": "f5a4e789db4b2809f3a7046bd3df90b6b41a2f940e2c02db799ddb194816f303",
+    "native_reference_sha256": "d6b8b58fb3866ff8a3a2cfcbb1cf513282874ff3bc5aed2c4c00b15b769c20f0",
+    "reference_sha256": "05506e7422f4446e70d4018af648d45520518c533bec74e82234e5a927f0792c",
+    "encoded_sha256": "8696a6cc4a90b821db57ddd4bb915bf6fe9666bb49a02d824d4e78790b6ce379",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0036 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C36",
+    "reference_id": "mailb:0037",
+    "source_sha256": "e8e8ad2ca66e36e416dcf670133c093fbbb867029fef4096aca1d83291ac0ac8",
+    "native_reference_sha256": "3843bdcd22d09d0366d0de1146772d6a1babd4eed588c61ff5b5693558fcbb30",
+    "reference_sha256": "3ac308b96850f9ae2a12a7a9d2b43adbb284a157c9d658b269581dc7959fb40b",
+    "encoded_sha256": "56cc3c02f017ed8185912ee58ad39d0379245cf8d53b9c0d925d39e6d7d21510",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0037 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C37",
+    "reference_id": "mailb:0038",
+    "source_sha256": "06c2897a9e8bc910e86ba4aeb39513aa996492abb89c4cb117af5c7eeba6b5a6",
+    "native_reference_sha256": "3cac068714ed9fde309a3d3c9141f20618c0d3b38e386ab45956ff615058db5c",
+    "reference_sha256": "912c2a3937b6fed9ffcc25762e8b7df0f2bc848a07c1e79829efa7b930c28e16",
+    "encoded_sha256": "72341eb7622d2fc9c66f40af1e643b57f9e0986b5f953a587dbec724bc456600",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0038 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C38",
+    "reference_id": "mailb:0039",
+    "source_sha256": "114727b8db5bffaeaa20585178fd2aca2804390406ddfa882df2737513ae2a51",
+    "native_reference_sha256": "5fb0feb8ff7519b763c5c5fbcd224685dfda80346e4adde7be2c34558f71dd32",
+    "reference_sha256": "9a2ae68144af88659d9fbbb345b3f3c93874589c8443511db6ec15893bb4b5c2",
+    "encoded_sha256": "1fd98d3c49b8bed4303b6195dfcb806144df11cd2ba6cc11e921564deb5bb28d",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:0039 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C39",
+    "reference_id": "mailb:003A",
+    "source_sha256": "401b7f2209ce41db7a0c688bfff7709e320885bbf8cae612034a77057a3c6e36",
+    "native_reference_sha256": "53c47e2af2bea2efe53905130d135b40ce2c012772f9b70e657bc5cf6f438625",
+    "reference_sha256": "09c90b924049d01ed0125040bfcd2e06fcf65e4d5a59b17341098777c50277d3",
+    "encoded_sha256": "d3fbb95fad33b60c473b5b49c047e29bd9d72678b052d91fca5e7af2e6999335",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:003A fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C3A",
+    "reference_id": "mailb:003B",
+    "source_sha256": "b118ac2999d085dd6e9a3e885dbb74f67ad9fb6ecd9213d7082151645584bf78",
+    "native_reference_sha256": "db316837b1b9f539961d17620f3b2feaf9ab91c3783e39b6486ee8c62d41f25c",
+    "reference_sha256": "a3be395c4ed8f06573fe0b8046ff26a38094e8cb5e79df12eabdc5899111db1a",
+    "encoded_sha256": "a797805c07b5cf46742d7fa5440d32977d550476488326c0ef74aaa741f9d818",
+    "comparison": "reviewed_native_variation",
+    "evidence": "The only internal native difference is the space after recipient field 24. Both recommend a refreshing morning walk."
+  },
+  {
+    "id": "message:1C3B",
+    "reference_id": "mailb:003C",
+    "source_sha256": "40ca83270ebe9b2c7d2f22a68ac40e01fe6389c78798b74ca6a4e64853042894",
+    "native_reference_sha256": "7147439b68180da41b070897ffaedb191b1d999226e03edb28f7708354bab17f",
+    "reference_sha256": "040c999abb6c4808da703d84b13fb8b8655efd7c940e336550b757569f10146f",
+    "encoded_sha256": "33d68450c35e9e6b12c0d28a830327d1247270abca7a022aeb03879b1b5696bb",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:003C fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C3C",
+    "reference_id": "mailb:003D",
+    "source_sha256": "195e6500afa8795fdbee1a3b85f353044f15833934aa195d09d4dca07e9351a2",
+    "native_reference_sha256": "9eb527e87c1dc77d59f0b2d6ea1870d648d9b24cd70ab9a9af7f7cf6d5aca5c0",
+    "reference_sha256": "46348b0bc3189e7ec11bb05601968cba4dd473b9829c3b067d0166a4d5fef6f8",
+    "encoded_sha256": "c09329a681d37caa9889b62fe0d9105e1ad7eea865dc0dd7b35498d9e783a349",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:003D fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C3D",
+    "reference_id": "mailb:003E",
+    "source_sha256": "34b525107ea0233477c279b7a273f838bd2df953192ed906421b92c43e8be75c",
+    "native_reference_sha256": "4654b710f7285686b9d573a6787dce4b77fccfd0fcbe1a8080a0c7d8ccf23d6c",
+    "reference_sha256": "9b4b2c69c242a94ae57703b89a71cac081b9bf95c99f43bc3c7dc301d30cd0c0",
+    "encoded_sha256": "868266337c8f73b6e922f4066c99d9837c377ec8e51785cec30913fe2f4b17ae",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:003E fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C3E",
+    "reference_id": "mailb:003F",
+    "source_sha256": "ef31b18cefffe10211f600a096918c24cb7201eb55479440eb3711124d43d69d",
+    "native_reference_sha256": "8c84c475a1169028434ea17e01b737030b2027f62bf378d530bbc72009e01001",
+    "reference_sha256": "ea178852d49704b6f0b6190ed8bba53039614e086d0252f55c4afc58d6eba941",
+    "encoded_sha256": "c759ee02738f6c05f129d1e7153d375bd611999b7a05546c9542f47104e181df",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailb:003F fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C53",
+    "reference_id": "mailc:0034",
+    "source_sha256": "0777c6d4e2db365edb4f978992face1e22c10111e9c2bc550ed0a4ba7b1ac9a5",
+    "native_reference_sha256": "130c00ab3819b644afd0ff7be44cdf0df37f8830756b1f51c1adba81ac69e420",
+    "reference_sha256": "3efdc0e9fd764bfba18786c1a35a13c96a00587c4d58154990c44c584d84f0cb",
+    "encoded_sha256": "745fec906271ce5200baff02cc23fedf9d670a5571c280872fadb455555a583f",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0034 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C54",
+    "reference_id": "mailc:0035",
+    "source_sha256": "cd61b048e30b7e195ae2f7a6e31ee236a931feff9156c003ca9a810c90a20e64",
+    "native_reference_sha256": "214beb61f5ac1470422e23e1effbd29c2a0450912ad6f531c2ff7ccb89be4866",
+    "reference_sha256": "62d697bdeeb0ec1abde736dcf35e39e679ce2f7b942ec69f0d3c6044295467b6",
+    "encoded_sha256": "e944dd91c5142e0145a25450658d49811e9085e77c9a1e46b543959034b1f31d",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0035 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C55",
+    "reference_id": "mailc:0036",
+    "source_sha256": "7b78cd7325f8b536e03507f1b821c98f3a5a197dd275a0ba45ac2d75f19e136d",
+    "native_reference_sha256": "5f19d52dec6093840ca233d5269069d63127fe91ce35d338f60a359aa85962c8",
+    "reference_sha256": "33850342a50677fabdcef5944d44452e6fb80d5dbee1d47ebc04039bfd0e7a82",
+    "encoded_sha256": "ef05fbfcc6ce69aa5812798a4cea3071925b593c0b4aef17e2a30a280512adcb",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0036 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C56",
+    "reference_id": "mailc:0037",
+    "source_sha256": "1ae8f0b2970529e6ca452ca289408fb7c7af6807d673dcb268edf89d32af6bef",
+    "native_reference_sha256": "d7f8d492386627d3c467722fa3edb155566832fa87383b459215eecb2b0eeffd",
+    "reference_sha256": "869bf62daabb96955ab8a4cac3c1b06b2a98e8f3d1b1bae4d4f1d98b486c0c32",
+    "encoded_sha256": "7e5ca76710eacf8cef3b434b8c457e19cee2ed4debfa059e22ece9b72f67aeef",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0037 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C57",
+    "reference_id": "mailc:0038",
+    "source_sha256": "5c14090aaaf1d7aa43249cfbce65d01a2aac04e406b49190161ff9eb6c243056",
+    "native_reference_sha256": "433d667168d5b47afe7492ed7618b401d078abe40bcd034f19ff25a923564941",
+    "reference_sha256": "360ffda6e020ebfb0e5f17d0ae3cb16b927d6ff15c6728eceac307479b9f4d4c",
+    "encoded_sha256": "541f8a2e3158621905ce88fcd2a4b0d00ff9c60cf6f4c705fdd18e9ced41cc96",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0038 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C58",
+    "reference_id": "mailc:0039",
+    "source_sha256": "4c4bcb236db278e2ee6350295825edba6868bb8625daa425aceed4dbc29db587",
+    "native_reference_sha256": "5843271f2a306b71a974a27963c11b669a78f98ebf674d722768ba960e54d045",
+    "reference_sha256": "3f3fd38fcb4ddf2b4c1ce19c8476bc95fec5828fb4ac1e20a90b1c971d946f9a",
+    "encoded_sha256": "6a35fb064c3922c164ec31153045925765973dbc312e50304c3e7d589c3f2f16",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:0039 fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C59",
+    "reference_id": "mailc:003A",
+    "source_sha256": "6829896c70acab4a22eabe0d50c8c6a15fe26cb00340627847e7b79e2750a339",
+    "native_reference_sha256": "daeead778752a9ce5a2c9439e3fac4a85a566eef6e41300aae350bdb244d389e",
+    "reference_sha256": "cd0ba99b54e8d7aa2f5c0e2c6740373e758df6b3dc6099f9388c9dba731de61e",
+    "encoded_sha256": "17735e83e61d8f8d224fe867c8c9df16399a157d28b3bb4b3ef426cbd2994d82",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003A fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C5A",
+    "reference_id": "mailc:003B",
+    "source_sha256": "6fa300f056ab600825ec6e71eeae3af202dbd5b1320cf00f9d008bab0bcc7e7e",
+    "native_reference_sha256": "32f17e0e47077c0be7cef1867bc0b777a613eefb6fba5a91f8a8cba02e31edec",
+    "reference_sha256": "d91f9784b741377a989063620870d4baab9c3780688cf147242522fb95475ee9",
+    "encoded_sha256": "07153a5b9e0a2fdec86ff216ae230d75285eaf93c82afa08578575352128205e",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003B fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C5B",
+    "reference_id": "mailc:003C",
+    "source_sha256": "901f6e504c77513796296565d5f6b959e9ecbc764983a919e118f673a74f7a9a",
+    "native_reference_sha256": "8252676f4bd987570b7e64d6db78e8a04f5b6f2e6ea3399a13063b41816b5e0d",
+    "reference_sha256": "a442264bca2d651811398cb8f402c364e672fd07b89d6f839d0379e6f0ca5caa",
+    "encoded_sha256": "6e59c7825ca00039bf7d096ea59feb0ec6c3bdf08fbc739740d751e83f17b81f",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003C fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C5C",
+    "reference_id": "mailc:003D",
+    "source_sha256": "1cd4c7e8d8ca2b041f543a494b1ad288d4ac81b1db9cbb56a21a85697f307228",
+    "native_reference_sha256": "ada982e71a89df66aa1f29599732d6330502de1c04adc720359d91dea3730730",
+    "reference_sha256": "a3bce15e0a277a554a82de277003103163ff0fe2b152024195539eced159d291",
+    "encoded_sha256": "fd564f243fae62a06be77ebc9d42998a803ed183080d02be903fdc9def445f27",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003D fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C5D",
+    "reference_id": "mailc:003E",
+    "source_sha256": "0a031d84d04972100ac0bf72e4dd67185a864257ba82dbb6e44b91f3579d5d4d",
+    "native_reference_sha256": "30e67873c2825f43faa9d944faa86818a2b9c41f10b31239f2c882a26f68f6ea",
+    "reference_sha256": "da3690d9dea38d8911055912ee67923382b037aa268987351474afa6b63f606e",
+    "encoded_sha256": "988866071feea4a5b66aef6e0d9a7babdb924324d4e638251d6b6e366b5776f2",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003E fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  },
+  {
+    "id": "message:1C5E",
+    "reference_id": "mailc:003F",
+    "source_sha256": "0f7ff75f817702c809b0878c5701218742eb3b690a623d62e3a3b72df5bd2bc1",
+    "native_reference_sha256": "f2c8ef9da53e159bba0ef789694b61413cc5d6ec8bd4d7fc05944a44dd78f1e0",
+    "reference_sha256": "650674269461da49cf8b93a1d0a5c031ec662db4f71ea27a19d22f676cfdffdf",
+    "encoded_sha256": "431efbac6afec55f779578d059a1da107f650a1237e66c99e895359434ce68a6",
+    "comparison": "identical_body",
+    "evidence": "Complete Japanese dialogue body equals the native mailc:003F fragment after only removing final 7F00 and outer spaces/newlines. The complete English mail fragment agrees with the supplied legacy reference. Preserve every reference character and append the native dialogue ending; no mail-engine permission follows."
+  }
+]

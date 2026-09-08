@@ -1,0 +1,18 @@
+[
+  {
+    "id": "message:1C18",
+    "source_sha256": "391d44019810148a2e4555dc2a695d2e2e3156a5ccf70f4cb100430e1b8fed06",
+    "translation": "Thank you for always\nhelping me.\nIt's me, {cmd:7F24}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The dialogue source uses field 24 for the writer, while maila:0039 uses 25. Keep the actual native field and complete thanks and self-introduction; do not import the unsupported donor field. Reachability, final wording, and presentation review remain."
+  },
+  {
+    "id": "message:1C1D",
+    "source_sha256": "e6bfb775f7faded73cae25176df89e426924f8bf03bc1a7f47cb29fe6324c00b",
+    "translation": "Hello. Have you paid off\nyour home loan yet?\nOnly kidding!{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The native dialogue adds a joking qualification absent from maila:003E. Retain the greeting, home-loan question, joke, and exact native final ending. Reachability, final wording, and presentation review remain."
+  }
+]

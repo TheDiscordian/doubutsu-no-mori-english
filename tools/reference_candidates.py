@@ -28,6 +28,7 @@ from dialogue_dates import requires_dialogue_dates
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 from reference_content import adapt_content_reference, validate_content_candidate
 from placeholder_text import placeholder_edit
+from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -152,12 +153,25 @@ def main():
                                        Path("translations/n64-startup-pak.json"),
                                        Path("translations/n64-startup-greetings.json"),
                                        Path("translations/n64-resident-gaps.json"),
-                                       Path("translations/n64-gyroid-charm-dialogue.json")])
+                                       Path("translations/n64-gyroid-charm-dialogue.json"),
+                                       Path("translations/n64-letter-fragments.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
     matches = load_matches(args.matches)
+    fragment_matches = load_fragment_matches()
+    fragment_references, fragment_inventory = {}, {}
+    for name in ('maila', 'mailb', 'mailc'):
+        fragment_references.update({r['id']: r for r in map(json.loads,
+            (args.gc_text/(name+'.jsonl')).read_text().splitlines())})
+        fragment_inventory.update({r['id']: r for r in map(json.loads,
+            (args.inventory/(name+'.jsonl')).read_text().splitlines())})
+    fragments = reference_fragment_edits(fragment_matches,
+        {name: bank.entries() for name, bank in source_banks.items()},
+        fragment_references, fragment_inventory, info)
     sequence_members = {m['id'] for group in load_sequences().values() for m in group['members']}
+    if fragments.keys() & (override_ids | matches.keys() | sequence_members):
+        raise ValueError('Mail-fragment reference conflicts with another approval or draft')
     if any('resident_animations' in record for record in matches.values()):
         verify_native_consumer(rom)
     verify_native_equivalents(matches, source_banks)
@@ -176,6 +190,8 @@ def main():
             raise ValueError("Reviewed sequence conflicts with a draft or identity override")
         if sequences.keys() - {row["id"] for row in inventory}:
             raise ValueError("Reviewed sequence is absent from the inventory")
+        if name == 'message' and fragments.keys() - {row['id'] for row in inventory}:
+            raise ValueError('Reviewed mail fragment is absent from the inventory')
         counts, review = Counter(), []
         for row in inventory:
             id = row["id"]
@@ -183,7 +199,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in sequences:
+            if id in fragments:
+                edit = fragments[id]
+                if row['source_sha256'] != edit['source_sha256']:
+                    raise ValueError('Stale mail-fragment main inventory')
+                counts['cross_bank_mail_fragments'] += 1
+            elif id in sequences:
                 edit = sequences[id]
                 if row["source_sha256"] != edit["source_sha256"]:
                     raise ValueError("Stale sequence inventory")
@@ -266,7 +287,7 @@ def main():
             record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
-                skip_ids=override_ids | matches.keys(), resident_runtime=bool(args.runtime_module))
+                skip_ids=override_ids | matches.keys() | fragments.keys(), resident_runtime=bool(args.runtime_module))
             for edit in aliases:
                 rejected = [row for row in review if row["id"] == edit["id"]]
                 if len(rejected) != 1:

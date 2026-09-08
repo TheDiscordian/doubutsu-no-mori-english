@@ -4229,6 +4229,95 @@
   donor review. Broader text, runtime destinations, normal gameplay/saves,
   complete review, hardware, release preparation, and stretch goals remain active.
 
+## 2026-09-07 — Complete cross-bank letter-message fragments
+
+- Revalidated the clean `ba3ca96` checkpoint after the requested one-time text
+  measurement. The status-only turn did not advance implementation. Continued
+  the missing letter-message audit and built a separate, restricted reference
+  path rather than weakening the ordinary cross-bank rejection.
+- Main dialogue `1BFF..1C3E/1C53..1C5E` contains 76 Japanese fragments with empty
+  same-ID GameCube main references. Explicit counterparts are native/English
+  `maila:0020..003F`, `mailb:0020..003F`, and `mailc:0034..003F`. Sixty-six
+  Japanese bodies equal their native mail counterparts after removing only
+  final `7F00` and outer spaces/newlines. Eight individually bound variants
+  preserve the same ordered fields: `1C01/1C07/1C22/1C29/1C2C/1C2E/1C33/1C3A`.
+  Their differences are greeting grammar, a malformed particle, internal
+  whitespace, or a spelling/punctuation error, not missing gameplay content.
+- Added `tools/reference_mail_fragments.py` and 74 explicit approvals containing
+  native dialogue, native donor, complete English, and final encoded hashes.
+  Each donor agrees completely with the legacy English extraction. The final
+  text is the whole GameCube fragment plus the native final ending. No English
+  space, manual line, word, or field changes. Both generator and independent
+  builder reject stale sources/references, changed output, missing ending,
+  unsupported glyphs, non-field commands, and unavailable fields. Registered
+  validation cannot be bypassed by deleting edit provenance. The ordinary
+  resolver still rejects cross-bank matches, and these records do not become
+  implicit alias donors or inherit sequence/actor/field exceptions.
+- Added two original native-complete drafts in `n64-letter-fragments.json`.
+  `1C18` keeps native writer field `24`, not the donor's unavailable `25`;
+  `1C1D` retains its greeting, home-loan question, and joking qualification.
+  Both preserve every original command and fit without width warnings.
+  Complete English reference bounds are at most 136 bytes and require no
+  resident extension. Eight reference records retain generic field-width
+  warnings: `1C02/1C07/1C11/1C27/1C29/1C38/1C39/1C3A`. No reflow is performed.
+- Added ten focused tests covering all native mappings/full English outputs,
+  schema and duplicate rejection, source/reference/legacy mutations, strict
+  internal-whitespace comparison, explicit variations, unsupported controls,
+  added fields, independent builder checks without provenance, and both drafts.
+  `tests-letter-fragments-focused-01.log` passes ten tests in 0.563 seconds.
+  `tests-letter-fragments-full-01.log` passes all 577 tests in 213.571 seconds
+  on the initial 75-message batch. A broader exact-fragment scan then identified
+  adjacent `1BFF`, the only additional missing match under this rule. Its
+  complete `maila:0020` source/reference was added, and the final focused run
+  `tests-letter-fragments-focused-02.log` passes all ten tests in 0.543 seconds,
+  covering all 74 references and both drafts. No production logic changed
+  between the full-suite run and this final data/test-expectation addition.
+- Initial `smoke-letter-fragments-01/` passes all 75 loads, 227 assertions, and
+  384 recorded steps. Final `smoke-letter-fragments-02/` passes all 76 complete
+  cartridge loads, 230 assertions, and 389 steps. Only native loader `8009E558`
+  is called. Complete headers/text, adjacent/module guards, restored checkpoint,
+  and graceful shutdown pass. Both runs use fresh four-MiB state, no save seeds,
+  audio disabled, and FlashRAM/Pak write permissions false. Final isolated
+  FlashRAM/Pak remain blank with hashes
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`
+  and `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+- Final full generation produces 11,508 edits, with all previous 11,432 edits
+  unchanged. The 10,263 main candidates comprise 9,627 reference candidates,
+  345 original dialogue drafts, and 291 original label drafts. Basic generation
+  produces 10,809 edits and includes every addition without changing earlier
+  edits. Main records without candidates number 1,489: 567 Japanese static,
+  919 non-static, one Latin, and two symbol/numeric records. Ten non-static
+  records contain dynamic insertions and still need caller/control review.
+  The generator rejects 1,490 main records, including one existing original
+  fallback: 1,204 unconfirmed identities, 260 control differences, 24 missing
+  fields, and two overflows. Reference warning-bearing records number 1,450;
+  aliases remain 41 and conflicts zero. Source-volume coverage gains 2,008
+  characters, reaching 606,393 of the unchanged 746,978-character denominator.
+- Final ROM `build/letter-fragments-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `be6edf6404b67795056863c213bca39b2b9ffcb4b829b015f0a5096cbf5e6a71`.
+  UPS SHA-256:
+  `a4041a43f0e933eb4a9fcbb7400ac7ccb6178b22c3408ab68d3e0124ee0a1f17`.
+  Candidate SHA-256:
+  `2af70e2a05ab789768079af078bc5535190d46c879def1b9f4b034762ed1890a`.
+  Scenario SHA-256:
+  `272c1608786faf5860ab975d7eea3fd91f3ba5bf71eae8d638de53e4628d0b7c`.
+  UPS application reconstructs the complete ROM from the verified original.
+  Against the gyroid pilot, only main text `02000000`, pointer data `00CF9000`,
+  and directory container `00019D40` differ among extracted DMA files. The
+  directory container is unchanged outside its table. Runtime/code/font/name/
+  mail resources and saved structures remain unchanged.
+- Regenerated coverage and both read-only review queues. The same-ID comparison
+  pool remains empty under current rules, with 1,128 absent visible references,
+  ten field cases, twelve control cases, seven overflows, 36 non-static cases,
+  ten glyph failures, one reference-encoding/hash uncertainty, and one original
+  fallback. Ten unapproved expression comparisons remain. Final wording work
+  explicitly includes the duplicated pronoun in `1C06` and missing verb in
+  `1C2C`, both present in the supplied complete English donor. No final semantic,
+  normal-caller, dynamic-field, mail-delivery, save, or hardware approval is
+  inferred from this loader batch. Separate remaining dialogue, runtime,
+  generation/editor integration, public patch preparation, and stretch goals
+  remain active. The font-atlas-edge investigation remains paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
