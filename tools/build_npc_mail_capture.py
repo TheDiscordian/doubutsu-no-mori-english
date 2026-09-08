@@ -16,10 +16,10 @@ from npc_mail_capture import RAM,source_hashes,relocate,verified_resources
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False):
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    sources = source_hashes(mother_letters=mother_letters);out.mkdir(parents=True,exist_ok=True)
+    sources = source_hashes(mother_letters=mother_letters,departed_letters=departed_letters);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     fado = root/'upstream/af/tools/fado'
     fado_sources = sorted((fado/'src').glob('*.c'))+[fado/'lib/fairy/fairy.c',fado/'lib/fairy/fairy_print.c',fado/'lib/vc_vector/vc_vector.c']
@@ -42,6 +42,7 @@ def build(module,words,aliases,out,*,mother_letters=False):
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
+    if departed_letters: names += ('departed_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
@@ -52,6 +53,7 @@ def build(module,words,aliases,out,*,mother_letters=False):
     if result.returncode: raise ValueError(result.stdout+result.stderr)
     run('as','-EB','-mabi=32','-march=vr4300','-o','relocation.o','relocation.s')
     linker = 'system_capture.ld' if mother_letters else 'capture.ld'
+    if departed_letters: linker = 'departed_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','overlay.elf',*objects,'relocation.o')
@@ -86,7 +88,7 @@ def build(module,words,aliases,out,*,mother_letters=False):
     for symbol,resource in (('af_npc_word_data',words),('af_npc_alias_data',aliases)):
         at = symbols[symbol]-RAM
         if data[at:at+len(resource)] != resource: raise ValueError('Linked NPC capture resource differs')
-    if source_hashes(mother_letters=mother_letters) != sources or fado_hashes != {p.relative_to(fado).as_posix():sha256(p.read_bytes()) for p in fado_inputs}:
+    if source_hashes(mother_letters=mother_letters,departed_letters=departed_letters) != sources or fado_hashes != {p.relative_to(fado).as_posix():sha256(p.read_bytes()) for p in fado_inputs}:
         raise ValueError('NPC capture source changed during compilation')
     report = {'version':1,'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),
               'overlay_sha256':sha256(data),'relocation_sha256':sha256(reloc),
@@ -97,6 +99,7 @@ def build(module,words,aliases,out,*,mother_letters=False):
               'stack_usage':{name:(out/(name+'.su')).read_text() for name in names},
               'fado_sources':fado_hashes,'status':'Complete capture/generation code; gameplay publication not installed'}
     if mother_letters: report['mother_letters'] = True
+    if departed_letters: report['departed_letters'] = True
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -110,9 +113,11 @@ def main():
     parser.add_argument('--aliases',type=Path,default=Path('build/npc-mail-names/aliases.bin'))
     parser.add_argument('--output',type=Path,default=Path('build/npc-mail-capture'))
     parser.add_argument('--mother-letters',action='store_true',help='Add complete Mom-letter dispatch without changing the resident loader')
+    parser.add_argument('--departed-letters',action='store_true',help='Add complete departed-villager letters; requires --mother-letters')
     args = parser.parse_args()
+    if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
-                           mother_letters=args.mother_letters),indent=2))
+                           mother_letters=args.mother_letters,departed_letters=args.departed_letters),indent=2))
 
 
 if __name__ == '__main__': main()

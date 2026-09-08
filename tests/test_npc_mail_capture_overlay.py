@@ -47,6 +47,17 @@ class CaptureRelocationTests(unittest.TestCase):
             with self.assertRaises(ValueError): relocate(data,self.reloc,0x80200000,self.imports)
         for reloc in (b'',self.reloc[:4],self.reloc[:-1],self.reloc[:-4],self.reloc+bytes(4096)):
             with self.assertRaises(ValueError): relocate(self.data,reloc,0x80200000,self.imports)
+
+    def test_floating_load_relocation_requires_aligned_read_only_word(self):
+        data = bytearray(self.data);struct.pack_into('>I',data,12,0xC5000020)
+        for base in (0x80200000,0x802F7FF0,0x802F8010):
+            out = relocate(bytes(data),self.reloc,base,self.imports)
+            high,low = struct.unpack_from('>2I',out,8)
+            self.assertEqual((high&65535)*65536+(low&65535)-(65536 if low&32768 else 0),base+32)
+            self.assertEqual(low>>26,49)
+        for target in (0,16,31,33,46,48):
+            struct.pack_into('>I',data,12,0xC5000000|target)
+            with self.assertRaises(ValueError): relocate(bytes(data),self.reloc,0x80200000,self.imports)
         for at,value in ((0,16),(4,16),(8,32),(12,16),(16,999),(len(self.reloc)-4,0)):
             reloc = bytearray(self.reloc);struct.pack_into('>I',reloc,at,value)
             with self.assertRaises(ValueError): relocate(self.data,reloc,0x80200000,self.imports)

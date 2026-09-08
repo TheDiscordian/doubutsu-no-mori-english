@@ -20,6 +20,7 @@ def configuration(data,reloc,report,module):
     if len(reloc) < 32 or len(reloc)&15:
         raise ValueError('NPC creator relocation blob must be DMA aligned')
     entry = 'af_system_mail_create' if report.get('mother_letters') else 'af_npc_mail_create'
+    if report.get('departed_letters'): entry = 'af_departed_mail_create'
     return [VROM,len(data)+len(reloc),len(data),len(reloc),report['symbols'][entry],
             struct.unpack_from('>I',reloc)[0],zlib.crc32(data+reloc),ABI]
 

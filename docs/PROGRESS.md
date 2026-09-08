@@ -13,6 +13,21 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [departed-villager integration](../specs/DEPARTED_VILLAGER_LETTERS.md)
+installs all eighteen complete English letters with full villager names and
+remembered town identity. All 36 native comparisons preserve original metadata,
+temporary fields, and RNG; all eighteen delivered letters reconstruct completely.
+Six rejections and a resource-recovery retry pass, with 177 calls and 474 memory
+assertions. Live save/globals and the checkpoint are restored; isolated saves
+remain blank. Thirteen creator tests, the sanitizer run, six installer tests,
+independent builds, and independent assembly pass. No resident or saved-layout
+growth is added. All 965 regression tests pass. Failed delivery retains the
+remembered villager, but exact selected template/paper retry is not made durable.
+Normal scheduling, queue
+draining, saving/reloading, and hardware remain acceptance work. The
+[checkpoint](checkpoints/DEPARTED_VILLAGER_LETTERS.md) pins artifacts and test
+scope. Birthday/Christmas creators and remaining general/item text follow.
+
 The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
 supported letters through native home-mailbox delivery. Ten host creator tests,
 the sanitizer run, five installer tests, independent builds, and independent

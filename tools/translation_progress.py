@@ -211,6 +211,11 @@ def measure(native, built, report):
             verify_installation(built, native, module, report['mother_letters'])
             credit_mail(0x03000000, {k: COMPLETE for k in ('super', 'mail', 'ps')}, 'mother_letters')
 
+        if report.get('departed_letters'):
+            from departed_letters import TEMPLATES, verify_installation
+            verify_installation(built, native, module, report['departed_letters'])
+            credit_mail(0x03000000, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'departed_letters')
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard

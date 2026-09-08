@@ -23,11 +23,21 @@ calls and 730 memory assertions. Host, sanitizer, installer, independent-build,
 and assembly checks pass, along with all 945 regression tests. One body still needs a semicolon glyph. Native
 scheduling and normal save/reload remain acceptance work. Continue other letter
 creators and remaining general/item text; keep the full project scope below.
-The next [departed-villager group](../specs/DEPARTED_VILLAGER_LETTERS.md) has
-eighteen complete reference letters and four identified name/town fields. Its
-native caller currently clears remembered-villager state regardless of receipt
-success; guard that clear while connecting complete creation. This group is not
-yet installed or credited as a new translation route.
+The [departed-villager group](../specs/DEPARTED_VILLAGER_LETTERS.md) installs
+all eighteen complete English letters with full villager names and remembered
+towns. Native selection/metadata/RNG comparisons and all delivered readbacks pass,
+including failed-receipt retention and a resource-recovery retry. Thirteen host
+creator tests, sanitizers, six installer tests, independent builds, and independent
+assembly pass, along with all 965 regression tests. Native scheduling, queue
+draining, and save/reload still require acceptance. Continue birthday/Christmas
+creators and remaining general/item text;
+do not treat direct calls as normal gameplay or original-hardware evidence.
+The [next shared villager-event batch](../specs/VILLAGER_EVENT_LETTERS.md)
+binds all 165 friendship-gift, birthday, goodbye, and Christmas parts. It has
+54 complete reference letters and one birthday body requiring the semicolon.
+Its shared native creator and publication boundaries are identified, but the
+new route is not installed. Preserve native gift choices, full selected item
+names, and real caller failure propagation while implementing this batch.
 
 The [renewal publication actor](../specs/RENEWAL_LETTERS.md) installs complete
 renovation notices with native mailbox ownership and retained failure. Nine

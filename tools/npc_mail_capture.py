@@ -34,13 +34,16 @@ def call_patches(code,module):
     return output
 
 
-def source_hashes(*,mother_letters=False):
+def source_hashes(*,mother_letters=False,departed_letters=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
     names += ['runtime/mail/'+name for name in ('npc_generation.h','npc_loader.h','catalog.h','format.h','record.h')]
     if mother_letters:
         names += ['overlays/mail_generation/'+name for name in ('mother_creator.c','mother_creator.h','system_capture.ld')]
+    if departed_letters:
+        if not mother_letters: raise ValueError('Departed creator requires the Mom dispatcher')
+        names += ['overlays/mail_generation/'+name for name in ('departed_creator.c','departed_creator.h','departed_capture.ld')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -52,9 +55,11 @@ def verified_resources(words,aliases):
 def validate(data,reloc,report,module):
     mother = report.get('mother_letters') is True
     if 'mother_letters' in report and not mother: raise ValueError('Unknown system creator variant')
+    departed = report.get('departed_letters') is True
+    if 'departed_letters' in report and not departed: raise ValueError('Unknown departed creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in IMPORTS}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -68,6 +73,7 @@ def validate(data,reloc,report,module):
                 'af_npc_mail_source_alias','af_npc_mail_capture_event','af_npc_mail_create',
                 'af_npc_word_data','af_npc_alias_data'}
     if mother: required.add('af_system_mail_create')
+    if departed: required.add('af_departed_mail_create')
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data')):
@@ -107,10 +113,13 @@ def relocate(data,reloc,base,imports):
             continue
         elif kind == 6:
             register = (word>>21)&31
-            if word>>26 != 9 or register not in high: raise ValueError('Invalid NPC capture low relocation')
+            opcode = word>>26
+            if opcode not in (9,49) or register not in high: raise ValueError('Invalid NPC capture low relocation')
             hi_at,hi_word = high.pop(register)
             target = ((hi_word&65535)<<16)+(word&65535)-(65536 if word&32768 else 0)
             if not RAM <= target < RAM+len(data): raise ValueError('NPC capture data pointer escapes image')
+            if opcode == 49 and (target&3 or not RAM+text <= target <= RAM+len(data)-4):
+                raise ValueError('NPC capture floating constant is outside aligned read-only data')
             target += base-RAM
             struct.pack_into('>I',out,hi_at,(hi_word&0xFFFF0000)|(((target+32768)>>16)&65535))
             word = (word&0xFFFF0000)|(target&65535)
