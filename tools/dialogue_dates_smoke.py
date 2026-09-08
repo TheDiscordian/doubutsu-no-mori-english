@@ -10,7 +10,9 @@ from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK, GUARD_ADDRESS, G
 from textcodec import tokenize
 
 EDGE = b'EDGE'*4
-WINDOW, RTC_YEAR = 0x80142410, 0x80136FC2
+WINDOW, RTC_YEAR, RTC_START = 0x80142410, 0x80136FC2, 0x80136FB8
+QUIZ_DATES = ((2000, 2, 5), (2001, 5, 23), (2004, 2, 29),
+              (2026, 9, 8), (2030, 8, 15), (2032, 12, 31))
 
 
 def ordinal(day):
@@ -46,15 +48,18 @@ def exercise(debug, request, record):
     for address, value in request['guards'].items():
         check('unchanged original consumer/converter', int(address, 16), bytes.fromhex(value))
     check('complete resident leap-month literal', int(module['symbols']['af_leap_month'], 16), b'leap month')
-    saved, rtc = read(SAVE_RAM, SAVE_BYTES), read(RTC_YEAR, 2)
-    size = 16+SPEC.resident_bytes+len(reloc)+16+0x460+16
+    saved, rtc = read(SAVE_RAM, SAVE_BYTES), read(RTC_START, 16)
+    original_orders_pointer = read(0x80104A70, 4)
+    size = 16+SPEC.resident_bytes+len(reloc)+16+0x900+16
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM+RESERVATION <= allocation <= 0x80400000-size:
         raise ValueError('Dialogue date fixture allocation failed')
     base = allocation+16
     data = base+SPEC.resident_bytes+len(reloc)+16
     cursor, date_source, date_result = data+0x420, data+0x430, data+0x440
+    manager, orders = data+0x470, data+0x690
     guard_addresses = (allocation, data-16, data+0x410, allocation+size-16,
+                       manager-16, manager+0x200, orders-16, orders+216,
                        TEST_STACK-0x800, TEST_STACK+0x30)
     for address in guard_addresses:
         write(address, EDGE)
@@ -117,6 +122,8 @@ def exercise(debug, request, record):
     write(WINDOW+12, struct.pack('>I', data))
     message_loads, insertions = 0, 0
     for number, raw in request['messages'].items():
+        if number == '246D':
+            continue
         entry = bytes.fromhex(raw)
         for year in ((2001, 2026) if number in ('11AC', '180B') else (2026,)):
             write(RTC_YEAR, struct.pack('>H', year))
@@ -137,9 +144,83 @@ def exercise(debug, request, record):
                     check('retained insertion cursor', cursor, struct.pack('>I', token.offset))
                     insertions += 1
             message_loads += 1
-    write(RTC_YEAR, rtc)
+    # The quiz's 0C request writes quest row nine, slot seven. The real demo
+    # dispatcher reads manager +1AC/+1AE, not the reminder routine's field slots.
+    quiz = bytes.fromhex(request['messages']['246D'])
+    if quiz[:5] != bytes.fromhex('7F0C070001'):
+        raise ValueError('Old-calendar quiz must retain its complete native request')
+    write(0x80104A70, struct.pack('>I', orders))
+    quiz_cases = 0
+    for year, month, day in QUIZ_DATES:
+        current_rtc = bytearray(rtc)
+        current_rtc[7], current_rtc[9] = day, month
+        struct.pack_into('>H', current_rtc, RTC_YEAR-RTC_START, year)
+        write(RTC_START, current_rtc)
+        expected_fields = bytearray(b'X'*200)
+        for converter, source_month, source_day, slot in (
+                (0x800D60E4, 8, 15, 11), (0x800D60E4, 9, 13, 13),
+                (0x800D6218, month, day, 15)):
+            source_date = struct.pack('>HBB', year, source_month, source_day)
+            write(date_source, source_date)
+            write(date_result, b'!'*4)
+            call(converter, [date_result, date_source], 1)
+            converted = struct.unpack('>HBB', read(date_result, 4))
+            if not 2000 <= converted[0] <= 2033 or not 1 <= converted[1] <= 13 or not 1 <= converted[2] <= 31:
+                raise ValueError('Calendar-order fixture received an invalid conversion')
+            output_month = b'leap month' if converted[1] == 13 else calendar.month_name[converted[1]].encode('ascii')
+            output_day = ordinal(converted[2])
+            expected_fields[slot*10:(slot+2)*10] = output_month.ljust(10, b' ')+output_day.ljust(10, b' ')
+            check('calendar-order conversion source retained', date_source, source_date)
+            if slot == 15 and (year, month, day) == (2001, 5, 23) and converted[1:] != (13, 1):
+                raise ValueError('Calendar-order fixture misses the native leap month')
+        call(0x8009E558, [data, 0x246D, 0], 1)
+        check('complete old-calendar quiz from cartridge', data, struct.pack('>4I', 1, 0x246D, len(quiz), 0)+quiz)
+        write(orders, b'X'*216)
+        write(cursor, bytes(4))
+        call(0x800A21C0, [WINDOW, cursor], 0)
+        expected_orders = bytearray(b'X'*216)
+        expected_orders[16+9*20+7*2:16+9*20+7*2+2] = b'\0\1'
+        check('complete quest request table; only calendar value changes', orders, expected_orders)
+        check('calendar request advances exactly five bytes', cursor, struct.pack('>I', 5))
+        state = bytearray(0x200)
+        struct.pack_into('>HH', state, 0x1AC, 7, 1)
+        write(manager, state)
+        write(fields_start, b'X'*200)
+        call(base+0x809215E4-SPEC.ram, [manager], proof=proof)
+        check('actual order dispatcher prepares fields eleven through sixteen', fields_start, expected_fields)
+        check('calendar dispatch retains the complete manager', manager, state)
+        check('calendar dispatch retains the complete current clock', RTC_START, current_rtc)
+        expected = quiz
+        for command, value in ((0x3B, output_month), (0x3C, output_day)):
+            tokens = [t for t in tokenize(expected, request['info']) if t.kind == 'cmd' and t.data[1] == command]
+            if len(tokens) != 1:
+                raise ValueError('Old-calendar quiz must use each exact free field once')
+            token = tokens[0]
+            write(cursor, struct.pack('>I', token.offset))
+            write(WINDOW+0x28C, bytes(4))
+            call(0x800A21C0, [WINDOW, cursor], 0)
+            expected = expected[:token.offset]+value+expected[token.offset+2:]
+            check('complete old-calendar native field insertion', data,
+                  struct.pack('>4I', 1, 0x246D, len(expected), 0)+expected)
+            check('old-calendar insertion cursor retained', cursor, struct.pack('>I', token.offset))
+            insertions += 1
+        record({'calendar_quiz_current_date': [year, month, day],
+                'month': output_month.decode(), 'day': output_day.decode(), 'passed': True})
+        quiz_cases += 1
+        message_loads += 1
+    for value in (0, 2):
+        state = bytearray(0x200)
+        struct.pack_into('>HH', state, 0x1AC, 7, value)
+        write(manager, state)
+        write(fields_start, b'X'*200)
+        call(base+0x809215E4-SPEC.ram, [manager], proof=proof)
+        check('non-one calendar order leaves all free fields unchanged', fields_start, b'X'*200)
+        check('non-one calendar order retains complete manager', manager, state)
+    write(0x80104A70, original_orders_pointer)
+    check('original actor-order pointer restored', 0x80104A70, original_orders_pointer)
+    write(RTC_START, rtc)
     check('complete saved game retained', SAVE_RAM, saved)
-    check('original clock year restored', RTC_YEAR, rtc)
+    check('complete original clock restored', RTC_START, rtc)
     check('complete overlay code retained', base, proof[1])
     for address in guard_addresses:
         check('heap and call-stack guard', address, EDGE)
@@ -147,5 +228,7 @@ def exercise(debug, request, record):
     call(0x8009C040, [allocation])
     return {'dialogue_date_preparations': prepared, 'calendar_conversions': conversions,
             'message_loads': message_loads, 'date_insertions': insertions,
+            'calendar_quiz_cases': quiz_cases, 'calendar_quiz_direct_conversions': quiz_cases*3,
+            'calendar_noop_orders': 2,
             'allocation_freed': f'{allocation:08X}', 'normal_gameplay': False,
             'requires_checkpoint_restore': True}

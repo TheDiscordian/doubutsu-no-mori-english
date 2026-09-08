@@ -1,5 +1,21 @@
 [
   {
+    "id": "message:246D",
+    "source_sha256": "e91a0e5074dbab5d64522c38f55afa5bfe9a7505d14ec1045f6390c0c47b3b0b",
+    "reference_id": "message:246D",
+    "reference_sha256": "17468b4f708835d50e8608b4cea622a2aa9a8a1711d6f6e9ed759970ed464082",
+    "native_choices": {
+      "reference_command": "7F1600250051",
+      "native_command": "7F1600CD00CE",
+      "offset": 58,
+      "adapted_sha256": "4871c7845a5f2269fc1870021876b02c432e85a5943123e8f2fbcc99cbba8ff0"
+    },
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "evidence": "Complete old-calendar quiz retains native request 7/value 1, free fields 15/16, answer order, and success/failure branches. Native 809215E4 dispatches table entry seven to 80920F20, which uses the current RTC month/day and 800D6218 through 8091EBB8 to prepare these exact fields. The complete English date-overlay patch is mandatory independently of candidate metadata. Only the canonical native menu is substituted; contextual English labels restore the complete GameCube reference with all words, newlines, pages, and pauses. See DIALOGUE_DATES.md."
+  },
+  {
     "id": "message:2773",
     "reference_id": "message:2773",
     "source_sha256": "29aac53aa63f76a3b12ea183c86603b6ee388402473efaaca440823969d6d9a3",

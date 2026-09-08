@@ -25,7 +25,9 @@ def scenario(rom, native, module, edits):
     code = files[CODE_VROM].extract(rom)
     guards = {}
     for start, end in ((0x8009D6D0, 0x8009D7E8), (0x800A134C, 0x800A1390),
-                       (0x800A1690, 0x800A16E0), (0x800D5D00, 0x800D64E0)):
+                       (0x800A1668, 0x800A16E0), (0x800D5D00, 0x800D64E0),
+                       (0x8007B44C, 0x8007B49C), (0x8009DF1C, 0x8009DFBC),
+                       (0x800A08F8, 0x800A0A04), (0x80107CD8, 0x80107CEC)):
         value = original[start-CODE_RAM:end-CODE_RAM]
         if code[start-CODE_RAM:end-CODE_RAM] != value:
             raise ValueError('Native calendar or free-string consumer changed')
@@ -38,9 +40,9 @@ def scenario(rom, native, module, edits):
     by_id = {r['id']: r for r in edits}
     info = module_command_info(native)
     messages = {}
-    for number in (0x119C, 0x27C0, 0x11AC, 0x180B):
+    for number in (0x119C, 0x27C0, 0x11AC, 0x180B, 0x246D):
         if entries[number] != encode(by_id[f'message:{number:04X}']['translation'], info):
-            raise ValueError('Native festival cartridge text differs from the candidate')
+            raise ValueError('Native calendar cartridge text differs from the candidate')
         messages[f'{number:04X}'] = entries[number].hex()
     request = {'source': data.hex(), 'relocation': reloc.hex(), 'module': module,
                'loader': loader.hex(), 'guards': guards, 'messages': messages, 'info': info}

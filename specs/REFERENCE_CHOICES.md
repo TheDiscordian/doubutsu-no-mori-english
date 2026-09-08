@@ -22,7 +22,7 @@ The host parser recognises reference-only `74` without adding it to the native
 command table. The ordinary adapter still removes it only directly before an
 already supported native string insertion. Other occurrences remain rejected.
 
-Nineteen [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
+Twenty reference [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
 separate final menu-only mapping after this complete native-ID validation.
 They retain every answer index and branch, require all destination English
 labels, and reverse to this exact canonical payload for independent builder
@@ -84,9 +84,14 @@ See [complete content and verification scope](GYROID_CHARM_DIALOGUE.md).
 
 ## Validation
 
+The complete old-calendar quiz `246D` also uses this contract and the separate
+contextual menu. Its reviewed identity requires the full English ordinary-date
+patch independently of removable candidate metadata. See
+[actual request and free fields](DIALOGUE_DATES.md#actual-old-calendar-quiz-request).
+
 Portable tests cover exact replacement, changed sources/references, missing or
 duplicate menus, wrong offsets, changed action counts, unrelated controls, and
-the independent final-payload guard. Retail-input tests check all 164 approvals,
+the independent final-payload guard. Retail-input tests check all 165 approvals,
 their unchanged native choice commands, complete capacity validation, and the
 source-bound original labels. The [broader native-menu batch](NATIVE_MENUS.md)
 supplies 135 approvals beyond the shop and police-station explanations, with

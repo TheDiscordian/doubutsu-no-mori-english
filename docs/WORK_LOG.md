@@ -5560,3 +5560,98 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Ordinary topic/answer actions, rewards, shout rendering, calendar selection,
   saves, final wording, artwork, hardware, and patch-only release remain. The
   title screen is the first image priority; no title replacement is installed.
+
+## 2026-09-08 — Complete old-calendar quiz and required English date preparation
+
+- Audited actual native quiz `246D`, its `0C 07 0001` request, the complete
+  ordinary overlay, dispatcher `809215E4`, and table `80921D88`. Entry seven
+  selects `80920F20`. Manager type/value are 16-bit fields `1AC/1AE`. Value one
+  converts the two moon-viewing dates into free fields 11/12 and 13/14, then
+  current RTC month/day into 15/16 through `800D6218` and `8091EBB8`. The current
+  day/month/year addresses are `80136FBF/80136FC1/80136FC2`; `3B/3C` insert free
+  fields 15/16. This is distinct from the earlier reminder caller's fields and
+  from birthday item slots. Exact instruction/body/table hashes and source words
+  are recorded in the date spec and tests.
+- Added complete English reference `246D`, canonical native-menu approval, and
+  contextual `0025/0051` answers. All native requests and answer branches remain:
+  affirmative reaches `2472`, negative reaches `2476`. The displayed payload
+  equals the complete supplied GameCube reference, including every word, manual
+  newline, page, pause, field, and ending. It is 81 stored/157 conservatively
+  expanded bytes. The generic free-field warning remains; a separate 403-case
+  complete-layout audit covers every month, leap month, and ordinal day. Every
+  complete layout fits; the widest actual date line is 88 pixels, leap month 10th.
+  No text is shortened and no font, runtime code, or saved structure changes.
+- Added reviewed-reference support for the existing `ordinary_dialogue_dates`
+  requirement. The generator withholds the reference when the complete English
+  date patch is unavailable and carries its requirement when enabled. The builder
+  consults the identity approval independently of candidate metadata; omitting
+  the list or supplying an empty list cannot remove the dependency. Both complete
+  overlay/relocation files and the resident module/literal remain mandatory.
+  Unknown, duplicate, malformed, empty explicit reference requirements, and
+  non-message reference requirements fail. Original-draft behaviour remains.
+- Expanded the owned-heap native fixture to execute the actual quiz request and
+  relocated demo dispatcher. It checks the complete quest request table, manager,
+  twenty free fields, current clock, message, and actual `3B/3C` insertions. Six
+  current dates cover 2000-02-05, 2001-05-23's native leap-month start,
+  2004-02-29, 2026-09-08, 2030-08-15, and 2032-12-31. Independent native
+  conversions supply expected values; values zero and two leave all fields
+  unchanged. The fixture restores the actor-order pointer and complete RTC block,
+  retains saved game and code, guards its allocation and stack, and frees the
+  allocation before one checkpoint restore. It does not simulate ordinary quest
+  polling or claim quiz rewards.
+- Added `calendar_quiz_test_scenario.py` to combine all date and contextual-answer
+  checks in one checkpoint. Thirteen focused date/dependency tests pass in
+  0.645 seconds (`build/tests-calendar-quiz-dates-01.log`), all 96 reference tests
+  pass in 17.768 seconds, and the complete 700-test suite passes in 226.242 seconds
+  (`build/tests-calendar-quiz-full-01.log`). The full suite includes current native
+  topics, contextual choices, date dependencies, and unchanged portable/runtime C.
+- `build/calendar-quiz-candidates/` adds exactly one ordinary edit to 12,529;
+  every earlier candidate remains unchanged. Basic output remains exactly the
+  same 11,816 edits and records the quiz's missing-date requirement. Full main
+  coverage is 10,736: 9,763 references, 584 original dialogue drafts, one original
+  continuation, 289 development labels, and 99 diagnostics. All 460 choice texts
+  remain. The 1,016 gaps comprise 94 Japanese-static, 919 nonstatic, one Latin,
+  and two symbol records; ten nonstatic records have dynamic insertions and none
+  is deemed unreachable. Main rejections are 926 unconfirmed, 65 control
+  differences, 24 missing-field records, and two overflows, with one original
+  fallback. Reference/label warnings total 1,473, plus the two separately recorded
+  original shout warnings. Source weight is 638,100/746,978 characters. The full
+  native-menu registry contains 165 approvals; contextual mappings total 22,
+  with twenty complete references and two originals. Basic generation retains
+  three, withholding eighteen for complete labels and one for date preparation.
+- `build/calendar-quiz-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `ed738e2e59c0f93b25faebcd568f79cef0acf07da74fe09c1311a3640a73a8c6`.
+  UPS SHA-256:
+  `6cad8e919472aa15bc8b7033bd9dc1326bd8f187e21e0119f257dc644546df23`.
+  Candidate SHA-256:
+  `cbf8b3aa7ba0e34653cc2e2dcae235ede423ce33864d4a4d61f02671acc12184`.
+  `build/calendar-quiz-artifact-audit.log` verifies every installed payload,
+  complete source/build/patch hashes, UPS reconstruction, exact prior-candidate
+  and basic retention, and the full displayed reference. Only `00019D40`,
+  `02000000`, and `00CF9000` differ from the topic pilot; the DMA container remains
+  unchanged outside its table. All runtime/font/name/item/mail resources remain.
+- `build/smoke-calendar-quiz-01/` passes 2,039 recorded steps: 496 calls,
+  294 explicit expected-return checks, and 822 memory assertions. There are
+  78 actual cartridge message loads. The date group covers 53 preparations,
+  thirteen earlier conversions, eighteen direct quiz conversions, six actual
+  quiz requests/dispatches, two no-op orders, twelve date-message loads, and
+  twenty date insertions. The contextual group covers 43 messages, all 48 answer
+  selections/insertions, and 44 actual contextual branches; shape random outcomes
+  are not executed. The single checkpoint restore, complete clock/saved-game
+  retention, allocation freeing, guards, restored stacks, and silent graceful
+  shutdown pass. Four MiB, no seeds, both save-write flags disabled; FlashRAM/Pak
+  retain the same blank hashes as the topic run.
+- `build/calendar-quiz-native-audit-02.log` independently checks all explicit
+  scenario call arguments, declared return values, complete memory assertions,
+  saved hashes, and regenerated fixture identity. The first audit compared Python
+  tuples with decoded JSON lists and failed only its final fixture comparison;
+  normalising through JSON fixes that audit without changing the run or code.
+  Scenario SHA-256:
+  `6bde62a8b49c36b42f2fbafcfad83b9f9d9f98f8d35be1b6f2d98a713d3dc54d`.
+  Layout evidence is `build/calendar-quiz-layout-audit.log`. No emulator rerun was
+  needed. Normal conversations, request polling, calendar selection, actual
+  rewards, out-of-table dates, rendering, saves, hardware, and final review remain.
+- Updated the current progress, queue, date, menu, and dependency contracts.
+  Birthday `088B/2586` and letter reaction `1C6F` remain among the next native
+  content tasks. The title screen remains the first image priority after the main
+  port, with no installed replacement. The complete project goal remains active.

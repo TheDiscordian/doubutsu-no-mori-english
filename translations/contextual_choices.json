@@ -1,5 +1,27 @@
 [
   {
+    "id": "message:246D",
+    "source_sha256": "e91a0e5074dbab5d64522c38f55afa5bfe9a7505d14ec1045f6390c0c47b3b0b",
+    "candidate_sha256": "4871c7845a5f2269fc1870021876b02c432e85a5943123e8f2fbcc99cbba8ff0",
+    "display_sha256": "17468b4f708835d50e8608b4cea622a2aa9a8a1711d6f6e9ed759970ed464082",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 58,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "The old-calendar statement uses the actual native converted current date. That's right! remains index zero and success 2472; Nope! remains index one and failure 2476. Complete native date preparation and English label dependencies are mandatory. Only the exact menu span changes after canonical validation; the full displayed payload equals the complete supplied English reference. See DIALOGUE_DATES.md and CONTEXTUAL_CHOICES.md."
+  },
+  {
     "id": "message:0B69",
     "source_kind": "native_original",
     "source_sha256": "255c3426599f09b2e9b30314fdc2ee00d50cc8e0e3f3e1648385e484d538fa88",

@@ -98,8 +98,20 @@ def requires_dialogue_dates(edit):
     return bool(requirements)
 
 
-def verify_requirements(edits, rom, replacements, additions, module):
+def validate_reference_requirements(record):
+    if 'runtime_requirements' in record:
+        if not requires_dialogue_dates(record) or not record['id'].startswith('message:'):
+            raise ValueError('Reference runtime requirements must name the reviewed dialogue-date dependency')
+
+
+def verify_requirements(edits, rom, replacements, additions, module, *, matches=None):
     requested = [requires_dialogue_dates(edit) for edit in edits]
+    # The reviewed identity remains authoritative even if candidate metadata is
+    # omitted. Supplying a shorter requirements list cannot remove a dependency.
+    for edit in edits:
+        record = (matches or {}).get(edit.get('id'), {})
+        validate_reference_requirements(record)
+        requested.append(requires_dialogue_dates(record))
     if any(requested):
         expected = {}
         install(rom, expected, additions or {}, module)

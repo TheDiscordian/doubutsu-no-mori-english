@@ -6,8 +6,8 @@ The 135 native-menu approvals in `translations/reference_matches.json` retain
 complete GameCube English text while substituting each original N64 choice
 command in the canonical payload. The explicit batch IDs are checked in
 `tests/test_native_menus.py`. Together with the 22 shop, two police-station,
-and five additional contextual-menu approvals, 164 records use the
-[native-choice contract](REFERENCE_CHOICES.md). Nineteen reference display menus
+five additional contextual-menu approvals, and the complete old-calendar quiz,
+165 records use the [native-choice contract](REFERENCE_CHOICES.md). Twenty reference display menus
 and two original quiz drafts have separate
 [contextual-label approvals](CONTEXTUAL_CHOICES.md), including
 fourteen reference quiz questions in this batch.
@@ -96,7 +96,7 @@ must agree with native schedules and linked event replies.
 
 Do not globally rename `00CD/00CE` to True/False. The same Circle/X labels occur
 in 35 menus across 33 records, including both quizzes and shape-guessing games.
-The shared labels preserve the shape games. Sixteen approved quiz questions
+The shared labels preserve the shape games. Seventeen approved quiz questions
 have separate complete English answer mappings, with selected-text and native
 branch verification. Explicit contexts for `00B7` (none versus pear) and `0010`
 (agreement versus refusal) also have per-message mappings; their shared labels
@@ -105,15 +105,19 @@ remain unchanged. Further contexts require individual review and approval.
 ## Withheld menu comparisons
 
 The reviewed comparison pool contains 154 same-ID/legacy-agreeing references
-that pass mechanical checks after native menu substitution. Of these, 140 have
-complete donor approvals, including five requiring contextual English labels.
+that pass mechanical checks after native menu substitution. Of these, 141 have
+complete donor approvals, including six requiring contextual English labels.
 Eleven receive complete original drafts: five above and six
-[native-topic questions](NATIVE_TOPIC_GAPS.md). Three still need the following work:
+[native-topic questions](NATIVE_TOPIC_GAPS.md). Two still need the following work:
 
 | Records | Remaining requirement |
 | --- | --- |
 | `088B`, `2586` | Audit birthday month/day, zodiac item-field preparation, and acknowledgement labels. |
-| `246D` | Audit the actual preparation of old-calendar free fields `3B/3C`. |
+
+The complete `246D` reference requires its verified
+[native old-calendar request](DIALOGUE_DATES.md#actual-old-calendar-quiz-request)
+and English date preparation. Its full contextual labels retain both branches;
+normal request polling, rewards, and rendered calendar text remain gameplay checks.
 
 The original questions retain the native Pon Curry claim, row-six wording,
 this-season statement, positive item-attachment question, and both meal-greeting

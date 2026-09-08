@@ -262,6 +262,8 @@ def main():
                     visited_matches.add(id)
                 if reason is None:
                     try:
+                        if requires_dialogue_dates(matches.get(id, {})) and not args.english_dialogue_dates:
+                            raise ValueError('runtime_requirement_unavailable')
                         reference_text, actor_edits = adapt_actor_request_reference(reference, original, matches.get(id), info)
                         reference_text, choice_edits = adapt_choice_reference(
                             {**reference, "text": reference_text}, original, matches.get(id), info)
@@ -328,6 +330,8 @@ def main():
                                        "reference_id": reference["id"], "reference_sha256": reference["sha256"],
                                        "match_basis": match_basis},
                         "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
+                if requires_dialogue_dates(matches.get(id, {})):
+                    edit['runtime_requirements'] = list(matches[id]['runtime_requirements'])
             record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,

@@ -55,11 +55,11 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     if english_runtime:
         verify_english_runtime(rom, replacements, layout)
     edits = json.loads(path.read_text()) if path else []
-    verify_requirements(edits, rom, replacements, module_additions, module_report)
     source_banks = banks(rom)
     item_matches = load_item_matches()
     item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
+    verify_requirements(edits, rom, replacements, module_additions, module_report, matches=matches)
     contextual = load_contextual_choices(matches)
     edits_by_id = {edit['id']: edit for edit in edits}
     source_labels = next(b for b in source_banks if b.name == 'select').entries()

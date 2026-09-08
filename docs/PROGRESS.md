@@ -147,14 +147,13 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 675 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 700 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
-  The suite includes all fifteen item-identity/scenario-composition checks and
-  five cartridge-clock/town-data error checks, and eleven native-mood reference checks.
-  The current phrase-anchor extension additionally passes all 96 reference-group
-  tests, including thirteen mood checks, and seven text-coverage tests. Unchanged
-  runtime/C tests retain their full-suite checkpoint rather than being rerun for
-  this text-import-only change.
+  The complete run includes the item/name checks, startup errors, thirteen
+  native-mood checks, nine native-topic checks, twelve contextual-choice checks,
+  and thirteen date/dependency checks. All 96 reference-group tests also pass
+  independently. The calendar-quiz checkpoint reruns the full runtime/C suite;
+  it adds no production runtime or font change.
   The renovation sequence also passes eight numeric/source/draft checks, all 96
   reference checks, eleven placeholder checks, and seven coverage checks.
   Retail tests require
@@ -470,20 +469,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/topic-gaps-pilot/`
-contains 12,528 edits, including
-9,762 reference main-bank candidates, all 460 choices, 584 original dialogue
+The current experimental resident-module pilot in `build/calendar-quiz-pilot/`
+contains 12,529 edits, including
+9,763 reference main-bank candidates, all 460 choices, 584 original dialogue
 drafts, one original-dialogue continuation, 289 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,017
+still require review. The original main-bank audit leaves 1,016
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,472 conservative layout-warning records include full default
+listed below. The 1,473 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/topic-gaps-ready-candidates/` and `build/topic-gaps-coverage/`. Two
+`build/calendar-quiz-candidates/` and `build/calendar-quiz-coverage/`. Two
 original meal-greeting drafts separately retain explicit-formatting warnings.
 The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
@@ -850,7 +849,7 @@ this main-bank work does not approve stored-mail generation or delivery.
 
 The [native-menu batch](../specs/NATIVE_MENUS.md) adds 135 complete GameCube
 references and five native-specific questions, and corrects five connected
-replies and eight shared labels. All 164 native-choice approvals bind exact
+replies and eight shared labels. All 165 native-choice approvals bind exact
 source/reference/menu/output hashes. English reference wording, manual lines,
 pages, emphasis, and pauses remain; original N64 selection order and gameplay
 branches are retained. Ten native dialogue drafts preserve every original
@@ -871,35 +870,37 @@ and all eighteen original edits, withholding `0A0A` without cancellation support
 its candidate file does not establish that longer labels fit a retail buffer.
 Nineteen new reference warning-bearing records and two original formatting
 warnings remain for polish. Shared Circle/X labels stay available for shape
-games; the contextual-label implementation supplies English answers for sixteen
-approved quiz questions without changing their answer order. Three menu
+games; the contextual-label implementation supplies English answers for seventeen
+approved quiz questions without changing their answer order. Two menu
 comparisons, further label contexts, live fields, ordinary answer actions,
 final wording/layout, saving, and hardware remain.
 
 The [contextual-choice implementation](../specs/CONTEXTUAL_CHOICES.md) gives
-twenty-one questions complete English answer labels without changing their answer
-indices or actions. Sixteen quiz questions no longer display ambiguous shape
+twenty-two questions complete English answer labels without changing their answer
+indices or actions. Seventeen quiz questions no longer display ambiguous shape
 labels; actual shape games retain Circle/X. Five additional complete reference
 questions and four native-specific connected replies fill nine missing messages.
 All surrounding reference wording, lines, pages, emphasis, and pauses remain.
 Every original draft command stays exact, including the native two-way trade
 continuation and the moving conversation's final ending.
-Nineteen mappings require a complete reviewed reference parent; two native-original
+Twenty mappings require a complete reviewed reference parent; two native-original
 quiz mappings independently retain every canonical native command and argument.
-All twelve contextual tests pass within 131 focused checks across five groups;
-the runtime retains its 675-test full-suite checkpoint. The combined native batch
-includes forty-two contextual message checks, 46 selected-label/insertion cases,
-and all 42 corresponding conditional branch cases, plus complete topic and mood
-checks: 423 calls and 763 assertions over 1,754 steps, with restored checkpoint
+All twelve contextual tests pass within the 700-test full suite. The combined
+calendar/choice native batch includes forty-three contextual message checks,
+48 selected-label/insertion cases, and all 44 corresponding conditional branch
+cases, plus actual calendar request/preparation/insertion checks:
+496 calls and 822 assertions over 2,039 steps, with restored checkpoint
 and blank FlashRAM/Pak files. Ordinary
 trades, moving, quiz actions, rendering, and gameplay remain separate checks.
-All 12,528 ordinary edits match the current built ROM. Against the renovation
+All 12,529 ordinary edits match the current built ROM. Against the native-topic
 pilot, only main text, its pointers, and the DMA directory change; all
 referenced labels, fonts, code, runtime resources, and saved layouts remain
 unchanged. The UPS round trip passes. Basic generation withholds eighteen
 otherwise eligible contextual messages because complete required English labels
 are absent; it does not shorten labels or silently restore misleading answers.
-Three menu comparisons and further native dialogue, fields, and caller review
+It separately withholds the old-calendar reference when its required English
+date patch is unavailable, leaving three complete contextual mappings.
+Two menu comparisons and further native dialogue, fields, and caller review
 remain active.
 
 The [native return greetings](../specs/RETURN_GREETINGS.md) fill 35 missing
@@ -1042,7 +1043,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,528 edits; basic generation has 11,816, including both startup-error drafts,
+12,529 edits; basic generation has 11,816, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1051,13 +1052,13 @@ resource contains 2,713 slots from 771 references. Four rotations are one name,
 not four distinct translations. The 126 new names longer than ten bytes remain
 complete in the wide resource, not shortened for unexpanded callers.
 
-All 12,528 actual installed edits, source/candidate/build hashes, the complete
+All 12,529 actual installed edits, source/candidate/build hashes, the complete
 wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
 changes only the native item-name file and the existing wide-name resource
 relative to the travel pilot; their dimensions and DMA entries remain unchanged.
 Runtime code, main text,
 fonts, save structures, and caller capacities are unchanged by the name edits.
-The 675-test suite includes all fifteen item checks. The first-300-group native loader
+The 700-test suite includes all fifteen item checks. The first-300-group native loader
 batch passes 757 calls and 749 memory assertions over 2,271 steps, including all
 461 wider-name reference identities and all 212 new ten-byte slots. Complete
 names, unaligned wide destinations, capacity/header failures, guards, and restored
@@ -1080,7 +1081,7 @@ and placed form. All three checkpoints restore with intact guards and blank
 isolated saves. The final refinement changes only one original-width name and
 two wider fields; every other tested byte remains unchanged. All 2,713 wider
 slots resolve to their complete selected English name after the native conversion.
-The full 675-test checkpoint and all 12,528 installed ordinary payloads pass. Gyroids,
+The full 700-test checkpoint and all 12,529 installed ordinary payloads pass. Gyroids,
 changed species/designs, game slots, remaining identities, and all unexpanded
 destinations stay in the completion queue.
 
@@ -1094,7 +1095,7 @@ original request and normal ending, without adding erasure or card-slot choices.
 Every native command remains except the exact highlighted booklet-name length.
 Both complete drafts fit at 361 and 178 expanded bytes with no layout warnings.
 
-All five focused checks and the 675-test full suite pass. One silent four-MiB
+All five focused checks and the 700-test full suite pass. One silent four-MiB
 native batch passes the two drafts and three connected messages: five complete
 loads, seventeen memory assertions, guards, and restored state. The final ROM
 retains every earlier edit, all name resources, code, fonts, and saved structures.
@@ -1114,11 +1115,11 @@ only the final newline/normal ending. Unanchored page-start rules remain strict.
 No gameplay code, saved structure, font, or buffer capacity changes.
 
 All thirteen mood tests pass within the 96-test reference batch; seven coverage
-checks also pass. The preceding full-suite checkpoint passes 675 tests. The silent
+checks also pass. The preceding full-suite checkpoint passes 700 tests. The silent
 four-MiB combined batch includes twenty-five complete mood-message loads and 50
 actual mood/timer order dispatches. The complete topic/context/mood batch passes
 423 calls, 763 memory assertions, guards, and restored state. All
-12,528 installed edits and the UPS reconstruction pass. The mood import preserves
+12,529 installed edits and the UPS reconstruction pass. The mood import preserves
 resources outside the main text/table; the separate item-name
 checks above cover the current name changes. Normal resident
 mood progression, rendered conversation, final wording, saving, and original
@@ -1163,7 +1164,7 @@ answers; shared shape labels remain unchanged. The snow-reference approval adds
 one further missing record. Only existing candidate `25FD` changes wording.
 
 Nine focused topic tests, twelve contextual tests, 96 reference tests, seven
-native-menu tests, and seven coverage tests pass. All 12,528 actual ROM payloads
+native-menu tests, and seven coverage tests pass. All 12,529 actual ROM payloads
 and the UPS reconstruction pass. One isolated four-MiB checkpoint combines
 107 actual cartridge message loads, 46 selected-label/insertion cases, 42 contextual
 branch cases, and all 25 mood messages/50 orders: 423 native calls, 309 explicit
@@ -1173,9 +1174,41 @@ checked. Guards, restoration, silent shutdown, and blank isolated saves pass.
 Normal conversation selection/actions, shout rendering, actual rewards,
 poster/map artwork, calendar selection, final wording, and hardware remain.
 
+## Complete old-calendar quiz and required date fields
+
+The [old-calendar quiz](../specs/DIALOGUE_DATES.md#actual-old-calendar-quiz-request)
+retains the complete supplied English `246D`, including every manual line and
+pause. Its original calendar request prepares current-date free fields 15/16
+through the real native calendar conversion. The existing guarded English date
+patch supplies full month names, ordinal days, and leap month. Both complete
+patched files are required by the reviewed identity, even if candidate metadata
+is removed. Complete contextual answers retain affirmative success at `2472`
+and negative failure at `2476`. No runtime code, font, saved format, or earlier
+candidate changes.
+
+All 700 regression tests pass. Thirteen focused date/dependency tests and the
+96-test reference group also pass independently. The full quiz is 81 stored/157
+conservatively expanded bytes. All 403 complete month/day combinations fit;
+the widest date line is 88 pixels. The generic two-free-field warning remains
+recorded without shortening text. All 12,529 installed payloads, earlier-candidate
+retention, complete UPS reconstruction, and unchanged basic candidates pass.
+Normal request polling, conversation selection, actual rewards, rendering,
+out-of-table dates, saving, and original hardware remain separate requirements.
+
+The silent four-MiB combined native run passes 496 calls, 294 explicit expected
+returns, and 822 memory assertions over 2,039 recorded steps. Six real quiz
+request/dispatcher cases prepare and insert complete dates; two non-one orders
+leave all fields untouched. It also checks 53 date preparations, thirteen
+earlier calendar conversions, eighteen direct quiz-reference conversions,
+twelve date-message loads, and twenty date insertions. All 48 contextual/shape
+answer selections and 44 actual contextual branches pass. Complete saved game,
+clock, manager, code, heap/stack/module guards, freed allocation, single restored
+checkpoint, and unchanged blank isolated FlashRAM/Pak pass. These are injected
+native handlers, not normal gameplay or hardware acceptance.
+
 ## Text-volume measurement
 
-The generated coverage report measures 638,075 covered source characters out of
+The generated coverage report measures 638,100 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1195,8 +1228,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,528 edits, including
-9,762 reference main-bank candidates, 289 original development-label drafts,
+The resident-module experiment contains 12,529 edits, including
+9,763 reference main-bank candidates, 289 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1216,9 +1249,9 @@ two native renovation drafts, and ten native-topic drafts including the
 connected `25FD` correction.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,018 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,017 main records without
-candidates: 95 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,017 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,016 main records without
+candidates: 94 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

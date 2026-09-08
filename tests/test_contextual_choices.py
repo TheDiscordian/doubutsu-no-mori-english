@@ -181,13 +181,13 @@ class ContextualChoiceRetailTests(unittest.TestCase):
         text,_=adapt_reference(text,source,self.info,'reference_layout',resident_runtime=True)
         return source,encode(text,self.info)
 
-    def test_all_nineteen_exact_display_labels_preserve_complete_base_and_actions(self):
-        self.assertEqual(len(self.approvals),21)
+    def test_all_twenty_reference_display_labels_preserve_complete_base_and_actions(self):
+        self.assertEqual(len(self.approvals),22)
         labels=self.reference_edits()
         self.assertEqual(len(labels),12)
         reference_approvals = {id: row for id, row in self.approvals.items()
                                if row.get('source_kind', 'gamecube') == 'gamecube'}
-        self.assertEqual(len(reference_approvals), 19)
+        self.assertEqual(len(reference_approvals), 20)
         for id,row in reference_approvals.items():
             source,base=self.reference_base(id)
             output=display_candidate(id,source,base,self.approvals,self.info)

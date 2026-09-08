@@ -39,6 +39,38 @@ Commands `3C/3D` select fields 16/17 through handlers `800A1690/800A16B8` and
 common insertion `800A134C`. They must remain the calculated event date, not the
 current date of the conversation.
 
+### Actual old-calendar quiz request
+
+Quiz `246D` begins with `0C 07 0001`. The native command writes quest row nine,
+slot seven. The ordinary demo dispatcher at `809215E4` reads the manager's
+16-bit type/value at `+1AC/+1AE`; table `80921D88` entry seven points to
+`80920F20`. Value one prepares the two moon-viewing pairs in free fields 11/12
+and 13/14, then converts the current RTC month/day through `800D6218` and
+`8091EBB8` into free fields 15/16. Other values do nothing. This is a distinct
+caller from the reminder routine's fields 16/17 and 18/19.
+
+Native current day is `80136FBF`, month `80136FC1`, and year `80136FC2`.
+Command `3B` selects free field fifteen through `800A1668`; `3C` selects field
+sixteen through `800A1690`. Neither is an item/birthday field. The quiz therefore
+requires the complete English ordinary-date patch, not an English text-only
+substitution or the globally unrelated calendar formatters.
+
+Complete source-bound ranges:
+
+- Calendar order `80920F20..80920FAC`:
+  `9bf9caeea2fb53a6fcd19f14919da05bd6ca1b85ec63d0efa93afbb56f540c9c`.
+- Dispatcher `809215E4..80921618`:
+  `2d8086d5a521c3b80975007d2a9c71d1e327b96bcc6337a7cb835306616bc344`.
+- Ten-entry table `80921D88..80921DB0`:
+  `bf46ef90ed07efe5040c9382dd3f247769c475398261e07859f5e7319049f890`.
+
+The complete supplied English quiz keeps every word, newline, pause, native
+request, field, and branch. Its canonical native menu receives the separately
+bound `0025/0051` contextual labels: affirmation reaches `2472`, denial reaches
+`2476`. The final displayed payload is the complete supplied reference, 81
+stored/157 conservatively expanded bytes. Its generic two-free-field width
+warning remains visible; the complete actual month/day values are not shortened.
+
 The month-13 branch's five-byte Japanese literal has only eight bytes before
 a live jump table at `80921BE0`. Instead of overwriting that table or shortening
 the English, the patch uses the resident ten-byte `af_leap_month` value,
@@ -65,6 +97,15 @@ requires the resident module. Without it, dependent drafts are recorded in
 `drafts-withheld.json` and excluded from output; they are not replaced with
 incompatible GameCube references. The ordinary non-module build remains usable.
 
+Reviewed references may declare the same exact requirement in their identity
+approval. The candidate generator withholds a dependent reference when the
+option is absent and records `runtime_requirement_unavailable`; enabled edits
+carry the explicit requirement. The builder consults both the edit and the
+reviewed identity independently. Omitting candidate metadata or supplying an
+empty list cannot remove the identity's dependency. Explicit reference lists
+must name this supported requirement and belong to a main-message approval.
+Both complete installed files remain mandatory; unknown or malformed lists fail.
+
 The NPC letter-show harness recognises only this exact extra patch and derives
 the corresponding relocated image. Unrelated overlay changes remain rejected.
 The actual letter-show handlers and saved-letter inputs are unchanged.
@@ -86,3 +127,24 @@ drafts and two years for each dated message. Complete save retention, RTC-year
 restoration, heap/stack/module guards, freeing the allocation, and checkpoint
 restoration pass. Normal resident selection, final rendering, full seasonal
 coverage, and original-hardware acceptance remain separate requirements.
+
+`calendar_quiz_test_scenario.py` combines date preparation and every contextual
+answer case into one isolated checkpoint. Six current-date cases cover 2000,
+2001's leap-month start, 2004's February 29, 2026, 2030, and 2032. Each executes
+the actual quiz request, checks the complete quest table, invokes the real
+relocated demo dispatcher, compares all twenty free fields against independently
+called native conversions, and inserts both complete quiz fields. Two non-one
+orders check the no-op branch. The complete manager, clock, saved game, code,
+heap/stack/module guards, actor-order pointer restoration, and allocation lifetime
+are checked. Exact completed results belong in the work log. This does not
+execute normal request polling, calendar scheduling, quiz rewards, or hardware.
+
+The completed combined run passes 496 calls, 294 explicit expected returns, and
+822 memory assertions over 2,039 recorded steps. It includes all six quiz dates,
+two no-op orders, 53 preparer cases, thirteen earlier and eighteen direct quiz
+conversions, twelve date-message loads, twenty date insertions, 48 answer
+selections, and 44 contextual branch cases. All guards, saved-game/clock retention,
+allocation freeing, one checkpoint restore, silent shutdown, and blank isolated
+saves pass. All 700 regression tests pass, including thirteen date/dependency
+tests. A separate complete-layout audit checks all 403 month/day combinations;
+the widest date line is 88 pixels. The generic free-field warning remains.
