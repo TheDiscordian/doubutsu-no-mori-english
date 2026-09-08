@@ -51,9 +51,11 @@ instead of the GameCube `0003/0004` or `004C/0051` labels. These changes retain
 the native choices, not the GameCube action table. Every ordinary shop selection
 still requires gameplay review; a text match cannot establish that review.
 
-The twins' `172A` and `1737` remain withheld: even after their choice correction,
-their speaker/echo control sequences differ. This approval does not relax those
-controls. Other menu families require their own source and action review.
+The twins' `172A` and `1737` use complete
+[native-specific originals](CONNECTED_SERVICE_DIALOGUE.md): even after choice
+correction, their supplied speaker/echo sequences differ. Their native menu,
+speaker boundaries, and complete echoes remain; this reference approval does
+not relax those controls. Other menu families require source/action review.
 
 ## Earlier native shop records
 

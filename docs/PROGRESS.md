@@ -21,6 +21,12 @@ Six native storage, raffle, and offering drafts preserve the original menus,
 prize ranks, pauses, and four paired shop-twin exchanges. Their combined native
 batch passes eleven complete messages, six menu labels, and 41 memory assertions.
 Normal service actions and twin-echo rendering remain gameplay/polish checks.
+Four complete GameCube references retain the original native random response
+commands. Fifteen further native-specific drafts cover shop services, moving,
+gift refusal, catchphrase advice, paint, and resident reactions. Five focused
+draft tests and all 104 reference tests pass. Normal actions remain unverified.
+The combined cartridge batch passes 39 complete messages, eighteen menu labels,
+and 137 memory assertions with restored checkpoint and blank isolated saves.
 
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
@@ -485,22 +491,22 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/storage-raffle-pilot/`
-contains 12,538 edits, including
-9,765 reference main-bank candidates, all 460 choices, 591 original dialogue
+The current experimental resident-module pilot in `build/connected-services-pilot/`
+contains 12,557 edits, including
+9,769 reference main-bank candidates, all 460 choices, 606 original dialogue
 drafts, one original-dialogue continuation, 289 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,007
+still require review. The original main-bank audit leaves 988
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,475 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/storage-raffle-candidates/` and `build/storage-raffle-coverage/`.
+`build/connected-services-candidates/` and `build/connected-services-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
-the complete four-pair raffle echo; these do not increase the reference count.
+the complete raffle and service echoes; these do not increase the reference count.
 The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
@@ -1060,7 +1066,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,538 edits; basic generation has 11,795, including both startup-error drafts,
+12,557 edits; basic generation has 11,814, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1285,9 +1291,42 @@ Guards, one restored checkpoint, silent graceful shutdown, and blank isolated
 FlashRAM/Pak pass. Normal storage swaps, raffle entry/prize delivery, offering
 deductions, twin-echo rendering, and hardware remain separate requirements.
 
+## Native service replies and complete random-response references
+
+Four [complete random-response references](../specs/NATIVE_RANDOM_REFERENCES.md)
+keep the native branch commands in `263E/2646/2650/26C5`. The English versions
+repeat one destination in a three-entry command; the installed messages retain
+the original native two-entry command. Complete English wording, manual layout,
+pauses, and all other gameplay commands remain. Each source/reference/span/output
+is independently hash-bound; no runtime or general flow permission changes.
+
+Fifteen [connected service drafts](../specs/CONNECTED_SERVICE_DIALOGUE.md)
+preserve the remaining twin-shopkeeper exchanges, two-answer moving question,
+gift refusal loop, catchphrase editor/reassurance choices, native rain/brown-paint
+comments, and complete resident reactions. No extra GameCube mood/quest request,
+third answer, unavailable field, or empty native branch is introduced.
+All ten service echoes are complete; their three formatting warnings remain
+for the polish pass. The other twelve original layouts have no warning.
+
+Five focused draft tests and all 104 reference tests pass, including eight new
+random-reference checks. All 12,557 installed payloads and complete UPS
+reconstruction pass. Every earlier full/basic candidate is unchanged. Only
+main message data, its pointer table, and the associated DMA table change;
+all runtime/font/name/item/mail resources remain unchanged. The full runtime
+suite retains its separate 714-test birthday checkpoint, not a new full run.
+
+`build/smoke-connected-services-01/` passes 276 recorded steps, 57 native calls,
+39 declared expected returns, and 137 memory assertions. The nineteen new
+messages and twenty directly connected replies all load completely, as do
+eighteen menu labels. Independent scenario regeneration, all call arguments,
+expected returns, complete memory reads, guards, single restored checkpoint,
+silent graceful shutdown, and blank isolated FlashRAM/Pak pass. These are
+cartridge text loads, not executed trades, gifts, mood changes, random selections,
+editor input, normal saving, rendered twins, or hardware acceptance.
+
 ## Text-volume measurement
 
-The generated coverage report measures 638,459 covered source characters out of
+The generated coverage report measures 639,612 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1307,8 +1346,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,538 edits, including
-9,765 reference main-bank candidates, 289 original development-label drafts,
+The resident-module experiment contains 12,557 edits, including
+9,769 reference main-bank candidates, 289 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1326,12 +1365,13 @@ eight native moving conversations, seven game-launch prompts, and four complete
 native travel explanations using five records, two native startup errors,
 two native renovation drafts, ten native-topic drafts including the
 connected `25FD` correction, one native two-answer letter question, and six
-native storage, raffle, and offering drafts.
+native storage, raffle, and offering drafts, plus fifteen native connected
+service/reaction drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,008 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,007 main records without
-candidates: 85 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 989 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 988 main records without
+candidates: 66 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

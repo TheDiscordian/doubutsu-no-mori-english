@@ -5863,3 +5863,93 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   content/destination integration and normal gameplay remain active. The title
   screen remains the main image priority after the main port. The complete
   translation goal remains active.
+
+## 2026-09-08 — Complete native service replies and preserve random responses
+
+- Added four complete GameCube references for `263E/2646/2650/26C5` with one
+  individually reviewed `complete_reference.native_random` rule each. The
+  English three-entry branch duplicates one destination; the native two-entry
+  command remains exact. Source/reference offsets, complete command bytes,
+  identical destination sets, unique spans, and complete source/reference/output
+  hashes are mandatory. Every other gameplay command `08..19` must agree before
+  the ordinary adapter. Other adaptation permissions cannot combine. The builder
+  rejects modified complete payloads independently of edit metadata. All English
+  words, newlines, pages, waits, emphasis, and pauses remain. No runtime change.
+- Reviewed all eight connected random replies, including praise versus louder
+  retries, sleepy bedtime acceptance, and the sunshine-boy denial/training joke.
+  The four expanded bounds are 58/58/59/127. Native `2769`, with a different
+  third destination, is deliberately outside the same-destination-set rule.
+  `14FD` passes N64 content validation but the supplied GameCube plus glyph does
+  not reproduce its original hash through the current native encoder; that
+  reference remains withheld for source-encoding work, not paraphrased away.
+  `17B1` still has the GameCube-only cancellation command and remains withheld.
+- Added fifteen complete native-specific drafts in
+  `translations/n64-connected-services.json`: `1722/172A/1737/1889/1CD7/1D27/
+  2065/2077/23DC/2769/2798/2CD0/1502/1D3D/28EE`. They retain the complete twin
+  sale/order/apology/disposal exchanges; Gracie outfit advice; moving-away
+  remembrance; gift-refusal self-loop; catchphrase replacement/reassurance;
+  rain-colour paint; brown-paint aside; suspense lead-in; forced sale; repayment
+  and advice reactions; and the complete mock-shopkeeper sale/item reveal.
+  Native-only meanings and actions are not replaced by different GameCube ones.
+- Every native command/argument remains exact except three complete English
+  twin echo colour/scale spans under the existing layout policy. All ten echoes
+  retain RGB `198CDC`, eight-pixel anchors, and original 26/32 scale before
+  every character. Native pair counts remain 2/5/3. The three explicit-formatting
+  warnings remain for the polish pass; the other twelve drafts have no layout
+  warning. Native-original line placement avoids overlong dynamic-field lines;
+  no GameCube reference is reflowed. Bounds in file order are
+  215/600/336/395/309/276/192/285/369/118/62/194/275/282/571.
+- Moving keeps two answers and `1CD8/1CD9`; native `1CDA` is empty. Gift refusal
+  returns to `2065`; alternative native `2068` is empty. Catchphrase answers keep
+  `2774/2775`. Brown paint retains native `276A/276B/276C`, including the
+  original too-flashy branch rather than GameCube `276D`. Shared labels stay
+  unchanged. No extra GameCube quest request, persistent mood, absent catchphrase
+  field, new branch, or new action is installed.
+- Five focused draft tests pass in 0.209 seconds at
+  `build/tests-connected-services-01.log`. All 104 reference tests pass in
+  19.029 seconds at `build/tests-connected-services-reference-01.log`, including
+  eight new random-reference checks. The content-only wording suite explicitly
+  excludes the new random-rule category, whose complete-reference and native-flow
+  retention have their own tests. The unchanged production runtime retains the
+  full 714-test birthday checkpoint; no new full-suite run is claimed.
+- Full generation has 12,557 ordinary edits; basic generation has 11,814.
+  All nineteen new records appear in both. Every earlier full/basic edit object
+  is unchanged. Main coverage is 10,764: 9,769 references, 606 original dialogue
+  drafts, one original continuation, 289 development labels, and 99 diagnostics.
+  The 988 gaps comprise 66 Japanese-static, 919 nonstatic, one Latin, and two
+  symbol records. Ten nonstatic records have dynamic fields; none is deemed
+  unreachable. Reference rejections are 924 unconfirmed identities, forty
+  control differences, 23 missing fields, and two overflows, with one original
+  fallback. Reference/label layout warnings stay 1,475; original echo warnings
+  are separate. All 460 choices, 178 ordinary villager names, and 779 ordinary
+  item slots remain. Source weight is 639,612/746,978; main source weight is
+  629,280/637,761. These are candidate measurements, not completed review.
+- Pilot: `build/connected-services-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `0f3777d64a6594224c2150259834378e437cf978e882c8ae3688158a80d35d02`.
+  UPS SHA-256:
+  `9fad302395751e09bf8318479335a73daed61c9c5364440bbc2de09d08a652ed`.
+  Candidate SHA-256:
+  `58a9dd78125fc2f0796e1deaf7e935db5c61fcf29d3c14d43c376205e68ac672`.
+  `build/connected-services-artifact-audit.log` verifies all 12,557 actual
+  payloads, complete UPS reconstruction, all earlier full/basic edits, and
+  unchanged font atlases. Only `00019D40`, `02000000`, and `00CF9000` DMA files
+  change from the storage/raffle pilot; the container changes only its table.
+  Runtime, names, items, mail resources, font metrics, and saved formats remain.
+- `build/smoke-connected-services-01/` passes 276 steps, 57 native calls,
+  39 declared expected returns, and 137 memory assertions. The nineteen new
+  messages and twenty directly connected replies load completely, plus eighteen
+  menu labels. `build/connected-services-native-audit.log` independently
+  regenerates the scenario and checks every address, argument, return, restored
+  stack, complete memory read, guard, single checkpoint restoration, and silent
+  graceful shutdown. Scenario SHA-256:
+  `bb1b95f6e19cad56bb3c7d8b87c8512e6f336d4cba085e5ab0eeab9748fea080`.
+  The four-MiB run has no seeded saves/checkpoints, disables both save-write
+  flags, and retains blank FlashRAM/Pak. These are text loads, not executed
+  random selections, gifts, trades, friendship changes, catchphrase entry,
+  ordinary saving, rendered twin echoes, or original-hardware validation.
+- Current progress, queue, reference-choice boundaries, and both new contracts
+  are updated. Remaining main dialogue, general/name/mail destinations, normal
+  gameplay, final semantic/presentation review, original hardware, and patch-only
+  release remain. The title screen stays the first image priority. The complete
+  project goal remains active.

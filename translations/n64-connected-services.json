@@ -1,0 +1,125 @@
+[
+  {
+    "id": "message:1722",
+    "source_sha256": "5657a5a69a248abaa4a0aac67777c79c9f76d2d2bd1d57622bfe4b5cfee9c414",
+    "translation": "{cmd:7F5C}Welcome!{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC08}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}c{cmd:7F541A}o{cmd:7F541A}m{cmd:7F541A}e{cmd:7F541A}!{cmd:7F030C}\n{cmd:7F5C}Today is a special event!{cmd:7F04}\n{cmd:7F02}We have hard-to-find items\non {cmd:7F0306}special sale\njust {cmd:7F0304}for you!{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC07}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}y{cmd:7F541A}o{cmd:7F541A}u{cmd:7F541A}!\n{cmd:7F00}",
+    "notes": "Retain the native two complete twin-speaker pairs, special-event announcement, rare merchandise, and special sale. The supplied GameCube has an additional echo. Every native pause, page, speaker control, and ending stays exact; only colour lengths and complete per-character English echo scaling change.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:172A",
+    "source_sha256": "3162da23cf4a6a9a0498f928728afef5f192fa9de42894fc8d62fcc66ad6bfd9",
+    "translation": "{cmd:7F5C}Oh,{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC06}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}o{cmd:7F541A}h{cmd:7F541A},\n{cmd:7F5C}you want to order\n\"{cmd:7F32}\"{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}Unfortunately,\nan order for that item{cmd:7F030C}\nis not something\nwe can accept.{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC0A}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}a{cmd:7F541A}c{cmd:7F541A}c{cmd:7F541A}e{cmd:7F541A}p{cmd:7F541A}t{cmd:7F541A}.{cmd:7F04}\n{cmd:7F02}{cmd:7F5C}It comes from a different\nsupplier than the one\nour store uses.{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC08}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}u{cmd:7F541A}s{cmd:7F541A}e{cmd:7F541A}s{cmd:7F541A}.{cmd:7F04}\n{cmd:7F02}{cmd:7F5C}We are sorry, but\nyou will have to\ngive up on this one!{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC07}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}o{cmd:7F541A}n{cmd:7F541A}e{cmd:7F541A}!{cmd:7F04}\n{cmd:7F02}{cmd:7F5C}Is there anything\nelse we can\nhelp you with?{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC08}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}w{cmd:7F541A}i{cmd:7F541A}t{cmd:7F541A}h{cmd:7F541A}?{cmd:7F180009000A01C4000B}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "notes": "Retain all five native twin exchanges, complete requested-item field, supplier explanation, separate apology, and original Turnip prices / Sell / Catalog / Leave menu. The GameCube omits the apology exchange and reorders services. Every non-formatting native command and argument remains exact.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:1737",
+    "source_sha256": "d6b5740ab2dee27547f8b8ea769cd2a01f77138aeec0db73c0430bef7174ffe2",
+    "translation": "{cmd:7F5C}Yes,{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC07}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}y{cmd:7F541A}e{cmd:7F541A}s{cmd:7F541A},{cmd:7F5C}we understand.{cmd:7F04}\n{cmd:7F02}Taking unwanted items{cmd:7F0308}\noff your hands is\none of our services.{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC0C}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}s{cmd:7F541A}e{cmd:7F541A}r{cmd:7F541A}v{cmd:7F541A}i{cmd:7F541A}c{cmd:7F541A}e{cmd:7F541A}s{cmd:7F541A}!{cmd:7F04}\n{cmd:7F02}{cmd:7F5C}Is there anything{cmd:7F0306}\nelse we can\nhelp you with?{cmd:7F0306}{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC08}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}w{cmd:7F541A}i{cmd:7F541A}t{cmd:7F541A}h{cmd:7F541A}?{cmd:7F180009000A01C4000B}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F19}{cmd:7F09090001}\n{cmd:7F01}",
+    "notes": "Retain all three native twin-speaker pairs, separate acknowledgement before the first page, complete disposal service explanation, and exact native four-service menu order. Do not import GameCube speaker-boundary changes. Only complete echo colour/scale spans differ.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout"
+  },
+  {
+    "id": "message:1889",
+    "source_sha256": "8f15bcbef6be7141e318acdd8da18da5a03dee8b42dd4e85a09d68a1ca2a4a03",
+    "translation": "{cmd:7F09000015}{cmd:7F1A}, did you know?{cmd:7F030E}\nClothes by a designer\ncalled Gracie{cmd:7F030C}\nare really popular now.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}And guess what.{cmd:7F0308}\nGracie won't sell\nthose clothes for{cmd:7F030C}\nany amount of money!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}That's pretty cool.{cmd:7F030C}\nThe clothes you have on{cmd:7F0308}\naren't all that\ninteresting, so...\n{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}why not try Gracie's clothes{cmd:7F0308}\nand become a\nreal fashion star?\n{cmd:7F00}",
+    "notes": "Retain the native fashion advice, unavailable-for-money claim, criticism of the current outfit, player field, and all original expressions/pauses. Do not import the additional GameCube catchphrase field or changed expression sequence; no assumption about a new actor field is made.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:1CD7",
+    "source_sha256": "a5bb418f0f7dbcffdc0465856c907c5b339cc91f7d39622d7d8b73e74b477165",
+    "translation": "{cmd:7F090000FF}I've been thinking{cmd:7F030C}\nthat someday\nI might move away\nfrom this town,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}Then{cmd:7F030C}\nyou and I, {cmd:7F1A},{cmd:7F0306}\nwouldn't be able\nto play together anymore.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}You won't forget\nabout me, will you?\n{cmd:7F1600EE017F}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1CD8}{cmd:7F101CD9}{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain the native moving-away question, complete player and catchphrase fields, two answers Naturally! / I have no idea., and 1CD8/1CD9. Do not introduce the GameCube third answer or empty native 1CDA destination. Every native command and argument stays exact.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:1D27",
+    "source_sha256": "c4008b14446c5b6debba4720e07a5f69ac90a7220b3a067f4f0ebb4ab337a8b8",
+    "translation": "{cmd:7F09000002}Huh! {cmd:7F0306}Really?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Even in weather like this,\nyou're offering to help?{cmd:7F0304}\nThat makes me happy,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}But I don't need anything now,{cmd:7F0306}\nso I'll ask you\nsome other time,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "notes": "Retain native thanks for offering help in bad weather and the lack of a current errand, including both catchphrases and all expressions/pauses. The GameCube-only quest request is not imported.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:2065",
+    "source_sha256": "8e218f1676720bf4bd6b2594084c86a0fd416d4744ef6ae54f9c40fb5b371308",
+    "translation": "{cmd:7F0C050066}{cmd:7F0C020001}{cmd:7F09000002}{cmd:7F0307}Oh, come on!{cmd:7F030C}\n{cmd:7F0900000E}Don't be so distant,{cmd:7F0306}\n{cmd:7F1A}!{cmd:7F0310}\n{cmd:7F090000FF}Now,{cmd:7F0308} {cmd:7F0900000B}{cmd:7F0302}what would you like?{cmd:7F1800AD00AE00AF004E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2062}{cmd:7F102063}{cmd:7F112064}{cmd:7F122065}{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain both original quest preparations, three gift categories, and fourth-answer No way! returning to this same question. The GameCube fourth choice and empty native 2068 destination are not imported. Every native expression, pause, menu, and branch remains exact.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:2077",
+    "source_sha256": "d9ce187d389b1b455a04f8f02b70e98eeb8dec8aa7b980f503e05f5d74da3964",
+    "translation": "{cmd:7F09000017}The other day,\n{cmd:7F39} told me{cmd:7F0306}\nmy catchphrase{cmd:7F030C}\nwas really uncool.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F1A}{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\nIs my catchphrase{cmd:7F0306}\nreally that\nuncool,{cmd:7F0306} {cmd:7F1C}? {cmd:7F0306}{cmd:7F09000004}{cmd:7F0305}Oh!{cmd:7F16011E0128}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2774}{cmd:7F102775}{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain the native question about an uncool catchphrase, its accidental repetition, named critic/player fields, and Maybe... / That is not true! answer meanings. Maybe reaches the existing catchphrase editor at 2774; reassurance reaches 2775. Do not import extra GameCube expressions or its changed shared refusal label.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:23DC",
+    "source_sha256": "19a8ed32f1b7ec71327e02fa90f2e5ee21d41331ad2ddf713369d155e3e6be16",
+    "translation": "{cmd:7F0C000006}{cmd:7F09000006}Oh,{cmd:7F0306} you want\n{cmd:7F2E}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000003}That's just{cmd:7F0304}\nthe colour of\nthe falling rain,{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}All right.{cmd:7F04}\nYou chose it,{cmd:7F0306}\n{cmd:7F2E}\nis what I'll use!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}I'll finish before you\nget home,{cmd:7F0306}\nso look forward to it,{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "notes": "Retain the native rain-colour comparison, both selected-colour fields, painting request 00/0006, and promise of completion before the player returns. The same-ID GameCube compares the sky instead. Every native command and pause remains exact.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:2769",
+    "source_sha256": "968cd60c820c31c74bd8502716206d08ee8d3f0b9b458bef9a890c408a1de450",
+    "translation": "{cmd:7F0C00000C}{cmd:7F09000015}It's brown.{cmd:7F030C}\nI almost forgot\nto tell you,{cmd:7F0306} {cmd:7F1C}.\n{cmd:7F14276A276B276C}\n{cmd:7F01}",
+    "notes": "Retain the native brown-paint statement, almost-forgot aside, quest request, and all three original continuations 276A/276B/276C. Do not replace the third destination with GameCube 276D or import its earth-tone claim.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:2798",
+    "source_sha256": "b2ee99231076eb1bfa97f7201d318f984e8043d73e4e897ccbfa69ace766375e",
+    "translation": "{cmd:7F09000016}Well, you see{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F132799279A}\n{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain the complete native lead-in, four suspense pauses, two-entry random continuation, and original 19/01 ending. The GameCube omits 19 and changes the last pause; no flow exception is introduced.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:2CD0",
+    "source_sha256": "aa0ad58677dae7fef17202125e200ad927022aa81db9aa0096257009a8e88149",
+    "translation": "{cmd:7F0C030015}All right, then.{cmd:7F030C}\nYou can buy my\n{cmd:7F35}{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0C03000C}for {cmd:7F3F} Bells,\n{cmd:7F0306}{cmd:7F1C}.\n{cmd:7F00}",
+    "notes": "Retain the native item selection and sale requests in their original positions, full item/price/catchphrase fields, and complete forced-sale statement. Do not add the GameCube-only 02/000C preparation or move the native item request.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:1502",
+    "source_sha256": "80024ac9fcc95427abd23b0dd7cc1982d6659b9625ca0e10c2dc677f4fff5ec0",
+    "translation": "{cmd:7F09000001}What do you mean,\n\"{cmd:7F2E}\"?!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Just because he says\nyou can pay when you can,\nwith no reminders,{cmd:7F0306}\nthat's no way to act!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000F}Oh, honestly.{cmd:7F0306}\nI'm really\ndisappointed in you,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F00}",
+    "notes": "Retain the native response to the quoted repayment answer, pay-when-able policy, disappointment, selected text/catchphrase fields, and all original expressions/pauses. The GameCube-only angry mood/duration commands are not installed.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:1D3D",
+    "source_sha256": "b0df1d6c6ac14969ec8904bfe890d334a0949b26149f814e37bdd813e94adf04",
+    "translation": "{cmd:7F09000001}What is that supposed to mean?!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}You're not paying attention,\nso I was only trying\nto give you some advice!\n{cmd:7F04}\n{cmd:7F02}I can't believe\nyou'd say that!{cmd:7F030F}\nFine, do whatever\nyou want,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "notes": "Retain the native attention/advice complaint and dismissal, both catchphrases, original expressions, and pauses. Do not import the additional GameCube persistent angry mood and duration orders.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:28EE",
+    "source_sha256": "9de0984018c882d829a599197ed4d5371d7058dc17c8b25a1c06db5f24cfd9d5",
+    "translation": "{cmd:7F09000004}So this one caught your eye!{cmd:7F0308}\n{cmd:7F09000015}You have a fine eye,{cmd:7F0304}\nmy valued customer!{cmd:7F0308} Ha!{cmd:7F0308}\n{cmd:7F090000FF}{cmd:7F0C030012}Here you are.{cmd:7F04}\n{cmd:7F02}{cmd:7F0C030009}{cmd:7F09000015}Thanks for your business!{cmd:7F0308}\nCome again! Ha ha!{cmd:7F04}\n{cmd:7F02}That was fun.{cmd:7F0310}\n{cmd:7F090000FF}You waited till\nthe very last moment.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000B}Did you get something you liked?{cmd:7F030C}\n{cmd:7F09000016}Or did you buy it\nin a panic?{cmd:7F0308} {cmd:7F09000015}Ha ha ha!{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Now,{cmd:7F0304} I bet you want to know\nwhat the last item{cmd:7F0304} was, huh?{cmd:7F0310}\nThat last piece of furniture{cmd:7F0304}\nwas {cmd:7F32}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Let's play again,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "notes": "Retain the native mock-shopkeeper sale, final-moment purchase, desired-versus-panic question, full unchosen furniture reveal, and invitation to play again. Item handoff/payment requests and every expression/pause remain exact. The additional GameCube 02/0001 preparation is not imported.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  }
+]

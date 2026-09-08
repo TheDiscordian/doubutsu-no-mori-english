@@ -1,5 +1,69 @@
 [
   {
+    "id": "message:263E",
+    "source_sha256": "87edb95a8c53d6d561821cd2db07f84baadb558612107795b6d2fdf0133cd3d0",
+    "reference_id": "message:263E",
+    "reference_sha256": "11f1f19f5a87c5a8d5a1cb6c4c1e889bc3498e871843cb0e694e5b221eaa314e",
+    "complete_reference": {
+      "adapted_sha256": "aa5f4f95eba8dbb9ec5e5ff900dba23c4fd71238746dbbec4dae9d0ae6d3313f",
+      "native_random": {
+        "source_offset": 27,
+        "reference_offset": 30,
+        "native_command": "7F13263F2640",
+        "reference_command": "7F14263F263F2640"
+      }
+    },
+    "evidence": "Complete surprised greeting reaction preserves the original two-entry random response 263F/2640, rather than duplicating the positive entry as in GameCube. Positive praise and negative speak-louder/retry responses are already complete English; every reference word, manual line, and pause remains. No native probability, actor state, or other gameplay command changes. See NATIVE_RANDOM_REFERENCES.md."
+  },
+  {
+    "id": "message:2646",
+    "source_sha256": "5b90b258f0fdbbae3c434883fb62a653cf555a2973f541c5b164eace1d619e87",
+    "reference_id": "message:2646",
+    "reference_sha256": "8b13eec0b537fa26e0d3cd2dd5978d521800adbcc2a02451627c204137cef9bb",
+    "complete_reference": {
+      "adapted_sha256": "43f503dfea08fc6c66bbdb2c23bd85a6ba93f1078aef76ef367973b4411dd3f0",
+      "native_random": {
+        "source_offset": 27,
+        "reference_offset": 30,
+        "native_command": "7F1326472648",
+        "reference_command": "7F14264726472648"
+      }
+    },
+    "evidence": "Complete surprised old-fashioned greeting reaction retains native 2647/2648 and its original selection weights. Both the praise and speak-louder/retry contexts remain appropriate; the supplied English duplicates the positive destination. Preserve every English word and presentation command while restoring only the exact original branch. See NATIVE_RANDOM_REFERENCES.md."
+  },
+  {
+    "id": "message:2650",
+    "source_sha256": "15fd90ed9e74af2fd9ea1361c59bfb5cd789f0544a0f14e664c59cdad9a063bc",
+    "reference_id": "message:2650",
+    "reference_sha256": "4dbc6ad7ac5f1aebd12a1265a12cb93d7e3a5c60dd695e3f698b3364a66ad3f9",
+    "complete_reference": {
+      "adapted_sha256": "4325703f7a014a10ae7f72756011b0d00450c42c9cd0e462e23bdb1ebd30c305",
+      "native_random": {
+        "source_offset": 27,
+        "reference_offset": 31,
+        "native_command": "7F1326512652",
+        "reference_command": "7F14265126512652"
+      }
+    },
+    "evidence": "Complete surprised bedtime-greeting reaction retains native 2651/2652, including sleepy acceptance versus a request for a more heartfelt greeting and retry. Do not import the repeated positive GameCube branch. Every English word, line, and pause remains. See NATIVE_RANDOM_REFERENCES.md."
+  },
+  {
+    "id": "message:26C5",
+    "source_sha256": "c9e9e33bb8b368e78b098f819bee9f1b413174a9c82d617dde184de17f98b5b5",
+    "reference_id": "message:26C5",
+    "reference_sha256": "ac026b660df60129b79f37fcddee6aed4fc6c39b3da7b33add92e595aa3b3e88",
+    "complete_reference": {
+      "adapted_sha256": "8ed1dc125535e5bc992cbdebe1ac060b49f6f2cc234213b63115ba664a6efe03",
+      "native_random": {
+        "source_offset": 52,
+        "reference_offset": 102,
+        "native_command": "7F1326C626C7",
+        "reference_command": "7F1426C626C726C7"
+      }
+    },
+    "evidence": "Complete rain-bringer question retains original quest request 05/0066 and native 26C6/26C7 random continuation. Both English replies retain the sunshine-boy denial/training joke and original retry route. Preserve full GameCube wording and presentation without its duplicated second destination. See NATIVE_RANDOM_REFERENCES.md."
+  },
+  {
     "id": "message:246D",
     "source_sha256": "e91a0e5074dbab5d64522c38f55afa5bfe9a7505d14ec1045f6390c0c47b3b0b",
     "reference_id": "message:246D",
