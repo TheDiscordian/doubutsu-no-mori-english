@@ -211,6 +211,7 @@ def main():
     parser.add_argument('--english-mother-letters', action='store_true', help='Complete supported Mom letters; requires the system variant of the NPC cartridge creator')
     parser.add_argument('--english-departed-letters', action='store_true', help='Complete departed-villager letters with guarded receipt; requires Mom integration and the extended creator')
     parser.add_argument('--english-villager-event-letters', action='store_true', help='Complete supported friendship, birthday, goodbye, and Christmas letters; requires departed integration and full item names')
+    parser.add_argument('--english-academy-letters', action='store_true', help='Complete HRA welcome/advice letters with scheduler success gates; requires villager-event integration')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -238,6 +239,8 @@ def main():
         parser.error('--english-departed-letters requires --english-mother-letters and the extended creator')
     if args.english_villager_event_letters and not (args.english_departed_letters and args.extended_items):
         parser.error('--english-villager-event-letters requires --english-departed-letters and --extended-items')
+    if args.english_academy_letters and not args.english_villager_event_letters:
+        parser.error('--english-academy-letters requires --english-villager-event-letters')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -325,6 +328,9 @@ def main():
     if args.english_villager_event_letters:
         from villager_event_letters import install as install_villager_event_letters
         report['villager_event_letters'] = install_villager_event_letters(rom,replacements,additions,report.get('runtime_module'))
+    if args.english_academy_letters:
+        from academy_letters import install as install_academy_letters
+        report['academy_letters'] = install_academy_letters(rom,replacements,additions,report.get('runtime_module'))
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

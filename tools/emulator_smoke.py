@@ -635,6 +635,8 @@ def main():
     parser.add_argument("--ares", default="/usr/bin/ares")
     parser.add_argument("--seconds", type=int, default=40)
     parser.add_argument("--scenario", type=Path)
+    parser.add_argument('--no-initial-screenshot',action='store_true',
+                        help='Skip the diagnostic startup image for memory-only batches; scenario image checks still run')
     parser.add_argument("--post-scenario", type=Path, help="Additional assertions after the main scenario")
     parser.add_argument("--port", type=int, default=19264)
     parser.add_argument("--seed-save", type=Path, help="Copy this isolated test directory's cartridge saves")
@@ -656,6 +658,7 @@ def main():
     shutil.copyfile(args.rom, rom)
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
     provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False,
+                  "initial_screenshot": not args.no_initial_screenshot,
                   "allow_test_flash_write": args.allow_test_flash_write,
                   "allow_test_pak_write": args.allow_test_pak_write,
                   "runner_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
@@ -736,9 +739,13 @@ def main():
         results = [{"rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
                     "audio": "disabled", "expansion_pak": False,
                     "scenario": str(args.scenario) if args.scenario else "default"}]
-        subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
-                        "-video_size", "800x640", "-i", display, "-frames:v", "1", str(out / "initial.png")],
-                       env=env, check=True, timeout=15, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+        if not args.no_initial_screenshot:
+            try:
+                subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
+                                "-video_size", "800x640", "-i", display, "-frames:v", "1", str(out / "initial.png")],
+                               env=env, check=True, timeout=15, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            except subprocess.CalledProcessError as error:
+                raise ValueError('Initial screenshot failed: '+error.stderr.decode(errors='replace')) from error
         debug = connect_debugger(ares, args.port)
         results.append({"debug_features": debug.command("qSupported:multiprocess+")})
         keyboard = Keyboard(display)
@@ -921,6 +928,12 @@ def main():
                     raise ValueError('Villager-event probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_villager_event_letters'],record))
+            if 'test_academy_letters' in action:
+                from academy_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Academy probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_academy_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

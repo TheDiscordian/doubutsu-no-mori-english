@@ -15,10 +15,10 @@ from npc_mail_capture import RAM,source_hashes,creator_imports,relocate,verified
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False):
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events)
+    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     fado = root/'upstream/af/tools/fado'
@@ -44,6 +44,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
     if departed_letters: names += ('departed_creator',)
     if villager_events: names += ('villager_event_creator',)
+    if academy_letters: names += ('academy_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
@@ -56,6 +57,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     linker = 'system_capture.ld' if mother_letters else 'capture.ld'
     if departed_letters: linker = 'departed_capture.ld'
     if villager_events: linker = 'villager_event_capture.ld'
+    if academy_letters: linker = 'academy_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','overlay.elf',*objects,'relocation.o')
@@ -103,6 +105,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if mother_letters: report['mother_letters'] = True
     if departed_letters: report['departed_letters'] = True
     if villager_events: report['villager_events'] = True
+    if academy_letters: report['academy_letters'] = True
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -118,12 +121,14 @@ def main():
     parser.add_argument('--mother-letters',action='store_true',help='Add complete Mom-letter dispatch without changing the resident loader')
     parser.add_argument('--departed-letters',action='store_true',help='Add complete departed-villager letters; requires --mother-letters')
     parser.add_argument('--villager-events',action='store_true',help='Add complete villager-event letters; requires --departed-letters')
+    parser.add_argument('--academy-letters',action='store_true',help='Add complete HRA welcome/advice letters; requires --villager-events')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
     if args.villager_events and not args.departed_letters: parser.error('--villager-events requires --departed-letters')
+    if args.academy_letters and not args.villager_events: parser.error('--academy-letters requires --villager-events')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
-                           villager_events=args.villager_events),indent=2))
+                           villager_events=args.villager_events,academy_letters=args.academy_letters),indent=2))
 
 
 if __name__ == '__main__': main()

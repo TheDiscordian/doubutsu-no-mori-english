@@ -13,6 +13,18 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [HRA welcome/advice integration](../specs/ACADEMY_LETTERS.md) installs twenty
+complete letters and preserves membership/date eligibility when delivery fails.
+All 21 host creator tests, sanitizers, five installer tests, independent builds,
+and independent assembly pass. The silent native batch passes forty original
+metadata comparisons, forty-four complete readbacks, six real scheduler cases,
+nine rejections, two resource retries, 152 calls, and 436 memory assertions.
+All four homes and ten mailbox slots are covered; same-day duplicates are rejected.
+Live save/globals and the checkpoint are restored, with blank isolated saves and
+graceful shutdown. All 1,013 regression tests pass. HRA score letters, the missing
+semicolon path, normal gameplay/save acceptance, and the wider project remain.
+The [checkpoint](checkpoints/ACADEMY_LETTERS.md) records artifacts and limits.
+
 The [shared villager-event integration](../specs/VILLAGER_EVENT_LETTERS.md)
 installs 54 complete supported friendship-gift, birthday, moving-away, and
 Christmas letters. The complete creator retains original selection routines,

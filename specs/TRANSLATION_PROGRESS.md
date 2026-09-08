@@ -16,7 +16,7 @@ special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, and keyboard labels. Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,
-sale/Redd event, Mom, departed-villager, and villager-event routes. Unavailable
+sale/Redd event, Mom, departed-villager, villager-event, and HRA welcome/advice routes. Unavailable
 Mom and birthday bodies do not receive complete-letter credit.
 Catalogue presence alone does not credit unused letters or GameCube-only IDs.
 Reader and NPC capture/delivery patches are checked against installed bytes;

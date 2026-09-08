@@ -16,6 +16,19 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [HRA welcome/advice route](../specs/ACADEMY_LETTERS.md) installs all twenty
+complete letters and gates membership/date updates on actual delivery. The native
+batch passes every template in both capitalization states, all home/slot positions,
+real scheduler failure/retry, and same-day duplicate prevention. Host, sanitizer,
+installer, and independent build/assembly checks pass, along with all 1,013
+regression tests.
+Next connect score letters with full item/series names and English date fields.
+The source verifier binds all 63 score parts and 55 complete series names; four
+focused tests pass, including 2,200 complete field-capacity combinations. Body
+`003D` needs the semicolon alongside Mom `0136` and birthday `00F6`.
+The native score selector has no GameCube house-model reward path; do not add
+GameCube-only reward/cottage templates to the N64 selection.
+
 The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
 letters without added resident code or saved-layout growth. All 113 native
 post-to-mailbox-to-reader cases, seven rejections, and a retry pass, with 239
