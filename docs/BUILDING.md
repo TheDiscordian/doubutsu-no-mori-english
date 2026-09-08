@@ -276,6 +276,22 @@ complete creations, failure cases, and older-catalogue reads. The ordinary
 silent emulator runner executes the scenario with a checkpoint and owned heap
 memory. See [fortune-slip contracts](../specs/FORTUNE_SLIP_LETTERS.md).
 
+`tools/build_fortune_actor.py --rom <native-ROM> --output build/fortune-actor`
+builds the complete native Miko adapter against the current module and full
+fortune phrase resource. Add `--english-fortune-slips build/fortune-actor` to the
+full ROM build to install its two callbacks, extended actor size, and relocated
+DMA pair. It requires the complete snapshot reader and immutable catalogue three.
+The actor stays within its existing native pool; it adds no resident reservation
+or saved field. This remains experimental pending cancellation/removal recovery
+and normal gameplay acceptance.
+
+`tools/fortune_actor_scenario.py --rom <built-ROM> --build-report
+<ROM-directory>/build.json --output <ignored-json>` prepares the silent native
+hand-off batch. It tests 24 complete outcome/template/capitalization cases,
+all ten pocket positions, native relocation and metadata, complete reader
+restoration, failed-resource retries, duplicate prevention, and heap accounting.
+Run with the existing silent emulator runner and isolated checkpoint/save files.
+
 For configured-generation ROMs, native test tools require the ROM output's
 `runtime-module.json`, not the unconfigured compiler report. The build report
 binds the approved creator blob, complete source/import checks, and header words.

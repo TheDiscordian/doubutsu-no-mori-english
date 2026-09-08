@@ -6,8 +6,10 @@ All 64 random phrases, four outcome labels, and three complete English
 header/body/footer triples have source-bound local resources. The portable
 creator publishes a complete saved snapshot without truncating any wording.
 The N64 CPU probe passes complete creation and older-catalogue restoration.
-The native Miko actor is unchanged: normal item hand-off, allocation lifetime,
-retry ownership, and delivery are not installed or validated by this work.
+The optional native Miko adapter installs complete item hand-off with per-instance
+retry choices and synchronous temporary work. Native cartridge loading, real
+actor callbacks, whole-pocket publication, and complete reader restoration pass.
+Normal interaction and cancellation across actor removal remain unverified.
 
 `tools/fortune_slips.py` binds the native actor and complete supplied English
 sources. `tools/build_fortune_slips.py` builds ignored reference resources.
@@ -15,6 +17,11 @@ sources. `tools/build_fortune_slips.py` builds ignored reference resources.
 The existing native generation builder has an explicit fortune-slip probe
 variant, with its own source/export checks; a generic generation probe cannot
 silently stand in for that variant.
+
+`overlays/mail_generation/fortune_actor.c` supplies the native init/give callbacks.
+`tools/build_fortune_actor.py` appends them to the source-verified original actor;
+`tools/fortune_actor.py` guards allocation limits, all relocation records, source
+words, reader dependencies, DMA ownership, and the atomic installation.
 
 ## Native selection and metadata
 
@@ -51,12 +58,13 @@ outcome field, explicit spaces, and six body newlines. The header's newline
 remains its native name-placement marker. Fortune mail type five suppresses
 recipient-name insertion in the existing full reader.
 
-The native give handler is `809E5EA0..809E5FA0`. It currently advances five
+The original give handler is `809E5EA0..809E5FA0`. It advances five
 demo orders and switches to action zero before creating/copying a letter.
 Creation does not return failure. A replacement must stage complete mail and
 verify a free pocket before announcing a hand-off; it must not lose a paid slip
 or reroll its choices on a retry. The charge and luck assignment already occur
-in the preceding action. The current transaction does not solve that caller.
+in the preceding action. The optional adapter replaces the give-table callback
+and delays those same five order writes until complete publication succeeds.
 
 ## Native allocator evidence for the hand-off adapter
 
@@ -77,9 +85,10 @@ the patch builder must enforce the complete loaded image/relocation bounds.
 The actor-instance allocator rejects sizes above 2,400 (`0960` hexadecimal).
 Miko's profile requests 2,376 (`0948`), leaving 24 bytes inside that existing
 limit. The main actor initializer clears the profile's requested instance size.
-This provides a candidate per-instance location for captured selections and
-retry ownership without a retained heap allocation or shared global pending
-state. No profile-size change or new state layout is installed yet.
+The optional adapter raises only Miko's requested size to 2,400 and uses those
+24 bytes for pending selections. The native initializer's first 48 bytes have
+SHA-256 `aef7ac2b327aedb17d1ee2eb6a32c30b51089835db4d9dedec0eb43f4d97cf33`;
+its profile-sized clear covers the extension. No shared actor pool grows.
 
 Function-region hashes for the next adapter's guards:
 
@@ -144,8 +153,8 @@ catalogue three, and validates complete packing and cartridge-backed restoration
 before publication. The saved envelope occupies 97 of the existing 122 text
 bytes, including its CRC. Publication sets received status zero, split `80`,
 fortune type five, and paper 25. Native identities, attachment fields, and other
-metadata come from the caller and remain intact. A native adapter still has to
-clear/stage a new letter and set its recipient using the original helpers.
+metadata come from the caller and remain intact. The optional native adapter
+clears/stages a new letter and sets its recipient using the original helpers.
 
 The native probe has 2,244 code bytes, no mutable/global data, and only the
 three checked resident catalogue/pack/restore imports. All internal absolute
@@ -153,6 +162,59 @@ jumps are inventoried and relocated. Compiler-reported frames are 64 bytes for
 the fortune creator and 216 for general generation, before nested reader work.
 The resident module uses 24,288 linked bytes, leaving 288 within its existing
 24 KiB limit. Its 32 KiB reservation and native saved layouts do not grow.
+
+## Native adapter and retry state
+
+The extended actor has 7,248 loaded bytes and 288 relocation bytes. Its native
+8,192-byte slot has 944 loaded bytes free; relocation scratch is separately owned
+by the native loader. Original code/data retain their linked addresses, and
+the original sixteen-byte BSS is materialised as zero bytes before new code.
+Only three original actor words change: profile size, init-table entry two,
+and process-table entry three. Original charge, effect, message selection,
+outcome initializer, and other callbacks remain unchanged.
+
+The original actor and relocation DMA rows retain their indices and adjacency,
+but move to VROM `03600000` and `03608000`. The native loader discovers relocation
+data from the next DMA row, not from numerical VROM adjacency. Ownership metadata
+at `80101D10` supplies the extended loaded bounds while preserving the profile
+address. Original relocations retain their order; original data-section records
+use adjusted offsets inside the materialised prefix. New ELF records identify
+every internal jump/data reference and all approved fixed native/resident imports.
+The complete native loader output agrees with the independent relocation model.
+
+The pending extension starts at actor offset `0948`:
+
+| Offset within extension | Bytes | Value |
+| --- | ---: | --- |
+| `00` | 8 | Complete phrase/outcome/template selection |
+| `08` | 4 | Empty, armed, selected, or delivered state |
+| `0C` | 4 | Captured initial capitalization |
+| `10` | 4 | Native current-player pointer |
+| `14` | 4 | Zero reserved word |
+
+The initializer resets pending state, records the player, and calls the original
+one-draw outcome initializer. The give callback requires action three, ready
+demo order, the same player, valid outcome/state, and a free pocket. It allocates
+5,471 temporary bytes, including alignment slack for 5,456-byte work. Only then
+does an armed state draw the four phrase indices and one template. Selected
+states reuse every captured value. Generation and a final player/action/order/
+pocket recheck precede the native copy. The delivered state blocks duplicate
+publication even if the callback is invoked again with a ready order.
+
+Every allocated attempt frees work before returning or issuing hand-off orders.
+No heap pointer or large buffer remains in the actor. Complete snapshots carry
+all five sixteen-byte values without relying on or changing the native ten-byte
+handbill table. These templates contain no sticky-capitalization-setting command;
+the adapter preserves the current shared flag instead of overwriting a newer
+value with an old retry's captured flag. The unchanged previous action owns the
+fifty-Bell charge and luck assignment; the give adapter never charges again.
+
+Pending state belongs to a live actor, not the save. A forced new initializer
+resets that state, and actor removal discards it. The current checks do **not**
+prove that cancellation/removal cannot abandon an already paid, undelivered slip.
+Before release, trace the native talk cancellation and removal routes and either
+prove they cannot occur during a pending delivery or implement explicit recovery.
+Do not describe the synchronous retry checks as persistent paid-letter recovery.
 
 ## Executed checks and required next work
 
@@ -170,16 +232,29 @@ gracefully, and isolated FlashRAM/Pak files remain blank. This tests creation
 and decoding in owned memory, not normal delivery, the visible letter window,
 arbitrary player editing, save-menu operation, or original hardware.
 
+Eleven adapter/installer host tests pass, including complete real formatter
+transactions, all sixteen heap alignments, every selected read failure, changed
+owners/orders, full pockets, repeat delivery, two independent actor states,
+source mutations, missing dependencies, and installer rollback. A mutation of
+the compressed main-code file must operate on extracted code before reinsertion,
+not use an uncompressed function offset inside compressed physical storage.
+
+The native adapter batch passes all 24 outcome/template/capitalization
+combinations, all ten pocket positions, full-pocket rejection, four disabled
+resource attempts, successful retained-choice retry, and duplicate prevention.
+Its 88 native calls and 578 memory assertions also prove exact loaded relocations,
+complete pocket-to-reader text, unchanged heap accounting after attempts,
+retained live save/handbill fields, allocation/stack guards, restored checkpoint,
+blank isolated saves, and graceful shutdown. This is not normal player input,
+visible letter-window rendering, cancellation/removal, or hardware acceptance.
+
 Required next work:
 
-1. Enforce the verified 8,192-byte overlay and 2,400-byte instance limits when
-   appending the native adapter; verify its complete relocation ownership.
-2. Install the creator at the native give boundary, with complete recipient and
-   paper metadata, transaction-before-hand-off, and durable retry selections.
-3. Prove no lost charge/item, rerolled phrase, duplicate delivery, or retained
-   heap allocation on failure, repeated action, cancellation, and actor removal.
-4. Batch creator-to-pocket-to-reader checks and the existing mail/save paths;
+1. Close the cancellation/removal lifetime gap for already paid pending slips;
+   preserve native outcome, price, and effects without duplicate delivery.
+2. Validate ordinary paid reading and subsequent input/action progression.
+3. Batch the remaining visible reader and existing mail/save paths;
    retain outstanding custom editing, normal play, semantic review, and hardware
    acceptance. The unrelated ordinary NPC creator rejection remains deferred.
-5. Continue the remaining general text and main-port work. The title screen is
+4. Continue the remaining general text and main-port work. The title screen is
    still the first image task, followed by the GC-style keyboard stretch goal.

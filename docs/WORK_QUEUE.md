@@ -95,9 +95,14 @@ The [fortune-slip transaction](../specs/FORTUNE_SLIP_LETTERS.md) has complete
 68-value sources and three templates, including the previously unavailable
 signatures in independently frozen catalogue three. The native creation probe
 passes forty full slips, failure retention, old-catalogue reads, and 525 memory
-checks. The native actor still uses `80093F04` and ten-byte fields. Verify its
-allocator, connect the whole hand-off, and preserve selected values across
-failure/retry before enabling ordinary fortune-slip delivery. Preserve source
+checks. The optional extended actor connects complete hand-off without changing
+the native price, outcome, or luck action. Its native batch passes 24 complete
+pocket-to-reader cases, retries, duplicate prevention, and 578 memory assertions.
+Both actor/instance pool limits, original DMA-row adjacency, and complete native
+relocation are verified. Pending selections survive failed synchronous attempts,
+but forced reinitialization or actor removal discards actor-owned state. Close
+that already-paid-letter lifetime gap and validate normal interaction before
+release. Preserve source
 identity and complete wording when
 mapping the remaining text; a same-ID GameCube row alone is not approval.
 

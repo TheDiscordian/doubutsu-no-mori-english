@@ -204,6 +204,7 @@ def main():
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
+    parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -229,6 +230,8 @@ def main():
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
         parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
+    if args.english_fortune_slips and not (args.runtime_module and args.english_runtime and args.english_mail_snapshots):
+        parser.error('--english-fortune-slips requires the resident module, English runtime, and full snapshot reader')
     if args.npc_mail_generation and not (args.runtime_module and args.english_runtime
                                         and args.english_mail_snapshots and args.english_mail_grading):
         parser.error('--npc-mail-generation requires the runtime module, English runtime, full snapshot reader, and English mail grading')
@@ -254,7 +257,6 @@ def main():
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
         defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits)
-    report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
@@ -280,6 +282,11 @@ def main():
     if args.extended_font:
         from extended_font_cartridge import install as install_font
         report['extended_font'] = install_font(rom,replacements,additions,report.get('runtime_module'),args.extended_font)
+    if args.english_fortune_slips:
+        from fortune_actor import install as install_fortune_actor
+        report['fortune_actor'] = install_fortune_actor(rom,replacements,additions,relocations,
+                                                       report.get('runtime_module'),args.english_fortune_slips)
+    report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():

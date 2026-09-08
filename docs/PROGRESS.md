@@ -3,20 +3,23 @@
 ## Active work
 
 The [complete fortune-slip creator](../specs/FORTUNE_SLIP_LETTERS.md) preserves
-all 68 phrase/outcome values and all three English letter templates. A separate
-immutable catalogue adds the three complete Katrina signatures while retaining
-catalogue two for existing snapshots. Ten focused host tests pass, including
-384 complete combinations. The silent native batch passes forty complete slips,
-eight rejected choices, disabled-resource rejection, four older-catalogue reads,
-and 525 memory assertions, with restored checkpoint and blank isolated saves.
-The native Miko hand-off is not hooked yet; allocator ownership, failure/retry
-selections, and ordinary delivery are the next implementation steps. No approved
-font pixel or spacing changes. Ordinary applied edits remain 13,383; this work
-adds complete saved-letter support rather than more ordinary-bank candidates.
-All 870 regression tests pass. Independent reconstruction verifies every
-applied edit and the original-ROM UPS round trip; the two independent resident
-builds match. The [work record](checkpoints/FORTUNE_SLIP_FOUNDATION.md) binds the
-current artifacts and the remaining native hand-off work.
+all 68 phrase/outcome values and all three English letter templates. The optional
+native actor now stores the complete letter before announcing hand-off, retains
+selected values across failed attempts, and frees temporary work on every path.
+It fits the unchanged overlay/instance pools and preserves original DMA-row
+adjacency. Eleven focused host tests pass. The silent native hand-off batch passes
+24 complete outcome/template/capitalization combinations, every pocket position,
+full-pocket rejection, failed-resource retries, duplicate prevention, complete
+reader restoration, and 578 memory assertions. All 881 regression tests pass;
+independent actor builds and installed-text/UPS checks agree. Heap accounting, live save,
+checkpoint restoration, and blank isolated saves pass. Native price/outcome/effect
+code, resident module, font, and ordinary 13,383 applied edits remain unchanged.
+Cancellation or actor removal can discard actor-owned pending state; close that
+paid-letter lifetime gap and validate normal gameplay next. No persistent recovery
+or hardware acceptance is claimed. The [adapter work record](checkpoints/FORTUNE_ACTOR.md)
+tracks current artifacts, regression evidence, and remaining work; the
+[foundation record](checkpoints/FORTUNE_SLIP_FOUNDATION.md) retains the independent
+creator/catalogue evidence.
 
 The [native English credits](../specs/NATIVE_CREDITS.md) install all 110 complete
 rows, adding 106 translated entries. Explicit identities correct swapped,
