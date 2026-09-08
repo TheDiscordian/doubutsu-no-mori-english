@@ -38,6 +38,7 @@ from contextual_choices import load_contextual_choices, canonical_candidate, val
 from extended_choices import payloads as extended_choice_payloads, install as install_extended_choices
 from fortune_strings import permits as fortune_permits, install as install_fortunes, STRING_RELOCATION
 from resetti_replies import permits as resetti_permits, install as install_resetti
+from shop_units import permits as shop_unit_permits, verify_callers as verify_shop_unit_callers
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -46,11 +47,12 @@ RELOCATED_BANKS = {
 
 
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
-                       extended_font=None, english_fortunes=False, english_resetti_replies=False):
+                       extended_font=None, english_fortunes=False, english_resetti_replies=False,
+                       english_shop_units=False):
     if english_fortunes and not runtime_module:
         raise ValueError('English fortunes require the complete resident runtime')
     relocated_banks = {**RELOCATED_BANKS, **({'string': STRING_RELOCATION}
-                       if english_fortunes or english_resetti_replies else {})}
+                       if english_fortunes or english_resetti_replies or english_shop_units else {})}
     layout = ChoiceLayout()
     module_report = None
     if runtime_module:
@@ -70,6 +72,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     edits = json.loads(path.read_text()) if path else []
     string_permits = fortune_permits(rom, edits, info) if english_fortunes else {}
     reply_permits = resetti_permits(rom, edits, info) if english_resetti_replies else {}
+    unit_permits = shop_unit_permits(rom, edits, info) if english_shop_units else {}
     source_banks = banks(rom)
     item_matches = load_item_matches()
     item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
@@ -127,7 +130,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                catchphrase_permit=catchphrase_permit(edit["id"], original, checked, matches),
                                animation_permit=animation_permit(edit['id'], original, checked, matches),
                                extended_glyphs=use_glyphs, fortune_permit=string_permits.get(edit['id']),
-                               resetti_permit=reply_permits.get(edit['id']))
+                               resetti_permit=reply_permits.get(edit['id']),
+                               shop_unit_permit=unit_permits.get(edit['id']))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -158,6 +162,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         install_fortunes(rom, replacements)
     if english_resetti_replies:
         install_resetti(rom, replacements)
+    if english_shop_units:
+        verify_shop_unit_callers(rom, replacements)
     if any(label.get('source_kind') == 'appended_gamecube'
            for id in seen if id in contextual for label in contextual[id]['labels']):
         install_extended_choices(rom, replacements)
@@ -173,6 +179,7 @@ def main():
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
     parser.add_argument('--english-fortunes', action='store_true', help='Complete Katrina phrases and sixteen-byte caller; requires resident module')
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete Resetti rude replies with their native substring lengths')
+    parser.add_argument('--english-shop-units', action='store_true', help='Complete native shop counter families within their ten-byte callers')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -216,7 +223,8 @@ def main():
     report["translation_edits"], relocations = apply_translations(
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font,
-        english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies)
+        english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
+        english_shop_units=args.english_shop_units)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),

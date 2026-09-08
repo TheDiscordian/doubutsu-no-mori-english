@@ -2,17 +2,29 @@
 
 ## Active work
 
+All 120 [shop quantity counters](../specs/SHOP_UNITS.md) are installed with
+complete English singular/plural values and thirty intentional empty counters.
+The native sapling family uses sapling/saplings, not the same-ID GameCube turnip
+wording. No shop actor instruction or saved layout changes. The silent five-shop
+batch passes 120 complete loads, 120 preparations, 250 field insertions, and
+746 memory assertions, with restored checkpoint and blank isolated saves.
+All 829 host regression tests pass. Full/basic candidates total 12,876/12,015;
+ordinary strings are 413/1,562, leaving 1,149 without candidates. All installed
+payloads pass independent reconstruction. These counts do not establish semantic
+review, normal transactions, or hardware compatibility. Shared resident-word
+callers are next; the title screen remains the main image task after the main port.
+
 Fifteen [native engine tests and shopping labels](../specs/ENGINE_DIAGNOSTICS.md)
 have complete English drafts with every native command, menu target, page,
 printed number, and ending retained. Five focused tests and fifteen complete
 native cartridge loads pass, including 47 memory assertions and restored blank
 isolated saves. Both generation modes add exactly fifteen records and retain all
-earlier edits unchanged. Full/basic candidates are 12,757/11,896, with 10,825
+earlier edits unchanged. Full/basic candidates are 12,876/12,015, with 10,825
 main-bank candidates. The five remaining Japanese main-bank records are larger
 test scripts with deliberate glyph/sound samples; those samples need an explicit
 preservation policy, not deletion for coverage. Shared strings and their callers
 remain next; the title screen is the main image replacement after the main port.
-All 822 host regression tests pass.
+All 829 host regression tests pass.
 
 The [Resetti reply dictionary](../specs/RESETTI_REPLIES.md) installs all 32
 complete English rude replies with matching substring lengths. The unchanged
@@ -20,7 +32,7 @@ ten-byte input needs only two actor-instruction changes and compact boundaries
 in the existing table. All 817 host tests pass. The silent native batch passes
 227 detector cases, fourteen installed English apology targets, thirty result
 classifications, and 302 memory assertions with restored checkpoint and blank
-saves. Ordinary strings total 294.
+saves. Ordinary strings total 413, including the complete shop-counter group.
 The two sun/skull apology targets and ordinary editor input/retry remain
 unimplemented or unverified. Broader shared strings, those editor consumers,
 and the five larger native test scripts remain; title artwork stays first after the
@@ -56,7 +68,7 @@ at an existing page boundary. Both full cartridge loads, the continuation, both
 ending phases, and fifteen memory assertions pass in a silent restored
 checkpoint with blank isolated saves. Focused sequence and placeholder checks
 pass; normal first-job interaction and expression rendering remain playthrough
-checks. Current full/basic candidates are 12,757/11,896. All three number-game
+checks. Current full/basic candidates are 12,876/12,015. All three number-game
 questions use dedicated Less/More labels while the clothing menu's shared
 labels remain unchanged. Title artwork remains the first
 image replacement after the main text/runtime work.
@@ -69,8 +81,8 @@ The birthday preparer supplies full English animal/sign names, month names, and
 ordinal days to all 33 native request conversations. Its 24 native boundary cases,
 48 original RNG comparisons, 57 complete message loads, and 190 field insertions
 pass; normal birthday-entry, gift, and horoscope gameplay remain unverified.
-The complete 822-test host suite passes, including the cartridge-font,
-number-game, full-fortune, Resetti-dictionary, and engine-diagnostic integrations. The final 26
+The complete 829-test host suite passes, including the cartridge-font,
+number-game, full-fortune, Resetti-dictionary, shop-counter, and engine-diagnostic integrations. The final 26
 choice tests and seven reply tests also pass.
 The silent birthday/date/choice batch
 passes 913 native calls and 1,588 memory assertions; the fresh train-to-town and
@@ -616,7 +628,7 @@ user's direction. The production build retains the approved spacing metrics.
 ## Current reference candidates
 
 The current experimental resident-module pilot in `build/engine-diagnostics-pilot/`
-contains 12,757 edits, including
+contains 12,876 edits, including
 9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
 drafts, one original-dialogue continuation, 280 original development-label drafts,
 and 114 complete diagnostic/sample drafts.
@@ -1197,7 +1209,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,757 edits; basic generation has 11,896, including both startup-error drafts,
+12,876 edits; basic generation has 12,015, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1527,7 +1539,7 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,757 edits, including
+The resident-module experiment contains 12,876 edits, including
 9,812 reference main-bank candidates, 280 original development-label drafts,
 114 original diagnostic/sample drafts,
 all 460 choices, 178 villager names,

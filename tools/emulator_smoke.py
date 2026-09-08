@@ -897,6 +897,12 @@ def main():
                     raise ValueError('NPC letter-show probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,keyboard,action['test_npc_mail_show'],record))
+            if 'test_shop_units' in action:
+                from shop_unit_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Shop-unit probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_shop_units'],record))
             if 'test_resetti_replies' in action:
                 from resetti_reply_smoke import exercise
                 if not (out/'test.bs1').is_file():

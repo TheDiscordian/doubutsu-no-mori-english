@@ -6900,3 +6900,88 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   rows also require explicit treatment. No shop-unit implementation is included
   in this checkpoint. All broader translation, review, save/gameplay, release,
   original-hardware, title, and keyboard requirements remain active.
+
+## 2026-09-08: complete native shop quantity counters
+
+- Continued from `a034990` and collected the actual terminal five-shop test
+  process. The previous measurement turn independently verified all 12,876
+  installed edits against the candidate and source records, producing evidence
+  rather than another estimate. The complete project goal remains active.
+  The title screen remains the main image priority after the main port.
+- Added `--english-shop-units` to generation and construction, with original
+  tools, seven focused tests, and `specs/SHOP_UNITS.md`. All 120 entries in
+  `0566..05DD` form a complete source-bound group. First 105 values agree fully
+  between supplied English and legacy sources. Thirty empty English counters
+  are intentional. The last fifteen are original sapling/saplings drafts:
+  native item `2900` is the sapling, whereas the same-ID English reference says
+  turnip/turnips. Native turnip bundles continue to use bunch/bunches. Reserved
+  rows beginning at `05DE` remain unchanged.
+- Verified all five original shop actor/relocation hashes, sixteen category
+  pointers and arrays, eight family bases, count-minus-one arithmetic, ten-byte
+  locals, free-string slot 8, and native consumer routines. The two following
+  price words are not additional native families. Full-item-indexed turnip-price
+  address biases are exact permitted constants in the independent relocation
+  model, not arbitrary relaxed bounds. All 600 family/count combinations pass
+  the host model. No production actor instruction, price, quantity, RNG, saved
+  layout, font, or resident allocation changes.
+- Full/basic generation reaches 12,876/12,015, adding exactly 119 entries.
+  Existing `string:05C0` retains its complete bag text with updated group
+  provenance; every other earlier edit and metadata field remains identical.
+  Disabling the option reproduces the earlier full candidate file exactly.
+  General strings total 413/1,562, leaving 1,149 missing candidates. Their
+  candidates comprise 383 Latin values and thirty intentional empty counters.
+  Main candidates remain 10,825, with 927 gaps, including the five deliberate
+  Japanese sample scripts. Reference layout warnings remain 1,491 and semantic
+  review-complete remains zero. Ordinary source-character counts are
+  647,911/746,978 across the 29 banks and 636,391/637,761 in the main bank.
+  These counts are not full caller, review, gameplay, or completion claims.
+- All 829 host regression tests pass in 305.016 seconds,
+  `build/tests-shop-units-full.log`. Seven focused tests pass in 3.013 seconds;
+  after correcting only the native fixture guard placement, the same seven
+  tests pass in 2.886 seconds, `build/tests-shop-units-final.log`. Tests cover
+  complete groups, wrong singular/plural/sapling meanings, stale actors and
+  sources, unrelated capacity rejection, two relocation bases, and independent
+  construction without a resident module. The original relocation-model test
+  initially rejected the legitimate biased price constants; exact native
+  effective-address evidence corrected the fixture, not the game code.
+- Pilot `build/shop-units-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `7e1b7581ea8884b9b9c69f38b259e07e21a43938cf37a371e4fb2bd583d7ecee`.
+  UPS SHA-256:
+  `f1387889e92d4ebe70dd3138fc85707fa3ae328ed4a74af551fe2caa35efc05b`.
+  Candidate `build/shop-units-candidates/translations.json`, SHA-256:
+  `36582094f335e8e1be9783de53358bb1a7be722ecd0075d4e77bf338ecfdbf9a`.
+  Coverage: `build/shop-units-coverage/`. Independent reconstruction verifies
+  every installed edit, unchanged general strings, and the complete original-ROM
+  UPS application. Only DMA metadata `00019D40`, string offsets `00D18000`, and
+  relocated string data `02600000` differ from the engine-diagnostic pilot.
+  String data occupies 8,416 bytes; the resident remains 24,192 linked bytes
+  with 384 free. All five original shop actors remain unchanged.
+- The first native batch `build/smoke-shop-units-01/` passed all 120 counter
+  loads and the Cranny preparations/insertions, then correctly failed its final
+  fixture guard. The guard had been placed inside the relocation workspace
+  explicitly supplied to the original loader. Its changed digest matches the
+  first sixteen original relocation bytes. Moved the fixture guard after the
+  complete workspace and added complete workspace-retention assertions and a
+  host bounds check. No ROM, candidate, or production patch changed. The first
+  failed run does not supply checkpoint-restoration evidence.
+- Final batch `build/smoke-shop-units-02/` passes 555 native calls and 746
+  memory assertions in 2,269 recorded steps. It loads all 120 counters and
+  prepares counts 1, 2, and 15 for every family in all five original actors:
+  120 preparations and 250 complete field insertions. Ten complete shop-message
+  loads preserve `108A/173D` and their reference count-only wording; no unit
+  field is added to those sentences for visibility. Independently checked all
+  case IDs/counts, complete actor/BSS and relocation workspaces, save retention,
+  native stack restoration, 55 edge guards, module guards, scenario identity,
+  restored emulator checkpoint, blank isolated FlashRAM/Pak, and graceful exit.
+  The runner is silent and configured for four MiB; no existing saves are used.
+  Scenario SHA-256:
+  `f858b1e4a152bb5b8e3dd5b82c98e33df91b2b22ac5a543ee3f52a844609ad86`.
+  Normal shop transactions, presentation, and original hardware remain distinct
+  gameplay checks.
+- Next content audit: ordinary resident helper `80920FFC` loads ten-byte
+  random phrases into item fields through four preparers. Drinks/colours and
+  existing NPC-mail families need complete destination/caller proofs. The
+  separate 352-phrase mail resource does not translate this ordinary bank.
+  Resident shop-name and category-label paths use different destinations and
+  need separate treatment. All broader text, editor, mail, review, gameplay,
+  release, hardware, title, and keyboard requirements remain open.

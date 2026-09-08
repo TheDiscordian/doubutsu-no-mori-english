@@ -31,6 +31,7 @@ from reference_animations import animation_permit, verify_animation_reference, v
 from reference_content import adapt_content_reference, validate_content_candidate, validate_glyph_candidate
 from fortune_strings import candidates as fortune_candidates, permits as fortune_permits
 from resetti_replies import candidates as resetti_candidates, permits as resetti_permits
+from shop_units import candidates as shop_unit_candidates, permits as shop_unit_permits
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -151,6 +152,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--english-fortunes', action='store_true', help='Complete source-verified Katrina phrases; requires resident module')
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete source-verified Resetti reply dictionary and matching lengths')
+    parser.add_argument('--english-shop-units', action='store_true', help='Complete source-verified native shop counter families')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -269,6 +271,11 @@ def main():
         replies = (resetti_candidates(rom,gc,{r['id']:r for r in inventory},info)
                    if name == 'string' and args.english_resetti_replies else {})
         reply_permits = resetti_permits(rom,list(replies.values()),info) if replies else {}
+        units = (shop_unit_candidates(rom,gc,{r['id']:r for r in inventory},info)
+                 if name=='string' and args.english_shop_units else {})
+        unit_permits = shop_unit_permits(rom,list(units.values()),info) if units else {}
+        if units.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys()):
+            raise ValueError('Shop-unit group conflicts with another approved group')
         if replies.keys() & (override_ids | matches.keys() | fortunes.keys()):
             raise ValueError('Resetti dictionary conflicts with another approved group')
         if fortunes.keys() & (override_ids | matches.keys()):
@@ -289,7 +296,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in replies:
+            if id in units:
+                edit=units[id]
+                validate_entry(original,encode(edit['translation'],info),info,name,
+                               shop_unit_permit=unit_permits[id])
+                counts['complete_shop_units'] += 1
+            elif id in replies:
                 edit = replies[id]
                 validate_entry(original,encode(edit['translation'],info),info,name,
                                resetti_permit=reply_permits[id])

@@ -54,13 +54,19 @@ glyphs, and ordinary gameplay moving alongside these consumers. Title artwork
 is the first image replacement after the main port. Do not resume the paused
 atlas-edge investigation.
 
-The next shared-string group is shop quantity units. The five shop actors have
-ten-byte loader calls and item-category/unit tables; verify their complete
-count arithmetic, mappings, local buffers, and free-string consumers before
-admitting longer English entries. The English source's count arithmetic differs
-in form, so shared IDs alone do not establish singular/plural selection.
-Unused/reserved unit rows and empty English counters need explicit handling,
-not blanket candidate credit.
+The complete [shop-counter group](../specs/SHOP_UNITS.md) supplies all 120 native
+entries, including thirty explicit empty English counters and the native sapling
+identity correction. All five original actors pass 120 preparations, 250 field
+insertions, and complete actor/save retention. Normal transactions and visual
+polish remain gameplay checks; reserved counter rows stay unchanged.
+
+Next shared-string work covers ordinary resident random words. Native helper
+`80920FFC` loads only ten bytes, then supplies item fields; longer complete
+English phrases need caller/storage changes. Audit all four calling preparers,
+their ID tables, static temporary ownership, and resident item-field consumers
+before importing their groups. The separate 352-phrase NPC-mail resource does
+not translate this ordinary bank. Also check the resident shop-name preparer
+and category labels separately; their destinations and lengths differ.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch
