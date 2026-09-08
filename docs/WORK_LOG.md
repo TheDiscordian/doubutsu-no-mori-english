@@ -6199,3 +6199,55 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   controls/fields, test text, general/name/mail destinations, normal gameplay,
   semantic/presentation review, title-first images, GameCube-style keyboard,
   original hardware, and patch-only release remain. The full goal stays active.
+
+## 2026-09-08 — Complete nine native menu and dialogue follow-ups
+
+- Added complete original drafts for `0467/0970/09D0/0D3F/0F10/10B7/10B8/10BE/17B1`.
+  They retain the native seat-refusal/name request, full two-line fortune chant,
+  50-Bell question, sound retry, entire sleeping apology about Daddy's turnips,
+  snowfall observation, distinct music-player menus, and NES prompt/instructions.
+  All controls remain exact except two NES highlight lengths. No GameCube-only
+  menu, cancellation command, waking expression, or random continuation is added.
+  Expanded bounds are 113, 226, 69, 493, 207, 100, 143, 143, and 62 bytes;
+  approved font metrics report no layout warnings for these drafts.
+- Five focused tests pass in 0.213 seconds, 110 reference tests in 34.659 seconds,
+  and seven native-menu tests in 2.123 seconds. Logs are
+  `build/tests-menu-followups-{01,reference-01,native-menus-01}.log`.
+  The separate unchanged full-runtime checkpoint remains 714 passing tests.
+- `build/smoke-menu-followups-01/` passes 193 steps, 41 native calls, twenty
+  declared returns, twenty full messages, 21 choice labels, and 83 memory checks.
+  Eleven connected fortune/sound/music/NES replies are included. Independent
+  regeneration verifies every call/address/argument/return, complete read,
+  guard, restored stack/checkpoint, silent four-MiB shutdown, and blank isolated
+  FlashRAM/Pak. No save seeds or write permissions are used. Scenario SHA-256:
+  `f9e525f529d56969fd527b55b07ea3593ab7031eb0c7f2e29eab71329227b2d0`.
+  Normal item/music/fortune/NES actions, name entry, sleeping animation, and
+  weather conversations remain gameplay checks, not claims from injected calls.
+- Full/basic output has 12,585/11,838 edits. Only the nine new IDs are added;
+  all earlier complete edit objects remain unchanged and no reserve is allocated.
+  Main coverage: 10,792 = 9,793 references + 615 original dialogue drafts + one
+  original continuation + 284 development labels + 99 diagnostics. The 960 gaps
+  comprise 38 Japanese-static, 919 nonstatic, one Latin, and two symbol records.
+  Ten nonstatic records contain dynamic insertions; reachability remains open.
+  Rejections: 915 unconfirmed, 21 control differences, 23 missing fields, and two
+  overflows, with one original fallback. Reference/label warnings remain 1,484.
+  Candidate source weight: 643,605/746,978; main 633,273/637,761.
+- Pilot: `build/menu-followups-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `36d2809c538c22aceb3faa75721ad7917a608285a5fbc1bfdd9b577d4cb8692b`.
+  UPS SHA-256:
+  `274ac58c29d3510e5559ab39616d587bbb02532e9e3ee1d8205e6a418e0db557`.
+  Candidate SHA-256:
+  `971a4f67e2384870ceb21acae5fa1b1cf419d58d301e2346784a36080273e0d6`.
+  The independent artifact audit verifies every installed payload, source/build
+  hash, complete UPS reconstruction, and exact full/basic differences. Only
+  `00019D40/00CF9000/02000000` DMA files differ; the first changes only its table.
+  Runtime, both font atlases, all other resources, and save layouts are unchanged.
+- Recorded the native `0970` second-answer route back to itself for ordinary
+  decline/cancellation review; did not silently replace it with the GameCube
+  branch. Identified shared size labels in clothing `1772` and all three number
+  games `2D01/2D06/2D0B`; scoped numeric labels remain required for all three,
+  including the two already translated candidates. Progress, queue, and the new
+  menu-follow-up spec track these limits. Main translation/integration, gameplay,
+  semantic/presentation review, title-first images, keyboard, hardware, and
+  patch-only release remain. The complete project goal stays active.

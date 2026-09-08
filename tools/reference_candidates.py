@@ -194,6 +194,7 @@ def main():
                                        Path("translations/n64-letter-question.json"),
                                        Path("translations/n64-storage-raffle.json"),
                                        Path("translations/n64-connected-services.json"),
+                                       Path("translations/n64-menu-followups.json"),
                                        Path("translations/n64-return-greetings.json"),
                                        Path("translations/n64-daily-greetings.json"),
                                        Path("translations/n64-reunion-greetings.json"),

@@ -1,0 +1,75 @@
+[
+  {
+    "id": "message:0467",
+    "source_sha256": "f786725e7f2ab83ae442a55583f373da7c07894c0ae7a31b77a32fe5b2f42a11",
+    "translation": "Don't be so uptight!{cmd:7F0308}\nI'm sitting here anyway.{cmd:7F04}\n{cmd:7F02}By the way,{cmd:7F0306}\nwhat's your name?\n{cmd:7F09090001}\n{cmd:7F55}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native seat-refusal reply, name-entry request, control 55, and continuing ending. Do not borrow the different train actor's expression tuples or add the reference's unverified expressions."
+  },
+  {
+    "id": "message:0970",
+    "source_sha256": "529b93bf7c347df3d7c6dcf5a843dae54240e390722a142abb7dbaa96ef5b8e3",
+    "translation": "Ke{cmd:7F0301}h{cmd:7F0301}ha {cmd:7F0304}Mo{cmd:7F0301}r{cmd:7F0301}ta{cmd:7F0301}a{cmd:7F0306}\nKe{cmd:7F0301}h{cmd:7F0301}ha {cmd:7F0304}Mo{cmd:7F0301}nu{cmd:7F0301}ra{cmd:7F0301}ta{cmd:7F0301}a{cmd:7F0306}\n.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F04}\n{cmd:7F02}Shall I reveal your fortune{cmd:7F0306}\nfor a mere 50 Bells{cmd:7F0306}?\n{cmd:7F0900000B}What do you say?{cmd:7F16006A0034}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0973}{cmd:7F100970}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Transliterate the complete native chant with each syllable pause and retain the 50-Bell question, expression, menu, cancellation, and exact 0973/0970 destinations. The native second choice returns to 0970, unlike GameCube 0971; normal actor/decline behaviour remains an explicit gameplay check, not a silently changed branch."
+  },
+  {
+    "id": "message:09D0",
+    "source_sha256": "5eebfa7fdb55524800eb9703c44ac911e143b57afc3b73420397e9a0189d0507",
+    "translation": "Are these sound settings\nOK?{cmd:7F16004C00F1}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F09C9}{cmd:7F1009C8}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain Yes/Once more, accepted settings at 09C9, and retry at the existing sound menu 09C8. Do not import the GameCube-only 09DB flow or its different negative label."
+  },
+  {
+    "id": "message:0D3F",
+    "source_sha256": "66ce576f67742a4f0e1335a4cbbf0ea6bd7b3c7171e0835056deedb958b0ee50",
+    "translation": "{cmd:7F4F}{cmd:7F09000013}{cmd:7F030C}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}Mmm{cmd:7F030C}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}Hmm{cmd:7F030C}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F030C}\n.{cmd:7F0304}.{cmd:7F0304}So{cmd:7F0301}r{cmd:7F0301}ry{cmd:7F0301}, {cmd:7F0304}D{cmd:7F0301}a{cmd:7F0301}d{cmd:7F0301}d{cmd:7F0301}y{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}Lo{cmd:7F0301}ng{cmd:7F0301} ago, {cmd:7F0304}D{cmd:7F0301}a{cmd:7F0301}d{cmd:7F0301}d{cmd:7F0301}y{cmd:7F0301}'s {cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F030C}\n.{cmd:7F0304}.{cmd:7F0304}pr{cmd:7F0301}e{cmd:7F0301}ci{cmd:7F0301}ous {cmd:7F0301}tur{cmd:7F0301}ni{cmd:7F0301}ps{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F030C}\n.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}the {cmd:7F0301}o{cmd:7F0301}ne {cmd:7F0301}who {cmd:7F0301}a{cmd:7F0301}te {cmd:7F0301}the{cmd:7F0301}m{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}i{cmd:7F0301}t {cmd:7F0301}wa{cmd:7F0301}s {cmd:7F0301}m{cmd:7F0301}e{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F030C}\n.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}mu{cmd:7F0301}m{cmd:7F0301}ble, {cmd:7F0301}mu{cmd:7F0301}m{cmd:7F0301}ble{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F030C}\n.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}Snooore{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full sleeping apology to Daddy, the long-ago precious turnips, admission of eating them, mumbling, and final snore. Every native voice, sleeping-expression, syllable pause, page, and normal ending remains exact. Do not invent the reference's waking expressions or embarrassed spoken question."
+  },
+  {
+    "id": "message:0F10",
+    "source_sha256": "5e3ab75f1620d52999017a770622ad1d74610ac829cb3bfa4b5273160ad58a64",
+    "translation": "{cmd:7F090000FF}It's been snowing all day,\never since this morning.{cmd:7F04}{cmd:7F0900000F}\n{cmd:7F02}{cmd:7F030A}Where in the sky could\nall this snow have\nbeen waiting?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}It's such a mystery,\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Translate the full native all-day snowfall, question about the sky holding so much snow, and mystery observation. Retain native expressions, pauses, catchphrase, and normal ending without the reference-only four-way random follow-up."
+  },
+  {
+    "id": "message:10B7",
+    "source_sha256": "03610ad8c5217880b93d8469d26684594bf3d9102933102a92084d3291133dee",
+    "translation": "{cmd:7F054B1E14} There's no music inside.\n\n{cmd:7F054B1E14} Want to listen to something?\n{cmd:7F1600E2000D}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The empty native player offers listen or leave, not the GameCube three-answer registration menu. Retain both brown spans, two choices, cancellation, selection, and continuing ending."
+  },
+  {
+    "id": "message:10B8",
+    "source_sha256": "46c62653a226f8be9e064a5bdacf63ca66a1751e3994e3e36fad9eb8ca53df4f",
+    "translation": "{cmd:7F054B1E14} It has {cmd:7F31}.\n{cmd:7F054B1E14} There's music inside.\n{cmd:7F054B1E14} What would you like to do?\n{cmd:7F18009E007E00E900A0}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full music-name field and native Turn on/Remove/Swap/Nothing order. No GameCube-only registration menu or cancellation command is added. Every native command and argument remains exact."
+  },
+  {
+    "id": "message:10BE",
+    "source_sha256": "73a9d439a036bb593de6d372a8263f65af4b00b1af09764ad92b1d95fe4fdba0",
+    "translation": "{cmd:7F054B1E14} It has {cmd:7F31}.\n{cmd:7F054B1E14} There's music inside.\n{cmd:7F054B1E14} What would you like to do?\n{cmd:7F18009F007E00E900A0}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full music-name field and native Turn off/Remove/Swap/Nothing order. No GameCube-only registration menu or cancellation command is added. Every native command and argument remains exact."
+  },
+  {
+    "id": "message:17B1",
+    "source_sha256": "6131640ac78ecb2cd4f26a9d5126999aa7406e0ae07a94733e80914ec0a603c3",
+    "translation": "\n  Play your {cmd:7F50324BE103}NES{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Translate the complete native NES launch question, retaining the two play/refuse labels, original selection behaviour, and 17B5 instructions. Only the blue NES and brown question-mark highlight lengths change to 3 and 1; no GameCube cancellation command is added.",
+    "control_policy": "reference_layout"
+  }
+]
