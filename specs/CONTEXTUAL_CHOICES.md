@@ -19,21 +19,25 @@ the source description alone is not gameplay proof.
 Shared native labels are context-dependent. Circle/X can mean shapes in one
 game and correctness in a quiz. Native `00B7` can mean either none or pear,
 and `0010` can express agreement or refusal. Unconditional English replacements
-cannot resolve those meanings. Existing English bank entries already supply
-the required answers, so this implementation adds no label records, table
-capacity, command, runtime hook, or saved field.
+cannot resolve those meanings. Most contexts use complete existing English bank entries. The three
+[number-game questions](NUMBER_GAME_CHOICES.md) require two appended four-byte
+labels and two native count-check changes. Other contexts add no label records,
+and no choice command, resident runtime hook, or saved field changes.
 
 ## Two complete payload approvals
 
-`translations/contextual_choices.json` contains twenty-six explicit approvals.
-Twenty-two require a complete [native-menu reference approval](REFERENCE_CHOICES.md).
-Two require a complete unchanged native-menu reference, and two require the
+`translations/contextual_choices.json` contains twenty-nine explicit approvals.
+Twenty-three require a complete [native-menu reference approval](REFERENCE_CHOICES.md).
+Four require a complete unchanged native-menu reference, and two require the
 explicit original-draft contract below. Every approval binds
 its original source hash, complete canonical English payload hash,
 exact native menu, exact menu offset, replacement display menu, complete final
 payload hash, and every destination label's source and encoded-English hashes.
 There must be exactly one menu, with the same command kind and answer count.
-Only existing label IDs below 460 are allowed. Each review establishes the
+Ordinary bindings use existing label IDs below 460. The explicit
+`appended_gamecube` label kind admits only the two complete registered
+Less/More bindings at `01CC/01CD`, with exact reference IDs and source/output
+hashes. Those hashes describe supplied English labels, not native slots. Each review establishes the
 meaning of the question and each answer index; these are not automatic
 label substitutions based on English words.
 
@@ -57,7 +61,9 @@ The generator first performs all ordinary source/reference, native-menu,
 field, actor, layout, and capacity validation. After all bank edits are available,
 it replaces only the approved menu span. Every surrounding byte stays unchanged,
 including GameCube words, newlines, pages, emphasis, pauses, and native branch
-assignments. Native instruction and resource files are unchanged.
+assignments. Ordinary contextual mappings leave native instruction and resource files
+unchanged. The number-game integration adds only its two labels and two
+independently guarded count instructions after complete menu validation.
 
 The builder independently requires the final display payload, even if all
 adaptation/provenance metadata is removed. It reverses only the exact menu
@@ -68,7 +74,9 @@ is written to the ROM. Both payload hashes, their equal lengths, and the
 unique menu constrain the only permitted difference to label IDs. No generic
 control-signature exception or alternative branch policy is introduced.
 
-All referenced English label edits must be in the same build input. Their
+All referenced ordinary English label edits must be in the same build input.
+Appended labels require their complete independently checked resource instead;
+ordinary edit metadata cannot supply or override those new slots. Their
 complete source and output hashes must match, they must be nonempty plain
 text, and ordinary choice-capacity validation still applies. Missing label
 dependencies withhold the affected generator candidate rather than publishing
@@ -94,6 +102,7 @@ it is not permission to ignore the English runtime's capacity requirements.
 | `246D` | `0025/0051`: That's right! / Nope! | Complete old-calendar reference; requires the actual English date preparer and retains affirmative success. |
 | `088A/088B/088C` | `0021/00C4`: You know it! / You're wrong! | Birthday acknowledgement at `0889` versus correction at `088A`; not a greeting. |
 | `2586` | `0127/0162/00C4`: Yeah! / Not really. / You're wrong! | Confidence, modesty, and an incorrect random sign remain distinct at `259D/259E/259F`. |
+| `2D01/2D06/2D0B` | Appended `01CC/01CD`: Less / More. | Smaller first, larger second, with every original branch and clothing-size label retained. |
 
 Twenty-one reference menus use the complete supplied GameCube answer pairing. `1FAE`
 retains the original native moderate second answer using the independently
@@ -101,7 +110,8 @@ corrected shared `0103` label, rather than importing stronger agreement.
 `088A/088C` use the complete birthday acknowledgement pair from `088B`, without
 changing shared greeting label `0041`. All four birthday mappings require the
 complete [birthday preparer](BIRTHDAY_FIELDS.md).
-The sixteen distinct destination label records remain unchanged by these mappings.
+The sixteen distinct original destination label records remain unchanged by
+these mappings. Two dedicated appended labels serve the number-game questions.
 Unmapped Circle/X shape-game messages retain their exact previous payloads
 and labels. Other contexts require their own approvals.
 The two [native-topic quiz originals](NATIVE_TOPIC_GAPS.md) preserve their
@@ -132,16 +142,18 @@ behaviour. Final wording and presentation review remain.
 `tests/test_contextual_choices.py` checks schema and duplicate rejection,
 complete native-menu parent binding, both payload directions, exact label
 dependencies, source/layout/menu/action mutations, missing-label withholding,
-all twenty-four retail-reference cases, unmapped shape games, the native moderate
+all twenty-seven retail-reference cases, unmapped shape games, the native moderate
 answer, builder rejection without metadata, and all four original replies.
 Two native-original fixtures additionally check absent/colliding parents and
 independent canonical-command rejection. Topic tests cover both real original
 quizzes, complete original accounting, and missing-label draft withholding.
 
 `tools/contextual_choice_test_scenario.py` uses real cartridge text and labels.
-It checks fifty-four unique messages, including all changed/new messages,
-twenty-two connected replies, and an unchanged four-choice shape game. The
-twenty-six contextual menus supply 53 answer cases; the shape game supplies four more.
+It checks 73 unique messages, including all changed/new messages, connected
+replies, an unchanged four-choice shape game, and the complete unchanged
+clothing question. The 29 contextual menus supply 59 answer cases; the shape
+and clothing menus supply four and three more respectively. Eight label-table
+boundary cases exercise both native count guards and aligned tail reads.
 Actual native loaders, row setters, width calculation, determination, selected
 text insertion, and conditional handlers execute in one isolated checkpoint.
 Every selected answer is checked against its complete label, length, original

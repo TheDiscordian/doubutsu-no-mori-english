@@ -19,8 +19,9 @@ def validate_choice_approval(record):
     if "native_choices" not in record:
         return
     rule = record["native_choices"]
+    required = {"reference_command", "native_command", "offset", "adapted_sha256"}
     if (not isinstance(rule, dict)
-            or set(rule) != {"reference_command", "native_command", "offset", "adapted_sha256"}
+            or not required <= set(rule) <= required | {'answer_permutation'}
             or not record["id"].startswith("message:") or "controller" in record
             or type(rule["offset"]) is not int or not 0 <= rule["offset"] < 1024
             or not isinstance(rule["adapted_sha256"], str)
@@ -29,6 +30,28 @@ def validate_choice_approval(record):
     before, after = choice_command(rule["reference_command"]), choice_command(rule["native_command"])
     if before == after or before[1] != after[1]:
         raise ValueError("Native-choice approval must retain the number of choices")
+    if 'answer_permutation' in rule:
+        permutation = rule['answer_permutation']
+        count = before[1]-0x14
+        if (not isinstance(permutation, list) or len(permutation) != count
+                or any(type(n) is not int for n in permutation)
+                or sorted(permutation) != list(range(count))
+                or permutation == list(range(count))):
+            raise ValueError('Native-choice answer permutation must reorder every answer exactly once')
+
+
+def permuted_routes(source, reference, permutation, native_info, reference_info):
+    """Prove each destination's equivalent answer index before restoring it."""
+    def routes(data, info):
+        result = [t for t in tokenize(data, info) if t.kind == 'cmd' and 0x0F <= t.data[1] <= 0x12]
+        if ([t.data[1] for t in result] != list(range(0x0F, 0x0F+len(permutation)))
+                or any(b.offset != a.offset+4 for a, b in zip(result, result[1:]))):
+            raise ValueError('Answer permutation requires one contiguous ordered branch per answer')
+        return result
+    native, english = routes(source, native_info), routes(reference, reference_info)
+    if any(native[i].data[2:] != english[j].data[2:] for i, j in enumerate(permutation)):
+        raise ValueError('Answer permutation changes a native destination or its meaning')
+    return [(english[i].offset, native[i].data) for i in range(len(permutation))]
 
 
 def adapt_choice_reference(reference, source, record, info):
@@ -54,10 +77,18 @@ def adapt_choice_reference(reference, source, record, info):
             or english[0].data != before or english[0].offset != rule["offset"]):
         raise ValueError("Approved choice span differs from the unique native/reference menu")
     offset = rule["offset"]
-    adapted = raw[:offset]+after+raw[offset+len(before):]
-    return decode(adapted, reference_info), [{"operation": "preserve_approved_native_choices",
+    adapted = bytearray(raw[:offset]+after+raw[offset+len(before):])
+    changes = [{"operation": "preserve_approved_native_choices",
                                    "byte_offset": offset, "gamecube": before.hex().upper(),
                                    "n64": after.hex().upper()}]
+    if 'answer_permutation' in rule:
+        routes = permuted_routes(source, raw, rule['answer_permutation'], info, reference_info)
+        for at, command in routes:
+            adapted[at:at+4] = command
+        changes.append({'operation': 'preserve_approved_native_answer_indices',
+                        'native_to_reference': rule['answer_permutation'],
+                        'routes': [{'offset': at, 'native': cmd.hex().upper()} for at, cmd in routes]})
+    return decode(bytes(adapted), reference_info), changes
 
 
 def validate_choice_candidate(id, source, candidate, matches):

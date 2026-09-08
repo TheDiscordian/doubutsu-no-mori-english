@@ -6612,3 +6612,73 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   size labels remain unchanged. No numeric-menu implementation is claimed.
   The title screen remains the first image task, using supplied English artwork.
   The complete translation/runtime/review/release goal remains active.
+
+## 2026-09-08: complete three-round numeric answers with unchanged clothing labels
+
+- Added dedicated complete Less/More labels at appended choice IDs `01CC/01CD`,
+  bound to supplied `select:025C/025B`. All 460 original label records remain
+  unchanged. Both four-byte labels fit the original and expanded choice buffers;
+  no resident code/allocation, font, or saved format changes. The two exact
+  native `slti` count limits at `80065544/80065DAC` become 462. The cumulative
+  table retains its following zero words, and label data remains DMA-aligned.
+- Complete first-round `2D01` uses an explicit `[1,0]` answer permutation.
+  The GameCube's More/Less and `2D03/2D02` become native smaller/larger indices
+  and `2D02/2D03`; exact mapped destinations, contiguous branch blocks, complete
+  source/reference hashes, and final payload hashes are independently checked.
+  All English question wording, manual lines, timing, expressions, and endings
+  remain. The second and final questions `2D06/2D0B` retain their complete
+  unadapted-reference parents and native branch order before menu-only display
+  substitution. Their connected English replies explicitly retain less/smaller
+  versus more/bigger meaning, and all random-result weights stay unchanged.
+- Generation verifies the actual supplied label references. Builder authority
+  comes from the two registered appended bindings and complete contextual
+  approvals, not candidate metadata. Missing appended resources withhold the
+  dependent contextual messages; stale or changed labels fail. A candidate file
+  cannot override the added IDs. Count/data/table publication occurs only after
+  all ordinary message and menu validation. Unknown IDs, changed padding, count
+  overlaps, partial/invalid permutations, and new branch destinations fail.
+- All 26 choice tests pass, including seven extension/number-game tests.
+  Initial tests identified only the two older approval-count expectations;
+  updated them to the independently enumerated 168 native-menu and 29 contextual
+  approvals. The complete suite passes **803 tests in 297.930 seconds**, log
+  `build/tests-number-game-full.log`. Final malformed-binding checks also pass
+  the 26-test batch in 3.182 seconds, `build/tests-number-choices-final.log`.
+- Full/basic candidates: 12,603/11,850. Only `2D01` is added; only `2D06/2D0B`
+  change among existing candidates. All other dialogue, original labels, names,
+  items, and mail candidates remain unchanged. Main: 10,810 = 9,812 references
+  + 618 original dialogue drafts + one original continuation + 280 development
+  labels + 99 diagnostics. Appended labels are not counted as native edits.
+  Remaining: 942 = twenty Japanese-static diagnostics + 919 nonstatic + one
+  Latin + two symbol records, including ten dynamic-only records. Rejections:
+  905 unconfirmed identities, fourteen controls, 23 fields, and one overflow,
+  with one original fallback. Layout warnings stay 1,491. Ordinary candidate
+  source weights: 646,357/746,978 across banks, 636,025/637,761 in main dialogue.
+  These are candidate inventories, not semantic or project-completion claims.
+- Pilot `build/number-game-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `f82093cfb4b87e623174dc9d5093e0122bdeaea78b381322d69af6f2bf4a8996`.
+  UPS SHA-256:
+  `faf4d1030ae823ae33269be6da7975387b98395a2d17d03a35ce1f09bd4d920a`.
+  Candidate SHA-256:
+  `ff095dbfd5c7140fbcb10bd170ab94d11d3df632a4fad4cb2dd102dcd51deb1d`.
+  Full reconstruction checks all 12,603 installed edits, both extra labels,
+  all 460 unchanged original labels, complete original-ROM UPS recovery, and
+  the exact two-instruction main-code difference. Only main/choice data and
+  tables, those two instructions, and ROM DMA metadata differ from the
+  snooty-letter pilot. All other extracted files and resources remain identical.
+- `build/smoke-number-game-01/` passes 2,003 recorded steps, 510 native calls,
+  331 declared returns, 817 complete memory assertions, and 669 fixture writes.
+  The batch covers 73 unique messages, 66 answer cases, all 29 contextual menus,
+  the unchanged clothing/shape menus, and eight label-index boundaries in both
+  the actual table reader and loader. All six number answers reach native
+  `2D02/2D03`, `2D07/2D08`, and `2D0C/2D0D`; the three clothing answers retain
+  `1777/1778/1779`. No random payout is executed. Buffer/module guards,
+  stack/checkpoint restoration, blank isolated FlashRAM/Pak, and graceful
+  shutdown pass. Audio is disabled and four-MiB configuration is selected.
+  Independent scenario regeneration checks every argument, return, read, and
+  write. Scenario SHA-256:
+  `ddce8e2d1c0603db9b444eb6225161ccecb23b452c46652d68ab259a5dd9ee5c`.
+- Normal input, three-round progression/prizes, clothing actions, final layout,
+  human semantic review, saves in ordinary play, and hardware remain unverified.
+  Next content work includes general strings/callers, apology/editor matching,
+  and the remaining native diagnostics. Title artwork stays first in the image
+  queue after the main port. The full objective remains active, not complete.

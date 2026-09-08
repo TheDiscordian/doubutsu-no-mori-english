@@ -35,6 +35,7 @@ from reference_animations import animation_permit, verify_native_consumer
 from reference_content import validate_content_candidate, validate_glyph_candidate
 from reference_mail_fragments import load_fragment_matches, validate_fragment_candidate
 from contextual_choices import load_contextual_choices, canonical_candidate, validate_labels
+from extended_choices import payloads as extended_choice_payloads, install as install_extended_choices
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -102,7 +103,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 validate_item_candidate(edit, item_sources, info, item_matches)
                 checked = canonical_candidate(edit['id'], original, replacement, contextual, info)
                 if edit['id'] in contextual:
-                    validate_labels(contextual[edit['id']], edits_by_id, source_labels, info)
+                    validate_labels(contextual[edit['id']], edits_by_id, source_labels, info,
+                                    extended_labels=extended_choice_payloads())
                 validate_controller_candidate(edit["id"], original, checked, matches)
                 validate_choice_candidate(edit["id"], original, checked, matches)
                 validate_actor_request_candidate(edit["id"], original, checked, matches)
@@ -143,6 +145,9 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             replacements[vrom] = bytes(whole)
     if grouped:
         raise ValueError(f"Unknown translation banks: {list(grouped)}")
+    if any(label.get('source_kind') == 'appended_gamecube'
+           for id in seen if id in contextual for label in contextual[id]['labels']):
+        install_extended_choices(rom, replacements)
     return count, relocations
 
 

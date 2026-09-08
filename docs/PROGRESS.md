@@ -2,15 +2,26 @@
 
 ## Active work
 
+The [three-round number game](../specs/NUMBER_GAME_CHOICES.md) has complete
+English questions and dedicated Less/More answers without changing the clothing
+menu. The silent native batch passes all 29 contextual menus, the clothing/shape
+regressions, and eight table boundaries: 73 unique messages, 66 answer cases,
+510 native calls, and 817 memory assertions, with restored checkpoint and blank
+saves. Only two choice-count instructions change; no new resident allocation,
+font metric, saved field, or random-outcome command changes. Normal rounds,
+prizes, clothing actions, final wording/layout, and hardware remain separate
+gameplay/playthrough checks. General strings/callers, apology matching, and
+remaining native diagnostics are the next content targets.
+
 The complete [snooty letter-sharing explanation](../specs/SNOOTY_LETTER_SEQUENCE.md)
 is installed as `0912 → 2B47`, retaining every GameCube word and splitting only
 at an existing page boundary. Both full cartridge loads, the continuation, both
 ending phases, and fifteen memory assertions pass in a silent restored
 checkpoint with blank isolated saves. Focused sequence and placeholder checks
 pass; normal first-job interaction and expression rendering remain playthrough
-checks. Current full/basic candidates are 12,602/11,849. The next main-bank
-task is scoped numeric answers for all three number-game questions without
-altering the clothing menu's shared labels. Title artwork remains the first
+checks. Current full/basic candidates are 12,603/11,850. All three number-game
+questions use dedicated Less/More labels while the clothing menu's shared
+labels remain unchanged. Title artwork remains the first
 image replacement after the main text/runtime work.
 
 Complete the main translation/runtime port, then the matching GameCube image
@@ -21,7 +32,8 @@ The birthday preparer supplies full English animal/sign names, month names, and
 ordinal days to all 33 native request conversations. Its 24 native boundary cases,
 48 original RNG comparisons, 57 complete message loads, and 190 field insertions
 pass; normal birthday-entry, gift, and horoscope gameplay remain unverified.
-The complete 792-test host suite passes, including the cartridge-font integration.
+The complete 803-test host suite passes, including the cartridge-font and
+number-game integrations. The final 26 choice tests also pass.
 The silent birthday/date/choice batch
 passes 913 native calls and 1,588 memory assertions; the fresh train-to-town and
 cartridge-mail batch passes 245 calls and 546 memory assertions. Both restore
@@ -64,8 +76,9 @@ seat-refusal introduction, snowfall observation, and sleeping apology. Five
 focused tests, 110 reference tests, and seven native-menu tests pass. Their
 silent cartridge batch passes twenty complete messages, 21 choice labels, and
 83 memory assertions with restored checkpoint and blank saves. Normal menu
-actions and actor progression remain gameplay checks. Shared number-game/clothing
-answer labels require scoped handling; no global label change is made.
+actions and actor progression remain gameplay checks. Shared number-game/clothing answer labels use the separate
+[number-game integration](../specs/NUMBER_GAME_CHOICES.md); no global label
+change is made.
 
 Six [complete Resetti/Gulliver scripts](../specs/RESETTI_GULLIVER_SEQUENCES.md)
 retain all GameCube wording and presentation, using three checked continuations.
@@ -563,20 +576,22 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/snooty-letter-pilot/`
-contains 12,602 edits, including
-9,811 reference main-bank candidates, all 460 choices, 618 original dialogue
+The current experimental resident-module pilot in `build/number-game-pilot/`
+contains 12,603 edits, including
+9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
 drafts, one original-dialogue continuation, 280 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 943
+still require review. Two additional complete numeric labels extend the choice
+bank to 462 entries without increasing the native candidate count.
+The original main-bank audit leaves 942
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,491 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/snooty-letter-candidates/` and `build/snooty-letter-coverage/`.
+`build/number-game-candidates/` and `build/number-game-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1138,7 +1153,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,602 edits; basic generation has 11,849, including both startup-error drafts,
+12,603 edits; basic generation has 11,850, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1468,8 +1483,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,602 edits, including
-9,811 reference main-bank candidates, 280 original development-label drafts,
+The resident-module experiment contains 12,603 edits, including
+9,812 reference main-bank candidates, 280 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1492,9 +1507,9 @@ service/reaction drafts, nine native menu/dialogue follow-ups, and three native
 special-dialogue follow-ups.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 944 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 943 main records without
-candidates: 21 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 943 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 942 main records without
+candidates: 20 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

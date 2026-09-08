@@ -18,17 +18,24 @@ field, native actor-argument, and capacity checks still run after adaptation.
 The builder verifies the approved final hash independently of candidate metadata.
 Controller-text and native-choice adaptations cannot share an approval.
 
+The explicit [number-game answer permutation](NUMBER_GAME_CHOICES.md) preserves
+native answer indices when the English reference reverses its label/branch order.
+Only a declared complete permutation with one contiguous branch per answer and
+identical mapped destinations is permitted. The full source/reference/output
+hashes and independent native-flow guard still apply; this does not permit
+arbitrary branch destinations or an implicit change to another menu.
+
 The host parser recognises reference-only `74` without adding it to the native
 command table. The ordinary adapter still removes it only directly before an
 already supported native string insertion. Other occurrences remain rejected.
 
-Twenty-two reference [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
+Twenty-three reference [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
 separate final menu-only mapping after this complete native-ID validation.
 They retain every answer index and branch, require all destination English
 labels, and reverse to this exact canonical payload for independent builder
 validation. They do not relax the native-choice contract or change shared
 labels globally.
-Two further contextual approvals bind a complete reference whose menu already
+Four further contextual approvals bind a complete reference whose menu already
 uses the native IDs; they do not invent an adaptation under this contract.
 
 ## Shop-service batch
@@ -95,7 +102,7 @@ patch independently of removable candidate metadata. See
 
 Portable tests cover exact replacement, changed sources/references, missing or
 duplicate menus, wrong offsets, changed action counts, unrelated controls, and
-the independent final-payload guard. Retail-input tests check all 167 approvals,
+the independent final-payload guard. Retail-input tests check all 168 approvals,
 their unchanged native choice commands, complete capacity validation, and the
 source-bound original labels. The [broader native-menu batch](NATIVE_MENUS.md)
 supplies 135 approvals beyond the shop and police-station explanations, with

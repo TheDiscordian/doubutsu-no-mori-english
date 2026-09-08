@@ -21,6 +21,7 @@ from runtime_module import module_command_info
 from textbanks import banks
 from textcodec import decode, encode, tokenize
 from textvalidate import validate_entry
+from extended_choices import payloads as extended_payloads
 from test_retail import ROM_PATH
 
 
@@ -184,6 +185,8 @@ class ContextualChoiceRetailTests(unittest.TestCase):
         result={}
         for row in self.approvals.values():
             for label in row['labels']:
+                if label.get('source_kind') == 'appended_gamecube':
+                    continue
                 id=label['id'];source=self.sources['select'][int(id[7:],16)]
                 result[id]=overrides.get(id,dict(id=id,source_sha256=sha256(source),translation=refs[id]['text']))
         return result
@@ -198,19 +201,19 @@ class ContextualChoiceRetailTests(unittest.TestCase):
         return source,encode(text,self.info)
 
     def test_all_reference_display_labels_preserve_complete_base_and_actions(self):
-        self.assertEqual(len(self.approvals),26)
+        self.assertEqual(len(self.approvals),29)
         labels=self.reference_edits()
         self.assertEqual(len(labels),16)
         reference_approvals = {id: row for id, row in self.approvals.items()
                                if row.get('source_kind') != 'native_original'}
-        self.assertEqual(len(reference_approvals), 24)
+        self.assertEqual(len(reference_approvals), 27)
         for id,row in reference_approvals.items():
             source,base=self.reference_base(id)
             output=display_candidate(id,source,base,self.approvals,self.info)
             self.assertEqual(canonical_candidate(id,source,output,self.approvals,self.info),base)
             validate_choice_candidate(id,source,base,self.matches)
             validate_entry(source,base,self.info,'message','reference_layout',resident_runtime=True)
-            validate_labels(row,labels,self.sources['select'],self.info)
+            validate_labels(row,labels,self.sources['select'],self.info,extended_labels=extended_payloads())
             before=unique_menu(base,self.info);after=unique_menu(output,self.info)
             self.assertEqual(base[:before.offset],output[:after.offset])
             self.assertEqual(base[before.offset+len(before.data):],output[after.offset+len(after.data):])

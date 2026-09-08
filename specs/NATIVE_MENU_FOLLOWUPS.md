@@ -42,12 +42,12 @@ Normal item removal/swapping, music output, fortune payment/refusal, name entry,
 NES start/quit, sleeping-resident animation, and weather conversations remain
 separate gameplay and human-playthrough checks.
 
-The numeric game at `2D01` remains a separate contextual-label task. The same
+The numeric game uses the separate [contextual-label integration](NUMBER_GAME_CHOICES.md). The same
 native size labels `01B0/00F0` occur in all three number questions
 `2D01/2D06/2D0B` and clothing question `1772`. Do not rename them globally to
-Less than 5/More than 5. The two other number questions already have candidates
-and need the same contextual-label review; fixing only the untranslated root
-would leave inconsistent answers. No shared label changes are made here.
+Less than 5/More than 5. All three number questions use complete dedicated Less/More labels, retaining
+the original answer indices and routes. The complete clothing question and all
+original label records remain unchanged.
 
 ## Verification evidence
 

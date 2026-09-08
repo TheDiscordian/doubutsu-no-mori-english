@@ -32,6 +32,7 @@ from reference_content import adapt_content_reference, validate_content_candidat
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
+from extended_choices import verify_reference_labels
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -443,9 +444,11 @@ def main():
     selected = {edit["id"] for edit in edits}
     edits += [edit for edit in drafts if edit["id"] not in selected]
     before_context = {edit['id']: edit for edit in edits}
+    extended_labels = verify_reference_labels({r['id']: r for r in map(json.loads,
+        (args.gc_text/'select.jsonl').read_text().splitlines())}, info)
     edits, context_ids, context_withheld = contextualize_edits(
         edits, source_banks['message'].entries(), source_banks['select'].entries(),
-        load_contextual_choices(matches), info)
+        load_contextual_choices(matches), info, extended_labels=extended_labels)
     context_removed = {r['id'] for r in context_withheld}
     context_counts = Counter(reports['message'])
     manifests = record_contextual_candidates(before_context, edits, context_ids, context_removed,

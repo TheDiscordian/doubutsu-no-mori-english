@@ -7364,5 +7364,33 @@
       "gamecube_glyph_offsets": [182]
     },
     "evidence": "Soccer conversation retains all four pages, the 24/7 expression, native actor expressions, and all supplied player, rival, and catchphrase fields. Every supplied English word, manual line, page, pause, and native action remains unchanged. Only the registered separate-font prefix is added to the original GameCube slash code; the complete source stream and final payload are hash-bound. Requires the source-verified cartridge glyph capability. See EXTENDED_GLYPHS.md."
+  },
+  {
+    "id": "message:2D01",
+    "source_sha256": "a716d152e8206173ef645d0f050d47fb96b1957e9972b04971f7b5f615cdab2d",
+    "reference_id": "message:2D01",
+    "reference_sha256": "645ae0a5fada2ef27938a8d692237d6aeb3b7077ebf03dd7350299de6a42f24b",
+    "native_choices": {
+      "reference_command": "7F16025B025C",
+      "native_command": "7F1601B000F0",
+      "offset": 115,
+      "adapted_sha256": "7370a90ab2c1715ab9f16d8ca1220b653f4ee8e0ab9692dc53b5b3d1545cdaa2",
+      "answer_permutation": [1, 0]
+    },
+    "evidence": "Complete first number-game question preserves every supplied English word, pause, line, expression, and ending. The English reference orders More/Less with destinations 2D03/2D02; restore native Less/More indices and destinations 2D02/2D03 through the exact answer permutation. Mandatory contextual display labels use dedicated appended numeric answers without changing shared clothing labels. See NUMBER_GAME_CHOICES.md."
+  },
+  {
+    "id": "message:2D06",
+    "source_sha256": "abf115f3a69773a22ec8996315027963542529e025933140e9328eb4f23bea34",
+    "reference_id": "message:2D06",
+    "reference_sha256": "cdd7eff801df84ce6474e06bf42d098b09a7f07423c8c2414f0234fc52d9fba1",
+    "evidence": "Complete second number-game question retains its original native menu and smaller/larger answer indices, routes 2D07/2D08, all English wording, lines, pauses, expressions, and ending. Mandatory contextual numeric labels leave the shared clothing-size labels untouched. See NUMBER_GAME_CHOICES.md."
+  },
+  {
+    "id": "message:2D0B",
+    "source_sha256": "c81051b1ebcb664f1d529a1bb57ad54dccb9d6a20497c9ddd7c0b24f294045a7",
+    "reference_id": "message:2D0B",
+    "reference_sha256": "1adf434c92828332b9dc3d5ace590c4356d4888195acb7aed2d6484230352656",
+    "evidence": "Complete final number-game question retains its original native menu and smaller/larger answer indices, routes 2D0C/2D0D, all English wording, lines, pauses, expressions, and ending. Mandatory contextual numeric labels leave the shared clothing-size labels untouched. See NUMBER_GAME_CHOICES.md."
   }
 ]

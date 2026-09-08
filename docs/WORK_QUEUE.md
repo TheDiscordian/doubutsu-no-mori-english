@@ -24,11 +24,13 @@ delivery command. The native batch passes 26 draws, eight cursor cases, six
 complete loads, and 324 memory assertions. Native atlas/spacing and saved formats
 remain unchanged. The complete `0912 → 2B47` letter explanation passes both
 native loads, its continuation/endings, and fifteen memory assertions with a
-restored checkpoint and blank saves. Next main targets are scoped labels for
-all three `2D01/2D06/2D0B` number-game questions and twenty native diagnostic
-records. The [number-game source and integration plan](../specs/NUMBER_GAME_CHOICES.md)
-records the exact menus, answer permutation, appended-label sources, and native
-count guards; implementation remains pending. Apology `048E/0491`
+restored checkpoint and blank saves. All three
+[number-game questions](../specs/NUMBER_GAME_CHOICES.md) use complete Less/More
+labels through two appended slots and guarded count checks. All six numeric
+answers and unchanged clothing choices pass the combined native batch: 73
+unique messages, 66 answer cases, eight boundaries, and 817 memory assertions.
+Next work covers general strings and their callers, apology input/matching,
+and the twenty remaining native diagnostic records. Apology `048E/0491`
 still requires editor/token/matching integration; its rude-reply strings and
 lengths need one coordinated update. Keep general strings, remaining mail
 glyphs, and ordinary gameplay moving alongside these consumers. Title artwork
@@ -587,9 +589,9 @@ complete loads, four labels, 52 order dispatches, and 237 memory assertions with
 restored checkpoint and blank saves. Sale outcomes, apology/editor integration,
 Gulliver gifts, reset outcomes, wording/layout, and hardware remain required.
 
-Current main-bank coverage is 10,809 candidates; 943 records remain without
-candidates, including 21 containing Japanese static text. The reference
-rejection queue contains 905 unconfirmed identities, fifteen control-signature
+Current main-bank coverage is 10,810 candidates; 942 records remain without
+candidates, including 20 containing Japanese static text. The reference
+rejection queue contains 905 unconfirmed identities, fourteen control-signature
 differences, 23 missing-field records, and one expansion overflow. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -664,12 +666,12 @@ identity batches remain, alongside final native festival review and gameplay.
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, ordinary resident year/month/day/leap-month preparation, and all 33 birthday-request fields pass targeted checks; normal birthday entry/gifts, other UI callers, and out-of-table native calendar dates remain |
-| R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 167 dialogue approvals preserve native menu order, and twenty-six contextual mappings retain answer indices/actions; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; further contextual labels, full review, and actor-specific runtime paths remain |
+| R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 168 dialogue approvals preserve native menu order, and twenty-nine contextual mappings retain answer indices/actions; twenty-byte capacity, long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; appended numeric labels retain all three rounds and clothing meanings in the 73-message/66-answer/eight-boundary native batch; further contextual labels, full review, and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; ten-byte default catchphrase display passes all 216 default loads and main insertion with unchanged saved bytes; gyroid owner-message pixel wrapping and native insertion pass with unchanged saved/editor limits; longer gyroid default/custom storage, ambiguous borrowed phrases, shared choices, mail, and shop destinations remain |
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, the complete snooty letter explanation, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, six separate-glyph references, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 25 guarded continuation allocations; 99 complete diagnostic labels covered; 21 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, the complete snooty letter explanation, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, six separate-glyph references, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 25 guarded continuation allocations; 99 complete diagnostic labels covered; scoped three-round numeric answers complete; 20 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Missing punctuation/symbols and later layout polish | active | Startup-loaded five-glyph resource, native drawing/reveal, and gated main imports pass; six complete references installed; formatting spans, mail/editor/save consumers, and ordinary gameplay remain; preserve GameCube line/page/timing intent |

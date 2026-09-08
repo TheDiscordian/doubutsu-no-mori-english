@@ -579,5 +579,49 @@
         "encoded_sha256": "1f21198ac632d1e4d9c67062b87bf5fb5e0ab267d47919c6da5eb50bdfee8384"
       }
     ]
+  },
+  {
+    "id": "message:2D01",
+    "source_sha256": "a716d152e8206173ef645d0f050d47fb96b1957e9972b04971f7b5f615cdab2d",
+    "candidate_sha256": "7370a90ab2c1715ab9f16d8ca1220b653f4ee8e0ab9692dc53b5b3d1545cdaa2",
+    "display_sha256": "b46ab988079462d92ce2e26fab51e95dc2f409ecd9f84cca6e6a1a134f57647c",
+    "native_command": "7F1601B000F0",
+    "display_command": "7F1601CC01CD",
+    "offset": 115,
+    "labels": [
+      {"id": "select:01CC", "source_kind": "appended_gamecube", "reference_id": "select:025C", "source_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f", "encoded_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f"},
+      {"id": "select:01CD", "source_kind": "appended_gamecube", "reference_id": "select:025B", "source_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996", "encoded_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996"}
+    ],
+    "evidence": "First number round displays complete supplied Less/More labels in native smaller/larger order, retaining canonical routes 2D02/2D03 after the separately guarded answer permutation. Only this display-menu span changes. Dedicated appended labels leave clothing question 1772 and every original bank label untouched. See NUMBER_GAME_CHOICES.md."
+  },
+  {
+    "id": "message:2D06",
+    "source_kind": "gamecube_native_menu",
+    "source_sha256": "abf115f3a69773a22ec8996315027963542529e025933140e9328eb4f23bea34",
+    "candidate_sha256": "cdd7eff801df84ce6474e06bf42d098b09a7f07423c8c2414f0234fc52d9fba1",
+    "display_sha256": "5c375a724e60fc3d1a59f20fd6a69a58aee0eab7534c6241a1bc8dafeecc2fed",
+    "native_command": "7F1601B000F0",
+    "display_command": "7F1601CC01CD",
+    "offset": 92,
+    "labels": [
+      {"id": "select:01CC", "source_kind": "appended_gamecube", "reference_id": "select:025C", "source_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f", "encoded_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f"},
+      {"id": "select:01CD", "source_kind": "appended_gamecube", "reference_id": "select:025B", "source_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996", "encoded_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996"}
+    ],
+    "evidence": "Second number round displays complete Less/More answers while preserving native answer indices and 2D07/2D08 routes. Every surrounding English byte remains; shared clothing-size labels do not change. See NUMBER_GAME_CHOICES.md."
+  },
+  {
+    "id": "message:2D0B",
+    "source_kind": "gamecube_native_menu",
+    "source_sha256": "c81051b1ebcb664f1d529a1bb57ad54dccb9d6a20497c9ddd7c0b24f294045a7",
+    "candidate_sha256": "1adf434c92828332b9dc3d5ace590c4356d4888195acb7aed2d6484230352656",
+    "display_sha256": "0e70d8320740dfee0dde324722f707415cb74d8aa41826eb111b8b7e7b992cba",
+    "native_command": "7F1601B000F0",
+    "display_command": "7F1601CC01CD",
+    "offset": 94,
+    "labels": [
+      {"id": "select:01CC", "source_kind": "appended_gamecube", "reference_id": "select:025C", "source_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f", "encoded_sha256": "ae5239ec63f28cd401ccd63e9f56e4ede8254a738a135ebcd33e844c18dd247f"},
+      {"id": "select:01CD", "source_kind": "appended_gamecube", "reference_id": "select:025B", "source_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996", "encoded_sha256": "d47d7cb0e4f8fd2be5ee07826694c18917d83ca77d0a01698582d05f432db996"}
+    ],
+    "evidence": "Final number round displays complete Less/More answers while preserving native answer indices and 2D0C/2D0D routes. Every surrounding English byte remains; shared clothing-size labels do not change. See NUMBER_GAME_CHOICES.md."
   }
 ]

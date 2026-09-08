@@ -7,6 +7,7 @@ import re
 from aflib import sha256
 from reference_choices import choice_command
 from textcodec import decode, encode, tokenize
+from extended_choices import validate_binding as validate_extended_binding, payloads as extended_payloads
 
 APPROVALS = Path(__file__).resolve().parents[1]/'translations/contextual_choices.json'
 
@@ -59,10 +60,15 @@ def load_contextual_choices(matches, path=APPROVALS):
             raise ValueError('Contextual choices require every destination label')
         seen = set()
         for label in labels:
-            if (not isinstance(label, dict) or set(label) != {'id', 'source_sha256', 'encoded_sha256'}
+            extended = isinstance(label, dict) and label.get('source_kind') == 'appended_gamecube'
+            if extended:
+                validate_extended_binding(label)
+            if (not isinstance(label, dict)
+                    or set(label) != ({'id', 'source_sha256', 'encoded_sha256', 'reference_id', 'source_kind'}
+                                      if extended else {'id', 'source_sha256', 'encoded_sha256'})
                     or not isinstance(label.get('id'), str)
                     or not re.fullmatch(r'select:[0-9A-F]{4}', label['id'])
-                    or label['id'] in seen or int(label['id'][7:], 16) >= 460
+                    or label['id'] in seen or not extended and int(label['id'][7:], 16) >= 460
                     or any(not isinstance(label[k], str) or not re.fullmatch(r'[0-9a-f]{64}', label[k])
                            for k in ('source_sha256', 'encoded_sha256'))):
                 raise ValueError('Invalid contextual-choice label binding')
@@ -82,9 +88,16 @@ def unique_menu(data, info):
     return menus[0]
 
 
-def validate_labels(row, edits, source_labels, info):
+def validate_labels(row, edits, source_labels, info, *, extended_labels=None):
     for label in row['labels']:
         id = label['id']; index = int(id[7:], 16)
+        if label.get('source_kind') == 'appended_gamecube':
+            validate_extended_binding(label)
+            if extended_labels is None or id not in extended_labels:
+                raise MissingChoiceLabels('Contextual menu requires complete appended English labels')
+            if id in edits or extended_labels[id] != extended_payloads()[id]:
+                raise ValueError('Extended choice cannot be overridden or shortened by candidate metadata')
+            continue
         if index >= len(source_labels) or sha256(source_labels[index]) != label['source_sha256']:
             raise ValueError('Stale contextual-choice native label')
         edit = edits.get(id)
@@ -135,7 +148,7 @@ def canonical_candidate(id, source, candidate, approvals, info):
     return result
 
 
-def contextualize_edits(edits, source_messages, source_labels, approvals, info):
+def contextualize_edits(edits, source_messages, source_labels, approvals, info, *, extended_labels=None):
     """Apply the exact label-only edit; withhold messages missing required labels."""
     by_id = {r['id']: r for r in edits}
     if len(by_id) != len(edits):
@@ -149,7 +162,7 @@ def contextualize_edits(edits, source_messages, source_labels, approvals, info):
         source = source_messages[int(id[8:], 16)]
         candidate = display_candidate(id, source, encode(edit['translation'], info), approvals, info)
         try:
-            validate_labels(row, by_id, source_labels, info)
+            validate_labels(row, by_id, source_labels, info, extended_labels=extended_labels)
         except MissingChoiceLabels as exc:
             withheld.append({'id': id, 'reason': str(exc)})
             continue

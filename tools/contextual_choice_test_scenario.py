@@ -15,10 +15,15 @@ from reference_matches import load_matches
 from runtime_module import MODULE_VROM, module_command_info
 from textbanks import Bank, banks
 from textcodec import encode, tokenize
+from extended_choices import COUNT, LABELS, LIMITS, payloads as extended_payloads
+from aflib import CODE_RAM, CODE_VROM
 
-CONNECTED = '1378 1379 186D 187A 1872 1CE2 26D0 26D3 23B5 23B6 0B64 0B65 1C94 1C97 2472 2476 0889 259D 259E 259F 1C70 1C71'.split()
+CONNECTED = ('1378 1379 186D 187A 1872 1CE2 26D0 26D3 23B5 23B6 0B64 0B65 1C94 1C97 2472 2476 '
+             '0889 259D 259E 259F 1C70 1C71 2D02 2D03 2D04 2D05 2D07 2D08 2D09 2D0A 2D0C 2D0D '
+             '2D0E 2D0F 1777 1778 1779').split()
 DRAFT_IDS = ['message:'+n for n in ('186E','187B','1880','1CE3','1C6F')]
 SHAPE_ID = 'message:2C8F'
+CLOTHING_ID = 'message:1772'
 
 
 def native_choice_width(payload, advances):
@@ -39,10 +44,17 @@ def scenario(rom, source_rom, edits):
     labels = Bank('select',0x02400000,0x00D06000,
         files[0x02400000].extract(rom),files[0x00D06000].extract(rom)).entries()
     layout = ChoiceLayout(*struct.unpack_from('>4I',files[MODULE_VROM].extract(rom),40))
-    if layout.capacity != 20 or len(labels) != 460:
+    if layout.capacity != 20 or len(labels) != COUNT+len(LABELS):
         raise ValueError('Contextual-choice scenario requires the complete twenty-byte pilot')
+    extra = extended_payloads()
+    if labels[COUNT:] != list(extra.values()):
+        raise ValueError('Appended cartridge labels differ from their complete references')
+    code = files[CODE_VROM].extract(rom)
+    for address, word in LIMITS.items():
+        if struct.unpack_from('>I',code,address-CODE_RAM)[0] != (word & 0xFFFF0000)|len(labels):
+            raise ValueError('Native choice-count checks do not match the installed label bank')
     by_id = {r['id']:r for r in edits}
-    ids = sorted(set(approvals)|set(DRAFT_IDS)|{'message:'+n for n in CONNECTED}|{SHAPE_ID})
+    ids = sorted(set(approvals)|set(DRAFT_IDS)|{'message:'+n for n in CONNECTED}|{SHAPE_ID,CLOTHING_ID})
     actions = message_scenario(rom,edits,info,message_ids=ids)
     ending = actions[-5:];actions=actions[:-5]
     _, font = make_halfwidth(source_rom)
@@ -58,17 +70,34 @@ def scenario(rom, source_rom, edits):
         if result is not None:entry['expect_return']=result
         actions.append({'call':entry})
     cases=[]
-    for id in [*sorted(approvals),SHAPE_ID]:
+    # Check both native count guards and aligned even/odd tail DMA. Invalid
+    # indices return a null address/size and leave the destination untouched.
+    for number in (-1, 0, COUNT-1, COUNT, COUNT+1, COUNT+2, COUNT+3, 0x7FFF):
+        write(index,b'G'*16)
+        call(0x80065528,[number & 0xFFFFFFFF,index,index+4])
+        if 0 <= number < len(labels):
+            offset=sum(map(len,labels[:number]));expected=struct.pack('>2I',0x02400000+offset,len(labels[number]))
+        else:
+            expected=bytes(8)
+        read(index,expected+b'G'*8)
+        write(staging,b'G'*32)
+        call(0x80065D90,[choice,staging,number & 0xFFFFFFFF,0])
+        expected=labels[number].ljust(20,b' ')+b'G'*12 if 0 <= number < len(labels) else b'G'*32
+        read(staging,expected)
+    for id in [*sorted(approvals),SHAPE_ID,CLOTHING_ID]:
         number=int(id[8:],16);entry=messages[number]
         if id in approvals:
             canonical_candidate(id,sources['message'][number],entry,approvals,info)
-            validate_labels(approvals[id],by_id,sources['select'],info)
+            validate_labels(approvals[id],by_id,sources['select'],info,extended_labels=extra)
         menu=unique_menu(entry,info)
         choice_ids=[int.from_bytes(menu.data[i:i+2],'big') for i in range(2,len(menu.data),2)]
         if id==SHAPE_ID and choice_ids != [0xCD,0xCE,0xCF,0xD0]:
             raise ValueError('Shape-game choices changed')
+        if id==CLOTHING_ID and (choice_ids != [0xC6,0x1B0,0xF0]
+                or sha256(entry) != 'e06fcc87886395bf8b31df818ecee9b2b41fc67195956cdb9d6fbe899642e89d'):
+            raise ValueError('Complete clothing question changed')
         branches=[t for t in tokenize(entry,info) if t.kind=='cmd' and 0x0f<=t.data[1]<=0x12]
-        if id in approvals and sorted(t.data[1] for t in branches) != list(range(0x0f,0x0f+len(choice_ids))):
+        if id != SHAPE_ID and sorted(t.data[1] for t in branches) != list(range(0x0f,0x0f+len(choice_ids))):
             raise ValueError('Expected exactly one native branch for every reviewed answer')
         write(window,bytes(0x330));write(window+12,struct.pack('>I',data))
         call(0x8009E558,[data,number,0],1)
@@ -77,7 +106,9 @@ def scenario(rom, source_rom, edits):
         payloads=[]
         for position,label_id in enumerate(choice_ids):
             label=labels[label_id]
-            if label != encode(by_id[f'select:{label_id:04X}']['translation'],info):
+            label_key=f'select:{label_id:04X}'
+            expected=extra[label_key] if label_key in extra else encode(by_id[label_key]['translation'],info)
+            if label != expected:
                 raise ValueError('Built label differs from its complete candidate')
             write(staging+position*32,b'G'*32)
             call(0x80065D90,[choice,staging+position*32,label_id,0])
@@ -103,7 +134,7 @@ def scenario(rom, source_rom, edits):
             call(0x8009F3A8,[choice-0x1B0,insertion,1,4],len(payload)+2)
             read(insertion,b'X'+payload+b'Y')
             target=None
-            if id in approvals:
+            if id != SHAPE_ID:
                 write(window+0x2C4,b'\xff'*4)
                 for token in branches:
                     write(index,struct.pack('>I',token.offset))

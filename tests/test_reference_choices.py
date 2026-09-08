@@ -111,7 +111,7 @@ class ReferenceChoiceTests(unittest.TestCase):
         refs = {r["id"]: r for r in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         matches = load_matches(ROOT/"translations/reference_matches.json")
         approved = [r for r in matches.values() if "native_choices" in r]
-        self.assertEqual(len(approved), 167)
+        self.assertEqual(len(approved), 168)
         for record in approved:
             source = source_banks["message"][int(record["id"].split(":")[1], 16)]
             text, _ = adapt_choice_reference(refs[record["reference_id"]], source, record, info)
