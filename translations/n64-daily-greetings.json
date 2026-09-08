@@ -1,0 +1,682 @@
+[
+  {
+    "id": "message:005B",
+    "source_sha256": "91a676c0183ad430568b592f1306bf3f3b5f26e582cf0d9c381df840150f338e",
+    "translation": "Good morning!\nSurprised to see me?\nI moved here\nthe other day!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:005C",
+    "source_sha256": "8e9c8469d0eb39e297a5dd53b84b79f18b312c92bee23ff858b3c2e9a2c89233",
+    "translation": "Hello, {cmd:7F1A}!\nHee hee! I've moved\nhere now!\nDon't forget!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:005D",
+    "source_sha256": "e4daba1b576808fcd6fc24ac7cdba1f7b856d1d454cba46fd25bf341f3263d12",
+    "translation": "Evening, {cmd:7F1A}!\nI've just moved away\nfrom {cmd:7F2A}.\nSo if you need me,\n{cmd:7F04}\n{cmd:7F02}come and see me here!\nHee hee! Don't go to\nthe wrong place, {cmd:7F1C}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:005E",
+    "source_sha256": "df370ea373522535e6ed899923fe29804513485d49c4286bc7ef227581590aa2",
+    "translation": "{cmd:7F1A},\nyou really shouldn't\nbe out playing this late!\nOh, what am I to do...\n{cmd:7F04}\n{cmd:7F02}Oh, that's right!\nI've moved away from\n{cmd:7F2A}.\nI'll be staying here awhile,\n{cmd:7F04}\n{cmd:7F02}so if you need anything,\ncome here to see me!\nDon't forget, {cmd:7F1C}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:005F",
+    "source_sha256": "84f62e4e4fbfe823019ee8ab464063dbea693e8c5ef9887320428876c29fdb4d",
+    "translation": "Good morning!\nHey, guess what?\nI moved here\njust a few days ago!\n{cmd:7F04}\n{cmd:7F02}I was going to\nkeep it a secret from you,\n{cmd:7F1A}, but you\nfound me, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0060",
+    "source_sha256": "a90adef68da7e217c928cf47005eebe28c5505978675e95cb9ed51e6866f2d8a",
+    "translation": "{cmd:7F1A},\ndid you know\nI'd moved here?\nWhy did you turn up?\n{cmd:7F04}\n{cmd:7F02}I wanted to go somewhere\nwhere nobody\nknew me at all...\nJust kidding!\n{cmd:7F04}\n{cmd:7F02}I'll be living here awhile,\nso if you need anything,\ncome here, {cmd:7F1C}!\nDon't go to the wrong place!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0061",
+    "source_sha256": "626a91b67c84d8d141047920006b13fa54ddf5cb578f6806ab9ce27558359763",
+    "translation": "Good evening!\n{cmd:7F1A}, it's me!\n{cmd:7F1B}! I've moved from\n{cmd:7F2A}...\n{cmd:7F04}\n{cmd:7F02}to here! I told you\nI was moving, but\nI never said where\nI was going, {cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}I thought I'd decide\nwhen the mood struck me...\nAnd I chose this place!\nIt's pretty nice here!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0062",
+    "source_sha256": "b1eb967e6df74305450cdfac41b39a054c57db392892a05a5fbcb0ee20d95ff6",
+    "translation": "Good eeevening!\nIt's a bit late for\nsuch a peppy greeting...\nStaying up so late!\n{cmd:7F04}\n{cmd:7F02}Oh, that's right!\nI've moved away from\n{cmd:7F2A}.\nDid you know?\n{cmd:7F04}\n{cmd:7F02}So from now on,\nif you need me,\ncome to {cmd:7F2F}!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0063",
+    "source_sha256": "ee5d928386e176b8c14cec1bf0311b83505980e452ba584835ef7d066e458e5e",
+    "translation": "Yaaawn... So sleepy...\nMorning, {cmd:7F1A}.\nOh, didn't I tell you?\nI've moved!\n{cmd:7F04}\n{cmd:7F02}I told you I was moving,\nright? Well, here I am!\nYou won't find me in\n{cmd:7F2A} anymore!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0064",
+    "source_sha256": "7c5642808e296b3532430a7f9f4691ed72acffe675cd6217615852e940f82e1b",
+    "translation": "Hi, {cmd:7F1A}.\nI moved here\njust the other day.\nIt's pretty nice, isn't it?\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2A} was nice,\nbut I've taken a liking\nto this place.\nMaybe I'll stay awhile.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0065",
+    "source_sha256": "dcab00ef6b3f43aef447bfb592e5f67387b51e1f7a4b10d4cf6c1459be5c4be4",
+    "translation": "Evening, {cmd:7F1A}.\nSurprised to see me\nhere?\nYou're not?\n{cmd:7F04}\n{cmd:7F02}Aw, that's no fun...\nI've moved away from\n{cmd:7F2A}\nto here. So,\n{cmd:7F04}\n{cmd:7F02}if you need me, don't go to\n{cmd:7F2A}!\nCome to {cmd:7F2F}.\nRemember that, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0066",
+    "source_sha256": "fd17df04412311f359349dd4eabb530bdef28ef54a743c8ca7af21d49f21d2de",
+    "translation": "Yaaawn... I'm sleepy!\nI've only just moved in,\nand I'm not done unpacking.\nI've been so busy,\n{cmd:7F04}\n{cmd:7F02}I'm worn out...\n{cmd:7F1A},\nyou're so full of energy,\neven this late at night...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0067",
+    "source_sha256": "7a035431e7dffdd40332c4a4eec8c020cd376c9a9095750d6c68256d68a3119b",
+    "translation": "Hey, good morning!\nHa ha! Wondering\nwhat I'm doing here?\nI've moved!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2A} was nice,\nbut I felt like\na change of pace.\nSo I came to {cmd:7F2F}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0068",
+    "source_sha256": "e675d14d10a405022d1809e7a103c7428e4c8c948a077ac4696fd90adcd3a1f6",
+    "translation": "Hey, {cmd:7F1A}!\nI've moved to\n{cmd:7F2F}\nthis time!\n{cmd:7F04}\n{cmd:7F02}If you need me from now on,\ncome here! Don't go by mistake\nto {cmd:7F2A}!\nI won't be there, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0069",
+    "source_sha256": "fa1febd31d0ee414b4abc82eabb5632a81b22066d45dbbaecfae50afc0acce8d",
+    "translation": "{cmd:7F1A}! At last!\nSince I moved away from\n{cmd:7F2A},\nmy old pals haven't visited,\n{cmd:7F04}\n{cmd:7F02}and I was getting bored!\nCome and see me\nevery now and then,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006A",
+    "source_sha256": "d7f12c13813ba40fa81e471318cbe9ebcde29ec98e14bf6c0d21a0d54cca0aa0",
+    "translation": "Hey, hey! You shouldn't\nbe wandering around\nthis late, {cmd:7F1A}!\n\n{cmd:7F04}\n{cmd:7F02}What about me?\nI'm allowed!\nI've only just moved here,\nso I'm exploring the area.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006B",
+    "source_sha256": "0a85c2e36f4de425a42ca53564c781978cefca34ce72ccb7d0ee8d3be4a8a6cf",
+    "translation": "Hey! What's up\nso early, {cmd:7F1A}?\nYou're quite the early bird!\nI'd have liked a little\n{cmd:7F04}\n{cmd:7F02}more sleep myself,\nbut I've only just moved in.\nThere's a whole lot\nI've got to sort out!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006C",
+    "source_sha256": "45e0b6778f0179d52da960a99e2c1e9574b80bffd9e014aeb93c326a510e0da7",
+    "translation": "Hey, it's me, {cmd:7F1B}.\nWhat are you scared of?\nI don't want to eat you,\nso relax!\n{cmd:7F04}\n{cmd:7F02}I'd had enough of\n{cmd:7F2A}.\nSo I moved here, but it was\na nice place in its own way...\n{cmd:7F04}\n{cmd:7F02}Heh heh heh!\nThat wasn't like me\nto say, was it?\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006D",
+    "source_sha256": "3c064cb4945a802d9c62883e56991941039b4df1bc639f217e030863c136bcbf",
+    "translation": "Hey, it's {cmd:7F1A}.\nYou come all the way\nout here to play?\n\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2A} and\n{cmd:7F2F} are\npretty far apart, aren't they?\nYou're quite an adventurer!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006E",
+    "source_sha256": "72bdf42a12d187e17afc679c32c73aaf76ede15237579406d29b73943fadca5b",
+    "translation": "{cmd:7F1A}!\nDo you come here often?\n...I see. Well,\nI'm not here on a visit.\n{cmd:7F04}\n{cmd:7F02}I've moved here.\nNot that I got sick of\n{cmd:7F2A}\nor anything...\n{cmd:7F04}\n{cmd:7F02}Well, it's just...\nGrown-ups have\nall sorts of things\nto deal with.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:006F",
+    "source_sha256": "a1ecf52fb36f521992fc3f11f948de70ac330a0f757a1eba7e0f09e2de123c48",
+    "translation": "Morning, {cmd:7F1A}!\nI moved here the other day.\nBut {cmd:7F1A}, you\nshowed up right away!\n{cmd:7F04}\n{cmd:7F02}Is this your\nterritory, then?\nIf so, I've made a mistake!\n...\n{cmd:7F04}\n{cmd:7F02}Only joking!\nCome over and play\nevery now and then!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0070",
+    "source_sha256": "5a4893df89d4d1c7263c937c39d0765ccfa298266382ed291c73bd135b0e57a5",
+    "translation": "Hello! I've just moved\nfrom {cmd:7F2A}\nto {cmd:7F2F}.\n\n{cmd:7F04}\n{cmd:7F02}I felt like starting\nmy life over\nin a new place...\nOr something! Ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0071",
+    "source_sha256": "3146737967e87cbfd53ab881a1d1c6926c5bc03ca0675d4e6b6760627e1a16db",
+    "translation": "Oh, good evening.\n{cmd:7F1A},\nyou come out to\n{cmd:7F2F} too, do you?\n{cmd:7F04}\n{cmd:7F02}That's just perfect!\nI've only just moved in,\nand I don't have friends here.\nHaving someone I know\n{cmd:7F04}\n{cmd:7F02}around is a real comfort!\nSo come over and play\nevery now and then!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0072",
+    "source_sha256": "382c6d30d05dc49631d9eba7480f36ecaeacd478ac3dfbdf5470e53513c30684",
+    "translation": "Oh, {cmd:7F1A}!\nWandering around here\nat this hour?\nThat's just like you!\n{cmd:7F04}\n{cmd:7F02}Me? I'm busy\nwith all the unpacking\nand everything else\nafter my move.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0073",
+    "source_sha256": "b2dbe2b925fdd4491753865af5deddf7e3c8b91840c80ab471b9177645f6a48c",
+    "translation": "Good morning!\nI hope today will be\nanother lovely day,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0074",
+    "source_sha256": "483b906173d4f24c6a6a19e00ba43d5abc8be5ca92f39a182b28853005ff0d9d",
+    "translation": "Hello, {cmd:7F1A}.\nHow are you feeling?\nMe? I'm in a great mood,\nof course, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0075",
+    "source_sha256": "995dfa54544bd90e26233a5424ad9b3a32d6c471e13e194a2d020f290874c812",
+    "translation": "Good evening!\nI didn't see you\nduring the day today.\nI missed you, {cmd:7F1C}.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0076",
+    "source_sha256": "b3c121dbb80f93243491f145f72599750df0676ca04ae725feb8d09afbc64222",
+    "translation": "Good evening.\nBeing out\nat an hour like this\nis a bit risky, {cmd:7F1C}.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0077",
+    "source_sha256": "926a10c397f055aa0d0ec0c65bf9fad8d1854d1019c0091953931ad91edf463a",
+    "translation": "Good morning!\nWandering about so early!\nYou look so carefree!\nI'm jealous, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0078",
+    "source_sha256": "33846118961a921d1732e878926700c6a92a636a68e7f89c818f7adb133ea7e3",
+    "translation": "Hi there!\nI was just thinking\nabout today's snack!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0079",
+    "source_sha256": "53a4d52c55b13387b8159664dd52917d18814d8bbe704e552cd936f192ddeb5b",
+    "translation": "Good evening!\nIt's getting so late,\nI thought you weren't\ncoming over, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007A",
+    "source_sha256": "68c76a59a28f3a999827ac4b4c760ea5828da6c0faf8a653201a8db0f40a6916",
+    "translation": "{cmd:7F1A},\nwhat are you thinking,\ncoming to play so late?\nYou're hopeless, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007B",
+    "source_sha256": "12df15a8c3c328e62cdf8ce6fd2264e66651e2b70d20a064446c3ec32ff5dd9f",
+    "translation": "Ohhh... I'm so sleepy...\n...Yaaaaawn...\nGood morning.\nI want a little more sleep.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007C",
+    "source_sha256": "5c10091ec9bcf07d914dd24eaa5dbfad44be553123130399ff55a2a364fe48fb",
+    "translation": "Hello, {cmd:7F1A}.\nI was taking a nap\nuntil just now.\nI'm still a little sleepy.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007D",
+    "source_sha256": "ba701206079414fe9bce50605ebb7ee153406bdc2254e077f4e2d0e66a91f8bc",
+    "translation": "Good evening.\nI didn't see you at all\nduring the day.\nI was so bored...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007E",
+    "source_sha256": "195042de3b883c3fdfe7ea2b596c79d7a6f5abe1f5c3306a7044e0deac50591a",
+    "translation": "Good evening.\n{cmd:7F1A},\nyou take your walks\nawfully late at night...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:007F",
+    "source_sha256": "e70500a21d8d8019590d26f82f2e962a1106b37f35fdb094587b212162b7ebf4",
+    "translation": "Good morning!\nI'm going to give it my all\nagain today!\nYou do too, {cmd:7F1A}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0080",
+    "source_sha256": "00cc700c8cc81e9892d3d2bd9b048539cff117b0371f68279f97151d2d5199af",
+    "translation": "Hey!\nHow's it going?\nReally? That's great!\nWah ha ha ha ha ha!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0081",
+    "source_sha256": "bd103a7b4ac534af2e7b6fc504069b39a33c2e216193f4e887ba4a86f557a2bc",
+    "translation": "Good evening!\nWhere were you all day?\nYou never came over to play.\nI was bored, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0082",
+    "source_sha256": "8dfc61f0b1ad66da923d959c9f0e4256e24ba204ad5393b70c287d22ee8b6134",
+    "translation": "Whoa! What are you doing\nout so late at night?\nYou gave me a fright!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0083",
+    "source_sha256": "36da55f2b2d645bb676e43f36883b99bc80c9c24c7871200a10174928c7eff72",
+    "translation": "..........\nKeep it down! It's morning!\nI drank too much last night,\nand my head hurts...\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0084",
+    "source_sha256": "7ed95c157d410d8f1b8d17bb72c4d027d5923283c3fa954d81326bda5f03fa74",
+    "translation": "Hey!\nWandering about all day!\nDon't you have a job?\nOh, never mind.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0085",
+    "source_sha256": "649a7765f51347ce79a6200d5ded30a7bd3705890ddc60e46252129bb8de15f0",
+    "translation": "Hey, it's you.\nThe night's just starting!\nLet's have a good time!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0086",
+    "source_sha256": "350a09c4ef4f8075d4090ecf45abdd2a40567c53f56aaf51d1993db662d7d0bd",
+    "translation": "What are you doing?\nWandering around this late!\nYou'll never grow into\na decent adult like that!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0087",
+    "source_sha256": "b68eb49d8994582eac533000100f2421b42d0082e85c4885c180e5e45b9ad243",
+    "translation": "Good morning!\nA morning walk\nfeels lovely, doesn't it?\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0088",
+    "source_sha256": "6c8461f01187eab35c187fef2118808316777b2580652fc1fc65b646b0b563e7",
+    "translation": "Oh, it's {cmd:7F1A}!\nFeeling well? Eating properly?\nYou won't have any energy\nif you don't eat!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0089",
+    "source_sha256": "c07abfd1e6206d4e5c3e7fae2596ff0bd5a7d9f0498d5c5f15869ab5666f74b6",
+    "translation": "Good evening!\nI didn't see you all day.\nI wish you'd come while\nit was light, {cmd:7F1C}.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008A",
+    "source_sha256": "ef5d190fa65659c3981c6955cb199297cffa80949307145721c05c1ddfada4a7",
+    "translation": "Oh! I wondered who it was!\nDon't stay up this late!\nOff to bed with you!\nYou've an early start tomorrow!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008B",
+    "source_sha256": "b58862d5e03a311d511b5908694cc0ef8ee87d6579cc7d8aa1edf10de2eccb0a",
+    "translation": "Oh, hello.\nYou look busy\nso early in the morning!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008C",
+    "source_sha256": "95f36e7e75a0da86d4f31a23f911d9ba47312ac60a9bec64dfe61f329eb00454",
+    "translation": "You seem awfully busy.\nAren't you tired?\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008D",
+    "source_sha256": "87e1e9fdeccdae3217751aec28739dde284842d7758d83d00edf298409068df7",
+    "translation": "It's already getting\nso dark, {cmd:7F1C}.\nI'd better head home soon.\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008E",
+    "source_sha256": "ae3abc269fdcdd2a53c26d12a793147197114e516f2f9fec982daad380589883",
+    "translation": "How late are you planning\nto stay out, {cmd:7F1C}?\nMaybe it's not my business,\nbut go to bed, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:008F",
+    "source_sha256": "b941f431252f24da7feea991e1f3b7eddc317aed90af7d341ff90b270fc3c65d",
+    "translation": "Oh, good morning\nagain!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0090",
+    "source_sha256": "a84ae47fa89afd294d2eda807d9bf55a3ae954f150dd5c41a13c1def387df43f",
+    "translation": "Oh, hello there.\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0091",
+    "source_sha256": "fefc22bc20e5175c8583de6adb2173895a9cd51547baaf81ddb9cb2b6afc72e5",
+    "translation": "The night's only just begun!\nTime for a night out!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0092",
+    "source_sha256": "04ea3e723ed8bff49546a349fcb56a27d44e5749e21594729fbfaff2b4d3b22a",
+    "translation": "You really have nothing to do!\nYou'd better get to bed,\nor you won't get up tomorrow!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0093",
+    "source_sha256": "4151c5f279e35703f769e62aaeaace5236bab0a9766f74dedd59aa996f74c886",
+    "translation": "Hm? Didn't I just\nsay good morning to you?\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0094",
+    "source_sha256": "92773ae6c9e2c54f9c4b58056d02174b95ea82cbaeb7c7818f347a41dfbd0f9c",
+    "translation": "Whew... I'm hungry...\nLunch...\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0095",
+    "source_sha256": "953ccbf2cfa51ce72c596e689315fce17089cb8d37af133e19e956fb78ff86f5",
+    "translation": "Oh, hello, hello.\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0096",
+    "source_sha256": "6101dd73a5432710778391a3d0d0a218455a57c61b629a084e07f1e0a3070746",
+    "translation": "So sleeeepy...\n\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0097",
+    "source_sha256": "f34b1e12444aef7650b979c52f3b604d3cbd42ff9bac291a64ed4c67c040c89c",
+    "translation": "Hey, you're back again!\n\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0098",
+    "source_sha256": "59ceeb1fd2e05c9e6aa70e0841492739294ca7075778f220ae8d84ae29f96267",
+    "translation": "Hey! Nothing to do?\n\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0099",
+    "source_sha256": "cc8338f9c13dd2071f25ac8e03a44e30aca85855ca5a9685bd2092903c70668f",
+    "translation": "Hey, it's getting pretty dark!\n\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009A",
+    "source_sha256": "72c8137b42973b6d4b6db00d0de5b1e68dab1ffcda6b570c77766529752786a7",
+    "translation": "Stay up too late,\nand you won't get up tomorrow!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009B",
+    "source_sha256": "cce63d12aa7be596c7f777d7ec12b6248622774ecdc7c576dc36eb234aafb51f",
+    "translation": "You again? So early!\nQuit making such a racket!\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009C",
+    "source_sha256": "c03e04136c9ec7fbcced865e1f1100d47a5e4a917a9b48aa0a41ceb86d4fd90f",
+    "translation": "Hey, hey!\nPester people too much,\nand they won't like you!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009D",
+    "source_sha256": "14faa7e7313b06d8b3d51482c020762d33d2d95afa2b531e1a7adf39fab0e46c",
+    "translation": "Again?\nYou really must have\nnothing else to do!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009E",
+    "source_sha256": "85cf3f189c388578bac2acd454ff09fe765feb6bc90e2fce988c3e227a72881e",
+    "translation": "Hey! Still want something?\nRespectable folks\nwent to bed\na long time ago!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:009F",
+    "source_sha256": "a7c217c776a833cd2ecc221c870fe0a85a5f7003a591043c992e5038282b53a9",
+    "translation": "What is it?\nBack again, are you?\n\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A0",
+    "source_sha256": "f542e97085193f684dc0667236cae5f1ab312f9bfc29e862c10a32e2326c4758",
+    "translation": "Oh?\nAll these visits!\nYou're working hard!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A1",
+    "source_sha256": "20904367d9241e91fd12217ec4d70b6b3b5b539de5f90c5980237adbe4379ff4",
+    "translation": "Back again?\nIt's getting dark.\nI think you'd better\nhead home soon.\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A2",
+    "source_sha256": "a74716a20d972297d1f8b833b0c86c0cc8bea58b1c142877409ae8e1bb7123ce",
+    "translation": "Again? At this hour?\nDon't you understand\nwhen I tell you\nto get to bed early?\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A3",
+    "source_sha256": "e956dc715284475d27dd0d9033c58c4e3395f05b142f51e2406f6cfa12e27fe6",
+    "translation": "Oh, what a rare sight!\nIt's {cmd:7F1A}!\nNot one visit for\n{cmd:7F2B} months!\n{cmd:7F04}\n{cmd:7F02}Where have you been?\nWhat've you been doing?\nIf you went out to play,\nI'd have liked to go, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A4",
+    "source_sha256": "4ce23950761aa200fda8b5879f15daddd16c40477a166a53337671aec768cfe7",
+    "translation": "Oh, it's {cmd:7F1A}!\nHaven't seen you for about\n{cmd:7F2B} months.\nHave you put on a little weight?\n{cmd:7F04}\n{cmd:7F02}While you were away,\nI lost 3 kilos!\nHee hee!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A5",
+    "source_sha256": "7a3046405270f4a88124dd8fc47c29cb073fc990e44f0f3c1e4392f8a3608f8c",
+    "translation": "Wow! Long time no see!\nWhat've you been doing for\n{cmd:7F2B} months?\nI was worried about you!\n{cmd:7F04}\n{cmd:7F02}You've just been off\nplaying at something else,\nhaven't you? Honestly!\n\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A6",
+    "source_sha256": "c289a933fe3f546b4cb8a6698a78da1efe6def6374e8c5cda734d1627c94de1d",
+    "translation": "Well, {cmd:7F1A}!\nI haven't seen you in a while,\nand here you are,\nwandering around so late!\n{cmd:7F04}\n{cmd:7F02}When did you become\nsuch a party animal?\nYou're such a handful,\n{cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A7",
+    "source_sha256": "12c689c808caa028c540bff8eb5110d83c144ab9463598dda699c794e0f3b6c9",
+    "translation": "Oh, my goodness!\nIt's been ages!\n{cmd:7F2B} months!\nWhere have you been?\n{cmd:7F04}\n{cmd:7F02}You never showed your face!\nI thought you might've\ncollapsed somewhere!\nI was worried, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A8",
+    "source_sha256": "4680833efebe977012867b69de292761d9dbe0695c9d9ce25ad84b486c4fbf44",
+    "translation": "No way!\nIt's {cmd:7F1A}!\nWe haven't seen each other\nin such a long time!\n{cmd:7F04}\n{cmd:7F02}Do you remember me?\nI bet you've forgotten after\n{cmd:7F2B} months!\nAh ha ha! Don't worry!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00A9",
+    "source_sha256": "06ee70496b65b91304cbf4756594b2526127624b08985e70746ec63b98dd0af8",
+    "translation": "Eeeek! It's {cmd:7F1A}!\nLong time no see!\nHow are you? No visits for\n{cmd:7F2B} months!\n{cmd:7F04}\n{cmd:7F02}You've got to look\nfor furniture every day,\nor you'll never have\na lovely room!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AA",
+    "source_sha256": "a3a862070b9479d3bdd9245c2be4694cc4586cf5bc400017587b5a52d3a64184",
+    "translation": "Well, well!\nIt's {cmd:7F1A}!\nYou've been slacking off\nfor {cmd:7F2B} months!\n{cmd:7F04}\n{cmd:7F02}No excuses!\nIf you don't come to play,\neveryone might\nforget all about you!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AB",
+    "source_sha256": "5ad8eb0a137c8760a26f0482834807ec04ee66d47296ad6c375fd371e80f0885",
+    "translation": "Oh! It's {cmd:7F1A}!\nWhat brings you here?\nYou haven't come over\nto play in ages!\n{cmd:7F04}\n{cmd:7F02}Look! It's already been\n{cmd:7F2B} months!\nI thought you'd forgotten\nall about me, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AC",
+    "source_sha256": "dde13d5754432ffe971f5962436822cd91959850169489ca22aa16a2896780c8",
+    "translation": "Hey, where have you been?\nIt's been so long\nsince we last talked...\nSince I last saw you,\n{cmd:7F04}\n{cmd:7F02}{cmd:7F2B} months!\nLeaving me all alone\nfor such a long time\nis too mean, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AD",
+    "source_sha256": "2647b1f8c7851796c1e891cf3564d1848723ee31a5d93ec52c69caaa6d0b64b3",
+    "translation": "I wondered who it was,\nbut it's {cmd:7F1A}!\nYou haven't shown up\nin such a long time!\n{cmd:7F04}\n{cmd:7F02}What've you been doing?\nPlaying some fun game\nall by yourself, I bet!\nLet me play too, {cmd:7F1C}!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AE",
+    "source_sha256": "2156304e944e12053a70dd721bed8f53291a9d44d34823db18bab78bbe6e3103",
+    "translation": "Ah! {cmd:7F1A}!\n{cmd:7F2B} months!\nWhat've you been doing?\nHave you been travelling?\n{cmd:7F04}\n{cmd:7F02}While you were away,\n{cmd:7F1A}, there was\nno one to play with!\nI was so bored!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:00AF",
+    "source_sha256": "e1faf65cd97bd46aea3ce58e839b4afb6050e3015ea3c9e7b94cd7c651fab217",
+    "translation": "Morning, {cmd:7F1A}!\nIt's been more than\n{cmd:7F2B} months!\nYou haven't shown your face!\n{cmd:7F04}\n{cmd:7F02}What on earth happened?\nKnowing you, you were off\nhaving fun behind my back!\nDarn it!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native move, daily/repeat, or month-return greeting. Preserve every native control and argument, field occurrence and page assignment, page/line counts, and continuing ending. Same-ID GameCube slot is empty; no reference-match permission is invented. Final wording, caller identity, live fields, presentation, and gameplay review remain."
+  }
+]

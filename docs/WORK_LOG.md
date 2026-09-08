@@ -4616,6 +4616,95 @@
   patch-only release, and the image/keyboard stretch goals remain active.
   The font-atlas-edge investigation stays paused.
 
+## 2026-09-07 — Native daily, move, repeat, and month-return greetings
+
+- The preceding goal turn made progress: the contextual-menu checkpoint and
+  35 return greetings were committed and pushed, with full artifact, regression,
+  and bounded native evidence. This batch starts from clean `9e16e2e` and
+  continues the still-missing native greeting block instead of repeating the
+  preceding cartridge-load or selection scenarios.
+- Added 85 complete original drafts in `translations/n64-daily-greetings.json`
+  for `005B..00AF`: 24 recent-move conversations, 24 daily greetings, 24 repeat
+  greetings, and thirteen month-return conversations. All 85 original and legacy
+  sources agree in Japanese, all same-ID GameCube slots contain only termination,
+  and none had a prior candidate. No reference identity or unreachable-code
+  status is invented. Together with the preceding return batch, `005B..00D2`
+  now has 120 complete English drafts.
+- Preserved every original command/argument, field occurrence and per-page
+  sequence, wait/clear, total/per-page newline count, and continuing `01` ending.
+  Old/current town fields remain distinct; repeated names and catchphrases are
+  retained. Native topics include incomplete unpacking, old-friend visits,
+  secret moves, starting over, daytime/evening and sleep distinctions, snacks,
+  furniture, gruff reprimands, drinking too much the previous night, and the
+  three-kilogram remark. Final native wording review retains the nightlife
+  meaning in `00A6` as party animal. No GameCube reference text is reflowed.
+- Added `specs/DAILY_GREETINGS.md` and eight focused tests. The tests cover all
+  original source/control/page/field/ending checks, complete encoding and bounds,
+  both runtime selections, source/legacy agreement, empty English donor slots,
+  all native topic groups, old/current town distinction, repeated fields, and
+  the more-than-months qualifier in `00AF`. The initial focused run passes all
+  eight tests in 0.531 seconds. After the final `00A6` wording adjustment,
+  `build/tests-daily-greetings-full-01.log` passes all 610 regression tests in
+  287.729 seconds, including all eight daily-greeting tests. Generation, building,
+  artifact validation, and the native batch complete without a failed run.
+- All conservative expansion bounds fit, from 36 to 370 bytes. Original lines
+  are arranged within the unchanged native pages to retain complete numeric
+  and old-town fields. Six generic current-town warnings remain for
+  `0062/0065/0067/006D/0070/0071`. The existing native `2F` consumer uses a
+  six-byte current-town name; `m_land.h` also defines `LAND_NAME_SIZE` as six.
+  All 85 layouts fit when substituting six fullwidth cells only for `2F`, with
+  every other field retaining its conservative bound. Global capacity/width
+  validation is unchanged, and the warnings remain explicit for presentation
+  review. This is not proof of live old-town/month field preparation.
+- Full generation contains 11,777 edits, adding exactly these 85 messages with
+  no changes or removals among the preceding 11,692. Main candidates number
+  10,532: 9,762 references, 479 original dialogue drafts, and 291 original
+  development labels. All 460 choices remain unchanged. Basic generation adds
+  the same 85 records to its previous 10,982, reaching 11,067 with no earlier
+  change or removal. Existing contextual-label and runtime gates stay intact.
+- The reference/label generator rejects 1,221 main records: 1,084 unconfirmed
+  identities, 111 control differences, 24 field differences, and two direct
+  overflows. One has an original fallback, leaving 1,220 final gaps: 298 Japanese
+  static-text, 919 non-static, one Latin, and two symbol/numeric records. Ten
+  non-static records have dynamic fields; all retain caller/control review.
+  Reference warning records remain 1,469, aliases 41, and conflicts zero.
+  Source-volume coverage gains 4,559 characters, reaching 620,354 of the unchanged
+  746,978-character denominator. This remains installed replacement coverage,
+  not complete semantic review, live gameplay, or an all-assets denominator.
+- `build/smoke-daily-greetings-01/` passes all 85 complete new messages through
+  native cartridge loader `8009E558`: 257 assertions and 434 recorded steps.
+  Complete headers/text, adjacent/module guards, restored `test.bs1`, and graceful
+  shutdown pass. Scenario SHA-256:
+  `710b47bbbb51ecb28aa46f5486f5a1b98995eae4f2f024bd66eff6f520661d94`.
+  The run has four MiB, no seeds, disabled audio, and both save-write permissions
+  false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  It does not run ordinary greeting selection, actor actions, field preparation,
+  moving, or saving. No earlier native batch is rerun.
+- ROM `build/daily-greetings-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `f651a8cad9496f458430273578b55119cb9abbf73ee84629095ed74e627dcd4b`.
+  UPS SHA-256:
+  `996d63dbc4c7806242ff59d08ae8f6269b66a56b41338582230bd382307655f8`.
+  Candidate SHA-256:
+  `32d4b28012e28278d66b0d6d1342cba382bb133e379b16cb16001d2168c6eb47`.
+  UPS application reconstructs the complete ROM from the verified original;
+  all 11,777 ordinary edits match their actual complete built-bank entries.
+  Extracted changes are confined to main text `02000000`, its pointers `00CF9000`,
+  and DMA directory container `00019D40`. The container is unchanged outside
+  its directory table; all code, fonts, runtime/name/mail/choice resources, and
+  saved layouts remain unchanged.
+- Regenerated final-hash coverage and both review queues under
+  `build/daily-greetings-*`. The current-rule unconfirmed same-ID pool remains
+  empty; absent visible same-ID references decrease to 1,008. Ten unapproved
+  special-expression comparisons and all distinct field/control/overflow/glyph
+  cases remain. The next early content block is `0013..005A` introductions and
+  reunions, with the separate `0001..0012` development/control samples retained
+  as a different audit. Normal caller selection, full wording/presentation,
+  general strings/names/mail, control support, gameplay/save/hardware acceptance,
+  patch-only release, and image/keyboard stretch goals remain active. The
+  font-atlas-edge investigation stays paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.
