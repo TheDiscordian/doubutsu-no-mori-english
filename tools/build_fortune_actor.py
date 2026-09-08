@@ -12,7 +12,7 @@ from aflib import sha256, verified_rom
 from check_keyboard_assembly import IMAGE
 from fortune_actor import (RAM, INSTANCE_BYTES, PROFILE_SIZE, INIT_SLOT, GIVE_SLOT,
                            INTERNAL_IMPORTS, WORDS_HASH, native_sources, source_hashes,
-                           imports_for, elf_inventory, relocation_bytes, validate)
+                           imports_for, elf_inventory, relocation_bytes, validate,patch_prefix)
 
 
 def build(rom,module,words,out):
@@ -33,7 +33,7 @@ def build(rom,module,words,out):
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
-    names = ('generate','fortune_slip','fortune_actor')
+    names = ('generate','fortune_slip','fortune_actor','fortune_recovery')
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','native.o',
@@ -48,9 +48,7 @@ def build(rom,module,words,out):
         if len(fields) == 3: symbols[fields[2]] = int(fields[0],16)
     run('objcopy','-O','binary','-j','.text','-j','.rodata','overlay.elf','overlay.bin')
     data = bytearray((out/'overlay.bin').read_bytes())
-    for at,value in ((PROFILE_SIZE,INSTANCE_BYTES),(INIT_SLOT,symbols['af_miko_fortune_init']),
-                     (GIVE_SLOT,symbols['af_miko_fortune_give'])):
-        struct.pack_into('>I',data,at,value)
+    data[:3008] = patch_prefix(native,{name:value-RAM for name,value in symbols.items()})
     text = symbols['__miko_text_end']-RAM
     if symbols['__miko_start'] != RAM or symbols['__miko_end'] != RAM+len(data):
         raise ValueError('Miko linked bounds disagree with extracted data')
@@ -63,7 +61,7 @@ def build(rom,module,words,out):
               'symbols':{name:value-RAM for name,value in symbols.items() if name.startswith('af_') and RAM <= value < RAM+len(data)},
               'elf_relocations':inventory,'compiler':run('gcc','--version').splitlines()[0],
               'flags':flags,'toolchain_image':IMAGE,'stack_usage':{name:(out/(name+'.su')).read_text() for name in names},
-              'status':'Experimental native adapter; normal interaction, cancellation lifetime, and hardware remain unverified'}
+              'status':'Native hand-off and guarded payment recovery; normal interaction, scene removal, and hardware remain unverified'}
     if source_hashes() != sources: raise ValueError('Miko sources changed while building')
     validate(rom,bytes(data),reloc,report,module)
     (out/'overlay.bin').write_bytes(data);(out/'relocation.bin').write_bytes(reloc)

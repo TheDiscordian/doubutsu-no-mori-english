@@ -7,16 +7,20 @@ all 68 phrase/outcome values and all three English letter templates. The optiona
 native actor now stores the complete letter before announcing hand-off, retains
 selected values across failed attempts, and frees temporary work on every path.
 It fits the unchanged overlay/instance pools and preserves original DMA-row
-adjacency. Eleven focused host tests pass. The silent native hand-off batch passes
+adjacency. Sixteen adapter/installer host tests pass. The silent native batch passes
 24 complete outcome/template/capitalization combinations, every pocket position,
 full-pocket rejection, failed-resource retries, duplicate prevention, complete
-reader restoration, and 578 memory assertions. All 881 regression tests pass;
+reader restoration, 64 exact interrupted-payment recoveries, and 1,255 memory
+assertions. All 886 regression tests pass;
 independent actor builds and installed-text/UPS checks agree. Heap accounting, live save,
-checkpoint restoration, and blank isolated saves pass. Native price/outcome/effect
-code, resident module, font, and ordinary 13,383 applied edits remain unchanged.
-Cancellation or actor removal can discard actor-owned pending state; close that
-paid-letter lifetime gap and validate normal gameplay next. No persistent recovery
-or hardware acceptance is claimed. The [adapter work record](checkpoints/FORTUNE_ACTOR.md)
+checkpoint restoration, and blank isolated saves pass. The original payment helper
+and luck timing remain intact. Guarded end/save/destructor/reinitialization
+callbacks refund an unfinished payment exactly once, including the original Bell
+bag and pocket when applicable. Changed owners, balances, or reused pockets are
+rejected without writes. The already revealed fortune is not undone; there is
+no persistent letter recovery. Resident module, font, and all 13,383 ordinary
+applied edits remain unchanged. Normal interaction, scene-removal routing, and
+hardware acceptance remain unverified. The [recovery work record](checkpoints/FORTUNE_RECOVERY.md)
 tracks current artifacts, regression evidence, and remaining work; the
 [foundation record](checkpoints/FORTUNE_SLIP_FOUNDATION.md) retains the independent
 creator/catalogue evidence.

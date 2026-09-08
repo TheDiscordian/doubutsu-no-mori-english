@@ -17,24 +17,48 @@ NEW_VROM, NEW_RELOCATION = 0x03600000, 0x03608000
 NATIVE_BYTES, PREFIX_BYTES, NATIVE_TEXT = 2992, 3008, 2848
 INSTANCE_BYTES, LIMIT = 2400, 8192
 PROFILE_SIZE, INIT_SLOT, GIVE_SLOT = 0xB2C, 0xB94, 0xBA8
+CALLBACKS = {INIT_SLOT:'af_miko_fortune_init',GIVE_SLOT:'af_miko_fortune_give',
+             0xB34:'af_miko_fortune_destroy',0xB40:'af_miko_fortune_save',0xB58:'af_miko_fortune_end'}
+CHARGE_ARGUMENT,CHARGE_CALL = 0x73C,0x748
 NATIVE_IMPORTS = {
     'af_miko_private':0x80136FD8, 'af_miko_random':0x8002C9AC,
     'af_miko_malloc':0x8009BFC0, 'af_miko_free':0x8009C040,
     'af_miko_get_order':0x8007B49C, 'af_miko_set_order':0x8007B44C,
     'af_miko_clear_mail':0x8009C384, 'af_miko_set_recipient':0x8009C4A0,
     'af_miko_free_mail':0x8009C534, 'af_miko_copy_mail':0x8009C67C,
+    'af_miko_find_item':0x800B80B4,
 }
-INTERNAL_IMPORTS = {'af_miko_original_init':0x809E5FA0,'af_miko_setup_action':0x809E6014}
+INTERNAL_IMPORTS = {'af_miko_original_init':0x809E5FA0,'af_miko_setup_action':0x809E6014,
+                    'af_miko_original_charge':0x809E5B7C,'af_miko_original_end':0x809E60F0,
+                    'af_miko_original_save':0x809E5848,'af_miko_original_destroy':0x809E5874,
+                    'af_miko_money_items':0x809E62B0,'af_miko_money_values':0x809E62A0}
 RESIDENT_IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid',
                     'af_mail_generation_capital')
 DATA_IMPORTS = {'af_miko_private','af_mail_generation_capital'}
 KINDS = {'32':2,'26':4,'HI16':5,'LO16':6}
+RECOVERY_CODE_GUARDS = (
+    (0x80056A14,0x80056B48,'d984922bc16f4f62a1f321e510b693d16495027ac97733178cca87d8c5382048'),
+    (0x80058298,0x8005832C,'e799d65e845ee0e346a1f7583de952b37d54afcc270ec6dac3bbc5da4dc39c1e'),
+    (0x8007C00C,0x8007C0B4,'b7036762f154aea16ba66d75a694621da033f27b1b41664bbe4030a19bbbb668'),
+    (0x800B80B4,0x800B8128,'a66e85096d846c37b6131dc4d5bb3b50fdde2ece121e1355c1c9bedb13bc1394'),
+    (0x800B83D4,0x800B8544,'3877e9aac55ee3ec6626275d2408d16f18bbaeb04033ba8654c2dccdf6a9e160'),
+    (0x800B88EC,0x800B8A88,'f545d3a285b2c1797a5a92cb8029ab62c3bce494d63496ec772dc34a5f07b676'),
+    (0x800B8B08,0x800B8B8C,'d71a5b88ba0df745be4c11c1e6dcfcda8c2dd6db8d4333a127b761907c6cb22a'),
+)
+
+
+def verify_recovery_code(code):
+    # Actor save/destruction order, talk ending, item lookup/count, collection,
+    # and possession writes establish the exact interrupted-payment contract.
+    for start,end,digest in RECOVERY_CODE_GUARDS:
+        if sha256(code[start-CODE_RAM:end-CODE_RAM]) != digest:
+            raise ValueError(f'Changed Miko payment/lifecycle helper {start:08X}')
 
 
 def source_hashes():
     sources = ['overlays/mail_generation/'+name for name in
                ('generate.c','generate.h','fortune_slip.c','fortune_slip.h',
-                'fortune_actor.c','fortune_actor.h','fortune_actor.s','fortune_actor.ld')]
+                'fortune_actor.c','fortune_actor.h','fortune_recovery.c','fortune_actor.s','fortune_actor.ld')]
     sources += ['runtime/mail/'+name for name in ('catalog.h','format.h','record.h')]
     return {name:sha256((ROOT/name).read_bytes()) for name in sources}
 
@@ -49,6 +73,7 @@ def native_sources(rom):
     if sha256(files[0x8681F0].extract(rom)) != '460777a8c6d6b57e9c83a7c9f3efe02593fd01b75f9a4e108db5b9c2a54a18e3':
         raise ValueError('Changed native NPC allocator capacity evidence')
     code = files[CODE_VROM].extract(rom)
+    verify_recovery_code(code)
     at = 0x80057D3C-CODE_RAM
     if sha256(code[at:at+48]) != 'aef7ac2b327aedb17d1ee2eb6a32c30b51089835db4d9dedec0eb43f4d97cf33':
         raise ValueError('Changed native profile-sized instance initialization')
@@ -122,7 +147,7 @@ def validate(rom,data,reloc,report,module):
             or len(data)&15 or len(data) > LIMIT or len(reloc) > 4096):
         raise ValueError('Miko exceeds its native loaded-image bounds')
     symbols = report.get('symbols',{})
-    for name in ('af_miko_fortune_init','af_miko_fortune_give'):
+    for name in (*CALLBACKS.values(),'af_miko_fortune_charge','af_miko_fortune_abort'):
         offset = symbols.get(name)
         if type(offset) is not int or offset&3 or not PREFIX_BYTES <= offset < text:
             raise ValueError('Miko callback export is outside new code')
@@ -131,10 +156,7 @@ def validate(rom,data,reloc,report,module):
         raise ValueError('Miko phrase export is outside read-only data')
     if sha256(data[words:words+1088]) != WORDS_HASH:
         raise ValueError('Miko no longer contains the complete verified phrases')
-    expected = bytearray(native+bytes(16))
-    for at,value in ((PROFILE_SIZE,INSTANCE_BYTES),(INIT_SLOT,RAM+symbols['af_miko_fortune_init']),
-                     (GIVE_SLOT,RAM+symbols['af_miko_fortune_give'])):
-        struct.pack_into('>I',expected,at,value)
+    expected = patch_prefix(native,symbols)
     if data[:PREFIX_BYTES] != expected:
         raise ValueError('Unapproved native Miko prefix change')
     inventory = report.get('elf_relocations',[])
@@ -189,6 +211,18 @@ def validate(rom,data,reloc,report,module):
     return spec
 
 
+def patch_prefix(native,symbols):
+    expected = bytearray(native+bytes(16))
+    if (struct.unpack_from('>I',native,CHARGE_ARGUMENT)[0] != 0x24040032
+            or struct.unpack_from('>I',native,CHARGE_CALL)[0] != 0x0C2796DF):
+        raise ValueError('Changed native Miko payment call')
+    for at,name in CALLBACKS.items(): struct.pack_into('>I',expected,at,RAM+symbols[name])
+    struct.pack_into('>I',expected,PROFILE_SIZE,INSTANCE_BYTES)
+    struct.pack_into('>I',expected,CHARGE_ARGUMENT,0x8FA40020)
+    struct.pack_into('>I',expected,CHARGE_CALL,0x0C000000|(((RAM+symbols['af_miko_fortune_charge'])>>2)&0x3FFFFFF))
+    return expected
+
+
 def metadata(size):
     value = bytearray(METADATA_BYTES)
     struct.pack_into('>4I',value,0,NEW_VROM,NEW_VROM+size,RAM,RAM+size)
@@ -205,6 +239,7 @@ def verify_installation(rom,native,report,module):
     data,reloc = files[NEW_VROM].extract(rom),files[NEW_RELOCATION].extract(rom)
     spec = validate(native,data,reloc,report,module)
     code = files[CODE_VROM].extract(rom)
+    verify_recovery_code(code)
     if code[METADATA-CODE_RAM:METADATA-CODE_RAM+32] != metadata(len(data)):
         raise ValueError('Installed Miko ownership metadata differs')
     return spec
@@ -237,6 +272,7 @@ def install(rom,replacements,additions,relocations,module,directory):
         raise ValueError('Duplicate or overlapping Miko actor patch')
     files = by_vrom(rom)
     code = bytearray(replacements.get(CODE_VROM,files[CODE_VROM].extract(rom)))
+    verify_recovery_code(code)
     at = METADATA-CODE_RAM
     if code[at:at+32] != METADATA_BYTES:
         raise ValueError('Overlapping Miko ownership metadata patch')
@@ -253,4 +289,4 @@ def install(rom,replacements,additions,relocations,module,directory):
     return {'overlay':report,'vrom':f'{NEW_VROM:08X}','relocation_vrom':f'{NEW_RELOCATION:08X}',
             'metadata':metadata(len(data)).hex(),'temporary_allocation_bytes':5471,
             'saved_layout_changed':False,
-            'status':'Experimental complete fortune hand-off; cancellation lifetime, normal gameplay, and hardware remain unverified'}
+            'status':'Complete fortune hand-off with guarded payment recovery; normal gameplay, scene removal, and hardware remain unverified'}

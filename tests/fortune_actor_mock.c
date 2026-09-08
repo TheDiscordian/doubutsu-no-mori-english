@@ -12,6 +12,9 @@ unsigned int af_miko_test_copies, af_miko_test_slots, af_miko_test_events[64];
 unsigned int af_miko_test_event_count;
 int af_miko_test_slot, af_miko_test_second_slot, af_miko_test_order;
 unsigned int af_miko_test_cancel, af_miko_test_switch_owner;
+unsigned int af_miko_test_charges, af_miko_test_end_result, af_miko_test_saves, af_miko_test_destroys;
+const unsigned short af_miko_money_items[4] = {0x2103,0x2100,0x2101,0x2102};
+const unsigned int af_miko_money_values[4] = {100,1000,10000,30000};
 unsigned char af_miko_test_other_player[4096];
 static unsigned char *allocation;
 static unsigned int allocation_bytes;
@@ -106,4 +109,44 @@ void af_miko_setup_action(unsigned char *actor, void *play, int action) {
     (void)play;
     *(int *)(actor+0x938u) = action;
     event(6);
+}
+
+int af_miko_find_item(unsigned char *player, unsigned int item, unsigned int condition) {
+    unsigned int slot;
+    for (slot = 0; slot < 15u; ++slot)
+        if (*(unsigned short *)(player+0x14u+slot*2u) == item
+                && ((*(unsigned int *)(player+0x34u)>>(slot*2u))&3u) == condition) return (int)slot;
+    return -1;
+}
+
+void af_miko_original_charge(unsigned int amount) {
+    unsigned int *wallet = (unsigned int *)(af_miko_private+0x38u),kind;
+    int slot;
+    if (*wallet < amount) {
+        for (kind = 0; kind < 4u; ++kind) {
+            slot = af_miko_find_item(af_miko_private,af_miko_money_items[kind],0);
+            if (slot >= 0) {
+                *(unsigned short *)(af_miko_private+0x14u+(unsigned int)slot*2u) = 0;
+                *wallet += af_miko_money_values[kind];
+                break;
+            }
+        }
+    }
+    *wallet -= amount;
+    ++af_miko_test_charges;
+    event(7);
+}
+
+int af_miko_original_end(unsigned char *actor, void *play) {
+    af_miko_fortune_give(actor,play);
+    event(8);
+    return (int)af_miko_test_end_result;
+}
+
+void af_miko_original_save(unsigned char *actor, void *play) {
+    (void)actor;(void)play;++af_miko_test_saves;event(9);
+}
+
+void af_miko_original_destroy(unsigned char *actor, void *play) {
+    (void)actor;(void)play;++af_miko_test_destroys;event(10);
 }

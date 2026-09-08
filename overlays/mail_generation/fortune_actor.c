@@ -33,6 +33,7 @@ void af_miko_fortune_init(unsigned char *actor, void *play) {
     AfMikoPending *pending;
     unsigned int i;
     if (!actor) return;
+    if (!af_miko_fortune_abort(actor)) return;
     pending = (AfMikoPending *)(actor+AF_MIKO_PENDING_OFFSET);
     for (i = 0; i < sizeof(*pending); ++i) ((unsigned char *)pending)[i] = 0;
     pending->owner = af_miko_private;
@@ -51,7 +52,7 @@ void af_miko_fortune_give(unsigned char *actor, void *play) {
     if (!actor || action(actor) != 3 || af_miko_get_order(4,9) != 1) return;
     pending = (AfMikoPending *)(actor+AF_MIKO_PENDING_OFFSET);
     owner = af_miko_private;
-    if (!owner || pending->owner != owner || pending->reserved
+    if (!owner || pending->owner != owner || (pending->payment & 0xFF800000u) != 0xA5000000u
             || (pending->state != AF_MIKO_ARMED && pending->state != AF_MIKO_SELECTED)
             || outcome(actor) < 0 || outcome(actor) >= 4
             || af_mail_generation_capital > 1u) return;
@@ -88,6 +89,7 @@ void af_miko_fortune_give(unsigned char *actor, void *play) {
         if (slot >= 0 && slot < 10) {
             af_miko_copy_mail(owner+AF_MIKO_MAIL_OFFSET+(unsigned int)slot*164u,work->mail);
             pending->state = AF_MIKO_DELIVERED;
+            pending->payment = 0;
         }
     }
     af_miko_free(allocation);

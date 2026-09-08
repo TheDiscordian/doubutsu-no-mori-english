@@ -78,7 +78,7 @@ and seven sites without a straight-line immediate length.
 | Five shop actors | Complete 120-counter group; count-minus-one indexing, eight native families, unchanged ten-byte locals and free-string slot 8 | Native batch passes all actors; ordinary transactions and presentation remain gameplay checks |
 | Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete resident and shared-word groups implemented; normal dialogue and category selection remain gameplay checks |
 | Fruit-box actor | Native performance credits, 110 rows, twenty-five-byte owned loader/drawer | Native batch passes every page and fade boundaries; normal K.K. performance, final presentation, and hardware remain |
-| Fortune-slip actor | Four ten-byte phrase pools and a result field, then native mail creation | Complete snapshot creation and saved-letter handling, not just a wider temporary |
+| Fortune-slip actor | All 68 complete sixteen-byte phrase/outcome values and three full templates through an owned snapshot creator | Native hand-off/readback and guarded payment recovery pass; normal interaction and scene cleanup remain gameplay checks |
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,

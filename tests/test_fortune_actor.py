@@ -20,7 +20,7 @@ from test_fortune_slips import Choice
 class Pending(C.Structure):
     _pack_ = 4
     _fields_ = [('choice',Choice),('state',C.c_uint),('capital',C.c_uint),
-                ('owner',C.c_void_p),('reserved',C.c_uint)]
+                ('owner',C.c_void_p),('payment',C.c_uint)]
 
 
 def draw(seed, count):
@@ -41,16 +41,20 @@ class FortuneActorTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-fortune-actor-')
         output = Path(cls.temporary.name)/'actor.so'
         sources = ['overlays/mail_generation/generate.c','overlays/mail_generation/fortune_slip.c',
-                   'overlays/mail_generation/fortune_actor.c','runtime/mail/catalog.c',
+                   'overlays/mail_generation/fortune_actor.c','overlays/mail_generation/fortune_recovery.c','runtime/mail/catalog.c',
                    'runtime/mail/format.c','runtime/mail/record.c','tests/mail_catalog_mock.c',
                    'tests/fortune_actor_mock.c']
         result = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                                  *(str(ROOT/p) for p in sources),'-o',str(output)],capture_output=True,text=True)
         if result.returncode: raise ValueError(result.stderr)
         cls.lib = C.CDLL(str(output))
-        for name in ('af_miko_fortune_init','af_miko_fortune_give'):
+        for name in ('af_miko_fortune_init','af_miko_fortune_give','af_miko_fortune_save','af_miko_fortune_destroy'):
             getattr(cls.lib,name).argtypes = [C.c_void_p,C.c_void_p]
             getattr(cls.lib,name).restype = None
+        cls.lib.af_miko_fortune_charge.argtypes = [C.c_void_p]
+        cls.lib.af_miko_fortune_charge.restype = None
+        cls.lib.af_miko_fortune_abort.argtypes = [C.c_void_p]
+        cls.lib.af_miko_fortune_end.argtypes = [C.c_void_p,C.c_void_p]
         cls.words = (ROOT/'build/fortune-slip-resources/fortune-words.bin').read_bytes()
         cls.catalog = (ROOT/'build/fortune-slip-resources/fortune-catalog.bin').read_bytes()
         cls.original = (ROOT/'build/fortune-slip-resources/catalog.bin').read_bytes()
@@ -63,7 +67,8 @@ class FortuneActorTests(unittest.TestCase):
 
     def setUp(self):
         for name in ('rng','draws','allocations','frees','live','fail_malloc','bad_free','alignment',
-                     'copies','slots','event_count','cancel','switch_owner','slot','second_slot','order'):
+                     'copies','slots','event_count','cancel','switch_owner','slot','second_slot','order',
+                     'charges','end_result','saves','destroys'):
             self.counter(name).value = 0
         for name,value in (('enabled',1),('reads',0),('dma_error',0),('fail_read',0)):
             C.c_uint.in_dll(self.lib,'af_mail_catalog_'+name).value = value
@@ -80,10 +85,13 @@ class FortuneActorTests(unittest.TestCase):
         self.counter('rng').value = 0xF13579BD
         self.counter('order').value = 1
         self.counter('slot').value = self.counter('second_slot').value = 7
-        self.before = self.player.raw
+        C.c_uint.from_address(self.owner.value+0x38).value = 500
+        self.unpaid = self.player.raw
         self.set_action(2)
         self.lib.af_miko_fortune_init(self.actor,None)
         self.set_action(3)
+        self.lib.af_miko_fortune_charge(self.actor)
+        self.before = self.player.raw
 
     def set_action(self,value): C.c_int.from_address(C.addressof(self.actor)+0x938).value = value
 
@@ -117,7 +125,7 @@ class FortuneActorTests(unittest.TestCase):
         self.assertEqual(self.actor.raw[0x948+C.sizeof(Pending):],original_actor[0x948+C.sizeof(Pending):])
         events = (C.c_uint*64).in_dll(self.lib,'af_miko_test_events')
         self.assertEqual(list(events)[:self.value('event_count')],
-                         [1,2,3,4,5,0x10490000,0x10410002,0x10502513,0x10510007,0x10520000,6])
+                         [1,7,2,3,4,5,0x10490000,0x10410002,0x10502513,0x10510007,0x10520000,6])
         before = self.player.raw,self.value('draws'),self.value('copies'),self.value('allocations')
         for action in (0,3):
             self.set_action(action);self.counter('order').value = 1;self.give()
@@ -159,10 +167,10 @@ class FortuneActorTests(unittest.TestCase):
             self.give()
             self.assertEqual((self.player.raw,self.pending.state,self.value('copies'),self.value('frees')),
                              (self.before,2,0,1))
-            self.assertEqual(self.value('event_count'),4)  # init, malloc, clear, free only
+            self.assertEqual(self.value('event_count'),5)  # init, charge, malloc, clear, free only
 
     def test_invalid_action_owner_outcome_pending_and_capital_do_not_allocate(self):
-        for mutation in ('null_actor','action','order','owner','null_owner','outcome','state','reserved','capital'):
+        for mutation in ('null_actor','action','order','owner','null_owner','outcome','state','payment','capital'):
             self.setUp()
             if mutation == 'null_actor':
                 self.lib.af_miko_fortune_give(None,None)
@@ -173,7 +181,7 @@ class FortuneActorTests(unittest.TestCase):
                 elif mutation == 'null_owner': self.owner.value = None
                 elif mutation == 'outcome': C.c_int.from_address(C.addressof(self.actor)+0x940).value = 4
                 elif mutation == 'state': self.pending.state = 0
-                elif mutation == 'reserved': self.pending.reserved = 1
+                elif mutation == 'payment': self.pending.payment = 1
                 elif mutation == 'capital': self.capital.value = 2
                 self.give()
             self.assertEqual((self.value('allocations'),self.value('draws'),self.player.raw),(0,1,self.before))
@@ -195,15 +203,110 @@ class FortuneActorTests(unittest.TestCase):
         C.c_uint.in_dll(self.lib,'af_mail_catalog_enabled').value = 0;self.give()
         original = bytes(self.pending)
         other = C.create_string_buffer(b'?'*4096,4096)
+        second_player = C.create_string_buffer(self.unpaid,4096)
+        self.owner.value = C.addressof(second_player)
         self.lib.af_miko_fortune_init(other,None)
         C.c_int.from_address(C.addressof(other)+0x938).value = 3
+        self.lib.af_miko_fortune_charge(other)
         self.lib.af_miko_fortune_give(other,None)
         self.assertEqual(bytes(self.pending),original)
         self.assertEqual(Pending.from_address(C.addressof(other)+0x948).state,2)
+        self.owner.value = C.addressof(self.player)
         self.lib.af_miko_fortune_init(self.actor,None)
         self.assertEqual((bytes(self.pending.choice),self.pending.state,self.pending.capital,
-                          self.pending.owner,self.pending.reserved),(bytes(8),1,0,self.owner.value,0))
+                          self.pending.owner,self.pending.payment),(bytes(8),1,0,self.owner.value,0))
+        self.assertEqual(self.player.raw,self.unpaid)
         self.assertEqual(self.value('live'),0)
+
+    def prepare_payment(self,money,kind=None,slot=0):
+        self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),1)
+        C.memset(self.owner.value+0x14,0,0x28)
+        C.c_uint.from_address(self.owner.value+0x38).value = money
+        if kind is not None:
+            C.c_ushort.from_address(self.owner.value+0x14+slot*2).value = (0x2103,0x2100,0x2101,0x2102)[kind]
+        self.lib.af_miko_fortune_init(self.actor,None)
+        self.set_action(3)
+        self.unpaid = self.player.raw
+        self.lib.af_miko_fortune_charge(self.actor)
+        self.before = self.player.raw
+
+    def test_exact_payment_recovery_for_every_bag_denomination_pocket_and_wallet_boundary(self):
+        for kind,value in enumerate((100,1000,10000,30000)):
+            for slot in range(15):
+                for money in (0,1,49):
+                    self.prepare_payment(money,kind,slot)
+                    self.assertEqual(C.c_uint.from_address(self.owner.value+0x38).value,money+value-50)
+                    self.assertEqual(C.c_ushort.from_address(self.owner.value+0x14+slot*2).value,0)
+                    self.assertEqual(self.pending.payment,0xA5000000|money|((slot+1)<<17)|(kind<<21))
+                    rng = self.value('rng')
+                    self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),1)
+                    self.assertEqual((self.player.raw,self.pending.state,self.pending.payment,self.value('rng')),
+                                     (self.unpaid,4,0,rng))
+                    for _ in range(3): self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),1)
+                    self.assertEqual(self.player.raw,self.unpaid)
+        for money in (50,51,500,99999,131071):
+            self.prepare_payment(money)
+            self.assertEqual(C.c_uint.from_address(self.owner.value+0x38).value,money-50)
+            self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),1)
+            self.assertEqual(self.player.raw,self.unpaid)
+
+    def test_interruption_hooks_recover_once_and_preserve_completed_delivery(self):
+        for hook in ('end','save','destroy'):
+            for selected in (False,True):
+                self.setUp()
+                if selected:
+                    C.c_uint.in_dll(self.lib,'af_mail_catalog_enabled').value = 0
+                    self.give()
+                self.counter('order').value = 0
+                self.counter('end_result').value = 1
+                function = getattr(self.lib,'af_miko_fortune_'+hook)
+                function(self.actor,None)
+                self.assertEqual((self.player.raw,self.pending.state,self.pending.payment),(self.unpaid,4,0))
+                function(self.actor,None)
+                self.assertEqual((self.player.raw,self.value('charges')),(self.unpaid,1))
+                if hook == 'save': self.assertEqual(self.value('saves'),2)
+                if hook == 'destroy': self.assertEqual(self.value('destroys'),2)
+        self.setUp();self.counter('order').value = 0
+        self.assertEqual(self.lib.af_miko_fortune_end(self.actor,None),0)
+        self.assertEqual(self.player.raw,self.before)
+        self.counter('order').value = 1;self.give();delivered = self.player.raw
+        self.counter('end_result').value = 1
+        for hook in ('end','save','destroy','init'):
+            getattr(self.lib,'af_miko_fortune_'+hook)(self.actor,None)
+            self.assertEqual((self.player.raw,self.value('charges')),(delivered,1))
+
+    def test_recovery_refuses_changed_owner_money_slot_flags_or_descriptor_without_erasing_state(self):
+        for mutation in ('owner','null_owner','money','slot','flags','tag','relationship','reserved'):
+            self.setUp();self.prepare_payment(1,2,14)
+            if mutation == 'owner': self.owner.value += 16
+            elif mutation == 'null_owner': self.owner.value = None
+            elif mutation == 'money': C.c_uint.from_address(self.owner.value+0x38).value += 1
+            elif mutation == 'slot': C.c_ushort.from_address(self.owner.value+0x14+14*2).value = 0x1234
+            elif mutation == 'flags': C.c_uint.from_address(self.owner.value+0x34).value = 1<<(14*2)
+            elif mutation == 'tag': self.pending.payment ^= 1<<24
+            elif mutation == 'relationship': self.pending.payment = 0xA5000001
+            elif mutation == 'reserved': self.pending.payment |= 1<<23
+            before = self.player.raw,bytes(self.pending),self.value('rng')
+            self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),0)
+            self.lib.af_miko_fortune_init(self.actor,None)
+            self.assertEqual((self.player.raw,bytes(self.pending),self.value('rng')),before)
+
+    def test_charge_is_once_only_and_does_not_consume_wrapped_or_missing_money(self):
+        self.lib.af_miko_fortune_charge(self.actor)
+        self.assertEqual((self.value('charges'),self.player.raw),(1,self.before))
+        self.assertEqual(self.lib.af_miko_fortune_abort(None),1)
+        self.lib.af_miko_fortune_charge(None)
+        for money in (0,49,131072):
+            self.setUp()
+            self.assertEqual(self.lib.af_miko_fortune_abort(self.actor),1)
+            C.memset(self.owner.value+0x14,0,0x28)
+            C.c_uint.from_address(self.owner.value+0x38).value = money
+            C.c_ushort.from_address(self.owner.value+0x14).value = 0x2103
+            C.c_uint.from_address(self.owner.value+0x34).value = 1
+            self.lib.af_miko_fortune_init(self.actor,None)
+            before,charges = self.player.raw,self.value('charges')
+            self.lib.af_miko_fortune_charge(self.actor)
+            self.assertEqual((self.player.raw,self.value('charges'),self.pending.payment),(before,charges,0))
 
 
 if __name__ == '__main__': unittest.main()

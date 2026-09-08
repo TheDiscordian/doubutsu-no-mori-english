@@ -9,7 +9,9 @@ The N64 CPU probe passes complete creation and older-catalogue restoration.
 The optional native Miko adapter installs complete item hand-off with per-instance
 retry choices and synchronous temporary work. Native cartridge loading, real
 actor callbacks, whole-pocket publication, and complete reader restoration pass.
-Normal interaction and cancellation across actor removal remain unverified.
+Interrupted hand-offs have guarded exact payment recovery on talk end, actor
+save/destruction, and reinitialization. Normal interaction and scene removal
+remain gameplay checks; this is not persistent letter recovery.
 
 `tools/fortune_slips.py` binds the native actor and complete supplied English
 sources. `tools/build_fortune_slips.py` builds ignored reference resources.
@@ -19,6 +21,7 @@ variant, with its own source/export checks; a generic generation probe cannot
 silently stand in for that variant.
 
 `overlays/mail_generation/fortune_actor.c` supplies the native init/give callbacks.
+`fortune_recovery.c` captures the original payment and wraps cleanup callbacks.
 `tools/build_fortune_actor.py` appends them to the source-verified original actor;
 `tools/fortune_actor.py` guards allocation limits, all relocation records, source
 words, reader dependencies, DMA ownership, and the atomic installation.
@@ -165,13 +168,22 @@ The resident module uses 24,288 linked bytes, leaving 288 within its existing
 
 ## Native adapter and retry state
 
-The extended actor has 7,248 loaded bytes and 288 relocation bytes. Its native
-8,192-byte slot has 944 loaded bytes free; relocation scratch is separately owned
+The extended actor has 8,032 loaded bytes and 336 relocation bytes. Its native
+8,192-byte slot has 160 loaded bytes free; relocation scratch is separately owned
 by the native loader. Original code/data retain their linked addresses, and
 the original sixteen-byte BSS is materialised as zero bytes before new code.
-Only three original actor words change: profile size, init-table entry two,
-and process-table entry three. Original charge, effect, message selection,
-outcome initializer, and other callbacks remain unchanged.
+Eight original actor words change: profile size; init, give, end, save, and
+destructor pointers; and the charge argument and call. The charge wrapper records
+payment then calls the unchanged native charge helper. The original luck store
+in the call's delay slot, message selection, and outcome initializer remain intact.
+The end/save/destructor wrappers retain the original callbacks.
+
+`ovlmgr_Load` calls `ovlmgr_LoadImpl` with no supplied relocation buffer.
+`ovlmgr_LoadImplDmaGetOvlOffsets` obtains the next DMA row and allocates relocation
+scratch separately; the loader frees that scratch after relocation. The actor
+allocator receives only `vramEnd - vramStart`. Thus the 8,192-byte resident limit
+does not include the separately allocated 336 relocation bytes. The builder
+enforces both the resident limit and a separate 4,096-byte relocation limit.
 
 The original actor and relocation DMA rows retain their indices and adjacency,
 but move to VROM `03600000` and `03608000`. The native loader discovers relocation
@@ -187,19 +199,21 @@ The pending extension starts at actor offset `0948`:
 | Offset within extension | Bytes | Value |
 | --- | ---: | --- |
 | `00` | 8 | Complete phrase/outcome/template selection |
-| `08` | 4 | Empty, armed, selected, or delivered state |
+| `08` | 4 | Empty, armed, selected, delivered, or cancelled state |
 | `0C` | 4 | Captured initial capitalization |
 | `10` | 4 | Native current-player pointer |
-| `14` | 4 | Zero reserved word |
+| `14` | 4 | Guarded payment descriptor, zero before charge/after completion |
 
-The initializer resets pending state, records the player, and calls the original
+The initializer first recovers any intact unfinished payment, then resets
+pending state, records the player, and calls the original
 one-draw outcome initializer. The give callback requires action three, ready
-demo order, the same player, valid outcome/state, and a free pocket. It allocates
+demo order, the same player, valid outcome/state/payment tag, and a free pocket. It allocates
 5,471 temporary bytes, including alignment slack for 5,456-byte work. Only then
 does an armed state draw the four phrase indices and one template. Selected
 states reuse every captured value. Generation and a final player/action/order/
 pocket recheck precede the native copy. The delivered state blocks duplicate
-publication even if the callback is invoked again with a ready order.
+publication even if the callback is invoked again with a ready order. Successful
+publication also clears the payment descriptor, preventing a later refund.
 
 Every allocated attempt frees work before returning or issuing hand-off orders.
 No heap pointer or large buffer remains in the actor. Complete snapshots carry
@@ -209,12 +223,46 @@ the adapter preserves the current shared flag instead of overwriting a newer
 value with an old retry's captured flag. The unchanged previous action owns the
 fifty-Bell charge and luck assignment; the give adapter never charges again.
 
-Pending state belongs to a live actor, not the save. A forced new initializer
-resets that state, and actor removal discards it. The current checks do **not**
-prove that cancellation/removal cannot abandon an already paid, undelivered slip.
-Before release, trace the native talk cancellation and removal routes and either
-prove they cannot occur during a pending delivery or implement explicit recovery.
-Do not describe the synchronous retry checks as persistent paid-letter recovery.
+## Interrupted-payment recovery
+
+The native conversation can end independently of successful delivery: `1910`
+permits payment; outcome messages `1911..1914` redirect to `1915`, whose demo
+order permits hand-off but whose ending does not wait for the new creator.
+Native talk end can therefore retire a failed pending attempt. The wrapper calls
+the original end callback first, allowing its final give attempt, then recovers
+an unfinished payment only when that callback reports an ended conversation.
+`Actor_dt` invokes save before destruction. Both profile wrappers recover before
+calling their original callbacks; the first success makes later calls harmless.
+`Actor_info_save_actor` also uses the profile save callback. Reinitialization
+refuses to discard payment state if its recovery guards fail.
+
+The native fifty-Bell helper consumes wallet money, or one normal-condition Bell
+bag when the wallet has fewer than fifty Bells. Its denomination scan is
+`2103`/100, `2100`/1,000, `2101`/10,000, `2102`/30,000; the first matching pocket
+in the selected denomination is consumed. The descriptor records:
+
+| Bits | Meaning |
+| --- | --- |
+| `31..24` | Tag `A5` |
+| `23` | Reserved zero |
+| `22..21` | Bag denomination index, zero when no bag |
+| `20..17` | Consumed pocket plus one, zero when no bag |
+| `16..0` | Original wallet amount |
+
+Recovery requires armed/selected state, valid descriptor, the same current player,
+the exact expected post-charge wallet, and an empty normal-condition consumed
+pocket. It restores the original wallet and bag identity/position, clears payment,
+and marks cancellation exactly once. Changed owners, reused pockets, changed
+balances, and malformed descriptors are rejected without writes. The descriptor
+does not justify recovering arbitrary externally mutated state or a stale player.
+
+This is a payment refund, not persistent delivery and not reversal of an already
+revealed fortune. Original luck type, RNG, and the native demo's fortune-date
+update remain unchanged. Normal successful readings retain their original price
+and charge timing. There is no new saved field or retained heap allocation.
+Lifecycle and currency helper hashes are guarded in both the native source and
+the installed main-code file; overlapping helper patches are rejected atomically.
+Normal player-driven end/save/scene-removal routing still needs gameplay evidence.
 
 ## Executed checks and required next work
 
@@ -232,26 +280,32 @@ gracefully, and isolated FlashRAM/Pak files remain blank. This tests creation
 and decoding in owned memory, not normal delivery, the visible letter window,
 arbitrary player editing, save-menu operation, or original hardware.
 
-Eleven adapter/installer host tests pass, including complete real formatter
+Sixteen adapter/installer host tests pass, including complete real formatter
 transactions, all sixteen heap alignments, every selected read failure, changed
 owners/orders, full pockets, repeat delivery, two independent actor states,
-source mutations, missing dependencies, and installer rollback. A mutation of
+source mutations, exact payment recovery, cleanup callback routing, missing
+dependencies, and installer rollback. A mutation of
 the compressed main-code file must operate on extracted code before reinsertion,
 not use an uncompressed function offset inside compressed physical storage.
 
 The native adapter batch passes all 24 outcome/template/capitalization
 combinations, all ten pocket positions, full-pocket rejection, four disabled
 resource attempts, successful retained-choice retry, and duplicate prevention.
-Its 88 native calls and 578 memory assertions also prove exact loaded relocations,
+The payment/recovery batch has 374 native calls and 1,255 memory assertions,
+including 64 exact refunds and original payment/effect-tail execution. It checks exact loaded relocations,
 complete pocket-to-reader text, unchanged heap accounting after attempts,
 retained live save/handbill fields, allocation/stack guards, restored checkpoint,
 blank isolated saves, and graceful shutdown. This is not normal player input,
-visible letter-window rendering, cancellation/removal, or hardware acceptance.
+visible letter-window rendering, scene-removal routing, or hardware acceptance.
+All 886 regression tests pass; current hashes and artifact details are recorded in
+the [recovery checkpoint](../docs/checkpoints/FORTUNE_RECOVERY.md).
 
 Required next work:
 
-1. Close the cancellation/removal lifetime gap for already paid pending slips;
-   preserve native outcome, price, and effects without duplicate delivery.
+1. Validate the installed cancellation/save/destruction routing during ordinary
+   play, including exact recovery of an interrupted paid slip. Native payment/
+   refund execution and host callback routing pass; normal scene removal does not
+   yet have direct gameplay evidence.
 2. Validate ordinary paid reading and subsequent input/action progression.
 3. Batch the remaining visible reader and existing mail/save paths;
    retain outstanding custom editing, normal play, semantic review, and hardware

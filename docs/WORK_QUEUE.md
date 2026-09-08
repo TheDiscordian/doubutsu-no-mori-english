@@ -96,13 +96,17 @@ The [fortune-slip transaction](../specs/FORTUNE_SLIP_LETTERS.md) has complete
 signatures in independently frozen catalogue three. The native creation probe
 passes forty full slips, failure retention, old-catalogue reads, and 525 memory
 checks. The optional extended actor connects complete hand-off without changing
-the native price, outcome, or luck action. Its native batch passes 24 complete
-pocket-to-reader cases, retries, duplicate prevention, and 578 memory assertions.
+the native successful-reading price, outcome, or luck timing. Its native batch
+passes 24 complete pocket-to-reader cases, retries, duplicate prevention,
+64 exact interrupted-payment recoveries, and 1,255 memory assertions.
 Both actor/instance pool limits, original DMA-row adjacency, and complete native
-relocation are verified. Pending selections survive failed synchronous attempts,
-but forced reinitialization or actor removal discards actor-owned state. Close
-that already-paid-letter lifetime gap and validate normal interaction before
-release. Preserve source
+relocation are verified. Pending selections survive failed synchronous attempts.
+The [payment-recovery adapter](checkpoints/FORTUNE_RECOVERY.md) restores the exact
+wallet and consumed Bell bag once on an interrupted hand-off, guarded against
+changed owners, balances, and reused pockets. End/save/destruction/reinitialization
+routing is installed and host/source verified; normal scene removal and ordinary
+interaction still need gameplay evidence. Recovery does not persist a letter or
+undo the already revealed fortune. Preserve source
 identity and complete wording when
 mapping the remaining text; a same-ID GameCube row alone is not approval.
 
