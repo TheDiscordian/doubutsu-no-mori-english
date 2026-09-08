@@ -27,6 +27,10 @@ def scenario(rom,native,report,edits):
     entries=Bank('string',STRING_RELOCATION[0],0xD18000,files[STRING_RELOCATION[0]].extract(rom),
                  files[0xD18000].extract(rom)).entries()
     verify_values([entries[int(id[7:],16)] for id in IDS],info)
+    if report.get('shared_npc_words'):
+        from shared_npc_words import IDS as SHARED_IDS, validated_values, verify_values as verify_shared_values
+        validated_values(native,edits,info)
+        verify_shared_values([entries[int(id[7:],16)] for id in SHARED_IDS])
     by_id={e['id']:e for e in edits}
     for index,value in enumerate(entries):
         id=f'string:{index:04X}'
@@ -57,6 +61,7 @@ def scenario(rom,native,report,edits):
     request={'source':original.hex(),'relocation':reloc.hex(),'installed_relocation':actual_reloc.hex(),
              'module':module,'dates':dates,'loader':loader.hex(),'rng':rng.hex(),
              'strings':[value.hex() for value in entries],'messages':messages,'info':info}
+    if report.get('shared_npc_words'):request['shared_npc_words']=True
     return [{'wait':8},{'save_state':True},{'pause_game_thread':True},{'test_resident_words':request},
             {'load_state':True},{'resume':True},{'wait':2},{'read':['8019B000',4],'expect':'00000000'}]
 
@@ -72,7 +77,7 @@ def main():
     actions=scenario(args.rom.read_bytes(),args.native_rom.read_bytes(),json.loads(args.module.read_text()),
                      json.loads(args.translations.read_text()))
     args.output.parent.mkdir(parents=True,exist_ok=True);args.output.write_text(json.dumps(actions,indent=2)+'\n')
-    print(json.dumps({'actions':len(actions),'random_words':128,'message_cases':{
+    print(json.dumps({'actions':len(actions),'random_words':288 if actions[3]['test_resident_words'].get('shared_npc_words') else 128,'message_cases':{
         k:len(v) for k,v in actions[3]['test_resident_words']['messages'].items()},'output':str(args.output)}))
 
 

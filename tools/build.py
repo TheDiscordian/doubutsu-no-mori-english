@@ -40,6 +40,8 @@ from fortune_strings import permits as fortune_permits, install as install_fortu
 from resetti_replies import permits as resetti_permits, install as install_resetti
 from shop_units import permits as shop_unit_permits, verify_callers as verify_shop_unit_callers
 from resident_words import permits as resident_word_permits, install as install_resident_words
+from shared_npc_words import (IDS as SHARED_WORD_IDS, validated_values as shared_word_values,
+                              install as install_shared_words)
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -49,11 +51,13 @@ RELOCATED_BANKS = {
 
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
                        extended_font=None, english_fortunes=False, english_resetti_replies=False,
-                       english_shop_units=False, english_resident_words=False):
+                       english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False):
     if english_fortunes and not runtime_module:
         raise ValueError('English fortunes require the complete resident runtime')
     if english_resident_words and not runtime_module:
         raise ValueError('Resident words require the complete resident runtime')
+    if defer_shared_npc_words and not (runtime_module and english_resident_words):
+        raise ValueError('Shared NPC words require the complete resident-word runtime')
     relocated_banks = {**RELOCATED_BANKS, **({'string': STRING_RELOCATION}
                        if english_fortunes or english_resetti_replies or english_shop_units or english_resident_words else {})}
     layout = ChoiceLayout()
@@ -73,6 +77,10 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         from extended_font_cartridge import planned_capability
         planned_capability(rom,replacements,module_additions,module_report,extended_font)
     edits = json.loads(path.read_text()) if path else []
+    if defer_shared_npc_words:
+        shared_word_values(rom, edits, info)
+        # Long shared words remain native until the final creator/reader checks.
+        edits = [edit for edit in edits if edit['id'] not in SHARED_WORD_IDS]
     string_permits = fortune_permits(rom, edits, info) if english_fortunes else {}
     reply_permits = resetti_permits(rom, edits, info) if english_resetti_replies else {}
     unit_permits = shop_unit_permits(rom, edits, info) if english_shop_units else {}
@@ -188,6 +196,7 @@ def main():
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete Resetti rude replies with their native substring lengths')
     parser.add_argument('--english-shop-units', action='store_true', help='Complete native shop counter families within their ten-byte callers')
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
+    parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -207,6 +216,8 @@ def main():
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
         parser.error('--english-resident-words requires --runtime-module')
+    if args.english_shared_npc_words and not (args.english_resident_words and args.runtime_module and args.npc_mail_generation):
+        parser.error('--english-shared-npc-words requires --english-resident-words, --runtime-module, and --npc-mail-generation')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -234,7 +245,8 @@ def main():
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font,
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
-        english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words)
+        english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
+        defer_shared_npc_words=args.english_shared_npc_words)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
@@ -254,6 +266,10 @@ def main():
         report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'), args.mail_catalog)
     if args.npc_mail_generation:
         report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation)
+    if args.english_shared_npc_words:
+        report['shared_npc_words'] = install_shared_words(rom, replacements, additions, report['runtime_module'],
+            json.loads(args.translations.read_text()) if args.translations else [], module_command_info(rom))
+        report['translation_edits'] += report['shared_npc_words']['translation_edits']
     if args.extended_font:
         from extended_font_cartridge import install as install_font
         report['extended_font'] = install_font(rom,replacements,additions,report.get('runtime_module'),args.extended_font)

@@ -33,6 +33,7 @@ from fortune_strings import candidates as fortune_candidates, permits as fortune
 from resetti_replies import candidates as resetti_candidates, permits as resetti_permits
 from shop_units import candidates as shop_unit_candidates, permits as shop_unit_permits
 from resident_words import candidates as resident_word_candidates, permits as resident_word_permits
+from shared_npc_words import candidates as shared_word_candidates
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -155,6 +156,7 @@ def main():
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete source-verified Resetti reply dictionary and matching lengths')
     parser.add_argument('--english-shop-units', action='store_true', help='Complete source-verified native shop counter families')
     parser.add_argument('--english-resident-words', action='store_true', help='Complete source-verified ordinary resident words; requires resident module')
+    parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; build also requires cartridge NPC generation')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -175,6 +177,8 @@ def main():
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
         parser.error('--english-resident-words requires --runtime-module')
+    if args.english_shared_npc_words and not (args.english_resident_words and args.runtime_module):
+        parser.error('--english-shared-npc-words requires --english-resident-words and --runtime-module')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     rom = verified_rom(args.rom.read_bytes())
@@ -281,6 +285,10 @@ def main():
         words = (resident_word_candidates(rom,gc,{r['id']:r for r in inventory},info)
                  if name=='string' and args.english_resident_words else {})
         word_permits = resident_word_permits(rom,list(words.values()),info) if words else {}
+        shared = (shared_word_candidates(rom,gc,{r['id']:r for r in inventory},info)
+                  if name=='string' and args.english_shared_npc_words else {})
+        if shared.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys() | words.keys()):
+            raise ValueError('Shared-word group conflicts with another approved group')
         if words.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys()):
             raise ValueError('Resident-word group conflicts with another approved group')
         if units.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys()):
@@ -305,7 +313,13 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in words:
+            if id in shared:
+                # The complete resource hash validates values and their identities.
+                # Installation is deferred until both consumer checks pass; there
+                # is deliberately no generic text-validator capacity exception.
+                edit=shared[id]
+                counts['complete_shared_npc_words'] += 1
+            elif id in words:
                 edit=words[id]
                 validate_entry(original,encode(edit['translation'],info),info,name,
                                resident_runtime=True,resident_word_permit=word_permits[id])

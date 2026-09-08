@@ -7088,3 +7088,74 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   rather than letting non-generation builds truncate words. The title screen
   remains the main image priority, and all wider translation, review, gameplay,
   editor, mail, release, keyboard, and hardware requirements remain active.
+
+## 2026-09-08: complete shared NPC reply words
+
+- The preceding user-requested measurement turn was read-only status work,
+  not progress toward the implementation goal. Revalidated the clean worktree
+  and continued the remaining 352-word import without changing the objective.
+- Added complete source-bound shared-word generation and two-phase installation.
+  All eleven native families retain their original 32-entry selection pools;
+  fish/insects use the explicit English source offsets, not same-ID guesses.
+  Full values agree with both supplied donors and the previously verified
+  resource hash. All 352 fit sixteen bytes; 83 exceed ten bytes. The ordinary
+  bank remains native until the complete resident caller, creator, catalog,
+  reader, eight capture hooks, and exact submission gate pass verification.
+  No generic text-budget exception or additional runtime code is introduced.
+- The original-ROM entry scan confirms the five native creator entry-reference
+  sets across DMA literals and pinned executable jumps. Seven complete native
+  functions, six selection/dispatch tables, saved-catchphrase IDs, special-name
+  IDs, and the earlier ordinary-helper ownership remain guarded. These scans
+  do not claim absence of arbitrarily computed pointers.
+- Full generation adds 288 records, reaching 13,277. Sixty-four earlier shared
+  words keep their complete English wording with updated group provenance.
+  Every other earlier edit and its metadata remains unchanged. Disabled full
+  generation reproduces the resident-word candidate file exactly. General
+  strings total 814/1,562, leaving 748 without candidates: 639 Japanese,
+  eighty development labels, four Latin, 24 empty, and one symbol record.
+  Candidate strings comprise 784 Latin and thirty intentional empty counters.
+  Ordinary source-character coverage is 649,791/746,978; general strings are
+  4,049/7,114. These counts grant no semantic-review or gameplay credit.
+- All 851 host tests pass in 318.700 seconds in
+  `build/tests-shared-npc-words-full.log`. The group tests cover source/mapping
+  agreement, corruption, partial/duplicate installation, deferral, both consumer
+  requirements, every capture hook and gate instruction, reader/resource/module
+  failures, unchanged unrelated entries, CLI dependencies, and actual relocated
+  bank reconstruction. The earlier ten focused tests also pass in 8.161 seconds.
+- Pilot `build/shared-npc-words-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `d301b311ed30f34857f3480b41896fbbe76436c5da6120d69ab81e89a5d6698e`.
+  UPS SHA-256:
+  `46e20ee01ba48bbd6e87269728258ae1d9779e6805489ea8fc4fc470f649b8ee`.
+  Candidate `build/shared-npc-words-candidates/translations.json`, SHA-256:
+  `1a6c6e5ca4f99b7f7ab7225e5073c3de7fc2a52e0c1f8d0208065d13306d7a71`.
+  Independent reconstruction verifies all 13,277 installed edits, all 748
+  untouched general strings, and the complete original-ROM UPS application.
+  Only DMA metadata `00019D40`, string data `02600000`, and offsets `00D18000`
+  differ from the resident-word pilot. Data occupies 10,272 bytes; the ROM is
+  32 MiB. Code, other actors, fonts, mail resources, title, and keyboard remain
+  identical. The resident stays at 24,192 linked bytes, with 384 free.
+- Expanded the ordinary fixture from four to nine random families, retaining
+  all real outer preparations and complete message cases. Fixed the NPC loader
+  scenario to follow the verified relocated string address and retain the
+  grown bank, rather than reading the old VROM or clipping to Japanese size.
+  The combined scenario uses separate restored checkpoints for dialogue and
+  letter creation. `build/smoke-shared-npc-words-01/` is running; a partial log
+  is not completed native evidence. Scenario SHA-256:
+  `366942eda49d6a2c7d5f0e14c6238dcc0c5503a0e2c63f70deeb03cb5a54e6ae`.
+- Further read-only caller inspection resolves the fruit-box bank use as the
+  native credits: `80AA3D08..80AA3D94` loads ten fifteen-byte rows using the page
+  table at `80AA4D54`, starting at `04EA` and clamping at `0557`. The direct draw
+  at `80AA3FFC` likewise consumes fifteen-byte rows, and the actor retains its
+  existing page, fade, and scale logic. This path cannot select shop names or
+  category labels above `0557`. Same-ID English credit entries differ, so
+  preserve native contributor identities and presentation in the next import.
+  Original actor SHA-256:
+  `e34789965dda5548c380a87e7384b635931fe6d6826356332f3ba6aa8878757c`.
+- The fortune-slip creator at `809E5BC4..809E5CF8` writes four selected ten-byte
+  handbill fields and one result field, then calls classic mail assembly at
+  `809E5CA8` for template `0072` plus an original three-way draw. These are saved
+  letters, not message-window item fields. Its 64 phrase references all fit
+  sixteen bytes and agree completely with the legacy source, but larger values
+  require the full snapshot creation path. No unsafe wider import is installed.
+  Original actor SHA-256:
+  `29bb1d033017871b77d40d246c7fe892e4fe61ba4f2fb067a43757a782ac8a1b`.

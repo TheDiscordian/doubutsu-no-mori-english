@@ -15,6 +15,14 @@ RANDOM_BASES=(0x414,0x434,0x464,0x4A0)
 PREPARER_BASES={1:(0x219,0x1E5,0x334,0x314,0x414),3:(0x464,0x2F4,0x4A0)}
 
 
+def random_cases(shared=False):
+    from shared_npc_words import ORDINARY_BASES
+    bases=RANDOM_BASES+(ORDINARY_BASES if shared else ())
+    # Isolated fields exercise all five supported item slots; the outer native
+    # preparations below separately prove the actual family-to-slot mapping.
+    return tuple((position%5,base) for position,base in enumerate(bases))
+
+
 def random_draw(seed,pool):
     final=(seed*0x19660D+0x3C6EF35F)&0xFFFFFFFF
     bits=(final>>9)|0x3F800000
@@ -103,12 +111,13 @@ def exercise(debug,request,record):
     write(WINDOW+12,struct.pack('>I',message))
 
     # Every selected English random word passes through the real native helper.
+    cases=random_cases(request.get('shared_npc_words',False))
     for index in range(32):
         seed,final,bits=seed_for(index)
         write(RNG,struct.pack('>I',seed));write(TEMP,bytes(4));call(RNG_START,proof=(RNG_START,rng))
         check('independent original RNG state',RNG,struct.pack('>I',final))
         check('independent original RNG float',TEMP,struct.pack('>I',bits))
-        for slot,start in enumerate(RANDOM_BASES):
+        for slot,start in cases:
             value=entries[start+index];before=read(WINDOW,0x330)
             write(RNG,struct.pack('>I',seed));write(TEMP,bytes(4))
             call(base+HELPER-SPEC.ram,[scratch,slot,start,0x42000000],proof=proof)
@@ -179,7 +188,7 @@ def exercise(debug,request,record):
     for at in edges:check('heap and native stack guard',at,EDGE)
     check('resident module guard',GUARD_ADDRESS,struct.pack('>4I',*([GUARD_WORD]*4)))
     call(0x8009C040,[allocation])
-    return {'resident_random_word_preparations':128,'resident_outer_preparations':preparations,
+    return {'resident_random_word_preparations':len(cases)*32,'resident_outer_preparations':preparations,
             'resident_independent_rng_calls':original_draws,'resident_complete_message_loads':loads,
             'resident_field_insertions':insertions,'resident_word_assertions':assertions,
             'normal_gameplay':False,'native_category_selection_executed':False,'requires_checkpoint_restore':True}

@@ -8,10 +8,11 @@ colours `0434..0453`, shop types `0454..0457`, places `0464..0483`, reading mate
 between the supplied English and legacy sources. Category labels fit ten bytes;
 the other groups fit sixteen. Generated reference text stays outside git.
 
-The five other thirty-two-entry families shared with NPC letter generation are
-separate work. Its existing 352-phrase resource does not translate their ordinary
-bank or grant capacity to other callers. Birthday animal/sign fields already
-have their own complete resident implementation.
+The five other thirty-two-entry families shared with NPC letter generation use
+the separate [shared-word import](SHARED_NPC_WORDS.md), which requires both this
+complete caller patch and the installed cartridge letter creator. Its 352-phrase
+resource alone does not translate the ordinary bank or grant capacity to other
+callers. Birthday animal/sign fields have their own complete implementation.
 
 ## Native preparation
 

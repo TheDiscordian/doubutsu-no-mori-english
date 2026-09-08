@@ -129,12 +129,17 @@ ROM construction:
 - `--english-resident-words`: 136 complete drinks, colours, places, reading
   material, shop types, and category labels; requires the resident module and
   installs the scoped native caller changes. It composes with dialogue dates.
+- `--english-shared-npc-words`: all 352 complete reply words, including 160 shared
+  with resident dialogue; requires resident words and the module. ROM building
+  also requires `--npc-mail-generation` with its full dependencies. Bank changes
+  are deferred until both complete consumers are installed and verified.
 
 Each group requires its complete source-bound values and caller changes. These
 options share the relocated general-string data bank and do not enlarge other
 callers. See [general strings](../specs/GENERAL_STRINGS.md) and
-[resident words](../specs/RESIDENT_WORDS.md). Basic non-module generation omits
-the two module-dependent options.
+[resident words](../specs/RESIDENT_WORDS.md), and
+[shared NPC words](../specs/SHARED_NPC_WORDS.md). Basic non-module generation omits
+the module-dependent options.
 
 Changing the module source also requires rebuilding the module-bound NPC creator
 and generation probe using `tools/build_npc_mail_capture.py` and

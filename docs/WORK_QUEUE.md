@@ -69,14 +69,24 @@ messages, and 1,097 memory assertions with restored checkpoint and blank saves.
 Category loading/free-field insertion is tested; normal category selection and
 villager interactions remain gameplay checks.
 
-Next shared-string work covers the five resident families shared with NPC mail:
-`01E5/0219/02F4/0314/0334`, thirty-two entries each. The complete 352-phrase
-mail resource is already available, but its separate generation/capture path
-does not translate the ordinary bank. Bind wider ordinary imports to every
-affected native/mail consumer without letting non-generation builds truncate
-long English words. Keep the other mail-only families in the same broader
-consumer audit. Fortune-slip and fruit-box labels also remain ordinary-bank
-work; their destinations differ from message item fields.
+The [shared NPC-word integration](../specs/SHARED_NPC_WORDS.md) installs all
+352 complete values, including the five ordinary families
+`01E5/0219/02F4/0314/0334`. It defers the bank changes until both complete
+consumers, catalog, reader, capture hooks, and failure gate pass verification.
+All 851 host tests and every installed-payload/UPS comparison pass. The combined
+native batch is running and is not yet passing evidence. Normal resident
+interaction, actual creator-to-receipt/pending-loop behaviour, and semantic
+review remain; default builds retain generation disabled.
+
+Next general-bank work covers fortune-slip letters, credits, saved/default
+catchphrases, other names/date destinations, and remaining native sample scripts.
+The fortune-slip actor assembles mail through `80093F04`, using four ten-byte
+phrase fields and a result field; it needs complete snapshot creation, not just
+a larger message temporary. The fruit-box actor's `04EA..0557` bank use is the
+native credits display: ten fifteen-byte rows, original page offsets, direct
+draw lengths, and timing. Its loader clamps at `0557`, so it does not reach
+shop types or item-category labels. Preserve native contributors and page/timing
+intent; same-ID GameCube credit rows are not a valid whole-bank match.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch

@@ -11,6 +11,7 @@ from npc_mail_capture import call_patches
 from npc_mail_delivery import START,END,patch as gate
 from npc_mail_loader import VROM
 from runtime_module import verify_test_module
+from fortune_strings import STRING_RELOCATION
 from textbanks import banks
 
 
@@ -38,7 +39,17 @@ def scenario(rom,native,module):
     catalog = files[CATALOG_VROM].extract(rom);verify_registered(catalog)
     sources = {b.name:b for b in banks(native) if b.name in ('string','npc_names')}
     for b in sources.values():
-        b.data = files[b.data_vrom].extract(rom)[b.data_offset:b.data_offset+len(b.data)]
+        if b.name == 'string':
+            vrom, address, before, after = STRING_RELOCATION
+            pair = code[address-CODE_RAM:address-CODE_RAM+8]
+            if pair == bytes.fromhex(before):
+                vrom = b.data_vrom
+            elif pair != bytes.fromhex(after):
+                raise ValueError('Unknown installed general-string data address')
+            # The relocated bank can grow beyond the original Japanese bank.
+            b.data = files[vrom].extract(rom)
+        else:
+            b.data = files[b.data_vrom].extract(rom)[b.data_offset:b.data_offset+len(b.data)]
         if b.table_vrom is not None:
             b.table = files[b.table_vrom].extract(rom)[b.table_offset:b.table_offset+len(b.table)]
     request = {'module':module,'catalog':catalog.hex(),'blob':files[VROM].extract(rom).hex(),'guards':guards,

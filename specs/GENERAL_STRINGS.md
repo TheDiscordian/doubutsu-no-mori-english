@@ -44,8 +44,10 @@ drinks, colours, places, reading-material words, shop types, and category labels
 Its random-word helper uses the available sixteen-byte BSS span; the shop-name
 preparer receives a sixteen-byte local. Seven instruction words change, with
 no new resident allocation. Category labels retain their ten-byte free-string
-caller. The five random-word families shared with NPC mail remain separate
-ordinary-bank work, despite their complete separate mail resource.
+caller. The separate [shared NPC-word import](SHARED_NPC_WORDS.md) installs all
+352 complete reply words, including five families used by ordinary dialogue.
+It requires both the complete resident caller and cartridge letter creator,
+and defers the ordinary bank replacements until all consumers are verified.
 
 `tools/audit_string_callers.py` scans pinned executable-segment definitions and
 records thirty-four direct J/JAL sites. It records nearby instructions, file
@@ -62,13 +64,13 @@ and seven sites without a straight-line immediate length.
 | `80094664`, `800C31FC` | Default home-gyroid message, string `055C`, sixty-four-byte destination | GameCube entry is eighty-eight bytes; saved gyroid message and editor limits need a separate design |
 | `80094F3C`, unreachable English-runtime `8009F4AC` | Town suffix, string `01E4` | Audit non-message town-name display separately |
 | `800A6428` | Shop-level name at `0558 + shop level`, ten-byte local and mail free-string copy | Full shop names need larger local storage and handbill substitutions |
-| `800A8D70` | Eleven families of randomized NPC-letter words, ten-byte local and handbill free strings | Expand only with the mail assembly, saved body, and editor design |
+| `800A8D70` | Eleven families of randomized NPC-letter words; native ten-byte fields plus complete selected-ID snapshot capture | Shared import requires the complete creator, catalog, reader, eight hooks, and failure gate; normal delivery remains |
 | `800A9F7C`, `800AA264` | Saved villager catchphrase at `Animal+4E5`, four bytes | Default main-dialogue display uses a separate ten-byte resource; custom editing, shared choices, mail, and save compatibility remain |
 | `800ACDC0` | Special-NPC name table, six-byte singleton then personal-name copy | Main dialogue/nameplates use the separate eight-byte display resource; other readers and identity storage remain native |
 | `800C40D4..800C43F4` | Native date/unit suffix formatters | Message date calls already use resident English formatters; other UI paths remain native |
 | `809DC590` in `ovl_Ev_Gypsy` | Four 32-entry fortune families; scoped sixteen-byte local and resident item fields | Complete source-bound English group implemented; normal paid readings and luck effects remain gameplay checks |
 | Five shop actors | Complete 120-counter group; count-minus-one indexing, eight native families, unchanged ten-byte locals and free-string slot 8 | Native batch passes all actors; ordinary transactions and presentation remain gameplay checks |
-| Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete scoped word group implemented; remaining families shared with NPC mail and ordinary gameplay still need work |
+| Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete resident and shared-word groups implemented; normal dialogue and category selection remain gameplay checks |
 | Other actor overlays | Fortune slips and fruit-box labels | Resolve ID tables, local frames, and downstream insertion/draw limits |
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
