@@ -4,9 +4,12 @@
 
 The 135 native-menu approvals in `translations/reference_matches.json` retain
 complete GameCube English text while substituting each original N64 choice
-command. The explicit batch IDs are checked in `tests/test_native_menus.py`.
-Together with the 22 shop and two police-station approvals, 159 records use the
-[native-choice contract](REFERENCE_CHOICES.md).
+command in the canonical payload. The explicit batch IDs are checked in
+`tests/test_native_menus.py`. Together with the 22 shop, two police-station,
+and five additional contextual-menu approvals, 164 records use the
+[native-choice contract](REFERENCE_CHOICES.md). Nineteen final display menus
+have a separate [contextual-label approval](CONTEXTUAL_CHOICES.md), including
+fourteen quiz questions in this batch.
 
 The batch covers Halloween candy, found items, trades and rewards, guessing
 games, event quizzes, resident opinions and advice, singing, early K.K.
@@ -92,23 +95,23 @@ must agree with native schedules and linked event replies.
 
 Do not globally rename `00CD/00CE` to True/False. The same Circle/X labels occur
 in 35 menus across 33 records, including both quizzes and shape-guessing games.
-The current labels preserve the shape games, but natural English quiz labels
-still need a context-specific implementation with native selection/insertion
-review. The shared `00B7` (none versus pear) and `0010` (agreement versus refusal)
-also need contextual handling, not unconditional English replacements.
+The shared labels preserve the shape games. Fourteen approved quiz questions
+have separate complete English answer mappings, with selected-text and native
+branch verification. Explicit contexts for `00B7` (none versus pear) and `0010`
+(agreement versus refusal) also have per-message mappings; their shared labels
+remain unchanged. Further contexts require individual review and approval.
 
 ## Withheld menu comparisons
 
 The reviewed comparison pool contains 154 same-ID/legacy-agreeing references
-that pass mechanical checks after native menu substitution. Nineteen are not
-approved as complete donor imports. Five receive the original drafts above;
-fourteen still need the following work:
+that pass mechanical checks after native menu substitution. Of these, 140 have
+complete donor approvals, including five requiring contextual English labels.
+Five receive the original drafts above; nine still need the following work:
 
 | Records | Remaining requirement |
 | --- | --- |
 | `088B`, `2586` | Audit birthday month/day, zodiac item-field preparation, and acknowledgement labels. |
 | `0B69` | Match the native poster/product joke and its answer against the artwork. |
-| `136E`, `1868`, `1CE0`, `1FAE`, `20CA` | Supply context-appropriate shared labels without reversing native answers. |
 | `1D47` | Verify the actual date range before importing an explicit September statement. |
 | `204B` | Retain the native positive attachment question and its connected replies. |
 | `246C` | Match the native map's row-six wording to its eventual English map labels. |

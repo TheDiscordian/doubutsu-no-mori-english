@@ -29,6 +29,7 @@ from reference_animations import animation_permit, verify_animation_reference, v
 from reference_content import adapt_content_reference, validate_content_candidate
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
+from contextual_choices import load_contextual_choices, contextualize_edits
 
 REFERENCE_BANKS = ("message", "select", "string", "mail", "super", "ps",
                    "maila", "mailb", "mailc", "psz", "superz")
@@ -155,7 +156,8 @@ def main():
                                        Path("translations/n64-resident-gaps.json"),
                                        Path("translations/n64-gyroid-charm-dialogue.json"),
                                        Path("translations/n64-letter-fragments.json"),
-                                       Path("translations/n64-native-menus.json")])
+                                       Path("translations/n64-native-menus.json"),
+                                       Path("translations/n64-contextual-choice-replies.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
@@ -360,6 +362,34 @@ def main():
         raise ValueError(f"Reviewed references are absent from the inventory: {matches.keys()-visited_matches}")
     selected = {edit["id"] for edit in edits}
     edits += [edit for edit in drafts if edit["id"] not in selected]
+    before_context = {edit['id']: edit for edit in edits}
+    edits, context_ids, context_withheld = contextualize_edits(
+        edits, source_banks['message'].entries(), source_banks['select'].entries(),
+        load_contextual_choices(matches), info)
+    context_removed = {r['id'] for r in context_withheld}
+    contextual_ids = set(context_ids) | context_removed
+    manifests = [m for m in manifests if m['id'] not in contextual_ids]
+    for id in sorted(contextual_ids):
+        previous_counts = Counter()
+        record_candidate(before_context[id], info, advances, 'message', [], [], previous_counts,
+                         resident_runtime=bool(args.runtime_module))
+        for key, value in previous_counts.items():
+            reports['message'][key] -= value
+    for edit in edits:
+        if edit['id'] in context_ids:
+            current_counts = Counter()
+            record_candidate(edit, info, advances, 'message', [], manifests, current_counts,
+                             resident_runtime=bool(args.runtime_module))
+            for key, value in current_counts.items():
+                reports['message'][key] += value
+    reports['message']['contextual_choice_candidates'] = len(context_ids)
+    if context_withheld:
+        remaining_path = args.output/'message-remaining.jsonl'
+        remaining = list(map(json.loads, remaining_path.read_text().splitlines()))
+        remaining.extend(context_withheld)
+        reports['message']['rejected'] += len(context_withheld)
+        reports['message']['remaining_by_reason'] = dict(Counter(r['reason'] for r in remaining))
+        remaining_path.write_text(''.join(json.dumps(r)+'\n' for r in remaining))
     (args.output/"translations.json").write_text(json.dumps(edits, ensure_ascii=False, indent=2)+"\n")
     (args.output/'drafts-withheld.json').write_text(json.dumps(withheld_drafts, indent=2)+'\n')
     (args.output/"manifest.json").write_text(json.dumps(manifests, indent=2)+"\n")

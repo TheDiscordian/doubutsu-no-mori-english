@@ -33,6 +33,7 @@ from dialogue_dates import install as install_dialogue_dates, verify_requirement
 from reference_animations import animation_permit, verify_native_consumer
 from reference_content import validate_content_candidate
 from reference_mail_fragments import load_fragment_matches, validate_fragment_candidate
+from contextual_choices import load_contextual_choices, canonical_candidate, validate_labels
 
 RELOCATED_BANKS = {
     "message": (0x02000000, 0x8009E474, "3C1800BD27184000", "3C18020027180000"),
@@ -56,6 +57,9 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     verify_requirements(edits, rom, replacements, module_additions, module_report)
     source_banks = banks(rom)
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
+    contextual = load_contextual_choices(matches)
+    edits_by_id = {edit['id']: edit for edit in edits}
+    source_labels = next(b for b in source_banks if b.name == 'select').entries()
     fragment_matches = load_fragment_matches()
     fragment_sources = {b.name: b.entries() for b in source_banks if b.name in ('maila', 'mailb', 'mailc')}
     if any('resident_animations' in matches.get(edit['id'], {}) for edit in edits):
@@ -84,18 +88,21 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 raise ValueError(f"Stale translation: {edit['id']}")
             replacement = encode(edit["translation"], info)
             try:
-                validate_controller_candidate(edit["id"], original, replacement, matches)
-                validate_choice_candidate(edit["id"], original, replacement, matches)
-                validate_actor_request_candidate(edit["id"], original, replacement, matches)
-                validate_content_candidate(edit["id"], original, replacement, matches)
-                validate_fragment_candidate(edit['id'], original, replacement, fragment_matches,
+                checked = canonical_candidate(edit['id'], original, replacement, contextual, info)
+                if edit['id'] in contextual:
+                    validate_labels(contextual[edit['id']], edits_by_id, source_labels, info)
+                validate_controller_candidate(edit["id"], original, checked, matches)
+                validate_choice_candidate(edit["id"], original, checked, matches)
+                validate_actor_request_candidate(edit["id"], original, checked, matches)
+                validate_content_candidate(edit["id"], original, checked, matches)
+                validate_fragment_candidate(edit['id'], original, checked, fragment_matches,
                                             fragment_sources, info, edit.get('control_policy', 'exact'))
-                validate_entry(original, replacement, info, bank.name, edit.get("control_policy", "exact"),
+                validate_entry(original, checked, info, bank.name, edit.get("control_policy", "exact"),
                                choice_bytes=layout.capacity if english_runtime else 10,
                                resident_runtime=bool(runtime_module), sequence_permit=permits.get(edit["id"]),
-                               field_permit=field_permit(edit["id"], original, replacement, matches),
-                               catchphrase_permit=catchphrase_permit(edit["id"], original, replacement, matches),
-                               animation_permit=animation_permit(edit['id'], original, replacement, matches))
+                               field_permit=field_permit(edit["id"], original, checked, matches),
+                               catchphrase_permit=catchphrase_permit(edit["id"], original, checked, matches),
+                               animation_permit=animation_permit(edit['id'], original, checked, matches))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:

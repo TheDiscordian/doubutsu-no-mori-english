@@ -4427,6 +4427,113 @@
   the image and keyboard stretch goals. Original hardware and human playthrough
   remain unverified. The font-atlas-edge investigation remains paused.
 
+## 2026-09-07 — Context-dependent English answers and connected replies
+
+- Added nineteen complete-payload approvals in `translations/contextual_choices.json`.
+  Fourteen quiz questions use their complete English truth/affirmation labels,
+  while unrelated Circle/X shape games retain their existing labels. Five
+  further contexts distinguish no interest from pear, trade acceptance from
+  refusal, move/stay requests, qualified excitement, and musical knowledge.
+  Eighteen menus use the complete supplied English answer pairing; `1FAE`
+  retains the native moderate second answer through the existing Somewhat.
+  label. All twelve destination-label records remain unchanged.
+- Added `tools/contextual_choices.py` and independent importer/builder checks.
+  Each mapping requires its native-menu parent approval, complete native/base/
+  final hashes, exact menu offset and commands, and every destination label's
+  source and complete English hashes. Only existing label IDs may change;
+  answer count, index, branches, surrounding wording, lines, pages, and timing
+  remain. The builder reverses the exact display menu for every existing
+  independent guard, then writes the approved final text. Missing label edits
+  withhold generator candidates; mutations fail. No generic control exception,
+  native descriptor, new label, buffer, runtime hook, font, or save change is made.
+- Added five complete native-menu reference approvals, bringing their total to
+  164: `136E/1868/1CE0/1FAE/20CA`. Four original connected replies fill
+  `186E/187B/1880/1CE3`. These keep every native command and argument, including
+  three emphatic item repetitions, the equal two-way `187B/1880` continuation,
+  the distinct refusal routes back to `186E` or onward to `1872`, and the moving
+  conversation's complete memories/farewell without a new reference-only menu.
+  Their conservative bounds are 358, 144, 144, and 433 bytes; all fit without
+  layout warnings. Ordinary trade, moving, quest, and friendship actions remain
+  unverified by this content and isolated-call batch.
+- Added ten focused tests covering schema, parent/payload/label bindings,
+  mutations, exact reversibility, dependency withholding, actual retail cases,
+  native branch preservation, unchanged shape contexts, all four drafts, and
+  native even-pixel width rounding. The initial nine tests pass in 0.982 seconds;
+  after the width-fixture correction, all ten pass in 0.941 seconds. Full suite
+  `build/tests-contextual-choices-full-01.log` passes 594 tests in 213.657 seconds.
+  The final `build/tests-contextual-choices-full-02.log` passes all 595 tests in
+  224.932 seconds.
+- Added `tools/contextual_choice_test_scenario.py`. Forty unique message checks
+  cover all nineteen menus, four new replies, sixteen unchanged connected
+  replies, and one unchanged four-choice shape game. Actual cartridge loading,
+  label loading, row setting, width, selection, insertion, and conditional
+  dispatch run together. All 42 selection cases retain complete labels and
+  indices; all 38 contextual cases reach the original conditional destinations,
+  including inverted source branch-command order. Shape-game random outcomes
+  and ordinary player interaction are not executed or claimed.
+- Two initial native runs exposed test-fixture errors, not production changes.
+  Run `smoke-contextual-choices-01` passed a scratch window with zero selected
+  length to insertion while selecting into the global choice object. The
+  corrected insertion parent is `80142410`. Run `-02` expected 87 pixels for
+  an odd-width label, while the retail helper returns 88. Actual instructions
+  `8009031C..80090328` round odd totals upward; the pinned GameCube source lacks
+  this final step. The fixture and its portable regression now model the retail
+  rule. The production ROM and approved glyph advances stayed unchanged through
+  both corrections.
+- Final `build/smoke-contextual-choices-03/` passes 302 native calls and 484
+  memory assertions over 1,195 recorded steps, restores `test.bs1`, and shuts
+  down gracefully. Scenario SHA-256:
+  `47874aa5a514c045d430fe463da62c207b1f91689d314424c31253fdf1f17b92`.
+  The run has four MiB, no seeds, disabled audio, and both save-write permissions
+  false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+- Full generation contains 11,657 edits: nine additions, fourteen deliberate
+  menu-only changes, no removals, and no unrelated changes. Main candidates
+  number 10,412: 9,762 references, 359 original dialogue drafts, and 291 original
+  development labels. All 460 choices remain unchanged. The rejected reference
+  pool is 1,341: 1,204 unconfirmed identities, 111 control differences, 24 field
+  differences, and two direct overflows; one has an original fallback. The
+  final 1,340 missing main records comprise 418 Japanese-static, 919 non-static,
+  one Latin, and two symbol/numeric records. Ten non-static records contain
+  dynamic fields. Reference warnings remain 1,469; aliases remain 41 with no
+  conflicts. Review queues are regenerated against the final candidate hash.
+- Basic generation contains 10,947 edits. It adds six messages, changes one
+  existing mapping, and withholds thirteen previously admitted quiz candidates
+  whose required complete English labels are unavailable at basic capacity.
+  Three additional new reference mappings are also withheld, giving sixteen
+  explicit contextual dependency failures; three mappings remain admitted.
+  This is deliberate dependency enforcement, not truncation or a full-pilot
+  content loss. Basic generation alone still does not establish that original
+  label drafts beyond ten bytes fit an unmodified retail choice buffer.
+- ROM `build/contextual-choices-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `1dc097f7b3e3cef99950caf90891f44a68af2c42d385a379e5962231bc6648b4`.
+  UPS SHA-256:
+  `9b53cfecbb3b08115f98186267f8c98e15639432e082c189bb2c9aa4e03bf582`.
+  Candidate SHA-256:
+  `34b931bb337230801dcf6022baa422606ea9f0ac1012a36f936bd804ebabb20a`.
+  UPS application reconstructs the complete ROM. All 10,412 main and 460
+  choice payloads match the candidates; a subsequent read-only measurement
+  additionally compares every one of the 11,657 ordinary edits against its
+  actual built-bank entry. Only extracted main text `02000000`, its pointers
+  `00CF9000`, and the DMA directory container `00019D40` differ from the preceding
+  pilot. The container is unchanged outside its table; code, fonts, runtime,
+  choice/name/mail resources, and saved structures remain unchanged.
+- The explicitly requested one-time measurement recalculates 613,016 covered
+  source characters out of 746,978, adding 507 under the unchanged definition.
+  The original, candidate, and built-ROM hashes match their reports. This is
+  installed replacement coverage across 29 banks, not full semantic review,
+  gameplay approval, or a complete denominator for embedded UI/image text and
+  separate runtime resources. No overall project-completion claim is made.
+- Nine mechanically compatible menu comparisons and separate `1C6F` remain
+  withheld for native questions, dates, artwork, field preparation, and meal
+  jokes. Further native dialogue, contextual labels, general strings/names/mail,
+  special controls, gameplay, saves, review, patch-only release, and stretch
+  goals remain active. Early `00C0..00D2` contains real resident return/greeting
+  prose; the broader early range must not be declared unused from debug-looking
+  neighbours. No reachability or hardware evidence is inferred. The font-atlas
+  edge investigation stays paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

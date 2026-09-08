@@ -1,0 +1,420 @@
+[
+  {
+    "id": "message:0B67",
+    "source_sha256": "d9d8c5814070db1ffd3ff4ee9940cf1a9ee3dcb3032c002bbce01f2e1eb70c4b",
+    "candidate_sha256": "4c03fe2a1ada9f9d2d5fb2d5e9922d52cf15cb0c77e70f548a6eacc4305b40a7",
+    "display_sha256": "19eb52eab7ba80c294c1567b22abd603ba33c4240b8d399d10644616cd98750d",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 84,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B68",
+    "source_sha256": "7dec48721cf449888e12f27e5bfe3e2e30fe82a7ad1a830c0dba7c15ce44fa81",
+    "candidate_sha256": "adb99aebfb4dcb66cc3a4fdf675ea93f36ad456423c8d0fd8b1e1704e14e5117",
+    "display_sha256": "7d6694ac2171358e5d1a6b6a878ea7b49a0454994f81c9bd9e29598408f3ab3c",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 55,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B6A",
+    "source_sha256": "a8353315714f2143a127a4f3728f7f84b59cd3d2b3dbc78ceea72f25a3e01241",
+    "candidate_sha256": "867059c7f738afec46966de36689a12d86548be7f91021beb792f7eb9419dfce",
+    "display_sha256": "a92673c309a600e90a5e3e1b8f73f63df299ce16ae9a9a66e049f1bd34eeb166",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 82,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B6C",
+    "source_sha256": "0f35d3e8c0e2248d5f49705dde7d93e4db13cabe4ebcdc9e7dc27acc271bec6b",
+    "candidate_sha256": "cde9a6e283279ce37a3b1cf43edecc02ae07cdd001efef0c42f9380ad8227a55",
+    "display_sha256": "70e6e9748d0ffb781482a67a54810fc995fd261683db14e95e16965cecbe325f",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 73,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B6D",
+    "source_sha256": "10cc21603edaef6a8b87d17c35ff73daed4ca649cb06c4336e2c640d7e36c8ce",
+    "candidate_sha256": "e18e73a691d8bf3308311a1a57b4e7e3bcdbb715a7a45d05d1109721168f6832",
+    "display_sha256": "374ff09b2bd23b8b93aef7a9984838fb4416ecb52e50d2e186995dcd2c141c51",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 80,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B6E",
+    "source_sha256": "edaf7c6d3e2ecd48dab56baf3f904bc3b6489f0218f94238dd88e47306709a9f",
+    "candidate_sha256": "3ea5cd3f141bb01ae19fd400dcff8f99bc864741c096e4981bd311fe7f5dc890",
+    "display_sha256": "baf7d05d5aaf897fcdb833cbebbce5e0f68e092fa529e52b629ef2418340381e",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 81,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B6F",
+    "source_sha256": "a7f6227b22a98a4663161253997db4bc82260c1f230370e3eed4c3cc8276bdaf",
+    "candidate_sha256": "d57612e33ff3d0ea76ee5c5061c562fcfad6eb211cf7fa42651543a6911ec997",
+    "display_sha256": "3ce8946ba49d07a49b5835858fcdc6060df52b68996d2e56ed245e9ce9bf9414",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 68,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:0B71",
+    "source_sha256": "6f61f86aa9e59f86f20ac24e353515e9eb4000232a58db4b64a9e96383cf2847",
+    "candidate_sha256": "4f16a2854ec5324e0437fb9e3a044abaa5745b02169f9e34b4d8bf12437b2719",
+    "display_sha256": "aa1597581ab5746b32a1cd1e7789e747ea6eefa133dfb933372fb888dc6a1c42",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250026",
+    "offset": 87,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0026",
+        "source_sha256": "f1954fbc368fe3b70bf098c171d70d5f11b9b1d838fe07156e970a7060f1e80f",
+        "encoded_sha256": "c8a33aa50bbb77d24889a5ac00fc40d94a42c3dbf056196db3cf4709d93b4888"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:1C91",
+    "source_sha256": "83b0c863e20e07581d0d4771f21e4aac7eceb4a765f4b188b3f904f1fefdabc9",
+    "candidate_sha256": "41d706247f4ba93f0c5ca74c2fe247bbf48543fa5acedc9bf3fd89808cc070b3",
+    "display_sha256": "646a55ede90f6b3339398dd675c7aa998e775663f4e401303d66ed25fe0271ff",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600030004",
+    "offset": 51,
+    "labels": [
+      {
+        "id": "select:0003",
+        "source_sha256": "ddab094fcd1ca5f66239f6c35e74e47524dddd5833cd8bc370ba19b67491b350",
+        "encoded_sha256": "5f9a2b795615ba6a3d5455fd5624d773fbca5bcd16249c421fd37411dc9837da"
+      },
+      {
+        "id": "select:0004",
+        "source_sha256": "45c04f355207740cd6f585aecad426ffa81de2fbd52b226114f3afd541d9ab83",
+        "encoded_sha256": "38178a20b470cfd18299fb1593dd4ba706f1a83321dac051d01086efd8b7a96f"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:246A",
+    "source_sha256": "885a113bf7b49d4f32685c6bc9e54235180dabe809b515fb008433531df4735d",
+    "candidate_sha256": "5fd955c2844944f6cec60a637a0b328caa86b8ca671275e8ae59917f0459623d",
+    "display_sha256": "128a0d52a345d76aa102a0bb78e7d00635dd09d1e5185b139b4b7049efbfe573",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 71,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:246B",
+    "source_sha256": "c45992694c4926f38bf6d3ba24898a35183712ac999a3f9caafb3be80f0847a2",
+    "candidate_sha256": "105b77d8fe03a7754c32ccd2bf3d26379c31870b592ee3b5c81cc450557dcd9d",
+    "display_sha256": "e0e3f7e650dadb9a05ca99b80a25aedf3e4d4ce02e01e94d34a89affb9c33f87",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 75,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:246E",
+    "source_sha256": "3c4c37502b00845ffe366d844c76cb791f31184f12b35d844c530eacf4560f3c",
+    "candidate_sha256": "22dd9fe34e68de21c1337a0247d34cca01e1f07b950d12a49a6ea6ab65733c98",
+    "display_sha256": "ca38b680f4a26084c5d2a6aff1a8ae79bdf6e7fe9745cc9b71d0a3ba6a27998d",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 60,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:246F",
+    "source_sha256": "c4b2dc079432727a65b428a4327f020db882f81e67909a010e66b65277404372",
+    "candidate_sha256": "c8b0f98f481efd1af92ac2310af044e57c24e303f8c9502601b3a7bc4a484926",
+    "display_sha256": "142ba6961211891c1c57bf2b1f68ab3adfa272599821f52ca1df4d47ca92d2fc",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 40,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:2471",
+    "source_sha256": "cb9825ecd14c90d56dd9817b513d573b9ae53bde2d8cd808cbe0b4aaaae9e65c",
+    "candidate_sha256": "fd0791b86c76e449784398a6d36251e65fb30cf9a0bfb56acb98b96e32246d93",
+    "display_sha256": "167a988e2fe13cf75cffc0c867266bbe33d2c6b47614f1aa477ae82ef495d5af",
+    "native_command": "7F1600CD00CE",
+    "display_command": "7F1600250051",
+    "offset": 53,
+    "labels": [
+      {
+        "id": "select:0025",
+        "source_sha256": "2b8a530239576c71b7afeacab975ca517c5e567d2f886a6d13677bd8aa312174",
+        "encoded_sha256": "5a8d713905887b93271484dee6a75f6499e5ff0b1a1bbcf30a3df70266e4e10c"
+      },
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      }
+    ],
+    "evidence": "Truth or correctness question: native Circle/X mean affirmative/negative here. The original answer indices and complete branch commands remain, with the supplied GameCube English question and matching English answer labels. Shape-game callers keep their original labels. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:136E",
+    "source_sha256": "00bf293db6b52753c671d330211ec30d30f6c38150d50ba87da05fa63f85b220",
+    "candidate_sha256": "dfda6fb9dbf3dd4a530ac44202b554ac22ede672aaec121f83408e923acf52d7",
+    "display_sha256": "2fd3cf4b51654be779656203d98c7a633d565e9e82bb8660452f3a60eb579c9d",
+    "native_command": "7F16001E00B7",
+    "display_command": "7F16001E00F9",
+    "offset": 99,
+    "labels": [
+      {
+        "id": "select:001E",
+        "source_sha256": "5d7f84dad86ae9bee09f950f16b2ca1ce5eb9ac18df12c2930d3e6d4fb6e24af",
+        "encoded_sha256": "efae25293d176300ee5e66d38c8383dc797c9478535d8d6aca6e92941f0cc781"
+      },
+      {
+        "id": "select:00F9",
+        "source_sha256": "a2264ad9e42a9882b661f5185b8849d34a8268084a9029954d5867a10439ce04",
+        "encoded_sha256": "0c90431c216ee42a87c63a63002e13af67e94cb3301c731c510a4fa2b57ce3bd"
+      }
+    ],
+    "evidence": "Interest in friends versus no interest, leading to 1378/1379; the latter is not a fruit choice. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:1868",
+    "source_sha256": "4c1ab8eeab0a60d5351f21fd9b872546abb7aa853558b75af219572f720a2b45",
+    "candidate_sha256": "d0c2589e421d0fb960b47b9d137140e1b9b2b604acfcbb8e56264b5257476cde",
+    "display_sha256": "23324f325f3e225547dc5ea7f4f4c3128255351c2153b3ecbad3855c0f6931f7",
+    "native_command": "7F1600100056",
+    "display_command": "7F1600270056",
+    "offset": 256,
+    "labels": [
+      {
+        "id": "select:0027",
+        "source_sha256": "af2b4de028c55007a274f7d771988e0de96f5942fa1406e65b954f788e5e5d73",
+        "encoded_sha256": "c1e484e42dffe717582165c4509c981907bf8c4779c0c574669f85761e5c72d9"
+      },
+      {
+        "id": "select:0056",
+        "source_sha256": "59e932798ca87b52ef2401476dfff5ff48a6fb3ce8ca7781ca1a1e01cdb40959",
+        "encoded_sha256": "9317a84bd54abe3247f4af961595199a9d0520cd3bcdb00d2dc66ae44552a169"
+      }
+    ],
+    "evidence": "Trade agreement versus refusal, preserving 186D/186E; the first answer must not say No, thanks. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:1CE0",
+    "source_sha256": "da3ff75482a6b49b200a2743c82b495196c78b6c65f8ed8a3e9654dec1ac87ad",
+    "candidate_sha256": "50546c6c20511b8e731e9ec98f849a5a9aa02b971f402f9b3c5be4802d0abd90",
+    "display_sha256": "ce40c7545d053bacede94d4f2cdfff5298a482c84b2eaa1ddde5c39320e00983",
+    "native_command": "7F1600100067",
+    "display_command": "7F1600DF00DE",
+    "offset": 251,
+    "labels": [
+      {
+        "id": "select:00DF",
+        "source_sha256": "3783b1957f08f0c40e6c84e28457fdcfc10bea07b6f0173a6dccdea84ae5d263",
+        "encoded_sha256": "3ca3a19a03a257e6c22e2c726d8eadf81685ccffb45abbbd818247024339bad2"
+      },
+      {
+        "id": "select:00DE",
+        "source_sha256": "5633c26d0212bbfcf475a2f6c624f44f44a592062436ef0e2ccc8dc85427cb84",
+        "encoded_sha256": "26c88866ba66a68ed7ada92146fc3c06f753306431a8abec0dce26e7f8835499"
+      }
+    ],
+    "evidence": "Permission to move versus asking the resident to stay, preserving 1CE2/1CE3 and the native response meaning. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:1FAE",
+    "source_sha256": "cdff787f9ce07efca2ce4db12ea26b1cbe1e663c4cdd2c5987bc8f4728832516",
+    "candidate_sha256": "4c41e946b9d235a36fdcca040a1e3f66175a3d9afcef957deae2647b5540b970",
+    "display_sha256": "61bb5efb3b566e92f6ecdd87cbf88d85581c417668efef5a7b220ef58ed0386b",
+    "native_command": "7F1601750103",
+    "display_command": "7F1600510103",
+    "offset": 139,
+    "labels": [
+      {
+        "id": "select:0051",
+        "source_sha256": "e14510d244fd5c636087aacc0a4e2b49985c13f151ccceaab6dd0c7e27744374",
+        "encoded_sha256": "9b39223391793bc1daf558ddc85d7f22f0cdd412972469565c8479137b3c9eba"
+      },
+      {
+        "id": "select:0103",
+        "source_sha256": "a1c6d482c581b67b82da231d355479829111f256396f1304451f3f96da2a4b3b",
+        "encoded_sha256": "d6916e50373c4baf9713f1c8c633860760c7059de1002e17c8aa264269b1257f"
+      }
+    ],
+    "evidence": "No excitement versus qualified agreement, preserving 26D0/26D3. Retain the native moderate second answer through the already corrected Somewhat label. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:20CA",
+    "source_sha256": "8fa367060282d17b89e7cb9f9af0579c29f296b5d8fa861fbab0419ebee0cb47",
+    "candidate_sha256": "ea59ad2637ea5a28f9da79d585af39af32b5e72310a04238027a243981155f81",
+    "display_sha256": "83d9dc752ffaa2570c52f7f50fafa2e98fbba8aa6f177b2549941f9da26d9005",
+    "native_command": "7F1600690015",
+    "display_command": "7F1600030004",
+    "offset": 60,
+    "labels": [
+      {
+        "id": "select:0003",
+        "source_sha256": "ddab094fcd1ca5f66239f6c35e74e47524dddd5833cd8bc370ba19b67491b350",
+        "encoded_sha256": "5f9a2b795615ba6a3d5455fd5624d773fbca5bcd16249c421fd37411dc9837da"
+      },
+      {
+        "id": "select:0004",
+        "source_sha256": "45c04f355207740cd6f585aecad426ffa81de2fbd52b226114f3afd541d9ab83",
+        "encoded_sha256": "38178a20b470cfd18299fb1593dd4ba706f1a83321dac051d01086efd8b7a96f"
+      }
+    ],
+    "evidence": "Knowledge of K.K. music versus no knowledge, preserving 23B5/23B6 rather than treating the second answer as cancellation. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  }
+]

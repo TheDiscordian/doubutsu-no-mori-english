@@ -1,0 +1,34 @@
+[
+  {
+    "id": "message:186E",
+    "source_sha256": "a78d6f8b03bb48c5d7674433042a3e0957cbb04bd2cebe0d86c8e5754fef2a18",
+    "translation": "{cmd:7F0C050066}{cmd:7F09000012}{cmd:7F0314}Aw, man!{cmd:7F0310}\n{cmd:7F09000007}{cmd:7F0305}Lucky you! Lucky you!{cmd:7F030C}\nI want one too, {cmd:7F0306}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}Such a huge\n{cmd:7F31}!\n{cmd:7F31}!{cmd:7F0306}\n{cmd:7F31}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000C}{cmd:7F031E}Oh, I get it!{cmd:7F0308}\nYou don't want\nthis {cmd:7F32},\n{cmd:7F0900000B}{cmd:7F0302}do you?\n{cmd:7F13187B1880}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Trade-refusal reply retains all three emphatic native item repetitions and the original two-way random continuation 187B/1880, not the GameCube three-way weighting. Every native command and argument remains exact. Final wording, live fields, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:187B",
+    "source_sha256": "2bf3e8fbf533353343f97a23399789a978cec571cfcfd31bbc1c41a2bb5cf0a5",
+    "translation": "{cmd:7F09000015}Then give me your\n{cmd:7F31}{cmd:7F030C}\nfor free, {cmd:7F0306}{cmd:7F1C}!{cmd:7F1600490051}{cmd:7F04}{cmd:7F0D}{cmd:7F0F187A}{cmd:7F10186E}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The first free-item request preserves acceptance at 187A and refusal returning to 186E. The existing I suppose/Nope labels match the native choices. Every native command and argument remains exact; ordinary handoff, loop behaviour, and final review remain."
+  },
+  {
+    "id": "message:1880",
+    "source_sha256": "6a56e99efb708a0e9b4a0cad5c809f2e52ed7cc452aa7d1498f09ec7cd646258",
+    "translation": "{cmd:7F09000015}{cmd:7F0306}Then give me your\n{cmd:7F31}\nfor free, {cmd:7F0306}{cmd:7F1C}!{cmd:7F1600490051}{cmd:7F04}{cmd:7F0D}{cmd:7F0F187A}{cmd:7F101872}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "The second free-item request preserves acceptance at 187A and its different refusal destination 1872. The existing I suppose/Nope labels match the native choices. Every native command and argument remains exact; ordinary handoff and final review remain."
+  },
+  {
+    "id": "message:1CE3",
+    "source_sha256": "7c3b726daec3e04d299e49777712dd4d310f9e387c0ffb7eb90a9f33e50e4757",
+    "translation": "{cmd:7F0C050003}{cmd:7F090000FF}I still remember.{cmd:7F0310}\nThe day\nwe first met{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}You and I share{cmd:7F030C}\na lot of memories.{cmd:7F04}\n{cmd:7F09000017}But{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}\n{cmd:7F04}\n{cmd:7F02}{cmd:7F09000007}{cmd:7F0305}I can't, {cmd:7F0306}{cmd:7F1A}!{cmd:7F030C}\nEven if you ask me to,{cmd:7F0303}\nI can't give in on this,\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Even if I move\nto another village,{cmd:7F030C}\ntake care of yourself,\n{cmd:7F0306}{cmd:7F1A}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native response to asking the resident to stay. Preserve memories, the refusal to change course, the farewell, all native expressions and pauses, and final termination. Do not import the GameCube extra choice or continuation. Every native command and argument remains exact; normal moving behaviour and final wording/layout remain unverified."
+  }
+]

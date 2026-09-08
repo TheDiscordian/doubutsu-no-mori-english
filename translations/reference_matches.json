@@ -1,5 +1,70 @@
 [
   {
+    "id": "message:136E",
+    "source_sha256": "00bf293db6b52753c671d330211ec30d30f6c38150d50ba87da05fa63f85b220",
+    "reference_id": "message:136E",
+    "reference_sha256": "2fd3cf4b51654be779656203d98c7a633d565e9e82bb8660452f3a60eb579c9d",
+    "native_choices": {
+      "reference_command": "7F16001E00F9",
+      "native_command": "7F16001E00B7",
+      "offset": 99,
+      "adapted_sha256": "dfda6fb9dbf3dd4a530ac44202b554ac22ede672aaec121f83408e923acf52d7"
+    },
+    "evidence": "Interest in friends versus no interest, leading to 1378/1379; the latter is not a fruit choice. Full native and English questions and linked native responses were reviewed. Preserve complete English wording and delivery through the canonical native-menu approval; the separate contextual choice-label approval is mandatory for the final displayed candidate. See CONTEXTUAL_CHOICES.md. Ordinary gameplay, live fields, and final review remain."
+  },
+  {
+    "id": "message:1868",
+    "source_sha256": "4c1ab8eeab0a60d5351f21fd9b872546abb7aa853558b75af219572f720a2b45",
+    "reference_id": "message:1868",
+    "reference_sha256": "668a793ccf692afae18c7f11aa19667b05edc72943349047f1c2026d8b4ecc87",
+    "native_choices": {
+      "reference_command": "7F1600270056",
+      "native_command": "7F1600100056",
+      "offset": 260,
+      "adapted_sha256": "d0c2589e421d0fb960b47b9d137140e1b9b2b604acfcbb8e56264b5257476cde"
+    },
+    "evidence": "Trade agreement versus refusal, preserving 186D/186E; the first answer must not say No, thanks. Full native and English questions and linked native responses were reviewed. Preserve complete English wording and delivery through the canonical native-menu approval; the separate contextual choice-label approval is mandatory for the final displayed candidate. See CONTEXTUAL_CHOICES.md. Ordinary gameplay, live fields, and final review remain."
+  },
+  {
+    "id": "message:1CE0",
+    "source_sha256": "da3ff75482a6b49b200a2743c82b495196c78b6c65f8ed8a3e9654dec1ac87ad",
+    "reference_id": "message:1CE0",
+    "reference_sha256": "ce40c7545d053bacede94d4f2cdfff5298a482c84b2eaa1ddde5c39320e00983",
+    "native_choices": {
+      "reference_command": "7F1600DF00DE",
+      "native_command": "7F1600100067",
+      "offset": 251,
+      "adapted_sha256": "50546c6c20511b8e731e9ec98f849a5a9aa02b971f402f9b3c5be4802d0abd90"
+    },
+    "evidence": "Permission to move versus asking the resident to stay, preserving 1CE2/1CE3 and the native response meaning. Full native and English questions and linked native responses were reviewed. Preserve complete English wording and delivery through the canonical native-menu approval; the separate contextual choice-label approval is mandatory for the final displayed candidate. See CONTEXTUAL_CHOICES.md. Ordinary gameplay, live fields, and final review remain."
+  },
+  {
+    "id": "message:1FAE",
+    "source_sha256": "cdff787f9ce07efca2ce4db12ea26b1cbe1e663c4cdd2c5987bc8f4728832516",
+    "reference_id": "message:1FAE",
+    "reference_sha256": "2da2754767d5d9b5a8a9cbf55bbe75ea31216287619cfd2ca5835631c7a29f17",
+    "native_choices": {
+      "reference_command": "7F160051001D",
+      "native_command": "7F1601750103",
+      "offset": 139,
+      "adapted_sha256": "4c41e946b9d235a36fdcca040a1e3f66175a3d9afcef957deae2647b5540b970"
+    },
+    "evidence": "No excitement versus qualified agreement, preserving 26D0/26D3. Retain the native moderate second answer through the already corrected Somewhat label. Full native and English questions and linked native responses were reviewed. Preserve complete English wording and delivery through the canonical native-menu approval; the separate contextual choice-label approval is mandatory for the final displayed candidate. See CONTEXTUAL_CHOICES.md. Ordinary gameplay, live fields, and final review remain."
+  },
+  {
+    "id": "message:20CA",
+    "source_sha256": "8fa367060282d17b89e7cb9f9af0579c29f296b5d8fa861fbab0419ebee0cb47",
+    "reference_id": "message:20CA",
+    "reference_sha256": "83d9dc752ffaa2570c52f7f50fafa2e98fbba8aa6f177b2549941f9da26d9005",
+    "native_choices": {
+      "reference_command": "7F1600030004",
+      "native_command": "7F1600690015",
+      "offset": 60,
+      "adapted_sha256": "ea59ad2637ea5a28f9da79d585af39af32b5e72310a04238027a243981155f81"
+    },
+    "evidence": "Knowledge of K.K. music versus no knowledge, preserving 23B5/23B6 rather than treating the second answer as cancellation. Full native and English questions and linked native responses were reviewed. Preserve complete English wording and delivery through the canonical native-menu approval; the separate contextual choice-label approval is mandatory for the final displayed candidate. See CONTEXTUAL_CHOICES.md. Ordinary gameplay, live fields, and final review remain."
+  },
+  {
     "id": "message:087C",
     "source_sha256": "912a5b40099078c06d8b2584ce4ee2fdef97a567b2c2a507bc80ad38c361a9be",
     "reference_id": "message:087C",

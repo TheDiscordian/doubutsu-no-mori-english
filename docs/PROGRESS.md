@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 585 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 595 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
@@ -462,18 +462,18 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/native-menus-pilot/`
-contains 11,648 edits, including
-9,757 reference main-bank candidates, all 460 choices, 355 original dialogue
+The current experimental resident-module pilot in `build/contextual-choices-pilot/`
+contains 11,657 edits, including
+9,762 reference main-bank candidates, all 460 choices, 359 original dialogue
 drafts, and 291 original development-label drafts. Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,349
+still require review. The original main-bank audit leaves 1,340
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,469 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/native-menus-candidates/` and `build/native-menus-coverage/`. The independent
+`build/contextual-choices-candidates/` and `build/contextual-choices-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -838,7 +838,7 @@ this main-bank work does not approve stored-mail generation or delivery.
 
 The [native-menu batch](../specs/NATIVE_MENUS.md) adds 135 complete GameCube
 references and five native-specific questions, and corrects five connected
-replies and eight shared labels. All 159 native-choice approvals bind exact
+replies and eight shared labels. All 164 native-choice approvals bind exact
 source/reference/menu/output hashes. English reference wording, manual lines,
 pages, emphasis, and pauses remain; original N64 selection order and gameplay
 branches are retained. Ten native dialogue drafts preserve every original
@@ -858,13 +858,37 @@ unchanged. The UPS round trip passes. Basic generation admits 134 new references
 and all eighteen original edits, withholding `0A0A` without cancellation support;
 its candidate file does not establish that longer labels fit a retail buffer.
 Nineteen new reference warning-bearing records and two original formatting
-warnings remain for polish. Circle/X still serve both shape games and quizzes;
-context-specific labels, fourteen withheld menu comparisons, live fields,
-ordinary answer actions, final wording/layout, saving, and hardware remain.
+warnings remain for polish. Shared Circle/X labels stay available for shape
+games; the contextual-label implementation supplies English answers for fourteen
+approved quiz questions without changing their answer order. Nine menu
+comparisons, further label contexts, live fields, ordinary answer actions,
+final wording/layout, saving, and hardware remain.
+
+The [contextual-choice implementation](../specs/CONTEXTUAL_CHOICES.md) gives
+nineteen questions complete English answer labels without changing their answer
+indices or actions. Fourteen quiz questions no longer display ambiguous shape
+labels; actual shape games retain Circle/X. Five additional complete reference
+questions and four native-specific connected replies fill nine missing messages.
+All surrounding reference wording, lines, pages, emphasis, and pauses remain.
+Every original draft command stays exact, including the native two-way trade
+continuation and the moving conversation's final ending.
+All 595 regression tests and ten focused tests pass. One isolated native batch
+passes forty unique message checks, 42 selected-label/insertion cases, and all
+38 corresponding conditional branch cases: 302 calls and 484 assertions over
+1,195 steps, with restored checkpoint and blank FlashRAM/Pak files. Ordinary
+trades, moving, quiz actions, rendering, and gameplay remain separate checks.
+All 11,657 ordinary edits match the current built ROM. Against the native-menu
+pilot, only main text, its pointers, and the DMA directory change; all twelve
+referenced labels, fonts, code, runtime resources, and saved layouts remain
+unchanged. The UPS round trip passes. Basic generation withholds sixteen
+otherwise eligible contextual messages because complete required English labels
+are absent; it does not shorten labels or silently restore misleading answers.
+Nine menu comparisons and further native dialogue, fields, and caller review
+remain active.
 
 ## Text-volume measurement
 
-The generated coverage report measures 612,509 covered source characters out of
+The generated coverage report measures 613,016 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -884,8 +908,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 11,648 edits, including
-9,757 reference main-bank candidates, 291 original development-label drafts,
+The resident-module experiment contains 11,657 edits, including
+9,762 reference main-bank candidates, 291 original development-label drafts,
 all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
@@ -895,12 +919,13 @@ community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
 drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
 drafts, fifty startup-greeting drafts, eighteen resident-topic drafts,
 21 gyroid/resident-state drafts, two letter-fragment drafts, and ten native-menu
-dialogue drafts, including five connected reply corrections.
+dialogue drafts, including five connected reply corrections, and four
+contextual-menu reply drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,350 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,349 main records without
-candidates: 427 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,341 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,340 main records without
+candidates: 418 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.
