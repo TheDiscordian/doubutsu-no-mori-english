@@ -75,6 +75,8 @@ def exercise(debug,request,record):
         call(0x8009C0C0,[metrics,metrics+4,metrics+8])
         return read(metrics,12)
     original_heap = heap()
+    record({'npc_loader_initial_heap':list(struct.unpack('>3I',original_heap)),
+            'creator_allocation_bytes':len(blob)+WORK_BYTES+15})
     def fixture(index):
         foreign,condition,looks,initial = index//24,(index//12)%2,(index//2)%6,index%2
         write(animal,identity[:11]+bytes((looks,)))
@@ -93,7 +95,18 @@ def exercise(debug,request,record):
     for at,before,after in hooks: write(at,after)
     flush()
     def created(index,initial,args,label):
-        call(loader,args,destination)
+        result=call(loader,args)
+        if result!=destination:
+            # Preserve useful failure evidence before the isolated process exits.
+            # This distinguishes unavailable allocation from capture/formatting
+            # failure without rerunning the already completed dialogue batch.
+            record({'npc_loader_failure':label,'source_case':index,'return_value':result,
+                    'heap':list(struct.unpack('>3I',heap())),
+                    'temporary_fields_changed':read(FREE,200)!=b'!'*200,
+                    'rng':[read(at,4).hex() for at in RNG],
+                    'capital':read(capital,4).hex(),'session':read(session,4).hex(),
+                    'assertion':'failed'})
+            raise ValueError('Cartridge NPC creator rejected the fixture; see recorded heap/capture evidence')
         native,fields,rng = baselines[index]
         result = read(destination,164)
         snapshot = unpack(result[42:],expected_catalog=2)

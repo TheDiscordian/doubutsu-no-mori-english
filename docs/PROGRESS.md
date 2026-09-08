@@ -8,8 +8,11 @@ dialogue. Full candidates total 13,277; general strings are 814/1,562, leaving
 748 without candidates. All 851 host tests pass, and independent reconstruction
 verifies every installed edit and the original-ROM UPS round trip. Only string
 data, offsets, and DMA metadata change from the resident-word pilot. The silent
-combined dialogue/letter batch is running; its result is not yet acceptance
-evidence. Generation stays opt-in, normal delivery and semantic review remain,
+dialogue portion passes all 288 random words, 118 complete messages, and 447
+insertions, with its checkpoint restored. The first complete letter-creator
+call rejects its fixture after native preparation; that failure is under
+investigation and the combined batch does not pass. Generation stays opt-in,
+normal delivery and semantic review remain,
 and the title screen stays the first image task after the main port.
 
 The [ordinary resident-word integration](../specs/RESIDENT_WORDS.md) installs

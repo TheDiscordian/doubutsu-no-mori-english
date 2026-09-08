@@ -16,8 +16,11 @@ the resource and installs scoped capture; default builds keep generation disable
 
 All 352 values fit sixteen bytes. Eighty-three exceed ten bytes, so those values
 cannot pass through the original ten-byte temporary without losing text. The
-resource does not replace the shared native string bank or enlarge arbitrary
-callers. It supplies complete literal values for the separate generation capture.
+resource alone does not replace the shared native string bank or enlarge
+arbitrary callers. It supplies complete literal values for generation capture.
+The optional [shared-word import](SHARED_NPC_WORDS.md) also installs all 352
+ordinary-bank values, but only with both the complete resident caller and the
+installed cartridge creator, catalog, reader, capture hooks, and failure gate.
 
 ## Identity and random selection
 

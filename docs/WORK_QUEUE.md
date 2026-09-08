@@ -73,12 +73,15 @@ The [shared NPC-word integration](../specs/SHARED_NPC_WORDS.md) installs all
 352 complete values, including the five ordinary families
 `01E5/0219/02F4/0314/0334`. It defers the bank changes until both complete
 consumers, catalog, reader, capture hooks, and failure gate pass verification.
-All 851 host tests and every installed-payload/UPS comparison pass. The combined
-native batch is running and is not yet passing evidence. Normal resident
+All 851 host tests and every installed-payload/UPS comparison pass. The native
+dialogue portion passes 288 words, 118 messages, and 447 insertions with a
+restored checkpoint. The letter creator rejects its first fixture after native
+preparation despite sufficient heap space; identify capture/formatting rejection
+before accepting the letter portion. The combined batch does not pass. Normal resident
 interaction, actual creator-to-receipt/pending-loop behaviour, and semantic
 review remain; default builds retain generation disabled.
 
-Next general-bank work covers fortune-slip letters, credits, saved/default
+Next general-bank work covers fortune-slip letters, [credits](../specs/NATIVE_CREDITS.md), saved/default
 catchphrases, other names/date destinations, and remaining native sample scripts.
 The fortune-slip actor assembles mail through `80093F04`, using four ten-byte
 phrase fields and a result field; it needs complete snapshot creation, not just

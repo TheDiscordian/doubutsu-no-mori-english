@@ -15,7 +15,7 @@ belong in one short-lived heap allocation. No pointer into that allocation may
 outlive the synchronous creation call. Persistent state consists only of the
 active-session pointer, a busy flag, and the GameCube-compatible capital word.
 
-The linked module uses 22,720 bytes, leaving 1,856 bytes before test scratch.
+The linked module uses 24,192 bytes, leaving 384 bytes before test scratch.
 The loader's own native stack frame is 104 bytes. Its shared capital word is
 `af_mail_generation_capital`; a local copy is committed only on successful,
 detached completion. Invalid or failed requests cannot advance that shared word.

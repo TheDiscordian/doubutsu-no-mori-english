@@ -11,17 +11,19 @@ and publication; these bindings identify where that API must be connected.
 
 The source checks and selection/coverage tests pass. A separate
 [complete word resource](NPC_MAIL_WORDS.md) verifies all 352 randomized phrases
-against the supplied English and legacy sources. No ordinary NPC creator
-currently generates English snapshot letters. Scoped full-word/name capture
-passes 48 isolated real-creator comparisons and complete English generation.
-The complete [creator transaction](NPC_MAIL_CREATOR.md) owns transient capture,
-private metadata, and publication. Semantic template approval, resident cartridge
-loading/lifetime, and delivery integration remain required. See
+against the supplied English and legacy sources. The optional cartridge creator
+generates complete English snapshot letters with scoped full-word/name capture;
+default builds keep generation disabled. Forty-eight isolated real-creator
+comparisons and complete English generation pass. The complete
+[creator transaction](NPC_MAIL_CREATOR.md) owns transient capture, private
+metadata, and publication through the [resident loader](NPC_MAIL_LOADER.md).
+Semantic template approval and normal delivery integration remain required. See
 [capture evidence](NPC_MAIL_CAPTURE.md).
 An [exact saved-name mapping](NPC_MAIL_NAMES.md) supplies full names for both
 known native Japanese and fitting English saved-name forms. Unknown names remain
-unresolved; native lookup and capture pass isolated execution, but ordinary
-gameplay loading and ownership remain uninstalled.
+unresolved and reject capture. Native lookup and capture pass isolated execution,
+and the bound name resource is installed with the optional creator. Normal
+gameplay loading and ownership acceptance remain distinct from these tests.
 
 ## Whole-record boundaries
 
@@ -104,8 +106,9 @@ including complete save/staging restoration, unchanged production instructions,
 heap/stack/module guards, allocation free, and checkpoint restoration. This
 does not run the pending-reply loop or a real complete creator. Separate scoped
 capture tests exercise the real creators; creator allocation/loader failures,
-normal delivery, and pending-loop integration
-remain requirements before installing the gate.
+normal delivery, and pending-loop integration remain separate checks. The gate
+is installed with the optional complete cartridge creator; default builds leave
+generation disabled. Isolated creator tests do not establish ordinary delivery.
 
 ## Capture ownership and selected fields
 
@@ -168,13 +171,15 @@ cartesian combination of selected parts.
 
 ## Remaining acceptance
 
-1. Connect the complete creator transaction to resident allocation ownership
-   and cartridge loading, including repeated and failed sessions.
+1. Validate the installed creator transaction's allocation ownership and
+   cartridge loading during normal delivery, including repeated and failed
+   sessions and broader allocation placements.
 2. Approve selected template meanings and support the unavailable footer without
    changing existing catalog identities or shortening text.
-3. Implement bounded loading and whole-record staging with explicit error returns;
-   retain gift, RNG, paper, pending state, and queue-capacity behaviour.
-4. Connect the tested failure gate to the actual creator-to-receipt-to-reader
+3. Retain the implemented bounded loading, whole-record staging, and explicit
+   error returns while validating gift, RNG, paper, pending state, and queue
+   capacity throughout actual delivery.
+4. Exercise the installed failure gate in the actual creator-to-receipt-to-reader
    path and pending-reply loop, including unavailable resources, allocation
    failure, queue capacity, and repeated generation.
 5. Validate normal play, saves/travel, old letters, and original hardware.

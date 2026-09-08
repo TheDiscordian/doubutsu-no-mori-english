@@ -7159,3 +7159,40 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   require the full snapshot creation path. No unsafe wider import is installed.
   Original actor SHA-256:
   `29bb1d033017871b77d40d246c7fe892e4fe61ba4f2fb067a43757a782ac8a1b`.
+- The combined native run terminates with failure in its letter portion, not
+  successful overall acceptance. The completed resident portion passes 926
+  calls, 1,896 helper assertions, all 288 random words, six outer preparations,
+  56 independent RNG calls, 118 complete message loads, and 447 insertions
+  across 5,031 records. Its checkpoint is loaded before the independent mail
+  checkpoint is created. The complete case/slot/index set, hashes, and native
+  stack restoration pass independent log inspection. Scenario regeneration
+  agrees after normal JSON tuple/list conversion; the initial direct Python
+  object comparison was a measurement-script representation mismatch.
+  Resident helper SHA-256:
+  `08091fcf7f79940db80f3b1e262d9ade83391ed9a4cbabe4eb9ee409bb88fbc7`.
+- The first cartridge creator call returns zero rather than a completed letter.
+  A letter-only diagnostic run reproduces the rejection after native temporary
+  fields and RNG change. It records 197,008 bytes in the largest free block
+  for a 29,743-byte request, unchanged heap totals, zero capital, and a detached
+  capture session. This excludes ordinary allocation shortage; it does not
+  establish the failing capture/formatting check or whether the defect predates
+  the shared-bank change. Evidence is in
+  `build/smoke-shared-npc-words-letter-01/`. No successful English letter cases
+  are claimed for this build. Retained explicit failure/heap diagnostics in
+  the standard fixture for the later bug pass.
+- A generic native-free breakpoint catches an unrelated allocation and yields
+  no useful creator state; a creator-release breakpoint attempt times out at
+  the debugger command. Both diagnostic processes terminate. Removed those
+  unproven breakpoint paths from the maintained fixture, retained their ignored
+  local logs, and stopped repeating the difficult check in accordance with
+  the user's bulk-work priority. The letter bug remains open. The dialogue
+  batch is not restarted. Every isolated run retains the exact blank FlashRAM
+  and Controller Pak hashes; incomplete runs do not establish final checkpoint
+  restoration or graceful shutdown for their failed letter portions.
+- Corrected the current creator/word/loader specifications to distinguish
+  implemented opt-in loading from unverified delivery, and to state the actual
+  24,192-byte resident size. Added the next native-credits design: the supplied
+  English source uses twenty-five-byte rows, while the original native buffer
+  has only 150 bytes before another BSS object. Preserve native contributors
+  and timing, append owned row storage, and bind loader/drawer/allocator changes
+  before applying complete longer names. No credits patch is installed yet.
