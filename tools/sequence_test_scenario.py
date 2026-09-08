@@ -22,6 +22,7 @@ SPECIAL_ACTOR_GROUPS = ('gracie_fashion_intro', 'redd_return_greeting', 'redd_co
 CONTEXTUAL_ACTOR_GROUPS = ('booker_lost_property_complete', 'gulliver_weekly_falls_complete',
                            'gulliver_sea_tales_complete', 'rover_seat_refusal_complete',
                            'rover_poor_arrival_complete')
+TRAIN_PHONE_GROUPS = ('rover_first_train_phone', 'rover_repeat_train_phone')
 CONTINUING_END_GROUPS = ('nook_planting_complete', 'gulliver_squid_story',
                          'gulliver_overseas_joke', 'gulliver_sailor_uniform',
                          'rover_seat_refusal_complete')
@@ -36,7 +37,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
                           "resident_late_night_introduction", "native_normal_travel_advice",
                           "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS,
-                          *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS):
+                          *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS, *TRAIN_PHONE_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):
@@ -149,6 +150,39 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
             read(window+0x28C, struct.pack('>I', 8))
             dispatch(commands[-1], 1)
             read(window+0x28C, bytes(4))
+    if group_name in TRAIN_PHONE_GROUPS:
+        # Exercise the real native message-change path, not only the DMA loader.
+        # Page handling resets current cancellation; the persistent enable word
+        # must survive a continuation with either current cancellation state.
+        if len(numbers) != 2 or module is None:
+            raise ValueError('Train phone state test requires two complete resident-runtime parts')
+        for active_cancel in (0, 1):
+            write(window, bytes(0x330))
+            write(window+12, struct.pack('>I', data))
+            load(numbers[0])
+            first = {t.data[1]: t for t in tokenize(entries[numbers[0]], info)
+                     if t.kind == 'cmd' and t.data[1] in (0x72, 0x73, 6)}
+            if set(first) != {0x72, 0x73, 6}:
+                raise ValueError('Train phone opening loses pacing/cancellation controls')
+            dispatch(first[0x72]); read(window+0x28C, struct.pack('>I', 0x4000))
+            dispatch(first[0x73]); read(window+0x28C, bytes(4))
+            dispatch(first[6]); read(window+0x2C0, struct.pack('>I', 1))
+            write(window+0x2BC, struct.pack('>I', active_cancel))
+            call(0x8009E658, [window, numbers[1]], 1)
+            entry = entries[numbers[1]]
+            read(data, struct.pack('>4I', 1, numbers[1], len(entry), 0)+entry)
+            read(data-16, b'G'*16); read(data+0x410, b'G'*32)
+            read(window+0x2BC, struct.pack('>2I', active_cancel, 1))
+            read(window+0x28C, bytes(4))
+            read(window+0x29C, bytes(8))
+            read(window+0x294, struct.pack('>f', 10.0))
+            actions.append({'call': {'address': '800A04E4', 'arguments': [window, 0]}})
+            read(window+0x2BC, struct.pack('>2I', 0, 1))
+            write(window+0x2BC, struct.pack('>I', active_cancel))
+            last = [t for t in tokenize(entry, info) if t.kind == 'cmd' and t.data[1] == 7]
+            if len(last) != 1:
+                raise ValueError('Train phone ending loses native cancellation reset')
+            dispatch(last[0]); read(window+0x2BC, bytes(8))
     actions += [{"read": ["8019C8D0", 16], "expect": "AF32C0DE"*4},
                 {"load_state": True}, {"resume": True}, {"wait": 2},
                 {"read": ["8019B000", 4], "expect": "00000000"}]

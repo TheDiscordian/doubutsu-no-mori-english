@@ -24,8 +24,8 @@ native ending. All complete references and final parts have independent hashes.
 Both parts of every group must be installed together.
 
 Rover's native and English calls seek a home, give the town/player name, and
-return to `046F`. The split follows the greeting, before phone mode `06`.
-Its entire `06/07` pair stays in part two. Both native row-nine actor requests,
+return to `046F`. The split follows the greeting, before cancellation-enable `06`.
+Its entire enable/disable `06/07` pair stays in part two. Both native row-nine actor requests,
 inner voice changes, final `0E046F`, and end `01` remain unchanged. The final
 destination is an existing conversation, not another repurposed slot.
 
@@ -72,7 +72,7 @@ Normal actor traversal remains necessary.
 ## Verification and limitations
 
 Host checks reconstruct all five complete references, verify original and part
-expansion bounds, retain the phone-mode pair and final link, keep capitalization
+expansion bounds, retain the cancellation pair and final link, keep capitalization
 with its insertion, validate basic/runtime selection, and reject partial groups,
 stale references, malformed article flags, unavailable fields, and new controls.
 Existing sequence rejection tests remain applicable to every new group.

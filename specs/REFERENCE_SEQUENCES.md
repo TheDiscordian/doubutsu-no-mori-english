@@ -64,6 +64,14 @@ An external continuation is permitted only in the final member and must match
 the original root's complete outgoing-link list and gameplay-command order.
 No new target or omitted original link is accepted.
 
+The [complete train phone calls](TRAIN_PHONE_SEQUENCES.md) retain both long
+English scripts through checked existing page boundaries. Balanced protected
+pacing `72/73` stays within one part and requires resident runtime. Unmatched,
+nested, runtime-less, and cross-part spans are rejected. Native `06/07`
+cancellation controls remain ordered; actual message-change and normal-page
+setup calls verify enabled-state retention across the approved phone split.
+This does not admit arbitrary persistent-state changes or other flow controls.
+
 ## Planting-job completion
 
 The one-record `nook_planting_complete` approval retains the complete English

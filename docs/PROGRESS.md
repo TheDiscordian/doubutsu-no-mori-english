@@ -38,6 +38,14 @@ full cartridge loads and both ending phases pass 27 memory assertions; all
 other native actions remain exact. Name-entry progression and actor presentation
 remain normal-play checks.
 
+Both long Rover train phone calls retain their full English wording through
+existing page-boundary splits. Their protected openings stay together, and
+actual native message changes preserve cancellation-enabled state. Five focused
+tests, ten pacing/advice tests, 110 reference tests, and ten special-actor tests
+pass. The silent 42-call native batch passes 104 memory assertions with restored
+checkpoint and blank saves. Ordinary train progression and real input timing
+remain gameplay checks; production runtime and fonts are unchanged.
+
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
 follow-up queue. A human playthrough drives the broad gameplay bug and polish
@@ -501,20 +509,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/contextual-actors-pilot/`
-contains 12,574 edits, including
-9,789 reference main-bank candidates, all 460 choices, 606 original dialogue
-drafts, one original-dialogue continuation, 286 original development-label drafts,
+The current experimental resident-module pilot in `build/train-phone-pilot/`
+contains 12,576 edits, including
+9,793 reference main-bank candidates, all 460 choices, 606 original dialogue
+drafts, one original-dialogue continuation, 284 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 971
+still require review. The original main-bank audit leaves 969
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,480 conservative layout-warning records include full default
+listed below. The 1,484 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/contextual-actors-candidates/` and `build/contextual-actors-coverage/`.
+`build/train-phone-candidates/` and `build/train-phone-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1076,9 +1084,11 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,574 edits; basic generation has 11,831, including both startup-error drafts,
+12,576 edits; basic generation has 11,829, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
+Basic generation omits runtime-dependent phone sequences and their allocated
+reserve-label candidates; full output contains every complete phone part.
 Name approvals leave unrelated dialogue unchanged.
 Ordinary item storage contains 779 slots from 242 distinct references; the wide
 resource contains 2,713 slots from 771 references. Four rotations are one name,
@@ -1382,7 +1392,7 @@ remain gameplay/playthrough checks.
 
 ## Text-volume measurement
 
-The generated coverage report measures 642,786 covered source characters out of
+The generated coverage report measures 643,251 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1402,8 +1412,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,574 edits, including
-9,789 reference main-bank candidates, 286 original development-label drafts,
+The resident-module experiment contains 12,576 edits, including
+9,793 reference main-bank candidates, 284 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1425,9 +1435,9 @@ native storage, raffle, and offering drafts, plus fifteen native connected
 service/reaction drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 972 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 971 main records without
-candidates: 49 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 970 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 969 main records without
+candidates: 47 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

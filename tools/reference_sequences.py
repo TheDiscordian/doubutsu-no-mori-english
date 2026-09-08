@@ -124,11 +124,18 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
         if any(c[1] in FIELDS and c[1] not in available_fields for c in part):
             raise ValueError("Sequence requests an unavailable text field")
         hour_seen = False
+        pacing_locked = False
         for command in part:
             if command[1] == 0x21:
                 hour_seen = True
             elif command[1] == 0x76 and (not resident_runtime or not hour_seen):
                 raise ValueError('Sequence AM/PM requires a preceding hour in the same resident-runtime record')
+            if command[1] in (0x72, 0x73):
+                if not resident_runtime or (command[1] == 0x72) == pacing_locked:
+                    raise ValueError('Sequence pacing requires a balanced resident-runtime span')
+                pacing_locked = command[1] == 0x72
+        if pacing_locked:
+            raise ValueError('Sequence pacing span crosses a message boundary')
         if any(c[1] in ACTOR and c not in available_actor for c in part):
             raise ValueError("Sequence requests a new actor argument")
         translated.extend(c for c in part if c[1] != 0x0E or index+1 == len(replacements))
@@ -138,9 +145,9 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
     actor_requests = lambda cmds: [c for c in cmds if c[1] in ACTOR and c[:3] != b'\x7f\x09\x00']
     if actor_requests(root) != actor_requests(translated):
         raise ValueError('Sequence changes a non-expression actor request')
-    # This is the existing one-shot capitalization implementation, not a new
-    # actor/flow permission. Exact complete payload approvals still apply.
-    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01} | ({0x75} if resident_runtime else set())
+    # Existing capitalization and balanced protected-pacing implementation;
+    # exact complete payload approvals and native cancellation controls remain.
+    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01} | ({0x72, 0x73, 0x75} if resident_runtime else set())
     native_flow = normalize_assignments([c for c in root if c[1] not in ignored])
     translated_flow = normalize_assignments([c for c in translated if c[1] not in ignored])
     if native_flow != translated_flow:

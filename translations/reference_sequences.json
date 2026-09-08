@@ -1,5 +1,63 @@
 [
   {
+    "id": "rover_first_train_phone",
+    "requires_resident_runtime": true,
+    "evidence": "The complete English train phone call retains all wording, manual layout, pauses, native player/town fields, voice controls, and cancellation enable/disable. The protected-pacing pair stays entirely in the first part. Split only the existing wait/newline/page-clear span; native message-change retains cancellation-enabled state across this boundary. The exact generic reserve has no incoming native script, relevant executable immediate, or aligned data reference. See specs/TRAIN_PHONE_SEQUENCES.md; normal input/actor traversal remain separate checks.",
+    "members": [
+      {
+        "id": "message:2AD0",
+        "reference_id": "message:2AD0",
+        "source_sha256": "eb83d00aca71d42a8fe8f3547363d3d3dbf57dd9e1a7003dca2b8679a2abb996",
+        "reference_sha256": "573beee238cf1eb9ad7855d19cfa66b0bd45f426d391872ff531309e48aeebda",
+        "reference_slice": [
+          0,
+          460
+        ],
+        "encoded_sha256": "cf0c3265360b72048b31fa67e2071daeb42220241bf5a09d5613e3e363491468"
+      },
+      {
+        "id": "message:07DA",
+        "reference_id": "message:2AD0",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_sha256": "573beee238cf1eb9ad7855d19cfa66b0bd45f426d391872ff531309e48aeebda",
+        "reference_slice": [
+          465,
+          1159
+        ],
+        "encoded_sha256": "9066583dd9be36b250bdaead079820be613ac62adacd4dca443e5e34078be5aa"
+      }
+    ]
+  },
+  {
+    "id": "rover_repeat_train_phone",
+    "requires_resident_runtime": true,
+    "evidence": "The complete English train phone call retains all wording, manual layout, pauses, native player/town fields, voice controls, and cancellation enable/disable. The protected-pacing pair stays entirely in the first part. Split only the existing wait/newline/page-clear span; native message-change retains cancellation-enabled state across this boundary. The exact generic reserve has no incoming native script, relevant executable immediate, or aligned data reference. See specs/TRAIN_PHONE_SEQUENCES.md; normal input/actor traversal remain separate checks.",
+    "members": [
+      {
+        "id": "message:2ADE",
+        "reference_id": "message:2ADE",
+        "source_sha256": "9a187b9a33a67ed5f6f429fd4beeb74d3ab887f48876dc3b39f6461eaf3821ba",
+        "reference_sha256": "cf7116f966c8f1a9cc0d919eb98c5dc0db1bad43af7c86aa870653782545a472",
+        "reference_slice": [
+          0,
+          471
+        ],
+        "encoded_sha256": "4b3c3d386e08b1c4dc675850b0996951fccb57b674efbc1816f97eab9bee33de"
+      },
+      {
+        "id": "message:2B1B",
+        "reference_id": "message:2ADE",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_sha256": "cf7116f966c8f1a9cc0d919eb98c5dc0db1bad43af7c86aa870653782545a472",
+        "reference_slice": [
+          476,
+          1183
+        ],
+        "encoded_sha256": "f0b8885548e4a7acc6a5718d5c8f3f5a2820d73d038a4072e3a9f99b6b49ea43"
+      }
+    ]
+  },
+  {
     "id": "booker_lost_property_complete",
     "evidence": "Booker explains that the owner of each lost item is unknown and permits taking it, with his complete hesitant English aside. The same native lost-property actor uses expression 17 in the no-items response 0786. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
     "members": [

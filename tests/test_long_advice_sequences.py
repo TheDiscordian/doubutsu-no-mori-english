@@ -90,10 +90,23 @@ class SequencePresentationTests(unittest.TestCase):
         audit_sequence(native, parts, [0, 1], self.info, resident_runtime=True)
         with self.assertRaisesRegex(ValueError, 'gameplay commands changed'):
             audit_sequence(native, parts, [0, 1], self.info)
-        for command in (0x30, 0x56, 0x57, 0x72, 0x73):
+        for command in (0x30, 0x56, 0x57):
             altered = [parts[0], parts[1].replace(b'\x7f\x75', bytes([0x7F, command]))]
             with self.assertRaisesRegex(ValueError, 'gameplay commands changed'):
                 audit_sequence(native, altered, [0, 1], self.info, resident_runtime=True)
+
+    def test_pacing_requires_balanced_spans_inside_each_runtime_part(self):
+        native = b'Native\x7f\x00'
+        first = b'\x7f\x72Protected\x7f\x73\x7f\x0e\x00\x01\xcd\x7f\x01'
+        last = b'Last\x7f\x00'
+        audit_sequence(native, [first, last], [0, 1], self.info, resident_runtime=True)
+        for parts, runtime in (([first, last], False),
+                ([first.replace(b'\x7f\x73', b''), last], True),
+                ([first.replace(b'\x7f\x72', b''), last], True),
+                ([first.replace(b'Protected', b'\x7f\x72Protected'), last], True),
+                ([first.replace(b'\x7f\x73', b''), b'\x7f\x73'+last], True)):
+            with self.assertRaisesRegex(ValueError, 'pacing'):
+                audit_sequence(native, parts, [0, 1], self.info, resident_runtime=runtime)
 
     def test_batch_uses_one_checkpoint_and_retains_every_group_body(self):
         prefix = [{'wait': 8}, {'save_state': True}, {'pause_game_thread': True}]

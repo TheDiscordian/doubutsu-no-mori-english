@@ -6133,3 +6133,69 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   controls/fields/long scripts, test text, general/name/mail integration, normal
   play, final review, title-first images, GameCube-style keyboard, hardware, and
   patch-only release remain. The complete project goal stays active.
+
+## 2026-09-08 — Complete both long train phone calls with native skip behaviour
+
+- Imported all English content for `2AD0 → 07DA` and `2ADE → 2B1B`. Original
+  full bounds are 1,235/1,259 bytes. Existing English wait/newline/page-clear
+  spans `[460,465)` and `[471,476)` become native continuing-message boundaries;
+  parts fit at 513/740 and 494/783 bytes. Every word, line, other page break,
+  voice control, grey/small-text formatting, pause, player/town field, and final
+  `00` remains. Both generic reserve records have the pinned common label hash
+  and no native script, relevant code-immediate, or aligned data references.
+- The previously implemented `72/73` protected-pacing pair stays entirely in
+  each first part. Sequence validation now permits balanced same-part spans with
+  the verified resident runtime and rejects unmatched, nested, cross-part, or
+  runtime-less spans. Native controls remain ordered. No runtime rebuild, buffer
+  expansion, font change, or save-format change is needed.
+- Confirmed that `06/07` enable/disable cancellation, not phone mode. Corrected
+  the living long-advice spec. Native message change `8009E658` resets loaded
+  cursor/line positions and timer but retains cancellation-enabled word `2C0`.
+  Native normal-page setup `800A04E4` clears only active cancellation `2BC`;
+  final `07` clears both. This permits the reviewed page split inside the
+  skippable section without changing the protected opening or later skip state.
+- Five focused tests pass in 1.895 seconds, ten advice/pacing tests in 4.805
+  seconds, 110 reference tests in 29.198 seconds, and ten special/contextual-actor
+  tests in 20.026 seconds. Logs: `build/tests-train-phone-01.log` and the
+  `build/tests-train-phone-{long-advice,reference,special}-01.log` files. Tests
+  check full reference reconstruction, cuts, capacities, runtime requirements,
+  partial/stale/payload rejection, exact voice/cancellation operations, reserve
+  scans, and pinned native loader/reset/cancellation code. The unchanged
+  full-runtime suite retains its separate 714-test checkpoint.
+- `build/smoke-train-phone-01/` passes 211 steps: 42 calls, 38 expected returns,
+  eight direct loads, four actual native message changes, four normal-page setup
+  calls, and 104 memory assertions. Both active-cancel states retain enabled
+  cancellation across each real loaded continuation. Protected flags, final
+  reset, complete buffers, cursor resets, timer, adjacent/module guards, restored
+  stacks/checkpoint, silent graceful shutdown, and blank FlashRAM/Pak pass.
+  The independent native audit regenerates all actions and checks every recorded
+  address, argument, return, and complete read. Scenario SHA-256:
+  `8236b8cd0fdea33bcd956948ade4af40db909d2f7d0d3b633085846d1318e64b`.
+  Normal train actor traversal and actual controller timing remain unverified.
+- Full/basic output has 12,576/11,829 edits. Full adds two roots and converts
+  two reserve-label candidates to continuations. Basic omits both runtime-only
+  sequences and their two allocated labels; all other earlier candidates remain
+  unchanged. The first artifact audit assumed basic retained those labels;
+  candidate inspection showed the generator's all-member withholding, and the
+  corrected exact-difference audit passes. No source/tool behaviour was relaxed.
+  Main coverage: 10,783 = 9,793 references + 606 original dialogue drafts + one
+  original continuation + 284 development labels + 99 diagnostics. Remaining:
+  969, including 47 Japanese-static, 919 nonstatic, one Latin, and two symbol
+  records. Rejections: 916 unconfirmed, 29 control differences, 23 missing fields,
+  and two overflows, with one original fallback. Layout warnings: 1,484.
+  Source weight: 643,251/746,978; main 632,919/637,761. These are candidate counts.
+- Pilot: `build/train-phone-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `930db1592acce9dc8bd1e447a10897ed163fac915e9d2e8e827b0229b33e6079`.
+  UPS SHA-256:
+  `74af4d9672e704595f157cb351929a2d25a01046644b092708879ce4ee079930`.
+  Candidate SHA-256:
+  `3e4965a6d26f45a3f99f25a235345561d566537e5b2434d2ea671e0432ac464f`.
+  The artifact audit verifies all 12,576 installed payloads, source/build hashes,
+  UPS reconstruction, and exact full/basic candidate differences. Only DMA files
+  `00019D40/02000000/00CF9000` change, with the first differing only in its table.
+  Runtime, fonts, other resources, and saved layouts remain unchanged.
+- Updated progress, queue, and sequence contracts. Remaining main dialogue,
+  controls/fields, test text, general/name/mail destinations, normal gameplay,
+  semantic/presentation review, title-first images, GameCube-style keyboard,
+  original hardware, and patch-only release remain. The full goal stays active.
