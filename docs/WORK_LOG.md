@@ -5799,3 +5799,67 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   hardware, and patch-only release remain. The title screen stays the first
   image priority; no replacement is installed. The complete project goal remains
   active.
+
+## 2026-09-08 — Complete native storage, raffle, and offering messages
+
+- Added six complete original drafts: `0A0B/10D9/10DA/10DB/112C/10E1`.
+  Storage keeps its original Remove / Never mind... / Swap order. All three
+  prize announcements retain complete item fields, prize ranks, native Nook
+  expressions, and every pause. The offering question retains give/refuse and
+  `112D/112E`, without importing the GameCube wishing-well name. No new
+  special-actor command permission is introduced.
+- The raffle greeting retains all four native twin-speaker pairs and complete
+  English echoes. Only the four colour-span lengths and repeated per-character
+  scale commands change, under the existing source-bound layout policy.
+  RGB `198CDC`, eight-pixel line anchors, 26/32 scale, original pauses, and every
+  other native command remain. The explicit-formatting warning is retained for
+  rendered-layout review; no font change is made.
+- Five focused tests pass in 0.203 seconds at
+  `build/tests-storage-raffle-01.log`; all 96 reference tests pass in 17.997
+  seconds at `build/tests-storage-raffle-reference-01.log`. Complete native
+  controls, source hashes, all English echoes, menus/branches/prizes, and bounds
+  pass. Expanded bounds in draft-file order are 98/166/146/175/86/312 bytes.
+  All six are available in both basic and full generation. The unchanged
+  runtime retains the independently recorded 714-test birthday checkpoint;
+  this content batch does not claim a new full-suite run.
+- Full generation has 12,538 ordinary edits; basic generation has 11,795.
+  Every earlier full/basic edit object remains unchanged. Main coverage is
+  10,745: 9,765 references, 591 original dialogue drafts, one original
+  continuation, 289 development labels, and 99 diagnostics. The 1,007 gaps
+  comprise 85 Japanese-static, 919 nonstatic, one Latin, and two symbol records.
+  Ten nonstatic records contain dynamic fields; none is deemed unreachable.
+  Reference rejections are 925 unconfirmed identities, 57 control differences,
+  24 missing fields, and two overflows, with one original fallback. All 460
+  choices, 178 ordinary villager names, and 779 ordinary item slots remain.
+  Reference/label warnings remain 1,475; original formatting warnings are
+  separate, including the new complete echo. Source weight is 638,459/746,978;
+  main source weight is 628,127/637,761. These are candidate measurements,
+  not semantic or whole-project completion claims.
+- Pilot: `build/storage-raffle-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `234e6e3a066826c7976f4e84d8eb1bac04b97c779e4988a13c3a19b72c4aff78`.
+  UPS SHA-256:
+  `e3e9cbfdf10ba3e0b8e88cb961a3b9bf61e54696392e029a91be2121d29e3a60`.
+  Candidate SHA-256:
+  `fd0f72c63e9172882cf4e6cb5f6949997a0a3167aec0c830df8027b67474f8bf`.
+  `build/storage-raffle-artifact-audit.log` confirms all 12,538 installed
+  payloads, source/build/candidate hashes, unchanged earlier candidates, and
+  complete UPS reconstruction. Only DMA container `00019D40`, main data
+  `02000000`, and pointer table `00CF9000` change from the birthday pilot.
+  The DMA container is unchanged outside its table. All runtime/name/item/mail
+  resources and both font atlases are unchanged.
+- `build/smoke-storage-raffle-01/` passes 88 steps, seventeen native calls,
+  eleven declared expected returns, and 41 memory assertions. All six drafts,
+  connected messages `0A0A/0A0C/0A0D/112D/112E`, and six menu labels load
+  completely from the cartridge. `build/storage-raffle-native-audit.log`
+  independently verifies regenerated scenario identity, every call argument,
+  expected return, complete read, guards, single checkpoint restoration,
+  silent graceful shutdown, and blank isolated FlashRAM/Pak. Scenario SHA-256:
+  `479fe0ad693741bbdf75d4ed967862f3751dd855fb2d02591965442d6cc16fae`.
+  The four-MiB run uses no seeded saves or checkpoints and disables both
+  save-write flags. No storage swap, prize delivery, offering deduction,
+  ordinary twin rendering, or original-hardware acceptance is claimed.
+- Updated the current progress, queue, and implementation contract. Main
+  content/destination integration and normal gameplay remain active. The title
+  screen remains the main image priority after the main port. The complete
+  translation goal remains active.

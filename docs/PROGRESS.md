@@ -17,6 +17,11 @@ their isolated checkpoints, retain blank cartridge/Pak saves, and shut down clea
 The [completion queue](WORK_QUEUE.md) tracks all required work;
 partial milestones do not complete the project.
 
+Six native storage, raffle, and offering drafts preserve the original menus,
+prize ranks, pauses, and four paired shop-twin exchanges. Their combined native
+batch passes eleven complete messages, six menu labels, and 41 memory assertions.
+Normal service actions and twin-echo rendering remain gameplay/polish checks.
+
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
 follow-up queue. A human playthrough drives the broad gameplay bug and polish
@@ -480,21 +485,22 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/birthday-final-pilot/`
-contains 12,532 edits, including
-9,765 reference main-bank candidates, all 460 choices, 585 original dialogue
+The current experimental resident-module pilot in `build/storage-raffle-pilot/`
+contains 12,538 edits, including
+9,765 reference main-bank candidates, all 460 choices, 591 original dialogue
 drafts, one original-dialogue continuation, 289 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,013
+still require review. The original main-bank audit leaves 1,007
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,475 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/birthday-final-candidates/` and `build/birthday-final-coverage/`. Two
-original meal-greeting drafts separately retain explicit-formatting warnings.
+`build/storage-raffle-candidates/` and `build/storage-raffle-coverage/`.
+Original drafts retain separate warnings, including the meal greetings and
+the complete four-pair raffle echo; these do not increase the reference count.
 The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
@@ -1054,7 +1060,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,532 edits; basic generation has 11,789, including both startup-error drafts,
+12,538 edits; basic generation has 11,795, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1255,9 +1261,33 @@ silently, and retain blank isolated FlashRAM/Pak files. Exact hashes and the
 independent execution audit are recorded in the work log. Normal birthday entry,
 gifts, conversations, mail delivery/editing/saving, and hardware remain required.
 
+## Complete storage, raffle, and offering dialogue
+
+The [storage/raffle batch](../specs/STORAGE_RAFFLE_DIALOGUE.md) supplies six
+complete native-specific drafts. Storage retains Remove / Never mind... / Swap,
+the three raffle announcements retain their prize ranks and full item fields,
+and the offering question retains its give/refuse branches without renaming
+the native shrine. The twins retain all four paired exchanges, original pauses,
+and complete scaled/coloured English echoes. Their explicit layout warning
+remains for the polish pass. No special-actor permission is added.
+
+Five focused tests and all 96 reference tests pass. Every earlier full/basic
+candidate is unchanged. All 12,538 installed edits and UPS reconstruction pass;
+only the main message data, pointer table, and corresponding DMA table change.
+Both font atlases and all runtime/name/item/mail resources remain unchanged.
+The full runtime-suite evidence remains the 714-test birthday checkpoint; the
+content batch is not a new full-suite run.
+
+`build/smoke-storage-raffle-01/` passes 88 steps, seventeen native calls, eleven
+declared expected returns, and 41 memory assertions. All six drafts, five
+connected messages, and six menu labels load completely from the cartridge.
+Guards, one restored checkpoint, silent graceful shutdown, and blank isolated
+FlashRAM/Pak pass. Normal storage swaps, raffle entry/prize delivery, offering
+deductions, twin-echo rendering, and hardware remain separate requirements.
+
 ## Text-volume measurement
 
-The generated coverage report measures 638,255 covered source characters out of
+The generated coverage report measures 638,459 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1277,7 +1307,7 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,532 edits, including
+The resident-module experiment contains 12,538 edits, including
 9,765 reference main-bank candidates, 289 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
@@ -1295,12 +1325,13 @@ move, repeat, and month-return greetings, 72 native introductions/reunions,
 eight native moving conversations, seven game-launch prompts, and four complete
 native travel explanations using five records, two native startup errors,
 two native renovation drafts, ten native-topic drafts including the
-connected `25FD` correction, and one native two-answer letter question.
+connected `25FD` correction, one native two-answer letter question, and six
+native storage, raffle, and offering drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,014 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,013 main records without
-candidates: 91 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,008 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,007 main records without
+candidates: 85 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

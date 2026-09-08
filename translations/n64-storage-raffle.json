@@ -1,0 +1,51 @@
+[
+  {
+    "id": "message:0A0B",
+    "source_sha256": "37eb3c257657544d073922c0d1f77cf28f60630c901e7dc6bc529c12ccec802e",
+    "translation": "\n{cmd:7F054B1E14}Inside: {cmd:7F31}\n{cmd:7F054B1E14}Take it out?\n{cmd:7F17007E000D00E9}{cmd:7F04}{cmd:7F0D}{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain the native stored-item question and original Remove / Never mind... / Swap order. Do not import GameCube-only choice IDs, additional page behaviour, or alter the item field. Every native command and argument remains exact.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:10D9",
+    "source_sha256": "9e6de2884600b4ad6035839c8cdd660af3a00bbdc2ba6e36b8cba303cdfac299",
+    "translation": "{cmd:7F0314}{cmd:7F09000006}{cmd:7F0308}Oh,{cmd:7F0306} oh,{cmd:7F0306} O{cmd:7F0302}O{cmd:7F0302}O{cmd:7F0302}H!!!{cmd:7F0314}{cmd:7F0900000E}\nYou've hit the jackpot!{cmd:7F04}\n{cmd:7F02}You get the first prize!{cmd:7F0306}\nIt's {cmd:7F31}!{cmd:7F0304}\n{cmd:7F00}",
+    "notes": "Retain the full first-prize announcement, item insertion, excited native pause pattern, and both original Nook expressions. The supplied GameCube adds a different actor slot-nine request and expression sequence; this complete native original does not import that unapproved special-actor behaviour.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:10DA",
+    "source_sha256": "98979410e8846b9388a060a3a3676c1575037f745ea41f1b555edeaf508552ba",
+    "translation": "{cmd:7F0314}{cmd:7F09000006}{cmd:7F0308}Oh{cmd:7F0302}h{cmd:7F0302}h{cmd:7F0302}!!!{cmd:7F0314}{cmd:7F0900000E}\nCongratu{cmd:7F0304}la{cmd:7F0304}tions!!!{cmd:7F04}\n{cmd:7F02}You won the second prize,{cmd:7F0306}\n{cmd:7F31}!\n{cmd:7F00}",
+    "notes": "Retain the full second-prize congratulations and item, including the native stretched celebration, all pauses, and Nook's original expressions. Do not substitute the GameCube actor slot-nine celebration or alter the prize rank.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:10DB",
+    "source_sha256": "c12d318124ccfae8f15027670da3d025af237bf550fac53c60192158d7cec25f",
+    "translation": "{cmd:7F0314}{cmd:7F0302}{cmd:7F0308}You've won!!!{cmd:7F0314}{cmd:7F09000015}\nYou've really won!{cmd:7F04}{cmd:7F0900000E}\n{cmd:7F02}The third prize,\n{cmd:7F31},{cmd:7F0306}\nis yours, {cmd:7F1A}!\n{cmd:7F00}",
+    "notes": "Retain the repeated winning announcement, third-prize rank, complete item and player-name fields, both native expressions, pauses, page, and ending. The GameCube's different special-actor celebration is not imported.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:112C",
+    "source_sha256": "f2d86ff2d64f564ff460bcc11d422ece2131b7872f339394fd95342ffc1c9ee6",
+    "translation": "{cmd:7F05FFEBEB}Would you like to\n{cmd:7F05FFEBEB}make an offering?{cmd:7F16001100F7}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F112D}{cmd:7F10112E}{cmd:7F19}\n{cmd:7F01}",
+    "notes": "Retain the native offering question and give/refuse answers, with thank-you at 112D and reassurance at 112E. Do not name the GameCube wishing well or replace the native selection IDs. Every original colour, choice, wait, branch, and ending remains.",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft"
+  },
+  {
+    "id": "message:10E1",
+    "source_sha256": "d2a44d0f71d03b31fb3445f742400688c1df860600a048000cc5f945c2664052",
+    "translation": "{cmd:7F5C}Welcome!{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC0B}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}W{cmd:7F541A}e{cmd:7F541A}l{cmd:7F541A}c{cmd:7F541A}o{cmd:7F541A}m{cmd:7F541A}e{cmd:7F541A}!{cmd:7F04}\n{cmd:7F5C}Today is{cmd:7F030C}\nraffle day!{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC07}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}d{cmd:7F541A}a{cmd:7F541A}y{cmd:7F541A}!{cmd:7F04}\n{cmd:7F02}{cmd:7F5C}But,{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC07}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}B{cmd:7F541A}u{cmd:7F541A}t{cmd:7F541A},{cmd:7F0308}\n{cmd:7F5C}please try the raffle{cmd:7F0306}\non the 1st floor!{cmd:7F5D}{cmd:7F5301}{cmd:7F50198CDC0D}{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}.{cmd:7F541A}1{cmd:7F541A}s{cmd:7F541A}t{cmd:7F541A} {cmd:7F541A}f{cmd:7F541A}l{cmd:7F541A}o{cmd:7F541A}o{cmd:7F541A}r{cmd:7F541A}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Retain the native four paired speakers, welcome, raffle-day notice, contrast, and instruction to use the first floor. Every non-formatting command and pause remains exact. Expand the original RGB colour and per-character 26/32 echo scale across each complete English echo; the GameCube's three-pair script cannot replace the native four-pair exchange."
+  }
+]
