@@ -23,6 +23,13 @@ item fields. Enabled builds relocate general-string data to `02600000`, retainin
 the native table, entry count, sixty-four-byte getter, and every other caller's
 limits. Other IDs do not inherit the fortune group's capacity permission.
 
+The optional [Resetti reply integration](RESETTI_REPLIES.md) supplies all 32
+complete rude replies in `04C0..04DF` and updates the native matcher to their
+English lengths. All words fit the unchanged ten-byte input/temporary fields.
+It shares the string-data relocation but requires no resident module. Other
+IDs retain their original budgets; the two glyph-bearing apology targets and
+ordinary editor operation remain separate work.
+
 `tools/audit_string_callers.py` scans pinned executable-segment definitions and
 records thirty-four direct J/JAL sites. It records nearby instructions, file
 hashes, linked addresses, and conservative immediate argument hints. Hints are

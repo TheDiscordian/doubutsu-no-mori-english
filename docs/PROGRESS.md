@@ -2,11 +2,23 @@
 
 ## Active work
 
+The [Resetti reply dictionary](../specs/RESETTI_REPLIES.md) installs all 32
+complete English rude replies with matching substring lengths. The unchanged
+ten-byte input needs only two actor-instruction changes and compact boundaries
+in the existing table. All 817 host tests pass. The silent native batch passes
+227 detector cases, fourteen installed English apology targets, thirty result
+classifications, and 302 memory assertions with restored checkpoint and blank
+saves. Full/basic candidates are 12,742/11,881; ordinary strings total 294.
+The two sun/skull apology targets and ordinary editor input/retry remain
+unimplemented or unverified. Broader shared strings, those editor consumers,
+and remaining native diagnostics are next; title artwork stays first after the
+main translation/runtime port.
+
 The [Katrina fortune integration](../specs/FORTUNE_STRINGS.md) installs all 128
 complete supplied English phrase fragments through a sixteen-byte native caller.
 This adds 108 ordinary string candidates; the other twenty already fit the old
-limits. Full/basic candidates are 12,711/11,850, with 263 general-string entries
-now applied. Seven actor-frame/length words and the general-string data-address
+limits. Its 128-record group is included in the full candidate build. Seven
+actor-frame/length words and the general-string data-address
 pair change; no resident growth, font metric, RNG selection, saved field, or
 fortune effect changes. All 810 host tests pass. The silent native batch passes
 128 complete phrase loads, 128 actual preparations, 32 original RNG comparisons,
@@ -32,7 +44,7 @@ at an existing page boundary. Both full cartridge loads, the continuation, both
 ending phases, and fifteen memory assertions pass in a silent restored
 checkpoint with blank isolated saves. Focused sequence and placeholder checks
 pass; normal first-job interaction and expression rendering remain playthrough
-checks. Current full/basic candidates are 12,711/11,850. All three number-game
+checks. Current full/basic candidates are 12,742/11,881. All three number-game
 questions use dedicated Less/More labels while the clothing menu's shared
 labels remain unchanged. Title artwork remains the first
 image replacement after the main text/runtime work.
@@ -45,8 +57,9 @@ The birthday preparer supplies full English animal/sign names, month names, and
 ordinal days to all 33 native request conversations. Its 24 native boundary cases,
 48 original RNG comparisons, 57 complete message loads, and 190 field insertions
 pass; normal birthday-entry, gift, and horoscope gameplay remain unverified.
-The complete 810-test host suite passes, including the cartridge-font,
-number-game, and full-fortune integrations. The final 26 choice tests also pass.
+The complete 817-test host suite passes, including the cartridge-font,
+number-game, full-fortune, and Resetti-dictionary integrations. The final 26
+choice tests and seven reply tests also pass.
 The silent birthday/date/choice batch
 passes 913 native calls and 1,588 memory assertions; the fresh train-to-town and
 cartridge-mail batch passes 245 calls and 546 memory assertions. Both restore
@@ -109,8 +122,9 @@ and full GameCube furniture-sale reference with its original zero-duration mood.
 Five focused tests and all 111 reference tests pass. The silent combined batch
 passes forty complete cartridge loads, four labels, 52 mood/timer order writes,
 and 237 memory assertions, with restored checkpoint and blank saves. Ordinary
-actions remain gameplay checks. The apology target bank still needs two glyphs,
-and its rude-reply detector needs English string storage and matching lengths.
+actions remain gameplay checks. The apology target bank still needs two glyphs
+and their input integration. Its complete English rude-reply dictionary and
+matching lengths are installed and pass the scoped native detector batch.
 
 Five [separate English glyphs](../specs/EXTENDED_GLYPHS.md) load from the cartridge
 into a persistent system allocation before rendering starts. The native atlas
@@ -589,8 +603,8 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/fortune-pilot/`
-contains 12,711 edits, including
+The current experimental resident-module pilot in `build/resetti-replies-pilot/`
+contains 12,742 edits, including
 9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
 drafts, one original-dialogue continuation, 280 original development-label drafts,
 and 99 complete diagnostic drafts.
@@ -604,10 +618,12 @@ records without candidates; the classification and remaining restrictions are
 listed below. The 1,491 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/fortune-candidates/` and `build/fortune-coverage/`. The full pilot enables
-`--english-fortunes` in generation and construction; disabling it retains the
-previous 12,603-edit configuration. Its complete 128-record source-bound group
-uses the native general-string bank, not a separately counted display resource.
+`build/resetti-replies-candidates/` and `build/resetti-replies-coverage/`.
+The full pilot enables `--english-fortunes` and `--english-resetti-replies` in
+generation and construction. Basic generation enables the latter without a
+resident module. Their complete source-bound groups use the native general-string
+bank, not separately counted display resources. Disabling the reply option
+reproduces the full 12,711-edit fortune configuration exactly.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1169,7 +1185,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,711 edits; basic generation has 11,850, including both startup-error drafts,
+12,742 edits; basic generation has 11,881, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1499,7 +1515,7 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,711 edits, including
+The resident-module experiment contains 12,742 edits, including
 9,812 reference main-bank candidates, 280 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,

@@ -6753,3 +6753,76 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   strings/callers, apology editor/matching, and twenty native diagnostic records
   remain next content work. The title screen remains first in the image queue
   after the main port. The full translation/review/release objective stays active.
+
+## 2026-09-08: complete English Resetti rude-reply matching
+
+- Added all 32 complete supplied English rude replies `string:04C0..04DF`.
+  Each agrees with its complete legacy entry, and all fit ten bytes. The exact
+  length-prefixed group digest is
+  `219407f63d8f310bc35973b7d075529eb45cf074002cb582293e1a9268a7435b`.
+  Source/output hashes, full group/order, and native length boundaries are
+  independently required by generation and construction. Partial, duplicate,
+  stale, shortened, reordered, and altered values fail; unrelated strings gain
+  no capacity. The extracted dictionary stays local, outside git.
+- The supplied English actor declares transitions `1,2,4,8,10,17,24,28,-1`.
+  Stored these as eight bytes and `FF` in the existing 24-byte table at
+  `809B572C`, with zero padding. Patched `809B4C68` from `lw` to `lbu` and
+  `809B4C80` from four-byte to one-byte pointer stepping. Original substring
+  loops, case-sensitive comparison, ten-byte input, exact padded-good-answer
+  comparison, and good-answer-first classification remain. No frame, allocation,
+  resident code, relocation, actor size, or save format changes. The complete
+  patched Majin3 actor digest is
+  `d2bf1cf76f408e71e5263617b5530de9d4ce2424c40f8798f511e514b85e253d`.
+- Added explicit `--english-resetti-replies` generation/build integration.
+  It uses the shared general-string relocation at `02600000`, without changing
+  any other caller limit. Unlike the wider fortune caller, this option does not
+  need resident code and works in basic builds. Current string data is 8,144
+  bytes and the ROM remains 32 MiB. The two symbol-bearing apology targets
+  `048E/0491` remain native; no unsupported keyboard character is imported.
+- Seven focused tests pass in 1.016 seconds,
+  `build/tests-resetti-replies-final.log`. They cover complete reference/legacy
+  agreement, changed/partial dictionaries, scoped capacity, the independent
+  builder without resident code, the compact table for every word length,
+  fixture boundaries, exact changed bytes, overlap rejection, and two relocation
+  bases. The full suite passes **817 tests in 304.711 seconds**,
+  `build/tests-resetti-replies-full.log`.
+- Full/basic candidates are 12,742/11,881, each adding exactly 31 entries.
+  Existing `04C0` retains its text with explicit group provenance; every other
+  earlier candidate remains identical. Ordinary string candidates total 294,
+  leaving 1,268 without candidates. Main remains 10,810 candidates with 942
+  without, and layout warnings remain 1,491. Ordinary source-character weight
+  is 647,353/746,978; main remains 636,025/637,761. Review-complete stays zero.
+  These are candidate inventories, not final semantic/gameplay/completion claims.
+  Disabled reply generation reproduces the preceding full 12,711-edit file
+  exactly, `build/resetti-replies-disabled-candidates/`.
+- Pilot `build/resetti-replies-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `689e28686b7714c0922cac91203e8d76a0514a5769e2fa0985bf3c50fb69a79d`.
+  UPS SHA-256:
+  `4d6caf5e82961cc26d345053609c97625156aba4778dbb1cad72ab0e6f039453`.
+  Candidates `build/resetti-replies-candidates/translations.json`, SHA-256:
+  `47356e2a2a9882c4251010559f592a33a6d592cab847650e5e0f830ec63ed96a`.
+  Coverage: `build/resetti-replies-coverage/`. The complete installed audit
+  reconstructs all candidates and unchanged general strings, verifies original
+  ROM recovery/application of the UPS, and confines changed files to the actor,
+  string data/table, and DMA metadata. The actor differs only at its two
+  instructions and existing table. Main/resident code, glyphs, graphics, other
+  actors, and every other resource remain unchanged from the fortune pilot.
+- The first silent native batch `build/smoke-resetti-replies-01/` passes 1,154
+  records, 306 calls, and 302 memory assertions. All 32 words load completely.
+  The 227 detector cases cover 126 fitting positions, 32 case variants, 32
+  incomplete prefixes, 32 attempted right-edge overreads, and five neutral or
+  partial replies. All fourteen installed English apology targets pass exact
+  matching. Thirty combined classifications preserve accepted/rude/incorrect
+  results and reject changed padding. Complete actor/input and saved-memory
+  retention, stack/heap/module guards, restored checkpoint, blank isolated
+  FlashRAM/Pak, and graceful shutdown pass. Audio is disabled and four-MiB
+  configuration is selected. The original loader loads and relocates the actual
+  patched cartridge actor; no actor code is uploaded. Independent regeneration
+  checks every detector result and complete dictionary hashes. Scenario SHA-256:
+  `0349e8fd8a6121625b7180c76b97627bc8fd6796a75bd7f9e3d7bc5122105f0f`.
+- Ordinary keyboard input/retry/acceptance, two sun/skull targets, visual polish,
+  ordinary saves, and hardware remain. Broader shared strings and twenty native
+  diagnostic records are also queued; the full translation/review/release goal
+  remains active. Title artwork is still first in the image queue after the main
+  port. Updated an obsolete number-game queue paragraph to reflect its already
+  installed and tested scoped labels; no additional number-game changes.

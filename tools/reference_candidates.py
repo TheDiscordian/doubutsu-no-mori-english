@@ -30,6 +30,7 @@ from birthday_fields import message_ids as birthday_message_ids
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 from reference_content import adapt_content_reference, validate_content_candidate, validate_glyph_candidate
 from fortune_strings import candidates as fortune_candidates, permits as fortune_permits
+from resetti_replies import candidates as resetti_candidates, permits as resetti_permits
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -149,6 +150,7 @@ def native_placeholder_fallback(row, original, info, *, skip_ids):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--english-fortunes', action='store_true', help='Complete source-verified Katrina phrases; requires resident module')
+    parser.add_argument('--english-resetti-replies', action='store_true', help='Complete source-verified Resetti reply dictionary and matching lengths')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -263,6 +265,11 @@ def main():
         fortunes = (fortune_candidates(rom, gc, {r['id']: r for r in inventory}, info)
                     if name == 'string' and args.english_fortunes else {})
         string_permits = fortune_permits(rom, list(fortunes.values()), info) if fortunes else {}
+        replies = (resetti_candidates(rom,gc,{r['id']:r for r in inventory},info)
+                   if name == 'string' and args.english_resetti_replies else {})
+        reply_permits = resetti_permits(rom,list(replies.values()),info) if replies else {}
+        if replies.keys() & (override_ids | matches.keys() | fortunes.keys()):
+            raise ValueError('Resetti dictionary conflicts with another approved group')
         if fortunes.keys() & (override_ids | matches.keys()):
             raise ValueError('Fortune group conflicts with a draft or identity override')
         sequence_edits, permits = (reference_sequence_edits(gc, source, info,
@@ -281,7 +288,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in fortunes:
+            if id in replies:
+                edit = replies[id]
+                validate_entry(original,encode(edit['translation'],info),info,name,
+                               resetti_permit=reply_permits[id])
+                counts['complete_resetti_replies'] += 1
+            elif id in fortunes:
                 edit = fortunes[id]
                 validate_entry(original, encode(edit['translation'], info), info, name,
                                resident_runtime=True, fortune_permit=string_permits[id])

@@ -37,10 +37,13 @@ The silent native batch passes every phrase load/preparation, 32 complete readin
 128 insertions, and 888 memory assertions with restored checkpoint and blank
 saves. Normal paid readings, resulting luck effects, and presentation remain
 gameplay/playthrough checks.
-Next work covers other general strings and their callers, apology input/matching,
+The [Resetti dictionary integration](../specs/RESETTI_REPLIES.md) installs all
+32 complete English rude replies with their native substring lengths. Its
+silent batch passes 227 detector cases, fourteen English apology targets,
+thirty classifications, and 302 memory assertions with retained actor/save data.
+Next work covers other general strings and their callers, apology input,
 and the twenty remaining native diagnostic records. Apology `048E/0491`
-still requires editor/token/matching integration; its rude-reply strings and
-lengths need one coordinated update. Keep general strings, remaining mail
+still requires editor/token/matching integration. Keep general strings, remaining mail
 glyphs, and ordinary gameplay moving alongside these consumers. Title artwork
 is the first image replacement after the main port. Do not resume the paused
 atlas-edge investigation.
@@ -563,21 +566,21 @@ messages, 21 labels, and 83 memory assertions with restored checkpoint and blank
 saves. Ordinary actions remain gameplay checks, including the native `0970`
 decline/cancellation route, which differs from the GameCube branch.
 
-Number-game questions `2D01/2D06/2D0B` share size labels `01B0/00F0` with
-clothing question `1772`. Provide scoped numeric answers for all three games
-without changing the clothing replies or reversing native branch meanings.
-Only `2D01` lacks a candidate; the other two need the same contextual correction.
-Establish native choice-table bounds and caller support before adding labels.
+All three [number-game questions](../specs/NUMBER_GAME_CHOICES.md) use dedicated
+Less/More labels while clothing question `1772` keeps its original size labels.
+Both numeric answers in each round, all three clothing answers, and native
+table boundaries pass. Ordinary round progression and prizes remain gameplay
+checks; no question remains withheld for this shared-label conflict.
 
 The [apology caller audit](../specs/NATIVE_SPECIAL_FOLLOWUPS.md) identifies sixteen
 ten-byte target phrases `0484..0493`. Fourteen have complete English candidates;
 `048E/0491` still need sun/skull glyphs and keyboard access. Preserve the complete
 English phrases and validate display, padding, case, symbols, retry, and matching.
-The 32 rude-reply strings `04C0..04DF` also require complete string storage and
-updated substring lengths: the native transition table is `6,16,25,30,31,-1`,
-not the English GameCube table. Only `04C0` has a candidate. Replacing those
-strings without the caller change would break matching. No editor/target or
-detector patch is supplied by translating the prompt alone.
+All 32 rude replies `04C0..04DF` are installed with their complete English
+length boundaries in the [scoped matcher](../specs/RESETTI_REPLIES.md). Native
+tests cover every fitting position, changed case, incomplete prefixes, attempted
+cross-boundary matches, and fourteen complete good targets. Ordinary input,
+retry/acceptance, and the two symbol-bearing targets remain required.
 
 Six [complete Resetti/Gulliver scripts](../specs/RESETTI_GULLIVER_SEQUENCES.md)
 retain entire English conversations through three checked continuation slots.
@@ -675,7 +678,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | --- | --- | --- | --- |
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, ordinary resident year/month/day/leap-month preparation, and all 33 birthday-request fields pass targeted checks; normal birthday entry/gifts, other UI callers, and out-of-table native calendar dates remain |
 | R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 168 dialogue approvals preserve native menu order, and twenty-nine contextual mappings retain answer indices/actions; twenty-byte capacity, long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; appended numeric labels retain all three rounds and clothing meanings in the 73-message/66-answer/eight-boundary native batch; further contextual labels, full review, and actor-specific runtime paths remain |
-| R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; all 128 complete Katrina phrases pass cartridge loading, native preparation, and full message insertion through a scoped sixteen-byte caller; ordinary string candidates total 263; ten-byte default catchphrase display passes all 216 default loads with unchanged saved bytes; gyroid pixel wrapping passes with unchanged saved/editor limits; longer gyroid storage, borrowed phrases, shared choices, mail, and shop destinations remain |
+| R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; all 128 complete Katrina phrases pass native preparation/insertion; all 32 English Resetti rude replies pass their scoped matcher; ordinary string candidates total 294; ten-byte default catchphrase display passes all 216 defaults with unchanged saved bytes; gyroid pixel wrapping passes with unchanged saved/editor limits; longer gyroid storage, borrowed phrases, shared choices, mail, and shop destinations remain |
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |

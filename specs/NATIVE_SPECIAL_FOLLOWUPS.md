@@ -50,10 +50,14 @@ hard-coded increasing substring length and ten-byte reply window. Its native
 length-transition table at `809B572C` contains `6, 16, 25, 30, 31, -1`,
 confirmed from the retail overlay. The GameCube uses different transition
 indices. The native match-length starts at two and grows at those indices.
-Only `04C0` currently has an English candidate. Importing the other
-English strings without updating storage and the length contract would change
-matching incorrectly. Keep complete string-bank integration and detector tests
-with the apology/editor work; no detector or target string is modified here.
+The [complete English dictionary integration](RESETTI_REPLIES.md) installs all
+32 words with their matching English lengths. Two guarded instructions read
+compact byte transitions from the existing table; native case-sensitive matching,
+all fitting substring positions, and good-answer-first classification remain.
+Its silent batch passes 227 detector cases, all fourteen installed English
+targets, thirty classifications, and 302 memory assertions. Sun/skull targets
+and ordinary editor entry/retry remain separate work; translating the prompt
+alone does not complete those paths.
 
 ## Acceptance
 
