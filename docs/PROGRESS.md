@@ -147,7 +147,7 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 620 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 632 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
@@ -462,18 +462,19 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/reunion-greetings-pilot/`
-contains 11,849 edits, including
-9,762 reference main-bank candidates, all 460 choices, 551 original dialogue
-drafts, and 291 original development-label drafts. Two additional original
+The current experimental resident-module pilot in `build/native-misc-pilot/`
+contains 11,937 edits, including
+9,736 reference main-bank candidates, all 460 choices, 566 original dialogue
+drafts, 291 original development-label drafts, and 99 complete diagnostic drafts.
+Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,148
+still require review. The original main-bank audit leaves 1,060
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,469 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/reunion-greetings-candidates/` and `build/reunion-greetings-coverage/`. The independent
+`build/native-misc-candidates/` and `build/native-misc-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -956,9 +957,38 @@ introductions/reunions or their field preparation, nor establish final wording,
 presentation, saving, or hardware acceptance. The complete `0013..00D2` range
 has 192 English drafts; full review remains required.
 
+The [moving and game-launch drafts](../specs/NATIVE_MOVING_AND_LAUNCH.md) supply
+eight native conversations and seven NES prompts. The town-satisfaction question
+retains its original answers/replies; native moving remarks gain no GameCube-only
+menus or actions. The launch prompts retain all seven exact supplied GameCube
+furniture titles, original choice order, and the existing quit-button explanation.
+Only the seven prompts' title/question-mark colour lengths change. The moving
+drafts retain every native command and field placement by page. All fifteen fit;
+two generic current-town warnings remain, with the verified six-cell check passing.
+
+The [complete diagnostic guard](../specs/NATIVE_DIAGNOSTICS.md) covers 99 records:
+28 rumour-pattern labels, 68 script-bug labels, and three gyroid debug notices.
+It fills 73 missing entries and corrects 26 partial English labels, preserving
+printed numbers, the debug-report request, native credit, and every command.
+These are diagnostics, not 99 additional gameplay conversations. The builder
+rejects partial labels, changed numbers, and unrelated save/menu imports.
+Diagnostic recognition does not change the coverage categories or denominator;
+the 26 corrections earn no extra source-volume credit.
+
+Both generation modes add 88 records and correct exactly those 26 labels, with
+all other edits unchanged. All 11,937 installed payloads and the UPS round trip
+pass. The twelve focused checks and complete 632-test suite pass. One silent
+four-MiB batch passes all 114 new/corrected cartridge loads and unchanged
+connections `0FA9/17B5`: 116 calls, 350 assertions, and 589 recorded steps.
+Headers, adjacent/module guards, checkpoint restoration, graceful shutdown,
+and blank isolated FlashRAM/Pak files pass. Production code, fonts, runtime
+resources, and saved layouts remain unchanged. Actual moving, game launching
+and quitting, diagnostic callers, final wording/layout, and hardware remain
+outside these loader checks.
+
 ## Text-volume measurement
 
-The generated coverage report measures 629,116 covered source characters out of
+The generated coverage report measures 631,270 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -978,8 +1008,9 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 11,849 edits, including
-9,762 reference main-bank candidates, 291 original development-label drafts,
+The resident-module experiment contains 11,937 edits, including
+9,736 reference main-bank candidates, 291 original development-label drafts,
+99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
@@ -991,12 +1022,13 @@ drafts, fifty startup-greeting drafts, eighteen resident-topic drafts,
 21 gyroid/resident-state drafts, two letter-fragment drafts, ten native-menu
 dialogue drafts (including five connected reply corrections), four
 contextual-menu reply drafts, 35 native return greetings, 85 native daily,
-move, repeat, and month-return greetings, and 72 native introductions/reunions.
+move, repeat, and month-return greetings, 72 native introductions/reunions,
+eight native moving conversations, and seven game-launch prompts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,149 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,148 main records without
-candidates: 226 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,061 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,060 main records without
+candidates: 138 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

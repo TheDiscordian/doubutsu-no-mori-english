@@ -3,6 +3,7 @@
 from textcodec import LATIN, tokenize
 from aflib import sha256
 from reference_sequences import SequencePermit
+from native_diagnostics import validate_diagnostic
 from reference_fields import ReferenceFieldPermit, SpeakerCatchphrasePermit
 from reference_animations import ResidentAnimationPermit, is_resident_animation, verify_animation_values
 from mail_controls import BANKS as MAIL_BANKS, validate_tokens as validate_mail_tokens
@@ -67,6 +68,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None):
     if bank == 'message' and policy != 'reviewed_sequence':
         validate_placeholder(original, replacement, info)
+        validate_diagnostic(original, replacement, info)
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
         raise ValueError("Unsupported choice runtime capacity")
     if animation_permit is not None:

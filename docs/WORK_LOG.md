@@ -4791,6 +4791,104 @@
   patch-only release, and image/keyboard stretch goals remain active. The
   font-atlas-edge investigation remains paused.
 
+## 2026-09-07 — Native moving, game-launch, and diagnostic text
+
+- Continued from clean pushed checkpoint `9493c80`. The subsequent one-time
+  measurement supplied fresh evidence that all 11,937 current edits are present
+  in the actual built ROM; it was progress by new verification, not a new
+  implementation batch or a project-completion claim. The pending build,
+  coverage, and full-suite handles were collected with terminal success rather
+  than restarted. No live prior build or test handle remains.
+- Added eight complete originals in `n64-moving-conversations.json` for
+  `0FA5..0FA8`, `0FAC`, and `2862..2864`. The native satisfaction question
+  retains choices `0103/0104` and replies `0FA8/0FA9`; the unchanged reply comes
+  from `n64-town-advice.json`. Five moving remarks retain final `00` with no new
+  GameCube-only moving questions or quest actions. Tom Nook's expansion dream
+  is retained instead of the unrelated same-ID furniture question. Every
+  original command/argument, field occurrence/order/page, wait, and ending
+  remains. Bounds are 281–531 bytes. Only `0FA5/2862` have generic `2F` warnings;
+  all eight layouts fit six fullwidth current-town cells with every other field
+  estimate unchanged. No actual GameCube reference is reflowed.
+- Added seven complete NES launch prompts `2B6B..2B71` with the exact supplied
+  GameCube furniture names `036A..0370`: Clu Clu Land, Balloon Fight, Donkey Kong,
+  DK Jr MATH, Pinball, Tennis, and Golf. Native Japanese titles are individually
+  checked; same-ID English main records contain unrelated Memory Card errors.
+  All choices, conditional `17B5` links, and continuing endings remain. Only the
+  title and question-mark colour lengths change. Bounds are 57–66 bytes with
+  no layout warnings. Existing `17B5` and choice labels remain unchanged.
+- Added all 99 complete exact native diagnostics: 28 rumour-pattern, 68
+  script-bug, and three gyroid debug notices. This fills 73 missing records
+  and corrects 26 existing partial imports at `2720..2739` that omitted Script
+  bug and the printed number. `2956` keeps its literal `10581`, not inferred
+  decimal ID `10582`. The gyroid notices retain `2351/2352/2353`, the debug-report
+  request, native By Eguchi credit, page transition, and no imported save action.
+  All commands are exact; bounds are 35–113 bytes without layout warnings.
+  Explicit diagnostic metadata separates these from original dialogue drafts.
+- Added the independent `native_diagnostics.py` source recogniser and complete
+  replacement guard to shared candidate/build validation. It rejects partial
+  labels, changed numbers, changed controls, and unrelated menus under all
+  ordinary policies. Sequence-policy declarations still require the separate
+  complete hash-bound approval. Exact source matching rejects false positives,
+  unknown tokens, and unexpected native control structure. The coverage label
+  catalog and denominator remain unchanged; the 26 corrected English-looking
+  labels receive no additional source-volume credit.
+- Added twelve focused tests. The initial focused run had one fixture-path
+  error looking for `0FA9` in the contextual-replies file; the correct existing
+  draft is in the town-advice file. Corrected only that test lookup. Final
+  `build/tests-native-misc-focused-02.log` passes twelve tests in 0.849 seconds;
+  `build/tests-native-misc-full-01.log` passes all 632 in 281.315 seconds.
+- Full generation adds exactly 88 missing records and corrects exactly the
+  26 diagnostic labels; every other prior edit remains unchanged. It contains
+  11,937 edits and 10,692 main candidates: 9,736 reference candidates, 566
+  original dialogue drafts, 291 development labels, and 99 diagnostics. All
+  460 choices remain unchanged. Basic generation has the same exact changes
+  and reaches 11,227. Every new/corrected candidate matches its versioned draft.
+  No runtime/date gate or ordinary bank-count contract is weakened.
+- Reference rejection totals 1,061: 935 unconfirmed identities, 100 control
+  differences, 24 missing-field records, and two direct overflows. One original
+  fallback leaves 1,060 final main gaps: 138 Japanese-static, 919 non-static,
+  one Latin, and two symbol/numeric records. Ten non-static entries contain
+  fields; no reachability is inferred. Reference warning records remain 1,469,
+  native aliases 41, and conflicts zero. Regenerated both final-hash review
+  queues; current-rule same-ID eligibility remains zero, no-visible-reference
+  entries are 866, and the ten special-expression cases remain unapproved.
+- ROM `build/native-misc-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `ab38396566ff8f35c356f1dfde6e880caea092f61d8c7154ef8dc214788c0dfe`.
+  UPS SHA-256:
+  `df82782d1e1d934010bd63791d86635019f65ac2384d1c809db9b0f68fa5d5a7`.
+  Candidate SHA-256:
+  `561dca1c28cb5c277b1d7528b1f471332c0d3c557b044aca6024b598299162c6`.
+  Fresh source/candidate/build hashes and every one of the 11,937 complete
+  actual built-bank entries pass. The existing text-volume definition counts
+  631,270 installed source characters of the unchanged 746,978 denominator,
+  adding 2,154. Embedded UI/images and incompletely integrated separate
+  resources remain outside this measurement; no new unsolicited percentage
+  or semantic/gameplay completion claim is made.
+- UPS application reconstructs the complete ROM. Against the reunion pilot,
+  only extracted main text `02000000`, pointers `00CF9000`, and DMA directory
+  container `00019D40` differ. The container is unchanged outside its table;
+  every other code, font, runtime, name, mail, and choice resource is unchanged.
+- `build/smoke-native-misc-01/` passes all 114 new/corrected message loads plus
+  unchanged `0FA9/17B5`: 116 calls at `8009E558`, 350 assertions, and 589 steps.
+  Complete headers/text, adjacent/module guards, restored `test.bs1`, and
+  graceful shutdown pass. Scenario SHA-256:
+  `15e75574f2f1ca43d8c42bcbd24d48858bff0ac9956614efdd072a5a236d6f63`.
+  The four-MiB run has no seeds, disabled audio, and both save-write permissions
+  false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  These calls do not execute ordinary moving selections, actual game launch or
+  quit, script-bug conditions, live field preparation, or saving.
+- Read all four native travel explanations `0848/0866/0870/087A` and their
+  complete supplied references for the next content batch. The English disc
+  adds second-Memory-Card and destination-town-data rules that differ from the
+  native Controller Pak instructions. Preserve all native advice and bulletin-
+  board details; add a guarded existing-page split if complete English needs it.
+  No travel draft or new sequence contract is implemented in this checkpoint.
+  All remaining dialogue/runtime, general strings/names/mail, full review,
+  ordinary gameplay/saves, hardware acceptance, patch-only release, and image/
+  keyboard stretch goals remain active. The font-edge investigation stays paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

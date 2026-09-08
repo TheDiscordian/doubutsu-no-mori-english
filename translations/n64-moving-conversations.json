@@ -1,0 +1,66 @@
+[
+  {
+    "id": "message:0FA5",
+    "source_sha256": "625169641d92e68a145eba5f664ce62220da4694a496204cd47aa9dc1930a725",
+    "translation": "{cmd:7F090000FF}Lately,{cmd:7F0308}\nI've felt like wandering\nsomewhere far away{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F04}{cmd:7F09000017}\n{cmd:7F02}{cmd:7F2F}\nisn't a bad place to live.{cmd:7F030C}\nIt's just a feeling,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Hey,{cmd:7F0308} {cmd:7F1A},{cmd:7F0306}\nlife in {cmd:7F2F}...\n{cmd:7F0900000B}Are you happy with it?{cmd:7F1601030104}{cmd:7F04}{cmd:7F0D}{cmd:7F0F0FA8}{cmd:7F100FA9}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0FA6",
+    "source_sha256": "d33cf841cc46a466700e6272c9e1c2d1c0489d82e32f898195267e9f5234b710",
+    "translation": "{cmd:7F090000FF}Day after day,{cmd:7F0308}\nit's the same scenery.\nDoesn't it{cmd:7F0308} get boring?{cmd:7F04}\n{cmd:7F02}Sometimes,{cmd:7F0308}\nI feel like living\nin a place I don't know,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}{cmd:7F1A},{cmd:7F0308}{cmd:7F0900000E}\nif you know a nice town,\nwould you take me there?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Even if you say{cmd:7F0306} no,\nI'll follow you anyway,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0FA7",
+    "source_sha256": "4aaaef6c9c3382ea07f828bc9a657f9807a20c00da22878f86003db8a5ccc6c8",
+    "translation": "{cmd:7F090000FF}While you're young,{cmd:7F0304}\nit's important to try\nliving in different places,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Meeting different people{cmd:7F0308}\nand experiencing\ndifferent surroundings...{cmd:7F04}{cmd:7F09000014}\n{cmd:7F02}Each time, you break\nout of your shell!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Experiences you can't have\nby staying in one place\nmust be waiting for you,{cmd:7F0308}\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}{cmd:7F0900000E}\n{cmd:7F02}Perhaps it's about time{cmd:7F0308}\nI went somewhere else,\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F09000015}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0FA8",
+    "source_sha256": "fa114a3cbf182307e8deb036f3c4fe84dfa2be9cd83278021ced07dcb687ed47",
+    "translation": "{cmd:7F090000FF}Hmm,{cmd:7F0308} so that's it{cmd:7F0308}.{cmd:7F0308}.{cmd:7F0308}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}{cmd:7F0308}But{cmd:7F0306} \"somewhat\"?\n{cmd:7F09000016}What kind of answer is that?{cmd:7F04}\n{cmd:7F02}If you're happy, say so!{cmd:7F0308}\nIf you're not, say so!{cmd:7F0308}\nSpeak clearly!{cmd:7F04}{cmd:7F09000001}\n{cmd:7F02}Honestly,{cmd:7F0304}{cmd:7F09000016}\nyou're so wishy-washy,\n{cmd:7F0304}{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:0FAC",
+    "source_sha256": "b45df86c515788e7ecd50b464e90154217420d78d9c08a8d7b228fb4627b9a9c",
+    "translation": "{cmd:7F0900000B}Do you{cmd:7F0306} know about{cmd:7F030C}\nTom Nook's dream?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Last time I talked to\nTom Nook, he told me...{cmd:7F04}\n{cmd:7F02}\"I want to make lots of money{cmd:7F0308}\nand keep making my shop\nbigger and bigger\"!{cmd:7F030C}\nThat's what he said!{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Heh,{cmd:7F0308} I can't wait to see\njust how big he can make it,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}By the way,{cmd:7F0308} your house...{cmd:7F0304}\nCan't you make it\nany bigger than that?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Follow Tom Nook's example,{cmd:7F0308}\n{cmd:7F1A}!\nKeep at it!{cmd:7F0306} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native Tom Nook shop-expansion dream and house advice; the same-ID GameCube record is unrelated furniture conversation. Preserve every native command and pause."
+  },
+  {
+    "id": "message:2862",
+    "source_sha256": "e0519d2135c34fd9c80d1e3653348be0936acc16da5d50ab63d8ac4c459aef28",
+    "translation": "{cmd:7F0900000F}Hmm,{cmd:7F0308} lately{cmd:7F0304}\nI've been in a slump,{cmd:7F0304}\nI really have.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}That must be it.{cmd:7F0308}\nFor a guy like me,{cmd:7F0304}\nquiet life in {cmd:7F2F}{cmd:7F0304}\njust doesn't fit, I guess.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Maybe it's about time{cmd:7F0304}\nI moved somewhere else.{cmd:7F0304}\nCould be good, {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:2863",
+    "source_sha256": "a8a58c224c0d1a1443fb89147420e4a3b35fc883db7b47005f256dc4f1d15841",
+    "translation": "{cmd:7F09000016}Ah,{cmd:7F0304} no,{cmd:7F0302} no!{cmd:7F0310}\nA guy like me{cmd:7F0306}\ncan't just waste away here!{cmd:7F0304}\n{cmd:7F0308}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Adventure!{cmd:7F0304} Romance!{cmd:7F0304} Courage!{cmd:7F030C}\n{cmd:7F0900000A}Exciting things{cmd:7F0308}\nmust be waiting for me!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}Staring at your silly grin{cmd:7F0304}\nevery day{cmd:7F0304} would leave me\nsoft in both body and mind!{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Maybe I should move{cmd:7F0303}.{cmd:7F0303}.{cmd:7F0303}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  },
+  {
+    "id": "message:2864",
+    "source_sha256": "6513ed729751454acb725079712c41387a43b2d4a08426d0174aeb5b6bbf2d74",
+    "translation": "{cmd:7F09000010}Sigh{cmd:7F0303}.{cmd:7F0303}.{cmd:7F0303}.{cmd:7F030E}\nHey,{cmd:7F0304} {cmd:7F1A}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}I{cmd:7F0304} may have stayed in\n{cmd:7F2F}{cmd:7F0304}\ntoo long,{cmd:7F0308} {cmd:7F1C}{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}This sort of life{cmd:7F0304}\njust doesn't seem right\nfor a drifter like me.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Next time you go\nto another town,{cmd:7F0308}\nI might tag along,\n{cmd:7F0308}{cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native moving conversation, all native commands and pauses, original menu/response context, and ending. Do not import GameCube-only moving choices, reply targets, or quest actions. Live gameplay and final wording/presentation review remain."
+  }
+]

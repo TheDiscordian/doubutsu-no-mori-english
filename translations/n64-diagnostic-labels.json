@@ -1,0 +1,992 @@
+[
+  {
+    "id": "message:092F",
+    "source_sha256": "92db1e21a8f35230b7e6410479de11fa80d5f85a8d944ad74ae663765688f5ee",
+    "translation": "This is message\n2351.{cmd:7F04}\n{cmd:7F02}If this message appears\nwhile debugging,\nplease report it.\nBy Eguchi\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "gyroid_debug_notice",
+    "printed_number": 2351,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0930",
+    "source_sha256": "e7a4f05f1cb8b9ebbeb339546a539068e0c01c4a19a0ebabc1f3d345be71961d",
+    "translation": "This is message\n2352.{cmd:7F04}\n{cmd:7F02}If this message appears\nwhile debugging,\nplease report it.\nBy Eguchi\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "gyroid_debug_notice",
+    "printed_number": 2352,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0931",
+    "source_sha256": "f698a878c03364e483aa3d8853dad884d2fe754565793846e192e04528966fd3",
+    "translation": "This is message\n2353.{cmd:7F04}\n{cmd:7F02}If this message appears\nwhile debugging,\nplease report it.\nBy Eguchi\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "gyroid_debug_notice",
+    "printed_number": 2353,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BB9",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBA",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBB",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBC",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBD",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBE",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BBF",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:0BC0",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2720",
+    "source_sha256": "de7eab25ceb7686516fd0ad6dc77f59e688744be6d73db4a1f6e162efd4d7823",
+    "translation": "Script bug\nCranky guy\n10016\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10016,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2721",
+    "source_sha256": "d9d9a9fdc702dfa0e81abf0e9214fe8411282faec9919767822b489cb8f9a3e7",
+    "translation": "Script bug\nCranky guy\n10017\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10017,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2722",
+    "source_sha256": "c8901fee80b8a03458bd3a43a01678fc55fd6c5f21b53da922b9e6b0882b17aa",
+    "translation": "Script bug\nCranky guy\n10018\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10018,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2723",
+    "source_sha256": "935b4fd2529a10f538a0e9b808b126be585eedba4a122620791f2289d9e84239",
+    "translation": "Script bug\nCranky guy\n10019\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10019,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2724",
+    "source_sha256": "c98d257d1267b9740bab8201a28e3f7996cc89bada9a98dd387f84333929ab4f",
+    "translation": "Script bug\nCranky guy\n10020\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10020,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2725",
+    "source_sha256": "df7a1c2f9f0e2533511afbd1ee5c4b6fe84142b08da9ebf827e097c5c640ec7a",
+    "translation": "Script bug\nCranky guy\n10021\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10021,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2726",
+    "source_sha256": "1b45eb417bbad882c4a352aec0a647fd532f285291c0d56b87d6ba6a12b910f0",
+    "translation": "Script bug\nCranky guy\n10022\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10022,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2727",
+    "source_sha256": "2ef6240d3c8ed931775ff7d9cfca9a2b15a529992bf9bfb9d0ad4364dee4d604",
+    "translation": "Script bug\nCranky guy\n10023\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10023,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2728",
+    "source_sha256": "b76b152deba19709144ba54066d956c332539d7967f1e4e28c9b85c4704bd9ec",
+    "translation": "Script bug\nCranky guy\n10024\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10024,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2729",
+    "source_sha256": "d737df6dd92fe2b151f0156e038a943bd09c9b3b56ab8f0de1a427f22796a2f9",
+    "translation": "Script bug\nCranky guy\n10025\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10025,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272A",
+    "source_sha256": "52338331b5649040fb7a44e133bc0d41ec0125bc96399ecaf474b060e1dd73b5",
+    "translation": "Script bug\nCranky guy\n10026\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10026,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272B",
+    "source_sha256": "175832b9faa7958d26c7672d9d754e3ae15060badb8141bd89ad2459086cd2b1",
+    "translation": "Script bug\nCranky guy\n10027\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10027,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272C",
+    "source_sha256": "a716b695b721a11857e55bfc1b51454edf6a73adf2ea9cc4b6d403b649d779fd",
+    "translation": "Script bug\nCranky guy\n10028\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10028,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272D",
+    "source_sha256": "9cc50dba8a9fd275ccd9a4f64be25dfd42dcb7b79ba66551ff9ae82e5f1e6512",
+    "translation": "Script bug\nCranky guy\n10029\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10029,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272E",
+    "source_sha256": "c484b666b84656a63e720df92eb83e4f72fda4ee64d562a3b7b6711c011baf11",
+    "translation": "Script bug\nCranky guy\n10030\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10030,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:272F",
+    "source_sha256": "f7cd8dd0bc3d63f0a60f7ba2b7d2259b67232df73b5c431acd7b28cc76dd4d58",
+    "translation": "Script bug\nCranky guy\n10031\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10031,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2730",
+    "source_sha256": "a6722038bc8f90a8f7ad69ed3fac6730cf1d940f1fa36235d4281d10854dc0eb",
+    "translation": "Script bug\nCranky guy\n10032\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10032,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2731",
+    "source_sha256": "2a935dcfadb8fbc0e0d908ed4c16cdedaba701ec8be5787ebb40209dd31a06dd",
+    "translation": "Script bug\nCranky guy\n10033\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10033,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2732",
+    "source_sha256": "ad577c8b51d2d1938436275a7f81753a8a19ada45d97f7ea18a3f94de413f11a",
+    "translation": "Script bug\nCranky guy\n10034\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10034,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2733",
+    "source_sha256": "9c098e420d5ddbd0e89dafb356d3f3faefa87e4081b87d66a636ab0d32af0cef",
+    "translation": "Script bug\nCranky guy\n10035\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10035,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2734",
+    "source_sha256": "e1ca12b929e59cac73a75b9f0ab147b6ca5da176862bbdf2240266e7684403c4",
+    "translation": "Script bug\nCranky guy\n10036\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10036,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2735",
+    "source_sha256": "ab1db3641fb8913b5efe7033d58f10034d2cda5dd9d4bbe8b8ef52dda01bfc92",
+    "translation": "Script bug\nCranky guy\n10037\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10037,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2736",
+    "source_sha256": "9e53a8e6185a7949ef6d7cb33564121e022e12b49b4654294f7076ccbe48a131",
+    "translation": "Script bug\nCranky guy\n10038\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10038,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2737",
+    "source_sha256": "29fa7e0002e1134ef92143c6355f2fd5631b1041172026c8497076f0b3700f59",
+    "translation": "Script bug\nCranky guy\n10039\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10039,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2738",
+    "source_sha256": "487c49893cdfbb892be1c2bc1db02507dd1593776d767814323438ba2141cb9f",
+    "translation": "Script bug\nCranky guy\n10040\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10040,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:2739",
+    "source_sha256": "d074930bf80b293f7101b93ac0ff56d2b85c5d92ad95828f2dfb5ec23c342641",
+    "translation": "Script bug\nCranky guy\n10041\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10041,
+    "notes": "Restore the native Script bug label and printed number omitted by the previous Cranky Guy extra reference. Preserve complete native commands and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code."
+  },
+  {
+    "id": "message:27F6",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27F7",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27F8",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27F9",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FA",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FB",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FC",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FD",
+    "source_sha256": "462b1729e00129b839f8038b6835f4c03af81dd1fdf8ce64665e2ac1f4b6482d",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FE",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:27FF",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2849",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284A",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284B",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284C",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284D",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284E",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:284F",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2850",
+    "source_sha256": "462b1729e00129b839f8038b6835f4c03af81dd1fdf8ce64665e2ac1f4b6482d",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2851",
+    "source_sha256": "6eb0292e67f379e5c614921736557f0572e48189301ec53dc3620ca45efa9a1a",
+    "translation": "Rumour pattern 1\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 1,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2852",
+    "source_sha256": "a350661cdf33e295bd10db494c3386ed95102c2ea6c60d59e66d6e897609e7bd",
+    "translation": "Rumour pattern 2\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "rumour_pattern",
+    "printed_number": 2,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:292D",
+    "source_sha256": "aef56c1ac280e8c6fbb0f40c25ed12c34229196d32928ccddf2f5570f90523aa",
+    "translation": "Script bug\nCranky guy\n10541\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10541,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:292E",
+    "source_sha256": "a83448fc135f772dc5e0f5dbba613457480deae3da90be8dfadd1ae604369532",
+    "translation": "Script bug\nCranky guy\n10542\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10542,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:292F",
+    "source_sha256": "c6e14aa619bd109c97ffa5f1fd524687f5772e9a062a722b74677ed599b265e9",
+    "translation": "Script bug\nCranky guy\n10543\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10543,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2930",
+    "source_sha256": "a8ac5eab3cea549c8f39dfadb5034ea8303bb6927a0ca7989d207804287f28b8",
+    "translation": "Script bug\nCranky guy\n10544\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10544,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2931",
+    "source_sha256": "95e2f04dd695de233e83f5f57d31aed69e10fe2ceaca02cd3ceb0f5ad0fbbe49",
+    "translation": "Script bug\nCranky guy\n10545\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10545,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2932",
+    "source_sha256": "3fad9e87fecc755b570b149bed10dda2edbb5e8ff4e9ad1bb0a3acd8d9b68342",
+    "translation": "Script bug\nCranky guy\n10546\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10546,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:294F",
+    "source_sha256": "02343e196e5d0b1847af1ae88c355602e7d8547158ac45ae9d1edd44330c4bcd",
+    "translation": "Script bug\nCranky guy\n10575\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10575,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2950",
+    "source_sha256": "c58f83ee302cf82d549e9e17055c6f17accc854c3aeca0431d7b61810ca6a96a",
+    "translation": "Script bug\nCranky guy\n10576\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10576,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2951",
+    "source_sha256": "21063f76787b783e643d92c26b5722589e768c13a0c1e57074976ab3056e8e50",
+    "translation": "Script bug\nCranky guy\n10577\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10577,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2952",
+    "source_sha256": "825b2210bfd3bd892cdddafc9d2c611075419dd81d98ba3f89e52ebbc1b5d9e0",
+    "translation": "Script bug\nCranky guy\n10578\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10578,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2953",
+    "source_sha256": "a576546a20c87ac79fe26ffe6ffbde6d1f8b221a715cd2b550c152ba1af73f3f",
+    "translation": "Script bug\nCranky guy\n10579\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10579,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2954",
+    "source_sha256": "dcfd7a9a47f412c1c9858c5484880c5d809544957e6dbd7ba3f7bd260e904561",
+    "translation": "Script bug\nCranky guy\n10580\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10580,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2956",
+    "source_sha256": "22048ac86bf6657c0ee70f7b586072261182142e38e578cf7bf12b60071fbd40",
+    "translation": "Script bug\nCranky guy\n10581\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10581,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2957",
+    "source_sha256": "5e36252b798eada99d7ae27cca697f7e53e397593bd499aa90a43632accc39bf",
+    "translation": "Script bug\nCranky guy\n10582\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10582,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2958",
+    "source_sha256": "36d20e7789485381f090a369ed8ff42126afd0759aaa1a2acc9157d684743bec",
+    "translation": "Script bug\nCranky guy\n10583\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10583,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2959",
+    "source_sha256": "69a6b18eeb4eaf350ce459e211a385d1b33c6b0e9d666b8d36c0e792fc7f87df",
+    "translation": "Script bug\nCranky guy\n10584\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10584,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2964",
+    "source_sha256": "8acd6dc61ce7268265cab68eae0c74b702c3df7ae0253bdac21b8bf9cb10b727",
+    "translation": "Script bug\nCranky guy\n10596\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10596,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2965",
+    "source_sha256": "53abce354d78d6efceb66cc4fed408c1cf1800b4186ccaf49962bab872f1c877",
+    "translation": "Script bug\nCranky guy\n10597\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10597,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2966",
+    "source_sha256": "6cab064a9891fd48616c3f545cd33fb716c40b22e18eb5e27acec3a0c34fd96e",
+    "translation": "Script bug\nCranky guy\n10598\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10598,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2967",
+    "source_sha256": "e6b64194f06877f3e1da876656dadbf70765bbebc4cae7230d588e4d6ead4e15",
+    "translation": "Script bug\nCranky guy\n10599\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10599,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2968",
+    "source_sha256": "bc9055b6393d28ec77e597686039cdd8a670a015e4e457bd45bd3c613a07e803",
+    "translation": "Script bug\nCranky guy\n10600\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10600,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2969",
+    "source_sha256": "5e72adf721edcba21e775e262acf065d8a79494520f2ef220b0fdaf66b15e03e",
+    "translation": "Script bug\nCranky guy\n10601\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10601,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296A",
+    "source_sha256": "8a5884cdbd005cb865228528879ffc7a66fb7f9b43a975ca988a49b2d39ca61e",
+    "translation": "Script bug\nCranky guy\n10602\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10602,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296B",
+    "source_sha256": "8930679afa9b2ca9b70bf3ed9975a1d73e51056a45f03e0c2bce9cb12e3d9900",
+    "translation": "Script bug\nCranky guy\n10603\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10603,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296C",
+    "source_sha256": "48e230fd33ce3c55b4dbf869bbca91bd023a6b413b698d0d48797e7425b74d14",
+    "translation": "Script bug\nCranky guy\n10604\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10604,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296D",
+    "source_sha256": "601b299e00db8b1710afb089619a53f6bdb7051aa138642c3eacc89e9273a2f5",
+    "translation": "Script bug\nCranky guy\n10605\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10605,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296E",
+    "source_sha256": "d25492089bd6347041427a62f161d3687a8c6686a7d4fbd21271fd5f8e6bca27",
+    "translation": "Script bug\nCranky guy\n10606\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10606,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:296F",
+    "source_sha256": "ac59c0ef5ac2be1b594b2cfc761de2564a5c11288bdaa189f6721b37f8f919b9",
+    "translation": "Script bug\nCranky guy\n10607\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10607,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2970",
+    "source_sha256": "5f5fca6fbb88c068472663dba5495166ad75898d496322952a4d1a0f21abaec5",
+    "translation": "Script bug\nCranky guy\n10608\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10608,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2971",
+    "source_sha256": "1328fb3f43d8edd1efb7f83288e4b78ffe821948bccf3f485c9d75f2ebf46527",
+    "translation": "Script bug\nCranky guy\n10609\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10609,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2972",
+    "source_sha256": "60dc23da5fa44f634505a4d51d3ec336000678de5d704773fd3e9e40daf28921",
+    "translation": "Script bug\nCranky guy\n10610\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10610,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2973",
+    "source_sha256": "b1d99bf45c1f5b96bb439c886680b666673b8571303d98a47588d0fc0db83182",
+    "translation": "Script bug\nCranky guy\n10611\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10611,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:297E",
+    "source_sha256": "cd146d9b6cf941eeb2bf772d52ba3f9ff4eb680287b251cb0c471b7f606cd22d",
+    "translation": "Script bug\nCranky guy\n10622\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10622,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:297F",
+    "source_sha256": "cbb9760ba9987ec5ed2f42f502380c3669354ad9d8b99ba1e285281ce4795f7a",
+    "translation": "Script bug\nCranky guy\n10623\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10623,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2980",
+    "source_sha256": "54242d4b6ffd222f7507b897e4d321eb3af645a1709ed3695b619ab2b6d0c29b",
+    "translation": "Script bug\nCranky guy\n10624\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10624,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2981",
+    "source_sha256": "e63c309acb309c7216711a1215ba7a2c99ed9ff9d1daf432d9c743951eed192a",
+    "translation": "Script bug\nCranky guy\n10625\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10625,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2982",
+    "source_sha256": "7674fd956e9a16a526c9dcfef29c6846505963f1a9b5c3b7795f92c28565c211",
+    "translation": "Script bug\nCranky guy\n10626\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10626,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2983",
+    "source_sha256": "f7a35ee8847174939a5e6f537692a513ed571ba08d0c22392d46867cbd6bc30a",
+    "translation": "Script bug\nCranky guy\n10627\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10627,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2984",
+    "source_sha256": "8b0af03fc9339270cd4b0729df349a1cd1174030ca0fe6fff4b7fc0b74f302a0",
+    "translation": "Script bug\nCranky guy\n10628\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10628,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2985",
+    "source_sha256": "1d41d94d16be3bb41e99690afd6d16b2a12d791462e2f8b52c88d7f6b64a152a",
+    "translation": "Script bug\nCranky guy\n10629\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10629,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2986",
+    "source_sha256": "87b68a5730ab9d92a1804d86f25a59ada2f4187130f645b7fe660042f85be505",
+    "translation": "Script bug\nCranky guy\n10630\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10630,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  },
+  {
+    "id": "message:2987",
+    "source_sha256": "599898ccbe106ef694ad90f0531ced4ee6f884c29564d25045a8f0ea07702c4e",
+    "translation": "Script bug\nCranky guy\n10631\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 diagnostic text",
+    "status": "draft",
+    "diagnostic_kind": "script_bug",
+    "printed_number": 10631,
+    "notes": "Preserve the complete native diagnostic meaning, printed number, commands, and ending. This is not ordinary gameplay dialogue, a continuation allocation, or evidence of unreachable code. Do not import unrelated GameCube menus or infer a corrected printed number from the record ID."
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "id": "message:2B6B",
+    "source_sha256": "b8ba81cb2e8000e0cb83cf804960d4b3668f39a852c665a4c0639cc2c9b2cc09",
+    "translation": "\n Play {cmd:7F50324BE10C}Clu Clu Land{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036A. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B6C",
+    "source_sha256": "8497a5793f74684be786f4ca81887dab159dcc199f7f82e9966fe6a218aad38d",
+    "translation": "\n Play {cmd:7F50324BE10D}Balloon Fight{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036B. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B6D",
+    "source_sha256": "d6270bfa8665101aea96e358841d69cbc0469a347001faf1a4aa104e2fd7a171",
+    "translation": "\n Play {cmd:7F50324BE10B}Donkey Kong{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036C. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B6E",
+    "source_sha256": "4926cb35e33f6b38fa10f4f384e201e78b71079285f9ada9164a694c0fa094b7",
+    "translation": "\n Play {cmd:7F50324BE10A}DK Jr MATH{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036D. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B6F",
+    "source_sha256": "b539988b611fca98d51b9e120fdaf11361307347d54d3b8440edba7b3e7c1a0e",
+    "translation": "\n Play {cmd:7F50324BE107}Pinball{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036E. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B70",
+    "source_sha256": "cea8cc40aed43fc12963f9673c5f8b2fa564028da4175aefbd694fb4b9e2e5d8",
+    "translation": "\n Play {cmd:7F50324BE106}Tennis{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:036F. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  },
+  {
+    "id": "message:2B71",
+    "source_sha256": "16a878fcd2bc7dd3e2c359773d025237b4314cdf349e5625a28e4acbc4f62dcd",
+    "translation": "\n Play {cmd:7F50324BE104}Golf{cmd:7F504B1E1401}?{cmd:7F1601AA01AB}{cmd:7F04}{cmd:7F0D}{cmd:7F0F17B5}\n{cmd:7F01}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 launch prompt using the supplied English GameCube furniture title",
+    "status": "draft",
+    "notes": "Game title matches supplied English furniture:0370. Preserve choices 01AA/01AB, original 17B5 continuation, and native 01 ending; change only the two colour-span lengths to the complete English title and question mark. Same-ID GameCube text is an unrelated Memory Card message. This does not replace the embedded game or validate launch/quit gameplay."
+  }
+]
