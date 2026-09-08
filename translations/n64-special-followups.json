@@ -1,0 +1,26 @@
+[
+  {
+    "id": "message:23EB",
+    "source_sha256": "c4d7bee70b90460c2f83bb07f2895bddb28a173407bd60d83adcb864e6ca9bef",
+    "translation": "Ready? {cmd:7F0308}Here goes.{cmd:7F0308}{cmd:7F04}\n{cmd:7F02}{cmd:7F09000022}{cmd:7F5905}Say {cmd:7F502D642301}\"{cmd:7F509114A50A}{cmd:7F31}{cmd:7F502D642301}\"{cmd:7F0306}.{cmd:7F0308}\nGo on, say it!{cmd:7F031E}\n{cmd:7F09090001}\n{cmd:7F55}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native repeat-this-phrase request, all quote colours and lengths, free-string field, pauses, actor order, Button2 command 55, and continuing ending. The GameCube uses a different final input handoff. The underlying apology target bank still needs two missing glyphs and caller/editor validation; translating this prompt does not claim that integration is complete."
+  },
+  {
+    "id": "message:23FE",
+    "source_sha256": "41168e72da206d0a79b8132939ead04e4ec2de116db1155c75477c6166d0f395",
+    "translation": "{cmd:7F09000013}{cmd:7F030A}Yaaawn{cmd:7F0308}.{cmd:7F0308}.{cmd:7F030C}I slept so well{cmd:7F0308}.{cmd:7F0308}.{cmd:7F0308}.{cmd:7F0308}.{cmd:7F031E}\n{cmd:7F09000002}{cmd:7F0308}Oh!{cmd:7F030A}\nWhat's happened!?{cmd:7F0306}{cmd:7F09000007}\nW-{cmd:7F0304}what happened!?{cmd:7F04}\n{cmd:7F02}Where {cmd:7F0304}am I!?{cmd:7F0308}\nWho {cmd:7F0304}am I!?{cmd:7F04}{cmd:7F090000FF}\nAh,{cmd:7F0304} no,{cmd:7F0304} I'm{cmd:7F0308}\nGulliver{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F0304}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000004}{cmd:7F0305}Oh{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0306}that's right{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F090000FF}{cmd:7F030A}\nThe boat {cmd:7F0304}I was on{cmd:7F0306}\nwas rocked {cmd:7F0304}by a huge wave,{cmd:7F0308} and I{cmd:7F0304}\nfell into the sea{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F04}\n{cmd:7F02}{cmd:7F030A}Well,{cmd:7F0306} the boat was fine.{cmd:7F0304}\nI just {cmd:7F0304}went and{cmd:7F0306}\nfell overboard{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F0302}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000006}{cmd:7F0308}Oh!{cmd:7F030A}{cmd:7F090000FF}\nNever mind that,{cmd:7F0308}\nyou {cmd:7F0304}were the one who{cmd:7F0304}\nrescued me!?{cmd:7F04}{cmd:7F09000015}\n{cmd:7F02}Thank you so{cmd:7F0304} much!{cmd:7F030A}\nI don't {cmd:7F0304}know{cmd:7F0304}\nhow {cmd:7F0304}to thank{cmd:7F0304} you!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}{cmd:7F030A}Well,{cmd:7F0308}\nI {cmd:7F0304}just said \"thank you\"{cmd:7F0304}\nalready, didn't I?{cmd:7F04}\n{cmd:7F02}No, no,{cmd:7F0308}\nlet's leave {cmd:7F0304}that aside,{cmd:7F0308}{cmd:7F09000015}\nI'd like {cmd:7F0304}to give you{cmd:7F0304}\na gift {cmd:7F0306}to say{cmd:7F0304} thanks!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Complete native Gulliver waking story: good sleep, disorientation, remembered wave and fall, admission that the boat was safe, rescue thanks, the joke about already saying thank you, and gift offer. Every original command, pause, page, and continuing ending remains. Do not import the GameCube-only date insertion or alter the native speaker expressions."
+  },
+  {
+    "id": "message:2513",
+    "source_sha256": "5231a0de820c1e427e3077bd47c6b0c88cae7b90705f2f2691deb8ec3d39eec4",
+    "translation": "{cmd:7F09000022}Anyway,{cmd:7F0308}\nlet's stop resetting!{cmd:7F0314}\nAll right? {cmd:7F14251525162516}{cmd:7F0308}Got it?{cmd:7F160035004E}{cmd:7F5E}{cmd:7F04}{cmd:7F0D}{cmd:7F0F2514}\n{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native no-more-resetting warning, all pauses, existing Got it!/No way! answer slots and acceptance route, and the three-entry random fallback 2515/2516/2516. The GameCube adds a different 2517 destination; no native outcome or weighting changes."
+  }
+]

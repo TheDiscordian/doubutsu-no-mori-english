@@ -28,7 +28,9 @@ are the authority. Production actor code and saved structures remain unchanged.
 
 An individual `complete_reference.native_mood` rule binds the source byte offset,
 decoded-reference character offset, and complete original ten-byte pair. Only
-`09:02:0001` followed immediately by `09:08:0001` or `09:08:0002` is accepted.
+`09:02:0001` followed immediately by `09:08:0000`, `09:08:0001`, or
+`09:08:0002` is accepted. Duration zero requires the separate sale anchor below;
+it is not available to the existing page/expression/final-ending approvals.
 The native source must contain exactly those two mood/timer commands together.
 The English reference must contain no mood/timer command. Without an explicit
 anchor, the native pair must start a page and its English insertion point is
@@ -45,6 +47,13 @@ Five independently reviewed phrase rules use one of two exact anchors:
 - `before_final_end`: both sources must have only the final newline and normal
   `00` ending after the insertion/pair. No continuation, extra text, trailing
   token, or alternate terminator is permitted.
+
+The separate `after_sale_quest_before_surprise` anchor accepts only the original
+mood-one/duration-zero pair. The native message must start with `0C:02:0003`,
+then that pair, then `09:00:0002`. The English message must start with the same
+quest and expression, with the insertion precisely between them. Positive
+durations are rejected for this anchor, and duration zero is rejected for every
+other anchor. The native value is retained, not changed to create a timed mood.
 
 Other anchor values, missing/changed expressions, and arbitrary mid-word points
 are rejected. Every phrase still requires its individually reviewed semantic
@@ -67,7 +76,7 @@ changed topics remain outside this contract and require their own review.
 
 ## Acceptance
 
-Twenty-five complete references have individual approvals. Twenty use page starts:
+Twenty-six complete references have individual approvals. Twenty use page starts:
 
 `1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 2628
 2630 2634 263C 264F 2655 27B5 2773`.
@@ -89,6 +98,13 @@ complete final sunny-weather theory. Only `266B` uses the final-ending anchor.
 Every English word, newline, page, and pause remains intact. Only `2067` removes
 two redundant article-suppression controls through the
 existing adapter; no English text or delivery is removed.
+
+The twenty-sixth, `203C`, retains the full furniture-sale reference and its
+part-time-job joke. Its zero-duration pair remains between initial quest
+preparation and surprise. Original choices `0044/0056` and routes `2041/2042`
+stay intact. Only redundant article suppression before the item field is removed;
+the complete expanded bound is 445 bytes. The money-field width warning remains
+for presentation review. See [special follow-ups](NATIVE_SPECIAL_FOLLOWUPS.md).
 
 `2773` follows a complete [connected snow-conversation review](NATIVE_TOPIC_GAPS.md).
 The installed English `207A/2771/2772` already use the GameCube fluffy-snow/girls

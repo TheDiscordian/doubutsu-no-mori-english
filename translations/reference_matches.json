@@ -7282,5 +7282,21 @@
       "ordinary_dialogue_dates"
     ],
     "evidence": "Birthday entry after declining a present retains the complete supplied English teasing, invitation, birthday-entry and preparation requests, actual sign/month/day fields, and acknowledgement 0889 versus correction 088A. Display You know it! instead of the shared greeting Nice to meet ya.; do not rename global 0041 or alter any native action, reference wording, line, page, or pause."
+  },
+  {
+    "id": "message:203C",
+    "source_sha256": "daff38e85c5e2060cb51b8e9fc7866ab4c480777a36f65b9cc0e997dcdf66c5a",
+    "reference_id": "message:203C",
+    "reference_sha256": "4dfd670a37e0bc6f4f7369a87d2e9aacefd91e57b9b7a8a5e2d3aade5deb125b",
+    "complete_reference": {
+      "adapted_sha256": "486fc77b179f10edd52ee98226f1733e4b877bbda0c1dc6d3183a5ecd16b1e54",
+      "native_mood": {
+        "source_offset": 5,
+        "reference_offset": 16,
+        "commands": "7F090200017F09080000",
+        "anchor": "after_sale_quest_before_surprise"
+      }
+    },
+    "evidence": "Complete furniture-sale reference retains surprise at the player money, the fish-scrubber part-time-job joke, the 1,000-Bell offer, and original choices/routes. Restore the exact native mood-one/duration-zero pair between initial quest 0C/02/0003 and surprise expression 02; do not invent a duration. Every English word and delivery command remains; only redundant article suppression before the already-native item field is removed by the established adapter. See NATIVE_MOOD_REFERENCES.md and NATIVE_SPECIAL_FOLLOWUPS.md."
   }
 ]

@@ -195,10 +195,10 @@ cartridge loads, six links, and termination phases pass in one native batch:
 36 calls and 70 assertions, with guards and checkpoint restoration. All 494
 regression tests pass. Normal
 actor progression, furniture handoffs, and rendered layout remain gameplay checks.
-Remaining direct capacity rejections are `0B14` (native numeric test loop,
-not missing Japanese prose) and `2511` (Resetti's special `58:08` ending).
-The latter is not an ordinary `00/01` terminator and needs its own continuation
-audit. Other overlong references remain inside the broader unconfirmed queue.
+The remaining direct capacity rejection is `0B14` (native numeric test loop,
+not missing Japanese prose). Resetti's `2511` uses the complete checked
+[timed-ending sequence](../specs/RESETTI_GULLIVER_SEQUENCES.md).
+Other overlong references remain inside the broader unconfirmed queue.
 
 The [native service/save batch](../specs/SERVICE_SAVE_DIALOGUE.md) adds 47
 original drafts, including the native-only menu variants, Phyllis `08B0/08B2`,
@@ -417,14 +417,15 @@ tests, the full 700-test suite, all actual installed edits, UPS application,
 and five native loads covering the drafts and their connected messages pass.
 Normal clock failure/recovery, date entry, saving, and final wording remain.
 
-Twenty-five [complete mood-preserving references](../specs/NATIVE_MOOD_REFERENCES.md)
+Twenty-six [complete mood-preserving references](../specs/NATIVE_MOOD_REFERENCES.md)
 retain both original mood/timer orders at individually matched English pages or
-phrases, with all reference words, layout, and pauses unchanged. Thirteen mood
-checks, the 96-test reference group, seven coverage checks, all installed payloads,
-UPS application, twenty-five native loads, and 50 native order dispatches pass
-within the combined topic/context/mood batch.
-The unchanged runtime retains its 700-test full-suite checkpoint. Explicit
+phrases, with all reference words, layout, and pauses unchanged. Fourteen mood
+checks, the 111-test reference group, all installed payloads, UPS application,
+26 native mood-message loads, and 52 native order dispatches pass within the
+combined special-follow-up batch. The unchanged runtime retains its 714-test
+full-suite checkpoint. Explicit
 phrase anchors cover `203A/262B/2637/264B/266B`; unanchored page rules stay strict.
+Only the separate initial quest/surprise anchor for `203C` accepts duration zero.
 Normal mood/timer progression and rendered conversations remain gameplay checks.
 The complete `2773` snow reply is approved after reviewing the coherent English
 parent and all three connected replies together. No general mood, actor, or random-branch
@@ -539,6 +540,16 @@ without changing the clothing replies or reversing native branch meanings.
 Only `2D01` lacks a candidate; the other two need the same contextual correction.
 Establish native choice-table bounds and caller support before adding labels.
 
+The [apology caller audit](../specs/NATIVE_SPECIAL_FOLLOWUPS.md) identifies sixteen
+ten-byte target phrases `0484..0493`. Fourteen have complete English candidates;
+`048E/0491` still need sun/skull glyphs and keyboard access. Preserve the complete
+English phrases and validate display, padding, case, symbols, retry, and matching.
+The 32 rude-reply strings `04C0..04DF` also require complete string storage and
+updated substring lengths: the native transition table is `6,16,25,30,31,-1`,
+not the English GameCube table. Only `04C0` has a candidate. Replacing those
+strings without the caller change would break matching. No editor/target or
+detector patch is supplied by translating the prompt alone.
+
 Six [complete Resetti/Gulliver scripts](../specs/RESETTI_GULLIVER_SEQUENCES.md)
 retain entire English conversations through three checked continuation slots.
 Four explicit cue approvals preserve GameCube sound placement/count within
@@ -549,9 +560,17 @@ both timed endings, and 143 assertions with restored checkpoint and blank saves.
 Normal encounters, apology entry, mock-reset scene, gift delivery, audible
 presentation, final layout, and hardware remain required.
 
-Current main-bank coverage is 10,798 candidates; 954 records remain without
-candidates, including 32 containing Japanese static text. The reference
-rejection queue contains 913 unconfirmed identities, eighteen control-signature
+Four [special-dialogue follow-ups](../specs/NATIVE_SPECIAL_FOLLOWUPS.md) cover
+the complete native apology prompt, Gulliver waking story, reset warning, and
+full GameCube sale dialogue with its original zero-duration mood. Five focused,
+111 reference, and nine batching/topic tests pass. The native batch passes forty
+complete loads, four labels, 52 order dispatches, and 237 memory assertions with
+restored checkpoint and blank saves. Sale outcomes, apology/editor integration,
+Gulliver gifts, reset outcomes, wording/layout, and hardware remain required.
+
+Current main-bank coverage is 10,802 candidates; 950 records remain without
+candidates, including 28 containing Japanese static text. The reference
+rejection queue contains 912 unconfirmed identities, fifteen control-signature
 differences, 23 missing-field records, and one expansion overflow. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -631,7 +650,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four complete English references retaining exact native random branches, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 24 guarded continuation allocations; 99 complete diagnostic labels covered; 32 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 24 guarded continuation allocations; 99 complete diagnostic labels covered; 28 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |

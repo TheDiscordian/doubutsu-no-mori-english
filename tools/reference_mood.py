@@ -3,6 +3,7 @@
 from textcodec import encode, tokenize
 
 PAIRS = frozenset(('7F090200017F09080001', '7F090200017F09080002'))
+SALE_PAIR = '7F090200017F09080000'
 
 
 def validate_rule(rule):
@@ -10,8 +11,10 @@ def validate_rule(rule):
     if (not isinstance(rule, dict) or not required <= set(rule) <= required | {'anchor'}
             or any(type(rule.get(key)) is not int or not 0 <= rule[key] < 8192
                    for key in ('source_offset', 'reference_offset'))
-            or not isinstance(rule.get('commands'), str) or rule['commands'] not in PAIRS
-            or 'anchor' in rule and rule['anchor'] not in ('before_expression_0E', 'before_final_end')):
+            or not isinstance(rule.get('commands'), str) or rule['commands'] not in PAIRS | {SALE_PAIR}
+            or 'anchor' in rule and rule['anchor'] not in ('before_expression_0E', 'before_final_end',
+                                                          'after_sale_quest_before_surprise')
+            or (rule['commands'] == SALE_PAIR) != (rule.get('anchor') == 'after_sale_quest_before_surprise')):
         raise ValueError('Native mood restoration requires one exact original mood/timer pair')
 
 
@@ -36,7 +39,13 @@ def restore(reference_text, source, rule, info):
         raise ValueError('Native mood insertion exceeds the complete English reference')
     tag = '{cmd:7F02}'
     anchor = rule.get('anchor')
-    if anchor == 'before_expression_0E':
+    if anchor == 'after_sale_quest_before_surprise':
+        if (source[:at] != bytes.fromhex('7F0C020003')
+                or source[at+10:at+15] != bytes.fromhex('7F09000002')
+                or reference_text[:offset] != '{cmd:7F0C020003}'
+                or not reference_text[offset:].startswith('{cmd:7F09000002}')):
+            raise ValueError('Zero-duration sale mood requires the exact initial quest and surprise expression')
+    elif anchor == 'before_expression_0E':
         if (source[at+10:at+15] != bytes.fromhex('7F0900000E')
                 or not reference_text[offset:].startswith('{cmd:7F0900000E}')):
             raise ValueError('Phrase mood anchor must precede the exact original expression')

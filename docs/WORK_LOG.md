@@ -6316,3 +6316,73 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   fields, glyphs, test text, general/name/mail destinations, ordinary gameplay,
   semantic/presentation review, title-first graphics, GameCube-style keyboard,
   hardware, and patch-only release remain. The complete project goal stays active.
+
+## 2026-09-08 — Complete native special-dialogue follow-ups and sale mood
+
+- Added complete native-original drafts `23EB/23FE/2513`: the repeat-this-phrase
+  prompt, full Gulliver waking/wave/fall/rescue/thanks/gift story, and no-resetting
+  warning. All native commands and arguments remain exact, including input `55`,
+  the ten-byte coloured free-string field, pauses, expressions, choice order,
+  acceptance `2514`, and fallback `2515/2516/2516`. No GameCube-only date field,
+  expression, or `2517` random destination is introduced. Bounds are 145/823/108,
+  with no approved-font layout warnings. Existing answers remain `Got it!`/`No
+  way!` and sale answers `Sure!`/`Sorry!`; no shared label is changed.
+- Imported complete GameCube `203C`, including its part-time fish-scrubber joke,
+  money surprise, and 1,000-Bell sale. Restored the exact native mood-one/duration-
+  zero pair between initial quest `0C/02/0003` and expression `09/00/0002`.
+  The new anchor requires those exact initial commands and accepts only duration
+  zero; other anchors cannot use zero. Full source/reference/output hashes and
+  complete actor order remain enforced. Every English word, page, and pause
+  remains; only redundant article suppression before the native item field is
+  removed. Its 445-byte bound fits. One conservative money-width warning remains.
+- Five focused tests pass in 0.200 seconds, fourteen mood tests in 1.385 seconds,
+  all 111 reference tests in 33.932 seconds, and nine topic/batching tests in
+  1.023 seconds. Logs are `build/tests-special-followups-02.log` and
+  `build/tests-special-followups-{mood-01,reference-01,batching-01}.log`.
+  The first focused run caught an outdated 824-byte expected bound after a draft
+  wording edit; the actual complete payload is 823. Only the expected bound and
+  specification were corrected. The separate full-runtime checkpoint remains
+  714 passing tests; no runtime code changes are introduced.
+- `build/smoke-special-followups-01/` passes 469 recorded steps: forty complete
+  cartridge loads, four choice labels, 52 native mood/timer order dispatches,
+  96 total calls, 92 declared returns, and 237 memory assertions. The 468-action
+  combined scenario checks fourteen selected messages, including ten connected
+  replies, plus all 26 mood approvals. Independent regeneration checks every
+  call/address/argument/return, read, fixture write, guard, restored stack, and
+  checkpoint. Four-MiB execution, disabled audio, graceful shutdown, and blank
+  isolated FlashRAM/Pak pass, with no seed or save-write permission. Scenario
+  SHA-256: `3b371b05af0862eca0c737ed35b423bb5d20bbb5d042c66b95059f15cbe180e4`.
+  Ordinary sale/payment, apology entry/retry/matching, rescue/gift, and reset
+  progression remain separate gameplay requirements.
+- Audited the native Majin3 apology preparer, target comparison, rude-reply scan,
+  and retail length table. The native table at `809B572C` is
+  `6,16,25,30,31,-1`, different from the GameCube. Fourteen of sixteen ten-byte
+  targets already have complete candidates; `048E/0491` need sun/skull glyphs.
+  Only one of 32 rude-reply strings has a candidate; complete English storage
+  and the matching-length contract must change together. Recorded the concrete
+  keyboard/caller work without paraphrasing phrases or claiming prompt translation
+  completes the editor. No apology detector or target bank is changed here.
+- Full/basic candidates: 12,595/11,848. Main: 10,802 = 9,803 references + 618
+  original dialogue drafts + one original continuation + 281 development labels
+  + 99 diagnostics. Remaining: 950 = 28 Japanese-static + 919 nonstatic + one
+  Latin + two symbol records; ten nonstatic records contain dynamic insertions.
+  Rejections: 912 unconfirmed, fifteen control differences, 23 missing fields,
+  and one overflow, with one original fallback. Reference/label layout warnings:
+  1,489. Candidate source weight: 645,388/746,978; main 635,056/637,761.
+- Pilot: `build/special-followups-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `308c7ce2ac780c86c80e5ab9eadc9963b7d3dad378cffe6791d92b7afc485005`.
+  UPS SHA-256:
+  `fba2ddd6b2ebd70f4b92359380bd6611604a24989c09801479f9739e5605cfac`.
+  Candidate SHA-256:
+  `87ad1a974a2f4c69a9174a9dc39dab97cc95741f3b02c68277accb6365e474f0`.
+  The artifact audit verifies all 12,595 installed payloads, complete source/build
+  hashes and UPS reconstruction, only four added IDs, no reserve conversion, and
+  all earlier full/basic edits unchanged. Only DMA `00019D40/00CF9000/02000000`
+  differs; the first differs only in its table. All runtime/font/name/item/mail
+  resources match the Resetti/Gulliver pilot.
+- Updated progress, queue, and the mood/special-follow-up contracts; removed the
+  stale `2511` overflow item now covered by the complete timed-ending sequence.
+  Remaining main text/fields/glyphs, general/name/mail integration, semantic and
+  gameplay review, title-first images, GameCube-style keyboard, hardware, and
+  patch-only release remain. The complete project goal stays active.

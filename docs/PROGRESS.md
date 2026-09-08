@@ -65,6 +65,15 @@ train-phone tests pass. The silent cartridge batch passes all nine parts,
 restoration, blank saves, and graceful shutdown pass. Ordinary Resetti/Gulliver
 progression, audible presentation, and hardware remain separate checks.
 
+Four [special-dialogue follow-ups](../specs/NATIVE_SPECIAL_FOLLOWUPS.md) supply
+the complete native apology prompt, Gulliver waking/rescue story, reset warning,
+and full GameCube furniture-sale reference with its original zero-duration mood.
+Five focused tests and all 111 reference tests pass. The silent combined batch
+passes forty complete cartridge loads, four labels, 52 mood/timer order writes,
+and 237 memory assertions, with restored checkpoint and blank saves. Ordinary
+actions remain gameplay checks. The apology target bank still needs two glyphs,
+and its rude-reply detector needs English string storage and matching lengths.
+
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
 follow-up queue. A human playthrough drives the broad gameplay bug and polish
@@ -528,20 +537,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/resetti-gulliver-pilot/`
-contains 12,591 edits, including
-9,802 reference main-bank candidates, all 460 choices, 615 original dialogue
+The current experimental resident-module pilot in `build/special-followups-pilot/`
+contains 12,595 edits, including
+9,803 reference main-bank candidates, all 460 choices, 618 original dialogue
 drafts, one original-dialogue continuation, 281 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 954
+still require review. The original main-bank audit leaves 950
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,488 conservative layout-warning records include full default
+listed below. The 1,489 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/resetti-gulliver-candidates/` and `build/resetti-gulliver-coverage/`.
+`build/special-followups-candidates/` and `build/special-followups-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1103,8 +1112,8 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,591 edits; basic generation has 11,844, including both startup-error drafts,
-all twenty-five mood-preserving references, the later renovation dialogue, and
+12,595 edits; basic generation has 11,848, including both startup-error drafts,
+all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
 reserve-label candidates; full output contains every complete phone part.
@@ -1166,7 +1175,7 @@ original hardware remain separate acceptance requirements.
 
 ## Native mood effects in complete English references
 
-Twenty-five [complete English conversations](../specs/NATIVE_MOOD_REFERENCES.md)
+Twenty-six [complete English conversations](../specs/NATIVE_MOOD_REFERENCES.md)
 retain the original resident mood and duration commands at individually reviewed
 corresponding pages or phrases. Every supplied English word, newline, page, and pause stays
 intact. The sun-contest message places its effect after the fourth English page
@@ -1174,16 +1183,18 @@ clear, not the third native page clear. The approval requires complete original
 actor-command order before adaptation and the unchanged native mood consumer.
 Five phrase rules require either the exact following original expression or
 only the final newline/normal ending. Unanchored page-start rules remain strict.
+The separate `203C` sale anchor retains duration zero precisely between its
+original initial quest and surprise expression; it does not generalise zero
+duration to other anchors or change the native timer value.
 No gameplay code, saved structure, font, or buffer capacity changes.
 
-All thirteen mood tests pass within the 96-test reference batch; seven coverage
-checks also pass. The preceding full-suite checkpoint passes 700 tests. The silent
-four-MiB combined batch includes twenty-five complete mood-message loads and 50
-actual mood/timer order dispatches. The complete topic/context/mood batch passes
-423 calls, 763 memory assertions, guards, and restored state. All
-12,532 installed edits and the UPS reconstruction pass. The mood import preserves
-resources outside the main text/table; the separate item-name
-checks above cover the current name changes. Normal resident
+All fourteen mood tests pass within the 111-test reference batch. The separate
+unchanged full-runtime checkpoint passes 714 tests. The silent four-MiB special
+follow-up batch includes all 26 complete mood-message loads and 52 actual
+mood/timer order dispatches. Combined with the new drafts, connected replies,
+and menu labels, it passes 96 calls and 237 memory assertions, guards, restored
+state, and blank saves. All 12,595 installed edits and the UPS reconstruction
+pass. The mood import preserves resources outside the main text/table. Normal resident
 mood progression, rendered conversation, final wording, saving, and original
 hardware remain separate acceptance requirements.
 
@@ -1411,7 +1422,7 @@ remain gameplay/playthrough checks.
 
 ## Text-volume measurement
 
-The generated coverage report measures 644,939 covered source characters out of
+The generated coverage report measures 645,388 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1431,8 +1442,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,591 edits, including
-9,802 reference main-bank candidates, 281 original development-label drafts,
+The resident-module experiment contains 12,595 edits, including
+9,803 reference main-bank candidates, 281 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1451,12 +1462,13 @@ native travel explanations using five records, two native startup errors,
 two native renovation drafts, ten native-topic drafts including the
 connected `25FD` correction, one native two-answer letter question, and six
 native storage, raffle, and offering drafts, plus fifteen native connected
-service/reaction drafts and nine native menu/dialogue follow-ups.
+service/reaction drafts, nine native menu/dialogue follow-ups, and three native
+special-dialogue follow-ups.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 955 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 954 main records without
-candidates: 32 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 951 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 950 main records without
+candidates: 28 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

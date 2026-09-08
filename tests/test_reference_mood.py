@@ -23,7 +23,7 @@ from test_retail import ROM_PATH
 
 PAIR = '{cmd:7F09020001}{cmd:7F09080001}'
 IDS = set('1788 1F88 1FAD 1FB6 2067 207D 25E0 25EA 25F4 25F6 2621 2623 '
-          '2628 2630 2634 263C 264F 2655 27B5 203A 262B 2637 264B 266B 2773'.split())
+          '2628 2630 2634 263C 264F 2655 27B5 203A 262B 2637 264B 266B 2773 203C'.split())
 
 
 class NativeMoodTests(unittest.TestCase):
@@ -123,6 +123,23 @@ class NativeMoodTests(unittest.TestCase):
             with self.assertRaises(ValueError): restore(changed, source, rule, self.info)
         with self.assertRaises(ValueError):
             restore(text, source.replace(b'\x7f\x00', b'\x7f\x01'), rule, self.info)
+
+    def test_zero_duration_sale_pair_requires_exact_quest_and_surprise_anchor(self):
+        self.info[0x0C] = (5, 0)
+        prefix, expression = '{cmd:7F0C020003}', '{cmd:7F09000002}'
+        pair = '{cmd:7F09020001}{cmd:7F09080000}'
+        source = encode(prefix+pair+expression+'Native{cmd:7F00}', self.info)
+        text = prefix+expression+'Complete English{cmd:7F00}'
+        rule = {'source_offset': 5, 'reference_offset': len(prefix),
+                'commands': '7F090200017F09080000', 'anchor': 'after_sale_quest_before_surprise'}
+        self.assertEqual(restore(text, source, rule, self.info)[0], prefix+pair+text[len(prefix):])
+        for change in ({'commands': '7F090200017F09080001'}, {'source_offset': 0},
+                       {'reference_offset': 0}, {'anchor': 'before_expression_0E'}):
+            with self.assertRaises(ValueError): restore(text, source, {**rule, **change}, self.info)
+        for bad in (text.replace('7F0C020003', '7F0C020006'), text.replace('7F09000002', '7F0900000E')):
+            with self.assertRaisesRegex(ValueError, 'exact initial quest'):
+                restore(bad, source, rule, self.info)
+        with self.assertRaises(ValueError): validate_rule({k: v for k, v in rule.items() if k != 'anchor'})
 
 
 @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/gamecube/text/message.jsonl').is_file(),
