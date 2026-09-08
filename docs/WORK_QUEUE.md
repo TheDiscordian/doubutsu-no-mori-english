@@ -32,12 +32,17 @@ assembly pass, along with all 965 regression tests. Native scheduling, queue
 draining, and save/reload still require acceptance. Continue birthday/Christmas
 creators and remaining general/item text;
 do not treat direct calls as normal gameplay or original-hardware evidence.
-The [next shared villager-event batch](../specs/VILLAGER_EVENT_LETTERS.md)
-binds all 165 friendship-gift, birthday, goodbye, and Christmas parts. It has
-54 complete reference letters and one birthday body requiring the semicolon.
-Its shared native creator and publication boundaries are identified, but the
-new route is not installed. Preserve native gift choices, full selected item
-names, and real caller failure propagation while implementing this batch.
+The [shared villager-event batch](../specs/VILLAGER_EVENT_LETTERS.md) installs
+54 complete friendship-gift, birthday, goodbye, and Christmas letters. All 165
+source parts are bound; one birthday body still requires the semicolon. Original
+gift choices, full selected item names, and real caller failure propagation are
+preserved. Seventeen host creator tests, sanitizers, five installer tests,
+independent builds, and independent entry assembly pass. All 987 regression tests
+pass. The silent native batch passes 108 native-selection comparisons and complete
+delivered readbacks, eighteen rejections, four resource retries, 573 calls, and
+1,956 memory assertions, with restored checkpoint and blank isolated saves.
+Happy Room Academy and the remaining letter creators are next. Top-level goodbye pending-bit scheduling,
+normal gameplay, save/reload, and hardware remain acceptance work.
 
 The [renewal publication actor](../specs/RENEWAL_LETTERS.md) installs complete
 renovation notices with native mailbox ownership and retained failure. Nine

@@ -915,6 +915,12 @@ def main():
                     raise ValueError('Departed-letter probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_departed_letters'],record))
+            if 'test_villager_event_letters' in action:
+                from villager_event_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Villager-event probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_villager_event_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

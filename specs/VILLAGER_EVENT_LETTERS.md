@@ -1,12 +1,14 @@
 # Complete villager-event letters
 
-## Verified content and next implementation
+## Installed scope and verified content
 
-The next batch groups native friendship gifts, birthday cards, moving-away
+The optional integration groups native friendship gifts, birthday cards, moving-away
 goodbyes, and the Christmas card. `tools/villager_event_letters.py` verifies all
 165 selected parts against the original ROM, immutable catalogue two, and the
-supplied English executable and text-bank hashes. This is content/caller evidence,
-not an installed translation route.
+supplied English executable and text-bank hashes. `--english-villager-event-letters`
+installs complete supported creation and guarded publication. It requires the
+creator built with `--mother-letters --departed-letters --villager-events`,
+the previous system-letter integrations, and full installed item names.
 
 | Group | Classic templates | Complete references | Required fields |
 | --- | --- | --- | --- |
@@ -26,9 +28,9 @@ values without inserting arguments omitted by the supplied English wording.
 `mNpc_LoadMailDataCommon2` occupies `800A93AC..800A9468` (188 bytes), SHA-256
 `c032ea2500931cc53d4fc3b0abb2b210b825b3775189e9d675109d18fceb48e8`.
 The friendship-gift, birthday, and goodbye creators all call it after preparing
-their selected template, gift, paper, and temporary fields. Replacing this
-shared narrowing routine can install complete text for all three groups while
-retaining their original choice and gift operations. Native callers use the
+their selected template, gift, paper, and temporary fields. The shared routine
+installs complete text for all three groups while retaining their original
+choice and gift operations. Native callers use the
 staging letter at `80142F80`, distinct from Mom/departed staging at `80144570`.
 
 | Creator | Creator range | Publication caller |
@@ -46,9 +48,9 @@ Friendship gifts use `0060 + personality*3 + friendship-type`. Goodbyes use
 `020E + personality*3 + mQst_GetRandom(3)` and capture the current saved town,
 not an assumed town derived from the recipient identity.
 
-## Proposed synchronous descriptor
+## Synchronous descriptor
 
-Use an optional extension of the on-demand system creator, leaving the resident
+The optional extension of the on-demand system creator leaves the resident
 loader and saved layout unchanged. The ordinary loader permits a null animal
 argument when an eighteen-byte reply-origin record is present, with condition
 zero and the foreign flag one. That same bounded input slot can carry this
@@ -64,42 +66,69 @@ temporary descriptor:
 
 Offset sixteen holds native reply flags whose lower seven bits encode personality
 0..5; `FC` instead encodes 124 and cannot represent a valid ordinary reply.
-The optional dispatcher must check all output/input/control/resource overlaps
-before inspecting it. The descriptor contains copied data, no embedded pointers.
+The optional dispatcher checks all output/input/control/resource overlaps
+before inspecting it, including smaller output objects before session reads.
+The descriptor contains copied data, no embedded pointers.
 The existing player input remains the sixteen-byte native recipient identity.
-Freeze and independently assemble the final wrapper before installation; this
-descriptor is a design, not an installed ABI claim.
+The independently assembled common wrapper has a 48-byte frame, copies the
+twelve-byte identity through halfword accesses, and rejects null/odd identities
+or oversized template/gift/paper arguments before narrowing. It occupies the
+original 188-byte range without adding resident code.
 
-Creation must stage complete metadata and a complete English snapshot privately,
-then publish all 164 bytes and capitalization only on success. Preserve sender,
-recipient, gift, paper, and native type. Ordinary replies, Mom, and departed
-letters must continue through their existing dispatcher paths. The item-name
-import is optional for this creator variant; do not invalidate older artifacts.
+Creation stages complete metadata and a complete English snapshot privately,
+then publishes all 164 bytes and capitalization only on success. Sender,
+recipient, gift, paper, and native type are retained. Ordinary replies, Mom, and
+departed letters continue through their existing dispatcher paths. The
+`af_load_item_name` import is optional for this creator variant; older source
+inventories and artifacts remain valid. Only birthday bodies `00EF/00F1/00F4/00FB`
+require a complete gift-name load. Bodies which omit that field do not depend on
+the unused lookup. Article state remains zero, matching the donor's plain setter.
+Goodbye field three captures the actual saved town at `80129E00`.
 
-## Caller and Christmas requirements
+## Caller gates and Christmas metadata
 
-Friendship and birthday mailbox copies and queue submissions need failure gates.
-Their existing creator epilogues retain the called routine's return register,
-but this must be checked against actual installed instructions. Goodbye creation
-currently sets success unconditionally after the shared creator; propagate real
-success there so the existing per-player pending bits are cleared only after
-successful delivery. Do not claim exact selection retries across attempts merely
-because notification state remains eligible.
+Friendship and birthday mailbox copies and queue submissions test the returned
+complete destination pointer before publication. Their existing creator
+epilogues retain that return register. Mailbox gates occupy 48 bytes each at
+`800A961C` and `800A9B3C`; eight-byte queue gates occupy `800A9688` and `800A9B9C`.
+Goodbye creation uses `sltu v1,zero,v0` at `800AC340` to propagate real success
+into its unchanged publication/pending-bit callers. Notification eligibility
+does not preserve exact template/gift/paper selections across attempts. No RNG
+draw is rolled back, and no new durable selection state is added.
 
-Christmas has a separate creator and requires a distinct entry adaptation.
+Christmas uses a separate 148-byte entry with a 64-byte frame.
 Its N64 implementation randomly selects a gift from category zero, priority
 three, whereas the supplied GameCube implementation sets a fixed NES item. Keep
 the N64 gift operation; the supplied English body describes a present without
 identifying the item and remains applicable. Preserve native type one and paper
-22, and guard the mailbox copy. The original sender/staging initialization needs
-an explicit metadata check before choosing how to replace creation.
+22. It clears the temporary gift output before the original selection call and
+then supplies a descriptor with twelve zero identity bytes, template `00D7`,
+the selected gift, marker `FC`, and paper 22. The mailbox copy has a 48-byte
+failure gate at `800A9E08`.
+
+The original N64 Christmas creator does not clear its shared staging letter;
+the supplied English caller explicitly does. Complete creation uses freshly
+cleared private staging and an empty invalid sender instead of carrying a
+previous villager's identity into a system letter. Native metadata comparisons
+use a freshly cleared original baseline. This is an intentional initialization
+correction, not a claim that arbitrary stale native sender bytes are preserved.
 
 ## Acceptance still required
 
-Implement the creator, guards, full selected item lookup, and caller success
-propagation. Batch all complete templates, native selection/gift/metadata
-comparisons, unavailable text, resource failures, all mailbox/queue destinations,
-retained pending bits, and complete reader reconstruction. Normal scheduling,
+The creator, guards, full selected item lookup, and caller success propagation
+are installed. Seventeen host creator tests and the sanitizer run pass, covering
+all complete templates in both capitalization states, full-name combinations
+for all 216 villagers, and the inherited ordinary/Mom/departed contracts. Five
+installer tests and independent builds/entry assembly pass, along with all 987
+regression tests. All 54 templates pass native selection comparisons and complete
+delivered readbacks in both capitalization states; eighteen rejection cases and
+four resource-recovery retries pass.
+
+The native batch checks all complete templates, native selection/gift/metadata
+comparisons, unavailable text, resource failures, mailbox destinations, queue refusal,
+and complete reader reconstruction. Its results belong in the
+[integration checkpoint](../docs/checkpoints/VILLAGER_EVENT_LETTERS.md).
+The top-level goodbye pending-bit scheduler, normal scheduling,
 queue draining, real save/reload, human playthrough, and original hardware remain
 outside direct-call proof. Complete the semicolon mail path as part of the full
 translation rather than silently excluding that letter.

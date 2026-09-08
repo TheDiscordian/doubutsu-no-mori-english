@@ -13,6 +13,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [shared villager-event integration](../specs/VILLAGER_EVENT_LETTERS.md)
+installs 54 complete supported friendship-gift, birthday, moving-away, and
+Christmas letters. The complete creator retains original selection routines,
+uses full villager and selected item names, and checks success before native
+publication. The integrated ROM builds, seventeen host tests and sanitizers pass,
+and five installer tests and independent builds/assembly pass. One birthday
+body still requires the semicolon. All 987 regression tests pass. The silent
+native batch passes 108 original-selection comparisons, 108 complete delivered
+readbacks, eighteen rejections, four resource retries, 573 calls, and 1,956 memory
+assertions including checkpoint restoration. Live save/globals are restored and
+isolated saves remain blank. Normal scheduling, top-level goodbye pending-bit
+handling, saving/reloading, and hardware remain unverified. The
+[checkpoint](checkpoints/VILLAGER_EVENT_LETTERS.md) records current artifacts.
+
 The [departed-villager integration](../specs/DEPARTED_VILLAGER_LETTERS.md)
 installs all eighteen complete English letters with full villager names and
 remembered town identity. All 36 native comparisons preserve original metadata,

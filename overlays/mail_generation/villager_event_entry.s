@@ -1,0 +1,144 @@
+.set noreorder
+.set noat
+.text
+.globl villager_event_entry
+villager_event_entry:
+    addiu $sp,$sp,-48
+    sw $ra,44($sp)
+    beqz $a2,common_fail
+    andi $t0,$a2,1
+    bnez $t0,common_fail
+    lw $t0,64($sp)
+    sltiu $at,$t0,64
+    beqz $at,common_fail
+    lw $t1,68($sp)
+    sltiu $at,$t1,0x220
+    beqz $at,common_fail
+    srl $at,$a3,16
+    bnez $at,common_fail
+    sh $t1,36($sp)
+    sh $a3,38($sp)
+    sb $t0,41($sp)
+    ori $t0,$zero,252
+    sb $t0,40($sp)
+    lhu $t0,0($a2)
+    sh $t0,24($sp)
+    lhu $t0,2($a2)
+    sh $t0,26($sp)
+    lhu $t0,4($a2)
+    sh $t0,28($sp)
+    lhu $t0,6($a2)
+    sh $t0,30($sp)
+    lhu $t0,8($a2)
+    sh $t0,32($sp)
+    lhu $t0,10($a2)
+    sh $t0,34($sp)
+    addiu $a3,$sp,24
+    move $a2,$zero
+    sw $zero,16($sp)
+    ori $t0,$zero,1
+    jal af_npc_mail_load
+    sw $t0,20($sp)
+    b common_return
+    nop
+common_fail:
+    move $v0,$zero
+common_return:
+    lw $ra,44($sp)
+    jr $ra
+    addiu $sp,$sp,48
+    .org 188
+
+    .org 0x800A961C-0x800A93AC
+    beqz $v0,event_end
+    lw $v1,40($sp)
+    lw $t2,48($sp)
+    sll $t3,$v1,2
+    addu $t3,$t3,$v1
+    sll $t3,$t3,3
+    addu $t3,$t3,$v1
+    sll $t3,$t3,2
+    addu $a0,$t2,$t3
+    addiu $a0,$a0,0x478
+    jal 0x8009C67C
+    move $a1,$v0
+    .org 0x800A9688-0x800A93AC
+    beqz $v0,event_end
+    move $a0,$v0
+    .org 0x800A969C-0x800A93AC
+event_end:
+
+    .org 0x800A9B3C-0x800A93AC
+    beqz $v0,birthday_end
+    lw $v1,32($sp)
+    lw $t0,40($sp)
+    sll $t1,$v1,2
+    addu $t1,$t1,$v1
+    sll $t1,$t1,3
+    addu $t1,$t1,$v1
+    sll $t1,$t1,2
+    addu $a0,$t0,$t1
+    addiu $a0,$a0,0x478
+    jal 0x8009C67C
+    move $a1,$v0
+    .org 0x800A9B9C-0x800A93AC
+    beqz $v0,birthday_end
+    move $a0,$v0
+    .org 0x800A9BB0-0x800A93AC
+birthday_end:
+
+    .org 0x800A9CD4-0x800A93AC
+    addiu $sp,$sp,-64
+    sw $ra,60($sp)
+    sw $a0,52($sp)
+    sw $a1,56($sp)
+    sh $zero,46($sp)
+    move $a0,$zero
+    addiu $a1,$sp,46
+    ori $a2,$zero,1
+    move $a3,$zero
+    sw $zero,16($sp)
+    sw $zero,20($sp)
+    ori $t0,$zero,3
+    jal 0x800BFCF0
+    sw $t0,24($sp)
+    sw $zero,32($sp)
+    sw $zero,36($sp)
+    sw $zero,40($sp)
+    ori $t0,$zero,0xD7
+    sh $t0,44($sp)
+    ori $t0,$zero,252
+    sb $t0,48($sp)
+    ori $t0,$zero,22
+    sb $t0,49($sp)
+    lw $a0,52($sp)
+    lw $a1,56($sp)
+    move $a2,$zero
+    addiu $a3,$sp,32
+    sw $zero,16($sp)
+    ori $t0,$zero,1
+    jal af_npc_mail_load
+    sw $t0,20($sp)
+    lw $ra,60($sp)
+    jr $ra
+    addiu $sp,$sp,64
+    .org 0x800A9D68-0x800A93AC
+
+    .org 0x800A9E08-0x800A93AC
+    beqz $v0,christmas_end
+    lw $v1,32($sp)
+    lw $t9,40($sp)
+    sll $t0,$v1,2
+    addu $t0,$t0,$v1
+    sll $t0,$t0,3
+    addu $t0,$t0,$v1
+    sll $t0,$t0,2
+    addu $a0,$t9,$t0
+    addiu $a0,$a0,0x478
+    jal 0x8009C67C
+    move $a1,$v0
+    .org 0x800A9E40-0x800A93AC
+christmas_end:
+
+    .org 0x800AC340-0x800A93AC
+    sltu $v1,$zero,$v0
