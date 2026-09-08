@@ -24,6 +24,11 @@ recorded tests. An emulator boot does not establish hardware compatibility.
 - Document what is complete, what is experimental, and what is untested.
 - Keep progress updates in chat and describe concrete completed work. Do not
   open repeated status renders or repeat an unchanged completion percentage.
+- When asked for total translation progress, run `python3 tools/translation_progress.py`
+  and report its single fresh combined approximation. Names and letters belong
+  in the same total as dialogue. Do not reuse the bank-only diagnostic or mix
+  testing/polish effort into the text-replacement figure. See
+  `specs/TRANSLATION_PROGRESS.md` for the counting rules and inventory limits.
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.

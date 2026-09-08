@@ -2,6 +2,10 @@
 
 ## Scope and meaning
 
+For the user's overall progress question, use the
+[combined translation counter](TRANSLATION_PROGRESS.md), not this narrower
+candidate-bank diagnostic.
+
 `tools/text_coverage.py` classifies every record in the 29 native banks against
 an explicit candidate file. Native ROM verification, candidate source hashes,
 unique IDs, known banks/indices, and candidate encoding are mandatory. This is

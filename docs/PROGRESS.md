@@ -1,5 +1,16 @@
 # Current progress
 
+## Translation measurement
+
+`python3 tools/translation_progress.py` produces one fresh combined
+text-replacement approximation from the newest completed ROM. Dialogue, names,
+catchphrases, letters, and inventoried interface text share one denominator;
+alternate English storage does not count the same source twice. Generated
+results and the per-entry ledger are in `build/translation-progress/`.
+The [counting rules](../specs/TRANSLATION_PROGRESS.md) retain the inventory limits
+without mixing testing or polish into the percentage. Use this tool for progress
+questions; ordinary candidate-bank coverage is only a diagnostic.
+
 ## Active work
 
 The [complete leaflet creator](../specs/LEAFLET_LETTERS.md) supports all 22 renewal,
