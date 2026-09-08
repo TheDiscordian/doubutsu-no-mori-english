@@ -2,10 +2,22 @@
 
 ## Active work
 
+The [native English credits](../specs/NATIVE_CREDITS.md) install all 110 complete
+rows, adding 106 translated entries. Explicit identities correct swapped,
+missing, and substituted legacy contributors while preserving native pages and
+timing. A separate twenty-five-byte row buffer fits the existing structure slot.
+All 860 host tests pass. The silent native batch passes sixteen pages, 26 draws,
+3,425 glyphs, fade boundaries, and 97 memory assertions, with a restored
+checkpoint and blank isolated saves. Independent reconstruction verifies all
+13,383 applied edits and the UPS round trip. General strings total 920/1,562,
+leaving 642 without candidates. Normal K.K. performance, final visual/editorial
+review, and hardware remain unverified. Fortune-slip letters and remaining
+general-string consumers follow; the title screen remains the first image task.
+
 The [shared NPC-word integration](../specs/SHARED_NPC_WORDS.md) installs all
 352 complete English reply words, including 160 used by ordinary resident
-dialogue. Full candidates total 13,277; general strings are 814/1,562, leaving
-748 without candidates. All 851 host tests pass, and independent reconstruction
+dialogue. Full candidates total 13,383; general strings are 920/1,562, leaving
+642 without candidates. All 860 host tests pass, and independent reconstruction
 verifies every installed edit and the original-ROM UPS round trip. Only string
 data, offsets, and DMA metadata change from the resident-word pilot. The silent
 dialogue portion passes all 288 random words, 118 complete messages, and 447
@@ -35,7 +47,7 @@ batch passes 120 complete loads, 120 preparations, 250 field insertions, and
 746 memory assertions, with restored checkpoint and blank isolated saves.
 All installed payloads pass independent reconstruction. These counts do not
 establish semantic review, normal transactions, or hardware compatibility.
-Fortune-slip letter creation, native credits, other general-string destinations,
+Fortune-slip letter creation, other general-string destinations,
 and the remaining native sample scripts follow the shared-word batch.
 
 Fifteen [native engine tests and shopping labels](../specs/ENGINE_DIAGNOSTICS.md)
@@ -43,7 +55,7 @@ have complete English drafts with every native command, menu target, page,
 printed number, and ending retained. Five focused tests and fifteen complete
 native cartridge loads pass, including 47 memory assertions and restored blank
 isolated saves. Both generation modes add exactly fifteen records and retain all
-earlier edits unchanged. Full/basic candidates are 13,277/12,015, with 10,825
+earlier edits unchanged. Full/basic candidates are 13,383/12,015, with 10,825
 main-bank candidates. The five remaining Japanese main-bank records are larger
 test scripts with deliberate glyph/sound samples; those samples need an explicit
 preservation policy, not deletion for coverage. Shared strings and their callers
@@ -56,8 +68,8 @@ ten-byte input needs only two actor-instruction changes and compact boundaries
 in the existing table. All 817 host tests pass. The silent native batch passes
 227 detector cases, fourteen installed English apology targets, thirty result
 classifications, and 302 memory assertions with restored checkpoint and blank
-saves. Ordinary strings total 814, including the complete shop-counter,
-scoped resident-word, and shared NPC-word groups.
+saves. Ordinary strings total 920, including the complete shop-counter,
+scoped resident-word, shared NPC-word, and native-credit groups.
 The two sun/skull apology targets and ordinary editor input/retry remain
 unimplemented or unverified. Broader shared strings, those editor consumers,
 and the five larger native test scripts remain; title artwork stays first after the
@@ -93,7 +105,7 @@ at an existing page boundary. Both full cartridge loads, the continuation, both
 ending phases, and fifteen memory assertions pass in a silent restored
 checkpoint with blank isolated saves. Focused sequence and placeholder checks
 pass; normal first-job interaction and expression rendering remain playthrough
-checks. Current full/basic candidates are 13,277/12,015. All three number-game
+checks. Current full/basic candidates are 13,383/12,015. All three number-game
 questions use dedicated Less/More labels while the clothing menu's shared
 labels remain unchanged. Title artwork remains the first
 image replacement after the main text/runtime work.
@@ -652,8 +664,8 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/shared-npc-words-pilot/`
-contains 13,277 edits, including
+The current experimental resident-module pilot in `build/native-credits-pilot/`
+contains 13,383 edits, including
 9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
 drafts, one original-dialogue continuation, 280 original development-label drafts,
 and 114 complete diagnostic/sample drafts.
@@ -667,9 +679,9 @@ records without candidates; the classification and remaining restrictions are
 listed below. The 1,491 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/shared-npc-words-candidates/` and `build/shared-npc-words-coverage/`.
+`build/native-credits-candidates/` and `build/native-credits-coverage/`.
 The full pilot enables the complete fortune, Resetti, shop-counter, resident-word,
-and shared NPC-word options in generation and construction. Basic generation
+shared NPC-word, and native-credit options in generation and construction. Basic generation
 includes the Resetti and shop-counter groups without a resident module. These
 source-bound groups use the native general-string bank, not separately counted
 display resources. The engine-test drafts require none of these options; all
@@ -1235,7 +1247,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-13,277 edits; basic generation has 12,015, including both startup-error drafts,
+13,383 edits; basic generation has 12,015, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1545,7 +1557,7 @@ remain gameplay/playthrough checks.
 
 ## Text-volume measurement
 
-The generated coverage report measures 649,791 covered source characters out of
+The generated coverage report measures 650,464 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1565,7 +1577,7 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 13,277 edits, including
+The resident-module experiment contains 13,383 edits, including
 9,812 reference main-bank candidates, 280 original development-label drafts,
 114 original diagnostic/sample drafts,
 all 460 choices, 178 villager names,

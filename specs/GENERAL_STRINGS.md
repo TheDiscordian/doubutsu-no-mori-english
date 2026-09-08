@@ -49,6 +49,12 @@ caller. The separate [shared NPC-word import](SHARED_NPC_WORDS.md) installs all
 It requires both the complete resident caller and cartridge letter creator,
 and defers the ordinary bank replacements until all consumers are verified.
 
+The optional [native credits integration](NATIVE_CREDITS.md) supplies all 110
+rows in `04EA..0557`. Ten twenty-five-byte rows use a separate 256-byte actor
+BSS area, with updated ownership metadata and both load/draw lengths and
+strides. Native contributors, sixteen pages, scales, and fade timing remain.
+The group has its own complete-identity permit; unrelated IDs gain no capacity.
+
 `tools/audit_string_callers.py` scans pinned executable-segment definitions and
 records thirty-four direct J/JAL sites. It records nearby instructions, file
 hashes, linked addresses, and conservative immediate argument hints. Hints are
@@ -71,7 +77,8 @@ and seven sites without a straight-line immediate length.
 | `809DC590` in `ovl_Ev_Gypsy` | Four 32-entry fortune families; scoped sixteen-byte local and resident item fields | Complete source-bound English group implemented; normal paid readings and luck effects remain gameplay checks |
 | Five shop actors | Complete 120-counter group; count-minus-one indexing, eight native families, unchanged ten-byte locals and free-string slot 8 | Native batch passes all actors; ordinary transactions and presentation remain gameplay checks |
 | Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete resident and shared-word groups implemented; normal dialogue and category selection remain gameplay checks |
-| Other actor overlays | Fortune slips and fruit-box labels | Resolve ID tables, local frames, and downstream insertion/draw limits |
+| Fruit-box actor | Native performance credits, 110 rows, twenty-five-byte owned loader/drawer | Native batch passes every page and fade boundaries; normal K.K. performance, final presentation, and hardware remain |
+| Fortune-slip actor | Four ten-byte phrase pools and a result field, then native mail creation | Complete snapshot creation and saved-letter handling, not just a wider temporary |
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,

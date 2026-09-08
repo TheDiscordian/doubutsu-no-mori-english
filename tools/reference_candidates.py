@@ -34,6 +34,7 @@ from resetti_replies import candidates as resetti_candidates, permits as resetti
 from shop_units import candidates as shop_unit_candidates, permits as shop_unit_permits
 from resident_words import candidates as resident_word_candidates, permits as resident_word_permits
 from shared_npc_words import candidates as shared_word_candidates
+from credits_strings import candidates as credit_candidates, permits as credit_permits
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -157,6 +158,7 @@ def main():
     parser.add_argument('--english-shop-units', action='store_true', help='Complete source-verified native shop counter families')
     parser.add_argument('--english-resident-words', action='store_true', help='Complete source-verified ordinary resident words; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; build also requires cartridge NPC generation')
+    parser.add_argument('--english-credits', action='store_true', help='Complete identity-matched native credits with twenty-five-byte callers')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -287,6 +289,11 @@ def main():
         word_permits = resident_word_permits(rom,list(words.values()),info) if words else {}
         shared = (shared_word_candidates(rom,gc,{r['id']:r for r in inventory},info)
                   if name=='string' and args.english_shared_npc_words else {})
+        credits = (credit_candidates(rom,gc,{r['id']:r for r in inventory},info)
+                   if name=='string' and args.english_credits else {})
+        credits_approvals = credit_permits(rom,list(credits.values()),info) if credits else {}
+        if credits.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys() | words.keys() | shared.keys()):
+            raise ValueError('Credits conflict with another approved group')
         if shared.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys() | words.keys()):
             raise ValueError('Shared-word group conflicts with another approved group')
         if words.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys()):
@@ -313,7 +320,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in shared:
+            if id in credits:
+                edit = credits[id]
+                validate_entry(original,encode(edit['translation'],info),info,name,
+                               credits_permit=credits_approvals[id])
+                counts['complete_native_credits'] += 1
+            elif id in shared:
                 # The complete resource hash validates values and their identities.
                 # Installation is deferred until both consumer checks pass; there
                 # is deliberately no generic text-validator capacity exception.

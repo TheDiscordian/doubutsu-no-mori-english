@@ -40,6 +40,7 @@ from fortune_strings import permits as fortune_permits, install as install_fortu
 from resetti_replies import permits as resetti_permits, install as install_resetti
 from shop_units import permits as shop_unit_permits, verify_callers as verify_shop_unit_callers
 from resident_words import permits as resident_word_permits, install as install_resident_words
+from credits_strings import permits as credits_permits, install as install_credits
 from shared_npc_words import (IDS as SHARED_WORD_IDS, validated_values as shared_word_values,
                               install as install_shared_words)
 
@@ -51,7 +52,8 @@ RELOCATED_BANKS = {
 
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
                        extended_font=None, english_fortunes=False, english_resetti_replies=False,
-                       english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False):
+                       english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
+                       english_credits=False):
     if english_fortunes and not runtime_module:
         raise ValueError('English fortunes require the complete resident runtime')
     if english_resident_words and not runtime_module:
@@ -59,7 +61,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     if defer_shared_npc_words and not (runtime_module and english_resident_words):
         raise ValueError('Shared NPC words require the complete resident-word runtime')
     relocated_banks = {**RELOCATED_BANKS, **({'string': STRING_RELOCATION}
-                       if english_fortunes or english_resetti_replies or english_shop_units or english_resident_words else {})}
+                       if english_fortunes or english_resetti_replies or english_shop_units or english_resident_words or english_credits else {})}
     layout = ChoiceLayout()
     module_report = None
     if runtime_module:
@@ -85,6 +87,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     reply_permits = resetti_permits(rom, edits, info) if english_resetti_replies else {}
     unit_permits = shop_unit_permits(rom, edits, info) if english_shop_units else {}
     word_permits = resident_word_permits(rom, edits, info) if english_resident_words else {}
+    credit_permits = credits_permits(rom, edits, info) if english_credits else {}
     source_banks = banks(rom)
     item_matches = load_item_matches()
     item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
@@ -144,7 +147,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                extended_glyphs=use_glyphs, fortune_permit=string_permits.get(edit['id']),
                                resetti_permit=reply_permits.get(edit['id']),
                                shop_unit_permit=unit_permits.get(edit['id']),
-                               resident_word_permit=word_permits.get(edit['id']))
+                               resident_word_permit=word_permits.get(edit['id']),
+                               credits_permit=credit_permits.get(edit['id']))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -179,6 +183,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         verify_shop_unit_callers(rom, replacements)
     if english_resident_words:
         install_resident_words(rom, replacements, module_report)
+    if english_credits:
+        install_credits(rom,replacements)
     if any(label.get('source_kind') == 'appended_gamecube'
            for id in seen if id in contextual for label in contextual[id]['labels']):
         install_extended_choices(rom, replacements)
@@ -197,6 +203,7 @@ def main():
     parser.add_argument('--english-shop-units', action='store_true', help='Complete native shop counter families within their ten-byte callers')
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
+    parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -246,7 +253,7 @@ def main():
         runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font,
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
-        defer_shared_npc_words=args.english_shared_npc_words)
+        defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),

@@ -133,6 +133,9 @@ ROM construction:
   with resident dialogue; requires resident words and the module. ROM building
   also requires `--npc-mail-generation` with its full dependencies. Bank changes
   are deferred until both complete consumers are installed and verified.
+- `--english-credits`: all 110 native credit rows, with complete identity-matched
+  names/roles and an owned twenty-five-byte loader/drawer buffer. The native
+  structure slot, page sequence, and timing remain; no resident module is needed.
 
 Each group requires its complete source-bound values and caller changes. These
 options share the relocated general-string data bank and do not enlarge other
@@ -140,6 +143,14 @@ callers. See [general strings](../specs/GENERAL_STRINGS.md) and
 [resident words](../specs/RESIDENT_WORDS.md), and
 [shared NPC words](../specs/SHARED_NPC_WORDS.md). Basic non-module generation omits
 the module-dependent options.
+
+`tools/credits_test_scenario.py --rom <built-ROM> --module <build.json>
+--translations <candidate-json> --output <ignored-scenario.json>` generates the
+bounded silent credit test. It requires a resident-module build for test-only
+scratch space, not for the production credit patch. The native batch loads all
+110 rows, draws all sixteen pages and fade boundaries into owned graphics
+memory, and restores its isolated checkpoint. It does not play music or use a
+user save. See [native credits](../specs/NATIVE_CREDITS.md).
 
 Changing the module source also requires rebuilding the module-bound NPC creator
 and generation probe using `tools/build_npc_mail_capture.py` and

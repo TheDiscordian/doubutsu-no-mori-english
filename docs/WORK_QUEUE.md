@@ -81,15 +81,20 @@ before accepting the letter portion. The combined batch does not pass. Normal re
 interaction, actual creator-to-receipt/pending-loop behaviour, and semantic
 review remain; default builds retain generation disabled.
 
-Next general-bank work covers fortune-slip letters, [credits](../specs/NATIVE_CREDITS.md), saved/default
+The [native credits import](../specs/NATIVE_CREDITS.md) installs all 110 complete
+rows with explicit contributor/role identities, preserving native blank rows
+and page order. An owned twenty-five-byte row buffer fits the original structure
+slot. All sixteen native pages, 26 draws, 3,425 glyphs, fade boundaries, and
+97 memory assertions pass with restored checkpoint and blank saves. All 860
+host tests and independent installed-text/patch comparisons pass. Normal K.K.
+performance, final visual/editorial review, and hardware remain acceptance work.
+
+Next general-bank work covers fortune-slip letters, saved/default
 catchphrases, other names/date destinations, and remaining native sample scripts.
 The fortune-slip actor assembles mail through `80093F04`, using four ten-byte
 phrase fields and a result field; it needs complete snapshot creation, not just
-a larger message temporary. The fruit-box actor's `04EA..0557` bank use is the
-native credits display: ten fifteen-byte rows, original page offsets, direct
-draw lengths, and timing. Its loader clamps at `0557`, so it does not reach
-shop types or item-category labels. Preserve native contributors and page/timing
-intent; same-ID GameCube credit rows are not a valid whole-bank match.
+a larger message temporary. Preserve source identity and complete wording when
+mapping the remaining text; a same-ID GameCube row alone is not approval.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch
