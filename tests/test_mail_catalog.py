@@ -218,7 +218,7 @@ class MailCatalogRuntimeTests(unittest.TestCase):
             self.rom[word*4+3] ^= 1
             self.call(record, success=False)
             self.rom[word*4+3] ^= 1
-        for changed in (replace(record, catalog=3), replace(record, templates=(982,))):
+        for changed in (replace(record, catalog=4), replace(record, templates=(982,))):
             self.call(changed, success=False)
         self.enabled.value = 0
         self.reads.value = 0

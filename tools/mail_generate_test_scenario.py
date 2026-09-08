@@ -56,7 +56,7 @@ def scenario(rom,module,code,report,cases):
         add(label,record)
     for label,record,extra in (
             ('missing_required',Record(2,0,(2,),()),False),
-            ('unknown_catalog',Record(3,0,(0,),()),True),
+            ('unknown_catalog',Record(4,0,(0,),()),True),
             ('classic_id_bound',Record(2,0,(982,),()),True),
             ('composite_id_bound',Record(2,1,(0,0,384,0,0),()),True),
             ('unavailable_classic',Record(2,0,(43,),()),True),

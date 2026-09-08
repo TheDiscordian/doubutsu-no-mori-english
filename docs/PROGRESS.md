@@ -2,6 +2,22 @@
 
 ## Active work
 
+The [complete fortune-slip creator](../specs/FORTUNE_SLIP_LETTERS.md) preserves
+all 68 phrase/outcome values and all three English letter templates. A separate
+immutable catalogue adds the three complete Katrina signatures while retaining
+catalogue two for existing snapshots. Ten focused host tests pass, including
+384 complete combinations. The silent native batch passes forty complete slips,
+eight rejected choices, disabled-resource rejection, four older-catalogue reads,
+and 525 memory assertions, with restored checkpoint and blank isolated saves.
+The native Miko hand-off is not hooked yet; allocator ownership, failure/retry
+selections, and ordinary delivery are the next implementation steps. No approved
+font pixel or spacing changes. Ordinary applied edits remain 13,383; this work
+adds complete saved-letter support rather than more ordinary-bank candidates.
+All 870 regression tests pass. Independent reconstruction verifies every
+applied edit and the original-ROM UPS round trip; the two independent resident
+builds match. The [work record](checkpoints/FORTUNE_SLIP_FOUNDATION.md) binds the
+current artifacts and the remaining native hand-off work.
+
 The [native English credits](../specs/NATIVE_CREDITS.md) install all 110 complete
 rows, adding 106 translated entries. Explicit identities correct swapped,
 missing, and substituted legacy contributors while preserving native pages and

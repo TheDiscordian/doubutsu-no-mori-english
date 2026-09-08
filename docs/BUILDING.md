@@ -261,6 +261,21 @@ and English grading. This explicitly enables experimental cartridge-loaded NPC
 generation, the eight scoped capture calls, and submission failure handling.
 It does not establish complete gameplay, semantic review, or hardware acceptance.
 
+The complete fortune-slip resources use `tools/build_fortune_slips.py --rom
+<native-ROM> --output build/fortune-slip-resources`. This retains catalogue two
+and adds independently registered catalogue three. Rebuild the resident module
+and the module-bound NPC creator, then pass that resource directory as
+`--mail-catalog build/fortune-slip-resources` to the full ROM build. The native
+Miko hand-off is not installed by these options.
+
+`tools/build_mail_generation.py --fortune-slip --output build/fortune-slip-probe`
+compiles the complete fortune transaction for isolated native tests.
+`tools/fortune_slip_test_scenario.py --rom <built-ROM> --module
+<ROM-directory>/runtime-module.json --output <ignored-json>` prepares forty
+complete creations, failure cases, and older-catalogue reads. The ordinary
+silent emulator runner executes the scenario with a checkpoint and owned heap
+memory. See [fortune-slip contracts](../specs/FORTUNE_SLIP_LETTERS.md).
+
 For configured-generation ROMs, native test tools require the ROM output's
 `runtime-module.json`, not the unconfigured compiler report. The build report
 binds the approved creator blob, complete source/import checks, and header words.

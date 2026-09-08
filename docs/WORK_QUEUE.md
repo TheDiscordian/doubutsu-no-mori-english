@@ -91,9 +91,14 @@ performance, final visual/editorial review, and hardware remain acceptance work.
 
 Next general-bank work covers fortune-slip letters, saved/default
 catchphrases, other names/date destinations, and remaining native sample scripts.
-The fortune-slip actor assembles mail through `80093F04`, using four ten-byte
-phrase fields and a result field; it needs complete snapshot creation, not just
-a larger message temporary. Preserve source identity and complete wording when
+The [fortune-slip transaction](../specs/FORTUNE_SLIP_LETTERS.md) has complete
+68-value sources and three templates, including the previously unavailable
+signatures in independently frozen catalogue three. The native creation probe
+passes forty full slips, failure retention, old-catalogue reads, and 525 memory
+checks. The native actor still uses `80093F04` and ten-byte fields. Verify its
+allocator, connect the whole hand-off, and preserve selected values across
+failure/retry before enabling ordinary fortune-slip delivery. Preserve source
+identity and complete wording when
 mapping the remaining text; a same-ID GameCube row alone is not approval.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and

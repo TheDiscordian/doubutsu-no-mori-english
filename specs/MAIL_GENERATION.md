@@ -8,13 +8,15 @@ catalog and snapshot format. It is separate from the resident module: the
 resident reader uses short-lived decode scratch to leave room for generation.
 The generation code is compiled and loaded into private heap memory for isolated
 native tests.
-It is not yet installed as an on-demand gameplay overlay or a native creator
-hook. Ordinary gameplay generation remains disabled.
+The separately enabled [NPC creator](NPC_MAIL_CREATOR.md) includes this
+transaction in its on-demand image; default builds leave generation disabled.
+The [fortune-slip creator](FORTUNE_SLIP_LETTERS.md) also uses it in a native
+probe, but its ordinary actor hand-off is not hooked.
 
-Connecting this transaction to the actual N64 creators, complete English field
-sources, approved semantic template mappings, allocation lifetime, and failure
-propagation remains required. A successful isolated API call is not an English
-letter delivered through normal gameplay.
+Completing the remaining N64 creator bindings, English field sources, semantic
+template mappings, allocation lifetime, and failure propagation remains required.
+A successful isolated API call is not an English letter delivered through
+normal gameplay.
 
 ## Captured fields
 

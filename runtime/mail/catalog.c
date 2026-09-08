@@ -25,17 +25,18 @@ static unsigned int crc32(const unsigned char *data, unsigned int size) {
 }
 
 int af_mail_catalog_header_valid(const unsigned int *header, unsigned int catalog) {
-    static const unsigned int fingerprint[8] = {
-        0xa042bd72u, 0xf6158472u, 0x722717ddu, 0x3f19e761u, 0xea693ce6u, 0x32ae51acu, 0xc9aca26cu, 0x4d99c385u
+    static const unsigned int fingerprints[2][8] = {
+        {0xa042bd72u, 0xf6158472u, 0x722717ddu, 0x3f19e761u, 0xea693ce6u, 0x32ae51acu, 0xc9aca26cu, 0x4d99c385u},
+        {0xa9a2b2cdu, 0x78c72904u, 0x6b8be424u, 0x73b75938u, 0xc2a9bbc0u, 0xce8782fbu, 0x99097d76u, 0xdc13bd0du}
     };
     unsigned int i;
-    if (!header || catalog != AF_MAIL_CATALOG_ID || header[0] != 0x41464D4Cu
+    if (!header || !af_mail_catalog_vrom(catalog) || header[0] != 0x41464D4Cu
             || header[1] != 1u || header[2] != catalog || header[3] != 1u
-            || header[4] != AF_MAIL_CATALOG_BYTES || header[5] != 8u
+            || header[4] != af_mail_catalog_bytes(catalog) || header[5] != 8u
             || header[6] != 128u || header[7] != 16u)
         return 0;
     for (i = 0; i < 8; ++i)
-        if (header[8+i] != fingerprint[i])
+        if (header[8+i] != fingerprints[catalog-AF_MAIL_CATALOG_ID][i])
             return 0;
     for (i = 16; i < 32; ++i)
         if (header[i])
@@ -76,7 +77,7 @@ int af_mail_restore(AfMailText *output, const unsigned char *wire, unsigned int 
     unsigned int directory[4] __attribute__((aligned(16)));
     unsigned int row[4] __attribute__((aligned(16)));
     unsigned int part, count, bank, id, offset, length, padded, used = 0, body = 0, mask;
-    unsigned int table, entries, i, catalog;
+    unsigned int table, entries, i, catalog, vrom, bytes;
     if (!output || !wire || !work || size != AF_MAIL_RECORD_BYTES || !installed()
             || ((__UINTPTR_TYPE__)work & 15u)
             || overlap(work, sizeof(*work), wire, size)
@@ -84,9 +85,11 @@ int af_mail_restore(AfMailText *output, const unsigned char *wire, unsigned int 
             || overlap(output, sizeof(*output), wire, size))
         return 0;
     catalog = ((unsigned int)wire[3] << 8) | wire[4];
-    if (catalog != AF_MAIL_CATALOG_ID
+    vrom = af_mail_catalog_vrom(catalog);
+    bytes = af_mail_catalog_bytes(catalog);
+    if (!vrom
             || !af_mail_record_unpack(&work->record, wire, size, catalog)
-            || !dma(header, AF_MAIL_CATALOG_VROM, sizeof(header))
+            || !dma(header, vrom, sizeof(header))
             || !af_mail_catalog_header_valid(header, catalog))
         return 0;
     work->templates.catalog = catalog;
@@ -97,18 +100,18 @@ int af_mail_restore(AfMailText *output, const unsigned char *wire, unsigned int 
         id = work->record.templates[work->record.kind ? part : 0u];
         entries = bank < 3u ? 982u : 384u;
         table = 256u+(bank < 3u ? bank*982u : 2946u+(bank-3u)*384u)*16u;
-        if (id >= entries || !dma(directory, AF_MAIL_CATALOG_VROM+128u+bank*16u, sizeof(directory))
+        if (id >= entries || !dma(directory, vrom+128u+bank*16u, sizeof(directory))
                 || directory[0] != bank || directory[1] != entries || directory[2] != table || directory[3]
-                || !dma(row, AF_MAIL_CATALOG_VROM+table+id*16u, sizeof(row)))
+                || !dma(row, vrom+table+id*16u, sizeof(row)))
             return 0;
         offset = row[0];
         length = row[1] >> 16;
         padded = (length+15u) & ~15u;
         if ((row[1] & 0xFFFFu) || length > AF_MAIL_TEXT_BYTES || (offset & 15u)
-                || offset < 78112u || offset > AF_MAIL_CATALOG_BYTES
-                || padded > AF_MAIL_CATALOG_BYTES-offset || padded > AF_MAIL_SOURCE_BYTES-used)
+                || offset < 78112u || offset > bytes
+                || padded > bytes-offset || padded > AF_MAIL_SOURCE_BYTES-used)
             return 0;
-        if (padded && !dma(work->source+used, AF_MAIL_CATALOG_VROM+offset, padded))
+        if (padded && !dma(work->source+used, vrom+offset, padded))
             return 0;
         for (i = length; i < padded; ++i)
             if (work->source[used+i])

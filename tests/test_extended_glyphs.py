@@ -11,22 +11,22 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
-from aflib import sha256, verified_rom
+from aflib import replace_dma, sha256, verified_rom
 from build_extended_font_probe import RAM, relocate
 from extended_font_test_scenario import HOOKS, native_actions, scenario, texture_commands
 from extended_glyphs import (CODEPOINTS, ENCODINGS, GLYPHS, HEADER,
                              RESOURCE_BYTES, resource, source_atlas, untile_i4, validate_resource)
-from font import get_glyph, pack_pixels, pixels, resize_glyph
+from font import get_glyph, make_halfwidth, pack_pixels, pixels, resize_glyph
 from textbanks import banks
 from textcodec import tokenize
-from runtime_module import module_command_info
+from runtime_module import add_runtime_module, module_command_info
 from test_retail import ROM_PATH
 
 REL = ROOT/'build/gamecube/files/foresta.rel.szs.decoded'
 SYMBOLS = ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt'
 DECODER = ROOT/'local/ac-decomp/tools/msg_tool.py'
 PROBE = ROOT/'build/extended-font-probe'
-PILOT = ROOT/'build/special-followups-pilot'
+MODULE = ROOT/'build/runtime-module'
 
 
 class ExtendedGlyphTests(unittest.TestCase):
@@ -146,11 +146,15 @@ class ExtendedGlyphProbeTests(unittest.TestCase):
             with self.subTest(mutation=mutation), self.assertRaises(ValueError):
                 relocate(data,report,0x802F8010)
 
-    @unittest.skipUnless(ROM_PATH.is_file() and (PILOT/'runtime-module.json').is_file()
+    @unittest.skipUnless(ROM_PATH.is_file() and (MODULE/'module.json').is_file()
                          and (ROOT/'build/extended-glyphs/glyphs.bin').is_file(),'Pilot and resource stay local')
     def test_native_fixture_owns_code_checks_both_paths_and_restores_all_hooks(self):
-        rom = (PILOT/'animal-forest-halfwidth.z64').read_bytes()
-        module = json.loads((PILOT/'runtime-module.json').read_text())
+        # Build this unhooked fixture in memory from current verified code.
+        # Historical checkpoint ROMs must not be overwritten after a module change.
+        native = ROM_PATH.read_bytes()
+        replacements,_ = make_halfwidth(native)
+        additions,module = add_runtime_module(native,replacements,MODULE)
+        rom = replace_dma(native,replacements,additions=additions)
         resource = (ROOT/'build/extended-glyphs/glyphs.bin').read_bytes()
         actions = scenario(rom,ROM_PATH.read_bytes(),module,self.binary,self.report,resource)
         self.assertEqual(actions[:3],[{'wait':8},{'save_state':True},{'pause_game_thread':True}])

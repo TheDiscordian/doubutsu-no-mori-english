@@ -7,7 +7,8 @@ codec is `tools/mail_record.py`; the freestanding C implementation is
 `runtime/mail/record.c`. Full-letter assembly is implemented separately in
 `tools/mail_format.py` and `runtime/mail/format.c`. Both C files are linked into
 the experimental resident module and pass isolated N64 CPU calls. Native
-generation and editing are not connected to these APIs. The
+generation is connected by the separately enabled [NPC creator](NPC_MAIL_CREATOR.md);
+lossless editing remains unconnected. The
 separately enabled [experimental full reader](MAIL_READER.md) connects them to
 the native letter window for isolated snapshot probes. With English grading,
 the [whole-record send wrapper](MAIL_NPC_SEND.md) also supplies complete decoded
@@ -49,7 +50,7 @@ are relative to that text area. Multibyte integers are big-endian.
 | used minus 2 | 2 | CRC-16/CCITT-FALSE of all preceding used bytes |
 | used | remaining | Zero padding to 122 bytes |
 
-Version two is the current prototype; gameplay does not generate these records.
+Version two is the current experimental format used by the opt-in NPC creator.
 Version-one envelopes are
 rejected; no version-one catalog or generated-mail save format is released.
 The initial-capital bit preserves GAFE01's actual sticky capitalization state
@@ -85,6 +86,9 @@ content hashes, and readers must reject unavailable catalog identities. Test
 catalog numbers one and `FFFF` are test-only. [Catalog two](MAIL_CATALOG.md) is
 registered as an immutable experimental GAFE01 reference resource, not a release
 approval or permission to reuse matching numeric IDs as native translations.
+The independent [fortune-slip catalogue three](FORTUNE_SLIP_LETTERS.md) adds
+three complete signatures without changing catalogue two or reinterpreting
+existing saved snapshots.
 
 The magic byte is not sufficient to distinguish snapshots from native text.
 Native letters can contain arbitrary font bytes. The experimental full reader

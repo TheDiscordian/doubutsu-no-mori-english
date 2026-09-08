@@ -6,6 +6,22 @@
 #define AF_MAIL_CATALOG_VROM 0x03000000u
 #define AF_MAIL_CATALOG_ID 2u
 #define AF_MAIL_CATALOG_BYTES 319344u
+#define AF_MAIL_FORTUNE_CATALOG_ID 3u
+#define AF_MAIL_FORTUNE_CATALOG_VROM 0x03050000u
+#define AF_MAIL_FORTUNE_CATALOG_BYTES 319392u
+
+/* Catalog two stays at its original address with its frozen contents. The
+ * optional second resource is independently identified and validated. Unknown
+ * IDs never fall back to a newer interpretation of an old saved letter.
+ */
+static inline unsigned int af_mail_catalog_vrom(unsigned int catalog) {
+    return catalog == AF_MAIL_CATALOG_ID ? AF_MAIL_CATALOG_VROM :
+        catalog == AF_MAIL_FORTUNE_CATALOG_ID ? AF_MAIL_FORTUNE_CATALOG_VROM : 0u;
+}
+static inline unsigned int af_mail_catalog_bytes(unsigned int catalog) {
+    return catalog == AF_MAIL_CATALOG_ID ? AF_MAIL_CATALOG_BYTES :
+        catalog == AF_MAIL_FORTUNE_CATALOG_ID ? AF_MAIL_FORTUNE_CATALOG_BYTES : 0u;
+}
 /* Three 1024-byte sections; two additional DMA alignment gaps in composite body. */
 #define AF_MAIL_SOURCE_BYTES 3104u
 

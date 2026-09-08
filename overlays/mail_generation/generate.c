@@ -58,7 +58,7 @@ int af_mail_generate(unsigned char *mail, unsigned int mail_size, AfMailCapture 
                       const AfMailSelection *selection, AfMailGenerateWork *work) {
     unsigned int header[32] __attribute__((aligned(16)));
     unsigned int row[4] __attribute__((aligned(16)));
-    unsigned int part, count, bank, id, table, entries, mask = 0, i, j;
+    unsigned int part, count, bank, id, table, entries, mask = 0, i, j, vrom;
     AfMailRecord *record;
     if (!mail || mail_size != 164u || !capture || !selection || !work
             || ((__UINTPTR_TYPE__)capture & 3u) || ((__UINTPTR_TYPE__)selection & 1u)
@@ -70,14 +70,15 @@ int af_mail_generate(unsigned char *mail, unsigned int mail_size, AfMailCapture 
             || overlap(mail,mail_size,selection,sizeof(*selection))
             || overlap(capture,sizeof(*capture),selection,sizeof(*selection))
             || capture->capital > 1u || capture->valid >> AF_MAIL_FIELD_COUNT
-            || selection->catalog != AF_MAIL_CATALOG_ID || selection->kind > 1u
+            || !af_mail_catalog_vrom(selection->catalog) || selection->kind > 1u
             || selection->reserved || !installed())
         return 0;
     if (!selection->kind)
         for (i = 1; i < 5; ++i)
             if (selection->templates[i])
                 return 0;
-    if (!dma(header,AF_MAIL_CATALOG_VROM,sizeof(header))
+    vrom = af_mail_catalog_vrom(selection->catalog);
+    if (!dma(header,vrom,sizeof(header))
             || !af_mail_catalog_header_valid(header,selection->catalog))
         return 0;
     count = selection->kind ? 5u : 3u;
@@ -86,7 +87,7 @@ int af_mail_generate(unsigned char *mail, unsigned int mail_size, AfMailCapture 
         id = selection->templates[selection->kind ? part : 0u];
         entries = bank < 3u ? 982u : 384u;
         table = 256u+(bank < 3u ? bank*982u : 2946u+(bank-3u)*384u)*16u;
-        if (id >= entries || !dma(row,AF_MAIL_CATALOG_VROM+table+id*16u,sizeof(row))
+        if (id >= entries || !dma(row,vrom+table+id*16u,sizeof(row))
                 || (row[1] & 0xFFFFu) || row[2] >> AF_MAIL_FIELD_COUNT)
             return 0;
         mask |= row[2];

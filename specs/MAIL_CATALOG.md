@@ -1,5 +1,16 @@
 # Immutable English letter catalogs
 
+## Fortune-slip companion
+
+The optional [fortune-slip catalogue three](FORTUNE_SLIP_LETTERS.md) preserves
+every available catalogue-two part and supplies only the three complete Katrina
+signatures using an explicit native wave-decoration mapping. Catalogue two stays
+unchanged at `03000000`; three lives separately at `03050000`. The resident reader
+validates both identities independently. The primary resource must remain two,
+and the companion requires its own manifest. Catalogue three has 4,810 available
+parts and 56 unavailable parts; it does not solve the other missing glyph rows.
+The sections below describe the original catalogue-two resource and format.
+
 ## Contract
 
 The cartridge resource stores complete reference templates, not expanded saved

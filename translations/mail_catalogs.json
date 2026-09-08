@@ -24,6 +24,30 @@
       "encoding": "Existing supported N64 glyph identities; unsupported rows remain unavailable",
       "assembly": "Semantics one, snapshot version two, captured sticky capitalization and articles",
       "change_policy": "Never change an assigned identity's content; add a new ID and preserve existing saved catalogs"
+    },
+    {
+      "catalog": 3,
+      "format": 1,
+      "semantics": 1,
+      "bytes": 319392,
+      "sha256": "c75cc7d6c672e1f708a827cddb426895c3b15b7d3fc3c9337b6928174c71f254",
+      "payload_sha256": "a9a2b2cd78c729046b8be42473b75938c2a9bbc0ce8782fb99097d76dc13bd0d",
+      "counts": [982, 982, 982, 384, 384, 384, 384, 384],
+      "unavailable": {
+        "super": [43],
+        "mail": [43, 61, 192, 193, 194, 195, 196, 246, 310, 425, 427, 428, 429, 431, 432, 435, 436, 438, 440, 442, 443, 445, 446, 447, 449, 450, 453, 458, 498, 503, 504, 508, 510, 512, 515, 516, 517, 518, 519, 520, 521, 522, 523, 599, 605, 609, 808, 851, 922, 947, 965],
+        "ps": [43, 156, 955],
+        "superz": [],
+        "maila": [],
+        "mailb": [],
+        "mailc": [],
+        "psz": [77]
+      },
+      "source": "Unchanged catalog two plus the complete three source-verified GAFE01 fortune-slip signatures",
+      "status": "Frozen experimental catalog; fortune-slip creator and normal delivery integration remain",
+      "encoding": "Catalog two encoding with explicit GC tilde to existing native wave-glyph mapping in ps:0072..0074; no font changes",
+      "assembly": "Semantics one, snapshot version two, captured sticky capitalization and articles",
+      "change_policy": "Never change an assigned identity's content; add a new ID and preserve existing saved catalogs"
     }
   ]
 }

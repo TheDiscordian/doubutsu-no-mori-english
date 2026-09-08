@@ -145,9 +145,25 @@ def install(rom, additions, module_report, directory):
     report = json.loads((directory/'catalog.json').read_text())
     data = (directory/'catalog.bin').read_bytes()
     actual = verify_registered(data)
+    if actual['catalog'] != 2:
+        raise ValueError('Primary mail resource must retain frozen catalog two at its original address')
     if (report.get('source_sha256') != sha256(rom) or report.get('registered') is not True
             or any(report.get(key) != value for key, value in actual.items())):
         raise ValueError('Stale, proposed, or mismatched mail catalog resource')
+    extra = report.get('fortune_catalog')
+    extra_data = None
+    if extra is not None:
+        from fortune_slips import CATALOG, CATALOG_VROM
+        extra_data = (directory/'fortune-catalog.bin').read_bytes()
+        expected = {**verify_registered(extra_data),'vrom':f'{CATALOG_VROM:08X}'}
+        if (actual['catalog'] != 2 or expected['catalog'] != CATALOG or extra != expected
+                or CATALOG_VROM in additions or len(data) > CATALOG_VROM-VROM):
+            raise ValueError('Changed, overlapping, or duplicate fortune-slip catalog')
+        header = Path(__file__).resolve().parents[1]/'runtime/mail/catalog.h'
+        if not module_report or module_report.get('runtime_sources',{}).get('mail/catalog.h') != sha256(header.read_bytes()):
+            raise ValueError('Fortune-slip catalog requires the current multi-catalog reader')
+    elif (directory/'fortune-catalog.bin').exists():
+        raise ValueError('Untracked fortune-slip catalog resource')
     if (not module_report or MODULE_VROM not in additions
             or not {'af_mail_restore', 'af_mail_catalog_header_valid'} <= module_report['symbols'].keys()):
         raise ValueError('Mail catalogs require a capable resident module')
@@ -164,7 +180,10 @@ def install(rom, additions, module_report, directory):
         raise ValueError('Duplicate mail catalog configuration')
     struct.pack_into('>I', module, CONFIG_OFFSET, VROM)
     additions[MODULE_VROM], additions[VROM] = bytes(module), data
+    if extra_data is not None:
+        additions[CATALOG_VROM] = extra_data
     return {**actual, 'source_sha256': sha256(rom), 'vrom': f'{VROM:08X}',
+            **({'fortune_catalog':extra} if extra_data is not None else {}),
             'module_configuration_ram': f'{MODULE_RAM+CONFIG_OFFSET:08X}',
             'configured_module_sha256': sha256(module),
             'status': 'Experimental immutable reference catalog; generation/viewer/save hooks remain separate'}

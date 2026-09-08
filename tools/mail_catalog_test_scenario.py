@@ -60,7 +60,7 @@ def scenario(rom, module, cases):
             raise ValueError('Installed catalog output differs from verified reference')
         restore(record, skew=index % 8)
     for record in (Record(2, 0, (43,), ()), Record(2, 0, (982,), ()),
-                   Record(3, 0, (0,), ()), Record(2, 1, (0, 0, 0, 0, 77), ())):
+                   Record(4, 0, (0,), ()), Record(2, 1, (0, 0, 0, 0, 77), ())):
         restore(record, success=False)
     record = replace(cases[0][1], catalog=2)
     write(MODULE_RAM+CONFIG_OFFSET, bytes(4))

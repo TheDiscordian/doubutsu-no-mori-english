@@ -17,11 +17,14 @@ IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid
 SOURCES = ('overlays/mail_generation/generate.c','overlays/mail_generation/generate.h',
            'overlays/mail_generation/probe.ld','runtime/mail/catalog.h',
            'runtime/mail/format.h','runtime/mail/record.h')
+FORTUNE_SOURCES = SOURCES + ('overlays/mail_generation/fortune_slip.c',
+                            'overlays/mail_generation/fortune_slip.h')
 
 
-def build(module,out):
+def build(module,out,*,fortune_slip=False):
     root = Path(__file__).resolve().parents[1]
-    hashes = {name:sha256((root/name).read_bytes()) for name in SOURCES}
+    sources = FORTUNE_SOURCES if fortune_slip else SOURCES
+    hashes = {name:sha256((root/name).read_bytes()) for name in sources}
     out.mkdir(parents=True,exist_ok=True)
     common = ['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
               '-v',f'{root}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
@@ -37,9 +40,13 @@ def build(module,out):
              '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
              '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror']
     run('gcc',*flags,'/source/overlays/mail_generation/generate.c','-o','generate.o')
+    objects = ['generate.o']
+    if fortune_slip:
+        run('gcc',*flags,'/source/overlays/mail_generation/fortune_slip.c','-o','fortune_slip.o')
+        objects.append('fortune_slip.o')
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/probe.ld',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
-        '-o','generate.elf','generate.o')
+        '-o','generate.elf',*objects)
     if run('nm','--undefined-only','generate.elf').strip(): raise ValueError('Undefined generation symbols')
     symbols = {}
     for line in run('nm','--defined-only','generate.elf').splitlines():
@@ -72,14 +79,17 @@ def build(module,out):
     for offset in range(0,len(code),4):
         if struct.unpack_from('>I',code,offset)[0]>>26 in (2,3) and offset not in seen:
             raise ValueError('Untracked absolute generation jump')
-    if hashes != {name:sha256((root/name).read_bytes()) for name in SOURCES}:
+    if hashes != {name:sha256((root/name).read_bytes()) for name in sources}:
         raise ValueError('Generation source changed while building')
     report = {'version':1,'base':base,'bytes':len(code),'sha256':sha256(code),
               'sources':hashes,'module_sha256':module['module_sha256'],'imports':imports,
-              'symbols':{name:value-base for name,value in symbols.items() if name.startswith('af_mail_') and base <= value < end},
+              'symbols':{name:value-base for name,value in symbols.items() if name.startswith(('af_mail_','af_fortune_')) and base <= value < end},
               'jump_relocations':adjustments,'compiler':run('gcc','--version').splitlines()[0],
               'flags':flags,'stack_usage':(out/'generate.su').read_text(),'toolchain_image':IMAGE,
               'status':'Test-only native generation code; no game hooks or generation setting changed'}
+    if fortune_slip:
+        report['variant'] = 'fortune_slip'
+        report['stack_usage'] += (out/'fortune_slip.su').read_text()
     (out/'generate.asm').write_text(run('objdump','-d','generate.elf'))
     (out/'generate-relocations.txt').write_text(relocs)
     (out/'generate.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -90,8 +100,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--module',type=Path,default=Path('build/runtime-module/module.json'))
     parser.add_argument('--output',type=Path,default=Path('build/mail-generation-probe'))
+    parser.add_argument('--fortune-slip',action='store_true',help='Include the complete fortune-slip transaction probe')
     args = parser.parse_args()
-    print(json.dumps(build(json.loads(args.module.read_text()),args.output.resolve()),indent=2))
+    print(json.dumps(build(json.loads(args.module.read_text()),args.output.resolve(),fortune_slip=args.fortune_slip),indent=2))
 
 
 if __name__ == '__main__': main()

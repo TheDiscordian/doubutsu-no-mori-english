@@ -57,7 +57,7 @@ def scenario(rom,module,cases):
         probes.append(('npc:'+label,record,letter,None,npc_index))
     first = next(iter(selected.values()))
     probes += [('bad_checksum',first[1],None,'checksum',None),
-               ('unknown_catalog',replace(first[1],catalog=3),None,'catalog',None)]
+               ('unknown_catalog',replace(first[1],catalog=4),None,'catalog',None)]
     for index,(label,record,letter,error,npc_index) in enumerate(probes):
         mail = bytearray(164)
         mail[:6] = b'READER'

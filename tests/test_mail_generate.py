@@ -227,7 +227,7 @@ class MailGenerateTests(unittest.TestCase):
         fixture = self.fixture(record,extra=True)
         mail,capture,selection,workspace,work = fixture
         for target,field,value in ((capture,'capital',2),(capture,'valid',1<<20),
-                                   (selection,'catalog',3),(selection,'kind',2),(selection,'reserved',1)):
+                                   (selection,'catalog',4),(selection,'kind',2),(selection,'reserved',1)):
             old = getattr(target,field);setattr(target,field,value)
             self.call(record,success=False,fixture=fixture)
             setattr(target,field,old)
