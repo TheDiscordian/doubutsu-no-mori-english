@@ -7,6 +7,7 @@ import re
 
 from aflib import sha256
 from textcodec import decode, encode, tokenize
+from native_sequences import source_kind, validate_native_group, native_reference, audit_native_translation
 
 APPROVALS = Path(__file__).resolve().parents[1]/"translations/reference_sequences.json"
 # Native font consumers and argument constraints are audited in REFERENCE_LAYOUT.
@@ -64,6 +65,7 @@ def load_sequences(path=APPROVALS):
                     or any(not isinstance(c,str) or not re.fullmatch(r'7F090000[0-9A-F]{2}',c)
                            for c in actor_source['commands'])):
                 raise ValueError('Additional actor approvals require exact native speaker emotion commands')
+        validate_native_group(record)
         result[record["id"]] = record
     return result
 
@@ -172,6 +174,10 @@ def validate_sequences(edits, source, info, groups=None, *, resident_runtime=Fal
             if sha256(replacement) != member["encoded_sha256"]:
                 raise ValueError("Reference sequence translated bytes changed")
             replacements.append(replacement)
+        if source_kind(group) == 'native_original':
+            audit_native_translation(group, source[numbers[0]], info)
+            if replacements != reference_payloads(group, {}, info):
+                raise ValueError('Native sequence parts do not reconstruct the complete original translation')
         reserved = set(numbers[1:])
         for number, data in enumerate(source):
             if reserved.intersection(message_targets(data, info)):
@@ -197,6 +203,9 @@ def validate_sequences(edits, source, info, groups=None, *, resident_runtime=Fal
 
 
 def reference_payloads(group, references, info):
+    if source_kind(group) == 'native_original':
+        whole = native_reference(group, info)
+        references = {whole['id']: whole}
     members = group["members"]
     payloads, encoded_references = [], []
     for member in members:
@@ -271,8 +280,10 @@ def reference_sequence_edits(references, source, info, groups=None, *, resident_
         if group.get('requires_resident_runtime', False) and not resident_runtime:
             continue
         payloads = reference_payloads(group, references, info)
+        native = source_kind(group) == 'native_original'
         for member, payload in zip(group["members"], payloads):
-            reference = references[member.get("reference_id", member["id"])]
+            reference = (native_reference(group, info) if native else
+                         references[member.get("reference_id", member["id"])])
             edits.append({"id": member["id"], "source_sha256": member["source_sha256"],
                           "translation": decode(payload, info), "control_policy": "reviewed_sequence",
                           "reference_sequence": name,
@@ -282,8 +293,14 @@ def reference_sequence_edits(references, source, info, groups=None, *, resident_
                                          "match_basis": "reviewed_sequence_identity"},
                           "status": "mechanically_validated_candidate_not_reviewed",
                           "adaptations": [{"kind": "reviewed_multi_message_sequence", "sequence": name}]})
+            if native:
+                edits[-1]['status'] = 'draft'
+                edits[-1]['provenance'] = {
+                    'source': 'original translation of the Japanese N64 record',
+                    'native_id': reference['id'], 'draft_sha256': reference['sha256'],
+                    'match_basis': 'complete_native_original_sequence'}
             if "reference_slice" in member:
-                edits[-1]["provenance"]["reference_slice"] = member["reference_slice"]
+                edits[-1]["provenance"]["draft_slice" if native else "reference_slice"] = member["reference_slice"]
             if member.get('remove_redundant_cutarticle', False):
                 edits[-1]['adaptations'].append({'kind': 'remove_redundant_cutarticle_before_string'})
     return edits, validate_sequences(edits, source, info, groups, resident_runtime=resident_runtime)

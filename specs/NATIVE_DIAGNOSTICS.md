@@ -43,7 +43,7 @@ the established coverage-classification catalog. This does not move source
 characters out of the existing volume denominator or claim that English-looking
 text has completed semantic/gameplay review. The explicit `diagnostic_kind` and
 `printed_number` metadata keep these 99 records separate from original dialogue
-and the existing 291 generated development-label drafts. The 26 corrections
+and the generated development-label drafts. The 26 corrections
 gain no additional source-volume credit over their earlier English-looking text.
 
 ## Verification boundary

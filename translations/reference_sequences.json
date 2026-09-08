@@ -454,5 +454,61 @@
         "encoded_sha256": "8416ee1345bf6b9310cba343fae74c8269e716046549f689a423ab8a61a17bf6"
       }
     ]
+  },
+  {
+    "id": "native_normal_travel_advice",
+    "source_kind": "native_original",
+    "evidence": "Complete original translation of native 0848, including Controller Pak travel and bulletin-board advice. Same-ID GameCube text adds incompatible Memory Card travel rules. Split only at the existing wait/newline/page-clear boundary before bulletin-board advice. Native letter-show reserve 0A27 has its exact source hash, no native message-script incoming target, and no matching arithmetic/comparison/logical immediate or aligned non-executable halfword in the pinned code sections. This does not establish exhaustive indirect callers or normal gameplay. All original commands remain exact except four explicit colour lengths; complete original text and both outputs are independently bound.",
+    "original_translation": {
+      "id": "message:0848",
+      "text": "{cmd:7F090000FF}{cmd:7F1A},{cmd:7F0308}\ndo any of your friends live\noutside {cmd:7F2F}{cmd:7F0306}...\n{cmd:7F0900000B}{cmd:7F0304}in another town?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}If they do,{cmd:7F0306} you can visit\ntheir town,{cmd:7F0306} or have them\ncome here to visit you{cmd:7F0304}\ninstead,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Always playing in the same\ntown{cmd:7F0306} would get boring,\nwouldn't it,{cmd:7F0306} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}To visit another town,{cmd:7F0306}\ngo to the {cmd:7F504BA00007}station and\ncatch a train,{cmd:7F030C}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}To ride the train,{cmd:7F0306}\nyou need something called\na {cmd:7F50198CDC0E}Controller Pak.{cmd:7F04}\n{cmd:7F02}Please remember that,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}When you visit another town,{cmd:7F0306}\nits {cmd:7F504BA0000E}bulletin board{cmd:7F0306}\nis a fun place to write{cmd:7F0306}\nanything you like,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}People who visit\nthat town later{cmd:7F0308}\nwill read what you wrote,\n{cmd:7F1A}{cmd:7F0304}.{cmd:7F09000015}{cmd:7F04}\n{cmd:7F02}Write anything{cmd:7F0304}\nyou'd like lots of people{cmd:7F0308}\nto read,{cmd:7F0306}\n{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F090000FF}Of course,{cmd:7F0306}\nthe {cmd:7F504BA0000E}bulletin board here{cmd:7F0304}\nworks the very same way,\n{cmd:7F0306}{cmd:7F1C}!\n{cmd:7F00}",
+      "sha256": "9404a5afb7ae8c6f438cf4966487f5f4aa96c171ee34b104e944e1fe5a6fedd0"
+    },
+    "colour_lengths": [
+      {
+        "command_index": 24,
+        "original": "7F504BA00002",
+        "replacement": "7F504BA00007"
+      },
+      {
+        "command_index": 30,
+        "original": "7F50198CDC09",
+        "replacement": "7F50198CDC0E"
+      },
+      {
+        "command_index": 38,
+        "original": "7F504BA00005",
+        "replacement": "7F504BA0000E"
+      },
+      {
+        "command_index": 60,
+        "original": "7F504BA00005",
+        "replacement": "7F504BA0000E"
+      }
+    ],
+    "members": [
+      {
+        "id": "message:0848",
+        "source_sha256": "940c9336a55e095935cf6d450d798b5951b1216deb738ee9a49a7337942ce35a",
+        "reference_id": "message:0848",
+        "reference_sha256": "9404a5afb7ae8c6f438cf4966487f5f4aa96c171ee34b104e944e1fe5a6fedd0",
+        "reference_slice": [
+          0,
+          460
+        ],
+        "encoded_sha256": "9e9a92d282300185f1885952546109bc9a19133a991c4a712248575cac985ae3"
+      },
+      {
+        "id": "message:0A27",
+        "source_sha256": "90d32ead3827a2e2920a43565ba4e28cd4db7e82eeedf7005ad201fd6b8e4d1f",
+        "reference_id": "message:0848",
+        "reference_sha256": "9404a5afb7ae8c6f438cf4966487f5f4aa96c171ee34b104e944e1fe5a6fedd0",
+        "reference_slice": [
+          465,
+          818
+        ],
+        "encoded_sha256": "932bd9a6b9264396ee555aa30915900902055418eddad6dfd774ce9cd7508b5b"
+      }
+    ]
   }
 ]

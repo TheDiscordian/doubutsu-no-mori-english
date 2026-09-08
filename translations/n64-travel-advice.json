@@ -1,0 +1,29 @@
+[
+  {
+    "id": "message:0866",
+    "source_sha256": "04f5292b00ae78f57b13d1680d3b6fe44bfb363fdef2fde4d5792b438a23dd43",
+    "translation": "{cmd:7F090000FF}I've always thought\na guy needs{cmd:7F0306}\nsome adventure in his life!{cmd:7F04}\n{cmd:7F02}The quickest adventure{cmd:7F0308}\nis to{cmd:7F0304} leave familiar ground\nbehind,{cmd:7F0306} right?{cmd:7F0304}\n{cmd:7F1A}-{cmd:7F504B5F9B02}--?{cmd:7F04}\n{cmd:7F02}You agree, don't you?{cmd:7F0306}\nThen go visit\nanother town!{cmd:7F030C}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F0900000E}Meeting new people{cmd:7F0304}\nin places you've never seen!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}Oh, YEAH!!{cmd:7F0308}\nThat's a man's romance\nright there! {cmd:7F0306}{cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}To leave {cmd:7F2F}{cmd:7F0306}\nand set out on an adventure,{cmd:7F04}\nhead to the {cmd:7F504BA00007}station{cmd:7F0304} and\nhop on a train! {cmd:7F0306}{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}BUT!{cmd:7F0308}\nWithout a {cmd:7F50198CDC0E}Controller Pak,\nyou{cmd:7F0304} can't board the train!\n{cmd:7F0306}{cmd:7F1C}!{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Don't forget your\n{cmd:7F50198CDC0E}Controller Pak!{cmd:7F0308}\nIt's essential for travel,\n{cmd:7F1A}!\n{cmd:7F00}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 travel explanation",
+    "status": "draft",
+    "notes": "Retain the complete native Controller Pak travel instructions, all pauses, fields, actor commands, pages, and final ending. Only explicit colour-span lengths change. The supplied GameCube same-ID text adds different Memory Card travel rules and is not a complete native instruction match. Final wording, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:0870",
+    "source_sha256": "243c92eb43d13778f3c1a9a20369a36842c6f67397af04d924ab0712607356fa",
+    "translation": "{cmd:7F090000FF}Hey,{cmd:7F0304} do you have any friends{cmd:7F0306}\nwho live in another town,\n{cmd:7F0900000B}not this one?{cmd:7F030A}\n{cmd:7F1C}?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}If you do,{cmd:7F0308}\nyou could go{cmd:7F0304}\nbarge into their town...{cmd:7F04}\n{cmd:7F02}Or{cmd:7F0306} have them\ncome visit you here{cmd:7F0304}\ninstead! Sounds fun!{cmd:7F030C}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}Your world's not{cmd:7F0304}\ngoing to get much bigger{cmd:7F0306}\nif you stay put{cmd:7F0304}\nin one town,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}If you want to\nvisit another town,{cmd:7F0306}\ngo to the {cmd:7F504BA00007}station{cmd:7F0304}\nand catch a train.{cmd:7F04}\n{cmd:7F02}To ride that train,{cmd:7F0304}\nyou need something called\na {cmd:7F50198CDC0E}Controller Pak,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}{cmd:7F09000016}\n{cmd:7F02}Don't you forget it!{cmd:7F0306}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 travel explanation",
+    "status": "draft",
+    "notes": "Retain the complete native Controller Pak travel instructions, all pauses, fields, actor commands, pages, and final ending. Only explicit colour-span lengths change. The supplied GameCube same-ID text adds different Memory Card travel rules and is not a complete native instruction match. Final wording, presentation, and gameplay review remain."
+  },
+  {
+    "id": "message:087A",
+    "source_sha256": "14199b685648e19ec5d9130e7d70f978e3705639a82cc3bac130c1ccabc82360",
+    "translation": "{cmd:7F090000FF}Have you heard the saying,\n\"A frog in a well\nknows nothing of the sea\"{cmd:7F0306}{cmd:7F0304}?{cmd:7F04}\n{cmd:7F02}It means{cmd:7F0304} acting superior,\nas if you know everything\nabout the world{cmd:7F0304}...{cmd:7F04}\n{cmd:7F02}When really,{cmd:7F0304}\nyou're just{cmd:7F0304} a country bumpkin\nwho knows nothing,{cmd:7F0306} {cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}You should take a chance{cmd:7F0304}\nto leave {cmd:7F2F}{cmd:7F0306}\nand see the world outside,\n{cmd:7F0306}{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000016}If you think everywhere\nis just the same,{cmd:7F0306}\nyou're very much mistaken!{cmd:7F0306}\n{cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}To go beyond\n{cmd:7F2F},{cmd:7F0308}\ntake a trip\non the train.{cmd:7F04}\n{cmd:7F02}For that, you need\na {cmd:7F50198CDC0E}Controller Pak,\nbut{cmd:7F0306}{cmd:7F0900000B}{cmd:7F0303} did you know that?{cmd:7F04}{cmd:7F090000FF}\n{cmd:7F02}Hee hee.{cmd:7F0308}\nYou made it to this town,\nso you must know that much,{cmd:7F030C}\n{cmd:7F1C}.\n{cmd:7F00}",
+    "control_policy": "reference_layout",
+    "provenance": "Original translation of the Japanese N64 travel explanation",
+    "status": "draft",
+    "notes": "Retain the complete native Controller Pak travel instructions, all pauses, fields, actor commands, pages, and final ending. Only explicit colour-span lengths change. The supplied GameCube same-ID text adds different Memory Card travel rules and is not a complete native instruction match. Final wording, presentation, and gameplay review remain."
+  }
+]

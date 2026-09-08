@@ -4889,6 +4889,121 @@
   ordinary gameplay/saves, hardware acceptance, patch-only release, and image/
   keyboard stretch goals remain active. The font-edge investigation stays paused.
 
+## 2026-09-08 — Complete native travel advice and original-text page splits
+
+- Continued after committing and pushing the moving/game-launch/diagnostic
+  batch as `90eda2c`. The tracked tree was clean, the repo was private, and
+  local HEAD, origin/main, and the actual remote branch all matched. That
+  batch and its native verification are completed progress; the full project
+  remains active. No subagents, desktop renders, audio, or existing saves were
+  used. All build/native handles from that batch were collected successfully.
+- Added complete native travel translations for `0848/0866/0870/087A`.
+  Their supplied GameCube references explain second-Memory-Card and destination-
+  town-data rules, which differ from the original Controller Pak instructions.
+  Native `0848` retains reciprocal visiting, boredom, station/train/Pak advice,
+  the reminder, other-town bulletin-board writing, later readers, writing for
+  that audience, and the home board's equivalent use. The other personalities
+  retain jock adventure/romance, cranky invitations and broadening one's world,
+  and the snooty frog-in-a-well/country-bumpkin exchange. These are original
+  drafts, not new GameCube identities or substitutes for glyph-blocked matches.
+- All native commands/arguments, fields/order/page, actor values, pauses, and
+  final endings remain except explicit colour-span lengths. The jock's coloured
+  two-character call and `04` without `02` inside the station advice remain.
+  An in-memory first draft of `0866` omitted one pause; the full native command
+  comparison caught it, and it was restored before the versioned draft and
+  all test/build runs. The ordinary expansion bounds are 861, 695, and 828.
+  Generic `2F` warnings remain on `0848/0866/087A`; all four full layouts fit
+  six fullwidth current-town cells without narrowing any other estimate.
+- Complete original `0848` is 818 stored bytes with a 1,134-byte expansion bound.
+  Added `native_normal_travel_advice`, `0848 → 0A27`, using `[0,460)` and
+  `[465,818)` of that complete draft. The existing `[460,465)` wait/newline/clear
+  precedes bulletin-board advice. Its replacement is exactly one native
+  continuation boundary; the final part retains `00`. Bounds are 663 and 489;
+  parts store 467 and 353 bytes. No words, pauses, other pages, or fields are
+  removed. Full draft SHA-256:
+  `9404a5afb7ae8c6f438cf4966487f5f4aa96c171ee34b104e944e1fe5a6fedd0`.
+- Extended the existing sequence framework with explicit `native_original`
+  provenance and an embedded complete original draft/hash. Added
+  `tools/native_sequences.py`: independent source-kind/schema checks, complete
+  native command comparison, and exact indexed original/replacement colour
+  commands. Only a nonzero final length byte may change. Native originals
+  cannot add actor-source or article-removal permissions. The independent ROM
+  builder also reconstructs every full original slice, in addition to existing
+  source/part hashes, membership, incoming branches, flow, and capacity checks.
+  Re-hashing an incomplete part cannot discard original wording; re-hashing
+  all English text cannot silently change native controls. Existing GameCube
+  groups retain their complete payloads and original permissions.
+- Native `0A27` is the exact letter-show reserve, with source SHA-256
+  `90d32ead3827a2e2920a43565ba4e28cd4db7e82eeedf7005ad201fd6b8e4d1f`.
+  It has no native message-script incoming target and no arithmetic/comparison/
+  logical/load-upper immediate or aligned non-executable halfword in the pinned
+  code-section scan. Other inspected reserve numbers had unrelated data hits
+  and were not used. This is slot-specific evidence, not exhaustive indirect
+  reachability proof. The placeholder audit now accounts for fifteen allocated
+  native label slots and 345 unallocated ones; source classification is unchanged.
+- Added twelve tests: seven portable native-sequence guard tests and five retail
+  content/layout/source/slot tests. Focused
+  `build/tests-native-travel-focused-01.log` passes all twelve in 2.344 seconds.
+  The initial existing sequence run passed fifteen tests and failed one stale
+  basic-mode count expecting 28 instead of 30 members. Updated explicit basic/
+  full counts to 30/34 and reserve accounting to include `0A27`. Final
+  `build/tests-native-travel-full-01.log` passes all 644 in 292.926 seconds.
+  This final suite includes the final original-provenance metadata and every
+  existing reference/placeholder guard; no test exclusions are added.
+- Both final generation modes add exactly four roots and change only `0A27`
+  from its old English reserve label into the guarded continuation. All other
+  edits remain identical. Full generation reaches 11,941 edits and 10,696 main
+  candidates: 9,736 references, 570 original dialogue drafts, one original-
+  dialogue continuation, 290 development-label drafts, and 99 diagnostics.
+  All 460 choices remain unchanged. Basic ten-byte-capacity generation reaches
+  11,231. A redundant sixteen-byte-choice generation was started after misreading
+  the basic comparison flags; its reports are retained separately in
+  `build/native-travel-sixteen-candidates/`. The final basic comparison was
+  regenerated with the actual baseline's no-runtime flags and passes the exact
+  four-addition/one-allocation check. No ROM used that redundant candidate set.
+- Reference rejection totals 1,057: 931 unconfirmed identities, 100 control
+  differences, 24 missing-field records, and two direct overflows. One original
+  fallback leaves 1,056 final gaps: 134 Japanese-static, 919 non-static, one
+  Latin, and two symbol/numeric entries. Ten non-static entries contain fields;
+  no reachability is inferred. Warning-bearing manifest records total 1,470,
+  including the new original sequence's generic town warning; native aliases
+  remain 41 with no conflicts. Final-hash review queues have zero current-rule
+  same-ID admissions and the same ten unapproved special-expression cases.
+- ROM `build/native-travel-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `b19f2ce726bfbdb59e23f14386603bdb9e4ccd36d119159213c578e5a3419d8b`.
+  UPS SHA-256:
+  `43c70bb98f075f78e8b7f3cda153bff05b874f06253e2d00326f4e048f74489f`.
+  Candidate SHA-256:
+  `a565b47eb3b56ded388998350c8519ec0340d12334b4bb0dfda96b4db5a2a44e`.
+  Source, candidate, and built hashes pass; all 11,941 complete installed bank
+  payloads match. UPS application reconstructs the entire ROM. Against the
+  preceding pilot, only extracted `02000000`, `00CF9000`, and DMA directory
+  container `00019D40` differ. The container is unchanged outside its table;
+  every other code/font/runtime/name/mail/choice resource is unchanged.
+  Measured source volume increases by 1,090 to 632,360 of the unchanged 746,978
+  characters. The reused placeholder earns no source-volume credit; no new
+  percentage, semantic-review, or project-completion claim is made.
+- `build/smoke-native-travel-01/` passes all five complete cartridge loads,
+  the internal link assignment, and both continuing/final termination phases:
+  ten calls, 25 assertions, and 56 recorded steps. Its scenario combines the
+  existing sequence generator and explicit-ID loader generator within one
+  identical checkpoint setup/restoration, with both restored scratch checks.
+  Scenario SHA-256:
+  `3361caeb9858dd6c8d101bd4083aa599964fbd88d991219a67a2a074e0f6d03e`.
+  Complete headers/text, adjacent/module guards, restored `test.bs1`, and
+  graceful shutdown pass. The four-MiB run has no seeds, disabled audio, and
+  both save-write permissions false. FlashRAM remains
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  No ordinary conversation, actual travel, board posting, or saving is executed.
+- Remaining main text/control/field/glyph work, general strings and full name/
+  mail destinations, final wording/presentation review, ordinary gameplay/save
+  acceptance, hardware validation, patch-only release, and image/keyboard stretch
+  goals remain active. The font-atlas-edge investigation stays paused. The
+  original-sequence contract is available for further genuinely native-specific
+  overlong text; it is not permission to replace compatible English references
+  or reuse arbitrary message slots.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

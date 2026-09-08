@@ -169,6 +169,18 @@ before adaptation; slice coverage applies to the complete adapted result, and
 every final payload retains its own hash. All members using that reference must
 agree on adaptation. Unknown commands and unavailable native fields still fail.
 
+## Original native translations
+
+The [complete native travel sequence](NATIVE_TRAVEL_ADVICE.md) uses the same
+all-or-nothing and existing-page-boundary mechanism with an explicit
+`native_original` source kind. Its full original English text and hash are
+stored in the approval, not borrowed from an unrelated GameCube record.
+Both candidate generation and the independent builder check its complete
+native command sequence, permitting only indexed colour-length corrections.
+No added field, actor permission, lost pause, changed page, or altered gameplay
+command is allowed. Output provenance identifies original work and draft
+slices; the default GameCube source kind retains its existing rules.
+
 ## Guarded approval
 
 A sequence record binds every original slot hash and exact approved English

@@ -24,7 +24,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
-                          "resident_late_night_introduction", *LONG_ADVICE_GROUPS):
+                          "resident_late_night_introduction", "native_normal_travel_advice", *LONG_ADVICE_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):

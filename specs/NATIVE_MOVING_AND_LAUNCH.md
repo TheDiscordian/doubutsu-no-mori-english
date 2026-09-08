@@ -70,5 +70,6 @@ and blank isolated saves. Results and hashes belong in `docs/WORK_LOG.md`.
 No production runtime, font, or saved layout changes. Loader checks are not
 ordinary moving selection, live town fields, answer actions, actual game launch
 or quitting, final presentation review, save acceptance, or hardware validation.
-The four long native travel explanations `0848/0866/0870/087A`, broader missing
-dialogue/controls, and remaining project requirements stay in the work queue.
+The four long [native travel explanations](NATIVE_TRAVEL_ADVICE.md) have complete
+drafts and a guarded existing-page split. Broader missing dialogue/controls and
+all remaining project requirements stay in the work queue.
