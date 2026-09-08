@@ -879,6 +879,12 @@ def main():
                     raise ValueError('Native fortune hand-off probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_fortune_actor'],record))
+            if 'test_leaflet_dates' in action:
+                from leaflet_date_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native leaflet probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_leaflet_dates'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -73,19 +73,20 @@ and seven sites without a straight-line immediate length.
 | `800A8D70` | Eleven families of randomized NPC-letter words; native ten-byte fields plus complete selected-ID snapshot capture | Shared import requires the complete creator, catalog, reader, eight hooks, and failure gate; normal delivery remains |
 | `800A9F7C`, `800AA264` | Saved villager catchphrase at `Animal+4E5`, four bytes | Default main-dialogue display uses a separate ten-byte resource; custom editing, shared choices, mail, and save compatibility remain |
 | `800ACDC0` | Special-NPC name table, six-byte singleton then personal-name copy | Main dialogue/nameplates use the separate eight-byte display resource; other readers and identity storage remain native |
-| `800C40D4..800C43F4` | Native date/unit suffix formatters | Message date calls already use resident English formatters; other UI paths remain native |
+| `800C40D4..800C43F4` | Native date/unit suffix formatters | Message/resident and leaflet preparation use complete English; notice and fishing callers remain native |
 | `809DC590` in `ovl_Ev_Gypsy` | Four 32-entry fortune families; scoped sixteen-byte local and resident item fields | Complete source-bound English group implemented; normal paid readings and luck effects remain gameplay checks |
 | Five shop actors | Complete 120-counter group; count-minus-one indexing, eight native families, unchanged ten-byte locals and free-string slot 8 | Native batch passes all actors; ordinary transactions and presentation remain gameplay checks |
 | Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete resident and shared-word groups implemented; normal dialogue and category selection remain gameplay checks |
 | Fruit-box actor | Native performance credits, 110 rows, twenty-five-byte owned loader/drawer | Native batch passes every page and fade boundaries; normal K.K. performance, final presentation, and hardware remain |
 | Fortune-slip actor | All 68 complete sixteen-byte phrase/outcome values and three full templates through an owned snapshot creator | Native hand-off/readback and guarded payment recovery pass; normal interaction and scene cleanup remain gameplay checks |
 
-The [remaining date-consumer design](LEAFLET_DATES.md) distinguishes all 23 direct
-date/unit calls in the built cartridge: ten English replacements are installed,
-and thirteen retain native formatters. It records the shop/Redd scratch lifetimes,
-complete AM/PM requirement, notice month/day spacing and fourteen-byte output,
-and fishing-unit consumers. Target classification is not a capacity or gameplay
-completion claim.
+The [leaflet integration](LEAFLET_DATES.md) distinguishes all 23 direct date/unit
+calls in the built cartridge: seventeen use resident English formatters, two use
+the complete English hour at the original entry, and four retain native formatters.
+Shop/Redd field preparation passes scoped native execution with unchanged resident
+and saved sizes. Full letter publication, wider sale-item capture, notice
+month/day spacing and fourteen-byte output, and fishing units remain. Target
+classification is not a capacity or gameplay completion claim.
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,

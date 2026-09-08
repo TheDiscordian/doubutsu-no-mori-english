@@ -2,6 +2,20 @@
 
 ## Active work
 
+The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete
+month/day/year and AM/PM preparation for renewal, sale, and Redd letters. Seven
+call words, two Redd scratch pointers, and the original hour formatter change;
+resident size, actor frames/BSS, saved layouts, approved font, and ordinary text
+remain unchanged. All 895 regression tests, six focused formatter/installer tests,
+and four final date-audit tests pass. The silent native batch passes 256 hours,
+twelve renewal date blocks, twelve sale preparations, 33 Redd preparations,
+354 calls, and 1,141 memory assertions, with a restored checkpoint, unchanged
+live save/heap accounting, blank isolated saves, and graceful shutdown. Independent
+hour builds and UPS/installed-text checks agree. Full letter creation/publication,
+wider sale-item capture, notice/fishing consumers, normal scheduling/delivery,
+and hardware remain. The [date work record](checkpoints/LEAFLET_DATES.md) tracks
+exact artifacts and test limits. Complete leaflet creation is the next task.
+
 The [complete fortune-slip creator](../specs/FORTUNE_SLIP_LETTERS.md) preserves
 all 68 phrase/outcome values and all three English letter templates. The optional
 native actor now stores the complete letter before announcing hand-off, retains

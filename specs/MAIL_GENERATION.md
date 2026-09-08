@@ -10,8 +10,10 @@ The generation code is compiled and loaded into private heap memory for isolated
 native tests.
 The separately enabled [NPC creator](NPC_MAIL_CREATOR.md) includes this
 transaction in its on-demand image; default builds leave generation disabled.
-The [fortune-slip creator](FORTUNE_SLIP_LETTERS.md) also uses it in a native
-probe, but its ordinary actor hand-off is not hooked.
+The optional [fortune-slip actor](FORTUNE_SLIP_LETTERS.md) also uses it for complete
+pocket hand-off, retaining choices across failed attempts and guarding interrupted
+payment recovery. Its scoped native hand-off/readback tests pass; ordinary
+interaction and scene cleanup still require gameplay evidence.
 
 Completing the remaining N64 creator bindings, English field sources, semantic
 template mappings, allocation lifetime, and failure propagation remains required.

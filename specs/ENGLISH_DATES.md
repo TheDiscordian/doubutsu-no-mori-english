@@ -4,7 +4,9 @@
 
 The resident module replaces the seven formatter calls inside the native message
 field-copy routines. The separate [ordinary resident preparation](DIALOGUE_DATES.md)
-also uses the year/month/day formatters in verified ten-byte fields. Other UI
+also uses the year/month/day formatters in verified ten-byte fields. The separate
+[leaflet integration](LEAFLET_DATES.md) supplies full month/day/year fields and
+complete AM/PM times for renewal, sale, and Redd preparation. Other UI
 and actor callers retain their native formatters until their destination
 capacities and surrounding punctuation are verified.
 No RTC representation, game clock, event scheduling, or saved date changes.

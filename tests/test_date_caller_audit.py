@@ -50,6 +50,21 @@ class DateCallerAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unrecognised installed date target'):
             inventory(self.native, replace_dma(self.installed, {0x84D180: bytes(changed)}), self.build)
 
+    @unittest.skipUnless((ROOT/'build/leaflet-dates-pilot/build.json').is_file(),
+                         'Installed full leaflet date fixture required')
+    def test_same_address_hour_body_is_counted_only_when_its_complete_english_code_is_verified(self):
+        from aflib import CODE_RAM,CODE_VROM
+        from leaflet_dates import HOUR
+        directory = ROOT/'build/leaflet-dates-pilot'
+        rom = (directory/'animal-forest-halfwidth.z64').read_bytes()
+        build = json.loads((directory/'build.json').read_text())
+        result = inventory(self.native,rom,build)
+        self.assertEqual(result['states'], {'resident_formatter_installed':17,
+                         'english_leaflet_formatter_installed':2,'native_formatter_remaining':4})
+        data = bytearray(by_vrom(rom)[CODE_VROM].extract(rom));data[HOUR-CODE_RAM+4] ^= 1
+        with self.assertRaises(ValueError):
+            inventory(self.native,replace_dma(rom,{CODE_VROM:bytes(data)}),build)
+
 
 if __name__ == '__main__':
     unittest.main()

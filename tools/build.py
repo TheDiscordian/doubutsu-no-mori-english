@@ -205,6 +205,7 @@ def main():
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
+    parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -220,6 +221,8 @@ def main():
     args = parser.parse_args()
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
+    if args.english_leaflet_dates and not (args.runtime_module and args.english_runtime):
+        parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -286,6 +289,10 @@ def main():
         from fortune_actor import install as install_fortune_actor
         report['fortune_actor'] = install_fortune_actor(rom,replacements,additions,relocations,
                                                        report.get('runtime_module'),args.english_fortune_slips)
+    if args.english_leaflet_dates:
+        from leaflet_dates import install as install_leaflet_dates
+        report['leaflet_dates'] = install_leaflet_dates(rom,replacements,additions,relocations,
+                                                       report.get('runtime_module'),args.english_leaflet_dates)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

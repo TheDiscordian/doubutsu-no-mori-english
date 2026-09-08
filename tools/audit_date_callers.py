@@ -35,6 +35,15 @@ def inventory(native, installed, build):
     verify_test_module(installed, module)
     files = by_vrom(installed)
     moved = {int(k, 16): int(v, 16) for k, v in build.get('vrom_relocations', {}).items()}
+    leaflet_hour = False
+    if 'leaflet_dates' in build:
+        from aflib import CODE_RAM,CODE_VROM
+        from leaflet_dates import HOUR,HOUR_END,validate_hour
+        report = build['leaflet_dates']['hour']
+        code = files[CODE_VROM].extract(installed)[HOUR-CODE_RAM:HOUR_END-CODE_RAM]
+        if code != validate_hour(code[:report['bytes']],report):
+            raise ValueError('Changed installed English leaflet hour body')
+        leaflet_hour = True
     rows, definitions = [], None
     for field, original, symbol in FORMATTERS:
         evidence = audit(native, original)
@@ -49,7 +58,9 @@ def inventory(native, installed, build):
             if offset > len(data)-4:
                 raise ValueError('Installed date caller is outside its DMA file')
             actual = call_target(struct.unpack_from('>I', data, offset)[0])
-            if actual == original:
+            if actual == original and field == 'hour' and leaflet_hour:
+                state = 'english_leaflet_formatter_installed'
+            elif actual == original:
                 state = 'native_formatter_remaining'
             elif actual == destination:
                 state = 'resident_formatter_installed'

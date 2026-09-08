@@ -110,13 +110,17 @@ undo the already revealed fortune. Preserve source
 identity and complete wording when
 mapping the remaining text; a same-ID GameCube row alone is not approval.
 
-The [leaflet/notice date design](../specs/LEAFLET_DATES.md) is the next grouped
-consumer task. Installed-instruction auditing finds ten English date calls and
-thirteen remaining native date/unit calls. Shop renewal, sale, and Redd leaflets
-need complete month/day/year/AM-PM fields and full publication; notice dates
-add a separating space and need fourteen-byte capture instead of the native
-ten-byte clamp. Three focused audit tests pass. No date replacement or text
-coverage increase is claimed from this inventory.
+The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete
+month/day/year/AM-PM preparation without resident, actor-frame, or saved-layout
+growth. The native batch passes 256 hours, twelve renewal date blocks, twelve
+sale preparations, 33 Redd preparations, and 1,141 memory assertions with restored
+checkpoint and blank saves. All 895 regression tests and four final audit tests
+pass. Nineteen direct date calls use English; four notice/fishing calls remain
+native. Next connect complete leaflet creation/publication, including wider sale
+item sources and failure propagation at actual owner boundaries. Notice dates
+need their separating space and full fourteen-byte capture beyond the native
+ten-byte setter. Normal delivery, schedules, and hardware remain validation work.
+The [date work record](checkpoints/LEAFLET_DATES.md) pins current evidence.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch

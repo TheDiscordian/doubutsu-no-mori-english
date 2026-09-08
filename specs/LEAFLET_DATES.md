@@ -1,16 +1,17 @@
-# Remaining leaflet, notice, and measurement date consumers
+# Leaflet dates and remaining notice/measurement consumers
 
 ## Current scope
 
 `tools/audit_date_callers.py` checks the verified native ROM's direct date calls
-against actual instructions in the built cartridge. The recovery pilot has
-23 direct calls across eight formatter entries: ten target the resident English
-formatters and thirteen retain native formatting. Seven completed calls belong
-to main dialogue; three belong to ordinary resident preparation. This inventory
+against actual instructions in the built cartridge. The leaflet pilot has
+23 direct calls across eight formatter entries: seventeen target the resident
+English formatters, two use the complete English leaflet hour at the original
+entry, and four retain native formatting. The installed calls belong to main
+dialogue, ordinary resident preparation, and shop/Redd leaflet preparation. This inventory
 does not establish indirect/inlined uses or imply that a changed target proves
 correct formatting, capacity, publication, or gameplay.
 
-The remaining groups are:
+The leaflet integration and remaining groups are:
 
 | Consumer | Native calls | Required presentation |
 | --- | --- | --- |
@@ -35,9 +36,10 @@ Shop renewal `809583B0..809585F4` has a `148`-byte frame. Day is at `sp+88`, mon
 at `sp+8C`, and year at `sp+90`; the mail record starts at `sp+9C`. Date input is
 copied at `sp+74`. The month is copied into handbill storage before day and year
 are formatted. A nine-byte month would overlap the later year temporary, not
-currently live year data. Reusing that sequential scratch span is a candidate
-implementation, but it needs explicit native guard/lifetime checks. Native time
-subtraction and shop-level branches must remain unchanged.
+currently live year data. The installed patch reuses that sequential scratch
+span; twelve native date-block cases verify the complete fields, later year
+local, and surrounding guards. Native time subtraction and shop-level branches
+remain unchanged; the date-block fixture does not execute those branches.
 
 Shop sale `8095BA60..8095BB80` has a `70`-byte frame. The saved incoming event
 pointer is at `sp+70`; item name scratch is `sp+44`, hour `sp+50`, day `sp+58`,
@@ -52,8 +54,8 @@ is `sp+14`; hour is `sp+1C`, day `sp+24`, month `sp+28`, and the event pointer i
 saved at `sp+30`. A nine-byte month at the existing address would corrupt that
 pointer, which is reloaded for day and hour. Moving only the month input/output
 pointer pair to `sp+18` gives nine bytes before the day field, reusing the hour
-temporary before hour formatting. This needs whole-caller verification, not a
-global capacity assumption.
+temporary before hour formatting. Both pointer words are changed, and the complete
+cartridge-loaded preparer passes valid/invalid-date and surrounding guard checks.
 
 Notice date `800A6384..800A63F8` uses a `28`-byte frame, four-byte temporary at
 `sp+24`, length temporaries at `sp+20`/`sp+1C`, and saved incoming destination/day
@@ -73,13 +75,24 @@ preserve the supplied `a.m.`/`p.m.` text and the space before it. Invalid hours
 use midnight; midnight and noon both use twelve. The complete result needs up to
 seven bytes. Do not substitute the numeric-only routine at the two leaflet sites.
 
-One implementation option is a scoped replacement of the original hour formatter
-body (`800C4228..800C42E8`, 192 bytes), using the existing resident numeric helper
-and appending the complete AM/PM suffix. This avoids resident growth if the new
-code fits that owned span. Approval requires source guards, complete entry/interior
-reference checks, all affected caller capacities, explicit import/jump inventory,
-and native execution. Main dialogue already bypasses the original hour entry.
-This is a design option, not an installed replacement or completed test.
+`overlays/leaflet_dates/hour.c` replaces the original hour formatter body
+(`800C4228..800C42E8`, 192 bytes) with 156 bytes of independently compiled original
+code and a zero-filled tail. It calculates the complete time without imports,
+division, relocations, mutable globals, or a stack frame. It writes exactly the
+returned six or seven bytes; the unchanged native setter pads the final field.
+The main-dialogue numeric-only call remains separate. Null destinations are
+rejected without writes.
+
+`tools/leaflet_dates.py` verifies the original whole actors, relocation files,
+hour body, all three external direct hour calls, and absence of aligned literal
+or direct interior references across the native DMA inventory. Dynamic/computed
+references are not proven absent by that scan. Current resident source/code,
+linked import addresses, complete compiled-hour identity, and conflicting patches
+are checked before replacement maps change. Seven month/day/year call words,
+two Redd scratch-pointer words, and the original hour body change. Actor frames,
+file/BSS sizes, relocation data, saved layouts, and resident allocation do not grow.
+The build option is `--english-leaflet-dates build/leaflet-dates`; it requires
+the current resident module and English runtime.
 
 ## Source identities
 
@@ -105,8 +118,8 @@ The supplied English executable has these reference functions:
 
 ## Implementation and acceptance order
 
-1. Install full month/day/year and AM/PM preparation for both leaflet actors,
-   preserving all live storage, native schedule calculations, and field identities.
+1. Full month/day/year and AM/PM field preparation is installed and passes the
+   scoped native batch. Validate ordinary schedule/actor traversal separately.
 2. Connect complete letter creation and publication at the actual owner boundaries.
    Generic classic loading into separate pointers cannot alone establish final
    snapshot ownership or protect against later native metadata/edge copies.
@@ -117,7 +130,23 @@ The supplied English executable has these reference functions:
    schedule boundaries, and saved metadata. Normal delivery/playthrough remains
    separate evidence from synthetic CPU fixtures.
 
-The audit output is `build/audits/date-callers-recovery.json`. Three focused audit
-tests check direct instruction decoding, all current caller classifications,
-and rejection of an unexpected installed overlay target. None claims the planned
-date replacements are installed or increases translation coverage.
+## Executed validation
+
+The audit output is `build/audits/date-callers-leaflet.json`. Four focused audit
+tests check direct decoding, installed caller classifications, unexpected targets,
+and altered same-address hour code. Six formatter/installer tests cover every
+byte hour at sixteen unaligned offsets, invalid full-width inputs, supplied
+English suffix identity, actor relocation at two bases, complete code mutations,
+and atomic dependency/overlap rejection. The regression batch passes 895 tests;
+the fourth audit test is additional to that batch.
+
+The silent native batch passes 256 hour values and null rejection, twelve renewal
+date blocks, twelve complete sale preparations, and 33 complete Redd preparations.
+It executes 354 calls and 1,141 memory assertions, plus one post-restore assertion.
+Whole actors/relocations, shared field restoration, live save, heap accounting,
+guards, checkpoint restoration, blank FlashRAM/Pak, and graceful shutdown pass.
+Renewal uses a test-only entry/exit in owned relocated code and does not execute
+mailbox mutation or publication. Sale tests retain native ten-byte item names;
+they do not establish wider item capture. Full letter creation, ordinary delivery,
+notice output, fishing units, gameplay presentation, and hardware remain required.
+The [work record](../docs/checkpoints/LEAFLET_DATES.md) pins artifacts and evidence.
