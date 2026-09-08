@@ -6386,3 +6386,71 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Remaining main text/fields/glyphs, general/name/mail integration, semantic and
   gameplay review, title-first images, GameCube-style keyboard, hardware, and
   patch-only release remain. The complete project goal stays active.
+
+## 2026-09-08 — Separate English glyph resource and native drawing foundation
+
+- Added exact-source extraction for semicolon, slash, sun, snowman, and skull.
+  The supplied GameCube font is 8×8-block-tiled I4, not native linear I4; the
+  converter checks the complete executable/font/symbol hashes and decoder
+  agreement before extracting cells. Semicolon/slash use the existing resize
+  algorithm with advances 3/6; symbols retain complete source pixels and width
+  twelve. The 1,600-byte separate resource leaves every native font cell intact.
+  Proposed pairs are `80D0/80AE/80A7/80AB/80BA`; all unlisted tags remain unknown.
+  Resource: `build/extended-glyphs/glyphs.bin`, SHA-256
+  `30dddc658038fea1a4abc359121e1e4fa110edac5f5757ad6001703eff8aae7e`.
+- Added bounded portable selection/measurement, resource binding, nested draw
+  context, and native rectangle/polygon/texture adapters. Every six-argument
+  texture-loader frame value is retained. An independent native instruction/
+  pointer audit over 1,838 executable segments finds no external interior
+  references into the four replaced entry regions. This is not an exhaustive
+  indirect-caller proof. No production hook or import permission is enabled.
+- Compiled 1,384 bytes with the pinned VR4300 Docker toolchain. The image has
+  1,356 text bytes, twenty read-only/alignment bytes, and eight state bytes.
+  The relocator checks internal jumps and signed high/low pairs, including
+  native load/store low halves, with explicit type/order/bounds/source failures.
+  Independent `build/extended-font-probe-repeat/` compilation matches the whole
+  binary, report, and relocation inventory. Code SHA-256:
+  `3aa77cc5ea55e6a79df760852f25e306cd0460e98f46e4b4533416268718b07e`.
+  Relocation-list SHA-256:
+  `67b32f53c2a10fb1426f430a239e03780a34217aef6f8e63fd004cdead4fa36e`.
+- Eight focused tests pass in 0.809 seconds (`build/tests-extended-glyphs-03.log`),
+  including address/undefined-behaviour sanitizers, all 256 second-byte values,
+  exact source pixels, all 29 native-bank tag census, relocation errors and
+  signed-low boundaries, and fixture ownership/restoration. Five unchanged
+  reader-probe tests pass in 0.007 seconds. The separate full-runtime checkpoint
+  remains 714 passing tests; no production runtime source changes are made.
+- The first native attempt stopped before executing new code: ordinary runner
+  calls reject boot routines and code in reserved test scratch. The final test
+  uses the existing verified-code interface and a real native allocation; no
+  call restriction is weakened. The relocation build also initially rejected
+  direct load/store low halves, then gained explicit checked support for those
+  actual compiler instructions. Both failures remain recorded in ignored logs.
+- `build/smoke-extended-font-02/` passes 593 recorded steps and 574 generated
+  native fixture actions: 113 calls, 67 declared returns, 286 memory assertions,
+  and 185 writes. The native allocator supplies 8 KiB at `802DDCE0`; relocated
+  code starts at `802DDCF0`, hash
+  `46fb9105b8fa2459a92e8b2443aa80df7d9b50fbb0e0c1fc3f2cf0e34c987bbb`.
+  All 26 mixed-token sentence draws pass through the actual rectangle/polygon
+  functions, with complete display-list/vertex, width, token-index, context,
+  resource, and guard assertions. Eight tag-helper boundary cases also pass.
+  Actual message-cursor/reveal timing remains untested and unhooked.
+- Independent regeneration checks every executed call/address/argument/declared
+  return, memory read, fixture write, native thread/stack, and restored hook.
+  Entire native font, width table, live save payload, and immutable code remain
+  intact. Hooks are restored/flushed before freeing the allocation, then the
+  whole checkpoint is restored. Four-MiB execution, disabled audio, graceful
+  shutdown, and blank isolated FlashRAM/Pak pass, without seeds or write opt-in.
+  No generated display list is submitted to the GPU. Audit summary:
+  `build/extended-font-native-audit.json`. Scenario SHA-256:
+  `8cb6dbb40acf4d848da323e3436d975c1045cff42e463e8f74cafbbc5873904e`.
+  Runner SHA-256:
+  `8f056906154f04e7fb319835f1145f772c2cdb754bd9314522671ca241506b91`.
+- Added the extended-glyph contract and concrete cartridge/reveal/import/input
+  follow-ups. The production ROM/UPS/candidates retain their complete previous
+  hashes and counts: 12,595 full edits, 11,848 basic edits, and 28 remaining
+  Japanese-static main records. This prototype does not add translated records,
+  solve apology input, approve saved two-byte text, or resume atlas-edge work.
+  Main follow-ups include the six compatible punctuation/symbol references,
+  general strings, remaining mail glyphs/callers, semantic review, and normal
+  gameplay. Title-first graphics, GameCube-style keyboard, hardware checks, and
+  patch-only release remain. The complete project goal stays active.

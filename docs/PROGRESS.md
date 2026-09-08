@@ -74,6 +74,16 @@ and 237 memory assertions, with restored checkpoint and blank saves. Ordinary
 actions remain gameplay checks. The apology target bank still needs two glyphs,
 and its rude-reply detector needs English string storage and matching lengths.
 
+Five [separate English glyphs](../specs/EXTENDED_GLYPHS.md) now have exact supplied
+GameCube source pixels, bounded measurement, and relocatable native draw adapters.
+Eight focused host tests and five reader-probe regressions pass. Both actual
+native drawing paths pass all 26 mixed-token draws, 113 calls, and 286 memory
+assertions, retaining the complete native font, approved widths, and save data.
+The test uses an owned allocation, restores all hooks, and restores its checkpoint.
+Cartridge loading, reveal timing, input/save handling, and import capabilities
+remain unimplemented; no new glyph or translation is enabled in the current ROM.
+This does not resume the paused atlas-edge investigation.
+
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
 follow-up queue. A human playthrough drives the broad gameplay bug and polish

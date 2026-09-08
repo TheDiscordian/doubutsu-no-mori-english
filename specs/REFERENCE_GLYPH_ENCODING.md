@@ -35,6 +35,10 @@ hashes in `translations/reference_matches.json`. Other unrepresentable English
 punctuation still needs actual glyph support; this approval does not replace it
 with shortened or reworded prose. Font-atlas investigation stays paused.
 
+The [separate five-glyph resource and native prototype](EXTENDED_GLYPHS.md)
+provide a tested drawing foundation for missing punctuation/symbols. They do
+not change this plus-only source approval or enable other glyphs in production.
+
 ## Verification boundary
 
 Require complete native/reference/output hash checks, token-aligned offset

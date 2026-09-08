@@ -809,6 +809,12 @@ def main():
                     raise ValueError(f"Unexpected function return: {result['return_value']}")
                 if 'expect_return_v1' in call and result['return_value_v1'] != call['expect_return_v1']:
                     raise ValueError(f"Unexpected v1 result: {result['return_value_v1']}")
+            if 'test_extended_font' in action:
+                from extended_font_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native font probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_extended_font'],record))
             if 'test_npc_mail_sends' in action:
                 from mail_npc_smoke import exercise
                 if not (out/'test.bs1').is_file():

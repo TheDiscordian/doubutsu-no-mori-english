@@ -16,6 +16,16 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+Immediate glyph work: connect the [separate English resource](../specs/EXTENDED_GLYPHS.md)
+to a cartridge loader and owned persistent allocation, then add reveal/width and
+explicit import-capability handling. Exact-source semicolon, slash, sun, snowman,
+and skull resources and both native draw adapters pass the isolated 26-draw batch.
+The production font, translation counts, save restrictions, and renderer remain
+unchanged. Next content targets are `04D2/04FA/08A2/08A6/0A15/0E2A`; apology
+`048E/0491` additionally requires editor/token/matching integration. Keep general
+strings, remaining mail glyphs, and other bulk translation work moving alongside
+these consumers. Do not resume the paused atlas-edge investigation.
+
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch
 passes 48 native actor receipt cases, eight hand-back initializer cases, sixteen
@@ -653,7 +663,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 24 guarded continuation allocations; 99 complete diagnostic labels covered; 28 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
-| R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |
+| R10 | Missing punctuation/symbols and later layout polish | active | Separate exact-source five-glyph resource and both native draw adapters pass host/native tests; cartridge loading, reveal, input/save consumers, and import gating remain; preserve GameCube line/page/timing intent and review necessary N64 departures individually |
 | R11 | Reported font-atlas edge defect | pending, paused by user direction | Do not resume the discarded font comparison investigation without renewed direction |
 
 ## Stability and compatibility
