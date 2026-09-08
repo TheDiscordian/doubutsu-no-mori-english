@@ -189,7 +189,7 @@ checks belong in the combined gameplay/playthrough pass.
 
 Five [complete long conversations](../specs/LONG_ADVICE_SEQUENCES.md) now use
 ten approved records, retaining all GameCube words and existing page/line/pause
-intent. Rover's phone-mode pair and final link, three furniture explanations,
+intent. Rover's cancellation-enable/disable pair and final link, three furniture explanations,
 and the letter-sharing conversation's capitalization remain. All ten complete
 cartridge loads, six links, and termination phases pass in one native batch:
 36 calls and 70 assertions, with guards and checkpoint restoration. All 494
@@ -539,10 +539,20 @@ without changing the clothing replies or reversing native branch meanings.
 Only `2D01` lacks a candidate; the other two need the same contextual correction.
 Establish native choice-table bounds and caller support before adding labels.
 
-Current main-bank coverage is 10,792 candidates; 960 records remain without
-candidates, including 38 containing Japanese static text. The reference
-rejection queue contains 915 unconfirmed identities, 21 control-signature
-differences, 23 missing-field records, and two expansion overflows. These are
+Six [complete Resetti/Gulliver scripts](../specs/RESETTI_GULLIVER_SEQUENCES.md)
+retain entire English conversations through three checked continuation slots.
+Four explicit cue approvals preserve GameCube sound placement/count within
+unchanged native actor/action intervals; two `5808` endings retain the native
+timer. Eight focused, 110 reference, ten earlier special-actor, and five train-phone
+tests pass. The native batch passes nine full parts, 35 silent cue dispatches,
+both timed endings, and 143 assertions with restored checkpoint and blank saves.
+Normal encounters, apology entry, mock-reset scene, gift delivery, audible
+presentation, final layout, and hardware remain required.
+
+Current main-bank coverage is 10,798 candidates; 954 records remain without
+candidates, including 32 containing Japanese static text. The reference
+rejection queue contains 913 unconfirmed identities, eighteen control-signature
+differences, 23 missing-field records, and one expansion overflow. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
 gameplay/field meaning and unused continuation slots have been established.
@@ -621,7 +631,7 @@ identity batches remain, alongside final native festival review and gameplay.
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, eleven special-actor and five contextual-expression conversations, nine native menu/dialogue follow-ups, four complete English references retaining exact native random branches, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 21 guarded continuation allocations; 99 complete diagnostic labels covered; 38 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four complete English references retaining exact native random branches, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 24 guarded continuation allocations; 99 complete diagnostic labels covered; 32 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |

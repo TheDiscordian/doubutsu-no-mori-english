@@ -36,6 +36,14 @@ def load_sequences(path=APPROVALS):
         members = record.get("members")
         if type(record.get('requires_resident_runtime', False)) is not bool:
             raise ValueError('Invalid sequence resident-runtime requirement')
+        if ('retain_reference_sound_triggers' in record
+                and record['retain_reference_sound_triggers'] is not True):
+            raise ValueError('Sequence sound-trigger permission must be explicitly true')
+        if 'timed_end' in record and record['timed_end'] != '7F5808':
+            raise ValueError('Only the reviewed native timed ending is supported')
+        if (('retain_reference_sound_triggers' in record or 'timed_end' in record)
+                and source_kind(record) != 'gamecube'):
+            raise ValueError('Sound/timed-ending permissions require a complete GameCube reference')
         if not isinstance(members, list) or not 1 <= len(members) <= 16:
             raise ValueError("Reference sequence requires one to sixteen members")
         for member in members:
@@ -99,10 +107,17 @@ def normalize_assignments(cmds):
     return result
 
 
-def audit_sequence(original, replacements, member_numbers, info, extra_actor=(), *, resident_runtime=False):
+def audit_sequence(original, replacements, member_numbers, info, extra_actor=(), *, resident_runtime=False,
+                   retain_reference_sound_triggers=False, timed_end=None):
     """Check semantics independently of the approved payload hashes."""
+    if type(retain_reference_sound_triggers) is not bool:
+        raise ValueError('Invalid sequence sound-trigger permission')
     root = commands(original, info)
-    if original[-2:] not in (b"\x7f\x00", b"\x7f\x01") or sum(c[1] in (0, 1) for c in root) != 1:
+    ending = bytes.fromhex(timed_end) if timed_end == '7F5808' else original[-2:]
+    end_codes = (0, 1, 0x58)
+    if (timed_end not in (None, '7F5808') or not root or root[-1] != ending
+            or not original.endswith(ending) or sum(c[1] in end_codes for c in root) != 1
+            or timed_end is None and ending not in (b"\x7f\x00", b"\x7f\x01")):
         raise ValueError("Sequence root must have one final terminator")
     available_fields = {c[1] for c in root if c[1] in FIELDS}
     # The existing English hour formatter prepares AM/PM for this same record.
@@ -113,8 +128,8 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
     translated = []
     for index, data in enumerate(replacements):
         part = commands(data, info)
-        terminator = b"\x7f\x01" if index+1 < len(replacements) else original[-2:]
-        if not data.endswith(terminator) or sum(c[1] in (0, 1) for c in part) != 1:
+        terminator = b"\x7f\x01" if index+1 < len(replacements) else ending
+        if not part or part[-1] != terminator or not data.endswith(terminator) or sum(c[1] in end_codes for c in part) != 1:
             raise ValueError("Sequence part changes the required final/continuing terminator")
         links = [c for c in part if c[1] == 0x0E]
         expected = ([b"\x7f\x0e"+member_numbers[index+1].to_bytes(2, "big")]
@@ -145,9 +160,29 @@ def audit_sequence(original, replacements, member_numbers, info, extra_actor=(),
     actor_requests = lambda cmds: [c for c in cmds if c[1] in ACTOR and c[:3] != b'\x7f\x09\x00']
     if actor_requests(root) != actor_requests(translated):
         raise ValueError('Sequence changes a non-expression actor request')
+    if retain_reference_sound_triggers:
+        # These are separate audible cues, not idempotent state assignments.
+        # Keep every cue in the full approved English; allow only repetitions
+        # of native Resetti cues in the same actor/action interval.
+        def sound_intervals(cmds):
+            result = []
+            for cmd in cmds:
+                if cmd[1] in PRESENTATION | FIELDS | {0, 1}:
+                    continue
+                if cmd[1] == 0x59:
+                    if cmd not in (b'\x7f\x59\x05', b'\x7f\x59\x06'):
+                        raise ValueError('Sequence sound cue is outside the reviewed native pair')
+                    if result and result[-1] == cmd:
+                        continue
+                result.append(cmd)
+            return normalize_assignments(result)
+        if not any(c[1] == 0x59 for c in root) or sound_intervals(root) != sound_intervals(translated):
+            raise ValueError('Sequence sound cues change native actor/action intervals')
     # Existing capitalization and balanced protected-pacing implementation;
     # exact complete payload approvals and native cancellation controls remain.
-    ignored = PRESENTATION | ACTOR | FIELDS | {0x00, 0x01} | ({0x72, 0x73, 0x75} if resident_runtime else set())
+    ignored = (PRESENTATION | ACTOR | FIELDS | {0x00, 0x01}
+               | ({0x72, 0x73, 0x75} if resident_runtime else set())
+               | ({0x59} if retain_reference_sound_triggers else set()))
     native_flow = normalize_assignments([c for c in root if c[1] not in ignored])
     translated_flow = normalize_assignments([c for c in translated if c[1] not in ignored])
     if native_flow != translated_flow:
@@ -212,7 +247,9 @@ def validate_sequences(edits, source, info, groups=None, *, resident_runtime=Fal
                     raise ValueError('Additional actor command is absent from its native source')
                 extra_actor.add(command)
         audit_sequence(source[numbers[0]], replacements, numbers, info, extra_actor,
-                       resident_runtime=resident_runtime)
+                       resident_runtime=resident_runtime,
+                       retain_reference_sound_triggers=group.get('retain_reference_sound_triggers', False),
+                       timed_end=group.get('timed_end'))
         for member in members:
             permits[member["id"]] = SequencePermit(name, member["source_sha256"], member["encoded_sha256"])
     return permits

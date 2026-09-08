@@ -23,9 +23,12 @@ CONTEXTUAL_ACTOR_GROUPS = ('booker_lost_property_complete', 'gulliver_weekly_fal
                            'gulliver_sea_tales_complete', 'rover_seat_refusal_complete',
                            'rover_poor_arrival_complete')
 TRAIN_PHONE_GROUPS = ('rover_first_train_phone', 'rover_repeat_train_phone')
+RESETTI_GULLIVER_GROUPS = ('resetti_reset_alarm_complete', 'resetti_bath_farewell_complete',
+                           'resetti_relaxed_play_complete', 'resetti_one_sock_complete',
+                           'resetti_fake_reset_complete', 'gulliver_shipmates_complete')
 CONTINUING_END_GROUPS = ('nook_planting_complete', 'gulliver_squid_story',
                          'gulliver_overseas_joke', 'gulliver_sailor_uniform',
-                         'rover_seat_refusal_complete')
+                         'rover_seat_refusal_complete', 'gulliver_shipmates_complete')
 
 
 def scenario(rom, group_name="nook_home_explanation", module=None):
@@ -37,7 +40,8 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
                           "resident_late_night_introduction", "native_normal_travel_advice",
                           "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS,
-                          *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS, *TRAIN_PHONE_GROUPS):
+                          *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS, *TRAIN_PHONE_GROUPS,
+                          *RESETTI_GULLIVER_GROUPS):
         raise ValueError("No native scenario exists for this sequence")
     group = load_sequences()[group_name]
     if group.get('requires_resident_runtime', False):
@@ -73,7 +77,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     def dispatch(token, result=0):
         write(index, struct.pack(">I", token.offset))
         call(0x800A21C0, [window, index], result)
-        if token.data[1] not in (0, 1):
+        if token.data[1] not in (0, 1, 0x58):
             read(index, struct.pack(">I", token.offset+len(token.data)))
 
     write(window, bytes(0x330))
@@ -81,6 +85,13 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     for position, number in enumerate(numbers):
         load(number)
         commands = [t for t in tokenize(entries[number], info) if t.kind == "cmd"]
+        if group_name in RESETTI_GULLIVER_GROUPS:
+            # Host audio remains disabled. Check every original English cue's
+            # native dispatch and cursor, without claiming audible output.
+            for token in commands:
+                if token.data[1] == 0x59:
+                    dispatch(token)
+                    read(window+0x2A0, struct.pack('>I', token.offset+len(token.data)))
         links = [t for t in commands if t.data[1] == 0x0E]
         if position+1 < len(numbers) or links:
             if len(links) != 1:
@@ -105,6 +116,20 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                     if token.data[1] in (0x0F, 0x10):
                         dispatch(token)
                 read(window+0x2C4, struct.pack(">I", target))
+        elif group.get('timed_end'):
+            token = commands[-1]
+            if token.data != bytes.fromhex(group['timed_end']) or token.data != b'\x7f\x58\x08':
+                raise ValueError('Sequence changes its approved native timed ending')
+            write(window+0x28C, bytes(4)); write(window+0x270, b'TT')
+            dispatch(token, 2)
+            read(window+0x28C, struct.pack('>I', 8))
+            read(window+0x270, b'TT')
+            read(window+0x2A0, struct.pack('>I', token.offset))
+            dispatch(token, 1)
+            read(window+0x28C, bytes(4))
+            # Retail shifts by one, unlike the GameCube's shift by two.
+            read(window+0x270, struct.pack('>H', 15))
+            read(index, struct.pack('>I', token.offset))
         else:
             expected_end = b"\x7f\x01" if group_name in CONTINUING_END_GROUPS else b"\x7f\x00"
             if commands[-1].data != expected_end:

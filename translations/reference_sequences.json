@@ -897,5 +897,143 @@
         "encoded_sha256": "932bd9a6b9264396ee555aa30915900902055418eddad6dfd774ce9cd7508b5b"
       }
     ]
+  },
+  {
+    "id": "resetti_reset_alarm_complete",
+    "evidence": "Complete supplied Reset Alarm speech retains the accusation, attempted denial, flashing Reset Center light, and bright-light punchline. Keep all English words, manual lines/pages, timing, character scale, and sound cues. The native and English sound streams differ only by one repetition of cue 05 within the same actor/action interval; native cue values 05/06, exact non-expression requests, BGM commands, external 1B3C link, and continuing ending remain. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:1B3B",
+        "source_sha256": "bb54be7cc1d0b1d83e985b122f1cea361e5789d91d6be1e733c9891cba773d41",
+        "reference_id": "message:1B3B",
+        "reference_sha256": "e9dd6543e3516ef57333fda80ad5c3b90f7b63e2eb9ddc856032f296078ba7cf",
+        "encoded_sha256": "e9dd6543e3516ef57333fda80ad5c3b90f7b63e2eb9ddc856032f296078ba7cf"
+      }
+    ],
+    "retain_reference_sound_triggers": true
+  },
+  {
+    "id": "resetti_bath_farewell_complete",
+    "evidence": "Complete supplied farewell retains fatigue, the no-reset promise, bathing advice, and final SCRAM. Keep every English word and presentation cue, including one repeated native cue 05 at the same actor/action interval. Preserve BGM operations and the exact native timed ending 5808, without replacing it with an ordinary wait. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:1B41",
+        "source_sha256": "9ea59f6c3fa80864c42d8d6f2ad7bdf4ba1f04c3993a9b5003445bbda244dd11",
+        "reference_id": "message:1B41",
+        "reference_sha256": "c3394ae32e05880521b176196634b013202f2d1e9bade4227659da3bc9c8c2fb",
+        "encoded_sha256": "c3394ae32e05880521b176196634b013202f2d1e9bade4227659da3bc9c8c2fb"
+      }
+    ],
+    "retain_reference_sound_triggers": true,
+    "timed_end": "7F5808"
+  },
+  {
+    "id": "resetti_relaxed_play_complete",
+    "evidence": "Complete supplied relaxed-play lecture retains the entire fantasy/battles/flowers localisation, interruption for looking away, and reset scolding. Existing page boundary [619,624) becomes continuation 2B42; all other English text, lines, timing, cues, and emphasis remain. Sound cue 05 has one fewer repetition in the same actor/action interval; no cue kind, actor request, or external 2363 branch changes. The generic reserve has no native message, relevant code-immediate, or aligned data references in the pinned scan. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:2362",
+        "source_sha256": "130378b83cec7f986871dc0a648a29259c22007ba0cbeef951d04d297e9e44b8",
+        "reference_id": "message:2362",
+        "reference_sha256": "7b67d301da29d9a6474500e3c638442b846771a5e37e487ba41edc83f10e9bad",
+        "encoded_sha256": "a80c3d68f5819f965b85f2f447189b933e3f512f6a0f70adfa365ce5b4eed15c",
+        "reference_slice": [
+          0,
+          619
+        ]
+      },
+      {
+        "id": "message:2B42",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:2362",
+        "reference_sha256": "7b67d301da29d9a6474500e3c638442b846771a5e37e487ba41edc83f10e9bad",
+        "encoded_sha256": "a2ec2f6437d8c211206d601e093768760fdd31f67737cfa246cf59c19b4dac1f",
+        "reference_slice": [
+          624,
+          1188
+        ]
+      }
+    ],
+    "retain_reference_sound_triggers": true
+  },
+  {
+    "id": "resetti_one_sock_complete",
+    "evidence": "Complete supplied one-sock story retains Reset Alarm duty, eating, mud bath, Mole Monthly, sleeping, immediate digging, and the one-sock complaint. Keep every English word, page, pause, and sound cue, including one more native cue 05 within the same actor/action interval. All native actor requests and outgoing 23E9 continuation remain. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:23E8",
+        "source_sha256": "8b6cc0fba78589a4ca43b030ad09d55e41cf7b698f5bb830469abae64b446faa",
+        "reference_id": "message:23E8",
+        "reference_sha256": "d20145004da476a0fe6b62be3024b4a01f85f0ebc9421e805f686ef3abf507a7",
+        "encoded_sha256": "d20145004da476a0fe6b62be3024b4a01f85f0ebc9421e805f686ef3abf507a7"
+      }
+    ],
+    "retain_reference_sound_triggers": true
+  },
+  {
+    "id": "resetti_fake_reset_complete",
+    "evidence": "Complete supplied mock-reset speech retains freedom-of-choice sarcasm, the complete threat to reset progress, and farewell. Existing page boundary [511,516) becomes continuation 2B43; no English word, other page, pause, scaling cue, native sound request, BGM command, or final timed ending 5808 is removed. The generic reserve has no native message, relevant code-immediate, or aligned data references in the pinned scan. This imports dialogue, not a new reset or save-erasure operation. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:2511",
+        "source_sha256": "f02685723b18d70d315ac53c4d42b3b3abd86a8c08b5814a81b43d7edfb16c6c",
+        "reference_id": "message:2511",
+        "reference_sha256": "bb1d41e4bede260c74f02040a8ed54d00722ce70960d3cce64d39fcc4791b051",
+        "encoded_sha256": "13ab2d3c0be2f921e7e093dc69291103d91bf405446616ae1bb3ffb4cc1f0e97",
+        "reference_slice": [
+          0,
+          511
+        ]
+      },
+      {
+        "id": "message:2B43",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:2511",
+        "reference_sha256": "bb1d41e4bede260c74f02040a8ed54d00722ce70960d3cce64d39fcc4791b051",
+        "encoded_sha256": "fbe33c6257c45cf89260498a9cabbb0a6122f1bfd6111dbb6dfeee3d2bca79cf",
+        "reference_slice": [
+          516,
+          1023
+        ]
+      }
+    ],
+    "timed_end": "7F5808"
+  },
+  {
+    "id": "gulliver_shipmates_complete",
+    "evidence": "Complete supplied Gulliver shipmate story retains roughhousing, jumping overboard despite being unable to swim, the late-night video-game aside, rescue thanks, and treasure offer. Existing page boundary [555,560) becomes continuation 2B46. All English words, remaining pages, timing, and native continuing ending remain. Only expression 0F requires support from Gulliver's own native 240E; all other expression values occur in 23FF. The generic reserve has no native message, relevant code-immediate, or aligned data references in the pinned scan. See RESETTI_GULLIVER_SEQUENCES.md.",
+    "members": [
+      {
+        "id": "message:23FF",
+        "source_sha256": "fad2e5f9d84633ea014db0c04ec334a978e4317b993de504fa8cf90a72d6c14d",
+        "reference_id": "message:23FF",
+        "reference_sha256": "ece702f00e1496cb3bbd8cc15146f22346a0646bd085d18fdf785700be656f54",
+        "encoded_sha256": "310cecb6da07de9185163cf06378187ef246a59e6facacdefec48546cd6cc2f1",
+        "reference_slice": [
+          0,
+          555
+        ]
+      },
+      {
+        "id": "message:2B46",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:23FF",
+        "reference_sha256": "ece702f00e1496cb3bbd8cc15146f22346a0646bd085d18fdf785700be656f54",
+        "encoded_sha256": "ca14c5f8c9fca30b9c1e1dd27b2ea0d07c48d44eae43f5ff3262dbc172abfa06",
+        "reference_slice": [
+          560,
+          1031
+        ]
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:240E",
+        "source_sha256": "f68bcc2a6a22dd8d55e1ecebecc9f1448f365206edb6c49b3285892db2892c2d",
+        "commands": [
+          "7F0900000F"
+        ]
+      }
+    ]
   }
 ]

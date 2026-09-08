@@ -72,6 +72,15 @@ cancellation controls remain ordered; actual message-change and normal-page
 setup calls verify enabled-state retention across the approved phone split.
 This does not admit arbitrary persistent-state changes or other flow controls.
 
+Six [Resetti/Gulliver references](RESETTI_GULLIVER_SEQUENCES.md) retain complete
+English sound-cue presentation and native timed endings. Four explicit sound
+approvals allow only repetition changes for native cues `05/06` in the same
+actor/action intervals; the actual English cues are never collapsed or removed.
+All music operations and other sound commands remain exact. Two explicit
+`timed_end: 7F5808` approvals retain the exact native final timer command, with
+ordinary `01` only at intermediate continuation boundaries. These permissions
+require complete GameCube sources and do not apply to original-draft sequences.
+
 ## Planting-job completion
 
 The one-record `nook_planting_complete` approval retains the complete English
@@ -165,7 +174,7 @@ Five further [complete reference sequences](LONG_ADVICE_SEQUENCES.md) cover
 Rover's repeated phone call, three residents' furniture advice, and a cranky
 resident's letter-sharing explanation. Each uses one existing English page
 transition and an individually checked native reserve. Full English text remains.
-The phone-mode pair stays together; the existing external `046F` continuation
+The native cancellation-enable/disable pair stays together; the existing external `046F` continuation
 remains. The letter explanation retains `75` with its following catchphrase and
 requires the resident runtime. Only that verified capitalization command gains
 runtime-conditional presentation treatment; unrelated controls remain guarded.

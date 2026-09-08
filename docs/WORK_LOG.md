@@ -6134,6 +6134,71 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   play, final review, title-first images, GameCube-style keyboard, hardware, and
   patch-only release remain. The complete project goal stays active.
 
+## 2026-09-08 — Complete Resetti and Gulliver cue/timed-ending scripts
+
+- Imported six full English scripts: `1B3B`, `1B41`, `2362`, `23E8`, `2511`,
+  and `23FF`. They retain the Reset Alarm lecture, bathing farewell, relaxed-play
+  lecture, one-sock story, complete mock-reset threat, and Gulliver's roughhousing,
+  swimming, video-game, rescue, and treasure story. No wording is shortened.
+  Existing page gaps `[619,624)`, `[511,516)`, and `[555,560)` split the three
+  long scripts into reserves `2B42/2B43/2B46`. Bounds are 896; 610; 672/580;
+  842; 564/523; and 578/487. All three reserves have the generic-label source
+  hash and no pinned native script, relevant code-immediate, or aligned data
+  references. Nearby slots with data hits were not allocated.
+- Added explicit complete-reference sound-cue and timed-ending permissions to
+  sequence validation. Native `59` is a sound trigger, not an idempotent state
+  setter. Four approvals retain full English cue placement/count: native/English
+  counts 9/10, 5/6, 9/8, and 6/7. Only native `05/06` repetitions may differ,
+  within identical actor/action intervals; comparison does not remove installed
+  cues. Both native and English tables map those indices to `0427/0428`.
+  All other sound/music commands, fields, and native actions remain guarded.
+- Explicit `5808` endings remain only in the final `1B41/2511` parts. Both native
+  parser phases remain unchanged. The retail end timer is `(8-1)*2+1 = 15`,
+  unlike the GameCube source's doubled shift result of 29. Native instructions,
+  parser, dispatcher, and sound table are pinned in host tests. No production
+  timer, runtime, font, music operation, reset action, or save format changes.
+  Gulliver's additional expression `0F` is bound only to his own native `240E`.
+- Eight focused tests pass in 6.795 seconds; 110 reference tests in 33.144 seconds;
+  ten earlier special-actor tests in 19.927 seconds; and five train-phone tests
+  in 2.054 seconds. Logs are `build/tests-resetti-gulliver-02.log` and
+  `build/tests-resetti-gulliver-{reference-02,special-01,phone-01}.log`.
+  The first reference run failed only two catalogue-count fixtures (59/51);
+  the new nine sequence parts require 68/60. Updating those expected counts
+  resolves both failures without weakening validation. The separate unchanged
+  full-runtime checkpoint remains 714 passing tests.
+- `build/smoke-resetti-gulliver-01/` passes 309 steps, 68 native calls/returns,
+  nine full cartridge loads, 35 sound-cue dispatches, both timed endings, and
+  143 memory assertions. Both ending timers equal 15. Independent regeneration
+  checks every call/address/argument/return, full read/guard, restored stack and
+  checkpoint, silent four-MiB execution, graceful shutdown, and blank isolated
+  FlashRAM/Pak. No save seeds or write permissions are used. Scenario SHA-256:
+  `e92d7a1222c4a35da98086fe602285c16d9c8914d5697ce965ff09fe68e6d7d3`.
+  These injected calls do not establish ordinary encounters, apology entry,
+  mock-reset scene, treasure delivery, audible presentation, or hardware.
+- Full/basic candidates: 12,591/11,844. Main: 10,798 = 9,802 references + 615
+  original dialogue drafts + one original continuation + 281 development labels
+  + 99 diagnostics. Remaining: 954 = 32 Japanese-static + 919 nonstatic + one
+  Latin + two symbol records; ten nonstatic records contain dynamic insertions.
+  Rejections: 913 unconfirmed, eighteen control differences, 23 missing fields,
+  and one overflow, with one original fallback. Layout warnings: 1,488.
+  Candidate source weight: 644,939/746,978; main 634,607/637,761.
+- Pilot: `build/resetti-gulliver-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `58dfb1a1035ee865d0056db738dee98fe09fdc2e0ba32bb2909a72b3a204ba3e`.
+  UPS SHA-256:
+  `2e2e07afe16b3af615b79286e7b380c15ceae347eadaee6e99ad906b0170e886`.
+  Candidate SHA-256:
+  `0bc33d0dc5bda084985e250e221158806eb7930b291d0c2bcd78dc2d588f57f7`.
+  The artifact audit verifies all 12,591 installed payloads, source/build hashes,
+  full UPS reconstruction, only six added IDs and three reserve conversions,
+  and every earlier other full/basic edit unchanged. Only DMA files
+  `00019D40/00CF9000/02000000` differ; the first differs only in its table.
+  Runtime, fonts, and all other resource files match the menu-follow-up pilot.
+- Updated progress, queue, and sequence contracts. Remaining main commands,
+  fields, glyphs, test text, general/name/mail destinations, ordinary gameplay,
+  semantic/presentation review, title-first graphics, GameCube-style keyboard,
+  hardware, and patch-only release remain. The complete project goal stays active.
+
 ## 2026-09-08 — Complete both long train phone calls with native skip behaviour
 
 - Imported all English content for `2AD0 → 07DA` and `2ADE → 2B1B`. Original
