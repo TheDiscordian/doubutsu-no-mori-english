@@ -116,6 +116,26 @@ stay out of the candidate file and appear in `drafts-withheld.json`; basic build
 remain supported. The ROM builder independently verifies the complete installed
 overlay and relocation files before accepting dependent edits. See
 [date preparation](../specs/DIALOGUE_DATES.md).
+
+Shared-string groups use the same explicit option in candidate generation and
+ROM construction:
+
+- `--english-fortunes`: all 128 Katrina fragments and their sixteen-byte native
+  caller; requires the resident module.
+- `--english-resetti-replies`: all 32 rude replies and their native matching
+  lengths; does not require a resident module.
+- `--english-shop-units`: all 120 native quantity counters, including explicit
+  empty counters and the sapling identity correction; does not require a module.
+- `--english-resident-words`: 136 complete drinks, colours, places, reading
+  material, shop types, and category labels; requires the resident module and
+  installs the scoped native caller changes. It composes with dialogue dates.
+
+Each group requires its complete source-bound values and caller changes. These
+options share the relocated general-string data bank and do not enlarge other
+callers. See [general strings](../specs/GENERAL_STRINGS.md) and
+[resident words](../specs/RESIDENT_WORDS.md). Basic non-module generation omits
+the two module-dependent options.
+
 Changing the module source also requires rebuilding the module-bound NPC creator
 and generation probe using `tools/build_npc_mail_capture.py` and
 `tools/build_mail_generation.py`. Each report binds its imports to the exact

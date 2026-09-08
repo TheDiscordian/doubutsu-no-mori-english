@@ -32,6 +32,7 @@ from reference_content import adapt_content_reference, validate_content_candidat
 from fortune_strings import candidates as fortune_candidates, permits as fortune_permits
 from resetti_replies import candidates as resetti_candidates, permits as resetti_permits
 from shop_units import candidates as shop_unit_candidates, permits as shop_unit_permits
+from resident_words import candidates as resident_word_candidates, permits as resident_word_permits
 from placeholder_text import placeholder_edit
 from reference_mail_fragments import load_fragment_matches, reference_fragment_edits
 from contextual_choices import load_contextual_choices, contextualize_edits
@@ -153,6 +154,7 @@ def main():
     parser.add_argument('--english-fortunes', action='store_true', help='Complete source-verified Katrina phrases; requires resident module')
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete source-verified Resetti reply dictionary and matching lengths')
     parser.add_argument('--english-shop-units', action='store_true', help='Complete source-verified native shop counter families')
+    parser.add_argument('--english-resident-words', action='store_true', help='Complete source-verified ordinary resident words; requires resident module')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -171,6 +173,8 @@ def main():
         parser.error('--english-dialogue-dates requires --runtime-module')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
+    if args.english_resident_words and not args.runtime_module:
+        parser.error('--english-resident-words requires --runtime-module')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     rom = verified_rom(args.rom.read_bytes())
@@ -274,6 +278,11 @@ def main():
         units = (shop_unit_candidates(rom,gc,{r['id']:r for r in inventory},info)
                  if name=='string' and args.english_shop_units else {})
         unit_permits = shop_unit_permits(rom,list(units.values()),info) if units else {}
+        words = (resident_word_candidates(rom,gc,{r['id']:r for r in inventory},info)
+                 if name=='string' and args.english_resident_words else {})
+        word_permits = resident_word_permits(rom,list(words.values()),info) if words else {}
+        if words.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys() | units.keys()):
+            raise ValueError('Resident-word group conflicts with another approved group')
         if units.keys() & (override_ids | matches.keys() | fortunes.keys() | replies.keys()):
             raise ValueError('Shop-unit group conflicts with another approved group')
         if replies.keys() & (override_ids | matches.keys() | fortunes.keys()):
@@ -296,7 +305,12 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in units:
+            if id in words:
+                edit=words[id]
+                validate_entry(original,encode(edit['translation'],info),info,name,
+                               resident_runtime=True,resident_word_permit=word_permits[id])
+                counts['complete_resident_words'] += 1
+            elif id in units:
                 edit=units[id]
                 validate_entry(original,encode(edit['translation'],info),info,name,
                                shop_unit_permit=unit_permits[id])

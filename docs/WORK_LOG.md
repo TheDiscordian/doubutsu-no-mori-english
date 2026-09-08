@@ -6985,3 +6985,106 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Resident shop-name and category-label paths use different destinations and
   need separate treatment. All broader text, editor, mail, review, gameplay,
   release, hardware, title, and keyboard requirements remain open.
+
+## 2026-09-08: complete ordinary resident word fields
+
+- Collected and independently audited the passing five-shop process, updated
+  progress/specifications, and committed/pushed `bde0d88`. Verified the remote
+  remains private and its main branch equals local HEAD. The previous goal
+  turn's installed-text measurement provided verified evidence; this turn
+  continues implementation rather than repeating a completion estimate.
+- Added `--english-resident-words` and the complete 136-entry group:
+  `0414..0457/0464..0483/04A0..04BF/055D..0560`. These cover drinks, colours,
+  shop types, places, reading material, and item categories. All complete
+  supplied English values agree with the legacy bank and have source/output
+  hash-bound permits. Category labels fit ten bytes; the others fit sixteen.
+  No extracted reference text is committed.
+- Verified all four callers of native helper `80920FFC`, unchanged family
+  bases and random pools, and the BSS span `80921E08..80921E18`. The helper's
+  loader/setter lengths change from ten to sixteen. The three ordinary outer
+  preparers retain their exact RNG behaviour; GameCube previous-choice skip
+  logic and additional fish/insect entries are not introduced. The fourth
+  helper caller belongs to the separately replaced birthday body.
+- The shop-name preparer grows its frame from 48 to 56 bytes and loads the
+  full sixteen-byte plain English name at `sp+24`. That write replaces the
+  complete original temporary: six-byte `7F5046A00004` prefix plus four-byte
+  Japanese name. The native prefix would incorrectly constrain the longer
+  English name; the supplied English routine uses plain complete text instead.
+  The initial ten-byte construction is overwritten before consumption.
+  All four valid shop levels still come from the original two saved bits.
+  The three random-number fields and their exclusive upper bounds remain.
+- Exactly seven original instruction words change, none relocated. Installation
+  accepts only the original actor or the exact existing date/birthday patch,
+  retaining all earlier instructions and relocation edits. The resident item
+  setter already preserves sixteen-byte display values and ten-byte native
+  compatibility copies; no resident code/data/allocation growth is required.
+  Category labels still use ten-byte free-string slot 11 and command `37`,
+  not the town command `2F` or an item field. The actual native command table
+  and wrapper establish that binding before the scenario is generated.
+- Seven focused source/build tests pass in 6.914 seconds. The full 836-test
+  regression batch passes in 300.917 seconds,
+  `build/tests-resident-words-full.log`. Four added fixture tests cover native
+  pool indices/float bits, outer draw counts/ranges, request intervals, and
+  workspace/frame bounds. Their first combined run caught an arithmetic error
+  in the test itself: hexadecimal `24` plus sixteen is decimal 52, not 40.
+  Corrected that expected constant; no production or native-fixture code changed.
+  All eleven focused tests pass in 6.792 seconds,
+  `build/tests-resident-words-final-02.log`. The native batch was not restarted.
+- Full generation adds exactly 113 entries, reaching 12,989. Twenty-three
+  earlier texts retain their full wording with updated group provenance; all
+  other prior edits and metadata remain identical. Disabling the option
+  reproduces the shop-counter candidate file exactly. Non-module basic
+  generation remains 12,015. Ordinary strings total 526/1,562, leaving 1,036
+  missing candidates: 927 Japanese, eighty development labels, four Latin,
+  24 empty, and one symbol record. Current ordinary candidates comprise 496
+  Latin values and thirty intentional empty counters. Main candidates remain
+  10,825, with the same five Japanese sample scripts and other native gaps.
+  Source-character counts are 648,486/746,978 across ordinary banks and
+  2,744/7,114 in the general-string bank. No new semantic-review credit or
+  overall project-completion claim is made.
+- Pilot `build/resident-words-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `f88f63e9c6e61e7979ca7ba03a7af0efc8c6dbce4bcef1ac08de4f222d41eb3d`.
+  UPS SHA-256:
+  `84e08fa4eb3bddc40039e6bff8af1d272d7202383564702a4524d5eea0058fdf`.
+  Candidate `build/resident-words-candidates/translations.json`, SHA-256:
+  `5a818f24f4ba8c0003e22cb37cedf7069a1f0be9a6c948c6518a403b29318b53`.
+  Coverage: `build/resident-words-coverage/`. Independent reconstruction checks
+  all 12,989 installed edits, every unchanged general string, and the complete
+  original-ROM UPS application. Only DMA metadata `00019D40`, ordinary actor
+  `00815B70`, string offsets `00D18000`, and string data `02600000` differ from
+  the shop-counter pilot. Reversing the seven approved actor words reconstructs
+  that pilot's complete date/birthday actor. The relocation file, main code/text,
+  fonts, other actors, mail resources, keyboard, and title remain unchanged.
+  String data occupies 8,960 bytes; the ROM stays 32 MiB. The resident remains
+  24,192 linked bytes, with 384 free.
+- The first native batch `build/smoke-resident-words-01/` passes 606 calls and
+  1,097 memory assertions over 2,955 recorded steps. Every one of 128 new
+  random words passes the actual cartridge helper and complete insertion.
+  Six original outer-dispatch cases cover all three preparers and all four
+  complete English shop types. Fifty-six independent native RNG calls match
+  all subsequent preparation states and float bits. All 118 distinct complete
+  resident messages load, retaining every surrounding byte during 127 scoped
+  field insertions. Including isolated fields, 287 insertions pass. Four item
+  categories pass the native loader, free-string setter, and command `37`;
+  their category-selection actor path itself is not executed.
+- Independently regenerated the full scenario, checked every word ID/pool/slot,
+  outer group/shop/draw tuple, complete message ID/return, assertion hash,
+  stack-restored call, and complete actor/BSS/relocation/save retention.
+  Only the expected sixteen-byte actor temporary changes. Test shop-level
+  bits are changed in isolated RAM, checked against otherwise complete saved
+  memory, then restored. Heap/stack/module guards, checkpoint restoration,
+  blank isolated FlashRAM/Pak, and graceful shutdown pass. Audio is disabled
+  and four-MiB configuration is selected. Scenario SHA-256:
+  `3a263436a8872298660a8ca34295a09b09fcc0faf8d36b6ef8a265ab1df931f0`.
+  No ordinary villager interaction, category-selection gameplay, rendered
+  acceptance, or original-hardware validation is claimed.
+- Broader caller audit confirms the native fortune-slip bases
+  `02B1/02A1/02DA/02CA`, with sixteen choices each, and result base `02C1`;
+  these do not share the newly imported resident ranges. The fruit-box caller
+  uses a distinct fifteen-byte destination and page offsets beginning at
+  `04EA`. Its page bounds and remaining labels still need their own integration.
+  The five resident families shared with NPC mail remain the next ordinary-bank
+  import task; wider imports must bind every affected mail/ordinary consumer
+  rather than letting non-generation builds truncate words. The title screen
+  remains the main image priority, and all wider translation, review, gameplay,
+  editor, mail, release, keyboard, and hardware requirements remain active.

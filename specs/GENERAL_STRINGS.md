@@ -39,6 +39,14 @@ constants, and free-string consumers are bound to the native actors. This group
 shares string-data relocation without requiring a resident module; unrelated
 IDs retain their original budgets.
 
+The optional [resident-word integration](RESIDENT_WORDS.md) supplies 136 complete
+drinks, colours, places, reading-material words, shop types, and category labels.
+Its random-word helper uses the available sixteen-byte BSS span; the shop-name
+preparer receives a sixteen-byte local. Seven instruction words change, with
+no new resident allocation. Category labels retain their ten-byte free-string
+caller. The five random-word families shared with NPC mail remain separate
+ordinary-bank work, despite their complete separate mail resource.
+
 `tools/audit_string_callers.py` scans pinned executable-segment definitions and
 records thirty-four direct J/JAL sites. It records nearby instructions, file
 hashes, linked addresses, and conservative immediate argument hints. Hints are
@@ -60,7 +68,8 @@ and seven sites without a straight-line immediate length.
 | `800C40D4..800C43F4` | Native date/unit suffix formatters | Message date calls already use resident English formatters; other UI paths remain native |
 | `809DC590` in `ovl_Ev_Gypsy` | Four 32-entry fortune families; scoped sixteen-byte local and resident item fields | Complete source-bound English group implemented; normal paid readings and luck effects remain gameplay checks |
 | Five shop actors | Complete 120-counter group; count-minus-one indexing, eight native families, unchanged ten-byte locals and free-string slot 8 | Native batch passes all actors; ordinary transactions and presentation remain gameplay checks |
-| Other actor overlays | Fortune slips, fruit-box labels, and the ordinary resident overlay | Resolve ID tables, local frames, and downstream insertion/draw limits |
+| Ordinary resident overlay | Four helper callers, sixteen-byte shared temporary and item fields; full shop-type local; unchanged ten-byte item-category labels | Complete scoped word group implemented; remaining families shared with NPC mail and ordinary gameplay still need work |
+| Other actor overlays | Fortune slips and fruit-box labels | Resolve ID tables, local frames, and downstream insertion/draw limits |
 
 The NPC-letter families in `mNpc_SetRemailFreeString` use thirty-two-entry ranges
 starting at `0314`, `0334`, `02F4`, `0219`, `01E5`, `0354`, `0374`, `0394`,

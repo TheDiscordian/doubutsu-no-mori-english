@@ -60,13 +60,23 @@ identity correction. All five original actors pass 120 preparations, 250 field
 insertions, and complete actor/save retention. Normal transactions and visual
 polish remain gameplay checks; reserved counter rows stay unchanged.
 
-Next shared-string work covers ordinary resident random words. Native helper
-`80920FFC` loads only ten bytes, then supplies item fields; longer complete
-English phrases need caller/storage changes. Audit all four calling preparers,
-their ID tables, static temporary ownership, and resident item-field consumers
-before importing their groups. The separate 352-phrase NPC-mail resource does
-not translate this ordinary bank. Also check the resident shop-name preparer
-and category labels separately; their destinations and lengths differ.
+The [resident-word integration](../specs/RESIDENT_WORDS.md) installs 136 complete
+values for drinks, colours, places, reading material, shop types, and category
+labels. All four helper callers and static temporary ownership are verified;
+seven native instruction changes compose with date/birthday preparation.
+The silent batch passes every new random word and shop type, 118 unique complete
+messages, and 1,097 memory assertions with restored checkpoint and blank saves.
+Category loading/free-field insertion is tested; normal category selection and
+villager interactions remain gameplay checks.
+
+Next shared-string work covers the five resident families shared with NPC mail:
+`01E5/0219/02F4/0314/0334`, thirty-two entries each. The complete 352-phrase
+mail resource is already available, but its separate generation/capture path
+does not translate the ordinary bank. Bind wider ordinary imports to every
+affected native/mail consumer without letting non-generation builds truncate
+long English words. Keep the other mail-only families in the same broader
+consumer audit. Fortune-slip and fruit-box labels also remain ordinary-bank
+work; their destinations differ from message item fields.
 
 Follow-up R05 tasks: validate the ordinary post-office hand-back/error flow and
 finish remaining readers/metadata before enabling generation. The Pelly patch

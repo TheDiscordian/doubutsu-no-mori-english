@@ -12,6 +12,7 @@ from placeholder_text import validate_placeholder
 from fortune_strings import FortunePermit
 from resetti_replies import ResettiReplyPermit
 from shop_units import ShopUnitPermit
+from resident_words import ResidentWordPermit
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -70,7 +71,17 @@ def expanded_bound(data, info, *, extended_glyphs=False):
 
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
-                   extended_glyphs=False, fortune_permit=None, resetti_permit=None, shop_unit_permit=None):
+                   extended_glyphs=False, fortune_permit=None, resetti_permit=None, shop_unit_permit=None,
+                   resident_word_permit=None):
+    if resident_word_permit is not None:
+        if (not isinstance(resident_word_permit, ResidentWordPermit) or bank!='string' or policy!='exact'
+                or not resident_runtime or resident_word_permit.capacity not in (10,16)
+                or any(p is not None for p in (fortune_permit,resetti_permit,shop_unit_permit))
+                or resident_word_permit.source_sha256!=sha256(original)
+                or resident_word_permit.encoded_sha256!=sha256(replacement)
+                or not 1<=len(replacement)<=resident_word_permit.capacity
+                or any(t.kind!='text' for t in tokenize(replacement,info))):
+            raise ValueError('Resident-word capacity requires an exact complete field permit and resident runtime')
     if shop_unit_permit is not None:
         if (not isinstance(shop_unit_permit, ShopUnitPermit) or bank != 'string' or policy != 'exact'
                 or fortune_permit is not None or resetti_permit is not None
@@ -184,7 +195,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
         if any(t.kind == "cmd" for t in tokenize(replacement, info)) and len(replacement) > len(original):
             raise ValueError("Dynamic choice expansion requires review")
     elif (len(replacement) > len(original) and fortune_permit is None
-          and resetti_permit is None and shop_unit_permit is None):
+          and resetti_permit is None and shop_unit_permit is None and resident_word_permit is None):
         raise ValueError("Translation exceeds current entry budget")
     if bank != 'message' and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
         raise ValueError('Two-byte message tags need explicit semantic review')
