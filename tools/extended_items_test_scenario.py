@@ -6,9 +6,9 @@ import json
 from pathlib import Path
 import struct
 
-from aflib import by_vrom, sha256
+from aflib import by_vrom, sha256, verified_rom
 from extended_items import COUNTS, HEADER, VROM
-from item_names_test_scenario import ordinary_item
+from item_names_test_scenario import ordinary_item, scenario as native_scenario
 from runtime_module import MODULE_VROM, verify_test_module
 
 
@@ -73,14 +73,28 @@ def scenario(rom, module, names):
     return actions
 
 
+def combine_load_scenarios(wide, native):
+    """Keep both loader paths in one identical isolated checkpoint."""
+    if (len(wide) < 8 or len(native) < 8 or wide[:3] != native[:3]
+            or wide[-5:] != native[-5:]):
+        raise ValueError('Item loader scenarios must share exact setup and restoration')
+    return wide[:-5]+native[3:-5]+wide[-5:]
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--module", type=Path, default=Path("build/runtime-module/module.json"))
     parser.add_argument("--names", type=Path, default=Path("build/extended-items/names.json"))
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument('--native-item', type=lambda value: int(value, 0), action='append',
+                        help='Also test explicit unchanged-width item loads in the same checkpoint')
+    parser.add_argument('--source-rom', type=Path, default=Path('local/rom/Doubutsu no Mori (Japan).z64'))
     args = parser.parse_args()
     actions = scenario(args.rom.read_bytes(), json.loads(args.module.read_text()), json.loads(args.names.read_text()))
+    if args.native_item is not None:
+        native = native_scenario(verified_rom(args.source_rom.read_bytes()), args.rom.read_bytes(), args.native_item)
+        actions = combine_load_scenarios(actions, native)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"actions": len(actions), "output": str(args.output)}))

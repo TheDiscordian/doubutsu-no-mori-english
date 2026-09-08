@@ -15,6 +15,7 @@ from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import MODULE_COMMANDS, add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import load_sequences, reference_sequence_edits
+from item_matches import load_matches as load_item_matches
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
@@ -138,6 +139,7 @@ def main():
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
+    item_matches = load_item_matches()
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
                                        Path("translations/n64-intro-jobs.json"),
                                        Path("translations/n64-shop-menus.json"),
@@ -164,7 +166,8 @@ def main():
                                        Path("translations/n64-moving-conversations.json"),
                                        Path("translations/n64-nes-launch-prompts.json"),
                                        Path("translations/n64-diagnostic-labels.json"),
-                                       Path("translations/n64-travel-advice.json")])
+                                       Path("translations/n64-travel-advice.json"),
+                                       Path("translations/n64-startup-errors.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
@@ -349,7 +352,7 @@ def main():
         item_edits, item_manifests, item_remaining, item_report = item_candidates(
             bank, list(map(json.loads, (args.inventory/(name+".jsonl")).read_text().splitlines())),
             list(map(json.loads, (args.gc_names/(reference_name+".jsonl")).read_text().splitlines())),
-            info, override_ids)
+            info, override_ids, matches=item_matches)
         edits.extend(item_edits)
         manifests.extend(item_manifests)
         reports[name] = item_report

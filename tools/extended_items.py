@@ -8,6 +8,7 @@ import struct
 
 from aflib import CODE_VROM, by_vrom, sha256, verified_rom
 from item_candidates import item_candidates
+from item_matches import load_matches, validate_candidate
 from item_aliases import confirmed_aliases, update_alias_reports
 from textbanks import banks
 from textcodec import LATIN, command_info, encode, tokenize
@@ -23,8 +24,11 @@ def resource(rom, edits):
     if [b.name for b in selected] != [f"item_{g:02X}" for g in [*range(0x20, 0x30), 0x10]]:
         raise ValueError("Unexpected extended item-bank order")
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
+    matches = load_matches()
+    source_banks = {bank.name: bank.entries() for bank in selected}
     grouped = {}
     for edit in edits:
+        validate_candidate(edit, source_banks, info, matches)
         if edit["id"] in grouped:
             raise ValueError("Duplicate extended item-name ID")
         grouped[edit["id"]] = edit
@@ -90,6 +94,7 @@ def main():
     info = command_info(by_vrom(rom)[CODE_VROM].extract(rom))
     edits, reports, remaining_by_bank = [], {}, {}
     source_banks = {bank.name: bank for bank in banks(rom)}
+    matches = load_matches()
     args.output.mkdir(parents=True, exist_ok=True)
     for bank in source_banks.values():
         if not bank.name.startswith("item_"):
@@ -97,7 +102,7 @@ def main():
         reference_name = "furniture" if bank.name == "item_10" else bank.name
         rows = list(map(json.loads, (args.inventory/(bank.name+".jsonl")).read_text().splitlines()))
         refs = list(map(json.loads, (args.gc_names/(reference_name+".jsonl")).read_text().splitlines()))
-        candidates, _, remaining, report = item_candidates(bank, rows, refs, info, capacity=WIDTH)
+        candidates, _, remaining, report = item_candidates(bank, rows, refs, info, capacity=WIDTH, matches=matches)
         edits.extend(candidates)
         reports[bank.name] = report
         remaining_by_bank[bank.name] = remaining

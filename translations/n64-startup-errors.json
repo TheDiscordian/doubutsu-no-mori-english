@@ -1,0 +1,20 @@
+[
+  {
+    "id": "message:09CC",
+    "source_sha256": "d84ca565ff0fa8e205578548d814115ec7a2d38ab8f4ad529bd7404caea8b1cd",
+    "translation": "I'm sorry.{cmd:7F030C}\nThe clock built into this\ncartridge{cmd:7F0308} seems to have stopped.{cmd:7F04}\n{cmd:7F02}For details on how\nto deal with this,{cmd:7F04}\nplease see your\n{cmd:7F50E11ED713}Instruction Booklet.{cmd:7F04}\n{cmd:7F02}You can still play the game\nwithout using {cmd:7F0306}the clock.{cmd:7F04}\n{cmd:7F02}Do you want to start playing\nas things are?{cmd:7F030C}\nOr would you rather wait a bit{cmd:7F0306}\nand try again?{cmd:7F1600E700E8}{cmd:7F04}{cmd:7F0D}{cmd:7F0F09CD}{cmd:7F1009CF}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "reference_layout",
+    "notes": "Native cartridge-clock failure, not the GameCube console clock. Preserve the instruction-booklet advice, playing without the clock, and waiting before another attempt. Keep native choices 00E7/00E8 and successors 09CD/09CF. Only the highlighted Instruction Booklet length changes from 0C to 13; every other native command and argument remains exact. This text edit does not diagnose hardware or change the clock path."
+  },
+  {
+    "id": "message:09D1",
+    "source_sha256": "91947d9e118818fa4c865fc5e08e222f2149e174716e503c03f8b16a276a1264",
+    "translation": "I'm sorry{cmd:7F0304} to interrupt.{cmd:7F04}\n{cmd:7F02}It looks like your town data\nhas been corrupted.{cmd:7F04}\n{cmd:7F02}Please start again{cmd:7F0306}\nfrom the beginning.{cmd:7F04}\nI'm very sorry about this.{cmd:7F09090001}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "control_policy": "exact",
+    "notes": "Native corrupted-town notice asks the player to start again and apologises, then emits the existing 09/9/0001 request and normal terminator. Do not import GameCube Memory Card slot insertion, a new erase/retry choice, or the legacy's different continuation. This edit changes wording only, not save data or recovery logic."
+  }
+]

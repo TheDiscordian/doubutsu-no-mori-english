@@ -5,13 +5,14 @@ from collections import Counter
 from aflib import sha256
 from textcodec import LATIN, encode, tokenize
 from textvalidate import validate_entry
+from item_matches import identity_key, verify_source
 
 ITEM_WIDTH = 10
 REFERENCE_WIDTH = 16
 FURNITURE_COUNT = 947
 
 
-def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=ITEM_WIDTH):
+def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=ITEM_WIDTH, matches=None):
     if capacity not in (ITEM_WIDTH, REFERENCE_WIDTH):
         raise ValueError("Unsupported item-name candidate capacity")
     source = bank.entries()
@@ -28,12 +29,22 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
             result[row["id"]] = row
         return result
     inventory, references = indexed(inventory), indexed(references)
+    matches = {} if matches is None else matches
+    for id in matches:
+        if id.startswith(bank.name+':'):
+            index = int(id.split(':')[1], 16)
+            if index >= len(source)-(1 if furniture else 0) or identity_key(id) != id:
+                raise ValueError('Item identity approval has an absent or non-root native slot')
     edits, manifests, remaining, counts, identities = [], [], [], Counter(), set()
     count = FURNITURE_COUNT*4 if furniture else len(source)
     for index in range(count):
         id = f"{bank.name}:{index:04X}"
         reference_index = index//4 if furniture else index
         reference_id = f"{'furniture' if furniture else bank.name}:{reference_index:04X}"
+        match = matches.get(identity_key(id))
+        if match:
+            verify_source(match, source[index], info)
+            reference_id = match['reference_id']
         legacy_id = f"{bank.name}:{reference_index:04X}"
         if furniture and source[index] != source[index//4*4]:
             raise ValueError("Native furniture rotation names differ")
@@ -41,6 +52,8 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
             counts["original_draft_override"] += 1
             continue
         row, reference = inventory.get(id), references.get(reference_id)
+        if match and (not reference or reference.get('source_sha256') != match['reference_sha256']):
+            raise ValueError('Missing or stale approved item-name reference')
         if not row or row.get("source_sha256") != sha256(source[index]):
             raise ValueError("Missing or stale item-name inventory")
         if row.get("legacy_entry_id") != legacy_id:
@@ -48,7 +61,7 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
         reason = None
         if not reference or not reference.get("text"):
             reason = "missing_english_item_reference"
-        elif row.get("legacy", "").strip().casefold() != reference["text"].casefold():
+        elif not match and row.get("legacy", "").strip().casefold() != reference["text"].casefold():
             reason = "item_identity_not_confirmed_by_legacy"
         else:
             encoded = encode(reference["text"], info)
@@ -72,6 +85,10 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
                                "match_basis": "rotation_index_name_confirmed_case_insensitive_by_legacy"
                                if furniture else "same_id_name_confirmed_case_insensitive_by_legacy"},
                 "status": "mechanically_validated_candidate_not_reviewed", "adaptations": []}
+        if match:
+            edit['item_reference_match'] = match['id']
+            edit['provenance']['match_basis'] = 'reviewed_native_item_identity'
+            counts['reviewed_identity_candidates'] += 1
         edits.append(edit)
         manifest = {k: v for k, v in edit.items() if k != "translation"}
         manifest.update(encoded_bytes=len(encoded), encoded_sha256=sha256(encoded),

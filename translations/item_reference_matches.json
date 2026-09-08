@@ -1,0 +1,1434 @@
+[
+  {
+    "id": "item_10:0000",
+    "source_sha256": "92cc9bd73d1e4799981a729359aa5b14b2d523369a1be8a9db93d738360cd531",
+    "native_name": "ハロウィンクロゼット",
+    "reference_id": "furniture:0000",
+    "reference_sha256": "0c859f0ead850a37cdea605f7c278eea3bd7515af5c80f2e1b14995cbfb43ff4",
+    "evidence": "Reviewed native ハロウィンクロゼット against the complete supplied English name spooky wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0004",
+    "source_sha256": "3641676c12bc9f6c703c436691e5ccfbdb060073bf2ec2b42238b08604b2c7b2",
+    "native_name": "シックなクロゼット",
+    "reference_id": "furniture:0001",
+    "reference_sha256": "2c621a1193b8573e98dc66b1b019e449f9c5e723a5321cdaff530f3a1d9ac734",
+    "evidence": "Reviewed native シックなクロゼット against the complete supplied English name classic wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0008",
+    "source_sha256": "e723aa59716105d86c1008767dd540f4ba0c581adcbec06b5eccdb73106c2b80",
+    "native_name": "あおいクロゼット",
+    "reference_id": "furniture:0002",
+    "reference_sha256": "c286f7288d6eac37e320b799f41457c077ebd7ddeaf71d2f9d48226da227721f",
+    "evidence": "Reviewed native あおいクロゼット against the complete supplied English name blue wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:000C",
+    "source_sha256": "d8dfb511e8cc4eeff184c13bc3772f61439a7ba940081059d5cd7bdb33a9248f",
+    "native_name": "ロッカー",
+    "reference_id": "furniture:0003",
+    "reference_sha256": "741744127a2f62637a936de6d3353c2b345c9ccb025381d07dd12d6490624dd7",
+    "evidence": "Reviewed native ロッカー against the complete supplied English name office locker in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0010",
+    "source_sha256": "c396586259ccbf3a8b6c945728fdb12e8803311bf61750f3440a97d201c34171",
+    "native_name": "クリスマスクロゼット",
+    "reference_id": "furniture:0004",
+    "reference_sha256": "d6bd865efe80e59c4e1d3fb671ed3b03e3465ea385f16c16ad3da6824e83882e",
+    "evidence": "Reviewed native クリスマスクロゼット against the complete supplied English name Jingle wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0014",
+    "source_sha256": "4f7a3d10dbcbb97cfba0e5ad3b42355c8b955f986a02515c3642e9cb753de5af",
+    "native_name": "ロイヤルなクロゼット",
+    "reference_id": "furniture:0005",
+    "reference_sha256": "d4705fcf7421cdde7c0c8dc9403603087d940965b5edd1f5c8c7cd113e223c90",
+    "evidence": "Reviewed native ロイヤルなクロゼット against the complete supplied English name regal armoire in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0018",
+    "source_sha256": "6da96d2de39e50fe8ff66473971d927516c7a213f1d71a649cef59107d59f8fb",
+    "native_name": "リゾートなクロゼット",
+    "reference_id": "furniture:0006",
+    "reference_sha256": "987f871e86d42856bc905c7aa51777ee40fd8577a9b698efdbc87aabedc8f452",
+    "evidence": "Reviewed native リゾートなクロゼット against the complete supplied English name cabana wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:001C",
+    "source_sha256": "9ef6902b8fe3d7384327c388230562d81dc618101a5f6b75066cfc0a72a966a0",
+    "native_name": "ログクロゼット",
+    "reference_id": "furniture:0007",
+    "reference_sha256": "b6113da3edbb3ea636aecd909fe73e847dd2ef0030734c27f0223f45c0ae0896",
+    "evidence": "Reviewed native ログクロゼット against the complete supplied English name cabin wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0020",
+    "source_sha256": "d1089f6657e177a01c200db5b8128a1d9f37b2d7cc507477d0d60e82ed1a4421",
+    "native_name": "ラブリークロゼット",
+    "reference_id": "furniture:0008",
+    "reference_sha256": "e1d8a6ab679a9c5a4234f95ea54f87481ca51550ba816678893d032b5365bec8",
+    "evidence": "Reviewed native ラブリークロゼット against the complete supplied English name lovely armoire in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0024",
+    "source_sha256": "6f65deed41c3a866a5de476ca44f83b6f6cd3753ab8f70b3590c04793f88f11f",
+    "native_name": "みどりのクロゼット",
+    "reference_id": "furniture:0009",
+    "reference_sha256": "570023b1325411f50e6bc247ec0490c3d0c8305d9c5c760a6f0aa475beb905d7",
+    "evidence": "Reviewed native みどりのクロゼット against the complete supplied English name green wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0028",
+    "source_sha256": "fcb6cc689bfdf4c16727c821b1ff10cecb0bdf5f8cef3476f1fdb725afab28cf",
+    "native_name": "ヨウナシのクロゼット",
+    "reference_id": "furniture:000A",
+    "reference_sha256": "e9f2776147ed003656e25d6ab1d0dfdf843b4b3609c4896a7e6c3f38762d2875",
+    "evidence": "Reviewed native ヨウナシのクロゼット against the complete supplied English name pear wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:002C",
+    "source_sha256": "9755202622ff7628a8530a4f78b00f1c956475d97d39169e6c86c01c56257f4d",
+    "native_name": "カントリークロゼット",
+    "reference_id": "furniture:000B",
+    "reference_sha256": "192f3b227b387758d85f343e3b0a94730442e2a5850e5ad611e7c57202ecc32b",
+    "evidence": "Reviewed native カントリークロゼット against the complete supplied English name ranch wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0034",
+    "source_sha256": "e9c6459539e28f8b602e04e28c8e05bbc1708429ef0bc8bd708472692d533c59",
+    "native_name": "モノクロクロゼット",
+    "reference_id": "furniture:000D",
+    "reference_sha256": "339007737a0cd30f4c707ef3f5376ff403885bd143c392b5c9eccc2c246d51e4",
+    "evidence": "Reviewed native モノクロクロゼット against the complete supplied English name modern wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0038",
+    "source_sha256": "dd671faf9610a243ca3455f8cd3a475b361f878c5a442c8fce9a37b1adab8b86",
+    "native_name": "アジアなクロゼット",
+    "reference_id": "furniture:000E",
+    "reference_sha256": "968c8cfc5eade8a0048f7078ffda727ad459bfa8a9b9ab484cb18cf7afc93a68",
+    "evidence": "Reviewed native アジアなクロゼット against the complete supplied English name exotic wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:003C",
+    "source_sha256": "85ed92c5df8a334a51f70847c3cff54459eb53c86060494a30438bf8f9778497",
+    "native_name": "クリスマスタンス",
+    "reference_id": "furniture:000F",
+    "reference_sha256": "75cb78e9d757c5dc57f99bf783f5a181ae8f35069136f80e7590f332732c32a0",
+    "evidence": "Reviewed native クリスマスタンス against the complete supplied English name Jingle dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0040",
+    "source_sha256": "360921c7921d01b2431407f08fbaab1a803548d23e98d926ad376a027fff764d",
+    "native_name": "ロイヤルなタンス",
+    "reference_id": "furniture:0010",
+    "reference_sha256": "3f92431658dd65c9116f2ef4be20f6e282ab1513aaaf782526d111a019205c6f",
+    "evidence": "Reviewed native ロイヤルなタンス against the complete supplied English name regal dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0044",
+    "source_sha256": "cf45cf5284ec35e15f715ec093c359a57b8853b6ff6301c05ef4a8c66202e210",
+    "native_name": "リゾートなタンス",
+    "reference_id": "furniture:0011",
+    "reference_sha256": "29c7e5f78971ce7d4843512fbc7feb7cd62e087c532047c8ac953471248ea908",
+    "evidence": "Reviewed native リゾートなタンス against the complete supplied English name cabana dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0048",
+    "source_sha256": "97be65e16eacb0c202ff273b4e16dc15798d0e7281d84ff94c29c50d849430cf",
+    "native_name": "ログタンス",
+    "reference_id": "furniture:0012",
+    "reference_sha256": "6366b1fc2ba6dd2da63940724a5ad2d5d96d7cb2a63a47abeb9c8778c1abb0ec",
+    "evidence": "Reviewed native ログタンス against the complete supplied English name cabin dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:004C",
+    "source_sha256": "a509f065378db8a48d6ec60ac983729dfd15c5484fa10d73dc80dfd47aef2d26",
+    "native_name": "ラブリータンス",
+    "reference_id": "furniture:0013",
+    "reference_sha256": "c6646a57b2af742c48af23bdc410b9465febcdf58a1236db927309cf33b355af",
+    "evidence": "Reviewed native ラブリータンス against the complete supplied English name lovely dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0050",
+    "source_sha256": "00a582544b83a4fbbf44119d637cc8d26bd91b1a6c8651d45de46c4bb9b3cc95",
+    "native_name": "ハロウィンタンス",
+    "reference_id": "furniture:0014",
+    "reference_sha256": "6b8848416cbbd23c0b99086fc5454917a397317018e912aa180d380d8abf622a",
+    "evidence": "Reviewed native ハロウィンタンス against the complete supplied English name spooky dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0054",
+    "source_sha256": "a391a57a66a84e59e23c0552f1230e39fb84a7d7fe767cfb575a8eed470aaeca",
+    "native_name": "みどりのタンス",
+    "reference_id": "furniture:0015",
+    "reference_sha256": "68c2d995153ddb362e47f01d745f271e30f1ef7ae28385dd842760f0d9c8ffab",
+    "evidence": "Reviewed native みどりのタンス against the complete supplied English name green dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0058",
+    "source_sha256": "45588c77e93e103d47a7746dfd7d88c805cf8f5710cfe2d63a0571e252478850",
+    "native_name": "ヨウナシのタンス",
+    "reference_id": "furniture:0016",
+    "reference_sha256": "9c9b16d2cfbcde4137c115b6f907407294af9c0f7795f6f997f858b456c7c90f",
+    "evidence": "Reviewed native ヨウナシのタンス against the complete supplied English name pear dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:005C",
+    "source_sha256": "797220adbf33f7906ea8587d8998239c0f2d4b900675c3ccd64ac3ba3fb0cfad",
+    "native_name": "カントリーなタンス",
+    "reference_id": "furniture:0017",
+    "reference_sha256": "82edcb7786a7bfa510a92d9f96426fe1e7a5f750f3a1aac88c5264b38e731d4a",
+    "evidence": "Reviewed native カントリーなタンス against the complete supplied English name ranch dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0064",
+    "source_sha256": "d3c44f849f9d395c214a24e10bb5ff5eafcf5cd34d7ef4485bd1dfae585f192c",
+    "native_name": "あおいタンス",
+    "reference_id": "furniture:0019",
+    "reference_sha256": "cd7eeb0f613145c10af55b96929b89a82801ea53fce00fe57a516d36e9fe6e7b",
+    "evidence": "Reviewed native あおいタンス against the complete supplied English name blue bureau in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:006C",
+    "source_sha256": "31d5a7614a24cadd46968c99d620f0b2d3917828ae0a7c76160a63e293835aa1",
+    "native_name": "アジアなタンス",
+    "reference_id": "furniture:001B",
+    "reference_sha256": "51eb77f03100331c56776543cba053cfa9fef19fb7eb3e6b450825e98ed0cfa8",
+    "evidence": "Reviewed native アジアなタンス against the complete supplied English name exotic bureau in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0070",
+    "source_sha256": "1de679d8b500c688c9441f5c101fd07a131f88668c0df4bc32990f9807c88d33",
+    "native_name": "カラフルなタンス",
+    "reference_id": "furniture:001C",
+    "reference_sha256": "50ac8eee9af12a19f27b511715614b5b1db1c271539ed5706316ac58da234f57",
+    "evidence": "Reviewed native カラフルなタンス against the complete supplied English name kiddie dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0078",
+    "source_sha256": "289be72c38ded53be357622a5c71f4c89c1d3ad35a8b58eba737cb4524cfed26",
+    "native_name": "カラフルなクロゼット",
+    "reference_id": "furniture:001E",
+    "reference_sha256": "16d07a59fd37a211a6a72fed1e78e305722783a39adc03f653a5be36fcd40d1e",
+    "evidence": "Reviewed native カラフルなクロゼット against the complete supplied English name kiddie wardrobe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:007C",
+    "source_sha256": "d14e4f6db3aff2d5ac8df9ab13a94e47b710f01f4ed4043bd88b9693f19d2061",
+    "native_name": "きりだんす",
+    "reference_id": "furniture:001F",
+    "reference_sha256": "5db4f187d9a60393f517a4f962e34b5953c358c9dd86b85cce7aa7d9c20de5fb",
+    "evidence": "Reviewed native きりだんす against the complete supplied English name dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0080",
+    "source_sha256": "10fd1d31737833e056e16cfb461bf8086cd91c9d30bb7de5065fcf16cf6eb7e2",
+    "native_name": "かいだんだんす",
+    "reference_id": "furniture:0020",
+    "reference_sha256": "53ec47d200dc55d93d0c295671340c6fa7d1b8a520621d4ac67ecbd411305146",
+    "evidence": "Reviewed native かいだんだんす against the complete supplied English name tansu in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0084",
+    "source_sha256": "adba8d4005a6eca768630e54f5d630401a926fb1fc97000ea385e8bd1fbb8f54",
+    "native_name": "さいほうばこ",
+    "reference_id": "furniture:0021",
+    "reference_sha256": "cfdd9e35715ced9d97b1857e2612ec8819214d6a58a6fc7fae5051b7abed0a15",
+    "evidence": "Reviewed native さいほうばこ against the complete supplied English name sewing box in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0088",
+    "source_sha256": "c86d643f519ab8e3f9e13bb1f541134c1bee3931d75793488fe3132dedda4711",
+    "native_name": "せんぷうき",
+    "reference_id": "furniture:0022",
+    "reference_sha256": "c3d4f9a9627c849d339c12692645f1141139eed4912b0c46b4ecee16cfb9007c",
+    "evidence": "Reviewed native せんぷうき against the complete supplied English name fan in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0090",
+    "source_sha256": "0796eb63e218a3a2ae97cb4245777e30444ebd3d26477e1d166985b44a259942",
+    "native_name": "ちゃぶだい",
+    "reference_id": "furniture:0024",
+    "reference_sha256": "bd6bc96b5c0ceb75cb51ae4ab7b42035f70a46dd6f3605ebd1ec6aaba20453a7",
+    "evidence": "Reviewed native ちゃぶだい against the complete supplied English name tea table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0094",
+    "source_sha256": "23aee213e04216c8deaf7410ad387c3835191089d269660daad839c80c331ab7",
+    "native_name": "しょうぎばん",
+    "reference_id": "furniture:0025",
+    "reference_sha256": "2a057c5e39fe47ed8a909098ddea25899a22abae1c251a497b34792bf8cbcd53",
+    "evidence": "Reviewed native しょうぎばん against the complete supplied English name shogi board in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0098",
+    "source_sha256": "974043ff02d635b7cf0041ed1d589c0a68cfb68641aaab4ecedc19ffc827b884",
+    "native_name": "びょうぶ",
+    "reference_id": "furniture:0026",
+    "reference_sha256": "7ad9bc4680547f2a74fc25c6fb9c3ec436b724349540fa08c9a17462386af5e6",
+    "evidence": "Reviewed native びょうぶ against the complete supplied English name screen in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00A0",
+    "source_sha256": "f93270429d4c3850c71006dd8408ab2928fd145df18415e6afc0a3ebbb0f208d",
+    "native_name": "バスてい",
+    "reference_id": "furniture:0028",
+    "reference_sha256": "6d88f7769010563d3a862aff81ac1296df2d55b983f0891cbfb93439ba001812",
+    "evidence": "Reviewed native バスてい against the complete supplied English name bus stop in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00A8",
+    "source_sha256": "33cfb23c014c6f0d27f60839073c767112312dd6fc568b238fa2d99560bd54a6",
+    "native_name": "ハスのテーブル",
+    "reference_id": "furniture:002A",
+    "reference_sha256": "c10e24bcaecc82947138bccf776273b0674ee68715a1b585eab26edf2b1b3924",
+    "evidence": "Reviewed native ハスのテーブル against the complete supplied English name lily-pad table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00AC",
+    "source_sha256": "2baf0d06a97ff7d98e3843b81519fae95f1a9c7c79d9fdaf34c7c24703add84e",
+    "native_name": "れいぞうこ",
+    "reference_id": "furniture:002B",
+    "reference_sha256": "b54ff477b00de0daed71ef8ce1ab581f0af1686fbde74bbf4317fa4c0b88ca02",
+    "evidence": "Reviewed native れいぞうこ against the complete supplied English name refrigerator in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00BC",
+    "source_sha256": "50ef066c397803203bc8e722df57163cf57338c5a189d1840ec565e27d0a5c46",
+    "native_name": "あかいソファ",
+    "reference_id": "furniture:002F",
+    "reference_sha256": "542bf245a37d58cbf600af54b42398a7a65256ef295ffee6fb44de5c051dd147",
+    "evidence": "Reviewed native あかいソファ against the complete supplied English name red armchair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00C0",
+    "source_sha256": "a65c9173ef2d618158c36c61ea84799e7c0ebe08a667d5a9552b6206277ef62b",
+    "native_name": "ひばち",
+    "reference_id": "furniture:0030",
+    "reference_sha256": "693b71f91c8579f72ffc55b2fbab1eee9e53650545d4b77bfb2a7646ec678a4a",
+    "evidence": "Reviewed native ひばち against the complete supplied English name hibachi in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00C4",
+    "source_sha256": "abc15aeead152a0d3baad9d71877026f4cbb63cad7bc4df79b4ab0ab8938275c",
+    "native_name": "ガスレンジ",
+    "reference_id": "furniture:0031",
+    "reference_sha256": "0132b7ae56406cbc5ad4ca99bbdb34b31528f17b939113fb93b485726011c360",
+    "evidence": "Reviewed native ガスレンジ against the complete supplied English name stove in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00C8",
+    "source_sha256": "e0e587c6cbee2277867d85351a7eb8c9394cab7cdbe70c4a1e26c3f12e3cd5c2",
+    "native_name": "しろいソファ",
+    "reference_id": "furniture:0032",
+    "reference_sha256": "fc723921c61af9c7703a9c11259f2579a06c6f1d258c661e04ef907c7c4c44a1",
+    "evidence": "Reviewed native しろいソファ against the complete supplied English name cream sofa in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00CC",
+    "source_sha256": "230858ad8dfb1229ebe43789a6427daf601c11c2e530b85bdd248b5d50253059",
+    "native_name": "ちゃだんす",
+    "reference_id": "furniture:0033",
+    "reference_sha256": "2a7f31acc3bc2588b4c6e4d54cb73219274594d8c52e91027f5ebea368f01a35",
+    "evidence": "Reviewed native ちゃだんす against the complete supplied English name tea tansu in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00D8",
+    "source_sha256": "8ac1e6a783c1595e5ddf9ab02e4c682b198e070faeb8cb5dccc3e3f604020b99",
+    "native_name": "アコギターASー1",
+    "reference_id": "furniture:0036",
+    "reference_sha256": "bc6840ebf273c4136b0ae5788e4d3d95c7c0afa05ef1a88156fe35ba2b5bdb3f",
+    "evidence": "Reviewed native アコギターASー1 against the complete supplied English name folk guitar in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00DC",
+    "source_sha256": "2500381972ea9cb51fef51fa0985b8094fc8379c1ad565e8328a3be4eea7ae5f",
+    "native_name": "アコギターASー2",
+    "reference_id": "furniture:0037",
+    "reference_sha256": "4fb17530d8b5b795e86b8d9f2fa2409060e5e52a8b5ef2a8d5e2dfe5a2d78c3d",
+    "evidence": "Reviewed native アコギターASー2 against the complete supplied English name country guitar in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00E0",
+    "source_sha256": "b3703a385179b6aacb268e2374cdc817786eaf7621d55637951ba2c6bcd307a4",
+    "native_name": "エレキギターESー1",
+    "reference_id": "furniture:0038",
+    "reference_sha256": "09c2226cd925176cfde353c487795d9feec04107b3cb1f2e9ead5bd6870a9234",
+    "evidence": "Reviewed native エレキギターESー1 against the complete supplied English name rock guitar in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00E4",
+    "source_sha256": "9b9dcfb4f8bc49eccb6ac7feaec25958f5c2b12e4684cf033e0a69696b9c0801",
+    "native_name": "ひなにんぎょう",
+    "reference_id": "furniture:0039",
+    "reference_sha256": "2a38fbdb030db0959d6ab2156156829d5212b8c6d804bed0c1d6e5411c5383f5",
+    "evidence": "Reviewed native ひなにんぎょう against the complete supplied English name hinaningyo in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00E8",
+    "source_sha256": "8df36c7341b908a36c5ceff48442e351e54b1c0d6ecfd45dce145e6eb31528bb",
+    "native_name": "くまのダイちゃん",
+    "reference_id": "furniture:003A",
+    "reference_sha256": "ff3018ae7a081b1b26ea54c4488180137d2490e7d48eda0e10dfa68671d79724",
+    "evidence": "Reviewed native くまのダイちゃん against the complete supplied English name Papa bear in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00EC",
+    "source_sha256": "276ead278db6b96a0156458fb4c0f7224747b86343161ef78a9c2b8cfef7ae12",
+    "native_name": "くまのナミちゃん",
+    "reference_id": "furniture:003B",
+    "reference_sha256": "a34396e71edaa03c4661da58dd8c06ad1113fbf1d36701f1195899ab7deb43ce",
+    "evidence": "Reviewed native くまのナミちゃん against the complete supplied English name Mama bear in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00F0",
+    "source_sha256": "5a3f8d78f44cb2dcfbacb79d282f390d02f67ceb55a1f8ee19d360756091f7dd",
+    "native_name": "くまのチビちゃん",
+    "reference_id": "furniture:003C",
+    "reference_sha256": "6d0d98193ea106d67c4ef3bc3c0d1344ccdceb61c447b8212875cee75675c4e4",
+    "evidence": "Reviewed native くまのチビちゃん against the complete supplied English name Baby bear in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00F4",
+    "source_sha256": "41a7e7b67ea7cd245db727868233b58d5e913f1705cdf79bd50e56c4b19db7d1",
+    "native_name": "シックなしょっきだな",
+    "reference_id": "furniture:003D",
+    "reference_sha256": "cd9be758f6908e8b1a08e76588b1b3a679434ca31e41869f6a8a1267f23ff2bd",
+    "evidence": "Reviewed native シックなしょっきだな against the complete supplied English name classic hutch in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:00FC",
+    "source_sha256": "9dd3f1c923228d4fb2afe612e8d01572588cf4132be86659c8d9a3521a4197b5",
+    "native_name": "シックなビューロ",
+    "reference_id": "furniture:003F",
+    "reference_sha256": "40b0503c3e45063f3287256cfe46fdfb41500565a977a2b5fb36516eb29de8c7",
+    "evidence": "Reviewed native シックなビューロ against the complete supplied English name classic desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0104",
+    "source_sha256": "f55e0baa2a43ce0368eaba6912079b02c9256e588de0fff119d0c367505a5478",
+    "native_name": "シックなかざりだな",
+    "reference_id": "furniture:0041",
+    "reference_sha256": "b2f2dcd2402c744ff2b24a023b77bd73aa0a4a9762f300db3afc4478658e2a1f",
+    "evidence": "Reviewed native シックなかざりだな against the complete supplied English name classic cabinet in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0110",
+    "source_sha256": "7f33291f8c902d29bfc2d690c32c7d80a00fdd26fe628ca03b75ba328ebad5b9",
+    "native_name": "べんきょうづくえ",
+    "reference_id": "furniture:0044",
+    "reference_sha256": "cee325b540bddddd504e054646127c807f80905409ad7fd2ad8858438243d108",
+    "evidence": "Reviewed native べんきょうづくえ against the complete supplied English name writing desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:012C",
+    "source_sha256": "4a99679f09ec4291bac8f848803d917b565311eaacce107bdab3c73e29a9f00b",
+    "native_name": "ちきゅうぎ",
+    "reference_id": "furniture:004B",
+    "reference_sha256": "5f3a21c7eb517cbec0130a26d881ff142fc028ee521d0bc71010779e65066d32",
+    "evidence": "Reviewed native ちきゅうぎ against the complete supplied English name globe in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:014C",
+    "source_sha256": "5fb7890fd78f5fbeeab9a7e9de08a938b3d0454a0bb5b164024303b92c31aa28",
+    "native_name": "わだいこ",
+    "reference_id": "furniture:0053",
+    "reference_sha256": "4454d43764bff91d0cb4c0a8f0a7dd1d36844f9be581b668da788fb7e186722f",
+    "evidence": "Reviewed native わだいこ against the complete supplied English name taiko drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0150",
+    "source_sha256": "082a6c8336512c26612b78e5390732f5793467f3d8715c9f3f64e1430c8da957",
+    "native_name": "ストーブ",
+    "reference_id": "furniture:0054",
+    "reference_sha256": "aafd5636bc456c33a90bd6faf8112ead755ea28e5497f94feec1f91281738085",
+    "evidence": "Reviewed native ストーブ against the complete supplied English name space heater in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0158",
+    "source_sha256": "263439a3887f6c4374cc83d04cd6474a5b6a016e519118ee05dba1773d30065c",
+    "native_name": "リゾートなソファ",
+    "reference_id": "furniture:0056",
+    "reference_sha256": "b2d83d419278446c57e25b6b9000ad7cd1f36510714fe1d81ef4487c5807a007",
+    "evidence": "Reviewed native リゾートなソファ against the complete supplied English name cabana armchair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0160",
+    "source_sha256": "7cee10ecb2428c63c4d8e09de75b7c945a630641ed13d4e838527be1e560efdd",
+    "native_name": "ラブリーテーブル",
+    "reference_id": "furniture:0058",
+    "reference_sha256": "4201b2a0577bd75aba3fca7ea86d4485a6d2ed622a5cd8b5d4325a161c8cd2a7",
+    "evidence": "Reviewed native ラブリーテーブル against the complete supplied English name lovely end table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0164",
+    "source_sha256": "63e95c90ddda1ac61816bede01eedb110f804a5bd09add61f7a4245e73e2bac8",
+    "native_name": "ラブリーソファ",
+    "reference_id": "furniture:0059",
+    "reference_sha256": "ec8fd6b6122be66ebeda0451b33bc0ca4c3ffa7b3ec9f352b50fb6ef6c17a177",
+    "evidence": "Reviewed native ラブリーソファ against the complete supplied English name lovely armchair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:016C",
+    "source_sha256": "e82a186cf3f25d45fbed8e3b34cbd33a33282188acba31afe9df1b8e623db0e9",
+    "native_name": "ラブリースタンド",
+    "reference_id": "furniture:005B",
+    "reference_sha256": "e07fb1cabedbf84007d8dd7f19e0263b206538b12522f6bd57cac4f60a0d719f",
+    "evidence": "Reviewed native ラブリースタンド against the complete supplied English name lovely lamp in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:017C",
+    "source_sha256": "b476fa0a836f05d6477bd6bd9e930068c98e3d6b729753125cde6b5a42a72595",
+    "native_name": "シックなふりこどけい",
+    "reference_id": "furniture:005F",
+    "reference_sha256": "b2b167df99ccfa60d65d64a58ab686cb06667d60edb75571bdd98b889776eb3d",
+    "evidence": "Reviewed native シックなふりこどけい against the complete supplied English name classic clock in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0194",
+    "source_sha256": "6d15d8ffd451750711e27047cfb6aa90df24eeeb6596abf6c640c8937fa7c049",
+    "native_name": "べんきょうイス",
+    "reference_id": "furniture:0065",
+    "reference_sha256": "197c7a9c83b986822c805174ac2d87293ff8c63ac8b8627284c14c1a127770d7",
+    "evidence": "Reviewed native べんきょうイス against the complete supplied English name writing chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0198",
+    "source_sha256": "823f3fca102fc2968e7bff993859da265ff2594a7baefd8c9e1241e6d0df54d9",
+    "native_name": "カントリーなソファL",
+    "reference_id": "furniture:0066",
+    "reference_sha256": "14a5af4cbe17f1df42910d55289843d005a59f909b9b0595509cb18a0c950589",
+    "evidence": "Reviewed native カントリーなソファL against the complete supplied English name ranch couch in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:019C",
+    "source_sha256": "81f0754bd2b7efd11053a748530ba21ed6c68bc21ea59bf94790ef7540cd0682",
+    "native_name": "カントリーなソファ",
+    "reference_id": "furniture:0067",
+    "reference_sha256": "8d418b3b2adbd93927f1516501d22e1e8369cf75ca645b53b1a8a0898f64b2fc",
+    "evidence": "Reviewed native カントリーなソファ against the complete supplied English name ranch armchair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01A0",
+    "source_sha256": "32fbc4697705e12ed0505613ac804c2358d94c37c1a875a7f746a313d3607b45",
+    "native_name": "カントリーなつくえ",
+    "reference_id": "furniture:0068",
+    "reference_sha256": "daa039820d2995c389d4d1ae08f2bca69ef64d048215ba1ff7a64c212eb769ca",
+    "evidence": "Reviewed native カントリーなつくえ against the complete supplied English name ranch tea table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01A4",
+    "source_sha256": "0903c680ae9b1d6fc0b27fdcb1c21a719ba0193de3d0c4da6b1b5af5eda97b19",
+    "native_name": "カントリーなたな",
+    "reference_id": "furniture:0069",
+    "reference_sha256": "f8d03aefa3a6d0cdb75daeaa1e1b7d8edb35f2a07a135baeb7dbd37d2522884e",
+    "evidence": "Reviewed native カントリーなたな against the complete supplied English name ranch hutch in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01B8",
+    "source_sha256": "54ea9923f8cfbef509482ddaa79c19afab1d3da72dddcb7742bc07dae9a6a672",
+    "native_name": "パソコンとラック",
+    "reference_id": "furniture:006E",
+    "reference_sha256": "6563130475d8ac251dc3197de90c55ec06e105e3c76a96c2e1ce47f14e828b9d",
+    "evidence": "Reviewed native パソコンとラック against the complete supplied English name computer in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01BC",
+    "source_sha256": "2c2a9ace7d9a99b344e63dc90f6f8d745fd70dbf18a994d12aede84164063433",
+    "native_name": "じむづくえ",
+    "reference_id": "furniture:006F",
+    "reference_sha256": "97da605dc72eae111112d3af4a50e6004b3634f86c4eb82a90560d2daa5b7338",
+    "evidence": "Reviewed native じむづくえ against the complete supplied English name office desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01C4",
+    "source_sha256": "ae54e9bd8273207086cebda6015a5ffd06f26b994a3c9c0addbff02f1113dc85",
+    "native_name": "Nキューブ",
+    "reference_id": "furniture:0071",
+    "reference_sha256": "0995dba21e0812f03e0c634511d1efef6e4b7e57ab4190a8ff45eb77076e88ac",
+    "evidence": "Reviewed native Nキューブ against the complete supplied English name N logo in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01C8",
+    "source_sha256": "f71ab99562a5e790de981703ae22ebec80db5c6245fb954088c06779ec7c97b6",
+    "native_name": "ヴィブラフォン",
+    "reference_id": "furniture:0072",
+    "reference_sha256": "9a7bbad0878087d83efa76ceae25837c1a939d23b04a8c0d7e55117a9864bdfd",
+    "evidence": "Reviewed native ヴィブラフォン against the complete supplied English name vibraphone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01CC",
+    "source_sha256": "ae000f1f6789cb80daff382e49f8c8efea1e3898371e41d4cb7c66f9225b3b63",
+    "native_name": "びわ",
+    "reference_id": "furniture:0073",
+    "reference_sha256": "0a1f89552c3455df33f49defad8e1f6d4d380402fe647046c74a71aa11d8700c",
+    "evidence": "Reviewed native びわ against the complete supplied English name biwa lute in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01D0",
+    "source_sha256": "b630fbfecbd0c7c645e5233a94339289e0d5abffba1134ad8425b1f7405ab3ef",
+    "native_name": "コンガ",
+    "reference_id": "furniture:0074",
+    "reference_sha256": "06ac21baeb50fa8e7a3653541b81b102454dddba88ae936de952fd81606cf38a",
+    "evidence": "Reviewed native コンガ against the complete supplied English name conga drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01D4",
+    "source_sha256": "5ee1fe97069d6b16c367e232c30f315f0a8d58440020a24fc86f9411cb10d68a",
+    "native_name": "しょうかき",
+    "reference_id": "furniture:0075",
+    "reference_sha256": "6492faea2949572e10af6d29fb86dabc3508b3d9a102ce0638a7a8158a2070a2",
+    "evidence": "Reviewed native しょうかき against the complete supplied English name extinguisher in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01EC",
+    "source_sha256": "7268be5e959e29c804319a1180080bee0b6217eb9f6f3477c229fff2d9c1f2ea",
+    "native_name": "ラブリードレッサー",
+    "reference_id": "furniture:007B",
+    "reference_sha256": "4237808fa277ef1c1aa8f722be581cd87c50e0004451f8ea53e76bcad7d2e45c",
+    "evidence": "Reviewed native ラブリードレッサー against the complete supplied English name lovely vanity in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01F4",
+    "source_sha256": "0c6bb4898c51ace0a2006c2a7f34c1255c98985470d9f63e83ab463b95c31d9f",
+    "native_name": "ティンパニ",
+    "reference_id": "furniture:007D",
+    "reference_sha256": "32b8586c709c32d9699c3facceb4f29ddc14dd80f7904adf9ee2d1c462939a0d",
+    "evidence": "Reviewed native ティンパニ against the complete supplied English name timpano drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:01F8",
+    "source_sha256": "bfe0ac4a71bbf2369b5b66bf96abd913ba72190e1f188675b95e28efc7a725ef",
+    "native_name": "いいスピーカー",
+    "reference_id": "furniture:007E",
+    "reference_sha256": "2f8769d6aa284a368586cfea57b8132f957e404dbeac2a9f1f8b77e463405d70",
+    "evidence": "Reviewed native いいスピーカー against the complete supplied English name nice speaker in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0200",
+    "source_sha256": "b8be69a182f6e7e3905a38bb0db85a62ac890dad7a9a12f71d2de381d78b6534",
+    "native_name": "がっこうのつくえ",
+    "reference_id": "furniture:0080",
+    "reference_sha256": "5dfd72301b26cad553d5379356dd34154d48c0e349f2086f61ae48fbfd824244",
+    "evidence": "Reviewed native がっこうのつくえ against the complete supplied English name school desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0204",
+    "source_sha256": "0d586f29a4b19698485961331d54a88939882e4817451673a0b7585ca6a4060e",
+    "native_name": "らくがきのつくえ",
+    "reference_id": "furniture:0081",
+    "reference_sha256": "51adf298986debdc3cbae7255b2e6a792db5eff9e8b85e61695be6739abdb95a",
+    "evidence": "Reviewed native らくがきのつくえ against the complete supplied English name graffiti desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0208",
+    "source_sha256": "a7cafa6612760e4070100d12bfd5263ffa9da90bf554d052fad904cbe1aaae3f",
+    "native_name": "ぞうきんのつくえ",
+    "reference_id": "furniture:0082",
+    "reference_sha256": "524d6a7aedbc70b25d188e7dbc884cfa09d2e7a2dee57f6cca4f3586d83f1e2c",
+    "evidence": "Reviewed native ぞうきんのつくえ against the complete supplied English name towel desk in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:020C",
+    "source_sha256": "3b8bbedf6ecfbb3c64a61b13c8d38344c3e2df2d5d10550901f195bbfc43c420",
+    "native_name": "たてながサボテン",
+    "reference_id": "furniture:0083",
+    "reference_sha256": "1245193a2bc56bdddf10eb89d01762db203314b0c4427a67b3b1fe5fb972709f",
+    "evidence": "Reviewed native たてながサボテン against the complete supplied English name tall cactus in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0210",
+    "source_sha256": "b451f2b6c42161ed12b2d01658274473eab81f95e3caa82fd3f50020bfd69262",
+    "native_name": "まるサボテン",
+    "reference_id": "furniture:0084",
+    "reference_sha256": "a04ba54cf0d76ef2487e805661007a6cfbeb479449d4eab057486db07ba9d8b2",
+    "evidence": "Reviewed native まるサボテン against the complete supplied English name round cactus in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0218",
+    "source_sha256": "4f9799b15e2c7198f86edc650358fc391ed8f891ad964b87c1d47ba701f5fee9",
+    "native_name": "32がたワイドテレビ",
+    "reference_id": "furniture:0086",
+    "reference_sha256": "998ec23b76459236c222290d9a7d6af373bc4776b8d8877baf55bfa598a6a692",
+    "evidence": "Reviewed native 32がたワイドテレビ against the complete supplied English name wide-screen TV in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:021C",
+    "source_sha256": "8c1a85ba93014e325ccf5f0ef58758fdaa3d771df43f8b7a5301d4c5ab21c795",
+    "native_name": "ラブリーローテーブル",
+    "reference_id": "furniture:0087",
+    "reference_sha256": "098ad6e30208b3346320d3ec53338474f665c3053b6ca44c78378b7740501db9",
+    "evidence": "Reviewed native ラブリーローテーブル against the complete supplied English name lovely table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0220",
+    "source_sha256": "2a73c4da6f7b01dc429174f2fd2d808558d1998d19d53c37006097324d3cd1d2",
+    "native_name": "かどまつ",
+    "reference_id": "furniture:0088",
+    "reference_sha256": "77aa1c66e2f982b3caadc7690d3a40d8108b8da8b82672842355d7fa2a2768d1",
+    "evidence": "Reviewed native かどまつ against the complete supplied English name kadomatsu in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0224",
+    "source_sha256": "f8b61a6e9071ddd5dfcd48841b891600bc20f70d3a5dd066fae91e54950d3342",
+    "native_name": "かがみもち",
+    "reference_id": "furniture:0089",
+    "reference_sha256": "b11777720baa046fa70b4c2d6648dbb3049cb5b37bd4d0bedfb55cdca7b22470",
+    "evidence": "Reviewed native かがみもち against the complete supplied English name kagamimochi in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0228",
+    "source_sha256": "31a138259ae03209b1a48835cc7d2683af00975813effdda37c0cc412f2ac739",
+    "native_name": "ひくいとうろう",
+    "reference_id": "furniture:008A",
+    "reference_sha256": "d281189770326987bbf565b48fc05eeefca3fd0aba54ad5f5e3c7fbbbbbc0ca3",
+    "evidence": "Reviewed native ひくいとうろう against the complete supplied English name low lantern in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:022C",
+    "source_sha256": "5fcc12254ca7b9cbf9df9edbf8c355c8437ed37e72e249ba429ab7ebe07f5dbb",
+    "native_name": "とうろう",
+    "reference_id": "furniture:008B",
+    "reference_sha256": "a2f65fad218d448d389f73ecbdc220357a91a5350e5c09ebcf079be0be448280",
+    "evidence": "Reviewed native とうろう against the complete supplied English name tall lantern in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0234",
+    "source_sha256": "99e088fffdad36089bb48992e337d64a952ae91e3ea7e7bc68c8b0060439c8a7",
+    "native_name": "じむイス",
+    "reference_id": "furniture:008D",
+    "reference_sha256": "08c3ca2379771c2f82d10762e61655e176e23b7937402a512cc8d7764e30de57",
+    "evidence": "Reviewed native じむイス against the complete supplied English name office chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0238",
+    "source_sha256": "302fa5b2a47f35ba89559db0a158da68be9fef6de7ec77f6f80d77697dbd7523",
+    "native_name": "がっこうのげたばこ",
+    "reference_id": "furniture:008E",
+    "reference_sha256": "50b24c608a6c8ac67afdec073d2d71d81b906fc9514ea6798c5a8abcf548cd97",
+    "evidence": "Reviewed native がっこうのげたばこ against the complete supplied English name cubby hole in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:023C",
+    "source_sha256": "c4b7b0adcdbefba6bd11015af188980c7eb3d82da56251dfe93f0aff9d682de9",
+    "native_name": "ラブレターなげたばこ",
+    "reference_id": "furniture:008F",
+    "reference_sha256": "464e44053c418701873d431944ccb535bdcbfa3de4a24980451821a4111fa767",
+    "evidence": "Reviewed native ラブレターなげたばこ against the complete supplied English name letter cubby in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0240",
+    "source_sha256": "ad9a87f41fe04ae7ca5790ebebcb98ec59c1f541706d87198a4176baef6479da",
+    "native_name": "ゴツイがっこうのイス",
+    "reference_id": "furniture:0090",
+    "reference_sha256": "5f669d47dc8b7227f00c1365c0f3b50b610b890d0591dbf1f6890b9029130eee",
+    "evidence": "Reviewed native ゴツイがっこうのイス against the complete supplied English name heavy chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0244",
+    "source_sha256": "2fa9fd8fdbe4d25e02a9457b9dc540b23026753b3d991d711d0c1f4f43e35850",
+    "native_name": "がっこうのイス",
+    "reference_id": "furniture:0091",
+    "reference_sha256": "2c5ecfb12883345fef679d4623ab2dc2f31525bad9093c66b77a7a433feba09e",
+    "evidence": "Reviewed native がっこうのイス against the complete supplied English name school chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0248",
+    "source_sha256": "4c265c11596fb2461ddbe9dd9d51aa105f87f5858978e68ab94accc8ddc4717f",
+    "native_name": "ぞうきんのイス",
+    "reference_id": "furniture:0092",
+    "reference_sha256": "ab859c43937743c51ce1c1c3006ec7b2c0c31020f3fc277fc736cae691e45818",
+    "evidence": "Reviewed native ぞうきんのイス against the complete supplied English name towel chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:024C",
+    "source_sha256": "f41a955c6a37ce9abb0fa86f8e30da9a0a1c8a4845fcbec3f8fa954cb9651ee4",
+    "native_name": "りかしつのつくえ",
+    "reference_id": "furniture:0093",
+    "reference_sha256": "fab6d07e18ab5ee3584e1ffdfe03afb377a2f6d1cc5d7b72b4a418d0b67e3950",
+    "evidence": "Reviewed native りかしつのつくえ against the complete supplied English name science table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0254",
+    "source_sha256": "8a0f9765ccfba61b10b1eb0f9d3492be7f1042b836a5064484a8f8b3d2dc891d",
+    "native_name": "じんじゃのとうろう",
+    "reference_id": "furniture:0095",
+    "reference_sha256": "9eebbec71a8de9d11e34ae3c1188e6eea9b1bbdd2aa882f5e5f212ef11b4adb7",
+    "evidence": "Reviewed native じんじゃのとうろう against the complete supplied English name shrine lantern in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0258",
+    "source_sha256": "ce571fb3cf6bd839b465fe54f28d514935a298354faaf7a66d4679dc0f1a983f",
+    "native_name": "たる",
+    "reference_id": "furniture:0096",
+    "reference_sha256": "fb13fd644a272e33ad538eb3721651c95f53660c650750094f6e0e4dba5f6453",
+    "evidence": "Reviewed native たる against the complete supplied English name barrel in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:025C",
+    "source_sha256": "b71e7c5f16c9d08da65eee8849c9b8c828cc2e9314c0abe04a844fe66fe6953e",
+    "native_name": "よこむきのたる",
+    "reference_id": "furniture:0097",
+    "reference_sha256": "52588a3dbae720ef6d43388d1b16fcf67fa27ca12d437eb4b1022e92fb0db49e",
+    "evidence": "Reviewed native よこむきのたる against the complete supplied English name keg in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0260",
+    "source_sha256": "43c115fe72ac7079c57d1f08f2585b19eb6a655c090d02d1650d5e08ead0b7b6",
+    "native_name": "とびばこ",
+    "reference_id": "furniture:0098",
+    "reference_sha256": "7be8935fdd568b38173a2d9bdb6cf37cb23c7cfffc89abcffd9f6bb5697cb548",
+    "evidence": "Reviewed native とびばこ against the complete supplied English name vaulting horse in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0268",
+    "source_sha256": "e14a9cbdd366618706f49990faed32a3b642901ce4ba4af1f65ffc25dcdd1a54",
+    "native_name": "めざましどけい",
+    "reference_id": "furniture:009A",
+    "reference_sha256": "ce46ba2f04b5a0628c7d98df5e28bf1c098690b934e47f6824d548ad91a1b0ac",
+    "evidence": "Reviewed native めざましどけい against the complete supplied English name alarm clock in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0278",
+    "source_sha256": "0326a615233b9b2e8357e4491e128ed2b19d5c545218b0d4859ee7ee90611b35",
+    "native_name": "せいじのつぼ",
+    "reference_id": "furniture:009E",
+    "reference_sha256": "2bd2728faf1bbe7bf6b0e0c11f161bd105d6debc11243668e9c3155e570181a5",
+    "evidence": "Reviewed native せいじのつぼ against the complete supplied English name blue vase in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0288",
+    "source_sha256": "da0750366227aa3d34c2d2f031f59a296dd8ced73d908b71ff866f534951d24c",
+    "native_name": "ゾウのすべりだい",
+    "reference_id": "furniture:00A2",
+    "reference_sha256": "0956386cfa5f47b214072bb205b01945fd775284750afb3505aa501bb6de376d",
+    "evidence": "Reviewed native ゾウのすべりだい against the complete supplied English name elephant slide in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:028C",
+    "source_sha256": "81a96e91333f8658f82d36669fcbbb43e017d137fb7bb44dfa621b2f735e49ca",
+    "native_name": "ようしきトイレ",
+    "reference_id": "furniture:00A3",
+    "reference_sha256": "67ec6dd455a50cba3cec433f0934e38dd23090443c2668aa6d93e9eaef84797d",
+    "evidence": "Reviewed native ようしきトイレ against the complete supplied English name toilet in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0290",
+    "source_sha256": "99bd6b6d117049d02871a5f236bc5c4cdbd860b9c7a192d914d712be5dd0ce6b",
+    "native_name": "ウォッシュトイレ",
+    "reference_id": "furniture:00A4",
+    "reference_sha256": "d05f24f7c62fb03d25f4c796882b06c6a9df35cf68c825ad966db089811a5c8c",
+    "evidence": "Reviewed native ウォッシュトイレ against the complete supplied English name super toilet in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0294",
+    "source_sha256": "aaff6dc764d83b15eda634e5a26f99461fbce5fbfd4e6116e7043e9cef53aa7d",
+    "native_name": "パインざいのテーブル",
+    "reference_id": "furniture:00A5",
+    "reference_sha256": "15d18029981e7db3b7d3565ea6c4cf96990303257d4b75da0005dc142853c4b8",
+    "evidence": "Reviewed native パインざいのテーブル against the complete supplied English name pine table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0298",
+    "source_sha256": "a525b15bcfbf745efbe87d71180f69c71a1feadc7aba771356c0f32de3475193",
+    "native_name": "パインざいのイス",
+    "reference_id": "furniture:00A6",
+    "reference_sha256": "8aaea436e8b208d26ce270d3f652505c34f90613d219f44c7dec99dccb7cb4fc",
+    "evidence": "Reviewed native パインざいのイス against the complete supplied English name pine chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:029C",
+    "source_sha256": "b5dab91fafc5263e4b84bd2dadf592859c270d52219c8b43741ba91c1b3f961e",
+    "native_name": "ちゃつぼ",
+    "reference_id": "furniture:00A7",
+    "reference_sha256": "cb4e61067581f30f9f272ca74f3ffd01e5320c92cc3ac8c264750f83acd48b0c",
+    "evidence": "Reviewed native ちゃつぼ against the complete supplied English name tea vase in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:02A0",
+    "source_sha256": "b58b4a30d59fba004422b98daff57ea44fcaf9e5d765d2fcddf86a503ec4c864",
+    "native_name": "あかつぼ",
+    "reference_id": "furniture:00A8",
+    "reference_sha256": "a1a9e9c2dddba488341785304fa2cb8252dc7aea1bd375fd104017a322b10d80",
+    "evidence": "Reviewed native あかつぼ against the complete supplied English name red vase in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:02A4",
+    "source_sha256": "30396a5112389a066eeb1e891d33da175b9bef176e2fa47573a7a90dab053388",
+    "native_name": "ふるいミシン",
+    "reference_id": "furniture:00A9",
+    "reference_sha256": "8826d14928281d77857eac2141109171c1291f89ec37a6d9e4821c259fc58495",
+    "evidence": "Reviewed native ふるいミシン against the complete supplied English name sewing machine in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:02A8",
+    "source_sha256": "f6d788e9b23ad33e3c72aa660d023aa2e4c5f25ae8a5853620f9b3f9936cd67c",
+    "native_name": "ビリヤードのだい",
+    "reference_id": "furniture:00AA",
+    "reference_sha256": "0990ce87689636c2f42416551d0bea8cdc691c85e4acb0ba450010bff3a1a927",
+    "evidence": "Reviewed native ビリヤードのだい against the complete supplied English name billiard table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:02F0",
+    "source_sha256": "66ca6f57a81e4dfecd8cccff754aa09deb118587139f129170ef93df06187155",
+    "native_name": "しようふかタンス",
+    "reference_id": "furniture:00BC",
+    "reference_sha256": "f4a743da5af57678c777f0e34aca27020ea61e2c217ddb4f0b4566206fc9d937",
+    "evidence": "Reviewed native しようふかタンス against the complete supplied English name unused dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:02FC",
+    "source_sha256": "2e354db0249e7edfb02e656e99b18d1b628576b5e43ebcf8cb375d4d5893bd80",
+    "native_name": "たっきゅうだい",
+    "reference_id": "furniture:00BF",
+    "reference_sha256": "891496ef8261b30f05bec0963bbf449ab8aa132d9d5596185fd36863f1b1db01",
+    "evidence": "Reviewed native たっきゅうだい against the complete supplied English name table tennis in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0304",
+    "source_sha256": "4694f56f04c7656a22e13ee37dc36f3d7205c0e72b0f43b69434c607bbfa0197",
+    "native_name": "ログはとどけい",
+    "reference_id": "furniture:00C1",
+    "reference_sha256": "34a762902da9ff84d3de2db0440529b48b2d35bb81d62b631914e0a87a8249dc",
+    "evidence": "Reviewed native ログはとどけい against the complete supplied English name cabin clock in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0308",
+    "source_sha256": "9cdefd53b1f47de0662aeb630dd464a8b12b4d484580563053cfce66729dfdf5",
+    "native_name": "てつどうもけい",
+    "reference_id": "furniture:00C2",
+    "reference_sha256": "a747ed1d97b505d30a7bf036c6fc60c73622de9dabb962ce4b3663526ca2be29",
+    "evidence": "Reviewed native てつどうもけい against the complete supplied English name train set in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:030C",
+    "source_sha256": "ba8374e58391d6ec6068b3d1ec40fc0d48ae2d49cd5bcef3189769d55232d2cf",
+    "native_name": "みずのみドリ",
+    "reference_id": "furniture:00C3",
+    "reference_sha256": "ae405f3e574e20464c00adcffe46f8a0e54a7cc63057926b20160915cd8f34e6",
+    "evidence": "Reviewed native みずのみドリ against the complete supplied English name water bird in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0314",
+    "source_sha256": "e30a47c62fdcfa261a4c661b19fa5b99aa288be2f2b2ec61a968e09acdef3182",
+    "native_name": "しようふかおさる",
+    "reference_id": "furniture:00C5",
+    "reference_sha256": "0a72faa08165006e81f40d894d1c1941b5a8363a0d4d35851d844faffeabbdab",
+    "evidence": "Reviewed native しようふかおさる against the complete supplied English name unused monkey in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0318",
+    "source_sha256": "5eb79b5627c1ac98ca8ad57fc7d8b53a367130f45b3412dd335eb2a1a2d9707d",
+    "native_name": "スロットマシン",
+    "reference_id": "furniture:00C6",
+    "reference_sha256": "1996a280ea8f53394c79f26b1013f3ed07a88a836879adb29e86c698a141b251",
+    "evidence": "Reviewed native スロットマシン against the complete supplied English name slot machine in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:031C",
+    "source_sha256": "210d82fcc5023132592ff2a6a806470daafe069e74cfe35b93b4aa23373ec849",
+    "native_name": "アジアなベンチ",
+    "reference_id": "furniture:00C7",
+    "reference_sha256": "3b18560d3e8b34b099a7320e7f32cdd7ea57718edd31079200b014e5d325a7d5",
+    "evidence": "Reviewed native アジアなベンチ against the complete supplied English name exotic bench in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0320",
+    "source_sha256": "f9b3745a57e46e44910ee937d3ac8a63bcb75c530d98da3a16a03a8619c401dc",
+    "native_name": "アジアなイス",
+    "reference_id": "furniture:00C8",
+    "reference_sha256": "334be73824f41788cf81c8815465a7a620d481cbe69f48965708e8c0880af9cf",
+    "evidence": "Reviewed native アジアなイス against the complete supplied English name exotic chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0324",
+    "source_sha256": "56e61b1bec0fececbbb0093ec02cefa4337dd16f68a895fb6fa75a5e37398693",
+    "native_name": "アジアなバンダヂ",
+    "reference_id": "furniture:00C9",
+    "reference_sha256": "e05cee1fc53542dd4fe227627b14d83582a1ec90e3f2d8dea17a481c1c9ab4a3",
+    "evidence": "Reviewed native アジアなバンダヂ against the complete supplied English name exotic chest in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0328",
+    "source_sha256": "1c514b1c41374411f9ce878492224e4dcb6cd76880d81c18d54afede811cc599",
+    "native_name": "アジアなランプ",
+    "reference_id": "furniture:00CA",
+    "reference_sha256": "5151f3665231120c38348c9f20dbf6103086727972ec19e8e83f96b6c4fbdf18",
+    "evidence": "Reviewed native アジアなランプ against the complete supplied English name exotic lamp in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:032C",
+    "source_sha256": "833188f62678aa1ad42b9f893b15ad88f3cf5fcab272508812ad06351750d118",
+    "native_name": "カラジューム",
+    "reference_id": "furniture:00CB",
+    "reference_sha256": "521bd249a9c99627c8a059597e9c8cf842947fa9fd6adf698ed87ac691f3557a",
+    "evidence": "Reviewed native カラジューム against the complete supplied English name caladium in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0330",
+    "source_sha256": "f9b6700cf89d1a7489703afbae7540b047dac22551cc1072d3341a6d6819b23d",
+    "native_name": "シュロチク",
+    "reference_id": "furniture:00CC",
+    "reference_sha256": "76139031141b800329dc6b025dab7c54adab091c090976fbff8bdb844134605a",
+    "evidence": "Reviewed native シュロチク against the complete supplied English name lady palm in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0334",
+    "source_sha256": "47dd232b4c808b0394c8d44d2765613622ef01853ecb74b2157a72f347f52c03",
+    "native_name": "アジアなスクリーン",
+    "reference_id": "furniture:00CD",
+    "reference_sha256": "c68222c5f82c43ab9fd8ee7f726b7d76f870531886ccf2f599bb90707bb039bf",
+    "evidence": "Reviewed native アジアなスクリーン against the complete supplied English name exotic screen in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0338",
+    "source_sha256": "8468fe69346bf78ddb701211bd925faef288e49bddf7d8e37d48ca1a3758fa95",
+    "native_name": "アジアなテーブル",
+    "reference_id": "furniture:00CE",
+    "reference_sha256": "bb733417bff2b32ca47184ee72bc01d4f9ff5a92c88260eb187945cd5f6c7833",
+    "evidence": "Reviewed native アジアなテーブル against the complete supplied English name exotic table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:033C",
+    "source_sha256": "063cd5e066486af2e2d4dc8d67132106e1c3b262daab21aec6971055fcfe70b3",
+    "native_name": "シャンベ",
+    "reference_id": "furniture:00CF",
+    "reference_sha256": "ec2d0901aacdb5f36c50b15a8a7da89003d159d8e7617f7108e1ab3b03faa467",
+    "evidence": "Reviewed native シャンベ against the complete supplied English name djimbe drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0344",
+    "source_sha256": "3423ed201e2df17badfd53b26ded146e7aad8d5793f1cecb1ad72bf7fb59d652",
+    "native_name": "モノクロじむイス",
+    "reference_id": "furniture:00D1",
+    "reference_sha256": "1f5b04382161d911fe2d1a0b9e2b6c07ad7426606d26824ef1322ff672a034f9",
+    "evidence": "Reviewed native モノクロじむイス against the complete supplied English name modern den chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0348",
+    "source_sha256": "69556cc8c583a16d3b59369aeb18140e85f8f54d669d41981459c0e5843e0d18",
+    "native_name": "モノクロボード",
+    "reference_id": "furniture:00D2",
+    "reference_sha256": "2d2691790fc3adac7e5cd26f3035ca83e7fb2d45ec20594921a875e35d96a63d",
+    "evidence": "Reviewed native モノクロボード against the complete supplied English name modern cabinet in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0350",
+    "source_sha256": "32c37d00447df870933a7fcb9c5c80ddbfd6f479099c68af5ed229df9f3c91b1",
+    "native_name": "モノクロソファL",
+    "reference_id": "furniture:00D4",
+    "reference_sha256": "6ddf5070e1e73966d6d0787690aef8f5d01e19fb5df15e8cb3741588ad265355",
+    "evidence": "Reviewed native モノクロソファL against the complete supplied English name modern sofa in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0354",
+    "source_sha256": "6eb39015b7ef743edfca38ad9acdc63cd3385e7e47d829c4f4c3876f4cd4bd50",
+    "native_name": "モノクロローテーブル",
+    "reference_id": "furniture:00D5",
+    "reference_sha256": "ec3edb3c68044aaca6a1f87620221bbc0944170956cadab5e81dbf3c465029f0",
+    "evidence": "Reviewed native モノクロローテーブル against the complete supplied English name modern table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0364",
+    "source_sha256": "3ef512cbcd378b84ce6fdb5b0c219ace2c0a2f45cdc7ee55cfc4873412d2442b",
+    "native_name": "あおいチェスト",
+    "reference_id": "furniture:00D9",
+    "reference_sha256": "822998c14c44921dffdc69292a72aaeddda531d9b0da5752935c1c456ea7acea",
+    "evidence": "Reviewed native あおいチェスト against the complete supplied English name blue dresser in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0374",
+    "source_sha256": "6db28366262b04609a77714d36f607c754968f82e44d15d0e3ff116193709d27",
+    "native_name": "みどりのながイス",
+    "reference_id": "furniture:00DD",
+    "reference_sha256": "43b3af2f5b283a8171a5a4c162bd5b8fbde97014b2a6fd45b7aaad83cf6898d1",
+    "evidence": "Reviewed native みどりのながイス against the complete supplied English name green bench in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:037C",
+    "source_sha256": "0b4ac39588254e8808dc8c6f8809a75d10ef25890a82230bfb0e1b8d9f9d8700",
+    "native_name": "みどりのチェスト",
+    "reference_id": "furniture:00DF",
+    "reference_sha256": "6618096e9a49c2255bd93355be89b9cd2200f7c004d248cc9adc47632fc741bd",
+    "evidence": "Reviewed native みどりのチェスト against the complete supplied English name green pantry in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0390",
+    "source_sha256": "0bdf97616dc6b1918fc0ef869e2da800719769651a045a29719eb7ee92d41d2e",
+    "native_name": "ログソファL",
+    "reference_id": "furniture:00E4",
+    "reference_sha256": "78878b1806458a6913221381074dde27a21beab884dbe1d771092ab68fbd642c",
+    "evidence": "Reviewed native ログソファL against the complete supplied English name cabin couch in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0394",
+    "source_sha256": "7df540f7d0179853b6efe777f0edb77fdd7a5309f06b26147ba21cc5ac3f2c63",
+    "native_name": "ログソファ",
+    "reference_id": "furniture:00E5",
+    "reference_sha256": "b4ab130327bb5e473b790f411ad9f151ef73cacdc80351ac630d5f200eab6f05",
+    "evidence": "Reviewed native ログソファ against the complete supplied English name cabin armchair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0398",
+    "source_sha256": "d9bca156c1038bd760fa205b4967fd7abcbfd999738e0180b2bbc2830c2504bb",
+    "native_name": "ログボード",
+    "reference_id": "furniture:00E6",
+    "reference_sha256": "11e75e06dab457a34c0574db3e9307d7ed11e705a5154b1902a54827a34a529b",
+    "evidence": "Reviewed native ログボード against the complete supplied English name cabin bookcase in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:039C",
+    "source_sha256": "68be4e77e1bc1bc3d6816a3be33f5131cc704955b222217b0610dd932ddf81d2",
+    "native_name": "ログソファテーブル",
+    "reference_id": "furniture:00E7",
+    "reference_sha256": "a819e0d2527071b135b9b848a9972f7e0c32a99c5e00c742907df09621ae9085",
+    "evidence": "Reviewed native ログソファテーブル against the complete supplied English name cabin low table in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03AC",
+    "source_sha256": "af08cf1d9e1d368247af99da9a86182036da8b1c4157e7189b672b517117f04e",
+    "native_name": "サンセベリア",
+    "reference_id": "furniture:00EB",
+    "reference_sha256": "5459d2f3fabe9c7ea19cacb4cb02bc49477bb226a5d9b5a592c71ba543051d15",
+    "evidence": "Reviewed native サンセベリア against the complete supplied English name snake plant in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03B4",
+    "source_sha256": "5e3e7dba83f22d36416e993ac224ae36618e62ee105af2627475141170a8b66c",
+    "native_name": "ゴムのき",
+    "reference_id": "furniture:00ED",
+    "reference_sha256": "12a6e785e70b1c0d5acc293017c87fb81121c6efe25031307641045b641f2f54",
+    "evidence": "Reviewed native ゴムのき against the complete supplied English name rubber tree in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03B8",
+    "source_sha256": "916073ea6ccc39e7a523c2645e0f3069a09a95a2f466058ea05a84ab2a1fb4c7",
+    "native_name": "ポトス",
+    "reference_id": "furniture:00EE",
+    "reference_sha256": "53ded42a5a9c7b46255bb0279b0b0730cc5b53c0e4f4a711cc1ee5b9b250856a",
+    "evidence": "Reviewed native ポトス against the complete supplied English name pothos in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03C8",
+    "source_sha256": "4cc739029d4bb905aadb38307f549b9e1841d6847593dbdba291e50d2dcfcd03",
+    "native_name": "ベンジャミン",
+    "reference_id": "furniture:00F2",
+    "reference_sha256": "500d58c654e1206a95c3d5f4d1572e76cee47aa7bb55da2d2d07ff1a417678d9",
+    "evidence": "Reviewed native ベンジャミン against the complete supplied English name weeping fig in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03D0",
+    "source_sha256": "b0ea37d5062b9c877cbe637c4c77bd00d167ec5d1d6ea8f26f0e3a96d7b3fce5",
+    "native_name": "クロトン",
+    "reference_id": "furniture:00F4",
+    "reference_sha256": "d9baf23f2ed536f40b1df20464454e54c50d5f1d985ff704651eff4e1b0a9f88",
+    "evidence": "Reviewed native クロトン against the complete supplied English name croton in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03D4",
+    "source_sha256": "ea1764305a31943ed18ac7d1fb1b7dd9d15948097d518e766b3468a2d397fca0",
+    "native_name": "パキラ",
+    "reference_id": "furniture:00F5",
+    "reference_sha256": "0b83a088cc49a16746f9665a7dcf9adb8e80ff81d4fc3befb78cad0e4b535e02",
+    "evidence": "Reviewed native パキラ against the complete supplied English name pachira in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03D8",
+    "source_sha256": "6ecc44fc11421edb9415c1dc23dd6df3b5884cd25637b9e20cd7402a3dd4611b",
+    "native_name": "へんぺいサボテン",
+    "reference_id": "furniture:00F6",
+    "reference_sha256": "011608cf519faf7da23a25aa028d63713e75993149b20913e88a203199cf1fcc",
+    "evidence": "Reviewed native へんぺいサボテン against the complete supplied English name cactus in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03DC",
+    "source_sha256": "f4d1037342501791dbbfe92386c5655df9f85bdfc3c1ff5d9316e6d584ea2493",
+    "native_name": "メトロノーム",
+    "reference_id": "furniture:00F7",
+    "reference_sha256": "1c5e22b10ba2337b2a05a891eafa76f0b08a5ccf95f3e3dde2923b14c9158479",
+    "evidence": "Reviewed native メトロノーム against the complete supplied English name metronome in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03E0",
+    "source_sha256": "5857dda710ac605882766b81ad20748bf896887ff0e8442c537d94abcee8cf54",
+    "native_name": "ししおどし",
+    "reference_id": "furniture:00F8",
+    "reference_sha256": "ee3a0f0eb923e05d5be6498011755c5e77c57aee11174d6b25df833cc041ab0e",
+    "evidence": "Reviewed native ししおどし against the complete supplied English name deer scare in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03E4",
+    "source_sha256": "bd4baecfef6bc4dc55a0bf2fb4d951544fbffb03317cedb6b967b2aecb9b8aa6",
+    "native_name": "クロマツのぼんさい",
+    "reference_id": "furniture:00F9",
+    "reference_sha256": "3a3507570b5413a8e14f5b195a6f8757724dd078eac87cd58617aea6e03d82dc",
+    "evidence": "Reviewed native クロマツのぼんさい against the complete supplied English name pine bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03EC",
+    "source_sha256": "ac4ddb40df24719325c3de5680b8721b3a6534978f9ff37ea5c2cc12fca81a79",
+    "native_name": "バーバーポール",
+    "reference_id": "furniture:00FB",
+    "reference_sha256": "85906f228b873d23c60b47776d298698b7e1ecabe01ae10379ae0af9fbf7e284",
+    "evidence": "Reviewed native バーバーポール against the complete supplied English name barber's pole in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03F4",
+    "source_sha256": "e3cbf01d80b92b3664d9d2f4d7251149a252b5f53699c017821481029ea85023",
+    "native_name": "ウメのぼんさい",
+    "reference_id": "furniture:00FD",
+    "reference_sha256": "b3ccbf76252bca6b098681832fb412762a29e2ef618aa6dcea59e9b9ec94ff51",
+    "evidence": "Reviewed native ウメのぼんさい against the complete supplied English name plum bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03F8",
+    "source_sha256": "33bf71cbd547a66a09a42deb7a0d8bb4e81bf5505291cdb987706b9e11e4c8c4",
+    "native_name": "ひっしょうダルマ",
+    "reference_id": "furniture:00FE",
+    "reference_sha256": "4eaf5ad2700bee6100c1b9f8d8d0bf48680244d402e23b98a1ada16631c1e32f",
+    "evidence": "Reviewed native ひっしょうダルマ against the complete supplied English name giant dharma in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:03FC",
+    "source_sha256": "255e9598acb558abdc84505a314f48ec653b024e9996e5d2a2543211ff95603e",
+    "native_name": "ダルマ",
+    "reference_id": "furniture:00FF",
+    "reference_sha256": "4def83e598a3da7f5182a6880f90fb5f5453e057218e59f9cfc0871a41b5ca2d",
+    "evidence": "Reviewed native ダルマ against the complete supplied English name dharma in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0400",
+    "source_sha256": "f152f70705acc6061ac6c54bac9848e0d10751ae45dee6de9bac9ed8ec9f7e4f",
+    "native_name": "ミニダルマ",
+    "reference_id": "furniture:0100",
+    "reference_sha256": "eaecfe4482cc7ed0196905be1776d80b14032010d74a28c9a4feb4ff7442cf36",
+    "evidence": "Reviewed native ミニダルマ against the complete supplied English name mini-dharma in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0404",
+    "source_sha256": "8b538eac973f661fd35f59ce31c6ee9a8a1aa2bff699e51311f13a2371854b87",
+    "native_name": "ボケのぼんさい",
+    "reference_id": "furniture:0101",
+    "reference_sha256": "74a397d811b9cbb8fba94d23c372cc202db3d1a55f35c9a766f30dd8904b043c",
+    "evidence": "Reviewed native ボケのぼんさい against the complete supplied English name quince bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0408",
+    "source_sha256": "8ad450509ee1f339c48f4bc986fcc5aaf66275a210cb697fdedde4ae5b4af0f9",
+    "native_name": "サツキのぼんさい",
+    "reference_id": "furniture:0102",
+    "reference_sha256": "a7842d0b696fe996bd7515fe09ce347ee25bc77fdf3b9e273ce4115d13858f56",
+    "evidence": "Reviewed native サツキのぼんさい against the complete supplied English name azalea bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0414",
+    "source_sha256": "7ce90d6f14eadbb63351e1173fd1dfae8c0392a13d2b57920366a36d9233a92e",
+    "native_name": "おもりつきパイロン",
+    "reference_id": "furniture:0105",
+    "reference_sha256": "aa182681e0ed8dcefe4bfa0bece2bab2b229a7251373ab9a08a4c96475e852b3",
+    "evidence": "Reviewed native おもりつきパイロン against the complete supplied English name traffic cone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0418",
+    "source_sha256": "fd3affa0ed2f764c0c0490dc181f6cb16d98aab26b40ee8145fcf155eb28a7b3",
+    "native_name": "しましまパイロン",
+    "reference_id": "furniture:0106",
+    "reference_sha256": "c23383b71be694659a06a9a385f62f6e530ab334350f30278e4c73f3da1b3d94",
+    "evidence": "Reviewed native しましまパイロン against the complete supplied English name striped cone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:041C",
+    "source_sha256": "ead536f9503e1418a56a9db3c0163f084e75373d20060ace7688373485ac83d2",
+    "native_name": "パイロン",
+    "reference_id": "furniture:0107",
+    "reference_sha256": "715258997f6fdb390713f40d1ecffc594c26db7e6e41fc82a3176b17d6b7a827",
+    "evidence": "Reviewed native パイロン against the complete supplied English name orange cone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0424",
+    "source_sha256": "ff4a96830088551f636f7e373fbcaa88a656f62372edeb8258cf4220bcad24df",
+    "native_name": "モミジのぼんさい",
+    "reference_id": "furniture:0109",
+    "reference_sha256": "1e84d75b58ac09b777dd136128883c0a34d1f4c3d9e3ce0300bee1ab05ecea64",
+    "evidence": "Reviewed native モミジのぼんさい against the complete supplied English name maple bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:042C",
+    "source_sha256": "7d4aa1076c8965accf2e1c0875f85d4811e9604fce50f4f9515f5a803b8cfa3d",
+    "native_name": "ウメモドキのぼんさい",
+    "reference_id": "furniture:010B",
+    "reference_sha256": "204d9cc611b60d14f3b898abd24f90bd4c8500042ba01097c64f02facb94c3c3",
+    "evidence": "Reviewed native ウメモドキのぼんさい against the complete supplied English name holly bonsai in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0434",
+    "source_sha256": "88e115d1f75b08b7aa343404cb83b7286db267b373c65cf3225a3d003d7974e1",
+    "native_name": "フェンス",
+    "reference_id": "furniture:010D",
+    "reference_sha256": "d4e88616cb5cf966d1150e88df4925efe239a39a236a5b804b6524be0391a40d",
+    "evidence": "Reviewed native フェンス against the complete supplied English name fence in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0438",
+    "source_sha256": "9f4dc1a11cf1b03c4cfba95745cc38ce8da3b115acb3b29561dca58f2613ef79",
+    "native_name": "ビニールつきフェンス",
+    "reference_id": "furniture:010E",
+    "reference_sha256": "e03f7fbf5e7922d2481efb5b8486ff475cdf25c967b0e4ad011a1ae9fb8b9b11",
+    "evidence": "Reviewed native ビニールつきフェンス against the complete supplied English name plastic fence in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:043C",
+    "source_sha256": "57002383625c6db6cc0c80fffd0112239d0dccf30ca131a82eb118aed71487ef",
+    "native_name": "カンバンつきフェンス",
+    "reference_id": "furniture:010F",
+    "reference_sha256": "f4f204717e0c93fff57291e5ef7febf8d53fd42803c78daf61105ba1290d1a32",
+    "evidence": "Reviewed native カンバンつきフェンス against the complete supplied English name fence and sign in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:044C",
+    "source_sha256": "6934e4660e25f2f6336caefa069361a83a2df6c07349f234c0a8357f59b2c4c8",
+    "native_name": "ちゃいろのドラムカン",
+    "reference_id": "furniture:0113",
+    "reference_sha256": "fda595efde927bec996b93709cde617d1ea3ee5bb48512e01bb269da4ce3014c",
+    "evidence": "Reviewed native ちゃいろのドラムカン against the complete supplied English name brown drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0450",
+    "source_sha256": "ca979faa7b0963efdabf1a28d3bf011dedf92d88940dfef2baaea84f407e4d50",
+    "native_name": "みどりのドラムカン",
+    "reference_id": "furniture:0114",
+    "reference_sha256": "9de1f46fe61805b56cab239522ee97a1776d8b4a524837d680eb65a77704fcc3",
+    "evidence": "Reviewed native みどりのドラムカン against the complete supplied English name green drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0454",
+    "source_sha256": "b3d24c6541e5b10045447b3749121df1371adad841621546a56656838a556d53",
+    "native_name": "あかいドラムカン",
+    "reference_id": "furniture:0115",
+    "reference_sha256": "e7e15ab3d91830746fb9eda2d43fcee24869e65fc59136b7bbec4d1f70fe14d3",
+    "evidence": "Reviewed native あかいドラムカン against the complete supplied English name red drum in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:045C",
+    "source_sha256": "78058a2f3f7ba57118a9d4b624353a01d18d44a8a5db5baa3fe528c59fafc33b",
+    "native_name": "てっきん",
+    "reference_id": "furniture:0117",
+    "reference_sha256": "093977a82231b16aee94fb2d97583fbf83043b74404b3ac4181b36db8d5bb9fe",
+    "evidence": "Reviewed native てっきん against the complete supplied English name iron frame in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0460",
+    "source_sha256": "9886485e7e60d217dfa3565fae667e0829b5845bfcb112f7f925dcbdb0a669d7",
+    "native_name": "くずかご",
+    "reference_id": "furniture:0118",
+    "reference_sha256": "fcad267912fb08f9291cf1b5de8e71ccf397a4ab56efe883fc291492a0b25fd4",
+    "evidence": "Reviewed native くずかご against the complete supplied English name trash can in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0464",
+    "source_sha256": "f8bdc047d0ec6ef97dafdbe828622f3a4ed4c845dcc1f4922b1aedae1c11b55b",
+    "native_name": "ペール",
+    "reference_id": "furniture:0119",
+    "reference_sha256": "686cdbe257d555f73270130c9b3b9c033bede724ef1a02889e36b4a94a9a518c",
+    "evidence": "Reviewed native ペール against the complete supplied English name garbage pail in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0468",
+    "source_sha256": "97f77e0c823854238f0d1484da8f4bdc0d9689581dc435471f80220a9223080d",
+    "native_name": "あかいスイカのイス",
+    "reference_id": "furniture:011A",
+    "reference_sha256": "5125d727bc49c4f97026d151d4f0cb2a21931a6ba605eac00830ba85cf9d11c5",
+    "evidence": "Reviewed native あかいスイカのイス against the complete supplied English name watermelon chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:046C",
+    "source_sha256": "802bf9d57b0bb96d8969116f72c4b73c353cbddf81451a6355e6f6249d00d70b",
+    "native_name": "きいろいスイカのイス",
+    "reference_id": "furniture:011B",
+    "reference_sha256": "dbdf11fafaecee6b510cde968b7ea9fbd03803bd752476e3b439c7ea5f40f7bc",
+    "evidence": "Reviewed native きいろいスイカのイス against the complete supplied English name melon chair in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0474",
+    "source_sha256": "d1f31645f685b8a4e031821616aa9c7810d3a3f5fe15eda92a1dd5b3747d2f12",
+    "native_name": "こうつうゆうどうロボ",
+    "reference_id": "furniture:011D",
+    "reference_sha256": "bd14ec5fa67025bb0618d80ac43e640744d1d23b50a7db5b87f8f59b2037eb7e",
+    "evidence": "Reviewed native こうつうゆうどうロボ against the complete supplied English name robotic flagman in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0478",
+    "source_sha256": "62f17186cacc242a410f5c4d75db308f0e70b47db9bbacf0d3be2ec23a63ddd0",
+    "native_name": "ブリキのペール",
+    "reference_id": "furniture:011E",
+    "reference_sha256": "6e3427bd5aa3052798f915bf5f904f9b3e20d4f5992767b76437adeff99e5e36",
+    "evidence": "Reviewed native ブリキのペール against the complete supplied English name garbage can in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:047C",
+    "source_sha256": "435c76b20b7829f6351360262d474ea70669a186dad35a5f34eebd1e946be75a",
+    "native_name": "ごみばこ",
+    "reference_id": "furniture:011F",
+    "reference_sha256": "d2c3914af6bd3b635ace6f2d583fe8d1143e2bef655e1c2fffaa5094a21c39c2",
+    "evidence": "Reviewed native ごみばこ against the complete supplied English name trash bin in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0494",
+    "source_sha256": "a52be1446b6c9f46f5ed501e4262d8b639c624e93e9a0bc6dfbcece88c54cbb1",
+    "native_name": "ネコぐるま",
+    "reference_id": "furniture:0125",
+    "reference_sha256": "a2ea33f782186f79f8fc93aef140baf242a6de2f1ed1af90d4aaf06a09ac807d",
+    "evidence": "Reviewed native ネコぐるま against the complete supplied English name handcart in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:0498",
+    "source_sha256": "5e4f268522f40b40b0f2f688925a81d8f98b8702eaff92b9856e15a7b481ceb5",
+    "native_name": "ちょうずばち",
+    "reference_id": "furniture:0126",
+    "reference_sha256": "d1bab2d0db39eca74583e76b7ff6c027b50ae2c5b1d92a128a15c92c13378c94",
+    "evidence": "Reviewed native ちょうずばち against the complete supplied English name wash basin in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:049C",
+    "source_sha256": "b66a9fc84c562ed9f8389f499653f758b8a104ad71b69ab1d1e8652d93300b8d",
+    "native_name": "ハロウィンかぼちゃ",
+    "reference_id": "furniture:0127",
+    "reference_sha256": "f3df7d4ad04f4207b18b58cce2afd0a250fef7600bdb229c38a03f8204519820",
+    "evidence": "Reviewed native ハロウィンかぼちゃ against the complete supplied English name jack-o'-lantern in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:04A0",
+    "source_sha256": "44e1a0f5da1be31402d0611b4ba8f650fa5ede618c013f40f267dc082f17767b",
+    "native_name": "でんこうサイン",
+    "reference_id": "furniture:0128",
+    "reference_sha256": "2e64711bdd156a252b4e03575235fafb51e1086dd2ad30a194510fba6e7b974f",
+    "evidence": "Reviewed native でんこうサイン against the complete supplied English name warning sign in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:04A4",
+    "source_sha256": "226f09ad2f0b1fed957a76d31b633041dc1686bf076a529fa02531df4897512d",
+    "native_name": "やじるしボード",
+    "reference_id": "furniture:0129",
+    "reference_sha256": "319bc5675bf8853bdfe0ef55b4c203f22ba9a42ec638093936f1219a2c4a9658",
+    "evidence": "Reviewed native やじるしボード against the complete supplied English name detour arrow in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:04A8",
+    "source_sha256": "5f92ea34687a22df9069442001afca9ac6e0e7c229bfb571c6f96cb39124c280",
+    "native_name": "よくあるにわいし",
+    "reference_id": "furniture:012A",
+    "reference_sha256": "3090baa0882d88e67f2ce3c2e24d76c767c6c9c9304d1487f33ffdf1edf403da",
+    "evidence": "Reviewed native よくあるにわいし against the complete supplied English name garden stone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  },
+  {
+    "id": "item_10:04AC",
+    "source_sha256": "cf06271fd901f27fdc8a9ad5bdcc5ef4d9a66472c77fd642ff059aebfca8db9a",
+    "native_name": "たかいにわいし",
+    "reference_id": "furniture:012B",
+    "reference_sha256": "ee4a6fef6a1dd514974d94e2817fcbb94bc85a2968d50bb19e3a67921823fe9c",
+    "evidence": "Reviewed native たかいにわいし against the complete supplied English name standing stone in this furniture group. The object type and stated style/material/form agree; retain the official English naming rather than the legacy gloss. Four native rotation fields must remain identical. This approves the name identity, not artwork replacement, caller capacity, or gameplay."
+  }
+]

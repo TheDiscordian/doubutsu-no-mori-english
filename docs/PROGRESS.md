@@ -147,8 +147,10 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 644 passing portable-C, synthetic, and retail-input full-suite regression tests,
+- 660 passing portable-C, synthetic, and retail-input full-suite regression tests,
   including the repeatable text-volume report.
+  The suite includes all eleven item-identity/scenario-composition checks and
+  five cartridge-clock/town-data error checks.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
@@ -201,7 +203,7 @@ user's direction. The production build retains the approved spacing metrics.
 - Legacy item references recovered from the shipped loader's verified tables.
   All seventeen banks reconstruct unchanged, and 947 furniture groups map to
   their four native rotation slots. These are references, not approved imports.
-- 107 distinct reference IDs for complete English item-name candidates in 231 native storage
+- 160 distinct reference IDs for complete English item-name candidates in 443 native storage
   slots, retaining GameCube spelling/case and the original ten-byte fields.
   Thirty-five direct item-loader calls and their contexts are inventoried.
   Wider imports remain gated on name, message, handbill, and UI destinations.
@@ -209,7 +211,7 @@ user's direction. The production build retains the approved spacing metrics.
   All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
   DMA tests cover every confirmed reference identity, group boundaries, invalid
   inputs, unaligned destinations, resource disabling, and header validation.
-  The resource has 282 candidate reference IDs in 649 slots. This API alone does
+  The resource has 461 candidate reference IDs in 1,365 slots. This API alone does
   not enable wider names at a destination. A verified placed-clothing alias fills
   its ordinary-name destination; direct loading and all four rotations pass.
 - Sixteen-byte main-message item fields with unchanged native structure/save
@@ -462,20 +464,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/native-travel-pilot/`
-contains 11,941 edits, including
-9,736 reference main-bank candidates, all 460 choices, 570 original dialogue
+The current experimental resident-module pilot in `build/startup-errors-pilot/`
+contains 12,155 edits, including
+9,736 reference main-bank candidates, all 460 choices, 572 original dialogue
 drafts, one original-dialogue continuation, 290 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,056
+still require review. The original main-bank audit leaves 1,054
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,470 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/native-travel-candidates/` and `build/native-travel-coverage/`. The independent
+`build/startup-errors-candidates/` and `build/startup-errors-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -1016,9 +1018,59 @@ current-town warnings remain; all four complete layouts fit the verified six-cel
 town limit with every other field bound unchanged. Normal conversation, travel,
 board posting, final wording/presentation, and hardware validation remain.
 
+## Complete item-name identities
+
+The [reviewed item-name registry](../specs/ITEM_REFERENCE_MATCHES.md) supplies
+179 complete GameCube furniture names where legacy wording alone did not match.
+Each approval binds the native Japanese spelling, source hash, English reference
+and full padded hash, and all four rotation names. Both candidate generation
+and independent ROM/resource construction enforce the approval. Removing its
+metadata or re-hashing shortened text cannot bypass the complete-name check.
+Ambiguous artwork, species, figurine, and unused-name differences stay unapproved.
+
+All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
+unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
+12,155 edits; basic generation has 11,445, including both startup-error drafts.
+All earlier candidates remain unchanged.
+Ordinary item storage contains 443 slots from 160 distinct references; the wide
+resource contains 1,365 slots from 461 references. Four rotations are one name,
+not four distinct translations. The 126 new names longer than ten bytes remain
+complete in the wide resource, not shortened for unexpanded callers.
+
+All 12,155 actual installed edits, source/candidate/build hashes, the complete
+wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
+changes only the native item-name file and the existing wide-name resource
+relative to the travel pilot; their dimensions and DMA entries remain unchanged.
+Runtime code, main text,
+fonts, save structures, and caller capacities are unchanged by the name edits.
+The 660-test suite includes all eleven item checks. The combined native loader
+batch passes 757 calls and 749 memory assertions over 2,271 steps, including all
+461 wider-name reference identities and all 212 new ten-byte slots. Complete
+names, unaligned wide destinations, capacity/header failures, guards, and restored
+state pass. The earlier shorter-time-limit run remains recorded as incomplete.
+Normal item display and remaining wider destinations still need their own
+integration and gameplay checks.
+
+## Native startup errors
+
+The [cartridge-clock and town-data drafts](../specs/STARTUP_ERRORS.md) translate
+`09CC/09D1` without importing the GameCube's different hardware and actions.
+The clock warning retains playing immediately or waiting, native choices
+`00E7/00E8`, and successors `09CD/09CF`. The corrupted-town notice retains its
+original request and normal ending, without adding erasure or card-slot choices.
+Every native command remains except the exact highlighted booklet-name length.
+Both complete drafts fit at 361 and 178 expanded bytes with no layout warnings.
+
+All five focused checks and the 660-test full suite pass. One silent four-MiB
+native batch passes the two drafts and three connected messages: five complete
+loads, seventeen memory assertions, guards, and restored state. The final ROM
+retains every earlier edit, all name resources, code, fonts, and saved structures.
+Normal error selection, clock recovery, date entry, final wording, saving, and
+original hardware remain separate acceptance requirements.
+
 ## Text-volume measurement
 
-The generated coverage report measures 632,360 covered source characters out of
+The generated coverage report measures 633,777 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1038,11 +1090,11 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 11,941 edits, including
+The resident-module experiment contains 12,155 edits, including
 9,736 reference main-bank candidates, 290 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
-231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
+443 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
 advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, eighteen native
@@ -1054,12 +1106,12 @@ dialogue drafts (including five connected reply corrections), four
 contextual-menu reply drafts, 35 native return greetings, 85 native daily,
 move, repeat, and month-return greetings, 72 native introductions/reunions,
 eight native moving conversations, seven game-launch prompts, and four complete
-native travel explanations using five records.
+native travel explanations using five records, and two native startup errors.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,057 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,056 main records without
-candidates: 134 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,055 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,054 main records without
+candidates: 132 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

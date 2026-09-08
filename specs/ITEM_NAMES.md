@@ -8,11 +8,16 @@ twelve bits and stores four equal names per rotation group. The legacy and
 GameCube tables have one name per four furniture IDs; the final native filler
 slot is excluded. [Legacy extraction](LEGACY_ITEMS.md) establishes these mappings.
 
-Candidate identity requires the complete legacy name to match the GameCube name
+Automatic candidate identity requires the complete legacy name to match the GameCube name
 after trimming legacy padding and ignoring case only. Do not remove punctuation,
 substitute words, or shift indices to manufacture a match. Retain the exact
 GameCube capitalisation and spelling. Missing identities remain explicit in each
 bank's generated remaining report.
+
+Individually [reviewed native identities](ITEM_REFERENCE_MATCHES.md) provide a
+separate hash-bound path where the legacy wording differs or remains Japanese.
+The native name, reference, four furniture rotations, complete output, and
+capacity are independently checked. Unapproved legacy mismatches stay withheld.
 
 An additional alias pass may transfer an already confirmed placed-object name
 to the ordinary item that the pinned native `800BF10C` conversion actually reads.

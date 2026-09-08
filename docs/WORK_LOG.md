@@ -5004,6 +5004,154 @@
   overlong text; it is not permission to replace compatible English references
   or reuse arbitrary message slots.
 
+## 2026-09-08 — Complete furniture-name identity approvals
+
+- Continued the uncommitted item-name batch from `b8370d0`. The intervening
+  user-requested measurement independently verified all 12,153 installed edits;
+  it did not implement another translation batch. The full project remains
+  active, including all text, destination integration, review, available normal
+  gameplay/save tests, release preparation, and image/keyboard stretch goals.
+- Added 179 explicit native-to-GameCube furniture-name identities in
+  `translations/item_reference_matches.json`. Each records the Japanese name,
+  exact ten-byte source hash, English reference ID, full sixteen-byte hash,
+  and review explanation. All four native rotation fields must agree. This
+  covers unambiguous object and series names in the first 300 groups; ambiguous
+  artwork/species/figurine identities and dropped unused prefixes remain
+  unapproved. The review does not establish artwork identity or reachability.
+- Added `tools/item_matches.py` and shared the approval map across ordinary
+  candidate generation and wider resources. ROM and resource builders also
+  independently verify the complete approved value, actual target source,
+  all rotations, provenance, and any native placed-object conversion. Removing
+  metadata, shortening/re-hashing English, using a different reference, or
+  changing the donor/conversion cannot bypass these checks. Unapproved legacy
+  matches and all existing English candidates remain unchanged.
+- All 179 names fit sixteen bytes, adding 716 slots. Fifty-three fit ten bytes,
+  adding 212 slots without changing native capacities. The other 126 new names
+  remain complete in the wider resource and withheld from native ten-byte fields.
+  Full/basic generation reaches 12,153/11,443 ordinary edits, respectively.
+  Ordinary item names occupy 443 slots from 160 distinct reference IDs, including
+  376 furniture slots. The wide resource contains 1,365 slots from 461 reference
+  IDs, including 1,204 furniture slots. All previous full/basic/wide candidates
+  remain identical; only these explicitly approved furniture slots are added.
+- `build/tests-item-identities-full-01.log` passes all 653 tests in 270.698
+  seconds. The nine initial identity checks cover schema, complete source and
+  reference values, strict metadata types, capacity, aliases, all retail approval
+  hashes/rotations, excluded names, and independent builder/resource rejection.
+  Added two test-scenario composition checks after that full suite began;
+  `build/tests-item-identities-focused-02.log` passes all eleven final focused
+  tests in 1.155 seconds. Do not describe this as a 655-test full-suite run.
+- The combined scenario generator joins native ten-byte and wide sixteen-byte
+  bodies inside one identical setup/restoration, retaining all name and guard
+  checks. Its first invocation stopped before starting an emulator because the
+  default compiler module report lacks the ROM's NPC creator configuration.
+  The configured `build/item-identities-pilot/runtime-module.json` supplies the
+  correct independent approval; no guard or production code was changed.
+  The failed invocation remains in `build/item-identities-scenario.log`; the
+  corrected invocation is `build/item-identities-scenario-02.log`.
+- ROM `build/item-identities-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `5b33a20b617d022e31c575d311d7742c3bae0518e9371ea7f1d7251a93e79a67`.
+  UPS SHA-256:
+  `98d867d049d40c2940a42720e82f964f1403d17951f2842bcdd9f30d5d115368`.
+  Candidate SHA-256:
+  `0f77a61c23280fc719e19ae03b26b919fc6351b51f5cc29159e534b9403011a5`.
+  Wide resource SHA-256:
+  `b12e5a7463840ab65a513bc2232c07d375cb8d4fe955dedea04a0a6d57786b91`.
+  All actual installed edits match, and UPS application reconstructs the entire
+  ROM. The cartridge wide resource equals both `names.bin` and independently
+  reconstructed complete entries. The resource stays 72,736 bytes, with its
+  original header, 4,544 entries, and sixteen-byte stride.
+- The read-only artifact audit initially expected a DMA-directory change along
+  with the two name files; actual comparison proved that only `010F4000` and
+  `02A00000` differ from the travel pilot. The corrected exact-two-file assertion
+  passes. The DMA directory, code, main text, choice/name/mail resources other
+  than these item files, fonts, module, and saves remain unchanged. The ROM stays
+  32 MiB. Source-volume replacement coverage increases by 1,196 characters to
+  633,556 of the unchanged 746,978-character denominator; separately loaded names
+  receive no additional coverage credit.
+- Final-candidate identity and expression queues remain unchanged in scope:
+  no currently admissible same-ID references and ten unapproved special-actor
+  expression cases. Main candidates stay at 10,696, with 134 Japanese-static
+  gaps, 919 non-static gaps, one Latin gap, and two symbol/numeric gaps. All 460
+  choices remain unchanged. These counts do not imply completed wording review,
+  normal item display, every wider destination, saving, or hardware validation.
+- The first combined emulator run, `build/smoke-item-identities-01/`, stopped at
+  its 370-second process limit with a debugger connection reset. It records
+  606 calls and 596 passing memory assertions but no checkpoint restoration;
+  it is incomplete, not a successful batch or an established game crash.
+  No failed text assertion precedes the stop. The same complete scenario was
+  run once with a 600-second allowance in `build/smoke-item-identities-02/`.
+  That process exits successfully: 757 calls, 749 memory assertions, 545 expected
+  return values, and 2,271 recorded steps. All 461 wide reference representatives,
+  every new ten-byte rotation slot, boundary/capacity/header cases, unaligned
+  destinations, guards, full checkpoint restoration, and graceful shutdown pass.
+  The run uses no seeds, no audio, four MiB, and neither save-write permission.
+  FlashRAM remains `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  Scenario SHA-256:
+  `a37e4160ef4ffdf301209a7343d4d46ad6ee1f3f729ad7d68acf1ff25eec43c0`.
+  Each recorded address/argument, expected return, memory assertion, and restored
+  stack was independently compared with the complete scenario after termination.
+
+## 2026-09-08 — Native startup errors and final combined checkpoint
+
+- While the item-name batch ran, translated cartridge-clock failure `09CC` and
+  corrupted-town notice `09D1` in `translations/n64-startup-errors.json` and
+  integrated both into default full/basic generation. The GameCube texts refer
+  to its console clock or Memory Card insertion/erasure choices; those are not
+  the native instructions. The drafts preserve the native hardware meaning,
+  every command and argument, pauses, pages, choices, branches, and terminators,
+  except the exact Instruction Booklet colour length `0C → 13`.
+- The clock warning keeps `00E7/00E8` and `09CD/09CF`, including the choice to
+  wait and try later. The town-data notice retains `09:09:0001` and normal `00`,
+  not the legacy's `09D7` continuation or a GameCube erasure menu. No recovery,
+  clock, save, font, actor, or buffer code changes. Complete stored/expanded
+  lengths are 345/361 and 162/178 bytes, with no layout warnings.
+- All five focused checks pass in 0.271 seconds in
+  `build/tests-startup-errors-focused-01.log`. The final combined full-suite run,
+  `build/tests-startup-errors-full-01.log`, passes all 660 tests in 256.628
+  seconds, including the final eleven item tests and five new startup tests.
+- Full/basic generation adds only these two records and leaves every prior
+  candidate unchanged: 12,155/11,445 ordinary edits. The main bank contains
+  10,698 candidates: 9,736 references, 572 original dialogue drafts, one original
+  continuation, 290 development labels, and 99 diagnostic labels. Main reference
+  rejection totals 1,055: 929 unconfirmed identities, 100 control differences,
+  24 missing-field records, and two direct overflows. One original fallback
+  leaves 1,054 final gaps: 132 Japanese-static, 919 non-static, one Latin, and two
+  symbol/numeric. Ten non-static records contain insertions; no reachability is
+  inferred. Warning-bearing records stay 1,470; aliases stay 41 with no conflicts.
+  Identity review has zero current-rule admissions and the expression queue has
+  ten unapproved cases. Final reports use `build/startup-errors-*` paths.
+- ROM `build/startup-errors-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `f1d0985dd4911cf01b452e8742967b9a1fbf938a1816db0225aec760e03b159f`.
+  UPS SHA-256:
+  `e097539c4228f5495e07455a4a4cd7f3476cba77dcd86592a961bf5bfe102f1c`.
+  Candidate SHA-256:
+  `3866c07d4e6267aab431ea40296b0cac752dceee2e647a72d7c6df6746e28d17`.
+  All 12,155 installed edits, source/candidate/build hashes, and whole-ROM UPS
+  reconstruction pass. Only `02000000`, `00CF9000`, and the DMA directory container
+  differ from the item-name pilot; the container is unchanged outside its table.
+  An initial read-only check used the wrong list order for that exact set;
+  the corrected unordered comparison passes. Every name resource, code, font,
+  other table, and saved structure remains unchanged. Source-volume coverage
+  gains 221 characters to 633,777 of the unchanged 746,978-character denominator.
+  The user's subsequent one-time measurement used this verified final ROM.
+- `build/smoke-startup-errors-01/` passes all five complete cartridge loads for
+  `09CC/09D1/09CD/09CE/09CF`: seventeen memory assertions and 34 recorded steps,
+  complete headers/text, both adjacent guards, the module guard, restored
+  `test.bs1`, and graceful shutdown. All five expected return values pass.
+  Scenario SHA-256:
+  `64a642d44b9bf1142e28105c50daa79181e9b082fc0f7e72c9e53197ce2c54f6`.
+  The four-MiB process is silent, has no seeds, and has both save-write permissions
+  disabled. Blank FlashRAM/Pak hashes match the item-name batch. This loads text
+  only; ordinary error selection, live date input, clock recovery, saving, final
+  wording, and hardware still require their own acceptance evidence.
+- The previous goal work is progress: implemented and built two startup errors,
+  completed item-name validation, and verified the final installed artifacts.
+  The user's follow-up makes the title screen the image-pass priority. Recorded
+  that priority without removing other Japanese text-bearing images or moving
+  stretch work ahead of the main port. All broader completion-queue requirements
+  remain active, and font-atlas-edge investigation remains paused.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

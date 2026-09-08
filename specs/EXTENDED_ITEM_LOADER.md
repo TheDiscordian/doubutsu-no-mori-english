@@ -20,6 +20,8 @@ The final native furniture filler is excluded.
 Generation begins from the verified retail names, pads them to sixteen bytes,
 then overlays complete, hash-bound GameCube candidates accepted by the same
 identity checks as the bounded importer. Longer-than-sixteen names are rejected.
+The explicit [native-name approvals](ITEM_REFERENCE_MATCHES.md) are shared with
+that importer and independently rechecked by resource construction/installation.
 Unconfirmed identities retain the original Japanese name; the manifest separates
 those entries from English candidates. No caller silently loses a suffix.
 

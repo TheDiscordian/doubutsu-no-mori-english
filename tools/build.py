@@ -15,6 +15,7 @@ from keyboard import make_english_keyboard
 from english_runtime import ChoiceLayout, make_english_runtime, verify_english_runtime
 from runtime_module import add_runtime_module, module_command_info, verify_runtime_module
 from reference_sequences import validate_sequences
+from item_matches import load_matches as load_item_matches, validate_candidate as validate_item_candidate
 from extended_items import install as install_extended_items
 from display_names import install as install_display_names
 from catchphrases import install as install_catchphrases
@@ -56,6 +57,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     edits = json.loads(path.read_text()) if path else []
     verify_requirements(edits, rom, replacements, module_additions, module_report)
     source_banks = banks(rom)
+    item_matches = load_item_matches()
+    item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     contextual = load_contextual_choices(matches)
     edits_by_id = {edit['id']: edit for edit in edits}
@@ -88,6 +91,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 raise ValueError(f"Stale translation: {edit['id']}")
             replacement = encode(edit["translation"], info)
             try:
+                validate_item_candidate(edit, item_sources, info, item_matches)
                 checked = canonical_candidate(edit['id'], original, replacement, contextual, info)
                 if edit['id'] in contextual:
                     validate_labels(contextual[edit['id']], edits_by_id, source_labels, info)
