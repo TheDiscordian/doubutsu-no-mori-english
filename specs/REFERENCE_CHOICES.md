@@ -1,4 +1,4 @@
-# Native shop choices in English dialogue
+# Native choices in English dialogue
 
 ## Contract
 
@@ -57,14 +57,25 @@ special-event, bagged-money, and preview records. They preserve every original
 native command and argument in order, including the three-choice service menu,
 item/price fields, and purchase exits `02E6/02E5`. They do not inherit the later
 GameCube catalog action, extra choice, actor handoff, or continuation target.
-Shop reserve slots `02F1..02F4` remain untouched. Caller reachability, ordinary
+Shop reserve slots `02F1..02F4` have separate English development labels, not
+new dialogue allocations. Caller reachability, ordinary
 gameplay, and final wording/presentation review remain separate requirements.
+
+## Police-station explanations
+
+The complete GameCube `0777/0778` explanations retain original native choices
+`002F/000B`, with their existing further-explanation/refusal targets
+`0778/077C` and `0779/077C`. Only the exact six-byte menu span changes; all
+English wording, manual layout, pauses, emphasis, and jokes remain. Both fit
+the unchanged message capacity. These two approvals are separate from the
+22 shop records and do not permit unrelated actor or item-claim adaptations.
+See [complete content and verification scope](GYROID_CHARM_DIALOGUE.md).
 
 ## Validation
 
 Portable tests cover exact replacement, changed sources/references, missing or
 duplicate menus, wrong offsets, changed action counts, unrelated controls, and
-the independent final-payload guard. Retail-input tests check all 22 approvals,
+the independent final-payload guard. Retail-input tests check all 24 approvals,
 their unchanged native choice commands, complete capacity validation, and the
 source-bound turnip-price label. The native batch generator loads every complete
 approved message and all six referenced labels from the actual cartridge, with

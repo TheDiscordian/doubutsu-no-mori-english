@@ -81,14 +81,14 @@ class ReferenceChoiceTests(unittest.TestCase):
 
     @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/"build/gamecube/text/message.jsonl").is_file(),
                          "Retail and English reference inputs remain local")
-    def test_all_approved_shop_records_and_native_price_label(self):
+    def test_all_approved_menu_records_and_native_price_label(self):
         rom = ROM_PATH.read_bytes()
         info = module_command_info(rom)
         source_banks = {b.name: b.entries() for b in banks(rom)}
         refs = {r["id"]: r for r in map(json.loads, (ROOT/"build/gamecube/text/message.jsonl").read_text().splitlines())}
         matches = load_matches(ROOT/"translations/reference_matches.json")
         approved = [r for r in matches.values() if "native_choices" in r]
-        self.assertEqual(len(approved), 22)
+        self.assertEqual(len(approved), 24)
         for record in approved:
             source = source_banks["message"][int(record["id"].split(":")[1], 16)]
             text, _ = adapt_choice_reference(refs[record["reference_id"]], source, record, info)

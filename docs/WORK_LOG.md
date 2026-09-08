@@ -4133,6 +4133,102 @@
   charm-state responses. Early `0001..0012` diagnostics retain separate control/
   capacity concerns and must not be used to displace gameplay-content work.
 
+## 2026-09-07 — Complete gyroid/resident-state dialogue and police explanations
+
+- Previous goal turn made progress: committed/pushed `31aedfa`, completed the
+  reserve-label audit, and recorded repeatable all-bank text-volume measurement.
+  Revalidated a clean local/remote checkpoint before this content batch.
+- Added 21 native-complete drafts in `translations/n64-gyroid-charm-dialogue.json`:
+  failed-errand replies `02BD/02CC`, all ten earlier gyroid messages `0382..038B`,
+  and resident-state responses `0761/0763/0767/0768/076A/076B/076C/076E/0770`.
+  Every complete native command and argument remains exact. Both builds include
+  all drafts without new runtime requirements or weakened reference permissions.
+- The two favour responses retain native NPC0 slot-five requests `006B/0065`,
+  catchphrases, and the original expressions. The gyroid range retains its
+  distinct acknowledgement/acceptance/thanks/refusal meanings, three-choice
+  owner menu, two-choice visitor menu, and original `0385 → 0386` owner-message
+  continuation. No later save choice, house submenu, or new branch is added.
+  The saving notice retains the power-off warning, blue/red colours, full
+  pause/page order, and continuing ending. Its same-ID English references are
+  empty, not translations or evidence of native reachability.
+- All nine resident-state records retain command `41`, complete native endings,
+  and all existing actor requests. Six complete native second halves are not
+  replaced by the GameCube's partial records and `3057..3062` targets beyond
+  the native bank. Three records retain the original final row-two/row-eight
+  requests. Both two-character shout highlights remain exact over English
+  exclamation marks; no font or expression-consumer change is made.
+- Added two complete GameCube police explanations with existing hash-bound
+  native-choice approvals. `0777` keeps the twenty-item limit, oldest-first
+  disposal, prompt collection, and the supplied jokes; `0778` keeps claiming
+  lost property, local lack of punishment, and Copper's concern about his role.
+  All wording, lines, pages, pauses, and emphasis remain. Only each six-byte
+  choice command changes to native `16:002F:000B`; outgoing targets remain
+  `0778/077C` and `0779/077C`. Their complete bounds are 833 and 747 bytes.
+  There are now 24 native-choice approvals, including the unchanged 22 shop
+  records. Builder validation independently rejects changed full payloads.
+- Every native draft fits. In file order, conservative expanded bounds are
+  150, 141, 82, 51, 57, 171, 64, 50, 54, 99, 175, 81, 213, 276, 212, 205,
+  209, 188, 241, 129, and 247 bytes. Only `0385` retains a generic width
+  warning (`page_1_line_1_width_816`) for its embedded owner-message field.
+  Static surrounding text fits; real custom-owner wrapping has its separate
+  tested implementation and is not proved by substituting a short sample.
+- `build/tests-gyroid-charm-focused-01.log` passes seven tests in 0.478 seconds.
+  An initial test incorrectly expected the reference adapter's audit metadata
+  to be empty; its payload was already unchanged. The final test requires exact
+  payload preservation and permits only the existing retained-delivery/format
+  report entries. No production adaptation was changed for that expectation.
+  `build/tests-gyroid-charm-full-01.log` passes all 567 tests in 212.637 seconds,
+  including the full repeatable-volume reporting checks and all 24 choices.
+- Full generation produces 11,432 edits: 9,553 reference main-bank candidates,
+  343 original dialogue drafts, and 291 original label drafts give 10,187 main
+  candidates. All previous 11,409 edits remain identical. Basic generation
+  produces 10,733 edits, with the same 23 additions and no changed earlier edit.
+  The final main audit leaves 1,565 native records without candidates: 643 with
+  Japanese static text, 919 without static text, one Latin record, and two
+  symbol/number records. Ten non-static records contain dynamic fields.
+  Generator rejections total 1,566: 1,280 unconfirmed identities, 260 control
+  differences, 24 missing fields, and two overflows; one receives the existing
+  original fallback. Reference width-warning records remain 1,442, aliases 41,
+  and alias conflicts zero. Volume coverage gains 1,318 source characters,
+  reaching 604,385 of the unchanged 746,978-character denominator; no unsolicited
+  percentage is reported to the user.
+- `build/smoke-gyroid-charm-01/` passes 33 complete native cartridge loads and
+  all 101 assertions across 174 recorded steps. The batch includes all 23 new
+  messages and ten unchanged connected responses:
+  `0760/0762/0764/0765/0766/0769/076D/076F/0779/077C`. Complete loaded headers
+  and text, adjacent/module guards, checkpoint restoration, and graceful
+  shutdown pass. Only loader `8009E558` is called; the test does not execute
+  charm state changes, saving, police choices, item claims, or gyroid actions.
+  The fresh four-MiB run has no save seeds, audio disabled, and both storage-write
+  permissions false. Isolated FlashRAM/Pak remain blank with hashes
+  `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`
+  and `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+- Final ROM `build/gyroid-charm-pilot/animal-forest-halfwidth.z64`, SHA-256
+  `4cc9932855c35839e28640b2973a85edf6890a0ad683f7223f6d94c5ac81d88b`.
+  UPS SHA-256:
+  `6db4eaa5c2f9a2ffd1b9a1f39b50e33292bf741236dbce49be1819da817967cf`.
+  Scenario `build/gyroid-charm-scenario.json`, SHA-256
+  `82fac7d2bb531dd1f0b01cc20d97234b42adcca9409e9727ed5d765e58ce606e`.
+  Candidate file SHA-256:
+  `281ffdec0f5317762d70ddeb5bde2c12664084accffe13afe9d402d41778276f`.
+  UPS application reconstructs the complete ROM from the verified original.
+  Against the placeholder pilot, all extracted DMA contents remain unchanged
+  except main text `02000000`, its pointers `00CF9000`, and directory container
+  `00019D40`. The container remains unchanged outside directory bytes. All
+  code, fonts, metrics, runtime resources, and saved structures are unchanged.
+- Both read-only review queues are regenerated. The same-ID pool is still
+  empty under current compatibility rules; missing visible same-ID references
+  drop to 1,204. The other routes remain ten missing-field cases, twelve control
+  cases, seven overflows, 36 non-static records, ten glyph failures, one encoding/
+  hash uncertainty, and the original fallback. The ten unapproved expression
+  comparisons remain; no special-actor permission is assumed from resident tests.
+- Native `077E` still needs its take-an-item question instead of the GC ownership
+  question. `04D2/04FA` retain queued semicolon-glyph support for complete reference
+  text, rather than unnecessary rewritten introductions. The missing `1C00`
+  range includes letter-message fragments needing complete source-field and
+  donor review. Broader text, runtime destinations, normal gameplay/saves,
+  complete review, hardware, release preparation, and stretch goals remain active.
+
 Generated assets, logs, screenshots, ROMs, patches, and reference text remain
 local under ignored `build/` and `local/` paths. Current status belongs in
 `PROGRESS.md`; this file records completed work and test observations.

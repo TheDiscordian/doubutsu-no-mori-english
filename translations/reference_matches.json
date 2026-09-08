@@ -4903,6 +4903,32 @@
     "evidence": "Complete native source equals message 2DD7, including first-introduction NPC0 row-two/row-eight requests, expressions, player/speaker/catchphrase fields, and final 00. The English reference at that ID preserves the native introduction meaning without previous-town field 36. Use its complete wording, manual lines/pages, pauses, and closing variant unchanged. Full source/reference/output hashes are bound; no new actor or field permission. See specs/RESIDENT_GAPS.md. Ordinary introductions and final presentation remain review."
   },
   {
+    "id": "message:0777",
+    "source_sha256": "90de229586203a7c42eb4f8355d2b646b30c1adb957ea7f890dd4dd9ddc8e7fd",
+    "reference_id": "message:0777",
+    "reference_sha256": "304274f0eb389ea8bf274f84e0d32cdb67f4b7d0e9965a8173f5139471c1d2e5",
+    "native_choices": {
+      "offset": 792,
+      "reference_command": "7F1600440010",
+      "native_command": "7F16002F000B",
+      "adapted_sha256": "f042103f7fdf72d0187afff45edbd2eddff28e03134f4b0a26559f388ac61108"
+    },
+    "evidence": "Copper explains the police station's twenty-item lost-property capacity, oldest-first disposal, prompt collection, and offer of further explanation. Retain the complete GameCube wording, manual layout, pauses, emphasis, and jokes. The native More/Never mind choices remain 002F/000B with unchanged 0778/077C exits; only the exact six-byte choice command changes. All actors, actions, and native final 01 remain. See specs/GYROID_CHARM_DIALOGUE.md. Normal choice traversal and final presentation remain review."
+  },
+  {
+    "id": "message:0778",
+    "source_sha256": "38045e70cc2fb7ec75dafd56ea1240166abb7032c8586c1a1a5f650eb2c123ef",
+    "reference_id": "message:0778",
+    "reference_sha256": "05f89bac9a7b00247f6a5bfcfd570481a8643cd5c9cf4415361d0eef6d827f85",
+    "native_choices": {
+      "offset": 706,
+      "reference_command": "7F160044000B",
+      "native_command": "7F16002F000B",
+      "adapted_sha256": "860bf53a9a492815065ca5aff5d906685dbae39c325d35771d87ac42cfbf134f"
+    },
+    "evidence": "Copper explains free police-station access, claiming recovered items, absence of punishment for false claims in this town, and his resulting concern about his role. Retain the full GameCube wording, asides, manual layout, and timing. Only its unique choice command changes to native 002F/000B; continue/refuse still target 0779/077C. Native expression sequence and final 01 remain, with no new actor permission. See specs/GYROID_CHARM_DIALOGUE.md. Ordinary police-station progression and final presentation remain review."
+  },
+  {
     "id": "message:18CA",
     "reference_id": "message:18CA",
     "source_sha256": "7cd5f9a23959beab75d481561b03bae8708a97f06bc16a90d38b6e98fb63a201",

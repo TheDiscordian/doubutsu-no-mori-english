@@ -147,8 +147,8 @@ user's direction. The production build retains the approved spacing metrics.
   labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
 - Silent isolated ares test runner, debugger memory assertions, controller input,
   repeated scenarios, and incremental message-state recording.
-- 557 passing portable-C, synthetic, and retail-input full-suite regression tests,
-  plus seven focused text-coverage checks for the volume report.
+- 567 passing portable-C, synthetic, and retail-input full-suite regression tests,
+  including the repeatable text-volume report.
   Retail tests require
   the local ROM; calendar-reference checks use the local English disc extraction.
 - Keyboard UI inventory identifies six embedded text entries and ten graphical
@@ -462,18 +462,18 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/placeholder-pilot/`
-contains 11,409 edits, including
-9,551 reference main-bank candidates, all 460 choices, 322 original dialogue
+The current experimental resident-module pilot in `build/gyroid-charm-pilot/`
+contains 11,432 edits, including
+9,553 reference main-bank candidates, all 460 choices, 343 original dialogue
 drafts, and 291 original development-label drafts. Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 1,588
+still require review. The original main-bank audit leaves 1,565
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,442 conservative layout warnings include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/placeholder-candidates/` and `build/placeholder-coverage/`. The independent
+`build/gyroid-charm-candidates/` and `build/gyroid-charm-coverage/`. The independent
 mail control gate withholds `mailb:00BB` until native mail supports its
 capitalization command. Layout warnings account for the wider catchphrase display.
 
@@ -804,9 +804,23 @@ restrictions. The independent wider item, display-name, catchphrase, and mail-ca
 additional ordinary-bank edits, and an API resource does not imply that every
 gameplay destination uses its wider names.
 
+The [gyroid/resident-state batch](../specs/GYROID_CHARM_DIALOGUE.md) adds 21
+native-complete drafts and two full GameCube police-station explanations.
+Every native draft control remains exact, including earlier gyroid menus,
+owner-message insertion, power-off warning, state command `41`, and original
+actor requests. The complete resident responses do not acquire GameCube-only
+continuation targets. Both police explanations retain all GameCube wording,
+layout, and timing, changing only their menus to original native choice IDs.
+All 567 full-suite tests and 33 native cartridge loads pass, including ten connected unchanged responses,
+with 101 assertions, complete guards, restored checkpoint, and blank saves.
+All earlier candidates remain unchanged. Basic generation admits all 23 additions.
+One generic owner-message field-width warning remains; the actual custom-message
+formatter has its separate contract. Normal gyroid, saving, state transitions,
+police choices, final wording/layout, and hardware remain acceptance work.
+
 ## Text-volume measurement
 
-The generated coverage report measures 603,067 covered source characters out of
+The generated coverage report measures 604,385 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -826,8 +840,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 11,409 edits, including
-9,551 reference main-bank candidates, 291 original development-label drafts,
+The resident-module experiment contains 11,432 edits, including
+9,553 reference main-bank candidates, 291 original development-label drafts,
 all 460 choices, 178 villager names,
 231 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
 four other introductory drafts, eleven earlier-shop drafts, seven native
@@ -835,12 +849,13 @@ advice/travel drafts, four native festival drafts, 26 native seasonal
 conversation drafts, eight native town-advice drafts, eighteen native
 community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
 drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
-drafts, fifty startup-greeting drafts, and eighteen resident-topic drafts.
+drafts, fifty startup-greeting drafts, eighteen resident-topic drafts, and
+21 gyroid/resident-state drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 1,589 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 1,588 main records without
-candidates: 666 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 1,566 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 1,565 main records without
+candidates: 643 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

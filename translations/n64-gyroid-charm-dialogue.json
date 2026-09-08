@@ -1,0 +1,170 @@
+[
+  {
+    "id": "message:02BD",
+    "source_sha256": "c0da7b75622b815eb777543324d577b81e430f60a7bb396af6762179cf6e3888",
+    "translation": "{cmd:7F0905006B}{cmd:7F09000016}You agreed to do it\nyourself, but you couldn't\neven see it through!{cmd:7F0306}\nThat's awful!{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the failed-errand NPC0 slot-five request 006B, expression, catchphrase, pauses, and final ending. The GameCube omits the native request and catchphrase. Full native control stream remains exact; wording and gameplay review remain."
+  },
+  {
+    "id": "message:02CC",
+    "source_sha256": "07da4fd3895f71331bce45d5c09433d9d42d8d6ba5f09b4525c4a3ad9a6daf08",
+    "translation": "{cmd:7F09050065}{cmd:7F09000017}So it was too much\neven for you...{cmd:7F04}\nBut it wasn't easy,{cmd:7F0306}\nso don't worry,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the original NPC0 slot-five request 0065 and single expression, not the GameCube quest-row request and added expression. Preserve the complete reassurance after the difficult task and every native command."
+  },
+  {
+    "id": "message:0382",
+    "source_sha256": "d388a170f29fcaf3b12c6396c602dc9b4df6681535738d5c6fbc2c8054ce9b87",
+    "translation": "Welcome home, master!{cmd:7F0314}\nWhat would you like to do?{cmd:7F17001300140015}{cmd:7F04}{cmd:7F0D}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Earlier gyroid greeting retains exactly three choices: Revise, Store an item, and Never mind. Do not add the later save choice, house submenu, or branch assignments. Same-ID English reference is empty; reachability is not established."
+  },
+  {
+    "id": "message:0383",
+    "source_sha256": "b8c82f2053970e69abbe807f9b6a9215d69af9d524bf577eeef12829adf04557",
+    "translation": "I see.{cmd:7F0314}\nTake care on your way!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Gyroid acknowledgement and departure farewell; retain the exact native pause and final ending. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:0384",
+    "source_sha256": "3b72d26100568ad3160a3b65cabee25dd6b316ccb0b8d7b2c9b449fc6cd1ab45",
+    "translation": "As you wish.{cmd:7F0314}\nTake care on your way!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Gyroid acceptance remains distinct from the preceding acknowledgement; retain the exact native pause and ending. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:0385",
+    "source_sha256": "52709c7da9c65c358f79ce20920f5523dbc5d7dfb94f37e0e4cd8e94fd075f5e",
+    "translation": "Welcome!{cmd:7F0314}\nHere is a message\nfrom my master.\n{cmd:7F04}\n{cmd:7F02}{cmd:7F40}\n{cmd:7F0E0386}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain complete owner-message insertion 40, existing continuation 0386, and continuing ending. Do not add an English reference mail snapshot or change the saved owner-message format. Same-ID reference is empty."
+  },
+  {
+    "id": "message:0386",
+    "source_sha256": "60a1d54ccb84f8ea8de0d2f470a575adb48e7ca7b767cf3e3eb62fdeefd66587",
+    "translation": "Now then,\nhow may I help you?{cmd:7F1600160015}{cmd:7F04}{cmd:7F0D}\n{cmd:7F09000001}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain native Check items/Never mind choices and the original expression after choice initialization. No branch, save action, or later menu is added. Same-ID reference is empty."
+  },
+  {
+    "id": "message:0387",
+    "source_sha256": "45ce127df61c84dbbd7aad3639323bfd8fdcb94263f4986457f5a626ff9b407c",
+    "translation": "I see.{cmd:7F0314}\nPlease stop by again.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Gyroid acknowledgement and invitation to return, with exact native controls. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:0388",
+    "source_sha256": "68eef83c9bfc31af4b0868cdff8863f8e39c935587097f191f25ebba0fd4f984",
+    "translation": "Thank you.{cmd:7F0314}\nPlease stop by again.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Gyroid thanks remain distinct from acknowledgement, with exact native controls. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:0389",
+    "source_sha256": "76a360d7a3785bbeeced093ac296f2be4f9dce1f18f86f7a7bccfc9d04aa1d6b",
+    "translation": "I'm very sorry.{cmd:7F0314}\nThere is nothing\nfor me to show you.{cmd:7F0314}\nPlease stop by again.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the empty-display refusal, invitation to return, both pauses, and ending. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:038A",
+    "source_sha256": "7aedc19279181b1235e72e953b265610f8a312359c951d87988bfca89fbfa264",
+    "translation": "Thank you for your hard work.{cmd:7F04}\nWell then,{cmd:7F0302} I'll save\nyour progress,{cmd:7F0306} so please\nwait a moment.{cmd:7F033C}\n{cmd:7F02}{cmd:7F050000C8}       Saving!\n\n{cmd:7F05C80000}Do not turn the power off!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the full saving notice and power-off warning, native pause/page order, blue/red colours, and continuing ending. No storage operation is introduced or executed by translating this record. Same-ID reference is empty."
+  },
+  {
+    "id": "message:038B",
+    "source_sha256": "360bdd9949b7bfc2951ff66e369aa7db7f306ebd69c5151e0377e36ef3fd2ced",
+    "translation": "Thank you for waiting.{cmd:7F030A}\nNow,{cmd:7F0306} please enjoy{cmd:7F0302}\na good rest.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full post-save farewell and exact native pauses/ending. This is not permission to infer that normal saving has completed validation. Same-ID English reference is empty."
+  },
+  {
+    "id": "message:0761",
+    "source_sha256": "6eb37b119a3107af2167f360f2deced407f42f1b2a6bb6e7a51d1bab1205be1c",
+    "translation": "{cmd:7F09000014}{cmd:7F0328}{cmd:7F09000015}{cmd:7F1A}!{cmd:7F030F}\nYou look so{cmd:7F0302}\nwonderful today!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F41}{cmd:7F090000FF}.{cmd:7F0306}.{cmd:7F0306}.{cmd:7F0900000B}{cmd:7F0306}Huh?{cmd:7F04}\n{cmd:7F09000017}On closer inspection,\nperhaps not,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep both the initial compliment and its complete retraction, native 41 state command, all expressions, and final 00. Do not import the GameCube's partial introduction and new 3057/3058 branch targets."
+  },
+  {
+    "id": "message:0763",
+    "source_sha256": "37612ff245a79a6d80d175d33502e0666b7b8e553077330fb025ee19f3fb98f5",
+    "translation": "{cmd:7F09000014}{cmd:7F0328}{cmd:7F09000007}Oh, this is hopeless!{cmd:7F0314}\nI can't stop thinking\nabout you, {cmd:7F1A}!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F04}\n{cmd:7F02}I've got to do something!{cmd:7F030C}\n{cmd:7F41}{cmd:7F09000016}All right,{cmd:7F0306}\nI'll come to my senses!{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native attempt to regain composure, command 41, both catchphrases, and all expressions. GameCube continuation slots 3059/305A do not replace the native final record."
+  },
+  {
+    "id": "message:0767",
+    "source_sha256": "00976b7d7a274a90ed998a6599153cdfb278e1bda8584fedf0adecb86436cfe6",
+    "translation": "{cmd:7F09000014}{cmd:7F030F}{cmd:7F1A},{cmd:7F030C}\nyou're{cmd:7F0304}\nso very charming!\n{cmd:7F04}\n{cmd:7F02}{cmd:7F41}{cmd:7F090000FF}{cmd:7F031E}{cmd:7F09000017}But,{cmd:7F0306}\nI think I'm getting\na little tired of looking\nat you,{cmd:7F0308} {cmd:7F1C}...\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native compliment and waning-interest response with command 41 and final 00, rather than the GameCube's added 305B/305C continuation branches. Every native control remains exact."
+  },
+  {
+    "id": "message:0768",
+    "source_sha256": "9c1c4ec45e3eb55983ca1b345f9ab0335e6abb27a89c05e5cc1ccdf76f2a6247",
+    "translation": "Who{cmd:7F0302}o{cmd:7F0302}a!{cmd:7F0306}\n{cmd:7F1A}{cmd:7F0302}!{cmd:7F504B5F9B02}{cmd:7F0302}!{cmd:7F0302}!{cmd:7F0302}!{cmd:7F030C}\nI don't{cmd:7F0302} know why,{cmd:7F41}{cmd:7F04}\n{cmd:7F02}but I've really wanted\nto see you,{cmd:7F0308} {cmd:7F1C}!\n{cmd:7F09020001}{cmd:7F0908000A}{cmd:7F0301}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep command 41, the original two-character coloured shout, all timing, and the final native NPC0 row-two/row-eight requests. Do not add the GameCube's other expressions or omit the native state command."
+  },
+  {
+    "id": "message:076A",
+    "source_sha256": "4f81efe96a80fb8915565bb8370f1398590944e4b4eabd7bee1c87ac7f2172b4",
+    "translation": "Hey,{cmd:7F0308} {cmd:7F1A}!{cmd:7F030C}\nI really wanted to see\nyou,{cmd:7F0308} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}But now that you're here,{cmd:7F0304}\nit doesn't feel special.{cmd:7F0310}\nWhat's going on?\n{cmd:7F41}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the full native anticlimax, state command 41 at the end, and final 00. Do not import the GameCube's first-page-only text, expressions, or 305D/305E branch targets."
+  },
+  {
+    "id": "message:076B",
+    "source_sha256": "cde914250dd491991ab3f73fed1d578b2e10023af8ae405ce4e38919fa4026e4",
+    "translation": "Yooo!{cmd:7F0308}\n{cmd:7F1A}!{cmd:7F504B5F9B02}!!{cmd:7F41}{cmd:7F04}\n{cmd:7F02}I don't know why,{cmd:7F0308}\nbut I've really been\nwanting to see you,{cmd:7F0308}\n{cmd:7F1C}!\n{cmd:7F09020001}{cmd:7F0908000A}{cmd:7F0301}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain native state command 41, the two-character coloured shout, and the exact final row-two/row-eight requests. The GameCube's added expression and omission of the state command are not imported."
+  },
+  {
+    "id": "message:076C",
+    "source_sha256": "8608dc4ba8da163cb31beb526b5204457c8f00b6ddb83d823327aa288a7a3165",
+    "translation": "Oh,{cmd:7F0304} there you are!{cmd:7F030C}\nI've been looking for you,{cmd:7F0308}\n{cmd:7F1A}!{cmd:7F0314} I really wanted\nto see you,{cmd:7F0308} {cmd:7F1C}!{cmd:7F04}\n{cmd:7F02}But,{cmd:7F0304} as soon as I saw you,{cmd:7F0308}\nI somehow stopped caring.\n{cmd:7F41}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Preserve the named-player search and complete sudden loss of interest, native 41, and final 00. The GameCube omits the player field and uses new 305F/3060 branch records. All original commands remain exact."
+  },
+  {
+    "id": "message:076E",
+    "source_sha256": "4a4bbbd14c5c8e5d1632abfee4f8055c225fbc356d039e2fcee7f99f4a0eb8b9",
+    "translation": "Oh,{cmd:7F0306} {cmd:7F1A}!{cmd:7F030E}\nFor some reason,{cmd:7F0304}\nI've really wanted\nto see you!{cmd:7F41}\n{cmd:7F09020001}{cmd:7F0908000A}{cmd:7F0301}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the complete native greeting, command 41, final actor requests, all pauses, and ending. Do not introduce the reference's different expression or omit native state handling."
+  },
+  {
+    "id": "message:0770",
+    "source_sha256": "326f893573a9299fc99e7d2b257e96764baed91ad3b48bf3d7b0765375121f2f",
+    "translation": "Oh,{cmd:7F0304} it's {cmd:7F1A}!{cmd:7F0310}\n.{cmd:7F0303}.{cmd:7F0303}.{cmd:7F0303}Why,{cmd:7F0308} until just now{cmd:7F0304}\nI wanted to see you{cmd:7F0304}\nso badly{cmd:7F0303}.{cmd:7F0303}.{cmd:7F0303}.{cmd:7F04}\n{cmd:7F02}Why have I suddenly{cmd:7F0304}\nlost interest?{cmd:7F0310}\nHow strange,{cmd:7F0308} {cmd:7F1C}.\n{cmd:7F41}\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Keep the entire native reflection on suddenly cooling feelings, its original catchphrase, command 41, and final 00. The GameCube's shorter first part and 3061/3062 branches are not the complete native conversation."
+  }
+]
