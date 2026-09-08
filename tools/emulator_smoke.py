@@ -891,6 +891,12 @@ def main():
                     raise ValueError('Native leaflet creation probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_leaflet_letters'],record))
+            if 'test_renewal_actor' in action:
+                from renewal_actor_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native renewal probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_renewal_actor'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

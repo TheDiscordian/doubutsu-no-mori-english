@@ -3,8 +3,9 @@
 ## Implemented scope
 
 `overlays/mail_generation/leaflet.c` creates complete received-letter snapshots
-for 22 native-selected classic templates. It is a reusable creation transaction,
-not an installed native delivery hook. The optional
+for 22 native-selected classic templates. It is a reusable creation transaction;
+the optional [renewal adapter](RENEWAL_LETTERS.md) connects it to home mailbox
+publication. Sale/Redd native registration remains to be connected. The optional
 [date patch](LEAFLET_DATES.md) is installed separately.
 
 `tools/leaflet_letters.py` binds all 66 header/body/footer parts to the verified
@@ -79,6 +80,10 @@ for leaflet creation and 216 for generic generation before nested reader calls.
 There is no resident-module or saved-structure growth.
 
 ## Actual owner boundaries still requiring installation
+
+Renewal publication and its notification failure gate are installed by the
+[renewal adapter](RENEWAL_LETTERS.md). The addresses below also define its
+original source contract. Event-manager publication remains uninstalled.
 
 Renewal ownership metadata is at `801011B0`; its native file/relocation rows are
 `0084D180`/`0084E000`, linked range `809583B0..80959230`, profile `80959040`.

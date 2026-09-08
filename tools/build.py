@@ -206,6 +206,7 @@ def main():
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
+    parser.add_argument('--english-renewal-letters', type=Path, help='Complete renewal mailbox publication actor; requires leaflet dates and the full snapshot reader')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -223,6 +224,8 @@ def main():
         parser.error('--english-dialogue-dates requires --runtime-module')
     if args.english_leaflet_dates and not (args.runtime_module and args.english_runtime):
         parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
+    if args.english_renewal_letters and not (args.english_leaflet_dates and args.english_mail_snapshots):
+        parser.error('--english-renewal-letters requires --english-leaflet-dates and --english-mail-snapshots')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -293,6 +296,10 @@ def main():
         from leaflet_dates import install as install_leaflet_dates
         report['leaflet_dates'] = install_leaflet_dates(rom,replacements,additions,relocations,
                                                        report.get('runtime_module'),args.english_leaflet_dates)
+    if args.english_renewal_letters:
+        from renewal_actor import install as install_renewal_actor
+        report['renewal_actor'] = install_renewal_actor(rom,replacements,additions,relocations,
+                                                       report.get('runtime_module'),args.english_renewal_letters)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

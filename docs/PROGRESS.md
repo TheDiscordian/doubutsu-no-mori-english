@@ -13,6 +13,18 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [renewal delivery actor](../specs/RENEWAL_LETTERS.md) installs all three complete
+English renovation letters in eligible native home mailboxes. Preparation completes
+before any copy, and the original caller retains its notification on failure.
+Nine host tests pass; independent actor builds agree. The silent native batch
+passes 24 complete combinations, five eligibility cases, failed-preparation retry,
+duplicate prevention, 165 calls, and 532 memory assertions. Live state and the
+checkpoint are restored, and isolated saves stay blank. The 7,472-byte actor keeps
+native profile/DMA ownership and adds no resident or saved-layout growth. Normal
+scheduling, gameplay, and hardware remain unverified. The
+[work record](checkpoints/RENEWAL_LETTERS.md) pins artifacts and remaining work;
+event-manager sale/Redd publication is next.
+
 The [complete leaflet creator](../specs/LEAFLET_LETTERS.md) supports all 22 renewal,
 sale, and Redd templates, with all 66 source-bound English header/body/footer
 parts. It captures full dates and sixteen-byte selected item names and publishes
@@ -23,9 +35,9 @@ regressions, and ten fortune-creator regressions pass. The silent native batch
 passes 77 complete creations/readbacks, six rejected inputs, disabled-catalogue
 retention, 165 calls, and 1,418 memory assertions, with restored checkpoint,
 retained RNG/handbill/save/heap state, blank isolated saves, and graceful shutdown.
-Independent 3,100-byte builds agree. This creator is not yet connected to native
-actors: item lookup, allocation/owner lifetime, renewal notification failure,
-event registration, and normal delivery remain. The [creation work record](checkpoints/LEAFLET_LETTERS.md)
+Independent 3,100-byte builds agree. The renewal actor uses this creator;
+sale/Redd item lookup, allocation/owner lifetime, event registration, and normal
+delivery remain. The [creation work record](checkpoints/LEAFLET_LETTERS.md)
 pins the evidence and actual next integration boundaries.
 
 The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete

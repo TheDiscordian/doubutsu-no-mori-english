@@ -65,6 +65,14 @@ it does not establish unreachable code or gameplay completion. See
 
 ## Silent emulator tests
 
+Complete renewal mailbox publication uses `tools/build_renewal_actor.py` and
+the ROM builder's `--english-renewal-letters <compiled-actor-directory>` option.
+It requires `--english-leaflet-dates`, `--english-mail-snapshots`, the complete
+leaflet creator, and their full resource/module dependencies. The
+[renewal specification](../specs/RENEWAL_LETTERS.md) and
+[work record](checkpoints/RENEWAL_LETTERS.md) record installation, reproduction,
+the bounded silent test, and its gameplay/hardware limits.
+
 Reviewed long dialogue can span linked native records without increasing the
 1,024-byte buffer. Runtime-dependent groups, including the late-night resident
 introduction and its AM/PM field, are included only when candidate generation
