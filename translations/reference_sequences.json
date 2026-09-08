@@ -1,5 +1,111 @@
 [
   {
+    "id": "booker_lost_property_complete",
+    "evidence": "Booker explains that the owner of each lost item is unknown and permits taking it, with his complete hesitant English aside. The same native lost-property actor uses expression 17 in the no-items response 0786. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
+    "members": [
+      {
+        "id": "message:0785",
+        "source_sha256": "4d202c70390c7e7f9b06686f72ae86d616e16e7701a5f70e496c43ef5778779d",
+        "reference_sha256": "cb0349d363ef5289295899cccee98a885399364650e1fafeb03865cf2488bec5",
+        "encoded_sha256": "cb0349d363ef5289295899cccee98a885399364650e1fafeb03865cf2488bec5"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0786",
+        "source_sha256": "9a52431f3a8983226e14ecc69354165325ed8af5b00a9de8c6291ccfcbe33a93",
+        "commands": [
+          "7F09000017"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gulliver_weekly_falls_complete",
+    "evidence": "Gulliver admits falling overboard weekly and the supplied English localises the native clumsiness wordplay as a catalogue of sea dangers followed by the klutz admission. The complete English is retained. Native Gulliver follow-up 240E supplies only expression 17. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
+    "members": [
+      {
+        "id": "message:240A",
+        "source_sha256": "1b91e55276ec293e4d87efc8783459819d43bf2fd6cce7168da8194a0aedeb27",
+        "reference_sha256": "3ba7907ea0c94342bb87fb0fabddc5b4be367f680bf0321d757833ba70a31b6f",
+        "encoded_sha256": "3ba7907ea0c94342bb87fb0fabddc5b4be367f680bf0321d757833ba70a31b6f"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:240E",
+        "source_sha256": "f68bcc2a6a22dd8d55e1ecebecc9f1448f365206edb6c49b3285892db2892c2d",
+        "commands": [
+          "7F09000017"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gulliver_sea_tales_complete",
+    "evidence": "Gulliver lists ghost ships and pirates and insists the stories are true. Retain the complete English Pinnacle Rock mistaken-recollection aside, without new game actions. Native Gulliver follow-up 240E supplies only expression 17. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
+    "members": [
+      {
+        "id": "message:240D",
+        "source_sha256": "459a0789c662e9efc8a6d4ab297812de7b7d05ee53164be1b50304fcb5f9b0e6",
+        "reference_sha256": "266464551de81abdd012dd765345df300039b2feb27fa07591516e96c67625b7",
+        "encoded_sha256": "266464551de81abdd012dd765345df300039b2feb27fa07591516e96c67625b7"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:240E",
+        "source_sha256": "f68bcc2a6a22dd8d55e1ecebecc9f1448f365206edb6c49b3285892db2892c2d",
+        "commands": [
+          "7F09000017"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rover_seat_refusal_complete",
+    "evidence": "Rover ignores refusal to share the seat and asks the player name. The exact native name-entry request 09/09/0001, control 55, and end 01 remain. The same native train actor uses expressions 1D and FE in housing/arrival response 2AD2; this is not the generic train prototype 0467. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
+    "members": [
+      {
+        "id": "message:2AC9",
+        "source_sha256": "cc3e4008abb3095f5c3849583a01184af25b928a9c2ac7d88b27e52cb70ed5d8",
+        "reference_sha256": "22b62a5ee914369440cc61cf30ceefb5030e72387759ac9a0bb66b9b371bbbcc",
+        "encoded_sha256": "22b62a5ee914369440cc61cf30ceefb5030e72387759ac9a0bb66b9b371bbbcc"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:2AD2",
+        "source_sha256": "6091b1db7b24bc063411da465eeca1b56865ebdacf37a501f1eafd689d223e58",
+        "commands": [
+          "7F0900001D",
+          "7F090000FE"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "rover_poor_arrival_complete",
+    "evidence": "Rover reassures the player about earning money, announces arrival at the native town field, offers encouragement, and says goodbye. Retain the full English circular-money aside. Only expression 1F is supplied from the same native train actor housing reply 2ACD. Every word, manual line/page, emphasis, and pause remains. Supporting approvals admit only the listed speaker-zero expressions; all other native actions retain exact order and multiplicity. Normal actor traversal and presentation remain separate checks.",
+    "members": [
+      {
+        "id": "message:2AD4",
+        "source_sha256": "35c7cad103b6cb1964c33d4e20533939ea020b8f66cd098f83442160216662b7",
+        "reference_sha256": "c41ede0f65efde05f8dd98033e2829b279a0733d1939f125dc0607f01023f341",
+        "encoded_sha256": "c41ede0f65efde05f8dd98033e2829b279a0733d1939f125dc0607f01023f341"
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:2ACD",
+        "source_sha256": "aa3d3df21c32ba80de73453afc17b8666d81ef872f9d5f1b66c36c1d83196d9a",
+        "commands": [
+          "7F0900001F"
+        ]
+      }
+    ]
+  },
+  {
     "id": "gracie_fashion_intro",
     "members": [
       {

@@ -219,6 +219,13 @@ existing English page boundaries and individually checked generic reserves;
 the other eight remain complete single records. All expression tuples occur
 in each conversation's own native source, without supporting actor approvals.
 
+Five [contextual-expression conversations](CONTEXTUAL_ACTOR_SEQUENCES.md) retain
+complete Booker, Gulliver, and Rover references. They use the same individually
+hash-bound supporting-expression mechanism as Nook's job dialogue, restricted
+to exact messages from each character's own native conversation context. All
+five fit complete single records, preserve non-expression actions, and allocate
+no continuation slots. The train name-entry request and ending remain native.
+
 Reserved continuation slots require their expected placeholder hashes and no
 incoming native message-script branches. This does not grant general permission
 to reuse arbitrary message IDs. New sequence approvals require their own review.

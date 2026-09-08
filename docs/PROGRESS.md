@@ -32,6 +32,11 @@ presentation; three use checked continuation slots at existing page breaks.
 Their silent cartridge batch passes eighteen message loads, eight choice labels,
 and 109 memory assertions, including the complete plus-glyph controller tip.
 Normal actor traversal and service/gift outcomes remain gameplay checks.
+Five further complete Booker, Gulliver, and Rover references use individually
+checked expressions from the same characters' native conversations. Their five
+full cartridge loads and both ending phases pass 27 memory assertions; all
+other native actions remain exact. Name-entry progression and actor presentation
+remain normal-play checks.
 
 Prioritise bulk English coverage and complete playable sections, batching useful
 crash/save/text checks across changes. Difficult isolated edge cases stay in the
@@ -496,20 +501,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/special-actors-pilot/`
-contains 12,569 edits, including
-9,784 reference main-bank candidates, all 460 choices, 606 original dialogue
+The current experimental resident-module pilot in `build/contextual-actors-pilot/`
+contains 12,574 edits, including
+9,789 reference main-bank candidates, all 460 choices, 606 original dialogue
 drafts, one original-dialogue continuation, 286 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 976
+still require review. The original main-bank audit leaves 971
 records without candidates; the classification and remaining restrictions are
-listed below. The 1,478 conservative layout-warning records include full default
+listed below. The 1,480 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/special-actors-candidates/` and `build/special-actors-coverage/`.
+`build/contextual-actors-candidates/` and `build/contextual-actors-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1071,7 +1076,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,569 edits; basic generation has 11,826, including both startup-error drafts,
+12,574 edits; basic generation has 11,831, including both startup-error drafts,
 all twenty-five mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Name approvals leave unrelated dialogue unchanged.
@@ -1363,9 +1368,21 @@ and blank isolated FlashRAM/Pak pass. This also checks `14FD` and the original
 connected `072A/09CA` messages. Normal actor progression, gift/service outcomes,
 sound-setting UI, final presentation, saving, and original hardware remain.
 
+Five [contextual-expression references](../specs/CONTEXTUAL_ACTOR_SEQUENCES.md)
+retain Booker's lost-property explanation, Gulliver's weekly falls and sea tales,
+and Rover's seat refusal and money/arrival encouragement. Supporting native
+messages bind only the exact same-character speaker expressions required by
+the complete English. Full native actions, name-entry request/control, endings,
+town field, wording, and presentation remain. No continuation slot is allocated.
+Five focused tests, 110 reference tests, and all five earlier special-actor tests
+pass. The silent five-message batch passes fifteen native calls/returns and
+27 memory assertions with restored checkpoint and blank isolated saves.
+Actual name entry, expressions, actor progression, collection, and final layout
+remain gameplay/playthrough checks.
+
 ## Text-volume measurement
 
-The generated coverage report measures 642,350 covered source characters out of
+The generated coverage report measures 642,786 covered source characters out of
 746,978 across all 29 native text banks. The denominator counts non-whitespace
 visible characters in Japanese-static-text records; each native record ID counts
 separately. Commands, exact development labels, already-English records, and
@@ -1385,8 +1402,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,569 edits, including
-9,784 reference main-bank candidates, 286 original development-label drafts,
+The resident-module experiment contains 12,574 edits, including
+9,789 reference main-bank candidates, 286 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1408,9 +1425,9 @@ native storage, raffle, and offering drafts, plus fifteen native connected
 service/reaction drafts.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 977 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 976 main records without
-candidates: 54 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 972 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 971 main records without
+candidates: 49 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

@@ -6085,3 +6085,51 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   dialogue, general/name/mail destinations, normal gameplay, final review,
   title-first image replacements, GameCube-style keyboard, original hardware,
   and patch-only release remain. The full project goal stays active.
+
+## 2026-09-08 — Complete five character-context references
+
+- Imported complete `0785/240A/240D/2AC9/2AD4`: Booker's lost-property explanation,
+  Gulliver's weekly falls and sea tales, and Rover's seat refusal and money/arrival
+  encouragement. Native `0786/240E/2AD2/2ACD` respectively supply only the explicitly
+  listed same-character expressions. The full English localisation, every manual
+  line/page, emphasis, pause, native non-expression request, field, and ending
+  remains. No continuation allocation, runtime/font change, or new adaptation is
+  needed. `2AC9` retains name-entry request `09/09/0001`, command `55`, and end `01`.
+  Expanded bounds are 211, 479, 487, 237, and 444 bytes.
+- Five focused tests pass in 11.126 seconds, 110 reference tests in 28.653 seconds,
+  and all five earlier special-actor tests in 8.188 seconds. Logs are
+  `build/tests-contextual-actors-{01,reference-01,special-01}.log`.
+  The focused checks reject missing/stale expression support, extra actor
+  requests, and modified reference wording; full/basic imports are identical.
+- `build/smoke-contextual-actors-01/` passes 79 steps, fifteen native calls/returns,
+  five complete cartridge loads, both ending phases, and 27 memory assertions.
+  `build/contextual-actors-native-audit.log` independently regenerates all actions
+  and checks exact calls/arguments/returns, restored stacks, full reads/guards,
+  one restored checkpoint, silent graceful shutdown, and blank FlashRAM/Pak.
+  No seeded saves or save-write permissions are used. Scenario SHA-256:
+  `7f6f91ab691ce6b216af283d6c4f797ad104789e47dbb6e8c349574583c9fbfb`.
+  Actual name-entry progression, expressions, collection, and actor traversal
+  are not established by injected loader/terminator calls.
+- Full/basic candidates: 12,574/11,831. Main: 10,781, comprising 9,789 references,
+  606 original dialogue drafts, one original continuation, 286 development labels,
+  and 99 diagnostics. Remaining main records: 971, including 49 Japanese-static,
+  919 nonstatic, one Latin, and two symbol-only records. Ten nonstatic records
+  insert fields; reachability remains unestablished. Rejections: 918 unconfirmed,
+  29 control differences, 23 missing fields, and two overflows, with one original
+  fallback. Reference/label layout warnings: 1,480. Source weight:
+  642,786/746,978; main 632,454/637,761. These remain candidate measurements.
+- Pilot: `build/contextual-actors-pilot/animal-forest-halfwidth.z64`.
+  ROM SHA-256:
+  `6d780f7deddccaf9e6e6498e70bebcb9771785cbac8a769ade8d88747c2ac040`.
+  UPS SHA-256:
+  `0ccaac657ea4764a5fa798eae343925aadc0000648e9f9b3565f229c5bfcf6c0`.
+  Candidate SHA-256:
+  `00cb11bd464da9092a6caad00a3678c8685c0649ebfdd3060b8672ad8d18b841`.
+  The independent artifact audit checks all 12,574 installed payloads, input/build
+  hashes, UPS reconstruction, only the five added IDs, and every earlier full/basic
+  edit unchanged. Only `00019D40/02000000/00CF9000` DMA files change; the first
+  differs only in its table. Runtime, both font atlases, and other resources match.
+- Current progress, queue, and reference contracts are updated. Remaining main
+  controls/fields/long scripts, test text, general/name/mail integration, normal
+  play, final review, title-first images, GameCube-style keyboard, hardware, and
+  patch-only release remain. The complete project goal stays active.
