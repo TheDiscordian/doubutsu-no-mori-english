@@ -39,7 +39,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
                           "resident_late_night_introduction", "native_normal_travel_advice",
-                          "nook_first_renovation_invoice", *LONG_ADVICE_GROUPS,
+                          "nook_first_renovation_invoice", "resident_snooty_letter_advice", *LONG_ADVICE_GROUPS,
                           *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS, *TRAIN_PHONE_GROUPS,
                           *RESETTI_GULLIVER_GROUPS):
         raise ValueError("No native scenario exists for this sequence")

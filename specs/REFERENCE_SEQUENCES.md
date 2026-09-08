@@ -186,6 +186,12 @@ before adaptation; slice coverage applies to the complete adapted result, and
 every final payload retains its own hash. All members using that reference must
 agree on adaptation. Unknown commands and unavailable native fields still fail.
 
+The complete [snooty letter-sharing explanation](SNOOTY_LETTER_SEQUENCE.md)
+uses `0912 → 2B47`, split only at its existing English page transition. Both
+parts retain all wording and fit the unchanged buffer. The calming aside uses
+only one additional expression, individually bound to the same personality's
+native standing greeting; no sleeping-state or other actor request is inherited.
+
 ## Native invoice prices
 
 The [first-renovation invoice](NOOK_RENOVATIONS.md) uses `107E → 083F` and a

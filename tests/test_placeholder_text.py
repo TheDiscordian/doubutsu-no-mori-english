@@ -26,7 +26,7 @@ from test_retail import ROM_PATH
 CORRECTED = {'message:'+id for id in '07DA 2AFF 2B00 2B01 2B02 2B03 2B04 2B42'.split()}
 ALLOCATED = {'message:'+id for id in
              '0486 07DA 0838 0839 083A 083B 083C 083D 083E 083F 0921 0A26 0A27 '
-             '2AE9 2AEA 2B02 2B03 2B05 2B06 2B07 2B1B 2B42 2B43 2B46'.split()}
+             '2AE9 2AEA 2B02 2B03 2B05 2B06 2B07 2B1B 2B42 2B43 2B46 2B47'.split()}
 
 
 class PlaceholderTests(unittest.TestCase):
@@ -134,7 +134,7 @@ class RetailPlaceholderTests(unittest.TestCase):
         for id in self.labels:
             self.assertEqual(classify(self.source[int(id[8:],16)], self.info)['category'],
                              'development_placeholder_text', id)
-        self.assertEqual(len(self.labels.keys()-self.allocated), 336)
+        self.assertEqual(len(self.labels.keys()-self.allocated), 335)
 
     def test_all_unallocated_labels_fit_and_preserve_exact_controls(self):
         prefixes, continuing = set(), set()
@@ -180,7 +180,7 @@ class RetailPlaceholderTests(unittest.TestCase):
         if not path.is_file(): self.skipTest('English extraction stays local')
         gc = {r['id']: r for r in map(json.loads, path.read_text().splitlines())}
         edits, permits = reference_sequence_edits(gc, self.source, self.info, resident_runtime=True)
-        self.assertEqual(len(edits), 68)
+        self.assertEqual(len(edits), 70)
         for edit in edits:
             source = self.source[int(edit['id'][8:],16)]; output = encode(edit['translation'], self.info)
             validate_entry(source, output, self.info, 'message', 'reviewed_sequence',

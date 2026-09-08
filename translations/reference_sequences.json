@@ -1035,5 +1035,34 @@
         ]
       }
     ]
+  },
+  {
+    "id": "resident_snooty_letter_advice",
+    "evidence": "Complete supplied snooty resident letter-sharing explanation retains the writing criticism, public sharing, embarrassment warning, calming aside, moving and showing letters to new friends, replacement-letter request, and farewell. Existing English wait/newline/page-clear boundary [659,664) becomes continuation 2B47. Every English word, other page, manual newline, pause, catchphrase insertion, and final native 00 remains. Only expression 13 requires supporting evidence from the same personality's standing morning greeting 0541; this is an existing shared resident expression, not a sleeping-state or other actor request. The generic reserve has no incoming native message-script, relevant code-immediate, or aligned data references in the pinned scan. See SNOOTY_LETTER_SEQUENCE.md.",
+    "members": [
+      {
+        "id": "message:0912",
+        "source_sha256": "14cf0527f044b2c89e8ba2b77d573888a2619f7ad4d8f1d4737790ae006ea07d",
+        "reference_id": "message:0912",
+        "reference_sha256": "15acd7f66c27566311bc0ad296ec86102c1e62a783c18bf2054fc2c200ae1543",
+        "encoded_sha256": "0707b1dcb52da4c7633e165874f8634ae5ebc53b5a9a2ef67c0b3a32dc884ee3",
+        "reference_slice": [0, 659]
+      },
+      {
+        "id": "message:2B47",
+        "source_sha256": "b2c0b6f9facf02630f093fd1b6a5a6e47d722ecadd50e6c82fae305db4821e2c",
+        "reference_id": "message:0912",
+        "reference_sha256": "15acd7f66c27566311bc0ad296ec86102c1e62a783c18bf2054fc2c200ae1543",
+        "encoded_sha256": "ef731e66ddf428ad847e5f98a29559130750ec5ec284ee2e24fd32535c923dd1",
+        "reference_slice": [664, 1226]
+      }
+    ],
+    "actor_sources": [
+      {
+        "id": "message:0541",
+        "source_sha256": "77936e9f3a4cfb1a44a0b5a03ff5783d9030e72a631d0bfe6dbed0d5209d3f8b",
+        "commands": ["7F09000013"]
+      }
+    ]
   }
 ]

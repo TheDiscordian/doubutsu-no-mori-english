@@ -2,6 +2,17 @@
 
 ## Active work
 
+The complete [snooty letter-sharing explanation](../specs/SNOOTY_LETTER_SEQUENCE.md)
+is installed as `0912 → 2B47`, retaining every GameCube word and splitting only
+at an existing page boundary. Both full cartridge loads, the continuation, both
+ending phases, and fifteen memory assertions pass in a silent restored
+checkpoint with blank isolated saves. Focused sequence and placeholder checks
+pass; normal first-job interaction and expression rendering remain playthrough
+checks. Current full/basic candidates are 12,602/11,849. The next main-bank
+task is scoped numeric answers for all three number-game questions without
+altering the clothing menu's shared labels. Title artwork remains the first
+image replacement after the main text/runtime work.
+
 Complete the main translation/runtime port, then the matching GameCube image
 replacements and GameCube-style keyboard. Immediate work covers broader missing
 dialogue, normal gameplay/save validation, unsupported text controls,
@@ -552,20 +563,20 @@ user's direction. The production build retains the approved spacing metrics.
 
 ## Current reference candidates
 
-The current experimental resident-module pilot in `build/extended-glyph-dialogue-pilot/`
-contains 12,601 edits, including
-9,809 reference main-bank candidates, all 460 choices, 618 original dialogue
-drafts, one original-dialogue continuation, 281 original development-label drafts,
+The current experimental resident-module pilot in `build/snooty-letter-pilot/`
+contains 12,602 edits, including
+9,811 reference main-bank candidates, all 460 choices, 618 original dialogue
+drafts, one original-dialogue continuation, 280 original development-label drafts,
 and 99 complete diagnostic drafts.
 Two additional original
 Pelly/Phyllis error messages extend the main bank
 to 11,754 records; they do not change the existing candidate counts. Candidates
-still require review. The original main-bank audit leaves 944
+still require review. The original main-bank audit leaves 943
 records without candidates; the classification and remaining restrictions are
 listed below. The 1,491 conservative layout-warning records include full default
 catchphrase width and do not trigger automatic
 reflow. Detailed candidate, rejection, and coverage reports remain local in
-`build/extended-font-candidates/` and `build/extended-font-coverage/`.
+`build/snooty-letter-candidates/` and `build/snooty-letter-coverage/`.
 Original drafts retain separate warnings, including the meal greetings and
 the complete raffle and service echoes; these do not increase the reference count.
 The independent
@@ -1127,7 +1138,7 @@ Ambiguous artwork, species, figurine, and unused-name differences stay unapprove
 
 All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
 unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
-12,601 edits; basic generation has 11,848, including both startup-error drafts,
+12,602 edits; basic generation has 11,849, including both startup-error drafts,
 all twenty-six mood-preserving references, the later renovation dialogue, and
 the complete native-topic drafts whose full answer labels fit that configuration.
 Basic generation omits runtime-dependent phone sequences and their allocated
@@ -1457,8 +1468,8 @@ explicitly requested, and retain this definition for comparable text measurement
 
 ## Validation and release status
 
-The resident-module experiment contains 12,601 edits, including
-9,809 reference main-bank candidates, 281 original development-label drafts,
+The resident-module experiment contains 12,602 edits, including
+9,811 reference main-bank candidates, 280 original development-label drafts,
 99 original diagnostic drafts,
 all 460 choices, 178 villager names,
 779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
@@ -1481,9 +1492,9 @@ service/reaction drafts, nine native menu/dialogue follow-ups, and three native
 special-dialogue follow-ups.
 It retains the GameCube calendar wording in Rover's opening
 question and admits reference capitalization and protected-pacing spans.
-Its reference/label generator rejects 945 main records; one receives an original
-fallback dialogue draft. The final candidate-file audit finds 944 main records without
-candidates: 22 with Japanese text, no exact placeholders, 919 with no static
+Its reference/label generator rejects 944 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 943 main records without
+candidates: 21 with Japanese text, no exact placeholders, 919 with no static
 text, one with Latin text, and two with only numbers/symbols. Ten command-only
 records contain dynamic insertions. All 919 retain their control-flow review
 requirement; none is deemed unreachable from this classification.

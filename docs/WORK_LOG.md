@@ -6553,3 +6553,62 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Title artwork is the first image task, followed by the other image inventory
   and GameCube-style keyboard. Semantic review, human playthrough, hardware,
   provenance, and patch-only release remain. The complete goal stays active.
+
+## 2026-09-08: complete snooty letter explanation and numeric-menu plan
+
+- Preserved the full 1,226-byte GameCube `0912` through `0912 → 2B47`.
+  Replaced only the existing page transition `[659,664)`; all English wording,
+  manual lines, other pages, pauses, catchphrases, punctuation, and native final
+  ending remain. The two parts have 666/562 bytes and expanded bounds 742/638.
+  The calming aside's sole additional expression `13` is bound to native snooty
+  standing greeting `0541` and the unchanged shared resident consumer.
+- Checked the generic reserve against every native script and pinned executable
+  section: no incoming message target, relevant code immediate, or aligned data
+  halfword reference. Allocated native development-label slots increase from
+  24 to 25; sequence parts increase from 68 to 70. No count, buffer, save,
+  font, runtime, other asset, or ordinary interaction code changes.
+- Four new focused tests and eleven placeholder tests pass. The 74-test sequence
+  batch initially passes 73 and finds one older basic-part count expectation;
+  corrected 60 to the independently generated 62. All seventeen reference
+  sequence tests then pass in 28.251 seconds. Logs:
+  `build/tests-snooty-sequences.log`, `build/tests-snooty-reference.log`, and
+  `build/tests-snooty-placeholder.log`. The last complete host-suite baseline
+  remains the earlier 792-test cartridge-font run; no fresh full-suite claim.
+- Full/basic generation adds only root `0912` and converts reserve `2B47`;
+  every other candidate remains unchanged. Full/basic totals: 12,602/11,849.
+  Main: 10,809 = 9,811 references + 618 original dialogue drafts + one original
+  continuation + 280 development labels + 99 diagnostics. Remaining: 943 =
+  21 Japanese-static + 919 nonstatic + one Latin + two symbol records, including
+  ten nonstatic records with dynamic insertions. Rejections: 905 unconfirmed,
+  fifteen controls, 23 fields, and one overflow, with one original fallback.
+  Layout warnings remain 1,491. Candidate source weights: 646,311/746,978
+  across ordinary banks, and 635,979/637,761 in main dialogue. These are not
+  semantic-review or project-completion measurements.
+- Pilot `build/snooty-letter-pilot/animal-forest-halfwidth.z64`, SHA-256:
+  `8699c1afd4210bbb3e52eb397fb90f6f564ff180b124927041a452dead63b7d7`.
+  UPS SHA-256:
+  `8300efd3bd6e49b741f77d1e0a9a1edfc48958546185e81610ba3c5694b1337c`.
+  Candidate SHA-256:
+  `b7586b9b2e5b820b9be4ce6031e188d1be0c65f7ef4731d75ab10400a576b3d3`.
+  The complete installed-payload audit passes all 12,602 edits and original-ROM
+  UPS reconstruction. Only main text, its cumulative table, and DMA metadata
+  differ from the prior cartridge-font pilot. The first audit attempts omitted
+  native fixed-slot space padding and expected DMA metadata changes; corrected
+  the read-only assertions without modifying build output or game code.
+- `build/smoke-snooty-letter-01/` passes forty recorded steps, seven native
+  calls, fifteen complete memory assertions, and eleven fixture writes. Both
+  complete loads, the continuation, both phases of each ending, stack/buffer/
+  module guards, one restored checkpoint, graceful shutdown, and blank isolated
+  FlashRAM/Pak pass. Four-MiB configuration is selected; audio is disabled.
+  Independent scenario regeneration verifies every call/argument/return, read,
+  and fixture write. Scenario SHA-256:
+  `d61413459283ed65b47ef1063894699815f95a45ec6c001e79986f3d00b2910e`.
+  Normal first-job interaction, letter sharing, expressions, final layout,
+  hardware, and human review are not established by injected calls.
+- Recorded the exact three-round number-game plan in `NUMBER_GAME_CHOICES.md`:
+  complete Less/More reference labels require two appended native slots and
+  two guarded count changes; `2D01` requires an explicit answer permutation,
+  while `2D06/2D0B` keep their native route order. Clothing `1772` and shared
+  size labels remain unchanged. No numeric-menu implementation is claimed.
+  The title screen remains the first image task, using supplied English artwork.
+  The complete translation/runtime/review/release goal remains active.
