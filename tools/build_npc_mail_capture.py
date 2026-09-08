@@ -16,10 +16,10 @@ from npc_mail_capture import RAM,source_hashes,relocate,verified_resources
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out):
+def build(module,words,aliases,out,*,mother_letters=False):
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    sources = source_hashes();out.mkdir(parents=True,exist_ok=True)
+    sources = source_hashes(mother_letters=mother_letters);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     fado = root/'upstream/af/tools/fado'
     fado_sources = sorted((fado/'src').glob('*.c'))+[fado/'lib/fairy/fairy.c',fado/'lib/fairy/fairy_print.c',fado/'lib/vc_vector/vc_vector.c']
@@ -41,16 +41,18 @@ def build(module,words,aliases,out):
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
-    for name in ('digest','npc_capture','generate','npc_creator'):
+    names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
+    for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
-    objects = ['digest.o','npc_capture.o','generate.o','npc_creator.o','sources.o']
+    objects = [name+'.o' for name in names]+['sources.o']
     result = subprocess.run([str(out/'fado'),*objects,'-n','af_npc_capture','-o','relocation.s'],
                             cwd=out,capture_output=True,text=True,timeout=60)
     (out/'fado.log').write_text(result.stdout+result.stderr)
     if result.returncode: raise ValueError(result.stdout+result.stderr)
     run('as','-EB','-mabi=32','-march=vr4300','-o','relocation.o','relocation.s')
-    run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/capture.ld','-Map=overlay.map',
+    linker = 'system_capture.ld' if mother_letters else 'capture.ld'
+    run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','overlay.elf',*objects,'relocation.o')
     if run('nm','--undefined-only','overlay.elf').strip(): raise ValueError('Undefined NPC capture symbol')
@@ -84,7 +86,7 @@ def build(module,words,aliases,out):
     for symbol,resource in (('af_npc_word_data',words),('af_npc_alias_data',aliases)):
         at = symbols[symbol]-RAM
         if data[at:at+len(resource)] != resource: raise ValueError('Linked NPC capture resource differs')
-    if source_hashes() != sources or fado_hashes != {p.relative_to(fado).as_posix():sha256(p.read_bytes()) for p in fado_inputs}:
+    if source_hashes(mother_letters=mother_letters) != sources or fado_hashes != {p.relative_to(fado).as_posix():sha256(p.read_bytes()) for p in fado_inputs}:
         raise ValueError('NPC capture source changed during compilation')
     report = {'version':1,'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),
               'overlay_sha256':sha256(data),'relocation_sha256':sha256(reloc),
@@ -92,8 +94,9 @@ def build(module,words,aliases,out):
               'word_sha256':sha256(words),'alias_sha256':sha256(aliases),
               'symbols':{name:value-RAM for name,value in symbols.items() if name.startswith('af_') and RAM <= value < RAM+len(data)},
               'compiler':run('gcc','--version').splitlines()[0],'flags':flags,'toolchain_image':IMAGE,
-              'stack_usage':{name:(out/(name+'.su')).read_text() for name in ('digest','npc_capture','generate','npc_creator')},
+              'stack_usage':{name:(out/(name+'.su')).read_text() for name in names},
               'fado_sources':fado_hashes,'status':'Complete capture/generation code; gameplay publication not installed'}
+    if mother_letters: report['mother_letters'] = True
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -106,8 +109,10 @@ def main():
     parser.add_argument('--words',type=Path,default=Path('build/npc-mail-words/words.bin'))
     parser.add_argument('--aliases',type=Path,default=Path('build/npc-mail-names/aliases.bin'))
     parser.add_argument('--output',type=Path,default=Path('build/npc-mail-capture'))
+    parser.add_argument('--mother-letters',action='store_true',help='Add complete Mom-letter dispatch without changing the resident loader')
     args = parser.parse_args()
-    print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve()),indent=2))
+    print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
+                           mother_letters=args.mother_letters),indent=2))
 
 
 if __name__ == '__main__': main()

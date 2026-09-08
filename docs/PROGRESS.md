@@ -13,6 +13,19 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
+supported letters through native home-mailbox delivery. Ten host creator tests,
+the sanitizer run, five installer tests, independent builds, and independent
+entry/gate assembly pass, along with all 945 regression tests. The silent native batch passes all 113 complete
+mailbox-to-reader cases, seven rejections, a retry, 239 calls, and 730 memory
+assertions, including the resumed-checkpoint check. Original save memory is
+restored, isolated saves stay blank, and shutdown is graceful. No resident code
+or saved structure grows; the optional system creator preserves ordinary NPC
+reply creation. One Mom body still requires the semicolon glyph. Normal
+scheduling, save/reload, and hardware remain unverified. The
+[integration checkpoint](checkpoints/MOTHER_LETTERS.md) pins the complete build
+and test evidence. Other letter creators and remaining general/item text are next.
+
 The [sale/Redd event-manager owner](../specs/EVENT_LEAFLET_PUBLICATION.md)
 installs all nineteen complete letter templates, resolves full sixteen-byte
 selected item names, and retains native event timestamps. It prepares the whole

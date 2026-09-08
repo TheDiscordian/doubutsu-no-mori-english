@@ -15,8 +15,9 @@ The total combines dialogue, choices, general strings, item names, villager and
 special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, and keyboard labels. Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
-the catalogue parts selected by installed NPC-reply, fortune, renewal, and
-sale/Redd event routes.
+the catalogue parts selected by installed NPC-reply, fortune, renewal,
+sale/Redd event, and Mom-letter routes. The unavailable Mom body does not receive
+complete-letter credit.
 Catalogue presence alone does not credit unused letters or GameCube-only IDs.
 Reader and NPC capture/delivery patches are checked against installed bytes;
 actor images and resources are bound to the completed build report.

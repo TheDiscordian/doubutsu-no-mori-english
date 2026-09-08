@@ -903,6 +903,12 @@ def main():
                     raise ValueError('Native event probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_event_actor'],record))
+            if 'test_mother_letters' in action:
+                from mother_letter_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native Mom-letter probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_mother_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

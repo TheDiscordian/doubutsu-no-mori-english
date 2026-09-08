@@ -31,6 +31,7 @@ ALIASES = ROOT/'build/npc-mail-names/aliases.bin'
 @unittest.skipUnless(shutil.which('gcc') and all(p.is_file() for p in (CATALOG,WORDS,ALIASES)),
                      'Host GCC and verified local complete sources required')
 class NpcMailCreatorTests(unittest.TestCase):
+    extra_sources = ()
     @classmethod
     def setUpClass(cls):
         cls.catalog = CATALOG.read_bytes();verify_registered(cls.catalog)
@@ -39,6 +40,7 @@ class NpcMailCreatorTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-npc-mail-creator-')
         library = Path(cls.temporary.name)/'creator.so'
         sources = ['overlays/mail_generation/'+name for name in ('digest.c','npc_capture.c','generate.c','npc_creator.c')]
+        sources += list(cls.extra_sources)
         sources += ['runtime/mail/'+name for name in ('record.c','format.c','catalog.c','npc_generation.c')]
         sources += ['tests/'+name for name in ('mail_catalog_mock.c','npc_mail_capture_mock.c','npc_mail_creator_mock.c')]
         flags = ['-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-g'] if os.environ.get('AF_NPC_CREATOR_SANITIZE') == '1' else []

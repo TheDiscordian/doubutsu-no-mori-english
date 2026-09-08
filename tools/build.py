@@ -208,6 +208,7 @@ def main():
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
     parser.add_argument('--english-renewal-letters', type=Path, help='Complete renewal mailbox publication actor; requires leaflet dates and the full snapshot reader')
     parser.add_argument('--english-event-letters', type=Path, help='Experimental complete sale/Redd letters; requires leaflet dates, full item names, and the snapshot reader')
+    parser.add_argument('--english-mother-letters', action='store_true', help='Complete supported Mom letters; requires the system variant of the NPC cartridge creator')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -229,6 +230,8 @@ def main():
         parser.error('--english-renewal-letters requires --english-leaflet-dates and --english-mail-snapshots')
     if args.english_event_letters and not (args.english_leaflet_dates and args.english_mail_snapshots and args.extended_items):
         parser.error('--english-event-letters requires --english-leaflet-dates, --english-mail-snapshots, and --extended-items')
+    if args.english_mother_letters and not args.npc_mail_generation:
+        parser.error('--english-mother-letters requires --npc-mail-generation built with --mother-letters')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -307,6 +310,9 @@ def main():
         from event_actor import install as install_event_actor
         report['event_actor'] = install_event_actor(rom,replacements,additions,relocations,
                                                    report.get('runtime_module'),args.english_event_letters)
+    if args.english_mother_letters:
+        from mother_letters import install as install_mother_letters
+        report['mother_letters'] = install_mother_letters(rom,replacements,additions,report.get('runtime_module'))
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

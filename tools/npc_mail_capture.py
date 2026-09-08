@@ -34,11 +34,13 @@ def call_patches(code,module):
     return output
 
 
-def source_hashes():
+def source_hashes(*,mother_letters=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
     names += ['runtime/mail/'+name for name in ('npc_generation.h','npc_loader.h','catalog.h','format.h','record.h')]
+    if mother_letters:
+        names += ['overlays/mail_generation/'+name for name in ('mother_creator.c','mother_creator.h','system_capture.ld')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -48,9 +50,11 @@ def verified_resources(words,aliases):
 
 
 def validate(data,reloc,report,module):
+    mother = report.get('mother_letters') is True
+    if 'mother_letters' in report and not mother: raise ValueError('Unknown system creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes()
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in IMPORTS}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -63,6 +67,7 @@ def validate(data,reloc,report,module):
                 'af_npc_mail_sources_init','af_npc_mail_source_word','af_npc_mail_source_name',
                 'af_npc_mail_source_alias','af_npc_mail_capture_event','af_npc_mail_create',
                 'af_npc_word_data','af_npc_alias_data'}
+    if mother: required.add('af_system_mail_create')
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data')):

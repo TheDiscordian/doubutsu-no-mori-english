@@ -206,6 +206,11 @@ def measure(native, built, report):
                     raise ValueError('Changed installed letter actor: '+key)
             credit_mail(vrom, {k: numbers for k in ('super', 'mail', 'ps')}, key)
 
+        if report.get('mother_letters'):
+            from mother_letters import COMPLETE, verify_installation
+            verify_installation(built, native, module, report['mother_letters'])
+            credit_mail(0x03000000, {k: COMPLETE for k in ('super', 'mail', 'ps')}, 'mother_letters')
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard

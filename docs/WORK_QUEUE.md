@@ -16,6 +16,19 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
+letters without added resident code or saved-layout growth. All 113 native
+post-to-mailbox-to-reader cases, seven rejections, and a retry pass, with 239
+calls and 730 memory assertions. Host, sanitizer, installer, independent-build,
+and assembly checks pass, along with all 945 regression tests. One body still needs a semicolon glyph. Native
+scheduling and normal save/reload remain acceptance work. Continue other letter
+creators and remaining general/item text; keep the full project scope below.
+The next [departed-villager group](../specs/DEPARTED_VILLAGER_LETTERS.md) has
+eighteen complete reference letters and four identified name/town fields. Its
+native caller currently clears remembered-villager state regardless of receipt
+success; guard that clear while connecting complete creation. This group is not
+yet installed or credited as a new translation route.
+
 The [renewal publication actor](../specs/RENEWAL_LETTERS.md) installs complete
 renovation notices with native mailbox ownership and retained failure. Nine
 focused host tests, the 918-test regression batch, and 24 complete native cases
