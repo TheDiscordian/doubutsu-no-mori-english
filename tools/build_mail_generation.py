@@ -23,12 +23,18 @@ LEAFLET_IMPORTS = IMPORTS + ('af_format_month','af_format_day','af_format_year')
 LEAFLET_SOURCES = SOURCES + ('overlays/mail_generation/leaflet.c',
                             'overlays/mail_generation/leaflet.h',
                             'overlays/leaflet_dates/hour.c','runtime/dateformat.h')
+EVENT_LEAFLET_IMPORTS = LEAFLET_IMPORTS + ('af_load_item_name',)
+EVENT_NATIVE_IMPORTS = {'af_event_leaflet_clear_mail':0x8009C384,
+                        'af_event_leaflet_receipt':0x800B6A3C}
+EVENT_LEAFLET_SOURCES = LEAFLET_SOURCES + ('overlays/mail_generation/event_leaflet.c',
+                                         'overlays/mail_generation/event_leaflet.h',
+                                         'runtime/item_name.h')
 
 
-def build(module,out,*,fortune_slip=False,leaflets=False):
+def build(module,out,*,fortune_slip=False,leaflets=False,event_leaflets=False):
     root = Path(__file__).resolve().parents[1]
-    if fortune_slip and leaflets: raise ValueError('Select one generation probe variant')
-    sources = LEAFLET_SOURCES if leaflets else FORTUNE_SOURCES if fortune_slip else SOURCES
+    if sum((fortune_slip,leaflets,event_leaflets)) > 1: raise ValueError('Select one generation probe variant')
+    sources = EVENT_LEAFLET_SOURCES if event_leaflets else LEAFLET_SOURCES if leaflets else FORTUNE_SOURCES if fortune_slip else SOURCES
     hashes = {name:sha256((root/name).read_bytes()) for name in sources}
     out.mkdir(parents=True,exist_ok=True)
     common = ['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -38,9 +44,11 @@ def build(module,out,*,fortune_slip=False,leaflets=False):
                                 capture_output=True,text=True,timeout=60)
         if result.returncode: raise ValueError(f'Generation {tool} failed: '+result.stdout+result.stderr)
         return result.stdout
-    imports = {name:int(module['symbols'][name],16) for name in (LEAFLET_IMPORTS if leaflets else IMPORTS)}
+    resident_imports = EVENT_LEAFLET_IMPORTS if event_leaflets else LEAFLET_IMPORTS if leaflets else IMPORTS
+    imports = {name:int(module['symbols'][name],16) for name in resident_imports}
     if any(not MODULE_RAM+0x300 <= value < MODULE_RAM+LINKED_LIMIT or value&3 for value in imports.values()):
         raise ValueError('Generation probe imports are outside resident code')
+    if event_leaflets: imports.update(EVENT_NATIVE_IMPORTS)
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
              '-fno-pic','-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
              '-ffunction-sections','-fdata-sections','-fstack-usage','-Wall','-Wextra','-Werror']
@@ -49,11 +57,14 @@ def build(module,out,*,fortune_slip=False,leaflets=False):
     if fortune_slip:
         run('gcc',*flags,'/source/overlays/mail_generation/fortune_slip.c','-o','fortune_slip.o')
         objects.append('fortune_slip.o')
-    if leaflets:
+    if leaflets or event_leaflets:
         for source,name in (('overlays/mail_generation/leaflet.c','leaflet'),
                             ('overlays/leaflet_dates/hour.c','hour')):
             run('gcc',*flags,'/source/'+source,'-o',name+'.o')
             objects.append(name+'.o')
+    if event_leaflets:
+        run('gcc',*flags,'/source/overlays/mail_generation/event_leaflet.c','-o','event_leaflet.o')
+        objects.append('event_leaflet.o')
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/probe.ld',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','generate.elf',*objects)
@@ -93,16 +104,18 @@ def build(module,out,*,fortune_slip=False,leaflets=False):
         raise ValueError('Generation source changed while building')
     report = {'version':1,'base':base,'bytes':len(code),'sha256':sha256(code),
               'sources':hashes,'module_sha256':module['module_sha256'],'imports':imports,
-              'symbols':{name:value-base for name,value in symbols.items() if name.startswith(('af_mail_','af_fortune_','af_leaflet_')) and base <= value < end},
+              'symbols':{name:value-base for name,value in symbols.items() if name.startswith(('af_mail_','af_fortune_','af_leaflet_','af_event_leaflet_')) and base <= value < end},
               'jump_relocations':adjustments,'compiler':run('gcc','--version').splitlines()[0],
               'flags':flags,'stack_usage':(out/'generate.su').read_text(),'toolchain_image':IMAGE,
               'status':'Test-only native generation code; no game hooks or generation setting changed'}
     if fortune_slip:
         report['variant'] = 'fortune_slip'
         report['stack_usage'] += (out/'fortune_slip.su').read_text()
-    if leaflets:
-        report['variant'] = 'leaflets'
+    if leaflets or event_leaflets:
+        report['variant'] = 'event_leaflets' if event_leaflets else 'leaflets'
         report['stack_usage'] += (out/'leaflet.su').read_text()+(out/'hour.su').read_text()
+    if event_leaflets:
+        report['stack_usage'] += (out/'event_leaflet.su').read_text()
     (out/'generate.asm').write_text(run('objdump','-d','generate.elf'))
     (out/'generate-relocations.txt').write_text(relocs)
     (out/'generate.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -115,9 +128,10 @@ def main():
     parser.add_argument('--output',type=Path,default=Path('build/mail-generation-probe'))
     parser.add_argument('--fortune-slip',action='store_true',help='Include the complete fortune-slip transaction probe')
     parser.add_argument('--leaflets',action='store_true',help='Include complete renewal, sale, and Redd creation')
+    parser.add_argument('--event-leaflets',action='store_true',help='Include source-item lookup and native saved-event publication')
     args = parser.parse_args()
     print(json.dumps(build(json.loads(args.module.read_text()),args.output.resolve(),
-                          fortune_slip=args.fortune_slip,leaflets=args.leaflets),indent=2))
+                          fortune_slip=args.fortune_slip,leaflets=args.leaflets,event_leaflets=args.event_leaflets),indent=2))
 
 
 if __name__ == '__main__': main()

@@ -13,10 +13,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [sale/Redd publication transaction](../specs/EVENT_LEAFLET_PUBLICATION.md)
+resolves full sixteen-byte selected item names, retains native event timestamps,
+and prepares complete letters before the mode-two saved-event receipt. Its
+3,716-byte MIPS probe and focused host tests cover all nineteen templates.
+The event-manager owner hooks and retained-failure lifetime remain to be
+connected; compiling the transaction does not install new letters in the ROM.
+The [integration checkpoint](checkpoints/EVENT_LEAFLET_PUBLICATION.md) records
+the exact native callers, ignored returns, source fields, and next steps.
+
 The [renewal delivery actor](../specs/RENEWAL_LETTERS.md) installs all three complete
 English renovation letters in eligible native home mailboxes. Preparation completes
 before any copy, and the original caller retains its notification on failure.
-Nine host tests pass; independent actor builds agree. The silent native batch
+Nine host tests and the 918-test renewal regression batch pass; independent actor
+builds agree. The silent native batch
 passes 24 complete combinations, five eligibility cases, failed-preparation retry,
 duplicate prevention, 165 calls, and 532 memory assertions. Live state and the
 checkpoint are restored, and isolated saves stay blank. The 7,472-byte actor keeps

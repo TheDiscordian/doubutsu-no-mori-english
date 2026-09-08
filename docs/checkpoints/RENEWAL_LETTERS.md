@@ -22,9 +22,10 @@ The [specification](../../specs/RENEWAL_LETTERS.md) describes the actual boundar
   and unchanged RNG/handbill fields pass. Isolated FlashRAM remains all `FF`;
   the Pak remains the blank fixture. No user save or physical hardware is used.
 
-The full regression batch is tracked in
-`build/tests-renewal-actor-regression.log`; only its completed result may be
-reported as passing. Normal scheduling and shop progression remain unverified.
+The full renewal regression batch passes 918 tests in 454.958 seconds, recorded
+in `build/tests-renewal-actor-regression.log`. The later event-publication work
+has its own focused tests; that is not retroactively included in this completed
+renewal batch. Normal scheduling and shop progression remain unverified.
 
 ## Artifact identities
 

@@ -16,6 +16,17 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [renewal publication actor](../specs/RENEWAL_LETTERS.md) installs complete
+renovation notices with native mailbox ownership and retained failure. Nine
+focused host tests, the 918-test regression batch, and 24 complete native cases
+plus five eligibility cases pass. Normal scheduling and hardware remain.
+The next [sale/Redd transaction](../specs/EVENT_LEAFLET_PUBLICATION.md) resolves
+full selected names and complete event-letter publication, with a compiled
+3,716-byte probe and focused tests. Install its owner/caller hooks next, including
+retained choices, retries, actor lifetime, and save boundaries. The native parent
+initializer ignores child returns, so a changed registration return alone is
+insufficient. Do not turn this into repeated probe testing before integration.
+
 The [separate English resource](../specs/EXTENDED_GLYPHS.md) has startup-owned
 cartridge loading, native drawing/prefix/reveal hooks, and independently checked
 main-dialogue import capability. Six complete references
