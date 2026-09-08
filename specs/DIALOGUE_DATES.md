@@ -4,7 +4,8 @@
 
 `--english-dialogue-dates` connects the ordinary resident-dialogue overlay's
 year/month/day preparation to the existing resident English formatters. It covers
-the overlay's reunion dates, converted lunar dates, and event reminders. The RTC,
+the overlay's reunion dates, converted lunar dates, event reminders, and
+[complete birthday item fields](BIRTHDAY_FIELDS.md). The RTC,
 schedule, calendar conversion, saves, and other actors' helpers remain unchanged.
 
 The overlay is VROM `00815B70`, RAM `8091D7B0`, with 17,968 file bytes and
@@ -77,8 +78,11 @@ the English, the patch uses the resident ten-byte `af_leap_month` value,
 `leap month`, and passes length ten. Its old pointer's HI/LO relocation entries,
 `45001464/46001468`, are removed so native loading does not shift the fixed
 resident address. The remaining 550 entries retain their order and the file
-length is unchanged. Only six instructions change: three formatter calls,
+length is unchanged. Six date instructions change: three formatter calls,
 the address pair at `8091EC14/8091EC18`, and the length at `8091EC28`.
+The birthday entry adds a guarded jump and delay-slot nop at `80921324/80921328`,
+making eight changed words in the complete installed overlay. No birthday
+relocation is added or removed; its native dispatch table remains unchanged.
 
 The native conversion table covers 2000–2032. Out-of-table dates and failed
 conversion handling remain boundary-audit work. This patch does not extend the
@@ -112,7 +116,7 @@ The actual letter-show handlers and saved-letter inputs are unchanged.
 
 ## Verification
 
-Host tests check all six words, two removed relocations, unchanged sizes, two
+Host tests check all eight words, two removed relocations, unchanged sizes, two
 relocation bases, source/module/literal bounds, overlap rejection, complete
 dependencies, and all four festival command sequences. Portable tests cover all
 retail-width formatter inputs and the ten-byte nonterminated leap-month field.

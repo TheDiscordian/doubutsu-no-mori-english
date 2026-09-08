@@ -25,7 +25,8 @@ from reference_fields import (field_permit, verify_field_reference, catchphrase_
                               verify_catchphrase_reference)
 from item_aliases import confirmed_aliases, update_alias_reports
 from message_aliases import confirmed_message_aliases
-from dialogue_dates import requires_dialogue_dates
+from dialogue_dates import REQUIREMENT, requires_dialogue_dates
+from birthday_fields import message_ids as birthday_message_ids
 from reference_animations import animation_permit, verify_animation_reference, verify_native_consumer
 from reference_content import adapt_content_reference, validate_content_candidate
 from placeholder_text import placeholder_edit
@@ -167,6 +168,8 @@ def main():
     _, font_report = make_halfwidth(rom)
     advances = {int(k, 16): v for k, v in font_report["advance_by_glyph"].items()}
     source_banks = {bank.name: bank for bank in banks(rom)}
+    birthday_ids = birthday_message_ids(rom)
+    disabled_birthdays = birthday_ids if not args.english_dialogue_dates else frozenset()
     item_matches = load_item_matches()
     drafts = load_drafts(args.drafts or [Path("translations/opening.json"), Path("translations/n64-exercise.json"),
                                        Path("translations/n64-intro-jobs.json"),
@@ -188,6 +191,7 @@ def main():
                                        Path("translations/n64-letter-fragments.json"),
                                        Path("translations/n64-native-menus.json"),
                                        Path("translations/n64-contextual-choice-replies.json"),
+                                       Path("translations/n64-letter-question.json"),
                                        Path("translations/n64-return-greetings.json"),
                                        Path("translations/n64-daily-greetings.json"),
                                        Path("translations/n64-reunion-greetings.json"),
@@ -199,6 +203,10 @@ def main():
                                        Path("translations/n64-renovations.json"),
                                        Path("translations/n64-topic-gaps.json")])
     override_ids = {r["id"] for r in drafts if not r.get("reference_fallback", False)}
+    for edit in drafts:
+        if edit['id'] in birthday_ids:
+            requires_dialogue_dates(edit)  # Reject malformed metadata before adding the source dependency.
+            edit['runtime_requirements'] = [REQUIREMENT]
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
     matches = load_matches(args.matches)
@@ -262,7 +270,7 @@ def main():
                     visited_matches.add(id)
                 if reason is None:
                     try:
-                        if requires_dialogue_dates(matches.get(id, {})) and not args.english_dialogue_dates:
+                        if (requires_dialogue_dates(matches.get(id, {})) or id in birthday_ids) and not args.english_dialogue_dates:
                             raise ValueError('runtime_requirement_unavailable')
                         reference_text, actor_edits = adapt_actor_request_reference(reference, original, matches.get(id), info)
                         reference_text, choice_edits = adapt_choice_reference(
@@ -330,12 +338,13 @@ def main():
                                        "reference_id": reference["id"], "reference_sha256": reference["sha256"],
                                        "match_basis": match_basis},
                         "status": "mechanically_validated_candidate_not_reviewed", "adaptations": adaptations}
-                if requires_dialogue_dates(matches.get(id, {})):
-                    edit['runtime_requirements'] = list(matches[id]['runtime_requirements'])
+                if requires_dialogue_dates(matches.get(id, {})) or id in birthday_ids:
+                    edit['runtime_requirements'] = [REQUIREMENT]
             record_candidate(edit, info, advances, name, edits, manifests, counts, resident_runtime=bool(args.runtime_module))
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
-                skip_ids=override_ids | matches.keys() | fragments.keys(), resident_runtime=bool(args.runtime_module))
+                skip_ids=override_ids | matches.keys() | fragments.keys() | disabled_birthdays,
+                resident_runtime=bool(args.runtime_module))
             for edit in aliases:
                 rejected = [row for row in review if row["id"] == edit["id"]]
                 if len(rejected) != 1:

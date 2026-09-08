@@ -6,8 +6,9 @@ The 135 native-menu approvals in `translations/reference_matches.json` retain
 complete GameCube English text while substituting each original N64 choice
 command in the canonical payload. The explicit batch IDs are checked in
 `tests/test_native_menus.py`. Together with the 22 shop, two police-station,
-five additional contextual-menu approvals, and the complete old-calendar quiz,
-165 records use the [native-choice contract](REFERENCE_CHOICES.md). Twenty reference display menus
+five additional contextual-menu approvals, the complete old-calendar quiz, and
+two birthday references, 167 records use the
+[native-choice contract](REFERENCE_CHOICES.md). Twenty-four reference display menus
 and two original quiz drafts have separate
 [contextual-label approvals](CONTEXTUAL_CHOICES.md), including
 fourteen reference quiz questions in this batch.
@@ -102,17 +103,16 @@ branch verification. Explicit contexts for `00B7` (none versus pear) and `0010`
 (agreement versus refusal) also have per-message mappings; their shared labels
 remain unchanged. Further contexts require individual review and approval.
 
-## Withheld menu comparisons
+## Complete reviewed menu comparisons
 
 The reviewed comparison pool contains 154 same-ID/legacy-agreeing references
-that pass mechanical checks after native menu substitution. Of these, 141 have
-complete donor approvals, including six requiring contextual English labels.
+that pass mechanical checks after native menu substitution. Of these, 143 have
+complete donor approvals, including eight requiring contextual English labels.
 Eleven receive complete original drafts: five above and six
-[native-topic questions](NATIVE_TOPIC_GAPS.md). Two still need the following work:
-
-| Records | Remaining requirement |
-| --- | --- |
-| `088B`, `2586` | Audit birthday month/day, zodiac item-field preparation, and acknowledgement labels. |
+[native-topic questions](NATIVE_TOPIC_GAPS.md). The complete `088B/2586` references
+require [English birthday preparation](BIRTHDAY_FIELDS.md) and their exact
+contextual acknowledgements. Runtime dependencies do not establish normal
+birthday-entry, gift, or horoscope gameplay.
 
 The complete `246D` reference requires its verified
 [native old-calendar request](DIALOGUE_DATES.md#actual-old-calendar-quiz-request)
@@ -125,8 +125,11 @@ jokes. The related `25FD` reply retains the daytime hello correction. The actual
 date-selector range, native poster readability, and eventual map artwork remain
 separate integration/image checks; translated wording does not prove those.
 
-Separate `1C6F` has a different native/reference choice count and needs its own
-letter-reaction/label review. Mechanical compatibility never approves a changed
+Separate `1C6F` has a complete original two-answer letter-reaction question in
+`translations/n64-letter-question.json`. Every native command stays exact:
+Funny! reaches `1C70`, and Like a star! reaches `1C71`. The GameCube-only third
+answer and empty native `1C72` destination are not imported. Mechanical
+compatibility never approves a changed
 question, platform feature, date, or action. Broader native-only dialogue,
 cross-ID matching, general strings/names/mail, and special-actor controls remain.
 

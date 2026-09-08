@@ -8,6 +8,7 @@ from dialogue_dates import SPEC, patch, relocated
 from flash_mail import SAVE_RAM, SAVE_BYTES
 from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK, GUARD_ADDRESS, GUARD_WORD
 from textcodec import tokenize
+from birthday_smoke import exercise as exercise_birthday
 
 EDGE = b'EDGE'*4
 WINDOW, RTC_YEAR, RTC_START = 0x80142410, 0x80136FC2, 0x80136FB8
@@ -216,6 +217,7 @@ def exercise(debug, request, record):
         call(base+0x809215E4-SPEC.ram, [manager], proof=proof)
         check('non-one calendar order leaves all free fields unchanged', fields_start, b'X'*200)
         check('non-one calendar order retains complete manager', manager, state)
+    birthday = exercise_birthday(debug,request,record,base,proof)
     write(0x80104A70, original_orders_pointer)
     check('original actor-order pointer restored', 0x80104A70, original_orders_pointer)
     write(RTC_START, rtc)
@@ -226,7 +228,7 @@ def exercise(debug, request, record):
         check('heap and call-stack guard', address, EDGE)
     check('resident module guard', GUARD_ADDRESS, struct.pack('>4I', *([GUARD_WORD]*4)))
     call(0x8009C040, [allocation])
-    return {'dialogue_date_preparations': prepared, 'calendar_conversions': conversions,
+    return {**birthday, 'dialogue_date_preparations': prepared, 'calendar_conversions': conversions,
             'message_loads': message_loads, 'date_insertions': insertions,
             'calendar_quiz_cases': quiz_cases, 'calendar_quiz_direct_conversions': quiz_cases*3,
             'calendar_noop_orders': 2,

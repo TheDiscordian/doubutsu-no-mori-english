@@ -101,7 +101,7 @@ including controlled allocation exhaustion, full save retention, and exact heap
 totals after release. No creator code/resources are debugger-uploaded. The new
 ROM passes four-MiB town arrival. Main content work proceeds while actual
 creator-to-receipt and pending-loop checks stay queued for batch integration.
-The resident module leaves 1,856 linked bytes inside the unchanged 32 KiB
+The resident module leaves 1,088 linked bytes inside the unchanged 32 KiB
 reservation. Allocation/error ownership tests,
 four-MiB town arrival, and all eight complete native letter windows pass.
 
@@ -301,22 +301,27 @@ keep every command and argument. Normal answering, live fields, final wording,
 and rendering remain separate acceptance work.
 
 The [contextual-choice implementation](../specs/CONTEXTUAL_CHOICES.md) supplies
-twenty-two per-message mappings, including seventeen quiz menus and the reviewed
+twenty-six per-message mappings, including seventeen quiz menus and the reviewed
 none/pear and agreement/refusal contexts. Shared Circle/X labels remain intact
 for shape games. Five complete reference questions and four native-complete
 replies add nine missing messages. Two native-original quiz mappings independently
-guard every canonical native command and argument. All twelve contextual tests
-pass within the 700-test full suite.
-The combined calendar/choice native batch checks 48 selected labels and insertions
-and 44 actual conditional branch cases, with 496 calls, 822 assertions, 2,039 steps,
+guard every canonical native command and argument. Two complete unchanged-menu
+references have their own explicit source kind and parent/hash checks. All
+thirteen contextual tests pass within the 714-test full suite.
+The combined birthday/calendar/choice native batch checks 57 selected labels and insertions
+and 53 actual conditional branch cases, with 913 calls, 1,588 assertions, 4,083 steps,
 restored checkpoint, and blank isolated saves.
 Basic generation withholds eighteen mappings whose complete labels are missing;
-it separately withholds the old-calendar reference without its date patch.
+it separately withholds old-calendar and birthday references without their preparation patch.
 Do not bypass those dependencies. Broader contextual labels remain individual
 review tasks, not a global label replacement.
-Two reviewed but withheld menu references (`088B/2586`) and separate
-`1C6F` need birthday or native letter-reaction/label work,
-as listed in the native-menu specification. Unsupported `74` remains rejected
+The complete birthday references `088B/2586`, corrected acknowledgements
+`088A/088C`, and original two-answer letter question `1C6F` are installed.
+The birthday preparer retains the complete English names and dates, both
+original random draws, native sign boundaries, and unchanged saved fields.
+All 33 original birthday requests own a source-derived build dependency, even
+without candidate metadata. Normal birthday entry/gifts, letter-show interaction,
+and further shared-label contexts remain. Unsupported `74` remains rejected
 except its existing direct pre-field removal; parsing a donor is not a new
 runtime permission. Do not repeat the unchanged loader batch while those content
 and runtime tasks remain available.
@@ -472,9 +477,9 @@ conversions, twelve date-message loads, and twenty date insertions pass. The
 combined native run restores the complete clock and checkpoint, retains the
 saved game, frees its owned allocation, and keeps both isolated saves blank.
 
-Current main-bank coverage is 10,736 candidates; 1,016 records remain without
-candidates, including 94 containing Japanese static text. The reference
-rejection queue contains 926 unconfirmed identities, 65 control-signature
+Current main-bank coverage is 10,739 candidates; 1,013 records remain without
+candidates, including 91 containing Japanese static text. The reference
+rejection queue contains 926 unconfirmed identities, 62 control-signature
 differences, 24 missing-field records, and two expansion overflows. These are
 candidate counts, not completed semantic or gameplay review. Other overlong
 records may use existing page-boundary splitting after their complete native
@@ -548,13 +553,13 @@ identity batches remain, alongside final native festival review and gameplay.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, and ordinary resident year/month/day/leap-month preparation pass; birthday item fields, other UI callers, and out-of-table native calendar dates remain |
-| R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 165 dialogue approvals preserve native menu order, and twenty-two contextual mappings retain answer indices/actions; 48 selected-label/insertion cases and 44 actual branch cases pass; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; further contextual labels, full review, and actor-specific runtime paths remain |
+| R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, ordinary resident year/month/day/leap-month preparation, and all 33 birthday-request fields pass targeted checks; normal birthday entry/gifts, other UI callers, and out-of-table native calendar dates remain |
+| R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 167 dialogue approvals preserve native menu order, and twenty-six contextual mappings retain answer indices/actions; twenty-byte capacity, thirteen long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; further contextual labels, full review, and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; ten-byte default catchphrase display passes all 216 default loads and main insertion with unchanged saved bytes; gyroid owner-message pixel wrapping and native insertion pass with unchanged saved/editor limits; longer gyroid default/custom storage, ambiguous borrowed phrases, shared choices, mail, and shop destinations remain |
 | R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
 | R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
-| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including sixteen guarded continuation allocations; 99 complete diagnostic labels covered; 94 Japanese-static-text gaps and broader matching remain |
+| R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including sixteen guarded continuation allocations; 99 complete diagnostic labels covered; 91 Japanese-static-text gaps and broader matching remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |
 | R09 | Embedded UI, calendar, credits, and other uncovered text | pending | Inventory extends beyond the current 29 banks and keyboard UI |
 | R10 | Punctuation and layout polish | pending | Preserve GameCube line/page/timing intent; review necessary N64 departures individually |

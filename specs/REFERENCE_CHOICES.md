@@ -22,12 +22,14 @@ The host parser recognises reference-only `74` without adding it to the native
 command table. The ordinary adapter still removes it only directly before an
 already supported native string insertion. Other occurrences remain rejected.
 
-Twenty reference [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
+Twenty-two reference [contextual display-label approvals](CONTEXTUAL_CHOICES.md) add a
 separate final menu-only mapping after this complete native-ID validation.
 They retain every answer index and branch, require all destination English
 labels, and reverse to this exact canonical payload for independent builder
 validation. They do not relax the native-choice contract or change shared
 labels globally.
+Two further contextual approvals bind a complete reference whose menu already
+uses the native IDs; they do not invent an adaptation under this contract.
 
 ## Shop-service batch
 
@@ -91,13 +93,17 @@ patch independently of removable candidate metadata. See
 
 Portable tests cover exact replacement, changed sources/references, missing or
 duplicate menus, wrong offsets, changed action counts, unrelated controls, and
-the independent final-payload guard. Retail-input tests check all 165 approvals,
+the independent final-payload guard. Retail-input tests check all 167 approvals,
 their unchanged native choice commands, complete capacity validation, and the
 source-bound original labels. The [broader native-menu batch](NATIVE_MENUS.md)
 supplies 135 approvals beyond the shop and police-station explanations, with
 native-specific questions and connected reply corrections where required.
 Five further complete references have mandatory contextual labels for interest,
 trading, moving, rainy-night excitement, and music knowledge.
+The complete birthday references `088B/2586` retain their native menus before
+contextual acknowledgement/modesty labels are applied. All 33 native birthday
+request messages require the complete English preparer independently of metadata;
+see [birthday fields and answer meanings](BIRTHDAY_FIELDS.md).
 The native batch generator loads selected complete messages and all labels
 referenced by their decoded menus from the actual cartridge, with buffer/module
 guards and full checkpoint restoration. Ordinary selection,

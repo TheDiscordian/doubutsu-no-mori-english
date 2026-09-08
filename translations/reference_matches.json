@@ -7155,5 +7155,57 @@
       }
     },
     "evidence": "Reviewed complete native and supplied English meaning, controls, and effect placement. After the complete final English confidence claim and added closing aside, before the unchanged final newline and normal ending. Restore the exact original mood/timer pair without changing any English word, newline, page, pause, field, or command. Require the unchanged native consumer and independent full hashes; no general mid-sentence permission or gameplay validation is implied."
+  },
+  {
+    "id": "message:088A",
+    "source_sha256": "6f76bfccec34b3639786a109a011799241385562f87f6470ef8baf357fbbddae",
+    "reference_id": "message:088A",
+    "reference_sha256": "be7a7e527adeb8b98408f4f22cf1df95cf8e5343b76efb301cc504bca299e325",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "evidence": "Birthday confirmation preserves the native birthday-entry request, preparation request, full actual-sign/month/day fields, and 0889 acknowledgement versus 088A correction loop. Use You know it! for confirmation, not the shared greeting Nice to meet ya. Retain every supplied English word, manual line, page, pause, and native action. Full names and dates require the guarded complete ordinary birthday preparer; no global label rename or saved-date change. See BIRTHDAY_FIELDS.md."
+  },
+  {
+    "id": "message:088B",
+    "source_sha256": "273e3d7661ccc3b3978de725ea7fec1dc52f74d1834c03a10e6b9980279a33b9",
+    "reference_id": "message:088B",
+    "reference_sha256": "5bf7bb840146df9ec4f28044134896ba610f79201e88b5d5f3e3db806d1cdfb5",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "native_choices": {
+      "reference_command": "7F16002100C4",
+      "native_command": "7F16004100C4",
+      "offset": 228,
+      "adapted_sha256": "1bfb2f30086f344da1842983910d1dd8520e569edafe55436fc4eee0fd5a5ccf"
+    },
+    "evidence": "Birthday confirmation preserves the native birthday-entry request, preparation request, full actual-sign/month/day fields, and 0889 acknowledgement versus 088A correction loop. Use You know it! for confirmation, not the shared greeting Nice to meet ya. Retain every supplied English word, manual line, page, pause, and native action. Full names and dates require the guarded complete ordinary birthday preparer; no global label rename or saved-date change. See BIRTHDAY_FIELDS.md."
+  },
+  {
+    "id": "message:2586",
+    "source_sha256": "3a15bd727eeac5316fcf7c978040ffd519b2545ea9617f7cf0dbf6164f2b9a6c",
+    "reference_id": "message:2586",
+    "reference_sha256": "2220ab48310c915b83a474821bfc9ae349103e60743fb69c8f726f4953ddbc2e",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "native_choices": {
+      "reference_command": "7F170127016200C4",
+      "native_command": "7F170127012800C4",
+      "offset": 153,
+      "adapted_sha256": "e00bb4f072b88f7a86d5246116af043c96af02109cb49cbc315d52c604d2d220"
+    },
+    "evidence": "Birthday-sign conversation preserves the deliberately random Western sign in field 32, not the actual sign in field 33. Yeah! retains confident reply 259D; Not really. retains modest reply 259E; You're wrong! retains incorrect-sign reply 259F. Native friendship requests 005/003/069 remain in those replies. Retain every supplied English word, manual line, page, pause, and native action. Full names and dates require the guarded complete ordinary birthday preparer; no global label rename or saved-date change. See BIRTHDAY_FIELDS.md."
+  },
+  {
+    "id": "message:088C",
+    "reference_id": "message:088C",
+    "source_sha256": "5264ff4fb25040f02a9ca02d2c27a8a7882fa6bc317efe2bf7d068bf3dfbe279",
+    "reference_sha256": "92647ebe74c8fb84716d36d89ce968a25f47af549d944b72b969a4d9bb51a326",
+    "runtime_requirements": [
+      "ordinary_dialogue_dates"
+    ],
+    "evidence": "Birthday entry after declining a present retains the complete supplied English teasing, invitation, birthday-entry and preparation requests, actual sign/month/day fields, and acknowledgement 0889 versus correction 088A. Display You know it! instead of the shared greeting Nice to meet ya.; do not rename global 0041 or alter any native action, reference wording, line, page, or pause."
   }
 ]

@@ -150,6 +150,22 @@ class ContextualChoiceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'changes a native command'):
                 display_candidate('message:0000', self.source, base, approvals, self.info)
 
+    def test_unchanged_native_menu_requires_explicit_kind_and_exact_reference_parent(self):
+        row = {**self.row, 'source_kind': 'gamecube_native_menu'}
+        match = dict(id=row['id'], source_sha256=row['source_sha256'],
+                     reference_id=row['id'], reference_sha256=row['candidate_sha256'])
+        approvals = self.load_rows([row], {row['id']: match})
+        self.assertEqual(display_candidate(row['id'], self.source, self.base, approvals, self.info), self.final)
+        self.assertEqual(canonical_candidate(row['id'], self.source, self.final, approvals, self.info), self.base)
+        for change in ({'source_sha256': '0'*64}, {'reference_id': 'message:0001'},
+                       {'reference_sha256': '0'*64}, {'native_choices': {}}):
+            with self.assertRaisesRegex(ValueError, 'complete unchanged native-menu reference'):
+                self.load_rows([row], {row['id']: {**match, **change}})
+        with self.assertRaises(ValueError):
+            self.load_rows([row], {})
+        with self.assertRaisesRegex(ValueError, 'complete native-menu approval'):
+            self.load_rows([self.row], {row['id']: match})
+
 
 @unittest.skipUnless(ROM_PATH.is_file(),'Retail ROM remains local')
 class ContextualChoiceRetailTests(unittest.TestCase):
@@ -181,13 +197,13 @@ class ContextualChoiceRetailTests(unittest.TestCase):
         text,_=adapt_reference(text,source,self.info,'reference_layout',resident_runtime=True)
         return source,encode(text,self.info)
 
-    def test_all_twenty_reference_display_labels_preserve_complete_base_and_actions(self):
-        self.assertEqual(len(self.approvals),22)
+    def test_all_reference_display_labels_preserve_complete_base_and_actions(self):
+        self.assertEqual(len(self.approvals),26)
         labels=self.reference_edits()
-        self.assertEqual(len(labels),12)
+        self.assertEqual(len(labels),16)
         reference_approvals = {id: row for id, row in self.approvals.items()
-                               if row.get('source_kind', 'gamecube') == 'gamecube'}
-        self.assertEqual(len(reference_approvals), 20)
+                               if row.get('source_kind') != 'native_original'}
+        self.assertEqual(len(reference_approvals), 24)
         for id,row in reference_approvals.items():
             source,base=self.reference_base(id)
             output=display_candidate(id,source,base,self.approvals,self.info)

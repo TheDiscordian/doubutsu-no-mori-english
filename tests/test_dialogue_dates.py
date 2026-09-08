@@ -27,6 +27,7 @@ from reference_choices import adapt_choice_reference
 from gc_adapter import adapt_reference
 from build import apply_translations
 from dialogue_dates_smoke import QUIZ_DATES
+from birthday_fields import START as BIRTHDAY_START
 from test_retail import ROM_PATH
 
 
@@ -66,7 +67,7 @@ class DialogueDateTests(unittest.TestCase):
         cls.module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
         cls.binary = (ROOT/'build/runtime-module/module.bin').read_bytes()
 
-    def test_only_six_words_and_two_relocations_change(self):
+    def test_only_eight_words_and_two_relocations_change(self):
         data, reloc = patch(self.data, self.reloc, self.module)
         self.assertEqual(len(data), len(self.data))
         self.assertEqual(len(reloc), len(self.reloc))
@@ -76,7 +77,7 @@ class DialogueDateTests(unittest.TestCase):
             self.assertEqual(struct.unpack_from('>I', self.data, at)[0], before)
             self.assertEqual(struct.unpack_from('>I', data, at)[0], after)
             allowed.update(range(at, at+4))
-        self.assertEqual(len(allowed), 24)
+        self.assertEqual(len(allowed), 32)
         self.assertTrue(all(a == b or i in allowed for i, (a, b) in enumerate(zip(data, self.data))))
         self.assertEqual(reloc[:16], self.reloc[:16])
         count = struct.unpack_from('>I', reloc, 16)[0]
@@ -105,6 +106,11 @@ class DialogueDateTests(unittest.TestCase):
             hi = struct.unpack_from('>I', data, LEAP_HIGH-SPEC.ram)[0] & 0xFFFF
             lo = struct.unpack_from('>h', data, LEAP_LOW-SPEC.ram+2)[0]
             self.assertEqual((hi << 16)+lo, int(self.module['symbols']['af_leap_month'], 16))
+            word = struct.unpack_from('>I', data, BIRTHDAY_START-SPEC.ram)[0]
+            self.assertEqual(word >> 26, 2)
+            self.assertEqual(0x80000000 | ((word & 0x3FFFFFF) << 2),
+                             int(self.module['symbols']['af_birthday_fields'], 16))
+            self.assertEqual(data[BIRTHDAY_START+4-SPEC.ram:BIRTHDAY_START+8-SPEC.ram], bytes(4))
 
     def test_install_requires_full_module_literal_and_no_overlap(self):
         for binary, module in ((self.binary[:-1], self.module), (self.binary, None),
@@ -126,7 +132,7 @@ class DialogueDateTests(unittest.TestCase):
         self.assertEqual(report['relocations'], 550)
 
     def test_symbols_must_stay_in_complete_resident_bounds(self):
-        for symbol in ('af_format_year', 'af_format_month', 'af_format_day', 'af_leap_month'):
+        for symbol in ('af_format_year', 'af_format_month', 'af_format_day', 'af_leap_month', 'af_birthday_fields'):
             for address in ('0', '80000000', '8019FFFF'):
                 module = deepcopy(self.module)
                 module['symbols'][symbol] = address

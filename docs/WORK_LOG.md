@@ -5655,3 +5655,147 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   Birthday `088B/2586` and letter reaction `1C6F` remain among the next native
   content tasks. The title screen remains the first image priority after the main
   port, with no installed replacement. The complete project goal remains active.
+
+## 2026-09-08 — Full birthday names/dates and connected English answers
+
+- Continued from private checkpoint `101c95762156f1c6364ddba010743a0fae943132`.
+  Verified the complete native birthday preparer at `80921324..80921464`,
+  its boundary table, dispatch table, player pointer/month/day, both random
+  draws, and ten-byte native item mirrors. The body hash is
+  `770b3dbb0270671fe82acf1804887c667dd60e4c1ebd6f07c95b95be35a05440`.
+  The complete pointer/jump/branch audit finds exactly one entry reference,
+  ordinary-overlay offset `0045D4`, and no external interior references.
+  Source definitions retain their recorded pins. GameCube repeat-avoidance state
+  is not present in the native helper and is not imported.
+- Added `runtime/birthday.c`: full common English names for all twelve animals
+  and Western signs, full month names, and ordinal days. Existing sixteen-byte
+  message-item rows retain Sagittarius in full while preserving all fifty
+  native compatibility bytes and every saved structure. Exactly two native RNG
+  draws remain in their original order. The native first-ceiling/minus-three
+  constellation calculation retains all byte-valued invalid-date behaviour;
+  English display fallback remains separate. Null player consumes no RNG and
+  changes no fields. No general-string bank or unrelated destination is widened.
+- Extended the guarded ordinary-date patch with one entry jump and delay-slot
+  nop. Eight words now change; the original file/BSS sizes, native dispatcher,
+  and 550 remaining relocations are retained. Both birthday entry words have no
+  relocation. Every one of the 33 native `0C 09 0004` messages owns the complete
+  installed-patch dependency independently of identity/candidate metadata. The
+  generator withholds unsupported references and prevents alias fallback from
+  bypassing that requirement. Omitted or empty metadata cannot remove it.
+- Installed complete English `088B/2586` and corrected the acknowledgement in
+  existing `088A/088C`. All supplied words, manual newlines, pages, and pauses
+  remain. You know it! acknowledges the birthday at `0889`; You're wrong!
+  returns to `088A`. Shared greeting `0041` stays unchanged. The deliberately
+  random Western sign in `2586` retains confidence, modesty, and incorrect-sign
+  answers at `259D/259E/259F`, including friendship values `005/003/069`.
+  The native-menu registry has 167 approvals. The contextual registry has 26:
+  22 adapted references, two complete unchanged-menu references, and two original
+  quizzes. The explicit unchanged-menu kind binds the entire unadapted reference
+  and forbids a fictitious native-menu adaptation; default behaviour stays strict.
+- Added complete native-original letter question `1C6F` with both original
+  answers and every command preserved. Funny! reaches `1C70`; Like a star!
+  reaches `1C71`. The GameCube-only third answer is not added: native `1C72`
+  contains only the normal end command. This is a draft, not a reviewed reference
+  or a normal letter-show gameplay claim.
+- Host checks exercise the real wider setter/reader across all 144 random pool
+  pairs, all 65,536 byte-valued date pairs, all retail month/day combinations,
+  display fallbacks, complete names, first-row publication before the second
+  draw, saved-player retention, and adjacent guards. Source/table/entry mutations,
+  all 33 dependencies without metadata, missing entry-hook rejection, complete
+  reference controls/branches, and the original letter question are checked.
+  The full 714-test run passes in 268.581 seconds at
+  `build/tests-birthday-full-02.log`. The first full run found two stale test
+  expectations: the empty record was incorrectly asserted as literal zero
+  instead of `7F00`, and the menu-approval count still expected 165 instead of
+  167. Both test expectations were corrected; no ROM change was needed.
+- Independent pinned-Docker modules agree: 23,488 linked bytes, 1,088 bytes free,
+  the unchanged 32 KiB reservation, and module SHA-256
+  `9f1f730f13d0a2a78bc2bbcfc570a5fa2249976cbe253edd6a22274eb95a6460`.
+  Birthday stack use is 64 bytes; both local helpers use zero additional stack.
+  Rebuilt module-bound NPC capture/creator and generation-probe artifacts;
+  independent creator code/relocation also match. Earlier ignored default-module
+  and imported-overlay artifacts were moved to explicit calendar-quiz backup
+  directories before refreshing defaults. No source ROM, old pilot, or user save
+  was replaced.
+- `build/birthday-final-candidates/` has 12,532 ordinary edits: three additions,
+  only existing `088A/088C` payloads changed, and 29 earlier payloads receive
+  metadata-only dependencies. Main coverage is 10,739: 9,765 references, 585
+  original dialogue drafts, one original continuation, 289 development labels,
+  and 99 diagnostics. All 460 choice texts, 178 villager-name slots, and 779
+  ordinary item slots remain. The 1,013 gaps comprise 91 Japanese-static,
+  919 nonstatic, one Latin, and two symbol records. Ten nonstatic entries have
+  dynamic fields; none is deemed unreachable. Main rejections are 926
+  unconfirmed identities, 62 control differences, 24 missing fields, and two
+  overflows, with one original fallback. Reference/label warnings total 1,475,
+  plus the two separate original shout warnings. Source weight is
+  638,255/746,978; main source weight is 627,923/637,761. These are coverage
+  measurements, not completed semantic review or total project completion.
+- Basic generation is 11,789 edits. It adds `1C6F` and withdraws 28 previously
+  admitted birthday references that lacked actual English field preparation;
+  five other birthday requests were already withheld. Every retained basic
+  payload is unchanged. Full generation includes all 33. The basic contextual
+  output retains three mappings; eighteen lack complete labels and five require
+  birthday/calendar preparation. Withholding a misleading basic candidate is
+  not a removal from the full translation pilot.
+- `build/birthday-final-pilot/animal-forest-halfwidth.z64` SHA-256:
+  `87f1c48893c48b94efe2380a150bcc2b3f7c3a6cc3a762035ef98fc5097d9062`.
+  UPS SHA-256:
+  `4039b2a6b83b66406f54539deacd4fdb68a6e4b45baf61a75c1b96d9cbb6653f`.
+  Candidate SHA-256:
+  `349e8796694880524a4ebb3529d6ea6d834c5913d1409991eb025b23e3a0aa57`.
+  `build/birthday-final-artifact-audit-02.log` checks all 12,532 installed
+  payloads, full UPS reconstruction, all earlier payload changes, dependency
+  coverage, both unchanged font atlases, and independent module/creator/ROM/patch
+  equality. Only DMA container `00019D40`, code `00675720`, board `007908A0`,
+  ordinary overlay `00815B70`, Pelly `008A6C10`, main data/table, module, and NPC
+  creator change. Board/Pelly changes are their guarded resident-address bindings.
+  The initial audit's expected file set omitted those two shifted bindings;
+  the corrected audit verifies them without rebuilding the ROM.
+- `build/smoke-birthday-dates-02/` passes 4,083 steps, 913 native calls,
+  274 scenario-declared expected returns, 1,588 memory assertions, and 150
+  cartridge message loads. Birthday coverage includes both sides of all twelve
+  constellation boundaries, both complete random pools, 48 independent native
+  RNG calls, 57 complete question/message loads, all 33 related conversations,
+  190 full field insertions, and null-player rejection. The all-message batch
+  uses complete Sagittarius in both Western fields. It leaves the earlier food
+  field in `0872` and later lucky-colour field in `29F9` untouched. The complete
+  manager, saved player, RNG, clock, saved game, code, and heap/stack/module
+  guards remain; both owned allocations are freed before one checkpoint restore.
+  The ordinary date/calendar group also passes all 53 preparations, thirteen
+  earlier conversions, eighteen direct quiz conversions, six current-date
+  requests, two no-op orders, twelve date-message loads, and twenty insertions.
+  All 54 contextual messages, 57 selections/insertions, and 53 branches pass.
+  Scenario SHA-256:
+  `4bf56831839d5fbdbdfd0b86f7a9dc2511758e2b5dfa9147848c3be65e32c697`.
+- `build/smoke-birthday-arrival-mail-02/` passes the fresh four-MiB English
+  keyboard/train-to-town scenario and then the real cartridge NPC creator:
+  1,947 steps, 245 native calls, and 546 memory assertions. All 48 original
+  metadata/RNG comparisons, eight successive letters, and eight rejections pass.
+  Zero creator/resource bytes are debugger-uploaded. Complete reconstruction,
+  original metadata, names/words, capitalization, heap release, saved-game
+  retention, guards, and the final town checkpoint restore pass. The post-scenario
+  SHA-256 is `b0ef875ebecafa529b7515193ec40d6e2a463449d74e354aec3f02e31a2a8805`.
+  Actual letter delivery is not exercised or enabled by this evidence.
+- Both successful runs have no seeded saves or checkpoints, disable audio and
+  both save-write flags, restore one checkpoint, and shut down gracefully.
+  FlashRAM remains `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`;
+  Pak remains `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+  `build/birthday-final-native-audit.log` independently verifies all declared
+  call arguments/returns, complete plain reads, every custom assertion/hash,
+  restored stacks, recorded save hashes, and regenerated scenario identity.
+- Initial emulator batches were cut off by the declared timeouts without a
+  failed text/memory assertion: approximately 610 seconds for the combined native
+  batch and 308 seconds for the 300-second journey. The bounded runner ceiling
+  is now 1,200 seconds, with the same forty-second default; successful runs use
+  900 seconds. Mail tests execute after town creation, not from an unpopulated
+  title checkpoint. An initial 900-second request was rejected before launch by
+  the old CLI ceiling. Four read-only CLI boundary checks and seven scenario
+  tests pass after the ceiling change. No timing/layout or production-ROM change
+  was made to accommodate a test timeout.
+- Updated the birthday, date, choice, menu, building, progress, and queue records.
+  Reviewed the next storage, raffle, offering, and twin-speaker gaps while the
+  emulator batches ran. Normal gameplay/save validation, remaining main text and
+  general/name/mail destinations, final wording/presentation, image replacements,
+  hardware, and patch-only release remain. The title screen stays the first
+  image priority; no replacement is installed. The complete project goal remains
+  active.

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "message:1C6F",
+    "source_sha256": "e90400dce7c3989a968bfa3182cdc20850c9bd1ed0aedc938528ccda99fc8de6",
+    "translation": "{cmd:7F09000017}What do you think,{cmd:7F0306}\n{cmd:7F1A}?{cmd:7F030C}\nHow's this letter?\n{cmd:7F1600DA00EC}{cmd:7F04}{cmd:7F0D}{cmd:7F0F1C70}{cmd:7F101C71}{cmd:7F19}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 conversation",
+    "status": "draft",
+    "notes": "Retain the question about the displayed letter and both original answers: Funny! reaches the impressed 1C70 reply, and Like a star! reaches the baffled 1C71 reply. Every native command, pause, field, and branch stays exact. Do not add the GameCube third answer or its 1C72 branch; native 1C72 is empty. This draft does not establish normal letter-show progression."
+  }
+]

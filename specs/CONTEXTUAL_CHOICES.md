@@ -25,9 +25,10 @@ capacity, command, runtime hook, or saved field.
 
 ## Two complete payload approvals
 
-`translations/contextual_choices.json` contains twenty-two explicit approvals.
-Twenty require a complete [native-menu reference approval](REFERENCE_CHOICES.md).
-Two require the explicit original-draft contract below. Every approval binds
+`translations/contextual_choices.json` contains twenty-six explicit approvals.
+Twenty-two require a complete [native-menu reference approval](REFERENCE_CHOICES.md).
+Two require a complete unchanged native-menu reference, and two require the
+explicit original-draft contract below. Every approval binds
 its original source hash, complete canonical English payload hash,
 exact native menu, exact menu offset, replacement display menu, complete final
 payload hash, and every destination label's source and encoded-English hashes.
@@ -43,6 +44,14 @@ builder repeats that check through reverse validation, independently of edit
 metadata. All source/output hashes, menu uniqueness, label dependencies, and
 ordinary guards remain. Default and explicit `gamecube` kinds retain their
 complete-reference parent requirement; unknown kinds fail.
+
+Explicit `source_kind: gamecube_native_menu` covers a complete reference whose
+menu already uses the original label IDs. Its parent must bind the same source,
+same reference ID, and complete reference hash equal to the canonical payload
+hash, with no `native_choices` adaptation. Exact menu uniqueness and equality
+with the original menu remain independently checked in both directions. This
+does not allow an adapted or shortened donor to masquerade as an unchanged one.
+The default kind still requires its existing native-menu adaptation approval.
 
 The generator first performs all ordinary source/reference, native-menu,
 field, actor, layout, and capacity validation. After all bank edits are available,
@@ -83,11 +92,16 @@ it is not permission to ignore the English runtime's capacity requirements.
 | `0B69` | `0025/0026`: That's right! / That's wrong! | Original Pon Curry quiz; the negative answer wins. |
 | `246C` | `0025/0051`: That's right! / Nope! | Original row-six ocean quiz; the affirmative answer wins. |
 | `246D` | `0025/0051`: That's right! / Nope! | Complete old-calendar reference; requires the actual English date preparer and retains affirmative success. |
+| `088A/088B/088C` | `0021/00C4`: You know it! / You're wrong! | Birthday acknowledgement at `0889` versus correction at `088A`; not a greeting. |
+| `2586` | `0127/0162/00C4`: Yeah! / Not really. / You're wrong! | Confidence, modesty, and an incorrect random sign remain distinct at `259D/259E/259F`. |
 
-Nineteen reference menus use the complete supplied GameCube answer pairing. `1FAE`
+Twenty-one reference menus use the complete supplied GameCube answer pairing. `1FAE`
 retains the original native moderate second answer using the independently
 corrected shared `0103` label, rather than importing stronger agreement.
-The twelve distinct destination label records remain unchanged by this batch.
+`088A/088C` use the complete birthday acknowledgement pair from `088B`, without
+changing shared greeting label `0041`. All four birthday mappings require the
+complete [birthday preparer](BIRTHDAY_FIELDS.md).
+The sixteen distinct destination label records remain unchanged by these mappings.
 Unmapped Circle/X shape-game messages retain their exact previous payloads
 and labels. Other contexts require their own approvals.
 The two [native-topic quiz originals](NATIVE_TOPIC_GAPS.md) preserve their
@@ -118,16 +132,16 @@ behaviour. Final wording and presentation review remain.
 `tests/test_contextual_choices.py` checks schema and duplicate rejection,
 complete native-menu parent binding, both payload directions, exact label
 dependencies, source/layout/menu/action mutations, missing-label withholding,
-all twenty retail-reference cases, unmapped shape games, the native moderate
+all twenty-four retail-reference cases, unmapped shape games, the native moderate
 answer, builder rejection without metadata, and all four original replies.
 Two native-original fixtures additionally check absent/colliding parents and
 independent canonical-command rejection. Topic tests cover both real original
 quizzes, complete original accounting, and missing-label draft withholding.
 
 `tools/contextual_choice_test_scenario.py` uses real cartridge text and labels.
-It checks forty-three unique messages, including all changed/new messages, sixteen
-connected replies, and an unchanged four-choice shape game. The twenty-two
-contextual menus supply 44 answer cases; the shape game supplies four more.
+It checks fifty-four unique messages, including all changed/new messages,
+twenty-two connected replies, and an unchanged four-choice shape game. The
+twenty-six contextual menus supply 53 answer cases; the shape game supplies four more.
 Actual native loaders, row setters, width calculation, determination, selected
 text insertion, and conditional handlers execute in one isolated checkpoint.
 Every selected answer is checked against its complete label, length, original

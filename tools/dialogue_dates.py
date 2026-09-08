@@ -5,6 +5,8 @@ import struct
 from aflib import sha256
 from npc_mail_show import OVERLAYS, source, verify, relocated as original_relocated
 from runtime_layout import MODULE_RAM, MODULE_VROM, LINKED_LIMIT, RESERVATION
+from birthday_fields import (changes as birthday_changes, verify_source as verify_birthday,
+                             audit_references, message_ids as birthday_message_ids)
 
 SPEC = OVERLAYS['ordinary']
 CALLS = ((0x8091D980, 0x800C4084, 'af_format_year'),
@@ -32,11 +34,12 @@ def changes(module):
     result += [(LEAP_HIGH, 0x3C068092, 0x3C060000 | (((literal+0x8000) >> 16) & 0xFFFF)),
                (LEAP_LOW, 0x24C61BD8, 0x24C60000 | (literal & 0xFFFF)),
                (LEAP_LENGTH, 0x24070005, 0x2407000A)]
-    return result
+    return result+birthday_changes(module)
 
 
 def patch(data, reloc, module):
     verify(SPEC, data, reloc)
+    verify_birthday(data,reloc)
     output = bytearray(data)
     for address, before, after in changes(module):
         at = address-SPEC.ram
@@ -78,6 +81,7 @@ def install(rom, replacements, additions, module):
     if literal < 0 or binary[literal:literal+10] != b'leap month':
         raise ValueError('Dialogue dates require the complete English leap-month literal')
     data, reloc = source(rom, 'ordinary')
+    birthday_audit = audit_references(rom)
     patched, new_reloc = patch(data, reloc, module)
     if any(vrom in replacements and replacements[vrom] != original
            for vrom, original in ((SPEC.vrom, data), (SPEC.relocation, reloc))):
@@ -88,7 +92,8 @@ def install(rom, replacements, additions, module):
             'relocation_sha256': sha256(new_reloc), 'relocations': SPEC.sections[4]-2,
             'changes': [{'ram': f'{a:08X}', 'before': f'{b:08X}', 'after': f'{c:08X}'}
                         for a, b, c in changes(module)],
-            'scope': 'Ordinary resident date preparation; native lunar conversion and saved dates unchanged'}
+            'birthday_audit':birthday_audit,
+            'scope': 'Ordinary free-date and birthday item preparation; native lunar conversion, RNG, and saved dates unchanged'}
 
 
 def requires_dialogue_dates(edit):
@@ -106,6 +111,8 @@ def validate_reference_requirements(record):
 
 def verify_requirements(edits, rom, replacements, additions, module, *, matches=None):
     requested = [requires_dialogue_dates(edit) for edit in edits]
+    if any(edit.get('id') in birthday_message_ids(rom) for edit in edits):
+        requested.append(True)
     # The reviewed identity remains authoritative even if candidate metadata is
     # omitted. Supplying a shorter requirements list cannot remove a dependency.
     for edit in edits:

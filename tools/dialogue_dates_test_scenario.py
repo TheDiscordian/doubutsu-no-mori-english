@@ -11,6 +11,8 @@ from npc_mail_show import source
 from runtime_module import module_command_info, verify_test_module
 from textbanks import Bank
 from textcodec import encode
+from birthday_fields import message_ids as birthday_message_ids
+from birthday_smoke import RNG_START, RNG_END, RNG_SHA256
 
 
 def scenario(rom, native, module, edits):
@@ -46,6 +48,17 @@ def scenario(rom, native, module, edits):
         messages[f'{number:04X}'] = entries[number].hex()
     request = {'source': data.hex(), 'relocation': reloc.hex(), 'module': module,
                'loader': loader.hex(), 'guards': guards, 'messages': messages, 'info': info}
+    birthday_messages = {}
+    for id in sorted(birthday_message_ids(native)):
+        number = int(id[8:],16)
+        if entries[number] != encode(by_id[id]['translation'],info):
+            raise ValueError('Native birthday cartridge text differs from the candidate')
+        birthday_messages[id[8:]] = entries[number].hex()
+    at = 0x1060+RNG_START-0x80025C60
+    rng = native[at:at+RNG_END-RNG_START]
+    if sha256(rng) != RNG_SHA256 or rom[at:at+len(rng)] != rng:
+        raise ValueError('Complete original birthday RNG changed')
+    request.update(birthday_messages=birthday_messages,birthday_rng=rng.hex())
     return [{'wait': 8}, {'save_state': True}, {'pause_game_thread': True},
             {'test_dialogue_dates': request}, {'load_state': True}, {'resume': True}, {'wait': 2},
             {'read': ['8019B000', 4], 'expect': '00000000'}]

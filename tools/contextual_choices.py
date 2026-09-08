@@ -25,7 +25,7 @@ def load_contextual_choices(matches, path=APPROVALS):
                 'id', 'source_sha256', 'candidate_sha256', 'display_sha256',
                 'native_command', 'display_command', 'offset', 'labels', 'evidence'}
         if (not isinstance(row, dict) or not required <= set(row) <= required | {'source_kind'}
-                or row.get('source_kind', 'gamecube') not in ('gamecube', 'native_original')
+                or row.get('source_kind', 'gamecube') not in ('gamecube', 'gamecube_native_menu', 'native_original')
                 or not isinstance(row.get('id'), str)
                 or not re.fullmatch(r'message:[0-9A-F]{4}', row['id'])
                 or row['id'] in result or not isinstance(row['evidence'], str)
@@ -42,6 +42,14 @@ def load_contextual_choices(matches, path=APPROVALS):
         if row.get('source_kind') == 'native_original':
             if row['id'] in matches:
                 raise ValueError('Original contextual choices cannot override a reference approval')
+        elif row.get('source_kind') == 'gamecube_native_menu':
+            # Some complete references already use the native label IDs. Bind
+            # that exact unadapted reference, not a fictitious menu conversion.
+            if (match.get('source_sha256') != row['source_sha256']
+                    or match.get('reference_id') != row['id']
+                    or match.get('reference_sha256') != row['candidate_sha256']
+                    or 'native_choices' in match):
+                raise ValueError('Contextual choices require the complete unchanged native-menu reference')
         elif (match.get('source_sha256') != row['source_sha256']
                 or match.get('native_choices', {}).get('native_command') != row['native_command']
                 or match.get('native_choices', {}).get('adapted_sha256') != row['candidate_sha256']):

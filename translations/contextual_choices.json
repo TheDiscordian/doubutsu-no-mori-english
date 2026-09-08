@@ -484,5 +484,100 @@
       }
     ],
     "evidence": "Knowledge of K.K. music versus no knowledge, preserving 23B5/23B6 rather than treating the second answer as cancellation. Only the exact menu bytes change after the complete canonical reference adaptation. Label identities and complete payloads are independently bound. See CONTEXTUAL_CHOICES.md."
+  },
+  {
+    "id": "message:088A",
+    "source_sha256": "6f76bfccec34b3639786a109a011799241385562f87f6470ef8baf357fbbddae",
+    "candidate_sha256": "be7a7e527adeb8b98408f4f22cf1df95cf8e5343b76efb301cc504bca299e325",
+    "display_sha256": "c0bbca9f5163b47c9f0680248c3db75fed66456618266ff8608d797d28cf6f32",
+    "native_command": "7F16004100C4",
+    "display_command": "7F16002100C4",
+    "offset": 183,
+    "labels": [
+      {
+        "id": "select:0021",
+        "source_sha256": "6c09cd9cfa6ba2e0a870a2745cb16ec0ad6d06cb348887cb4cace9528b73116b",
+        "encoded_sha256": "d009cbd4b86f2d549218aa1d518f53dc2e4cd815f2a4cad1c26312ee209ca8b4"
+      },
+      {
+        "id": "select:00C4",
+        "source_sha256": "b90a2c284cfc2b9f51413f2937c0a28d0ef72c70764157079d042434da894760",
+        "encoded_sha256": "1f21198ac632d1e4d9c67062b87bf5fb5e0ab267d47919c6da5eb50bdfee8384"
+      }
+    ],
+    "evidence": "Birthday confirmation preserves the native birthday-entry request, preparation request, full actual-sign/month/day fields, and 0889 acknowledgement versus 088A correction loop. Use You know it! for confirmation, not the shared greeting Nice to meet ya. Only the exact menu span changes; complete payloads and destination labels remain independently bound.",
+    "source_kind": "gamecube_native_menu"
+  },
+  {
+    "id": "message:088B",
+    "source_sha256": "273e3d7661ccc3b3978de725ea7fec1dc52f74d1834c03a10e6b9980279a33b9",
+    "candidate_sha256": "1bfb2f30086f344da1842983910d1dd8520e569edafe55436fc4eee0fd5a5ccf",
+    "display_sha256": "5bf7bb840146df9ec4f28044134896ba610f79201e88b5d5f3e3db806d1cdfb5",
+    "native_command": "7F16004100C4",
+    "display_command": "7F16002100C4",
+    "offset": 228,
+    "labels": [
+      {
+        "id": "select:0021",
+        "source_sha256": "6c09cd9cfa6ba2e0a870a2745cb16ec0ad6d06cb348887cb4cace9528b73116b",
+        "encoded_sha256": "d009cbd4b86f2d549218aa1d518f53dc2e4cd815f2a4cad1c26312ee209ca8b4"
+      },
+      {
+        "id": "select:00C4",
+        "source_sha256": "b90a2c284cfc2b9f51413f2937c0a28d0ef72c70764157079d042434da894760",
+        "encoded_sha256": "1f21198ac632d1e4d9c67062b87bf5fb5e0ab267d47919c6da5eb50bdfee8384"
+      }
+    ],
+    "evidence": "Birthday confirmation preserves the native birthday-entry request, preparation request, full actual-sign/month/day fields, and 0889 acknowledgement versus 088A correction loop. Use You know it! for confirmation, not the shared greeting Nice to meet ya. Only the exact menu span changes; complete payloads and destination labels remain independently bound."
+  },
+  {
+    "id": "message:2586",
+    "source_sha256": "3a15bd727eeac5316fcf7c978040ffd519b2545ea9617f7cf0dbf6164f2b9a6c",
+    "candidate_sha256": "e00bb4f072b88f7a86d5246116af043c96af02109cb49cbc315d52c604d2d220",
+    "display_sha256": "2220ab48310c915b83a474821bfc9ae349103e60743fb69c8f726f4953ddbc2e",
+    "native_command": "7F170127012800C4",
+    "display_command": "7F170127016200C4",
+    "offset": 153,
+    "labels": [
+      {
+        "id": "select:0127",
+        "source_sha256": "a451a7c20b98af93ff157c4b1bc6c506276ab4722d068b316098da364c04e856",
+        "encoded_sha256": "67f9f733fd7fadcc1d599365bb0784710bfe275ad9e94f6e919b166adf6b208e"
+      },
+      {
+        "id": "select:0162",
+        "source_sha256": "544dc9a6f98d5892f26047bef32a7503cf49f59315e1be116b6b8e8909aab6ae",
+        "encoded_sha256": "0c90431c216ee42a87c63a63002e13af67e94cb3301c731c510a4fa2b57ce3bd"
+      },
+      {
+        "id": "select:00C4",
+        "source_sha256": "b90a2c284cfc2b9f51413f2937c0a28d0ef72c70764157079d042434da894760",
+        "encoded_sha256": "1f21198ac632d1e4d9c67062b87bf5fb5e0ab267d47919c6da5eb50bdfee8384"
+      }
+    ],
+    "evidence": "Birthday-sign conversation preserves the deliberately random Western sign in field 32, not the actual sign in field 33. Yeah! retains confident reply 259D; Not really. retains modest reply 259E; You're wrong! retains incorrect-sign reply 259F. Native friendship requests 005/003/069 remain in those replies. Only the exact menu span changes; complete payloads and destination labels remain independently bound."
+  },
+  {
+    "id": "message:088C",
+    "source_kind": "gamecube_native_menu",
+    "source_sha256": "5264ff4fb25040f02a9ca02d2c27a8a7882fa6bc317efe2bf7d068bf3dfbe279",
+    "candidate_sha256": "92647ebe74c8fb84716d36d89ce968a25f47af549d944b72b969a4d9bb51a326",
+    "display_sha256": "2415d9ae68c73fe64611cddd6f7b8e8328699d5d12b1ab31bf768ef4eef7e07a",
+    "native_command": "7F16004100C4",
+    "display_command": "7F16002100C4",
+    "offset": 258,
+    "evidence": "Birthday entry after declining a present retains the complete supplied English teasing, invitation, birthday-entry and preparation requests, actual sign/month/day fields, and acknowledgement 0889 versus correction 088A. Display You know it! instead of the shared greeting Nice to meet ya.; do not rename global 0041 or alter any native action, reference wording, line, page, or pause.",
+    "labels": [
+      {
+        "id": "select:0021",
+        "source_sha256": "6c09cd9cfa6ba2e0a870a2745cb16ec0ad6d06cb348887cb4cace9528b73116b",
+        "encoded_sha256": "d009cbd4b86f2d549218aa1d518f53dc2e4cd815f2a4cad1c26312ee209ca8b4"
+      },
+      {
+        "id": "select:00C4",
+        "source_sha256": "b90a2c284cfc2b9f51413f2937c0a28d0ef72c70764157079d042434da894760",
+        "encoded_sha256": "1f21198ac632d1e4d9c67062b87bf5fb5e0ab267d47919c6da5eb50bdfee8384"
+      }
+    ]
   }
 ]

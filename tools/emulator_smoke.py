@@ -646,8 +646,8 @@ def main():
     args = parser.parse_args()
     if args.seed_save and args.seed_state:
         parser.error("choose cartridge saves or a matching-ROM state, not both")
-    if not 1 <= args.seconds <= 600:
-        parser.error("seconds must be between 1 and 600")
+    if not 1 <= args.seconds <= 1200:
+        parser.error("seconds must be between 1 and 1200")
     if args.output.exists():
         parser.error("output must be a fresh directory to isolate saves")
     out = args.output.resolve()

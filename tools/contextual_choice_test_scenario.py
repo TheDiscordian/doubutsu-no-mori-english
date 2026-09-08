@@ -16,8 +16,8 @@ from runtime_module import MODULE_VROM, module_command_info
 from textbanks import Bank, banks
 from textcodec import encode, tokenize
 
-CONNECTED = '1378 1379 186D 187A 1872 1CE2 26D0 26D3 23B5 23B6 0B64 0B65 1C94 1C97 2472 2476'.split()
-DRAFT_IDS = ['message:'+n for n in ('186E','187B','1880','1CE3')]
+CONNECTED = '1378 1379 186D 187A 1872 1CE2 26D0 26D3 23B5 23B6 0B64 0B65 1C94 1C97 2472 2476 0889 259D 259E 259F 1C70 1C71'.split()
+DRAFT_IDS = ['message:'+n for n in ('186E','187B','1880','1CE3','1C6F')]
 SHAPE_ID = 'message:2C8F'
 
 
