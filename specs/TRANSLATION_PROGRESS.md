@@ -17,6 +17,12 @@ name-entry prompts, keyboard labels, 39 embedded inventory action-label records,
 thirteen category/present/question records, and eight inventory mail/quest
 description records (including the canonical Museum spelling).
 The two embedded festival-stall cancellation labels also enter the shared total.
+Eight embedded map records also enter the total, including landmark labels,
+the post-office continuation, and the vacant-house label. Their source weights
+remain in older builds. Credit requires the complete installed English map
+label image, source-bound GC wording/line positions, retained resident-name
+cache, drawing calls, relocation, and allocation. Splitting English into two
+lines does not create extra original IDs or duplicate the bank-name resources.
 They keep their original weights in older builds; English credit requires the
 installed full choice routine, appended labels, allocation metadata, and resident
 choice/name dependencies. Connecting stall item names does not multiply their

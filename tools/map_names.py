@@ -106,6 +106,9 @@ def relocation_data(native, inventory, size):
 
 
 def validate(native, data, reloc, report, module):
+    if report.get('labels'):
+        from map_labels import validate as validate_labels
+        return validate_labels(native, data, reloc, report, module)
     if not APPROVED: raise ValueError('Map image needs independent approval')
     if (len(data) != APPROVED['bytes'] or report.get('symbols') != APPROVED['symbols']
             or report.get('bytes') != len(data) or report.get('imports') != IMPORTS
@@ -121,13 +124,15 @@ def validate(native, data, reloc, report, module):
     return Image(RAM, len(data), struct.unpack_from('>5I', reloc))
 
 
-def metadata():
+def metadata(size=None):
+    if size is None: size = APPROVED['bytes']
     value = bytearray(OWNER_ROW)
-    struct.pack_into('>4I', value, 0, NEW_VROM, NEW_VROM+APPROVED['bytes'], RAM, RAM+APPROVED['bytes'])
+    struct.pack_into('>4I', value, 0, NEW_VROM, NEW_VROM+size, RAM, RAM+size)
     return bytes(value)
 
 
-def allocation(tag_size=None):
+def allocation(tag_size=None, size=None):
+    if size is None: size = APPROVED['bytes']
     from inventory_english import allocation as inventory
     from catalogue_names import START as catalog_size
     from notice_overlay import pool_sizes
@@ -136,9 +141,9 @@ def allocation(tag_size=None):
     # conservatively by the catalogue branch, retaining even its unused tag and
     # inventory allowances and 16-KiB miscellaneous reserve.
     required = (pool_sizes(True)['alternative']+current['tag_growth']
-                -align(catalog_size)+align(APPROVED['bytes']))
+                -align(catalog_size)+align(size))
     if required > current['combined_pool']: raise ValueError('Map exceeds the installed submenu pool')
-    return {'map_growth': align(APPROVED['bytes'])-align(START), 'conservative_required': required,
+    return {'map_growth': align(size)-align(START), 'conservative_required': required,
             'combined_pool': current['combined_pool'], 'extra_reservation': 0}
 
 
@@ -148,7 +153,6 @@ def verify_shared_parts(built, native, module, report=None):
     from display_names import VROM as names_vrom
     from runtime_module import MODULE_VROM
     inventory = verify_inventory(built, native, module)
-    required = allocation(inventory['resident_bytes'])
     files, originals = by_vrom(built), by_vrom(native)
     code, native_code = files[CODE_VROM].extract(built), originals[CODE_VROM].extract(native)
     if (NEW_VROM not in files or NEW_RELOC not in files or VROM in files or RELOC in files
@@ -159,16 +163,22 @@ def verify_shared_parts(built, native, module, report=None):
             or code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM] != native_code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM]):
         raise ValueError('Missing complete map DMA pair or display-name resource')
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOC].extract(built)
+    required = allocation(inventory['resident_bytes'], len(data))
     if report is None:
-        report = {'overlay': {**APPROVED, 'sources': source_hashes(), 'imports': IMPORTS,
-                  'overlay_sha256': sha256(data), 'elf_relocations': APPROVED['elf_relocations']}, 'allocation': required}
+        if len(data) == APPROVED['bytes']:
+            overlay = {**APPROVED, 'sources': source_hashes(), 'imports': IMPORTS,
+                       'overlay_sha256': sha256(data), 'elf_relocations': APPROVED['elf_relocations']}
+        else:
+            from map_labels import installed_report
+            overlay = installed_report(data)
+        report = {'overlay': overlay, 'allocation': required}
     elif (report.get('complete_name_slots') != 15 or report.get('new_saved_bytes') != 0
             or report.get('vrom') != f'{NEW_VROM:08X}' or report.get('relocation_vrom') != f'{NEW_RELOC:08X}'):
         raise ValueError('Changed map name application evidence')
     validate(native, data, reloc, report['overlay'], module)
-    if files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata() or report.get('allocation') != required:
+    if files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata(len(data)) or report.get('allocation') != required:
         raise ValueError('Incomplete map allocation or ownership')
-    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata()}
+    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata(len(data))}
 
 
 def install(native, replacements, additions, relocations, module, directory, notice_report):
@@ -185,9 +195,9 @@ def install(native, replacements, additions, relocations, module, directory, not
     validate(native, data, reloc, report, module)
     owner = bytearray(replacements.get(OWNER, files[OWNER].extract(native)))
     if owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW: raise ValueError('Changed map owner row')
-    owner[OWNER_AT:OWNER_AT+32] = metadata()
+    owner[OWNER_AT:OWNER_AT+32] = metadata(len(data))
     if TAG not in replacements: raise ValueError('Map requires the complete inventory image')
-    result = {'overlay': report, 'allocation': allocation(len(replacements[TAG])), 'vrom': f'{NEW_VROM:08X}',
+    result = {'overlay': report, 'allocation': allocation(len(replacements[TAG]), len(data)), 'vrom': f'{NEW_VROM:08X}',
               'relocation_vrom': f'{NEW_RELOC:08X}', 'complete_name_slots': 15, 'new_saved_bytes': 0,
               'status': 'Complete map villager names installed; ordinary gameplay acceptance pending'}
     changes = {VROM: data, RELOC: reloc, OWNER: bytes(owner)}; moves = {VROM: NEW_VROM, RELOC: NEW_RELOC}

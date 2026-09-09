@@ -127,7 +127,7 @@ class ActorNameTests(unittest.TestCase):
         report = json.loads((BUILD/'build.json').read_text())
         ledger = measure(self.native, (BUILD/'animal-forest-halfwidth.z64').read_bytes(), report)
         summary = ledger.summary()
-        self.assertEqual(summary['total_source_characters'], 751256)
+        self.assertEqual(summary['total_source_characters'], 751284)
         self.assertEqual(summary['replaced_source_characters'], 720661)
         self.assertGreater(summary['pending_application_records'], 0)
         self.assertNotIn('Shared choices', str(pending_name_consumers(report)))

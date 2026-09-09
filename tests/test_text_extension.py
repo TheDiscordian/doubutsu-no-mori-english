@@ -122,7 +122,7 @@ class TextExtensionTests(unittest.TestCase):
         ledger = measure(self.native, built, report)
         result = ledger.summary()
         self.assertEqual(result['replaced_source_characters'], 720661)
-        self.assertEqual(result['total_source_characters'], 751256)
+        self.assertEqual(result['total_source_characters'], 751284)
         self.assertGreater(result['pending_application_records'], 0)
         # No invented source records or duplicate weight for field connections.
         self.assertFalse(any(key.startswith('text_extension:') for key in ledger.rows))

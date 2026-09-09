@@ -38,11 +38,15 @@ helpers and zero-initialized cache. Only four instructions in the native prefix
 change. Original relocation entries retain their targets; new local calls and
 addresses receive explicit relocations. Resident imports remain fixed.
 
-The 26,544-byte image moves to VROM `03B00000`, with adjacent DMA relocation
+The base 26,544-byte image moves to VROM `03B00000`, with adjacent DMA relocation
 entry at `03B10000`. The original submenu owner's map row at offset `2AB0`
 retains its constructor/destructor/setup pointers and supplies the new image
 endpoints. The aligned map allocation grows by 768 bytes. No permanent module,
 main-code allocation, save field, or submenu pool reservation changes.
+The [English landmark variant](MAP_LABELS.md) appends its bounded label drawer
+and text without moving or changing the name cache. Profile verification selects
+the exact approved image and owner endpoints; older name-only images remain
+independently verifiable.
 
 The native map dependency flag is zero (`flg_table_916`, program five); the map
 does not request inventory/tag/hand/editor children. `mSM_set_other_seg` and

@@ -377,6 +377,8 @@ def measure(native, built, report):
 
     from stall_choices import measure_labels as measure_stall_labels
     measure_stall_labels(ledger, native, built, report)
+    from map_labels import measure_labels as measure_map_labels
+    measure_map_labels(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

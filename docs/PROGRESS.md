@@ -25,13 +25,23 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [English map labels](checkpoints/MAP_LABELS.md) install the complete GC
+landmark words, reference one/two-line positions, and vacant-house label while
+retaining full villager names and every prior translation. All six focused
+checks, three base-map regressions, and twelve counter tests pass; independent
+builds agree. The current combined ROM/UPS is `build/map-labels-pilot`.
+The eight embedded source records join combined accounting once, with installed
+reader verification. Continue the fishing-record display reader, remaining
+identity/catchphrase/item consumers, residual text/letters, and accents.
+Ordinary gameplay and save/restart remain in the combined v0 smoke.
+
 The [map/opening-guide integration](checkpoints/MAP_GUIDE_NAMES.md) supplies complete
 map villager names and the opening guide's coloured name field without widening
 packed map records or saved identities. All twelve focused implementation,
 assembly, relocation, cartridge, and accounting checks pass; independent map
 builds agree. The map fits the existing submenu pool, and the guide actor adds
-112 bytes. The current combined ROM/UPS is `build/guide-name-pilot`.
-Continue the fishing-record display reader, embedded map labels, remaining
+112 bytes. Its retained ROM/UPS is `build/guide-name-pilot`.
+Continue the fishing-record display reader, remaining
 identity/catchphrase/item consumers, residual text/letters, and accents.
 Ordinary interaction and save/restart remain in the combined v0 smoke.
 The checkpoint records one unresolved legacy regression-fixture rejection;

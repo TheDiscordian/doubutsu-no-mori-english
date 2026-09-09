@@ -15,15 +15,23 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [map-label checkpoint](checkpoints/MAP_LABELS.md) supplies complete English
+landmarks and the vacant-house label with exact GC line placement. The current
+combined build is `build/map-labels-pilot`; focused checks and counter integration
+pass. Continue the fishing-event winner-name display using exact saved-name
+aliases, then the remaining identity/catchphrase/item readers, residual
+text/letters, accents, and combined v0 smoke. Map labels and its full-name cache
+are implemented; ordinary gameplay remains unverified rather than another
+pre-implementation test matrix.
+
 The [map/guide checkpoint](checkpoints/MAP_GUIDE_NAMES.md) supplies complete
 fifteen-position map villager-name storage/drawing and the opening guide's
-coloured name field. The current combined build is `build/guide-name-pilot`.
+coloured name field. Its retained build is `build/guide-name-pilot`.
 All twelve focused checks pass. Keep the unresolved obsolete item test fixture
 separate from observed game defects; its failed check is not a pass.
 Next, connect the fishing record's display setter at `80A9031C` using the
 existing exact saved-name aliases, preserving the six-byte saved writer and
-real player winners. Apply embedded map landmark/empty-house labels with GC
-wording and line intent, then continue the remaining identity/catchphrase/item
+real player winners. Continue the remaining identity/catchphrase/item
 readers, residual text/letters, and accents. Map/guide gameplay remains in the
 combined v0 smoke, not another per-record native matrix.
 
