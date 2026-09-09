@@ -96,3 +96,9 @@ follow-up. Continue remaining noticeboard/general/name consumers, review,
 normal gameplay/save/travel acceptance, title-first artwork, GameCube-style
 keyboard, and patch-only release preparation. This checkpoint is not full
 project completion or hardware certification.
+
+The next [noticeboard inventory](../../specs/NOTICEBOARD_TEXT.md) identifies
+the native fifteen-slot layout, four-post initializer, append/shift writer,
+automatic-post call, and reference field families. Its bodies require their
+own storage/reader integration and native-event matching; they are not credited
+merely because the mail catalogue contains English references.
