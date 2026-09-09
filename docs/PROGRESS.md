@@ -25,13 +25,22 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [house-sign integration](checkpoints/HOUSE_NAME.md) supplies complete English
+villager names in existing eight-byte stack storage, including a blank fallback
+when no house matches. Actor/save layouts, messages, colours, and timing remain.
+All six focused checks and twelve counter tests pass, including independent MIPS
+assembly, relocation, retained prior payloads, and UPS reconstruction. The current
+combined ROM/UPS is `build/house-name-pilot`. Continue letter-editor recipient
+names, remaining item readers, borrowed-catchphrase ambiguity, residual
+text/letters, and accents, then the bounded combined v0 smoke.
+
 The [conversation-name integration](checkpoints/CONVERSATION_NAMES.md) supplies
 complete names in three request/conversation fields and the ordinary resident's
 other-villager field, preserving saved identities and all prior translations.
 All six focused checks, the selected secret-actor regression, twelve counter
 tests, and independent builds pass. The silent native startup/bridge check passes
 twenty-six calls and thirty-six assertions with restored guards/checkpoint and
-blank isolated saves. The current combined ROM/UPS is
+blank isolated saves. Its retained combined ROM/UPS is
 `build/conversation-names-pilot`. Continue the villager house-sign reader,
 remaining item readers, borrowed-catchphrase ambiguity, residual text/letters,
 and accents. Ordinary interaction and save/restart remain in combined v0 smoke.

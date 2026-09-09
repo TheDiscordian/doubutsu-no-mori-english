@@ -45,6 +45,8 @@ def pending_name_consumers(report):
         pending['display_names'] += '; saved fishing-winner name is connected'
     if report.get('conversation_names'):
         pending['display_names'] += '; request and ordinary-conversation identity names are connected'
+    if report.get('house_name'):
+        pending['display_names'] += '; house-sign names are connected'
     return pending
 
 
@@ -137,6 +139,9 @@ def measure(native, built, report):
         verify_installation(built, native, report)
     if report.get('fishing_name'):
         from fishing_name import verify_installation
+        verify_installation(built, native, report)
+    if report.get('house_name'):
+        from house_name import verify_installation
         verify_installation(built, native, report)
     pending_names = pending_name_consumers(report)
     info = module_command_info(native)

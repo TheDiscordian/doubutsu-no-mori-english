@@ -7,8 +7,9 @@ villager and special-character names. The resident module integrates these at
 two nameplate call sites, the main-message talk-name insertion, and read-only
 NPC recipient names in letter headers. The bounded shared-choice extension and
 the [festival/reserve actor integration](ACTOR_DISPLAY_NAMES.md),
-[map cache](MAP_NAMES.md), and [opening-guide adapter](GUIDE_NAME.md) connect further
-display-only callers. These changes
+[map cache](MAP_NAMES.md), [opening-guide adapter](GUIDE_NAME.md),
+[conversation fields](CONVERSATION_NAMES.md), [fishing record](FISHING_NAME.md),
+and [house signs](HOUSE_NAME.md) connect further display-only callers. These changes
 remain experimental pending broader conversation, save, and hardware validation.
 Six-byte saved names and identity structures remain unchanged. Other identity-
 based name-loader callers and editors retain their own integration requirements.
@@ -101,5 +102,6 @@ Test every villager, every special actor mapping, unsupported IDs, nulls,
 resource disabling, malformed headers, aligned DMA, and adjacent stack guards.
 Native tests must exercise client-name setup, talk-name insertion and exact
 message limits, and the draw consumer. Normal conversations must show full names
-and retain page/timing behaviour. Other dynamic-name fields, house signs, mail
-editors, and saved-name consumers remain separate work.
+and retain page/timing behaviour. Mail-editor recipient headers retain the native
+six-byte display and require integration; saved-name writers retain their native
+capacity. The installed full-name letter renderer currently handles read mode.

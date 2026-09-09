@@ -30,8 +30,10 @@ The adapter first obtains the original six-byte name and pads two spaces. Only
 a non-null identity with ID `E000..E0D7` may replace it using the complete
 eight-byte English resource. Failed loads and unsupported identities retain
 that fresh padded native fallback; null destinations receive no writes.
-It is used only by the four verified display temporaries, never by saved-name
-writers. Main-dialogue field storage and colour duration already support eight.
+The conversation integration uses it only for these four verified display
+temporaries; the separate house-sign integration uses its exclusive eight-byte
+display destination. Saved-name writers never use it. Main-dialogue field
+storage and colour duration already support eight.
 
 The variant has its own pinned compiled profile and loader. Older field-only and
 choice-only profiles remain valid. All four call patches use a fixed main-code

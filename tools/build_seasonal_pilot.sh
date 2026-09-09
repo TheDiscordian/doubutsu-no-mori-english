@@ -62,6 +62,10 @@ conversation_name_args=()
 if [[ "${AF_CONVERSATION_NAMES:-0}" == 1 ]]; then
   conversation_name_args=(--english-conversation-names)
 fi
+house_name_args=()
+if [[ "${AF_HOUSE_NAME:-0}" == 1 ]]; then
+  house_name_args=(--english-house-name)
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -98,4 +102,5 @@ exec python3 tools/build.py \
   "${guide_name_args[@]}" \
   "${fishing_name_args[@]}" \
   "${conversation_name_args[@]}" \
+  "${house_name_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

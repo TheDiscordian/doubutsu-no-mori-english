@@ -229,6 +229,7 @@ def main():
     parser.add_argument('--english-guide-name', action='store_true', help='Complete opening-guide dialogue name; requires display names and persistent text fields')
     parser.add_argument('--english-fishing-name', type=Path, help='Compiled save-preserving fishing winner name reader')
     parser.add_argument('--english-conversation-names', action='store_true', help='Four complete identity-based dialogue names; requires the identity text-extension variant')
+    parser.add_argument('--english-house-name', action='store_true', help='Complete house-sign name with initialized eight-byte display storage')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -340,6 +341,8 @@ def main():
         parser.error('--english-fishing-name requires --english-text-extension and --display-names')
     if args.english_conversation_names and not (args.english_text_extension and args.display_names and args.english_secret_letters):
         parser.error('--english-conversation-names requires --english-text-extension, --display-names, and --english-secret-letters')
+    if args.english_house_name and not (args.english_text_extension and args.display_names):
+        parser.error('--english-house-name requires --english-text-extension and --display-names')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -511,6 +514,9 @@ def main():
     if args.english_conversation_names:
         from conversation_names import install as install_conversation_names
         report['conversation_names'] = install_conversation_names(rom, replacements, report)
+    if args.english_house_name:
+        from house_name import install as install_house_name
+        report['house_name'] = install_house_name(rom, replacements, additions, report)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -545,6 +551,9 @@ def main():
         verify_installation(output, rom, report)
     if args.english_fishing_name:
         from fishing_name import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_house_name:
+        from house_name import verify_installation
         verify_installation(output, rom, report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)

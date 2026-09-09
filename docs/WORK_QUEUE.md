@@ -15,9 +15,18 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [house-sign checkpoint](checkpoints/HOUSE_NAME.md) supplies complete English
+villager names with initialized eight-byte temporaries and no allocation or save
+growth. Its complete build is `build/house-name-pilot`; all six focused checks and
+twelve counter tests pass. Continue the letter-editor recipient header and cursor
+geometry: the existing full-name header renderer is read-mode-only. Keep the
+native six-byte mail-identity and fishing-record writers intact. Remaining item
+readers, borrowed-catchphrase ambiguity, residual text/letters, accents, and the
+combined v0 smoke remain in scope.
+
 The [conversation-name checkpoint](checkpoints/CONVERSATION_NAMES.md) connects
 four complete identity-based name fields through the guarded startup bridge.
-The current combined build is `build/conversation-names-pilot`; focused checks,
+The retained combined build is `build/conversation-names-pilot`; focused checks,
 independent builds, and the bounded silent native bridge check pass. Continue
 the house-sign name reader, remaining item readers, borrowed-catchphrase
 ambiguity, residual text/letters, accents, and combined v0 smoke. Preserve all
