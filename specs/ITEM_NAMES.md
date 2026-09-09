@@ -79,6 +79,13 @@ keeps 63 complete names in owned transient storage; its item-name drawer reads
 the full copies without per-frame DMA. Neither integration globally widens the
 legacy loader or changes saved item IDs.
 
+The [shop/Redd preparers](SHOP_ITEM_NAMES.md) connect six native actors and
+eighteen helper calls to the complete resident item fields. The
+[player capture/dig preparers](PLAYER_ITEM_NAMES.md) connect all three original
+player item-name calls through a zero-safe main-code bridge. Their original
+actor/stack fields are not widened. Other actor, free-string, and dynamic-choice
+consumers remain to be connected; these routes alone do not complete every name.
+
 ## Acceptance
 
 Tests reject stale references, wrong legacy donors, differing rotation names,

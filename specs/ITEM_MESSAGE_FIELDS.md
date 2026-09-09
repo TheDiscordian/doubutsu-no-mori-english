@@ -46,6 +46,15 @@ Item zero remains a no-op in this convenience wrapper, matching its native
 behaviour. This integration covers this wrapper's five identified callers;
 the other direct item-name loaders still require their own destination audit.
 
+The [shop integration](SHOP_ITEM_NAMES.md) and
+[player integration](PLAYER_ITEM_NAMES.md) add zero-safe adapters for six
+shop/Redd actors and three player item-name preparations. They preserve the
+quest wrapper's original zero-item no-op contract by handling empty-item clearing
+in their adapters. With player integration enabled, the inactive native wrapper
+tail `800BB6A8..800BB6F0` is occupied by the shared zero-safe bridge; it is not
+available for another allocation. The live eight-byte quest-wrapper entry remains
+unchanged. Other free-string and dynamic-choice consumers remain unfinished.
+
 ## Validation
 
 Require source hashes and external-interior-reference checks for all replaced

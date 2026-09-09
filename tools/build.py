@@ -53,7 +53,7 @@ RELOCATED_BANKS = {
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
                        extended_font=None, extended_items=None, english_fortunes=False, english_resetti_replies=False,
                        english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
-                       english_credits=False, english_gyroid_default=False):
+                       english_credits=False, english_gyroid_default=False, english_town_suffix=False):
     if english_gyroid_default and not (runtime_module and english_runtime):
         raise ValueError('Gyroid default requires the complete English runtime')
     if english_fortunes and not runtime_module:
@@ -84,6 +84,9 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             install_extended_items(rom,planned_additions,planned_module,extended_items)
         planned_capability(rom,replacements,planned_additions,planned_module,extended_font)
     edits = json.loads(path.read_text()) if path else []
+    if english_town_suffix:
+        from town_suffix import with_candidate
+        edits = with_candidate(rom,edits)
     from gyroid_default import permits as gyroid_permits, feature_matches
     gyroid_approvals = gyroid_permits(rom, edits, info, enabled=bool(english_gyroid_default))
     if defer_shared_npc_words:
@@ -216,6 +219,9 @@ def main():
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
+    parser.add_argument('--english-town-suffix', action='store_true', help='Use the complete empty English town suffix without changing saved names')
+    parser.add_argument('--english-shop-item-names', action='store_true', help='Complete item names in the five shopkeeper variants and Redd; requires resident runtime and extended items')
+    parser.add_argument('--english-player-item-names', action='store_true', help='Complete names in insect, fish, and dig messages; requires resident runtime and extended items')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -306,6 +312,10 @@ def main():
         parser.error('--english-resident-words requires --runtime-module')
     if args.english_shared_npc_words and not (args.english_resident_words and args.runtime_module and args.npc_mail_generation):
         parser.error('--english-shared-npc-words requires --english-resident-words, --runtime-module, and --npc-mail-generation')
+    if args.english_shop_item_names and not (args.runtime_module and args.english_runtime and args.extended_items):
+        parser.error('--english-shop-item-names requires --runtime-module, --english-runtime, and --extended-items')
+    if args.english_player_item_names and not (args.runtime_module and args.english_runtime and args.extended_items):
+        parser.error('--english-player-item-names requires --runtime-module, --english-runtime, and --extended-items')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -338,7 +348,7 @@ def main():
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
         defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits,
-        english_gyroid_default=bool(args.english_gyroid_default))
+        english_gyroid_default=bool(args.english_gyroid_default), english_town_suffix=args.english_town_suffix)
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
@@ -445,7 +455,16 @@ def main():
         from catalogue_names import install as install_catalogue
         report['catalogue_names'] = install_catalogue(rom, replacements, additions, relocations,
             report.get('runtime_module'), args.english_catalogue, report['noticeboard'])
+    if args.english_shop_item_names:
+        from shop_item_names import install as install_shop_item_names
+        report['shop_item_names'] = install_shop_item_names(rom, replacements, additions, report['runtime_module'])
+    if args.english_player_item_names:
+        from player_item_names import install as install_player_item_names
+        report['player_item_names'] = install_player_item_names(rom, replacements, additions, report['runtime_module'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
+    if args.english_town_suffix:
+        from town_suffix import planned
+        report['town_suffix'] = planned(rom, replacements)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():
@@ -453,6 +472,15 @@ def main():
             raise ValueError("Reinserted file does not match replacement")
     if n64_checksum(output) != struct.unpack_from(">2I", output, 16):
         raise ValueError("Output checksum failure")
+    if args.english_town_suffix:
+        from town_suffix import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_shop_item_names:
+        from shop_item_names import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_player_item_names:
+        from player_item_names import verify_installation
+        verify_installation(output, rom, report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)
     patch = make_ups(rom, output)

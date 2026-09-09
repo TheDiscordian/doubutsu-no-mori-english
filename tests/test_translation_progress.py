@@ -32,6 +32,11 @@ class TranslationProgressTests(unittest.TestCase):
         self.ledger.credit('mail:0000', encode('Aあ', self.info), 'mail', mail=True)
         self.assertEqual(self.ledger.summary()['percent'], 0)
 
+    def test_unapproved_empty_translation_gets_no_automatic_credit(self):
+        self.add('string:0000', 'あい')
+        self.ledger.credit('string:0000', b'', 'native_bank')
+        self.assertEqual(self.ledger.summary()['percent'], 0)
+
     def test_partially_connected_resources_do_not_count_as_applied(self):
         self.add('string:0000', 'あいうえ')
         for route in ('display_names', 'catchphrases'):

@@ -65,6 +65,9 @@ This deliberately remains a quick approximation, not an exhaustive new audit.
 Other embedded interface strings and text-bearing artwork still need inventory
 expansion. Unknown glyph/undecodable source categories are reported, not silently
 declared translated. Empty replacement text receives no automatic credit.
+The town-name suffix is an explicit exception: its exact empty English reference
+and unchanged native constructors must pass `town_suffix.verify_installation`
+before original `string:01E4` receives credit for the intentional omission.
 English application is not a judgement of wording quality, gameplay, testing,
 polish, or hardware readiness. Those do not add to or subtract from this
 text-replacement percentage. A missing connection that leaves Japanese text in

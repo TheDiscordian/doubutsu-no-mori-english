@@ -18,6 +18,18 @@ catalogue_args=()
 if [[ -n "${AF_CATALOGUE_NAMES:-}" ]]; then
   catalogue_args=(--english-catalogue "$AF_CATALOGUE_NAMES")
 fi
+town_suffix_args=()
+if [[ "${AF_ENGLISH_TOWN_SUFFIX:-0}" == 1 ]]; then
+  town_suffix_args=(--english-town-suffix)
+fi
+shop_item_args=()
+if [[ "${AF_ENGLISH_SHOP_ITEMS:-0}" == 1 ]]; then
+  shop_item_args=(--english-shop-item-names)
+fi
+player_item_args=()
+if [[ "${AF_ENGLISH_PLAYER_ITEMS:-0}" == 1 ]]; then
+  player_item_args=(--english-player-item-names)
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -43,4 +55,7 @@ exec python3 tools/build.py \
   "${hboard_args[@]}" \
   "${inventory_args[@]}" \
   "${catalogue_args[@]}" \
+  "${town_suffix_args[@]}" \
+  "${shop_item_args[@]}" \
+  "${player_item_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

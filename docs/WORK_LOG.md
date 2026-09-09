@@ -7502,3 +7502,65 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   hardware acceptance do not change application credit. Other embedded text and
   artwork remain explicit inventory gaps. Preserve the unfinished town-suffix
   implementation separately; resume base translation work after this answer.
+
+### 2026-09-09 — Apply town, shop, and player name consumers
+
+- Classified the preceding counter-correction turn as progress: `46fa606` is
+  committed and pushed. Resumed the unfinished town-suffix work and then
+  implemented two connected groups of full-name readers instead of expanding
+  the gameplay test matrix or repeating a progress percentage.
+- Installed the exact empty English town suffix `string:01E4`. Source, complete
+  GameCube reference, and all three native town-name constructors are guarded.
+  Saved six-byte names, native code, and every other string remain unchanged.
+  The counter credits only this explicitly verified grammatical omission;
+  arbitrary blank entries remain uncredited. All four focused town checks and
+  twelve fast counter tests pass. The initial test import named a nonexistent
+  module; corrected it to the existing `aflib` implementation and reran once.
+- Connected all five Nook shopkeeper variants and Redd's in-shop actor using
+  their identical original helper spans. Eighteen existing helper calls now
+  use complete sixteen-byte resident item fields. Explicit item-zero handling
+  clears the selected field; blindly tail-calling the quest wrapper would have
+  left stale text for zero. Actor dimensions, relocation records, native prices,
+  quantity logic, and messages remain unchanged. No new allocation or saved
+  bytes are introduced.
+- All four final six-actor shop checks pass, including source/dependency
+  rejection without partial writes, argument and delay-slot decoding, relocation
+  at two bases, actual cartridge retention, and UPS reconstruction. The first
+  cartridge comparison omitted the self-containing DMA file from the expected
+  change set. Inspected the differences: only physical-address pairs change
+  when the actors are appended. Added an explicit normalised-table comparison
+  requiring unchanged virtual IDs, sizes, and all other table bytes, then
+  reran successfully. Five existing resident item-field regressions pass.
+- Connected the player's three original item-name preparations for special
+  insect capture, special fish capture, and dug-up item text. They preserve the
+  native item expressions, field zero, surrounding branches, wording, pauses,
+  and animation. Reused the seventy-two inactive main-code bytes behind the
+  already-installed quest-wrapper entry jump for the zero-safe bridge; guarded
+  both the live entry and original tail and scanned for external native entries.
+  No widened value is written into the old player stack temporaries.
+- Both assembly checks pass in the existing pinned Docker image: the shared
+  helper is 72 bytes and the player call sequences total 84 bytes. All five
+  player checks pass: three source/argument/ownership/relocation checks in
+  2.873 seconds and two complete-cartridge/accounting checks in 27.349 seconds.
+  The item-name resource and reader implementations are unchanged; their
+  existing focused C regressions are reused rather than expanded into a new
+  native per-item matrix. No new native test harness or audible test is run.
+- Retained the town and shop intermediate ROM/UPS artifacts. The complete
+  combined build is `build/player-item-names-pilot`, ROM SHA-256
+  `eb8d09b49f50409082bb33c95aea9c6ff28e66b9b2651b9c55f81d6bcf832a6a`,
+  UPS SHA-256
+  `821b62cbb9cd97f0d7c1c60d9ca504a3fc2ec4ac1667b76ba11908ebd46361a6`.
+  The ROM remains 32 MiB and the configured memory requirement remains four MiB.
+  Updated building instructions, current progress, the completion queue, and
+  the [combined checkpoint](checkpoints/TEXT_NAME_CONSUMERS.md).
+- Continue Police2, the opening shopkeeper, Redd outside his shop, Saharah,
+  fishing-event/home-room readers, free-string/choice paths, character names,
+  and catchphrase consumers, alongside remaining strings/letters/accents.
+  Existing complete letter owners can bypass old handbill code; unchanged
+  dormant loader instructions alone do not establish missing application.
+  Shops/catches/digging join the combined v0 smoke with menus, mail, and
+  save/restart. No gameplay, persistence, or original-hardware success is
+  claimed, and no known game defect is waived. Public-release preparation,
+  human playthrough, and the full v1 title/keyboard goals remain open.
+- GitHub visibility is rechecked and remains private. Final diff checks, shell
+  syntax checks for the wrapper chain, and Python compilation checks pass.

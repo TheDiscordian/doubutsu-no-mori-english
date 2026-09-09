@@ -56,6 +56,15 @@ duplicate translation credit.
 
 ## Full-project scope and evidence
 
+The [town/shop/player checkpoint](checkpoints/TEXT_NAME_CONSUMERS.md) supplies the
+English town suffix and full-name connections in six shop/Redd actors and three
+player capture/dig sequences. The current combined build is
+`build/player-item-names-pilot`. Continue the named remaining message preparers,
+home-room readers, free-string/choice destinations, character displays, and
+catchphrase input/readers; retain the existing general-string, letter, and accent
+queue. Reuse the zero-safe full-item bridge where the native contract matches.
+Do not repeat completed name-resource matching or broad loader matrices.
+
 This is the durable queue for the complete translation project. A working
 milestone does not complete the project. Continue through available work without
 requiring the user to advance an automated procedure. Commit verified changes

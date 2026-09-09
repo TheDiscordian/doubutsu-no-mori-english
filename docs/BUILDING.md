@@ -23,20 +23,21 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/inventory-menu-text-pilot`.
-Its [checkpoint](checkpoints/INVENTORY_MENU_TEXT.md) records exact dependencies,
+The current combined integration build is `build/player-item-names-pilot`.
+Its [checkpoint](checkpoints/TEXT_NAME_CONSUMERS.md) records exact dependencies,
 artifacts, and verification limits. With the retained prerequisite resources:
 
 ```sh
-python3 tools/build_inventory_menu_text.py
-bash tools/build_inventory_menu_pilot.sh
+bash tools/build_player_item_names_pilot.sh
 ```
 
 This wrapper retains the complete seasonal/letter/name/default-message/editor
-integration, inventory labels/questions, and complete inventory/catalogue item
-names. The base overlay prerequisites are reproduced with
+integration, complete inventory labels/questions/descriptions, inventory/catalogue
+and world names, the English town suffix, and the shop/player name connections.
+The base overlay prerequisites are reproduced with
 `python3 tools/build_inventory_overlay.py` and `python3 tools/build_catalogue_overlay.py`.
-The combined wrapper does not
+The world-font prerequisites and complete retained variants are documented in
+the [world checkpoint](checkpoints/WORLD_ITEM_NAMES.md). The combined wrapper does not
 run an exhaustive gameplay matrix or constitute a v0 release by itself.
 The smaller recipes below reproduce their named framework milestones.
 

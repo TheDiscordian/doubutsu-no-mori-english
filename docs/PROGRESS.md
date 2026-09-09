@@ -25,14 +25,25 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [town/shop/player name integration](checkpoints/TEXT_NAME_CONSUMERS.md)
+omits the Japanese town suffix exactly as the English reference does and
+connects complete item names in six shop/Redd actors and three player capture/dig
+paths. It preserves zero-item clearing, native prices, message selection, timing,
+and saved fields without new RAM allocation. Independent MIPS assembly, focused
+source/argument/relocation checks, and complete ROM/UPS retention pass. The current
+combined build is `build/player-item-names-pilot`. Continue other item, character,
+free-string/choice, and catchphrase consumers, plus remaining text and accents.
+Ordinary shops, catches, digging, and save/restart remain in the combined v0 smoke;
+these installed routes do not imply gameplay or hardware certification.
+
 The [world item-label integration](checkpoints/WORLD_ITEM_NAMES.md) installs
 complete sixteen-byte names, reset, proportional sizing, and centred drawing
 without widening the native field or overwriting its adjacent display flag.
 The startup-owned rendering allocation grows by 1,040 bytes; existing font
 pixels, saved fields, main-code file, resident code, and every earlier
 translation resource remain. All six focused/core/cartridge/accounting checks
-and four font/loader regressions pass; independent builds agree. The current
-complete ROM/UPS is `build/world-names-pilot`. Ordinary startup, labels, and scene
+and four font/loader regressions pass; independent builds agree. The retained
+world-label ROM/UPS is `build/world-names-pilot`. Ordinary startup, labels, and scene
 transitions join the combined v0 smoke. Continue remaining general strings,
 letters, accented names, and wider input/display consumers.
 

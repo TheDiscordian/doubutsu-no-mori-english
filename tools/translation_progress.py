@@ -324,6 +324,27 @@ def measure(native, built, report):
                     ledger.credit(f'mail:{entry["template"]:04X}', complete_body(record, entry),
                                   'noticeboard', mail=True, mail_glyphs=True)
 
+    if report.get('town_suffix'):
+        from town_suffix import verify_installation
+        evidence = verify_installation(built, native, report)
+        # The exact English reference intentionally omits this grammatical
+        # suffix. Only its verified source/data/consumer-bound route can credit
+        # an empty replacement; arbitrary blank entries still receive no credit.
+        row = ledger.rows[evidence['id']]
+        if row['source_sha256'] != evidence['source_sha256']:
+            raise ValueError('Town-suffix progress source does not match')
+        row['replacements'].append({'route': 'town_suffix', 'sha256': evidence['encoded_sha256'],
+                                    'intentional_omission': True})
+
+    if report.get('shop_item_names'):
+        from shop_item_names import verify_installation
+        verify_installation(built, native, report)
+        # Connected shop/Redd readers do not finish every item-name consumer.
+        # Resource-only item records remain pending until the rest are connected.
+    if report.get('player_item_names'):
+        from player_item_names import verify_installation
+        verify_installation(built, native, report)
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import EDITOR_VROM, LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard
