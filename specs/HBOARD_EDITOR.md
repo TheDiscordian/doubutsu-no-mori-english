@@ -166,7 +166,12 @@ the visitor-default and seasonal-submenu options. The complete local recipe is
 
 ## Remaining acceptance
 
-Native acceptance must exercise normal initialization and closing, loaded
+The [v0 plan](../docs/V0_PLAN.md) schedules a representative native safety check
+in the combined pass and sets the harness/retry limits. The full matrix below
+remains broader acceptance work, not a prerequisite for the next translation
+batch or an exhaustive pre-v0 gate.
+
+Full native acceptance covers normal initialization and closing, loaded
 relocations, the full default, custom message edits, every home, cursor and
 display agreement, rejected over-capacity confirmation, unchanged adjacent
 Bells/save bytes, cleanup, and persistence. Host comparisons and a compiled

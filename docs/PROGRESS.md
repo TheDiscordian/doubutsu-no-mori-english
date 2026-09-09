@@ -13,6 +13,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [v0 delivery plan](V0_PLAN.md) governs the next implementation and test
+batches. Finish remaining text and consumers before expanding acceptance work;
+reuse passing evidence and apply the explicit harness/retry limits. Assemble and
+hand over the base translation after bounded safety checks. The human playthrough
+uses that build; full gameplay/hardware review, polish, and v1 title/keyboard work
+are not prerequisites for producing it. This workflow does not mark any pending
+implementation or test as completed.
+
 The [owner-message editor integration](checkpoints/HBOARD_EDITOR.md) installs the
 complete English draft, proportional four-row layout, cursor/edit operations,
 capacity/conflict warnings, save-safe confirmation, and cleanup together.
@@ -22,9 +30,10 @@ saved layout, resident code, and every earlier translation resource remain.
 Eight bridge/artifact/cartridge tests, nine core tests, the 10,000-command core
 sanitizer exercise, and twenty-one notice regressions pass. Independent builds
 agree. The source-bound cursor/layout comparisons retain GameCube manual breaks.
-Native emulator editor execution and normal interaction/save/reload are next;
-no hardware or visual acceptance is claimed. Custom messages retain the native
-64-byte saved limit; the complete default uses its exact canonical representation
+Representative native editor execution and normal interaction/save/reload belong
+in the combined v0 safety pass, not an exhaustive editor matrix before other
+translation work. No hardware or visual acceptance is claimed. Custom messages
+retain the native 64-byte saved limit; the complete default uses its exact canonical representation
 without truncation.
 
 The [home-gyroid default integration](checkpoints/GYROID_DEFAULT.md) installs the

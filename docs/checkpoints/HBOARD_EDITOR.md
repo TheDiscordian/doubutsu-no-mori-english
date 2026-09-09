@@ -5,8 +5,9 @@
 The complete `build/hboard-editor-pilot` cartridge installs initialization,
 editing, cursor, drawing/status, confirmation, and destructor bridges together.
 The original frame, portrait, English-first palette, all other editor modes,
-and every earlier translation resource remain. Native editor execution is the
-next acceptance step; this checkpoint does not claim it.
+and every earlier translation resource remain. Native editor execution is pending
+in the combined v0 safety pass; this checkpoint does not claim it or require a
+full editor matrix before unrelated translation work.
 
 The portable owner-editor core has a complete 128-byte private draft, exact
 saved-default recognition, four-row proportional layout, manual-newline
@@ -128,16 +129,17 @@ credited default text; it adds no second text-replacement credit.
 
 ## Next work and limits
 
-Prepare one bounded silent native editor batch using the new complete cartridge.
-Load the real submenu owner, editor, and window through their cartridge DMA and
-relocations; exercise actual initialization, the patched mode dispatch, drawing,
-confirmation, and destruction. Preserve save, stack, heap, live ownership, and
-checkpoint state. Test the complete default and custom message for all four homes,
-rejected oversized confirmation, and unaffected other editor modes together.
-Do not replay the completed visitor-default or notice-body native batches.
+Include one representative editor open/edit/confirm/close check in the combined
+silent v0 safety pass, with the full default, a custom message, and adjacent-save
+protection. Reuse the passing host/compiled checks for complete command, all-home,
+and other-mode combinations; expand native cases only for a concrete risk or bug.
+Follow the [v0 plan](../V0_PLAN.md) harness budget and retry limit. Do not build a
+new exhaustive native matrix before continuing unrelated translation work or
+replay the completed visitor-default and notice-body batches.
 
-The existing owner fixture in `tools/notice_reader_smoke.py` provides the verified
-native loader at owner-relative `8085D128`, asset callback `8085D43C`, transition
+If a focused native fixture is needed, the existing owner fixture in
+`tools/notice_reader_smoke.py` provides the verified native loader at
+owner-relative `8085D128`, asset callback `8085D43C`, transition
 callback `8085D4D4`, owned-state layout, graphics arena setup, and checkpoint
 restoration pattern. Adapt its setup, not its already completed body tests.
 Its original owner has a 64-KiB asset arena; inspect the keyboard constructor's

@@ -11,7 +11,9 @@ memory requirement; permission to use eight MiB does not itself change heap boun
 
 ## Workflow
 
-- Read `docs/PROGRESS.md` and the relevant specs before making changes.
+- Read `docs/PROGRESS.md`, `docs/V0_PLAN.md`, and the relevant specs before making
+  changes. `docs/V0_PLAN.md` governs pre-v0 priorities and test scope; broader
+  acceptance lists do not turn every pending test into a v0 prerequisite.
 - Keep ROMs, extracted game assets, legacy distribution contents, saves, and
   generated patches in ignored directories. Commit original tools, translation
   edits, specifications, provenance records, and test fixtures made for testing.
@@ -35,6 +37,16 @@ memory requirement; permission to use eight MiB does not itself change heap boun
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.
+- Use existing focused checks once per meaningful change. Reuse passing native
+  evidence for unchanged code/resources; do not add exhaustive per-record or
+  all-combinations harnesses without a concrete uncovered risk. For a failing
+  native scenario, allow one initial attempt and one retry after a concrete fix.
+  New harness construction/debugging has a 30-minute budget per implementation
+  batch; record unresolved results and continue unrelated work at that limit.
+  Credible crash/save/memory risks remain blockers, not silently passed tests.
+- Produce and hand over v0 before the human playthrough. Comprehensive gameplay,
+  hardware, and polish acceptance cannot block the build that enables that work.
+  English title artwork and the GameCube-style keyboard belong to v1.
 - A human playthrough supplies broad gameplay bug reports after the main work.
   Automated checks concentrate on crashes, save corruption, broken text, and
   obvious regressions. Do not claim that planned playthrough as completed proof.

@@ -2,10 +2,13 @@
 
 ## When this applies
 
-The human playthrough follows the broadly complete translation build. Current
-experimental milestones are not that final handoff. Development continues with
-batched automated crash, save-integrity, text, and regression checks; difficult
-isolated cases do not repeatedly hold up unrelated content work.
+The v0 base-translation build is delivered before the human playthrough. Player
+testing requires that copy; completing the playthrough is never a condition for
+building or handing it over. The [v0 delivery plan](V0_PLAN.md) limits pre-handoff
+automation to build safeguards, affected regressions, and a bounded combined
+safety smoke pass. The full validation matrix and v1 stretch goals do not gate
+that handoff. Experimental checkpoints are not silently relabelled as accepted
+v0 builds; known blockers and untested areas stay explicit.
 
 The playtest package needs a patch, input/output checksums, exact build revision,
 compatibility notes, and a linked known-issues list. Keep original saves backed
@@ -53,4 +56,5 @@ No report is silently treated as fixed because it cannot yet be reproduced.
 English-looking text is not proof of correct meaning, and successful isolated
 function calls are not ordinary gameplay proof. The
 [validation matrix](VALIDATION.md) and [completion queue](WORK_QUEUE.md) remain
-the release checklist; planned human or hardware tests are not marked passed.
+the broader release checklist, not prerequisites for receiving v0. Planned human
+or hardware tests are not marked passed.

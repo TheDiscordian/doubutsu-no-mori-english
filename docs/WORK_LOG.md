@@ -7196,3 +7196,24 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   has only 150 bytes before another BSS object. Preserve native contributors
   and timing, append owned row storage, and bind loader/drawer/allocator changes
   before applying complete longer names. No credits patch is installed yet.
+
+## 2026-09-09: bounded v0 verification workflow
+
+- At the user's request, repaired the working instructions before resuming goal
+  implementation. Added `docs/V0_PLAN.md` as the authority for pre-v0 scope:
+  complete the base translation/integration, perform bounded safety checks,
+  and hand over the playtest patch before the human playthrough. Title artwork
+  and the GameCube-style keyboard remain v1; full public/hardware acceptance
+  does not gate the private playtest build.
+- Updated repository instructions, progress, queue, validation, playtesting,
+  and the active owner-editor checkpoint/spec to distinguish v0 requirements
+  from broad acceptance. The editor no longer mandates a new all-home/all-mode
+  native matrix before continuing unrelated content work.
+- Set one initial native-scenario attempt plus one retry after a concrete fix,
+  and a 30-minute new-harness construction/debugging budget per implementation
+  batch. Unresolved evidence is recorded without pretending a pass or silently
+  ignoring credible crash/save/memory risks. Unchanged passing native batches
+  are reused; relevant changes and actual bugs determine new test scope.
+- This change is documentation only. No runtime, translation, build safeguards,
+  test assertions, ROM, or coverage definitions change. Document/diff checks
+  apply; no emulator run, full regression suite, or ROM rebuild is warranted.

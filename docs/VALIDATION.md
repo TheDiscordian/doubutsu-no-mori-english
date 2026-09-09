@@ -1,5 +1,13 @@
 # Validation requirements
 
+## V0 versus full acceptance
+
+The [v0 delivery plan](V0_PLAN.md) defines the bounded pre-handoff checks and
+retry limits. Build safeguards stay mandatory. The matrix below records wider
+acceptance work; it is not an all-pass prerequisite for the v0 build.
+Human playthrough and original-hardware testing require the delivered build and
+cannot block its creation. Untested areas remain labelled, not claimed passed.
+
 ## Automated checks
 
 - Verify source identity and all DMA bounds before patching.
@@ -12,8 +20,12 @@
 - Keep graphics edits inside declared texture spans; never resize neighbours.
 - Record candidate provenance, command adaptations, rejection reasons, and layout
   warnings independently of translation approval.
-- Batch checks around complete content/runtime changes. Keep difficult isolated
-  edge cases in the follow-up queue rather than repeatedly delaying bulk work.
+- Run affected checks once per meaningful content/runtime batch; reuse passing
+  native evidence for unchanged dependencies. Follow the v0 limit of one initial
+  scenario attempt, one concretely justified retry, and at most 30 minutes of
+  new harness construction/debugging per batch. Record difficult cases for the
+  combined bug pass and continue unrelated implementation. Do not weaken guards
+  or conceal credible crash/save/memory risks to meet that limit.
 
 The user plans a human playthrough after the main translation work, reporting
 bugs for the final fix and polish pass. Prepare a broadly complete playable build
@@ -26,7 +38,8 @@ the information needed to turn observations into reproducible bug reports.
 ## Emulator matrix
 
 Use isolated saves and disabled audio. Record the exact ROM SHA-256 and emulator
-version. Four-MiB RAM tests precede Expansion Pak tests.
+version and the actual RAM requirement. Test the supported configuration;
+four-MiB compatibility is not a prerequisite for an Expansion Pak build.
 
 | Area | Required evidence | Current status |
 | --- | --- | --- |
@@ -74,6 +87,9 @@ labelled a PC. The bulk `g` response follows the N64 core's 71-register ordering
 the checkpoint probe records both forms for comparison.
 
 ## Original hardware and release
+
+These are broader acceptance/public-release requirements, not prerequisites for
+the private v0 playtest handoff. Hardware results follow access to that build.
 
 Record console region, flash cartridge/firmware, RAM configuration, Controller
 Pak, RTC behaviour, patch and source hashes, and saved-game migration results.

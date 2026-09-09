@@ -1,5 +1,22 @@
 # Completion queue
 
+## V0 execution priority
+
+Follow the [v0 delivery plan](V0_PLAN.md) for the next work: finish remaining
+text and consumer integration, run bounded combined safety checks, and hand over
+the playtest patch. Player testing follows that handoff. V1 title/image and
+GameCube-keyboard work and the full public-release matrix are not v0 gates.
+
+The subsystem records and tables below cover the entire project, not a list of
+tests that must all pass before v0. Use the active section of
+[progress](PROGRESS.md) and its linked checkpoints for current implementation;
+do not redo completed batches because an earlier record still lists them as
+next work. Remaining broad acceptance is not automatically an implementation
+gap. Record deferred test issues at the affected checkpoint with build, failure,
+risk classification, and next useful check; keep actual v0 blockers explicit.
+
+## Full-project scope and evidence
+
 This is the durable queue for the complete translation project. A working
 milestone does not complete the project. Continue through available work without
 requiring the user to advance an automated procedure. Commit verified changes
@@ -1005,6 +1022,10 @@ identity batches remain, alongside final native festival review and gameplay.
 
 ## Stability and compatibility
 
+This is the broad acceptance matrix. The narrower v0 smoke scope and retry
+limits are in [V0_PLAN.md](V0_PLAN.md); incomplete player/hardware coverage does
+not block production of the playtest build. Actual safety/progression defects do.
+
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
 | V01 | Repeatable build and regression suite | active | Verified inputs, deterministic outputs, all tests passing, clean tracked worktree |
@@ -1039,6 +1060,10 @@ changing original menu, clock, save-data, or selected-player transitions.
 | S04 | GameCube-style English keyboard | pending, specified | Real 10×4 grid, case/symbol pages, N64 controller mapping, all editor callers and save limits tested |
 
 ## Release
+
+The v0 playtest handoff needs its patch, hashes, revision, compatibility notes,
+and known issues. The final acceptance row below covers the complete project,
+including v1 and external validation; it does not gate that earlier handoff.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
