@@ -16,13 +16,21 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [selected song-title integration](checkpoints/SONG_ITEM_NAMES.md) installs
+full item fields through the native fruit-box actor callback, with no memory or
+save growth and unchanged credits. All 53 focused regressions, independent
+assembly, and current-ROM/UPS checks pass. The completed silent native batch
+passes 55 complete fields and insertions, five rejections, three argument cases,
+and fallback/recovery: 125 calls and 326 assertions. Save/live actor state,
+heap/stack guards, restored checkpoint, blank saves, and shutdown pass. Typed
+requests, accented names, other full-name destinations, and ordinary gameplay remain.
+
 The [ordinary-name batch](checkpoints/ORDINARY_ITEM_NAMES.md) installs 209
 additional complete song/stationery/tool/quest/seed/ticket/miscellaneous names,
 including fifty short fields, retaining every earlier candidate and all non-item
 resources. All 38 focused tests pass. The native batch passes 392 calls and
 385 assertions, with restored checkpoint, blank saves, and graceful shutdown.
-Continue the full-name K.K. dialogue
-setter, remaining wider callers, accents/native-specific names, and noticeboard
+Continue remaining wider callers, accents/native-specific names, and noticeboard
 text; do not repeat passed letter batches for this name-only resource change.
 
 The [letter-quest replies](checkpoints/QUEST_REPLY_LETTERS.md) install all

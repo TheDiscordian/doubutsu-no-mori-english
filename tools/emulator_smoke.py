@@ -1018,6 +1018,12 @@ def main():
                     raise ValueError('Credits probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_credits'],record))
+            if 'test_song_item_names' in action:
+                from song_item_names_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native song-title tests require an isolated checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_song_item_names'],record))
             if 'test_shop_units' in action:
                 from shop_unit_smoke import exercise
                 if not (out/'test.bs1').is_file():

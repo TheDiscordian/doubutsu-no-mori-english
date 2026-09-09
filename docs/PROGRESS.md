@@ -13,6 +13,17 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [selected song-title caller](checkpoints/SONG_ITEM_NAMES.md) now uses full
+sixteen-byte item fields, retaining the entire credits overlay layout and adding
+no resident/saved memory. The complete ROM changes only that actor relative to
+the ordinary-name build. Independent assembly, current-ROM/UPS checks, and all
+53 focused regressions pass. The completed silent native batch passes all 55
+full-title fields and native insertions, five rejections, three eight-bit argument
+cases, and fallback/recovery: 125 calls and 326 assertions. Live actor ownership,
+save memory, heap/stack guards, restored globals/checkpoint, blank isolated saves,
+and graceful shutdown pass. Typed song requests, the two accented song names,
+normal gameplay, and hardware remain.
+
 The [ordinary item-name batch](checkpoints/ORDINARY_ITEM_NAMES.md) installs 209
 additional complete English names: songs, stationery, tools, quest items, seeds,
 raffle tickets, Bell denominations, mushroom/candy, grab bags, and turnips.

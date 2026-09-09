@@ -73,7 +73,8 @@ python3 tools/ordinary_item_scenario.py --output build/ordinary-items-scenario.j
 
 Continue full-name display/insertion callers, accented and native-specific names,
 noticeboard/general text, review, normal gameplay/save/travel acceptance,
-patch-only release preparation, and the title/keyboard stretch goals. The native
-K.K. song-title setter at `80AA4794..80AA47E8` still creates a ten-byte local;
-the existing complete item-ID wrapper can replace that path without resident
-growth. Song-request input remains a different ten-byte saved-event/editor path.
+patch-only release preparation, and the title/keyboard stretch goals. The
+[selected song-title integration](SONG_ITEM_NAMES.md) replaces the native
+K.K. setter's ten-byte local through the existing complete item-ID wrapper,
+without resident growth. Song-request input remains a different ten-byte
+saved-event/editor path.
