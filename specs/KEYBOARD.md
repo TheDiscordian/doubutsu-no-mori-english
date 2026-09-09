@@ -45,9 +45,10 @@ changes from three to four. Input limits remain six characters for player/town,
 four for catchphrases, and ten for apology/song input. These are storage limits,
 not widths to increase simply because Latin letters are narrower.
 
-The separate [owner-message editor](HBOARD_EDITOR.md) has a complete English
-draft/layout core awaiting overlay integration. Its saved custom-message field
-stays 64 bytes. The GameCube-style input grid must use the same verified
+The separate [owner-message editor](HBOARD_EDITOR.md) installs a complete English
+draft, proportional layout, and save-safe confirmation. Its native execution
+acceptance remains. Its saved custom-message field stays 64 bytes. The
+GameCube-style input grid must use the same verified
 field-specific editing and confirmation operations, not bypass their limits.
 
 ### Name-entry cursor

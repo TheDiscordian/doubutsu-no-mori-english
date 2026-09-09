@@ -175,6 +175,13 @@ its addresses. The submenu growth reservation is 20,480 bytes, producing a
 the smaller profiles and their exact compiled identities remain verifiable.
 The resident module/bootstrap and four-MiB address bounds are unchanged.
 
+The optional [owner-message editor](HBOARD_EDITOR.md) contributes a separate
+8-KiB submenu reservation, producing a combined 243,072-byte dominant sum.
+Notice verification accepts only its exact complete editor/window image and
+metadata before permitting that additional allocation instruction. The seasonal
+reader, saved posts, original notice-editing mode, and its own 20-KiB contribution
+remain unchanged.
+
 `--english-notice-seasonal` requires the seasonal reader, complete seasonal
 creator, and treasure installation. The installer validates actual cartridge
 configuration/code/resources, exact scheduler edits, reader relocations, pool

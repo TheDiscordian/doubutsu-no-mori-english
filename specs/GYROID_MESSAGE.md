@@ -28,8 +28,9 @@ window offset `132`, preserves explicit `CD` newlines, and pads with spaces.
 It clamps the source length to sixty-eight; zero/negative lengths clear the
 destination to spaces. Invalid slots or null source pointers do not write.
 Its original automatic wrapping inserts a newline every sixteen characters.
-Both identified callers pass only sixty-four bytes. The saved owner message
-and its editor still have that limit.
+Both identified callers pass only sixty-four bytes. The saved custom owner
+message retains that limit; the separate complete-default editor draft does
+not enlarge this formatter's source field.
 
 The supplied GAFE01 setter uses a 132-byte destination and measured glyph
 widths. It appends a glyph, then inserts a newline when accumulated width is
@@ -84,5 +85,7 @@ in the work log. Ordinary other-owner gyroid interaction and saved custom editin
 remain required. The installed complete English
 [default-message design](GYROID_DEFAULT.md) uses the four strings actually
 selected by GameCube initialisation, not the older same-ID eighty-eight-byte
-concatenation. Default substitution preserves saved storage; owner-editor
-presentation and the larger custom-message representation remain unfinished.
+concatenation. Default substitution preserves saved storage. The
+[complete owner-editor integration](HBOARD_EDITOR.md) retains the native custom
+capacity and adds a separate full-default draft; native editor presentation and
+persistence acceptance remain unfinished.

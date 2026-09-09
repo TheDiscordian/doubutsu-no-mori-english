@@ -13,15 +13,19 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
-The [owner-message editor core](checkpoints/HBOARD_EDITOR.md) implements the
-complete English draft, proportional four-row layout, pixel-based cursor/edit
-operations, and save-safe confirmation. Nine focused tests and the 10,000-command
-sanitizer exercise pass, including comparison with the pinned GameCube layout
-and cursor functions. The 2,344-byte code/read-only core compiles for N64 with
-no external imports or mutable globals. It is not installed in the cartridge
-yet: scoped overlay bridges, drawing/warnings, allocation, and native acceptance
-are the next work. Custom messages retain the native 64-byte saved limit; the
-complete default uses its exact canonical representation without truncation.
+The [owner-message editor integration](checkpoints/HBOARD_EDITOR.md) installs the
+complete English draft, proportional four-row layout, cursor/edit operations,
+capacity/conflict warnings, save-safe confirmation, and cleanup together.
+The current complete ROM/UPS is `build/hboard-editor-pilot`. Its 20,416-byte
+owned editor adds 5,568 aligned bytes and a separate 8-KiB submenu reservation;
+saved layout, resident code, and every earlier translation resource remain.
+Eight bridge/artifact/cartridge tests, nine core tests, the 10,000-command core
+sanitizer exercise, and twenty-one notice regressions pass. Independent builds
+agree. The source-bound cursor/layout comparisons retain GameCube manual breaks.
+Native emulator editor execution and normal interaction/save/reload are next;
+no hardware or visual acceptance is claimed. Custom messages retain the native
+64-byte saved limit; the complete default uses its exact canonical representation
+without truncation.
 
 The [home-gyroid default integration](checkpoints/GYROID_DEFAULT.md) installs the
 complete four-line GameCube greeting through a source-bound 206-byte message
@@ -30,7 +34,7 @@ saved storage and resident memory remain unchanged. Independent Docker builds,
 all eleven focused host/source/ROM/accounting tests, and seventeen sequence
 regressions pass. Every earlier translation candidate and resource is retained
 apart from the one repurposed reserve, actor pair, and its allocation metadata.
-The current complete ROM/UPS is `build/gyroid-default-pilot`. The completed
+Its retained ROM/UPS checkpoint is `build/gyroid-default-pilot`. The completed
 silent native batch passes 112 calls and 133 assertions: cartridge loading and
 relocation, custom-byte protection, real default/custom selection for all four
 homes, complete native message/continuation loads, retained guards/save RAM,

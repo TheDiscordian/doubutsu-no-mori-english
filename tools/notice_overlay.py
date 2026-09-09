@@ -376,7 +376,16 @@ def verify_installation(built, native, module, report):
     from snowman_actor import verify_resources
     catalog = verify_resources(built, native, module)[0]
     files = by_vrom(built)
-    audit_editor(native, files[0x78CB80].extract(built))
+    editor_extension = None
+    if 0x78CB80 in files:
+        audit_editor(native, files[0x78CB80].extract(built))
+    else:
+        from hboard_overlay import verify_shared_parts
+        editor_extension = verify_shared_parts(built, native)
+        # The extension verifier binds the complete image to the English-first
+        # prefix with only its three scoped hooks. All palettes, conversion,
+        # and notice-mode input remain native; retain their exclusion audit.
+        audit_editor(native)
     treasure = report.get('overlay', {}).get('treasure', False)
     seasonal = report.get('overlay', {}).get('seasonal', False)
     templates = list(INITIAL_IDS)
@@ -404,8 +413,17 @@ def verify_installation(built, native, module, report):
     _, _, old_owner, old_owner_reloc = native_sources(native)
     expected = bytearray(old_owner)
     expected[METADATA:METADATA+32] = metadata(len(data), report['overlay']['symbols'], seasonal)
+    if editor_extension:
+        at = editor_extension['owner_offset']
+        expected[at:at+32] = editor_extension['owner_bytes']
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
+        if at == POOL_PATCH and editor_extension:
+            word = struct.unpack('>I', value)[0]
+            extra = editor_extension['pool_extra']
+            if not 0x8000 <= (word & 65535)+extra <= 0xFFFF:
+                raise ValueError('Combined submenu reservation changes the native high-half contract')
+            value = struct.pack('>I', word+extra)
         if code[at-CODE_RAM:at-CODE_RAM+len(value)] != value: raise ValueError('Missing notice creator or pool patch')
     original_code = by_vrom(native)[CODE_VROM].extract(native)
     for start, end in ((0x800A5B50, INIT_START), (INIT_END, 0x800A5DF4), (POOL_START, POOL_PATCH), (POOL_PATCH+4, POOL_END)):

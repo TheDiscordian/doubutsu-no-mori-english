@@ -6,6 +6,10 @@ gyroid_args=()
 if [[ -n "${AF_GYROID_DEFAULT:-}" ]]; then
   gyroid_args=(--english-gyroid-default "$AF_GYROID_DEFAULT")
 fi
+hboard_args=()
+if [[ -n "${AF_HBOARD_EDITOR:-}" ]]; then
+  hboard_args=(--english-hboard-editor "$AF_HBOARD_EDITOR")
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -28,4 +32,5 @@ exec python3 tools/build.py \
   --english-notice-treasure build/noticeboard-treasure/owners \
   --english-notice-seasonal build/noticeboard-seasonal/owner \
   "${gyroid_args[@]}" \
+  "${hboard_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

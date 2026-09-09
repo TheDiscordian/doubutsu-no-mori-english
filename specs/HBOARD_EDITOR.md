@@ -2,11 +2,12 @@
 
 ## Current implementation and save contract
 
-`runtime/hboard_editor.c` implements an overlay-owned editing core, separate from
-the visitor-message formatter. It is compiled and host tested, but not installed
-in the current cartridge. The [checkpoint](../docs/checkpoints/HBOARD_EDITOR.md)
-records the evidence and remaining integration. The complete project still needs
-normal editing, persistence, gameplay review, and hardware acceptance.
+`runtime/hboard_editor.c` and `overlays/hboard/` implement the complete
+owner-message editor, separate from the visitor-message formatter. The complete
+cartridge installs its initialization, mode-1 editing, cursor, drawing, and
+confirmation bridges together. The [checkpoint](../docs/checkpoints/HBOARD_EDITOR.md)
+records the host/compiled/cartridge evidence. Native editor execution, normal
+interaction, persistence, gameplay review, and hardware acceptance remain.
 
 The native home-gyroid message occupies exactly 64 bytes. Held Bells immediately
 follow it; enlarging the existing write would corrupt that value. Do not borrow
@@ -40,7 +41,8 @@ not a separate saved-text cancellation transaction.
 
 `af_hboard_commit` also compares all saved bytes with the opening snapshot.
 If another path changed that field while editing, confirmation refuses to
-overwrite it. The core exposes an explicit conflict result for the UI.
+overwrite it. The UI explains that another Done press closes without saving;
+the second press retains the newer saved value.
 
 ## Layout and commands
 
@@ -109,31 +111,60 @@ The window's existing text/cursor renderer is `80882D08`. Its text helper
 The renderer calls that helper at `80882DAC`, then uses fixed twelve-pixel
 cursor steps. Redirecting only the text draw cannot make editing correct.
 
-## Remaining atomic integration
+## Installed atomic integration
 
-Append the core, bridge functions, source-bound defaults, width cache, and draft
-to the owned character-editor allocation. Preserve the original 48-byte BSS
-addresses when laying out the extension. Redirect initialization, only the mode-1
-table entry, and the per-frame cursor call through scoped bridges. Other modes
-retain native input, capacity, palette, and cursor behaviour. The window must
-call the loaded editor's drawing bridge through a verified owned pointer, not
-through its link-time RAM address after relocation.
+The core, bridge functions, source-bound defaults, width cache, and draft live
+in a 20,416-byte character-editor image at VROM `03940000`. The adjacent 1,440-byte
+relocation file is at `03948000`; both original DMA indices remain. The original
+48-byte BSS retains its addresses in zero-backed file storage. Sixteen additional
+bytes precede appended code; native editor offset `30` contains the draw callback.
+The separate 472-byte context contains the 196-byte draft, 256 glyph advances,
+ownership pointers, warning, and active flag.
 
-The new renderer must use one layout for text, cursor, and end marker; retain
-the native frame and portrait; and display the capacity warning without covering
-the four message rows or keyboard. Only successful confirmation may invoke the
-native Done transition. Initialize and clear extension ownership on every editor
-entry/destruction; do not reuse a draft from a previous field or home.
+Initialization at `80888484`, only the mode-1 table entry at `80888828`, and
+the per-frame cursor call at `808869A4` target owned bridges. The constructor,
+native case conversion, English-first palette, mode-2 notice editing, and other
+mode handlers remain. The metadata destructor points to a wrapper that clears
+extension ownership and then calls the unchanged original destructor. Every
+initialization resets ownership; only the selected home's exact saved pointer
+can activate the gyroid draft. Invalid setup permits closing without a saved write.
 
-Regenerate affected relocations and update the editor allocation metadata.
-Audit simultaneous submenu allocations before choosing the additional pool
-reservation. The seasonal notice reader already reserves an additional 20 KiB;
-that reservation is not automatically spare editor memory. Its existing editor
-audit accepts only the native English-first prefix, so extend verification to
-recognise the exact new owned image while preserving the palette/conversion
-exclusion of `7F` and `80`. Install all affected parts together and reject partial
-or overlapping patches. Do not change the resident module or saved layout just
-to accommodate this on-demand editor.
+The owner-message window retains its image size and relocation file. Its
+`80882D08` entry becomes a 52-byte pointer-based tail bridge with an unchanged
+o32 argument stack. It obtains the current loaded editor's `+30` callback,
+returns safely for null pointers, and never jumps to an unrelocated link address.
+The original frame and portrait functions are unchanged.
+
+The new renderer uses one layout for text, cursor, and end marker. Text retains
+the native `x+46`, `54-y` origin, with GameCube scale one, 16-pixel row spacing,
+and `(30,0,0,255)` colour. The cursor uses the measured advance minus seven
+pixels, and the end marker retains its model-coordinate conversion. A half-scale
+capacity/status line sits twelve pixels above the first message row. Host checks
+verify these coordinates; normal visual placement still needs native review.
+
+The editor's actual aligned growth is 5,568 bytes. It receives a separate 8-KiB
+reservation in addition to the seasonal notice reader's 20 KiB. The source-bound
+dominant native submenu sum becomes 243,072 bytes; the original alternative and
+player sums remain. Only `800C4B10` changes from the seasonal `25CEDB20` to
+`25CEFB20`, preserving its signed-immediate/high-half contract. The owner changes
+only the editor metadata row in addition to the already installed notice row.
+
+`tools/hboard_overlay.py` pins the complete appended image and relocation hash,
+preserves native relocation order, checks three relocated bases, and requires
+all bridges, allocation metadata, full visitor greeting, and shared notice
+installation together. The notice verifier accepts either the original
+English-first editor or this exact complete extension, never arbitrary prefix
+changes. Both paths retain the original palette/conversion exclusion of `7F`
+and `80`. Partial or overlapping installs fail before publishing caller maps.
+
+The resident source inventory includes `hboard_editor.[ch]`, but its compiler
+excludes the explicitly overlay-owned C unit. Rebuilding the inventory retains
+the exact resident and bootstrap machine code, symbols, reservation, and four-MiB
+memory bounds. The full build option is `--english-hboard-editor`; it requires
+the visitor-default and seasonal-submenu options. The complete local recipe is
+`bash tools/build_hboard_editor_pilot.sh`.
+
+## Remaining acceptance
 
 Native acceptance must exercise normal initialization and closing, loaded
 relocations, the full default, custom message edits, every home, cursor and

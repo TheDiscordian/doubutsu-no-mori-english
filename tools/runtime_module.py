@@ -149,13 +149,14 @@ def runtime_source_hashes(source):
 
 
 def resident_c_sources(source):
-    """Keep shared on-demand notice helpers outside the bounded resident image.
+    """Keep shared on-demand menu helpers outside the bounded resident image.
 
     Their complete sources still belong to runtime_source_hashes. Exclude only
     these explicit overlay-owned compilation units; new resident files continue
-    to compile, and an accidental resident call to a notice helper fails to link.
+    to compile, and an accidental resident call to an owned helper fails to link.
     """
-    on_demand = {'notice/record.c', 'notice/initial.c', 'notice/page.c', 'notice/treasure.c', 'notice/seasonal.c'}
+    on_demand = {'notice/record.c', 'notice/initial.c', 'notice/page.c', 'notice/treasure.c', 'notice/seasonal.c',
+                 'hboard_editor.c'}
     return [p for p in sorted(source.rglob('*.c')) if p.relative_to(source).as_posix() not in on_demand]
 
 

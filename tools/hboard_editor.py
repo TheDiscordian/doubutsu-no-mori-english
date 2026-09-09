@@ -1,4 +1,4 @@
-"""Pinned owner-message editor sources; no cartridge installation yet."""
+"""Pinned owner-message editor sources; installation is verified separately."""
 
 from pathlib import Path
 import struct
@@ -87,4 +87,4 @@ def audit(native):
             'english_default_sha256': sha256(english), 'saved_bytes': 64, 'draft_bytes': 128,
             'line_pixels': 192, 'lines': 4, 'mode': 1, 'shared_native_mode_preserved': 2,
             'saved_field_follows': 'held Bells', 'native_editing': 'direct saved writes, Done closes editor',
-            'status': 'Draft/layout core only; owned overlay integration and native acceptance remain'}
+            'status': 'Native/reference source audit; cartridge installation is not inferred'}

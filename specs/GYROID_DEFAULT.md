@@ -114,7 +114,7 @@ capacity is not implemented by default substitution. The owner-message editor
 must also present the English default; leaving the Japanese default visible
 there is not a complete translation. Preserve explicit input limits and custom
 text without truncation when implementing that route. The
-[owner-editor core](HBOARD_EDITOR.md) provides its separate complete draft,
-proportional layout, and save-safe confirmation; the owned overlay integration
-remains required. Normal gyroid interaction,
+[owner-editor integration](HBOARD_EDITOR.md) installs its separate complete draft,
+proportional layout, and save-safe confirmation; native editor execution remains
+unverified. Normal gyroid interaction,
 save/reload, rendering review, and hardware remain broader acceptance work.
