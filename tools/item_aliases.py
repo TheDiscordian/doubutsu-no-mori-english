@@ -49,7 +49,8 @@ def confirmed_aliases(source_banks, edits, info, capacity=10, skip_ids=()):
         existing = indexed.get(id) or aliases.get(id)
         if existing:
             if existing["translation"] != donor["translation"]:
-                raise ValueError("Conflicting English names for a verified native item alias")
+                raise ValueError(f"Conflicting English names for native alias {donor_id} -> {id}: "
+                                 f"{donor['translation']!r} / {existing['translation']!r}")
             continue
         provenance = donor.get("provenance")
         if (not isinstance(provenance, dict) or

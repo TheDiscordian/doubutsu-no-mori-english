@@ -13,6 +13,21 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [bilingual item-name batch](checkpoints/SHEET_ITEM_NAMES.md) installs 327
+additional source-bound identities in 834 full fields, with 112 also fitting
+native short storage. The complete `build/sheet-items-pilot` retains every
+earlier edit and adds the matching treasure article profile. All eight final
+source/resource/ROM/accounting checks, nine article/creator tests and their
+sanitizer equivalents pass. Independent creator builds agree; only read-only
+article data changes within its unchanged code/size. The full ROM also changes
+the two name files and creator-CRC configuration; no saved layout, font, reader,
+other actor, or memory bound changes. The completed silent native batch in
+`build/smoke-sheet-items-01` passes all 527 calls and 519 memory assertions, with
+restored stack/checkpoint, blank isolated saves, and graceful shutdown. Its frozen
+evidence and source-bound plan remain checked without replaying earlier batches.
+Remaining names, full-name callers, general/letter text, review, save/gameplay,
+release, and title/keyboard work continue.
+
 The [complete seasonal notice integration](checkpoints/NOTICEBOARD_SEASONAL.md)
 installs all 41 English bodies in `build/notice-seasonal-pilot`: 21 unchanged
 GameCube references, fifteen native-specific adaptations, and five original

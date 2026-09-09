@@ -187,9 +187,9 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         report['stack_usage']['notice_seasonal'] = (out/'notice_seasonal.su').read_text()
     if notice_treasure:
         report['notice_treasure'] = True
-        from item_articles import DATA_HASH, NAMES_HASH
-        report['item_articles_sha256'] = DATA_HASH
-        report['item_names_sha256'] = NAMES_HASH
+        from item_articles import verify as verify_articles
+        report['item_articles_sha256'] = sha256(item_articles)
+        report['item_names_sha256'] = verify_articles(item_articles)
         report['stack_usage']['item_article'] = (out/'item_article.su').read_text()
         for name in ('record', 'treasure'):
             report['stack_usage']['notice_'+name] = (out/('notice_'+name+'.su')).read_text()

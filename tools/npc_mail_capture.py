@@ -105,6 +105,19 @@ def catalog_id(report):
     return 4 if report.get('mail_glyphs') is True else 2
 
 
+def source_report_matches(actual, expected, *, article_names=None):
+    if actual == expected:
+        return True
+    # The original immutable article profile also accepts its pinned original
+    # generator provenance. Every compiled source and resource remains checked;
+    # this does not let new name profiles claim the old generator.
+    from item_articles import NAMES_HASH, LEGACY_GENERATOR_SHA256
+    if article_names == NAMES_HASH and 'tools/item_articles.py' in expected:
+        legacy = {**expected, 'tools/item_articles.py': LEGACY_GENERATOR_SHA256}
+        return actual == legacy
+    return False
+
+
 def validate(data,reloc,report,module):
     catalog = catalog_id(report)
     mother = report.get('mother_letters') is True
@@ -134,7 +147,9 @@ def validate(data,reloc,report,module):
     if 'notice_seasonal' in report and not seasonal: raise ValueError('Unknown seasonal creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner,notice_seasonal=seasonal)
+            or report.get('relocation_sha256') != sha256(reloc) or not source_report_matches(
+                report.get('sources'), source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner,notice_seasonal=seasonal),
+                article_names=report.get('item_names_sha256') if treasure else None)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -185,11 +200,11 @@ def validate(data,reloc,report,module):
                 or report.get('academy_series_sha256') != ACADEMY_SERIES_HASH):
             raise ValueError('Invalid complete academy series-name resource')
     if treasure:
-        from item_articles import SIZE, DATA_HASH, NAMES_HASH, verify
+        from item_articles import SIZE, verify
         article = symbols['af_item_article_data']
         if (article&15 or article < text or article+SIZE != symbols['af_academy_series_data']
-                or report.get('item_articles_sha256') != DATA_HASH
-                or report.get('item_names_sha256') != NAMES_HASH):
+                or report.get('item_articles_sha256') != sha256(data[article:article+SIZE])
+                or report.get('item_names_sha256') != verify(data[article:article+SIZE])):
             raise ValueError('Invalid complete item article resource')
         verify(data[article:article+SIZE])
     if seasonal:

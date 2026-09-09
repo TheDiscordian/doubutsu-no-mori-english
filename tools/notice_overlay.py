@@ -336,8 +336,9 @@ def verify_treasure_installation(built, native, module, report):
     resident = files[MODULE_VROM].extract(built)
     creator = files[CREATOR_VROM].extract(built)
     verify_configuration(resident, creator, module)
-    verify_names(files[0x02A00000].extract(built), struct.unpack_from('>I', resident, 56)[0])
     approval = module['npc_mail_loader']
+    verify_names(files[0x02A00000].extract(built), struct.unpack_from('>I', resident, 56)[0],
+                 approval['overlay']['item_names_sha256'])
     if (approval['overlay'].get('notice_owner') is not True
             or report.get('creator_sha256') != sha256(creator)):
         raise ValueError('Treasure reader requires the installed complete transaction creator')

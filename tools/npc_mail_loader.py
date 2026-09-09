@@ -82,7 +82,7 @@ def install(rom,replacements,additions,module,directory,*,glyph_font=None):
     approved = configuration(data,reloc,report,module)
     if report.get('notice_treasure'):
         from item_articles import verify_names
-        verify_names(additions.get(0x02A00000, b''), struct.unpack_from('>I', binary, 56)[0])
+        verify_names(additions.get(0x02A00000, b''), struct.unpack_from('>I', binary, 56)[0], report['item_names_sha256'])
     if report.get('mail_glyphs'):
         from extended_font_cartridge import mail_capability
         from mail_creator_catalog import identity,vrom

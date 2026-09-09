@@ -32,7 +32,7 @@ class OrdinaryItemNameTests(unittest.TestCase):
         cls.info = module_command_info(cls.native)
         cls.banks = {b.name:b for b in banks(cls.native)}
         cls.source = {k:b.entries() for k,b in cls.banks.items()}
-        cls.matches = {k:v for k,v in load_matches().items() if k[5:7] in GROUP_COUNTS}
+        cls.matches = {k:v for k,v in load_matches(include_sheet=False).items() if k[5:7] in GROUP_COUNTS}
 
     def test_all_209_complete_names_exact_sources_and_fifty_short_fields(self):
         self.assertEqual(len(self.matches), 209)
@@ -95,7 +95,7 @@ class OrdinaryItemArtifactTests(unittest.TestCase):
         cls.report = json.loads((BUILD/'build.json').read_text())
         cls.names = json.loads((ROOT/'build/ordinary-items-resource/names.json').read_text())
         cls.info = module_command_info(cls.native)
-        cls.matches = {k:v for k,v in load_matches().items() if k[5:7] in GROUP_COUNTS}
+        cls.matches = {k:v for k,v in load_matches(include_sheet=False).items() if k[5:7] in GROUP_COUNTS}
 
     def test_all_old_candidates_retained_and_only_two_resources_change(self):
         for oldpath, newpath, field, counts in (

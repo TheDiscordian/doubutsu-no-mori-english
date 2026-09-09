@@ -31,7 +31,7 @@ class FloorWallArtifactTests(unittest.TestCase):
         cls.report = json.loads((BUILD/'build.json').read_text())
         cls.info = module_command_info(cls.native)
         cls.names = json.loads((ROOT/'build/interior-items-resource/names.json').read_text())
-        cls.matches = {k:v for k,v in load_matches().items() if k.startswith(('item_26:','item_27:'))}
+        cls.matches = {k:v for k,v in load_matches(include_sheet=False).items() if k.startswith(('item_26:','item_27:'))}
 
     def test_all_previous_candidates_are_retained_and_only_ten_short_names_are_added(self):
         old = {r['id']:r for r in json.loads((ROOT/'build/native-credits-candidates/translations.json').read_text())}

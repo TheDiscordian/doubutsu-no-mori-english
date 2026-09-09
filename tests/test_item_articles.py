@@ -23,12 +23,16 @@ DIRECTORY = ROOT/'build/noticeboard-treasure/articles'
 
 @unittest.skipUnless((DIRECTORY/'articles.bin').is_file(), 'Local supplied article resource required')
 class ItemArticleTests(unittest.TestCase):
+    directory = DIRECTORY
+    names_directory = ROOT/'build/native-items-resource'
+    data_hash, names_hash, known_slots = DATA_HASH, NAMES_HASH, 3563
+
     @classmethod
     def setUpClass(cls):
-        cls.data = (DIRECTORY/'articles.bin').read_bytes()
-        cls.report = json.loads((DIRECTORY/'articles.json').read_text())
-        cls.names = (ROOT/'build/native-items-resource/names.bin').read_bytes()
-        cls.names_report = json.loads((ROOT/'build/native-items-resource/names.json').read_text())
+        cls.data = (cls.directory/'articles.bin').read_bytes()
+        cls.report = json.loads((cls.directory/'articles.json').read_text())
+        cls.names = (cls.names_directory/'names.bin').read_bytes()
+        cls.names_report = json.loads((cls.names_directory/'names.json').read_text())
         cls.rel = (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
         cls.symbols = (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_text()
         cls.rom = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
@@ -41,7 +45,7 @@ class ItemArticleTests(unittest.TestCase):
                  if os.environ.get('AF_ITEM_ARTICLE_SANITIZE') == '1' else [])
         env = dict(os.environ); env.pop('LD_PRELOAD', None)
         result = subprocess.run(['gcc', '-std=c99', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fPIC',
-                                 '-Wa,-I'+str(DIRECTORY), '-Wl,-z,noexecstack', *flags,
+                                 '-Wa,-I'+str(cls.directory), '-Wl,-z,noexecstack', *flags,
                                  *(str(ROOT/p) for p in sources), '-o', str(library)],
                                 capture_output=True, text=True, env=env, timeout=60)
         if result.returncode: raise ValueError(result.stderr)
@@ -54,8 +58,8 @@ class ItemArticleTests(unittest.TestCase):
     def test_complete_source_rebuild_and_immutable_profile(self):
         data, report = build(self.rom, self.names, self.names_report, self.rel, self.symbols, self.originals)
         self.assertEqual((data, report), (self.data, self.report))
-        self.assertEqual((len(data), sha256(data), sha256(self.names)), (SIZE, DATA_HASH, NAMES_HASH))
-        self.assertEqual((report['known_slots'], report['unknown_slots']), (3563, 981))
+        self.assertEqual((len(data), sha256(data), sha256(self.names)), (SIZE, self.data_hash, self.names_hash))
+        self.assertEqual((report['known_slots'], report['unknown_slots']), (self.known_slots, 4544-self.known_slots))
         verify(data)
         for offset in (0, 15, 16, 47, 48, len(data)-1):
             changed = bytearray(data); changed[offset] ^= 1
@@ -140,7 +144,7 @@ class ItemArticleTests(unittest.TestCase):
         with self.assertRaises(ValueError): verify(data)
 
     def test_installer_requires_matching_enabled_full_name_resource(self):
-        verify_names(self.names, 0x02A00000)
+        verify_names(self.names, 0x02A00000, self.names_hash)
         for data, address in ((b'', 0x02A00000), (self.names, 0), (self.names[:-1], 0x02A00000)):
             with self.assertRaises(ValueError): verify_names(data, address)
 

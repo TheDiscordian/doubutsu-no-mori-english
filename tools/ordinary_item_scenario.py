@@ -16,7 +16,7 @@ GROUPS = ('20', '21', '22', '25', '28', '29', '2A', '2C', '2E', '2F')
 
 def scenario(native, built, module, names):
     info = module_command_info(native)
-    approved = {key for key in load_matches() if key[5:7] in GROUPS}
+    approved = {key for key in load_matches(include_sheet=False) if key[5:7] in GROUPS}
     selected = [r for r in names['edits'] if r['id'] in approved]
     if len(selected) != 209 or {r['id'] for r in selected} != approved:
         raise ValueError('Ordinary item batch requires all 209 complete approved names')

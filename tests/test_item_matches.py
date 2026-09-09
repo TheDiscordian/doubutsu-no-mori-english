@@ -151,7 +151,9 @@ class ItemMatchRetailTests(unittest.TestCase):
         cls.rom = verified_rom(ROM_PATH.read_bytes()); cls.info = module_command_info(cls.rom)
         cls.banks = {b.name: b for b in banks(cls.rom)}
         cls.source = {name: b.entries() for name, b in cls.banks.items()}
-        cls.matches = load_matches()
+        # Preserve the original batch's exact scope; the sheet-reviewed batch
+        # has its own source/complete-output tests.
+        cls.matches = load_matches(include_sheet=False)
         cls.rows = list(map(json.loads, (ROOT/'build/inventory/item_10.jsonl').read_text().splitlines()))
         cls.refs = list(map(json.loads, (ROOT/'build/gamecube/names/furniture.jsonl').read_text().splitlines()))
 
