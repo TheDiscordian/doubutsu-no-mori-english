@@ -5,6 +5,9 @@
 Build a complete English translation for the Japanese Nintendo 64 release, with
 halfwidth Latin text and original hardware compatibility. Keep claims tied to
 recorded tests. An emulator boot does not establish hardware compatibility.
+An Expansion Pak requirement is acceptable if needed for the complete translation.
+Four-MiB compatibility is not a release requirement. Document and test the actual
+memory requirement; permission to use eight MiB does not itself change heap bounds.
 
 ## Workflow
 

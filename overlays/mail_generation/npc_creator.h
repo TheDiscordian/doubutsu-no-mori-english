@@ -20,6 +20,13 @@ typedef struct {
  * Return one only after complete native metadata and English text publication.
  * This does not allocate, load cartridge code, or submit/deliver the letter.
  */
+/* Read-only common guard for all creator dispatchers. Validate the small
+ * control objects and all output/resource intersections before reading any
+ * workspace session fields. The optional immutable input belongs to the
+ * particular dispatcher (for example current town or the series-name table).
+ */
+int af_mail_create_guard(AfNpcMailCreateWork *, unsigned char *, AfNpcMailSession **,
+                         unsigned int *, const void *, unsigned int);
 int af_npc_mail_create(AfNpcMailCreateWork *, unsigned char *, AfNpcMailSession **, unsigned int *);
 
 #endif

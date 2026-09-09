@@ -13,6 +13,22 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [post-office integration](checkpoints/POST_OFFICE_LETTERS.md) installs all
+four catalogue-order letters and the raffle-ticket letter with complete supplied
+English wording, sixteen-byte item names, and full expiry-month names. Native
+order and ticket loops retain their pending gifts/counts until successful mailbox
+receipt. Thirty host creator tests, the same thirty sanitizer tests, six installer
+and actual-ROM checks, thirty-five reader/loader/accounting regressions, and
+independent creator builds and native assembly pass. The silent native batch
+passes all 68 original comparisons/creations/receipts/readbacks, ten pending-loop
+cases, five invalid requests, 364 calls, and 615 assertions. Restored state,
+heap/stack guards, checkpoint reload, blank isolated saves, and graceful shutdown
+pass. Normal scheduling, save/reload, review, and original hardware remain.
+Shared creator guards recover enough space for this group: the new complete
+creator has 1,264 image bytes free, with no resident or saved-layout growth.
+An Expansion Pak requirement is permitted if the finished translation needs it;
+the implemented memory layout remains four-MiB until explicitly rebuilt/tested.
+
 The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
 additional complete GameCube names in the full translation ROM. Ten also fit
 native ten-byte fields; all other names remain complete in the existing wider
@@ -35,7 +51,8 @@ eight rejections, checkpoint restoration, and blank isolated saves. The earlier
 ordinary-NPC rejection does not recur in this matching-town fixture; its cause
 is not established. The score scheduler leaves mail/date state unchanged when
 the test expects delivery, so overall scheduling acceptance remains open. The creator
-has 240 image bytes free and the resident has none. Remaining text consumers,
+uses the shared guard in the current postal build; the resident has no linked
+headroom. Remaining text consumers,
 ordinary NPC delivery, review, real saves, release, and both stretch goals remain.
 
 The [complete mail-glyph framework](../specs/MAIL_GLYPHS.md) transcodes all 4,866

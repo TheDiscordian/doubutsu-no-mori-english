@@ -16,6 +16,31 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [postal integration](checkpoints/POST_OFFICE_LETTERS.md) installs complete
+catalogue-order and raffle-ticket wording through guarded creation and receipt.
+Host, sanitizer, actual-ROM, accounting, independent-build, and assembly checks
+pass. The silent native batch passes all 68 complete original comparisons and
+readbacks, ten pending-loop cases, five invalid requests, 364 calls, and 615
+assertions. Full-mailbox retention, partial delivery, absent-player rejection,
+resource retries, restored live state/heap/checkpoint, blank isolated saves, and
+graceful shutdown pass. Normal scheduling, save/reload, review, and hardware remain.
+The creator has 1,264 image bytes free; resident code and saved layouts do not grow.
+An Expansion Pak requirement is allowed. Preserve current four-MiB checks until
+an explicit eight-MiB memory layout and bootstrap are implemented and validated;
+complete text/presentation takes priority over retaining four-MiB compatibility.
+
+The next letter group is museum mail: introduction `00BD`, non-fossil reply
+`00BE`, and 25 fossil-result templates `010E..0126`. Both frozen English creator
+catalogues have all 81 complete parts with no free-field requirements. The
+original fossil table at `8010AE50` matches the supplied GameCube table order:
+`010E/0110/010F/0111/0113/0112/0114/0116/0115/0117/0119/0118/011A/011B/011C/
+011D/011E/011F/0120/0121/0126/0125/0123/0124/0122`. Native museum creation at
+`800A345C` is distinct from postal creation at `800B6B94`. Preserve the original
+sender identity/type through `800A3420`, paper 24, gift selection, initial-mail
+flags, pending fossils, and both mailbox/queue receipts. This group is not
+installed or credited by the new postal route; source-part and caller approvals,
+complete creation, both receipt gates, and native validation remain to implement.
+
 The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
 complete names in the full glyph ROM, with ten additional native-width edits.
 Only the two existing item-name resources change; every earlier candidate is

@@ -15,11 +15,12 @@ from npc_mail_capture import RAM,source_hashes,creator_imports,relocate,verified
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False):
     if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
+    if type(post_office) is not bool: raise ValueError('Invalid post-office creator option')
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores)
+    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     if academy_scores:
@@ -55,6 +56,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if villager_events: names += ('villager_event_creator',)
     if academy_letters: names += ('academy_creator',)
     if academy_scores: names += ('academy_score_creator',)
+    if post_office: names += ('post_office_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
@@ -73,6 +75,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if villager_events: linker = 'villager_event_capture.ld'
     if academy_letters: linker = 'academy_capture.ld'
     if academy_scores: linker = 'academy_score_capture.ld'
+    if post_office: linker = 'post_office_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','overlay.elf',*objects,'relocation.o')
@@ -122,6 +125,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if departed_letters: report['departed_letters'] = True
     if villager_events: report['villager_events'] = True
     if academy_letters: report['academy_letters'] = True
+    if post_office: report['post_office'] = True
     if academy_scores:
         report['academy_scores'] = True;report['academy_series_sha256'] = sha256(series)
         at = symbols['af_academy_series_data']-RAM
@@ -145,16 +149,18 @@ def main():
     parser.add_argument('--villager-events',action='store_true',help='Add complete villager-event letters; requires --departed-letters')
     parser.add_argument('--academy-letters',action='store_true',help='Add complete HRA welcome/advice letters; requires --villager-events')
     parser.add_argument('--academy-scores',action='store_true',help='Add complete HRA score capture; requires --academy-letters')
+    parser.add_argument('--post-office',action='store_true',help='Add complete catalogue-order and raffle-ticket letters; requires --academy-scores')
     parser.add_argument('--mail-glyphs',action='store_true',help='Create new letters with complete glyph catalogue four')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
     if args.villager_events and not args.departed_letters: parser.error('--villager-events requires --departed-letters')
     if args.academy_letters and not args.villager_events: parser.error('--academy-letters requires --villager-events')
     if args.academy_scores and not args.academy_letters: parser.error('--academy-scores requires --academy-letters')
+    if args.post_office and not args.academy_scores: parser.error('--post-office requires --academy-scores')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
-                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs),indent=2))
+                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office),indent=2))
 
 
 if __name__ == '__main__': main()

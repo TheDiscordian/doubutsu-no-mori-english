@@ -22,10 +22,15 @@ static int overlap(const void *a, unsigned int as, const void *b, unsigned int b
     return x <= y ? y-x < as : x-y < bs;
 }
 
-static int separate(AfNpcMailCreateWork *work, unsigned char *destination,
-                    AfNpcMailSession **active, unsigned int *capital) {
-    const void *outputs[4], *inputs[5];
-    unsigned int sizes[4], lengths[5], i, j;
+int af_mail_create_guard(AfNpcMailCreateWork *work, unsigned char *destination,
+                         AfNpcMailSession **active, unsigned int *capital,
+                         const void *extra, unsigned int extra_bytes) {
+    const void *outputs[4], *inputs[3];
+    unsigned int sizes[4], lengths[3], i, j;
+    if (!work || !destination || !active || !capital || (!extra != !extra_bytes)
+            || ((__UINTPTR_TYPE__)work & 15u)
+            || ((__UINTPTR_TYPE__)active & (__alignof__(AfNpcMailSession *)-1u))
+            || ((__UINTPTR_TYPE__)capital & (__alignof__(unsigned int)-1u))) return 0;
     outputs[0] = work; sizes[0] = sizeof(*work);
     outputs[1] = destination; sizes[1] = 164;
     outputs[2] = active; sizes[2] = sizeof(*active);
@@ -33,19 +38,21 @@ static int separate(AfNpcMailCreateWork *work, unsigned char *destination,
     /* Reject a work pointer aliased to a smaller control object before reading
      * that alleged work object's session fields.
      */
-    for (i = 0; i < 4; ++i)
+    for (i = 0; i < 4; ++i) {
         for (j = 0; j < i; ++j)
             if (overlap(outputs[i],sizes[i],outputs[j],sizes[j])) return 0;
+        if (overlap(outputs[i],sizes[i],af_npc_word_data,AF_NPC_WORD_BYTES)
+                || overlap(outputs[i],sizes[i],af_npc_alias_data,AF_NPC_ALIAS_BYTES)
+                || overlap(outputs[i],sizes[i],extra,extra_bytes)) return 0;
+    }
     inputs[0] = work->captured.session.player; lengths[0] = 16;
     inputs[1] = work->captured.session.animal; lengths[1] = 12;
     inputs[2] = work->captured.session.remail; lengths[2] = 18;
-    inputs[3] = af_npc_word_data; lengths[3] = AF_NPC_WORD_BYTES;
-    inputs[4] = af_npc_alias_data; lengths[4] = AF_NPC_ALIAS_BYTES;
     for (i = 0; i < 4; ++i) {
-        for (j = 0; j < 5; ++j)
+        for (j = 0; j < 3; ++j)
             if (overlap(outputs[i],sizes[i],inputs[j],lengths[j])) return 0;
     }
-    return 1;
+    return !*active && *capital <= 1u;
 }
 
 int af_npc_mail_create(AfNpcMailCreateWork *work, unsigned char *destination,
@@ -53,13 +60,10 @@ int af_npc_mail_create(AfNpcMailCreateWork *work, unsigned char *destination,
     AfNpcMailCaptureWork *capture;
     AfNpcMailSession *session;
     unsigned int i, owned;
-    if (!work || !destination || !active || !capital || ((__UINTPTR_TYPE__)work & 15u)
-            || ((__UINTPTR_TYPE__)active & (__alignof__(AfNpcMailSession *)-1u))
-            || ((__UINTPTR_TYPE__)capital & (__alignof__(unsigned int)-1u))) return 0;
+    if (!af_mail_create_guard(work,destination,active,capital,0,0)) return 0;
     capture = &work->captured;
     session = &capture->session;
-    if (!separate(work,destination,active,capital) || *active || *capital > 1u
-            || !session->player || (!session->animal && !session->remail)
+    if (!session->player || (!session->animal && !session->remail)
             || session->condition > 1u || session->foreign > 1u
             || session->foreign != (session->remail != 0)
             || (session->remail ? session->remail[16]&127u : session->animal[11]) >= 6u)

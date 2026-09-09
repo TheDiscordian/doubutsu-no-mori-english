@@ -235,6 +235,11 @@ def measure(native, built, report):
             verify_installation(built, native, module, report['academy_score_letters'])
             credit_mail(creator_vrom, {k: report['academy_score_letters']['complete_templates'] for k in ('super', 'mail', 'ps')}, 'academy_score_letters')
 
+        if report.get('post_office_letters'):
+            from post_office_letters import TEMPLATES, verify_installation
+            verify_installation(built, native, module, report['post_office_letters'])
+            credit_mail(creator_vrom, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'post_office_letters')
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard

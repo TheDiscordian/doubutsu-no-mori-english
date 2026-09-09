@@ -247,5 +247,22 @@ class NpcMailCreatorTests(unittest.TestCase):
         self.assertEqual((fixture[0].raw,fixture[6].raw,fixture[-1].value),before)
         self.assertEqual(self.calls.value,0)
 
+    def test_shared_guard_optional_input_boundaries_and_no_mutation(self):
+        guard = self.lib.af_mail_create_guard
+        guard.argtypes = [C.c_void_p]*5+[C.c_uint];guard.restype = C.c_int
+        fixture = self.fixture();extra = C.create_string_buffer(b'X'*32)
+        args = [fixture[1],C.addressof(fixture[6])+16,C.addressof(self.active),C.addressof(fixture[7])]
+        before = fixture[0].raw,fixture[6].raw,fixture[-1].value,self.active.value,extra.raw
+        self.assertEqual(guard(*args,0,0),1)
+        self.assertEqual(guard(*args,C.addressof(extra),32),1)
+        self.assertEqual(guard(*args,0,32),0)
+        self.assertEqual(guard(*args,C.addressof(extra),0),0)
+        for at,size in zip(args,(self.lib.af_npc_creator_size(),164,C.sizeof(C.c_void_p),C.sizeof(C.c_uint))):
+            # Optional immutable ranges are checked without dereferencing them.
+            for start,length in ((at,1),(at+size-1,1),(at-1,2),(at-16,size+32)):
+                self.assertEqual(guard(*args,start,length),0)
+        self.assertEqual((fixture[0].raw,fixture[6].raw,fixture[-1].value,self.active.value,extra.raw),before)
+        self.assertEqual(self.calls.value,0);self.assertEqual(self.clear_calls.value,0)
+
 
 if __name__ == '__main__': unittest.main()

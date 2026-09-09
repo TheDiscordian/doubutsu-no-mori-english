@@ -11,6 +11,14 @@ selectable while module features are developed. The module includes bounded
 
 ## Memory contract
 
+An Expansion Pak requirement is permitted for the finished translation. The
+current implementation below remains four-MiB; this is an implementation bound,
+not a requirement to sacrifice complete text or presentation. An eight-MiB
+implementation must detect the installed RAM, establish non-overlapping heap,
+framebuffer, code, and test regions, and update allocator/relocation checks and
+release requirements together. Do not enable extra addresses merely by changing
+an allocation limit.
+
 The retail `mainproc` calls `SystemHeap_Init(801948E0, 0026B720)` at RAM
 `800D6720`. The heap begins immediately after the static buffers segment and
 ends at `80400000`. The DMA manager is already running; no system-heap allocation

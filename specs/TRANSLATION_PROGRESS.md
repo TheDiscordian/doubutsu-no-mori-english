@@ -16,7 +16,8 @@ special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, and keyboard labels. Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,
-sale/Redd event, Mom, departed-villager, villager-event, and HRA welcome/advice routes. Unavailable
+sale/Redd event, Mom, departed-villager, villager-event, HRA welcome/advice/score,
+and catalogue-order/raffle-ticket routes. Unavailable
 Mom, birthday, and score bodies do not receive complete-letter credit in the
 default catalogue-two variant. The counter reads the compiled creator's selected
 catalogue and each verified route's complete IDs. Catalogue-four glyphs receive

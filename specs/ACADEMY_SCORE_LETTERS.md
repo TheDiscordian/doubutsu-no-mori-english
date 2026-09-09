@@ -113,10 +113,14 @@ zero gift, font zero, type six, and paper 51 retain native meanings. The origina
 200-byte handbill temporary strings stay untouched: this complete owned capture
 replaces their six old preparations, rather than widening those native fields.
 
-The glyph-capable linked creator has 32,528 image bytes and 560 relocation bytes.
-Each call requests 38,447 bytes including workspace and alignment. The score
-dispatcher frame is 144 bytes. Only 240 image bytes remain below its 32 KiB image limit;
-the complete blob is allowed to include a separately bounded relocation table.
+The glyph-capable score creator uses the shared read-only creator guard and has
+30,720 image bytes and 432 relocation bytes. Each call requests 36,511 bytes
+including workspace and alignment. The score dispatcher frame is 112 bytes;
+the shared guard uses its own 80-byte frame.
+The optional [post-office creator](POST_OFFICE_LETTERS.md) includes this full
+chain in 31,504 image bytes with 448 relocation bytes, retaining 1,264 image bytes
+below the 32 KiB image limit. The complete blob may also include its separately
+bounded relocation table.
 The glyph reader's resident module occupies 24,576 linked bytes. No saved structure grows.
 
 ## Native publication and failure propagation

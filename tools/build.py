@@ -213,6 +213,7 @@ def main():
     parser.add_argument('--english-villager-event-letters', action='store_true', help='Complete supported friendship, birthday, goodbye, and Christmas letters; requires departed integration and full item names')
     parser.add_argument('--english-academy-letters', action='store_true', help='Complete HRA welcome/advice letters with scheduler success gates; requires villager-event integration')
     parser.add_argument('--english-academy-scores', action='store_true', help='Complete HRA score letters and full field capture; requires welcome/advice and the score creator')
+    parser.add_argument('--english-post-office-letters', action='store_true', help='Complete catalogue-order and raffle-ticket letters; requires the postal creator and full item names')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -244,6 +245,8 @@ def main():
         parser.error('--english-academy-letters requires --english-villager-event-letters')
     if args.english_academy_scores and not args.english_academy_letters:
         parser.error('--english-academy-scores requires --english-academy-letters')
+    if args.english_post_office_letters and not (args.npc_mail_generation and args.extended_items):
+        parser.error('--english-post-office-letters requires --npc-mail-generation and --extended-items')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -345,6 +348,9 @@ def main():
     if args.english_academy_scores:
         from academy_score_letters import install as install_academy_scores
         report['academy_score_letters'] = install_academy_scores(rom,replacements,additions,report.get('runtime_module'))
+    if args.english_post_office_letters:
+        from post_office_letters import install as install_post_office
+        report['post_office_letters'] = install_post_office(rom,replacements,additions,report.get('runtime_module'))
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

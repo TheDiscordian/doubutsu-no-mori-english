@@ -940,6 +940,12 @@ def main():
                     raise ValueError('Academy score probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_academy_scores'],record))
+            if 'test_post_office_letters' in action:
+                from post_office_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Post-office probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_post_office_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():
