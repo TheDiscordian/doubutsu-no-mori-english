@@ -12,11 +12,16 @@ from villager_event_scenario import scenario as event_scenario
 from topic_gap_test_scenario import combine_checkpoints
 
 
-def scenario(native,built,report):
+def scenario(native,built,report,groups=('mother','events','scores','npc')):
     if report['runtime_module']['npc_mail_loader']['overlay'].get('mail_glyphs') is not True:
         raise ValueError('Complete glyph creator integration is required')
-    batches = [mother_scenario(native,built,report),event_scenario(native,built,report),
-               score_scenario(native,built,report),npc_scenario(built,native,report['runtime_module'])]
+    makers = {'mother':lambda:mother_scenario(native,built,report),
+              'events':lambda:event_scenario(native,built,report),
+              'scores':lambda:score_scenario(native,built,report),
+              'npc':lambda:npc_scenario(built,native,report['runtime_module'])}
+    if not groups or len(groups)!=len(set(groups)) or any(group not in makers for group in groups):
+        raise ValueError('Select unique known native creator batches')
+    batches = [makers[group]() for group in groups]
     # Each native test restores its own live save/globals and allocations. One
     # outer checkpoint also restores scratch and resumes the original thread.
     return combine_checkpoints(batches)
@@ -37,9 +42,11 @@ def main():
     parser.add_argument('--build',type=Path,default=Path('build/mail-glyph-letters-pilot'))
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--boot-output',type=Path,help='Also prepare the existing boot-to-town scenario without screenshots')
+    parser.add_argument('--groups',nargs='+',choices=('mother','events','scores','npc'),
+                        default=('mother','events','scores','npc'),help='Run selected groups without repeating completed native batches')
     args = parser.parse_args()
     actions = scenario(args.native_rom.read_bytes(),(args.build/'animal-forest-halfwidth.z64').read_bytes(),
-                       json.loads((args.build/'build.json').read_text()))
+                       json.loads((args.build/'build.json').read_text()),args.groups)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(actions,indent=2)+'\n')
     if args.boot_output:
@@ -47,7 +54,7 @@ def main():
         boot = without_captures(json.loads((root/'tests/runtime-choice-scenario.json').read_text()))
         args.boot_output.parent.mkdir(parents=True,exist_ok=True)
         args.boot_output.write_text(json.dumps(boot,indent=2)+'\n')
-    print(json.dumps({'actions':len(actions),'creator_batches':4,'cartridge_loading':True,
+    print(json.dumps({'actions':len(actions),'creator_batches':len(args.groups),'cartridge_loading':True,
                       'save_round_trip':False,'hardware_validation':False}))
 
 

@@ -18,6 +18,11 @@ from runtime_layout import MODULE_RAM,RESERVATION,TEST_STACK,GUARD_ADDRESS,GUARD
 from villager_event_scenario import IDENTITIES
 
 
+def mailbox_position(index,capital):
+    """Cycle four native players and ten slots even beyond twenty templates."""
+    return (index//10+capital*2)%4,index%10
+
+
 def exercise(debug,request,record):
     read,write = debug.read_memory,debug.write_memory
     assertions = readbacks = 0
@@ -119,7 +124,7 @@ def exercise(debug,request,record):
     comparisons = 0
     for index,case in enumerate([] if request.get('scheduler_only') else request['cases']):
         for cap in (0,1):
-            player,slot = index//10+cap*2,index%10;home = homes[player]
+            player,slot = mailbox_position(index,cap);home = homes[player]
             at = HOME_MAILBOX+home*HOME_STRIDE+slot*164;month,day = index%12+1,index%28+1
             args = [home,case['points'],case['room'],series,0x11FC,0]
             before = fixture(player,slot,cap,case,month=month,day=day)

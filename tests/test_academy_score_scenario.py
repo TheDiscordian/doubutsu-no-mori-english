@@ -6,9 +6,23 @@ import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from academy_score_scenario import selected_template
+from academy_score_smoke import mailbox_position
 
 
 class AcademyScoreScenarioTests(unittest.TestCase):
+    def test_all_twenty_one_templates_use_existing_players_and_slots(self):
+        seen = set()
+        for index in range(21):
+            for capital in (0,1):
+                player,slot = mailbox_position(index,capital)
+                self.assertIn(player,range(4));self.assertIn(slot,range(10))
+                if index<20:
+                    self.assertEqual((player,slot),(index//10+capital*2,index%10))
+                seen.add((player,slot))
+        self.assertEqual(seen,{(p,s) for p in range(4) for s in range(10)})
+        self.assertEqual(mailbox_position(20,0),(2,0))
+        self.assertEqual(mailbox_position(20,1),(0,0))
+
     def test_fallback_points_and_original_room_defaults(self):
         request = {'selection_table':[-1]*64}
         for points,room,expected in ((0,0,0x42),(1,0,0x43),(19999,1,0x44),(5000,2,0x45),

@@ -3910,5 +3910,565 @@
     "reference_id": "item_24:0078",
     "reference_sha256": "b2afc333bb49aae70ab2fc0c7b32a87515108e4a88c44a423a7c6ef12d7a8abf",
     "evidence": "The original carried clothing name クマのふく identifies the complete supplied bear shirt reference. It differs from its placed name only in a Japanese linking particle or hiragana/katakana spelling. Bind this actual ordinary field and reference independently; do not relax the exact-source alias rule or normalise other unreviewed names."
+  },
+  {
+    "id": "item_26:0001",
+    "source_sha256": "5055106b142cc00b80e0cea239952d1e35fdf7a059ff56bebfb62e3492e137e6",
+    "native_name": "シックなじゅうたん",
+    "reference_id": "item_26:0001",
+    "reference_sha256": "132d4c733af3ebe4a8ca8caa266a7b9b10f1003c1c76a6037f24c35d17be5567",
+    "evidence": "The native chic series uses the already established classic English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0003",
+    "source_sha256": "00e4c86680ffa7b617157e0c1ca07f70cbd13c38ad5ac8960eef8fb90088f3eb",
+    "native_name": "ふるいフローリング",
+    "reference_id": "item_26:0003",
+    "reference_sha256": "56c52f18a5fe96e9f4953b9fa68b4d72ca3f34587f474cbaba85d69d7ac34923",
+    "evidence": "The original names old wooden flooring; the supplied name retains that identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0006",
+    "source_sha256": "e41caf1e96d210c361c26ebc556077c8bd0b8fded74b50295fcd062a11e764e8",
+    "native_name": "きょうしつのゆか",
+    "reference_id": "item_26:0006",
+    "reference_sha256": "79050bb56d0030118eb6ccd5f2cc34c4eefa374eb8a041f8de9318abe582d2c3",
+    "evidence": "Both names explicitly identify a classroom floor. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0009",
+    "source_sha256": "374d28c63bbc1463bda023cd1e3ccde48555aa6b8058c9c9119c3b0b81560db7",
+    "native_name": "こけにわのゆか",
+    "reference_id": "item_26:0009",
+    "reference_sha256": "c7a4ab9b55e60d6d222e1d69fcc2cd324a2dff72948fbe0692bc0dcfb1df319b",
+    "evidence": "Both names identify moss-covered ground. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:000A",
+    "source_sha256": "206ce16aeed16215d53946ca0072e5e0981684b653e678f454b11f34585e4e87",
+    "native_name": "18じょうじきだたみ",
+    "reference_id": "item_26:000A",
+    "reference_sha256": "487fe4470688608ff9d6d74821b7d5b48540b9ac082be6b94d5fbf6f68b4c822",
+    "evidence": "Both names explicitly retain eighteen tatami mats. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:000B",
+    "source_sha256": "8bcbdf0fdd39a7b01ca43720384ea0a1b9aad82205bdb80246d310534011b07b",
+    "native_name": "8じょうじきだたみ",
+    "reference_id": "item_26:000B",
+    "reference_sha256": "6cb6debbe8e4b242fd04edf6b7bd84fa817b4840ef11c62276d5971a9b550176",
+    "evidence": "Both names explicitly retain eight tatami mats. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:000D",
+    "source_sha256": "9f1e9891c9c6866e3b43b86ea667bfa972c5187a8b1baa046e2fb48bd0466e21",
+    "native_name": "ログハウスのゆか",
+    "reference_id": "item_26:000D",
+    "reference_sha256": "bbaf5a656d0fb4a9214bdee7800213af204233399a3e473e8cafd9a699da74cc",
+    "evidence": "The native log-house theme uses the established cabin English series name; the shifted legacy gloss is not used. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:000E",
+    "source_sha256": "8adcb43c0e8f08c9a3456734f4bc6359225e580651b9a0d08c5ad99f6cd0e561",
+    "native_name": "ひびわれたどうろ",
+    "reference_id": "item_26:000E",
+    "reference_sha256": "0f2ea16b695f40b89585023791934087ecf07b2062e63782391dcdf17f7c293c",
+    "evidence": "The native cracked road matches the supplied road identity; the shifted legacy lunar gloss is not used. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:000F",
+    "source_sha256": "0a049d3b3f6a32afc64256f17d06ea30e6d82eb0544ab4b582a73a92e899f525",
+    "native_name": "げつめんのゆか",
+    "reference_id": "item_26:000F",
+    "reference_sha256": "679a877349b5c651c9a9db690c1de2f882165803afa057e98356e40bc995bb7b",
+    "evidence": "Both names identify the lunar surface; the shifted legacy sand gloss is not used. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0010",
+    "source_sha256": "ae25d4a9a2b110793848368773319f17431a13f39f87d23869a67da90af82e42",
+    "native_name": "かれさんすいのゆか",
+    "reference_id": "item_26:0010",
+    "reference_sha256": "d7ccf2aee8b83001491cc1752390401b23ba66469822235076e4f22f12a93960",
+    "evidence": "The native dry-landscape garden matches the supplied sand-garden identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0011",
+    "source_sha256": "902d637a5dc0b4b5d31b733b47c17c8e8b48e1278b4ac7d45d19d015f673036f",
+    "native_name": "ハロウィンじゅうたん",
+    "reference_id": "item_26:0011",
+    "reference_sha256": "efe4f7378517b5b23ede504cb67155ae01fc0b4396a0400fe5a1a8c27a054aaa",
+    "evidence": "The native Halloween theme uses the established spooky English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0013",
+    "source_sha256": "f21f751d4b0a52a3f686c26793f5039df57f2afaba6ef2f773e61b48738405ee",
+    "native_name": "みどりのじゅうたん",
+    "reference_id": "item_26:0013",
+    "reference_sha256": "21f6f5383428477f92f967c2a35b3a3e0a59fe6d11a3ff4a82c14ecdd0d700a8",
+    "evidence": "Both names identify the green carpet; the shifted legacy blue-tile gloss is not used. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0014",
+    "source_sha256": "b0fbf29dcf9f2bbd69fa9af51d8efaf1fe2944cc7882e4451410d5a78ee2f9a0",
+    "native_name": "あおいゆか",
+    "reference_id": "item_26:0014",
+    "reference_sha256": "ba095fa4623fced11fee52adf6ce2be87eca02301f68e28669df7581445d52a8",
+    "evidence": "Both names explicitly identify blue flooring; the shifted legacy regal gloss is not used. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0015",
+    "source_sha256": "182d7d2c132f1f11a74ba4514f85dd05cc152a3708cd4d680aa84d59a9bb715f",
+    "native_name": "ロイヤルなゆか",
+    "reference_id": "item_26:0015",
+    "reference_sha256": "9bca1ce2ac07ba4a6d17907580bbb9ce91ccb34e6f12d63f3388a9d5e50a4b62",
+    "evidence": "The native royal theme uses the established regal English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0016",
+    "source_sha256": "241effb4dacb5a47f9ec2388723af704e992bce5b16af50b8c674e8482b470bc",
+    "native_name": "カントリーなゆか",
+    "reference_id": "item_26:0016",
+    "reference_sha256": "b3992d1d254f82e899cc750f938eee722a9d5502b10f2f592e2ddee2adc88cf0",
+    "evidence": "The native country theme uses the established ranch English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0017",
+    "source_sha256": "853bcfc3f5c4b60c61b6e6e8145ce547248e08dc11681a79451a3103c91a5101",
+    "native_name": "モノクロタイルのゆか",
+    "reference_id": "item_26:0017",
+    "reference_sha256": "4e40686d3b501f3d50a121ca97221b129140d60f654096a66abca34e1333ea58",
+    "evidence": "The native monochrome theme uses the established modern English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0018",
+    "source_sha256": "0c4c85e692b1702a459a2e245ded05f911ae4f11ea22d8926a958ec8da82a48e",
+    "native_name": "リゾートなゆか",
+    "reference_id": "item_26:0018",
+    "reference_sha256": "670a0c0da5ac356a12ac415a118455b8485a9d7459cefd2f792bbf90c895fecb",
+    "evidence": "The native resort theme uses the established cabana English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0019",
+    "source_sha256": "894a4a90b0d901fe9f2d47e4648fd5950c6c4f8de2d96c1dcc15f5900686c2fa",
+    "native_name": "ゆきだるまじゅうたん",
+    "reference_id": "item_26:0019",
+    "reference_sha256": "3ab6be55ee65be49c39ee32ce5a93c7dda5ecc5ae018965b1a8d69afab16cb3b",
+    "evidence": "Both names explicitly identify the snowman carpet; preserve supplied capitalization. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:001F",
+    "source_sha256": "63adc2ac08eb22020f4395866b7419b5ad1b92d45e5c6bd1d82d2a416e51e3b3",
+    "native_name": "いたまつきのたたみ",
+    "reference_id": "item_26:001F",
+    "reference_sha256": "be837f283f4121d85714654cb3b70f3eecac86ccde41c36c11812235ba1f6363",
+    "evidence": "Both names identify tatami flooring; no change to the wood-bordered native artwork is approved. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0020",
+    "source_sha256": "3b0f9fad561b0be2b3773abe43df1cd7427e323b27f2c7976ac21d442d5b6e02",
+    "native_name": "バンブーなゆか",
+    "reference_id": "item_26:0020",
+    "reference_sha256": "ac3479b1c452b3ed209640bfcb74212744d99a8e0083d259bbf8200aaa8379d8",
+    "evidence": "Both names explicitly identify bamboo flooring. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0021",
+    "source_sha256": "09b054bdccd70e0eadf060ef497d9c1efe0f91a17a445dc16edbd8bda7ecd4b3",
+    "native_name": "キッチンのゆか",
+    "reference_id": "item_26:0021",
+    "reference_sha256": "22db5e07ffe5db7d549f5e4cc7eb50fe8d770db6185859e87e32bc54b3fe39cb",
+    "evidence": "Both names explicitly identify kitchen flooring. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0024",
+    "source_sha256": "7ce6253f0d53f5e6e9e5c340d6b32c74318a55c51f58ef01581a9fc555cce43a",
+    "native_name": "おうちょうなゆか",
+    "reference_id": "item_26:0024",
+    "reference_sha256": "1a32fc6493924e3101a0e100e1b3f4701613f7fe7175f845658907827ff38ed6",
+    "evidence": "The native imperial-court floor matches the supplied imperial identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0028",
+    "source_sha256": "736c6cf45c58f1102626085958001cbb787b57ef4cd1b8ac8bb3a8beba96e477",
+    "native_name": "ごうかなじゅうたん",
+    "reference_id": "item_26:0028",
+    "reference_sha256": "9c3cd91b017e2e6ef0e96bd39c97035ff97e744b20297421efc870f72dca45e2",
+    "evidence": "The native ornate carpet matches the supplied fancy-carpet meaning. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0029",
+    "source_sha256": "0d794e5c238d49b006dd5b0c3c9152673a513fac67f78696cd27e4e0e822c735",
+    "native_name": "ぎゅうがわのしきもの",
+    "reference_id": "item_26:0029",
+    "reference_sha256": "336ccbcd8b91942ac9048b877a3b5d5d35af9c8cf2bf0c938d139c7973ef9e16",
+    "evidence": "Both names explicitly identify a cowhide floor covering. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:002A",
+    "source_sha256": "b77efcb7d17058bb74f0d4b6b9a8f5eb554924790d3e525eb6b32484b461c4d3",
+    "native_name": "てっぱんのゆか",
+    "reference_id": "item_26:002A",
+    "reference_sha256": "faec3751c8369063ff2c0cd866ec3bb55dbeb591966b4435f634defcaf862443",
+    "evidence": "Both names identify metal-plate flooring. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:002B",
+    "source_sha256": "3adf3d99618e76cd8a497e3f68442fefd2d27f8adb5c4cfb7cb5fe0fa386bf72",
+    "native_name": "オフィスのゆか",
+    "reference_id": "item_26:002B",
+    "reference_sha256": "59e10eb7e2ee27774b988d9fa22d4b42749462df77f81aae30d9113ac3443f4e",
+    "evidence": "Both names explicitly identify office flooring. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:002C",
+    "source_sha256": "d377e442b092a7cdeaee11d05b57f802fbbf9d9cee9fbd168c9c5014855527de",
+    "native_name": "エジプトなゆか",
+    "reference_id": "item_26:002C",
+    "reference_sha256": "95d48a2856701324e6670bed20334d506bd70762701b4729652ddd3602db543d",
+    "evidence": "The native Egyptian theme uses the ancient English series naming. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:002E",
+    "source_sha256": "be309543732ec978286da89fa952fdb1a7b8847a46412824ab7d712f1e6b71fb",
+    "native_name": "あきちのゆか",
+    "reference_id": "item_26:002E",
+    "reference_sha256": "0c168596ef0f185b4aafb50c64e84e7a394a87fd18738990f320f82a36f7efae",
+    "evidence": "Both names identify vacant outdoor ground. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:002F",
+    "source_sha256": "22e3a41e5b18ab6077de4ff0e79b9209c13e8b306a682899a27478aeca124bec",
+    "native_name": "クリスマスじゅうたん",
+    "reference_id": "item_26:002F",
+    "reference_sha256": "dbf063429cb8252c6dadc904be160be9a16713f34dd1693acd17ff1ee94e6c8e",
+    "evidence": "The native Christmas theme uses the established Jingle English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0031",
+    "source_sha256": "ae6318f3f9529a708f7aa386e0db3c9b35fab21ecab228df50e56b06d998a472",
+    "native_name": "ほどうのゆか",
+    "reference_id": "item_26:0031",
+    "reference_sha256": "44b196dd2b5dec63d6c625e6b1dbcc56a81b8c081504cfb0ee8324b5d5be3fa0",
+    "evidence": "Both names identify a paved footpath. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0032",
+    "source_sha256": "7af4716a8f44775ad416b262498d479535840c83be019151a3c6816df534a625",
+    "native_name": "モザイクタイルのゆか",
+    "reference_id": "item_26:0032",
+    "reference_sha256": "f066976b487374de505bf125897bf2a35309eb44f34006219fb9f4adc5358422",
+    "evidence": "Both names explicitly identify mosaic tile. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0034",
+    "source_sha256": "12f0a70a02c0ef617f641a3707a64e1435a941744968e07deee5c041e7919a2b",
+    "native_name": "ちかしつのゆか",
+    "reference_id": "item_26:0034",
+    "reference_sha256": "f5b6e5858269b4b1dbe55ee1726adb0905664138534cf0c4db9f0bb4415d73ea",
+    "evidence": "Both names explicitly identify basement flooring. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:0036",
+    "source_sha256": "2d50faf7dfa2214b4370d9555306e5354876609a767ed9640ffe170eede25b5a",
+    "native_name": "カラフルなゆか",
+    "reference_id": "item_26:0036",
+    "reference_sha256": "d14498063df4a39e2f08631b94f9dedeb9d87674b872668fab601fb3efa64faa",
+    "evidence": "The native colourful theme uses the established kiddie English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:003B",
+    "source_sha256": "9d90f88ca1d983e7567145902f84dfaa8dc8870472115919fe0e7f7b6706cc03",
+    "native_name": "きゅうでんのゆか",
+    "reference_id": "item_26:003B",
+    "reference_sha256": "bdd5adfed65df25d68049b938cc950bea3dcce2d242c53d51f0aac003403a162",
+    "evidence": "Both names explicitly identify a palace floor. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:003C",
+    "source_sha256": "5833ff2b7874de39cc42a2eee9874d8aa40a0e58a3a52baa086d123cfa65c8b3",
+    "native_name": "みなみのしまなゆか",
+    "reference_id": "item_26:003C",
+    "reference_sha256": "e942a68747114429fbf2ba7b1588cbd974cb912033a5f1314bbc78856e22631c",
+    "evidence": "The native southern-island theme matches the supplied tropical identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:003D",
+    "source_sha256": "4f16554d68cdc27468da7d0c17a1d1de071b9d914ce33c94220f6656bc66c743",
+    "native_name": "おもちゃなゆか",
+    "reference_id": "item_26:003D",
+    "reference_sha256": "086bd18e3a1422d688055f4998d2c38fc598e92028270c099842f06a928c2b59",
+    "evidence": "The native toy theme matches the supplied playroom identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_26:003E",
+    "source_sha256": "c762eaf226dbe8452d670ea411a47fc276d10d1fe0547c580b61c6d2e2290da3",
+    "native_name": "キッチュなゆか",
+    "reference_id": "item_26:003E",
+    "reference_sha256": "be35a82980a3418503a6af5089d9ea26315a4637754b8f36c019fdcf27c7168f",
+    "evidence": "Both names explicitly identify the kitsch theme. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0001",
+    "source_sha256": "f0fb230929726f315223bcefa1fb1aca846847764808087a2973286accf11344",
+    "native_name": "シックなかべ",
+    "reference_id": "item_27:0001",
+    "reference_sha256": "cc6a3b9003da288275eea06a0ad457df2d6ba6ff925ee60161d1b8aedd94b301",
+    "evidence": "The native chic theme uses the already established classic English series name; do not confuse native row zero. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0007",
+    "source_sha256": "a97820cfe88164fb5f0150dd08d0b4ab7ebb665d9b24674a087a2ca26754e33e",
+    "native_name": "ラブリーかべがみ",
+    "reference_id": "item_27:0007",
+    "reference_sha256": "9fbea211aea9336481fcb68794d76ea7efdd78e7cae4b91f48ade09bef965693",
+    "evidence": "Both names explicitly identify the lovely series. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0008",
+    "source_sha256": "e647c0f6af67959480f06f416d15e5d2115363f8a1d276010b0734298ef61509",
+    "native_name": "アジアなすだれ",
+    "reference_id": "item_27:0008",
+    "reference_sha256": "f2eb7f368c31433d72dadc280fc28bb9ca419c93783818846d83229817178bbb",
+    "evidence": "The native Asian theme uses the established exotic English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0009",
+    "source_sha256": "52e4732e41cf190c3ed708de101f139d67480d807069587d8d40f2370829813f",
+    "native_name": "しっくいのへい",
+    "reference_id": "item_27:0009",
+    "reference_sha256": "a2b6f70c2af10d9d4723a22e3314314d12fc3236465f25b998d8e40e926a90d6",
+    "evidence": "The native plastered wall and supplied mortar-wall name describe the same construction category. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:000A",
+    "source_sha256": "4c3eb1aabf613b0146ff0e889c55203b8ea1113c0b5962a462def6df5b1172ee",
+    "native_name": "きんぱくのふすま",
+    "reference_id": "item_27:000A",
+    "reference_sha256": "21b983a771a3897267882f6378ed1df11ceca1116b5409ba3e5f33d3b215173e",
+    "evidence": "Both names identify gold-covered sliding screens. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:000B",
+    "source_sha256": "876835fe851ff73e06fcb38df7390dcef4ca381c67dd398e6c379a454a5744af",
+    "native_name": "ちゃしつなかべ",
+    "reference_id": "item_27:000B",
+    "reference_sha256": "01b947a510254842ac6f28ea54395872716859f89c413860bcdeffcaef860ecb",
+    "evidence": "Both names explicitly identify a tea-room wall. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:000D",
+    "source_sha256": "df342f5ed2b096e4fcbb6c102788c0779137b2a7c03361c42a2fd42da6c15776",
+    "native_name": "ログハウスのかべ",
+    "reference_id": "item_27:000D",
+    "reference_sha256": "3274541e65191b57c449fbf8e40db3db402ddc6498ac8235419165a66f38aec1",
+    "evidence": "The native log-house theme uses the established cabin English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:000E",
+    "source_sha256": "5d2b3f95089570b9f6b9b9637b776b653242c39d91adf367177644bde44639c5",
+    "native_name": "ブルーシートかべ",
+    "reference_id": "item_27:000E",
+    "reference_sha256": "2b6e6b58e6e0019ddeff0808bb255cdc2d15b982feef916fcd9b5acd5986601c",
+    "evidence": "Both names explicitly identify a blue tarpaulin. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0011",
+    "source_sha256": "1a8504b02997256bc9643f087bd397587f16a3e9542818276ea967d2672e2495",
+    "native_name": "ハロウィンかべ",
+    "reference_id": "item_27:0011",
+    "reference_sha256": "a16486f375f76fdfb102b9b9660b518242ff8e9f60703763e4aa6c55502c2621",
+    "evidence": "The native Halloween theme uses the established spooky English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0013",
+    "source_sha256": "93d4d9f2c9ee017bf1f22f9e7617f6f75f9e07af1513ff38f001bd8adbdf0765",
+    "native_name": "みどりのかべがみ",
+    "reference_id": "item_27:0013",
+    "reference_sha256": "fc12a43697bb37c46af3c3285fdad47a3db162497e3150d353708f3e03aeab0c",
+    "evidence": "Both names explicitly identify green wallpaper. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0015",
+    "source_sha256": "caaa36e407e45a99e10251f4db527c5192193d0fea13550a4b167333a3b21d58",
+    "native_name": "ロイヤルなかべがみ",
+    "reference_id": "item_27:0015",
+    "reference_sha256": "570a9ffdc95acf27b3f6b937c4c5d79c62472498e7765086cd9bcf23795f6300",
+    "evidence": "The native royal theme uses the established regal English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0016",
+    "source_sha256": "b6802e2b5565621c6e82e9ed010b7f13dacec24b669c935bdd6e318c95af4620",
+    "native_name": "カントリーなかべがみ",
+    "reference_id": "item_27:0016",
+    "reference_sha256": "634c231bfbadc127979982941c965e78f12198e781782d86aed569f27328e31f",
+    "evidence": "The native country theme uses the established ranch English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0017",
+    "source_sha256": "1e812171cc066e36360989a5452db9ce455afb1c83e45d4f62b4c8826d39c52f",
+    "native_name": "モノクロなかべがみ",
+    "reference_id": "item_27:0017",
+    "reference_sha256": "4e4e2bdb0c1b954b02bee5e28a9a060ed194d98e6ef0bfe2b28b5f2cf0e470bf",
+    "evidence": "The native monochrome theme uses the established modern English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0018",
+    "source_sha256": "4ececc175831da5bd7efbe2634b9597197d869263c060c62d7f8d58451b6cd0a",
+    "native_name": "リゾートなかべ",
+    "reference_id": "item_27:0018",
+    "reference_sha256": "85b353d6bf1fb00c26c5e3159afbbe9f66ed419afd9a00e7982f942c40eb9232",
+    "evidence": "The native resort theme uses the established cabana English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0019",
+    "source_sha256": "8756dd7aac84c80d8a8d2afb25501e71963f5d9128685702c9fc4ced298ceaad",
+    "native_name": "ゆきだるまのかべがみ",
+    "reference_id": "item_27:0019",
+    "reference_sha256": "9caba73a6e5528878e849f50c3e736540bf1cd81de3e278f53c9bfeaff392bee",
+    "evidence": "Both names explicitly identify snowman wallpaper; preserve supplied capitalization. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:001D",
+    "source_sha256": "5195105b5406b89d7df6419f71995f79040bfc30e9c2c0e773139d6bdebeb845",
+    "native_name": "オリエンタルラティス",
+    "reference_id": "item_27:001D",
+    "reference_sha256": "1e3c69d1c3bda758e610f26f4f86959ae374706fcb25abb324ef807cb196bb3e",
+    "evidence": "Both names identify latticework. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:001F",
+    "source_sha256": "464ee508952c0d38c5e66b07971dbfa16d95196281455d418f52fa6946a509a4",
+    "native_name": "モダンなしょうじ",
+    "reference_id": "item_27:001F",
+    "reference_sha256": "c0daba82bf15373cdd304d645bd6ea07b45dcde62614d45aaac13535b9042559",
+    "evidence": "Both names identify modern sliding screens. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0028",
+    "source_sha256": "bbb099c574c50e60572cca1c4f2653596f4a3acd29a662986572267c4268e30c",
+    "native_name": "バラのかべがみ",
+    "reference_id": "item_27:0028",
+    "reference_sha256": "5a9f3d923e0914f43f019eb6acb997d1f6a275f943575e3bf7816139b5990470",
+    "evidence": "Both names explicitly identify rose wallpaper. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0029",
+    "source_sha256": "3a9885e854fd354d336c63a4e5b40ceb8357c1fe5e84daafaa3826aaaba17119",
+    "native_name": "ウッディーなかべ",
+    "reference_id": "item_27:0029",
+    "reference_sha256": "95cb412ee621a1c2c9b7b3e09ef3f6d2af59e1e1d1ac93902e08cfa7417ec77a",
+    "evidence": "Both names identify wooden wall covering. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:002C",
+    "source_sha256": "0aa87683440afba6d40db614f0ea6c4d1c000539c95794e19b64b790babf8630",
+    "native_name": "エジプトなかべ",
+    "reference_id": "item_27:002C",
+    "reference_sha256": "41350f758ca61d3508c752db505e356b68ab7332569c02edf5e832ab9744daac",
+    "evidence": "The native Egyptian theme uses the ancient English series naming. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:002E",
+    "source_sha256": "981bf26e3149fe1f52b55151a4a24b79e78e7bda8aefb663e8f217f679fb9d33",
+    "native_name": "あきちのかべ",
+    "reference_id": "item_27:002E",
+    "reference_sha256": "0cd65b6b7e4e80a3ea9db3b05ad37ecb77790650e1c81207bfc0f5d649644198",
+    "evidence": "Both names identify a vacant-lot setting. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:002F",
+    "source_sha256": "2faed77a3880b67b7f1c3ab86caafeba2b1f44ebc36ac2676ba8cc1d10d479ea",
+    "native_name": "クリスマスなかべ",
+    "reference_id": "item_27:002F",
+    "reference_sha256": "47b067fda97dc172cc29996c71779655aa05d85d2521faf5c391b25dc0dc3ae5",
+    "evidence": "The native Christmas theme uses the established Jingle English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0030",
+    "source_sha256": "c3513260fd04413b3c015ed1ec73cac466b71526571a22a4822ab85578ff4b0c",
+    "native_name": "こうげんなかべ",
+    "reference_id": "item_27:0030",
+    "reference_sha256": "60c747638efa0668d629112f732fac761bf31d3ec040662b81358997e0e8acc0",
+    "evidence": "The native highland setting matches the supplied meadow vista. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0031",
+    "source_sha256": "f882baeaeb7045c93469cf995f4216da5631f252462b5646d0d5be2cb4e6d4bd",
+    "native_name": "がいろじゅのかべ",
+    "reference_id": "item_27:0031",
+    "reference_sha256": "9e105826c9fb1e03395a24955c35cb4bf70236ad81825a99a6137b1dbde6479a",
+    "evidence": "The native roadside-tree wall matches the supplied tree-lined identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0032",
+    "source_sha256": "3d702b800395c0d63c53a7ce4f1cf0548dc546d6250f89d1dbb0ad90c8c2b2be",
+    "native_name": "モザイクタイルのかべ",
+    "reference_id": "item_27:0032",
+    "reference_sha256": "be731cc956f1f7d73af5b3ae45afa838415593391b5b99dcd7b0e293b47a0136",
+    "evidence": "Both names explicitly identify mosaic tile walls. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0034",
+    "source_sha256": "6e1ac551e952c0782fb01fa73531ec39bfba38039acbb2213744987d439de75a",
+    "native_name": "ちかしつのかべ",
+    "reference_id": "item_27:0034",
+    "reference_sha256": "a9e903c048a4d6cd5bf952d0da33be30f2df463e4df8bef3570ccf19324c0ad2",
+    "evidence": "Both names explicitly identify basement walls. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0036",
+    "source_sha256": "d357346ecac92818fde95763ce44bd998492337ffacd64d498545a824a328eda",
+    "native_name": "カラフルなかべ",
+    "reference_id": "item_27:0036",
+    "reference_sha256": "6ce465ebde549f81a317e9dd44ec88f29df9ff2e1b03214ea00b9fdf99be400d",
+    "evidence": "The native colourful theme uses the established kiddie English series name. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0038",
+    "source_sha256": "91af38fbe3dc10e45103f1315ff9ef239e432f02bc7d09edb72192519714f937",
+    "native_name": "ファクトリーなかべ",
+    "reference_id": "item_27:0038",
+    "reference_sha256": "1684c15ecc93abb332679277ddd07e1d05df701741832657366c069678e11098",
+    "evidence": "The native factory theme matches the supplied industrial identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:0039",
+    "source_sha256": "c10250bc50c6cebbe719f14e6925709dcd75719a39aeb37112ea3cd1f1d4651c",
+    "native_name": "さばくなかべ",
+    "reference_id": "item_27:0039",
+    "reference_sha256": "20abb7356ceea0105a735cbcb507b721397c1c91e3f65db5720afc1f2c493fec",
+    "evidence": "Both names explicitly identify the desert setting. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:003C",
+    "source_sha256": "d487d850b719181984dfdec49480ab1215ceed689bfa1a2a9fb16c8298a9dd1d",
+    "native_name": "みなみのうみなかべ",
+    "reference_id": "item_27:003C",
+    "reference_sha256": "d98f5941ed1cb4f163ef646767f9748fcab922d9aadb4bce528a17f05b163911",
+    "evidence": "The native southern-sea setting matches the supplied tropical identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:003D",
+    "source_sha256": "9bd281ce7de1019fba8cdbe373a7d6d2321a75dd877a52a6f8373fff0f607774",
+    "native_name": "おもちゃなかべがみ",
+    "reference_id": "item_27:003D",
+    "reference_sha256": "79e915654aab26c91277853ccbb561eec871d8bf669e21dd802156a9bb223d24",
+    "evidence": "The native toy theme matches the supplied playroom identity. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:003E",
+    "source_sha256": "dbc4fe48d415f80b01dc7700252d94540493f1b0b95c053f54619ef15f3209a9",
+    "native_name": "キッチュなかべがみ",
+    "reference_id": "item_27:003E",
+    "reference_sha256": "2303693faf129fbeccad01c02fad61fae6894f67ce12ac4247b160fff6667975",
+    "evidence": "Both names explicitly identify kitsch wallpaper. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_27:003F",
+    "source_sha256": "669561855eb02adcc0bdd6124271fc4bee460167903333e261ddd5838c46b03c",
+    "native_name": "サイケなかべがみ",
+    "reference_id": "item_27:003F",
+    "reference_sha256": "d6c3846fd15489e1695cf18e076cba5ca5a243a3e7d3b6018d576e91da83a69a",
+    "evidence": "The native psychedelic wallpaper matches the supplied groovy theme. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
   }
 ]

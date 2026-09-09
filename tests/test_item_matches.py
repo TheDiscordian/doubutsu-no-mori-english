@@ -156,8 +156,9 @@ class ItemMatchRetailTests(unittest.TestCase):
         cls.refs = list(map(json.loads, (ROOT/'build/gamecube/names/furniture.jsonl').read_text().splitlines()))
 
     def test_all_reviewed_names_rotations_hashes_and_precise_capacity_totals(self):
-        self.assertEqual(len(self.matches), 489)
-        ordinary = list(map(json.loads, (ROOT/'build/gamecube/names/item_24.jsonl').read_text().splitlines()))
+        self.assertEqual(len(self.matches), 559)
+        ordinary = [row for bank in ('item_24','item_26','item_27') for row in
+                    map(json.loads, (ROOT/f'build/gamecube/names/{bank}.jsonl').read_text().splitlines())]
         refs = {r['id']: r for r in self.refs+ordinary}
         for key, match in self.matches.items():
             bank = key.split(':')[0]
@@ -169,7 +170,8 @@ class ItemMatchRetailTests(unittest.TestCase):
                 self.assertEqual(match['reference_id'], f'furniture:{group+delta:04X}')
                 self.assertEqual(self.source[bank][first:first+4], [self.source[bank][first]]*4)
             else:
-                self.assertIn(key, ('item_24:006D', 'item_24:0078'))
+                if bank=='item_24': self.assertIn(key, ('item_24:006D', 'item_24:0078'))
+                else: self.assertIn(bank, ('item_26','item_27'))
                 self.assertEqual(match['reference_id'], key)
             verify_source(match, self.source[bank][first], self.info)
             reference = refs[match['reference_id']]
@@ -260,6 +262,38 @@ class ItemMatchRetailTests(unittest.TestCase):
             validate_candidate(wide[key], self.source, self.info, self.matches)
         self.assertNotIn('item_24:006D', short)
         self.assertEqual(short['item_24:0078']['translation'], 'bear shirt')
+
+    def test_floor_wall_batch_keeps_full_names_and_native_topics(self):
+        short_count = 0
+        for bank,count in (('item_26',37),('item_27',33)):
+            rows = list(map(json.loads, (ROOT/f'build/inventory/{bank}.jsonl').read_text().splitlines()))
+            refs = list(map(json.loads, (ROOT/f'build/gamecube/names/{bank}.jsonl').read_text().splitlines()))
+            approved = {k:v for k,v in self.matches.items() if k.startswith(bank+':')}
+            self.assertEqual(len(approved),count)
+            for capacity in (10,16):
+                old = item_candidates(self.banks[bank],rows,refs,self.info,capacity=capacity)[0]
+                new = item_candidates(self.banks[bank],rows,refs,self.info,capacity=capacity,matches=self.matches)[0]
+                by_id = {r['id']:r for r in new}
+                self.assertTrue(all(by_id[r['id']]==r for r in old))
+                added = [r for r in new if r['id'] in approved]
+                if capacity==16: self.assertEqual(len(added),count)
+                else: short_count += len(added)
+                for edit in added:
+                    validate_candidate(edit,self.source,self.info,self.matches)
+                    self.assertEqual(edit['translation'],refs[int(edit['id'].split(':')[1],16)]['text'])
+                    changed = deepcopy(edit);changed['translation'] = edit['translation'][:-1]
+                    changed['provenance']['reference_sha256'] = sha256(encode(changed['translation'],self.info).ljust(16,b' '))
+                    with self.assertRaisesRegex(ValueError,'complete exact'):
+                        validate_candidate(changed,self.source,self.info,self.matches)
+            # Native bathhouse and worn-earth/wood designs are not western scenery.
+            for number in (0x12,0x1A): self.assertNotIn(f'{bank}:{number:04X}',approved)
+        self.assertEqual(short_count,10)
+        for key,text in (('item_26:000D','cabin rug'),('item_26:000E','closed road'),
+                         ('item_26:000F','lunar surface'),('item_26:0013','green rug'),
+                         ('item_26:0014','blue flooring')):
+            match = self.matches[key]
+            self.assertEqual(match['reference_sha256'],sha256(encode(text,self.info).ljust(16,b' ')))
+        self.assertNotIn('item_27:0000',self.matches)
 
     def test_full_resource_retains_long_names_and_rejects_rehashed_shortening(self):
         edits = item_candidates(self.banks['item_10'], self.rows, self.refs, self.info,

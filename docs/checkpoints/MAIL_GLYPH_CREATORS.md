@@ -81,7 +81,7 @@ Log SHA-256 values, in the order above:
   linked headroom. This integration adds no resident instructions or saved bytes.
 - Exact catalogue/font identities remain those in [MAIL_GLYPHS.md](MAIL_GLYPHS.md).
 
-## Native acceptance in progress
+## Native acceptance
 
 `tools/mail_glyph_creator_scenario.py` composes the source-bound Mom, event,
 score, and ordinary NPC batches with every original assertion and one shared
@@ -92,9 +92,67 @@ save/global restoration, allocation accounting, and checkpoint checks remain.
 `build/smoke-mail-glyph-creator-01` runs with a 1,200-second bound, four MiB,
 disabled audio, no screenshots, and no permitted test FlashRAM/Pak writes. A
 fresh boot-to-town supplies the new ROM's own generated population. No state
-from a different ROM is loaded. The native result is pending; partial logs do
-not prove acceptance. The previously recorded ordinary-NPC capture rejection
-remains open until current execution resolves it.
+from a different ROM is loaded. This run reaches message `07DD` and its matching
+town checkpoint. All 114 Mom cases, seven rejections, one retry, and 735 helper
+assertions pass. All 55 villager-event templates pass 110 original comparisons
+and delivered readbacks, seventeen rejections, four retries, and 1,986 assertions.
+Both completed helpers restore their own live save/globals and allocations.
+
+Seventeen score templates `0034..0044`, including `003D`, pass both-capital
+comparisons before the run reaches its process limit. The debugger connection
+closes 1,209 seconds after the run manifest is created; the runner starts a
+forced-kill timeout at `seconds+10`. No failing assertion is recorded, but the
+score helper does not complete, NPC tests do not begin, and final checkpoint
+restoration/graceful shutdown do not occur. This is not a passing overall batch.
+FlashRAM remains erased and the Pak retains the blank fixture hash.
+
+`build/smoke-mail-glyph-creator-02` continues only the unfinished score and NPC
+groups, using the exact same ROM and the saved pre-test town checkpoint from
+run 01. It has a 900-second bound and the same silence/no-write constraints.
+It passes 41 complete score readbacks, then a Python `IndexError` stops the
+twenty-first template's second capital state: the fixture's twenty-template
+player mapping selects a nonexistent fifth player. `mailbox_position` cycles
+the four actual players while preserving the original first twenty mappings.
+The seven focused tests pass in 7.633 seconds and cover every player/mailbox.
+This failure is in the test script, not evidence of a game crash.
+
+`build/smoke-mail-glyph-creator-03` repeats only the unfinished groups with that
+correction. All 21 templates pass 42 original comparisons, and 44 complete
+readbacks include resource retry and original empty-room scoring. The batch
+records 152 calls and 414 passing assertions, then one failed assertion at the
+expected successful scheduler delivery. The entire save still matches the
+pre-call fixture: neither mail nor the evaluation date is published. The
+game-owned allocation probe returns zero; the successful case uses the original
+NULL-game path. The cause remains unproven. This is not a passing scheduler
+batch, and final checkpoint restoration/graceful shutdown do not occur.
+
+`build/smoke-mail-glyph-creator-04` selects only NPCs from the same original
+matching-town checkpoint. All 48 original comparisons, eight successive complete
+creations, and eight rejections pass, including controlled allocation failure.
+All 245 calls and 539 memory assertions pass. Complete English reconstruction,
+metadata, RNG, native temporary fields, source saves, heap accounting, and
+guards are retained. Live globals restore, the fixture allocation is released,
+the checkpoint loads, the process survives, and shutdown is graceful. The old
+ordinary-NPC rejection does not recur in this current build/fixture; that does
+not establish the cause of the earlier rejection. No creator bytes are uploaded
+by the debugger. Actual receipt/pending-loop and normal interaction remain.
+
+FlashRAM and Pak hashes remain the blank fixtures in all three continuations.
+The scenario generator's
+`--groups` option retains every selected group's assertions and shared checkpoint;
+completed Mom/event groups are not repeated.
+
+Partial native evidence SHA-256:
+
+- Run 01 results: `2027b920e2957aa42af3976b378112d1bd744cbaa9fd674b5e9ca92888f52469`.
+- Run 02 results: `e5e161f32230f31ba3856384f9e491f83dd2253a1892f5bc0b01ec24621ebf26`.
+- Run 03 results: `9d22b467af40b616bea2779102c28cb86983259e3399485a0ec1f088bd99a3f2`.
+- Run 04 results: `7488660fa86b7884934d013abf1027a640b41f09bb6c2c3ca284bcc391d349ca`.
+- Seven-test fixture log: `41507ef3ebca2211a32d5e46733e55906ef24ad2d3df4035558117d8a6e2544d`.
+- Full post-scenario: `c4f970627339e9612f4b98a2e17b53ddf98a0c0e4c836a2949976f0726b3a0a7`.
+- Boot scenario: `e9d9b23136eac346eb5ef3de87f560d321fa0ad9d843da467acbb9ce7b8cca73`.
+- Erased FlashRAM: `b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+- Blank Pak fixture: `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
 
 ## Reproduction
 
@@ -121,9 +179,12 @@ Generated game content, ROMs, patches, and logs remain ignored.
 
 ## Required continuation
 
-Collect the native batch and inspect complete outcomes, blank saves, checkpoint
-restoration, and rejection evidence. Continue remaining native letter/general
+Diagnose the actual HRA scheduler's missing delivery in a bounded later bug
+batch, without repeating complete template comparisons. Continue actual NPC
+receipt/pending-loop and remaining native letter/general
 text consumers and review, actual save/travel compatibility, ordinary gameplay,
 editorial/presentation polish, patch-only release preparation, title-first images,
 and the GameCube-style keyboard. Hardware requires actual hardware evidence.
 No full-project regression or complete-gameplay claim is made here.
+The [flooring/wallpaper build](FLOOR_WALL_NAMES.md) retains every glyph/runtime/
+letter file and supplies the next complete ROM with seventy additional names.

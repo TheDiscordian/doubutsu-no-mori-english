@@ -91,12 +91,16 @@ guards, and save retention. A separate checkpoint in the same batch exercises
 48 original NPC metadata comparisons, eight successive complete letters, and
 eight rejected creator calls using cartridge-loaded code and resources.
 
-The host suite passes all 851 tests. The dialogue portion passes all 288 random
+The shared-word host suite passes all 851 tests. The dialogue portion passes all 288 random
 words, six outer preparations, 118 complete message loads, 447 insertions, and
-1,896 helper assertions across 926 calls. Its checkpoint restores. The letter
-portion rejects its first creator call after native preparation despite enough
-free heap space; capture/formatting diagnosis remains active. The combined
-batch does not pass, and no letter acceptance is inferred from dialogue success.
+1,896 helper assertions across 926 calls. Its checkpoint restores. The current
+glyph-capable creator separately passes all 48 original comparisons, eight
+successive complete replies, and eight rejections in its matching-town fixture.
+All 245 calls and 539 assertions pass, with live save/heap/global retention,
+checkpoint restoration, blank cartridge/Pak saves, and graceful shutdown. The
+earlier fixture's capture rejection is not reproduced; its cause remains
+unproven. The [current checkpoint](../docs/checkpoints/MAIL_GLYPH_CREATORS.md)
+binds these results to the actual ROM. Direct creation is not ordinary delivery.
 
 Normal
 villager interactions, creator-to-receipt and pending-loop integration, semantic

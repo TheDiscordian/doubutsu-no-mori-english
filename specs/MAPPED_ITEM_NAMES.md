@@ -67,8 +67,9 @@ independently bound instead; no general spelling normalisation is introduced.
 Both names fit sixteen bytes; only bear shirt fits ten. These direct approvals
 bring the batch to 1,348 added wide slots and 336 ordinary edits.
 
-The full wide resource has 2,713 candidate slots from 771 reference IDs;
-ordinary ten-byte storage has 779 candidate slots from 242 references. These are
+Including the [flooring/wallpaper approvals](FLOOR_WALL_NAMES.md), the full wide
+resource has 2,783 candidate slots from 841 reference IDs; ordinary ten-byte
+storage has 789 candidate slots from 252 references. These are
 separate storage counts, not distinct translated sentences. Four rotations and
 their converted ordinary alias must not be counted as five new name identities.
 Resource size, headers, DMA entries, native IDs, saved structures, code, font
@@ -76,8 +77,9 @@ metrics, and caller capacities remain unchanged.
 
 ## Acceptance
 
-All 489 registry entries (487 furniture and two ordinary) are independently checked against native/reference
-hashes and exact name bytes. Tests cover complete output at both capacities,
+All 559 registry entries (487 furniture, two clothing, and seventy floor/wall)
+are independently checked against native/reference hashes and exact name bytes.
+Tests cover complete output at both capacities,
 cross-index identities, withheld mismatches, exact placed conversion, metadata
 removal, and rejection of shortened/relabelled names. Artifact checks compare
 every installed ordinary edit and every converted wide-name result with the

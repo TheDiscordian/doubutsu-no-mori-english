@@ -39,6 +39,16 @@ class MailGlyphProgressTests(unittest.TestCase):
             self.assertEqual(len({c['template'] for c in request['cases']}),expected)
         self.assertTrue(any('test_npc_mail_loader' in a for a in actions))
 
+    def test_resume_only_unfinished_groups_without_losing_checkpoint_checks(self):
+        actions = scenario(self.native,self.built,self.report,('scores','npc'))
+        self.assertEqual(sum('save_state' in a for a in actions),1)
+        self.assertEqual(sum('load_state' in a for a in actions),1)
+        self.assertTrue(any('test_academy_scores' in a for a in actions))
+        self.assertTrue(any('test_npc_mail_loader' in a for a in actions))
+        self.assertFalse(any('test_mother_letters' in a or 'test_villager_event_letters' in a for a in actions))
+        for groups in ((),('scores','scores'),('unknown',)):
+            with self.assertRaises(ValueError): scenario(self.native,self.built,self.report,groups)
+
 
 class SilentScenarioTests(unittest.TestCase):
     def test_remove_only_captures_recursively_preserving_input_and_assertions(self):

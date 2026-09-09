@@ -16,13 +16,25 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
+complete names in the full glyph ROM, with ten additional native-width edits.
+Only the two existing item-name resources change; every earlier candidate is
+retained. Forty host/artifact tests, eleven scenario/regression tests, and the
+189-call/181-assertion native batch pass, with restored state and blank saves.
+Continue remaining names, wider consumers, letters, general text, and review.
+
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 installs complete resources for all 114 Mom, 55 villager-event, and 21 score
 templates and the missing ordinary reply footer in the full translation ROM.
 All 57 creator/installer tests, 26 sanitizer tests, and 75 reader/accounting tests
-pass; independent creator builds agree. The fresh silent boot-to-town and native
-creation/delivery batch is active. Collect its actual result and retain unresolved
-ordinary-NPC, save, gameplay, and review work before claiming full acceptance.
+pass; independent creator builds agree. Native batches pass all Mom and
+villager-event templates, all 42 score comparisons/44 readbacks, and 56 complete
+ordinary NPC creations plus eight rejections. The current NPC rejection does
+not recur; save/global/heap and checkpoint restoration pass in that group.
+The score scheduler fails its expected-delivery assertion without changing the
+mailbox or date. Diagnose that owner/eligibility path in the combined bug pass;
+do not repeat the completed template groups. Native receipt/pending-loop, save,
+gameplay, and review work remain before full acceptance.
 
 The [HRA welcome/advice route](../specs/ACADEMY_LETTERS.md) installs all twenty
 complete letters and gates membership/date updates on actual delivery. The native
@@ -159,9 +171,10 @@ The [shared NPC-word integration](../specs/SHARED_NPC_WORDS.md) installs all
 consumers, catalog, reader, capture hooks, and failure gate pass verification.
 All 851 host tests and every installed-payload/UPS comparison pass. The native
 dialogue portion passes 288 words, 118 messages, and 447 insertions with a
-restored checkpoint. The letter creator rejects its first fixture after native
-preparation despite sufficient heap space; identify capture/formatting rejection
-before accepting the letter portion. The combined batch does not pass. Normal resident
+restored checkpoint. The current glyph NPC fixture separately passes 56 complete
+creations and eight rejections, with restored globals/heap/checkpoint and blank
+saves. Its earlier capture rejection does not recur, but its cause is not
+established. Do not relabel the older combined run as passing. Normal resident
 interaction, actual creator-to-receipt/pending-loop behaviour, and semantic
 review remain; default builds retain generation disabled.
 
@@ -847,8 +860,8 @@ identity batches remain, alongside final native festival review and gameplay.
 | R01 | English runtime substitutions, including town/date/time formats | active | Town, seven message date/time fields, AM/PM, ordinary resident year/month/day/leap-month preparation, and all 33 birthday-request fields pass targeted checks; normal birthday entry/gifts, other UI callers, and out-of-table native calendar dates remain |
 | R02 | Choice strings beyond ten bytes | active | All 460 choices have candidates; nine original labels retain native meanings, 168 dialogue approvals preserve native menu order, and twenty-nine contextual mappings retain answer indices/actions; twenty-byte capacity, long DMA loads, four rows, insertion, and cancellation pass targeted MIPS tests; appended numeric labels retain all three rounds and clothing meanings in the 73-message/66-answer/eight-boundary native batch; further contextual labels, full review, and actor-specific runtime paths remain |
 | R03 | General strings and UI caller capacities | active | Thirty-four direct calls inventoried; all 128 complete Katrina phrases pass native preparation/insertion; all 32 English Resetti rude replies pass their scoped matcher; ordinary string candidates total 294; ten-byte default catchphrase display passes all 216 defaults with unchanged saved bytes; gyroid pixel wrapping passes with unchanged saved/editor limits; longer gyroid storage, borrowed phrases, shared choices, mail, and shop destinations remain |
-| R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 242 item reference IDs occupy 779 ten-byte slots, and 771 references occupy 2,713 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls with restored states, and full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
-| R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; experimental split marker is not release-approved; 59 reference parts need glyph support; complete metadata/other-reader handling, semantic identities, generation, lossless editing, normal delivery, and save/reload remain |
+| R04 | NPC and item names | active | 178 six-byte villager names and all native loads pass; eight-byte API covers all 216 villagers and 64 special-actor rows; main insertion, two nameplate consumers, eight rendered quads, and guards pass native tests; combined train-to-town regression passes; 252 item reference IDs occupy 789 ten-byte slots, and 841 references occupy 2,783 wider-resource slots; all 4,547 native item-ID cases have passing runs with documented initial failures; mapped-name batches pass 1,199 native calls, and the floor/wall batch passes 189 calls with restored states; full converted-name checks pass; sixteen-byte main item fields and one item-ID wrapper pass native tests; other destinations and identities remain |
+| R05 | Mail, headers, footers, and NPC mail components | active | Verified 164-byte record and 10/96/16 fields; full-letter codec, formatter, immutable catalog, and restoration pass host/native tests; full snapshot reader retains all wording across pages and matches 6,398 host reference probes; actual window tests cover long classic/composite letters, complete glyph vertices, page input, and unchanged source/preferences; English ordinary scoring and distinct quest word tables pass native tests; complete-record send decoding and post-office failure retention pass 32 N64 cases, including local/visitor replies, friendship, quests, gifts, counters, and unchanged rejected records; catalogue four supplies all glyph-bearing parts and current NPC/Mom/event/score creation passes complete readbacks; HRA scheduling, remaining creators, complete metadata/other-reader handling, semantic identities, lossless editing, normal delivery, save/reload, and release approval remain |
 | R06 | Remaining GameCube controls | active | AM/PM, capitalization, protected pacing, complete choice-close handling, and pixel-space rendering pass targeted MIPS tests; random-range and wider flow coverage remain |
 | R07 | Remaining message matching | active | Hash-bound identities, complete reference and native-original sequences including both long train phone calls, the complete snooty letter explanation, eleven special-actor and five contextual-expression conversations, six Resetti/Gulliver sequences, nine native menu/dialogue follow-ups, four special-dialogue follow-ups, four complete English references retaining exact native random branches, six separate-glyph references, complete plus-glyph controller tip, 41 unanimous complete-native-record aliases, and 74 separately guarded cross-bank letter references implemented; all 360 exact development-label slots accounted for, including 25 guarded continuation allocations; 114 complete diagnostic/sample drafts covered; scoped three-round numeric answers complete; five Japanese-static test-script gaps and broader caller/review work remain |
 | R08 | Review all candidate dialogue | pending | Meaning, placeholders, branches, actor arguments, and delivery reviewed; candidates are not automatically approved |

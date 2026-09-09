@@ -13,16 +13,30 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
+additional complete GameCube names in the full translation ROM. Ten also fit
+native ten-byte fields; all other names remain complete in the existing wider
+resource. Every previous candidate and every non-item DMA file is unchanged.
+Forty host/artifact tests and eleven scenario/regression tests pass. The silent
+native batch passes 189 calls and 181 assertions, with checkpoint restoration,
+blank isolated saves, and graceful shutdown. Remaining name identities, wider
+callers, letters, other text, review, and full-project acceptance continue.
+
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 builds the complete translation ROM with all 114 Mom, 55 villager-event, and
 21 HRA score templates, plus the glyph-bearing ordinary reply footer. The
 compiled catalogue choice, exact font/catalogue installation, source approvals,
 and combined text counter retain legacy catalogue semantics. All 57 host and
 installer tests, 26 sanitizer tests, and 75 reader/accounting regressions pass.
-Independent creator builds agree. The silent boot-to-town and native creator
-batch is in progress; actual delivery acceptance is not yet claimed. The creator
+Independent creator builds agree. Native runs pass all 114 Mom deliveries,
+110 villager-event comparisons/readbacks, 42 score comparisons, and 44 score
+readbacks. An independently resumed NPC group passes all 56 complete creations,
+eight rejections, checkpoint restoration, and blank isolated saves. The earlier
+ordinary-NPC rejection does not recur in this matching-town fixture; its cause
+is not established. The score scheduler leaves mail/date state unchanged when
+the test expects delivery, so overall scheduling acceptance remains open. The creator
 has 240 image bytes free and the resident has none. Remaining text consumers,
-ordinary NPC rejection, review, real saves, release, and both stretch goals remain.
+ordinary NPC delivery, review, real saves, release, and both stretch goals remain.
 
 The [complete mail-glyph framework](../specs/MAIL_GLYPHS.md) transcodes all 4,866
 reference parts, retaining every original word, command, and manual break. Its

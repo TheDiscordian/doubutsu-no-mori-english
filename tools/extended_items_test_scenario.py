@@ -12,7 +12,12 @@ from item_names_test_scenario import ordinary_item, scenario as native_scenario
 from runtime_module import MODULE_VROM, verify_test_module
 
 
-def scenario(rom, module, names):
+def scenario(rom, module, names, reference_banks=None):
+    if reference_banks is not None:
+        allowed = {f'item_{g:02X}' for g in [*range(0x20,0x30),0x10]}
+        if (not reference_banks or len(reference_banks)!=len(set(reference_banks))
+                or set(reference_banks)-allowed):
+            raise ValueError('Select unique known item reference banks')
     files = by_vrom(rom)
     data = files[VROM].extract(rom)
     if data[:32] != HEADER or sha256(data) != names["data_sha256"]:
@@ -31,6 +36,8 @@ def scenario(rom, module, names):
         offset += count
     seen = set()
     for edit in names["edits"]:
+        if reference_banks is not None and edit['id'].split(':')[0] not in reference_banks:
+            continue
         reference = edit["provenance"]["reference_id"]
         if reference in seen:
             continue
@@ -90,8 +97,11 @@ def main():
     parser.add_argument('--native-item', type=lambda value: int(value, 0), action='append',
                         help='Also test explicit unchanged-width item loads in the same checkpoint')
     parser.add_argument('--source-rom', type=Path, default=Path('local/rom/Doubutsu no Mori (Japan).z64'))
+    parser.add_argument('--reference-bank', action='append',
+                        help='Select reference families; retain every loader boundary and failure check')
     args = parser.parse_args()
-    actions = scenario(args.rom.read_bytes(), json.loads(args.module.read_text()), json.loads(args.names.read_text()))
+    actions = scenario(args.rom.read_bytes(), json.loads(args.module.read_text()),
+                       json.loads(args.names.read_text()),args.reference_bank)
     if args.native_item is not None:
         native = native_scenario(verified_rom(args.source_rom.read_bytes()), args.rom.read_bytes(), args.native_item)
         actions = combine_load_scenarios(actions, native)
