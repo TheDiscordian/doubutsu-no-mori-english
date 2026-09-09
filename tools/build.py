@@ -90,6 +90,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     credit_permits = credits_permits(rom, edits, info) if english_credits else {}
     source_banks = banks(rom)
     item_matches = load_item_matches()
+    from native_item_names import load_names as load_native_item_names
+    native_item_names = load_native_item_names()
     item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
     verify_requirements(edits, rom, replacements, module_additions, module_report, matches=matches)
@@ -126,7 +128,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             use_glyphs = bool(extended_font) and bank.name == 'message'
             replacement = encode(edit["translation"], info, extended_glyphs=use_glyphs)
             try:
-                validate_item_candidate(edit, item_sources, info, item_matches)
+                validate_item_candidate(edit, item_sources, info, item_matches, originals=native_item_names)
                 checked = canonical_candidate(edit['id'], original, replacement, contextual, info)
                 if edit['id'] in contextual:
                     validate_labels(contextual[edit['id']], edits_by_id, source_labels, info,

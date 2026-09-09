@@ -79,6 +79,12 @@ repository approval. A propagated alias must retain its exact native donor,
 conversion, source-name equality, and complete reference. Unknown/malformed
 approvals and non-item metadata fail.
 
+The [original N64 name registry](NATIVE_ITEM_NAMES.md) is a distinct source for
+native objects with absent, garbled, or different donor names. It uses explicit
+project-authored provenance and `native:` identities, not fabricated GameCube
+references. It shares both capacity paths while retaining independent complete
+wording/source/alias validation. Original and donor approvals cannot overlap.
+
 ## Runtime and review boundary
 
 The resource stays at its existing VROM, size, entry count, sixteen-byte stride,

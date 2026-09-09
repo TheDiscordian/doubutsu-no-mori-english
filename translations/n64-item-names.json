@@ -1,0 +1,156 @@
+[
+  {
+    "id": "item_10:009C",
+    "source_sha256": "ca1fcf2e8c77d765d638e0f78da9160f472bd4be4bd86c12fd9b77cb22303d2a",
+    "native_name": "しようふかざぶとん",
+    "translation": "unused zabuton",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:00B0",
+    "source_sha256": "30fb7d2033317b876aaaedaadacc25457283553d6e997c3a3b331cea2553b170",
+    "native_name": "しようふかチェスト",
+    "translation": "unused chest",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:00B4",
+    "source_sha256": "65951377b0df63221ea2b9cf600719819530eb5a43278085d999915b7d3ed624",
+    "native_name": "しようふかラック",
+    "translation": "unused rack",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0AA8",
+    "source_sha256": "f9d6c461030cfd16a6b6212228b6466f683d991efba193200595ec772797c019",
+    "native_name": "アイラブ64のふく",
+    "translation": "I love 64 shirt",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0AD8",
+    "source_sha256": "54e1e28e484dbff07aa85db8102252a299b0b7245768af361de9edd6fc166a3d",
+    "native_name": "Nキューブなふく",
+    "translation": "N cube shirt",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D28",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D2C",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D30",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D34",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D38",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D3C",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D40",
+    "source_sha256": "983cc1d4efe3ef058690ff7ddfd836faf99ed642024091109359189564aa2dc7",
+    "native_name": "ファミコン",
+    "translation": "Famicom",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_10:0D44",
+    "source_sha256": "5f10b5919ad9faaca84f2c2ef2b50b306d7ae55b5d44e7004fa4cda2b2a06e02",
+    "native_name": "ディスクシステム",
+    "translation": "Disk System",
+    "evidence": "Preserve the complete N64 object/design and any explicit unused designation. The corresponding donor name omits the unused status, describes changed console/shirt hardware, or belongs to another inserted item family; it does not establish the native name. Generic console labels do not identify individual software titles."
+  },
+  {
+    "id": "item_25:0000",
+    "source_sha256": "39079431adcb1171eeb318c94a4842cb8c9643a14176e8369dcb5cefdfddcf24",
+    "native_name": "クエストてがみ",
+    "translation": "quest letter",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:0001",
+    "source_sha256": "174ef7ada29bf62a927103b48b361fda04869764f6890036191ff76c0a49e745",
+    "native_name": "クエストぬの",
+    "translation": "quest cloth",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:0002",
+    "source_sha256": "ad475cdc942daaadb1c838591bac48a16c9cfe8283727466bee9f04e2c83af57",
+    "native_name": "クエストおかね",
+    "translation": "quest money",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:000C",
+    "source_sha256": "0739ac243a401b807a23490c81e593dcb534d488399ad783a688b34f5d2d1548",
+    "native_name": "めがね",
+    "translation": "glasses",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:000D",
+    "source_sha256": "f454862e5596ce1ee5412332702f29c278a4344cc5e8933263d462e4c8b6cf6f",
+    "native_name": "おかね1000ベル",
+    "translation": "1,000 Bells",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:0013",
+    "source_sha256": "3f686adb90259e22c54b403450434df64886e1dc3da0008431af2138127ce5a8",
+    "native_name": "おみくじ",
+    "translation": "fortune slip",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_25:001D",
+    "source_sha256": "16c3501f00068aa4d964061716f8162348e9dfda9a00549c8f5897416c9e09c4",
+    "native_name": "ムラノまっぷ",
+    "translation": "town map",
+    "evidence": "Translate the complete native quest-object label rather than the garbled donor text or a different container. Retain the stated object, quest designation, and exact Bell amount. No item type, reward, or picture changes."
+  },
+  {
+    "id": "item_29:0004",
+    "source_sha256": "c2e46140d778c8c1881bc1f63eea6992e041c599ebe3b2b30bb41c3376f06f4d",
+    "native_name": "きいろいコスモス",
+    "translation": "yellow cosmos",
+    "evidence": "The native name specifies yellow cosmos, not the white cosmos inserted in the English seed list. Translate the whole native species/colour name; it contains no seed or bag suffix. Do not change species or shorten a supplied English reference."
+  },
+  {
+    "id": "item_2B:0000",
+    "source_sha256": "4c7d16d9796ad9d4953da611abcd5581df3d8bb532f3976e726b0164941b3cce",
+    "native_name": "あき",
+    "translation": "empty",
+    "evidence": "The complete native entry is an empty-slot label. The donor college-rule stationery label does not describe this native group; retain the empty designation without inventing a stationery item."
+  }
+]

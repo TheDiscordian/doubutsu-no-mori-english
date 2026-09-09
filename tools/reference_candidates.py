@@ -18,6 +18,7 @@ from reference_sequences import load_sequences, reference_sequence_edits
 from item_matches import load_matches as load_item_matches
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
+from native_item_names import load_names as load_native_item_names
 from controller_adaptations import adapt_controller_reference, validate_controller_candidate
 from reference_choices import adapt_choice_reference, validate_choice_candidate
 from reference_actor_requests import adapt_actor_request_reference, validate_actor_request_candidate
@@ -495,6 +496,7 @@ def main():
     reports["npc_names"] = name_report
     (args.output/"npc_names-remaining.jsonl").write_text("".join(json.dumps(r)+"\n" for r in name_remaining))
     item_remaining_by_bank = {}
+    native_item_names = load_native_item_names()
     for name, bank in source_banks.items():
         if not name.startswith("item_"):
             continue
@@ -502,7 +504,7 @@ def main():
         item_edits, item_manifests, item_remaining, item_report = item_candidates(
             bank, list(map(json.loads, (args.inventory/(name+".jsonl")).read_text().splitlines())),
             list(map(json.loads, (args.gc_names/(reference_name+".jsonl")).read_text().splitlines())),
-            info, override_ids, matches=item_matches)
+            info, override_ids, matches=item_matches, originals=native_item_names)
         edits.extend(item_edits)
         manifests.extend(item_manifests)
         reports[name] = item_report

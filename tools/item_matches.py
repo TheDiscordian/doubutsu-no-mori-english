@@ -48,8 +48,14 @@ def verify_source(match, native, info):
         raise ValueError('Stale item identity source or native name')
 
 
-def validate_candidate(edit, source_banks, info, matches):
+def validate_candidate(edit, source_banks, info, matches, *, originals=None):
     """The builder/resource checks exact approved names, including native aliases."""
+    from native_item_names import load_names, validate
+    originals = load_names() if originals is None else originals
+    if validate(edit,source_banks,info,originals):
+        if identity_key(edit['id']) in matches:
+            raise ValueError('Native item name conflicts with a donor approval')
+        return
     if not edit['id'].startswith('item_'):
         if 'item_reference_match' in edit:
             raise ValueError('Item identity metadata belongs only to item names')

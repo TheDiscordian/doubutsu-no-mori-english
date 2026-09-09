@@ -13,6 +13,17 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs
+22 source-bound original entries in 63 complete fields, including 31 unchanged-
+width fields and two clothing aliases. It preserves N64 objects/designs and
+unused labels where donor names differ, with explicit original provenance.
+Both builders reject shortened, relabelled, or misattributed output even when
+approval metadata is removed. All sixty selected host/artifact/regression checks
+have passing results; only the two name resources change in the full ROM.
+The silent native batch passes 143 calls and 135 assertions, including restored
+checkpoint, blank saves, and graceful shutdown. Remaining names, full-name
+callers, noticeboard/general text, review, and full acceptance continue.
+
 The [gyroid-name batch](checkpoints/GYROID_ITEM_NAMES.md) installs all 127 complete
 English names in 508 rotation slots; 124 also fit unchanged native fields. Only
 the two item-name files change, with all earlier text/runtime/save structures

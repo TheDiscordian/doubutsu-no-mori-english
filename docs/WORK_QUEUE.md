@@ -16,6 +16,13 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [native-specific names](checkpoints/NATIVE_ITEM_NAMES.md) install 22 original
+entries across 63 fields, with source-bound complete wording, honest provenance,
+and independent builder/alias checks. All sixty selected checks have passing
+results. The silent native batch passes 143 calls and 135 assertions, with
+restored checkpoint, blank saves, and graceful shutdown. Continue remaining
+names, noticeboard/general text, and wider consumers without repeating this batch.
+
 The [gyroid-name batch](checkpoints/GYROID_ITEM_NAMES.md) installs all 127 names,
 508 wide rotation fields, and 124 short fields without changing runtime or saved
 layouts. All 51 focused tests pass, including complete ROM/UPS retention and

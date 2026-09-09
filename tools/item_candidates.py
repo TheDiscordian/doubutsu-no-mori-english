@@ -12,7 +12,7 @@ REFERENCE_WIDTH = 16
 FURNITURE_COUNT = 947
 
 
-def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=ITEM_WIDTH, matches=None):
+def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=ITEM_WIDTH, matches=None, originals=None):
     if capacity not in (ITEM_WIDTH, REFERENCE_WIDTH):
         raise ValueError("Unsupported item-name candidate capacity")
     source = bank.entries()
@@ -30,7 +30,10 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
         return result
     inventory, references = indexed(inventory), indexed(references)
     matches = {} if matches is None else matches
-    for id in matches:
+    originals = {} if originals is None else originals
+    if matches.keys() & originals.keys():
+        raise ValueError('Native and donor item-name approvals conflict')
+    for id in {*matches,*originals}:
         if id.startswith(bank.name+':'):
             index = int(id.split(':')[1], 16)
             if index >= len(source)-(1 if furniture else 0) or identity_key(id) != id:
@@ -41,7 +44,8 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
         id = f"{bank.name}:{index:04X}"
         reference_index = index//4 if furniture else index
         reference_id = f"{'furniture' if furniture else bank.name}:{reference_index:04X}"
-        match = matches.get(identity_key(id))
+        original_name = originals.get(identity_key(id))
+        match = original_name or matches.get(identity_key(id))
         if match:
             verify_source(match, source[index], info)
             reference_id = match['reference_id']
@@ -52,6 +56,9 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
             counts["original_draft_override"] += 1
             continue
         row, reference = inventory.get(id), references.get(reference_id)
+        if original_name:
+            reference = {'id':match['reference_id'],'text':match['translation'],
+                         'source_sha256':match['reference_sha256']}
         if match and (not reference or reference.get('source_sha256') != match['reference_sha256']):
             raise ValueError('Missing or stale approved item-name reference')
         if not row or row.get("source_sha256") != sha256(source[index]):
@@ -85,7 +92,13 @@ def item_candidates(bank, inventory, references, info, skip_ids=(), *, capacity=
                                "match_basis": "rotation_index_name_confirmed_case_insensitive_by_legacy"
                                if furniture else "same_id_name_confirmed_case_insensitive_by_legacy"},
                 "status": "mechanically_validated_candidate_not_reviewed", "adaptations": []}
-        if match:
+        if original_name:
+            from native_item_names import SOURCE
+            edit['native_item_name'] = original_name['id']
+            edit['provenance'].update(source=SOURCE,match_basis='reviewed_native_original_translation')
+            edit['status'] = 'source_reviewed_original_translation'
+            counts['native_original_candidates'] += 1
+        elif match:
             edit['item_reference_match'] = match['id']
             edit['provenance']['match_basis'] = 'reviewed_native_item_identity'
             counts['reviewed_identity_candidates'] += 1
