@@ -16,7 +16,8 @@ from mail_record import Field,Record
 from npc_mail_capture import ALIAS_HASH
 from npc_mail_names import unpack_aliases
 from runtime_module import verify_test_module
-from villager_event_letters import COMPLETE,EVENT,BIRTHDAY,GOODBYE,patches,verify_templates,verify_installation
+from villager_event_letters import EVENT,BIRTHDAY,GOODBYE,patches,verify_templates,verify_installation
+import mail_creator_catalog as creator_catalog
 
 IDENTITIES = tuple(f'PLYR{i} '.encode()+b'TOWN  '+bytes.fromhex('1234')+bytes((0x30,i+1)) for i in range(4))
 
@@ -33,15 +34,17 @@ def expected_record(catalog,names,case,player,gift,capital):
             if index >= COUNTS[number_group]: raise ValueError('Selected native gift exceeds installed item group')
             at = 32+(sum(COUNTS[:number_group])+index)*WIDTH
             values[2] = Field(names[at:at+WIDTH])
-    result = Record(2,0,(number,),tuple(sorted(values.items())),bool(capital))
-    needed = set().union(*(template_fields(part) for part in templates(catalog,result).parts))
+    catalog_id = creator_catalog.identity(catalog)
+    result = Record(catalog_id,0,(number,),tuple(sorted(values.items())),bool(capital))
+    needed = set().union(*(template_fields(part,extended_glyphs=catalog_id==4) for part in templates(catalog,result).parts))
     return replace(result,fields=tuple((i,v) for i,v in result.fields if i in needed))
 
 
 def scenario(native,built,report):
     module = report['runtime_module'];verify_test_module(built,module)
     verify_installation(built,native,module,report['villager_event_letters'])
-    files = by_vrom(built);catalog = files[0x03000000].extract(built);verify_templates(native,catalog)
+    files = by_vrom(built);catalog_id = creator_catalog.selected(module)
+    catalog = files[creator_catalog.vrom(catalog_id)].extract(built);evidence = verify_templates(native,catalog)
     names = files[0x02A00000].extract(built)
     if (names[:32] != HEADER or len(names) != 32+sum(COUNTS)*WIDTH
             or sha256(names) != report['extended_items']['data_sha256']): raise ValueError('Changed selected item resource')
@@ -58,7 +61,7 @@ def scenario(native,built,report):
         choice = int(struct.unpack('>f',struct.pack('>f',draw*3.0))[0]);seeds.setdefault(choice,seed)
     if set(seeds) != {0,1,2}: raise ValueError('Incomplete three-choice native RNG fixtures')
     cases = []
-    for number in COMPLETE:
+    for number in evidence['complete_templates']:
         family = 'event' if number in EVENT else 'birthday' if number in BIRTHDAY else 'goodbye' if number in GOODBYE else 'christmas'
         first = {'event':0x60,'birthday':0xEA,'goodbye':0x20E,'christmas':0xD7}[family]
         personality,choice = divmod(number-first,3)
@@ -74,7 +77,7 @@ def scenario(native,built,report):
         at = 0x1060+start-0x80025C60
         if built[at:at+end-start] != native[at:at+end-start]: raise ValueError('Changed original cache/RNG helper')
         guards[f'{start:08X}'] = native[at:at+end-start].hex()
-    request = {'module':module,'cases':cases,'catalog':catalog.hex(),'items':names.hex(),'originals':originals,
+    request = {'module':module,'catalog_id':catalog_id,'cases':cases,'catalog':catalog.hex(),'items':names.hex(),'originals':originals,
                'patches':{f'{at:08X}':value.hex() for at,value in patches(original,int(module['symbols']['af_npc_mail_load'],16)).items()},
                'guards':guards}
     return [{'wait':8},{'save_state':True},{'pause_game_thread':True},{'test_villager_event_letters':request},

@@ -37,7 +37,9 @@ catalogue contains all 4,866 reference parts. All 80 final focused tests pass,
 including complete C restoration and full page/footer drawing for glyph-bearing
 references. Both formatters and the C restorer pass all 6,514 declared reference
 assembly cases. Cartridge execution passes the complete glyph and old-catalogue
-batch; affected creator routing remains active.
+batch. Native routing is installed through the optional `--mail-glyphs` creator;
+its [checkpoint](../docs/checkpoints/MAIL_GLYPH_CREATORS.md) tracks the complete
+translation build and current native acceptance.
 The [checkpoint](../docs/checkpoints/MAIL_GLYPHS.md) records exact evidence.
 
 Catalogue four uses format one, semantics two, VROM `030A0000`, and 326,288
@@ -94,8 +96,8 @@ The glyph reader occupies exactly 24,576 linked resident bytes, with no remainin
 linked headroom. Shared `af_crc32` and `af_mail_draw` remove duplicate instructions
 without changing validation or rendering semantics. Its reservation remains
 32,768 bytes and its test scratch remains separate. The last integrated
-on-demand creator has 256 image bytes free; its new source-bound build and
-glyph routing are pending. Measure actual new code before choosing where it lives.
+on-demand creator has 240 image bytes free, including its compiled catalogue
+marker. Measure actual new code before choosing where it lives.
 Do not enlarge the resident reservation into its test scratch or assume the
 creator's current 32 KiB bound permits a larger image. Any required bound change
 must update loader/build checks and prove four-MiB allocation and rejection paths.

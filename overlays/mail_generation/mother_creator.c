@@ -46,7 +46,7 @@ int af_system_mail_create(AfNpcMailCreateWork *work,unsigned char *destination,
     work->stage[36] = request[6];work->stage[37] = request[7];
     work->stage[40] = 4u;work->stage[41] = request[8];
     work->captured.capture.capital = *capital;
-    work->captured.selection.catalog = 2u;
+    work->captured.selection.catalog = AF_MAIL_CREATOR_CATALOG;
     work->captured.selection.templates[0] = (unsigned short)template_id;
     /* Every selected Mom template has no free-string fields. The catalogue and
      * complete formatter validate that contract before publication. A currently

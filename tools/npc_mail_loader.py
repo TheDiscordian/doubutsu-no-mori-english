@@ -47,7 +47,7 @@ def verify_configuration(module_data,blob,module):
         raise ValueError('NPC creator configuration does not match its verified image')
 
 
-def install(rom,replacements,additions,module,directory):
+def install(rom,replacements,additions,module,directory,*,glyph_font=None):
     from runtime_module import runtime_source_hashes
     if (not module or MODULE_VROM not in additions or module.get('source_sha256') != sha256(rom)
             or module.get('runtime_sources') != runtime_source_hashes(Path(__file__).resolve().parents[1]/'runtime')):
@@ -73,6 +73,12 @@ def install(rom,replacements,additions,module,directory):
     report = json.loads((directory/'overlay.json').read_text())
     data,reloc = (directory/'overlay.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
     approved = configuration(data,reloc,report,module)
+    if report.get('mail_glyphs'):
+        from extended_font_cartridge import mail_capability
+        from mail_creator_catalog import identity,vrom
+        if glyph_font is None or identity(additions.get(vrom(4),b'')) != 4:
+            raise ValueError('Glyph creator requires catalogue four and its complete cartridge font')
+        glyph_font_hash = mail_capability(glyph_font)
     blob = data+reloc
     files = by_vrom(rom)
     intervals = [(entry.vstart,entry.vend) for entry in files.values()]
@@ -95,6 +101,7 @@ def install(rom,replacements,additions,module,directory):
     code[START-CODE_RAM:END-CODE_RAM] = delivery
     struct.pack_into('>8I',binary,CONFIG_OFFSET,*approved)
     approval = {'configuration':approved,'blob_sha256':sha256(blob),'overlay':report}
+    if report.get('mail_glyphs'): approval['glyph_font_sha256'] = glyph_font_hash
     # Publish only after all resource, dependency, native-code, and target checks.
     replacements[CODE_VROM] = bytes(code)
     additions[MODULE_VROM],additions[VROM] = bytes(binary),blob

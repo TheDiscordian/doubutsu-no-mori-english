@@ -109,7 +109,7 @@ def exercise(debug,request,record):
             raise ValueError('Cartridge NPC creator rejected the fixture; see recorded heap/capture evidence')
         native,fields,rng = baselines[index]
         result = read(destination,164)
-        snapshot = unpack(result[42:],expected_catalog=2)
+        snapshot = unpack(result[42:],expected_catalog=request.get('catalog_id',2))
         if (snapshot.kind != args[4] or snapshot.initial_capital != bool(initial)):
             raise ValueError('Cartridge creator selected an incorrect kind or initial capital')
         foreign,condition,looks = args[5],args[4],(index//2)%6

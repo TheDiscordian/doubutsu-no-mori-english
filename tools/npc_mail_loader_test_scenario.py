@@ -6,13 +6,14 @@ import json
 from pathlib import Path
 
 from aflib import CODE_RAM,CODE_VROM,by_vrom,verified_rom
-from mail_catalog import VROM as CATALOG_VROM,verify_registered
+from mail_catalog import verify_registered
 from npc_mail_capture import call_patches
 from npc_mail_delivery import START,END,patch as gate
 from npc_mail_loader import VROM
 from runtime_module import verify_test_module
 from fortune_strings import STRING_RELOCATION
 from textbanks import banks
+import mail_creator_catalog as creator_catalog
 
 
 def scenario(rom,native,module):
@@ -36,7 +37,9 @@ def scenario(rom,native,module):
         value = native[at:at+size]
         if rom[at:at+size] != value: raise ValueError('Changed boot relocation/cache/RNG helper')
         guards[f'{start:08X}'] = value.hex()
-    catalog = files[CATALOG_VROM].extract(rom);verify_registered(catalog)
+    catalog_id = creator_catalog.selected(module)
+    creator_catalog.verify_installation(rom,module,{'catalog':catalog_id})
+    catalog = files[creator_catalog.vrom(catalog_id)].extract(rom);verify_registered(catalog)
     sources = {b.name:b for b in banks(native) if b.name in ('string','npc_names')}
     for b in sources.values():
         if b.name == 'string':
@@ -52,7 +55,7 @@ def scenario(rom,native,module):
             b.data = files[b.data_vrom].extract(rom)[b.data_offset:b.data_offset+len(b.data)]
         if b.table_vrom is not None:
             b.table = files[b.table_vrom].extract(rom)[b.table_offset:b.table_offset+len(b.table)]
-    request = {'module':module,'catalog':catalog.hex(),'blob':files[VROM].extract(rom).hex(),'guards':guards,
+    request = {'module':module,'catalog_id':catalog_id,'catalog':catalog.hex(),'blob':files[VROM].extract(rom).hex(),'guards':guards,
                'hooks':[(at,before.hex(),after.hex()) for at,before,after in hooks],
                'native_words':[entry.hex() for entry in sources['string'].entries()],
                'native_names':[entry.hex() for entry in sources['npc_names'].entries()]}

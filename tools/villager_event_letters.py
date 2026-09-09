@@ -13,7 +13,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
 from audit_mail_templates import template_fields
 from gc_names import symbol_data
 from gc_text import decoder_tables
-from mail_catalog import parse,verify_registered
+from mail_catalog import parse
 from mail_reference import BANK_HASHES,DECODER_SHA256,transcode
 from npc_mail_loader import VROM as CREATOR_VROM,verify_configuration
 from runtime_layout import MODULE_RAM,MODULE_VROM,LINKED_LIMIT
@@ -78,10 +78,10 @@ def verify_code(code):
 
 
 def verify_templates(rom,catalog,root=ROOT):
+    import mail_creator_catalog as creator_catalog
     rom = verified_rom(rom);code = by_vrom(rom)[CODE_VROM].extract(rom)
     verify_code(code)
-    if verify_registered(catalog)['catalog'] != 2:
-        raise ValueError('Villager-event references require unchanged catalogue two')
+    catalog_id = creator_catalog.identity(catalog)
     native = {b.name:b.entries() for b in banks(rom) if b.name in ('super','mail','ps')}
     installed = parse(catalog)[1]
     rel = (root/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
@@ -105,18 +105,19 @@ def verify_templates(rom,catalog,root=ROOT):
                 raise ValueError('Changed native villager-event field source')
             row = {'id':f'{name}:{number:04X}','source_sha256':sha256(native[name][number]),
                    'reference_sha256':sha256(reference[number])}
-            try: value = transcode(reference[number],tables)
+            try: value = transcode(reference[number],tables,extended_glyphs=catalog_id==4)
             except ValueError as error:
                 if name != 'mail' or number != 0xF6 or 'GC D0' not in str(error): raise
                 if installed[name][number] is not None: raise ValueError('Missing semicolon must stay unavailable')
                 row['unavailable'] = str(error)
             else:
-                if value != installed[name][number] or template_fields(value) != fields(name,number):
+                if value != installed[name][number] or template_fields(value,extended_glyphs=catalog_id==4) != fields(name,number):
                     raise ValueError('Changed complete villager-event text or field identity')
                 row.update(encoded_sha256=sha256(value),bytes=len(value),fields=sorted(fields(name,number)))
             rows.append(row)
-    return {'classic_templates':list(TEMPLATES),'complete_templates':list(COMPLETE),
-            'unavailable_templates':list(UNAVAILABLE),'parts':rows,
+    return {'catalog':catalog_id,'classic_templates':list(TEMPLATES),
+            'complete_templates':list(TEMPLATES if catalog_id==4 else COMPLETE),
+            'unavailable_templates':[] if catalog_id==4 else list(UNAVAILABLE),'parts':rows,
             'reference_functions':REFERENCE_FUNCTIONS,'native_guards':GUARDS,
             'status':'Verified reference content and callers only; no installed route'}
 
@@ -163,6 +164,7 @@ def patches(code,loader):
 
 
 def install(rom,replacements,additions,module):
+    import mail_creator_catalog as creator_catalog
     from departed_letters import START as DSTART,END as DEND,patch as departed_patch
     from mother_letters import START as MSTART,END as MEND,patch as mother_patch
     from extended_items import HEADER,COUNTS,WIDTH
@@ -182,23 +184,25 @@ def install(rom,replacements,additions,module):
     for start,end,patch in ((MSTART,MEND,mother_patch),(DSTART,DEND,departed_patch)):
         if code[start-CODE_RAM:end-CODE_RAM] != patch(original[start-CODE_RAM:end-CODE_RAM],loader):
             raise ValueError('Villager-event letters require earlier complete system-letter routes')
-    evidence = verify_templates(rom,additions[0x03000000]);changes = patches(code,loader)
+    evidence = verify_templates(rom,creator_catalog.resource(additions,module));changes = patches(code,loader)
     for at,value in changes.items(): code[at-CODE_RAM:at-CODE_RAM+len(value)] = value
     replacements[CODE_VROM] = bytes(code)
     return {**evidence,'patches':[{'ram':f'{at:08X}','bytes':len(value),'sha256':sha256(value)} for at,value in changes.items()],
             'loader_ram':f'{loader:08X}','new_resident_bytes':0,'common_wrapper_stack_bytes':48,
-            'christmas_wrapper_stack_bytes':64,'status':'Complete supported event letters installed; semicolon and gameplay acceptance remain'}
+            'christmas_wrapper_stack_bytes':64,'status':'Complete selected-catalogue event letters installed; gameplay acceptance remains'}
 
 
 def verify_installation(built,native,module,report):
+    import mail_creator_catalog as creator_catalog
     files = by_vrom(built)
     verify_configuration(files[MODULE_VROM].extract(built),files[CREATOR_VROM].extract(built),module)
+    catalog = creator_catalog.verify_installation(built,module,report)
     if module['npc_mail_loader']['overlay'].get('villager_events') is not True:
         raise ValueError('Villager-event dispatcher is not installed')
     original = by_vrom(native)[CODE_VROM].extract(native)
     changes = patches(original,int(module['symbols']['af_npc_mail_load'],16))
     expected = [{'ram':f'{at:08X}','bytes':len(value),'sha256':sha256(value)} for at,value in changes.items()]
-    if report.get('patches') != expected or report.get('complete_templates') != list(COMPLETE):
+    if report.get('patches') != expected or report.get('complete_templates') != list(TEMPLATES if catalog==4 else COMPLETE):
         raise ValueError('Changed villager-event installation report')
     actual = bytearray(files[CODE_VROM].extract(built))
     for at,value in changes.items():
@@ -214,7 +218,7 @@ def main():
     parser.add_argument('--catalog',type=Path,default=ROOT/'build/mail-catalog/catalog.bin')
     args = parser.parse_args()
     report = verify_templates(args.rom.read_bytes(),args.catalog.read_bytes())
-    print(json.dumps({'templates':len(TEMPLATES),'complete':len(COMPLETE),'parts':len(report['parts']),
+    print(json.dumps({'templates':len(TEMPLATES),'complete':len(report['complete_templates']),'parts':len(report['parts']),
                       'unavailable':report['unavailable_templates'],'installed':False}))
 
 

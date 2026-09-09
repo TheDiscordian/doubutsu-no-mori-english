@@ -12,7 +12,7 @@ event/raffle furniture, useful placement, creativity, and neighbour trading.
 No GameCube-only house feature is introduced by these letters.
 
 `tools/academy_letters.py` binds the original creator/scheduler, supplied English
-executable functions, immutable catalogue two, decoder, and all sixty source parts.
+executable functions, selected immutable catalogue two or four, decoder, and all sixty source parts.
 Catalogue presence alone does not count as installation. The creator is built
 with `--mother-letters --departed-letters --villager-events --academy-letters`.
 The existing resident loader and saved record layout remain unchanged.
@@ -25,8 +25,8 @@ identity, null animal, condition zero, and foreign one. Native reply flags canno
 encode the marker as a valid personality. The dispatcher checks aliases before
 session reads, validates the whole descriptor, builds privately, and copies all
 164 bytes only after complete text and snapshot reconstruction succeeds. Metadata
-retains the cleared sender, recipient, type six, and wing paper. Score/reward
-templates are rejected until their complete variable-field path is implemented.
+retains the cleared sender, recipient, type six, and wing paper. The optional
+score dispatcher handles score templates through its separate complete field path.
 
 The 276-byte native `8009CC94..8009CDA8` entry becomes a bounded wrapper. Its
 240-byte frame owns the temporary descriptor and whole letter, adding 24 stack
@@ -54,11 +54,11 @@ The N64 score overlay is VROM `0081D9D0..00821740`, linked RAM
 `809259E0..80929C30`, with entry `809281B8` and owner `80107B50`. Its caller
 allocates, loads, invokes, frees, and marks the date. Complete score letters need
 verified points, full item/series names, dates, and selected templates. Native
-selection covers `0034..0048`; body `003D` requires the semicolon. The N64 selector
+selection covers `0034..0048`; catalogue four retains the semicolon in `003D`. The N64 selector
 has no GameCube house-model reward checks or gifts. Do not introduce GameCube-only
 cottage `0220` or reward `0221/0222` templates. Preserve N64 scoring/selection and
 propagate publication failure before clearing evaluation eligibility. The
-[score-letter specification](ACADEMY_SCORE_LETTERS.md) records the remaining path.
+[score-letter specification](ACADEMY_SCORE_LETTERS.md) records the installed path and acceptance limits.
 
 ## Verification and remaining work
 
@@ -68,5 +68,5 @@ letters in both capitalization states, all forty home/slot combinations, and
 actual scheduler membership/date gates, resource failure/retry, full home,
 duplicate prevention, input bounds, guards, heap accounting, and checkpoint
 restoration. The [checkpoint](../docs/checkpoints/ACADEMY_LETTERS.md) pins results.
-Normal gameplay, real save/reload, original hardware, score letters, and the
+Normal gameplay, real save/reload, original hardware, and the
 wider project remain incomplete.

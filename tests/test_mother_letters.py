@@ -42,7 +42,7 @@ class MotherLetterTests(npc_tests.NpcMailCreatorTests):
         if not success:
             self.assertEqual((destination.raw,capital.value),before[:2])
             return
-        record = Record(2,0,(int.from_bytes(request.raw[4:6],'big'),),(),bool(before[1]))
+        record = Record(self.catalog_id,0,(int.from_bytes(request.raw[4:6],'big'),),(),bool(before[1]))
         expected = bytearray(164);expected[:16] = player.raw
         expected[18:30] = b' '*12;expected[30:35] = b'\xff'*5
         expected[36:38] = request.raw[6:8]
@@ -57,13 +57,13 @@ class MotherLetterTests(npc_tests.NpcMailCreatorTests):
 
     def test_every_supported_mom_letter_both_capitals_and_native_metadata(self):
         self.assertEqual((len(TEMPLATES),len(COMPLETE)),(114,113))
-        for number in COMPLETE:
+        for number in TEMPLATES if self.catalog_id==4 else COMPLETE:
             for capital in (0,1):
                 with self.subTest(number=f'{number:04X}',capital=capital):
                     self.mother_invoke(self.mother_fixture(number,capital,paper=number%64,gift=number))
 
     def test_unavailable_glyph_invalid_descriptor_and_unused_native_ids_never_publish(self):
-        self.mother_invoke(self.mother_fixture(0x136,1),False)
+        self.mother_invoke(self.mother_fixture(0x136,1),self.catalog_id==4)
         for number in (0,0x12B,0x182,0x183,*range(0x186,0x18A),0x1A4,65535):
             self.mother_invoke(self.mother_fixture(number,1),False)
         for offset,value in ((0,0),(1,0),(2,0),(3,0),(8,64),(9,1),(10,1),(11,6)):

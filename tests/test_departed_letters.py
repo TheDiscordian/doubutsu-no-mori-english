@@ -58,9 +58,9 @@ class DepartedLetterTests(mother_tests.MotherLetterTests):
         draw = C.c_float.in_dll(self.lib,'af_departed_draw').value
         number = 0xFC+looks*3+int(C.c_float(draw*3).value)
         values = (Field(player.raw[:6]),Field(name),Field(request.raw[4:10]),Field(player.raw[6:12]))
-        record = Record(2,0,(number,),tuple(enumerate(values)),bool(before[1]))
+        record = Record(self.catalog_id,0,(number,),tuple(enumerate(values)),bool(before[1]))
         parts = templates(self.catalog,record)
-        needed = set().union(*(template_fields(p) for p in parts.parts))
+        needed = set().union(*(template_fields(p,extended_glyphs=self.catalog_id==4) for p in parts.parts))
         record = replace(record,fields=tuple((slot,value) for slot,value in record.fields if slot in needed))
         expected = bytearray(164);expected[:16] = player.raw
         expected[18:24] = b'NATIVE';expected[24:30] = request.raw[4:10]

@@ -15,9 +15,10 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
 from audit_mail_templates import template_fields
 from gc_names import symbol_data
 from gc_text import decoder_tables
-from mail_catalog import parse,verify_registered
+from mail_catalog import parse
 from mail_reference import BANK_HASHES,DECODER_SHA256,transcode
 from textbanks import Bank,banks
+import mail_creator_catalog as creator_catalog
 
 VROM,RAM,RELOCATION = 0x81D9D0,0x809259E0,0x821740
 TEMPLATES = tuple(range(0x34,0x49))
@@ -67,7 +68,7 @@ def references(native,catalog,root=ROOT):
     native = verified_rom(native);files = by_vrom(native);verify_code(files[CODE_VROM].extract(native))
     data,relocation = (files[v].extract(native) for v in (VROM,RELOCATION))
     table = verify_overlay(data,relocation)
-    if verify_registered(catalog)['catalog'] != 2: raise ValueError('Score references require catalogue two')
+    catalog_id = creator_catalog.identity(catalog)
     installed = parse(catalog)[1]
     rel = (root/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
     symbols = (root/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_text()
@@ -101,17 +102,18 @@ def references(native,catalog,root=ROOT):
             if template_fields(original) != fields(name,number): raise ValueError('Changed native score field set')
             row = {'id':f'{name}:{number:04X}','source_sha256':sha256(original),'reference_sha256':sha256(reference[number]),
                    'fields':sorted(fields(name,number))}
-            try: value = transcode(reference[number],tables)
+            try: value = transcode(reference[number],tables,extended_glyphs=catalog_id==4)
             except ValueError as error:
                 if name!='mail' or number!=0x3D or 'GC D0' not in str(error): raise
                 if installed[name][number] is not None: raise ValueError('Unavailable semicolon must remain missing')
                 row['unavailable'] = str(error)
             else:
-                if value != installed[name][number] or template_fields(value) != fields(name,number):
+                if value != installed[name][number] or template_fields(value,extended_glyphs=catalog_id==4) != fields(name,number):
                     raise ValueError('Changed complete score text or fields')
                 row.update(encoded_sha256=sha256(value),bytes=len(value))
             rows.append(row)
-    return {'classic_templates':list(TEMPLATES),'complete_templates':list(COMPLETE),'unavailable_templates':[0x3D],
+    return {'catalog':catalog_id,'classic_templates':list(TEMPLATES),
+            'complete_templates':list(TEMPLATES if catalog_id==4 else COMPLETE),'unavailable_templates':[] if catalog_id==4 else [0x3D],
             'parts':rows,'series':series,'native_selection_table':table,'installed':False,
             'native_guards':GUARDS,'reference_functions':REFERENCE}
 
@@ -195,25 +197,26 @@ def install(native,replacements,additions,module):
     at,value = scheduler_patch();offset = at-CODE_RAM
     if code[offset:offset+len(value)] != original[offset:offset+len(value)] or any(v in replacements for v in (VROM,RELOCATION)):
         raise ValueError('Overlapping score creator or scheduler patch')
-    evidence = references(native,additions[0x03000000]);data,reloc,sections = patched_overlay(native,loader)
+    evidence = references(native,creator_catalog.resource(additions,module));data,reloc,sections = patched_overlay(native,loader)
     code[offset:offset+len(value)] = value
     replacements.update({CODE_VROM:bytes(code),VROM:data,RELOCATION:reloc})
     return {**evidence,'installed':True,'overlay_sha256':sha256(data),'relocation_sha256':sha256(reloc),
             'sections':sections,'scheduler_sha256':sha256(value),'new_resident_bytes':0,'new_saved_bytes':0,
-            'wrapper_stack_bytes':256,'score_points_return_preserved':True,'complete_templates':list(COMPLETE)}
+            'wrapper_stack_bytes':256,'score_points_return_preserved':True}
 
 
 def verify_installation(built,native,module,report):
     from npc_mail_loader import verify_configuration,VROM as CREATOR
     from runtime_layout import MODULE_VROM
     files = by_vrom(built);verify_configuration(files[MODULE_VROM].extract(built),files[CREATOR].extract(built),module)
+    catalog = creator_catalog.verify_installation(built,module,report)
     if module['npc_mail_loader']['overlay'].get('academy_scores') is not True:
         raise ValueError('Score dispatcher is not installed')
     data,reloc,sections = patched_overlay(native,int(module['symbols']['af_npc_mail_load'],16));at,value=scheduler_patch()
     if (files[VROM].extract(built) != data or files[RELOCATION].extract(built) != reloc
             or files[CODE_VROM].extract(built)[at-CODE_RAM:at-CODE_RAM+len(value)] != value
             or report.get('overlay_sha256') != sha256(data) or report.get('relocation_sha256') != sha256(reloc)
-            or report.get('scheduler_sha256') != sha256(value) or report.get('complete_templates') != list(COMPLETE)):
+            or report.get('scheduler_sha256') != sha256(value) or report.get('complete_templates') != list(TEMPLATES if catalog==4 else COMPLETE)):
         raise ValueError('Complete score-letter creation or publication is not installed')
 
 
@@ -226,7 +229,7 @@ def main():
     args.output.mkdir(parents=True,exist_ok=True)
     (args.output/'references.json').write_text(json.dumps(report,indent=2)+'\n')
     (args.output/'series.bin').write_bytes(series_resource(report))
-    print(json.dumps({'templates':len(TEMPLATES),'complete_references':len(COMPLETE),'parts':len(report['parts']),
+    print(json.dumps({'templates':len(TEMPLATES),'complete_references':len(report['complete_templates']),'parts':len(report['parts']),
                       'full_series_names':len(report['series']),'unavailable':report['unavailable_templates'],'installed':False}))
 
 

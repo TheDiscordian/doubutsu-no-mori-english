@@ -17,7 +17,11 @@ name-entry prompts, and keyboard labels. Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,
 sale/Redd event, Mom, departed-villager, villager-event, and HRA welcome/advice routes. Unavailable
-Mom and birthday bodies do not receive complete-letter credit.
+Mom, birthday, and score bodies do not receive complete-letter credit in the
+default catalogue-two variant. The counter reads the compiled creator's selected
+catalogue and each verified route's complete IDs. Catalogue-four glyphs receive
+credit only with the exact installed font and complete reader; unknown pairs
+remain uncredited. The denominator and duplicate-ID rules do not change.
 Catalogue presence alone does not credit unused letters or GameCube-only IDs.
 Reader and NPC capture/delivery patches are checked against installed bytes;
 actor images and resources are bound to the completed build report.

@@ -7,12 +7,13 @@ from pathlib import Path
 import struct
 
 from academy_letters import SCHEDULER,verify_installation as verify_advice
-from academy_score_letters import RAM,VROM,RELOCATION,COMPLETE,fields,references,verify_installation
+from academy_score_letters import RAM,VROM,RELOCATION,fields,references,verify_installation
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256
 from extended_items import COUNTS,HEADER,WIDTH
 from item_aliases import ordinary_item
 from mail_record import Field,Record
 from runtime_module import verify_test_module
+import mail_creator_catalog as creator_catalog
 
 
 def selected_template(request,case,seed):
@@ -43,7 +44,7 @@ def expected_record(request,number,points,series,month,day,capital,item=0x11FC):
         values[1] = Field(bytes.fromhex(request['items'])[at:at+WIDTH])
     if number in (0x3A,0x3B): values[2] = Field(bytes.fromhex(request['series'][series]['english']))
     if set(values) != fields('mail',number): raise ValueError('Score fixture field set differs from source')
-    return Record(2,0,(number,),tuple(sorted(values.items())),bool(capital))
+    return Record(request.get('catalog_id',2),0,(number,),tuple(sorted(values.items())),bool(capital))
 
 
 def scenario(native,built,report):
@@ -52,7 +53,8 @@ def scenario(native,built,report):
     verify_advice(built,native,module,report['academy_letters'])
     verify_installation(built,native,module,report['academy_score_letters'])
     source,files = by_vrom(native),by_vrom(built)
-    catalog = files[0x03000000].extract(built);evidence = references(native,catalog)
+    catalog_id = creator_catalog.selected(module)
+    catalog = files[creator_catalog.vrom(catalog_id)].extract(built);evidence = references(native,catalog)
     items = files[0x02A00000].extract(built)
     if items[:32] != HEADER or sha256(items) != report['extended_items']['data_sha256']:
         raise ValueError('Changed installed item names')
@@ -63,7 +65,7 @@ def scenario(native,built,report):
         choice = int(struct.unpack('>f',struct.pack('>f',draw*3))[0]);seeds.setdefault(choice,seed)
     if set(seeds) != {0,1,2}: raise ValueError('Incomplete native RNG choices')
     cases = []
-    for number in COMPLETE:
+    for number in evidence['complete_templates']:
         points,room,bits,seed = 123456,0,0,0
         if number < 0x42:
             index = evidence['native_selection_table'].index(number);bits = 1<<index;seed = seeds[index//16]
@@ -81,7 +83,7 @@ def scenario(native,built,report):
         value = original[start-CODE_RAM:end-CODE_RAM]
         if code[start-CODE_RAM:end-CODE_RAM] != value: raise ValueError('Changed native eligibility/allocation helper')
         guards[f'{start:08X}'] = value.hex()
-    request = {'module':module,'cases':cases,'series':evidence['series'],'items':items.hex(),'catalog':catalog.hex(),
+    request = {'module':module,'catalog_id':catalog_id,'cases':cases,'series':evidence['series'],'items':items.hex(),'catalog':catalog.hex(),
                'selection_table':evidence['native_selection_table'],
                'data':files[VROM].extract(built).hex(),'relocation':files[RELOCATION].extract(built).hex(),
                'original':source[VROM].extract(native).hex(),'original_relocation':source[RELOCATION].extract(native).hex(),

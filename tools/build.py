@@ -299,7 +299,7 @@ def main():
         report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'),
                                                        args.mail_catalog,glyph_font=args.extended_font)
     if args.npc_mail_generation:
-        report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation)
+        report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation,glyph_font=args.extended_font)
     if args.english_shared_npc_words:
         report['shared_npc_words'] = install_shared_words(rom, replacements, additions, report['runtime_module'],
             json.loads(args.translations.read_text()) if args.translations else [], module_command_info(rom))
@@ -307,6 +307,9 @@ def main():
     if args.extended_font:
         from extended_font_cartridge import install as install_font
         report['extended_font'] = install_font(rom,replacements,additions,report.get('runtime_module'),args.extended_font)
+    if report.get('npc_mail_loader',{}).get('glyph_font_sha256'):
+        if report.get('extended_font',{}).get('blob_sha256') != report['npc_mail_loader']['glyph_font_sha256']:
+            raise ValueError('Glyph creator requires the exact approved installed cartridge font')
     if report.get('mail_catalog',{}).get('glyph_catalog'):
         if (not args.english_mail_snapshots or report.get('extended_font',{}).get('blob_sha256') !=
                 report['mail_catalog']['glyph_font_sha256']):

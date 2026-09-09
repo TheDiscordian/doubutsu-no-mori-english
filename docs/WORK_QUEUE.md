@@ -16,13 +16,21 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
+installs complete resources for all 114 Mom, 55 villager-event, and 21 score
+templates and the missing ordinary reply footer in the full translation ROM.
+All 57 creator/installer tests, 26 sanitizer tests, and 75 reader/accounting tests
+pass; independent creator builds agree. The fresh silent boot-to-town and native
+creation/delivery batch is active. Collect its actual result and retain unresolved
+ordinary-NPC, save, gameplay, and review work before claiming full acceptance.
+
 The [HRA welcome/advice route](../specs/ACADEMY_LETTERS.md) installs all twenty
 complete letters and gates membership/date updates on actual delivery. The native
 batch passes every template in both capitalization states, all home/slot positions,
 real scheduler failure/retry, and same-day duplicate prevention. Host, sanitizer,
 installer, and independent build/assembly checks pass, along with all 1,013
 regression tests.
-The [score integration](../specs/ACADEMY_SCORE_LETTERS.md) installs twenty supported
+The catalogue-two [score integration](../specs/ACADEMY_SCORE_LETTERS.md) has twenty supported
 letters with full item/series names, comma-separated points, and English dates.
 The source verifier binds all 63 score parts and 55 complete series names.
 Host/sanitizer and installer tests, independent builds, assembly, and all 1,047
@@ -32,8 +40,8 @@ readbacks, four scheduler cases, thirteen rejections, two retries, 159 calls,
 and 450 memory assertions. Live save/globals and checkpoint restoration pass,
 with blank isolated saves and graceful shutdown. The successful scheduler uses
 the original NULL-game allocation path; game-owned allocation failure is checked
-separately. Body
-`003D` needs the semicolon alongside Mom `0136` and birthday `00F6`.
+separately. Catalogue four supplies the exact semicolon bodies `003D`, Mom
+`0136`, and birthday `00F6`; current native acceptance is tracked above.
 The native score selector has no GameCube house-model reward path; do not add
 GameCube-only reward/cottage templates to the N64 selection.
 
@@ -45,16 +53,16 @@ in the new fourteen-cell resource. Complete template parsing, token-aware mail
 pagination/footer alignment, and frozen catalogue four pass all 80 final focused
 tests. The native batch passes 114 glyph-bearing and eight old-catalogue
 reconstructions, 28 line scans, 44 draws, seventeen cursor cases, and 1,224
-assertions, with a restored checkpoint. Connect the affected creator routes and
-rebuild all module-bound dependencies for the complete translation ROM. Keep
+assertions, with a restored checkpoint. The creator integration above builds
+the complete translation ROM with current module-bound dependencies. Keep
 catalogues two and three unchanged. See the [glyph checkpoint](checkpoints/MAIL_GLYPHS.md);
 reference availability is not applied-text credit.
 
-The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
+The catalogue-two [Mom-letter integration](../specs/MOTHER_LETTERS.md) has 113 complete
 letters without added resident code or saved-layout growth. All 113 native
 post-to-mailbox-to-reader cases, seven rejections, and a retry pass, with 239
 calls and 730 memory assertions. Host, sanitizer, installer, independent-build,
-and assembly checks pass, along with all 945 regression tests. One body still needs a semicolon glyph. Native
+and assembly checks pass, along with all 945 regression tests. Catalogue four supplies the remaining body. Native
 scheduling and normal save/reload remain acceptance work. Continue other letter
 creators and remaining general/item text; keep the full project scope below.
 The [departed-villager group](../specs/DEPARTED_VILLAGER_LETTERS.md) installs
@@ -66,9 +74,9 @@ assembly pass, along with all 965 regression tests. Native scheduling, queue
 draining, and save/reload still require acceptance. Continue birthday/Christmas
 creators and remaining general/item text;
 do not treat direct calls as normal gameplay or original-hardware evidence.
-The [shared villager-event batch](../specs/VILLAGER_EVENT_LETTERS.md) installs
+The catalogue-two [villager-event batch](../specs/VILLAGER_EVENT_LETTERS.md) has
 54 complete friendship-gift, birthday, goodbye, and Christmas letters. All 165
-source parts are bound; one birthday body still requires the semicolon. Original
+source parts are bound; catalogue four supplies the remaining birthday body. Original
 gift choices, full selected item names, and real caller failure propagation are
 preserved. Seventeen host creator tests, sanitizers, five installer tests,
 independent builds, and independent entry assembly pass. All 987 regression tests

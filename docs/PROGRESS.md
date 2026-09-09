@@ -13,6 +13,17 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
+builds the complete translation ROM with all 114 Mom, 55 villager-event, and
+21 HRA score templates, plus the glyph-bearing ordinary reply footer. The
+compiled catalogue choice, exact font/catalogue installation, source approvals,
+and combined text counter retain legacy catalogue semantics. All 57 host and
+installer tests, 26 sanitizer tests, and 75 reader/accounting regressions pass.
+Independent creator builds agree. The silent boot-to-town and native creator
+batch is in progress; actual delivery acceptance is not yet claimed. The creator
+has 240 image bytes free and the resident has none. Remaining text consumers,
+ordinary NPC rejection, review, real saves, release, and both stretch goals remain.
+
 The [complete mail-glyph framework](../specs/MAIL_GLYPHS.md) transcodes all 4,866
 reference parts, retaining every original word, command, and manual break. Its
 new immutable catalogue supports the 59 unavailable parts and donor accented
@@ -25,12 +36,12 @@ seventeen cursor cases, 346 calls, and 1,224 assertions. Checkpoint restoration,
 erased FlashRAM, and the unchanged blank Pak fixture pass. The resident image
 fits exactly within the existing 24 KiB limit
 after sharing checksum and draw routines; the RAM reservation and saved layouts
-do not grow. Native creator routing, the complete
-translation build, and wider acceptance remain; reference availability is not
+do not grow. Creator routing and the complete translation build use the
+integration above; native and wider acceptance remain. Reference availability is not
 installed-translation credit. The [glyph checkpoint](checkpoints/MAIL_GLYPHS.md)
 records current artifacts and the next implementation steps.
 
-The [HRA score integration](../specs/ACADEMY_SCORE_LETTERS.md) installs twenty
+The catalogue-two [HRA score integration](../specs/ACADEMY_SCORE_LETTERS.md) has twenty
 complete supported letters with full dates, comma-separated points, and complete
 selected item/series names. Native scoring and rewards remain unchanged; delivery
 success crosses the original scoring return and scheduler cleanup before the
@@ -43,8 +54,8 @@ and 450 memory assertions. Checkpoint restoration and blank isolated saves pass.
 Successful scheduling uses the original NULL-game allocation path; the
 game-owned allocation fails in this checkpoint and retains eligibility correctly.
 The [score checkpoint](checkpoints/ACADEMY_SCORE_LETTERS.md) tracks evidence and
-remaining work. The complete mail-glyph framework above supports the next
-affected-creator integration. The broader translation/review remains active.
+remaining work. The glyph framework and creator integration above support all
+selected bodies. The broader translation/review remains active.
 
 The [HRA welcome/advice integration](../specs/ACADEMY_LETTERS.md) installs twenty
 complete letters and preserves membership/date eligibility when delivery fails.
@@ -54,17 +65,17 @@ metadata comparisons, forty-four complete readbacks, six real scheduler cases,
 nine rejections, two resource retries, 152 calls, and 436 memory assertions.
 All four homes and ten mailbox slots are covered; same-day duplicates are rejected.
 Live save/globals and the checkpoint are restored, with blank isolated saves and
-graceful shutdown. All 1,013 regression tests pass. Complete HRA score acceptance, the missing
-semicolon path, normal gameplay/save acceptance, and the wider project remain.
+graceful shutdown. All 1,013 regression tests pass. Catalogue-four acceptance,
+normal gameplay/save acceptance, and the wider project remain.
 The [checkpoint](checkpoints/ACADEMY_LETTERS.md) records artifacts and limits.
 
-The [shared villager-event integration](../specs/VILLAGER_EVENT_LETTERS.md)
+The catalogue-two [villager-event integration](../specs/VILLAGER_EVENT_LETTERS.md)
 installs 54 complete supported friendship-gift, birthday, moving-away, and
 Christmas letters. The complete creator retains original selection routines,
 uses full villager and selected item names, and checks success before native
 publication. The integrated ROM builds, seventeen host tests and sanitizers pass,
-and five installer tests and independent builds/assembly pass. One birthday
-body still requires the semicolon. All 987 regression tests pass. The silent
+and five installer tests and independent builds/assembly pass. Catalogue four
+supplies the remaining birthday body. All 987 catalogue-two tests pass. The silent
 native batch passes 108 original-selection comparisons, 108 complete delivered
 readbacks, eighteen rejections, four resource retries, 573 calls, and 1,956 memory
 assertions including checkpoint restoration. Live save/globals are restored and
@@ -87,7 +98,7 @@ draining, saving/reloading, and hardware remain acceptance work. The
 [checkpoint](checkpoints/DEPARTED_VILLAGER_LETTERS.md) pins artifacts and test
 scope. Birthday/Christmas creators and remaining general/item text follow.
 
-The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
+The catalogue-two [Mom-letter integration](../specs/MOTHER_LETTERS.md) has 113 complete
 supported letters through native home-mailbox delivery. Ten host creator tests,
 the sanitizer run, five installer tests, independent builds, and independent
 entry/gate assembly pass, along with all 945 regression tests. The silent native batch passes all 113 complete
@@ -95,7 +106,7 @@ mailbox-to-reader cases, seven rejections, a retry, 239 calls, and 730 memory
 assertions, including the resumed-checkpoint check. Original save memory is
 restored, isolated saves stay blank, and shutdown is graceful. No resident code
 or saved structure grows; the optional system creator preserves ordinary NPC
-reply creation. One Mom body still requires the semicolon glyph. Normal
+reply creation. Catalogue four supplies the remaining Mom body. Normal
 scheduling, save/reload, and hardware remain unverified. The
 [integration checkpoint](checkpoints/MOTHER_LETTERS.md) pins the complete build
 and test evidence. Other letter creators and remaining general/item text are next.

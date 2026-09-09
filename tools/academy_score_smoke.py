@@ -148,7 +148,9 @@ def exercise(debug,request,record):
     for player in (() if request.get('scheduler_only') else (4,0xFFFFFFFF)):
         before = fixture(0,0,1,case);call(base+0x27D8,[player],0,proof,v1=0)
         check('invalid scoring entry retains save',SAVE_RAM,before);rejections += 1
-    for fault in (() if request.get('scheduler_only') else ('disabled','unknown_series','semicolon','full_queue')):
+    failures = ('disabled','unknown_series','full_queue')
+    if request.get('catalog_id',2)==2: failures += ('semicolon',)
+    for fault in (() if request.get('scheduler_only') else failures):
         chosen = next(c for c in request['cases'] if c['template']==0x3A) if fault=='unknown_series' else dict(case)
         if fault=='semicolon':
             chosen['bits'] = f'{1<<17:016X}'

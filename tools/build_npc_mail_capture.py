@@ -15,7 +15,8 @@ from npc_mail_capture import RAM,source_hashes,creator_imports,relocate,verified
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False):
+    if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
     variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores)
@@ -48,6 +49,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
+    if mail_glyphs: flags.append('-DAF_MAIL_CREATOR_CATALOG=4')
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
     if departed_letters: names += ('departed_creator',)
     if villager_events: names += ('villager_event_creator',)
@@ -116,6 +118,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
               'stack_usage':{name:(out/(name+'.su')).read_text() for name in names},
               'fado_sources':fado_hashes,'status':'Complete capture/generation code; gameplay publication not installed'}
     if mother_letters: report['mother_letters'] = True
+    if mail_glyphs: report['mail_glyphs'] = True
     if departed_letters: report['departed_letters'] = True
     if villager_events: report['villager_events'] = True
     if academy_letters: report['academy_letters'] = True
@@ -123,6 +126,8 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         report['academy_scores'] = True;report['academy_series_sha256'] = sha256(series)
         at = symbols['af_academy_series_data']-RAM
         if data[at:at+len(series)] != series: raise ValueError('Linked academy series resource differs')
+    from npc_mail_capture import validate
+    validate(data,reloc,report,module)
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -140,6 +145,7 @@ def main():
     parser.add_argument('--villager-events',action='store_true',help='Add complete villager-event letters; requires --departed-letters')
     parser.add_argument('--academy-letters',action='store_true',help='Add complete HRA welcome/advice letters; requires --villager-events')
     parser.add_argument('--academy-scores',action='store_true',help='Add complete HRA score capture; requires --academy-letters')
+    parser.add_argument('--mail-glyphs',action='store_true',help='Create new letters with complete glyph catalogue four')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
     if args.villager_events and not args.departed_letters: parser.error('--villager-events requires --departed-letters')
@@ -148,7 +154,7 @@ def main():
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
-                           academy_scores=args.academy_scores),indent=2))
+                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs),indent=2))
 
 
 if __name__ == '__main__': main()

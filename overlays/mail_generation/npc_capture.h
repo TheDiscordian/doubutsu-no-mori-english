@@ -7,6 +7,16 @@
 #define AF_NPC_WORD_BYTES 11328u
 #define AF_NPC_ALIAS_BYTES 6368u
 
+/* The build variant selects new letters only. Saved catalogue identities and
+ * the resident primary resource retain their original meanings. */
+#ifndef AF_MAIL_CREATOR_CATALOG
+#define AF_MAIL_CREATOR_CATALOG 2u
+#endif
+#if AF_MAIL_CREATOR_CATALOG != 2 && AF_MAIL_CREATOR_CATALOG != 4
+#error Unsupported creator catalogue
+#endif
+extern const unsigned int af_npc_mail_catalog_id;
+
 typedef struct {
     const unsigned char *words;
     const unsigned char *aliases;

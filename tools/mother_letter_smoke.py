@@ -93,7 +93,7 @@ def exercise(debug,request,record):
     first = request['cases'][0]
     for fault in ('unavailable','disabled','full_mailbox','full_queue','owner','bad_paper','bad_template'):
         case = dict(first)
-        if fault == 'unavailable': case['template'] = 0x136
+        if fault == 'unavailable': case['template'] = 0x182 if request.get('catalog_id',2)==4 else 0x136
         if fault == 'bad_paper': case['paper'] = 64
         if fault == 'bad_template': case['template'] = 0x10000+0x12C
         before = fixture(case,slot=10 if fault in ('full_mailbox','full_queue') else 0,

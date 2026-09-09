@@ -7,7 +7,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
 from audit_mail_templates import template_fields
 from gc_names import symbol_data
 from gc_text import decoder_tables
-from mail_catalog import parse,verify_registered
+from mail_catalog import parse
 from mail_reference import BANK_HASHES,DECODER_SHA256,transcode
 from mother_letters import START as MOM_START,END as MOM_END,patch as mother_patch
 from npc_mail_loader import VROM as CREATOR_VROM,verify_configuration
@@ -53,9 +53,9 @@ def verify_code(code):
 
 
 def verify_templates(rom,catalog,root=ROOT):
+    import mail_creator_catalog as creator_catalog
     rom = verified_rom(rom);verify_code(by_vrom(rom)[CODE_VROM].extract(rom))
-    if verify_registered(catalog)['catalog'] != 2:
-        raise ValueError('Departed letters require immutable catalogue two')
+    catalog_id = creator_catalog.identity(catalog)
     at = 0x1060+0x8002C970-0x80025C60
     if sha256(rom[at:at+0xE8]) != 'bebe6ab1df04e185b55ed2719392f11a4e9c2e85c443f5771d95eabad1105de0':
         raise ValueError('Changed original departed-villager RNG')
@@ -77,14 +77,14 @@ def verify_templates(rom,catalog,root=ROOT):
         if (sha256(data),sha256(table)) != BANK_HASHES[name]: raise ValueError('Changed departed-villager reference bank')
         reference = Bank(name,0,0,data,table).entries()
         for number in TEMPLATES:
-            value = transcode(reference[number],tables)
-            if (installed[name][number] != value or template_fields(value) != fields(name,number)
+            value = transcode(reference[number],tables,extended_glyphs=catalog_id==4)
+            if (installed[name][number] != value or template_fields(value,extended_glyphs=catalog_id==4) != fields(name,number)
                     or template_fields(native[name][number]) != fields(name,number,native=True)):
                 raise ValueError('Changed departed-villager text or field identity')
             rows.append({'id':f'{name}:{number:04X}','source_sha256':sha256(native[name][number]),
                          'reference_sha256':sha256(reference[number]),'encoded_sha256':sha256(value),
                          'bytes':len(value),'fields':sorted(fields(name,number))})
-    return {'classic_templates':list(TEMPLATES),'parts':rows,'reference_functions':REFERENCE_FUNCTIONS}
+    return {'catalog':catalog_id,'classic_templates':list(TEMPLATES),'parts':rows,'reference_functions':REFERENCE_FUNCTIONS}
 
 
 def patch(original,loader):
@@ -109,6 +109,7 @@ def patch(original,loader):
 
 
 def install(rom,replacements,additions,module):
+    import mail_creator_catalog as creator_catalog
     rom = verified_rom(rom)
     if not module or not module.get('npc_mail_loader',{}).get('overlay',{}).get('departed_letters'):
         raise ValueError('Departed letters require the verified extended system creator')
@@ -120,7 +121,7 @@ def install(rom,replacements,additions,module):
     loader = int(module['symbols']['af_npc_mail_load'],16)
     if code[MOM_START-CODE_RAM:MOM_END-CODE_RAM] != mother_patch(original[MOM_START-CODE_RAM:MOM_END-CODE_RAM],loader):
         raise ValueError('Departed letters require complete installed Mom-letter integration')
-    evidence = verify_templates(rom,additions[0x03000000])
+    evidence = verify_templates(rom,creator_catalog.resource(additions,module))
     value = patch(code[START-CODE_RAM:END-CODE_RAM],loader)
     code[START-CODE_RAM:END-CODE_RAM] = value
     replacements[CODE_VROM] = bytes(code)
@@ -130,8 +131,10 @@ def install(rom,replacements,additions,module):
 
 
 def verify_installation(built,native,module,report):
+    import mail_creator_catalog as creator_catalog
     files = by_vrom(built)
     verify_configuration(files[MODULE_VROM].extract(built),files[CREATOR_VROM].extract(built),module)
+    creator_catalog.verify_installation(built,module,report)
     if not module['npc_mail_loader']['overlay'].get('departed_letters'):
         raise ValueError('Departed-villager dispatcher is not installed')
     original = by_vrom(native)[CODE_VROM].extract(native);verify_code(original)

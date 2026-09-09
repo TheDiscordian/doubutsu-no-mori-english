@@ -9,22 +9,24 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom
 from mail_catalog import templates
 from mail_record import Record,pack
 from mail_runtime_test_scenario import output_bytes
-from mother_letters import START,END,COMPLETE,verify_templates,verify_installation
+from mother_letters import START,END,verify_templates,verify_installation
 from runtime_module import verify_test_module
+import mail_creator_catalog as creator_catalog
 
 
 def scenario(native,built,report):
     module = report['runtime_module'];verify_test_module(built,module)
     verify_installation(built,native,module,report['mother_letters'])
-    files = by_vrom(built);catalog = files[0x03000000].extract(built)
-    verify_templates(native,catalog)
+    files = by_vrom(built);catalog_id = creator_catalog.selected(module)
+    catalog = files[creator_catalog.vrom(catalog_id)].extract(built)
+    evidence = verify_templates(native,catalog)
     cases = []
-    for index,number in enumerate(COMPLETE):
-        record = Record(2,0,(number,),(),bool(index%2))
+    for index,number in enumerate(evidence['complete_templates']):
+        record = Record(catalog_id,0,(number,),(),bool(index%2))
         cases.append({'template':number,'capital':index%2,'paper':index%64,'gift':0x1000+index,
                       'wire':pack(record).hex(),'text':output_bytes(record,templates(catalog,record)).hex()})
     code = files[CODE_VROM].extract(built)
-    request = {'module':module,'cases':cases,'code':code[START-CODE_RAM:END-CODE_RAM].hex()}
+    request = {'module':module,'catalog_id':catalog_id,'cases':cases,'code':code[START-CODE_RAM:END-CODE_RAM].hex()}
     return [{'wait':8},{'save_state':True},{'pause_game_thread':True},
             {'test_mother_letters':request},{'load_state':True},{'resume':True},
             {'wait':2},{'read':['8019B000',4],'expect':'00000000'}]
@@ -40,7 +42,7 @@ def main():
                        json.loads((args.build/'build.json').read_text()))
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(actions,indent=2)+'\n')
-    print(json.dumps({'actions':len(actions),'complete_mom_templates':len(COMPLETE)}))
+    print(json.dumps({'actions':len(actions),'complete_mom_templates':len(actions[3]['test_mother_letters']['cases'])}))
 
 
 if __name__ == '__main__': main()

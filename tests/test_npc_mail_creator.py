@@ -32,9 +32,11 @@ ALIASES = ROOT/'build/npc-mail-names/aliases.bin'
                      'Host GCC and verified local complete sources required')
 class NpcMailCreatorTests(unittest.TestCase):
     extra_sources = ()
+    catalog_id = 2
+    catalog_path = CATALOG
     @classmethod
     def setUpClass(cls):
-        cls.catalog = CATALOG.read_bytes();verify_registered(cls.catalog)
+        cls.catalog = cls.catalog_path.read_bytes();verify_registered(cls.catalog)
         cls.words,cls.aliases = WORDS.read_bytes(),ALIASES.read_bytes()
         cls.word_rows = unpack_words(cls.words,WORD_HASH);cls.alias_rows = unpack_aliases(cls.aliases,ALIAS_HASH)
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-npc-mail-creator-')
@@ -45,6 +47,7 @@ class NpcMailCreatorTests(unittest.TestCase):
         sources += ['runtime/crc32.c']
         sources += ['tests/'+name for name in ('mail_catalog_mock.c','npc_mail_capture_mock.c','npc_mail_creator_mock.c')]
         flags = ['-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-g'] if os.environ.get('AF_NPC_CREATOR_SANITIZE') == '1' else []
+        flags += [f'-DAF_MAIL_CREATOR_CATALOG={cls.catalog_id}']
         compiler_env = dict(os.environ);compiler_env.pop('LD_PRELOAD',None)
         compiled = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',*flags,
                         *(str(ROOT/p) for p in sources),'-o',str(library)],capture_output=True,text=True,env=compiler_env)
@@ -63,7 +66,10 @@ class NpcMailCreatorTests(unittest.TestCase):
         self.words_memory = (C.c_ubyte*len(self.words)).in_dll(self.lib,'af_npc_word_data')
         self.alias_memory = (C.c_ubyte*len(self.aliases)).in_dll(self.lib,'af_npc_alias_data')
         C.memmove(self.words_memory,self.words,len(self.words));C.memmove(self.alias_memory,self.aliases,len(self.aliases))
-        C.memmove((C.c_ubyte*0x100000).in_dll(self.lib,'af_mail_catalog_rom'),self.catalog,len(self.catalog))
+        rom = (C.c_ubyte*0x100000).in_dll(self.lib,'af_mail_catalog_rom')
+        C.memset(rom,0,len(rom))
+        C.memmove(rom,CATALOG.read_bytes(),CATALOG.stat().st_size)
+        C.memmove(C.addressof(rom)+(0xA0000 if self.catalog_id==4 else 0),self.catalog,len(self.catalog))
         for name in ('af_npc_creator_calls','af_npc_creator_clear_calls','af_npc_creator_fault',
                      'af_npc_creator_nested_result','af_npc_creator_nested_capital',
                      'af_mail_catalog_reads','af_mail_catalog_dma_error','af_mail_catalog_fail_read'):
@@ -117,9 +123,10 @@ class NpcMailCreatorTests(unittest.TestCase):
         selected = capture.selection
         fields = tuple((slot,Field(bytes(field.text[:field.length]),field.article))
                        for slot,field in enumerate(capture.capture.fields) if capture.capture.valid&(1<<slot))
-        result = Record(2,selected.kind,tuple(selected.templates[:5 if selected.kind else 1]),fields,bool(old_capital))
+        self.assertEqual(selected.catalog,self.catalog_id)
+        result = Record(self.catalog_id,selected.kind,tuple(selected.templates[:5 if selected.kind else 1]),fields,bool(old_capital))
         parts = templates(self.catalog,result)
-        needed = set().union(*(template_fields(part) for part in parts.parts))
+        needed = set().union(*(template_fields(part,extended_glyphs=self.catalog_id==4) for part in parts.parts))
         result = replace(result,fields=tuple((slot,field) for slot,field in result.fields if slot in needed))
         expected = bytearray(164);expected[:16] = player.raw
         expected[18:24] = remail.raw[4:10] if capture.session.foreign else b'SENDER'
@@ -128,7 +135,7 @@ class NpcMailCreatorTests(unittest.TestCase):
         expected[36:42] = bytes((16 if selected.kind else 0,int(bool(selected.kind)),0,128,0,7+capture.session.foreign))
         expected[42:] = pack(result)
         self.assertEqual(destination.raw[16:180],bytes(expected))
-        self.assertEqual(unpack(destination.raw[58:180],expected_catalog=2),result)
+        self.assertEqual(unpack(destination.raw[58:180],expected_catalog=self.catalog_id),result)
         letter = format_letter(result,parts)
         native = CText.from_address(address+self.text)
         self.assertEqual(tuple(bytes(native.text[o:o+n]) for o,n in zip(native.offsets,native.lengths)),
@@ -192,7 +199,7 @@ class NpcMailCreatorTests(unittest.TestCase):
             self.assertEqual((self.calls.value,self.clear_calls.value),(calls,clears))
             self.assertIsNone(self.active.value);resource[-1] = last
         fixture = self.fixture(good=1,looks=1,capital=1);self.ids[4] = 77
-        self.invoke(fixture,False)
+        self.invoke(fixture,self.catalog_id==4)
         enabled = C.c_uint.in_dll(self.lib,'af_mail_catalog_enabled');enabled.value = 0
         self.invoke(self.fixture(capital=1),False);enabled.value = 1
         reads = C.c_uint.in_dll(self.lib,'af_mail_catalog_reads');reads.value = 0

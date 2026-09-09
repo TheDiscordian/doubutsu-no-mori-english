@@ -5,7 +5,7 @@ import struct
 import unittest
 
 import test_academy_creator as academy_tests
-from academy_score_letters import COMPLETE,fields,references,series_resource
+from academy_score_letters import fields,references,series_resource
 from mail_record import Record,Field,pack
 from mail_format import format_letter
 from mail_catalog import templates
@@ -60,7 +60,7 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
         if number in (0x3A,0x3B):
             i = next(i for i in range(55) if self.series_data[i*26:i*26+10] == series.raw[:10])
             values[2] = Field(self.series_data[i*26+10:i*26+26])
-        record = Record(2,0,(number,),tuple(sorted(values.items())),bool(before[1]))
+        record = Record(self.catalog_id,0,(number,),tuple(sorted(values.items())),bool(before[1]))
         expected = bytearray(164);expected[:16] = player.raw;expected[18:30] = b' '*12;expected[30:35] = b'\xff'*5
         expected[39:42] = bytes((128,6,51));expected[42:] = pack(record)
         self.assertEqual(destination.raw[16:180],bytes(expected))
@@ -71,7 +71,7 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
         if calls: self.assertEqual(C.c_uint.in_dll(self.lib,'af_event_card_item_id').value,item)
 
     def test_all_score_templates_both_capitals_all_series_and_point_boundaries(self):
-        for number in COMPLETE:
+        for number in self.score_references['complete_templates']:
             for cap in (0,1): self.score_invoke(self.score_fixture(number,cap))
         for i in range(55):
             for number in (0x3A,0x3B): self.score_invoke(self.score_fixture(number,i%2,series=i))
@@ -84,7 +84,8 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
                 self.score_invoke(self.score_fixture(0x34,day%2,month=month,day=day))
 
     def test_invalid_dates_descriptors_and_unused_names(self):
-        for values in (dict(points=0x80000000),dict(number=0x33),dict(number=0x49),dict(number=0x3D),
+        self.score_invoke(self.score_fixture(0x3D,1),self.catalog_id==4)
+        for values in (dict(points=0x80000000),dict(number=0x33),dict(number=0x49),
                        dict(year=1900),dict(year=2100),dict(month=0),dict(month=13),dict(day=0),
                        dict(month=4,day=31),dict(month=2,day=30),dict(year=1901,month=2,day=29)):
             self.score_invoke(self.score_fixture(capital=1,**values),False)
@@ -92,7 +93,7 @@ class AcademyScoreCreatorTests(academy_tests.AcademyCreatorTests):
             fixture = self.score_fixture(capital=1);C.c_ubyte.from_address(C.addressof(fixture[5])+offset).value ^= 1
             self.score_invoke(fixture,False)
         C.c_uint.in_dll(self.lib,'af_event_card_item_fail').value = 1
-        for number in COMPLETE:
+        for number in self.score_references['complete_templates']:
             fixture = self.score_fixture(number,1)
             if number not in (0x3A,0x3B): fixture[2].session.animal = None
             self.score_invoke(fixture,number!=0x37)

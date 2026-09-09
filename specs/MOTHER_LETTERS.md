@@ -5,7 +5,7 @@
 `build_npc_mail_capture.py --mother-letters` builds the optional system creator.
 The ROM builder's `--english-mother-letters` installs complete supported Mom
 creation and failure-aware publication. It requires that creator, the existing
-resident loader, immutable catalogue two, and the complete snapshot reader.
+resident loader, immutable catalogue two or four, and the complete snapshot reader.
 Ordinary NPC replies continue through the unchanged original creator.
 
 The native selectors reach 114 classic IDs: `012C..0181`, `0184..0185`, and
@@ -15,10 +15,11 @@ and August choices. GameCube-only Christmas selectors `0182..0183` are not added
 as N64 events. Gifts, stationery selection, recipients, RNG, and scheduling
 remain native operations.
 
-113 complete letters are available. Body `mail:0136` requires a semicolon glyph
-absent from the mail font and remains unavailable. Its source wording must not
-be shortened or have punctuation substituted to manufacture completion. Other
-parts of this unavailable letter do not count as a completed Mom letter.
+All 114 letters are available with the creator's `--mail-glyphs` variant and
+catalogue four, including the exact semicolon in body `mail:0136`. The default
+catalogue-two variant supports 113 and rejects that body. Keep both catalogue
+identities immutable; never shorten wording or substitute punctuation. Each
+installation report names the compiled creator's catalogue and complete IDs.
 
 `tools/mother_letters.py` verifies the native selector/creator/scheduler bodies,
 the supplied English executable's corresponding functions, full text-bank hashes,
@@ -55,7 +56,7 @@ split marker and 122-byte text area carry the existing snapshot format.
 
 The same resident allocator, synchronous DMA, approved checksum, original
 relocation, cache maintenance, and free routines load both creator variants.
-Legacy creator source inventories and binaries remain valid. The system image
+Legacy catalogue selection remains available through a current rebuild. The system image
 has no writable/BSS section. No resident code or saved structure is enlarged.
 
 ## Native entry and delivery gates
@@ -97,4 +98,5 @@ the completed ROM. Native batch evidence belongs in the
 
 Normal scheduling, dates across saving/reloading, human playthrough, old-save
 policy, and original hardware are not established by direct creator/post calls.
-The missing semicolon remains a translation requirement.
+Catalogue-four delivery acceptance is tracked in the
+[creator checkpoint](../docs/checkpoints/MAIL_GLYPH_CREATORS.md).

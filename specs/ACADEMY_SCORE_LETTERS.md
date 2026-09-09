@@ -4,11 +4,12 @@
 
 The original N64 scoring overlay selects twenty-one templates `0034..0048`.
 All sixty-three Japanese/English parts have verified identities and field sets.
-Twenty complete letters are installed through the optional score creator and
-native scheduler gates; body `003D` needs the semicolon path. Reference extraction
+All twenty-one complete letters are installed through the optional glyph-capable
+score creator and native scheduler gates, including the semicolon in body `003D`.
+The default catalogue-two creator supports twenty and rejects that body. Reference extraction
 alone does not credit text. The translation counter verifies the actual installed
 creator, scoring overlay, relocation resource, and scheduler before crediting
-the twenty complete templates.
+the complete templates belonging to the compiled creator's selected catalogue.
 
 The scoring overlay is VROM `0081D9D0`, 15,728 bytes, SHA-256
 `9e42076944c8684c0220f442cb03c60d4ae485c15658a7fa761091f34fcb196b`.
@@ -112,11 +113,11 @@ zero gift, font zero, type six, and paper 51 retain native meanings. The origina
 200-byte handbill temporary strings stay untouched: this complete owned capture
 replaces their six old preparations, rather than widening those native fields.
 
-The linked creator has 32,512 image bytes and 560 relocation bytes. Each call
-requests 38,431 bytes including workspace and alignment. The score dispatcher
-frame is 144 bytes. Only 256 image bytes remain below its 32 KiB image limit;
+The glyph-capable linked creator has 32,528 image bytes and 560 relocation bytes.
+Each call requests 38,447 bytes including workspace and alignment. The score
+dispatcher frame is 144 bytes. Only 240 image bytes remain below its 32 KiB image limit;
 the complete blob is allowed to include a separately bounded relocation table.
-The resident module stays at 24,288 linked bytes. No saved structure grows.
+The glyph reader's resident module occupies 24,576 linked bytes. No saved structure grows.
 
 ## Native publication and failure propagation
 
@@ -175,5 +176,7 @@ forty-four readbacks, thirteen rejections, two retries, and original evaluation
 returns. The scheduler's NULL-game allocation path passes delivery and cleanup;
 game-owned system allocation fails in the checkpoint and retains eligibility.
 Successful game-owned allocation is not covered by this batch. Normal gameplay,
-save/reload, semicolon support,
+save/reload,
 editorial/presentation review, and original hardware remain acceptance work.
+Catalogue-four creator evidence is tracked in the
+[creator checkpoint](../docs/checkpoints/MAIL_GLYPH_CREATORS.md).

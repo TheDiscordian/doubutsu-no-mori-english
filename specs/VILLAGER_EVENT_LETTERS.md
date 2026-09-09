@@ -4,7 +4,7 @@
 
 The optional integration groups native friendship gifts, birthday cards, moving-away
 goodbyes, and the Christmas card. `tools/villager_event_letters.py` verifies all
-165 selected parts against the original ROM, immutable catalogue two, and the
+165 selected parts against the original ROM, selected immutable catalogue two or four, and the
 supplied English executable and text-bank hashes. `--english-villager-event-letters`
 installs complete supported creation and guarded publication. It requires the
 creator built with `--mother-letters --departed-letters --villager-events`,
@@ -13,13 +13,14 @@ the previous system-letter integrations, and full installed item names.
 | Group | Classic templates | Complete references | Required fields |
 | --- | --- | --- | --- |
 | Friendship gifts | `0060..0071` | 18 | Player 0, full villager name 6 |
-| Birthday cards | `00EA..00FB` | 17 of 18 | Player 0, full villager name 1, selected gift name 2 |
+| Birthday cards | `00EA..00FB` | 18 with catalogue four; 17 with two | Player 0, full villager name 1, selected gift name 2 |
 | Moving-away goodbyes | `020E..021F` | 18 | Player 0, full villager name 1, current town 3 |
 | Christmas | `00D7` | 1 | None |
 
-Body `00F6` requires the missing semicolon glyph. Preserve the complete wording;
-do not substitute punctuation, change immutable catalogue two, or count the
-unavailable letter as complete. Source/English field sets deliberately differ
+Body `00F6` retains its exact semicolon through the creator's `--mail-glyphs`
+variant and catalogue four. The default catalogue-two creator still rejects that
+body. Do not substitute punctuation or change immutable catalogue two.
+Source/English field sets deliberately differ
 in several bodies. The verifier records those exact sets; prune unused captured
 values without inserting arguments omitted by the supplied English wording.
 
@@ -79,8 +80,8 @@ Creation stages complete metadata and a complete English snapshot privately,
 then publishes all 164 bytes and capitalization only on success. Sender,
 recipient, gift, paper, and native type are retained. Ordinary replies, Mom, and
 departed letters continue through their existing dispatcher paths. The
-`af_load_item_name` import is optional for this creator variant; older source
-inventories and artifacts remain valid. Only birthday bodies `00EF/00F1/00F4/00FB`
+`af_load_item_name` import is optional for this creator variant; legacy catalogue
+selection remains available through a current rebuild. Only birthday bodies `00EF/00F1/00F4/00FB`
 require a complete gift-name load. Bodies which omit that field do not depend on
 the unused lookup. Article state remains zero, matching the donor's plain setter.
 Goodbye field three captures the actual saved town at `80129E00`.
@@ -130,5 +131,5 @@ and complete reader reconstruction. Its results belong in the
 [integration checkpoint](../docs/checkpoints/VILLAGER_EVENT_LETTERS.md).
 The top-level goodbye pending-bit scheduler, normal scheduling,
 queue draining, real save/reload, human playthrough, and original hardware remain
-outside direct-call proof. Complete the semicolon mail path as part of the full
-translation rather than silently excluding that letter.
+outside direct-call proof. The complete catalogue-four creator and its acceptance
+are tracked in the [creator checkpoint](../docs/checkpoints/MAIL_GLYPH_CREATORS.md).

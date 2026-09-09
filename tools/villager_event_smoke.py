@@ -146,7 +146,7 @@ def exercise(debug,request,record):
             write(MODULE_RAM+68,globals_before[MODULE_RAM+68])
             if fault == 'disabled':
                 call(POST[family],post_args(case,0),1)
-                at = HOME_MAILBOX+homes[0]*HOME_STRIDE;mail = read(at,164);snapshot = unpack(mail[42:],expected_catalog=2)
+                at = HOME_MAILBOX+homes[0]*HOME_STRIDE;mail = read(at,164);snapshot = unpack(mail[42:],expected_catalog=request.get('catalog_id',2))
                 selected = snapshot.templates[0]
                 if not case['template'] <= selected < case['template']+(1 if family == 'christmas' else 3):
                     raise ValueError('Resource retry changed the event/personality group')
@@ -158,7 +158,9 @@ def exercise(debug,request,record):
             rejected += 1;record({'native_villager_event_rejection':fault,'family':family,'passed':True})
     unavailable = dict(next(c for c in request['cases'] if c['template'] == 0xF7))
     unavailable.update(template=0xF6,choice=0,seed=request['cases'][0]['seed'])
-    for case,fault in ((unavailable,'semicolon'),(next(c for c in request['cases'] if c['template'] == 0xEF),'items')):
+    failures = [(next(c for c in request['cases'] if c['template'] == 0xEF),'items')]
+    if request.get('catalog_id',2)==2: failures.insert(0,(unavailable,'semicolon'))
+    for case,fault in failures:
         before = fixture(case,0,0,1)
         if fault == 'items': write(MODULE_RAM+56,bytes(4))
         call(POST['birthday'],post_args(case,0),0)

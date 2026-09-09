@@ -14,9 +14,12 @@ from glyph_codes import ENCODINGS
 from placeholder_text import label
 
 
-def classify(data, info, *, extended_glyphs=False):
+def classify(data, info, *, extended_glyphs=False, mail_glyphs=False):
     tokens = list(tokenize(data, info, strict=False))
     extensions = {data:char for char,data in ENCODINGS.items()} if extended_glyphs else {}
+    if mail_glyphs:
+        from extended_glyphs import MAIL_GLYPHS
+        extensions.update({bytes((0x80,code)):char for char,code,_ in MAIL_GLYPHS})
     visible = "".join(GLYPHS[t.data[0]] if t.kind == 'text' else extensions.get(t.data, '')
                       for t in tokens if t.kind in ('text', 'glyph'))
     text = visible.strip()

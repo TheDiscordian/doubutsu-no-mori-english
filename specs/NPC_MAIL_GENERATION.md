@@ -164,8 +164,9 @@ in complete letters remain.
 All available selectable reference parts use only fields provided by the
 corresponding local or visitor preparation path. The coverage check includes
 24 composite group/gift combinations and all 36 bad-reply selections. It finds
-no missing field source slots. Composite footer `psz:004D` remains unavailable
-in the current catalog because of unsupported glyphs. This check proves field
+no missing field source slots. Composite footer `psz:004D` retains its complete
+glyph through catalogue four and the `--mail-glyphs` creator variant; the default
+catalogue-two variant rejects it. This check proves field
 availability only: it does not approve full values, articles, wording, or every
 cartesian combination of selected parts.
 
@@ -174,8 +175,8 @@ cartesian combination of selected parts.
 1. Validate the installed creator transaction's allocation ownership and
    cartridge loading during normal delivery, including repeated and failed
    sessions and broader allocation placements.
-2. Approve selected template meanings and support the unavailable footer without
-   changing existing catalog identities or shortening text.
+2. Approve selected template meanings and validate the glyph-capable reply path
+   without changing existing catalogue identities or shortening text.
 3. Retain the implemented bounded loading, whole-record staging, and explicit
    error returns while validating gift, RNG, paper, pending state, and queue
    capacity throughout actual delivery.

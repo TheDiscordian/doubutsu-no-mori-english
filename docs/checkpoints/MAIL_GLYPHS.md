@@ -112,11 +112,11 @@ one checkpoint after all glyph and old-catalogue checks.
 
 ## Required continuation
 
-1. Connect catalogue four to the affected native creator routes, beginning with
-   all supported Mom, birthday, HRA score, and composite replies together. Preserve
-   source identity approval and original metadata/selection/reward behaviour.
-2. Rebuild all module-bound creator/probe/actor dependencies and the complete
-   translation ROM. The resident has no linked headroom. Do not expand into test
+1. Complete native acceptance of the [creator integration](MAIL_GLYPH_CREATORS.md).
+   Its selected catalogue, full translation ROM, source approvals, and current
+   module-bound actors are implemented. Original metadata/selection/rewards remain.
+2. Keep the current resident and creator limits. The resident has no linked
+   headroom and the creator has 240 image bytes free. Do not expand into test
    scratch or raise creator bounds without actual allocation evidence.
 3. Validate complete delivered letters, old saved catalogue reconstruction, and
    isolated save round trips. Only installed, verified routes receive translation

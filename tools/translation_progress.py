@@ -37,12 +37,13 @@ class CounterLedger:
             'replacements': [],
         }
 
-    def credit(self, identity, data, route, *, mail=False):
+    def credit(self, identity, data, route, *, mail=False, mail_glyphs=False):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
             info[0x74] = info[0x75] = (2, 0)
-        details = classify(data, info, extended_glyphs=identity.startswith('message:'))
+        if mail_glyphs and not mail: raise ValueError('Mail glyph credit requires a verified mail route')
+        details = classify(data, info, extended_glyphs=identity.startswith('message:'),mail_glyphs=mail_glyphs)
         if (details['category'] in ENGLISH_CATEGORIES
                 and details['non_whitespace_static_characters']):
             self.rows[identity]['replacements'].append(
@@ -164,7 +165,7 @@ def measure(native, built, report):
         def credit_mail(vrom, selected, route):
             from mail_catalog import parse, verify_registered
             data = extract(vrom)
-            verify_registered(data)
+            catalog = verify_registered(data)['catalog']
             contents = parse(data)[1]
             for name, numbers in selected.items():
                 for number in numbers:
@@ -174,9 +175,12 @@ def measure(native, built, report):
                         raise ValueError('Letter mapping has no original source: '+identity)
                     value = contents[name][number]
                     if value is not None:
-                        ledger.credit(identity, value, route, mail=True)
+                        ledger.credit(identity, value, route, mail=True,mail_glyphs=catalog==4)
 
         if report.get('npc_mail_loader'):
+            import mail_creator_catalog as creator_catalog
+            creator_catalog.verify_installation(built,module,{'catalog':creator_catalog.selected(module)})
+            creator_vrom = creator_catalog.vrom(creator_catalog.selected(module))
             from npc_mail_capture import call_patches
             from npc_mail_delivery import START, END, patch
             from npc_mail_generation import GROUPS, classic_selection
@@ -191,7 +195,7 @@ def measure(native, built, report):
                 raise ValueError('NPC letter delivery hook is not installed')
             composite = sorted({start+i for group in GROUPS for start in group for i in range(32)})
             classic = sorted({classic_selection(f, p, i) for f in range(2) for p in range(6) for i in range(3)})
-            credit_mail(0x03000000,
+            credit_mail(creator_vrom,
                         {**{k: composite for k in ('superz', 'maila', 'mailb', 'mailc', 'psz')},
                          **{k: classic for k in ('super', 'mail', 'ps')}}, 'npc_letters')
 
@@ -207,29 +211,29 @@ def measure(native, built, report):
             credit_mail(vrom, {k: numbers for k in ('super', 'mail', 'ps')}, key)
 
         if report.get('mother_letters'):
-            from mother_letters import COMPLETE, verify_installation
+            from mother_letters import verify_installation
             verify_installation(built, native, module, report['mother_letters'])
-            credit_mail(0x03000000, {k: COMPLETE for k in ('super', 'mail', 'ps')}, 'mother_letters')
+            credit_mail(creator_vrom, {k: report['mother_letters']['complete_templates'] for k in ('super', 'mail', 'ps')}, 'mother_letters')
 
         if report.get('departed_letters'):
             from departed_letters import TEMPLATES, verify_installation
             verify_installation(built, native, module, report['departed_letters'])
-            credit_mail(0x03000000, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'departed_letters')
+            credit_mail(creator_vrom, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'departed_letters')
 
         if report.get('villager_event_letters'):
-            from villager_event_letters import COMPLETE, verify_installation
+            from villager_event_letters import verify_installation
             verify_installation(built, native, module, report['villager_event_letters'])
-            credit_mail(0x03000000, {k: COMPLETE for k in ('super', 'mail', 'ps')}, 'villager_event_letters')
+            credit_mail(creator_vrom, {k: report['villager_event_letters']['complete_templates'] for k in ('super', 'mail', 'ps')}, 'villager_event_letters')
 
         if report.get('academy_letters'):
             from academy_letters import TEMPLATES, verify_installation
             verify_installation(built, native, module, report['academy_letters'])
-            credit_mail(0x03000000, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'academy_letters')
+            credit_mail(creator_vrom, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'academy_letters')
 
         if report.get('academy_score_letters'):
-            from academy_score_letters import COMPLETE, verify_installation
+            from academy_score_letters import verify_installation
             verify_installation(built, native, module, report['academy_score_letters'])
-            credit_mail(0x03000000, {k: COMPLETE for k in ('super', 'mail', 'ps')}, 'academy_score_letters')
+            credit_mail(creator_vrom, {k: report['academy_score_letters']['complete_templates'] for k in ('super', 'mail', 'ps')}, 'academy_score_letters')
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

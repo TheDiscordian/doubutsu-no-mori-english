@@ -97,7 +97,7 @@ int af_villager_event_mail_create(AfNpcMailCreateWork *work,unsigned char *desti
     for (i = 0; i < 16u; ++i) work->stage[i] = player[i];
     work->stage[16] = 0;work->stage[36] = request[14];work->stage[37] = request[15];
     work->stage[38] = 0;work->stage[40] = (unsigned char)christmas;work->stage[41] = request[17];
-    work->captured.selection.catalog = 2u;
+    work->captured.selection.catalog = AF_MAIL_CREATOR_CATALOG;
     work->captured.selection.templates[0] = (unsigned short)number;
     if (!af_mail_generate(work->stage,164u,&work->captured.capture,&work->captured.selection,&work->generation)) return 0;
     for (i = 0; i < 164u; ++i) destination[i] = work->stage[i];

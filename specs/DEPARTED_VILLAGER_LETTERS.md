@@ -3,7 +3,7 @@
 ## Installed scope and verified content
 
 The eighteen native classic templates `00FC..010D` have complete supplied
-English header/body/footer parts in catalogue two. All 54 parts match the
+English header/body/footer parts in catalogues two and four. All 54 parts match the
 verified donor-bank transcoding without unsupported glyphs. The optional
 `--english-departed-letters` ROM build connects complete native creation and
 mode-zero queued receipt. It requires Mom integration and the creator built
@@ -71,7 +71,7 @@ and publishes capitalization. Failed creation leaves that destination unchanged.
 The optional image has no writable/BSS data. Its native relocation validator
 also accepts paired `LUI`/`LWC1` references to aligned four-byte read-only floating
 constants inside the image. Other unsupported instructions and escaped targets
-still fail. Existing ordinary and Mom creator artifacts remain valid.
+still fail. Legacy catalogue selection remains available through a current rebuild.
 
 ## Native entry and failure boundary
 

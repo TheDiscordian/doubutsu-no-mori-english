@@ -58,6 +58,19 @@ class TranslationProgressTests(unittest.TestCase):
         self.assertEqual(self.ledger.summary()['total_source_characters'], 3)
         self.assertEqual(self.ledger.summary()['percent'], 100)
 
+    def test_mail_glyphs_require_complete_route_capability_and_known_codes(self):
+        from mail_glyph_codes import ADVANCES
+        self.add('mail:0000','あいうえ')
+        text = b'English '+b''.join(bytes((0x80,code)) for code in ADVANCES)
+        self.ledger.credit('mail:0000',text,'legacy_mail',mail=True)
+        self.assertEqual(self.ledger.summary()['percent'],0)
+        self.ledger.credit('mail:0000',text+b'\x80\x01','glyph_mail',mail=True,mail_glyphs=True)
+        self.assertEqual(self.ledger.summary()['percent'],0)
+        self.ledger.credit('mail:0000',text,'glyph_mail',mail=True,mail_glyphs=True)
+        self.assertEqual(self.ledger.summary()['percent'],100)
+        with self.assertRaises(ValueError):
+            self.ledger.credit('mail:0000',text,'not_mail',mail_glyphs=True)
+
 
 if __name__ == '__main__':
     unittest.main()

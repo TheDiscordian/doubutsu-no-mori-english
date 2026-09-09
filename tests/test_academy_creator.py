@@ -42,7 +42,7 @@ class AcademyCreatorTests(event_tests.VillagerEventCreatorTests):
         if not success:
             self.assertEqual((destination.raw,capital.value),before[:2]);return
         number = int.from_bytes(request.raw[12:14],'big')
-        record = Record(2,0,(number,),(),bool(before[1]))
+        record = Record(self.catalog_id,0,(number,),(),bool(before[1]))
         expected = bytearray(164);expected[:16] = player.raw
         expected[18:30] = b' '*12;expected[30:35] = b'\xff'*5
         expected[39:42] = bytes((128,6,51));expected[42:] = pack(record)

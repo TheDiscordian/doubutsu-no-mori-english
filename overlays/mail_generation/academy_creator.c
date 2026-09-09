@@ -57,7 +57,7 @@ int af_academy_mail_create(AfNpcMailCreateWork *work,unsigned char *destination,
     for (i = 30u; i < 35u; ++i) work->stage[i] = 255u;
     work->stage[38] = 0;work->stage[40] = 6u;work->stage[41] = 51u;
     work->captured.capture.capital = *capital;
-    work->captured.selection.catalog = 2u;
+    work->captured.selection.catalog = AF_MAIL_CREATOR_CATALOG;
     work->captured.selection.templates[0] = (unsigned short)number;
     if (!af_mail_generate(work->stage,164u,&work->captured.capture,&work->captured.selection,&work->generation)) return 0;
     for (i = 0; i < 164u; ++i) destination[i] = work->stage[i];

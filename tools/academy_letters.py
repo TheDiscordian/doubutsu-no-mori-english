@@ -9,7 +9,7 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
 from audit_mail_templates import template_fields
 from gc_names import symbol_data
 from gc_text import decoder_tables
-from mail_catalog import parse,verify_registered
+from mail_catalog import parse
 from mail_reference import BANK_HASHES,DECODER_SHA256,transcode
 from npc_mail_loader import VROM as CREATOR_VROM,verify_configuration
 from runtime_layout import MODULE_RAM,MODULE_VROM,LINKED_LIMIT
@@ -38,9 +38,9 @@ def verify_code(code):
 
 
 def verify_templates(rom,catalog,root=ROOT):
+    import mail_creator_catalog as creator_catalog
     rom = verified_rom(rom);verify_code(by_vrom(rom)[CODE_VROM].extract(rom))
-    if verify_registered(catalog)['catalog'] != 2:
-        raise ValueError('Academy letters require unchanged catalogue two')
+    catalog_id = creator_catalog.identity(catalog)
     native = {b.name:b.entries() for b in banks(rom) if b.name in ('super','mail','ps')}
     installed = parse(catalog)[1]
     rel = (root/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
@@ -59,14 +59,14 @@ def verify_templates(rom,catalog,root=ROOT):
         if (sha256(data),sha256(table)) != BANK_HASHES[name]: raise ValueError('Changed reference letter bank')
         reference = Bank(name,0,0,data,table).entries()
         for number in TEMPLATES:
-            value = transcode(reference[number],tables)
-            if (value != installed[name][number] or template_fields(value)
+            value = transcode(reference[number],tables,extended_glyphs=catalog_id==4)
+            if (value != installed[name][number] or template_fields(value,extended_glyphs=catalog_id==4)
                     or template_fields(native[name][number])):
                 raise ValueError('Changed complete academy text or field contract')
             rows.append({'id':f'{name}:{number:04X}','source_sha256':sha256(native[name][number]),
                          'reference_sha256':sha256(reference[number]),'encoded_sha256':sha256(value),
                          'bytes':len(value),'fields':[]})
-    return {'classic_templates':list(TEMPLATES),'parts':rows,'reference_functions':REFERENCE_FUNCTIONS}
+    return {'catalog':catalog_id,'classic_templates':list(TEMPLATES),'parts':rows,'reference_functions':REFERENCE_FUNCTIONS}
 
 
 def patches(code,loader):
@@ -94,6 +94,7 @@ def patches(code,loader):
 
 
 def install(rom,replacements,additions,module):
+    import mail_creator_catalog as creator_catalog
     from villager_event_letters import patches as event_patches
     rom = verified_rom(rom)
     if not module or module.get('npc_mail_loader',{}).get('overlay',{}).get('academy_letters') is not True:
@@ -106,7 +107,7 @@ def install(rom,replacements,additions,module):
     for at,value in event_patches(original,loader).items():
         if code[at-CODE_RAM:at-CODE_RAM+len(value)] != value:
             raise ValueError('Academy letters require installed villager-event integration')
-    evidence = verify_templates(rom,additions[0x03000000]);changes = patches(code,loader)
+    evidence = verify_templates(rom,creator_catalog.resource(additions,module));changes = patches(code,loader)
     for at,value in changes.items(): code[at-CODE_RAM:at-CODE_RAM+len(value)] = value
     replacements[CODE_VROM] = bytes(code)
     return {**evidence,'patches':[{'ram':f'{at:08X}','bytes':len(value),'sha256':sha256(value)} for at,value in changes.items()],
@@ -115,8 +116,10 @@ def install(rom,replacements,additions,module):
 
 
 def verify_installation(built,native,module,report):
+    import mail_creator_catalog as creator_catalog
     files = by_vrom(built)
     verify_configuration(files[MODULE_VROM].extract(built),files[CREATOR_VROM].extract(built),module)
+    creator_catalog.verify_installation(built,module,report)
     if module['npc_mail_loader']['overlay'].get('academy_letters') is not True:
         raise ValueError('Academy dispatcher is not installed')
     original = by_vrom(native)[CODE_VROM].extract(native)

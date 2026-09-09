@@ -7,12 +7,13 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
 from audit_mail_templates import template_fields
 from gc_names import symbol_data
 from gc_text import decoder_tables
-from mail_catalog import VROM as CATALOG_VROM,parse,verify_registered
+from mail_catalog import VROM as CATALOG_VROM,parse
 from mail_reference import BANK_HASHES,DECODER_SHA256,transcode
 from mail_view_patch import install as install_reader
 from npc_mail_loader import VROM as CREATOR_VROM,verify_configuration
 from runtime_layout import MODULE_RAM,MODULE_VROM,LINKED_LIMIT
 from textbanks import Bank,banks
+import mail_creator_catalog as creator_catalog
 
 ROOT = Path(__file__).resolve().parents[1]
 START,POST,END = 0x800B8FB8,0x800B9038,0x800B9170
@@ -48,8 +49,7 @@ def verify_code(code):
 def verify_templates(rom,catalog,root=ROOT):
     rom = verified_rom(rom)
     verify_code(by_vrom(rom)[CODE_VROM].extract(rom))
-    if verify_registered(catalog)['catalog'] != 2:
-        raise ValueError('Mom letters require unchanged immutable catalogue two')
+    catalog_id = creator_catalog.identity(catalog)
     installed = parse(catalog)[1]
     native = {b.name:b.entries() for b in banks(rom) if b.name in ('super','mail','ps')}
     rel = (root/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
@@ -78,19 +78,20 @@ def verify_templates(rom,catalog,root=ROOT):
             if template_fields(native[name][number]):
                 raise ValueError('Unexpected native Mom-letter free-string field')
             try:
-                value = transcode(reference[number],tables)
+                value = transcode(reference[number],tables,extended_glyphs=catalog_id==4)
             except ValueError as error:
                 if name != 'mail' or number != 0x136 or 'GC D0' not in str(error): raise
                 if installed[name][number] is not None:
                     raise ValueError('Unsupported Mom letter must remain explicitly unavailable')
                 row['unavailable'] = str(error)
             else:
-                if value != installed[name][number] or template_fields(value):
+                if value != installed[name][number] or template_fields(value,extended_glyphs=catalog_id==4):
                     raise ValueError('Changed complete Mom-letter part or field identities')
                 row.update(encoded_sha256=sha256(value),bytes=len(value))
             rows.append(row)
-    return {'parts':rows,'classic_templates':list(TEMPLATES),'complete_templates':list(COMPLETE),
-            'unavailable_templates':list(UNAVAILABLE),'reference_functions':REFERENCE_FUNCTIONS}
+    return {'catalog':catalog_id,'parts':rows,'classic_templates':list(TEMPLATES),
+            'complete_templates':list(TEMPLATES if catalog_id==4 else COMPLETE),
+            'unavailable_templates':[] if catalog_id==4 else list(UNAVAILABLE),'reference_functions':REFERENCE_FUNCTIONS}
 
 
 def patch(original,loader):
@@ -131,7 +132,7 @@ def install(rom,replacements,additions,module):
     install_reader(rom,reader,{MODULE_VROM:bytes(baseline)},module,snapshots=True)
     if any(replacements.get(vrom) != data for vrom,data in reader.items()):
         raise ValueError('Mom letters require the installed complete snapshot reader')
-    evidence = verify_templates(rom,additions[CATALOG_VROM])
+    evidence = verify_templates(rom,creator_catalog.resource(additions,module))
     code = bytearray(replacements.get(CODE_VROM,by_vrom(rom)[CODE_VROM].extract(rom)))
     verify_code(code)
     loader = int(module['symbols']['af_npc_mail_load'],16)
@@ -142,12 +143,13 @@ def install(rom,replacements,additions,module):
     replacements[CODE_VROM] = bytes(code)
     return {**evidence,'loader_ram':f'{loader:08X}','patch_sha256':sha256(value),
             'native_guards':CODE_GUARDS,'new_resident_bytes':0,'creator_stack_bytes':48,
-            'status':'Complete supported Mom letters installed; one glyph row, gameplay, and save acceptance remain'}
+            'status':'Complete selected-catalogue Mom letters installed; gameplay and save acceptance remain'}
 
 
 def verify_installation(built,native,module,report):
     files = by_vrom(built)
     verify_configuration(files[MODULE_VROM].extract(built),files[CREATOR_VROM].extract(built),module)
+    catalog = creator_catalog.verify_installation(built,module,report)
     if not module['npc_mail_loader']['overlay'].get('mother_letters'):
         raise ValueError('Mom-letter dispatch is not installed')
     original = by_vrom(native)[CODE_VROM].extract(native)
@@ -155,7 +157,7 @@ def verify_installation(built,native,module,report):
     expected = patch(original[START-CODE_RAM:END-CODE_RAM],int(module['symbols']['af_npc_mail_load'],16))
     actual = files[CODE_VROM].extract(built)
     if (actual[START-CODE_RAM:END-CODE_RAM] != expected or report['patch_sha256'] != sha256(expected)
-            or report['complete_templates'] != list(COMPLETE)):
+            or report['complete_templates'] != list(TEMPLATES if catalog==4 else COMPLETE)):
         raise ValueError('Mom-letter creation or publication gate is not installed')
     restored = bytearray(actual);restored[START-CODE_RAM:END-CODE_RAM] = original[START-CODE_RAM:END-CODE_RAM]
     verify_code(restored)

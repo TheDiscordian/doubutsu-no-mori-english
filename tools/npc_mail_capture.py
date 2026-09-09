@@ -69,7 +69,14 @@ def verified_resources(words,aliases):
     unpack_aliases(aliases,ALIAS_HASH)
 
 
+def catalog_id(report):
+    if 'mail_glyphs' in report and report['mail_glyphs'] is not True:
+        raise ValueError('Unknown mail-glyph creator variant')
+    return 4 if report.get('mail_glyphs') is True else 2
+
+
 def validate(data,reloc,report,module):
+    catalog = catalog_id(report)
     mother = report.get('mother_letters') is True
     if 'mother_letters' in report and not mother: raise ValueError('Unknown system creator variant')
     departed = report.get('departed_letters') is True
@@ -94,7 +101,7 @@ def validate(data,reloc,report,module):
     required = {'af_mail_capture_reset','af_mail_capture_set','af_mail_generate','af_mail_source_digest',
                 'af_npc_mail_sources_init','af_npc_mail_source_word','af_npc_mail_source_name',
                 'af_npc_mail_source_alias','af_npc_mail_capture_event','af_npc_mail_create',
-                'af_npc_word_data','af_npc_alias_data'}
+                'af_npc_word_data','af_npc_alias_data','af_npc_mail_catalog_id'}
     if mother: required.add('af_system_mail_create')
     if departed: required.add('af_departed_mail_create')
     if events: required.add('af_villager_event_mail_create')
@@ -102,8 +109,11 @@ def validate(data,reloc,report,module):
     if scores: required.update(('af_academy_score_mail_create','af_academy_series_data'))
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
-    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data')):
+    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id')):
         raise ValueError('NPC capture function points outside text')
+    marker = symbols['af_npc_mail_catalog_id']
+    if not text <= marker <= len(data)-4 or struct.unpack_from('>I',data,marker)[0] != catalog:
+        raise ValueError('Creator catalogue approval differs from its compiled variant')
     w,a = symbols['af_npc_word_data'],symbols['af_npc_alias_data']
     if w&15 or a&15 or not text <= w or a != w+11328 or a+6368 != len(data):
         raise ValueError('NPC capture resource offsets are invalid')

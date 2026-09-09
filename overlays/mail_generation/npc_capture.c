@@ -3,6 +3,8 @@
 
 #define READY 0x41464353u
 
+const unsigned int af_npc_mail_catalog_id = AF_MAIL_CREATOR_CATALOG;
+
 static const unsigned int word_bases[11] = {
     0x314u,0x334u,0x2F4u,0x219u,0x1E5u,0x354u,0x374u,0x394u,0x3D4u,0x3F4u,0x3B4u
 };
@@ -173,7 +175,7 @@ int af_npc_mail_capture_event(AfNpcMailSession *session, unsigned int event, con
     if (work->phase != 2u || !data) return invalid(work);
     looks = session->remail ? session->remail[16]&127u : session->animal[11];
     if (looks >= 6u) return invalid(work);
-    work->selection.catalog = AF_MAIL_CATALOG_ID;
+    work->selection.catalog = AF_MAIL_CREATOR_CATALOG;
     work->selection.reserved = 0;
     if (event == AF_NPC_COMPOSITE && value == 5u && session->condition == 1u) {
         base = group_bases[session->foreign*6u+looks];

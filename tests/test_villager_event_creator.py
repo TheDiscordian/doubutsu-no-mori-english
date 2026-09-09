@@ -11,7 +11,7 @@ from mail_catalog import templates
 from mail_format import format_letter
 from mail_record import Field,Record,pack
 from test_mail_format import CText
-from villager_event_letters import EVENT,BIRTHDAY,GOODBYE,CHRISTMAS,COMPLETE
+from villager_event_letters import EVENT,BIRTHDAY,GOODBYE,CHRISTMAS,COMPLETE,TEMPLATES
 
 
 class VillagerEventCreatorTests(departed_tests.DepartedLetterTests):
@@ -62,9 +62,9 @@ class VillagerEventCreatorTests(departed_tests.DepartedLetterTests):
             fields = ((0,Field(player.raw[:6])),(6 if number in EVENT else 1,Field(name)))
             if number in GOODBYE: fields += ((3,Field(b'HERE  ')),)
             if number in (0xEF,0xF1,0xF4,0xFB): fields += ((2,Field(bytes(self.item_name))),)
-        record = Record(2,0,(number,),fields,bool(before[1]))
+        record = Record(self.catalog_id,0,(number,),fields,bool(before[1]))
         parts = templates(self.catalog,record)
-        needed = set().union(*(template_fields(p) for p in parts.parts))
+        needed = set().union(*(template_fields(p,extended_glyphs=self.catalog_id==4) for p in parts.parts))
         record = replace(record,fields=tuple(sorted((i,v) for i,v in fields if i in needed)))
         expected = bytearray(164);expected[:16] = player.raw
         if number in CHRISTMAS:
@@ -85,7 +85,7 @@ class VillagerEventCreatorTests(departed_tests.DepartedLetterTests):
 
     def test_every_complete_letter_both_capitals_and_all_villager_names(self):
         self.assertEqual(len(COMPLETE),54)
-        for number in COMPLETE:
+        for number in TEMPLATES if self.catalog_id==4 else COMPLETE:
             for capital in (0,1):
                 with self.subTest(number=f'{number:04X}',capital=capital):
                     self.event_invoke(self.event_fixture(number,capital,paper=number%64))
@@ -95,7 +95,7 @@ class VillagerEventCreatorTests(departed_tests.DepartedLetterTests):
     def test_unused_item_loads_do_not_block_other_birthday_letters(self):
         C.c_uint.in_dll(self.lib,'af_event_card_item_fail').value = 1
         for number in BIRTHDAY:
-            self.event_invoke(self.event_fixture(number,1),number not in (0xEF,0xF1,0xF4,0xF6,0xFB))
+            self.event_invoke(self.event_fixture(number,1),number not in (0xEF,0xF1,0xF4,0xFB) and (number!=0xF6 or self.catalog_id==4))
         for number in (0x61,0x214,0xD7): self.event_invoke(self.event_fixture(number,1))
 
     def test_catalogue_failures_and_unavailable_semicolon_retain_complete_destination(self):
@@ -105,7 +105,7 @@ class VillagerEventCreatorTests(departed_tests.DepartedLetterTests):
             reads.value = 0;C.c_uint.in_dll(self.lib,'af_mail_catalog_fail_read').value = index
             self.event_invoke(self.event_fixture(0xEF,1),False)
         C.c_uint.in_dll(self.lib,'af_mail_catalog_fail_read').value = 0
-        self.event_invoke(self.event_fixture(0xF6,1),False)
+        self.event_invoke(self.event_fixture(0xF6,1),self.catalog_id==4)
         C.c_uint.in_dll(self.lib,'af_mail_catalog_enabled').value = 0
         for number in (0x61,0xEF,0x214,0xD7): self.event_invoke(self.event_fixture(number,1),False)
 

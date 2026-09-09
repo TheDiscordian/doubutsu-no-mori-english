@@ -296,6 +296,17 @@ and English grading. This explicitly enables experimental cartridge-loaded NPC
 generation, the eight scoped capture calls, and submission failure handling.
 It does not establish complete gameplay, semantic review, or hardware acceptance.
 
+Add `--mail-glyphs` to the creator build to route new ordinary replies, Mom,
+departed-villager, villager-event, and HRA letters through complete catalogue four.
+This requires `--mail-catalog build/mail-glyph-resources` and
+`--extended-font build/mail-font-cartridge` in the ROM build, plus the complete
+snapshot reader. Each optional system route still requires its existing creator
+and ROM flags. The creator's compiled catalogue marker prevents enabling glyphs
+by changing only its manifest. Legacy catalogue-two creation remains available
+without `--mail-glyphs`; saved catalogues two and three remain unchanged/readable.
+The [complete recipe and validation checkpoint](checkpoints/MAIL_GLYPH_CREATORS.md)
+bind the current integrated artifacts and remaining acceptance.
+
 The complete fortune-slip resources use `tools/build_fortune_slips.py --rom
 <native-ROM> --output build/fortune-slip-resources`. This retains catalogue two
 and adds independently registered catalogue three. Rebuild the resident module
