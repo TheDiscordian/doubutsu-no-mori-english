@@ -13,6 +13,28 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
+complete gift letters with full sixteen-byte item fields. Twenty-four fixed
+snapshots preserve both capitalization states and require no new per-letter
+allocation or text reads. The 18,384-byte actor adds 1,472 bytes within its native
+allocation lifetime, with no resident or saved-layout growth. Independent builds
+and wrapper/gate assembly agree; all eighteen final focused/evidence tests,
+four sanitizer tests, and 24 reader/relocation/accounting regressions pass.
+Silent native execution passes all 24 original metadata/RNG comparisons and
+reward-queue deliveries, with 48 complete readbacks. The first run then stops on
+a visitor-fixture address error. Its corrected edge-only resume passes all five
+owner cases, four creator rejections, an additional full readback, restored
+state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown. The
+completed text cases are not rerun. Native full-mailbox/queue failure still has no durable reward
+retry; that is the original policy, not new translation resource failure.
+Normal gameplay, save/reload, review, and hardware remain unverified.
+
+The next [spotlight-item/reopening notice group](../specs/SHOP_NOTICE_LETTERS.md)
+has nine source-approved templates and 27 complete parts. Both native selectors
+and the supplied English counterparts are verified, including a differing
+level-zero reopening slot. Two source-audit tests pass. Complete creator/owner
+integration remains next; source approval is not installed-text credit.
+
 The [museum integration](checkpoints/MUSEUM_LETTERS.md) installs complete English
 introduction, non-fossil, and 25 fossil-result letters. All 81 source-bound parts
 are retained without free-field or saved-layout changes. Thirty-three host tests,

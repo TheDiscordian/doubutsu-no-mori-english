@@ -86,7 +86,8 @@ def audit(rom,catalog,items,root=ROOT):
                           'reference_sha256':sha256(reference[number]),'encoded_sha256':sha256(value),
                           'bytes':len(value),'fields':sorted(fields)})
     return {'native_actor_sha256':sha256(actor),'native_relocation_sha256':sha256(reloc),
-            'catalog':catalog_id,'parts':parts,'gifts':names,'reference_functions':REFERENCE,
+            'catalog':catalog_id,'parts':parts,'gifts':names,
+            'reference_functions':{name:list(value) for name,value in REFERENCE.items()},
             'installed':False,'status':'Source and field approval only; creation, receipt, and retry remain'}
 
 

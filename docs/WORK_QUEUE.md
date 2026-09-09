@@ -44,14 +44,24 @@ bytes free. Continue other text consumers
 after this bounded batch; retain normal scheduling, save/reload, museum sender
 display mapping, review, and hardware in the acceptance queue.
 
-The next [Snowman gift group](../specs/SNOWMAN_LETTERS.md) has twelve templates
-`0202..020D` with 36 complete source-approved parts and all twelve full item
-names. The native actor, relocation, creator, allocating owner, gift order, and
-GameCube counterparts are bound by `tools/audit_snowman_letters.py`. Implement
-complete creation and gated receipt with explicit failed-reward retention.
-Preserve the N64 single random selection; GameCube's reroll is not native here.
-No Snowman hook is installed or credited by the source audit. Its actor-owned
-code option avoids pretending the remaining 544 creator bytes are unlimited.
+The [Snowman gift integration](../specs/SNOWMAN_LETTERS.md) builds twelve
+templates `0202..020D`, with 36 complete source-approved parts and all twelve
+full item names. Its actor owns 24 prevalidated fixed snapshots and the complete
+creator, adding no per-letter allocations or catalogue reads. The N64 single
+random selection, native allocation/receipt policy, and actor lifetime remain;
+GameCube's reroll is not introduced. Independent builds/assembly and host creator
+tests/sanitizers pass. Eighteen final focused/evidence tests and 24
+reader/relocation/accounting regressions pass. Native execution completes all 24
+original comparisons and queue deliveries, with 48 readbacks, before a
+visitor-fixture address error stops the first run. The corrected edge-only
+resume passes five owner cases, four creator rejections, one full readback,
+restored state/heap/stack/checkpoint, blank saves, and graceful shutdown. Continue
+the spotlight/reopening group and other text without rerunning completed cases.
+The original owner has no
+durable reward retry after full-mailbox/queue rejection; no saved retry state is
+invented or claimed. Normal scheduling, save/reload, review, and hardware remain
+in the acceptance queue. The [checkpoint](checkpoints/SNOWMAN_LETTERS.md) records
+the exact artifacts and limits.
 
 The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
 complete names in the full glyph ROM, with ten additional native-width edits.
@@ -59,6 +69,16 @@ Only the two existing item-name resources change; every earlier candidate is
 retained. Forty host/artifact tests, eleven scenario/regression tests, and the
 189-call/181-assertion native batch pass, with restored state and blank saves.
 Continue remaining names, wider consumers, letters, general text, and review.
+
+The next [spotlight-item and reopening notices](../specs/SHOP_NOTICE_LETTERS.md)
+have nine source-bound templates and 27 complete parts. Four bodies need full
+item field seven; the other five need no fields. The native spotlight table
+agrees with the donor, while the reopening level-zero slot differs and must not
+be silently substituted. Implement complete preparation before both spotlight
+publication modes and before clearing reopening notification bit `20`.
+`tools/audit_shop_notice_letters.py` supplies source approval only, not installed
+coverage. Main-code owner integration and an explicitly bounded code allocation
+remain next implementation work.
 
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 installs complete resources for all 114 Mom, 55 villager-event, and 21 score

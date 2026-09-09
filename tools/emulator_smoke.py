@@ -952,6 +952,12 @@ def main():
                     raise ValueError('Museum probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_museum_letters'],record))
+            if 'test_snowman_letters' in action:
+                from snowman_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Snowman probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_snowman_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():
