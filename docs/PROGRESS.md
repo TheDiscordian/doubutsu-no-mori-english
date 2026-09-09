@@ -25,17 +25,20 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
-The [persistent text extension](checkpoints/TEXT_EXTENSION.md) installs twenty
-sixteen-byte general fields, complete plain/coloured dialogue insertion, the
-native item-to-free-field wrapper, and three direct actor adapters. Its 2,159-byte
-startup-owned allocation leaves the full resident module and save layout intact.
-Independent builds, six focused checks, nine item/font regressions, and twelve
-counter tests pass. The silent native check passes ten calls and 21 assertions,
-including actual startup, complete item insertion, flags/colours, empty clearing,
-overflow rejection, guards, and checkpoint restoration. The current combined
-ROM/UPS is `build/text-extension-pilot`. Continue shared dynamic-choice readers,
-remaining character/catchphrase consumers, residual text/letters, and accents.
-Normal interaction/save/restart and original hardware remain unverified.
+The [choice-capable text extension](checkpoints/CHOICE_SUBSTITUTIONS.md) installs
+complete bounded shared-choice substitutions alongside the twenty sixteen-byte
+general fields, plain/coloured dialogue insertion, native item-to-free-field
+wrapper, and three actor adapters. Its 3,263-byte startup-owned allocation leaves
+the resident module and save layout intact. Independent builds and all five
+focused checks pass, as do nine choice-runtime regressions, twelve counter tests,
+and two baseline field/artifact checks. The silent native check passes twenty
+calls and thirty memory assertions, including actual startup, full item/character
+names, default catchphrases, selected answers, overflow/control rejection, guards,
+and checkpoint restoration. The current combined ROM/UPS is
+`build/text-choices-pilot`. Continue remaining character-name actor preparations,
+catchphrase input/display consumers, other full-item readers, residual
+text/letters, and accents. Normal interaction/save/restart and original hardware
+remain unverified; the actual build still uses four MiB.
 
 The [festival-stall integration](checkpoints/STALL_CHOICES.md) installs complete
 sixteen-byte item choices and both exact GameCube English cancellation labels.

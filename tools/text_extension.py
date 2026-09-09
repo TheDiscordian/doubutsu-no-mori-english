@@ -93,21 +93,35 @@ def image_spec(image, reloc):
                      sha256(image), sha256(reloc))
 
 
+def artifact_profile(artifact):
+    if 'choices' in artifact:
+        if artifact['choices'] is not True:
+            raise ValueError('Invalid text-extension choice capability')
+        from text_choices import PROFILE as profile, SYMBOLS as symbols, ELF_SHA
+        from build_text_extension import CHOICE_IMPORTS
+        return profile, symbols, {**IMPORTS, **CHOICE_IMPORTS}, ELF_SHA
+    return PROFILE, SYMBOLS, IMPORTS, 'ee4d355d470cee436e3fcd4fb5c3b06e766761a49f415473205fff90ed9b83a3'
+
+
 def validate(blob, loader, artifact):
-    image, reloc = blob[:PROFILE['image_bytes']], blob[PROFILE['image_bytes']:]
-    for key, value in PROFILE.items():
+    profile, symbols, imports, elf_sha = artifact_profile(artifact)
+    image, reloc = blob[:profile['image_bytes']], blob[profile['image_bytes']:]
+    for key, value in profile.items():
         if artifact.get(key) != value: raise ValueError('Unapproved text-extension profile: '+key)
     for name, value in (('image', image), ('relocation', reloc), ('blob', blob), ('loader', loader)):
-        if len(value) != PROFILE[name+'_bytes'] or sha256(value) != PROFILE[name+'_sha256']:
+        if len(value) != profile[name+'_bytes'] or sha256(value) != profile[name+'_sha256']:
             raise ValueError('Changed text-extension artifact: '+name)
     sources = {p.name: sha256(p.read_bytes()) for p in sorted((ROOT/'overlays/text_extension').iterdir()) if p.is_file()}
-    if (artifact.get('sources') != sources or artifact.get('imports') != IMPORTS
-            or artifact.get('symbols') != SYMBOLS or artifact.get('compiler_image') != IMAGE
+    if artifact.get('choices'):
+        sources.update({'choices/'+p.name: sha256(p.read_bytes())
+                        for p in sorted((ROOT/'overlays/text_choices').iterdir()) if p.is_file()})
+    if (artifact.get('sources') != sources or artifact.get('imports') != imports
+            or artifact.get('symbols') != symbols or artifact.get('compiler_image') != IMAGE
             or artifact.get('blob_crc32') != f'{zlib.crc32(blob):08X}'
             or sha256(json.dumps(artifact.get('elf_relocations'), sort_keys=True).encode())
-            != 'ee4d355d470cee436e3fcd4fb5c3b06e766761a49f415473205fff90ed9b83a3'):
+            != elf_sha):
         raise ValueError('Unbound text-extension source, imports, symbols, or relocations')
-    if (any(image[SYMBOLS['valid']:]) or struct.unpack_from('>4I', reloc) != (len(image), 0, 0, 0)
+    if (any(image[symbols['valid']:]) or struct.unpack_from('>4I', reloc) != (len(image), 0, 0, 0)
             or struct.unpack_from('>I', reloc, len(reloc)-4)[0] != len(reloc)):
         raise ValueError('Text-extension state or allocation is not initialized')
     for base in (0x801A0010, 0x803F0010):
@@ -115,13 +129,16 @@ def validate(blob, loader, artifact):
     return image, reloc
 
 
-@lru_cache(maxsize=1)
-def audit_references(native):
+@lru_cache(maxsize=2)
+def audit_references(native, choices=False):
     verified_rom(native)
     segments, definitions = code_segments()
     regions = [(CODE_VROM, SETTER, SETTER_END), (CODE_VROM, 0x800BB6F0, 0x800BB740),
                (CODE_VROM, 0x800A1394, 0x800A141C), (CODE_VROM, BOOT-16, BOOT_END)]
     regions += [(s.vrom, s.entry, s.entry+CALLS[name][0]) for name, s in ACTORS.items()]
+    if choices:
+        from text_choices import ENTRY, END
+        regions.append((CODE_VROM, ENTRY, END))
     if len(segments) < 100 or any(v not in segments for v, _, _ in regions):
         raise ValueError('Incomplete text-extension executable inventory')
     for vrom, file in by_vrom(native).items():
@@ -170,6 +187,10 @@ def install(native, replacements, additions, relocations, module, directory=None
                          json.loads((directory/'extension.json').read_text()))
     blob, loader, artifact = artifact_data
     validate(blob, loader, artifact)
+    choice_evidence = None
+    if artifact.get('choices'):
+        from text_choices import verify_dependencies
+        choice_evidence = verify_dependencies(native, replacements, additions, module)
     intervals = [(relocations.get(v, v), relocations.get(v, v)+len(replacements.get(v, b'')))
                  if v in replacements else (f.vstart, f.vend) for v, f in files.items()]
     intervals += [(v, v+len(data)) for v, data in additions.items()]
@@ -195,7 +216,7 @@ def install(native, replacements, additions, relocations, module, directory=None
         pending[spec.vrom] = bytes(result)
         actors[name] = {'vrom': f'{spec.vrom:08X}', 'installed_sha256': sha256(result),
                         'relocation_sha256': sha256(reloc), 'file_bytes': len(data), 'bss_bytes': spec.sections[3]}
-    audit = audit_references(native)
+    audit = audit_references(native, bool(choice_evidence))
     code = bytearray(current)
     code[SETTER-CODE_RAM:SETTER_END-CODE_RAM] = loader.ljust(SETTER_END-SETTER, b'\0')
     code[EPILOGUE-CODE_RAM:EPILOGUE-CODE_RAM+8] = struct.pack('>2I', jump(TAIL), 0)
@@ -203,11 +224,15 @@ def install(native, replacements, additions, relocations, module, directory=None
     pending[CODE_VROM] = bytes(code)
     replacements.update(pending)
     additions[VROM] = blob
-    return {'vrom': f'{VROM:08X}', 'artifact': artifact, 'actors': actors,
+    evidence = {'vrom': f'{VROM:08X}', 'artifact': artifact, 'actors': actors,
             'additional_system_allocation_bytes': len(blob)+15, 'main_window': '80142410',
             'field_count': 20, 'field_bytes': 16, 'saved_layout_changes': False,
             'bootstrap_tail': f'{TAIL:08X}', 'reference_audit': audit,
             'scope': 'Complete main-message general fields and item adapters; shared choices remain pending'}
+    if choice_evidence:
+        evidence['choices'] = choice_evidence
+        evidence['scope'] = 'Complete general fields, item adapters, and bounded full-English choice substitutions'
+    return evidence
 
 
 def verify_installation(built, native, report):
@@ -217,7 +242,8 @@ def verify_installation(built, native, report):
     files, originals = by_vrom(built), by_vrom(native)
     if VROM not in files: raise ValueError('Missing persistent text extension')
     code = files[CODE_VROM].extract(built)
-    loader = code[SETTER-CODE_RAM:SETTER-CODE_RAM+PROFILE['loader_bytes']]
+    profile, _, _, _ = artifact_profile(entry['artifact'])
+    loader = code[SETTER-CODE_RAM:SETTER-CODE_RAM+profile['loader_bytes']]
     normalized = bytearray(code)
     original = originals[CODE_VROM].extract(native)
     normalized[SETTER-CODE_RAM:SETTER_END-CODE_RAM] = original[SETTER-CODE_RAM:SETTER_END-CODE_RAM]
@@ -225,6 +251,10 @@ def verify_installation(built, native, report):
     normalized[TAIL-CODE_RAM:TAIL-CODE_RAM+36] = bytes(36)
     replacements = {CODE_VROM: bytes(normalized)}
     additions = {v: files[v].extract(built) for v in (MODULE_VROM, ITEMS_VROM, 0x03400000)}
+    if entry['artifact'].get('choices'):
+        from text_choices import ACTOR_VROMS, RESOURCE_HASHES
+        replacements.update({v: files[v].extract(built) for v in ACTOR_VROMS})
+        additions.update({v: files[v].extract(built) for v in RESOURCE_HASHES})
     evidence = install(native, replacements, additions, {}, module,
         artifact_data=(files[VROM].extract(built), loader, entry['artifact']))
     for vrom, expected in replacements.items():

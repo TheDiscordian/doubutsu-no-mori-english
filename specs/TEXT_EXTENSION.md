@@ -56,9 +56,10 @@ the relocated extension only after successful startup. Caller adapters preserve
 their original unsigned item expression, slot, colour, and nonzero/quest branches.
 No widened name is written into a native stack temporary.
 
-Shared dynamic-choice readers still use the native compatibility mirror until
-their smaller substitution buffers receive complete capacity-aware integration.
-Installing this main-message extension does not claim those readers are done.
+The baseline profile supplies only main-message readers. The
+[choice-capable profile](CHOICE_SUBSTITUTIONS.md) also installs complete bounded
+substitutions in the twenty-byte shared choice destination. Its field state and
+readers share the same allocation; the compatibility mirrors remain unchanged.
 Other character/name callers and default catchphrase editing remain main work.
 
 The native message initializer `8009E6F8` does not clear the twenty native general
@@ -68,7 +69,7 @@ only a complete successful setter call marks a row valid.
 
 ## Installed profile
 
-The approved image is 1,952 bytes including zero-filled private state, followed
+The baseline approved image is 1,952 bytes including zero-filled private state, followed
 by a 192-byte native relocation. The loader is 216 bytes inside the 336-byte
 native setter span. Total system allocation is 2,159 bytes including alignment.
 The initializer installs six jumps/calls: setter, plain reader, coloured reader,

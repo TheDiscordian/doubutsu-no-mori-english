@@ -21,9 +21,12 @@ IMPORTS = {
     'af_allocate': 0x8002BC60, 'af_release': 0x8002BC90, 'af_dma': 0x80026B44,
     'af_crc32': 0x80195938, 'af_relocate': 0x8002B9C0,
 }
+CHOICE_IMPORTS = {'af_copy_item_string': 0x801966AC, 'af_copy_talk_name': 0x80195E2C,
+                  'af_copy_catchphrase': 0x801952F4}
 
 
-def relocation(data, size):
+def relocation(data, size, imports=None):
+    imports = IMPORTS if imports is None else imports
     rows, evidence = [], []
     for line in data.splitlines():
         if 'R_MIPS_' not in line: continue
@@ -34,7 +37,7 @@ def relocation(data, size):
         if at & 3 or not 0 <= at <= size-4: raise ValueError('Invalid text-extension relocation offset')
         if RAM <= target < RAM+size:
             rows.append(0x40000000 | kind << 24 | at)
-        elif IMPORTS.get(symbol) != target or kind != 4:
+        elif imports.get(symbol) != target or kind != 4:
             raise ValueError('Unbound text-extension external symbol: '+symbol)
         evidence.append([at, kind, target, symbol])
     if not rows or len(rows) != len(set(w & 0xFFFFFF for w in rows)):
@@ -47,13 +50,16 @@ def relocation(data, size):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('build/text-extension'))
+    parser.add_argument('--choices', action='store_true', help='Include complete bounded shared choice substitutions')
     args = parser.parse_args()
     verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     source = ROOT/'overlays/text_extension'
+    imports = {**IMPORTS, **(CHOICE_IMPORTS if args.choices else {})}
     with tempfile.TemporaryDirectory(prefix='af-text-extension-') as directory:
         out = Path(directory)
         common = ['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
-                  '-v',f'{source}:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+                  '-v',f'{source}:/source:ro','-v',f'{ROOT}/overlays/text_choices:/choices:ro',
+                  '-v',f'{out}:/out','-w','/out','--entrypoint']
         def run(tool, *args):
             return subprocess.run(common+[f'/n64_toolchain/bin/mips64-elf-{tool}', IMAGE, *args],
                                   check=True, capture_output=True, text=True, timeout=60).stdout
@@ -61,14 +67,19 @@ def main():
                  '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector',
                  '-fno-asynchronous-unwind-tables','-fno-unwind-tables','-fno-jump-tables',
                  '-Wall','-Wextra','-Werror']
-        definitions = [f'--defsym={name}={address:#x}' for name,address in IMPORTS.items()]
-        run('gcc', *flags, '-c','/source/fields.c','-o','fields.o')
-        run('ld','-EB','--emit-relocs','-T','/source/extension.ld',*definitions,'-o','extension.elf','fields.o')
+        definitions = [f'--defsym={name}={address:#x}' for name,address in imports.items()]
+        rename = ['-Daf_text_extension_init=af_text_fields_init'] if args.choices else []
+        run('gcc', *flags, *rename, '-c','/source/fields.c','-o','fields.o')
+        objects = ['fields.o']
+        if args.choices:
+            run('gcc', *flags, '-I/source', '-c', '/choices/choices.c', '-o', 'choices.o')
+            objects.insert(0, 'choices.o')
+        run('ld','-EB','--emit-relocs','-T','/source/extension.ld',*definitions,'-o','extension.elf',*objects)
         run('objcopy','-O','binary','-j','.text','extension.elf','extension.bin')
         binary = (out/'extension.bin').read_bytes()
         if not 16 <= len(binary) <= 0x8000 or len(binary) & 15:
             raise ValueError('Text-extension image exceeds its bounded allocation')
-        rel, inventory = relocation(run('readelf','-rW','extension.elf'),len(binary))
+        rel, inventory = relocation(run('readelf','-rW','extension.elf'),len(binary),imports)
         symbols = {}
         for line in run('nm','-n','extension.elf').splitlines():
             match = re.fullmatch(r'([0-9a-fA-F]+)\s+[a-zA-Z]\s+(\S+)',line)
@@ -86,9 +97,13 @@ def main():
         report = {'image_bytes':len(binary),'relocation_bytes':len(rel),'blob_bytes':len(blob),
                   'loader_bytes':len(loader),'image_sha256':sha256(binary),'relocation_sha256':sha256(rel),
                   'blob_sha256':sha256(blob),'blob_crc32':f'{zlib.crc32(blob):08X}',
-                  'loader_sha256':sha256(loader),'symbols':symbols,'imports':IMPORTS,
+                  'loader_sha256':sha256(loader),'symbols':symbols,'imports':imports,
                   'elf_relocations':inventory,'compiler_image':IMAGE,
                   'sources':{p.name:sha256(p.read_bytes()) for p in sorted(source.iterdir()) if p.is_file()}}
+        if args.choices:
+            report['choices'] = True
+            report['sources'].update({'choices/'+p.name:sha256(p.read_bytes())
+                                     for p in sorted((ROOT/'overlays/text_choices').iterdir()) if p.is_file()})
         args.output.mkdir(parents=True,exist_ok=True)
         for name,data in (('extension.bin',binary),('relocation.bin',rel),('blob.bin',blob),('loader.bin',loader)):
             (args.output/name).write_bytes(data)

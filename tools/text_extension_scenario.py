@@ -54,6 +54,38 @@ def scenario(native, built, report):
     write(buffer-16, words(1, 0, 1024, 0)+payload)
     call(0x800A134C, [window, 0, 19], 0)
     check(buffer-8, words(1024)); check(buffer, payload)
+    if report['text_extension'].get('choices'):
+        # Reuse the same paused/checkpoint-owned scratch. Actor/animal fixtures
+        # remain below the test stack and above the previous message buffer.
+        actor, animal = 0x8019B600, 0x8019B800
+        def choice(payload, expected, actor_pointer=0):
+            data = payload.ljust(20, b' ')
+            guard = b'CHOICE-ROW-GUARD'
+            assert len(guard) == 16 and len(data) == 20
+            write(buffer-16, guard+data+guard)
+            call(0x80065CF8, [buffer, 20, actor_pointer], len(expected) if expected is not None else 0)
+            check(buffer-16, guard+(expected.ljust(20, b' ') if expected is not None else data)+guard)
+        choice(b'>\x7f\x3f!', b'>abcdefghijklmnop!')
+        call(0x8009D88C, [window, 0, source, 16])
+        choice(b'\x7f\x31', b'abcdefghijklmnop')
+        names = by_vrom(built)[0x02C00000].extract(built)
+        npc, full_name = next((i, names[32+i*8:40+i*8]) for i in range(216)
+                             if names[39+i*8] != 32 and all(32 <= b < 127 for b in names[32+i*8:40+i*8]))
+        actor_data = bytearray(0x178); actor_data[2] = 3
+        struct.pack_into('>I', actor_data, 0x174, animal)
+        write(actor, actor_data); write(animal, struct.pack('>H', 0xE000+npc)+bytes(0x526))
+        choice(b'\x7f\x1b', full_name, actor)
+        phrases = by_vrom(built)[0x02E00000].extract(built)
+        phrase = next(phrases[at:at+16] for at in range(32, len(phrases), 16)
+                      if phrases[at+15] != 32 and all(32 <= b < 127 for b in phrases[at+6:at+16]))
+        write(animal, phrase[4:6]); write(animal+0x4E5, phrase[:4])
+        choice(b'\x7f\x1c', phrase[6:], actor)
+        write(0x8019A8C0, b'Full selected answer'); write(window+0x228, words(20))
+        choice(b'\x7f\x2e', b'Full selected answer')
+        write(window+0x228, words(21)); choice(b'\x7f\x2e', None)
+        choice(b'12345\x7f\x31', None)
+        choice(b'bad\x7f\x00', None)
+        choice(b'1234567890123456789\x7f', None)
     check(0x8019C8D0, bytes.fromhex('AF32C0DE'*4))
     actions += [{'load_state': True}, {'resume': True}, {'wait': 2}]
     check(source, bytes(16))

@@ -119,8 +119,8 @@ human playthrough retain their separate responsibilities.
 
 ## Next work
 
-Connect the bounded shared dynamic-choice free/item/name readers, then remaining
-character/catchphrase consumers and default input. Retain the residual general
+Use the [choice-capable integration](CHOICE_SUBSTITUTIONS.md) for complete bounded
+shared choices. Continue remaining character/catchphrase consumers and default input. Retain the residual general
 strings, letters, and accented names queue. Preserve GameCube wording, manual
 breaks, and timing. Finish main translation and bounded v0 handoff before human
 playthrough; title/images, GameCube-style keyboard, and public-release preparation

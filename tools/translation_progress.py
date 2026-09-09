@@ -108,6 +108,12 @@ def measure(native, built, report):
     if report.get('text_extension'):
         from text_extension import verify_installation
         verify_installation(built, native, report)
+    pending_names = dict(PENDING_NAME_CONSUMERS)
+    if report.get('text_extension', {}).get('choices'):
+        # Installed verification above includes complete choice substitutions;
+        # independent actors/editors still prevent full resource-family credit.
+        pending_names['display_names'] = 'Other native six-byte character-name consumers remain unchanged'
+        pending_names['catchphrases'] = 'Default-phrase editing still uses the native four-byte field'
     info = module_command_info(native)
     ledger = CounterLedger(info)
     original = {b.name: b for b in banks(native)}
@@ -152,7 +158,7 @@ def measure(native, built, report):
                 for number in range(count):
                     ledger.credit(f'item_{group:02X}:{number:04X}',
                                   items[position:position+WIDTH], 'extended_items',
-                                  pending_reason=PENDING_NAME_CONSUMERS['extended_items'])
+                                  pending_reason=pending_names['extended_items'])
                     position += WIDTH
 
         names = resource('display_names', 60)
@@ -164,7 +170,7 @@ def measure(native, built, report):
             identities += [f'string:{i:04X}' for _, _, i, _ in special_table(native)]
             for number, identity in enumerate(identities):
                 ledger.credit(identity, names[32+number*WIDTH:32+(number+1)*WIDTH], 'display_names',
-                              pending_reason=PENDING_NAME_CONSUMERS['display_names'])
+                              pending_reason=pending_names['display_names'])
 
         phrases = resource('catchphrases', 64)
         if phrases is not None:
@@ -179,7 +185,7 @@ def measure(native, built, report):
                     raise ValueError('Invalid catchphrase actor identity')
                 seen.add(actor)
                 ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases',
-                              pending_reason=PENDING_NAME_CONSUMERS['catchphrases'])
+                              pending_reason=pending_names['catchphrases'])
 
         if report.get('gyroid_default'):
             from gyroid_default_actor import verify_installation
