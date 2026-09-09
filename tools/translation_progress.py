@@ -25,7 +25,7 @@ ENGLISH_CATEGORIES = {'latin_static_text', 'numbers_or_symbols_only'}
 PENDING_NAME_CONSUMERS = {
     'extended_items': 'Remaining native ten-byte item-name consumers are not connected to the complete resource',
     'display_names': 'Shared choices and other native six-byte name consumers remain unchanged',
-    'catchphrases': 'Shared choices and default-phrase editing still use the native four-byte field',
+    'catchphrases': 'Shared choices and ambiguous borrowed catchphrases still need complete integration',
 }
 
 
@@ -34,13 +34,15 @@ def pending_name_consumers(report):
     pending = dict(PENDING_NAME_CONSUMERS)
     if report.get('text_extension', {}).get('choices'):
         pending['display_names'] = 'Other native six-byte character-name consumers remain unchanged'
-        pending['catchphrases'] = 'Default-phrase editing still uses the native four-byte field'
+        pending['catchphrases'] = 'Ambiguous borrowed catchphrases can still display their saved Japanese key'
     if report.get('actor_display_names'):
         pending['display_names'] = 'NPC identity-based name readers and editors still need complete integration'
     if report.get('map_names'):
         pending['display_names'] = 'Remaining dialogue identity-name readers and editors still need complete integration; map names are connected'
     if report.get('guide_name'):
         pending['display_names'] += '; opening-guide name is connected'
+    if report.get('fishing_name'):
+        pending['display_names'] += '; saved fishing-winner name is connected'
     return pending
 
 
@@ -130,6 +132,9 @@ def measure(native, built, report):
         verify_shared_parts(built, native, report['runtime_module'], report['map_names'])
     if report.get('guide_name'):
         from guide_name import verify_installation
+        verify_installation(built, native, report)
+    if report.get('fishing_name'):
+        from fishing_name import verify_installation
         verify_installation(built, native, report)
     pending_names = pending_name_consumers(report)
     info = module_command_info(native)

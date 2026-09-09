@@ -58,6 +58,22 @@ one direct call at `8009EDF0`; the resetter has one overlay call at `80979ED8`.
 No direct setter calls or aligned literal pointers to these four routines are
 found. This does not prove that inline saved-field users are absent.
 
+## Native editor and ambiguous borrowing
+
+The native name-entry actor does not prefill the catchphrase editor from the
+saved default. Its initializer at `80884B30` selects a private four-byte buffer,
+clears it to spaces at `80884C38`, and opens the editor at `80884C68`. Confirmation
+copies four bytes to the caller at `8088445C`. The four-character custom-input
+limit is a saved-storage constraint, not a remaining Japanese-default reader.
+
+The pinned default resource has one ambiguous saved key: `D0 90 20 20` (`グー`).
+Dozer (`E014`) uses the GC English `zzzzzz`; Bea (`E0C5`) uses `bingo`. Own-ID
+display succeeds. An unrelated villager holding that key falls back to native
+text because four saved bytes contain no donor identity. Native greeting
+copies propagate those same four bytes. All other key groups have a single
+English value. Complete borrowed-phrase application requires an explicit policy
+and installed implementation for this ambiguity, not a guessed donor identity.
+
 ## Validation requirements
 
 Confirm every default-table/string/name identity, duplicate-key behaviour,

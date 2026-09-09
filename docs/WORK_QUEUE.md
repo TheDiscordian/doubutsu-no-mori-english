@@ -15,9 +15,19 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [fishing-name checkpoint](checkpoints/FISHING_NAME.md) supplies the complete
+NPC winner-name display with exact saved-key and identity-marker guards.
+The current combined build is `build/fishing-name-pilot`; all six focused and
+twelve counter checks pass. Continue remaining identity/item readers,
+borrowed-catchphrase ambiguity, residual text/letters, accents, and combined v0
+smoke. The catchphrase editor opens blank rather than displaying native defaults;
+do not widen its saved input field to fix a nonexistent default-prefill reader.
+The one ambiguous borrowed key and its two English references are documented
+in the checkpoint for the next implementation decision.
+
 The [map-label checkpoint](checkpoints/MAP_LABELS.md) supplies complete English
 landmarks and the vacant-house label with exact GC line placement. The current
-combined build is `build/map-labels-pilot`; focused checks and counter integration
+retained build is `build/map-labels-pilot`; focused checks and counter integration
 pass. Continue the fishing-event winner-name display using exact saved-name
 aliases, then the remaining identity/catchphrase/item readers, residual
 text/letters, accents, and combined v0 smoke. Map labels and its full-name cache

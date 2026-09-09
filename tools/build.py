@@ -227,6 +227,7 @@ def main():
     parser.add_argument('--english-text-extension', type=Path, help='Persistent complete general dialogue fields and free-item adapters')
     parser.add_argument('--english-actor-display-names', action='store_true', help='Complete festival/reserve name preparations; requires display names and persistent text fields')
     parser.add_argument('--english-guide-name', action='store_true', help='Complete opening-guide dialogue name; requires display names and persistent text fields')
+    parser.add_argument('--english-fishing-name', type=Path, help='Compiled save-preserving fishing winner name reader')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -334,6 +335,8 @@ def main():
         parser.error('--english-actor-display-names requires --english-text-extension and --display-names')
     if args.english_guide_name and not (args.english_text_extension and args.display_names):
         parser.error('--english-guide-name requires --english-text-extension and --display-names')
+    if args.english_fishing_name and not (args.english_text_extension and args.display_names):
+        parser.error('--english-fishing-name requires --english-text-extension and --display-names')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -499,6 +502,9 @@ def main():
     if args.english_guide_name:
         from guide_name import install as install_guide_name
         report['guide_name'] = install_guide_name(rom, replacements, additions, relocations, report['runtime_module'])
+    if args.english_fishing_name:
+        from fishing_name import install as install_fishing_name
+        report['fishing_name'] = install_fishing_name(rom, replacements, additions, relocations, args.english_fishing_name)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -530,6 +536,9 @@ def main():
         verify_installation(output, rom, report)
     if args.english_guide_name:
         from guide_name import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_fishing_name:
+        from fishing_name import verify_installation
         verify_installation(output, rom, report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)
