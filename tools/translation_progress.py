@@ -275,6 +275,15 @@ def measure(native, built, report):
             for number in INITIAL_IDS:
                 body = initial_body(Record(4, 0, (number,), ()), catalog_banks)
                 ledger.credit(f'mail:{number:04X}', body, 'noticeboard', mail=True, mail_glyphs=True)
+            if report['noticeboard'].get('treasure_owner'):
+                from notice_treasure import IDS, body as treasure_body, fields_for
+                from mail_record import Field
+                samples = {1: Field(b'ABCDEFGHIJKLMNOP'), 2: Field(b'abcdefghijklmnop', 1),
+                           3: Field(b'6'), 4: Field(b'5'), 5: Field(b'TownXX')}
+                for number in IDS:
+                    record = Record(4, 0, (number,), tuple((i, samples[i]) for i in fields_for(number)))
+                    ledger.credit(f'mail:{number:04X}', treasure_body(record, catalog_banks),
+                                  'noticeboard', mail=True, mail_glyphs=True)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

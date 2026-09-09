@@ -13,37 +13,32 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
-The [treasure transaction owner](../specs/NOTICEBOARD_TREASURE_OWNER.md) implements
-original burial, exact stack-only undo, complete English post creation, and guarded
-publication. Its 176-byte native bridges fit the old treasure field-helper slot;
-the 48,752-byte on-demand image keeps the existing workspace, resident module, and
-save layout. Fifty owner/creator tests and corresponding sanitizer checks have
-passing results, including all acres/units, all pitfall shapes, failed deposits,
-and complete ordinary/pitfall posts. Five artifact tests verify independent builds,
-exact bridge instructions, and retained original code outside the intended edits.
-The current ROM's main code accepts guarded patch construction. The owner is not
-installed or executed natively yet: connect the treasure reader and full-build
-dependencies, build/verify the ROM and UPS, then run one combined native batch.
-No new application credit is claimed for these uninstalled helpers.
+The [complete treasure integration](checkpoints/NOTICEBOARD_TREASURE.md) installs
+all eighteen English posts in `build/notice-treasure-pilot`, including their
+transactional creator, native burial/publication bridges, and full-body reader.
+The build requires both sides together and verifies the actual installed creator,
+article/name resources, reader relocations, and original scheduling instructions.
+The combined counter credits the eighteen installed bodies once, alongside the
+four initial announcements; its unchanged denominator still includes remaining
+names, letters, dialogue, and other inventoried text.
 
-The [complete treasure creator and decoder](checkpoints/NOTICEBOARD_TREASURE.md)
-implement all eighteen bodies with full names, numeric N64 acre coordinates,
-and unchanged 96-byte saved-message capacity. The native-specific `01F4` retains
-the town/row-only clue and all six manual lines. Article lookup binds all 3,563
-translated item-name slots to supplied metadata or explicit native-name grammar
-approvals, checks each complete name, and rejects missing translations. Six
-article tests cover every native 16-bit item ID; all 45 creator/dispatcher tests
-and the same 51 sanitizer checks pass. The 46,592-byte creator builds identically
-twice, with 672 relocation bytes, unchanged 5,344-byte workspace, and unchanged
-resident code/bootstrap. Five artifact tests and four retained native-reader
-evidence checks pass. The decoder retains its five passing host/sanitizer checks.
-Native inspection identifies both ordinary and pitfall burial writes and the
-selected acre/flag addresses for exact failure recovery. These helpers are not
-yet connected to native treasure creation or the installed reader, so they
-receive no text-application credit. The transaction owner above supplies the
-compiled hooks and undo. Finish reader routing and complete-ROM installation,
-then continue seasonal posts.
-Do not rerun the completed initial board batches.
+The 15,984-byte reader adds 2,144 bytes within the existing submenu reservation.
+The 48,752-byte creator, 5,344-byte workspace, resident module, and native saved
+layout remain unchanged. All manual breaks and full names are retained; `01F4`
+keeps the town/row-only clue without revealing the item. Ten combined-reader host
+tests and their sanitizer equivalents pass, covering all eighteen bodies, both
+capitalizations, all five article modes, complete pages, mixed-post caching, and
+resource failure/retry. Eight new compilation/installation/accounting tests pass,
+including independent builds, the full ROM/UPS, atomic failures, and retained
+resources. Ten initial installation checks, five owner artifact checks, and four
+retained native-reader evidence checks also pass without replaying native batches.
+
+Next execute one bounded native treasure batch: actual burial, both loader phases,
+rollback, publication, full reading, and scheduling eligibility. The new treasure
+path has not executed natively yet; compiled and host results are not that proof.
+Then continue the forty-one seasonal notices and other remaining text. Do not
+rerun the completed initial board batches. Save/reload, gameplay, human review,
+hardware acceptance, patch-only release, and title/keyboard stretch goals remain.
 
 The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
 installs all four complete announcements, full-body pages, and English entry/date
@@ -61,11 +56,12 @@ recovery, entry labels, and all twelve months pass. The final edge run restores
 heap/save/input state and its checkpoint, with blank isolated saves and graceful
 shutdown. The [native reader evidence](checkpoints/NOTICEBOARD_NATIVE_READER.md)
 distinguishes completed checks from partial fixture runs. Normal menu entry and
-C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal/
-eighteen treasure bodies remain active work. Seventeen treasure references have
+C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal
+bodies remain active work. Seventeen treasure references have
 source/field review; the creator/decoder above also implements the native-specific
 `01F4` heading without revealing the original clue's hidden item. Continue
-bulk automatic-post implementation, without replaying passed storage/reader cases.
+native treasure acceptance and bulk seasonal-post implementation, without replaying
+passed storage/reader cases.
 
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs
 22 source-bound original entries in 63 complete fields, including 31 unchanged-

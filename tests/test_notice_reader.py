@@ -34,6 +34,9 @@ class Label(C.Structure):
 
 @unittest.skipUnless(initial_tests.CATALOG.is_file(), 'Local immutable catalogue required')
 class NoticeReaderTests(unittest.TestCase):
+    reader_source = 'overlays/notice/reader.c'
+    extra_sources = ()
+
     @classmethod
     def setUpClass(cls):
         cls.data = initial_tests.CATALOG.read_bytes()
@@ -43,8 +46,8 @@ class NoticeReaderTests(unittest.TestCase):
         sources = ['runtime/mail/record.c', 'runtime/mail/format.c', 'runtime/mail/catalog.c',
                    'runtime/crc32.c', 'runtime/dateformat.c', 'runtime/mail/view.c',
                    'runtime/notice/record.c', 'runtime/notice/initial.c', 'runtime/notice/page.c',
-                   'overlays/notice/reader.c', 'tests/mail_catalog_mock.c', 'tests/mail_view_mock.c',
-                   'tests/notice_reader_mock.c']
+                   cls.reader_source, 'tests/mail_catalog_mock.c', 'tests/mail_view_mock.c',
+                   'tests/notice_reader_mock.c', *cls.extra_sources]
         flags = ['-fsanitize=address,undefined', '-fno-sanitize-recover=all',
                  '-fno-omit-frame-pointer', '-g'] if os.environ.get('AF_NOTICE_SANITIZE') == '1' else []
         compiler_env = dict(os.environ)

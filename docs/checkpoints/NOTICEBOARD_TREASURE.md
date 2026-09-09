@@ -2,6 +2,13 @@
 
 ## Implemented
 
+The complete installed build is `build/notice-treasure-pilot`. It contains the
+transaction creator, native treasure bridges, and full-body reader together;
+all eighteen treasure bodies receive verified application credit. Native execution
+of the treasure path remains unverified. The complete translation project remains
+active, including seasonal/general text, names, review, persistence, hardware,
+patch-only release preparation, title artwork, and keyboard stretch work.
+
 All eighteen treasure notices have complete C/Python decoding models, including
 the native-specific `01F4` town/row clue. Seventeen use the supplied GameCube bodies
 unchanged. The adapted two-line heading keeps the six-line structure, blank third
@@ -54,8 +61,52 @@ Logs are `owner-tests.log`, `owner-focused-tests.log`, `owner-sanitizer-tests.lo
 owner/creator build logs under `build/noticeboard-treasure/`. The current playable
 ROM's main code accepts guarded patch construction: resulting code length 826,800,
 SHA-256 `99f690b9a4bc523c87ab13206985b60c3b90df298e22d54ec786b80e6423bbe6`.
-That check does not write or install a ROM. Native placement/loader/undo execution
-remains unverified; the host rollback helper models the bridge's stores only.
+The complete installed ROM has that same main-code digest. Native placement/
+loader/undo execution remains unverified; the host rollback helper models the
+bridge's stores only.
+
+## Installed complete reader and ROM
+
+The [treasure reader profile](../../specs/NOTICEBOARD_TREASURE_READER.md) adds all
+eighteen decoder routes while retaining the initial reader source and its frozen
+native evidence. Independent `reader` and `reader-repeat` builds agree. It grows
+the reader by 2,144 bytes inside the existing submenu reservation; no saved or
+resident structure grows. The complete ROM changes only main code, reader and its
+relocations, submenu metadata, the creator and its resident configuration, and
+the physical DMA table. Every other translation resource is unchanged.
+
+| Artifact | Size | SHA-256 |
+| --- | ---: | --- |
+| Complete reader | 15,984 | `61180ff0e7dc2b99518bb8c3678b7a09a4c0461005744d0d43d8d51ae58a7a7e` |
+| Reader relocations | 640 | `5eac036261e2bda36c9bf5545d800d12bc2621438958eea06def3e98bab1b837` |
+| Appended suffix | 9,200 | `8b4dbfefe26ff39b938cefa28d1323b5983794a24231f505ec84b71e831934ff` |
+| Complete ROM | 33,554,432 | `df1ef97f9376e4cb0f0cdfc7e8845de837f61a1d9427334333b69a8f3c5f035d` |
+| UPS patch | 4,474,425 | `e97ead04029a9202fb9a77fc77d19ec01e2565ade4e658b8ab287e54364f0ed3` |
+
+Ten combined-reader tests and the same sanitizer tests pass. The complete-body
+case checks all eighteen templates, both capitals, and all five articles, with
+all characters reachable through pages and no saved-message edits. Other cases
+cover mixed initial/treasure caches, malformed fields, every read failure for the
+adapted template, retry, unchanged native-control precedence, and retained dates.
+Eight new artifact/installation/accounting tests pass. Ten initial installer tests,
+five owner artifact checks, and four retained native-reader evidence checks pass.
+No completed native initial batch is replayed.
+
+Logs under `build/noticeboard-treasure/` are `reader-build.log`,
+`reader-repeat-build.log`, `full-build.log`, `reader-tests.log`,
+`reader-sanitizer-tests.log`, `reader-install-tests.log`,
+`initial-install-retention-tests.log`, `reader-owner-retention-tests.log`, and
+`reader-native-retention-tests.log`. The combined counter verifies the current
+ROM's complete owner/reader installation before adding precisely the eighteen
+source bodies; the source inventory and denominator remain unchanged.
+
+Rebuild the reader with `python3 tools/build_notice_overlay.py --treasure
+--module build/notice-treasure-runtime/module.json --output
+build/noticeboard-treasure/reader`. The complete ROM uses the existing full-build
+options, with `--npc-mail-generation build/noticeboard-treasure/owner-creator`,
+`--english-noticeboard build/noticeboard-treasure/reader`,
+`--english-notice-treasure build/noticeboard-treasure/owners`, and
+`--output build/notice-treasure-pilot`. The builder rejects partial installation.
 
 ## Text-only creator profile
 
@@ -131,34 +182,23 @@ Cross-compiled notice
 helpers are in `mips/`; their object SHA-256 is
 `fccc10a6bdaad414aed228a0c56e3c2b1721aa188b7cf429b6055a2cb87614f4`.
 
-## Next required integration
+## Next required execution
 
-The installed ROM remains `build/noticeboard-pilot`; **treasure creation and the
-new decoder are not installed**. No treasure text gains application credit yet.
-
-1. Connect the compiled native owner using the original selected animal (`s6`),
-   template, item, coordinates, and RTC. In the 352-byte treasure scheduler frame,
-   the post starts at `sp+68h`, its timestamp at `sp+C8h`, item at `sp+66h`, column
-   at `sp+60h`, row at `sp+5Ch`, and selected template at the formatter's fifth
-   argument `sp+10h`. The formatter call is `800A62A0`; publication is `800A62A8`.
-   The original field preparer `800A5E58..800A5F08` is 176 bytes, called at
-   `800A6214`. The guarded builder supplies these patches and the placement
-   forwarding thunks; full-ROM dependency checks are still required.
-2. Execute the implemented undo path, including allocation failures before both
-   phases, original pitfall/non-pitfall deposit, and scheduling eligibility. The
-   host results and exact assembly do not establish native execution or recovery.
-3. Route the reader to complete treasure decoding while retaining initial-post
-   support and the passed native controls/cache behaviour. Keep old installed
-   artifact verification usable; changing existing source-bound reader files
-   indiscriminately would invalidate the retained initial-reader evidence.
-4. Build the complete ROM, verify installed owner/reader/resources and UPS,
-   update combined accounting only for verified installation, then run a bounded
-   native creator/publication/readback batch. Do not replay completed initial
-   storage/reader batches. Normal gameplay, save/reload, and hardware remain.
+1. Exercise actual native burial and both on-demand transaction phases, including
+   original pitfall/non-pitfall deposits and scheduling eligibility. Include
+   allocation failures before both phases and exact stack-only undo. Host results
+   and exact assembly do not establish native execution or recovery.
+2. Load the larger reader from the actual ROM and read complete newly created
+   posts. The old initial fixture's graphics state at auxiliary `3800` overlaps
+   this reader: use explicit non-overlapping allocations and independently model
+   soft wrapping for full dynamic names. Retain initial evidence without replay.
+3. Verify native owner/publication/readback, resource failure/retry, heap/stack
+   guards, restored checkpoint/input/save state, and blank isolated save files in
+   one bounded silent batch. Normal gameplay, save/reload, and hardware remain.
 
 Continue the forty-one seasonal notices and other remaining text afterwards.
 Keep the complete translation, review, patch-only release, title art, and keyboard
-stretch goals active; this helper milestone is not project completion.
+stretch goals active; this integration is not project completion.
 
 ## Native burial evidence and implementation direction
 

@@ -14,15 +14,18 @@ from notice_overlay import (ROOT, RAM, INIT_START, INIT_END, native_sources, sou
 from audit_noticeboard import audit
 
 
-def build(native, module, catalog, output):
+def build(native, module, catalog, output, *, treasure=False):
     output = output.resolve()
     original, native_reloc, _, _ = native_sources(native)
     approval = audit(native, catalog)
-    sources = source_hashes()
+    if treasure:
+        from audit_notice_treasure import audit as audit_treasure
+        approval = {'initial': approval, 'treasure': audit_treasure(native, catalog)}
+    sources = source_hashes(treasure)
     output.mkdir(parents=True, exist_ok=True)
     (output/'native.bin').write_bytes(original)
     (output/'imports.ld').write_text(''.join(f'{name} = 0x{value:08X};\n'
-                                           for name, value in imports(module).items()))
+                                           for name, value in imports(module, treasure).items()))
     common = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}:/source:ro', '-v', f'{output}:/out', '-w', '/out', '--entrypoint']
 
@@ -37,7 +40,8 @@ def build(native, module, catalog, output):
              '-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     units = {name: 'runtime/notice/'+name+'.c' for name in ('record', 'initial', 'page')}
-    units['reader'] = 'overlays/notice/reader.c'
+    if treasure: units['treasure'] = 'runtime/notice/treasure.c'
+    units['reader'] = 'overlays/notice/reader_treasure.c' if treasure else 'overlays/notice/reader.c'
     for name, path in units.items(): run('gcc', *flags, '/source/'+path, '-o', name+'.o')
     run('as', '-EB', '-mabi=32', '-march=vr4300', '-I/out', '-o', 'native.o', '/source/overlays/notice/reader.s')
     run('ld', '-EB', '--emit-relocs', '-T', '/source/overlays/notice/reader.ld', '-Map=overlay.map',
@@ -50,12 +54,12 @@ def build(native, module, catalog, output):
     run('objcopy', '-O', 'binary', '-j', '.text', 'overlay.elf', 'overlay.bin')
     data = bytearray((output/'overlay.bin').read_bytes())
     exports = {name: value-RAM for name, value in symbols.items()
-               if name.startswith('af_notice_') and name not in imports(module)}
+               if name.startswith('af_notice_') and name not in imports(module, treasure)}
     data[:len(original)] = patch_prefix(native, exports)
     if symbols['__notice_end'] != RAM+len(data): raise ValueError('Notice linked bounds disagree')
     elf_text = run('readelf', '-rW', 'overlay.elf')
     inventory = elf_inventory(elf_text)
-    reloc = relocation_bytes(native_reloc, inventory, len(data), module)
+    reloc = relocation_bytes(native_reloc, inventory, len(data), module, treasure)
     run('as', '-EB', '-mabi=32', '-march=vr4300', '-o', 'init.o', '/source/overlays/notice/initial.s')
     run('ld', '-EB', '-Ttext', f'0x{INIT_START:X}', '-e', 'af_notice_native_init', '-o', 'init.elf', 'init.o')
     run('objcopy', '-O', 'binary', '-j', '.text', 'init.elf', 'init.bin')
@@ -65,12 +69,13 @@ def build(native, module, catalog, output):
     report = {'version': 1, 'ram': RAM, 'bytes': len(data), 'overlay_sha256': sha256(data),
               'suffix_sha256': sha256(data[0x1A80:]), 'relocation_bytes': len(reloc),
               'relocation_sha256': sha256(reloc), 'init_sha256': sha256(init), 'sources': sources,
-              'module_sha256': module['module_sha256'], 'imports': imports(module), 'symbols': exports,
+              'module_sha256': module['module_sha256'], 'imports': imports(module, treasure), 'symbols': exports,
               'code_end': symbols['__notice_code_end']-RAM, 'bss_start': symbols['__notice_bss_start']-RAM,
               'elf_relocations': inventory, 'approval': approval, 'flags': flags, 'toolchain_image': IMAGE,
               'compiler': run('gcc', '--version').splitlines()[0],
               'stack_usage': {name: (output/(name+'.su')).read_text() for name in units}}
-    if source_hashes() != sources: raise ValueError('Notice sources changed during compilation')
+    if treasure: report['treasure'] = True
+    if source_hashes(treasure) != sources: raise ValueError('Notice sources changed during compilation')
     (output/'overlay.bin').write_bytes(data)
     (output/'relocation.bin').write_bytes(reloc)
     (output/'init.bin').write_bytes(init)
@@ -88,9 +93,10 @@ def main():
     parser.add_argument('--module', type=Path, default=ROOT/'build/shop-notice-runtime/module.json')
     parser.add_argument('--catalog', type=Path, default=ROOT/'build/mail-glyph-resources/glyph-catalog.bin')
     parser.add_argument('--output', type=Path, default=ROOT/'build/noticeboard-reader')
+    parser.add_argument('--treasure', action='store_true', help='Include all complete treasure-post bodies')
     args = parser.parse_args()
     report = build(verified_rom(args.rom.read_bytes()), json.loads(args.module.read_text()),
-                   args.catalog.read_bytes(), args.output)
+                   args.catalog.read_bytes(), args.output, treasure=args.treasure)
     print(json.dumps({key: report[key] for key in ('bytes', 'suffix_sha256', 'overlay_sha256',
                      'relocation_bytes', 'relocation_sha256', 'init_sha256', 'symbols', 'stack_usage')}, indent=2))
 

@@ -104,8 +104,8 @@ field expansion. Fifty-seven have six explicit visible lines, four have five,
 one has four, and `01AE` has seven. These are source-layout observations, not
 pixel-fit or native-draw proof. Preserve manual breaks and check the seventh
 line, full dynamic names/dates, and existing post-navigation/edit controls.
-The initial-post route is installed. Seasonal and treasure identity/field review
-remain part of the complete board requirement.
+Initial and treasure routes are installed. Seasonal identity/field review remains
+part of the complete board requirement.
 
 ## Implemented compact envelope and full-body page planner
 
@@ -174,8 +174,10 @@ clear routine handles the eleven remaining slots. No new initial-creation
 allocation or cartridge read is needed.
 
 The full reader is appended after the original file and 128 zero-backed BSS
-bytes. Its 13,840-byte file resides at VROM `03920000`, with the 560-byte adjacent
-relocation file at `03928000`. The original DMA row indices remain. Original
+bytes. The initial-only profile is 13,840 bytes with 560 relocation bytes; the
+complete treasure profile is 15,984 bytes with 640 relocation bytes. Reader and
+relocations reside at VROM `03920000` and `03928000`. The original DMA row indices
+remain. Original
 section-relative relocations are flattened without reordering, and appended ELF
 relocations include only targets inside the overlay; fixed verified resident
 imports are not moved. Code, initialization, relocations, and exported offsets
@@ -190,8 +192,9 @@ declared size; source is `upstream/af/src/overlays/submenu/submenu_ovl/`.
 The pool calculation's instruction at `800C4B10` adds 16,384 bytes to its editor
 term, which is part of the dominant submenu sum. The actual arithmetic yields
 214,400 native bytes and 230,784 expanded bytes, above the unchanged alternative
-199,488 and player 186,240 terms. The added reader's aligned growth is 7,104
-bytes. This reserves space without changing any other program's declared image.
+199,488 and player 186,240 terms. The initial reader's aligned growth is 7,104
+bytes; the complete treasure reader's is 9,216. This reserves space without
+changing any other program's declared image.
 The actual native program loader and constructor pass in an isolated owned
 submenu fixture, including complete image/asset DMA, aligned allocation advance,
 relocated callbacks, single-owner reopening, and temporary relocation cleanup.
@@ -253,8 +256,9 @@ retained. Manual breaks and article commands remain part of the reference.
 and town, while the donor's `1/2/3` reveal the buried item. Adapt the town's
 treasure-hunt heading without disclosing that item. This is a real clue difference,
 not a reason to drop the entry or pass an empty item name to the donor formatter.
-All eighteen need native owner/reader installation, publication handling, and
-persistence integration; the source audit grants no installed-translation credit.
+All eighteen have native owner/reader installation and transactional publication
+handling. Native execution and persistence remain unverified; the source audit
+itself grants no installed-translation credit.
 
 ## Complete treasure helpers and integration contract
 
@@ -307,6 +311,8 @@ global state, and the unchanged 5,344-byte caller workspace. Independent builds,
 checks pass. The unchanged decoder retains its five host/sanitizer results.
 The creator remains
 inside the existing 65,536-byte image limit, and the freshly inventoried resident
-module and bootstrap are unchanged. Native hooks, reader routing,
-post-burial failure recovery, actual execution, and persistence remain uninstalled
-or unverified. See the [treasure checkpoint](../docs/checkpoints/NOTICEBOARD_TREASURE.md).
+module and bootstrap are unchanged. The transactional 48,752-byte creator variant
+and complete reader are installed together with the native hooks and stack-only
+undo; actual execution and persistence remain unverified. See the
+[treasure checkpoint](../docs/checkpoints/NOTICEBOARD_TREASURE.md) and
+[complete reader profile](NOTICEBOARD_TREASURE_READER.md).

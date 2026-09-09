@@ -107,11 +107,14 @@ Five artifact tests verify independent builds, all bridge words, unchanged nativ
 code outside the intended intervals, and retained verification of older creators.
 The current playable ROM's main code also accepts guarded patch construction.
 
-These are compiled/host results, not executed native ownership. The actual ROM
-still uses its initial-only notice reader. Full installation must require both
-the `--notice-owner` creator and a treasure-capable reader before enabling the
-native bridges. Add the full build dependency checks, reader routing, ROM/UPS
-verification, and accounting together. Then execute a bounded native batch for
-real placement, loader failures, rollback, posting, reading, heap/stack state, and
-scheduling eligibility. Save/reload, old saved automatic posts, ordinary gameplay,
-and hardware acceptance remain. Do not replay passed initial-post batches.
+These are compiled/host results, not executed native ownership. The actual ROM at
+`build/notice-treasure-pilot` installs the `--notice-owner` creator, a complete
+treasure reader, and the native bridges together. The full builder and independent
+verifier require the real configured creator, matching article/name resource,
+reader profile, and every guarded native interval. ROM/UPS and combined accounting
+checks pass. See [reader installation](NOTICEBOARD_TREASURE_READER.md).
+
+Execute a bounded native batch for real placement, loader failures, rollback,
+posting, reading, heap/stack state, and scheduling eligibility. Save/reload, old
+saved automatic posts, ordinary gameplay, and hardware acceptance remain.
+Do not replay passed initial-post batches.

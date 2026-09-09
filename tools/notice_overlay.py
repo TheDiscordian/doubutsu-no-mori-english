@@ -33,6 +33,21 @@ EXPECTED_SYMBOLS = {
     'af_notice_initial_restore': 7384, 'af_notice_page': 8008, 'af_notice_read_control': 9252,
     'af_notice_record_expand': 7036, 'af_notice_record_pack': 6848, 'af_notice_record_tagged': 6784,
 }
+# Independent treasure-reader builds retain the initial-only profile above.
+TREASURE_SYMBOLS = {
+    'af_notice_cache': 13536, 'af_notice_complete_restore': 10380,
+    'af_notice_construct': 11124, 'af_notice_draw_body': 11516,
+    'af_notice_draw_date': 12668, 'af_notice_draw_entry': 12500,
+    'af_notice_initial_pack': 7284, 'af_notice_initial_restore': 7384,
+    'af_notice_page': 8008, 'af_notice_read_control': 11180,
+    'af_notice_record_expand': 7036, 'af_notice_record_pack': 6848, 'af_notice_record_tagged': 6784,
+    'af_notice_treasure_decode': 9904, 'af_notice_treasure_decode_parts': 8948,
+    'af_notice_treasure_mask': 8392, 'af_notice_treasure_pack': 8880,
+    'af_notice_treasure_restore': 10020, 'af_notice_treasure_valid': 8432,
+}
+TREASURE_END, TREASURE_BSS = 13168, 13536
+TREASURE_SUFFIX_HASH = '8b4dbfefe26ff39b938cefa28d1323b5983794a24231f505ec84b71e831934ff'
+TREASURE_RELOC_HASH = '5eac036261e2bda36c9bf5545d800d12bc2621438958eea06def3e98bab1b837'
 KINDS = {'32': 2, '26': 4, 'HI16': 5, 'LO16': 6}
 NATIVE_IMPORTS = {'af_notice_original_construct': 0x80895B04,
                   'af_notice_original_read': 0x80894560, 'af_notice_original_body': 0x8089542C}
@@ -45,19 +60,23 @@ CALLS = {0x80895750: ('af_notice_draw_entry', 0x80895298),
          0x808957C0: ('af_notice_draw_body', 0x8089542C)}
 
 
-def source_hashes():
+def source_hashes(treasure=False):
     paths = ['overlays/notice/'+name for name in ('reader.c', 'reader.h', 'reader.s', 'reader.ld', 'initial.s')]
     paths += ['runtime/notice/'+name+suffix for name in ('record', 'initial', 'page') for suffix in ('.c', '.h')]
     paths += ['runtime/mail/'+name+'.h' for name in ('record', 'format', 'catalog', 'glyph', 'view')]
     paths += ['runtime/dateformat.h', 'runtime/crc32.h', 'tools/audit_noticeboard.py', 'tools/notice_record.py']
+    if treasure:
+        paths += ['overlays/notice/reader_treasure.c', 'runtime/notice/treasure.c',
+                  'runtime/notice/treasure.h', 'tools/audit_notice_treasure.py', 'tools/notice_treasure.py']
     return {name: sha256((ROOT/name).read_bytes()) for name in paths}
 
 
-def imports(module):
+def imports(module, treasure=False):
+    required = {**MODULE_IMPORTS, **({'af_mail_format': 0x80197654} if treasure else {})}
     if (module['module_sha256'] != MODULE_HASH
-            or any(int(module['symbols'][name], 16) != address for name, address in MODULE_IMPORTS.items())):
+            or any(int(module['symbols'][name], 16) != address for name, address in required.items())):
         raise ValueError('Notice reader requires its verified resident imports')
-    return {**NATIVE_IMPORTS, **MODULE_IMPORTS}
+    return {**NATIVE_IMPORTS, **required}
 
 
 def native_sources(native):
@@ -151,8 +170,8 @@ def elf_inventory(text):
     return result
 
 
-def relocation_bytes(native_reloc, inventory, size, module):
-    allowed = imports(module)
+def relocation_bytes(native_reloc, inventory, size, module, treasure=False):
+    allowed = imports(module, treasure)
     rows = []
     for row in struct.unpack_from('>69I', native_reloc, 20):
         section, kind, at = row >> 30, (row >> 24) & 63, row & 0xFFFFFF
@@ -217,25 +236,34 @@ class OverlayImage:
 
 def validate(native, data, reloc, init, report, module, catalog):
     original, native_reloc, _, _ = native_sources(native)
-    imports(module)
+    treasure = report.get('treasure', False)
+    if type(treasure) is not bool: raise ValueError('Invalid notice reader profile')
+    imports(module, treasure)
     audit_editor(native)
+    approval = audit(native, catalog)
+    if treasure:
+        from audit_notice_treasure import audit as audit_treasure
+        approval = {'initial': approval, 'treasure': audit_treasure(native, catalog)}
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('overlay_sha256') != sha256(data) or report.get('relocation_bytes') != len(reloc)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes()
-            or report.get('module_sha256') != MODULE_HASH or report.get('imports') != imports(module)
-            or report.get('approval') != audit(native, catalog)):
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(treasure)
+            or report.get('module_sha256') != MODULE_HASH or report.get('imports') != imports(module, treasure)
+            or report.get('approval') != approval):
         raise ValueError('Stale or changed notice reader build')
     symbols, end, bss = report.get('symbols', {}), report.get('code_end'), report.get('bss_start')
-    if (symbols != EXPECTED_SYMBOLS or end != 11232 or bss != 11392
+    expected_symbols = TREASURE_SYMBOLS if treasure else EXPECTED_SYMBOLS
+    expected_end, expected_bss = (TREASURE_END, TREASURE_BSS) if treasure else (11232, 11392)
+    suffix_hash, reloc_hash = (TREASURE_SUFFIX_HASH, TREASURE_RELOC_HASH) if treasure else (SUFFIX_HASH, RELOC_HASH)
+    if (symbols != expected_symbols or end != expected_end or bss != expected_bss
             or len(data) & 15 or not RESIDENT < len(data) <= RESIDENT+GROWTH
             or type(end) is not int or type(bss) is not int or end & 15 or bss & 15
             or not RESIDENT < end <= bss < len(data) or any(data[bss:])
             or data[:PREFIX] != patch_prefix(native, symbols) or any(data[PREFIX:RESIDENT])
-            or sha256(data[RESIDENT:]) != SUFFIX_HASH or report.get('suffix_sha256') != SUFFIX_HASH
-            or sha256(reloc) != RELOC_HASH or sha256(init) != INITIAL_HASH
+            or sha256(data[RESIDENT:]) != suffix_hash or report.get('suffix_sha256') != suffix_hash
+            or sha256(reloc) != reloc_hash or sha256(init) != INITIAL_HASH
             or report.get('init_sha256') != INITIAL_HASH):
         raise ValueError('Unapproved notice code, initialization, or relocation image')
-    if reloc != relocation_bytes(native_reloc, report.get('elf_relocations', []), len(data), module):
+    if reloc != relocation_bytes(native_reloc, report.get('elf_relocations', []), len(data), module, treasure):
         raise ValueError('Changed notice relocation inventory')
     spec = OverlayImage(RAM, len(data), struct.unpack_from('>5I', reloc))
     prior = OverlayImage(RAM, RESIDENT, struct.unpack_from('>5I', native_reloc))
@@ -256,15 +284,47 @@ def metadata(size, symbols):
                        RAM+symbols['af_notice_construct'], 0x80895B9C, 0x80895A30, 0)
 
 
+def verify_treasure_installation(built, native, module, report):
+    from item_articles import verify_names
+    from npc_mail_loader import VROM as CREATOR_VROM, verify_configuration
+    from runtime_layout import MODULE_VROM
+    import notice_treasure_owner as treasure
+    files = by_vrom(built)
+    resident = files[MODULE_VROM].extract(built)
+    creator = files[CREATOR_VROM].extract(built)
+    verify_configuration(resident, creator, module)
+    verify_names(files[0x02A00000].extract(built), struct.unpack_from('>I', resident, 56)[0])
+    approval = module['npc_mail_loader']
+    if (approval['overlay'].get('notice_owner') is not True
+            or report.get('creator_sha256') != sha256(creator)):
+        raise ValueError('Treasure reader requires the installed complete transaction creator')
+    original = by_vrom(native)[CODE_VROM].extract(native)
+    expected = treasure.patch(original, treasure.expected(int(module['symbols']['af_npc_mail_load'], 16)),
+                              report['bridges'], module)
+    actual = files[CODE_VROM].extract(built)
+    # Check every guarded scheduler/placement/deposit/helper interval, including
+    # all retained instructions. A manifest or image alone is not installation.
+    for start, end, _ in treasure.RANGES:
+        if actual[start-CODE_RAM:end-CODE_RAM] != expected[start-CODE_RAM:end-CODE_RAM]:
+            raise ValueError('Missing or changed native treasure transaction installation')
+
+
 def verify_installation(built, native, module, report):
     from snowman_actor import verify_resources
     catalog = verify_resources(built, native, module)[0]
     files = by_vrom(built)
     audit_editor(native, files[0x78CB80].extract(built))
+    treasure = report.get('overlay', {}).get('treasure', False)
+    templates = list(INITIAL_IDS)
+    if treasure:
+        from audit_notice_treasure import IDS
+        templates += list(IDS)
+    if bool(report.get('treasure_owner')) != treasure:
+        raise ValueError('Treasure creation and full-body reading must be installed together')
     if (NEW_VROM not in files or NEW_RELOCATION not in files or VROM in files or RELOCATION in files
             or files[NEW_VROM].index != by_vrom(native)[VROM].index
             or files[NEW_RELOCATION].index != files[NEW_VROM].index+1
-            or report.get('catalog') != 4 or report.get('complete_templates') != list(INITIAL_IDS)
+            or report.get('catalog') != 4 or report.get('complete_templates') != templates
             or report.get('pool') != pool_sizes()):
         raise ValueError('Missing installed notice reader, source IDs, or native DMA positions')
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOCATION].extract(built)
@@ -282,16 +342,19 @@ def verify_installation(built, native, module, report):
     for start, end in ((0x800A5B50, INIT_START), (INIT_END, 0x800A5DF4), (POOL_START, POOL_PATCH), (POOL_PATCH+4, POOL_END)):
         if code[start-CODE_RAM:end-CODE_RAM] != original_code[start-CODE_RAM:end-CODE_RAM]:
             raise ValueError('Changed saved-post layout, insertion, or allocation policy')
+    if treasure: verify_treasure_installation(built, native, module, report['treasure_owner'])
     return spec
 
 
-def install(native, replacements, additions, relocations, module, directory):
+def install(native, replacements, additions, relocations, module, directory, *, treasure_owner_directory=None):
     native_sources(native)
     for address in (VROM, RELOCATION, NEW_VROM, NEW_RELOCATION, OWNER_VROM, OWNER_RELOCATION):
         if any(address in mapping for mapping in (replacements, additions, relocations)):
             raise ValueError('Overlapping native notice overlay/owner replacement')
     data, reloc, init = ((directory/name).read_bytes() for name in ('overlay.bin', 'relocation.bin', 'init.bin'))
     overlay = json.loads((directory/'overlay.json').read_text())
+    if bool(overlay.get('treasure')) != (treasure_owner_directory is not None):
+        raise ValueError('Treasure creation and full-body reading must be installed together')
     files = by_vrom(native)
     original = files[CODE_VROM].extract(native)
     code = GuardedCode(original, replacements.get(CODE_VROM, original), CODE_RAM, SOURCE_HASHES[CODE_VROM])
@@ -302,6 +365,15 @@ def install(native, replacements, additions, relocations, module, directory):
               'vrom': f'{NEW_VROM:08X}', 'relocation_vrom': f'{NEW_RELOCATION:08X}',
               'new_saved_bytes': 0, 'new_resident_module_bytes': 0,
               'status': 'Initial notice creation/full-body reader installed; native and persistence acceptance remain'}
+    if treasure_owner_directory is not None:
+        from audit_notice_treasure import IDS
+        from npc_mail_loader import VROM as CREATOR_VROM
+        from notice_treasure_owner import patch
+        bridges = json.loads((treasure_owner_directory/'owners.json').read_text())
+        code.data = bytearray(patch(bytes(code.data), (treasure_owner_directory/'owners.bin').read_bytes(), bridges, module))
+        report['complete_templates'] += list(IDS)
+        report['treasure_owner'] = {'bridges': bridges, 'creator_sha256': sha256(additions[CREATOR_VROM])}
+        report['status'] = 'Initial and treasure creation/full-body reader installed; native and persistence acceptance remain'
     changes = {VROM: data, RELOCATION: reloc, OWNER_VROM: bytes(owner), CODE_VROM: bytes(code.data)}
     moves = {VROM: NEW_VROM, RELOCATION: NEW_RELOCATION}
     prospective = replace_dma(native, {**replacements, **changes}, {**relocations, **moves}, additions)
