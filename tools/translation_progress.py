@@ -245,6 +245,11 @@ def measure(native, built, report):
             verify_installation(built, native, module, report['museum_letters'])
             credit_mail(creator_vrom, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'museum_letters')
 
+        if report.get('shop_notices'):
+            from shop_notice_letters import TEMPLATES, verify_installation
+            verify_installation(built, native, module, report['shop_notices'])
+            credit_mail(creator_vrom, {k: TEMPLATES for k in ('super', 'mail', 'ps')}, 'shop_notices')
+
         if report.get('snowman_actor'):
             from snowman_actor import verify_installation
             verify_installation(built,native,module,report['snowman_actor'])

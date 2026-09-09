@@ -13,6 +13,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [shop-notice integration](checkpoints/SHOP_NOTICE_LETTERS.md) installs all
+nine spotlight/reopening templates and 27 complete parts, including full
+sixteen-byte item fields. Reopening prepares the full letter before any home
+copy or notification clear; original selectors and eligibility remain. The
+33,008-byte creator uses a checked 65,536-byte image limit. The resident change
+is one instruction, with identical size, symbols, bootstrap, reservation, and
+four-MiB heap bounds. Thirty-seven creator tests, eight loader tests, all 45
+corresponding sanitizer tests, six installation/accounting tests, and 24
+scenario/reader/relocation/accounting regressions pass. The full ROM retains
+every earlier text resource and actor. The silent native batch is in progress;
+no native delivery, normal scheduling, save/reload, review, or hardware result
+is claimed yet. Spotlight resource-failure recovery beyond its original call
+still needs scheduling evidence.
+
 The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
 complete gift letters with full sixteen-byte item fields. Twenty-four fixed
 snapshots preserve both capitalization states and require no new per-letter
@@ -28,12 +42,6 @@ state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown. The
 completed text cases are not rerun. Native full-mailbox/queue failure still has no durable reward
 retry; that is the original policy, not new translation resource failure.
 Normal gameplay, save/reload, review, and hardware remain unverified.
-
-The next [spotlight-item/reopening notice group](../specs/SHOP_NOTICE_LETTERS.md)
-has nine source-approved templates and 27 complete parts. Both native selectors
-and the supplied English counterparts are verified, including a differing
-level-zero reopening slot. Two source-audit tests pass. Complete creator/owner
-integration remains next; source approval is not installed-text credit.
 
 The [museum integration](checkpoints/MUSEUM_LETTERS.md) installs complete English
 introduction, non-fossil, and 25 fossil-result letters. All 81 source-bound parts

@@ -14,7 +14,7 @@ SECTIONS
     __capture_end = .;
     ASSERT(SIZEOF(.bss) == 0, "Academy creator retains mutable state")
     ASSERT(SIZEOF(.data) == 0, "Academy creator contains writable data")
-    ASSERT(__capture_end - __capture_start <= 0x8000, "Academy creator exceeds bounded allocation")
+    ASSERT(__capture_end - __capture_start <= AF_CREATOR_IMAGE_MAX, "Academy creator exceeds bounded allocation")
     .ovl : { relocation.o(.ovl) }
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

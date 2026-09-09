@@ -15,8 +15,8 @@ belong in one short-lived heap allocation. No pointer into that allocation may
 outlive the synchronous creation call. Persistent state consists only of the
 active-session pointer, a busy flag, and the GameCube-compatible capital word.
 
-The linked module uses 24,192 bytes, leaving 384 bytes before test scratch.
-The loader's own native stack frame is 104 bytes. Its shared capital word is
+The linked module uses 24,576 bytes, filling the linked region before test scratch.
+The loader's own native stack frame is 112 bytes. Its shared capital word is
 `af_mail_generation_capital`; a local copy is committed only on successful,
 detached completion. Invalid or failed requests cannot advance that shared word.
 
@@ -33,7 +33,7 @@ Eight big-endian words occupy offsets `48..67` hexadecimal:
 | --- | --- |
 | 0 | Creator blob VROM, exactly `03200000` |
 | 1 | Complete DMA byte count, image plus relocation |
-| 2 | Linked image bytes, nonzero, sixteen-byte aligned, at most `8000` |
+| 2 | Linked image bytes, nonzero, sixteen-byte aligned, at most `10000` |
 | 3 | Relocation bytes, sixteen-byte aligned, `20..1000` |
 | 4 | Four-byte-aligned whole-creator entry offset inside text |
 | 5 | Nonzero, sixteen-byte-aligned text bytes, within the image |
@@ -41,8 +41,14 @@ Eight big-endian words occupy offsets `48..67` hexadecimal:
 | 7 | ABI/version `41464E01`, with a 32-byte session prefix and 5,344-byte work |
 
 Sizes in the table are hexadecimal except the explicitly stated workspace size.
-The complete blob is 24,384 bytes. Including work and alignment, each call requests
-29,743 temporary bytes. The allocation is released before the loader returns.
+The complete shop-notice blob is 33,488 bytes: 33,008 image bytes and 480
+relocation bytes. Including work and alignment, each call requests 38,847
+temporary bytes. The allocation is released before the loader returns.
+The 65,536-byte image limit is shared by the C header, Python validator, and
+all creator linker scripts through the builder's `AF_CREATOR_IMAGE_MAX` symbol.
+At maximum image and relocation sizes, allocation requests 74,991 bytes and
+still must fit wholly within `8019C8E0..80400000`. Neither the permanent
+reservation nor the four-MiB heap boundary changes.
 
 The configuration must bind the complete blob size, image and relocation sizes,
 text range, whole-creator entry offset, full-blob checksum, and ABI/version.
@@ -93,10 +99,11 @@ The plain compiler report cannot approve a configured generation ROM. Symbol
 verification checks the complete image, relocation, source inventory, imports,
 resource hashes, and exact eight configuration words before normalizing them.
 
-Seven host tests pass allocation and four-MiB bounds, every byte corruption in
+Eight host tests pass allocation and four-MiB bounds, every byte corruption in
 the synthetic blob, failed DMA, all alignment offsets, all seven re-entry
 boundaries, argument forwarding, repeated capitalization, creator failures,
-scope cleanup, and caller/allocation overlap. AddressSanitizer and
+scope cleanup, caller/allocation overlap, above-32-KiB images, and all alignment
+offsets at the maximum image/relocation limit and exact heap end. AddressSanitizer and
 UndefinedBehaviorSanitizer pass. Six installer/CLI tests cover complete and
 atomic installation, missing readers/resources, stale sources, changed native
 functions/targets, cartridge overlap, DMA termination, and external approval.

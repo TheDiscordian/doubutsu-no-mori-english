@@ -26,6 +26,7 @@ def configuration(data,reloc,report,module):
     if report.get('academy_scores'): entry = 'af_academy_score_mail_create'
     if report.get('post_office'): entry = 'af_post_office_mail_create'
     if report.get('museum'): entry = 'af_museum_mail_create'
+    if report.get('shop_notices'): entry = 'af_shop_notice_mail_create'
     return [VROM,len(data)+len(reloc),len(data),len(reloc),report['symbols'][entry],
             struct.unpack_from('>I',reloc)[0],zlib.crc32(data+reloc),ABI]
 

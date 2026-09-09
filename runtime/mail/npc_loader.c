@@ -63,7 +63,7 @@ unsigned char *af_npc_mail_load(unsigned char *destination, const unsigned char 
     for (size = 0; size < sizeof(approved); ++size)
         ((unsigned char *)&approved)[size] = ((volatile const unsigned char *)config)[size];
     if (approved.vrom != AF_NPC_MAIL_CREATOR_VROM || approved.abi != AF_NPC_MAIL_LOADER_ABI
-            || !approved.image_bytes || approved.image_bytes > 0x8000u || (approved.image_bytes & 15u)
+            || !approved.image_bytes || approved.image_bytes > AF_NPC_MAIL_IMAGE_BYTES_MAX || (approved.image_bytes & 15u)
             || approved.relocation_bytes < 32u || approved.relocation_bytes > 0x1000u
             || (approved.relocation_bytes & 15u)
             || approved.blob_bytes != approved.image_bytes+approved.relocation_bytes

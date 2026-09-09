@@ -7,6 +7,7 @@
 #define AF_NPC_MAIL_LOADER_ABI 0x41464E01u
 #define AF_NPC_MAIL_CREATOR_VROM 0x03200000u
 #define AF_NPC_MAIL_CREATOR_RAM 0x80B00000u
+#define AF_NPC_MAIL_IMAGE_BYTES_MAX 0x10000u
 
 typedef struct {
     unsigned int vrom, blob_bytes, image_bytes, relocation_bytes;

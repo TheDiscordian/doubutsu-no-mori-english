@@ -70,15 +70,16 @@ retained. Forty host/artifact tests, eleven scenario/regression tests, and the
 189-call/181-assertion native batch pass, with restored state and blank saves.
 Continue remaining names, wider consumers, letters, general text, and review.
 
-The next [spotlight-item and reopening notices](../specs/SHOP_NOTICE_LETTERS.md)
-have nine source-bound templates and 27 complete parts. Four bodies need full
-item field seven; the other five need no fields. The native spotlight table
-agrees with the donor, while the reopening level-zero slot differs and must not
-be silently substituted. Implement complete preparation before both spotlight
-publication modes and before clearing reopening notification bit `20`.
-`tools/audit_shop_notice_letters.py` supplies source approval only, not installed
-coverage. Main-code owner integration and an explicitly bounded code allocation
-remain next implementation work.
+The [spotlight-item and reopening notices](checkpoints/SHOP_NOTICE_LETTERS.md)
+install all nine templates and 27 complete parts, including full item field
+seven. The native selectors are preserved, including the differing level-zero
+reopening slot. Complete preparation precedes publication and reopening bit
+`20` clearing. The shared image limit is checked consistently at 65,536 bytes;
+the 33,008-byte creator adds no resident reservation or saved-layout growth.
+Host/sanitizer, installation/accounting, and scenario/reader regressions pass.
+The silent native batch remains in progress. Finish that bounded batch, retain
+spotlight resource-failure scheduling/recovery, normal gameplay, save/reload,
+review, and hardware acceptance, then continue the remaining text groups.
 
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 installs complete resources for all 114 Mom, 55 villager-event, and 21 score

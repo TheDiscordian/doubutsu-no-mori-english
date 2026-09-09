@@ -14,7 +14,7 @@ SECTIONS
     __capture_end = .;
     ASSERT(SIZEOF(.bss) == 0, "NPC capture overlay retains mutable state")
     ASSERT(SIZEOF(.data) == 0, "NPC capture overlay contains writable data")
-    ASSERT(__capture_end - __capture_start <= 0x8000, "NPC capture overlay exceeds bounded allocation")
+    ASSERT(__capture_end - __capture_start <= AF_CREATOR_IMAGE_MAX, "NPC capture overlay exceeds bounded allocation")
     .ovl : { relocation.o(.ovl) }
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

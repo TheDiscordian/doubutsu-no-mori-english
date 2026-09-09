@@ -95,11 +95,11 @@ import capability remains restricted to its existing five glyphs.
 The glyph reader occupies exactly 24,576 linked resident bytes, with no remaining
 linked headroom. Shared `af_crc32` and `af_mail_draw` remove duplicate instructions
 without changing validation or rendering semantics. Its reservation remains
-32,768 bytes and its test scratch remains separate. The last integrated
-on-demand creator has 240 image bytes free, including its compiled catalogue
-marker. Measure actual new code before choosing where it lives.
+32,768 bytes and its test scratch remains separate. The shop-notice
+on-demand creator uses 33,008 image bytes under a checked 65,536-byte limit,
+including its compiled catalogue marker. Measure actual new code before choosing where it lives.
 Do not enlarge the resident reservation into its test scratch or assume the
-creator's current 32 KiB bound permits a larger image. Any required bound change
+creator's current 64 KiB bound permits a larger image. Any required bound change
 must update loader/build checks and prove four-MiB allocation and rejection paths.
 Avoid keeping additional complete formatters resident when a shared implementation
 can retain the old catalogue semantics and fit the established memory limits.

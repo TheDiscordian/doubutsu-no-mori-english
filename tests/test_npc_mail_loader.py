@@ -38,7 +38,7 @@ class NpcMailLoaderTests(unittest.TestCase):
 
     def setUp(self):
         self.config = (C.c_uint*8).in_dll(self.lib,'af_npc_loader_test_config')
-        self.blob = (C.c_ubyte*0x9000).in_dll(self.lib,'af_npc_loader_blob')
+        self.blob = (C.c_ubyte*0x11000).in_dll(self.lib,'af_npc_loader_blob')
         self.log = (C.c_ubyte*128).in_dll(self.lib,'af_npc_loader_log')
         self.active = C.c_void_p.in_dll(self.lib,'af_npc_mail_session');self.active.value = None
         self.capital = C.c_uint.in_dll(self.lib,'af_mail_generation_capital');self.capital.value = 0
@@ -103,7 +103,7 @@ class NpcMailLoaderTests(unittest.TestCase):
     def test_configuration_boundaries_reject_before_allocation(self):
         good = tuple(self.config)
         invalid = {0:(0,0x03200010,0xFFFFFFFF),1:(0,good[1]-16,good[1]+16,0xFFFFFFFF),
-                   2:(0,1,0x8001,0xFFFFFFFF),3:(0,16,24,33,0x1001,0xFFFFFFFF),
+                   2:(0,1,0x8001,0x10001,0x10010,0xFFFFFFFF),3:(0,16,24,33,0x1001,0xFFFFFFFF),
                    4:(1,2,3,good[5],0xFFFFFFFF),5:(0,1,good[2]+16,0xFFFFFFFF),
                    7:(0,0x41464E00,0x41464E02)}
         for field,values in invalid.items():
@@ -113,9 +113,21 @@ class NpcMailLoaderTests(unittest.TestCase):
         self.config[:] = (0,)*8;self.invoke(False,())
         # Config checksum is independently approved, not read from the blob.
         self.config[:] = good;self.config[6] ^= 1;self.invoke(False,(1,2,7))
-        for image,reloc,text,entry in ((16,32,16,0),(0x8000,0x1000,0x8000,0x7FFC)):
+        for image,reloc,text,entry in ((16,32,16,0),(0x8000,0x1000,0x8000,0x7FFC),
+                                      (0x8010,32,0x8010,0x800C),(0xA000,0x1000,0xA000,0x9FFC),
+                                      (0x10000,0x1000,0x10000,0xFFFC)):
             self.resource(image,reloc,text,entry);self.number('calls').value = 0
             self.invoke(True,range(1,8))
+
+    def test_maximum_image_allocation_obeys_heap_end_and_all_alignment_offsets(self):
+        self.resource(0x10000,0x1000,0x10000,0xFFFC)
+        size = self.config[1]+5344+15
+        for alignment in range(16):
+            self.number('alignment').value = alignment;self.number('calls').value = 0
+            self.number('heap').value = 0x80400000-size
+            self.invoke(True,range(1,8))
+            self.number('calls').value = 0;self.number('heap').value += 1
+            self.invoke(False,(1,7))
 
     def test_allocation_failure_and_four_mib_bounds_release_exactly_once(self):
         self.number('fail_alloc').value = 1;self.invoke(False,(1,))

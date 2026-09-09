@@ -4,7 +4,7 @@
 
 AfNpcMailLoaderConfig af_npc_loader_test_config;
 AfNpcMailSession *af_npc_mail_session;
-unsigned char af_npc_loader_blob[0x9000], af_npc_loader_log[128];
+unsigned char af_npc_loader_blob[AF_NPC_MAIL_IMAGE_BYTES_MAX+0x1000u], af_npc_loader_log[128];
 unsigned int af_npc_loader_calls, af_npc_loader_errors, af_npc_loader_fail_alloc;
 unsigned int af_npc_loader_dma_failure, af_npc_loader_corrupt, af_npc_loader_mode;
 unsigned int af_npc_loader_alignment, af_npc_loader_heap = 0x80200000u;

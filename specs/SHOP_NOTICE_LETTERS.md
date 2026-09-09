@@ -44,15 +44,56 @@ The saved notification at `80135C12`, bit `20`, clears after the loop. Complete
 preparation must succeed before this clear; do not confuse this bit with the
 earlier renovation notice's bit `10` in the same byte.
 
-## Implementation and acceptance queue
+## Complete creator and delivery integration
 
-Reuse the complete immutable catalogue and full snapshot reader. The museum
-creator has only 544 image bytes free, so establish a checked code/allocation
-strategy for these main-code owners. A larger on-demand creator requires all
-loader/build/relocation bounds to agree; Expansion Pak permission does not by
-itself change runtime bounds or memory ownership. Fixed no-field templates can
-use prevalidated snapshots, but the four item-bearing templates need complete
-selected-name capture and safe failed-preparation handling.
+`shop_notice_creator.c` dispatches an `AFSN` descriptor through the shared
+creator. It retains all nine complete catalogue parts, captures full sixteen-byte
+item field seven only where the original template uses it, and publishes a
+complete 164-byte snapshot only after formatter/reader agreement. The descriptor
+contains the template and selected item as big-endian halfwords, paper 55,
+recipient flag zero/one, a reserved zero byte, and marker `F7`. Flag zero retains
+the original cleared leaflet identity; flag one copies the supplied player.
+Sender, gift zero, font zero, type two, and paper 55 retain native meanings.
+Failures preserve destination, input identities, and capitalization.
+
+`shop_notice_entry.s` replaces only the two original delivery functions, within
+their original 472-byte and 504-byte slots. The 448-byte rare-item selection
+caller and both native tables remain unchanged. The spotlight wrapper keeps
+native home/working checks, original template selection, saved-leaflet mode one,
+and direct home publication. The complete creator replaces the ten-byte clamp.
+The wrapper's stack is 304 bytes; reopening retains a 288-byte stack.
+
+Reopening prepares one complete no-field letter before any home copy, then
+uses the original home mapping, capacity/owner/working exclusions, and identity
+copy. All three templates preserve capitalization across repeated copies.
+Failed preparation returns before any delivery or notification-bit clear.
+After successful preparation, original all-full/all-absent/all-working policy
+still clears the pending bit. No partial catalogue reads remain inside the
+publication loop, so a failed read cannot produce some letters and later
+duplicate them on retry.
+
+The spotlight selector has no durable retry receipt contract. A failed creator
+leaves the saved leaflet and home mailboxes untouched, but that alone does not
+prove eventual delivery of the selected notice. Source-approved scheduling and
+resource-failure recovery beyond that call remain acceptance work; do not claim
+a new persistent retry mechanism.
+
+The shared creator is 33,008 image bytes plus 480 relocation bytes. Its checked
+image limit is 65,536 in C, Python, and every linker script. It requests 38,847
+temporary heap bytes including work/alignment, with no saved-layout change.
+The resident image still uses 24,576 linked bytes and a 32,768-byte reservation.
+Only the maximum-image instruction changes; exports and bootstrap are unchanged.
+Expansion Pak permission does not itself change the implemented four-MiB bounds.
+
+Build the creator with `--shop-notices` after all preceding dispatchers. Build
+both owners using `tools/build_shop_notice_owners.py` and install with
+`tools/build.py --english-shop-notices <owners-directory>`. Every dependency,
+source approval, native function/table, and compiled image must validate before
+installation. The combined counter credits all 27 parts only through the
+verified installed route. The [checkpoint](../docs/checkpoints/SHOP_NOTICE_LETTERS.md)
+records the complete build recipe, actual artifacts, and test evidence.
+
+## Acceptance queue
 
 Acceptance covers all nine complete texts, both capitalization states, every
 shop/type combination, full sixteen-byte item fields, both publication modes,

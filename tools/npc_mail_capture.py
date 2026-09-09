@@ -11,6 +11,7 @@ from runtime_layout import MODULE_RAM,RESERVATION
 
 ROOT = Path(__file__).resolve().parents[1]
 RAM = 0x80B00000
+IMAGE_BYTES_MAX = 0x10000
 WORD_HASH = '698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1'
 ALIAS_HASH = 'a79b6bc3c5b36c7ce2bcea55932ccdf4ce694608e5dcfb896226a24d368bf5d6'
 ACADEMY_SERIES_HASH = 'be1258e1806e2a5e38a64cad52863c632d45b4610685ec9590dd264bb1569a38'
@@ -39,7 +40,7 @@ def creator_imports(*,villager_events=False,academy_scores=False):
     return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -68,6 +69,9 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     if museum:
         if not post_office: raise ValueError('Museum creator requires post-office dispatch')
         names += ['overlays/mail_generation/'+name for name in ('museum_creator.c','museum_creator.h','museum_capture.ld')]
+    if shop_notices:
+        if not museum: raise ValueError('Shop notice creator requires museum dispatch')
+        names += ['overlays/mail_generation/'+name for name in ('shop_notice_creator.c','shop_notice_creator.h','shop_notice_capture.ld')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -98,9 +102,11 @@ def validate(data,reloc,report,module):
     if 'post_office' in report and not postal: raise ValueError('Unknown post-office creator variant')
     museum = report.get('museum') is True
     if 'museum' in report and not museum: raise ValueError('Unknown museum creator variant')
+    shop = report.get('shop_notices') is True
+    if 'shop_notices' in report and not shop: raise ValueError('Unknown shop notice creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -120,6 +126,7 @@ def validate(data,reloc,report,module):
     if scores: required.update(('af_academy_score_mail_create','af_academy_series_data'))
     if postal: required.add('af_post_office_mail_create')
     if museum: required.add('af_museum_mail_create')
+    if shop: required.add('af_shop_notice_mail_create')
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id')):
@@ -139,7 +146,7 @@ def validate(data,reloc,report,module):
 
 
 def relocate(data,reloc,base,imports):
-    if (not 0 < len(data) <= 0x8000 or len(data)&15 or len(reloc) < 24 or len(reloc)&3
+    if (not 0 < len(data) <= IMAGE_BYTES_MAX or len(data)&15 or len(reloc) < 24 or len(reloc)&3
             or len(reloc) > 0x1000 or type(base) is not int or base&15
             or not MODULE_RAM+RESERVATION <= base <= 0x80400000-len(data)):
         raise ValueError('Invalid NPC capture relocation buffer')
