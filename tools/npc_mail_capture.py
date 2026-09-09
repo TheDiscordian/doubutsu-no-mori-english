@@ -36,11 +36,11 @@ def call_patches(code,module):
     return output
 
 
-def creator_imports(*,villager_events=False,academy_scores=False):
-    return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())
+def creator_imports(*,villager_events=False,academy_scores=False,notice_treasure=False):
+    return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())+(('af_crc32','af_mail_format','af_mail_record_unpack') if notice_treasure else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -75,6 +75,12 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     if quest_replies:
         if not shop_notices: raise ValueError('Quest reply creator requires shop notice dispatch')
         names += ['overlays/mail_generation/'+name for name in ('quest_reply_creator.c','quest_reply_creator.h','quest_reply_capture.ld')]
+    if notice_treasure:
+        if not quest_replies: raise ValueError('Treasure creator requires complete quest reply dispatch')
+        names += ['overlays/mail_generation/'+name for name in
+                  ('notice_treasure_creator.c','notice_treasure_creator.h','notice_treasure_capture.ld')]
+        names += ['runtime/notice/'+name for name in ('record.c','record.h','initial.h','treasure.c','treasure.h')]
+        names += ['runtime/crc32.h']
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -109,11 +115,14 @@ def validate(data,reloc,report,module):
     if 'shop_notices' in report and not shop: raise ValueError('Unknown shop notice creator variant')
     quest = report.get('quest_replies') is True
     if 'quest_replies' in report and not quest: raise ValueError('Unknown quest reply creator variant')
+    treasure = report.get('notice_treasure') is True
+    if 'notice_treasure' in report and not treasure: raise ValueError('Unknown notice treasure creator variant')
+    if treasure and catalog != 4: raise ValueError('Treasure creation requires the complete glyph catalogue')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure)
             or report.get('module_sha256') != module['module_sha256']
-            or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores)}
+            or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
         raise ValueError('Stale or changed NPC capture overlay')
     # Validate lengths before reading even the first relocation-header word.
@@ -133,6 +142,11 @@ def validate(data,reloc,report,module):
     if museum: required.add('af_museum_mail_create')
     if shop: required.add('af_shop_notice_mail_create')
     if quest: required.add('af_quest_reply_mail_create')
+    if treasure:
+        required.update(('af_notice_treasure_create','af_notice_record_tagged','af_notice_record_pack',
+                         'af_notice_record_expand','af_notice_treasure_mask','af_notice_treasure_valid',
+                         'af_notice_treasure_pack','af_notice_treasure_decode_parts',
+                         'af_notice_treasure_decode','af_notice_treasure_restore'))
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id')):

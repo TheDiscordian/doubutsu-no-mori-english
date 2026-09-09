@@ -114,10 +114,11 @@ Use the complete [native-name build](NATIVE_ITEM_NAMES.md), with resident path
 merely to revisit progress.
 
 Continue the 41 seasonal and eighteen treasure bodies with native calendar, venue,
-coordinate, and full-field meanings retained. The treasure audit approves seventeen
-supplied references and flags `01F4` for native-specific text: the donor reveals
-the buried item instead of preserving the native town/row-only clue. The reader
-still accepts only the four initial templates. Old saved automatic-post display,
+coordinate, and full-field meanings retained. The [treasure helpers](NOTICEBOARD_TREASURE.md)
+implement seventeen supplied bodies and the native-specific `01F4` town/row-only
+clue. Native creation, reader routing, articles, and publication recovery still
+need installation; the installed reader accepts only the four initial templates.
+Old saved automatic-post display,
 normal draft publication, persistence, reader hint/date placement, other remaining
 text and full-name callers, review, patch-only release preparation, title-first
 artwork, and GameCube-style keyboard remain. The full project goal stays active.

@@ -155,7 +155,7 @@ def resident_c_sources(source):
     these explicit overlay-owned compilation units; new resident files continue
     to compile, and an accidental resident call to a notice helper fails to link.
     """
-    on_demand = {'notice/record.c', 'notice/initial.c', 'notice/page.c'}
+    on_demand = {'notice/record.c', 'notice/initial.c', 'notice/page.c', 'notice/treasure.c'}
     return [p for p in sorted(source.rglob('*.c')) if p.relative_to(source).as_posix() not in on_demand]
 
 

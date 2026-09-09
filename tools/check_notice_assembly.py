@@ -18,8 +18,10 @@ HEADERS = ('runtime/mail/record.h', 'runtime/mail/format.h', 'runtime/mail/catal
            'runtime/mail/glyph.h', 'runtime/mail/view.h', 'runtime/crc32.h')
 
 
-def build(output):
-    paths = [ROOT/'runtime/notice'/f'{name}.{suffix}' for name in UNITS for suffix in ('c', 'h')]
+def build(output, *, treasure=False):
+    units = UNITS+(('treasure',) if treasure else ())
+    imports = sorted(IMPORTS+(('af_mail_format',) if treasure else ()))
+    paths = [ROOT/'runtime/notice'/f'{name}.{suffix}' for name in units for suffix in ('c', 'h')]
     paths += [ROOT/name for name in HEADERS]
     sources = {p.relative_to(ROOT).as_posix(): sha256(p.read_bytes()) for p in paths}
     output = output.resolve()
@@ -38,11 +40,11 @@ def build(output):
              '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common', '-fno-stack-protector',
              '-ffunction-sections', '-fdata-sections', '-fstack-usage', '-Wall', '-Wextra', '-Werror',
              '-mno-explicit-relocs', '-mno-split-addresses']
-    for name in UNITS:
+    for name in units:
         run('gcc', *flags, f'/source/notice/{name}.c', '-o', f'{name}.o')
-    run('ld', '-EB', '-r', '-o', 'notice.o', *(name+'.o' for name in UNITS))
+    run('ld', '-EB', '-r', '-o', 'notice.o', *(name+'.o' for name in units))
     undefined = sorted(line.split()[-1] for line in run('nm', '--undefined-only', 'notice.o').splitlines())
-    if undefined != list(IMPORTS):
+    if undefined != imports:
         raise ValueError('Unexpected notice runtime imports: '+repr(undefined))
     symbols = run('nm', '--defined-only', 'notice.o')
     if any(line.split()[1] in ('b', 'B', 'd', 'D', 'C', 'G', 'g', 's', 'S')
@@ -54,7 +56,7 @@ def build(output):
               'compiler': run('gcc', '--version').splitlines()[0], 'imports': undefined,
               'object_sha256': sha256((output/'notice.o').read_bytes()),
               'sections': run('size', '-A', 'notice.o'),
-              'stack_usage': {name: (output/(name+'.su')).read_text() for name in UNITS},
+              'stack_usage': {name: (output/(name+'.su')).read_text() for name in units},
               'symbols': symbols, 'installed': False,
               'scope': 'Relocatable VR4300 objects only; no ROM hooks or native execution'}
     (output/'notice.asm').write_text(run('objdump', '-dr', 'notice.o'))
@@ -65,7 +67,9 @@ def build(output):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT/'build/noticeboard-foundation/mips')
-    report = build(parser.parse_args().output)
+    parser.add_argument('--treasure', action='store_true')
+    args = parser.parse_args()
+    report = build(args.output, treasure=args.treasure)
     print(json.dumps({key: report[key] for key in ('object_sha256', 'imports', 'installed')}))
 
 

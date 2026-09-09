@@ -13,6 +13,19 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [complete treasure creator and decoder](checkpoints/NOTICEBOARD_TREASURE.md)
+implement all eighteen bodies with full names, numeric N64 acre coordinates,
+and unchanged 96-byte saved-message capacity. The native-specific `01F4` retains
+the town/row-only clue and all six manual lines. Forty-four creator/dispatcher
+tests, five decoder tests, and the same 49 sanitizer checks pass. The 37,792-byte
+on-demand creator builds identically twice, with 656 relocation bytes, unchanged
+5,344-byte workspace, and unchanged resident code/bootstrap. Four artifact tests
+and four retained native-reader evidence checks pass. These helpers are not yet
+connected to native treasure creation or the installed reader, so they receive
+no text-application credit. Finish native item-article lookup, owner hooks,
+post-burial failure recovery, reader routing, and the complete-ROM installation;
+then continue seasonal posts. Do not rerun the completed initial board batches.
+
 The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
 installs all four complete announcements, full-body pages, and English entry/date
 labels. Source wording and manual breaks remain, with only `C Stick` adapted to
@@ -31,8 +44,8 @@ shutdown. The [native reader evidence](checkpoints/NOTICEBOARD_NATIVE_READER.md)
 distinguishes completed checks from partial fixture runs. Normal menu entry and
 C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal/
 eighteen treasure bodies remain active work. Seventeen treasure references have
-source/field review and 34 complete-field examples; `01F4` needs a native-specific
-heading to avoid revealing an item that the original clue keeps secret. Continue
+source/field review; the creator/decoder above also implements the native-specific
+`01F4` heading without revealing the original clue's hidden item. Continue
 bulk automatic-post implementation, without replaying passed storage/reader cases.
 
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs

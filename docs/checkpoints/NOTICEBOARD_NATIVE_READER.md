@@ -72,9 +72,10 @@ tests pass in `build/noticeboard-reader/native-reader-results-tests.log`.
 ## Continue bulk translation
 
 Do not rerun completed storage or reader batches. Continue automatic-post
-creation and full-field capture: seventeen treasure references have source review,
-and `01F4` needs native-specific wording to retain its hidden-item clue. The
-treasure audit and complete-field samples are in `build/audits/notice-treasure.json`.
+creation and full-field capture. The [treasure helpers](NOTICEBOARD_TREASURE.md)
+implement all eighteen bodies, including `01F4` with its hidden-item clue retained;
+native creation/reader routing, articles, and publication recovery need installation.
+The source audit and samples are in `build/audits/notice-treasure.json`.
 The forty-one seasonal posts require native event/calendar matching as well.
 
 Normal top-level submenu allocation/initialization, C-button/analogue selection,

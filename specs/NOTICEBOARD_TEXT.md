@@ -217,8 +217,8 @@ Editor mode invokes the retained native body/cursor implementation, and a draft
 confirmation never interprets its bytes as a persistent snapshot.
 
 The resident module retains its exact binary, symbols, reservation, and heap
-bounds. The resident compiler excludes only the three explicit on-demand notice
-C units while keeping every nested runtime source/header in its source inventory.
+bounds. The resident compiler excludes the explicit on-demand notice C units while
+keeping every nested runtime source/header in its source inventory.
 The full build requires a freshly generated manifest, the English keyboard,
 complete glyph resources, and snapshot reader. An Expansion Pak is permitted,
 but the implemented memory configuration remains four MiB.
@@ -253,5 +253,55 @@ retained. Manual breaks and article commands remain part of the reference.
 and town, while the donor's `1/2/3` reveal the buried item. Adapt the town's
 treasure-hunt heading without disclosing that item. This is a real clue difference,
 not a reason to drop the entry or pass an empty item name to the donor formatter.
-All eighteen need creator capture, reader approval, publication handling, and
+All eighteen need native owner/reader installation, publication handling, and
 persistence integration; the source audit grants no installed-translation credit.
+
+## Complete treasure helpers and integration contract
+
+`runtime/notice/treasure.[ch]` accepts only the eighteen source-bound identities
+and each complete selected field mask. Fields one/two retain complete sender/item
+text up to sixteen bytes. Row three is a single native digit `1..6`; column four
+is `1..5`. Town five retains up to six original identity bytes without a Japanese
+suffix. Only the item field may carry an article. Empty names, embedded commands,
+newlines, extra fields, wrong catalogues, malformed envelopes, and changed complete
+source lengths/checksums are rejected before body publication.
+
+Seventeen bodies retain their complete supplied wording and manual whitespace.
+For `01F4`, the two-line heading is `{town}'s Treasure Hunt!` followed by
+`Come and join the fun! Woo!`. The blank third line and remaining donor lines,
+including the row clue and sender decoration, remain intact. The decoder loads
+and verifies the immutable donor body in scratch, substitutes the heading there,
+and formats again with native fields `1/3/5`. It never stores, displays, or reveals
+an item for that clue. The catalogue itself does not change. Both capitalization
+states and all source manual line boundaries are retained.
+
+`af_notice_treasure_restore` publishes a complete body with a cleared unused tail;
+failure leaves output unchanged. Input/output overlap is supported after decoding.
+The existing aligned notice workspace remains sufficient. The split-scratch API
+lets the mail creator use its existing catalogue/text/wire members without a second
+allocation or incompatible-structure casts.
+
+The optional `af_notice_treasure_create` dispatcher preserves the complete earlier
+creator chain. Its twelve-byte request is `AFNT`, BE16 template, BE16 item, row,
+column, item article, and marker `245`. The existing loader's player argument
+points to the selected native animal identity with sixteen readable bytes; animal
+points to the request. Remail, condition, and foreign are zero. The template must
+match the original animal personality group; the creator does not choose new RNG,
+items, or coordinates. Town bytes come from the source-verified `80129E00` identity.
+
+The dispatcher captures complete immutable villager names and sixteen-byte item
+names, packs the compact record, and validates its whole decoded body before
+publishing exactly 96 message bytes plus 68 zero staging bytes. Its 164-byte output
+is only the existing loader's scratch interface, not a native notice record.
+The owner must copy **only 96 bytes** into the original 104-byte post and retain
+its original timestamp. No saved post, buried object, timestamp, or eligibility
+state is modified by these helpers. Article is currently a validated caller input;
+the GameCube article-table lookup still needs native item-identity binding.
+
+The complete creator image is 37,792 bytes with 656 relocation bytes, no mutable
+global state, and the unchanged 5,344-byte caller workspace. Independent builds,
+49 host/sanitizer checks, and artifact/retention checks pass. The creator remains
+inside the existing 65,536-byte image limit, and the freshly inventoried resident
+module and bootstrap are unchanged. Native hooks, reader routing, article capture,
+post-burial failure recovery, actual execution, and persistence remain uninstalled
+or unverified. See the [treasure checkpoint](../docs/checkpoints/NOTICEBOARD_TREASURE.md).
