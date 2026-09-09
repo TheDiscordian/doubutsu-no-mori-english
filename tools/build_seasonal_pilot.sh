@@ -46,6 +46,14 @@ actor_name_args=()
 if [[ "${AF_ENGLISH_ACTOR_NAMES:-0}" == 1 ]]; then
   actor_name_args=(--english-actor-display-names)
 fi
+map_name_args=()
+if [[ -n "${AF_MAP_NAMES:-}" ]]; then
+  map_name_args=(--english-map-names "$AF_MAP_NAMES")
+fi
+guide_name_args=()
+if [[ "${AF_ENGLISH_GUIDE_NAME:-0}" == 1 ]]; then
+  guide_name_args=(--english-guide-name)
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -78,4 +86,6 @@ exec python3 tools/build.py \
   "${stall_choice_args[@]}" \
   "${text_extension_args[@]}" \
   "${actor_name_args[@]}" \
+  "${map_name_args[@]}" \
+  "${guide_name_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

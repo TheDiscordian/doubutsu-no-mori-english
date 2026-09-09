@@ -226,10 +226,12 @@ def main():
     parser.add_argument('--english-stall-choices', action='store_true', help='Complete festival-stall names and cancellation choices; requires resident English choices and items')
     parser.add_argument('--english-text-extension', type=Path, help='Persistent complete general dialogue fields and free-item adapters')
     parser.add_argument('--english-actor-display-names', action='store_true', help='Complete festival/reserve name preparations; requires display names and persistent text fields')
+    parser.add_argument('--english-guide-name', action='store_true', help='Complete opening-guide dialogue name; requires display names and persistent text fields')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
     parser.add_argument('--english-catalogue', type=Path, help='Complete cached catalogue names; requires the English inventory and full item resource')
+    parser.add_argument('--english-map-names', type=Path, help='Complete display-only map villager names; requires English inventory and display names')
     parser.add_argument('--english-song-names', action='store_true', help='Complete selected song titles through full item fields; requires English credits, runtime, and extended items')
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
@@ -282,6 +284,8 @@ def main():
         parser.error('--english-inventory requires --english-hboard-editor and --extended-items')
     if args.english_catalogue and not args.english_inventory:
         parser.error('--english-catalogue requires --english-inventory')
+    if args.english_map_names and not (args.english_inventory and args.display_names):
+        parser.error('--english-map-names requires --english-inventory and --display-names')
     if args.english_leaflet_dates and not (args.runtime_module and args.english_runtime):
         parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
     if args.english_renewal_letters and not (args.english_leaflet_dates and args.english_mail_snapshots):
@@ -328,6 +332,8 @@ def main():
         parser.error('--english-text-extension requires the resident runtime, full item names, and startup font')
     if args.english_actor_display_names and not (args.english_text_extension and args.display_names):
         parser.error('--english-actor-display-names requires --english-text-extension and --display-names')
+    if args.english_guide_name and not (args.english_text_extension and args.display_names):
+        parser.error('--english-guide-name requires --english-text-extension and --display-names')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -486,6 +492,13 @@ def main():
     if args.english_actor_display_names:
         from actor_display_names import install as install_actor_names
         report['actor_display_names'] = install_actor_names(rom, replacements, additions, report['runtime_module'])
+    if args.english_map_names:
+        from map_names import install as install_map_names
+        report['map_names'] = install_map_names(rom, replacements, additions, relocations,
+            report['runtime_module'], args.english_map_names, report['noticeboard'])
+    if args.english_guide_name:
+        from guide_name import install as install_guide_name
+        report['guide_name'] = install_guide_name(rom, replacements, additions, relocations, report['runtime_module'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -514,6 +527,9 @@ def main():
         verify_installation(output, rom, report)
     if args.english_text_extension:
         from text_extension import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_guide_name:
+        from guide_name import verify_installation
         verify_installation(output, rom, report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)

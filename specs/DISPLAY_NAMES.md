@@ -6,7 +6,8 @@ The separate resource and `af_load_display_name` API provide complete GameCube
 villager and special-character names. The resident module integrates these at
 two nameplate call sites, the main-message talk-name insertion, and read-only
 NPC recipient names in letter headers. The bounded shared-choice extension and
-the [festival/reserve actor integration](ACTOR_DISPLAY_NAMES.md) connect further
+the [festival/reserve actor integration](ACTOR_DISPLAY_NAMES.md),
+[map cache](MAP_NAMES.md), and [opening-guide adapter](GUIDE_NAME.md) connect further
 display-only callers. These changes
 remain experimental pending broader conversation, save, and hardware validation.
 Six-byte saved names and identity structures remain unchanged. Other identity-

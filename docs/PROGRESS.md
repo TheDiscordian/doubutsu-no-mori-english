@@ -25,6 +25,18 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [map/opening-guide integration](checkpoints/MAP_GUIDE_NAMES.md) supplies complete
+map villager names and the opening guide's coloured name field without widening
+packed map records or saved identities. All twelve focused implementation,
+assembly, relocation, cartridge, and accounting checks pass; independent map
+builds agree. The map fits the existing submenu pool, and the guide actor adds
+112 bytes. The current combined ROM/UPS is `build/guide-name-pilot`.
+Continue the fishing-record display reader, embedded map labels, remaining
+identity/catchphrase/item consumers, residual text/letters, and accents.
+Ordinary interaction and save/restart remain in the combined v0 smoke.
+The checkpoint records one unresolved legacy regression-fixture rejection;
+neither that check nor unperformed gameplay is reported as passed.
+
 The [festival/reserve character-name integration](checkpoints/ACTOR_DISPLAY_NAMES.md)
 connects four actor preparations to complete eight-byte names within their
 original stack frames. Actor selection, field slots, messages, timing, saved
@@ -32,8 +44,8 @@ fields, permanent allocations, and all prior translation resources remain.
 All six focused source/assembly/relocation/cartridge/accounting checks and
 seventeen name/counter regressions pass. Unchanged full-name/general-field
 helpers reuse the recorded native evidence; ordinary actor interactions remain
-in the combined v0 smoke. The current combined ROM/UPS is `build/actor-names-pilot`.
-Continue identity-based map/guide/fishing-event name readers, catchphrase
+in the combined v0 smoke. Its retained ROM/UPS is `build/actor-names-pilot`.
+Continue identity-based fishing-event name readers, catchphrase
 input/display, other item readers, residual text/letters, and accents.
 
 The [choice-capable text extension](checkpoints/CHOICE_SUBSTITUTIONS.md) installs

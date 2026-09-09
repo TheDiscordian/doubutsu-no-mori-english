@@ -11,7 +11,8 @@ from check_keyboard_assembly import IMAGE
 import catalogue_names as c
 
 
-def build(native, module, out):
+def build(native, module, out, c=c):
+    stem = 'map' if c.__name__ == 'map_names' else 'catalog'
     sources = c.source_hashes()
     out = out.resolve(); out.mkdir(parents=True, exist_ok=True)
     (out/'native.bin').write_bytes(c.native_sources(native)[0])
@@ -27,9 +28,9 @@ def build(native, module, out):
              '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common', '-fno-stack-protector',
              '-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses',
              '-fstack-usage', '-Wall', '-Wextra', '-Werror']
-    run('gcc', *flags, '/source/overlays/catalog/names.c', '-o', 'names.o')
-    run('as', '-EB', '-mabi=32', '-march=vr4300', '-I/out', '-o', 'native.o', '/source/overlays/catalog/image.s')
-    run('ld', '-EB', '--emit-relocs', '-T', '/source/overlays/catalog/image.ld', '-Map=overlay.map',
+    run('gcc', *flags, f'/source/overlays/{stem}/names.c', '-o', 'names.o')
+    run('as', '-EB', '-mabi=32', '-march=vr4300', '-I/out', '-o', 'native.o', f'/source/overlays/{stem}/image.s')
+    run('ld', '-EB', '--emit-relocs', '-T', f'/source/overlays/{stem}/image.ld', '-Map=overlay.map',
         '-o', 'overlay.elf', 'native.o', 'names.o')
     if run('nm', '--undefined-only', 'overlay.elf').strip(): raise ValueError('Unresolved catalogue import')
     symbols = {}
@@ -37,18 +38,18 @@ def build(native, module, out):
         parts = line.split()
         if len(parts) == 3: symbols[parts[2]] = int(parts[0], 16)
     exports = {name: value-c.RAM for name, value in symbols.items()
-               if name.startswith('af_catalog_') and name not in c.IMPORTS}
-    if symbols['__catalog_code_start'] != c.RAM+c.START: raise ValueError('Catalogue BSS moved')
+               if name.startswith(f'af_{stem}_') and name not in c.IMPORTS}
+    if symbols[f'__{stem}_code_start'] != c.RAM+c.START: raise ValueError('Native BSS moved')
     run('objcopy', '-O', 'binary', '-j', '.text', 'overlay.elf', 'overlay.bin')
     data = bytearray((out/'overlay.bin').read_bytes()); data[:c.PREFIX] = c.patch_prefix(native, exports)
-    if symbols['__catalog_end'] != c.RAM+len(data): raise ValueError('Catalogue linked bounds disagree')
+    if symbols[f'__{stem}_end'] != c.RAM+len(data): raise ValueError('Overlay linked bounds disagree')
     elf = run('readelf', '-rW', 'overlay.elf'); inventory = c.elf_inventory(elf)
     reloc = c.relocation_data(native, inventory, len(data))
     if sources != c.source_hashes(): raise ValueError('Catalogue sources changed during compilation')
     report = {'bytes': len(data), 'symbols': exports, 'sources': sources, 'imports': c.IMPORTS,
               'overlay_sha256': sha256(data), 'suffix_sha256': sha256(data[c.START:]),
               'relocation_sha256': sha256(reloc), 'elf_relocations': inventory,
-              'code_end': symbols['__catalog_code_end']-c.RAM, 'bss_start': symbols['__catalog_bss_start']-c.RAM,
+              'code_end': symbols[f'__{stem}_code_end']-c.RAM, 'bss_start': symbols[f'__{stem}_bss_start']-c.RAM,
               'toolchain_image': IMAGE, 'flags': flags, 'stack_usage': (out/'names.su').read_text()}
     (out/'overlay.bin').write_bytes(data); (out/'relocation.bin').write_bytes(reloc)
     (out/'overlay.json').write_text(json.dumps(report, indent=2)+'\n')

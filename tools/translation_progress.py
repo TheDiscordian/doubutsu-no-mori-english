@@ -37,6 +37,10 @@ def pending_name_consumers(report):
         pending['catchphrases'] = 'Default-phrase editing still uses the native four-byte field'
     if report.get('actor_display_names'):
         pending['display_names'] = 'NPC identity-based name readers and editors still need complete integration'
+    if report.get('map_names'):
+        pending['display_names'] = 'Remaining dialogue identity-name readers and editors still need complete integration; map names are connected'
+    if report.get('guide_name'):
+        pending['display_names'] += '; opening-guide name is connected'
     return pending
 
 
@@ -121,6 +125,12 @@ def measure(native, built, report):
         verify_installation(built, native, report)
     if report.get('actor_display_names') and not report.get('text_extension'):
         raise ValueError('Actor display-name application lacks the verified text extension')
+    if report.get('map_names'):
+        from map_names import verify_shared_parts
+        verify_shared_parts(built, native, report['runtime_module'], report['map_names'])
+    if report.get('guide_name'):
+        from guide_name import verify_installation
+        verify_installation(built, native, report)
     pending_names = pending_name_consumers(report)
     info = module_command_info(native)
     ledger = CounterLedger(info)

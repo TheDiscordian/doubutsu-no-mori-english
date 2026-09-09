@@ -1,64 +1,62 @@
-"""Guarded complete catalogue name storage and rendering integration."""
-from dataclasses import dataclass
+"""Complete display-only villager names in the packed native map."""
 import json
 from pathlib import Path
-import re
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, replace_dma, sha256, verified_rom
+from catalogue_names import Image, elf_inventory as catalogue_inventory
 
 ROOT = Path(__file__).resolve().parents[1]
-VROM, RELOC, RAM = 0x7A28F0, 0x7AC200, 0x808A6100
-PREFIX, BSS = 39184, 12576
+VROM, RELOC, RAM = 0x795350, 0x797870, 0x8088DBD0
+PREFIX, BSS = 9504, 16256
 START = PREFIX+BSS
-NEW_VROM, NEW_RELOC = 0x03970000, 0x03980000
-OWNER, OWNER_RELOC, OWNER_AT = 0x7749C0, 0x7778B0, 0x2C90
-OWNER_ROW = bytes.fromhex('007a28f0007ac200808a6100808b2b30808a96ac808a97c0808a92ec00000000')
-SECTIONS = (14048, 25024, 112, 12576, 130)
-IMPORTS = {'af_catalog_native_init': 0x808A93A8, 'af_catalog_native_name': 0x80096740,
-           'af_catalog_native_draw': 0x80090E98, 'af_load_item_name': 0x801969C8}
-HOOKS = {0x808A6C20: ('af_catalog_load_name', 0x80096740),
-         0x808A961C: ('af_catalog_load_name', 0x80096740),
-         0x808A8A9C: ('af_catalog_draw', 0x80090E98),
-         0x808A9798: ('af_catalog_init', 0x808A93A8)}
+NEW_VROM, NEW_RELOC = 0x03B00000, 0x03B10000
+OWNER, OWNER_RELOC, OWNER_AT = 0x7749C0, 0x7778B0, 0x2AB0
+OWNER_ROW = bytes.fromhex('00795350007978708088dbd0808940708088fbf08088fcbc8088fb4000000000')
+SECTIONS = (8464, 992, 48, 16256, 114)
+IMPORTS = {'af_map_native_init': 0x8088FB70, 'af_map_native_name': 0x800ACD18,
+           'af_map_native_draw': 0x80090E98, 'af_load_display_name': 0x80196044}
+HOOKS = {0x8088E030: ('af_map_load_name', 0x800ACD18),
+         0x8088F2F0: ('af_map_draw', 0x80090E98),
+         0x8088F32C: ('af_map_draw', 0x80090E98),
+         0x8088FC98: ('af_map_init', 0x8088FB70)}
 APPROVED = {
-    'bytes': 53584,
-    'symbols': {'af_catalog_init': 51760, 'af_catalog_load_name': 51800,
-                'af_catalog_name': 52068, 'af_catalog_draw': 52160},
-    'suffix_sha256': '6a98c7e8b7dd97a76be8112fe9d16f9a374ab9feb5f8d2b3f7718d60d498cc4b',
-    'relocation_sha256': 'e828349a5dd1b46b2df4673af1d9d3f0d1938af332c4ab1783cdcc7179831122',
+    'bytes': 26544,
+    'symbols': {'af_map_draw': 26196, 'af_map_init': 25760,
+                'af_map_load_name': 25800, 'af_map_name': 26108},
+    'suffix_sha256': 'a5b2870aa29a5958be5b949b76ee772a490108a41c357dbb63a00a650fd8b15a',
+    'relocation_sha256': '70eb5d92ee6f7466f420df56adfc44b2c9a9c1e70286e5380349f19695bcbf8f',
+    'elf_sha256': 'f2953c5992efdc32866b69a7000f3d91112c55759eb25ddb94e3ddd8763c1510',
     'elf_relocations': [
-        [51760, 5, RAM, '.text'], [51764, 6, RAM, '.text'],
-        [51768, 5, RAM, '.text'], [51772, 6, RAM, '.text'],
-        [51792, 4, 0x808A93A8, 'af_catalog_native_init'],
-        [51832, 4, 0x80096740, 'af_catalog_native_name'],
-        [51840, 5, RAM, '.text'], [51844, 6, RAM, '.text'],
-        [51900, 5, RAM, '.text'], [51904, 6, RAM, '.text'],
-        [51944, 4, 0x801969C8, 'af_load_item_name'],
-        [52068, 5, RAM, '.text'], [52072, 6, RAM, '.text'],
-        [52084, 5, RAM, '.text'], [52088, 6, RAM, '.text'],
-        [52144, 5, RAM, '.text'], [52148, 6, RAM, '.text'],
-        [52176, 4, 0x808B2C64, 'af_catalog_name'],
-        [52284, 4, 0x80090E98, 'af_catalog_native_draw'],
+        [25760, 5, RAM, '.text'], [25764, 6, RAM, '.text'],
+        [25768, 5, RAM, '.text'], [25772, 6, RAM, '.text'],
+        [25792, 4, 0x8088FB70, 'af_map_native_init'],
+        [25832, 4, 0x800ACD18, 'af_map_native_name'],
+        [25840, 5, RAM, '.text'], [25844, 6, RAM, '.text'],
+        [25980, 4, 0x80196044, 'af_load_display_name'],
+        [26116, 5, RAM, '.text'], [26120, 6, RAM, '.text'],
+        [26220, 4, 0x808941CC, 'af_map_name'],
+        [26320, 4, 0x80090E98, 'af_map_native_draw'],
     ],
 }
 
 
 def source_hashes():
     return {p: sha256((ROOT/p).read_bytes()) for p in
-            ('overlays/catalog/names.c', 'overlays/catalog/image.s', 'overlays/catalog/image.ld')}
+            ('overlays/map/names.c', 'overlays/map/image.s', 'overlays/map/image.ld')}
 
 
 def native_sources(native):
-    native = verified_rom(native); files = by_vrom(native)
+    files = by_vrom(verified_rom(native))
     data, reloc, owner, owner_reloc = [files[v].extract(native) for v in (VROM, RELOC, OWNER, OWNER_RELOC)]
-    if (len(data) != PREFIX or sha256(data) != '8fad244f38141aa81de27fe539fabcc6c6d2e4ba4f60eb26fdaa6c5f601a6a6b'
-            or sha256(reloc) != '49ca34e8e0a5a5726f99cfd2e9f1537f0c4e12c73f90825b65428270509ce85a'
+    if (len(data) != PREFIX or sha256(data) != 'e10dd3ba1ef1f2f29eeb8481217db927b2302811abc68884109fc9ad67210099'
+            or sha256(reloc) != 'e986f18115f0585fbc82c0edd6dbb594f49088a7a2e56ca3ee4e09c9f26c008a'
             or struct.unpack_from('>5I', reloc) != SECTIONS
             or sha256(owner) != 'ff0c90d15d6e17baa1eee5acdf86cf1fe8af9ce5479acc8f6e55d731fc837a20'
             or sha256(owner_reloc) != '6bf5b91ed57e9ede41bbff8bbe6dea18844e99fcfe668b88a0e115cc5669a5fa'
-            or owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW or files[RELOC].index != files[VROM].index+1):
-        raise ValueError('Changed native catalogue source or ownership')
+            or owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW
+            or files[RELOC].index != files[VROM].index+1):
+        raise ValueError('Changed native map source or ownership')
     return data, reloc, owner, owner_reloc
 
 
@@ -67,7 +65,7 @@ def original_relocations(reloc):
     for (row,) in struct.iter_unpack('>I', reloc[20:20+SECTIONS[4]*4]):
         section, kind, at = row >> 30, (row >> 24) & 63, row & 0xFFFFFF
         if section not in (1, 2, 3) or kind not in (2, 4, 5, 6):
-            raise ValueError('Invalid native catalogue relocation')
+            raise ValueError('Invalid native map relocation')
         rows.append((at+(0, SECTIONS[0], SECTIONS[0]+SECTIONS[1])[section-1], kind))
     return rows
 
@@ -76,53 +74,39 @@ def patch_prefix(native, symbols):
     original, reloc, _, _ = native_sources(native)
     data = bytearray(original); slots = dict(original_relocations(reloc))
     for at, (name, target) in HOOKS.items():
-        expected_kind = 4 if target == IMPORTS['af_catalog_native_init'] else None
+        expected_kind = 4 if target == IMPORTS['af_map_native_init'] else None
         if (struct.unpack_from('>I', data, at-RAM)[0] != 0x0C000000 | (target >> 2) & 0x3FFFFFF
                 or slots.get(at-RAM) != expected_kind):
-            raise ValueError('Changed catalogue hook instruction or relocation')
+            raise ValueError('Changed map hook instruction or relocation')
         struct.pack_into('>I', data, at-RAM, 0x0C000000 | ((RAM+symbols[name]) >> 2) & 0x3FFFFFF)
     return bytes(data)
 
 
-def elf_inventory(text, ram=RAM):
-    result = []
-    for line in text.splitlines():
-        if 'R_MIPS_' not in line: continue
-        match = re.fullmatch(r'\s*([0-9a-fA-F]+)\s+[0-9a-fA-F]+\s+R_MIPS_(32|26|HI16|LO16)\s+([0-9a-fA-F]+)\s+(\S+)\s*', line)
-        if not match: raise ValueError('Unsupported catalogue ELF relocation')
-        result.append([int(match[1], 16)-ram, {'32': 2, '26': 4, 'HI16': 5, 'LO16': 6}[match[2]],
-                       int(match[3], 16), match[4]])
-    return result
+def elf_inventory(text):
+    return catalogue_inventory(text, ram=RAM)
 
 
 def relocation_data(native, inventory, size):
     rows = original_relocations(native_sources(native)[1])
-    rows += [(at-RAM, 4) for at in HOOKS if at != 0x808A9798]
+    rows += [(at-RAM, 4) for at in HOOKS if at != 0x8088FC98]
     seen = set()
     for at, kind, target, name in inventory:
         if at in seen or at & 3 or not START <= at <= size-4 or kind not in (2, 4, 5, 6):
-            raise ValueError('Invalid appended catalogue relocation')
+            raise ValueError('Invalid appended map relocation')
         seen.add(at)
         if RAM <= target < RAM+size:
             rows.append((at, kind))
         elif IMPORTS.get(name) != target or kind != 4:
-            raise ValueError('Unbound catalogue external target')
-    if len({at for at, _ in rows}) != len(rows): raise ValueError('Duplicate catalogue relocation')
+            raise ValueError('Unbound map external target')
+    if len({at for at, _ in rows}) != len(rows): raise ValueError('Duplicate map relocation')
     values = [0x40000000 | kind << 24 | at for at, kind in rows]
     length = (24+len(values)*4+15) & ~15
     return (struct.pack('>5I', size, 0, 0, 0, len(values))+struct.pack('>'+str(len(values))+'I', *values)
             +bytes(length-24-len(values)*4)+struct.pack('>I', length))
 
 
-@dataclass(frozen=True)
-class Image:
-    ram: int
-    resident_bytes: int
-    sections: tuple
-
-
 def validate(native, data, reloc, report, module):
-    if not APPROVED: raise ValueError('Catalogue image needs independent approval')
+    if not APPROVED: raise ValueError('Map image needs independent approval')
     if (len(data) != APPROVED['bytes'] or report.get('symbols') != APPROVED['symbols']
             or report.get('bytes') != len(data) or report.get('imports') != IMPORTS
             or report.get('sources') != source_hashes()
@@ -130,10 +114,10 @@ def validate(native, data, reloc, report, module):
             or data[:PREFIX] != patch_prefix(native, APPROVED['symbols']) or any(data[PREFIX:START])
             or sha256(data[START:]) != APPROVED['suffix_sha256']
             or sha256(reloc) != APPROVED['relocation_sha256']
-            or report.get('elf_relocations') != APPROVED['elf_relocations']
+            or sha256(json.dumps(report.get('elf_relocations'), separators=(',', ':')).encode()) != APPROVED['elf_sha256']
             or reloc != relocation_data(native, report.get('elf_relocations', []), len(data))
-            or int(module['symbols']['af_load_item_name'], 16) != IMPORTS['af_load_item_name']):
-        raise ValueError('Changed complete catalogue image, imports, or relocation')
+            or int(module['symbols']['af_load_display_name'], 16) != IMPORTS['af_load_display_name']):
+        raise ValueError('Changed complete map image, imports, or relocation')
     return Image(RAM, len(data), struct.unpack_from('>5I', reloc))
 
 
@@ -145,32 +129,45 @@ def metadata():
 
 def allocation(tag_size=None):
     from inventory_english import allocation as inventory
+    from catalogue_names import START as catalog_size
     from notice_overlay import pool_sizes
     current = inventory(tag_size); align = lambda n: (n+63) & ~63
-    growth = align(APPROVED['bytes'])-align(START)
-    alternative = pool_sizes(True)['alternative']+current['tag_growth']+growth
-    if growth < 0 or alternative > current['combined_pool']:
-        raise ValueError('Catalogue growth exceeds the installed submenu pool')
-    return {'catalogue_growth': growth, 'inventory_growth': current['tag_growth'],
-            'alternative_required': alternative, 'combined_pool': current['combined_pool']}
+    # Map's dependency flag is zero: it opens no tag/hand/editor child. Bound it
+    # conservatively by the catalogue branch, retaining even its unused tag and
+    # inventory allowances and 16-KiB miscellaneous reserve.
+    required = (pool_sizes(True)['alternative']+current['tag_growth']
+                -align(catalog_size)+align(APPROVED['bytes']))
+    if required > current['combined_pool']: raise ValueError('Map exceeds the installed submenu pool')
+    return {'map_growth': align(APPROVED['bytes'])-align(START), 'conservative_required': required,
+            'combined_pool': current['combined_pool'], 'extra_reservation': 0}
 
 
 def verify_shared_parts(built, native, module, report=None):
     from inventory_english import verify_shared_parts as verify_inventory
+    from actor_display_names import NAMES_SHA
+    from display_names import VROM as names_vrom
+    from runtime_module import MODULE_VROM
     inventory = verify_inventory(built, native, module)
     required = allocation(inventory['resident_bytes'])
     files, originals = by_vrom(built), by_vrom(native)
+    code, native_code = files[CODE_VROM].extract(built), originals[CODE_VROM].extract(native)
     if (NEW_VROM not in files or NEW_RELOC not in files or VROM in files or RELOC in files
             or files[NEW_VROM].index != originals[VROM].index
-            or files[NEW_RELOC].index != files[NEW_VROM].index+1):
-        raise ValueError('Missing complete catalogue DMA pair')
+            or files[NEW_RELOC].index != files[NEW_VROM].index+1
+            or sha256(files[names_vrom].extract(built)) != NAMES_SHA
+            or struct.unpack_from('>I', files[MODULE_VROM].extract(built), 60)[0] != names_vrom
+            or code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM] != native_code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM]):
+        raise ValueError('Missing complete map DMA pair or display-name resource')
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOC].extract(built)
     if report is None:
         report = {'overlay': {**APPROVED, 'sources': source_hashes(), 'imports': IMPORTS,
-                             'overlay_sha256': sha256(data)}, 'allocation': required}
+                  'overlay_sha256': sha256(data), 'elf_relocations': APPROVED['elf_relocations']}, 'allocation': required}
+    elif (report.get('complete_name_slots') != 15 or report.get('new_saved_bytes') != 0
+            or report.get('vrom') != f'{NEW_VROM:08X}' or report.get('relocation_vrom') != f'{NEW_RELOC:08X}'):
+        raise ValueError('Changed map name application evidence')
     validate(native, data, reloc, report['overlay'], module)
     if files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata() or report.get('allocation') != required:
-        raise ValueError('Incomplete catalogue allocation or ownership')
+        raise ValueError('Incomplete map allocation or ownership')
     return {'owner_offset': OWNER_AT, 'owner_bytes': metadata()}
 
 
@@ -182,20 +179,20 @@ def install(native, replacements, additions, relocations, module, directory, not
             or VROM in relocations or RELOC in relocations
             or any(v in files or v in replacements or v in additions or v in relocations.values()
                    for v in (NEW_VROM, NEW_RELOC))):
-        raise ValueError('Overlapping catalogue installation')
+        raise ValueError('Overlapping map installation')
     data, reloc = (directory/'overlay.bin').read_bytes(), (directory/'relocation.bin').read_bytes()
     report = json.loads((directory/'overlay.json').read_text())
     validate(native, data, reloc, report, module)
     owner = bytearray(replacements.get(OWNER, files[OWNER].extract(native)))
-    if owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW: raise ValueError('Changed catalogue owner row')
+    if owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW: raise ValueError('Changed map owner row')
     owner[OWNER_AT:OWNER_AT+32] = metadata()
-    if TAG not in replacements: raise ValueError('Catalogue requires the complete inventory image')
+    if TAG not in replacements: raise ValueError('Map requires the complete inventory image')
     result = {'overlay': report, 'allocation': allocation(len(replacements[TAG])), 'vrom': f'{NEW_VROM:08X}',
-              'relocation_vrom': f'{NEW_RELOC:08X}', 'complete_name_slots': 63, 'new_saved_bytes': 0,
-              'status': 'Complete catalogue names installed; ordinary gameplay acceptance pending'}
+              'relocation_vrom': f'{NEW_RELOC:08X}', 'complete_name_slots': 15, 'new_saved_bytes': 0,
+              'status': 'Complete map villager names installed; ordinary gameplay acceptance pending'}
     changes = {VROM: data, RELOC: reloc, OWNER: bytes(owner)}; moves = {VROM: NEW_VROM, RELOC: NEW_RELOC}
     prospective = replace_dma(native, {**replacements, **changes}, {**relocations, **moves}, additions)
     verify_shared_parts(prospective, native, module, result)
-    verify_notice(prospective, native, module, notice_report, catalogue_report=result)
+    verify_notice(prospective, native, module, notice_report, map_report=result)
     replacements.update(changes); relocations.update(moves)
     return result

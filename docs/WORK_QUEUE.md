@@ -15,13 +15,25 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [map/guide checkpoint](checkpoints/MAP_GUIDE_NAMES.md) supplies complete
+fifteen-position map villager-name storage/drawing and the opening guide's
+coloured name field. The current combined build is `build/guide-name-pilot`.
+All twelve focused checks pass. Keep the unresolved obsolete item test fixture
+separate from observed game defects; its failed check is not a pass.
+Next, connect the fishing record's display setter at `80A9031C` using the
+existing exact saved-name aliases, preserving the six-byte saved writer and
+real player winners. Apply embedded map landmark/empty-house labels with GC
+wording and line intent, then continue the remaining identity/catchphrase/item
+readers, residual text/letters, and accents. Map/guide gameplay remains in the
+combined v0 smoke, not another per-record native matrix.
+
 The [festival/reserve name checkpoint](checkpoints/ACTOR_DISPLAY_NAMES.md) supplies
 the three festival character-name preparations and the reserve actor's full
 Tom Nook name. Its combined build is `build/actor-names-pilot`, retaining complete
 bounded shared choices, general dialogue fields, and free-item actor connections.
 Source/assembly/relocation/cartridge/accounting checks pass; unchanged shared
 helpers reuse their recorded native evidence. Continue identity-based names at
-map `8088E030`, opening guide `809C8318`, and fishing-event `80A90270`, then other
+the fishing-event display reader, then other
 live callers from the identity-name inventory, catchphrase input/display, and
 item readers. Do not redo complete owned letter/quest paths just because their
 original native instructions remain in the ROM. Retain the residual

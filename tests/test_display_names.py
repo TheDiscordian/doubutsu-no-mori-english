@@ -3,6 +3,7 @@
 from copy import deepcopy
 import ctypes
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -16,6 +17,8 @@ from aflib import sha256
 from display_names import HEADER, SPECIAL_HASH, VROM, candidates, install, resource, special_table
 from runtime_module import MODULE_VROM, add_runtime_module
 from test_retail import ROM_PATH
+
+MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE', str(ROOT/'build/notice-seasonal-runtime')))
 
 
 @unittest.skipUnless(shutil.which("gcc"), "Host GCC executes the original display-name API")
@@ -116,10 +119,10 @@ class DisplayNameResourceTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "identity/hash"):
                 resource(self.rom, changed)
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(), "Build the resident module first")
+    @unittest.skipUnless((MODULE_DIR/"module.json").is_file(), "Build the current resident module first")
     def test_module_configuration_and_combined_item_resource(self):
         from extended_items import install as item_install, VROM as ITEM_VROM
-        additions, module = add_runtime_module(self.rom, {}, ROOT/"build/runtime-module")
+        additions, module = add_runtime_module(self.rom, {}, MODULE_DIR)
         data = resource(self.rom, self.edits)
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary)
