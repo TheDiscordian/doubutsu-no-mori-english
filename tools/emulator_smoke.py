@@ -946,6 +946,12 @@ def main():
                     raise ValueError('Post-office probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_post_office_letters'],record))
+            if 'test_museum_letters' in action:
+                from museum_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Museum probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_museum_letters'],record))
             if 'test_mail_menu' in action:
                 from mail_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -13,6 +13,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [museum integration](checkpoints/MUSEUM_LETTERS.md) installs complete English
+introduction, non-fossil, and 25 fossil-result letters. All 81 source-bound parts
+are retained without free-field or saved-layout changes. Thirty-three host tests,
+the same sanitizer tests, six installer/accounting/actual-ROM tests, three native
+scenario tests, 32 reader/loader/accounting regressions, and independent creator
+builds and assembly pass. The completed silent native batch passes 54 original
+comparisons/complete home deliveries, 75 full readbacks, five fallback cases,
+twenty pending-notice/fossil cases, resource retries, and duplicate-notice checks.
+All 313 calls and 666 assertions pass, with restored state/heap/stack/checkpoint,
+blank isolated saves, and graceful shutdown. The creator is 32,224 image bytes with 544 bytes free under
+its current limit; the resident size and four-MiB layout remain unchanged.
+Normal scheduling, save/reload, the museum's sender display mapping, review, and
+original hardware remain unverified.
+
 The [post-office integration](checkpoints/POST_OFFICE_LETTERS.md) installs all
 four catalogue-order letters and the raffle-ticket letter with complete supplied
 English wording, sixteen-byte item names, and full expiry-month names. Native

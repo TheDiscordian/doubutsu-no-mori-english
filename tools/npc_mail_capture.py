@@ -39,7 +39,7 @@ def creator_imports(*,villager_events=False,academy_scores=False):
     return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -65,6 +65,9 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
         if not academy_scores: raise ValueError('Post-office creator requires academy score dispatch')
         names += ['overlays/mail_generation/'+name for name in
                   ('post_office_creator.c','post_office_creator.h','post_office_capture.ld')]
+    if museum:
+        if not post_office: raise ValueError('Museum creator requires post-office dispatch')
+        names += ['overlays/mail_generation/'+name for name in ('museum_creator.c','museum_creator.h','museum_capture.ld')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -93,9 +96,11 @@ def validate(data,reloc,report,module):
     if 'academy_scores' in report and not scores: raise ValueError('Unknown academy score creator variant')
     postal = report.get('post_office') is True
     if 'post_office' in report and not postal: raise ValueError('Unknown post-office creator variant')
+    museum = report.get('museum') is True
+    if 'museum' in report and not museum: raise ValueError('Unknown museum creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -114,6 +119,7 @@ def validate(data,reloc,report,module):
     if academy: required.add('af_academy_mail_create')
     if scores: required.update(('af_academy_score_mail_create','af_academy_series_data'))
     if postal: required.add('af_post_office_mail_create')
+    if museum: required.add('af_museum_mail_create')
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id')):

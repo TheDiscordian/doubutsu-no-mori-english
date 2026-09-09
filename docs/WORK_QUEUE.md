@@ -29,17 +29,29 @@ An Expansion Pak requirement is allowed. Preserve current four-MiB checks until
 an explicit eight-MiB memory layout and bootstrap are implemented and validated;
 complete text/presentation takes priority over retaining four-MiB compatibility.
 
-The next letter group is museum mail: introduction `00BD`, non-fossil reply
-`00BE`, and 25 fossil-result templates `010E..0126`. Both frozen English creator
-catalogues have all 81 complete parts with no free-field requirements. The
-original fossil table at `8010AE50` matches the supplied GameCube table order:
-`010E/0110/010F/0111/0113/0112/0114/0116/0115/0117/0119/0118/011A/011B/011C/
-011D/011E/011F/0120/0121/0126/0125/0123/0124/0122`. Native museum creation at
-`800A345C` is distinct from postal creation at `800B6B94`. Preserve the original
-sender identity/type through `800A3420`, paper 24, gift selection, initial-mail
-flags, pending fossils, and both mailbox/queue receipts. This group is not
-installed or credited by the new postal route; source-part and caller approvals,
-complete creation, both receipt gates, and native validation remain to implement.
+The [museum integration](checkpoints/MUSEUM_LETTERS.md) installs introduction
+`00BD`, non-fossil reply `00BE`, and 25 fossil-result templates `010E..0126`.
+All 81 complete parts and native/donor selection tables are source-bound. The
+original museum sender identity/type, paper 24, fossil selection, pending flags
+and counts, and mailbox/queue policies remain. Thirty-three host/sanitizer tests,
+six installer/accounting tests, three scenario tests, 32 reader/loader regressions,
+independent builds, and independent native assembly pass. The completed silent
+native batch passes 54 complete original comparisons/home deliveries, 75 full
+readbacks, five fallback cases, twenty pending-notice/fossil cases, 313 calls,
+and 666 assertions. Resource retries, duplicate-notice checks, restored state and
+checkpoint, blank saves, and graceful shutdown pass. The creator has 544 image
+bytes free. Continue other text consumers
+after this bounded batch; retain normal scheduling, save/reload, museum sender
+display mapping, review, and hardware in the acceptance queue.
+
+The next [Snowman gift group](../specs/SNOWMAN_LETTERS.md) has twelve templates
+`0202..020D` with 36 complete source-approved parts and all twelve full item
+names. The native actor, relocation, creator, allocating owner, gift order, and
+GameCube counterparts are bound by `tools/audit_snowman_letters.py`. Implement
+complete creation and gated receipt with explicit failed-reward retention.
+Preserve the N64 single random selection; GameCube's reroll is not native here.
+No Snowman hook is installed or credited by the source audit. Its actor-owned
+code option avoids pretending the remaining 544 creator bytes are unlimited.
 
 The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
 complete names in the full glyph ROM, with ten additional native-width edits.
