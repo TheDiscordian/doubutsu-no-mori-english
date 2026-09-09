@@ -8,12 +8,56 @@ unchanged. The adapted two-line heading keeps the six-line structure, blank thir
 line, remaining wording, and sender decoration without disclosing the item.
 Source lengths/CRC32 values and exact native field masks guard every body.
 
-The optional on-demand creator captures full names, numeric N64 coordinates, and
+The optional text-only creator captures full names, numeric N64 coordinates, and
 the original town identity, then verifies complete decoding before publishing its
 compact output. It uses the existing 164-byte loader destination only as scratch:
 the first 96 bytes are the notice, and the final 68 are zero. Native saved records
 remain 104 bytes with their RTC field at offset 96. Creator workspace stays 5,344
 bytes; no native save or buried-object state is touched by the creator.
+
+## Transactional native owner
+
+The [transaction owner](../../specs/NOTICEBOARD_TREASURE_OWNER.md) adds original
+burial, a sixteen-byte stack-only undo record, complete text creation, and native
+publication. The fixed bridge can undo a failed second loader allocation without
+loading any code again. Ordinary items and all 25 native pitfall shapes are
+handled; no-change or unexpected deposits restore the selected acre immediately.
+No saved record or resident allocation grows.
+
+Use `--notice-owner` in addition to the complete treasure/article creator flags.
+Current images are `build/noticeboard-treasure/owner-creator` and
+`owner-creator-repeat`; native bridges are `owners` and `owners-repeat`.
+Independent binaries, relocations, and manifests agree.
+
+| Artifact | Size | SHA-256 |
+| --- | ---: | --- |
+| Transaction creator | 48,752 | `d68503a283a0186402c70a4f1c6969702fb76a3b6ee9da01f82f6ff25cebd9a8` |
+| Transaction relocations | 752 | `434c01f2c661f8b6376485bbe50bb1ee54cb51e2d6fb95f51a5dd011e872df86` |
+| Transaction manifest | 16,450 | `bf50fdf98a57591055dca453d4bb30f5d3bbfd3d96898aab60cfd04a4bc7f682` |
+| Native bridges | 176 | `c9d5f554774e693859c185a28789458201c29edb6a7218dac1c17b0d653c5596` |
+| Native bridge manifest | 689 | `039852bf32486ceab386fe42803e650b7532b12c4c79d1e4df1cf3084c76c334` |
+
+Fifty owner/creator tests have passing host and sanitizer results. They retain
+every earlier dispatcher and cover thirty acres, all 256 unit positions, every
+pitfall shape, existing flag bits, failed/malformed deposits, exact undo, source
+failures, and complete publication. The expanded publication case separately
+checks all eighteen bodies in both capitals with ordinary items and pitfalls:
+72 complete source-model, saved-message, and RTC comparisons. That case passes
+normally and with sanitizers. Five artifact tests bind all bridge words, guard
+every changed native interval, verify independent builds, and retain both the
+text-only treasure and quest-reply creator manifests. Four retained initial-reader
+evidence tests pass without native replay.
+
+Logs are `owner-tests.log`, `owner-focused-tests.log`, `owner-sanitizer-tests.log`,
+`owner-publication-tests.log`, `owner-publication-sanitizer-tests.log`,
+`owner-artifact-tests.log`, `owner-initial-reader-retention-tests.log`, and both
+owner/creator build logs under `build/noticeboard-treasure/`. The current playable
+ROM's main code accepts guarded patch construction: resulting code length 826,800,
+SHA-256 `99f690b9a4bc523c87ab13206985b60c3b90df298e22d54ec786b80e6423bbe6`.
+That check does not write or install a ROM. Native placement/loader/undo execution
+remains unverified; the host rollback helper models the bridge's stores only.
+
+## Text-only creator profile
 
 `build/noticeboard-treasure/article-creator` and `article-creator-repeat` contain
 identical images, relocations, and manifests. The builder requires
@@ -92,17 +136,17 @@ helpers are in `mips/`; their object SHA-256 is
 The installed ROM remains `build/noticeboard-pilot`; **treasure creation and the
 new decoder are not installed**. No treasure text gains application credit yet.
 
-1. Install native owner wrappers using the original selected animal (`s6`),
+1. Connect the compiled native owner using the original selected animal (`s6`),
    template, item, coordinates, and RTC. In the 352-byte treasure scheduler frame,
    the post starts at `sp+68h`, its timestamp at `sp+C8h`, item at `sp+66h`, column
    at `sp+60h`, row at `sp+5Ch`, and selected template at the formatter's fifth
    argument `sp+10h`. The formatter call is `800A62A0`; publication is `800A62A8`.
    The original field preparer `800A5E58..800A5F08` is 176 bytes, called at
-   `800A6214`. Verify every caller/side effect before reusing a native region.
-2. Implement recovery if creation fails after the original code buries
-   an object. Merely skipping the post or timestamp update leaves an unannounced
-   object and is not complete handling. Check the actual placement/removal and
-   eligibility code before choosing rollback, preflight, or durable pending data.
+   `800A6214`. The guarded builder supplies these patches and the placement
+   forwarding thunks; full-ROM dependency checks are still required.
+2. Execute the implemented undo path, including allocation failures before both
+   phases, original pitfall/non-pitfall deposit, and scheduling eligibility. The
+   host results and exact assembly do not establish native execution or recovery.
 3. Route the reader to complete treasure decoding while retaining initial-post
    support and the passed native controls/cache behaviour. Keep old installed
    artifact verification usable; changing existing source-bound reader files
@@ -141,18 +185,18 @@ A scan of every extracted native file finds only these direct calls:
 The old town helper is also called at `800A6400`; do not reclaim it together with
 the treasure-only field helper.
 
-Prefer a before-burial on-demand transaction that snapshots the chosen acre's
+The compiled before-burial transaction snapshots the chosen acre's
 512 foreground bytes and 32 flag bytes, invokes the unmodified deposit function,
-then reduces the actual change to a small undo record. Retain that record until
-complete post creation/publication succeeds. Restore immediately inside the
-loaded transaction if deposit changes an unexpected set of fields. This handles
+then reduces the actual change to a small undo record. It retains that record
+until complete post creation/publication succeeds and restores immediately inside
+the loaded transaction if deposit changes an unexpected set of fields. This handles
 duplicate items elsewhere and pitfalls without guessing which object was placed.
-Allocation/read failure before this transaction runs must not call burial. Later
-creator failure must use the retained undo record even if allocation fails.
+Allocation/read failure before this transaction runs does not call burial. Later
+creator failure reaches the fixed undo stores even if allocation fails.
 
-This direction is not installed code. Establish exact lifetime/stack ownership
-for undo, preserve RNG order and animal/template selection, and prove cleanup
-and eligibility. The 352-byte scheduler frame has formatter scratch at `D0..F7`
+This implementation is not installed code. Verify native lifetime/stack ownership,
+RNG and animal/template retention, cleanup, and eligibility in the combined batch.
+The 352-byte scheduler frame has formatter scratch at `D0..F7`
 available once native formatting is removed; its candidate list starts at `FC`.
 A 164-byte staging copy at `68` would corrupt that list. Keep loader staging in
 its wrapper's own frame; copy only verified compact output/undo data to the parent.

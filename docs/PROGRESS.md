@@ -13,6 +13,19 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [treasure transaction owner](../specs/NOTICEBOARD_TREASURE_OWNER.md) implements
+original burial, exact stack-only undo, complete English post creation, and guarded
+publication. Its 176-byte native bridges fit the old treasure field-helper slot;
+the 48,752-byte on-demand image keeps the existing workspace, resident module, and
+save layout. Fifty owner/creator tests and corresponding sanitizer checks have
+passing results, including all acres/units, all pitfall shapes, failed deposits,
+and complete ordinary/pitfall posts. Five artifact tests verify independent builds,
+exact bridge instructions, and retained original code outside the intended edits.
+The current ROM's main code accepts guarded patch construction. The owner is not
+installed or executed natively yet: connect the treasure reader and full-build
+dependencies, build/verify the ROM and UPS, then run one combined native batch.
+No new application credit is claimed for these uninstalled helpers.
+
 The [complete treasure creator and decoder](checkpoints/NOTICEBOARD_TREASURE.md)
 implement all eighteen bodies with full names, numeric N64 acre coordinates,
 and unchanged 96-byte saved-message capacity. The native-specific `01F4` retains
@@ -27,8 +40,9 @@ evidence checks pass. The decoder retains its five passing host/sanitizer checks
 Native inspection identifies both ordinary and pitfall burial writes and the
 selected acre/flag addresses for exact failure recovery. These helpers are not
 yet connected to native treasure creation or the installed reader, so they
-receive no text-application credit. Finish owner hooks, post-burial undo, reader
-routing, and complete-ROM installation; then continue seasonal posts.
+receive no text-application credit. The transaction owner above supplies the
+compiled hooks and undo. Finish reader routing and complete-ROM installation,
+then continue seasonal posts.
 Do not rerun the completed initial board batches.
 
 The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)

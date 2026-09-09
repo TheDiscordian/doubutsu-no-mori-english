@@ -5,7 +5,7 @@ extern unsigned char af_event_card_item_name[16];
 int af_notice_item_article(unsigned int item, const unsigned char *name) {
     unsigned int i;
     ++af_notice_test_article_calls;
-    if (item != 0x11FCu || !name) return -1;
+    if ((item != 0x11FCu && item != 0x2512u) || !name) return -1;
     for (i = 0; i < 16u; ++i) if (name[i] != af_event_card_item_name[i]) return -1;
     return af_notice_test_article;
 }

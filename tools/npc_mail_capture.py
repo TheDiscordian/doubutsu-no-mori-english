@@ -40,7 +40,7 @@ def creator_imports(*,villager_events=False,academy_scores=False,notice_treasure
     return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())+(('af_crc32','af_mail_format','af_mail_record_unpack','af_item_name_index') if notice_treasure else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,notice_owner=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -83,6 +83,9 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
         names += ['tools/item_articles.py', 'translations/n64-item-articles.json']
         names += ['runtime/notice/'+name for name in ('record.c','record.h','initial.h','treasure.c','treasure.h')]
         names += ['runtime/crc32.h']
+    if notice_owner:
+        if not notice_treasure: raise ValueError('Treasure owner requires complete treasure text and articles')
+        names += ['overlays/mail_generation/'+name for name in ('notice_owner.c','notice_owner.h','notice_owner_capture.ld')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -120,9 +123,11 @@ def validate(data,reloc,report,module):
     treasure = report.get('notice_treasure') is True
     if 'notice_treasure' in report and not treasure: raise ValueError('Unknown notice treasure creator variant')
     if treasure and catalog != 4: raise ValueError('Treasure creation requires the complete glyph catalogue')
+    owner = report.get('notice_owner') is True
+    if 'notice_owner' in report and not owner: raise ValueError('Unknown treasure owner variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -150,6 +155,7 @@ def validate(data,reloc,report,module):
                          'af_notice_treasure_pack','af_notice_treasure_decode_parts',
                          'af_notice_treasure_decode','af_notice_treasure_restore',
                          'af_notice_item_article','af_item_article_data'))
+    if owner: required.add('af_notice_owner_create')
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
     if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id','af_item_article_data')):
