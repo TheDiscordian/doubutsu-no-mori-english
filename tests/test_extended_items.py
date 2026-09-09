@@ -3,6 +3,7 @@
 from copy import deepcopy
 import ctypes
 import json
+import os
 from pathlib import Path
 import shutil
 import subprocess
@@ -11,6 +12,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE', str(ROOT/'build/runtime-module')))
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import sha256
 from extended_items import COUNTS, HEADER, WIDTH, VROM, install, resource
@@ -107,8 +109,9 @@ class ExtendedItemResourceTests(unittest.TestCase):
         bank = next(b for b in banks(rom) if b.name == "item_22")
         native = bank.entries()[3]
         edit = {"id": "item_22:0003", "source_sha256": sha256(native), "translation": "fishing rod",
-                "provenance": {"reference_sha256": sha256(b"fishing rod".ljust(16, b" "))}}
-        # Synthetic test approval; production identities come from the importer.
+                "provenance": {"reference_id": "item_22:0003",
+                               "reference_sha256": sha256(b"fishing rod".ljust(16, b" "))}}
+        # Retain the complete approved reference identity as well as its hash.
         result = resource(rom, [edit])
         offset = 32+(64+4+3)*16
         self.assertEqual(result[:offset], original[:offset])
@@ -120,13 +123,13 @@ class ExtendedItemResourceTests(unittest.TestCase):
                 resource(rom, edits)
         changed = deepcopy(edit)
         changed["provenance"]["reference_sha256"] = "0"*64
-        with self.assertRaisesRegex(ValueError, "reference hash"):
+        with self.assertRaisesRegex(ValueError, "complete exact English reference"):
             resource(rom, [changed])
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(), "Build the resident module first")
+    @unittest.skipUnless((MODULE_DIR/"module.json").is_file(), "Build the resident module first")
     def test_installation_requires_exact_resource_and_module(self):
         rom = ROM_PATH.read_bytes()
-        additions, module = add_runtime_module(rom, {}, ROOT/"build/runtime-module")
+        additions, module = add_runtime_module(rom, {}, MODULE_DIR)
         data = resource(rom, [])
         manifest = {"source_sha256": sha256(rom), "data_sha256": sha256(data), "edits": []}
         with tempfile.TemporaryDirectory() as directory:

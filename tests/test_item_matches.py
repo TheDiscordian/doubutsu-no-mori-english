@@ -156,8 +156,9 @@ class ItemMatchRetailTests(unittest.TestCase):
         cls.refs = list(map(json.loads, (ROOT/'build/gamecube/names/furniture.jsonl').read_text().splitlines()))
 
     def test_all_reviewed_names_rotations_hashes_and_precise_capacity_totals(self):
-        self.assertEqual(len(self.matches), 559)
-        ordinary = [row for bank in ('item_24','item_26','item_27') for row in
+        self.assertEqual(len(self.matches), 768)
+        ordinary_banks = sorted({key.split(':')[0] for key in self.matches if not key.startswith('item_10:')})
+        ordinary = [row for bank in ordinary_banks for row in
                     map(json.loads, (ROOT/f'build/gamecube/names/{bank}.jsonl').read_text().splitlines())]
         refs = {r['id']: r for r in self.refs+ordinary}
         for key, match in self.matches.items():
@@ -171,8 +172,11 @@ class ItemMatchRetailTests(unittest.TestCase):
                 self.assertEqual(self.source[bank][first:first+4], [self.source[bank][first]]*4)
             else:
                 if bank=='item_24': self.assertIn(key, ('item_24:006D', 'item_24:0078'))
-                else: self.assertIn(bank, ('item_26','item_27'))
-                self.assertEqual(match['reference_id'], key)
+                if bank=='item_29':
+                    self.assertIn(first, (1,2,3,5,6,7,8,9))
+                    self.assertEqual(match['reference_id'], f'{bank}:{first+1:04X}')
+                else:
+                    self.assertEqual(match['reference_id'], key)
             verify_source(match, self.source[bank][first], self.info)
             reference = refs[match['reference_id']]
             self.assertEqual(sha256(encode(reference['text'], self.info).ljust(16, b' ')), match['reference_sha256'])

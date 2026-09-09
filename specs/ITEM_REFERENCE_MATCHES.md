@@ -19,7 +19,8 @@ name family; placed-object aliases use their separate native conversion proof.
 ## Reviewed furniture groups
 
 The registry contains 487 furniture identities, two ordinary clothing-name
-approvals, and seventy [flooring/wallpaper approvals](FLOOR_WALL_NAMES.md).
+approvals, seventy [flooring/wallpaper approvals](FLOOR_WALL_NAMES.md), and
+209 [song, stationery, seed, ticket, and other ordinary names](ORDINARY_ITEM_NAMES.md).
 Of the furniture identities, 179 cover the first 300 groups.
 It covers wardrobes/dressers/cabinets, furniture-series pieces, household and
 school objects, instruments, recognisable plants/bonsai, and outdoor/construction

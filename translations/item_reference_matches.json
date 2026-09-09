@@ -4470,5 +4470,1677 @@
     "reference_id": "item_27:003F",
     "reference_sha256": "d6c3846fd15489e1695cf18e076cba5ca5a243a3e7d3b6018d576e91da83a69a",
     "evidence": "The native psychedelic wallpaper matches the supplied groovy theme. Reviewed from the complete native name and supplied English table. This approves the full name, not artwork changes, wider callers, or gameplay."
+  },
+  {
+    "id": "item_2A:0000",
+    "source_sha256": "43dee2208a6ea53d9b264f512f5fdf9521e83d4082f70c3f5b566c61f8b7017f",
+    "native_name": "けけさんびか",
+    "reference_id": "item_2A:0000",
+    "reference_sha256": "1db9c24ef87f61ecc342f6bdd1b15d4afa0a5adbbb319981fa2526fac2c5c38c",
+    "evidence": "Reviewed native song identity: Hymn/chorale, not a march; the legacy first two titles are swapped. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0001",
+    "source_sha256": "272901d26bb4fcc005e7ff5d1457aa67bad807a2c0a99bbe10e79695d195b2e3",
+    "native_name": "けけマーチ",
+    "reference_id": "item_2A:0001",
+    "reference_sha256": "bfffa11537efa169e39f10c52c5e8f67d83ffd4de0ca3142e1dcfc879bc6bb31",
+    "evidence": "Reviewed native song identity: March, not a chorale; the legacy first two titles are swapped. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0002",
+    "source_sha256": "8a0515f04566cce9f015c0322d55643982f61c6afc836c024254f2a3ae456d58",
+    "native_name": "けけワルツ",
+    "reference_id": "item_2A:0002",
+    "reference_sha256": "7d7eb8aeadebd005406c5fdf89962c864796a90cabf2d080ab14fd53b935c831",
+    "evidence": "Reviewed native song identity: Waltz. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0003",
+    "source_sha256": "a286ed5b2c25701daa70916bfefb4995d8f3da4936075eb5a2c59495edda26a9",
+    "native_name": "けけスウィング",
+    "reference_id": "item_2A:0003",
+    "reference_sha256": "7266cbfc4559ed5f4868d12dedb03a54f15984837c6ea43b7c9a29aee1d3f87a",
+    "evidence": "Reviewed native song identity: Swing. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0004",
+    "source_sha256": "8a77eb4f13478df36cb5bbef9412b406fe6763489468471c78fcb43d220d24ce",
+    "native_name": "けけジャズ",
+    "reference_id": "item_2A:0004",
+    "reference_sha256": "4237447ba1209c1c1be101f2967d14e81d9a9556337274f0d54cc7d57d374ed1",
+    "evidence": "Reviewed native song identity: Jazz. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0005",
+    "source_sha256": "648df7d4fc8385e5a1add574430a98f3b9e8bd5ac40304e0eaf1b0363c5c029f",
+    "native_name": "けけフュージョン",
+    "reference_id": "item_2A:0005",
+    "reference_sha256": "697c94cac24d4b7d093911c69006d9959abc1f82337ec8544e6e1f4b1a095f3c",
+    "evidence": "Reviewed native song identity: Fusion. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0006",
+    "source_sha256": "4f70455dd1336e73953d779b9ef6d4a086cf741d6b6bb57ba16c68e69f82abe8",
+    "native_name": "けけのエチュード",
+    "reference_id": "item_2A:0006",
+    "reference_sha256": "7a14d1da3a71e79fc02bfd4fc0e1c8abf53a3e7d82a67f49fc3d26b92619e281",
+    "evidence": "Reviewed native song identity: Etude. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0007",
+    "source_sha256": "f867476edfd8932d2d198700e16a7a295b42161c0b6866b7167328434fce1274",
+    "native_name": "けけララバイ",
+    "reference_id": "item_2A:0007",
+    "reference_sha256": "063c0beb651b2e7d56eb49b40e4aa3889379f3082c28fbfaecf6afb452f24089",
+    "evidence": "Reviewed native song identity: Lullaby. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0008",
+    "source_sha256": "ff6631d40248079492c76d37998d18ec4c367d5ada770a8f9d025c6a12559fed",
+    "native_name": "けけマリア",
+    "reference_id": "item_2A:0008",
+    "reference_sha256": "7949d9e8e8156f6f1bf445ae7a4ee52ce19019c74a1d35773d6ba0f4b46cdb22",
+    "evidence": "Reviewed native song identity: The native Maria title is localised as Aria; corroborated by https://nookipedia.com/wiki/K.K._Aria. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0009",
+    "source_sha256": "2c3372a7ad5deae58ba038b1047d5e51d93b27e4d4aaea08fa4fac390a4f5a60",
+    "native_name": "けけサンバ",
+    "reference_id": "item_2A:0009",
+    "reference_sha256": "7b692c7a25344486409b391527dc2c5ba44c7a36418f37464a5e6e4444cb8797",
+    "evidence": "Reviewed native song identity: Samba. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000A",
+    "source_sha256": "f7e0e5d82a50e6c745366ed0a0174e7b8bc87f8ad9435918768582879977e0aa",
+    "native_name": "けけボッサ",
+    "reference_id": "item_2A:000A",
+    "reference_sha256": "b743a74b9d19c835eb203d40aafe35ee76049d1947b5430e1df7011986fb6470",
+    "evidence": "Reviewed native song identity: Bossa nova. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000B",
+    "source_sha256": "66619fed0b68c9e8fc44b42c7df5800a855c4b78933b567635c529f4a2b07912",
+    "native_name": "けけカリプソ",
+    "reference_id": "item_2A:000B",
+    "reference_sha256": "c0f5039ca76070b1a3358fcd299af8a2c31614bb5e63355f74c8176e817e2e93",
+    "evidence": "Reviewed native song identity: Calypso. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000C",
+    "source_sha256": "993faa13f9b90c11f9cbf7c62cf7fcea647d0a9d91c93b09ab08c702cc7e4422",
+    "native_name": "けけサルサ",
+    "reference_id": "item_2A:000C",
+    "reference_sha256": "d6fcb514c3ef8a1b2173849dc215ce899a627af0cae46464a56b865c3f2d52c1",
+    "evidence": "Reviewed native song identity: Salsa. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000D",
+    "source_sha256": "f019d1898a3cc8480022777f9c693690dfd5f5da8f7e22c8a1a64ca916dffb58",
+    "native_name": "けけマンボ",
+    "reference_id": "item_2A:000D",
+    "reference_sha256": "4691a18b2749ea81328ae4b7f8003dd9ab528bd276bf8d3db01ff77605c86af2",
+    "evidence": "Reviewed native song identity: Mambo. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000E",
+    "source_sha256": "2fe7a7ac2db546f55aab0dd42e6a33f252ee267179b04cbfb1a9db37d64539d1",
+    "native_name": "けけレゲエ",
+    "reference_id": "item_2A:000E",
+    "reference_sha256": "b5f786e46575cd5b9e1bac1b51243f1a863dfc842cd6d1edbfae677964ad9d0d",
+    "evidence": "Reviewed native song identity: Reggae. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:000F",
+    "source_sha256": "b52990dc139f9402ca467da6b84e59996132c5d14dbf46387aa006942536ff12",
+    "native_name": "けけスカ",
+    "reference_id": "item_2A:000F",
+    "reference_sha256": "dd89e90be19915b5131b03376fca807b6baa6bef9c08c9a726e66b70485d5590",
+    "evidence": "Reviewed native song identity: Ska. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0010",
+    "source_sha256": "08dca6ba809cceee67264c5a319b6c7cf8f4fff8cb1d5291c86b5cbdc7525d9e",
+    "native_name": "けけタンゴ",
+    "reference_id": "item_2A:0010",
+    "reference_sha256": "2aa5c33d316178ea029f2fca5fb44af1d26dda3010400b8a2a434fd6e450eeeb",
+    "evidence": "Reviewed native song identity: Tango. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0011",
+    "source_sha256": "caf81d3044b4964b7c558248411f84a649788e163331515793c5786a7f1a5772",
+    "native_name": "ハイサイけけ",
+    "reference_id": "item_2A:0011",
+    "reference_sha256": "f951be43b1d7fe817866a17d734b63b75afa1f62dad29a84f251458039f0dd36",
+    "evidence": "Reviewed native song identity: The native Haisai song is localised as K.K. Faire; corroborated by https://w.atwiki.jp/animalcrossing-wii/pages/33.html. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0012",
+    "source_sha256": "8d7021aa982757344e907e44d7d349211f4110e5fc1f0899b2d648868f5e07d8",
+    "native_name": "アロハけけ",
+    "reference_id": "item_2A:0012",
+    "reference_sha256": "7b5fc00c81578760a72064ee96f1f314eeabf3b87643a010c65d38550bbc2665",
+    "evidence": "Reviewed native song identity: Aloha. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0013",
+    "source_sha256": "f0b5031a2c209e76a71ea0f676fef7789972db151f3f26a2ca542e074c99e4a4",
+    "native_name": "アイリッシュそんぐ",
+    "reference_id": "item_2A:0013",
+    "reference_sha256": "6774b9cbd607c4a7ddf9318213de098c37130900ec0ddff31ca57e2c7cc7e34b",
+    "evidence": "Reviewed native song identity: Irish song, localised as Lucky K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0014",
+    "source_sha256": "70771d486fff5b60b8a66457132da753d66733be16f6dd141518ce643c140ede",
+    "native_name": "ペルーのうた",
+    "reference_id": "item_2A:0014",
+    "reference_sha256": "689b289e6fcf2b4253df485278d5ed6c7f249a3534cd432d8214afc2ab121f1f",
+    "evidence": "Reviewed native song identity: Peruvian song, localised as K.K. Condor. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0015",
+    "source_sha256": "577254f7f583887e7f292660b1b102ef5f70782e18a38ed179db204a8180de1a",
+    "native_name": "コサックそんぐ",
+    "reference_id": "item_2A:0015",
+    "reference_sha256": "90421d0f6008238635c652423346ac1d3cd181efb4e990f336f46577f0b2c64f",
+    "evidence": "Reviewed native song identity: Cossack song, localised as K.K. Steppe. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0016",
+    "source_sha256": "7377dcd262ff3fe4baa0503b6d4c07944b29e56ec27c20027fa3483a13b6e99a",
+    "native_name": "けけチャイナ",
+    "reference_id": "item_2A:0016",
+    "reference_sha256": "497e94aabacb3e08fdb549e42c245ac697cf0610051555eb604207de30b293d0",
+    "evidence": "Reviewed native song identity: China-themed song, localised as Imperial K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0017",
+    "source_sha256": "18ce6f12b141b14d8e2ef6f1ba87fe3c4e27b0150c7a915af20c64b672427f0b",
+    "native_name": "トルコそんぐ",
+    "reference_id": "item_2A:0017",
+    "reference_sha256": "4b8dd6696eab5da6431b1c2452475b4dd38db2f87d59935e70f6c56c3f33a9a5",
+    "evidence": "Reviewed native song identity: Turkish song, localised as K.K. Casbah. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0018",
+    "source_sha256": "76f60e2f0568fc0b02cc1d5e28554a31c7c84ee28529a6cb75e6d2512477386e",
+    "native_name": "けけアフロ",
+    "reference_id": "item_2A:0018",
+    "reference_sha256": "b580d7bdc0d2bb158b36b1eefb5a407cf1fb6c3afe8c1ed4506187ccf388f1d6",
+    "evidence": "Reviewed native song identity: Afro-themed song, localised as K.K. Safari. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0019",
+    "source_sha256": "5da8bd79a44fb347656791dd0c1ccd6e32b7794fccb73544a98fa8dbafec0209",
+    "native_name": "けけみんよう",
+    "reference_id": "item_2A:0019",
+    "reference_sha256": "2eaa3de70f730e0c64c9b36cdaab7b546f2293931ea7dea3ce670c9044727b02",
+    "evidence": "Reviewed native song identity: Folk song. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001A",
+    "source_sha256": "ab4855f7298d7834fbf42ee6de685f3cdb34f57acc432136c0e5e35918910c2f",
+    "native_name": "けけロック",
+    "reference_id": "item_2A:001A",
+    "reference_sha256": "db916990f42dd50527b3ba9214bce9c98643ef29f4cd7a284c26c5fbca1edbd0",
+    "evidence": "Reviewed native song identity: Rock. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001B",
+    "source_sha256": "2209a5bcc53e128266c8dd1a0c3ae251d23c0284234eab97790228f10414b4b8",
+    "native_name": "けけのロケンロール",
+    "reference_id": "item_2A:001B",
+    "reference_sha256": "58c40752f5d17079bcb0a88a149dfda4d0b82c1c0c6d0f5be120fb0759b0bf4d",
+    "evidence": "Reviewed native song identity: Rock and roll. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001C",
+    "source_sha256": "d581a54d6b3bc1e99e6587f6fdc5b4a86271d9f3ea9fa692b382b96c6e044cd5",
+    "native_name": "ラグタイム",
+    "reference_id": "item_2A:001C",
+    "reference_sha256": "7d9c7d2542fbdfbcc2f9c97f2ad5e46574f437ec070a55e681136cdb1c567e0a",
+    "evidence": "Reviewed native song identity: Ragtime. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001D",
+    "source_sha256": "cb5fba88b8eb8a8bbbffb4b2f9d9535b657fad01d635b48b576f964e7802fb9a",
+    "native_name": "ニューオリンズそんぐ",
+    "reference_id": "item_2A:001D",
+    "reference_sha256": "78b974fd9e8239ca67d2abd9c12109f66e557a52db91be420889dc3940b9825d",
+    "evidence": "Reviewed native song identity: New Orleans song, localised as K.K. Gumbo. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001E",
+    "source_sha256": "2e1b0c9e26f88cfe9348858e2e3c1a788af842a5a645ef26e86acb3a35e52c17",
+    "native_name": "けけファンク",
+    "reference_id": "item_2A:001E",
+    "reference_sha256": "4a029464edaff69dda0f8ec895d6a772e78f82c6d6633181a0650369c6af46d9",
+    "evidence": "Reviewed native song identity: Funk. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:001F",
+    "source_sha256": "a4213731d2f9af1d655d602e0da75988e2e10142b75767dc20764457956d9c31",
+    "native_name": "けけブルース",
+    "reference_id": "item_2A:001F",
+    "reference_sha256": "794f923911a2a4a4b615f33303177e61fc645301bde806bf43e842b037201d66",
+    "evidence": "Reviewed native song identity: Blues. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0020",
+    "source_sha256": "e5e0e4fe206d9563db15ba19dc5ae55fbe5d007b0f3cad81d94dfef12eab6a67",
+    "native_name": "けけゴスペル",
+    "reference_id": "item_2A:0020",
+    "reference_sha256": "8f4a265348c92a97dfbc697bfec7498d98c47c592c2ece62bef57a32311c1ef4",
+    "evidence": "Reviewed native song identity: Gospel, localised as Soulful K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0021",
+    "source_sha256": "a27c61d65349c46c22bacef807df9c3846ea19c4dbe5de17cd4edb7c0b6f3b28",
+    "native_name": "けけソウル",
+    "reference_id": "item_2A:0021",
+    "reference_sha256": "6297ef0d6c58a4ceb76195501cb16d6d01e7d3073c753493eed09a658df3af51",
+    "evidence": "Reviewed native song identity: Soul. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0022",
+    "source_sha256": "5b5770943156642e47bb920b5e15d488bdb7b59d62d6d77b3d15238567043a31",
+    "native_name": "アーバンけけ",
+    "reference_id": "item_2A:0022",
+    "reference_sha256": "7a36c6dbddcbea56ad98b97a3be5132416cd92ac9f2bfac840ca36f478049e3d",
+    "evidence": "Reviewed native song identity: Urban K.K., localised as K.K. Cruisin'. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0023",
+    "source_sha256": "64cbec7bb9002ccc4e79d0dbc6fd9d9f0edd5f0f958d92de77ae3d6fb3ad740e",
+    "native_name": "けけラヴソング",
+    "reference_id": "item_2A:0023",
+    "reference_sha256": "25f78c5c08031c8b62176ac84116e5f6f3194d1ad823ec21e01f6cfcbdd46906",
+    "evidence": "Reviewed native song identity: Love song. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0024",
+    "source_sha256": "1a6e9cec302c692a805a4ea6eb404e2cbfb96a0da255e1aef492c6aa5e7b7753",
+    "native_name": "ドラムンベース",
+    "reference_id": "item_2A:0024",
+    "reference_sha256": "900eec46ea60997add0a9bf84dd6e494b95de56477009505dabbf0a5ead8c093",
+    "evidence": "Reviewed native song identity: Drum and bass. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0025",
+    "source_sha256": "e634f4be4b75835ab1e1e99945a8b4392d04f943d8ada3e93a373b3f48e4f337",
+    "native_name": "テクノビート",
+    "reference_id": "item_2A:0025",
+    "reference_sha256": "2b9bde390b3ce1101e7393d8ff054039293681fa236ecf7be8d4d49cf6a1ef0b",
+    "evidence": "Reviewed native song identity: Techno beat, localised as K.K. Technopop. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0026",
+    "source_sha256": "e7717807025c7633ace92c25858c1c62c0aadc2dff8e9c4cd2557f259a9efd95",
+    "native_name": "ユーロビート",
+    "reference_id": "item_2A:0026",
+    "reference_sha256": "d222996221da4037ba7e3cd748bf99b443ee439da725ac6175a539d7d86e8413",
+    "evidence": "Reviewed native song identity: Eurobeat, localised as DJ K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0028",
+    "source_sha256": "09d2c9ba4f942d35a3fd29b5c6e5defb3c7d05e371c8b4caf9b6843e2def19ac",
+    "native_name": "けけカントリー",
+    "reference_id": "item_2A:0028",
+    "reference_sha256": "2ffddd77c518dc7782f75488d6c82212f254a5e0fad02faa37f2ba5cd8cdae1f",
+    "evidence": "Reviewed native song identity: Country. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0029",
+    "source_sha256": "f00d91281d88b2b1baa0b7b938e977476f4855e21695471d2e4b2ffaef8e5129",
+    "native_name": "エレキそんぐ",
+    "reference_id": "item_2A:0029",
+    "reference_sha256": "1fb73bf1b149c75b5d20a51f5b4b214d8b7d331e4cef34baaf14bedc391f3cf6",
+    "evidence": "Reviewed native song identity: Electric-guitar song, localised as Surfin' K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002A",
+    "source_sha256": "db3e471f3bd5fc0729cf9f7cf15d1e48839e5f458c0ae7207c465bdc19274432",
+    "native_name": "けけバラッド",
+    "reference_id": "item_2A:002A",
+    "reference_sha256": "f6a52738584c0dbbdf22201e812d5d2a973fa7cf7fd9d24b41ce4d388c91a7ef",
+    "evidence": "Reviewed native song identity: Ballad. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002B",
+    "source_sha256": "bcd9c4290732cfdeb77167c8d3332ae9fdcd519e807b7a6c9bd5802992704753",
+    "native_name": "しょうわけけかよう",
+    "reference_id": "item_2A:002B",
+    "reference_sha256": "d7a9722a556244da6450686f5863791f8928ea696d6973ed5f376f18aecb3583",
+    "evidence": "Reviewed native song identity: The native Showa-era song is localised as Comrade K.K.; corroborated by https://nookipedia.com/wiki/Comrade_K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002C",
+    "source_sha256": "d185884bf13f6a00b3b02a1e4fdeed21c3a17e968699bde0fcbb153deaf6cb81",
+    "native_name": "けけえんか",
+    "reference_id": "item_2A:002C",
+    "reference_sha256": "65265a9b159622ca71e672ba4141773054da3cb00e1a5df089a228a1c48d4d20",
+    "evidence": "Reviewed native song identity: Enka, localised as K.K. Lament. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002D",
+    "source_sha256": "c63e7e9ad25d7496eea42962e18e174a2df7f242644998cb49717e306051432d",
+    "native_name": "ゆけ!けけライダー",
+    "reference_id": "item_2A:002D",
+    "reference_sha256": "53bcdad473543d5d8f7e98c7a1c5bf9d5b47073317b31513b8ea5c5951fce64e",
+    "evidence": "Reviewed native song identity: Go, K.K. Rider. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002E",
+    "source_sha256": "ec6e18ee9744bb5ea3ea58fa6c67a3c815cfc994341481a9aca3a852d163a081",
+    "native_name": "こわいうた",
+    "reference_id": "item_2A:002E",
+    "reference_sha256": "da4f6927481e5db517354fdf16bd2a82e1a9ce5aa1f2df2affe55692a1a2f8a7",
+    "evidence": "Reviewed native song identity: Scary song, localised as K.K. Dirge. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:002F",
+    "source_sha256": "a4df4904ac34b9fce97712139a1810f02d4117ab536c9bf499ced44e5437e1f0",
+    "native_name": "けけウェスタン",
+    "reference_id": "item_2A:002F",
+    "reference_sha256": "d2672a8c24aca9d4ae2af4f676a2bd8de4d3d08e6cea0df8921599a223406e63",
+    "evidence": "Reviewed native song identity: Western. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0030",
+    "source_sha256": "2c3663d5ff0e1c637c8b056d0fcc944db1bcf4d639bb9edd9a0be6041e6e56ff",
+    "native_name": "けけせんせい",
+    "reference_id": "item_2A:0030",
+    "reference_sha256": "f0786355df97787ba1ddde7aab88e13eefc8bb74603107738c280585f625201d",
+    "evidence": "Reviewed native song identity: Teacher/Mr. K.K. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0032",
+    "source_sha256": "2cbb87e70467e990dfc316d490646c719faaa62af60dd80a4d8cce8185503f9c",
+    "native_name": "けけパレード",
+    "reference_id": "item_2A:0032",
+    "reference_sha256": "4bd1b051742cae8212cb1301038c6fa583bc3fb4ab304bfce18fa2b6a7cae985",
+    "evidence": "Reviewed native song identity: Parade. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0034",
+    "source_sha256": "a94e458bfebdf984d6b6215171f15d27db6743e3a071f66ce161e2d007138e2a",
+    "native_name": "けけソング",
+    "reference_id": "item_2A:0034",
+    "reference_sha256": "85e79abdc63c336bdfc81c223a2e3e514eb4e315a2f416898419945fb4da9da5",
+    "evidence": "Reviewed native song identity: K.K. Song. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0035",
+    "source_sha256": "f3858a6dd6a4f61fbdc5c97b4edfa753df3ced6a1b8da0e71c57c87912568ba7",
+    "native_name": "だいすき",
+    "reference_id": "item_2A:0035",
+    "reference_sha256": "eb4a73e5a234c3c14f27c6cd80f9e8f5704d64380f66243e89dbbc6049541067",
+    "evidence": "Reviewed native song identity: Love, localised as I Love You. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2A:0036",
+    "source_sha256": "9987b02e2e3e3807d59be3e5df240f8281bed8560e22e7d11cb9822a16944557",
+    "native_name": "おととい",
+    "reference_id": "item_2A:0036",
+    "reference_sha256": "665d99fa4958cd9de7aa78c6bc1ee2d70fefa66fa68f9b955025ebf5ed3e7ae2",
+    "evidence": "Reviewed native song identity: The day before yesterday, localised as Two Days Ago. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0013",
+    "source_sha256": "3761bb28df1911af1cbad3432a768c82eb106cf10648afb7f527c584386ecd48",
+    "native_name": "もみじのびんせん",
+    "reference_id": "item_20:0013",
+    "reference_sha256": "46f5076f22a37fd8b0357a96cf8cb24828e7abfb13ff12e260b441e7f3b5f88d",
+    "evidence": "Reviewed stationery name: Maple leaves. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0016",
+    "source_sha256": "a85453540fdc185ad34374de26b6e23c1ab29750411fbc7fe42874c197c64313",
+    "native_name": "クリスマスのびんせん",
+    "reference_id": "item_20:0016",
+    "reference_sha256": "94ca001cb9c425f39f38f552611865238e442e6bb0ddd5497f403e16df824da3",
+    "evidence": "Reviewed stationery name: Christmas/festive. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0017",
+    "source_sha256": "119c808e9d6b4ee2999161cf52fe6ffb05a67c1305c3fa50ee57d4cff94936cf",
+    "native_name": "まちなみのびんせん",
+    "reference_id": "item_20:0017",
+    "reference_sha256": "83a3db883ad4283d4607ad6e0fdbe2da2971f5648fd32bca438a69a50dd14388",
+    "evidence": "Reviewed stationery name: Town skyline. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0023",
+    "source_sha256": "5ead01c5624294ab0ce40f526c12c172d98b3540df1e3e17a7a46988eb0b385a",
+    "native_name": "ゴージャスなびんせん",
+    "reference_id": "item_20:0023",
+    "reference_sha256": "ef6f739af87e57177fb8110ba9a46b32370963d026e7f0c90ab5e42f160b6b8a",
+    "evidence": "Reviewed stationery name: Gorgeous/elegant. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0024",
+    "source_sha256": "b6e5c418bed1e282828d3b2dca403cb7d499ee9bc39205fedab03a78236a90ec",
+    "native_name": "レースなびんせん",
+    "reference_id": "item_20:0024",
+    "reference_sha256": "6b7a97badb1225b523a580326960670ea51b1827df2412fa116e539b02dad208",
+    "evidence": "Reviewed stationery name: Lace. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0025",
+    "source_sha256": "28de42485367fdf3b434f3377f6356af5bcaa5152d1a774a2a6649983f6a8ca3",
+    "native_name": "みずたまなびんせん",
+    "reference_id": "item_20:0025",
+    "reference_sha256": "8158f172fdddfcf8ec8cfbe820048fb5cdd5b53c4d56f71cdfa0ca9f99aff550",
+    "evidence": "Reviewed stationery name: Polka dots. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0030",
+    "source_sha256": "6ebd4d00d214077baa11be42cec62917c8130f0a4bb7f6da8daeb27b38cee674",
+    "native_name": "ふゆのもりのびんせん",
+    "reference_id": "item_20:0030",
+    "reference_sha256": "4caf07dc56795accc5f781eacb54b06d9c99964da25e215bd6b45001d4b08dc6",
+    "evidence": "Reviewed stationery name: Winter forest. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0032",
+    "source_sha256": "23fb929fe12aacf1b16bc0d38ba25df7b1c04abe5267e9b762f1bf1fedf9241c",
+    "native_name": "つるくさのびんせん",
+    "reference_id": "item_20:0032",
+    "reference_sha256": "eb4de376169f32017801311ab13b6629c6791c3e726a4b58e45f05554efa4f94",
+    "evidence": "Reviewed stationery name: Climbing vines/ivy. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0036",
+    "source_sha256": "7c989e1460e6c75247392a5c05023b08edfd9edc12ec2acfa684531cf2813aed",
+    "native_name": "かすみのびんせん",
+    "reference_id": "item_20:0036",
+    "reference_sha256": "ed35016f8267d095c3e6850591ccbd97fcb5bf3f31039ab5f27cd309f0eec011",
+    "evidence": "Reviewed stationery name: Mist. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0037",
+    "source_sha256": "10617c8dd1bf3b8e3a1fde6915006536ee3472716ec3a0e8df5fc213a9ad3813",
+    "native_name": "よくあるびんせん",
+    "reference_id": "item_20:0037",
+    "reference_sha256": "6255a1a66bdc13257ba252e61611a19437a03b16048ccb0b647e068ac1361b2d",
+    "evidence": "Reviewed stationery name: Ordinary/simple. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0039",
+    "source_sha256": "9b771782da38ba978b6089bffb0bb7acfe97f6691db54e58ef5f0cd9e1e53c2b",
+    "native_name": "ふしぎなびんせん",
+    "reference_id": "item_20:0039",
+    "reference_sha256": "13d789eb5c3e8db6749872df042fd16304ae4b03c5081c55bd0ed5e7bea79398",
+    "evidence": "Reviewed stationery name: Mysterious/mystic. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0000",
+    "source_sha256": "2bf1c23f1a1e522a33c939e1dacf7b889ea81577d4aa0df07b47387f276704a8",
+    "native_name": "エアメールなびんせん",
+    "reference_id": "item_20:0000",
+    "reference_sha256": "98cd82cd359b2ab0086d7f07abf95302b29feba791e4810c9f225d390cd0f3b6",
+    "evidence": "Reviewed stationery name: Air mail. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0001",
+    "source_sha256": "8dfba89bc36f9057e85dd33532ff14c27f45c04b61da249813f7fc5d40133327",
+    "native_name": "キラキラなびんせん",
+    "reference_id": "item_20:0001",
+    "reference_sha256": "f408a14146cf85d4fb589a234cb11956a0f20c884ed9e3d3046b26c170b658eb",
+    "evidence": "Reviewed stationery name: Sparkling. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0004",
+    "source_sha256": "569427d553defee8044362dc765d7b6287cfce582e1e113aaf724c7c1c9a9c89",
+    "native_name": "げんこうようし",
+    "reference_id": "item_20:0004",
+    "reference_sha256": "39e2f046b6e5dbb776d58a4cbde5a9c391ef8167377af51123bb4b00e8bd5d4a",
+    "evidence": "Reviewed stationery name: Manuscript/essay writing. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0006",
+    "source_sha256": "52881f87f9358880b135384ca05bb6513165a99bc7dd8efb88cb220116446fed",
+    "native_name": "カントリーなびんせん",
+    "reference_id": "item_20:0006",
+    "reference_sha256": "c839cb111bde609c4b5eb73269f4b81cc823a49ecac4b38970b0b4bbaaeff86e",
+    "evidence": "Reviewed stationery name: Country/ranch. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0007",
+    "source_sha256": "ebdd3df2c8933db8f055547feda46a4aba47a17bd5eec9290909b2f1a4e4c56a",
+    "native_name": "てっぱんのびんせん",
+    "reference_id": "item_20:0007",
+    "reference_sha256": "d80c835b4d1b18eeae244bb48ebdd7ec97a4276afab4d5430dd23130475abcef",
+    "evidence": "Reviewed stationery name: Iron plate/steel. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0008",
+    "source_sha256": "32463a13ed7a88f0b5fcbfbfd88ef7e33dd88c659106eb87de924d13991e5ac5",
+    "native_name": "はなわくのびんせん",
+    "reference_id": "item_20:0008",
+    "reference_sha256": "1543e6310c7650d67cc7949ef0c9307e4c7a66c59d1e83ea3378509dda7be592",
+    "evidence": "Reviewed stationery name: Floral border/blossom. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:0009",
+    "source_sha256": "24a30475a9de0d8157b51f89d98fa38377cacb4a01dc19265f0be4eac77ee32d",
+    "native_name": "つたのびんせん",
+    "reference_id": "item_20:0009",
+    "reference_sha256": "4c208346b33c7f15ef849277a33f32e89d0b536f4fc442d3593f6db32bd8e91f",
+    "evidence": "Reviewed stationery name: Vine. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:000A",
+    "source_sha256": "abcfd83dda4c6a6aac0e1b33274bffb69f1a36bd35e3346bd67540ecb9620924",
+    "native_name": "なつのくものびんせん",
+    "reference_id": "item_20:000A",
+    "reference_sha256": "6b8b21bb28ea1ec4938aa298b426902d9e9d7523942702ffb5f892dc676e1de6",
+    "evidence": "Reviewed stationery name: Summer clouds. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:000B",
+    "source_sha256": "94dae952432fe8cb1faf4ec9c74d0dbf3717db882707b0903c85dc76cd509a2c",
+    "native_name": "さくらちるびんせん",
+    "reference_id": "item_20:000B",
+    "reference_sha256": "f4df1a8aea776f81f1ff1c2d080e87a4dc498fa91363c38c9615e7fba0b5860e",
+    "evidence": "Reviewed stationery name: Falling cherry petals. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:000C",
+    "source_sha256": "9f3ab3867279ebe6bf26ec35295445c4c1b0c92d0a9c041d743f837e7184f13c",
+    "native_name": "ゆきふるびんせん",
+    "reference_id": "item_20:000C",
+    "reference_sha256": "bdd6e4c6035c0dff63927d206f113ebf8361bbff78e624c45725f98219858de7",
+    "evidence": "Reviewed stationery name: Falling snow. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:000D",
+    "source_sha256": "0b6898b160a4c7084088614ac0a9af1185433bee73ea4bb47a02de4666f00dd5",
+    "native_name": "あめふるびんせん",
+    "reference_id": "item_20:000D",
+    "reference_sha256": "e599c1c465c6061acdf4421430059ea5ac2b4d22174cd954f8e934a414790fc5",
+    "evidence": "Reviewed stationery name: Falling rain. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:001A",
+    "source_sha256": "d039974b5fa84afdf1a8b42892fa5da3078f837db014dbbf21f65c64e9a75c60",
+    "native_name": "ステージのびんせん",
+    "reference_id": "item_20:001A",
+    "reference_sha256": "f5044cd3ce3712c62ea122d695aa6aa38991f4312bf35e69156132a5cb7c33da",
+    "evidence": "Reviewed stationery name: Stage. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:001B",
+    "source_sha256": "b570236d08df620edbda1d806b45b5c953e5cb114869765e8ec07857e1e05e84",
+    "native_name": "あつがみのびんせん",
+    "reference_id": "item_20:001B",
+    "reference_sha256": "6be73c904a8932c2f89ba23ba871a94e16d8cf54e0f90e58035812019b75521e",
+    "evidence": "Reviewed stationery name: Thick card. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:001E",
+    "source_sha256": "0c437a366142b3607693942012d132f2c19ccd05528e18716adb8e48dc0653fb",
+    "native_name": "せいそなびんせん",
+    "reference_id": "item_20:001E",
+    "reference_sha256": "eddacdccd5d36fd2fd49d7e011c52bf4bb5f748d8e11b4c7917322923e525e8b",
+    "evidence": "Reviewed stationery name: Neat. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:002A",
+    "source_sha256": "ddd35556c34bf597995ee7f5cffc60320cec051f59cf24c4ddadc5ec11a4c989",
+    "native_name": "アロハなびんせん",
+    "reference_id": "item_20:002A",
+    "reference_sha256": "c7edbaf607cf10d70b0f7205054a9d50ccaff8e53cdfd45ec49ac62eef8f2c79",
+    "evidence": "Reviewed stationery name: Aloha. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:002E",
+    "source_sha256": "d13e03a92fd3e630c90c7952d6ccd3039121b1267f27ad2c205351f91a8cc1ea",
+    "native_name": "いちょうのびんせん",
+    "reference_id": "item_20:002E",
+    "reference_sha256": "a17832bbdf900f3fd7e83eb347aaa83a3f6710660316bf5501e6a5d620ce3ab8",
+    "evidence": "Reviewed stationery name: Ginkgo; retain the supplied English spelling gingko. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:003C",
+    "source_sha256": "1c2985f376211ac447d4a1d6d79ccb19fd1e15060f3cc5526163b4fa1afb972b",
+    "native_name": "プチはなのびんせん",
+    "reference_id": "item_20:003C",
+    "reference_sha256": "c072cf011321159e5467e3cbb5ec39fe405e760a63b4f591bc97f17804236eaf",
+    "evidence": "Reviewed stationery name: Small flowers/dainty. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:003E",
+    "source_sha256": "465d4d1f47bcaa6104f6d4b44b6ccc434d104a49eed9f9786db068c19011f600",
+    "native_name": "しょうがつなびんせん",
+    "reference_id": "item_20:003E",
+    "reference_sha256": "04a5ad926b5ed03fbfce57e080361b8f22c9a5f4b1b7a2f1bcc570f9323d19d6",
+    "evidence": "Reviewed stationery name: New Year. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_20:003F",
+    "source_sha256": "be94a68146f12a8482ab67e43e9a04fc60e583f1ad6f02a92c594d39e79b4456",
+    "native_name": "タコちゃんのびんせん",
+    "reference_id": "item_20:003F",
+    "reference_sha256": "ba7fa93fdb200d34baebe12fd72f155981b4ec546a375a12ea4bd18a0b888094",
+    "evidence": "Reviewed stationery name: Octopus/inky. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_21:0000",
+    "source_sha256": "f454862e5596ce1ee5412332702f29c278a4344cc5e8933263d462e4c8b6cf6f",
+    "native_name": "おかね1000ベル",
+    "reference_id": "item_21:0000",
+    "reference_sha256": "2f794c7f8e1ae50722396054c4856b322ab9e06c9ca3f08011198af79580d4bf",
+    "evidence": "The native denomination is 1000 Bells; preserve the complete comma-separated English amount. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_21:0001",
+    "source_sha256": "e2987304e2a49216f742986e5612c555a7922c85582d00cbe5b1f44b45e435d5",
+    "native_name": "おかね10000ベル",
+    "reference_id": "item_21:0001",
+    "reference_sha256": "29678841b85a84e552b35e623b8edbdb9c537dc3ed1ab638b0d810b211f069c0",
+    "evidence": "The native denomination is 10000 Bells; preserve the complete comma-separated English amount. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_21:0002",
+    "source_sha256": "9f2e5eedc0bd2b545365cf99b3acf3f76821b36f4994857ab6e714fd5edd81c4",
+    "native_name": "おかね30000ベル",
+    "reference_id": "item_21:0002",
+    "reference_sha256": "dbb7e0993546a73e711c4e5d6f76311875c4f081da0e83bb427180e94110d767",
+    "evidence": "The native denomination is 30000 Bells; preserve the complete comma-separated English amount. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:0003",
+    "source_sha256": "e8813de87e4c1a904dd9123998feea642e66d49603cb176a519b0ab7304136e4",
+    "native_name": "つりざお",
+    "reference_id": "item_22:0003",
+    "reference_sha256": "f70f7cd7ccbf90b6af1f914c05b8425535b83d11de852b50a57c87964275b0a9",
+    "evidence": "Reviewed native tool or umbrella: Fishing rod. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:0008",
+    "source_sha256": "fd680e6e43bd44b71a63b60d7c48c110639040f6dd6fef086c6062ce82ffafb1",
+    "native_name": "ポップなかさ",
+    "reference_id": "item_22:0008",
+    "reference_sha256": "8e0c02aba5c002c783fdf0f4940fa86f08eb9eb68c61d62e39a012c6be057954",
+    "evidence": "Reviewed native tool or umbrella: Pop/mod style. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:0009",
+    "source_sha256": "cc4c159523ff9cbb5c2d762ef2ccd000c39494e595d73ecf333c99f838d76e53",
+    "native_name": "マーガレットのかさ",
+    "reference_id": "item_22:0009",
+    "reference_sha256": "6eeb65da54c34d46bc32e4437805b824c89da86b809dbc98c804b7025299f8ca",
+    "evidence": "Reviewed native tool or umbrella: Marguerite flower/petal. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:000B",
+    "source_sha256": "9de150111a6b8a7731a1138c777ef757920e07820a775020f56653e6ae00ca3b",
+    "native_name": "ピンクチェックのかさ",
+    "reference_id": "item_22:000B",
+    "reference_sha256": "44cfda961eee53c1e0884554aff4b2cea21003739368efddecf0e10a6a8f3cb3",
+    "evidence": "Reviewed native tool or umbrella: Pink checked/gingham pattern. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:000C",
+    "source_sha256": "0a87f54c07205785e2fd81bb4864f0c047fae0a390732570199e1118b7462e74",
+    "native_name": "シアンチェックのかさ",
+    "reference_id": "item_22:000C",
+    "reference_sha256": "5656b789fb6d62386704ab2c83796dd162d78530d0cf0885856aada86e249f5b",
+    "evidence": "Reviewed native tool or umbrella: Cyan checked/plaid pattern. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_22:0013",
+    "source_sha256": "1d72acb7c6f8597103dc6100fb9fd4517b9aa9b6928a7e29f6586ed2efbb3034",
+    "native_name": "ひまわりのかさ",
+    "reference_id": "item_22:0013",
+    "reference_sha256": "33a7f51232252d6efc88bf5fc18248fc4e850a9933731bf1d6594eee57cd1488",
+    "evidence": "Reviewed native tool or umbrella: Sunflower/sunny. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0003",
+    "source_sha256": "c0b785e618f5b8585a32354818bc285e6a38ca4d85ba484f899e8152461f5c0c",
+    "native_name": "ビデオ",
+    "reference_id": "item_25:0003",
+    "reference_sha256": "14366c35ada85b109e88cf8a1ed03e4ae218061b8c6ca66d6846afd1e6ad188f",
+    "evidence": "Reviewed native quest item: Video cassette/videotape. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0004",
+    "source_sha256": "b7c7c1f64730fa95c171bde6cf25c150d5801dadf44ec17cac673d2db70c8eb7",
+    "native_name": "てちょう",
+    "reference_id": "item_25:0004",
+    "reference_sha256": "ad0e5600e6f493fe8eea1b09898af8628ee4a8d3bd99c2bf82ba6d4cf68cf65b",
+    "evidence": "Reviewed native quest item: Pocket diary/organizer. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0006",
+    "source_sha256": "5c3eb80088fbbd79cacb87bb5a2f6060ed0915052a1da690349406f393bde944",
+    "native_name": "マンガ",
+    "reference_id": "item_25:0006",
+    "reference_sha256": "e29e1f6f06e7d659c5482515f5ed98fe1b4a090a9c1eecddcaa2907892bbd369",
+    "evidence": "Reviewed native quest item: Manga/comic book. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0007",
+    "source_sha256": "ea3e2d8eb2ffb4e0a096755280cb788a85f92685177291a0944f42570120be7e",
+    "native_name": "えほん",
+    "reference_id": "item_25:0007",
+    "reference_sha256": "8fefd8533fd8b7c003588d9d62f74d47eccab1dd5a9d64e26718e85b63bf4a32",
+    "evidence": "Reviewed native quest item: Illustrated/picture book. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0008",
+    "source_sha256": "470aa5a10f08368e6078f41758d50e1ba2b069e77136b0f47ac9d65d8d5b6de0",
+    "native_name": "GB",
+    "reference_id": "item_25:0008",
+    "reference_sha256": "de7181aeb7502ef7c4da3a37915d60481e1e69fc1138ec7cf1a5baf4c02a65b5",
+    "evidence": "Reviewed native quest item: GB/Game Boy. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_25:0012",
+    "source_sha256": "77d93de404bd02820adf9be89cf347d2690608f533ececc37455cd9131a59260",
+    "native_name": "おとしあなのたね",
+    "reference_id": "item_25:0012",
+    "reference_sha256": "ddc077bd6d57172b3c6051a6c0723c5a8e9c4dff58354b6117bead0101007639",
+    "evidence": "Reviewed native quest item: Pitfall seed. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_28:0005",
+    "source_sha256": "94a64cff70d7b674ec696d80a5af5e31359f6f23f07893724991577adf8782e9",
+    "native_name": "マツタケ",
+    "reference_id": "item_28:0005",
+    "reference_sha256": "0088d6ee62742325ada3918335bd80e13b9b59c0cf9c5bab64540690629d72a8",
+    "evidence": "The native matsutake is the mushroom item, not the legacy candy gloss. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_28:0006",
+    "source_sha256": "0fd6876928621b122672d30ce439f36f321dd87d50bbce848ff3bb02ffb9136c",
+    "native_name": "あめ",
+    "reference_id": "item_28:0006",
+    "reference_sha256": "6cd9f8698f70a457e935dee27b80d7175dcb838bed451a7902adb3d59784d593",
+    "evidence": "The native sweet is candy, not the legacy coconut gloss. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0001",
+    "source_sha256": "fe868d5dd36603fb882a65be107469e3aaec5b207d72309d7a63fa7c2c3c69cf",
+    "native_name": "しろいパンジー",
+    "reference_id": "item_29:0002",
+    "reference_sha256": "49c0486ea5a14fa91ceb7ea7ad3263237e2d9d9be9dcc3353246ac0d863491b7",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: しろいパンジー to white pansy bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0002",
+    "source_sha256": "ad1c7d75da9ef76c37d3f9aa453a39eadf1f44a7c0610dfd4cf68b115c8bded8",
+    "native_name": "むらさきパンジー",
+    "reference_id": "item_29:0003",
+    "reference_sha256": "0eaf70b1cf675e1f22a6ac93a724241ddc6ce7d48d500ec04d5c9dcfaa214cf6",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: むらさきパンジー to purple pansy bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0003",
+    "source_sha256": "1ff312b35c95b860a461d7085d0aa7a798c3958ecb84729e892923d3ddf67db9",
+    "native_name": "きいろいパンジー",
+    "reference_id": "item_29:0004",
+    "reference_sha256": "834c5983bbcf71a9756d626084fed0a3bb8fa6f5b4d1e4c4f9a99510add898b6",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: きいろいパンジー to yellow pansy bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0005",
+    "source_sha256": "cdbe247e3391a422b8a64c75ea532632f94a84ec7bc10c195c7c436cc20c8ac4",
+    "native_name": "ピンクのコスモス",
+    "reference_id": "item_29:0006",
+    "reference_sha256": "5f0ab1b2f1c6bbf82d19bce50d9f7d860c8e377b87c95e2bdcb82e3284a64d6c",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: ピンクのコスモス to pink cosmos bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0006",
+    "source_sha256": "2e28f41bc3148683bc6f93e9d32099da64fb1b4f6f5f53378a55568788915d31",
+    "native_name": "みずいろコスモス",
+    "reference_id": "item_29:0007",
+    "reference_sha256": "46f2905adf541dfb06b958dd964b26e99f949e502e293a1dda02d6e44ed9e1a5",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: みずいろコスモス to blue cosmos bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0007",
+    "source_sha256": "ba59f9fa080363b586b115d213af2eb024a6fbd285f08e25f937cbefb632529c",
+    "native_name": "あかいチューリップ",
+    "reference_id": "item_29:0008",
+    "reference_sha256": "a29e6736174c39fa97ee5226b1098311c4d7aa36258827a30bef92c88de1d82b",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: あかいチューリップ to red tulip bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0008",
+    "source_sha256": "176fdca6d7aa633dbe44e2d1c4f019e405042c01253e0cf9a74664f42ae8b3cf",
+    "native_name": "しろいチューリップ",
+    "reference_id": "item_29:0009",
+    "reference_sha256": "e1d5f4d3c787255d6b9843e7f9a131b596f6f244219f894216656abb0f307c47",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: しろいチューリップ to white tulip bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_29:0009",
+    "source_sha256": "5608f2e8fc04a4cc6f29b39fb7715b676080858c8de0fa647ac6c3abaf580a63",
+    "native_name": "きいろいチューリップ",
+    "reference_id": "item_29:000A",
+    "reference_sha256": "e62901bd11aa026cbef36ca54ea07910bdd6db5789b472735d0c2597ba1ff6da",
+    "evidence": "The English table inserts cedar sapling before flower seeds. Match the native species and colour explicitly: きいろいチューリップ to yellow tulip bag. Do not shift the native yellow cosmos to English white cosmos. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0000",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0000",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0001",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0001",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0002",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0002",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0003",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0003",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0004",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0004",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0005",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0005",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0006",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0006",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0007",
+    "source_sha256": "f7fa470a44a347cb2f21cfa87529663c6fb3dfbeab75e015c3e6a5eda326552c",
+    "native_name": "1がつふくびきけん",
+    "reference_id": "item_2C:0007",
+    "reference_sha256": "02fddb1c35b3234771e7b2dc2d79902de20de9ed5e69f15a44c8901f9746c690",
+    "evidence": "The native raffle ticket expires in month 1, January; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0008",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:0008",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0009",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:0009",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000A",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000A",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000B",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000B",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000C",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000C",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000D",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000D",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000E",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000E",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:000F",
+    "source_sha256": "de073848daaf6be3ee07dc47ddbf96b261ef704e190a9006576a2771f4068684",
+    "native_name": "2がつふくびきけん",
+    "reference_id": "item_2C:000F",
+    "reference_sha256": "eb60abae8bd68b6d1b7637061dadc4f54a415b1fb3d535fb4d4afa55c8af4a90",
+    "evidence": "The native raffle ticket expires in month 2, February; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0010",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0010",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0011",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0011",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0012",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0012",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0013",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0013",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0014",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0014",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0015",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0015",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0016",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0016",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0017",
+    "source_sha256": "499ec9edce1cf0117f9bf15b20ae8afe47a3289890f9da8002a902f860f8dfd5",
+    "native_name": "3がつふくびきけん",
+    "reference_id": "item_2C:0017",
+    "reference_sha256": "bf57370d1d6609b30e44fbc1a8cde6abab8b85ae96d85ef9a7b95be03add543d",
+    "evidence": "The native raffle ticket expires in month 3, March; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0018",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:0018",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0019",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:0019",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001A",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001A",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001B",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001B",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001C",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001C",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001D",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001D",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001E",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001E",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:001F",
+    "source_sha256": "35761fe52a3f566818ae3e011ad964348526eae63409375841e941c4729b9524",
+    "native_name": "4がつふくびきけん",
+    "reference_id": "item_2C:001F",
+    "reference_sha256": "e991d74387428165f13f8f0b1d3c4182a1c59a3eeaf1b127175bde5b6c7a433f",
+    "evidence": "The native raffle ticket expires in month 4, April; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0020",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0020",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0021",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0021",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0022",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0022",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0023",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0023",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0024",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0024",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0025",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0025",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0026",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0026",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0027",
+    "source_sha256": "21e300b530a7e41cdbf3e4eb5a9971011187a2ef51285540f9811635e8a1a4a7",
+    "native_name": "5がつふくびきけん",
+    "reference_id": "item_2C:0027",
+    "reference_sha256": "95791351979271e3f2ba823078f39b9a980a76ee72c53d0b09093bbe822fa310",
+    "evidence": "The native raffle ticket expires in month 5, May; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0028",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:0028",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0029",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:0029",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002A",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002A",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002B",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002B",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002C",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002C",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002D",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002D",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002E",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002E",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:002F",
+    "source_sha256": "f4176e5bd76e309fb354b8e5952d2aadebcbe0718ab72bcb5178ce39fe99f919",
+    "native_name": "6がつふくびきけん",
+    "reference_id": "item_2C:002F",
+    "reference_sha256": "e76f4c016e746cac8ab8256f6396944cdb768ee12186adf4f8622e7bf561e292",
+    "evidence": "The native raffle ticket expires in month 6, June; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0030",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0030",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0031",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0031",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0032",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0032",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0033",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0033",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0034",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0034",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0035",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0035",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0036",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0036",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0037",
+    "source_sha256": "1fd439866b2bf94f7f12c0e90ddbddc1887eeb9d24eef1ccb7beace36a419dbd",
+    "native_name": "7がつふくびきけん",
+    "reference_id": "item_2C:0037",
+    "reference_sha256": "70c54f82e724da35b2b07edc0f689f807bcd53525f89cd16dbe452ed61d6eba5",
+    "evidence": "The native raffle ticket expires in month 7, July; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0038",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:0038",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0039",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:0039",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003A",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003A",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003B",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003B",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003C",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003C",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003D",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003D",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003E",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003E",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:003F",
+    "source_sha256": "dcc25baaef3ff4b1f3674bb862267abe4da7215ef7797e1b12fed92f091b7258",
+    "native_name": "8がつふくびきけん",
+    "reference_id": "item_2C:003F",
+    "reference_sha256": "a5afc6f8e40d2e855ded763d8e9009b075d68e050fd755bcc18fd6eee67c66ea",
+    "evidence": "The native raffle ticket expires in month 8, August; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0040",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0040",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0041",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0041",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0042",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0042",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0043",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0043",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0044",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0044",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0045",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0045",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0046",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0046",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0047",
+    "source_sha256": "b64916374e897e954d39f1e5b7897c9f9c85eebdeb7796cdc8539dc96b270043",
+    "native_name": "9がつふくびきけん",
+    "reference_id": "item_2C:0047",
+    "reference_sha256": "e283f302892b3ff448de801412243a65390098f0f175778bf490de163028c5c2",
+    "evidence": "The native raffle ticket expires in month 9, September; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0048",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:0048",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0049",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:0049",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004A",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004A",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004B",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004B",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004C",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004C",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004D",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004D",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004E",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004E",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:004F",
+    "source_sha256": "96da5338f6ff0d15ae11af0b41bf53f81e32ba8c4af5fd44b2cc2c09991bb1c2",
+    "native_name": "10がつふくびきけん",
+    "reference_id": "item_2C:004F",
+    "reference_sha256": "c91bf7e6cd8f073eef9bb9df8fc3a6eea382ae1ea6caa27f5e7a873d19d15d03",
+    "evidence": "The native raffle ticket expires in month 10, October; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0050",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0050",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0051",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0051",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0052",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0052",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0053",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0053",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0054",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0054",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0055",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0055",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0056",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0056",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0057",
+    "source_sha256": "26e6a2c2dd263b0b47946f14ba14d253a6214318847e216fe062b92fe20291b3",
+    "native_name": "11がつふくびきけん",
+    "reference_id": "item_2C:0057",
+    "reference_sha256": "58166ac08e6b43da6ec08f3cd2ad94b2d1b4adae66d4d01693e3b36ac9016b8e",
+    "evidence": "The native raffle ticket expires in month 11, November; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0058",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:0058",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 1 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:0059",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:0059",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 2 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005A",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005A",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 3 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005B",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005B",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 4 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005C",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005C",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 5 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005D",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005D",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 6 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005E",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005E",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 7 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2C:005F",
+    "source_sha256": "fde0959ac8ce0daa9616e43a8d8e5f969243becbce917d2c629c8f5ab8ffdbd0",
+    "native_name": "12がつふくびきけん",
+    "reference_id": "item_2C:005F",
+    "reference_sha256": "9110679f765dbbe83eee85d24acae7258b02f0df1b46a54f34b632dcab52de33",
+    "evidence": "The native raffle ticket expires in month 12, December; this is quantity slot 8 of eight identical names. October must not inherit the legacy September label. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2E:0000",
+    "source_sha256": "a38a55db282b2c69500be3c3899ca507e9f3a07601848b2a8fb2f08cedae57d9",
+    "native_name": "ふくぶくろ",
+    "reference_id": "item_2E:0000",
+    "reference_sha256": "d5773e24d37ccfb786b043d4adc08f3b6aa5cea999c970d111f43aa81fdc72e2",
+    "evidence": "The native lucky bag is the supplied grab bag. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2E:0001",
+    "source_sha256": "a38a55db282b2c69500be3c3899ca507e9f3a07601848b2a8fb2f08cedae57d9",
+    "native_name": "ふくぶくろ",
+    "reference_id": "item_2E:0001",
+    "reference_sha256": "d5773e24d37ccfb786b043d4adc08f3b6aa5cea999c970d111f43aa81fdc72e2",
+    "evidence": "The native lucky bag is the supplied grab bag. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2F:0000",
+    "source_sha256": "79d0e1d8d66a175a653f6a09e1e654d2973e625b881702cc26b7bf3e352a5370",
+    "native_name": "10かぶ",
+    "reference_id": "item_2F:0000",
+    "reference_sha256": "88d703f82c0b3a0979cbfad1a5692c36845cf551682ec8788b39b2acb6358d60",
+    "evidence": "The native quantity or spoilage state is 10 turnips. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2F:0001",
+    "source_sha256": "ce71cf55e28f4fe75975d12c9bd12a479e52990dc97072afa6a7afd0a4c9d35f",
+    "native_name": "50かぶ",
+    "reference_id": "item_2F:0001",
+    "reference_sha256": "bc8b049eaecb2ee216dcf72cff245c3299ad9291ebdd482abd51103bd9e00709",
+    "evidence": "The native quantity or spoilage state is 50 turnips. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2F:0002",
+    "source_sha256": "5abb049f109c906a28af4e88b940d7e0b1f79513300bddbe37c0da6ffe4f198f",
+    "native_name": "100かぶ",
+    "reference_id": "item_2F:0002",
+    "reference_sha256": "078b9c792514ff891fd97e3055d04412800e2d848e14880e89a93e4b6241f5ba",
+    "evidence": "The native quantity or spoilage state is 100 turnips. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_2F:0003",
+    "source_sha256": "1cda5bae12c525401c713abde068ffacb3cc27da8d45b4c445579f15ac4fe621",
+    "native_name": "くさったかぶ",
+    "reference_id": "item_2F:0003",
+    "reference_sha256": "1e7e15bf02e3c40dd761b2140a5c629e3d6f0e07cf54fd77707f556ce02bbe8a",
+    "evidence": "The native quantity or spoilage state is Spoiled turnips. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
   }
 ]
