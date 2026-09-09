@@ -257,6 +257,17 @@ def verify_installation(built, native, report):
         additions.update({v: files[v].extract(built) for v in RESOURCE_HASHES})
     evidence = install(native, replacements, additions, {}, module,
         artifact_data=(files[VROM].extract(built), loader, entry['artifact']))
+    if report.get('actor_display_names'):
+        # The complete later integration may consume only its explicitly
+        # approved reserve-name sequence, including the adapter's final NOP.
+        from actor_display_names import verify_installation as verify_actor_names, patches
+        verify_actor_names(built, native, report)
+        spec = ACTORS['reserve']
+        result = bytearray(replacements[spec.vrom])
+        for address, body in patches('reserve').items():
+            at = address-spec.ram
+            result[at:at+len(body)] = body
+        replacements[spec.vrom] = bytes(result)
     for vrom, expected in replacements.items():
         if files[vrom].extract(built) != expected:
             raise ValueError('Incomplete installed text-extension code or actor')

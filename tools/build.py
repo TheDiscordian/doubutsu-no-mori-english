@@ -225,6 +225,7 @@ def main():
     parser.add_argument('--english-event-item-names', action='store_true', help='Complete names in event, opening shop, and home conversations; requires player item-name bridge')
     parser.add_argument('--english-stall-choices', action='store_true', help='Complete festival-stall names and cancellation choices; requires resident English choices and items')
     parser.add_argument('--english-text-extension', type=Path, help='Persistent complete general dialogue fields and free-item adapters')
+    parser.add_argument('--english-actor-display-names', action='store_true', help='Complete festival/reserve name preparations; requires display names and persistent text fields')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -325,6 +326,8 @@ def main():
         parser.error('--english-stall-choices requires --runtime-module, --english-runtime, and --extended-items')
     if args.english_text_extension and not (args.runtime_module and args.english_runtime and args.extended_items and args.extended_font):
         parser.error('--english-text-extension requires the resident runtime, full item names, and startup font')
+    if args.english_actor_display_names and not (args.english_text_extension and args.display_names):
+        parser.error('--english-actor-display-names requires --english-text-extension and --display-names')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -480,6 +483,9 @@ def main():
         from text_extension import install as install_text_extension
         report['text_extension'] = install_text_extension(rom, replacements, additions, relocations,
             report['runtime_module'], args.english_text_extension)
+    if args.english_actor_display_names:
+        from actor_display_names import install as install_actor_names
+        report['actor_display_names'] = install_actor_names(rom, replacements, additions, report['runtime_module'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned

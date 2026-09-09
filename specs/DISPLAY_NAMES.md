@@ -5,10 +5,12 @@
 The separate resource and `af_load_display_name` API provide complete GameCube
 villager and special-character names. The resident module integrates these at
 two nameplate call sites, the main-message talk-name insertion, and read-only
-NPC recipient names in letter headers. These changes
+NPC recipient names in letter headers. The bounded shared-choice extension and
+the [festival/reserve actor integration](ACTOR_DISPLAY_NAMES.md) connect further
+display-only callers. These changes
 remain experimental pending broader conversation, save, and hardware validation.
-Six-byte saved names, identity structures, catchphrases, the shared dynamic-choice
-insertion, and unrelated name-loader callers remain unchanged.
+Six-byte saved names and identity structures remain unchanged. Other identity-
+based name-loader callers and editors retain their own integration requirements.
 
 Letter headers use the existing packed villager identity only when the native
 recipient type is one and the index is below 216. Player names and unsupported
@@ -36,11 +38,13 @@ or literal pointers into the changed nameplate/message-handler interiors.
 
 Executable-segment auditing also finds calls in `ovl_Tukimi_Npc0` at `809DFF2C`,
 `ovl_Tukimi_Npc1` at `809E0788`, and `ovl_Turi_Npc0` at `809E3230`.
-Those overlay destinations remain native. `mMsg_CopyTalkName` itself serves both
-the main message handler (`800A1100`) and dynamic choices (`800656B0`). The latter
-does not have an approved widened destination. A separately bounded main-message
-insertion at its caller leaves the shared six-byte function and its choice caller
-unchanged. The existing move routine can report an oversized result without
+The actor integration supplies complete eight-byte temporaries and field lengths
+at all three sites, within their original frames. The original
+`mMsg_CopyTalkName` serves the main message handler (`800A1100`) and dynamic
+choices (`800656B0`). The installed main-message helper and replacement shared-
+choice formatter bypass these native six-byte paths without widening the native
+function globally. The choice formatter stages a complete bounded twenty-byte
+result. The existing move routine can report an oversized result without
 moving the suffix; replacement insertion rejects expansion beyond 1024 bytes
 before calling it or copying the name.
 
@@ -54,7 +58,8 @@ disabled resource fall back to the unchanged native resolver with two padding
 spaces. A null destination causes no write. The six-byte resolver itself is not
 redirected.
 
-`af_copy_talk_name` replaces only the main-message call. It checks cursor/length
+`af_copy_talk_name` serves the main-message call and staged shared-choice values.
+It checks cursor/length
 bounds and complete command size, stages the eight-byte name, trims trailing
 padding, and rejects expansion beyond the 1024-byte message buffer. A null actor
 inserts zero bytes, matching the original insertion behaviour. The surrounding
@@ -88,8 +93,9 @@ range. Villager IDs are limited to `E000..E0D7`.
 ## Validation requirements
 
 Audit literal and executable references to the affected routines and calls.
-Verify the complete eight-byte nameplate temporaries, the widened setup length,
-and unchanged shared insertion/choice lengths.
+Verify complete eight-byte nameplate/actor temporaries and widened field lengths,
+plus the separate staged choice bounds. The native six-byte compatibility APIs
+remain unchanged for saved-name and unsupported-identity callers.
 Test every villager, every special actor mapping, unsupported IDs, nulls,
 resource disabling, malformed headers, aligned DMA, and adjacent stack guards.
 Native tests must exercise client-name setup, talk-name insertion and exact

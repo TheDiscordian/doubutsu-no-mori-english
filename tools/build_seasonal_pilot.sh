@@ -42,6 +42,10 @@ text_extension_args=()
 if [[ -n "${AF_TEXT_EXTENSION:-}" ]]; then
   text_extension_args=(--english-text-extension "$AF_TEXT_EXTENSION")
 fi
+actor_name_args=()
+if [[ "${AF_ENGLISH_ACTOR_NAMES:-0}" == 1 ]]; then
+  actor_name_args=(--english-actor-display-names)
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -73,4 +77,5 @@ exec python3 tools/build.py \
   "${event_item_args[@]}" \
   "${stall_choice_args[@]}" \
   "${text_extension_args[@]}" \
+  "${actor_name_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

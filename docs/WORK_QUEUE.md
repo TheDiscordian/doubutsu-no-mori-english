@@ -15,16 +15,19 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
-The [choice-substitution checkpoint](checkpoints/CHOICE_SUBSTITUTIONS.md) supplies
-complete bounded shared choices alongside general dialogue fields and the
-native/free-item actor connections. Its combined build is `build/text-choices-pilot`;
-actual startup and focused native field/choice insertion pass. Continue the
-character-name preparations at `809DFF2C`, `809E0788`, and `809E3230`, the reserve
-actor's name caller, remaining catchphrase input/display and item readers, and
-the existing residual text/letter/accent queue. Shared-choice and general-field
-insertion no longer need initial implementation. Keep the native compatibility
-mirrors and saved fields unchanged. Do not remove pending name-family counting
-rules until the remaining required paths and installed verification are complete.
+The [festival/reserve name checkpoint](checkpoints/ACTOR_DISPLAY_NAMES.md) supplies
+the three festival character-name preparations and the reserve actor's full
+Tom Nook name. Its combined build is `build/actor-names-pilot`, retaining complete
+bounded shared choices, general dialogue fields, and free-item actor connections.
+Source/assembly/relocation/cartridge/accounting checks pass; unchanged shared
+helpers reuse their recorded native evidence. Continue identity-based names at
+map `8088E030`, opening guide `809C8318`, and fishing-event `80A90270`, then other
+live callers from the identity-name inventory, catchphrase input/display, and
+item readers. Do not redo complete owned letter/quest paths just because their
+original native instructions remain in the ROM. Retain the residual
+text/letter/accent queue. Keep native compatibility mirrors and saved fields
+unchanged. Complete remaining required paths and installed verification before
+removing pending name-family counting rules.
 
 The [inventory checkpoint](checkpoints/INVENTORY_ENGLISH.md) supplies all 39
 embedded label records and the ordinary full item-name load/draw path. Continue

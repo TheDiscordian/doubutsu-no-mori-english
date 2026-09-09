@@ -29,6 +29,17 @@ PENDING_NAME_CONSUMERS = {
 }
 
 
+def pending_name_consumers(report):
+    """Describe remaining paths for this build, after installed verification."""
+    pending = dict(PENDING_NAME_CONSUMERS)
+    if report.get('text_extension', {}).get('choices'):
+        pending['display_names'] = 'Other native six-byte character-name consumers remain unchanged'
+        pending['catchphrases'] = 'Default-phrase editing still uses the native four-byte field'
+    if report.get('actor_display_names'):
+        pending['display_names'] = 'NPC identity-based name readers and editors still need complete integration'
+    return pending
+
+
 class CounterLedger:
     """One original ID, one source weight, regardless of replacement storage."""
 
@@ -108,12 +119,9 @@ def measure(native, built, report):
     if report.get('text_extension'):
         from text_extension import verify_installation
         verify_installation(built, native, report)
-    pending_names = dict(PENDING_NAME_CONSUMERS)
-    if report.get('text_extension', {}).get('choices'):
-        # Installed verification above includes complete choice substitutions;
-        # independent actors/editors still prevent full resource-family credit.
-        pending_names['display_names'] = 'Other native six-byte character-name consumers remain unchanged'
-        pending_names['catchphrases'] = 'Default-phrase editing still uses the native four-byte field'
+    if report.get('actor_display_names') and not report.get('text_extension'):
+        raise ValueError('Actor display-name application lacks the verified text extension')
+    pending_names = pending_name_consumers(report)
     info = module_command_info(native)
     ledger = CounterLedger(info)
     original = {b.name: b for b in banks(native)}
@@ -456,7 +464,7 @@ def main():
               'method': 'Japanese-source non-whitespace character weight; each original ID counted once',
               'kind': 'combined applied translation approximation, not testing or release completion',
               'application_rule': 'Native-bank English or verified complete replacement route; partially connected name resources alone receive no credit',
-              'pending_name_consumers': PENDING_NAME_CONSUMERS,
+              'pending_name_consumers': pending_name_consumers(report),
               'inventory_complete': False,
               'inventory_gaps': ['Other embedded interface text and text-bearing artwork need inventory expansion'],
               'source_categories': dict(Counter(r['source_category'] for r in ledger.rows.values())),
