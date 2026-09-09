@@ -437,6 +437,12 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
         expected[at:at+32] = map_names['owner_bytes']
     elif map_report is not None:
         raise ValueError('Map report has no installed overlay')
+    letter_names = None
+    if 0x03B60000 in files:
+        from letter_names import verify_shared_parts as verify_letter_names
+        letter_names = verify_letter_names(built, native, module)
+        at = letter_names['owner_offset']
+        expected[at:at+32] = letter_names['owner_bytes']
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
         if at == POOL_PATCH and editor_extension:
@@ -445,6 +451,8 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
             if not 0x8000 <= (word & 65535)+extra <= 0xFFFF:
                 raise ValueError('Combined submenu reservation changes the native high-half contract')
             value = struct.pack('>I', word+extra)
+        if at == POOL_PATCH and letter_names:
+            value = letter_names['pool_patch']
         if code[at-CODE_RAM:at-CODE_RAM+len(value)] != value: raise ValueError('Missing notice creator or pool patch')
     original_code = by_vrom(native)[CODE_VROM].extract(native)
     for start, end in ((0x800A5B50, INIT_START), (INIT_END, 0x800A5DF4), (POOL_START, POOL_PATCH), (POOL_PATCH+4, POOL_END)):

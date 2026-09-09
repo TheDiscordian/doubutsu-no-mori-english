@@ -47,6 +47,11 @@ def pending_name_consumers(report):
         pending['display_names'] += '; request and ordinary-conversation identity names are connected'
     if report.get('house_name'):
         pending['display_names'] += '; house-sign names are connected'
+    if report.get('letter_editor_names'):
+        pending['display_names'] += '; letter-editor recipient names are connected; remaining-reader classification is pending'
+    from display_name_readers import complete
+    if complete(report):
+        del pending['display_names']
     return pending
 
 
@@ -143,6 +148,9 @@ def measure(native, built, report):
     if report.get('house_name'):
         from house_name import verify_installation
         verify_installation(built, native, report)
+    from display_name_readers import complete, verify_main_routes
+    if complete(report):
+        verify_main_routes(built, report)
     pending_names = pending_name_consumers(report)
     info = module_command_info(native)
     ledger = CounterLedger(info)
@@ -200,7 +208,7 @@ def measure(native, built, report):
             identities += [f'string:{i:04X}' for _, _, i, _ in special_table(native)]
             for number, identity in enumerate(identities):
                 ledger.credit(identity, names[32+number*WIDTH:32+(number+1)*WIDTH], 'display_names',
-                              pending_reason=pending_names['display_names'])
+                              pending_reason=pending_names.get('display_names'))
 
         phrases = resource('catchphrases', 64)
         if phrases is not None:
@@ -228,8 +236,11 @@ def measure(native, built, report):
             baseline[56:0x88] = bytes(0x88-56)
             expected_reader = {}
             install_reader(native, expected_reader, {MODULE_VROM: bytes(baseline)}, module, snapshots=True)
-            if any(extract(vrom) != data for vrom, data in expected_reader.items()):
-                raise ValueError('Complete letter reader is not installed')
+            from mail_view_patch import verify_reader_files
+            verify_reader_files(built, native, module, expected_reader)
+            if report.get('letter_editor_names'):
+                from letter_names import verify_installation
+                verify_installation(built, native, report)
 
         def credit_mail(vrom, selected, route):
             from mail_catalog import parse, verify_registered

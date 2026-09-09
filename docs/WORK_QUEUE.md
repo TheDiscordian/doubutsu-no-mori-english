@@ -15,11 +15,19 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [letter-editor checkpoint](checkpoints/LETTER_EDITOR_NAMES.md) completes
+English recipient headers and matching editing geometry, retaining saved fields
+and full snapshot reading. Its combined build is `build/letter-names-pilot`;
+eight focused checks, twelve counter tests, and independent builds pass. The
+known character-name readers now satisfy their complete accounting gate.
+Continue the remaining item-reader classification, borrowed-catchphrase
+ambiguity, residual text/letters, accents, and bounded combined v0 smoke.
+
 The [house-sign checkpoint](checkpoints/HOUSE_NAME.md) supplies complete English
 villager names with initialized eight-byte temporaries and no allocation or save
 growth. Its complete build is `build/house-name-pilot`; all six focused checks and
-twelve counter tests pass. Continue the letter-editor recipient header and cursor
-geometry: the existing full-name header renderer is read-mode-only. Keep the
+twelve counter tests pass. The letter-editor integration above is installed
+alongside the read-mode full-name renderer. Keep the
 native six-byte mail-identity and fishing-record writers intact. Remaining item
 readers, borrowed-catchphrase ambiguity, residual text/letters, accents, and the
 combined v0 smoke remain in scope.

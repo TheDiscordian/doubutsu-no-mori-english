@@ -40,9 +40,12 @@ do not count again, and displaying a name in another menu adds no duplicate
 name credit. The saved Museum identity remains native while its display is English.
 Wider name resources map back to their original source IDs. Merely installing
 the English resource is insufficient: an ID with known readers still using its
-Japanese representation is not fully applied. The item-name, display-name, and
-catchphrase resources have partially connected readers, so their resource-only
-replacements are recorded as pending, not credited. English already replacing
+Japanese representation is not fully applied. The item-name and catchphrase
+resources have partially connected readers, so their resource-only replacements
+are recorded as pending, not credited. Wider character names receive credit only
+with the complete [verified reader family](DISPLAY_NAME_READERS.md), including
+the letter-writing header and its matching cursor. Earlier partial builds keep
+that family pending. English already replacing
 the native bank entry retains its credit; short complete names are not penalised
 because other names need wider storage. Finishing a family's remaining readers
 must also add their installed-code verification to the counter before enabling

@@ -168,7 +168,8 @@ def verify_resources(built,native,module):
     verify_configuration(files[MODULE_VROM].extract(built),files[FONT_VROM].extract(built),module)
     baseline = bytearray(files[MODULE_VROM].extract(built));baseline[56:0x88] = bytes(0x88-56)
     reader = {};install_reader(native,reader,{MODULE_VROM:bytes(baseline)},module,snapshots=True)
-    if any(files[v].extract(built)!=d for v,d in reader.items()): raise ValueError('Snowman complete snapshot reader is not installed')
+    from mail_view_patch import verify_reader_files
+    verify_reader_files(built,native,module,reader)
     return catalog,items
 
 

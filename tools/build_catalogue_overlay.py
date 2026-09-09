@@ -12,7 +12,7 @@ import catalogue_names as c
 
 
 def build(native, module, out, c=c):
-    stem = 'map' if c.__name__ == 'map_names' else 'catalog'
+    stem = getattr(c, 'STEM', 'map' if c.__name__ == 'map_names' else 'catalog')
     sources = c.source_hashes()
     out = out.resolve(); out.mkdir(parents=True, exist_ok=True)
     (out/'native.bin').write_bytes(c.native_sources(native)[0])
@@ -38,7 +38,7 @@ def build(native, module, out, c=c):
         parts = line.split()
         if len(parts) == 3: symbols[parts[2]] = int(parts[0], 16)
     exports = {name: value-c.RAM for name, value in symbols.items()
-               if name.startswith(f'af_{stem}_') and name not in c.IMPORTS}
+               if name.startswith(getattr(c, 'EXPORT_PREFIX', f'af_{stem}_')) and name not in c.IMPORTS}
     if symbols[f'__{stem}_code_start'] != c.RAM+c.START: raise ValueError('Native BSS moved')
     run('objcopy', '-O', 'binary', '-j', '.text', 'overlay.elf', 'overlay.bin')
     data = bytearray((out/'overlay.bin').read_bytes()); data[:c.PREFIX] = c.patch_prefix(native, exports)

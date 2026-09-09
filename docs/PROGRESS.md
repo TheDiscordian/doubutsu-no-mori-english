@@ -25,14 +25,23 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [letter-editor integration](checkpoints/LETTER_EDITOR_NAMES.md) supplies
+complete English recipients, GameCube-style header spacing, and matching cursor
+positions without changing saved fields. Opening/closing headers are independent
+of old snapshot-reader state. All eight focused checks, twelve counter tests,
+independent builds, retained-resource comparisons, and UPS reconstruction pass.
+The current combined ROM/UPS is `build/letter-names-pilot`. The known character-name
+reader family is complete and verified by combined accounting. Continue remaining
+item-reader classification, borrowed-catchphrase ambiguity, residual text/letters,
+and accents, then bounded combined v0 gameplay/save checks.
+
 The [house-sign integration](checkpoints/HOUSE_NAME.md) supplies complete English
 villager names in existing eight-byte stack storage, including a blank fallback
 when no house matches. Actor/save layouts, messages, colours, and timing remain.
 All six focused checks and twelve counter tests pass, including independent MIPS
 assembly, relocation, retained prior payloads, and UPS reconstruction. The current
-combined ROM/UPS is `build/house-name-pilot`. Continue letter-editor recipient
-names, remaining item readers, borrowed-catchphrase ambiguity, residual
-text/letters, and accents, then the bounded combined v0 smoke.
+combined ROM/UPS is retained in `build/house-name-pilot`. Its house-sign reader
+is also retained by the letter-editor build above.
 
 The [conversation-name integration](checkpoints/CONVERSATION_NAMES.md) supplies
 complete names in three request/conversation fields and the ordinary resident's

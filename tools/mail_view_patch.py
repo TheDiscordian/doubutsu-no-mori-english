@@ -15,6 +15,18 @@ SNAPSHOT_CALLS = ((0x8088A034, 0x80889CD8, 'af_mail_header_hook'),
                   (0x8088914C, 0x80078DF4, 'af_mail_reader_trigger'))
 
 
+def verify_reader_files(built, native, module, expected):
+    """Verify the complete reader, including its owned letter-editor variant."""
+    files = by_vrom(built)
+    if 0x03B60000 in files:
+        from letter_names import verify_shared_parts, preceding, VROM, RELOC
+        if expected != dict(zip((VROM, RELOC), preceding(native))):
+            raise ValueError('Letter editor lacks its exact preceding full reader')
+        verify_shared_parts(built, native, module)
+    elif any(v not in files or files[v].extract(built) != data for v, data in expected.items()):
+        raise ValueError('Complete letter reader is not installed')
+
+
 def remove_call_relocations(data, *, snapshots=False):
     if len(data) != 240 or sha256(data) != RELOC_SHA256:
         raise ValueError('Unexpected native board relocation file')

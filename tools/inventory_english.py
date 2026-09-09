@@ -223,11 +223,15 @@ def verify_shared_parts(built, native, module, report=None):
     from font import WIDTH_BRANCH, WIDTH_TABLE, make_halfwidth
     code = files[CODE_VROM].extract(built)
     expected_code = make_halfwidth(native)[0][CODE_VROM]
+    pool_patch = bytes.fromhex('25cefb20')
+    if 0x03B60000 in files:
+        from letter_names import verify_owned_parts
+        pool_patch = verify_owned_parts(built, native, module)['pool_patch']
     if (files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata(len(data))
             or files[ITEMS].extract(built)[:32] != HEADER
             or code[WIDTH_BRANCH:WIDTH_BRANCH+4] != bytes(4)
             or code[WIDTH_TABLE:WIDTH_TABLE+256] != expected_code[WIDTH_TABLE:WIDTH_TABLE+256]
-            or code[0x800C4B10-CODE_RAM:0x800C4B14-CODE_RAM] != bytes.fromhex('25cefb20')
+            or code[0x800C4B10-CODE_RAM:0x800C4B14-CODE_RAM] != pool_patch
             or report.get('allocation') != allocation(len(data))):
         raise ValueError('Incomplete inventory font, item, or allocation dependencies')
     return {'owner_offset': OWNER_AT, 'owner_bytes': metadata(len(data)), 'resident_bytes': len(data)}

@@ -230,6 +230,7 @@ def main():
     parser.add_argument('--english-fishing-name', type=Path, help='Compiled save-preserving fishing winner name reader')
     parser.add_argument('--english-conversation-names', action='store_true', help='Four complete identity-based dialogue names; requires the identity text-extension variant')
     parser.add_argument('--english-house-name', action='store_true', help='Complete house-sign name with initialized eight-byte display storage')
+    parser.add_argument('--english-letter-editor-names', type=Path, help='Complete letter-editor recipient names and matching header cursor')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -343,6 +344,8 @@ def main():
         parser.error('--english-conversation-names requires --english-text-extension, --display-names, and --english-secret-letters')
     if args.english_house_name and not (args.english_text_extension and args.display_names):
         parser.error('--english-house-name requires --english-text-extension and --display-names')
+    if args.english_letter_editor_names and not (args.english_mail_snapshots and args.display_names and args.english_inventory):
+        parser.error('--english-letter-editor-names requires --english-mail-snapshots, --display-names, and --english-inventory')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -517,6 +520,10 @@ def main():
     if args.english_house_name:
         from house_name import install as install_house_name
         report['house_name'] = install_house_name(rom, replacements, additions, report)
+    if args.english_letter_editor_names:
+        from letter_names import install as install_letter_names
+        report['letter_editor_names'] = install_letter_names(rom, replacements, additions, relocations,
+            report['runtime_module'], args.english_letter_editor_names)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -555,6 +562,11 @@ def main():
     if args.english_house_name:
         from house_name import verify_installation
         verify_installation(output, rom, report)
+    if args.english_letter_editor_names:
+        from letter_names import verify_installation
+        verify_installation(output, rom, report)
+        from notice_overlay import verify_installation
+        verify_installation(output, rom, report['runtime_module'], report['noticeboard'])
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)
     patch = make_ups(rom, output)
