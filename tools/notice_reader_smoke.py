@@ -37,6 +37,9 @@ def exercise(debug, request, record):
     read, write = debug.read_memory, debug.write_memory
     proofs = []
     assertions = draws = glyph_count = 0
+    treasure = request.get('treasure_only', False)
+    if type(treasure) is not bool or (treasure and request['report'].get('treasure') is not True):
+        raise ValueError('Invalid native treasure reader profile')
 
     def check(label, at, expected):
         nonlocal assertions
@@ -77,7 +80,8 @@ def exercise(debug, request, record):
     call(0x8009C0C0, [0x8019B000, 0x8019B004, 0x8019B008])
     record({'notice_heap_before_fixture': list(struct.unpack('>3I', read(0x8019B000, 12)))})
     allocations = []
-    for size in (0x13B00, 0xC000):
+    auxiliary_size = 0xD000 if treasure else 0xC000
+    for size in (0x13B00, auxiliary_size):
         pointer = call(0x8009BFC0, [size])
         if pointer & 15 or not MODULE_RAM+RESERVATION <= pointer <= 0x80400000-size:
             raise ValueError('Notice fixture allocation failed')
@@ -86,9 +90,11 @@ def exercise(debug, request, record):
     owner_at, scratch, submenu = (allocation+offset for offset in (0x10, 0x13640, 0x13900))
     state_owner = owner_at+len(owner)
     asset_at = state_owner+16
-    base, game, metrics, end, graph, arena = (
-        auxiliary+offset for offset in (0x10, 0x3800, 0x3920, 0x3940, 0x3A00, 0x3E00))
-    arena_end = auxiliary+0xC000-16
+    base = auxiliary+0x10
+    delta = 0x800 if treasure else 0
+    game, metrics, end, graph, arena = (
+        auxiliary+offset+delta for offset in (0x3800, 0x3920, 0x3940, 0x3A00, 0x3E00))
+    arena_end = auxiliary+auxiliary_size-16
     if (owner_at+owner_spec.resident_bytes > scratch-16 or scratch+len(owner_reloc) > submenu-16
             or submenu+0xF0 > allocation+0x13B00-16 or base+len(data) > game-16
             or asset_at+len(assets) > state_owner+0x10000-16 or game+0x100 > metrics-16
@@ -119,7 +125,7 @@ def exercise(debug, request, record):
     write(state_owner+0x106B0, words(owner_at+0x8085D4D4-OWNER_RAM))
     write(state_owner+0x106CC, words(owner_at+0x8085D43C-OWNER_RAM))
     rtc = bytes.fromhex('00120e04040907d1')
-    first = request['cases'][::2]
+    first = request['cases'][::2][:4]
     posts = b''.join(bytes.fromhex(case['wire'])+rtc for case in first)
     posts += bytes.fromhex(request['empty_post'])*11
     write(POSTS, posts)
@@ -184,7 +190,12 @@ def exercise(debug, request, record):
 
     def draw_body(slot, body, status=2, page=0):
         source = POSTS+slot*104
-        all_lines = body.rstrip(b'\xcd').split(b'\xcd') if body else []
+        if treasure:
+            from notice_native_layout import rows
+            spans = rows(body, widths)
+            all_lines = [text for _, text, _ in spans]
+        else:
+            all_lines = body.rstrip(b'\xcd').split(b'\xcd') if body else []
         if any(sum(glyph_advances(line, widths)) > 192 for line in all_lines):
             raise ValueError('Selected notice fixture requires independent soft-wrap modelling')
         lines = all_lines[page*6:page*6+6]
@@ -201,10 +212,13 @@ def exercise(debug, request, record):
         check('cache retains complete source and body', at,
               words(source, status, page)+read(source, 96)+words(len(body))+body)
         layout = bytearray(words(total, len(lines)))
-        offset = sum(len(line)+1 for line in all_lines[:page*6])
-        for line in lines:
-            layout += words(offset, len(line), sum(glyph_advances(line, widths)))
-            offset += len(line)+1
+        if treasure:
+            for offset, line, width in spans[page*6:page*6+6]: layout += words(offset, len(line), width)
+        else:
+            offset = sum(len(line)+1 for line in all_lines[:page*6])
+            for line in lines:
+                layout += words(offset, len(line), sum(glyph_advances(line, widths)))
+                offset += len(line)+1
         check('complete six-line page layout', at+1136, bytes(layout).ljust(80, b'\0'))
         drawing = [(line, 63, 63+row*16, 1) for row, line in enumerate(lines) if line]
         if total > 1: drawing.append((f'L/R: page {page+1}/{total}'.encode(), 63, 163, 0.75))
@@ -214,15 +228,30 @@ def exercise(debug, request, record):
         check('native body end coordinates', end, struct.pack('>2f', *expected_end))
         return at
 
+    if treasure:
+        call(0x8007D91C, [0], 0)
+        call(0x8007D90C, expected=0)
     for case in request['cases'][request.get('skip_initial', 0):]:
         wire, body = bytes.fromhex(case['wire']), bytes.fromhex(case['body'])
         write(POSTS, wire+rtc)
         draw_body(0, body)
+        if treasure:
+            from notice_native_layout import rows
+            pages = max(1, (len(rows(body, widths))+5)//6)
+            for page in range(1, pages):
+                write(state, bytes((0, 8, 0, 4, 0, 0, 0, 0)))
+                write(game_live+0x20, struct.pack('>H', 0x10))
+                call(base+symbols['af_notice_read_control'], [submenu, menu, state])
+                draw_body(0, body, page=page)
+            for _ in range(pages-1):
+                write(game_live+0x20, struct.pack('>H', 0x20))
+                call(base+symbols['af_notice_read_control'], [submenu, menu, state])
         check('reader leaves compact post and timestamp unchanged', POSTS, wire+rtc)
         call(0x8009C0C0, [metrics, metrics+4, metrics+8])
         check('cache miss releases full decoder workspace', metrics, heap)
-        record({'notice_initial_body': case['template'], 'capital': case['capital'], 'passed': True})
-    if not request.get('edges_only'):
+        record({('notice_treasure_body' if treasure else 'notice_initial_body'): case['template'],
+                'capital': case['capital'], **({'item': case['item']} if treasure else {}), 'passed': True})
+    if not treasure and not request.get('edges_only'):
         # Two cached posts must survive alternating animation draws and reopening.
         for slot, case in enumerate(first[:2]): write(POSTS+slot*104, bytes.fromhex(case['wire'])+rtc)
         for slot in (0, 1, 0, 1): draw_body(slot, bytes.fromhex(first[slot]['body']))
@@ -239,34 +268,35 @@ def exercise(debug, request, record):
         write(POSTS, bytes.fromhex(first[0]['wire'])+rtc)
         call(loader, [submenu, metadata])
         draw_body(0, bytes.fromhex(first[0]['body']))
-    # The real controller helpers read the paused game's input, not host mocks.
-    # Title attract mode deliberately suppresses input. Use the original setter
-    # to select ordinary input for this isolated fixture, then restore the flag.
-    call(0x8007D91C, [0], 0)
-    call(0x8007D90C, expected=0)
-    manual = b'A\xcd'*7
-    write(POSTS, manual.ljust(96, b' ')+rtc)
-    draw_body(0, manual, status=1)
-    for buttons, page in ((0x10, 1), (0x10, 1), (0x20, 0), (0x30, 0)):
-        write(state, bytes((0, 8, 0, 4, 0, 0, 0, 0)))
-        write(game_live+0x20, struct.pack('>H', buttons))
-        call(0x80078DF4, expected=buttons)
-        call(base+symbols['af_notice_read_control'], [submenu, menu, state])
-        draw_body(0, manual, status=1, page=page)
-        record({'notice_native_page_control': buttons, 'page': page, 'passed': True})
-    for entry in (1, 15):
-        arena_reset()
-        call(base+symbols['af_notice_draw_entry'], [game, entry, floating(63), floating(46)])
-        verify_draws([(f'entry {entry}'.encode(), 63, 46, 0.75)])
-    months = ('January February March April May June July August September October November December').split()
-    for month, name in enumerate(months, 1):
-        timestamp = bytes((0, 12, 14, 31, 0, month, 7, 0xD1))
-        write(POSTS+96, timestamp)
-        text = f'{name} 31, 2001'.encode()
-        arena_reset()
-        call(base+symbols['af_notice_draw_date'], [game, POSTS+96, floating(63), floating(46)])
-        x = 63+194-sum(glyph_advances(text, widths))*0.75
-        verify_draws([(text, x, 46, 0.75)])
+    if not treasure:
+        # Retained initial-only edge batch; do not replay it for treasure bodies.
+        # Native controller helpers read the paused game's input. The original
+        # setter enables ordinary input in this isolated title fixture.
+        call(0x8007D91C, [0], 0)
+        call(0x8007D90C, expected=0)
+        manual = b'A\xcd'*7
+        write(POSTS, manual.ljust(96, b' ')+rtc)
+        draw_body(0, manual, status=1)
+        for buttons, page in ((0x10, 1), (0x10, 1), (0x20, 0), (0x30, 0)):
+            write(state, bytes((0, 8, 0, 4, 0, 0, 0, 0)))
+            write(game_live+0x20, struct.pack('>H', buttons))
+            call(0x80078DF4, expected=buttons)
+            call(base+symbols['af_notice_read_control'], [submenu, menu, state])
+            draw_body(0, manual, status=1, page=page)
+            record({'notice_native_page_control': buttons, 'page': page, 'passed': True})
+        for entry in (1, 15):
+            arena_reset()
+            call(base+symbols['af_notice_draw_entry'], [game, entry, floating(63), floating(46)])
+            verify_draws([(f'entry {entry}'.encode(), 63, 46, 0.75)])
+        months = ('January February March April May June July August September October November December').split()
+        for month, name in enumerate(months, 1):
+            timestamp = bytes((0, 12, 14, 31, 0, month, 7, 0xD1))
+            write(POSTS+96, timestamp)
+            text = f'{name} 31, 2001'.encode()
+            arena_reset()
+            call(base+symbols['af_notice_draw_date'], [game, POSTS+96, floating(63), floating(46)])
+            x = 63+194-sum(glyph_advances(text, widths))*0.75
+            verify_draws([(text, x, 46, 0.75)])
     call(base+0x80895B9C-RAM, [submenu])
     check('native destructor releases notice ownership', state_owner+0x1070C, words(0))
     check('owner code retained', owner_at, loaded_owner[:owner_spec.sections[0]])
@@ -283,7 +313,9 @@ def exercise(debug, request, record):
         write(at, value)
         check('native global or input restored', at, value)
     for pointer in reversed(allocations): call(0x8009C040, [pointer])
-    return {'notice_initial_bodies': 8-request.get('skip_initial', 0), 'notice_native_draws': draws,
+    return {'notice_initial_bodies': 0 if treasure else 8-request.get('skip_initial', 0),
+            **({'notice_treasure_bodies': len(request['cases'])-request.get('skip_initial', 0)} if treasure else {}),
+            'notice_native_draws': draws,
             'notice_glyphs_verified': glyph_count, 'notice_reader_assertions': assertions,
             'actual_owner_loader': True, 'normal_submenu_initialization': False,
             'debugger_uploaded_reader_bytes': 0, 'requires_checkpoint_restore': True,

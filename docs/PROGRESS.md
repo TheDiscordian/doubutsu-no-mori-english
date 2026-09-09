@@ -33,12 +33,23 @@ including independent builds, the full ROM/UPS, atomic failures, and retained
 resources. Ten initial installation checks, five owner artifact checks, and four
 retained native-reader evidence checks also pass without replaying native batches.
 
-Next execute one bounded native treasure batch: actual burial, both loader phases,
-rollback, publication, full reading, and scheduling eligibility. The new treasure
-path has not executed natively yet; compiled and host results are not that proof.
-Then continue the forty-one seasonal notices and other remaining text. Do not
-rerun the completed initial board batches. Save/reload, gameplay, human review,
-hardware acceptance, patch-only release, and title/keyboard stretch goals remain.
+The completed silent native treasure owner batch passes all 72 publications and
+eleven failure/eligibility cases: 171 calls and 1,829 assertions. Actual native
+burial, all 25 pitfall shapes, both cartridge-loaded transaction phases, null
+allocator returns, exact undo, and unchanged unrelated save state are verified.
+The separate reader batch passes the same 72 records, 157 calls, 410 assertions,
+9,148 glyphs, and 36,592 vertex positions. Both restore heap/save/global state and
+their checkpoints, retain blank isolated saves, and shut down gracefully. No
+completed initial board batch is replayed. Ordinary-item cases substitute a
+known item at placement; the random furniture selector is not exercised. These
+reader fixtures fit single pages, so they do not add native multi-page evidence.
+
+Continue the forty-one seasonal notices and other remaining text. Their donor
+IDs differ from the N64 IDs, including Valentine's Day, White Day, Doll Festival,
+the two moon-viewing dates, and the sports/festival dates and shrine venue.
+Bind matching text by meaning and retain native-specific events. Save/reload,
+normal gameplay, human review, hardware acceptance, patch-only release, and
+title/keyboard stretch goals remain.
 
 The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
 installs all four complete announcements, full-body pages, and English entry/date
@@ -60,7 +71,7 @@ C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal
 bodies remain active work. Seventeen treasure references have
 source/field review; the creator/decoder above also implements the native-specific
 `01F4` heading without revealing the original clue's hidden item. Continue
-native treasure acceptance and bulk seasonal-post implementation, without replaying
+bulk seasonal-post implementation and remaining gameplay acceptance, without replaying
 passed storage/reader cases.
 
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs

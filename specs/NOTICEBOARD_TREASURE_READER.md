@@ -73,15 +73,23 @@ caches, unsupported fields/IDs, failed reads, and reopen recovery. Eight artifac
 installation/accounting tests pass, including partial-install rejection and actual
 native-hook removal. Existing initial artifact/native evidence remains verifiable.
 
-These are compiled and host results. Native treasure execution, owner rollback,
-normal scheduling, save/reload, gameplay review, and hardware remain unverified.
-The next bounded native batch must load both images from the new ROM, exercise
-real burial and both transaction phases, read complete posts, inject failures,
-and restore checkpoint/save/heap/input state without audio or save-file writes.
-Do not replay completed initial-post storage/reader cases.
+The completed native owner batch exercises all 72 records, original burial,
+both cartridge-loaded transaction phases, all 25 pitfall shapes, and eleven
+failure/eligibility cases. Null allocation returns in both phases and exact
+rollback are observed. The separate native reader batch loads the larger reader
+from the same ROM and draws the same 72 records completely: 9,148 glyphs and
+36,592 vertex positions. These particular full-name records fit single pages;
+multi-page treasure control paths have host, not additional native, evidence.
+Both batches restore checkpoint/save/heap/input state, retain blank isolated
+saves, and shut down gracefully. Completed initial-post cases are not replayed.
+The checkpoint binds the complete logs and records the limited fixtures: ordinary
+items are selected by substitution at placement, and normal scheduling, normal
+submenu entry, save/reload, gameplay review, and hardware remain unverified.
 
 The initial reader fixture places graphics state at auxiliary offset `3800`;
-that is too early for the larger treasure reader. A treasure fixture needs
-non-overlapping ranges and an independently modelled soft-wrap layout for long
-dynamic fields. Keep native owner tests distinct from source-only direct decoder
-calls: the latter cannot prove burial/publication rollback.
+that is too early for the larger treasure reader. The treasure fixture uses
+auxiliary offset `4000` and a `D000`-byte allocation, with checked non-overlapping
+ranges and independently modelled soft wrapping. Its layout model also passes
+host comparisons against the actual page planner for explicit whitespace, glyph
+pairs, full-width boundaries, and random complete text. Native owner tests remain
+distinct from source-only direct decoder calls, which cannot prove rollback.

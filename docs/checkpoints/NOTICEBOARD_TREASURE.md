@@ -4,8 +4,8 @@
 
 The complete installed build is `build/notice-treasure-pilot`. It contains the
 transaction creator, native treasure bridges, and full-body reader together;
-all eighteen treasure bodies receive verified application credit. Native execution
-of the treasure path remains unverified. The complete translation project remains
+all eighteen treasure bodies receive verified application credit. Native creation
+and full reading pass the bounded batches below. The complete translation project remains
 active, including seasonal/general text, names, review, persistence, hardware,
 patch-only release preparation, title artwork, and keyboard stretch work.
 
@@ -61,9 +61,9 @@ Logs are `owner-tests.log`, `owner-focused-tests.log`, `owner-sanitizer-tests.lo
 owner/creator build logs under `build/noticeboard-treasure/`. The current playable
 ROM's main code accepts guarded patch construction: resulting code length 826,800,
 SHA-256 `99f690b9a4bc523c87ab13206985b60c3b90df298e22d54ec786b80e6423bbe6`.
-The complete installed ROM has that same main-code digest. Native placement/
-loader/undo execution remains unverified; the host rollback helper models the
-bridge's stores only.
+The complete installed ROM has that same main-code digest. The host rollback
+helper models the bridge's stores only; the native batch below separately
+executes actual placement, loading, undo, and publication from this ROM.
 
 ## Installed complete reader and ROM
 
@@ -182,23 +182,86 @@ Cross-compiled notice
 helpers are in `mips/`; their object SHA-256 is
 `fccc10a6bdaad414aed228a0c56e3c2b1721aa188b7cf429b6055a2cb87614f4`.
 
-## Next required execution
+## Completed native execution
 
-1. Exercise actual native burial and both on-demand transaction phases, including
-   original pitfall/non-pitfall deposits and scheduling eligibility. Include
-   allocation failures before both phases and exact stack-only undo. Host results
-   and exact assembly do not establish native execution or recovery.
-2. Load the larger reader from the actual ROM and read complete newly created
-   posts. The old initial fixture's graphics state at auxiliary `3800` overlaps
-   this reader: use explicit non-overlapping allocations and independently model
-   soft wrapping for full dynamic names. Retain initial evidence without replay.
-3. Verify native owner/publication/readback, resource failure/retry, heap/stack
-   guards, restored checkpoint/input/save state, and blank isolated save files in
-   one bounded silent batch. Normal gameplay, save/reload, and hardware remain.
+`tools/notice_treasure_scenario.py` binds the current installed ROM, source helper
+instructions, native pitfall profiles, RNG seeds, full names, and complete
+source-model records. Its owner batch is `build/smoke-notice-treasure-05`;
+the complete reader batch is `build/smoke-notice-treasure-reader-01`.
+Both are terminal successful runs with audio disabled, no screenshots, no save
+seeds, no permitted FlashRAM/Pak writes, and no Expansion Pak enabled.
 
-Continue the forty-one seasonal notices and other remaining text afterwards.
-Keep the complete translation, review, patch-only release, title art, and keyboard
-stretch goals active; this integration is not project completion.
+The owner executes the actual scheduler `800A5F08`, placement, deposit callback,
+both fixed bridges, native allocator, and cartridge-loaded creator. It verifies
+18 templates times two capitalizations times two buried-object kinds: 72 exact
+96-byte publications and RTCs. All 25 native pitfall shapes appear. The fixture
+provides one eligible unit in a controlled field, familiar `Octavian`, and a
+six-byte town name. Pitfalls come from original RNG selection; ordinary cases
+substitute wide-name item `11FC` at the original placement call. The random
+furniture selector is not exercised.
+
+Eleven additional cases pass: allocation failure before each transaction phase,
+missing catalogue, missing names, creator CRC failure, unsupported hole profile,
+no eligible unit, early hour, recent burial, already checked date, and no familiar
+animal. Actual null malloc returns are observed under bounded heap pressure.
+Phase-two failure restores the exact foreground/flag values without needing
+another allocation. Every successful case checks the whole saved payload against
+only its intended burial, complete post/RTC, and buried-date edits. RNG draws,
+unrelated text fields, detached creator state, heap accounting, code, and guards
+are retained. All 171 calls and 1,829 assertions pass.
+
+The reader loads the native submenu owner and complete English reader from the
+cartridge. Its separate fixture supplies exactly the same 72 records verified
+above; it does not perform normal menu navigation or share the owner run's live
+field state. All complete cache bodies, page spans, saved records/RTCs, 72 native
+draws, 9,148 glyphs, and 36,592 vertex positions pass. These selected real-name
+records fit single pages. All 157 calls and 410 assertions pass. The larger
+fixture uses auxiliary size `D000` and graphics state at `4000`, avoiding the
+initial fixture's overlap. L/R handling supports longer cases, but this batch
+does not establish new native multi-page treasure evidence.
+
+Both batches execute cleanup, restore their complete saved payload and globals,
+free fixture allocations, reload their checkpoints, verify scratch RAM is zero,
+and shut down gracefully. FlashRAM and Pak retain the established blank hashes:
+`b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`
+and `ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51`.
+This is not save/reload or hardware acceptance.
+
+| Evidence | SHA-256 |
+| --- | --- |
+| Owner results, 2,711 records | `352d439d23a1fec0107fa0486bb3a00698d43d9011a1eba29379adccd156a3b7` |
+| Owner scenario | `bc702ef981c0b8241b9c2fb8df8d716102b800fd6c1e4dc8eb390e0f1687fdbb` |
+| Owner checkpoint | `441127269857d9a9aae3c03c3bf7e79133ececbf08557e098ef2eba43e48a368` |
+| Reader results, 720 records | `adc8c1ad1ba716ba23b3b557316d4895dcb8bfa1b794490e581d79b1d798beef` |
+| Reader scenario | `9b5540227bbc765e2f7f173f349847c7de20814dedee3f556945fa629cbaadba` |
+| Reader checkpoint | `09c837cabb70d93a0c81e3808336fe7aee22c265a5eeccf3a5a67cde494ae6d9` |
+
+Logs under `build/noticeboard-treasure/` are `native-owner-entry.log` and
+`native-reader.log`. Five frozen-result tests bind both completed runs and the
+actual published/read records. Four retained initial native evidence checks pass
+without replay. Seven scenario/transport tests and six page tests pass, including
+the independent native fixture layout. `native-evidence-tests.log` and
+`native-initial-evidence-retention.log` retain the evidence-check results.
+
+Earlier owner attempts `01..04` are terminal fixture/debugger failures, not
+acceptance. The installed ares JIT does not reliably stop at the chosen
+mid-basic-block call sites. The successful observer uses actual callee entries
+and post-call block starts, removes stopped breakpoints before resuming, and
+rearms shared entries between phases. No native game-code fix is inferred from
+those failed observations. The reader batch succeeds without a retry.
+
+## Remaining execution and text
+
+Continue all forty-one seasonal bodies with actual native event/calendar/venue
+matching, complete English fields, creation, and full reader installation.
+Retain source meaning where donor IDs differ; do not import unrelated Groundhog
+Day, Harvest Festival, Meteor Shower, or daylight-saving announcements. Remaining
+normal scheduling, ordinary random furniture selection, normal menu controls,
+old saved automatic posts, saving/reloading, resource retry across gameplay,
+human review, and hardware acceptance are not established by these fixtures.
+Do not replay the completed native initial or treasure batches. The complete
+translation, review, patch-only release, title art, and keyboard stretch goals
+remain active; this integration is not project completion.
 
 ## Native burial evidence and implementation direction
 

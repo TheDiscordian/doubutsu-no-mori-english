@@ -103,6 +103,24 @@ class NoticePageTests(unittest.TestCase):
             self.assertEqual(output.raw, b'!'*len(output))
         self.assertEqual(self.lib.af_notice_page(None, b'A', 1, 0), 0)
 
+    def test_independent_native_fixture_layout_matches_complete_page_spans(self):
+        from notice_native_layout import rows
+        rng = random.Random(0xAFB007)
+        texts = [b'', b'\xcd'*1024, b'A'*1024, b'A'*32+b'\xcd', b'  A\xcd\xcd B  ']
+        alphabet = [b' ', b'A', b"'", b'i', b'\xcd', b'\x80\xbf']
+        texts += [b''.join(rng.choice(alphabet) for _ in range(rng.randrange(600))) for _ in range(50)]
+        for text in texts:
+            expected = rows(text, self.widths)
+            spans = []
+            total = self.page(text)[0]
+            self.assertEqual(total, max(1, (len(expected)+5)//6))
+            for number in range(total):
+                spans += [(offset, text[offset:offset+length], width)
+                          for offset, length, width in self.page(text, number)[1]]
+            self.assertEqual(expected, spans)
+        for bad in (b'\x80', b'\x80\x00'):
+            with self.assertRaises(ValueError): rows(bad, self.widths)
+
     @unittest.skipUnless((ROOT/'build/mail-glyph-resources/glyph-catalog.bin').is_file(), 'Local references required')
     def test_all_scoped_bodies_and_full_dynamic_fields_retain_complete_text(self):
         from audit_noticeboard import INITIAL_IDS, SCOPED_IDS, initial_body

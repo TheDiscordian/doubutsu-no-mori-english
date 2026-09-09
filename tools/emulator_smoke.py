@@ -976,6 +976,12 @@ def main():
                     raise ValueError('Notice reader probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_notice_reader'],record))
+            if 'test_notice_treasure' in action:
+                from notice_treasure_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Treasure transaction probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_notice_treasure'],record))
             if 'test_quest_replies' in action:
                 from quest_reply_smoke import exercise
                 if not (out/'test.bs1').is_file():
