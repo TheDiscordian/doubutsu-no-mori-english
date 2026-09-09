@@ -113,3 +113,12 @@ consumer review, not deletion from the denominator. Eleven letter signatures
 also need review because a complete English dynamic-name-only field has no
 static characters for the current credit rule; do not invent static wording just
 to change the counter. These are investigation targets, not completed fixes.
+
+Native conversion narrows two remaining identity cases. Placed `item_10:0C2C`
+(`ヘラ`) converts to fish `2301`, whose carried Japanese field is `ヘラブナ`.
+This is the fish identity, not the unrelated dictionary meaning of a spatula;
+the unequal Japanese fields need an explicit source-bound alias review. Placed
+`17FC` says blue gym clothes but converts to carried `2414`, whose Japanese label
+says red. Placed `1800` says red and converts to carried `2415`, labelled blue.
+Preserve those actual conversions and inspect design evidence before resolving
+colours. The identical-source alias guard must not be relaxed globally.
