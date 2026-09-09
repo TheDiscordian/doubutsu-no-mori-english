@@ -37,11 +37,11 @@ class RenderingDiagnosticSourceTests(unittest.TestCase):
             broken = new.replace(b'\x7f\x04', b'\x7f\x06', 1)
             with self.assertRaises(ValueError): validate_entry(old, broken, info, 'message')
 
-    def test_complete_last_draft_is_kept_pending_until_its_expansion_is_split(self):
+    def test_complete_last_draft_cannot_be_installed_in_one_buffer(self):
         rom = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         info = module_command_info(rom)
         old = next(b for b in banks(rom) if b.name == 'message').entries()[4]
-        row, = json.loads((ROOT/'translations/pending-diagnostic-sequence.json').read_text())
+        row, = json.loads((ROOT/'translations/n64-message-diagnostic.json').read_text())
         new = encode(row['translation'], info)
         self.assertEqual(row['id'], 'message:0004')
         self.assertEqual(sha256(old), row['source_sha256'])
@@ -50,7 +50,7 @@ class RenderingDiagnosticSourceTests(unittest.TestCase):
         self.assertFalse(has_japanese(new, info))
         self.assertEqual((len(new), expanded_bound(new, info)), (961, 1581))
         self.assertEqual(sha256(new), '529a97e4cb7429444d483e0a6eacb0e38f7db22818bfa40b5ee2f3446c164eba')
-        self.assertEqual(row['status'], 'pending_sequence_integration')
+        self.assertEqual(row['status'], 'sequence_source')
         with self.assertRaisesRegex(ValueError, '1024'):
             validate_entry(old, new, info, 'message')
 

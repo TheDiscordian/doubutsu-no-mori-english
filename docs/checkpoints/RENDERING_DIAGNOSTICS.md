@@ -43,31 +43,17 @@ or original hardware.
 Logs use the `build/rendering-diagnostics-` prefix: `final-tests.log`,
 `evidence-tests.log`, `native.log`, `build.log`, and `candidates.log`.
 
-## Required continuation
+## Complete diagnostic continuation
 
-The still-pending `0004` diagnostic contains multiple dynamic fields and embedded
-letter text. Its complete English draft is stored in
-`translations/pending-diagnostic-sequence.json`, deliberately outside the default
-candidate files until sequence integration. All 62 commands match the source,
-with no Japanese remaining. It occupies 961 bytes but has an expanded bound of
-1,581; the ordinary validator correctly rejects single-record installation.
-The encoded draft hash is
+The [message-system diagnostic integration](MESSAGE_DIAGNOSTIC_SEQUENCE.md)
+installs the complete `0004` draft through reserve `2AEB`, preserving its existing
+`[416,421)` page separator and native cancellation/field state. Its independently
+bound original is `translations/n64-message-diagnostic.json`, outside the ordinary
+single-record drafts. All 62 commands match; the complete 961-byte source still
+fails single-buffer validation at 1,581 expanded bytes, while both sequence
+parts fit at 713/886. The original encoded hash remains
 `529a97e4cb7429444d483e0a6eacb0e38f7db22818bfa40b5ee2f3446c164eba`.
-
-The existing wait/newline/clear separator at `[416,421)` precedes the current
-date/time test. Splitting there gives conservative bounds of 713 and 886 after
-adding one native continuation. No text or extra pause must be lost. Preserve
-the enabled cancellation state and dynamic fields across that boundary.
-The alternate existing separators `[344,349)` and `[459,464)` also fit, but leave
-less balanced bounds (581/1,018 and 966/633 respectively).
-
-No continuation slot is approved yet. Candidate reserves `2D32..2D34` have no
-native message-script targets or matching arithmetic/logical/comparison
-immediates in the pinned code scan. They do have aligned data hits: `2D32`
-includes `ovl_Npc_Mamedanuki`, `2D33` includes `ovl_Npc`, and `2D34` has hits only
-in `ovl_famicom_emu` (`8083B8D6`) and its relocation data (`8085928A`). Classify
-those references or select another proven reserve before authorising a slot.
-Do not treat the absence of direct calls as proof about computed callers.
+The complete ROM and native-transition evidence are recorded in that checkpoint.
 
 Remaining general strings, letters, accented names, complete name callers,
 review, save/gameplay, patch-only release, and image/keyboard work continue.

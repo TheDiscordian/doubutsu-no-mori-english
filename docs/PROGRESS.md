@@ -13,16 +13,27 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [complete diagnostic sequence](checkpoints/MESSAGE_DIAGNOSTIC_SEQUENCE.md)
+installs the last inventoried Japanese message-bank record as `0004 → 2AEB`,
+preserving the complete English draft, all 62 native commands, and its existing
+page boundary. Six source/capacity/slot/ROM/accounting checks and seventeen
+sequence regressions pass. The silent native batch passes seventeen calls and
+51 assertions, including actual loaded transitions, cancellation/field retention,
+complete buffers, restored guards/checkpoint, blank saves, and graceful shutdown.
+All earlier resources remain; three reserve labels also adopt their unambiguous
+complete English reference. No inventoried Japanese message-bank text remains,
+but general strings, letters, accented names, full-name callers, review/gameplay,
+release, and title/keyboard work continue. The actual build still uses four MiB.
+
 The [rendering diagnostic batch](checkpoints/RENDERING_DIAGNOSTICS.md) installs
 four more complete English records, preserving their native control streams,
 line/page boundaries, note patterns, and test parameters. All previous edits
 and non-message resources remain unchanged. Four source/ROM/accounting checks
 pass; the silent native batch passes four complete loads and fourteen assertions,
 with restored guards/checkpoint, blank saves, and graceful shutdown. The remaining
-`0004` diagnostic has a complete 961-byte English draft, but its expanded bound
-is 1,581 bytes. It stays uninstalled until a guarded continuation slot and state
-preservation are approved; the existing page boundary can split it into 713/886
-byte expansion bounds. Remaining general strings, letters, accented names,
+`0004` diagnostic uses the guarded two-record integration above; its 961-byte
+complete English draft still correctly fails single-buffer validation at an
+expanded bound of 1,581 bytes. Remaining general strings, letters, accented names,
 full-name callers, review/gameplay, release, and title/keyboard work continue.
 
 The [native-design integration](checkpoints/DESIGN_ITEM_NAMES.md) adds 74 complete

@@ -38,7 +38,7 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
                 files[0x02000000].extract(rom), files[0x00CF9000].extract(rom))
     entries = bank.entries()
     if group_name not in ("nook_home_explanation", "nook_work_offer", "nook_house_purchase", "nook_planting_complete",
-                          "resident_late_night_introduction", "native_normal_travel_advice",
+                          "resident_late_night_introduction", "native_normal_travel_advice", "native_message_diagnostic",
                           "nook_first_renovation_invoice", "resident_snooty_letter_advice", *LONG_ADVICE_GROUPS,
                           *SPECIAL_ACTOR_GROUPS, *CONTEXTUAL_ACTOR_GROUPS, *TRAIN_PHONE_GROUPS,
                           *RESETTI_GULLIVER_GROUPS):
@@ -175,6 +175,46 @@ def scenario(rom, group_name="nook_home_explanation", module=None):
             read(window+0x28C, struct.pack('>I', 8))
             dispatch(commands[-1], 1)
             read(window+0x28C, bytes(4))
+    if group_name == 'native_message_diagnostic':
+        # The complete diagnostic's cancellation test finishes enabled before
+        # the split. Its free/item/mail fields must survive both native paths.
+        # Use a private window: do not execute player assignments, RNG, mail
+        # insertion, or sound commands on the real game's singleton.
+        if numbers != [0x0004, 0x2AEB] or module is None:
+            raise ValueError('Diagnostic state test requires its two complete approved parts')
+        fields = b''.join(f'free{i:02d}abcd'.encode() for i in range(20))
+        fields += b''.join(f'item{i}abcde'.encode() for i in range(5))
+        fields += b'M'*68
+        if len(fields) != 0x176-0x38:
+            raise ValueError('Private native field fixture has the wrong extent')
+        controls = [t for t in tokenize(entries[numbers[0]], info)
+                    if t.kind == 'cmd' and t.data[1] in (6, 7)]
+        if [t.data for t in controls] != [b'\x7f\x07', b'\x7f\x06']:
+            raise ValueError('Diagnostic changes its native cancellation-test order')
+        for active_cancel in (0, 1):
+            write(window-16, b'W'*16)
+            write(window, bytes(0x330))
+            write(window+0x330, b'W'*16)
+            write(window+12, struct.pack('>I', data))
+            write(window+0x38, fields)
+            load(numbers[0])
+            for token in controls:
+                dispatch(token)
+                read(window+0x2BC, struct.pack('>2I', 0, int(token.data[1] == 6)))
+            write(window+0x2BC, struct.pack('>I', active_cancel))
+            write(window+0x29C, struct.pack('>2I', 17, 31))
+            call(0x8009E658, [window, numbers[1]], 1)
+            entry = entries[numbers[1]]
+            read(data, struct.pack('>4I', 1, numbers[1], len(entry), 0)+entry)
+            read(data-16, b'G'*16); read(data+0x410, b'G'*32)
+            read(window+0x38, fields)
+            read(window+0x2BC, struct.pack('>2I', active_cancel, 1))
+            read(window+0x29C, bytes(8))
+            read(window+0x294, struct.pack('>f', 10.0))
+            actions.append({'call': {'address': '800A04E4', 'arguments': [window, 0]}})
+            read(window+0x2BC, struct.pack('>2I', 0, 1))
+            read(window+0x38, fields)
+            read(window-16, b'W'*16); read(window+0x330, b'W'*16)
     if group_name in TRAIN_PHONE_GROUPS:
         # Exercise the real native message-change path, not only the DMA loader.
         # Page handling resets current cancellation; the persistent enable word
@@ -235,11 +275,15 @@ def main():
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sequence", action='append', help='Repeat to batch approved groups in one checkpoint')
-    parser.add_argument('--module', type=Path)
+    parser.add_argument('--module', type=Path, help='Configured runtime manifest or complete build.json')
     args = parser.parse_args()
     rom = args.rom.read_bytes()
-    actions = batch_scenario(rom, args.sequence or ['nook_home_explanation'],
-                             json.loads(args.module.read_text()) if args.module else None)
+    module = json.loads(args.module.read_text()) if args.module else None
+    if module is not None and 'runtime_module' in module:
+        if module.get('output_sha256') != sha256(rom):
+            raise ValueError('Sequence ROM does not match its complete build report')
+        module = module['runtime_module']
+    actions = batch_scenario(rom, args.sequence or ['nook_home_explanation'], module)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(actions, indent=2)+"\n")
     print(json.dumps({"rom_sha256": sha256(rom), "actions": len(actions), "output": str(args.output)}))

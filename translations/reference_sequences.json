@@ -1,5 +1,34 @@
 [
   {
+    "id": "native_message_diagnostic",
+    "source_kind": "native_original",
+    "requires_resident_runtime": true,
+    "evidence": "Complete original translation of native message-system diagnostic 0004. Preserve all 62 native commands, test values, embedded mail, random-number generation, fields, player-variable assignments, cancellation controls, colours, pauses, manual newlines, and final 00. Replace only the existing wait/newline/page-clear separator at [416,421), before the current date/time test, with native continuation 2AEB. Both complete parts fit the unchanged message buffer at expanded bounds 713/886. The train-demo reserve has its exact source hash, no native script target, and no matching arithmetic/comparison/logical code immediate or aligned non-executable halfword in the pinned sections. This is not exhaustive proof about computed callers. Native message-change and ordinary page setup must preserve prepared fields and cancellation-enabled state. See specs/MESSAGE_DIAGNOSTIC_SEQUENCE.md.",
+    "original_translation": {
+      "id": "message:0004",
+      "text": "Display letter data.{cmd:7F04}\n{cmd:7F02}{cmd:7F40}{cmd:7F04}\n{cmd:7F02}Item0{cmd:7F31}\nItem4{cmd:7F35}\n{cmd:7F04}\n{cmd:7F02}Current country name\n\"{cmd:7F2F}\"\nRandom number 0 to 99\"{cmd:7F30}\"{cmd:7F04}\n{cmd:7F02}Demo command test\nSet player variable 0 to 2.{cmd:7F08000002}{cmd:7F033C}{cmd:7F080000FF}\nSurprise!!!{cmd:7F04}\n{cmd:7F02}Cursor cancellation test\nCancellation disabled{cmd:7F07}\naaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaa{cmd:7F04}\n{cmd:7F02}Cancellation enabled{cmd:7F06}\naaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaa\naaaaaaaaaaaaaaaa{cmd:7F04}\n{cmd:7F02}This tests replacing\ntext strings freely.\nString0 \"{cmd:7F24}\"\nString9 \"{cmd:7F2D}\"{cmd:7F04}\n{cmd:7F02}Current date and time\n{cmd:7F1D}{cmd:7F1E}{cmd:7F20}\n{cmd:7F1F}\n{cmd:7F21}{cmd:7F22}{cmd:7F23}{cmd:7F04}\n{cmd:7F02}Your name is\n\"{cmd:7F1A}\"{cmd:7F1C}.\nMy name is\n\"{cmd:7F1B}\"{cmd:7F1C}.{cmd:7F04}\n{cmd:7F02}{cmd:7F0500FFFF}This tests changing\n{cmd:7F0500FF00}the text colour.\n{cmd:7F050000FF}Each line changes colour.\n{cmd:7F05FF0000}Calling %CC%{cmd:7F04}\n{cmd:7F02}resets it automatically\nresets it automatically\nresets it automatically\nresets it automatically{cmd:7F04}\n{cmd:7F02}This tests delaying\nthe display of text.\n{cmd:7F0301}1 {cmd:7F0302}2 {cmd:7F0305}5 {cmd:7F030A}10 {cmd:7F0314}20 {cmd:7F031E}30{cmd:7F04}\n{cmd:7F02}AAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAA\nAAAAAAAAAAAAAAAA{cmd:7F04}\n{cmd:7F02}Do not end a message with\na button wait (%PB%)\nor a screen clear (%CC%).\nDo not add them at the end.\n{cmd:7F00}",
+      "sha256": "529a97e4cb7429444d483e0a6eacb0e38f7db22818bfa40b5ee2f3446c164eba"
+    },
+    "members": [
+      {
+        "id": "message:0004",
+        "source_sha256": "9cf6349bac72ea26b9a4930053e036d23813c7731f0777f16fd2c4aa4eee0b65",
+        "reference_id": "message:0004",
+        "reference_sha256": "529a97e4cb7429444d483e0a6eacb0e38f7db22818bfa40b5ee2f3446c164eba",
+        "reference_slice": [0, 416],
+        "encoded_sha256": "3f915ac48841e4766f370a6528effad5b53ce5d16d7dc59adcd9926c82dececf"
+      },
+      {
+        "id": "message:2AEB",
+        "source_sha256": "0727aac8e3f598400dccbb8e9a23f39c10b3bc13e0dc1c168b93d03c0aa95609",
+        "reference_id": "message:0004",
+        "reference_sha256": "529a97e4cb7429444d483e0a6eacb0e38f7db22818bfa40b5ee2f3446c164eba",
+        "reference_slice": [421, 961],
+        "encoded_sha256": "bcd231c497e2237ddea80649c078cf4748977f9fbcc2cb1611fc2e69b63039d2"
+      }
+    ]
+  },
+  {
     "id": "rover_first_train_phone",
     "requires_resident_runtime": true,
     "evidence": "The complete English train phone call retains all wording, manual layout, pauses, native player/town fields, voice controls, and cancellation enable/disable. The protected-pacing pair stays entirely in the first part. Split only the existing wait/newline/page-clear span; native message-change retains cancellation-enabled state across this boundary. The exact generic reserve has no incoming native script, relevant executable immediate, or aligned data reference. See specs/TRAIN_PHONE_SEQUENCES.md; normal input/actor traversal remain separate checks.",

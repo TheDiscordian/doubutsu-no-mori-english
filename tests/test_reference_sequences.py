@@ -168,7 +168,7 @@ class ReferenceSequenceTests(unittest.TestCase):
             native = source[int(edit['id'].split(':')[1], 16)]
             validate_entry(native, payload, info, 'message', 'reviewed_sequence',
                            resident_runtime=True, sequence_permit=permits[edit['id']])
-        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 70)
+        self.assertEqual(len(reference_sequence_edits(refs, source, info, resident_runtime=True)[0]), 72)
         with self.assertRaisesRegex(ValueError, 'Partial'):
             validate_sequences(edits[:1], source, info, {name: group}, resident_runtime=True)
         # Scan the pinned executable/data section inventory, not arbitrary ROM

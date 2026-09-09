@@ -34,9 +34,9 @@ guards, then restores its checkpoint. It does not execute state-changing or
 audible diagnostic commands, draw the extreme-scale examples, or claim a normal
 gameplay or hardware test.
 
-The remaining `0004` diagnostic includes embedded letter text, multiple item/free
-fields, date/name fields, random-number generation, and a player-state test.
-Its complete English version requires an explicit capacity review and possibly
-guarded continuation records. Additional page clears inside one record do not
-reduce the loader's expansion bound. Do not trim its instructions or remove
-functional commands to make a shorter candidate pass.
+The `0004` diagnostic includes embedded letter text, multiple item/free fields,
+date/name fields, random-number generation, and a player-state test. Its complete
+English version uses the [guarded diagnostic sequence](MESSAGE_DIAGNOSTIC_SEQUENCE.md).
+Additional page clears inside one record do not reduce the loader's expansion
+bound. Do not trim its instructions or remove functional commands to make a
+shorter candidate pass.
