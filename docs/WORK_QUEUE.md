@@ -16,6 +16,15 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [letter-quest replies](checkpoints/QUEST_REPLY_LETTERS.md) install all
+72 templates with full names and gift fields, plus a native complete-creation
+check before mailbox copying. Forty-one host tests and the same sanitizer
+tests pass; independent builds, exact assembly, installation/accounting checks,
+full-ROM retention, and UPS reconstruction pass. Collect the assigned
+`build/smoke-quest-reply-01` batch's terminal native evidence. Normal quest
+selection/cleanup, save/reload, review, and hardware remain. Continue remaining
+noticeboard and other text consumers without rerunning passed bulk cases.
+
 The [postal integration](checkpoints/POST_OFFICE_LETTERS.md) installs complete
 catalogue-order and raffle-ticket wording through guarded creation and receipt.
 Host, sanitizer, actual-ROM, accounting, independent-build, and assembly checks
@@ -94,8 +103,13 @@ builds/assembly, full-ROM retention, UPS round trip, and combined counting pass.
 All 56 current-runtime regressions pass. The native batch passes both real
 owner-loader bases, thirty selection/metadata comparisons, sixty complete
 readbacks, and three rejections, with 194 calls, 439 assertions, restored state,
-heap/checkpoint checks, blank saves, and graceful shutdown. Test the ordinary
-show-window path and fallback without repeating those completed bulk cases.
+heap/checkpoint checks, blank saves, and graceful shutdown. The ordinary
+unknown-sender show path also passes three complete boundary/glyph windows,
+fifteen calls, 53 assertions, and 504 glyphs. Each case occupies one page; no
+backward-page test is claimed for this group. The conversation selection/fallback
+still needs acceptance. Do not repeat completed bulk or window cases. The
+72 letter-quest replies `0075..00BC` have complete signatures and item fields
+through the integration above; native acceptance is in progress.
 Continue remaining text, review, normal conversation/save acceptance, and
 original-hardware validation.
 

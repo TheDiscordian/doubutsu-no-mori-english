@@ -216,6 +216,7 @@ def main():
     parser.add_argument('--english-post-office-letters', action='store_true', help='Complete catalogue-order and raffle-ticket letters; requires the postal creator and full item names')
     parser.add_argument('--english-museum-letters', action='store_true', help='Complete museum notices and fossil letters; requires the museum creator')
     parser.add_argument('--english-shop-notices',type=Path,help='Complete spotlight/reopening notices; requires shop notice owners, creator, and full item names')
+    parser.add_argument('--english-quest-replies',type=Path,help='Complete letter-quest replies; requires quest reply owners, creator, and full item names')
     parser.add_argument('--english-snowman-letters',type=Path,help='Complete fixed Snowman gift actor; requires the glyph catalogue/font and snapshot reader')
     parser.add_argument('--english-secret-letters',type=Path,help='Complete villager secret letters; retains the date/birthday/wider-word conversation overlay')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
@@ -255,6 +256,8 @@ def main():
         parser.error('--english-museum-letters requires --npc-mail-generation built with --museum')
     if args.english_shop_notices and not (args.npc_mail_generation and args.extended_items):
         parser.error('--english-shop-notices requires --npc-mail-generation built with --shop-notices and --extended-items')
+    if args.english_quest_replies and not (args.npc_mail_generation and args.extended_items):
+        parser.error('--english-quest-replies requires --npc-mail-generation built with --quest-replies and --extended-items')
     if args.english_snowman_letters and not (args.runtime_module and args.mail_catalog and args.extended_font and args.english_mail_snapshots and args.extended_items):
         parser.error('--english-snowman-letters requires --runtime-module, --mail-catalog, --extended-font, --english-mail-snapshots, and --extended-items')
     if args.english_secret_letters and not (args.runtime_module and args.mail_catalog and args.extended_font and args.english_mail_snapshots and args.extended_items and args.english_dialogue_dates and args.english_resident_words):
@@ -369,6 +372,9 @@ def main():
     if args.english_shop_notices:
         from shop_notice_letters import install as install_shop_notices
         report['shop_notices'] = install_shop_notices(rom,replacements,additions,report.get('runtime_module'),args.english_shop_notices)
+    if args.english_quest_replies:
+        from quest_reply_letters import install as install_quest_replies
+        report['quest_replies'] = install_quest_replies(rom,replacements,additions,report.get('runtime_module'),args.english_quest_replies)
     if args.english_snowman_letters:
         from snowman_actor import install as install_snowman
         report['snowman_actor'] = install_snowman(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_snowman_letters)

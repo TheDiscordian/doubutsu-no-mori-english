@@ -6,6 +6,20 @@ import time
 from emulator_smoke import require_program_counter
 from mail_view_smoke import snapshot as submenu_snapshot, pointer
 from runtime_layout import MODULE_RAM, TEST_RETURN
+from mail_glyph_codes import ADVANCES, glyph
+
+
+def glyph_advances(text, widths):
+    """Count complete displayed glyphs, not bytes in catalogue-four pairs."""
+    result = [];pos = 0
+    while pos < len(text):
+        if text[pos] == 0x80:
+            result.append(ADVANCES[glyph(text,pos)]);pos += 2
+        else:
+            advance = widths[text[pos]]
+            if not 0 < advance <= 192: raise ValueError('Invalid native glyph width')
+            result.append(advance);pos += 1
+    return result
 
 
 def snapshot(debug, address):
@@ -98,29 +112,28 @@ def observe_draw(debug, reader, hook, record):
     for span in current['spans']:
         text = bytes.fromhex(span['text'])
         if text:
-            if any(not 0 < widths[c] <= 192 for c in text):
-                raise ValueError('Invalid native glyph width')
-            px = x+192-sum(widths[c] for c in text) if span['section'] == 2 else x
-            draws.append((text,px,y+span['y']))
+            advances = glyph_advances(text,widths)
+            px = x+192-sum(advances) if span['section'] == 2 else x
+            draws.append((advances,px,y+span['y']))
     if current['total'] > 1:
-        draws.append((f"Left/Right: {current['page']+1}/{current['total']}".encode(),x,y+164))
-    glyphs = sum(len(text) for text,_,_ in draws)
+        draws.append((glyph_advances(f"Left/Right: {current['page']+1}/{current['total']}".encode(),widths),x,y+164))
+    glyphs = sum(len(advances) for advances,_,_ in draws)
     if (before['base'],before['size']) != (after['base'],after['size']):
         raise ValueError('Native font arena changed during a draw')
     if after['front']-before['front'] != 24*len(draws)+72*glyphs or before['back']-after['back'] != 64*glyphs:
         raise ValueError(f'Unexpected complete-letter graphics allocation: {before}, {after}, glyphs={glyphs}')
     vertices = debug.read_memory(after['back'],glyphs*64) if glyphs else b''
     index = 0
-    for text,px,py in draws:
-        for code in text:
+    for advances,px,py in draws:
+        for advance in advances:
             left,top = int((px-160)*16),int((120-py)*16)
-            right = left+widths[code]*16
+            right = left+advance*16
             base = before['back']-(index+1)*64
             for corner,expected in enumerate(((left,top,0),(left,top-256,0),(right,top-256,0),(right,top,0))):
                 actual = struct.unpack_from('>3h',vertices,base-after['back']+corner*16)
                 if actual != expected:
                     raise ValueError(f'Mail glyph {index}, corner {corner}: {actual}, expected {expected}')
-            px += widths[code]
+            px += advance
             index += 1
     record({'mail_page_drawing':current,'glyphs_verified':glyphs,'vertex_positions_verified':glyphs*4,
             'graphics_before':before,'graphics_after':after,'entry_pc':f'{target:08X}',

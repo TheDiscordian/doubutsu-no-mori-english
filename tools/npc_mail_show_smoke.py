@@ -2,11 +2,12 @@
 
 import struct
 import time
+from dataclasses import replace
 
 from aflib import sha256
 from mail_reader_smoke import all_pages
 from mail_view_smoke import pointer, snapshot
-from npc_mail_show import OVERLAYS, relocated
+from npc_mail_show import OVERLAYS, relocated, relocate_verified_data
 from dialogue_dates import relocated as dates_relocated
 from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK, GUARD_ADDRESS, GUARD_WORD
 
@@ -45,13 +46,25 @@ def exercise(debug,keyboard,request,record):
     preference = private+0x3EE
     preferences = read(preference,28)
     completed = 0
-    for branch in ('first_job','known_sender','unknown_sender'):
+    branches = tuple(request.get('branches',('first_job','known_sender','unknown_sender')))
+    if not branches or len(branches)!=len(set(branches)) or any(b not in ('first_job','known_sender','unknown_sender') for b in branches):
+        raise ValueError('Invalid NPC show branch selection')
+    for branch in branches:
         record(debug.pause_game_thread())
         submenu = closed()
         key = 'first_job' if branch == 'first_job' else 'ordinary'
         spec = OVERLAYS[key]
+        code_bytes = spec.sections[0]
         data = bytes.fromhex(request['overlays'][key]['data'])
         reloc = bytes.fromhex(request['overlays'][key]['relocation'])
+        secret = request.get('secret_overlay') if key == 'ordinary' else None
+        if secret:
+            from secret_actor import NEW_VROM,NEW_RELOCATION
+            if (sha256(data)!=secret['overlay_sha256'] or sha256(reloc)!=secret['relocation_sha256']
+                    or len(data)!=secret['bytes'] or len(reloc)!=secret['relocation_bytes']):
+                raise ValueError('Changed approved secret show overlay')
+            spec = replace(spec,vrom=NEW_VROM,relocation=NEW_RELOCATION,file_bytes=len(data),
+                           sections=struct.unpack_from('>5I',reloc))
         # Place relocation scratch after BSS, then guarded manager/client/memory
         # fixtures. Each region is 16-byte aligned and remains allocated until
         # every window referencing the overlay's static Mail_c has closed.
@@ -70,10 +83,13 @@ def exercise(debug,keyboard,request,record):
         call(0x800262D0,[spec.vrom,spec.vrom+spec.file_bytes,spec.ram,
              spec.ram+spec.resident_bytes,base,base+spec.resident_bytes,len(reloc)],
              proof=(0x800262D0,bytes.fromhex(request['loader'])))
-        overlay = (dates_relocated(data,reloc,request['date_module'],base)
+        overlay = (relocate_verified_data(spec,data,reloc,base) if secret else
+                   dates_relocated(data,reloc,request['date_module'],base)
                    if key == 'ordinary' and request.get('date_module') else relocated(spec,data,reloc,base))
         check('complete native relocation and zeroed BSS',base,overlay)
-        proof = (base,overlay[:spec.sections[0]])
+        # The enlarged file materializes writable data/BSS before new code.
+        # Only the unchanged native text prefix is a handler code proof.
+        proof = (base,overlay[:code_bytes])
         letter = base+spec.letter-spec.ram
         for index,case in enumerate(request['cases']):
             record(debug.pause_game_thread())
@@ -150,5 +166,5 @@ def exercise(debug,keyboard,request,record):
             completed += 1
         call(0x8009C040,[allocation])
         record({'npc_show_allocation_freed':f'{allocation:08X}','only_after_window_close':True})
-    return {'npc_show_cases':completed,'native_callers':3,'normal_actor_gameplay':False,
+    return {'npc_show_cases':completed,'native_callers':len(branches),'normal_actor_gameplay':False,
             'game_save_validation':False,'requires_checkpoint_restore':True}

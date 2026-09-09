@@ -7,7 +7,8 @@ import unittest
 from unittest.mock import Mock, patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from mail_reader_smoke import snapshot, graphics, all_pages
+from mail_reader_smoke import snapshot, graphics, all_pages, glyph_advances
+from mail_glyph_codes import ADVANCES
 from runtime_layout import TEST_RETURN
 
 
@@ -23,6 +24,20 @@ class Memory:
 
 
 class ReaderSmokeTests(unittest.TestCase):
+    def test_glyph_pairs_count_once_with_exact_odd_widths_and_neighbours(self):
+        widths = [6]*256;widths[ord('i')] = 3;widths[ord('I')] = 4
+        for code,advance in ADVANCES.items():
+            self.assertEqual(glyph_advances(b'i'+bytes((0x80,code))+b'I',widths),[3,advance,4])
+        self.assertEqual(glyph_advances(b'Plain text',widths),[6,6,6,3,6,6,6,6,6,6])
+
+    def test_truncated_unknown_pairs_and_invalid_native_widths_reject(self):
+        widths = [6]*256
+        for text in (b'\x80',b'a\x80',b'\x80\xff'):
+            with self.assertRaises(ValueError): glyph_advances(text,widths)
+        for bad in (0,-1,193):
+            widths[ord('a')] = bad
+            with self.assertRaises(ValueError): glyph_advances(b'a',widths)
+
     def test_cache_offsets_and_spans_follow_the_native_abi(self):
         debug = Memory()
         address = 0x80198A40

@@ -13,6 +13,17 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [letter-quest reply integration](checkpoints/QUEST_REPLY_LETTERS.md) installs
+all 72 templates `0075..00BC` and 216 complete parts, including full villager
+signatures and required item names. Original rewards, ranks, identities, native
+short fields, and paper remain. Mailbox copying requires complete creation.
+All 41 host tests and the same sanitizer tests pass; independent creator builds,
+exact wrapper/gate assembly, complete-ROM/UPS retention, and combined accounting
+checks pass. The 34,096-byte creator uses the unchanged resident loader and
+four-MiB layout. Native delivery/readback acceptance is assigned to
+`build/smoke-quest-reply-01`; inspect its terminal results before claiming it.
+Normal conversation, saving, review, and hardware remain unverified.
+
 The [shop-notice integration](checkpoints/SHOP_NOTICE_LETTERS.md) installs all
 nine spotlight/reopening templates and 27 complete parts, including full
 sixteen-byte item fields. Reopening prepares the full letter before any home
@@ -42,8 +53,13 @@ only the verified installed parts. All 56 current-runtime regressions pass.
 The silent native batch passes both actual quest-manager loading bases, thirty
 original paper/RNG comparisons, sixty full English readbacks, and three
 rejections: 194 calls and 439 assertions, with restored state/heap/checkpoint,
-blank isolated saves, and graceful shutdown. Ordinary show-window acceptance,
-normal conversation, save/reload, review, and hardware remain unverified.
+blank isolated saves, and graceful shutdown. Three additional ordinary
+unknown-sender windows pass complete text and glyph-position checks: fifteen
+calls, 53 assertions, 504 glyphs, and 2,016 vertex positions. The cases cover
+the longest header/body/footer and extended glyphs, each on one complete page.
+Normal conversation selection/fallback, save/reload, review, and hardware remain
+unverified. The letter-quest integration above adds the 72 replies `0075..00BC`,
+including full villager signatures and gift-item fields.
 
 The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
 complete gift letters with full sixteen-byte item fields. Twenty-four fixed

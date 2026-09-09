@@ -15,14 +15,15 @@ from npc_mail_capture import RAM,IMAGE_BYTES_MAX,source_hashes,creator_imports,r
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False):
     if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
     if type(post_office) is not bool: raise ValueError('Invalid post-office creator option')
     if type(museum) is not bool: raise ValueError('Invalid museum creator option')
     if type(shop_notices) is not bool: raise ValueError('Invalid shop notice creator option')
+    if type(quest_replies) is not bool: raise ValueError('Invalid quest reply creator option')
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office,museum=museum,shop_notices=shop_notices)
+    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office,museum=museum,shop_notices=shop_notices,quest_replies=quest_replies)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     if academy_scores:
@@ -61,6 +62,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if post_office: names += ('post_office_creator',)
     if museum: names += ('museum_creator',)
     if shop_notices: names += ('shop_notice_creator',)
+    if quest_replies: names += ('quest_reply_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
@@ -82,6 +84,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if post_office: linker = 'post_office_capture.ld'
     if museum: linker = 'museum_capture.ld'
     if shop_notices: linker = 'shop_notice_capture.ld'
+    if quest_replies: linker = 'quest_reply_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         f'--defsym=AF_CREATOR_IMAGE_MAX={IMAGE_BYTES_MAX}',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
@@ -135,6 +138,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if post_office: report['post_office'] = True
     if museum: report['museum'] = True
     if shop_notices: report['shop_notices'] = True
+    if quest_replies: report['quest_replies'] = True
     if academy_scores:
         report['academy_scores'] = True;report['academy_series_sha256'] = sha256(series)
         at = symbols['af_academy_series_data']-RAM
@@ -161,6 +165,7 @@ def main():
     parser.add_argument('--post-office',action='store_true',help='Add complete catalogue-order and raffle-ticket letters; requires --academy-scores')
     parser.add_argument('--museum',action='store_true',help='Add complete museum notices and fossil letters; requires --post-office')
     parser.add_argument('--shop-notices',action='store_true',help='Add complete spotlight/reopening notices; requires --museum')
+    parser.add_argument('--quest-replies',action='store_true',help='Add complete letter-quest replies; requires --shop-notices')
     parser.add_argument('--mail-glyphs',action='store_true',help='Create new letters with complete glyph catalogue four')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
@@ -170,10 +175,11 @@ def main():
     if args.post_office and not args.academy_scores: parser.error('--post-office requires --academy-scores')
     if args.museum and not args.post_office: parser.error('--museum requires --post-office')
     if args.shop_notices and not args.museum: parser.error('--shop-notices requires --museum')
+    if args.quest_replies and not args.shop_notices: parser.error('--quest-replies requires --shop-notices')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
-                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices),indent=2))
+                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices,quest_replies=args.quest_replies),indent=2))
 
 
 if __name__ == '__main__': main()
