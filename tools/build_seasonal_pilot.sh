@@ -14,6 +14,10 @@ inventory_args=()
 if [[ -n "${AF_INVENTORY_ENGLISH:-}" ]]; then
   inventory_args=(--english-inventory "$AF_INVENTORY_ENGLISH")
 fi
+catalogue_args=()
+if [[ -n "${AF_CATALOGUE_NAMES:-}" ]]; then
+  catalogue_args=(--english-catalogue "$AF_CATALOGUE_NAMES")
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -38,4 +42,5 @@ exec python3 tools/build.py \
   "${gyroid_args[@]}" \
   "${hboard_args[@]}" \
   "${inventory_args[@]}" \
+  "${catalogue_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

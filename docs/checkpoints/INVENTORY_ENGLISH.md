@@ -93,7 +93,8 @@ price placement in the combined v0 safety pass. Reuse the existing scenarios;
 do not build an exhaustive all-item/all-menu test matrix before continuing
 remaining translation and consumer integration.
 
-Catalogue and other full-name consumers, residual text/accents, normal saving,
+The [catalogue consumer](CATALOGUE_NAMES.md) supplies the complete cached names;
+other full-name consumers, residual text/accents, normal saving,
 contextual review, hardware, release preparation, and title/keyboard stretch
 goals remain. Follow the [v0 plan](../V0_PLAN.md): testing-setup limits never waive
 actual crashes, save damage, memory corruption, or unexplained possible game

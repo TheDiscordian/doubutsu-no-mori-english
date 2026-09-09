@@ -372,7 +372,7 @@ def verify_seasonal_installation(built, native, module, report):
             raise ValueError('Missing or changed native seasonal publication installation')
 
 
-def verify_installation(built, native, module, report, *, inventory_report=None):
+def verify_installation(built, native, module, report, *, inventory_report=None, catalogue_report=None):
     from snowman_actor import verify_resources
     catalog = verify_resources(built, native, module)[0]
     files = by_vrom(built)
@@ -423,6 +423,13 @@ def verify_installation(built, native, module, report, *, inventory_report=None)
         expected[at:at+32] = inventory['owner_bytes']
     elif inventory_report is not None:
         raise ValueError('Inventory report has no installed overlay')
+    if 0x03970000 in files:
+        from catalogue_names import verify_shared_parts as verify_catalogue
+        catalogue = verify_catalogue(built, native, module, catalogue_report)
+        at = catalogue['owner_offset']
+        expected[at:at+32] = catalogue['owner_bytes']
+    elif catalogue_report is not None:
+        raise ValueError('Catalogue report has no installed overlay')
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
         if at == POOL_PATCH and editor_extension:

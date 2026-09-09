@@ -7273,3 +7273,56 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   combined v0 safety pass. Continue catalogue/other full-name consumers and
   residual text rather than replaying completed host or earlier native batches.
   No hardware, normal save/reload, v0 delivery, or overall completion is claimed.
+
+## 2026-09-09: complete catalogue item-name consumer
+
+- Continued from the pushed inventory integration into both remaining catalogue
+  name-load sites. The source-hashed native pages have seven ten-byte fields at
+  their exact 966-byte boundary; directly widening those writes would corrupt
+  adjacent state. Implemented a private 63-slot full-name cache instead, keeping
+  all native pages, item IDs, category order, models, prices, and original short
+  compatibility writes intact.
+- Hooked native initialization on every catalogue entry to reset cache ownership,
+  both initial/page-change loads to populate complete names, and the catalogue
+  item-name font call to draw sixteen bytes with every other argument unchanged.
+  Drawing performs no item-name DMA. Rejections and unknown pointers show the
+  complete `Name unavailable` error instead of stale/truncated data.
+- Compiled and independently reproduced the 53,584-byte overlay and 624-byte
+  relocation through the pinned Docker toolchain. Inspected/pinned all 532
+  appended code bytes and nineteen ELF relocation records. The native prefix
+  differs at only four calls; all 130 original relocations and original BSS
+  addresses remain. The new pair is at `03970000/03980000` and updates only its
+  shared owner row. No main-code instruction or saved dimension changes.
+- Aligned growth is 1,856 bytes. The catalogue/inventory alternative submenu
+  sum needs 202,240 bytes under the existing 243,072-byte pool, so no additional
+  resident reservation or Expansion Pak requirement is introduced.
+- The first host compilation exposed the host compiler's warning for the
+  explicit sixteen-byte error array's omitted NUL. The string now owns its
+  terminator while all field copies/draws remain exactly sixteen bytes. Both
+  toolchain outputs are rebuilt after this source correction. The first
+  allocation assertion expected 1,792 bytes; independent alignment gives 1,856,
+  matching production validation. Its focused corrected check passes; no
+  allocation guard is weakened.
+- All six focused checks have passing results across the core/artifact run,
+  allocation recheck, and two cartridge tests. Host sanitizer execution covers
+  all 63 keys, page updates, initialization/reset, failure/recovery, missing and
+  overflow keys, original destination guards, and exact draw arguments, with
+  two initializations, 130 compatibility loads, 129 full loads, and 130 draws.
+  Artifact checks cover three relocation bases, fixed external imports, retained
+  original words/BSS, bounds, and rejected rehashed changes. The whole ROM/UPS
+  check and shared-owner verifier pass. Combined accounting rows are identical
+  before/after this additional consumer; no duplicate translation credit is added.
+- The complete ROM SHA-256 is
+  `b0061fd4e012a3b56ca15ebcf2e0d32c2da5eb89a1f6c9566820ffaa8897f9fa`;
+  UPS SHA-256 is
+  `30e96ba80d85b4bdeadfaca2e23478692f0bfeb71639d2d34169572de8d44a9c`.
+  Sources, commands, artifacts, and limits are in the
+  [catalogue checkpoint](checkpoints/CATALOGUE_NAMES.md). Normal catalogue
+  navigation/order and hardware are not claimed; they join the combined v0
+  pass rather than a new exhaustive catalogue harness.
+- Located the next embedded sources directly: nine Japanese category fields at
+  tag `80879148` and wrapped-present text at `8087913C`, with matching supplied
+  GameCube symbols. Confirmation prose also remains, including two donor
+  placeholders requiring original translations. Recorded exact copy/measurement
+  sites for the next batch. Eight accented names and other wider consumers,
+  residual text, review, save/gameplay checks, release, and v1 goals remain.

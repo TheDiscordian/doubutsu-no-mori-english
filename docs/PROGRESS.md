@@ -21,16 +21,26 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [catalogue full-name integration](checkpoints/CATALOGUE_NAMES.md) installs
+all 63 complete display-name slots across nine categories without widening the
+packed native pages. Both loaders, re-entry reset, and the item-name drawer
+are installed together. All six focused checks pass, including sanitizers,
+relocation, full-ROM/UPS retention, and unchanged combined accounting; independent
+builds agree. The current complete ROM/UPS is `build/catalogue-names-pilot`.
+The catalogue fits the existing submenu pool, with no main-code, resident, or
+save growth. Ordinary navigation/order remains in the combined v0 safety pass.
+Continue embedded category/present/confirmation text and other wider consumers.
+
 The [inventory English integration](checkpoints/INVENTORY_ENGLISH.md) installs
 39 complete label records, the ordinary sixteen-byte item-name consumer, and
 font-aware window widths. Native action order/callbacks, separate mail/quest
-fields, and numeric placement remain. The current complete ROM/UPS is
+fields, and numeric placement remain. Its retained complete ROM/UPS is
 `build/inventory-english-pilot`. The tag's 896 aligned bytes fit the owner
 editor's existing reservation; no main code, resident, or saved bytes change.
 Core/artifact checks, complete patch reconstruction, and 29 shared-menu
 regressions pass; independent overlay builds agree. Ordinary inventory, price,
 and mail/quest transition execution belong in the combined v0 safety pass.
-Catalogue and other wider consumers remain implementation work.
+Other wider consumers remain implementation work.
 
 The [owner-message editor integration](checkpoints/HBOARD_EDITOR.md) installs the
 complete English draft, proportional four-row layout, cursor/edit operations,

@@ -23,17 +23,19 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/inventory-english-pilot`.
-Its [checkpoint](checkpoints/INVENTORY_ENGLISH.md) records exact dependencies,
+The current combined integration build is `build/catalogue-names-pilot`.
+Its [checkpoint](checkpoints/CATALOGUE_NAMES.md) records exact dependencies,
 artifacts, and verification limits. With the retained prerequisite resources:
 
 ```sh
-python3 tools/build_inventory_overlay.py
-bash tools/build_inventory_pilot.sh
+python3 tools/build_catalogue_overlay.py
+bash tools/build_catalogue_pilot.sh
 ```
 
 This wrapper retains the complete seasonal/letter/name/default-message/editor
-integration and adds full inventory labels and ordinary item names. It does not
+integration, inventory labels, and complete inventory/catalogue item names. The
+inventory overlay prerequisite is reproduced with
+`python3 tools/build_inventory_overlay.py`. The combined wrapper does not
 run an exhaustive gameplay matrix or constitute a v0 release by itself.
 The smaller recipes below reproduce their named framework milestones.
 

@@ -17,10 +17,18 @@ risk classification, and next useful check; keep actual v0 blockers explicit.
 
 The [inventory checkpoint](checkpoints/INVENTORY_ENGLISH.md) supplies all 39
 embedded label records and the ordinary full item-name load/draw path. Continue
-catalogue and remaining wider consumers, residual strings/letters, and accents;
+remaining wider consumers, residual strings/letters, and accents;
 do not repeat completed inventory host/artifact checks before that work.
 Ordinary inventory, mail/quest transitions, and prices join the combined v0
 safety pass. Confirmed game defects are not subject to the harness retry limit.
+
+The [catalogue checkpoint](checkpoints/CATALOGUE_NAMES.md) installs complete
+sixteen-byte names in all 63 category/row display slots with private transient
+storage, preserving the packed native pages and original drawing geometry.
+Its focused host, artifact, cartridge, and accounting checks pass. Ordinary
+catalogue navigation/order joins the combined v0 pass. The immediate embedded-
+text batch is the nine category names, wrapped-present label, and remaining
+confirmation prose; exact source/copy sites are recorded at the checkpoint.
 
 ## Full-project scope and evidence
 

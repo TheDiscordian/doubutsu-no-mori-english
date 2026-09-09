@@ -72,6 +72,13 @@ sixteen-byte main-window values and covers the item-ID wrapper at `800BB6A0`.
 Other source-loader callers, the ten-byte compatibility getter, and dynamic
 choice insertion are not approved wider destinations.
 
+The [ordinary inventory consumer](INVENTORY_ENGLISH.md) uses a branch-specific
+sixteen-byte cleared span, retaining separate mail/quest fields. The
+[catalogue consumer](CATALOGUE_NAMES.md) retains native ten-byte page fields and
+keeps 63 complete names in owned transient storage; its item-name drawer reads
+the full copies without per-frame DMA. Neither integration globally widens the
+legacy loader or changes saved item IDs.
+
 ## Acceptance
 
 Tests reject stale references, wrong legacy donors, differing rotation names,
