@@ -13,6 +13,11 @@ ROOT = Path(__file__).resolve().parents[1]
 RAM = 0x80B00000
 IMAGE_BYTES_MAX = 0x10000
 WORD_HASH = '698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1'
+DESIGN_WORD_HASH = '3e06014a398b03a9ccac58fa8c9ac57ba3c5a5312e39167b288c314cc6dee4f9'
+WORD_PROFILES = frozenset((WORD_HASH, DESIGN_WORD_HASH))
+CAPTURE_SOURCE = 'overlays/mail_generation/npc_capture.c'
+LEGACY_CAPTURE_SOURCE_HASH = '68d4bf2c1624ec1df86f4a779dd820243dbb833e0012cf8dee31af4791bd8180'
+PROFILE_CAPTURE_SOURCE_HASH = '43208dfee76a7a811dab70b3dbd103b79033c8badfc3be3da3258801f4830169'
 ALIAS_HASH = 'a79b6bc3c5b36c7ce2bcea55932ccdf4ce694608e5dcfb896226a24d368bf5d6'
 ACADEMY_SERIES_HASH = 'be1258e1806e2a5e38a64cad52863c632d45b4610685ec9590dd264bb1569a38'
 IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid')
@@ -95,7 +100,10 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
 
 
 def verified_resources(words,aliases):
-    unpack_words(words,WORD_HASH)
+    digest = sha256(words)
+    if digest not in WORD_PROFILES:
+        raise ValueError('Unapproved complete NPC reply-word profile')
+    unpack_words(words,digest)
     unpack_aliases(aliases,ALIAS_HASH)
 
 
@@ -105,17 +113,41 @@ def catalog_id(report):
     return 4 if report.get('mail_glyphs') is True else 2
 
 
-def source_report_matches(actual, expected, *, article_names=None):
-    if actual == expected:
-        return True
+def source_report_matches(actual, expected, *, article_names=None, word_hash=None):
+    versions = [expected]
+    # The default-profile recompilation must reproduce the retained image.
+    # Only this exact conditional-digest source change permits its predecessor;
+    # future C edits do not inherit an exemption, nor does the corrected profile.
+    if word_hash == WORD_HASH and expected.get(CAPTURE_SOURCE) == PROFILE_CAPTURE_SOURCE_HASH:
+        versions.append({**expected, CAPTURE_SOURCE: LEGACY_CAPTURE_SOURCE_HASH})
     # Each retained immutable article profile also accepts its pinned original
     # generator provenance. Every compiled source and resource remains checked;
     # this does not let new name profiles claim the old generator.
-    from item_articles import PROFILE_GENERATORS
-    if article_names in PROFILE_GENERATORS and 'tools/item_articles.py' in expected:
-        legacy = {**expected, 'tools/item_articles.py': PROFILE_GENERATORS[article_names]}
-        return actual == legacy
-    return False
+    from item_articles import PROFILE_GENERATORS, PROFILE_ORIGINAL_ARTICLES
+    if isinstance(article_names, str) and article_names in PROFILE_GENERATORS and 'tools/item_articles.py' in expected:
+        versions += [{**version, 'tools/item_articles.py': PROFILE_GENERATORS[article_names],
+                      'translations/n64-item-articles.json': PROFILE_ORIGINAL_ARTICLES[article_names]}
+                     for version in tuple(versions)]
+    return actual in versions
+
+
+def word_guard_offset(data, symbols, text):
+    """Resolve the digest actually passed to the initializer's full-word hash."""
+    start = symbols['af_npc_mail_sources_init']
+    end = min((at for at in symbols.values() if start < at < text), default=text)
+    matches = []
+    for at in range(start, end-19, 4):
+        hi, lo, size, call, source = struct.unpack_from('>5I', data, at)
+        if (hi >> 16 == 0x3C06 and lo >> 16 == 0x24C6 and size == 0x24052C40
+                and call >> 26 == 3 and source == 0x02202025):
+            target = ((hi & 65535) << 16)+(lo & 65535)-(65536 if lo & 32768 else 0)-RAM
+            helper = (0x80000000 | ((call & 0x3FFFFFF) << 2))-RAM
+            if not text <= target <= len(data)-32 or target & 3 or not 0 <= helper < text:
+                raise ValueError('NPC word initializer has an invalid digest argument')
+            matches.append(target)
+    if len(matches) != 1:
+        raise ValueError('NPC word initializer must bind one complete word digest')
+    return matches[0]
 
 
 def validate(data,reloc,report,module):
@@ -149,10 +181,12 @@ def validate(data,reloc,report,module):
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
             or report.get('relocation_sha256') != sha256(reloc) or not source_report_matches(
                 report.get('sources'), source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner,notice_seasonal=seasonal),
-                article_names=report.get('item_names_sha256') if treasure else None)
+                article_names=report.get('item_names_sha256') if treasure else None,
+                word_hash=report.get('word_sha256'))
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
-            or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
+            or not isinstance(report.get('word_sha256'), str)
+            or report['word_sha256'] not in WORD_PROFILES or report.get('alias_sha256') != ALIAS_HASH):
         raise ValueError('Stale or changed NPC capture overlay')
     # Validate lengths before reading even the first relocation-header word.
     relocate(data,reloc,MODULE_RAM+RESERVATION,report['imports'].values())
@@ -194,19 +228,26 @@ def validate(data,reloc,report,module):
     if w&15 or a&15 or not text <= w or a != w+11328 or a+6368 != len(data):
         raise ValueError('NPC capture resource offsets are invalid')
     verified_resources(data[w:a],data[a:])
+    if report['word_sha256'] != sha256(data[w:a]):
+        raise ValueError('Declared NPC word profile does not match the embedded resource')
+    guard = word_guard_offset(data, symbols, text)
+    if data[guard:guard+32] != bytes.fromhex(report['word_sha256']):
+        raise ValueError('Compiled NPC word initializer rejects its embedded resource')
     if scores:
         series = symbols['af_academy_series_data']
         if (series&15 or not text <= series or series+1440 != w or sha256(data[series:w]) != ACADEMY_SERIES_HASH
                 or report.get('academy_series_sha256') != ACADEMY_SERIES_HASH):
             raise ValueError('Invalid complete academy series-name resource')
     if treasure:
-        from item_articles import SIZE, verify
+        from item_articles import SIZE, DESIGN_NAMES_HASH, verify
         article = symbols['af_item_article_data']
         if (article&15 or article < text or article+SIZE != symbols['af_academy_series_data']
                 or report.get('item_articles_sha256') != sha256(data[article:article+SIZE])
                 or report.get('item_names_sha256') != verify(data[article:article+SIZE])):
             raise ValueError('Invalid complete item article resource')
         verify(data[article:article+SIZE])
+        if report['item_names_sha256'] == DESIGN_NAMES_HASH and report['word_sha256'] != DESIGN_WORD_HASH:
+            raise ValueError('Native design item names require the corrected herabuna NPC word profile')
     if seasonal:
         from notice_seasonal import compiled_resource
         resource = compiled_resource((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),

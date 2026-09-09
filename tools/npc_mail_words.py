@@ -101,7 +101,7 @@ def lookup(rows,slot,native_id):
     return row.field()
 
 
-def prepare(native,legacy,reference,tables):
+def prepare(native,legacy,reference,tables, *, native_species=False):
     for label,bank,hashes in (('native',native,NATIVE_HASHES),('legacy',legacy,LEGACY_HASHES),
                               ('English',reference,BANK_HASHES['string'])):
         if bank.name != 'string' or bank.table is None or (sha256(bank.data),sha256(bank.table)) != hashes:
@@ -115,6 +115,9 @@ def prepare(native,legacy,reference,tables):
         # shared numeric ID assumption, or whitespace-normalized match.
         if text != old[native_id]:
             raise ValueError(f'NPC reply-word identity is not confirmed at native {native_id:04X}')
+        if native_species:
+            from native_species import correct_word
+            text = correct_word(native_id, originals[native_id], text)
         rows.append(Word(native_id,reference_id,slot,text))
         manifest.append({'slot':slot,'native_id':native_id,'reference_id':reference_id,
                          'native_sha256':sha256(originals[native_id]),
@@ -122,6 +125,9 @@ def prepare(native,legacy,reference,tables):
                          'reference_sha256':sha256(english[reference_id]),
                          'captured_sha256':sha256(text),'bytes':len(text),
                          'article':0,'match_basis':'verified_caller_family_and_exact_complete_legacy_value'})
+        if text != old[native_id]:
+            from native_species import SOURCE
+            manifest[-1].update(match_basis='reviewed_native_species_correction', translation_source=SOURCE)
     resource = pack_words(rows)
     return resource,{'resource_sha256':sha256(resource),'bytes':len(resource),'rows':manifest,
                      'word_count':len(rows),'words_exceeding_native_ten_bytes':sum(len(row.text)>10 for row in rows),
@@ -137,6 +143,7 @@ def main():
     parser.add_argument('--rel',type=Path,default=Path('build/gamecube/files/foresta.rel.szs.decoded'))
     parser.add_argument('--decomp',type=Path,default=Path('local/ac-decomp'))
     parser.add_argument('--output',type=Path,default=Path('build/npc-mail-words'))
+    parser.add_argument('--native-species', action='store_true', help='Retain the N64 herabuna instead of the replaced GC species')
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
     native = native_evidence(by_vrom(rom)[CODE_VROM].extract(rom))
@@ -150,7 +157,7 @@ def main():
                for data,old in ((rom,False),(args.legacy.read_bytes(),True))]
     sources.append(Bank('string',0,0,(args.gc_data/'string_data.bin').read_bytes(),
                         (args.gc_data/'string_data_table.bin').read_bytes()))
-    resource,report = prepare(*sources,decoder_tables(decoder))
+    resource,report = prepare(*sources,decoder_tables(decoder),native_species=args.native_species)
     report.update(native_code=native,reference_code=reference,decoder_sha256=DECODER_SHA256,
                   reference_setter_sha256=SETTER_SHA256,reference_field_sources=field_sources)
     args.output.mkdir(parents=True,exist_ok=True)

@@ -9,13 +9,19 @@ from item_matches import identity_key, verify_source
 from textcodec import LATIN, encode, tokenize
 
 PATH = Path(__file__).resolve().parents[1]/'translations/n64-item-names.json'
+DESIGN_PATH = PATH.with_name('n64-design-item-names.json')
 SOURCE = 'project-authored translation of the native Japanese item name'
 
 
-def load_names(path=PATH):
+def load_names(path=PATH, *, include_design=True):
     rows = json.loads(path.read_text())
     if not isinstance(rows,list):
         raise ValueError('Native item names require a list')
+    if path == PATH and include_design:
+        extra = json.loads(DESIGN_PATH.read_text())
+        if not isinstance(extra, list):
+            raise ValueError('Native design names require a list')
+        rows += extra
     result = {}
     for row in rows:
         if (not isinstance(row,dict) or not isinstance(row.get('id'),str) or

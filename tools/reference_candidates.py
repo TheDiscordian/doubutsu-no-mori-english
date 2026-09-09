@@ -217,6 +217,7 @@ def main():
                                        Path("translations/n64-native-context.json"),
                                        Path("translations/n64-pak-storage-dialogue.json"),
                                        Path("translations/n64-carp-fireworks.json"),
+                                       Path("translations/n64-herabuna-dialogue.json"),
                                        Path("translations/n64-service-save-dialogue.json"),
                                        Path("translations/n64-seasonal-topics.json"),
                                        Path("translations/n64-startup-pak.json"),

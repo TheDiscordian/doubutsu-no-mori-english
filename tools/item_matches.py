@@ -10,6 +10,7 @@ from textcodec import encode
 APPROVALS = Path(__file__).resolve().parents[1]/'translations/item_reference_matches.json'
 SHEET_APPROVALS = APPROVALS.with_name('item_sheet_matches.json')
 RESOLVED_APPROVALS = APPROVALS.with_name('item_resolved_matches.json')
+DESIGN_APPROVALS = APPROVALS.with_name('item_design_matches.json')
 ITEM_ID = re.compile(r'item_(10|2[0-9A-F]):([0-9A-F]{4})')
 
 
@@ -23,7 +24,7 @@ def identity_key(id):
     return f'item_{match[1]}:{index:04X}'
 
 
-def load_matches(path=APPROVALS, *, include_sheet=True, include_resolved=True):
+def load_matches(path=APPROVALS, *, include_sheet=True, include_resolved=True, include_design=True):
     rows = json.loads(path.read_text())
     if not isinstance(rows, list):
         raise ValueError('Item identity approvals must be a list')
@@ -37,6 +38,11 @@ def load_matches(path=APPROVALS, *, include_sheet=True, include_resolved=True):
             if not isinstance(extra, list):
                 raise ValueError('Resolved item identities must be a list')
             rows += extra
+            if include_design:
+                extra = json.loads(DESIGN_APPROVALS.read_text())
+                if not isinstance(extra, list):
+                    raise ValueError('Native design matches must be a list')
+                rows += extra
     result = {}
     for row in rows:
         if (not isinstance(row, dict) or not isinstance(row.get('id'), str)

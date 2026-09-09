@@ -1,0 +1,254 @@
+[
+  {
+    "id": "item_10:0250",
+    "source_sha256": "7ecef70dacbb8475c4dc12df858bc025ea3cea3d0418e4b42923cc3f95656189",
+    "native_name": "ちょうれいだい",
+    "translation": "assembly podium",
+    "evidence": "Translate the native assembly platform, not the GameCube stepstool replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 191,
+      "item": "0191"
+    }
+  },
+  {
+    "id": "item_10:0264",
+    "source_sha256": "ed805231936d0be72a2a461b1ff9e7fe55ddcb58c344d2e379b2055d882c4eb1",
+    "native_name": "すかしぼりのテーブル",
+    "translation": "fretwork table",
+    "evidence": "Retain the pierced-carving table named by the native Japanese source instead of asserting that its different referenced model has a glass top.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 197,
+      "item": "0197"
+    }
+  },
+  {
+    "id": "item_10:02B0",
+    "source_sha256": "00cbe874e9e51897d9ff8acfdb99c5f1f90e2346e7cfbaf3ffc19f4a7a1e5df9",
+    "native_name": "おそるべきめいが",
+    "translation": "fearful painting",
+    "evidence": "Translate the native painting adjective; the comparison sheet has no matching English-game artwork. Do not substitute the basic painting.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 217,
+      "item": "0217"
+    }
+  },
+  {
+    "id": "item_10:02B4",
+    "source_sha256": "f476a43815e770e85f14b06df088898ee0a84e92cb19177bde5ab5cc77b1e999",
+    "native_name": "ざんしんなめいが",
+    "translation": "modern painting",
+    "evidence": "Translate the native innovative/novel painting adjective, retaining its original artwork rather than the GameCube scary painting replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 220,
+      "item": "0220"
+    }
+  },
+  {
+    "id": "item_10:02C4",
+    "source_sha256": "b252da86e288587022cb63186e14d66dc737e851e1f3e2d94493b5b9a1f47be5",
+    "native_name": "いいめいが",
+    "translation": "good painting",
+    "evidence": "Translate the complete native adjective and painting noun. Retain the native artwork instead of adopting the unrelated quaint painting; avoid colliding with the separately present fine painting.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 226,
+      "item": "0226"
+    }
+  },
+  {
+    "id": "item_10:02D8",
+    "source_sha256": "fe44c02040a6d0f4801591df8a1c36c0c501391af9848060e031dd11c713447e",
+    "native_name": "いいかんじのめいが",
+    "translation": "nice painting",
+    "evidence": "Translate the native favourable-impression painting name while retaining its artwork rather than the classic painting replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 232,
+      "item": "0232"
+    }
+  },
+  {
+    "id": "item_10:0420",
+    "source_sha256": "bce9bc6b716d7229858389f6f2426f37cf5edf775e0fb71271653d989a69e1e6",
+    "native_name": "あかいじはんき",
+    "translation": "red vending unit",
+    "evidence": "Retain the explicit red colour and vending machine identity without assigning the changed GameCube cola product/design.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 329,
+      "item": "0329"
+    }
+  },
+  {
+    "id": "item_10:0458",
+    "source_sha256": "3d15441e1ce6c6513b4dd7b1fb2bd745cfb8c3b47130646aeb86567ecdcab395",
+    "native_name": "ドリンクじはんき",
+    "translation": "drink dispenser",
+    "evidence": "Retain the generic drink-vending meaning and native machine; do not replace it with the GameCube juice machine design.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 350,
+      "item": "0350"
+    }
+  },
+  {
+    "id": "item_10:0490",
+    "source_sha256": "f31fecfecd9dc48d09794173e1ee2eadb29fb1d4e8a5ac13c473df0b1050c02b",
+    "native_name": "ふせんちょうずばち",
+    "translation": "coin basin",
+    "evidence": "Translate the coin-form water basin in the native name. Fusen denotes the coin-shaped basin design, corroborated by https://www.aisf.or.jp/~jaanus/deta/f/fusen.htm . This is original wording, not the unused English zen basin label.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 369,
+      "item": "0369"
+    }
+  },
+  {
+    "id": "item_10:0528",
+    "source_sha256": "ede21b26dbd8aa297a23fec01ad694a4201b9deb3541e8e5ca5908137baa8e7b",
+    "native_name": "あらいば",
+    "translation": "wash station",
+    "evidence": "Translate the native washing-area furniture, preserving the original fixture rather than the GameCube faucet replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 421,
+      "item": "0421"
+    }
+  },
+  {
+    "id": "item_10:0814",
+    "source_sha256": "0bfe33899595e1eeb0228ba2bc3974d7766e85445096416132b2464481ad57cc",
+    "native_name": "パーティードレス",
+    "translation": "party dress",
+    "evidence": "Retain the native party dress design and complete garment name, not the replacement red aloha shirt.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 623,
+      "item": "0623"
+    }
+  },
+  {
+    "id": "item_10:0818",
+    "source_sha256": "1a5ed5f0605406a57c92f4c1d113bd449dca244f989c993d8e8b868fbf30f4b3",
+    "native_name": "タキシード",
+    "translation": "tuxedo",
+    "evidence": "Retain the native tuxedo design, not the replacement blue aloha shirt.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 625,
+      "item": "0625"
+    }
+  },
+  {
+    "id": "item_10:0950",
+    "source_sha256": "c8f7d6b177e37d3e38467fc86033f581fadbd6218de8fc9778094ed39311e5f4",
+    "native_name": "みたことあるセーター",
+    "translation": "familiar sweater",
+    "evidence": "Translate the complete placed sweater name. Native conversion reaches carried clothing 2469 with the broader Japanese familiar-clothes label; both describe this original sweater, not the changed donor designs.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 706,
+      "item": "0706"
+    }
+  },
+  {
+    "id": "item_10:0C2C",
+    "source_sha256": "ca1b79d3d07f37eee5d158d7c210eded0e23fe84e8ac57dfd4ad6b4c1e24d0ff",
+    "native_name": "ヘラ",
+    "translation": "herabuna",
+    "evidence": "Retain the native herabuna fish. The original conversion maps placed 1C2C to carried 2301, whose complete Japanese name is Herabuna. The abbreviated placed label does not mean the unrelated utensil. The GameCube brook trout is a replacement species, not an English name for this fish. https://nookipedia.com/wiki/Herabuna",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 920,
+      "item": "0920"
+    }
+  },
+  {
+    "id": "item_23:0001",
+    "source_sha256": "a741a671b67a83696c40bcf5c77736bc51c580aaff772dbd4abcf3563faa53a7",
+    "native_name": "ヘラブナ",
+    "translation": "herabuna",
+    "evidence": "Retain the complete romanised native fish name and species. The catalogue explicitly has no matching English-game identity. Correct the inherited brook trout label: that fish replaces the herabuna in GameCube Animal Crossing. https://nookipedia.com/wiki/Herabuna",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1528,
+      "item": "1528"
+    }
+  },
+  {
+    "id": "item_24:0069",
+    "source_sha256": "1e3449b915934ec3d081f0f6eff4a73e61bddde37f7e9d1b264c473faf238ab5",
+    "native_name": "みたことあるふく",
+    "translation": "familiar sweater",
+    "evidence": "Retain the native familiar garment. Placed item 1950 converts to this carried clothing ID and explicitly names a sweater, so both native labels receive the same full English wording. Do not adopt fortune shirt or zig-zag shirt from the changed donor versions.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1685,
+      "item": "1685"
+    }
+  },
+  {
+    "id": "item_20:0003",
+    "source_sha256": "4e4744280928fbb3ed7407544b3eedb681ed615a59942e2f7dc0c9286b9a7d58",
+    "native_name": "キケンなびんせん",
+    "translation": "danger paper",
+    "evidence": "Translate the complete native danger-themed stationery name and retain its original pattern, not the GameCube orange paper replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1161,
+      "item": "1161"
+    }
+  },
+  {
+    "id": "item_26:0012",
+    "source_sha256": "d1c67db38994f0f3148911c901d3508a5fb528600f6cff8cd56a61a7f496833a",
+    "native_name": "おふろばタイルのゆか",
+    "translation": "bath tile floor",
+    "evidence": "Retain the native tiled bathing-area floor rather than the GameCube western desert replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1924,
+      "item": "1924"
+    }
+  },
+  {
+    "id": "item_26:001A",
+    "source_sha256": "71b1d45db4591ae5783159ca4d97c4892ad3b69b9426db3ae7bcb95e45d782a6",
+    "native_name": "ふるいいたまのゆか",
+    "translation": "old plank floor",
+    "evidence": "Retain the worn wooden-plank floor in the native name and design rather than the GameCube backyard lawn replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1933,
+      "item": "1933"
+    }
+  },
+  {
+    "id": "item_27:0012",
+    "source_sha256": "efe101634c364574bb8ef9763788deff85a9cc7042835e8796604ff57372d7b2",
+    "native_name": "せんとうのかべ",
+    "translation": "bathhouse wall",
+    "evidence": "Retain the native public-bathhouse wall rather than the GameCube western vista replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 2000,
+      "item": "2000"
+    }
+  },
+  {
+    "id": "item_27:001A",
+    "source_sha256": "f3911f0a440467bb8f8d79d165c360d952d84a7d96fed7c1c533853a4119679b",
+    "native_name": "ボロいつちかべ",
+    "translation": "worn earth wall",
+    "evidence": "Retain the worn earthen wall in the native name and design rather than the GameCube backyard fence replacement.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 2009,
+      "item": "2009"
+    }
+  }
+]

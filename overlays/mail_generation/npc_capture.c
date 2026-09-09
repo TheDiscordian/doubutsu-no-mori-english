@@ -3,6 +3,13 @@
 
 #define READY 0x41464353u
 
+#ifndef AF_NPC_WORD_PROFILE
+#define AF_NPC_WORD_PROFILE 1
+#endif
+#if AF_NPC_WORD_PROFILE != 1 && AF_NPC_WORD_PROFILE != 2
+#error Unsupported NPC word profile
+#endif
+
 const unsigned int af_npc_mail_catalog_id = AF_MAIL_CREATOR_CATALOG;
 
 static const unsigned int word_bases[11] = {
@@ -42,7 +49,11 @@ static int hash(const unsigned char *data, unsigned int size, const unsigned int
 int af_npc_mail_sources_init(AfNpcMailSources *out, const unsigned char *words, unsigned int word_size,
                              const unsigned char *aliases, unsigned int alias_size) {
     static const unsigned int word_hash[8] = {
+#if AF_NPC_WORD_PROFILE == 2
+        0x3e06014au,0x398b03a9u,0xccac58fau,0x8c9ac57bu,0xa3c5a531u,0x2e39167bu,0x288c314cu,0xc6dee4f9u
+#else
         0x698e26d2u,0x1c20eddcu,0xc2576631u,0x7aa52024u,0x949f4ebau,0x51db99d7u,0x3d58d46fu,0x6c5a12c1u
+#endif
     };
     static const unsigned int alias_hash[8] = {
         0xa79b6bc3u,0xc5b36c7cu,0xe2bcea55u,0x932ccdf4u,0xce694608u,0xe5dcfb89u,0x6226a24du,0x368bf5d6u

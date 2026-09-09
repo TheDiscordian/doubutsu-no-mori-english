@@ -7,7 +7,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom
 from code_sections import code_segments
 from fortune_strings import STRING_RELOCATION, source_entries
-from npc_mail_capture import WORD_HASH, call_patches
+from npc_mail_capture import WORD_HASH, WORD_PROFILES, call_patches
 from npc_mail_generation import native_evidence
 from npc_mail_words import COUNT, Word, identity, pack_words
 from resident_words import (SPEC, IDS as RESIDENT_IDS, caller_evidence as resident_evidence,
@@ -72,8 +72,10 @@ def verify_values(values):
         raise ValueError('Shared NPC words require all 352 complete English values')
     rows = [Word(native, reference, slot, value)
             for (native, reference, slot), value in zip(IDENTITIES, values)]
-    if sha256(pack_words(rows)) != WORD_HASH:
+    digest = sha256(pack_words(rows))
+    if digest not in WORD_PROFILES:
         raise ValueError('Shared NPC words differ from the complete approved word resource')
+    return digest
 
 
 def candidates(rom, references, inventory, info):
@@ -90,6 +92,10 @@ def candidates(rom, references, inventory, info):
                 or row['source_sha256'] != sha256(originals[native])
                 or donor['sha256'] != sha256(value) or encode(row['legacy'], info) != value):
             raise ValueError('Changed complete shared-word native/reference/legacy agreement')
+        from native_species import correct_word, SOURCE
+        corrected = correct_word(native, originals[native], value)
+        is_original = corrected != value
+        value = corrected
         values.append(value)
         result[id] = {'id': id, 'source_sha256': sha256(originals[native]),
             'translation': donor['text'], 'control_policy': 'exact',
@@ -98,7 +104,12 @@ def candidates(rom, references, inventory, info):
                 'reference_id': reference_id, 'reference_sha256': donor['sha256'],
                 'native_mail_slot': slot, 'word_resource_sha256': WORD_HASH,
                 'match_basis': 'verified_native_family_and_complete_legacy_agreement'}}
-    verify_values(values)
+        if is_original:
+            result[id].update(translation=value.decode('ascii'), status='source_reviewed_original_translation')
+            result[id]['provenance'].update(source=SOURCE, reference_id='native:'+id,
+                reference_sha256=sha256(value), match_basis='reviewed_native_species_correction')
+    digest = verify_values(values)
+    for row in result.values(): row['provenance']['word_resource_sha256'] = digest
     return result
 
 
@@ -122,7 +133,7 @@ def validated_values(rom, edits, info):
     return dict(zip(IDS, values))
 
 
-def verify_consumers(rom, replacements, additions, module):
+def verify_consumers(rom, replacements, additions, module, *, expected_word_hash=None):
     from mail_catalog import VROM as CATALOG_VROM, verify_registered
     from mail_view_patch import install as install_reader
     from npc_mail_delivery import START, END, patch as gate
@@ -137,6 +148,10 @@ def verify_consumers(rom, replacements, additions, module):
     if len(binary) != RESERVATION:
         raise ValueError('Changed shared-word resident reservation')
     verify_configuration(binary, additions[VROM], module)
+    if expected_word_hash is not None and (
+            not isinstance(expected_word_hash, str) or expected_word_hash not in WORD_PROFILES
+            or module['npc_mail_loader']['overlay'].get('word_sha256') != expected_word_hash):
+        raise ValueError('Shared bank words require the matching installed NPC word profile')
     baseline = bytearray(binary)
     baseline[CONFIG_OFFSET:CONFIG_OFFSET+CONFIG_BYTES] = bytes(CONFIG_BYTES)
     for offset, vrom in ((56, 0x02A00000), (60, 0x02C00000), (64, 0x02E00000), (68, CATALOG_VROM)):
@@ -175,7 +190,8 @@ def verify_consumers(rom, replacements, additions, module):
 
 def install(rom, replacements, additions, module, edits, info):
     values = validated_values(rom, edits, info)
-    verify_consumers(rom, replacements, additions, module)
+    digest = verify_values(list(values.values()))
+    verify_consumers(rom, replacements, additions, module, expected_word_hash=digest)
     if 0xD16000 not in replacements or 0xD18000 not in replacements:
         raise ValueError('Shared words require the prepared resident-word string bank')
     bank = Bank('string', 0xD16000, 0xD18000, replacements[0xD16000], replacements[0xD18000])
@@ -191,7 +207,7 @@ def install(rom, replacements, additions, module, edits, info):
     data += bytes(-len(data) % 16)
     # No publication until the entire group, both consumers, and bank rebuild pass.
     replacements[0xD16000], replacements[0xD18000] = data, table
-    return {'translation_edits': COUNT, 'word_resource_sha256': WORD_HASH,
+    return {'translation_edits': COUNT, 'word_resource_sha256': digest,
             'ordinary_word_count': 160, 'mail_word_count': COUNT,
             'words_exceeding_ten_bytes': sum(len(value) > 10 for value in values.values()),
             'string_data_bytes': len(data), 'string_data_sha256': sha256(data),

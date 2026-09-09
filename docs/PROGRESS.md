@@ -13,6 +13,23 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [native-design integration](checkpoints/DESIGN_ITEM_NAMES.md) adds 74 complete
+name fields, corrects the native herabuna species across names, two messages,
+general strings, and dynamic letters, and leaves eight accented name fields.
+Its compile-time word profile and actual MIPS digest-argument verification keep
+the letter initializer consistent with the corrected resource. Eight host C
+capture tests pass, including full resources, local/foreign herabuna capture,
+and rejection of the old profile. Full-ROM rebuild, final artifact checks, and
+the ten source/ROM/accounting checks pass. The completed silent native batch
+passes all 137 calls and 129 assertions, including the ordinary herabuna word
+load, restored stack/checkpoint, blank isolated saves, and graceful shutdown.
+Frozen new and preceding native evidence stays checked without replay. Creator
+machine code, sizes, symbols, relocations, reader, saved layout, and memory bounds
+remain unchanged. The corrected C initializer's cartridge-load/relocation path
+still needs its focused native check; host C execution and MIPS digest-argument
+inspection do not establish that path. Remaining accents, general/letter text,
+full-name callers, gameplay/review, release, and title/keyboard work continue.
+
 The [resolved-name integration](checkpoints/RESOLVED_ITEM_NAMES.md) installs
 65 more complete fields: seventeen stationery names, four totems, seven numbered
 shirts, and the placed cicada. Thirty explicit approvals resolve repeated paper

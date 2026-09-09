@@ -1,0 +1,54 @@
+[
+  {
+    "id": "item_10:07FC",
+    "source_sha256": "1bc30b61b49bb5c8d7cc534dcacd954fcc1362d739530c47a092a409ac8e1f6a",
+    "native_name": "あおいたいそうふく",
+    "reference_id": "furniture:01FF",
+    "reference_sha256": "e33abaa1a6f8b96a7dc55be5fc8ae1d135dd5ba9da82084a85558d645eec1858",
+    "evidence": "Items row 617 binds this exact source field and complete supplied English name. Placed 17FC converts to carried 2414 and both catalogue model/texture references identify red; placed 1800 converts to carried 2415 and both identify blue. The native placed Japanese colour labels are reversed relative to their carried fields. Preserve the actual conversions and designs, and the GameCube distinction between placed sweats and carried sweatsuit wording. Do not infer aliases by normalizing these unequal Japanese fields.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 617,
+      "item": "0617"
+    }
+  },
+  {
+    "id": "item_10:0800",
+    "source_sha256": "6bfa08f665a1f682ecdeb797da2cceaa07a15d920ccdeb38dc031043fade9244",
+    "native_name": "あかいたいそうふく",
+    "reference_id": "furniture:0200",
+    "reference_sha256": "f4d10b7e452823a4b4a8a30a35a257eb1a03cddd8aae1d7b1b28266aef467624",
+    "evidence": "Items row 618 binds this exact source field and complete supplied English name. Placed 17FC converts to carried 2414 and both catalogue model/texture references identify red; placed 1800 converts to carried 2415 and both identify blue. The native placed Japanese colour labels are reversed relative to their carried fields. Preserve the actual conversions and designs, and the GameCube distinction between placed sweats and carried sweatsuit wording. Do not infer aliases by normalizing these unequal Japanese fields.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 618,
+      "item": "0618"
+    }
+  },
+  {
+    "id": "item_24:0014",
+    "source_sha256": "6bfa08f665a1f682ecdeb797da2cceaa07a15d920ccdeb38dc031043fade9244",
+    "native_name": "あかいたいそうふく",
+    "reference_id": "item_24:0014",
+    "reference_sha256": "66f1b17a3e09ce88186d9cfa875bf5a11898424bd4209582800c5227ecf303f0",
+    "evidence": "Items row 1596 binds this exact source field and complete supplied English name. Placed 17FC converts to carried 2414 and both catalogue model/texture references identify red; placed 1800 converts to carried 2415 and both identify blue. The native placed Japanese colour labels are reversed relative to their carried fields. Preserve the actual conversions and designs, and the GameCube distinction between placed sweats and carried sweatsuit wording. Do not infer aliases by normalizing these unequal Japanese fields.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1596,
+      "item": "1596"
+    }
+  },
+  {
+    "id": "item_24:0015",
+    "source_sha256": "1bc30b61b49bb5c8d7cc534dcacd954fcc1362d739530c47a092a409ac8e1f6a",
+    "native_name": "あおいたいそうふく",
+    "reference_id": "item_24:0015",
+    "reference_sha256": "035148d7112a762c3f1ac3e626d0f75a4e6c231e862bcae236b7ca267d7418f4",
+    "evidence": "Items row 1597 binds this exact source field and complete supplied English name. Placed 17FC converts to carried 2414 and both catalogue model/texture references identify red; placed 1800 converts to carried 2415 and both identify blue. The native placed Japanese colour labels are reversed relative to their carried fields. Preserve the actual conversions and designs, and the GameCube distinction between placed sweats and carried sweatsuit wording. Do not infer aliases by normalizing these unequal Japanese fields.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1597,
+      "item": "1597"
+    }
+  }
+]

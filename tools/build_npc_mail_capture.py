@@ -11,7 +11,7 @@ import subprocess
 
 from aflib import sha256
 from check_keyboard_assembly import IMAGE
-from npc_mail_capture import RAM,IMAGE_BYTES_MAX,source_hashes,creator_imports,relocate,verified_resources
+from npc_mail_capture import RAM,IMAGE_BYTES_MAX,DESIGN_WORD_HASH,source_hashes,creator_imports,relocate,verified_resources
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
@@ -72,6 +72,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
     if mail_glyphs: flags.append('-DAF_MAIL_CREATOR_CATALOG=4')
+    if sha256(words) == DESIGN_WORD_HASH: flags.append('-DAF_NPC_WORD_PROFILE=2')
     if notice_seasonal: flags.append('-I/out')
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
     if departed_letters: names += ('departed_creator',)

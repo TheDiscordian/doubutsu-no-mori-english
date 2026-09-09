@@ -1,18 +1,142 @@
 {
-  "unused zabuton": {"article": 2, "reason": "Singular object; unused begins with a vowel sound."},
-  "unused chest": {"article": 2, "reason": "Singular object; unused begins with a vowel sound."},
-  "unused rack": {"article": 2, "reason": "Singular object; unused begins with a vowel sound."},
-  "I love 64 shirt": {"article": 2, "reason": "Singular shirt; its full design name begins with the spoken pronoun I."},
-  "N cube shirt": {"article": 2, "reason": "Singular shirt; the letter N is pronounced en."},
-  "Famicom": {"article": 1, "reason": "Singular console, beginning with a consonant sound."},
-  "Disk System": {"article": 1, "reason": "Singular hardware unit, beginning with a consonant sound."},
-  "quest letter": {"article": 1, "reason": "Singular letter, retaining its quest designation."},
-  "quest cloth": {"article": 4, "reason": "Cloth is a mass noun here; some retains the uncounted material meaning."},
-  "quest money": {"article": 4, "reason": "Money is an uncounted quantity, not a singular object called a money."},
-  "glasses": {"article": 4, "reason": "The complete plural name takes some without adding a pair-of phrase."},
-  "1,000 Bells": {"article": 0, "reason": "The explicit numeric amount needs no additional article."},
-  "fortune slip": {"article": 1, "reason": "Singular slip, beginning with a consonant sound."},
-  "town map": {"article": 1, "reason": "Singular map, beginning with a consonant sound."},
-  "yellow cosmos": {"article": 1, "reason": "One native flower item; the design name begins with a consonant sound."},
-  "empty": {"article": 0, "reason": "An empty-slot label is not a named singular object."}
+  "unused zabuton": {
+    "article": 2,
+    "reason": "Singular object; unused begins with a vowel sound."
+  },
+  "unused chest": {
+    "article": 2,
+    "reason": "Singular object; unused begins with a vowel sound."
+  },
+  "unused rack": {
+    "article": 2,
+    "reason": "Singular object; unused begins with a vowel sound."
+  },
+  "I love 64 shirt": {
+    "article": 2,
+    "reason": "Singular shirt; its full design name begins with the spoken pronoun I."
+  },
+  "N cube shirt": {
+    "article": 2,
+    "reason": "Singular shirt; the letter N is pronounced en."
+  },
+  "Famicom": {
+    "article": 1,
+    "reason": "Singular console, beginning with a consonant sound."
+  },
+  "Disk System": {
+    "article": 1,
+    "reason": "Singular hardware unit, beginning with a consonant sound."
+  },
+  "quest letter": {
+    "article": 1,
+    "reason": "Singular letter, retaining its quest designation."
+  },
+  "quest cloth": {
+    "article": 4,
+    "reason": "Cloth is a mass noun here; some retains the uncounted material meaning."
+  },
+  "quest money": {
+    "article": 4,
+    "reason": "Money is an uncounted quantity, not a singular object called a money."
+  },
+  "glasses": {
+    "article": 4,
+    "reason": "The complete plural name takes some without adding a pair-of phrase."
+  },
+  "1,000 Bells": {
+    "article": 0,
+    "reason": "The explicit numeric amount needs no additional article."
+  },
+  "fortune slip": {
+    "article": 1,
+    "reason": "Singular slip, beginning with a consonant sound."
+  },
+  "town map": {
+    "article": 1,
+    "reason": "Singular map, beginning with a consonant sound."
+  },
+  "yellow cosmos": {
+    "article": 1,
+    "reason": "One native flower item; the design name begins with a consonant sound."
+  },
+  "empty": {
+    "article": 0,
+    "reason": "An empty-slot label is not a named singular object."
+  },
+  "assembly podium": {
+    "article": 2,
+    "reason": "Singular podium; assembly begins with a vowel sound."
+  },
+  "fretwork table": {
+    "article": 1,
+    "reason": "Singular table, beginning with a consonant sound."
+  },
+  "fearful painting": {
+    "article": 1,
+    "reason": "Singular painting, beginning with a consonant sound."
+  },
+  "modern painting": {
+    "article": 1,
+    "reason": "Singular painting, beginning with a consonant sound."
+  },
+  "good painting": {
+    "article": 1,
+    "reason": "Singular painting, beginning with a consonant sound."
+  },
+  "nice painting": {
+    "article": 1,
+    "reason": "Singular painting, beginning with a consonant sound."
+  },
+  "red vending unit": {
+    "article": 1,
+    "reason": "Singular vending unit, retaining the red design."
+  },
+  "drink dispenser": {
+    "article": 1,
+    "reason": "Singular drinks machine, beginning with a consonant sound."
+  },
+  "coin basin": {
+    "article": 1,
+    "reason": "Singular coin-form water basin."
+  },
+  "wash station": {
+    "article": 1,
+    "reason": "Singular washing fixture, beginning with a consonant sound."
+  },
+  "party dress": {
+    "article": 1,
+    "reason": "Singular dress, retaining its native garment identity."
+  },
+  "tuxedo": {
+    "article": 1,
+    "reason": "Singular garment, beginning with a consonant sound."
+  },
+  "familiar sweater": {
+    "article": 1,
+    "reason": "Singular sweater, identical across its two native name variants."
+  },
+  "herabuna": {
+    "article": 1,
+    "reason": "Singular native fish; the initial h is pronounced."
+  },
+  "danger paper": {
+    "article": 4,
+    "reason": "Stationery is a mass noun; some retains the paper-type meaning."
+  },
+  "bath tile floor": {
+    "article": 1,
+    "reason": "One complete room-floor item, not an unspecified quantity of tiles."
+  },
+  "old plank floor": {
+    "article": 2,
+    "reason": "Singular floor; old begins with a vowel sound."
+  },
+  "bathhouse wall": {
+    "article": 1,
+    "reason": "One complete wall-covering item."
+  },
+  "worn earth wall": {
+    "article": 1,
+    "reason": "One complete wall-covering item, beginning with a consonant sound."
+  }
 }

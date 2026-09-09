@@ -1,0 +1,18 @@
+[
+  {
+    "id": "message:10F7",
+    "source_sha256": "774d7bfbe2491d674b59b3870f30425282942e2f81818b38bd1bbfd24ea4dff1",
+    "translation": "{cmd:7F0328}{cmd:7F09000004}Hold on,{cmd:7F0304} that's not a bass.{cmd:7F0304}\nIt's a herabuna.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000017}Sorry,{cmd:7F0304} but it has to be\na black bass to qualify.\nNo other fish will do.{cmd:7F04}\n{cmd:7F02}{cmd:7F09000015}You know, herabuna are good\nstewed,{cmd:7F0304} but they're pretty\ntasty as sashimi, too.{cmd:7F0306}\nSlurp, slurp, slurp!\n{cmd:7F0E110E}\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Restore the native herabuna identity, bass-only tournament eligibility, and stew/sashimi aside. The supplied English release replaces this species with brook trout and its cooking text; do not apply those changed meanings to the unchanged N64 fish. Retain every native control, argument, page boundary, and continuation target."
+  },
+  {
+    "id": "message:1328",
+    "source_sha256": "5b08ed1940d30d20cf629d6e03dbbe13d73470ce8334fa9d8d4dc7056054c1e6",
+    "translation": "{cmd:7F051E3C1E}I caught a herabuna!{cmd:7F0306}\n\n{cmd:7F051E3C1E}A flat-out great catch!\n{cmd:7F01}",
+    "provenance": "Original translation of the Japanese N64 entry",
+    "status": "draft",
+    "notes": "Retain the native species and adapt the native flat-shape joke without using the donor trOUT pun about another species. Preserve both native colour commands, the pause, blank line, and final command."
+  }
+]

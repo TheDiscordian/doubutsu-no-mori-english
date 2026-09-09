@@ -35,6 +35,8 @@ class Work(C.Structure):
 
 @unittest.skipUnless(shutil.which('gcc'),'Host GCC required')
 class NpcMailCaptureTests(unittest.TestCase):
+    compiler_flags = ()
+    word_path = ROOT/'build/npc-mail-words/words.bin'
     @classmethod
     def setUpClass(cls):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-npc-mail-capture-')
@@ -44,7 +46,7 @@ class NpcMailCaptureTests(unittest.TestCase):
                    'runtime/mail/record.c','runtime/mail/format.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'tests/mail_catalog_mock.c','tests/npc_mail_capture_mock.c']
         subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
-                        *(str(ROOT/path) for path in sources),'-o',str(output)],check=True,capture_output=True)
+                        *cls.compiler_flags,*(str(ROOT/path) for path in sources),'-o',str(output)],check=True,capture_output=True)
         cls.lib = C.CDLL(str(output))
         for name,args in {
             'af_mail_source_digest':[C.c_void_p,C.c_void_p,C.c_uint],
@@ -76,7 +78,7 @@ class NpcMailCaptureTests(unittest.TestCase):
     def tearDown(self): self.active.value = None
 
     def sources(self):
-        wp,ap = ROOT/'build/npc-mail-words/words.bin',ROOT/'build/npc-mail-names/aliases.bin'
+        wp,ap = self.word_path,ROOT/'build/npc-mail-names/aliases.bin'
         if not wp.is_file() or not ap.is_file(): self.skipTest('Verified local full-word and name resources required')
         self.word_bytes,self.alias_bytes = wp.read_bytes(),ap.read_bytes()
         self.words = C.create_string_buffer(self.word_bytes,len(self.word_bytes))
