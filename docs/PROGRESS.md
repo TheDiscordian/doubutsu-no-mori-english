@@ -13,6 +13,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [seasonal notice source pass](checkpoints/NOTICEBOARD_SEASONAL.md) defines
+all 41 complete English bodies: 21 unchanged GameCube references, fifteen
+native-specific adaptations, and five original translations. All 82 complete
+body/capitalization models preserve native fields; six review tests and seven
+C page-planner tests pass. The actual N64 events, dates, speakers, shrine venue,
+and manual layout are retained. These definitions are not installed yet and earn
+no application credit. Next implement the decoder, full private name/date capture,
+failure-safe seasonal publication, and coupled reader route.
+
 The [complete treasure integration](checkpoints/NOTICEBOARD_TREASURE.md) installs
 all eighteen English posts in `build/notice-treasure-pilot`, including their
 transactional creator, native burial/publication bridges, and full-body reader.
@@ -44,7 +53,7 @@ completed initial board batch is replayed. Ordinary-item cases substitute a
 known item at placement; the random furniture selector is not exercised. These
 reader fixtures fit single pages, so they do not add native multi-page evidence.
 
-Continue the forty-one seasonal notices and other remaining text. Their donor
+Continue installing the forty-one seasonal notices and other remaining text. Their donor
 IDs differ from the N64 IDs, including Valentine's Day, White Day, Doll Festival,
 the two moon-viewing dates, and the sports/festival dates and shrine venue.
 Bind matching text by meaning and retain native-specific events. Save/reload,

@@ -148,6 +148,22 @@ class NoticePageTests(unittest.TestCase):
             if number == 0x1AE:
                 self.assertGreaterEqual(total, 2)
 
+    @unittest.skipUnless((ROOT/'build/mail-glyph-resources/glyph-catalog.bin').is_file(), 'Local references required')
+    def test_reviewed_seasonal_bodies_and_full_dates_have_complete_native_page_spans(self):
+        from notice_seasonal import audit
+        from notice_native_layout import rows
+        report = audit((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                       (ROOT/'build/mail-glyph-resources/glyph-catalog.bin').read_bytes())
+        for case in report['cases']:
+            body = bytes.fromhex(case['body'])
+            total = self.page(body)[0]
+            spans = []
+            for number in range(total):
+                spans += [(offset, body[offset:offset+length], width)
+                          for offset, length, width in self.page(body, number)[1]]
+            self.assertEqual(spans, rows(body, self.widths))
+            self.assertEqual(b''.join(text for _, text, _ in spans), body.replace(b'\xcd', b''))
+
 
 if __name__ == '__main__':
     unittest.main()
