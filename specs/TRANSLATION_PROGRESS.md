@@ -46,6 +46,13 @@ See `EXTENDED_ITEM_LOADER.md`, `DISPLAY_NAMES.md`, and `CATCHPHRASES.md` for rea
 boundaries. A saved Japanese identity used only as an internal lookup key is not
 an untranslated display. Testing or layout polish alone does not withhold credit.
 
+The persistent general-field extension receives installed-code verification
+before counting a build that includes it. Its completed main-message paths do
+not multiply existing item IDs or finish the remaining shared-choice readers;
+resource-only item replacements retain pending status until all required
+player-facing paths are connected. No new source weight is invented for this
+storage and reader integration.
+
 Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,
 sale/Redd event, Mom, departed-villager, villager-event, HRA welcome/advice/score,

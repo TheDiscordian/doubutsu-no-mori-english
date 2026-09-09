@@ -105,6 +105,9 @@ def measure(native, built, report):
     native = verified_rom(native)
     if report['source_sha256'] != sha256(native) or report['output_sha256'] != sha256(built):
         raise ValueError('Build report does not match the source and output ROMs')
+    if report.get('text_extension'):
+        from text_extension import verify_installation
+        verify_installation(built, native, report)
     info = module_command_info(native)
     ledger = CounterLedger(info)
     original = {b.name: b for b in banks(native)}

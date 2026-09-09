@@ -15,6 +15,16 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [persistent text-reader checkpoint](checkpoints/TEXT_EXTENSION.md) supplies
+complete general dialogue fields and the native/free-item actor connections.
+Its combined build is `build/text-extension-pilot`; actual startup and focused
+native field insertion pass. Continue the shared choice readers at `80065834`
+and `80065BD8`, remaining character/catchphrase paths, and the existing residual
+text/letter/accent queue. General-field insertion no longer needs initial
+implementation. Keep the compatibility mirror until every smaller destination
+has its own complete bounded reader. Do not remove pending name-family counting
+rules until the remaining required paths and installed verification are complete.
+
 The [inventory checkpoint](checkpoints/INVENTORY_ENGLISH.md) supplies all 39
 embedded label records and the ordinary full item-name load/draw path. Continue
 remaining wider consumers, residual strings/letters, and accents;

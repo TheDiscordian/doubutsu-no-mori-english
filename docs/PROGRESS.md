@@ -25,6 +25,18 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [persistent text extension](checkpoints/TEXT_EXTENSION.md) installs twenty
+sixteen-byte general fields, complete plain/coloured dialogue insertion, the
+native item-to-free-field wrapper, and three direct actor adapters. Its 2,159-byte
+startup-owned allocation leaves the full resident module and save layout intact.
+Independent builds, six focused checks, nine item/font regressions, and twelve
+counter tests pass. The silent native check passes ten calls and 21 assertions,
+including actual startup, complete item insertion, flags/colours, empty clearing,
+overflow rejection, guards, and checkpoint restoration. The current combined
+ROM/UPS is `build/text-extension-pilot`. Continue shared dynamic-choice readers,
+remaining character/catchphrase consumers, residual text/letters, and accents.
+Normal interaction/save/restart and original hardware remain unverified.
+
 The [festival-stall integration](checkpoints/STALL_CHOICES.md) installs complete
 sixteen-byte item choices and both exact GameCube English cancellation labels.
 It preserves item order, three/four-choice behaviour, the next-item index,
@@ -32,8 +44,8 @@ messages, and timing. A 24-byte stack increase and 32-byte actor increase keep
 the native saved fields and resident module unchanged. All six focused checks,
 nine choice-runtime regressions, and twelve counter tests pass, including
 independent assembly, relocation, complete cartridge retention, and UPS
-reconstruction. The current combined build is `build/stall-choices-pilot`.
-Continue item free-string and shared dynamic-choice readers, character and
+reconstruction. Its retained build is `build/stall-choices-pilot`.
+Continue shared dynamic-choice readers, character and
 catchphrase consumers, remaining text, and accents. Normal stall interaction
 remains in the combined v0 smoke; no gameplay or hardware certification is claimed.
 

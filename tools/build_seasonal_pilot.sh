@@ -38,6 +38,10 @@ stall_choice_args=()
 if [[ "${AF_ENGLISH_STALL_CHOICES:-0}" == 1 ]]; then
   stall_choice_args=(--english-stall-choices)
 fi
+text_extension_args=()
+if [[ -n "${AF_TEXT_EXTENSION:-}" ]]; then
+  text_extension_args=(--english-text-extension "$AF_TEXT_EXTENSION")
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -68,4 +72,5 @@ exec python3 tools/build.py \
   "${player_item_args[@]}" \
   "${event_item_args[@]}" \
   "${stall_choice_args[@]}" \
+  "${text_extension_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"
