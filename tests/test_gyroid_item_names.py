@@ -159,5 +159,46 @@ class GyroidItemArtifactTests(unittest.TestCase):
                 self.assertEqual(short[at:at+10],name.ljust(10,b' ') if len(name)<=10 else oldshort[at:at+10])
 
 
+@unittest.skipUnless((ROOT/'build/smoke-gyroid-items-01/results.json').is_file(),
+                     'Local gyroid native evidence required')
+class GyroidItemResultsTests(unittest.TestCase):
+    def test_all_planned_calls_buffers_guards_and_checkpoint_restoration(self):
+        run = ROOT/'build/smoke-gyroid-items-01'
+        raw = (run/'results.json').read_bytes()
+        self.assertEqual(sha256(raw),'6ab0fcd50499beae61467d43a944f7dc2a8269dc8c199fd4d451dbb9803cf347')
+        rows = json.loads(raw)
+        info = json.loads((run/'run.json').read_text())
+        plan = json.loads((ROOT/'build/gyroid-items-scenario.json').read_text())
+        self.assertEqual(len(rows),1032)
+        self.assertFalse(any('error' in r or r.get('assertion') == 'failed' for r in rows))
+        calls = [r for r in rows if 'test_only_function_call' in r]
+        self.assertEqual(len(calls),344)
+        for actual,expected in zip(calls,[a['call'] for a in plan if 'call' in a],strict=True):
+            self.assertEqual(actual['test_only_function_call'],expected['address'])
+            self.assertEqual(actual['arguments'],expected['arguments'])
+            self.assertTrue(actual['stack_restored'])
+            if 'expect_return' in expected:
+                self.assertEqual(actual['return_value'],expected['expect_return'])
+        reads = [r for r in rows if r.get('assertion') == 'passed']
+        self.assertEqual(len(reads),336)
+        for actual,expected in zip(reads,[a for a in plan if 'expect' in a],strict=True):
+            self.assertEqual(actual['read'],expected['read'])
+            self.assertEqual(actual['data'].lower(),expected['expect'].lower())
+        self.assertEqual(info['rom_sha256'],sha256((BUILD/'animal-forest-halfwidth.z64').read_bytes()))
+        self.assertEqual(info['scenario_sha256'],sha256((ROOT/'build/gyroid-items-scenario.json').read_bytes()))
+        self.assertEqual(info['audio'],'disabled')
+        self.assertEqual(info['seed_files'],[])
+        for key in ('initial_screenshot','expansion_pak','allow_test_flash_write','allow_test_pak_write'):
+            self.assertFalse(info[key])
+        restored = max(i for i,r in enumerate(rows) if r.get('loaded_state') == 'test.bs1')
+        self.assertTrue(any(r.get('read') == ['8019B000',4] and r.get('data') == '00000000'
+                            and r.get('assertion') == 'passed' for r in rows[restored+1:]))
+        self.assertTrue(rows[-1]['graceful_shutdown'])
+        for name,digest in (('test.bs1','9fddaf7b8734c5f1f0616e75e238e5262d5fdf4ea7910448ff10e4d056a9bbd4'),
+                            ('test.flash','b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260'),
+                            ('test.pak','ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51')):
+            self.assertEqual(sha256((run/name).read_bytes()),digest)
+
+
 if __name__ == '__main__':
     unittest.main()
