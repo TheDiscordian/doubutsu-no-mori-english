@@ -344,6 +344,9 @@ def measure(native, built, report):
     if report.get('player_item_names'):
         from player_item_names import verify_installation
         verify_installation(built, native, report)
+    if report.get('event_item_names'):
+        from event_item_names import verify_installation
+        verify_installation(built, native, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

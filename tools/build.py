@@ -222,6 +222,7 @@ def main():
     parser.add_argument('--english-town-suffix', action='store_true', help='Use the complete empty English town suffix without changing saved names')
     parser.add_argument('--english-shop-item-names', action='store_true', help='Complete item names in the five shopkeeper variants and Redd; requires resident runtime and extended items')
     parser.add_argument('--english-player-item-names', action='store_true', help='Complete names in insect, fish, and dig messages; requires resident runtime and extended items')
+    parser.add_argument('--english-event-item-names', action='store_true', help='Complete names in event, opening shop, and home conversations; requires player item-name bridge')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -316,6 +317,8 @@ def main():
         parser.error('--english-shop-item-names requires --runtime-module, --english-runtime, and --extended-items')
     if args.english_player_item_names and not (args.runtime_module and args.english_runtime and args.extended_items):
         parser.error('--english-player-item-names requires --runtime-module, --english-runtime, and --extended-items')
+    if args.english_event_item_names and not args.english_player_item_names:
+        parser.error('--english-event-item-names requires --english-player-item-names')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
@@ -461,6 +464,9 @@ def main():
     if args.english_player_item_names:
         from player_item_names import install as install_player_item_names
         report['player_item_names'] = install_player_item_names(rom, replacements, additions, report['runtime_module'])
+    if args.english_event_item_names:
+        from event_item_names import install as install_event_item_names
+        report['event_item_names'] = install_event_item_names(rom, replacements, additions, report['runtime_module'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -480,6 +486,9 @@ def main():
         verify_installation(output, rom, report)
     if args.english_player_item_names:
         from player_item_names import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_event_item_names:
+        from event_item_names import verify_installation
         verify_installation(output, rom, report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)

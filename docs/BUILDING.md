@@ -23,17 +23,17 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/player-item-names-pilot`.
-Its [checkpoint](checkpoints/TEXT_NAME_CONSUMERS.md) records exact dependencies,
+The current combined integration build is `build/event-item-names-pilot`.
+Its [checkpoint](checkpoints/EVENT_ITEM_NAMES.md) records exact dependencies,
 artifacts, and verification limits. With the retained prerequisite resources:
 
 ```sh
-bash tools/build_player_item_names_pilot.sh
+bash tools/build_event_item_names_pilot.sh
 ```
 
 This wrapper retains the complete seasonal/letter/name/default-message/editor
 integration, complete inventory labels/questions/descriptions, inventory/catalogue
-and world names, the English town suffix, and the shop/player name connections.
+and world names, the English town suffix, and the shop/player/event/home name connections.
 The base overlay prerequisites are reproduced with
 `python3 tools/build_inventory_overlay.py` and `python3 tools/build_catalogue_overlay.py`.
 The world-font prerequisites and complete retained variants are documented in

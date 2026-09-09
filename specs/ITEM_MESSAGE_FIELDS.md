@@ -53,7 +53,9 @@ quest wrapper's original zero-item no-op contract by handling empty-item clearin
 in their adapters. With player integration enabled, the inactive native wrapper
 tail `800BB6A8..800BB6F0` is occupied by the shared zero-safe bridge; it is not
 available for another allocation. The live eight-byte quest-wrapper entry remains
-unchanged. Other free-string and dynamic-choice consumers remain unfinished.
+unchanged. The [event/home integration](EVENT_ITEM_NAMES.md) uses this bridge
+for seven more sequences across six actors, preserving original item expressions
+and field slots. Other free-string and dynamic-choice consumers remain unfinished.
 
 ## Validation
 

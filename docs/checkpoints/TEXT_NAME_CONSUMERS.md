@@ -2,7 +2,9 @@
 
 ## Installed
 
-The complete combined build is `build/player-item-names-pilot`. It includes:
+The retained town/shop/player build is `build/player-item-names-pilot`. The
+[event/home integration](EVENT_ITEM_NAMES.md) supplies the current combined build.
+This checkpoint includes:
 
 - The exact GameCube English omission of the Japanese town-name suffix, with
   the six-byte saved town name and native formatting routines unchanged.
@@ -85,12 +87,12 @@ requiring all virtual identities, sizes, and unrelated payloads to remain.
 
 Continue the existing remaining reader inventory, especially other item-to-message
 preparers, free-string/choice paths, house and character-name displays, and default
-catchphrase input/readers. The audited item-loader calls still include Police2
-(`809C28BC`), the opening shopkeeper (`80A6D054`), Redd outside his shop
-(`809D7F74`), Saharah (`809DA8F4`), and the fishing-event actor (`809D608C`).
-Their original names longer than ten bytes need complete connections; do not
-patch them by increasing an unreviewed write length. The two home-room item
-preparers also require review. Existing complete letter owners may bypass some
+catchphrase input/readers. Police2 (`809C28BC`), the opening shopkeeper
+(`80A6D054`), outside Redd (`809D7F74`), Saharah (`809DA8F4`), the fishing-event
+actor (`809D608C`), and both home-room preparers use the complete
+[event/home connection](EVENT_ITEM_NAMES.md). Remaining narrow readers include
+festival-stall choices and item free-string preparations; do not increase
+unreviewed write lengths. Existing complete letter owners may bypass some
 old handbill callers; an unchanged dormant instruction alone is not proof of a
 missing live translation.
 
