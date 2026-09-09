@@ -90,9 +90,28 @@ The ROM has 33,554,432 bytes and the UPS has 4,493,115 bytes. Logs retain the
 
 ## Required continuation
 
-Exercise the corrected native C
-initializer through cartridge loading and relocation. Host execution and exact
-MIPS digest binding are not a substitute for that on-cartridge path.
+The corrected native C initializer also passes the cartridge-word batch in
+`build/smoke-design-species-01`. All thirteen calls and 22 assertions pass in
+58 records. The actual native DMA and relocation/cache functions load the entire
+creator from cartridge; no executable or complete resource is uploaded by the
+debugger. The relocated initializer accepts its corrected profile, produces the
+complete unaligned herabuna field, rejects a substituted old digest and damaged
+word data without changing its descriptor, and recovers after restoration.
+The complete image/resources, relocation records, live save, active-session
+pointer, all eight allocation/stack guards, and resident guard remain intact.
+The allocation is freed, original heap metrics and checkpoint are restored,
+isolated Flash/Pak files remain blank, and shutdown is graceful. Both frozen
+plan/result tests pass in 0.549 seconds without replay.
+
+This focused test uses the native DMA/relocation functions and compiled word
+initializer directly; it does not repeat normal full-letter delivery or claim
+hardware validation. Logs are `build/design-species-native.log` and
+`build/design-species-evidence-tests.log`. Exact hashes are:
+
+- Plan: `ebec9ded7f02e9695a60e71a012c1755b59789138148fe55a0dbb61fa5765fb2`.
+- Results: `90b352c8d53848c09572cfedcb19389255190c6079829dadb38aaf37fce4ece5`.
+- Restored checkpoint: `8e58eabbe3f6b6c3c7d40e638274c2f80e05431ee0ddd84ef778d6c5990fc951`.
+
 Preserve completed native batches without replay. Finish accented names,
 remaining general/letter text and full-name callers, contextual review, normal
 save/travel/gameplay checks, patch-only release preparation, title/keyboard work,

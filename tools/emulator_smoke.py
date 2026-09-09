@@ -1006,6 +1006,12 @@ def main():
                     raise ValueError('NPC capture probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_npc_mail_capture'],record))
+            if 'test_native_species_words' in action:
+                from native_species_scenario import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Native species probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_native_species_words'],record))
             if 'test_npc_mail_delivery' in action:
                 from npc_mail_delivery_smoke import exercise
                 if not (out/'test.bs1').is_file():

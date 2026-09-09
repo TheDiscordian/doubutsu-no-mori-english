@@ -1,0 +1,38 @@
+[
+  {
+    "id": "message:0005",
+    "source_sha256": "10b649709a2574abb5d378a2d2b0066b656dbfb07449640961c9fd449ae80b00",
+    "translation": "Consecutive notes{cmd:7F04}\n♪♪♪♪♪♪♪♪♪♪♪♪♪♪♪\n♪♪♪♪♪♪♪♪♪♪♪♪♪♪♪{cmd:7F04}\n{cmd:7F02}Notes and spaces{cmd:7F04}\n ♪ ♪ ♪ ♪ ♪ ♪\n ♪ ♪ ♪ ♪ ♪ ♪{cmd:7F04}\n{cmd:7F02}Notes and hearts{cmd:7F04}\n♥♪♥♪♥♪♥♪♥♪♥♪\n♥♪♥♪♥♪♥♪♥♪♥♪{cmd:7F04}\n{cmd:7F02}Notes and syllables{cmd:7F04}\na♪i♪u♪e♪o♪\nka♪ki♪ku♪ke♪ko♪{cmd:7F04}\n{cmd:7F02}Prolonged sounds{cmd:7F04}\naaaaaaaaaa♪{cmd:7F0303}\naaaaaaa♪aaa{cmd:7F0303}\na♪aaaaaaaaa{cmd:7F04}\n{cmd:7F02}{cmd:7F5292}{cmd:7F5302}     {cmd:7F504BA00001}{cmd:7F5428}♪ {cmd:7F52A0}{cmd:7F030A}{cmd:7F50E11ED701}{cmd:7F5440}♪ {cmd:7F5296}{cmd:7F030A}{cmd:7F50324BE101}{cmd:7F5426}♪\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 rendering test",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Translate the labels and romanise the test syllables. Preserve every note/heart, alternating-space example, wait, page, pause, colour span, offset, scale, and ending. The sustained vowel examples retain the original counts and note positions. No sound is played by automated source checks."
+  },
+  {
+    "id": "message:000F",
+    "source_sha256": "fdafa03d995aaf8aeb978188956ee70cc4f26a31c930b01010783ddd41d906a3",
+    "translation": "{cmd:7F50FF000001}red1{cmd:7F5000FF0002}blue2{cmd:7F500000FF03}blue colour3\n{cmd:7F0500FF00}This is a {cmd:7F50FF000004}colour test.{cmd:7F04}\n{cmd:7F02}Speaking an inner thought\n{cmd:7F5100}(This is the inner thought.){cmd:7F5101}\nEnd of inner-thought test.{cmd:7F04}\n{cmd:7F02}Line offset test 1\ntype0{cmd:7F5300}{cmd:7F5276}a{cmd:7F527F}i{cmd:7F5280}u{cmd:7F5281}e{cmd:7F528A}o\ntype1{cmd:7F5301}{cmd:7F5276}a{cmd:7F527F}i{cmd:7F5280}u{cmd:7F5281}e{cmd:7F528A}o\ntype2{cmd:7F5302}{cmd:7F5276}a{cmd:7F527F}i{cmd:7F5280}u{cmd:7F5281}e{cmd:7F528A}o{cmd:7F04}\n{cmd:7F02}Line offset test 2\ntype0{cmd:7F5300}{cmd:7F5200}a{cmd:7F5240}i{cmd:7F5280}u{cmd:7F52C0}e{cmd:7F52FF}o\ntype1{cmd:7F5301}{cmd:7F5200}a{cmd:7F5240}i{cmd:7F5280}u{cmd:7F52C0}e{cmd:7F52FF}o\ntype2{cmd:7F5302}{cmd:7F5200}a{cmd:7F5240}i{cmd:7F5280}u{cmd:7F52C0}e{cmd:7F52FF}o\n{cmd:7F581E}",
+    "provenance": "Original translation of the Japanese N64 rendering test",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Keep the original blue label even where its diagnostic command supplies green. The numbered one/two/three/four-character colour spans remain a length test, not new whole-word colour formatting. Romanised vowel probes remain one character each. Preserve both voice modes, every offset/type, all page boundaries, and the exact timed ending."
+  },
+  {
+    "id": "message:0010",
+    "source_sha256": "1c5da86f917fb3e48f4a23a948f544c10880832b60b9d223c2948941a02f2b6b",
+    "translation": "Scale test 00\n\na{cmd:7F5420}i{cmd:7F5418}u{cmd:7F5410}e{cmd:7F5408}o{cmd:7F5401}ka{cmd:7F04}\n{cmd:7F02}Scale test 01\n\na{cmd:7F5420}i{cmd:7F5440}u{cmd:7F547F}e{cmd:7F54FF}o{cmd:7F04}\n{cmd:7F02}Scale test 10\ntype0{cmd:7F5300}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype0{cmd:7F5300}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype0{cmd:7F5300}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}Scale test 11\ntype1{cmd:7F5301}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype1{cmd:7F5301}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype1{cmd:7F5301}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}Scale test 12\ntype2{cmd:7F5302}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype2{cmd:7F5302}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype2{cmd:7F5302}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}Scale test LINE0\ntype{cmd:7F5A10}L0{cmd:7F5300}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A20}L0{cmd:7F5300}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A30}L0{cmd:7F5300}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}Scale test LINE1\ntype{cmd:7F5A10}L1{cmd:7F5301}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A18}L1{cmd:7F5301}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A20}L1{cmd:7F5301}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}Scale test LINE2\ntype{cmd:7F5A20}L2{cmd:7F5302}{cmd:7F5276}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A30}L2{cmd:7F5302}{cmd:7F5280}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o\ntype{cmd:7F5A40}L2{cmd:7F5302}{cmd:7F528A}a{cmd:7F5420}i{cmd:7F5430}u{cmd:7F5440}e{cmd:7F5410}o{cmd:7F04}\n{cmd:7F02}{cmd:7F5301}{cmd:7F5280}{cmd:7F0500FF00}a{cmd:7F50FF000003}i{cmd:7F5440}ueo{cmd:7F04}\nStart BGM{cmd:7F560300}{cmd:7F04}\nStop BGM{cmd:7F570300}\nClose automatically.\n{cmd:7F584B}",
+    "provenance": "Original translation of the Japanese N64 rendering test",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Translate all scale/type/music labels and romanise test syllables. Retain every original scale, offset, line scale, colour span, music ID, wait, page boundary, and timed close. The extreme scale tests remain intentional diagnostics, not ordinary dialogue layout. Verification must remain silent."
+  },
+  {
+    "id": "message:0011",
+    "source_sha256": "99ad3954471476850d0bd17c42b7ee0af81818726463d4e32cb59b4b108ca40f",
+    "translation": "In{cmd:7F0303} the noooorth{cmd:7F0303}...{cmd:7F031D}.{cmd:7F0304}\nOn{cmd:7F0303} a{cmd:7F0303} ta{cmd:7F0303}vern{cmd:7F0303} street{cmd:7F0303},{cmd:7F0303} there{cmd:7F0303} issss{cmd:7F031E}.{cmd:7F04}\n{cmd:7F02}For eeeeeeever.{cmd:7F5900}{cmd:7F04}\n{cmd:7F02}Such a beauuuutiful person.{cmd:7F5901}{cmd:7F04}\n{cmd:7F02}Whaaaaaaat!{cmd:7F5902}{cmd:7F04}\n{cmd:7F02}Roooooar.{cmd:7F5903}{cmd:7F04}\n{cmd:7F02}Hmmmmm, wellllll.{cmd:7F5904}{cmd:7F04}\n{cmd:7F02}Heeeeelp, somebody!!{cmd:7F5905}{cmd:7F04}\n{cmd:7F02}The person I looooove.{cmd:7F5906}{cmd:7F04}\n{cmd:7F02}Can't heeeeelp it!{cmd:7F5B}{cmd:7F04}\n{cmd:7F02}Eeeeeeek!{cmd:7F04}\n{cmd:7F02}Doooooom!{cmd:7F04}\n{cmd:7F02}Sheeeeeh!{cmd:7F04}\n{cmd:7F02}Jooooooh!{cmd:7F04}\n{cmd:7F02}Smooch!{cmd:7F04}\n{cmd:7F02}Eeeek, look at that!!{cmd:7F5B}{cmd:7F04}\n{cmd:7F02}Let's zoooooom along!{cmd:7F04}\n{cmd:7F02}Can't heeeeelp it!{cmd:7F04}\n{cmd:7F02}How about some soccer!{cmd:7F04}\n{cmd:7F02}{cmd:7F06}{cmd:7F1A}!\n{cmd:7F1A}--!!\n{cmd:7F1A}----!!!\n{cmd:7F1A}{cmd:7F0303}-{cmd:7F0303}-{cmd:7F0303}-{cmd:7F0303}-{cmd:7F0303}?{cmd:7F04}\n{cmd:7F02}{cmd:7F1A}----\n----!{cmd:7F04}\n{cmd:7F02}Duuuuu\nuuuuuuuu\nuuuuuuuuuuuuuuu\nuuuuuuuuuuuuuun\n{cmd:7F00}",
+    "provenance": "Original translation of the Japanese N64 sound test",
+    "status": "draft",
+    "diagnostic_kind": "engine_test",
+    "notes": "Translate and adapt the northern-tavern singing and elongated speech samples while retaining the original pause sequence, seven sound-effect selections, two voice resets, cancellation flag, repeated player-name insertions, page boundaries, and ending. Unfamiliar comic sound effects remain romanised, not replaced with unrelated dialogue. Audible presentation is not tested."
+  }
+]

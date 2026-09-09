@@ -13,6 +13,18 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [rendering diagnostic batch](checkpoints/RENDERING_DIAGNOSTICS.md) installs
+four more complete English records, preserving their native control streams,
+line/page boundaries, note patterns, and test parameters. All previous edits
+and non-message resources remain unchanged. Four source/ROM/accounting checks
+pass; the silent native batch passes four complete loads and fourteen assertions,
+with restored guards/checkpoint, blank saves, and graceful shutdown. The remaining
+`0004` diagnostic has a complete 961-byte English draft, but its expanded bound
+is 1,581 bytes. It stays uninstalled until a guarded continuation slot and state
+preservation are approved; the existing page boundary can split it into 713/886
+byte expansion bounds. Remaining general strings, letters, accented names,
+full-name callers, review/gameplay, release, and title/keyboard work continue.
+
 The [native-design integration](checkpoints/DESIGN_ITEM_NAMES.md) adds 74 complete
 name fields, corrects the native herabuna species across names, two messages,
 general strings, and dynamic letters, and leaves eight accented name fields.
@@ -25,9 +37,11 @@ passes all 137 calls and 129 assertions, including the ordinary herabuna word
 load, restored stack/checkpoint, blank isolated saves, and graceful shutdown.
 Frozen new and preceding native evidence stays checked without replay. Creator
 machine code, sizes, symbols, relocations, reader, saved layout, and memory bounds
-remain unchanged. The corrected C initializer's cartridge-load/relocation path
-still needs its focused native check; host C execution and MIPS digest-argument
-inspection do not establish that path. Remaining accents, general/letter text,
+remain unchanged. The corrected C initializer also passes its focused cartridge
+batch: thirteen calls and 22 assertions cover actual DMA/relocation, the complete
+herabuna field, rejection/recovery, freed allocation, restored heap/checkpoint,
+and blank isolated saves. Both frozen evidence checks pass without replay; normal
+full-letter delivery and hardware remain outside that focused test. Remaining accents, general/letter text,
 full-name callers, gameplay/review, release, and title/keyboard work continue.
 
 The [resolved-name integration](checkpoints/RESOLVED_ITEM_NAMES.md) installs
