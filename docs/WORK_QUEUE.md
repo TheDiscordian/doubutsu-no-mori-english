@@ -41,9 +41,18 @@ installs the complete GameCube-style letter/delivery/fortune composition,
 eight-byte names, and Museum display mapping without changing saved identities
 or native quest/action behaviour. Focused host/sanitizer, relocation, shared
 allocation, whole-cartridge/UPS, and original-ID accounting checks pass. The
-current full build is `build/tag-descriptions-pilot`; normal menu transitions
+retained full build is `build/tag-descriptions-pilot`; normal menu transitions
 join the combined v0 safety pass. Continue the existing remaining-text and
 name/input-consumer queue without replaying the passed subsystem matrices.
+
+The [world item-label checkpoint](checkpoints/WORLD_ITEM_NAMES.md) installs full
+names and matching width/draw consumers in a persistent rendering variant.
+All six focused checks and four existing font/loader regressions pass, with
+independent build agreement and complete previous-resource retention. Its
+complete ROM/UPS is `build/world-names-pilot`. Normal startup, floating labels,
+and scene transitions join the combined v0 smoke. Continue the existing
+remaining-text and input/display queue; additional name consumers receive no
+duplicate translation credit.
 
 ## Full-project scope and evidence
 

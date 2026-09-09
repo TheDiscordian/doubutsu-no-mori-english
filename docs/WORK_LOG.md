@@ -7428,3 +7428,49 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   persistence, original-hardware, public-release, or full-goal completion is
   claimed. The font-atlas investigation remains paused; title/keyboard work
   remains in the full v1 goal.
+
+### 2026-09-09 — Complete floating world item names
+
+- Classified the preceding implementation checkpoint as progress: `653251b`
+  is clean and pushed. Completed the requested single combined measurement,
+  then resumed the existing world-label consumer without opening status renders,
+  replaying native matrices, or changing the user's saves.
+- Traced the forty-byte state at `801446A0`: its ten-byte name ends immediately
+  before the live draw flag. Added separate sixteen-byte storage, constructor
+  reset, complete-name loading, proportional sizing, and centred drawing as one
+  integration. Native compatibility writes, field/item conditions, animation,
+  colours, vertical placement, and `0.875` scale remain. The GameCube sizing
+  intent is adapted to the existing N64 bubble geometry; no pixels change.
+- Used a variant of the existing startup-owned persistent font allocation
+  because the fixed resident module is full. Image size is 4,560 bytes and
+  relocation 464; requested system allocation is 5,039, an increase of 1,040.
+  The existing loader, four-MiB bounds, main-code file, resident instructions,
+  submenu reservation, and saved format remain unchanged. Earlier font images
+  remain verifiable without recompilation or new source hashes.
+- The first compilation exposed valid floating-point load relocations absent
+  from the font validator's integer-only opcode list. Added explicit `lwc1`
+  and `swc1` low-pair handling with all existing pairing and bounds checks.
+  The first complete build correctly rejected the new item's dependency during
+  font preflight because item installation happens later. Preflight now fully
+  verifies the planned item resource on copies; final installation still
+  repeats the checks on the assembled cartridge. Neither issue is waived.
+- All six final focused tests pass in 48.544 seconds: host sanitizers and
+  failure atomicity, native/source/import checks, complete font and relocated
+  hooks, rehashed-change rejection, full ROM/UPS retention, and unchanged
+  source-ID accounting. Four existing font/loader regressions pass. Independent
+  Docker image, relocation, and report agree. The full main-code direct-branch
+  scan finds only the expected branch to the replacement width entry, not its
+  skipped interior. New test setup stays within the bounded batch policy;
+  no new native harness or retry loop is introduced.
+- The complete build is `build/world-names-pilot`, ROM SHA-256
+  `df5eb3a45b2997345c6efd590c26a3f13c6c69b96b346d6fc999723279f2f71e`,
+  UPS SHA-256
+  `879b7a247dbde33266db4d3c7bb25a09db6cc56c0a7c767bf0795eec98cb0624`.
+  Exact artifacts, reproduction, and limitations are in the
+  [checkpoint](checkpoints/WORLD_ITEM_NAMES.md). The repository is verified
+  private. Native startup and ordinary labels/scene changes remain in the
+  combined v0 pass; no gameplay, persistence, or hardware success is claimed.
+- Continue remaining general strings, letters, accents, and input/display
+  consumers, then the bounded safety pass and patch handoff. Full-name
+  consumers do not receive duplicate text credit. The goal, human playthrough,
+  public-release preparation, and v1 title/keyboard work remain open.

@@ -15,9 +15,12 @@ RESOURCE_HASH = '30dddc658038fea1a4abc359121e1e4fa110edac5f5757ad6001703eff8aae7
 MAIL_RESOURCE_HASH = '12a90673f21a6c0bfa3fc05039279b1efc65d96319460ae36993eafa0822c105'
 
 
-def source_hashes():
+def source_hashes(world_names=False):
     names = ['overlays/extended_font/'+name for name in ('font.c','font.h','native.c','texture.s')]
     names += ['overlays/extended_font_cartridge/'+name for name in ('entry.s','install.c','font.ld')]
+    if world_names:
+        names.remove('overlays/extended_font_cartridge/entry.s')
+        names += ['overlays/world_names/'+name for name in ('entry.s','install.c','names.c','names.h')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -56,7 +59,7 @@ def relocate(data,relocations,base):
             continue
         elif kind==6:
             register=(word>>21)&31
-            if section!=1 or word>>26 not in (9,35,43) or register not in high:
+            if section!=1 or word>>26 not in (9,35,43,49,57) or register not in high:
                 raise ValueError('Invalid font low relocation')
             high_at,high_word=high.pop(register)
             target=((high_word&65535)<<16)+(word&65535)-(65536 if word&32768 else 0)
@@ -80,13 +83,14 @@ def relocate(data,relocations,base):
 
 def validate(data,relocations,report):
     mail = report.get('mail_glyphs',False)
-    if type(mail) is not bool:
+    world = report.get('world_names',False)
+    if type(mail) is not bool or type(world) is not bool or (world and not mail):
         raise ValueError('Invalid persistent font glyph capability')
     resource_hash = MAIL_RESOURCE_HASH if mail else RESOURCE_HASH
     if (report.get('ram')!=RAM or report.get('bytes')!=len(data)
             or report.get('relocation_bytes')!=len(relocations)
             or report.get('sha256')!=sha256(data) or report.get('relocation_sha256')!=sha256(relocations)
-            or report.get('sources')!=source_hashes() or report.get('resource_sha256')!=resource_hash):
+            or report.get('sources')!=source_hashes(world) or report.get('resource_sha256')!=resource_hash):
         raise ValueError('Stale or altered persistent font build')
     relocate(data,relocations,0x801A0010)
     symbols=report['symbols'];text=struct.unpack_from('>I',relocations)[0]
@@ -103,6 +107,9 @@ def validate(data,relocations,report):
     state=struct.unpack_from('>3I',relocations)
     for name in ('glyph_resource','active_glyph'):
         if not sum(state)<=symbols.get(name,0)<len(data): raise ValueError('Font state overlaps immutable instructions')
+    if world:
+        from world_names import validate_image
+        validate_image(data,relocations,report)
 
 
 def configuration(data,relocations,report):
@@ -203,6 +210,9 @@ def install(rom,replacements,additions,module,directory):
     report=json.loads((directory/'font.json').read_text())
     data,relocations=(directory/'font.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
     approved=configuration(data,relocations,report);blob=data+relocations
+    if report.get('world_names'):
+        from world_names import dependencies
+        evidence['world_names']=dependencies(rom,current,binary,additions,module)
     files=by_vrom(rom)
     intervals=[(entry.vstart,entry.vend) for entry in files.values()]
     intervals += [(start,start+len(value)) for start,value in additions.items()]

@@ -7,5 +7,5 @@ export AF_GYROID_DEFAULT=build/gyroid-default-actor
 export AF_HBOARD_EDITOR=build/hboard-editor-overlay
 export AF_INVENTORY_ENGLISH=build/tag-descriptions-overlay
 export AF_CATALOGUE_NAMES=build/catalogue-names-overlay
-export AF_BUILD_OUTPUT=build/tag-descriptions-pilot
+export AF_BUILD_OUTPUT="${AF_BUILD_OUTPUT:-build/tag-descriptions-pilot}"
 exec bash tools/build_seasonal_pilot.sh

@@ -17,13 +17,14 @@ from extended_glyphs import validate_resource
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def build(resource,out):
+def build(resource,out,world_names=False):
     digest = sha256(resource)
     mail = digest == MAIL_RESOURCE_HASH
     if digest not in (RESOURCE_HASH,MAIL_RESOURCE_HASH):
         raise ValueError('Unapproved complete English glyph resource')
     validate_resource(resource,mail=mail)
-    sources=source_hashes();out=out.resolve();out.mkdir(parents=True,exist_ok=True)
+    if world_names and not mail: raise ValueError('World-name profile requires the complete mail font')
+    sources=source_hashes(world_names);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
     (out/'glyphs.bin').write_bytes(resource)
     common=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
             '-v',f'{ROOT}/overlays:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
@@ -39,10 +40,17 @@ def build(resource,out):
     for name in ('font','native','install'):
         directory='extended_font_cartridge' if name=='install' else 'extended_font'
         run('gcc',*flags,f'/source/{directory}/{name}.c','-o',name+'.o')
+    extra=[]
+    if world_names:
+        for name in ('names','install'):
+            obj='world_'+name
+            run('gcc',*flags,f'/source/world_names/{name}.c','-o',obj+'.o')
+            extra.append(obj+'.o')
     for name,directory in (('texture','extended_font'),('entry','extended_font_cartridge')):
+        if name=='entry' and world_names: directory='world_names'
         run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o',name+'.o',f'/source/{directory}/{name}.s')
     run('ld','-EB','--emit-relocs','-T','/source/extended_font_cartridge/font.ld','-Map=font.map',
-        '-o','font.elf','entry.o','font.o','native.o','texture.o','install.o')
+        '-o','font.elf','entry.o','font.o','native.o','texture.o','install.o',*extra)
     if run('nm','--undefined-only','font.elf').strip(): raise ValueError('Undefined persistent font symbol')
     symbols={}
     for line in run('nm','--defined-only','font.elf').splitlines():
@@ -74,7 +82,7 @@ def build(resource,out):
     raw_reloc=struct.pack('>5I',text,writable,rodata,bss,len(entries))+struct.pack('>'+str(len(entries))+'I',*entries)
     length=(len(raw_reloc)+4+15)&~15
     reloc=raw_reloc.ljust(length-4,b'\0')+struct.pack('>I',length)
-    if sources!=source_hashes(): raise ValueError('Font sources changed while compiling')
+    if sources!=source_hashes(world_names): raise ValueError('Font sources changed while compiling')
     report={'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),'sha256':sha256(data),
             'relocation_sha256':sha256(reloc),'resource_sha256':digest,'sources':sources,
             'symbols':{name:value-RAM for name,value in symbols.items() if RAM<=value<RAM+total},
@@ -83,6 +91,10 @@ def build(resource,out):
             'scope':'Persistent cartridge image; requires the matching guarded startup loader'}
     if mail:
         report['mail_glyphs'] = True
+    if world_names:
+        report['world_names'] = True
+        report['stack_usage'].update({name:(out/(name+'.su')).read_text()
+                                     for name in ('world_names','world_install')})
     validate(data,reloc,report)
     (out/'font.bin').write_bytes(data);(out/'relocation.bin').write_bytes(reloc)
     (out/'font-relocations.txt').write_text(elf_relocs)
@@ -95,5 +107,6 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--resource',type=Path,default=Path('build/extended-glyphs/glyphs.bin'))
     parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--world-names',action='store_true',help='Install the complete world-label consumers')
     args=parser.parse_args()
-    print(json.dumps(build(args.resource.read_bytes(),args.output),indent=2))
+    print(json.dumps(build(args.resource.read_bytes(),args.output,args.world_names),indent=2))

@@ -51,7 +51,7 @@ RELOCATED_BANKS = {
 
 
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
-                       extended_font=None, english_fortunes=False, english_resetti_replies=False,
+                       extended_font=None, extended_items=None, english_fortunes=False, english_resetti_replies=False,
                        english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
                        english_credits=False, english_gyroid_default=False):
     if english_gyroid_default and not (runtime_module and english_runtime):
@@ -79,7 +79,10 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         if not (runtime_module and english_runtime):
             raise ValueError('Extended dialogue glyphs require the complete English runtime')
         from extended_font_cartridge import planned_capability
-        planned_capability(rom,replacements,module_additions,module_report,extended_font)
+        planned_additions, planned_module = dict(module_additions), dict(module_report)
+        if extended_items:
+            install_extended_items(rom,planned_additions,planned_module,extended_items)
+        planned_capability(rom,replacements,planned_additions,planned_module,extended_font)
     edits = json.loads(path.read_text()) if path else []
     from gyroid_default import permits as gyroid_permits, feature_matches
     gyroid_approvals = gyroid_permits(rom, edits, info, enabled=bool(english_gyroid_default))
@@ -331,6 +334,7 @@ def main():
     report["translation_edits"], relocations = apply_translations(
         rom, replacements, args.translations, english_runtime=args.english_runtime,
         runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font,
+        extended_items=args.extended_items,
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
         defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits,

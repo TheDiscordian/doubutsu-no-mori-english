@@ -28,7 +28,7 @@ exec python3 tools/build.py \
   --display-names build/display-names --catchphrases build/catchphrases \
   --mail-catalog build/mail-glyph-resources --english-mail-layout \
   --english-mail-snapshots --english-mail-grading build/mail-grading-npc \
-  --npc-mail-generation "${AF_CREATOR:-build/noticeboard-seasonal/creator}" --extended-font build/mail-font-cartridge \
+  --npc-mail-generation "${AF_CREATOR:-build/noticeboard-seasonal/creator}" --extended-font "${AF_EXTENDED_FONT:-build/mail-font-cartridge}" \
   --english-fortune-slips build/shop-notice-fortune --english-leaflet-dates build/leaflet-dates \
   --english-renewal-letters build/shop-notice-renewal --english-event-letters build/shop-notice-event \
   --english-mother-letters --english-departed-letters --english-villager-event-letters \

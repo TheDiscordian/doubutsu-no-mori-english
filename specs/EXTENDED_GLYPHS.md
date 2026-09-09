@@ -18,6 +18,11 @@ this capability; ordinary glyph-bearing conversations and hardware need testing.
 The approved N64 atlas, Japanese cells, and existing Latin spacing stay unchanged.
 This work does not resume the paused atlas-edge investigation.
 
+The optional [world-label variant](WORLD_ITEM_NAMES.md) retains the complete
+fourteen-glyph resource and adds owned full item-name storage and consumers to
+the same startup allocation. It does not change glyph encodings or pixels.
+Both original font profiles retain their source identities and validation.
+
 | Character | Two-byte encoding | Pixel advance |
 | --- | --- | ---: |
 | Semicolon | `80D0` | 3 |

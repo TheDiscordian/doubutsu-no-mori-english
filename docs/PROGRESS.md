@@ -21,13 +21,24 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [world item-label integration](checkpoints/WORLD_ITEM_NAMES.md) installs
+complete sixteen-byte names, reset, proportional sizing, and centred drawing
+without widening the native field or overwriting its adjacent display flag.
+The startup-owned rendering allocation grows by 1,040 bytes; existing font
+pixels, saved fields, main-code file, resident code, and every earlier
+translation resource remain. All six focused/core/cartridge/accounting checks
+and four font/loader regressions pass; independent builds agree. The current
+complete ROM/UPS is `build/world-names-pilot`. Ordinary startup, labels, and scene
+transitions join the combined v0 smoke. Continue remaining general strings,
+letters, accented names, and wider input/display consumers.
+
 The [inventory description integration](checkpoints/INVENTORY_DESCRIPTIONS.md)
 installs complete English letter/delivery/fortune labels, eight-byte display
 names, and save-safe Museum spelling. It retains GameCube wording, line order,
 and name colours while preserving native actions, quest logic, and saved fields.
 Fifteen focused/shared-profile checks, an exact colour-role check, and both
-cartridge/accounting tests pass; independent builds agree. The current complete
-ROM/UPS is `build/tag-descriptions-pilot`. The tag and owner editor use 8,064 of
+cartridge/accounting tests pass; independent builds agree. The retained complete
+ROM/UPS checkpoint is `build/tag-descriptions-pilot`. The tag and owner editor use 8,064 of
 the existing 8,192-byte reservation, with no main-code or memory-layout change.
 Ordinary mail/quest transitions remain in the combined v0 safety pass. Continue
 remaining general strings/letters, accented names, and wider input/display consumers.
