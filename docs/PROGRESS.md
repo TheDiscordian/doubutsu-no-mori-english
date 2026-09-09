@@ -13,6 +13,23 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [HRA score integration](../specs/ACADEMY_SCORE_LETTERS.md) installs twenty
+complete supported letters with full dates, comma-separated points, and complete
+selected item/series names. Native scoring and rewards remain unchanged; delivery
+success crosses the original scoring return and scheduler cleanup before the
+evaluation date updates. The integrated ROM builds, 25 host/sanitizer tests and
+five installer tests pass, and independent builds/assembly agree. All 1,047
+regression tests pass, with five further fixture/audit tests passing separately.
+The complete silent native batch passes forty original comparisons, forty-four
+full readbacks, four scheduler cases, thirteen rejections, two retries, 159 calls,
+and 450 memory assertions. Checkpoint restoration and blank isolated saves pass.
+Successful scheduling uses the original NULL-game allocation path; the
+game-owned allocation fails in this checkpoint and retains eligibility correctly.
+The [score checkpoint](checkpoints/ACADEMY_SCORE_LETTERS.md) tracks evidence and
+remaining work. The [complete mail-glyph pass](../specs/MAIL_GLYPHS.md) is next:
+template parsing, pagination/footer widths, exact-source glyphs, a new immutable
+catalogue, and affected creators. The broader translation/review remains active.
+
 The [HRA welcome/advice integration](../specs/ACADEMY_LETTERS.md) installs twenty
 complete letters and preserves membership/date eligibility when delivery fails.
 All 21 host creator tests, sanitizers, five installer tests, independent builds,
@@ -21,7 +38,7 @@ metadata comparisons, forty-four complete readbacks, six real scheduler cases,
 nine rejections, two resource retries, 152 calls, and 436 memory assertions.
 All four homes and ten mailbox slots are covered; same-day duplicates are rejected.
 Live save/globals and the checkpoint are restored, with blank isolated saves and
-graceful shutdown. All 1,013 regression tests pass. HRA score letters, the missing
+graceful shutdown. All 1,013 regression tests pass. Complete HRA score acceptance, the missing
 semicolon path, normal gameplay/save acceptance, and the wider project remain.
 The [checkpoint](checkpoints/ACADEMY_LETTERS.md) records artifacts and limits.
 

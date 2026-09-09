@@ -15,12 +15,19 @@ from npc_mail_capture import RAM,source_hashes,creator_imports,relocate,verified
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False):
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters)
+    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
+    if academy_scores:
+        from academy_score_letters import references,series_resource
+        from npc_mail_capture import ACADEMY_SERIES_HASH
+        series = series_resource(references((root/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                            (root/'build/mail-catalog/catalog.bin').read_bytes()))
+        if sha256(series) != ACADEMY_SERIES_HASH: raise ValueError('Changed academy series resource')
+        (out/'academy-series.bin').write_bytes(series)
     fado = root/'upstream/af/tools/fado'
     fado_sources = sorted((fado/'src').glob('*.c'))+[fado/'lib/fairy/fairy.c',fado/'lib/fairy/fairy_print.c',fado/'lib/vc_vector/vc_vector.c']
     fado_inputs = sorted(set(fado_sources)|set((fado/'include').rglob('*.h'))|set((fado/'lib').rglob('*.h'))
@@ -35,7 +42,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
                                 capture_output=True,text=True,timeout=60)
         if result.returncode: raise ValueError(f'NPC capture {tool} failed: '+result.stdout+result.stderr)
         return result.stdout
-    imports = {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=villager_events)}
+    imports = {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=villager_events,academy_scores=academy_scores)}
     if any(value&3 or not MODULE_RAM+0x300 <= value < MODULE_RAM+min(module['linked_bytes'],LINKED_LIMIT)
            for value in imports.values()): raise ValueError('NPC capture imports are outside resident code')
     flags = ['-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls','-fno-pic',
@@ -45,10 +52,15 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if departed_letters: names += ('departed_creator',)
     if villager_events: names += ('villager_event_creator',)
     if academy_letters: names += ('academy_creator',)
+    if academy_scores: names += ('academy_score_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
     objects = [name+'.o' for name in names]+['sources.o']
+    if academy_scores:
+        run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','academy_score_sources.o',
+            '/source/overlays/mail_generation/academy_score_sources.s')
+        objects.append('academy_score_sources.o')
     result = subprocess.run([str(out/'fado'),*objects,'-n','af_npc_capture','-o','relocation.s'],
                             cwd=out,capture_output=True,text=True,timeout=60)
     (out/'fado.log').write_text(result.stdout+result.stderr)
@@ -58,6 +70,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if departed_letters: linker = 'departed_capture.ld'
     if villager_events: linker = 'villager_event_capture.ld'
     if academy_letters: linker = 'academy_capture.ld'
+    if academy_scores: linker = 'academy_score_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','overlay.elf',*objects,'relocation.o')
@@ -106,6 +119,10 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if departed_letters: report['departed_letters'] = True
     if villager_events: report['villager_events'] = True
     if academy_letters: report['academy_letters'] = True
+    if academy_scores:
+        report['academy_scores'] = True;report['academy_series_sha256'] = sha256(series)
+        at = symbols['af_academy_series_data']-RAM
+        if data[at:at+len(series)] != series: raise ValueError('Linked academy series resource differs')
     (out/'overlay.asm').write_text(run('objdump','-d','overlay.elf'))
     (out/'elf-relocations.txt').write_text(elf_relocs)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
@@ -122,13 +139,16 @@ def main():
     parser.add_argument('--departed-letters',action='store_true',help='Add complete departed-villager letters; requires --mother-letters')
     parser.add_argument('--villager-events',action='store_true',help='Add complete villager-event letters; requires --departed-letters')
     parser.add_argument('--academy-letters',action='store_true',help='Add complete HRA welcome/advice letters; requires --villager-events')
+    parser.add_argument('--academy-scores',action='store_true',help='Add complete HRA score capture; requires --academy-letters')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
     if args.villager_events and not args.departed_letters: parser.error('--villager-events requires --departed-letters')
     if args.academy_letters and not args.villager_events: parser.error('--academy-letters requires --villager-events')
+    if args.academy_scores and not args.academy_letters: parser.error('--academy-scores requires --academy-letters')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
-                           villager_events=args.villager_events,academy_letters=args.academy_letters),indent=2))
+                           villager_events=args.villager_events,academy_letters=args.academy_letters,
+                           academy_scores=args.academy_scores),indent=2))
 
 
 if __name__ == '__main__': main()

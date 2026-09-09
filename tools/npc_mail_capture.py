@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RAM = 0x80B00000
 WORD_HASH = '698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1'
 ALIAS_HASH = 'a79b6bc3c5b36c7ce2bcea55932ccdf4ce694608e5dcfb896226a24d368bf5d6'
+ACADEMY_SERIES_HASH = 'be1258e1806e2a5e38a64cad52863c632d45b4610685ec9590dd264bb1569a38'
 IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid')
 HOOKS = ((0x800A8E48,0x800A8C48,'af_npc_mail_prepare'),(0x800A8F6C,0x800A8C48,'af_npc_mail_prepare'),
          (0x800A8C90,0x800ACD18,'af_npc_mail_sender_name'),(0x800A8CB8,0x800ACD18,'af_npc_mail_other_name'),
@@ -34,11 +35,11 @@ def call_patches(code,module):
     return output
 
 
-def creator_imports(*,villager_events=False):
-    return IMPORTS+(('af_load_item_name',) if villager_events else ())
+def creator_imports(*,villager_events=False,academy_scores=False):
+    return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -55,6 +56,11 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     if academy_letters:
         if not villager_events: raise ValueError('Academy creator requires the villager-event dispatcher')
         names += ['overlays/mail_generation/'+name for name in ('academy_creator.c','academy_creator.h','academy_capture.ld')]
+    if academy_scores:
+        if not academy_letters: raise ValueError('Academy score creator requires welcome/advice dispatch')
+        names += ['overlays/mail_generation/'+name for name in
+                  ('academy_score_creator.c','academy_score_creator.h','academy_score_capture.ld','academy_score_sources.s')]
+        names += ['runtime/dateformat.h']
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -72,11 +78,13 @@ def validate(data,reloc,report,module):
     if 'villager_events' in report and not events: raise ValueError('Unknown villager-event creator variant')
     academy = report.get('academy_letters') is True
     if 'academy_letters' in report and not academy: raise ValueError('Unknown academy creator variant')
+    scores = report.get('academy_scores') is True
+    if 'academy_scores' in report and not scores: raise ValueError('Unknown academy score creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores)
             or report.get('module_sha256') != module['module_sha256']
-            or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events)}
+            or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
         raise ValueError('Stale or changed NPC capture overlay')
     # Validate lengths before reading even the first relocation-header word.
@@ -91,14 +99,20 @@ def validate(data,reloc,report,module):
     if departed: required.add('af_departed_mail_create')
     if events: required.add('af_villager_event_mail_create')
     if academy: required.add('af_academy_mail_create')
+    if scores: required.update(('af_academy_score_mail_create','af_academy_series_data'))
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
-    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data')):
+    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data')):
         raise ValueError('NPC capture function points outside text')
     w,a = symbols['af_npc_word_data'],symbols['af_npc_alias_data']
     if w&15 or a&15 or not text <= w or a != w+11328 or a+6368 != len(data):
         raise ValueError('NPC capture resource offsets are invalid')
     verified_resources(data[w:a],data[a:])
+    if scores:
+        series = symbols['af_academy_series_data']
+        if (series&15 or not text <= series or series+1440 != w or sha256(data[series:w]) != ACADEMY_SERIES_HASH
+                or report.get('academy_series_sha256') != ACADEMY_SERIES_HASH):
+            raise ValueError('Invalid complete academy series-name resource')
 
 
 def relocate(data,reloc,base,imports):

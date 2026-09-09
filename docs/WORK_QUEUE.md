@@ -22,12 +22,28 @@ batch passes every template in both capitalization states, all home/slot positio
 real scheduler failure/retry, and same-day duplicate prevention. Host, sanitizer,
 installer, and independent build/assembly checks pass, along with all 1,013
 regression tests.
-Next connect score letters with full item/series names and English date fields.
-The source verifier binds all 63 score parts and 55 complete series names; four
-focused tests pass, including 2,200 complete field-capacity combinations. Body
+The [score integration](../specs/ACADEMY_SCORE_LETTERS.md) installs twenty supported
+letters with full item/series names, comma-separated points, and English dates.
+The source verifier binds all 63 score parts and 55 complete series names.
+Host/sanitizer and installer tests, independent builds, assembly, and all 1,047
+regressions pass, with five additional fixture/audit tests passing separately.
+The complete native batch passes forty original comparisons, forty-four complete
+readbacks, four scheduler cases, thirteen rejections, two retries, 159 calls,
+and 450 memory assertions. Live save/globals and checkpoint restoration pass,
+with blank isolated saves and graceful shutdown. The successful scheduler uses
+the original NULL-game allocation path; game-owned allocation failure is checked
+separately. Body
 `003D` needs the semicolon alongside Mom `0136` and birthday `00F6`.
 The native score selector has no GameCube house-model reward path; do not add
 GameCube-only reward/cottage templates to the N64 selection.
+
+The [complete mail-glyph audit](../specs/MAIL_GLYPHS.md) finds 100 unsupported
+occurrences across 59 catalogue-two parts, covering nine glyph identities.
+Five bodies need only the existing separate semicolon/slash resource; seven
+additional glyph identities require exact-source font support. Implement complete
+template parsing, token-aware mail pagination/footer alignment, a new immutable
+catalogue, and the affected creator routes together. Do not change old catalogue
+IDs or interpret this source-only inventory as applied text.
 
 The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
 letters without added resident code or saved-layout growth. All 113 native

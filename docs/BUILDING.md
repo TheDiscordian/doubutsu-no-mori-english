@@ -65,6 +65,19 @@ it does not establish unreachable code or gameplay completion. See
 
 ## Silent emulator tests
 
+Complete HRA score publication uses the chained creator built with
+`--mother-letters --departed-letters --villager-events --academy-letters
+--academy-scores`. The ROM builder requires the corresponding
+`--english-mother-letters --english-departed-letters
+--english-villager-event-letters --english-academy-letters
+--english-academy-scores`, full item resources, and the complete mail reader.
+The [score checkpoint](checkpoints/ACADEMY_SCORE_LETTERS.md) contains the executed
+integrated build recipe and test evidence. `tools/academy_score_scenario.py`
+generates the complete native batch; `--scheduler-only` generates a bounded
+scoring/scheduler diagnostic without repeating the forty template comparisons.
+The source-only `tools/audit_mail_glyphs.py` inventories every unsupported glyph
+in the frozen mail catalogue without changing or crediting the ROM.
+
 Complete sale/Redd publication uses `tools/build_event_actor.py` and the builder's
 `--english-event-letters <compiled-actor-directory>` option. It requires complete
 item names, leaflet dates, and the full snapshot reader. The pending-selector

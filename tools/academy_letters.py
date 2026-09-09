@@ -129,6 +129,11 @@ def verify_installation(built,native,module,report):
         offset = at-CODE_RAM
         if actual[offset:offset+len(value)] != value: raise ValueError('Academy creation or success gate is not installed')
         actual[offset:offset+len(value)] = original[offset:offset+len(value)]
+    if module['npc_mail_loader']['overlay'].get('academy_scores') is True:
+        from academy_score_letters import scheduler_patch
+        at,value = scheduler_patch();offset = at-CODE_RAM
+        if actual[offset:offset+len(value)] == value:
+            actual[offset:offset+len(value)] = original[offset:offset+len(value)]
     verify_code(actual)
 
 
