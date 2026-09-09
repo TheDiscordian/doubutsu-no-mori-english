@@ -70,15 +70,33 @@ tests requiring current source cannot validate those older artifacts directly.
   complete-letter credit without changing the denominator.
 - `build/shop-notice-regression-tests.log`: all 24 scenario, reader, record,
   relocation, and combined-accounting tests pass.
+- Independent builds in `build/shop-notice-creator-repro` and
+  `build/shop-notice-owners-repro` match their respective binaries, relocation,
+  and source approval manifests exactly.
 
-The silent native run is `build/smoke-shop-notice-01`, with log
-`build/smoke-shop-notice-01.log`. Its scenario contains 32 spotlight cases,
+The completed silent native run is `build/smoke-shop-notice-01`, with log
+`build/smoke-shop-notice-01.log`. All 32 spotlight cases,
 eight reopening cases with four home deliveries each, 64 full readbacks, and
-seventeen owner-fault cases. It uses a fresh ROM-specific checkpoint, no
+seventeen owner-fault cases pass. Both failed-resource/invalid-capital retries
+complete all homes and prevent duplicate notices. All 172 calls and 376
+assertions pass in 779 result records. The run uses a fresh ROM-specific checkpoint, no
 screenshots, no audio, and isolated saves. The test uploads only the 1,424-byte
 original code for comparison; translated code/resources load from the cartridge.
-Completion and restored save/global/heap/stack/checkpoint evidence remain to
-be collected. Direct native calls are not normal scheduling or hardware proof.
+Save/global/heap/stack/module guards and checkpoint restoration pass. FlashRAM
+remains erased, the isolated Pak remains unchanged, and graceful shutdown passes.
+Direct native calls are not normal scheduling or hardware proof.
+
+Evidence hashes:
+
+- Results: `418c194768778e285461bb5db3346dca38552fb457ec3b154f8f1f98ee7a5842`.
+- Scenario: `3016bd175298d1f61eeb08479d7a82f2b177da62930a5cbe99c22dd1c2bca656`.
+- Native helper: `f8a48e39d921c1590f117867ca62ebf10d51f3d7e4250e01e75c8bf030fb48dd`.
+- Checkpoint: `5f5f2f94126e786fd2c9178dd5e1b70e13a98f0ca2cae23ee8faaf3a821793fb`.
+
+`tests/test_shop_notice_results.py` binds the native cases, exact result file,
+restoration, and save hashes to the installed ROM and current scenario.
+The final ten native-evidence, installation, accounting, and scenario tests pass
+in 17.665 seconds (`build/shop-notice-final-tests.log`).
 
 ## Rebuild
 

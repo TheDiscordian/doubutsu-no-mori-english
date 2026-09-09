@@ -76,10 +76,23 @@ seven. The native selectors are preserved, including the differing level-zero
 reopening slot. Complete preparation precedes publication and reopening bit
 `20` clearing. The shared image limit is checked consistently at 65,536 bytes;
 the 33,008-byte creator adds no resident reservation or saved-layout growth.
-Host/sanitizer, installation/accounting, and scenario/reader regressions pass.
-The silent native batch remains in progress. Finish that bounded batch, retain
-spotlight resource-failure scheduling/recovery, normal gameplay, save/reload,
-review, and hardware acceptance, then continue the remaining text groups.
+Host/sanitizer, installation/accounting, scenario/reader regressions, and
+independent creator/owner builds pass. The completed native batch passes all
+32 spotlight cases, eight four-home reopening cases, 64 readbacks, seventeen
+fault cases, retries, duplicate-notice guards, 172 calls, and 376 assertions.
+Restored state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown
+pass. Retain spotlight resource-failure scheduling/recovery, normal gameplay,
+save/reload, review, and hardware acceptance; continue remaining text groups
+without rerunning the completed batch.
+
+The next [villager secret-letter group](../specs/SECRET_LETTERS.md) covers
+`0022..0030`: fifteen complete templates, 45 parts, and thirty fixed snapshots
+in a 600-byte table. Source and snapshot checks pass. Append the creator/table
+to the ordinary-conversation overlay without losing its existing date, wider
+item, or birthday patches. Preserve its native random/paper selection, static
+132-byte compact record, relocation, writable data/BSS, and null-result fallback.
+Install and count only after full reader/creator/dependency validation, then
+batch all choices/capitals with original metadata and ordinary-show checks.
 
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 installs complete resources for all 114 Mom, 55 villager-event, and 21 score

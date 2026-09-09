@@ -22,10 +22,21 @@ is one instruction, with identical size, symbols, bootstrap, reservation, and
 four-MiB heap bounds. Thirty-seven creator tests, eight loader tests, all 45
 corresponding sanitizer tests, six installation/accounting tests, and 24
 scenario/reader/relocation/accounting regressions pass. The full ROM retains
-every earlier text resource and actor. The silent native batch is in progress;
-no native delivery, normal scheduling, save/reload, review, or hardware result
-is claimed yet. Spotlight resource-failure recovery beyond its original call
-still needs scheduling evidence.
+every earlier text resource and actor. Independent creator/owner builds agree.
+The silent native batch passes all 32 spotlight cases, eight four-home reopening
+cases, 64 full readbacks, seventeen owner-fault cases, resource retries, and
+duplicate-notice checks. All 172 calls and 376 assertions pass, with restored
+state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown.
+Normal scheduling, save/reload, review, and hardware remain unverified.
+Spotlight resource-failure recovery beyond its original call still needs
+scheduling evidence. Continue remaining text consumers without repeating this batch.
+
+The next [villager secret-letter group](../specs/SECRET_LETTERS.md) has fifteen
+source-approved templates, 45 complete parts, and thirty prevalidated fixed
+snapshots in 600 bytes. Two source/snapshot tests pass. Its original compact
+record and native selection are identified. Integration must retain existing
+date, wider-item, and birthday fixes in the same ordinary-conversation overlay.
+Prepared snapshots receive no installed-text credit.
 
 The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
 complete gift letters with full sixteen-byte item fields. Twenty-four fixed
