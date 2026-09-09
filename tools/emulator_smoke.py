@@ -970,6 +970,12 @@ def main():
                     raise ValueError('Secret-letter probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_secret_letters'],record))
+            if 'test_notice_reader' in action:
+                from notice_reader_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Notice reader probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_notice_reader'],record))
             if 'test_quest_replies' in action:
                 from quest_reply_smoke import exercise
                 if not (out/'test.bs1').is_file():

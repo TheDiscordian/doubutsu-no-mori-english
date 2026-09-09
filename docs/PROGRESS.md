@@ -22,9 +22,18 @@ unchanged. Six reader host/sanitizer checks and ten compilation/installation
 checks have passing results; independent builds agree. Native storage passes
 36 calls and 46 assertions, including every saved slot, full-board shifting,
 guards, checkpoint restoration, blank saves, and graceful shutdown. The combined
-counter credits only the four installed bodies. Native reader/owner loading,
-real navigation, old automatic posts, persistence, and the 41 seasonal/eighteen
-treasure bodies remain active work. Do not replay passed storage cases.
+counter credits only the four installed bodies. The native owner/reader batch
+verifies all eight complete body/capitalization cases, 33 draws, 2,210 glyphs,
+and 8,840 vertex positions. L/R page limits, two-post caching, corrupt-record
+recovery, entry labels, and all twelve months pass. The final edge run restores
+heap/save/input state and its checkpoint, with blank isolated saves and graceful
+shutdown. The [native reader evidence](checkpoints/NOTICEBOARD_NATIVE_READER.md)
+distinguishes completed checks from partial fixture runs. Normal menu entry and
+C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal/
+eighteen treasure bodies remain active work. Seventeen treasure references have
+source/field review and 34 complete-field examples; `01F4` needs a native-specific
+heading to avoid revealing an item that the original clue keeps secret. Continue
+bulk automatic-post implementation, without replaying passed storage/reader cases.
 
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs
 22 source-bound original entries in 63 complete fields, including 31 unchanged-

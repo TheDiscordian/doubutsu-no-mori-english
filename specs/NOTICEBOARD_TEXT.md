@@ -192,7 +192,11 @@ term, which is part of the dominant submenu sum. The actual arithmetic yields
 214,400 native bytes and 230,784 expanded bytes, above the unchanged alternative
 199,488 and player 186,240 terms. The added reader's aligned growth is 7,104
 bytes. This reserves space without changing any other program's declared image.
-Native loader/allocation execution still needs validation.
+The actual native program loader and constructor pass in an isolated owned
+submenu fixture, including complete image/asset DMA, aligned allocation advance,
+relocated callbacks, single-owner reopening, and temporary relocation cleanup.
+The top-level submenu pool allocator and normal menu initialization are not
+executed by that fixture and still need validation.
 
 The constructor wrapper clears two 1,216-byte caches and invokes the retained
 constructor. The read dispatch at `80895BC0` wraps the retained controls, and
@@ -201,7 +205,9 @@ read/edit functions are not overwritten by wrappers that would recurse into
 themselves. Full RTC dates use day byte three, month byte five, and BE16 year
 at byte six. Complete English month names are right-aligned in the header.
 L/R select additional six-line pages; existing post/navigation/edit controls
-take precedence. The page hint and header placement still need native review.
+take precedence. Native L/R limits and complete hint/entry/month glyph positions
+pass at the settled coordinates. Ordinary C-button/edit navigation and human
+review of the complete window still need validation.
 
 The reader's aligned decoder workspace is temporary heap storage; only its full
 decoded body stays in a cache. Comparing all 96 input bytes invalidates changed
@@ -219,7 +225,33 @@ but the implemented memory configuration remains four MiB.
 
 Native storage execution passes initial creation, count/clear, all fifteen
 positions, full-board shifting, manual/encoded record retention, timestamps,
-guards, and checkpoint restoration. Actual expanded-owner loading, native full
-decoding/drawing/navigation, normal draft publication, old automatic-post display,
-save/reload, seasonal/treasure meanings and full fields, ordinary gameplay, and
-original hardware remain. See the [integration checkpoint](../docs/checkpoints/NOTICEBOARD_READER.md).
+guards, and checkpoint restoration. Actual expanded-owner loading, all initial
+body decoding/drawing, two-post caches, corrupt-record recovery, L/R paging,
+entry labels, and all full months have native evidence. Normal draft publication,
+C-button/edit navigation, old automatic-post display, save/reload, seasonal/
+treasure creation and full fields, ordinary gameplay, and original hardware remain.
+See the [integration checkpoint](../docs/checkpoints/NOTICEBOARD_READER.md).
+
+## Treasure source review and next integration
+
+`tools/audit_notice_treasure.py` binds all 54 native/reference parts and both
+executables' field/selection helpers. The native treasure scheduler is
+`800A5F08..800A62EC`, SHA-256
+`e548281b85424af417431715461bd63d5806f4e15151fb90c0b263039917e53f`.
+The instruction sequence selects `01F0 + personality*3 + random(3)`, calls the
+formatter at `800A62A0`, publishes the 104-byte post at `800A62A8`, then updates
+the buried timestamp. Complete English creation must succeed before publication;
+failure after burying the object also requires an explicit recovery policy.
+
+Seventeen supplied English bodies preserve their corresponding native clue
+scope. Their 34 complete-field examples fit compact storage with full sixteen-byte
+villager/item names, decimal acre coordinates, and the six-byte town identity.
+The donor's `01FE` omits the author signature; its complete English wording is
+retained. Manual breaks and article commands remain part of the reference.
+
+`01F4` is not approved unchanged: Japanese fields `1/3/5` name the sender, row,
+and town, while the donor's `1/2/3` reveal the buried item. Adapt the town's
+treasure-hunt heading without disclosing that item. This is a real clue difference,
+not a reason to drop the entry or pass an empty item name to the donor formatter.
+All eighteen need creator capture, reader approval, publication handling, and
+persistence integration; the source audit grants no installed-translation credit.

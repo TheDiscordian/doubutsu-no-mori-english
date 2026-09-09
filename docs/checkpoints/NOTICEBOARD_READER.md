@@ -72,9 +72,14 @@ checkpoint restores, FlashRAM/Pak stay blank, and shutdown is graceful. The
 300-second-bounded run has no audio, screenshots, user save seeds, or save I/O.
 Its frozen result test checks all planned calls and outputs without replaying it.
 
-This native batch does not execute the expanded submenu loader, English decoder,
-draw wrappers, real navigation, or save/reload. Those remain explicit acceptance
-work, along with human presentation review and hardware testing.
+The separate [native reader batch](NOTICEBOARD_NATIVE_READER.md) executes the
+actual submenu program loader, constructor, complete English decoder, draw
+wrappers, and L/R controls in an isolated owned submenu fixture. All eight
+body/capitalization cases, 33 native draws, 2,210 glyphs, and 8,840 vertex positions
+have passing evidence. Cache reuse, corrupt-record recovery, full month labels,
+final guards/state/checkpoint restoration, blank saves, and shutdown pass.
+Normal submenu initialization, C-button/edit navigation, save/reload, human
+presentation review, and hardware testing remain explicit acceptance work.
 
 ## Artifacts
 
@@ -108,9 +113,11 @@ Use the complete [native-name build](NATIVE_ITEM_NAMES.md), with resident path
 `python3 tools/notice_storage_scenario.py`. It is already passed; do not rerun it
 merely to revisit progress.
 
-Continue native reader/owner allocation and complete decoding/navigation checks,
-then the 41 seasonal and eighteen treasure bodies with native calendar, venue,
-coordinate, and full-field meanings retained. Old saved automatic-post display,
+Continue the 41 seasonal and eighteen treasure bodies with native calendar, venue,
+coordinate, and full-field meanings retained. The treasure audit approves seventeen
+supplied references and flags `01F4` for native-specific text: the donor reveals
+the buried item instead of preserving the native town/row-only clue. The reader
+still accepts only the four initial templates. Old saved automatic-post display,
 normal draft publication, persistence, reader hint/date placement, other remaining
 text and full-name callers, review, patch-only release preparation, title-first
 artwork, and GameCube-style keyboard remain. The full project goal stays active.
