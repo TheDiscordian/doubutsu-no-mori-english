@@ -57,7 +57,7 @@ class NativeItemRetailTests(unittest.TestCase):
         cls.banks = {b.name:b for b in banks(cls.native)}
         cls.source = {name:b.entries() for name,b in cls.banks.items()}
         cls.originals = load_names()
-        cls.matches = load_matches()
+        cls.matches = load_matches(include_resolved=False)
 
     def generate(self,width):
         result = []

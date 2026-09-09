@@ -89,6 +89,11 @@ def identity_queue(path, inventory, references, remaining):
                 row['visual_changes'] = [key for key, other in (('CG', 'CQ'), ('CJ', 'CX'))
                                          if match.get(key, '-') != match.get(other, '-')]
                 refs_matching = [r for r in refs if r['text'] == match['J'] and r['text'].strip()]
+                if bank == 'item_20' and re.fullmatch('20[0-9A-F]{2}', match['E']):
+                    # Paper names repeat in four quantity groups. An explicit
+                    # catalogue ID, not the repeated wording, selects the field.
+                    exact = f"item_20:{int(match['E'], 16)-0x2000:04X}"
+                    refs_matching = [r for r in refs_matching if r['id'] == exact]
                 if len(refs_matching) == 1:
                     ref = refs_matching[0]
                     row.update(reference_id=ref['id'], reference_sha256=ref['source_sha256'])
@@ -97,7 +102,10 @@ def identity_queue(path, inventory, references, remaining):
                 elif len(refs_matching) != 1:
                     row['reason'] = 'missing_or_ambiguous_complete_reference'
                 elif row['visual_changes']:
-                    row['reason'] = 'version_specific_visual_reference'
+                    row['reason'] = ('same_stationery_pattern_requires_model_review'
+                                     if bank == 'item_20' and row['visual_changes'] == ['CG']
+                                     and match.get('CJ', '-') not in ('', '-')
+                                     else 'version_specific_visual_reference')
                 elif not match['J'].isascii():
                     row['reason'] = 'requires_accented_item_support'
                 else:

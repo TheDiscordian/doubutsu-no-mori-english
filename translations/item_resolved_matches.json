@@ -1,0 +1,400 @@
+[
+  {
+    "id": "item_2D:0005",
+    "source_sha256": "9955742267ab6b34254eb161325a823c60b341ff0a43565dcb75bf2e91a0b18d",
+    "native_name": "ツクツクボウシ",
+    "reference_id": "item_2D:0005",
+    "reference_sha256": "731f62bdd9dd6d04e14ea9a2889f0110a1c42c76ddc7d428ad77ce8c71990a94",
+    "evidence": "Items row 2332 identifies the native and English carried insect 2D05 as walker cicada, with identical model references and the exact native Japanese name. Retain this complete supplied carried label, already installed by the legacy-confirmed match. This explicit identity also resolves the native placed conversion without adopting the conflicting priest cicada furniture label. No translated bytes change in this carried field.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 2332,
+      "item": "2332"
+    }
+  },
+  {
+    "id": "item_10:013C",
+    "source_sha256": "0f504df4760b0f275a377338bbf29c911d4c5c6ad506ae739a98c7547026dd13",
+    "native_name": "トーテムポール・オヤ",
+    "reference_id": "furniture:004F",
+    "reference_sha256": "c68bbd7885d75fb0200d93e2ba42b47220f63654fdef8fd2058b7ba769524a2b",
+    "evidence": "Items row 107 identifies the exact totem ID, English localisation, and matching model/texture references. The only Japanese spelling difference is the sheet halfwidth middle dot versus the native fullwidth middle dot; this is explicitly reviewed for this one source, not a general normalization rule. Preserve the complete supplied English name and unchanged native artwork.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 107,
+      "item": "0107"
+    }
+  },
+  {
+    "id": "item_10:0140",
+    "source_sha256": "66310359f330de56130f65979e47b7628ae61be31de47a372831aa5ae6c7918f",
+    "native_name": "トーテムポール・マア",
+    "reference_id": "furniture:0050",
+    "reference_sha256": "7ffff20ee7dc65ebd477e686a321bc58a0c019dd42a95415dcdca4fb5416a3ef",
+    "evidence": "Items row 108 identifies the exact totem ID, English localisation, and matching model/texture references. The only Japanese spelling difference is the sheet halfwidth middle dot versus the native fullwidth middle dot; this is explicitly reviewed for this one source, not a general normalization rule. Preserve the complete supplied English name and unchanged native artwork.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 108,
+      "item": "0108"
+    }
+  },
+  {
+    "id": "item_10:0144",
+    "source_sha256": "044950d0da6c68396bf474095b1747ea798621f4d18c2c6b24f4ab41b4f655b0",
+    "native_name": "トーテムポール・アラ",
+    "reference_id": "furniture:0051",
+    "reference_sha256": "647523becde59972c8252266f6af91edff86fe364d8b0b8a3c25a613643497b0",
+    "evidence": "Items row 109 identifies the exact totem ID, English localisation, and matching model/texture references. The only Japanese spelling difference is the sheet halfwidth middle dot versus the native fullwidth middle dot; this is explicitly reviewed for this one source, not a general normalization rule. Preserve the complete supplied English name and unchanged native artwork.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 109,
+      "item": "0109"
+    }
+  },
+  {
+    "id": "item_10:0148",
+    "source_sha256": "aeb92fc41ae0600c23ce63897f302980ca8dcc03cef25d3b8f640973aa71f5b2",
+    "native_name": "トーテムポール・サテ",
+    "reference_id": "furniture:0052",
+    "reference_sha256": "e2f75f046e1c9bc2a5fa2ba5175067c82fbed22cdb1d1c016bdb80f392dce71a",
+    "evidence": "Items row 110 identifies the exact totem ID, English localisation, and matching model/texture references. The only Japanese spelling difference is the sheet halfwidth middle dot versus the native fullwidth middle dot; this is explicitly reviewed for this one source, not a general normalization rule. Preserve the complete supplied English name and unchanged native artwork.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 110,
+      "item": "0110"
+    }
+  },
+  {
+    "id": "item_20:000F",
+    "source_sha256": "f3528f0e3811e088cf8f6a9d11693883231a81bea12471c14fcd4a398d839059",
+    "native_name": "みなものびんせん",
+    "reference_id": "item_20:000F",
+    "reference_sha256": "3c938cc644b1a9618a055f85f9ff98dfaea7241bf2a92103cc82b08781b11637",
+    "evidence": "Items row 1174 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1174,
+      "item": "1174"
+    }
+  },
+  {
+    "id": "item_20:0010",
+    "source_sha256": "0ebd0472f28009177e60dfcc2c667e583ad630f00092fd4a7a0ddf6cb6563cbc",
+    "native_name": "ゆきあかりのびんせん",
+    "reference_id": "item_20:0010",
+    "reference_sha256": "1d11c079c10cbbecc73a70728ab9d2a2d8004dc85b66245699cd1514f9486e72",
+    "evidence": "Items row 1175 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1175,
+      "item": "1175"
+    }
+  },
+  {
+    "id": "item_20:0011",
+    "source_sha256": "ca02cdd9e3fe12ada91011653e3e08de7cbbf14dd682e77a4219d9a1f6f3a4f7",
+    "native_name": "セピアなびんせん",
+    "reference_id": "item_20:0011",
+    "reference_sha256": "32c39d02650a35a8f4fafb471456315523eafb451886c8a0565f8aa9a06d5af5",
+    "evidence": "Items row 1176 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1176,
+      "item": "1176"
+    }
+  },
+  {
+    "id": "item_20:0012",
+    "source_sha256": "14a03c711791f798692cdcd4591bd35e337d84159df09ddb0f7d8f85d2291304",
+    "native_name": "あさがおのびんせん",
+    "reference_id": "item_20:0012",
+    "reference_sha256": "7c30ee873ead4876e2353935964575cefb871e12dcd8293e3ddbe24c40029444",
+    "evidence": "Items row 1177 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1177,
+      "item": "1177"
+    }
+  },
+  {
+    "id": "item_20:0014",
+    "source_sha256": "45c6fe59b57d8fa74a3c4b5478981cc7177ea0f035824c8862176cd025fbcbe3",
+    "native_name": "アジアのびんせん",
+    "reference_id": "item_20:0014",
+    "reference_sha256": "b9c82d73695e21bdb21059084b3c8ad7c7fde6fb3bfb3a55c7e2431e1d69ae87",
+    "evidence": "Items row 1179 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1179,
+      "item": "1179"
+    }
+  },
+  {
+    "id": "item_20:0015",
+    "source_sha256": "f6a4edaebe11024d0f66dd9808466d5c69204f9a41625b8cb43f69f336481b76",
+    "native_name": "まきもののびんせん",
+    "reference_id": "item_20:0015",
+    "reference_sha256": "8811b7c44e3a3eb8b4b9494460a693c1584ba7e80a34eab915634f9b8884bd81",
+    "evidence": "Items row 1180 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1180,
+      "item": "1180"
+    }
+  },
+  {
+    "id": "item_20:0018",
+    "source_sha256": "29f6eea667182b3605a3cc54b35368b5aaa9cf7950d8592419dbace9ef9a97d7",
+    "native_name": "ようひしのびんせん",
+    "reference_id": "item_20:0018",
+    "reference_sha256": "fbdf1c0cdfbea18a686765eee2db83f2c5011e90692be1a5abd64a2f2e3f8543",
+    "evidence": "Items row 1183 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1183,
+      "item": "1183"
+    }
+  },
+  {
+    "id": "item_20:001D",
+    "source_sha256": "18fd14013c8592e07096442545bb3cbda128a69cb922fcdaf61185906ba063eb",
+    "native_name": "ちゅうかなびんせん",
+    "reference_id": "item_20:001D",
+    "reference_sha256": "568449b1fdc7556afde090d310c9b9eaf6b9b41fae09aa6865b7499e2af77fc2",
+    "evidence": "Items row 1188 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1188,
+      "item": "1188"
+    }
+  },
+  {
+    "id": "item_20:0021",
+    "source_sha256": "5074912bbe01a90a1eee39bec9e8ca26f313dc49ccc4ae0639f5d61d70144c00",
+    "native_name": "エキゾチックびんせん",
+    "reference_id": "item_20:0021",
+    "reference_sha256": "4b0f91b0ff4596c8a458a1808d7c1f599128b4d010aed461cda50b9a548a1746",
+    "evidence": "Items row 1192 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1192,
+      "item": "1192"
+    }
+  },
+  {
+    "id": "item_20:0022",
+    "source_sha256": "888b7f127ea621794c1e2119029b0c55d08941a1368d2d3a6cbfa7adc7f2a63b",
+    "native_name": "ピンストなびんせん",
+    "reference_id": "item_20:0022",
+    "reference_sha256": "c4505f1f497d431be0d6bb4f8d7d69c694c5689a9c3a02345736fc1d40ca4d81",
+    "evidence": "Items row 1193 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1193,
+      "item": "1193"
+    }
+  },
+  {
+    "id": "item_20:0026",
+    "source_sha256": "b4b31d9a62a7a7975542afb5c70ea3425ddeab8ada9ba785e92b0def674bbbcc",
+    "native_name": "デイジーなびんせん",
+    "reference_id": "item_20:0026",
+    "reference_sha256": "7ee05dabf1c0495c8fa976869f9cf71fe72ac3ee696b3a7c3f26c8817ecc1b12",
+    "evidence": "Items row 1197 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1197,
+      "item": "1197"
+    }
+  },
+  {
+    "id": "item_20:0028",
+    "source_sha256": "3068380b8f2489bcf9629e2fd8b66a9f4772fa49d2e3e25da5763d25f13552c0",
+    "native_name": "ストロベリーびんせん",
+    "reference_id": "item_20:0028",
+    "reference_sha256": "65d300c831ff9a566861b536c3c5520b9c11c645ce31416a5b2429a46be1e365",
+    "evidence": "Items row 1199 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1199,
+      "item": "1199"
+    }
+  },
+  {
+    "id": "item_20:0029",
+    "source_sha256": "399232d1114e9a8ed1abc39613782a89cc5936dcc5134a39ab1deee89e256ca3",
+    "native_name": "ボンダイなびんせん",
+    "reference_id": "item_20:0029",
+    "reference_sha256": "353da50705ac8ec51d29cced9170e68f35676e0c7a7b4a541cb1df5c37179c79",
+    "evidence": "Items row 1200 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1200,
+      "item": "1200"
+    }
+  },
+  {
+    "id": "item_20:002D",
+    "source_sha256": "45f2678d8233fd0975a157869039e4a5ce9e1914db590e909604b785587f2834",
+    "native_name": "きのこのびんせん",
+    "reference_id": "item_20:002D",
+    "reference_sha256": "e1427c44739a0c87318201cdaa9aab8962a170db597a75b6168346cf0e94c3d0",
+    "evidence": "Items row 1204 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1204,
+      "item": "1204"
+    }
+  },
+  {
+    "id": "item_20:0033",
+    "source_sha256": "a05a7cb0db21acf706afc8d143de1410d267f036730175560e6e7b680a079d08",
+    "native_name": "アカデミーのびんせん",
+    "reference_id": "item_20:0033",
+    "reference_sha256": "97545525d450d42374ee52c8a0e269d876f4f29aa03a5648219a0fd20c322754",
+    "evidence": "Items row 1210 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1210,
+      "item": "1210"
+    }
+  },
+  {
+    "id": "item_20:0034",
+    "source_sha256": "1e96380e664b32273d00b3fd65a80fd3c0cc1ddcfd905cc2018dd944721393b9",
+    "native_name": "ナイトのびんせん",
+    "reference_id": "item_20:0034",
+    "reference_sha256": "9ba656c9f0bac8653ebd992b4c069253186bc9b78d0f2f46ca06d06ca7e4dd46",
+    "evidence": "Items row 1211 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1211,
+      "item": "1211"
+    }
+  },
+  {
+    "id": "item_20:003B",
+    "source_sha256": "5c34983e7a49ef3e9a0177fab0557ea276a3ae75033fa9238648fb92fc22a864",
+    "native_name": "メカっぽいびんせん",
+    "reference_id": "item_20:003B",
+    "reference_sha256": "659aba43bf968fabd4c75af9b473e9ee32940d77b988c9d9a67715c8c7055a40",
+    "evidence": "Items row 1218 supplies the exact native and English item ID and bilingual name. The English field is selected by that ID among four repeated quantity groups. The paper-pattern texture reference agrees; the differing catalogue model reference depicts generic stationery and does not change the paper pattern. Preserve the complete supplied English name; no artwork is replaced.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 1218,
+      "item": "1218"
+    }
+  },
+  {
+    "id": "item_10:0A5C",
+    "source_sha256": "2a1b85e69534a3616103f8fdbfda20b7754809c966c9b3759ca878f1a15aa124",
+    "native_name": "No.1のふく",
+    "reference_id": "item_24:00AC",
+    "reference_sha256": "17064581344dabcc1d0f277286cff757cafa7a503ff15ecf61218701a8c55fcd",
+    "native_carried_id": "item_24:00AC",
+    "evidence": "Items row 774 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00AC, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 774,
+      "item": "0774"
+    }
+  },
+  {
+    "id": "item_10:0A60",
+    "source_sha256": "a52e35380ebbe8490cc19516dc568deb0a783e785cb3b3a1da89fb86c913ceb2",
+    "native_name": "No.2のふく",
+    "reference_id": "item_24:00AD",
+    "reference_sha256": "62a8821c051161d12c96dcb9f92cc825de439130fade476b6d010b089eb92c03",
+    "native_carried_id": "item_24:00AD",
+    "evidence": "Items row 775 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00AD, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 775,
+      "item": "0775"
+    }
+  },
+  {
+    "id": "item_10:0A64",
+    "source_sha256": "e48a35e3f292677e311656758ac897f4288babf21370dbe1d9d2f192b4c8331b",
+    "native_name": "No.3のふく",
+    "reference_id": "item_24:00AE",
+    "reference_sha256": "0da306eb152cb0508947d94d75bd62751ad56130d8f7c236ac99e9de35b29f06",
+    "native_carried_id": "item_24:00AE",
+    "evidence": "Items row 776 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00AE, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 776,
+      "item": "0776"
+    }
+  },
+  {
+    "id": "item_10:0A68",
+    "source_sha256": "58dbe139ee6f494e77c54ae02343b522d5123a3d3ca68778c52cc42a5ca564c2",
+    "native_name": "No.4のふく",
+    "reference_id": "item_24:00AF",
+    "reference_sha256": "a4a0e4d34112c9134ea104a777b7213a5d94fa415c87604adfa2050ef4c78672",
+    "native_carried_id": "item_24:00AF",
+    "evidence": "Items row 777 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00AF, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 777,
+      "item": "0777"
+    }
+  },
+  {
+    "id": "item_10:0A6C",
+    "source_sha256": "fd7fb21118bbcb329652856e09883aad8b1b6d9c5040622976760ad23312f828",
+    "native_name": "No.5のふく",
+    "reference_id": "item_24:00B0",
+    "reference_sha256": "7cb82c8b02235941dfa5d9c88c5e1bfab93523efd3b3ebb3006a43f5aa1e6ec9",
+    "native_carried_id": "item_24:00B0",
+    "evidence": "Items row 778 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00B0, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 778,
+      "item": "0778"
+    }
+  },
+  {
+    "id": "item_10:0A70",
+    "source_sha256": "2e0c8245d0bfc85fe066560f89a37853f0b47a93c9d65ea650b2c15a742b2dea",
+    "native_name": "No.23のふく",
+    "reference_id": "item_24:00B1",
+    "reference_sha256": "cba095d5848cb3c32cdec3cb3f2750eab3b4242ff9aeb1e7cdce56fd66df800c",
+    "native_carried_id": "item_24:00B1",
+    "evidence": "Items row 779 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00B1, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 779,
+      "item": "0779"
+    }
+  },
+  {
+    "id": "item_10:0A74",
+    "source_sha256": "ee6a38b9ef89ef3617476ef8859d09a22a2f29728f31a7fff7f5f3cc14c1b80f",
+    "native_name": "No.67のふく",
+    "reference_id": "item_24:00B2",
+    "reference_sha256": "556b5ad51175ad223b1f0c359c8a8842f8f6cfa0d5a9e907b9d4ee52ced742e1",
+    "native_carried_id": "item_24:00B2",
+    "evidence": "Items row 780 retains the native numbered shirt but the supplied placed furniture field contains filler. The original native conversion reaches item_24:00B2, whose Japanese field is identical and whose complete English name is already approved. Copy that exact supplied carried-name field, retaining its reference identity rather than attributing the English name to the filler furniture field. No shirt number or artwork changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 780,
+      "item": "0780"
+    }
+  },
+  {
+    "id": "item_10:0BBC",
+    "source_sha256": "9955742267ab6b34254eb161325a823c60b341ff0a43565dcb75bf2e91a0b18d",
+    "native_name": "ツクツクボウシ",
+    "reference_id": "item_2D:0005",
+    "reference_sha256": "731f62bdd9dd6d04e14ea9a2889f0110a1c42c76ddc7d428ad77ce8c71990a94",
+    "native_carried_id": "item_2D:0005",
+    "evidence": "The native placed ID 1BBC converts to carried insect 2D05, with exactly the same Japanese source name. Use the already approved supplied carried name walker cicada for this identity. The catalogue maps the placed object to a donor furniture field named priest cicada; that inconsistent placed label is not the carried name used by the native conversion. No creature, appearance, or behaviour changes.",
+    "identity_sheet": {
+      "sha256": "7fcfb2d7ac3c30c3c69650ed61ae253c9589be0fba4b3aff09a334770da32be0",
+      "row": 876,
+      "item": "0876"
+    }
+  }
+]

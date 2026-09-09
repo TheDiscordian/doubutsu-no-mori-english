@@ -52,7 +52,7 @@ class SheetReaderTests(unittest.TestCase):
 
     def test_approvals_are_explicit_unique_and_do_not_include_open_identity_conflicts(self):
         self.assertEqual((len(APPROVED), len(KEYS)), (327, 327))
-        old, new = load_matches(include_sheet=False), load_matches()
+        old, new = load_matches(include_sheet=False), load_matches(include_resolved=False)
         self.assertEqual(new.keys()-old.keys(), KEYS)
         self.assertTrue(all(new[key] == value for key, value in old.items()))
         for row in APPROVED:
@@ -91,7 +91,7 @@ class SheetNameResourceTests(unittest.TestCase):
         cls.native = verified_rom(ROM.read_bytes())
         cls.info = module_command_info(cls.native)
         cls.source = {b.name: b.entries() for b in banks(cls.native)}
-        cls.matches = load_matches()
+        cls.matches = load_matches(include_resolved=False)
         cls.names = json.loads((ROOT/'build/sheet-items-resource/names.json').read_text())
         cls.old = json.loads((ROOT/'build/native-items-resource/names.json').read_text())
 

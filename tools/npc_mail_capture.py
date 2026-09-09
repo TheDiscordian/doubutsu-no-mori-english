@@ -108,12 +108,12 @@ def catalog_id(report):
 def source_report_matches(actual, expected, *, article_names=None):
     if actual == expected:
         return True
-    # The original immutable article profile also accepts its pinned original
+    # Each retained immutable article profile also accepts its pinned original
     # generator provenance. Every compiled source and resource remains checked;
     # this does not let new name profiles claim the old generator.
-    from item_articles import NAMES_HASH, LEGACY_GENERATOR_SHA256
-    if article_names == NAMES_HASH and 'tools/item_articles.py' in expected:
-        legacy = {**expected, 'tools/item_articles.py': LEGACY_GENERATOR_SHA256}
+    from item_articles import PROFILE_GENERATORS
+    if article_names in PROFILE_GENERATORS and 'tools/item_articles.py' in expected:
+        legacy = {**expected, 'tools/item_articles.py': PROFILE_GENERATORS[article_names]}
         return actual == legacy
     return False
 

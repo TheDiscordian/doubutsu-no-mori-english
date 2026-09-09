@@ -13,6 +13,19 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [resolved-name integration](checkpoints/RESOLVED_ITEM_NAMES.md) installs
+65 more complete fields: seventeen stationery names, four totems, seven numbered
+shirts, and the placed cicada. Thirty explicit approvals resolve repeated paper
+quantity groups, totem dot spelling, and native carried-item conversions. Every
+prior English name stays unchanged; 35 new fields also fit native short storage.
+The matching article profile covers 4,462 wider fields, with 82 still pending.
+The complete ROM changes only name/article data and creator-CRC configuration.
+All seven source/ROM/accounting checks and eight article/creator checks pass,
+including the latter under sanitizers. Independent creator builds agree. The
+silent native batch in `build/smoke-resolved-items-01` passes all 157 calls and
+149 assertions, with restored stack/checkpoint, blank isolated saves, and graceful
+shutdown. Its frozen evidence and exact source-bound plan pass without replay.
+
 The [bilingual item-name batch](checkpoints/SHEET_ITEM_NAMES.md) installs 327
 additional source-bound identities in 834 full fields, with 112 also fitting
 native short storage. The complete `build/sheet-items-pilot` retains every

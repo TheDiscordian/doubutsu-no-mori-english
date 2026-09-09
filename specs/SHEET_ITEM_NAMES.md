@@ -24,7 +24,8 @@ then checks unique native IDs, exact Japanese spelling, complete reference names
 and version-specific image/texture references. Queue entries are never approvals.
 `load_matches` merges the separately versioned, explicitly reviewed registry and
 rejects duplicate roots or malformed identities. The original batch can still be
-selected for its frozen tests with `include_sheet=False`.
+selected for its frozen tests with `include_sheet=False`; `include_resolved=False`
+retains this sheet batch without the additional explicit resolutions.
 
 The shifted later furniture references stay explicit. The final figurine and
 four clocks do not inherit the donor's same-index custom umbrellas or NES titles.
@@ -35,17 +36,18 @@ than literal legacy glosses. All original object identities and behaviour stay.
 ## Open names are not silently resolved
 
 The four red/blue gym-clothing fields have conflicting carried/placed Japanese
-labels and differently worded English fields. The priest/walker cicada pair also
-has different supplied names for the same native conversion. Both groups remain
-pending explicit reconciliation. The furniture `cafe shirt` field does not
+labels and differently worded English fields and remain pending reconciliation.
+The [resolved-name specification](RESOLVED_ITEM_NAMES.md) binds the cicada's placed
+name to its existing supplied carried label through the actual native conversion.
+The furniture `cafe shirt` field does not
 authorise removing the accent from the carried `café shirt`.
 
 Accented songs, Pokémon Pikachu, native-specific changed paintings and garments,
 the pierced/glass-top table, bathhouse/worn-wood/worn-earth designs, original
-vending machines/basins, and numbered placed shirts remain required work. The
-four totem names need an explicit review of the sheet's halfwidth middle dot,
-not global kana normalization. Stationery references repeat across quantity
-groups; their exact native/English IDs must resolve that ambiguity before review.
+vending machines/basins remain required work. The additional resolved-name batch
+binds numbered placed shirts to their complete carried fields, reviews the four
+totem middle dots individually, and selects seventeen stationery references by
+exact native/English ID among repeated quantity groups.
 
 ## Complete resources and grammar
 

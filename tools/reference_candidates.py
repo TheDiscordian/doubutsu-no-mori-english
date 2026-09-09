@@ -15,7 +15,7 @@ from textvalidate import expanded_bound, layout_issues, validate_entry
 from runtime_module import MODULE_COMMANDS, add_runtime_module, module_command_info
 from reference_matches import load_matches, resolve_reference, verify_native_equivalents
 from reference_sequences import load_sequences, reference_sequence_edits
-from item_matches import load_matches as load_item_matches
+from item_matches import load_matches as load_item_matches, reference_rows as item_reference_rows
 from name_candidates import npc_candidates
 from item_candidates import item_candidates
 from native_item_names import load_names as load_native_item_names
@@ -500,10 +500,9 @@ def main():
     for name, bank in source_banks.items():
         if not name.startswith("item_"):
             continue
-        reference_name = "furniture" if name == "item_10" else name
         item_edits, item_manifests, item_remaining, item_report = item_candidates(
             bank, list(map(json.loads, (args.inventory/(name+".jsonl")).read_text().splitlines())),
-            list(map(json.loads, (args.gc_names/(reference_name+".jsonl")).read_text().splitlines())),
+            item_reference_rows(args.gc_names, name, item_matches),
             info, override_ids, matches=item_matches, originals=native_item_names)
         edits.extend(item_edits)
         manifests.extend(item_manifests)

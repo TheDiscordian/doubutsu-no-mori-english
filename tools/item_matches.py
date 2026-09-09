@@ -9,6 +9,7 @@ from textcodec import encode
 
 APPROVALS = Path(__file__).resolve().parents[1]/'translations/item_reference_matches.json'
 SHEET_APPROVALS = APPROVALS.with_name('item_sheet_matches.json')
+RESOLVED_APPROVALS = APPROVALS.with_name('item_resolved_matches.json')
 ITEM_ID = re.compile(r'item_(10|2[0-9A-F]):([0-9A-F]{4})')
 
 
@@ -22,7 +23,7 @@ def identity_key(id):
     return f'item_{match[1]}:{index:04X}'
 
 
-def load_matches(path=APPROVALS, *, include_sheet=True):
+def load_matches(path=APPROVALS, *, include_sheet=True, include_resolved=True):
     rows = json.loads(path.read_text())
     if not isinstance(rows, list):
         raise ValueError('Item identity approvals must be a list')
@@ -31,6 +32,11 @@ def load_matches(path=APPROVALS, *, include_sheet=True):
         if not isinstance(extra, list):
             raise ValueError('Sheet-reviewed item identities must be a list')
         rows += extra
+        if include_resolved:
+            extra = json.loads(RESOLVED_APPROVALS.read_text())
+            if not isinstance(extra, list):
+                raise ValueError('Resolved item identities must be a list')
+            rows += extra
     result = {}
     for row in rows:
         if (not isinstance(row, dict) or not isinstance(row.get('id'), str)
@@ -42,10 +48,33 @@ def load_matches(path=APPROVALS, *, include_sheet=True):
             if not isinstance(row.get(field), str) or not re.fullmatch(r'[0-9a-f]{64}', row[field]):
                 raise ValueError('Invalid item identity hash')
         prefix = 'furniture' if row['id'].startswith('item_10:') else row['id'].split(':')[0]
+        if 'native_carried_id' in row:
+            from item_aliases import ordinary_item
+            number = 0x1000+int(row['id'].split(':')[1], 16)
+            converted = ordinary_item(number)
+            carried = f'item_{converted >> 8:02X}:{converted & 255:04X}'
+            if not row['id'].startswith('item_10:') or converted == number or row['native_carried_id'] != carried:
+                raise ValueError('Placed reference requires its exact native carried conversion')
+            prefix = carried.split(':')[0]
         if not isinstance(row.get('reference_id'), str) or not re.fullmatch(prefix+r':[0-9A-F]{4}', row['reference_id']):
             raise ValueError('Item identity reference must belong to the same name family')
         result[row['id']] = row
+    for row in result.values():
+        if 'native_carried_id' in row:
+            donor = result.get(row['native_carried_id'])
+            if donor is None or any(row[k] != donor[k] for k in
+                                    ('source_sha256', 'native_name', 'reference_id', 'reference_sha256')):
+                raise ValueError('Placed reference must retain its complete approved carried donor')
     return result
+
+
+def reference_rows(directory, bank, matches):
+    """Read only the name families explicitly needed by this native bank."""
+    families = {'furniture' if bank == 'item_10' else bank}
+    families.update(row['reference_id'].split(':')[0] for key, row in matches.items()
+                    if key.startswith(bank+':'))
+    return [row for family in sorted(families)
+            for row in map(json.loads, (directory/(family+'.jsonl')).read_text().splitlines())]
 
 
 def verify_source(match, native, info):
@@ -81,6 +110,17 @@ def validate_candidate(edit, source_banks, info, matches, *, originals=None):
         raise ValueError('Item identity source slot is absent')
     native = source_banks[bank][index]
     verify_source(match, native, info)
+    if 'native_carried_id' in match:
+        from item_aliases import ordinary_item
+        number = 0x1000+index
+        converted = ordinary_item(number)
+        carried_bank, carried_index = match['native_carried_id'].split(':')
+        carried_index = int(carried_index, 16)
+        if (bank != 'item_10' or converted == number
+                or match['native_carried_id'] != f'item_{converted >> 8:02X}:{converted & 255:04X}'
+                or carried_bank not in source_banks or carried_index >= len(source_banks[carried_bank])
+                or source_banks[carried_bank][carried_index] != native):
+            raise ValueError('Placed reference changes its native carried identity or source')
     if bank == 'item_10' and (index+4 > len(source_banks[bank])
                              or any(raw != native for raw in source_banks[bank][index:index+4])):
         raise ValueError('Approved furniture rotation names differ')
