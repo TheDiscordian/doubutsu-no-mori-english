@@ -15,12 +15,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 The [ordinary item-name batch](checkpoints/ORDINARY_ITEM_NAMES.md) installs 209
 additional complete English names: songs, stationery, tools, quest items, seeds,
-raffle tickets, Bell denominations, fruit/mushroom/candy, grab bags, and turnips.
+raffle tickets, Bell denominations, mushroom/candy, grab bags, and turnips.
 All earlier candidates remain; fifty also fit unchanged native fields. Only
 the two item-name resources change in the full quest-reply ROM. All 38 focused
 host/artifact/scenario tests pass, including exact full output and the UPS round
-trip. The silent `build/smoke-ordinary-items-01` batch is assigned; terminal native
-acceptance, remaining accents/designs, full-name callers, and review remain.
+trip. The silent `build/smoke-ordinary-items-01` batch passes all 392 calls and
+385 assertions, with retained guards, restored checkpoint, blank isolated saves,
+and graceful shutdown. Remaining accents/designs, full-name callers, and review remain.
 
 The [letter-quest reply integration](checkpoints/QUEST_REPLY_LETTERS.md) installs
 all 72 templates `0075..00BC` and 216 complete parts, including full villager

@@ -19,8 +19,9 @@ its acceptance checks pass, not when a candidate or specification exists.
 The [ordinary-name batch](checkpoints/ORDINARY_ITEM_NAMES.md) installs 209
 additional complete song/stationery/tool/quest/seed/ticket/miscellaneous names,
 including fifty short fields, retaining every earlier candidate and all non-item
-resources. All 38 focused tests pass. Collect the assigned
-`build/smoke-ordinary-items-01` native batch. Continue the full-name K.K. dialogue
+resources. All 38 focused tests pass. The native batch passes 392 calls and
+385 assertions, with restored checkpoint, blank saves, and graceful shutdown.
+Continue the full-name K.K. dialogue
 setter, remaining wider callers, accents/native-specific names, and noticeboard
 text; do not repeat passed letter batches for this name-only resource change.
 

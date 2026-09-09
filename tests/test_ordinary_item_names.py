@@ -160,5 +160,43 @@ class OrdinaryItemArtifactTests(unittest.TestCase):
             scenario(self.native, self.built, self.report['runtime_module'], incomplete)
 
 
+@unittest.skipUnless((ROOT/'build/smoke-ordinary-items-01/results.json').is_file(), 'Local native ordinary-name evidence required')
+class OrdinaryItemResultsTests(unittest.TestCase):
+    def test_every_planned_native_call_guards_and_checkpoint_restore(self):
+        run = ROOT/'build/smoke-ordinary-items-01'
+        raw = (run/'results.json').read_bytes()
+        self.assertEqual(sha256(raw), '4f74c131e349123ec51e97e04fbb38354ae2c302fa4c489aa78955ae44562c7f')
+        rows = json.loads(raw)
+        actions = json.loads((ROOT/'build/ordinary-items-scenario.json').read_text())
+        info = json.loads((run/'run.json').read_text())
+        self.assertEqual(len(rows), 1337)
+        self.assertFalse(any('error' in r or r.get('assertion') == 'failed' for r in rows))
+        self.assertEqual(sum(r.get('assertion') == 'passed' for r in rows), 385)
+        calls = [r for r in rows if 'test_only_function_call' in r]
+        expected = [a['call'] for a in actions if 'call' in a]
+        self.assertEqual(len(calls), 392)
+        for actual, planned in zip(calls, expected):
+            self.assertEqual(actual['test_only_function_call'], planned['address'])
+            self.assertEqual(actual['arguments'], planned['arguments'])
+            self.assertTrue(actual['stack_restored'])
+            if 'expect_return' in planned:
+                self.assertEqual(actual['return_value'], planned['expect_return'])
+        self.assertEqual(info['post_scenario_sha256'], sha256((ROOT/'build/ordinary-items-scenario.json').read_bytes()))
+        self.assertEqual(info['rom_sha256'], sha256((BUILD/'animal-forest-halfwidth.z64').read_bytes()))
+        self.assertEqual(info['audio'], 'disabled')
+        self.assertEqual(info['seed_files'], [])
+        for key in ('initial_screenshot', 'expansion_pak', 'allow_test_flash_write', 'allow_test_pak_write'):
+            self.assertFalse(info[key])
+        loaded = next(i for i,r in enumerate(rows) if r.get('loaded_state') == 'test.bs1')
+        self.assertTrue(any(r.get('read') == ['8019B000',4] and r.get('data') == '00000000'
+                            and r.get('assertion') == 'passed' for r in rows[loaded+1:]))
+        self.assertTrue(rows[-1]['graceful_shutdown'])
+        for name, digest in (
+            ('test.bs1','bfdb6a84e7ea7a6db626c75d14a42d7686941ae1a08d9a7bca3e8aaee0dacd33'),
+            ('test.flash','b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260'),
+            ('test.pak','ab2a6e04fd3ceb36594f1216c888a1b8bd0a3ba0a94f715a7c7601e98c49ec51')):
+            self.assertEqual(sha256((run/name).read_bytes()), digest)
+
+
 if __name__ == '__main__':
     unittest.main()

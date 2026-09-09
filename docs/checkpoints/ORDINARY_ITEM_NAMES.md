@@ -37,12 +37,13 @@ current verifier; those older ROMs are not rebuilt. Current-ROM tests check
 retention of every earlier name and resource. No all-project regression claim
 is made from this focused batch.
 
-The assigned silent cartridge batch is `build/smoke-ordinary-items-01`. It uses
-the complete ordinary-name ROM, the existing silent boot, and
-`build/ordinary-items-scenario.json`, with a 900-second bound. Collect its
-terminal result before claiming native acceptance; do not restart an unobserved
-live process. No audio, screenshots, user save seeds, or game-save writes are
-enabled. Normal name display, wider callers, saving, and hardware remain.
+The silent cartridge batch `build/smoke-ordinary-items-01` passes all 392 calls
+and 385 assertions in 1,337 result records. Every planned loader call, complete
+return value, name buffer, guard, and restored checkpoint check passes. Its
+isolated FlashRAM and Pak remain blank, and shutdown is graceful. Audio,
+screenshots, user save seeds, and game-save writes are disabled. The frozen
+result test verifies the complete planned call sequence without rerunning it.
+Normal name display, wider callers, saving, and hardware remain.
 
 ## Artifact hashes
 
@@ -51,6 +52,8 @@ enabled. Normal name display, wider callers, saving, and hardware remain.
 - Wider resource: `96a9869e2850696ad7ca027967be7383e6ac7bb1015bbd4bf16690e57b05c5a7`.
 - Ordinary candidates: `9e0eddce8a9d63030b22837d7790cd0e206643a822ba3475211c33b294d8a437`.
 - Native scenario: `0724570c2a68328abd671e594e8f865e67dfef165b9f588f0a0569a64506155e`.
+- Native results: `4f74c131e349123ec51e97e04fbb38354ae2c302fa4c489aa78955ae44562c7f`.
+- Restored checkpoint: `bfdb6a84e7ea7a6db626c75d14a42d7686941ae1a08d9a7bca3e8aaee0dacd33`.
 
 ## Reproduction and continuation
 
