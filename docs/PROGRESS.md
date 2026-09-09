@@ -13,6 +13,23 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [complete mail-glyph framework](../specs/MAIL_GLYPHS.md) transcodes all 4,866
+reference parts, retaining every original word, command, and manual break. Its
+new immutable catalogue supports the 59 unavailable parts and donor accented
+capitalization. The fourteen-cell font retains every existing separate glyph
+and leaves the native atlas unchanged. Formatting, field scanning, line/page
+boundaries, and footer alignment retain complete pairs. All 80 final focused
+tests pass. The silent cartridge batch passes 114 glyph-bearing reconstructions,
+eight old-catalogue reconstructions, 28 native line scans, 44 native draws,
+seventeen cursor cases, 346 calls, and 1,224 assertions. Checkpoint restoration,
+erased FlashRAM, and the unchanged blank Pak fixture pass. The resident image
+fits exactly within the existing 24 KiB limit
+after sharing checksum and draw routines; the RAM reservation and saved layouts
+do not grow. Native creator routing, the complete
+translation build, and wider acceptance remain; reference availability is not
+installed-translation credit. The [glyph checkpoint](checkpoints/MAIL_GLYPHS.md)
+records current artifacts and the next implementation steps.
+
 The [HRA score integration](../specs/ACADEMY_SCORE_LETTERS.md) installs twenty
 complete supported letters with full dates, comma-separated points, and complete
 selected item/series names. Native scoring and rewards remain unchanged; delivery
@@ -26,9 +43,8 @@ and 450 memory assertions. Checkpoint restoration and blank isolated saves pass.
 Successful scheduling uses the original NULL-game allocation path; the
 game-owned allocation fails in this checkpoint and retains eligibility correctly.
 The [score checkpoint](checkpoints/ACADEMY_SCORE_LETTERS.md) tracks evidence and
-remaining work. The [complete mail-glyph pass](../specs/MAIL_GLYPHS.md) is next:
-template parsing, pagination/footer widths, exact-source glyphs, a new immutable
-catalogue, and affected creators. The broader translation/review remains active.
+remaining work. The complete mail-glyph framework above supports the next
+affected-creator integration. The broader translation/review remains active.
 
 The [HRA welcome/advice integration](../specs/ACADEMY_LETTERS.md) installs twenty
 complete letters and preserves membership/date eligibility when delivery fails.

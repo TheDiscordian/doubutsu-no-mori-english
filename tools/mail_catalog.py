@@ -12,6 +12,7 @@ from aflib import sha256, verified_rom
 from audit_mail_templates import CLASSIC, COMPOSITE, template_fields
 from mail_format import Templates
 from mail_reference import load_reference
+from mail_glyph_codes import CATALOG as GLYPH_CATALOG, SEMANTICS as GLYPH_SEMANTICS, VROM as GLYPH_VROM
 
 BANKS = CLASSIC+COMPOSITE
 COUNTS = (982,)*3+(384,)*5
@@ -25,10 +26,11 @@ def align16(value):
     return (value+15) & ~15
 
 
-def valid_part(data):
-    if not isinstance(data, bytes) or len(data) > 1024 or 0x80 in data:
+def valid_part(data, *, catalog=2):
+    extended = catalog == GLYPH_CATALOG
+    if not isinstance(data, bytes) or len(data) > 1024 or (not extended and 0x80 in data):
         raise ValueError('Unsupported catalog part length or extended glyph')
-    return sum(1 << index for index in template_fields(data))
+    return sum(1 << index for index in template_fields(data,extended_glyphs=extended))
 
 
 def resource(banks, catalog):
@@ -46,7 +48,7 @@ def resource(banks, catalog):
             if part is None:
                 rows.extend(struct.pack('>IHHII', 0, 0, 1, 0, 0))
                 continue
-            mask = valid_part(part)
+            mask = valid_part(part,catalog=catalog)
             rows.extend(struct.pack('>IHHII', data_start+len(payload), len(part), 0,
                                     mask, zlib.crc32(part)))
             payload.extend(part.ljust(align16(len(part)), b'\0'))
@@ -54,7 +56,8 @@ def resource(banks, catalog):
     total = HEADER_BYTES+len(body)
     if total > MAX_BYTES:
         raise ValueError('Mail catalog exceeds cartridge resource reservation')
-    header = struct.pack('>8I', MAGIC, VERSION, catalog, SEMANTICS, total, len(BANKS), HEADER_BYTES, ROW_BYTES)
+    semantics = GLYPH_SEMANTICS if catalog == GLYPH_CATALOG else SEMANTICS
+    header = struct.pack('>8I', MAGIC, VERSION, catalog, semantics, total, len(BANKS), HEADER_BYTES, ROW_BYTES)
     return header+hashlib.sha256(body).digest()+bytes(64)+body
 
 
@@ -63,7 +66,8 @@ def parse(data, *, expected_catalog=None):
         raise ValueError('Invalid mail catalog size')
     magic, version, catalog, semantics, total, count, directory, stride = struct.unpack_from('>8I', data)
     if (magic, version, semantics, total, count, directory, stride) != (
-            MAGIC, VERSION, SEMANTICS, len(data), len(BANKS), HEADER_BYTES, ROW_BYTES):
+            MAGIC, VERSION, GLYPH_SEMANTICS if catalog == GLYPH_CATALOG else SEMANTICS,
+            len(data), len(BANKS), HEADER_BYTES, ROW_BYTES):
         raise ValueError('Invalid mail catalog header')
     if not 2 <= catalog < 0xFFFF or expected_catalog is not None and catalog != expected_catalog:
         raise ValueError('Unknown mail catalog identity')
@@ -86,7 +90,7 @@ def parse(data, *, expected_catalog=None):
             if flags or offset != payload_offset or end > len(data) or size > 1024:
                 raise ValueError('Invalid mail catalog row or payload range')
             part = data[offset:offset+size]
-            if valid_part(part) != mask or zlib.crc32(part) != crc or any(data[offset+size:end]):
+            if valid_part(part,catalog=catalog) != mask or zlib.crc32(part) != crc or any(data[offset+size:end]):
                 raise ValueError('Invalid mail catalog part mask, CRC, or padding')
             parts.append(part)
             payload_offset = end
@@ -117,7 +121,8 @@ def templates(data, record):
 
 def identity(data):
     catalog, banks = parse(data)
-    return {'catalog': catalog, 'format': VERSION, 'semantics': SEMANTICS, 'bytes': len(data),
+    return {'catalog': catalog, 'format': VERSION,
+            'semantics': GLYPH_SEMANTICS if catalog == GLYPH_CATALOG else SEMANTICS, 'bytes': len(data),
             'sha256': sha256(data), 'payload_sha256': data[32:64].hex(),
             'counts': list(COUNTS), 'unavailable': {name: [i for i, part in enumerate(banks[name]) if part is None]
                                                    for name in BANKS}}
@@ -140,7 +145,7 @@ def verify_registered(data, registry=None):
     return actual
 
 
-def install(rom, additions, module_report, directory):
+def install(rom, additions, module_report, directory, *, glyph_font=None):
     from runtime_module import MODULE_RAM, MODULE_VROM
     report = json.loads((directory/'catalog.json').read_text())
     data = (directory/'catalog.bin').read_bytes()
@@ -164,6 +169,23 @@ def install(rom, additions, module_report, directory):
             raise ValueError('Fortune-slip catalog requires the current multi-catalog reader')
     elif (directory/'fortune-catalog.bin').exists():
         raise ValueError('Untracked fortune-slip catalog resource')
+    glyph = report.get('glyph_catalog')
+    glyph_data = font_hash = None
+    if glyph is not None:
+        from extended_font_cartridge import mail_capability
+        from runtime_module import runtime_source_hashes
+        glyph_data = (directory/'glyph-catalog.bin').read_bytes()
+        expected = {**verify_registered(glyph_data),'vrom':f'{GLYPH_VROM:08X}'}
+        if (expected['catalog'] != GLYPH_CATALOG or glyph != expected or GLYPH_VROM in additions
+                or len(data) > GLYPH_VROM-VROM
+                or extra_data is not None and len(extra_data) > GLYPH_VROM-CATALOG_VROM):
+            raise ValueError('Changed, overlapping, or duplicate complete glyph catalogue')
+        if (not module_report or module_report.get('runtime_sources') !=
+                runtime_source_hashes(Path(__file__).resolve().parents[1]/'runtime') or glyph_font is None):
+            raise ValueError('Complete glyph catalogue requires the current reader and matching font')
+        font_hash = mail_capability(glyph_font)
+    elif (directory/'glyph-catalog.bin').exists():
+        raise ValueError('Untracked complete glyph catalogue resource')
     if (not module_report or MODULE_VROM not in additions
             or not {'af_mail_restore', 'af_mail_catalog_header_valid'} <= module_report['symbols'].keys()):
         raise ValueError('Mail catalogs require a capable resident module')
@@ -182,8 +204,11 @@ def install(rom, additions, module_report, directory):
     additions[MODULE_VROM], additions[VROM] = bytes(module), data
     if extra_data is not None:
         additions[CATALOG_VROM] = extra_data
+    if glyph_data is not None:
+        additions[GLYPH_VROM] = glyph_data
     return {**actual, 'source_sha256': sha256(rom), 'vrom': f'{VROM:08X}',
             **({'fortune_catalog':extra} if extra_data is not None else {}),
+            **({'glyph_catalog':glyph,'glyph_font_sha256':font_hash} if glyph_data is not None else {}),
             'module_configuration_ram': f'{MODULE_RAM+CONFIG_OFFSET:08X}',
             'configured_module_sha256': sha256(module),
             'status': 'Experimental immutable reference catalog; generation/viewer/save hooks remain separate'}
@@ -200,10 +225,12 @@ def main():
     parser.add_argument('--propose-registration', action='store_true', help='Write local proposal only; never register or install it')
     args = parser.parse_args()
     rom = verified_rom(args.rom.read_bytes())
-    banks, reference = load_reference(args.gc_data, args.decomp, args.rel)
+    banks, reference = load_reference(args.gc_data, args.decomp, args.rel,
+                                      extended_glyphs=args.catalog == GLYPH_CATALOG)
     data = resource(banks, args.catalog)
     details = identity(data) if args.propose_registration else verify_registered(data)
-    report = {**details, 'source_sha256': sha256(rom), 'vrom': f'{VROM:08X}',
+    report = {**details, 'source_sha256': sha256(rom),
+              'vrom': f'{GLYPH_VROM if args.catalog == GLYPH_CATALOG else VROM:08X}',
               'reference': reference, 'registered': not args.propose_registration,
               'status': 'Immutable reference parts only; native semantic matches and gameplay hooks remain required'}
     args.output.mkdir(parents=True, exist_ok=True)

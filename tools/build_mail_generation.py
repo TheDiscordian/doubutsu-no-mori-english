@@ -16,7 +16,7 @@ from runtime_layout import MODULE_RAM,LINKED_LIMIT
 IMPORTS = ('af_mail_record_pack','af_mail_restore','af_mail_catalog_header_valid')
 SOURCES = ('overlays/mail_generation/generate.c','overlays/mail_generation/generate.h',
            'overlays/mail_generation/probe.ld','runtime/mail/catalog.h',
-           'runtime/mail/format.h','runtime/mail/record.h')
+           'runtime/mail/format.h','runtime/mail/record.h','runtime/mail/glyph.h')
 FORTUNE_SOURCES = SOURCES + ('overlays/mail_generation/fortune_slip.c',
                             'overlays/mail_generation/fortune_slip.h')
 LEAFLET_IMPORTS = IMPORTS + ('af_format_month','af_format_day','af_format_year')

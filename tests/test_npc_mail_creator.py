@@ -42,6 +42,7 @@ class NpcMailCreatorTests(unittest.TestCase):
         sources = ['overlays/mail_generation/'+name for name in ('digest.c','npc_capture.c','generate.c','npc_creator.c')]
         sources += list(cls.extra_sources)
         sources += ['runtime/mail/'+name for name in ('record.c','format.c','catalog.c','npc_generation.c')]
+        sources += ['runtime/crc32.c']
         sources += ['tests/'+name for name in ('mail_catalog_mock.c','npc_mail_capture_mock.c','npc_mail_creator_mock.c')]
         flags = ['-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-g'] if os.environ.get('AF_NPC_CREATOR_SANITIZE') == '1' else []
         compiler_env = dict(os.environ);compiler_env.pop('LD_PRELOAD',None)

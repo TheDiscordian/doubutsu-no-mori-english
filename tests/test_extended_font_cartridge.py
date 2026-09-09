@@ -26,6 +26,7 @@ class FontLoaderHostTests(unittest.TestCase):
             subprocess.run(['gcc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
                             '-fsanitize=address,undefined','-fno-omit-frame-pointer',
                             str(ROOT/'runtime/extended_font_loader.c'),str(ROOT/'tests/extended_font_loader_test.c'),
+                            str(ROOT/'runtime/crc32.c'),
                             '-o',str(target)],check=True,capture_output=True)
             result=subprocess.run([str(target)],check=True,capture_output=True,text=True,timeout=20)
             self.assertIn('ownership and failures passed',result.stdout)
@@ -47,6 +48,21 @@ class FontCartridgeTests(unittest.TestCase):
             with self.assertRaises(ValueError): validate(self.data,self.reloc,report)
         report=copy.deepcopy(self.report);report['symbols']['af_font_entry']=4
         with self.assertRaises(ValueError): validate(self.data,self.reloc,report)
+
+    @unittest.skipUnless((ROOT/'build/mail-font-cartridge/font.json').is_file(),'Mail font is locally generated')
+    def test_mail_capability_requires_all_exact_widths_pixels_and_approved_code(self):
+        from extended_font_cartridge import mail_capability
+        directory=ROOT/'build/mail-font-cartridge'
+        data=(directory/'font.bin').read_bytes();reloc=(directory/'relocation.bin').read_bytes()
+        report=json.loads((directory/'font.json').read_text())
+        self.assertEqual(mail_capability(directory),sha256(data+reloc))
+        validate(data,reloc,report)
+        with self.assertRaises(ValueError): mail_capability(FONT)
+        for value in (False,1,None,'yes'):
+            bad={**report,'mail_glyphs':value}
+            with self.assertRaises(ValueError): validate(data,reloc,bad)
+        for base in (0x801A0010,0x802F8010,0x803F0000):
+            self.assertEqual(len(relocate(data,reloc,base)),len(data))
 
     def test_native_pointer_and_jump_relocations_cross_signed_low_boundaries(self):
         text,writable,rodata,bss,count=struct.unpack_from('>5I',self.reloc)

@@ -37,7 +37,7 @@ class MailGenerateTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-mail-generation-')
         output = Path(cls.temporary.name)/'generate.so'
         sources = ['overlays/mail_generation/generate.c','runtime/mail/record.c',
-                   'runtime/mail/format.c','runtime/mail/catalog.c',
+                   'runtime/mail/format.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'tests/mail_catalog_mock.c','tests/mail_generate_mock.c']
         subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                         *(str(ROOT/path) for path in sources),'-o',str(output)],
@@ -227,7 +227,7 @@ class MailGenerateTests(unittest.TestCase):
         fixture = self.fixture(record,extra=True)
         mail,capture,selection,workspace,work = fixture
         for target,field,value in ((capture,'capital',2),(capture,'valid',1<<20),
-                                   (selection,'catalog',4),(selection,'kind',2),(selection,'reserved',1)):
+                                   (selection,'catalog',5),(selection,'kind',2),(selection,'reserved',1)):
             old = getattr(target,field);setattr(target,field,value)
             self.call(record,success=False,fixture=fixture)
             setattr(target,field,old)

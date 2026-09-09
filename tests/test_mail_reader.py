@@ -40,6 +40,7 @@ class MailReaderTests(unittest.TestCase):
                         '-I'+str(ROOT/'runtime'),str(ROOT/'runtime/display_name.c'),
                         str(ROOT/'tests/display_name_mock.c'),
                         *(str(ROOT/'runtime/mail'/name) for name in ('record.c','format.c','catalog.c','view.c','page.c','reader.c')),
+                        str(ROOT/'runtime/crc32.c'),
                         *(str(ROOT/'tests'/name) for name in ('mail_catalog_mock.c','mail_view_mock.c','mail_reader_mock.c')),
                         '-o',str(library)],capture_output=True,check=True)
         cls.lib = C.CDLL(str(library))
@@ -147,6 +148,50 @@ class MailReaderTests(unittest.TestCase):
         self.lib.af_mail_snapshot_header(1,1,self.menu,64,36,self.colour)
         self.assertLessEqual(self.calls.value,9)
         return [(bytes(d.text[:d.length]),d.x,d.y) for d in self.draws[:self.calls.value]]
+
+    @unittest.skipUnless((ROOT/'build/mail-glyph-catalog/catalog.bin').is_file(),'Complete glyph catalogue is locally generated')
+    def test_every_new_glyph_part_draws_complete_pages_and_aligned_footers(self):
+        from mail_glyph_codes import ADVANCES
+        from mail_catalog import BANKS
+        data = (ROOT/'build/mail-glyph-catalog/catalog.bin').read_bytes()
+        verify_registered(data)
+        banks = parse(data)[1]
+        rom = (C.c_ubyte*0x100000).in_dll(self.lib,'af_mail_catalog_rom')
+        C.memmove(C.addressof(rom)+0xA0000,data,len(data))
+        selections = [(0,(i,)) for i in range(982)
+                      if any(b'\x80' in banks[name][i] for name in BANKS[:3])]
+        selections += [(1,(77,)*5)]
+        for kind,ids in selections:
+            for capital in (False,True):
+                record = Record(4,kind,ids,(),capital)
+                parts = templates(data,record)
+                mask = set().union(*(template_fields(p,extended_glyphs=True) for p in parts.parts))
+                record = replace(record,fields=tuple((i,Field(b'x'*16,4)) for i in sorted(mask)))
+                letter = format_letter(record,parts)
+                source = self.open(record,kind=2)
+                self.assertEqual(self.state.status,1,(kind,ids))
+                reads = self.reads.value
+                collected = [bytearray(),bytearray()]
+                for number in range(self.state.total):
+                    drawings = self.draw()
+                    spans = [s for s in self.state.layout.spans[:self.state.layout.count] if s.length]
+                    for span,(text,x,y) in zip(spans,drawings):
+                        pos = width = 0
+                        while pos < len(text):
+                            if text[pos] == 0x80:
+                                self.assertLess(pos+1,len(text))
+                                width += ADVANCES[text[pos+1]];pos += 2
+                            else:
+                                width += self.widths[text[pos]];pos += 1
+                        self.assertEqual(x,256-width if span.section == 2 else 64)
+                        if span.section:
+                            collected[span.section-1].extend(text)
+                    self.buttons.value = 0x100
+                    self.lib.af_mail_reader_trigger(1,self.menu)
+                self.assertEqual(tuple(map(bytes,collected)),
+                                 (letter.body.replace(b'\xcd',b''),letter.footer.replace(b'\xcd',b'')))
+                self.assertEqual(self.reads.value,reads)
+                self.assertEqual(source[0x2A:],pack(record))
 
     def test_full_header_body_footer_all_pages_and_no_repeated_dma(self):
         record = self.record(0xFD)

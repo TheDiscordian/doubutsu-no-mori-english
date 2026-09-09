@@ -14,7 +14,9 @@ static unsigned int af_glyph_native_offset(unsigned int code) {
 }
 #endif
 
-static const unsigned char codes[AF_GLYPH_COUNT] = {0xD0, 0xAE, 0xA7, 0xAB, 0xBA};
+static const unsigned char codes[AF_GLYPH_MAIL_COUNT] = {
+    0xD0,0xAE,0xA7,0xAB,0xBA,0x2A,0x3B,0x5C,0x60,0x7C,0xBF,0xF7,0x08,0x0A
+};
 static const unsigned char *glyph_resource;
 static unsigned int active_glyph; /* Zero means native; slot+1 selects a glyph. */
 
@@ -24,20 +26,22 @@ static unsigned int word(const unsigned char *p) {
 }
 
 int af_glyph_bind(const unsigned char *resource, unsigned int bytes) {
-    unsigned int i;
+    unsigned int i,count;
     /* Rebinding during an active native draw would invalidate queued texture
        addresses. The owner retains the resource until every queued frame ends. */
     if (active_glyph) return 0;
     if (!resource || ((unsigned long)resource & 7u) || bytes != AF_GLYPH_BYTES || word(resource) != 0x41464758u
             || word(resource+4) != 1u || word(resource+8) != 192u
-            || word(resource+12) != 16u || word(resource+16) != AF_GLYPH_COUNT
+            || word(resource+12) != 16u
+            || (word(resource+16) != AF_GLYPH_COUNT && word(resource+16) != AF_GLYPH_MAIL_COUNT)
             || word(resource+20) != AF_GLYPH_TEXTURE_OFFSET || word(resource+24) != 1536u
             || word(resource+28)) return 0;
+    count = word(resource+16);
     for (i=0; i<16u; ++i) {
-        if (resource[32+i] != (i<AF_GLYPH_COUNT ? codes[i] : 0u)) return 0;
-        if (i<2u) {
+        if (resource[32+i] != (i<count ? codes[i] : 0u)) return 0;
+        if (i<count && ((0x3B23u>>i)&1u)) {
             if (!resource[48+i] || resource[48+i]>6u) return 0;
-        } else if (resource[48+i] != (i<AF_GLYPH_COUNT ? 12u : 0u)) return 0;
+        } else if (resource[48+i] != (i<count ? 12u : 0u)) return 0;
     }
     glyph_resource = resource;
     return 1;
@@ -46,7 +50,7 @@ int af_glyph_bind(const unsigned char *resource, unsigned int bytes) {
 int af_glyph_index(const unsigned char *text, unsigned int bytes) {
     unsigned int i;
     if (!glyph_resource || !text || bytes<2u || text[0]!=0x80u) return -1;
-    for (i=0; i<AF_GLYPH_COUNT; ++i) if (text[1]==codes[i]) return (int)i;
+    for (i=0; i<glyph_resource[19]; ++i) if (text[1]==codes[i]) return (int)i;
     return -1;
 }
 
@@ -79,7 +83,7 @@ unsigned int af_glyph_begin(const unsigned char *text, unsigned int bytes) {
 }
 
 void af_glyph_end(unsigned int previous) {
-    active_glyph = glyph_resource && previous<=AF_GLYPH_COUNT ? previous : 0u;
+    active_glyph = glyph_resource && previous<=glyph_resource[19] ? previous : 0u;
 }
 
 int af_glyph_code_width(unsigned int code, int cut) {

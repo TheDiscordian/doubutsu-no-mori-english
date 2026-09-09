@@ -1,4 +1,5 @@
 #include "catalog.h"
+#include "../crc32.h"
 
 #ifdef __mips__
 static unsigned int installed(void) {
@@ -14,24 +15,16 @@ extern int af_mail_catalog_test_dma(void *, unsigned int, unsigned int);
 #define dma af_mail_catalog_test_dma
 #endif
 
-static unsigned int crc32(const unsigned char *data, unsigned int size) {
-    unsigned int crc = 0xFFFFFFFFu, i, bit;
-    for (i = 0; i < size; ++i) {
-        crc ^= data[i];
-        for (bit = 0; bit < 8; ++bit)
-            crc = (crc >> 1) ^ ((0u - (crc & 1u)) & 0xEDB88320u);
-    }
-    return crc ^ 0xFFFFFFFFu;
-}
-
 int af_mail_catalog_header_valid(const unsigned int *header, unsigned int catalog) {
-    static const unsigned int fingerprints[2][8] = {
+    static const unsigned int fingerprints[3][8] = {
         {0xa042bd72u, 0xf6158472u, 0x722717ddu, 0x3f19e761u, 0xea693ce6u, 0x32ae51acu, 0xc9aca26cu, 0x4d99c385u},
-        {0xa9a2b2cdu, 0x78c72904u, 0x6b8be424u, 0x73b75938u, 0xc2a9bbc0u, 0xce8782fbu, 0x99097d76u, 0xdc13bd0du}
+        {0xa9a2b2cdu, 0x78c72904u, 0x6b8be424u, 0x73b75938u, 0xc2a9bbc0u, 0xce8782fbu, 0x99097d76u, 0xdc13bd0du},
+        {0x425e62e4u, 0x30847bcau, 0x0cf41244u, 0x1306dab1u, 0x41406453u, 0x51808fecu, 0x4f8bc262u, 0x727fd86cu}
     };
     unsigned int i;
     if (!header || !af_mail_catalog_vrom(catalog) || header[0] != 0x41464D4Cu
-            || header[1] != 1u || header[2] != catalog || header[3] != 1u
+            || header[1] != 1u || header[2] != catalog
+            || header[3] != (catalog == AF_MAIL_GLYPH_CATALOG_ID ? 2u : 1u)
             || header[4] != af_mail_catalog_bytes(catalog) || header[5] != 8u
             || header[6] != 128u || header[7] != 16u)
         return 0;
@@ -44,12 +37,15 @@ int af_mail_catalog_header_valid(const unsigned int *header, unsigned int catalo
     return 1;
 }
 
-static int fields(const unsigned char *data, unsigned int size, unsigned int *mask) {
+static int fields(const unsigned char *data, unsigned int size, unsigned int *mask, unsigned int catalog) {
     unsigned int pos = 0, used = 0, code;
     while (pos < size) {
         code = data[pos++];
-        if (code == 0x80u)
-            return 0;
+        if (code == 0x80u) {
+            if (catalog != AF_MAIL_GLYPH_CATALOG_ID || pos == size || !af_mail_glyph_width(data[pos++]))
+                return 0;
+            continue;
+        }
         if (code != 0x7Fu)
             continue;
         if (pos == size)
@@ -116,8 +112,8 @@ int af_mail_restore(AfMailText *output, const unsigned char *wire, unsigned int 
         for (i = length; i < padded; ++i)
             if (work->source[used+i])
                 return 0;
-        if (!fields(work->source+used, length, &mask) || mask != row[2]
-                || (mask & ~work->record.field_mask) || crc32(work->source+used, length) != row[3])
+        if (!fields(work->source+used, length, &mask, catalog) || mask != row[2]
+                || (mask & ~work->record.field_mask) || af_crc32(work->source+used, length) != row[3])
             return 0;
         work->templates.parts[part].text = work->source+used;
         work->templates.parts[part].length = length;

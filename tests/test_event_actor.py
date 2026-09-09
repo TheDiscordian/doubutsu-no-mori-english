@@ -20,7 +20,7 @@ class EventActorTests(unittest.TestCase):
         cls.temp = tempfile.TemporaryDirectory(prefix='af-event-actor-')
         sources = ('overlays/mail_generation/generate.c','overlays/mail_generation/leaflet.c',
                    'overlays/mail_generation/event_leaflet.c','overlays/mail_generation/event_actor.c',
-                   'overlays/leaflet_dates/hour.c','runtime/dateformat.c','runtime/mail/catalog.c',
+                   'overlays/leaflet_dates/hour.c','runtime/dateformat.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'runtime/mail/format.c','runtime/mail/record.c','tests/mail_catalog_mock.c',
                    'tests/event_leaflet_mock.c','tests/event_actor_mock.c')
         output = Path(cls.temp.name)/'event.so'

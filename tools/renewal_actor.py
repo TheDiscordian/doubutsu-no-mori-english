@@ -58,7 +58,7 @@ def source_hashes():
     names = ['overlays/mail_generation/'+name for name in
              ('renewal_actor.c','renewal_actor.h','renewal_actor.s','renewal_actor.ld',
               'leaflet.h','generate.h')]
-    names += ['runtime/mail/'+name for name in ('catalog.h','format.h','record.h')]
+    names += ['runtime/mail/'+name for name in ('catalog.h','format.h','record.h','glyph.h')]
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 

@@ -1,4 +1,5 @@
 #include "format.h"
+#include "glyph.h"
 
 typedef struct {
     AfMailText *out;
@@ -54,8 +55,20 @@ static int expand(Formatter *f, const AfMailPart *parts, unsigned int count, uns
             markers++;
             continue;
         }
-        if (byte == 0x80)
-            return 0;
+        if (byte == 0x80) {
+            if (f->record->catalog != AF_MAIL_GLYPH_CATALOG_ID
+                    || cursor.pos == cursor.parts[cursor.part].length
+                    || f->used > AF_MAIL_TEXT_BYTES-2u)
+                return 0;
+            opcode = next(&cursor);
+            if (!af_mail_glyph_width((unsigned int)opcode))
+                return 0;
+            f->out->text[f->used++] = 0x80;
+            f->out->text[f->used++] = (unsigned char)(pending ?
+                af_mail_glyph_upper((unsigned int)opcode) : (unsigned int)opcode);
+            pending = 0;
+            continue;
+        }
         if (byte != 0x7F) {
             if (!append(f, pending ? upper((unsigned int)byte) : (unsigned int)byte))
                 return 0;

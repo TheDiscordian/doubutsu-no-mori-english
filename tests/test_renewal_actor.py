@@ -25,7 +25,7 @@ class RenewalActorTests(unittest.TestCase):
         output = Path(cls.temp.name)/'actor.so'
         sources = ('overlays/mail_generation/generate.c','overlays/mail_generation/leaflet.c',
                    'overlays/mail_generation/renewal_actor.c','overlays/leaflet_dates/hour.c',
-                   'runtime/dateformat.c','runtime/mail/catalog.c','runtime/mail/format.c','runtime/mail/record.c',
+                   'runtime/dateformat.c','runtime/mail/catalog.c','runtime/mail/format.c','runtime/mail/record.c','runtime/crc32.c',
                    'tests/mail_catalog_mock.c','tests/renewal_actor_mock.c')
         result = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                                  *(str(ROOT/p) for p in sources),'-o',str(output)],capture_output=True,text=True)

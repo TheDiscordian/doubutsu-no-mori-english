@@ -55,7 +55,7 @@ def verify_semantics(rel, symbols):
     return dict(SEMANTIC_FUNCTIONS)
 
 
-def transcode(data, tables):
+def transcode(data, tables, *, extended_glyphs=False):
     """Keep all mail commands; translate only exact supported glyph identities."""
     output, pos = bytearray(), 0
     while pos < len(data):
@@ -71,6 +71,12 @@ def transcode(data, tables):
             output.extend(data[pos:pos+2])
             pos += 2
         else:
+            if extended_glyphs:
+                from mail_glyph_codes import ADVANCES
+                if byte in ADVANCES:
+                    output.extend((0x80,byte))
+                    pos += 1
+                    continue
             glyph = tables['CHAR_MAP'][byte]
             if glyph not in ENCODE:
                 raise ValueError(f"Unrepresentable mail glyph at {pos}: GC {byte:02X} {glyph!r}")
@@ -79,13 +85,16 @@ def transcode(data, tables):
     return bytes(output)
 
 
-def load_reference(directory, decomp, rel_path):
+def load_reference(directory, decomp, rel_path, *, extended_glyphs=False):
     decoder = decomp/'tools/msg_tool.py'
     if sha256(decoder.read_bytes()) != DECODER_SHA256:
         raise ValueError("Unexpected English decoder source")
     tables = decoder_tables(decoder)
     symbols = (decomp/'config/GAFE01_00/foresta/symbols.txt').read_text()
     semantics = verify_semantics(rel_path.read_bytes(), symbols)
+    if extended_glyphs:
+        from extended_glyphs import source_atlas
+        source_atlas(rel_path.read_bytes(),symbols,decoder,mail=True)
     banks, report = {}, {}
     for name, expected in BANK_HASHES.items():
         data = (directory/(name+'_data.bin')).read_bytes()
@@ -101,9 +110,9 @@ def load_reference(directory, decomp, rel_path):
         for index, entry in enumerate(entries):
             row = {'id': index, 'source_sha256': sha256(entry), 'source_bytes': len(entry)}
             try:
-                encoded = transcode(entry, tables)
+                encoded = transcode(entry, tables,extended_glyphs=extended_glyphs)
                 row.update(n64_hex=encoded.hex(), n64_sha256=sha256(encoded),
-                           fields=sorted(template_fields(encoded)), status='reference_only_not_approved')
+                           fields=sorted(template_fields(encoded,extended_glyphs=extended_glyphs)), status='reference_only_not_approved')
             except ValueError as error:
                 encoded = None
                 row.update(error=str(error), status='requires_glyph_or_command_support')

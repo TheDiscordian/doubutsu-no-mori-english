@@ -65,6 +65,13 @@ it does not establish unreachable code or gameplay completion. See
 
 ## Silent emulator tests
 
+The complete mail-glyph reader uses a separate fourteen-cell font and immutable
+catalogue four. Its [checkpoint](checkpoints/MAIL_GLYPHS.md) gives resource and
+fixture build commands. `tools/build_mail_glyph_catalog.py` bundles it beside
+unchanged catalogues two and three. `--mail-catalog` accepts that bundle only
+with its matching `--extended-font` and complete snapshot reader. The isolated
+native glyph fixture is not a full translation ROM or an applied-text milestone.
+
 Complete HRA score publication uses the chained creator built with
 `--mother-letters --departed-letters --villager-events --academy-letters
 --academy-scores`. The ROM builder requires the corresponding

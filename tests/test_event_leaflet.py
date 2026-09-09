@@ -27,7 +27,7 @@ class EventLeafletTests(unittest.TestCase):
         output = Path(cls.temp.name)/'event.so'
         sources = ('overlays/mail_generation/generate.c', 'overlays/mail_generation/leaflet.c',
                    'overlays/mail_generation/event_leaflet.c', 'overlays/leaflet_dates/hour.c',
-                   'runtime/dateformat.c', 'runtime/mail/catalog.c', 'runtime/mail/format.c',
+                   'runtime/dateformat.c', 'runtime/mail/catalog.c', 'runtime/mail/format.c','runtime/crc32.c',
                    'runtime/mail/record.c', 'tests/mail_catalog_mock.c', 'tests/event_leaflet_mock.c')
         result = subprocess.run(['gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-O2', '-shared', '-fPIC',
                                  *(str(ROOT/p) for p in sources), '-o', str(output)], capture_output=True, text=True)
@@ -155,7 +155,7 @@ class EventLeafletArtifactTests(unittest.TestCase):
         directory = ROOT/'build/event-leaflet-probe'
         code = (directory/'generate.bin').read_bytes()
         report = json.loads((directory/'generate.json').read_text())
-        module = json.loads((ROOT/'build/renewal-actor-pilot/runtime-module.json').read_text())
+        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
         self.assertEqual(evidence((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())['receipt_flag_bytes'], 2)
         validate(code, report, module, event_leaflets=True)
         for base in (0x801A0010, 0x802F8010, 0x803FE000):

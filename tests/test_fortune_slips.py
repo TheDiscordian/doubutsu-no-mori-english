@@ -147,7 +147,7 @@ class FortuneSlipRuntimeTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-fortune-slip-')
         output = Path(cls.temporary.name)/'fortune.so'
         sources = ['overlays/mail_generation/generate.c','overlays/mail_generation/fortune_slip.c',
-                   'runtime/mail/catalog.c','runtime/mail/format.c','runtime/mail/record.c',
+                   'runtime/mail/catalog.c','runtime/mail/format.c','runtime/mail/record.c','runtime/crc32.c',
                    'tests/mail_catalog_mock.c','tests/fortune_slip_mock.c']
         compiled = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                                    *(str(ROOT/p) for p in sources),'-o',str(output)],capture_output=True,text=True)

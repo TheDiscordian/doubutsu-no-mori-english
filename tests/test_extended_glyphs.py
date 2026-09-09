@@ -72,6 +72,36 @@ class ExtendedGlyphTests(unittest.TestCase):
 
 @unittest.skipUnless(REL.is_file() and SYMBOLS.is_file() and DECODER.is_file(), 'English sources remain local')
 class ExtendedGlyphRetailTests(unittest.TestCase):
+    def test_complete_mail_resource_retains_base_cells_and_exact_donor_sources(self):
+        from extended_glyphs import MAIL_GLYPHS
+        from extended_font_cartridge import MAIL_RESOURCE_HASH
+        from mail_glyph_codes import WIDTHS
+        atlas=source_atlas(REL.read_bytes(),SYMBOLS.read_text(),DECODER,mail=True)
+        data,rows=resource(atlas,mail=True)
+        base,_=resource(atlas)
+        self.assertEqual(sha256(data),MAIL_RESOURCE_HASH)
+        self.assertEqual({bytes.fromhex(row['encoding']):row['advance'] for row in rows},WIDTHS)
+        from gc_names import symbol_data
+        from mail_glyph_codes import ADVANCES,CAPITALS
+        raw=symbol_data(REL.read_bytes(),SYMBOLS.read_text(),'tbl$1185')
+        capitals=dict(zip(raw[::2],raw[1::2]))
+        self.assertEqual({code:capitals.get(code,code) for code in ADVANCES},
+                         {code:CAPITALS.get(code,code) for code in ADVANCES})
+        self.assertEqual(validate_resource(data,mail=True),data)
+        target=pixels(data[64:]);old=pixels(base[64:])
+        for y in range(16):
+            self.assertEqual(target[y*192:y*192+60],old[y*192:y*192+60])
+        for slot,(_,code,halfwidth) in enumerate(MAIL_GLYPHS):
+            original=get_glyph(atlas,code)
+            expected=resize_glyph(original)[0] if halfwidth else original
+            actual=[target[y*192+slot*12:y*192+slot*12+12] for y in range(16)]
+            self.assertEqual(actual,expected)
+        for value,mail in ((data,False),(base,True)):
+            with self.assertRaises(ValueError): validate_resource(value,mail=mail)
+        for offset in (19,45,46,47,61,62,63,64+84):
+            changed=bytearray(data);changed[offset]=255
+            with self.assertRaises(ValueError): validate_resource(bytes(changed),mail=True)
+
     def test_complete_source_and_each_glyph_are_verified_without_native_atlas_changes(self):
         rel=REL.read_bytes();symbols=SYMBOLS.read_text()
         atlas=source_atlas(rel,symbols,DECODER);data,rows=resource(atlas)

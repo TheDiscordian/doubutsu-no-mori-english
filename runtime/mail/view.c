@@ -1,4 +1,5 @@
 #include "view.h"
+#include "glyph.h"
 
 #ifdef __mips__
 static unsigned char *board(void *submenu) {
@@ -8,12 +9,6 @@ static unsigned char *board(void *submenu) {
 static int code_width(unsigned char code) {
     return ((int (*)(unsigned int, int))0x8009028Cu)(code, 0);
 }
-static void draw(void *game, const unsigned char *text, unsigned int length,
-                 float x, float y, const unsigned char *colour) {
-    ((float (*)(void *, const unsigned char *, int, float, float,
-                int, int, int, int, int, int, float, float, int))0x80090E98u)
-        (game, text, length, x, y, colour[0], colour[1], colour[2], 255, 0, 0, 1.0f, 1.0f, 0);
-}
 #else
 extern unsigned char *af_mail_view_test_board(void *);
 extern int af_mail_view_test_width(unsigned char);
@@ -21,12 +16,24 @@ extern void af_mail_view_test_draw(void *, const unsigned char *, unsigned int,
                                    float, float, const unsigned char *);
 #define board af_mail_view_test_board
 #define code_width af_mail_view_test_width
-#define draw af_mail_view_test_draw
 #endif
+
+void af_mail_draw(void *game, const unsigned char *text, unsigned int length,
+                   float x, float y, const unsigned char *colour) {
+#ifdef __mips__
+    ((float (*)(void *, const unsigned char *, int, float, float,
+                int, int, int, int, int, int, float, float, int))0x80090E98u)
+        (game, text, length, x, y, colour[0], colour[1], colour[2], 255, 0, 0, 1.0f, 1.0f, 0);
+#else
+    af_mail_view_test_draw(game,text,length,x,y,colour);
+#endif
+}
+#define draw af_mail_draw
 
 int af_mail_next_line(AfMailLine *line, const unsigned char *text, unsigned int length) {
     AfMailLine result = {0, 0, 0, 0};
     int advance;
+    unsigned int size;
     if (!line || !text || length > 1024u)
         return 0;
     while (result.consumed < length) {
@@ -35,14 +42,22 @@ int af_mail_next_line(AfMailLine *line, const unsigned char *text, unsigned int 
             result.newline = 1;
             break;
         }
-        advance = code_width(text[result.consumed]);
+        size = 1;
+        if (text[result.consumed] == 0x80u) {
+            if (result.consumed+1u == length)
+                return 0;
+            advance = (int)af_mail_glyph_width(text[result.consumed+1u]);
+            size = 2;
+        } else {
+            advance = code_width(text[result.consumed]);
+        }
         if (advance <= 0 || advance > 192)
             return 0;
         if (result.width+(unsigned int)advance > 192u)
             break;
         result.width += (unsigned int)advance;
-        ++result.drawn;
-        ++result.consumed;
+        result.drawn += size;
+        result.consumed += size;
     }
     *line = result;
     return 1;
@@ -86,21 +101,14 @@ void af_mail_read_body(void *submenu, void *menu, void *game, float x,
 void af_mail_read_footer(void *submenu, void *game, float x, float y,
                          const unsigned char *colour) {
     unsigned char *state;
-    unsigned int i, pixels = 0;
-    int advance;
+    AfMailLine line;
     if (!submenu || !game || !colour)
         return;
     state = board(submenu);
     if (!state || state[7] > 16u)
         return;
-    for (i = 0; i < state[7]; ++i) {
-        advance = code_width(state[0x9C+i]);
-        if (advance <= 0 || advance > 192)
-            return;
-        pixels += (unsigned int)advance;
-    }
-    if (pixels > 192u)
+    if (!af_mail_next_line(&line,state+0x9C,state[7]) || line.drawn != state[7])
         return;
     if (state[7])
-        draw(game, state+0x9C, state[7], x+192.0f-(float)pixels, y, colour);
+        draw(game, state+0x9C, state[7], x+192.0f-(float)line.width, y, colour);
 }

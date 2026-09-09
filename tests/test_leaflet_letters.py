@@ -77,7 +77,7 @@ class LeafletRuntimeTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-leaflet-')
         library = Path(cls.temporary.name)/'leaflet.so'
         sources = ('overlays/mail_generation/generate.c','overlays/mail_generation/leaflet.c',
-                   'overlays/leaflet_dates/hour.c','runtime/dateformat.c','runtime/mail/catalog.c',
+                   'overlays/leaflet_dates/hour.c','runtime/dateformat.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'runtime/mail/format.c','runtime/mail/record.c','tests/mail_catalog_mock.c','tests/leaflet_mock.c')
         subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                         *(str(ROOT/source) for source in sources),'-o',str(library)],

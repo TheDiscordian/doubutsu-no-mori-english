@@ -7,9 +7,14 @@ typedef struct {
 
 /* One reference-style 192-pixel line. Explicit newlines consume one byte;
  * they are never submitted as glyphs in read mode. No spaces are removed and
- * no words or saved bytes are rearranged. The caller retains any remainder.
+ * no words or saved bytes are rearranged. Registered two-byte glyphs consume
+ * once, at their exact advance; returned lengths remain byte counts. Unknown
+ * or truncated pairs fail without publishing. The caller retains any remainder.
  */
 int af_mail_next_line(AfMailLine *line, const unsigned char *text, unsigned int length);
+
+void af_mail_draw(void *game, const unsigned char *text, unsigned int length,
+                   float x, float y, const unsigned char *colour);
 
 /* Native board read-mode consumers. Editor paths retain their original code.
  * These consumers still read the native 96/16-byte fields, not snapshots.

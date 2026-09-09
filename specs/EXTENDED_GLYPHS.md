@@ -2,6 +2,11 @@
 
 ## Implemented scope
 
+This specification describes the five-glyph dialogue capability. The optional
+fourteen-cell [mail resource](MAIL_GLYPHS.md) preserves those cells and adds
+complete template glyphs under catalogue-four semantics. It does not widen
+dialogue imports or authorise two-byte saved field/editor input.
+
 Five otherwise unrepresentable English reference characters have an exact-source
 resource, bounded C measurement/selection functions, and relocatable native draw
 adapters. An opt-in cartridge installation owns the complete code and resource

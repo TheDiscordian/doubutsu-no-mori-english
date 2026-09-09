@@ -12,6 +12,7 @@ from runtime_layout import MODULE_RAM,MODULE_VROM,RESERVATION,LINKED_LIMIT
 ROOT = Path(__file__).resolve().parents[1]
 RAM, VROM, CONFIG_OFFSET, ABI = 0x80C00000,0x03400000,0x68,0x41464701
 RESOURCE_HASH = '30dddc658038fea1a4abc359121e1e4fa110edac5f5757ad6001703eff8aae7e'
+MAIL_RESOURCE_HASH = '12a90673f21a6c0bfa3fc05039279b1efc65d96319460ae36993eafa0822c105'
 
 
 def source_hashes():
@@ -78,10 +79,14 @@ def relocate(data,relocations,base):
 
 
 def validate(data,relocations,report):
+    mail = report.get('mail_glyphs',False)
+    if type(mail) is not bool:
+        raise ValueError('Invalid persistent font glyph capability')
+    resource_hash = MAIL_RESOURCE_HASH if mail else RESOURCE_HASH
     if (report.get('ram')!=RAM or report.get('bytes')!=len(data)
             or report.get('relocation_bytes')!=len(relocations)
             or report.get('sha256')!=sha256(data) or report.get('relocation_sha256')!=sha256(relocations)
-            or report.get('sources')!=source_hashes() or report.get('resource_sha256')!=RESOURCE_HASH):
+            or report.get('sources')!=source_hashes() or report.get('resource_sha256')!=resource_hash):
         raise ValueError('Stale or altered persistent font build')
     relocate(data,relocations,0x801A0010)
     symbols=report['symbols'];text=struct.unpack_from('>I',relocations)[0]
@@ -93,7 +98,7 @@ def validate(data,relocations,report):
         if not 0<=symbols.get(name,len(data))<text: raise ValueError('Missing persistent font entry')
     at=symbols.get('af_font_resource',len(data))
     resource=data[at:at+1600]
-    if at&15 or at<text or sha256(validate_resource(resource))!=RESOURCE_HASH:
+    if at&15 or at<text or sha256(validate_resource(resource,mail=mail))!=resource_hash:
         raise ValueError('Changed persistent font pixels or mapping')
     state=struct.unpack_from('>3I',relocations)
     for name in ('glyph_resource','active_glyph'):
@@ -104,6 +109,21 @@ def configuration(data,relocations,report):
     validate(data,relocations,report)
     return [VROM,len(data)+len(relocations),len(data),len(relocations),
             struct.unpack_from('>I',relocations)[0],0,zlib.crc32(data+relocations),ABI]
+
+
+def mail_capability(directory):
+    """Bind catalogue-four widths to a complete approved font, not a flag alone."""
+    from mail_glyph_codes import WIDTHS
+    data,reloc = ((directory/name).read_bytes() for name in ('font.bin','relocation.bin'))
+    report = json.loads((directory/'font.json').read_text())
+    validate(data,reloc,report)
+    if report.get('mail_glyphs') is not True:
+        raise ValueError('Complete mail glyphs require the fourteen-cell cartridge font')
+    at = report['symbols']['af_font_resource']
+    resource = data[at:at+1600]
+    if {bytes((0x80,resource[32+i])):resource[48+i] for i in range(14)} != WIDTHS:
+        raise ValueError('Mail glyph widths differ from the complete cartridge resource')
+    return sha256(data+reloc)
 
 
 def planned_capability(rom,replacements,additions,module,directory):

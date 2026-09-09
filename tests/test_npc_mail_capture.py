@@ -41,7 +41,7 @@ class NpcMailCaptureTests(unittest.TestCase):
         output = Path(cls.temporary.name)/'capture.so'
         sources = ['overlays/mail_generation/digest.c','overlays/mail_generation/npc_capture.c',
                    'overlays/mail_generation/generate.c','runtime/mail/npc_generation.c',
-                   'runtime/mail/record.c','runtime/mail/format.c','runtime/mail/catalog.c',
+                   'runtime/mail/record.c','runtime/mail/format.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'tests/mail_catalog_mock.c','tests/npc_mail_capture_mock.c']
         subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                         *(str(ROOT/path) for path in sources),'-o',str(output)],check=True,capture_output=True)

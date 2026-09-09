@@ -1,4 +1,5 @@
 #include "npc_loader.h"
+#include "../crc32.h"
 
 unsigned int af_mail_generation_capital;
 static unsigned int busy;
@@ -44,16 +45,6 @@ static int overlap(const void *a, unsigned int as, const void *b, unsigned int b
     return a && b && (x <= y ? y-x < as : x-y < bs);
 }
 
-static unsigned int crc32(const unsigned char *data, unsigned int size) {
-    unsigned int crc = 0xFFFFFFFFu, i, bit;
-    for (i = 0; i < size; ++i) {
-        crc ^= data[i];
-        for (bit = 0; bit < 8; ++bit)
-            crc = (crc >> 1) ^ ((0u-(crc & 1u)) & 0xEDB88320u);
-    }
-    return crc ^ 0xFFFFFFFFu;
-}
-
 unsigned char *af_npc_mail_load(unsigned char *destination, const unsigned char *player,
                                const unsigned char *animal, const unsigned char *remail,
                                unsigned int condition, unsigned int foreign) {
@@ -87,7 +78,7 @@ unsigned char *af_npc_mail_load(unsigned char *destination, const unsigned char 
             || overlap(allocation,size,animal,12) || overlap(allocation,size,remail,18)) goto done;
     image = (unsigned char *)(((__UINTPTR_TYPE__)allocation+15u)&~(__UINTPTR_TYPE__)15u);
     if (dma(image,approved.vrom,approved.blob_bytes) != 0
-            || crc32(image,approved.blob_bytes) != approved.crc32) goto done;
+            || af_crc32(image,approved.blob_bytes) != approved.crc32) goto done;
     /* The module-approved CRC binds the complete build-validated relocation
      * inventory and code. Nothing from this allocation executes before it.
      */

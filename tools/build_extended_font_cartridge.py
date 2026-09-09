@@ -11,14 +11,18 @@ import subprocess
 
 from aflib import sha256
 from check_keyboard_assembly import IMAGE
-from extended_font_cartridge import RAM,RESOURCE_HASH,source_hashes,validate
+from extended_font_cartridge import RAM,RESOURCE_HASH,MAIL_RESOURCE_HASH,source_hashes,validate
 from extended_glyphs import validate_resource
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 def build(resource,out):
-    if sha256(validate_resource(resource))!=RESOURCE_HASH: raise ValueError('Unapproved complete English glyph resource')
+    digest = sha256(resource)
+    mail = digest == MAIL_RESOURCE_HASH
+    if digest not in (RESOURCE_HASH,MAIL_RESOURCE_HASH):
+        raise ValueError('Unapproved complete English glyph resource')
+    validate_resource(resource,mail=mail)
     sources=source_hashes();out=out.resolve();out.mkdir(parents=True,exist_ok=True)
     (out/'glyphs.bin').write_bytes(resource)
     common=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
@@ -72,11 +76,13 @@ def build(resource,out):
     reloc=raw_reloc.ljust(length-4,b'\0')+struct.pack('>I',length)
     if sources!=source_hashes(): raise ValueError('Font sources changed while compiling')
     report={'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),'sha256':sha256(data),
-            'relocation_sha256':sha256(reloc),'resource_sha256':RESOURCE_HASH,'sources':sources,
+            'relocation_sha256':sha256(reloc),'resource_sha256':digest,'sources':sources,
             'symbols':{name:value-RAM for name,value in symbols.items() if RAM<=value<RAM+total},
             'compiler':run('gcc','--version').splitlines()[0],'toolchain_image':IMAGE,'flags':flags,
             'stack_usage':{name:(out/(name+'.su')).read_text() for name in ('font','native','install')},
             'scope':'Persistent cartridge image; requires the matching guarded startup loader'}
+    if mail:
+        report['mail_glyphs'] = True
     validate(data,reloc,report)
     (out/'font.bin').write_bytes(data);(out/'relocation.bin').write_bytes(reloc)
     (out/'font-relocations.txt').write_text(elf_relocs)

@@ -84,6 +84,11 @@ def inplace_reference(record, templates):
                 data[pos:pos] = articles[0 if forced else field.article]
                 if capital and pos < len(data) and ord('a') <= data[pos] <= ord('z'):
                     data[pos] -= 32
+                elif capital and record.catalog == 4 and data[pos:pos+1] == b'\x80':
+                    if data[pos+1] == 0x60:
+                        data[pos+1] = 0x08
+                    elif data[pos+1] == 0x7C:
+                        data[pos+1] = 0x0A
                 forced = False
             if header and pos < split:
                 split += len(data)-before

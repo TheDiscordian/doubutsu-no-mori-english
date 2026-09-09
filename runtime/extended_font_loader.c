@@ -1,4 +1,5 @@
 /* One system-heap owner survives every gameplay-arena teardown. */
+#include "crc32.h"
 typedef unsigned int u32;
 
 struct FontConfig { u32 vrom, blob, image, reloc, text, entry, crc, abi; };
@@ -40,7 +41,7 @@ int af_extended_font_init(void) {
     struct FontConfig approved;
     unsigned char *image;
     void *allocation;
-    u32 i, bit, crc, size, pointer;
+    u32 i, size, pointer;
     if (af_extended_font_image) return 1;
     if (busy) return 0;
     for (i=0;i<8u;++i) ((u32 *)&approved)[i]=((volatile const u32 *)config)[i];
@@ -61,12 +62,7 @@ int af_extended_font_init(void) {
     if (pointer<0x8019C8E0u || pointer>0x80400000u || size>0x80400000u-pointer) goto failed;
     image=(unsigned char *)(((__UINTPTR_TYPE__)allocation+15u)&~(__UINTPTR_TYPE__)15u);
     if (dma(image,approved.vrom,approved.blob)) goto failed;
-    crc=0xFFFFFFFFu;
-    for (i=0;i<approved.blob;++i) {
-        crc^=image[i];
-        for (bit=0;bit<8u;++bit) crc=(crc>>1)^((0u-(crc&1u))&0xEDB88320u);
-    }
-    if ((crc^0xFFFFFFFFu)!=approved.crc) goto failed;
+    if (af_crc32(image,approved.blob)!=approved.crc) goto failed;
     relocate(image,image+approved.image,0x80C00000u);
     writeback(image,approved.image);
     invalidate(image,approved.text);

@@ -16,10 +16,15 @@ COMPOSITE = ("superz", "maila", "mailb", "mailc", "psz")
 REPLY_CODE_SHA256 = "97919d8a755e399b85a058203f2b48bbac5efbfdd2ba6f3dff17f24b4784bdc3"
 
 
-def template_fields(data):
+def template_fields(data, *, extended_glyphs=False):
     """Mail commands are two-byte tokens; other GC bytes are single glyphs."""
     fields, pos = set(), 0
     while pos < len(data):
+        if extended_glyphs and data[pos] == 0x80:
+            from mail_glyph_codes import glyph
+            glyph(data,pos)
+            pos += 2
+            continue
         if data[pos] != 0x7F:
             pos += 1
             continue

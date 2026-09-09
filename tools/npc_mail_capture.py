@@ -43,7 +43,7 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
-    names += ['runtime/mail/'+name for name in ('npc_generation.h','npc_loader.h','catalog.h','format.h','record.h')]
+    names += ['runtime/mail/'+name for name in ('npc_generation.h','npc_loader.h','catalog.h','format.h','record.h','glyph.h')]
     if mother_letters:
         names += ['overlays/mail_generation/'+name for name in ('mother_creator.c','mother_creator.h','system_capture.ld')]
     if departed_letters:

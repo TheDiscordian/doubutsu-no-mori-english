@@ -73,6 +73,30 @@ class MailPageTests(unittest.TestCase):
                 collected[section].extend(parts[section][offset:offset+length])
         self.assertEqual(tuple(map(bytes,collected)),parts)
 
+    def test_glyph_pairs_cross_pages_without_splitting_or_reflow(self):
+        from mail_glyph_codes import ADVANCES
+        pairs = b''.join(bytes((0x80,code)) for code in ADVANCES)
+        parts = (pairs*36,b'a'*31+b'\x80\xbf\xcd\xcd'+pairs*30,pairs*36)
+        collected = [bytearray(),bytearray(),bytearray()]
+        total = self.page(parts)[0]
+        for number in range(total):
+            count, spans = self.page(parts,number)
+            self.assertEqual(count,total)
+            for section,offset,length,y in spans:
+                text = parts[section][offset:offset+length]
+                pos = width = 0
+                while pos < len(text):
+                    if text[pos] == 0x80:
+                        self.assertLess(pos+1,len(text))
+                        width += ADVANCES[text[pos+1]]
+                        pos += 2
+                    else:
+                        width += self.widths[text[pos]]
+                        pos += 1
+                self.assertLessEqual(width,192)
+                collected[section].extend(text)
+        self.assertEqual(tuple(map(bytes,collected)),tuple(p.replace(b'\xcd',b'') for p in parts))
+
     def test_random_pages_preserve_every_glyph_space_and_blank_line(self):
         rng = random.Random(7199)
         for _ in range(150):

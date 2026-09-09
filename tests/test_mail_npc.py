@@ -47,6 +47,7 @@ class MailNpcTests(unittest.TestCase):
         run = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',
                               '-I'+str(ROOT/'runtime'),
                               *(str(ROOT/'runtime/mail'/name) for name in ('record.c','format.c','catalog.c')),
+                              str(ROOT/'runtime/crc32.c'),
                               str(ROOT/'runtime/mail_grade.c'),str(ROOT/'runtime/mail_npc.c'),
                               str(ROOT/'overlays/mail_check/grade.c'),
                               *(str(ROOT/'tests'/name) for name in ('mail_catalog_mock.c','mail_grade_mock.c','mail_npc_mock.c')),

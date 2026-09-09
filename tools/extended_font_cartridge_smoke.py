@@ -5,7 +5,7 @@ import struct
 from aflib import sha256
 from extended_font_cartridge import RAM,relocate,validate
 from extended_font_test_scenario import texture_commands
-from extended_glyphs import GLYPHS
+from extended_glyphs import GLYPHS,MAIL_GLYPHS
 from flash_mail import SAVE_RAM,SAVE_BYTES
 from runtime_layout import MODULE_RAM,RESERVATION,TEST_STACK,GUARD_ADDRESS,GUARD_WORD
 
@@ -63,8 +63,10 @@ def exercise(debug,request,record):
     write(game,words(graph))
     tokens=[b'i',b'\x80\xD0',b'I',b'\x80\xAE',b"'",b'\x80\xA7',b'l',b'\x80\xAB',
             b'\xA1',b'\x80\xBA',b'Z',b'\x80\x42',b'\xE0']
+    glyphs = MAIL_GLYPHS if report.get('mail_glyphs') is True else GLYPHS
+    tokens += [bytes((0x80,code)) for _,code,_ in glyphs[len(GLYPHS):]]
     payload=b''.join(tokens);write(text,payload)
-    registered={code:i for i,(_,code,_) in enumerate(GLYPHS)}
+    registered={code:i for i,(_,code,_) in enumerate(glyphs)}
     prefix_width=sum(pixels[48+registered[t[1]]] if len(t)==2 and t[1] in registered
                      else sum(12-cuts[c] for c in t) for t in tokens)
     call(0x800902CC,[text,len(payload),1],(prefix_width+1)&~1)
@@ -108,7 +110,7 @@ def exercise(debug,request,record):
             check('native stack lower guard',TEST_STACK-0x600,EDGE)
     # The actual cursor must wait for each registered pair as one character.
     # Unknown tags retain their native skip, consuming the following ! instead.
-    cases=[(bytes((0x80,code)),2) for _,code,_ in GLYPHS]+[(b'\x80\x42',3),(b'i',1),(b'\xA1',1)]
+    cases=[(bytes((0x80,code)),2) for _,code,_ in glyphs]+[(b'\x80\x42',3),(b'i',1),(b'\xA1',1)]
     for token,consumed in cases:
         payload=token+b'!\x7f\x00'
         write(window,bytes(0x330));write(window+12,words(message))
@@ -133,5 +135,5 @@ def exercise(debug,request,record):
     check('resident module guard',GUARD_ADDRESS,words(*([GUARD_WORD]*4)))
     call(0x8009C040,[allocation])
     check('persistent owner survives fixture release',pointer,words(base))
-    return {'cartridge_font_draws':26,'native_cursor_cases':len(cases),'font_ram':f'{base:08X}',
+    return {'cartridge_font_draws':len(tokens)*2,'native_cursor_cases':len(cases),'font_ram':f'{base:08X}',
             'fixture_released':True,'font_code_or_resource_uploaded':False,'requires_checkpoint_restore':True}

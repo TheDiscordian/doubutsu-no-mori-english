@@ -13,8 +13,10 @@ int af_mail_catalog_test_dma(void *destination, unsigned int source, unsigned in
     unsigned int offset, local, base, limit, i;
     unsigned char *out = destination;
     ++af_mail_catalog_reads;
-    base = source >= AF_MAIL_FORTUNE_CATALOG_VROM ? AF_MAIL_FORTUNE_CATALOG_VROM : AF_MAIL_CATALOG_VROM;
-    limit = base == AF_MAIL_CATALOG_VROM ? AF_MAIL_CATALOG_BYTES : AF_MAIL_FORTUNE_CATALOG_BYTES;
+    base = source >= AF_MAIL_GLYPH_CATALOG_VROM ? AF_MAIL_GLYPH_CATALOG_VROM :
+        source >= AF_MAIL_FORTUNE_CATALOG_VROM ? AF_MAIL_FORTUNE_CATALOG_VROM : AF_MAIL_CATALOG_VROM;
+    limit = base == AF_MAIL_GLYPH_CATALOG_VROM ? AF_MAIL_GLYPH_CATALOG_BYTES :
+        base == AF_MAIL_CATALOG_VROM ? AF_MAIL_CATALOG_BYTES : AF_MAIL_FORTUNE_CATALOG_BYTES;
     if (source < base || source-base > limit || size > limit-(source-base)
             || ((__UINTPTR_TYPE__)destination & 15u) || (source & 15u) || (size & 15u)) {
         ++af_mail_catalog_dma_error;

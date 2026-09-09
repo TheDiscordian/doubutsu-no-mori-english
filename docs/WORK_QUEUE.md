@@ -40,10 +40,15 @@ GameCube-only reward/cottage templates to the N64 selection.
 The [complete mail-glyph audit](../specs/MAIL_GLYPHS.md) finds 100 unsupported
 occurrences across 59 catalogue-two parts, covering nine glyph identities.
 Five bodies need only the existing separate semicolon/slash resource; seven
-additional glyph identities require exact-source font support. Implement complete
-template parsing, token-aware mail pagination/footer alignment, a new immutable
-catalogue, and the affected creator routes together. Do not change old catalogue
-IDs or interpret this source-only inventory as applied text.
+additional glyph identities and two accented capitals have exact-source support
+in the new fourteen-cell resource. Complete template parsing, token-aware mail
+pagination/footer alignment, and frozen catalogue four pass all 80 final focused
+tests. The native batch passes 114 glyph-bearing and eight old-catalogue
+reconstructions, 28 line scans, 44 draws, seventeen cursor cases, and 1,224
+assertions, with a restored checkpoint. Connect the affected creator routes and
+rebuild all module-bound dependencies for the complete translation ROM. Keep
+catalogues two and three unchanged. See the [glyph checkpoint](checkpoints/MAIL_GLYPHS.md);
+reference availability is not applied-text credit.
 
 The [Mom-letter integration](../specs/MOTHER_LETTERS.md) installs 113 complete
 letters without added resident code or saved-layout growth. All 113 native

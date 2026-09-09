@@ -23,11 +23,17 @@ STACK_LOW = TEST_STACK-0xA00
 EDGE = b'EDGE'*4
 
 
-def scenario(rom, module, cases):
+def scenario(rom, module, cases, *, catalog_id=2):
     verify_test_module(rom, module)
     files = by_vrom(rom)
-    catalog = files[VROM].extract(rom)
-    verify_registered(catalog)
+    from mail_glyph_codes import VROM as GLYPH_VROM
+    from fortune_slips import CATALOG_VROM as FORTUNE_VROM
+    vrom = {2:VROM,3:FORTUNE_VROM,4:GLYPH_VROM}.get(catalog_id)
+    if vrom is None:
+        raise ValueError('Unknown native test catalogue identity')
+    catalog = files[vrom].extract(rom)
+    if verify_registered(catalog)['catalog'] != catalog_id:
+        raise ValueError('Mismatched native test catalogue identity')
     if files[MODULE_VROM].extract(rom)[CONFIG_OFFSET:CONFIG_OFFSET+4] != VROM.to_bytes(4, 'big'):
         raise ValueError('Native catalog test requires the configured cartridge resource')
     if WORK+WORK_BYTES+16 > OUTPUT-16 or OUTPUT+1040+16 >= STACK_LOW:
@@ -54,27 +60,29 @@ def scenario(rom, module, cases):
         read(WORK+WORK_BYTES, EDGE)
         read(STACK_LOW, EDGE)
     for index, (_, record, parts, _) in enumerate(cases):
-        record = replace(record, catalog=2)
-        original = format_letter(record, replace(parts, catalog=2))
+        record = replace(record, catalog=catalog_id)
+        original = format_letter(record, replace(parts, catalog=catalog_id))
         if format_letter(record, templates(catalog, record)) != original:
             raise ValueError('Installed catalog output differs from verified reference')
         restore(record, skew=index % 8)
-    for record in (Record(2, 0, (43,), ()), Record(2, 0, (982,), ()),
-                   Record(4, 0, (0,), ()), Record(2, 1, (0, 0, 0, 0, 77), ())):
+    rejected = [Record(catalog_id,0,(982,),()),Record(65534,0,(0,),())]
+    if catalog_id in (2,3):
+        rejected += [Record(catalog_id,0,(43,),()),Record(catalog_id,1,(0,0,0,0,77),())]
+    for record in rejected:
         restore(record, success=False)
-    record = replace(cases[0][1], catalog=2)
+    record = replace(cases[0][1], catalog=catalog_id)
     write(MODULE_RAM+CONFIG_OFFSET, bytes(4))
     restore(record, success=False)
     write(MODULE_RAM+CONFIG_OFFSET, VROM.to_bytes(4, 'big'))
     # Header corruption is tested through the real compiled validator without
     # changing the cartridge or invoking a decoder on an unknown catalog.
     write(WORK, catalog[:128])
-    call(module['symbols']['af_mail_catalog_header_valid'], [WORK, 2], 1)
+    call(module['symbols']['af_mail_catalog_header_valid'], [WORK, catalog_id], 1)
     for word in range(32):
         bad = bytearray(catalog[:128])
         bad[word*4+3] ^= 1
         write(WORK, bytes(bad))
-        call(module['symbols']['af_mail_catalog_header_valid'], [WORK, 2], 0)
+        call(module['symbols']['af_mail_catalog_header_valid'], [WORK, catalog_id], 0)
     read(STACK_LOW, EDGE)
     read(TEST_STACK+0x30, EDGE)
     read(GUARD_ADDRESS, struct.pack('>4I', *([GUARD_WORD]*4)))

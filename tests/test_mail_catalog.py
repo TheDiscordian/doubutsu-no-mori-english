@@ -143,6 +143,7 @@ class MailCatalogRuntimeTests(unittest.TestCase):
         library = Path(cls.temporary.name)/'mail-catalog.so'
         subprocess.run(['gcc', '-std=c99', '-Wall', '-Wextra', '-Werror', '-O2', '-shared', '-fPIC',
                         *(str(ROOT/'runtime/mail'/name) for name in ('record.c', 'format.c', 'catalog.c')),
+                        str(ROOT/'runtime/crc32.c'),
                         str(ROOT/'tests/mail_catalog_mock.c'), '-o', str(library)],
                        check=True, capture_output=True)
         cls.lib = C.CDLL(str(library))
@@ -156,6 +157,7 @@ class MailCatalogRuntimeTests(unittest.TestCase):
 
     def setUp(self):
         self.rom = (C.c_ubyte*0x100000).in_dll(self.lib, 'af_mail_catalog_rom')
+        C.memset(self.rom,0,C.sizeof(self.rom))
         C.memmove(self.rom, self.data, len(self.data))
         self.enabled = C.c_uint.in_dll(self.lib, 'af_mail_catalog_enabled')
         self.enabled.value = 1
@@ -218,7 +220,7 @@ class MailCatalogRuntimeTests(unittest.TestCase):
             self.rom[word*4+3] ^= 1
             self.call(record, success=False)
             self.rom[word*4+3] ^= 1
-        for changed in (replace(record, catalog=4), replace(record, templates=(982,))):
+        for changed in (replace(record, catalog=5), replace(record, templates=(982,))):
             self.call(changed, success=False)
         self.enabled.value = 0
         self.reads.value = 0
@@ -244,6 +246,33 @@ class MailCatalogRuntimeTests(unittest.TestCase):
                 with self.subTest(offset=index):
                     self.call(record, success=False)
                 self.rom[index] ^= 1
+
+    @unittest.skipUnless((ROOT/'build/mail-glyph-catalog/catalog.bin').is_file(),'Complete glyph catalogue is locally generated')
+    def test_complete_new_catalogue_reconstruction_and_old_snapshot_compatibility(self):
+        original = self.data
+        self.data = (ROOT/'build/mail-glyph-catalog/catalog.bin').read_bytes()
+        verify_registered(self.data)
+        C.memmove(C.addressof(self.rom)+0xA0000,self.data,len(self.data))
+        banks = parse(self.data)[1]
+        try:
+            cases = 0
+            for label,record,parts,limitation in assembly_cases(banks,ROM_PATH.read_bytes()):
+                self.assertIsNotNone(record,label)
+                record,parts = replace(record,catalog=4),replace(parts,catalog=4)
+                with self.subTest(case=label):
+                    self.call(record,inplace_reference(record,parts),skew=cases%8)
+                cases += 1
+            self.assertEqual(cases,6514)
+            for word in range(32):
+                self.rom[0xA0000+word*4+3] ^= 1
+                self.call(Record(4,0,(0,),()),success=False)
+                self.rom[0xA0000+word*4+3] ^= 1
+        finally:
+            self.data = original
+        # Both resources coexist; restoring old letters still uses catalogue two.
+        record = Record(2,0,(0,),())
+        mask = set().union(*(template_fields(p) for p in templates(self.data,record).parts))
+        self.call(replace(record,fields=tuple((i,Field(b'word')) for i in sorted(mask))))
 
     def test_invalid_pointers_sizes_and_workspace_aliases_do_not_write(self):
         storage = C.create_string_buffer(b'!'*12000, 12000)

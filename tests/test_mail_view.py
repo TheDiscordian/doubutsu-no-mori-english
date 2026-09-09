@@ -97,6 +97,32 @@ class MailViewTests(unittest.TestCase):
             self.assertEqual(self.lib.af_mail_next_line(C.byref(line),source,3), 0)
         self.assertEqual(tuple(getattr(line,n) for n,_ in Line._fields_), (1,2,3,4))
 
+    def test_complete_glyph_pairs_keep_exact_advances_and_byte_boundaries(self):
+        from mail_glyph_codes import ADVANCES
+        for code in range(256):
+            pair = bytes((0x80,code))
+            if code in ADVANCES:
+                width = ADVANCES[code]
+                self.assertEqual(self.scan(pair+b'\xcd'),(3,2,width,1))
+                self.assertEqual(self.scan(b'a'*31+pair),
+                                 (33,33,186+width,0) if width <= 6 else (31,31,186,0))
+                count = 192//width
+                self.assertEqual(self.scan(pair*(count+1)),(count*2,count*2,192,0))
+            else:
+                line = Line(1,2,3,4)
+                self.assertEqual(self.lib.af_mail_next_line(C.byref(line),pair,len(pair)),0)
+                self.assertEqual(tuple(getattr(line,n) for n,_ in Line._fields_),(1,2,3,4))
+        line = Line(1,2,3,4)
+        self.assertEqual(self.lib.af_mail_next_line(C.byref(line),b'a\x80',2),0)
+        self.assertEqual(tuple(getattr(line,n) for n,_ in Line._fields_),(1,2,3,4))
+        text = b'i\x80\xd0\x80\xbf'
+        self.board[7] = len(text)
+        self.board[0x9C:0x9C+len(text)] = text
+        self.lib.af_mail_read_footer(1,1,64,172,self.colour)
+        d = self.draws[0]
+        self.assertEqual((self.calls.value,d.length,d.x),(1,len(text),256-19))
+        self.assertEqual(bytes(d.text[:d.length]),text)
+
     def body(self, text):
         self.board[6] = len(text)
         self.board[0x3C:0x9C] = text.ljust(96,b' ')

@@ -48,6 +48,24 @@
       "encoding": "Catalog two encoding with explicit GC tilde to existing native wave-glyph mapping in ps:0072..0074; no font changes",
       "assembly": "Semantics one, snapshot version two, captured sticky capitalization and articles",
       "change_policy": "Never change an assigned identity's content; add a new ID and preserve existing saved catalogs"
+    },
+    {
+      "catalog": 4,
+      "format": 1,
+      "semantics": 2,
+      "bytes": 326288,
+      "sha256": "76aa61189ccc1043ee4d91f3fd7a2d351b0914b4a932515b47b5bcbe426323bb",
+      "payload_sha256": "425e62e430847bca0cf412441306dab14140645351808fec4f8bc262727fd86c",
+      "counts": [982, 982, 982, 384, 384, 384, 384, 384],
+      "unavailable": {
+        "super": [], "mail": [], "ps": [], "superz": [],
+        "maila": [], "mailb": [], "mailc": [], "psz": []
+      },
+      "source": "Complete user-supplied GAFE01 revision-zero banks, executable font, and uppercase table",
+      "status": "Frozen complete reference catalogue; native creator mapping and cartridge validation remain required",
+      "encoding": "Exact original one-byte mappings plus fourteen explicitly registered 80-prefixed donor glyph identities",
+      "assembly": "Semantics two preserves complete glyph pairs and donor accented capitalization; saved literal fields retain their single-byte restrictions",
+      "change_policy": "Never change an assigned identity's content; add a new ID and preserve existing saved catalogs"
     }
   ]
 }

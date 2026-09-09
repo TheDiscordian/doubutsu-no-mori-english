@@ -7,6 +7,7 @@ GAFE01's sticky capitalization is explicit input/output, never decoder-global.
 from dataclasses import dataclass
 
 from mail_record import pack
+from mail_glyph_codes import CATALOG as GLYPH_CATALOG, CAPITALS, glyph
 
 TEXT_BYTES = 1024
 ARTICLES = (b"", b"a ", b"an ", b"the ", b"some ")
@@ -57,6 +58,15 @@ def format_letter(record, templates):
         raise ValueError("Mail template identity/count mismatch")
     if any(type(part) is not bytes or len(part) > TEXT_BYTES for part in templates.parts):
         raise ValueError("Invalid mail template bytes/size")
+    # Pairs may not borrow their second byte from the next composite part.
+    if record.catalog == GLYPH_CATALOG:
+        for part in templates.parts:
+            pos = 0
+            while pos < len(part):
+                byte = part[pos]
+                if byte == 0x80:
+                    glyph(part,pos)
+                pos += 2 if byte in (0x7F,0x80) else 1
     fields = dict(record.fields)
     if any(any(byte in (0x7F, 0x80) for byte in field.text) for field in fields.values()):
         raise ValueError("Mail fields must contain literal single-byte glyphs")
@@ -83,7 +93,13 @@ def format_letter(record, templates):
                 split = len(output)
                 continue
             if byte == 0x80:
-                raise ValueError("Mail templates require single-byte glyphs")
+                if record.catalog != GLYPH_CATALOG:
+                    raise ValueError("Mail templates require single-byte glyphs")
+                code = glyph(data,pos-1)
+                append(bytes((0x80,CAPITALS.get(code,code) if pending else code)))
+                pos += 1
+                pending = False
+                continue
             if byte != 0x7F:
                 append(bytes((upper(byte) if pending else byte,)))
                 pending = False

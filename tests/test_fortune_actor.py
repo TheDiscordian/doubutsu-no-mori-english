@@ -41,7 +41,7 @@ class FortuneActorTests(unittest.TestCase):
         cls.temporary = tempfile.TemporaryDirectory(prefix='af-fortune-actor-')
         output = Path(cls.temporary.name)/'actor.so'
         sources = ['overlays/mail_generation/generate.c','overlays/mail_generation/fortune_slip.c',
-                   'overlays/mail_generation/fortune_actor.c','overlays/mail_generation/fortune_recovery.c','runtime/mail/catalog.c',
+                   'overlays/mail_generation/fortune_actor.c','overlays/mail_generation/fortune_recovery.c','runtime/mail/catalog.c','runtime/crc32.c',
                    'runtime/mail/format.c','runtime/mail/record.c','tests/mail_catalog_mock.c',
                    'tests/fortune_actor_mock.c']
         result = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',

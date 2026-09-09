@@ -19,31 +19,19 @@ static void copy_mail(unsigned char *destination, const unsigned char *source) {
 static unsigned int trigger(void) {
     return ((unsigned int (*)(void))0x80078DF4u)();
 }
-static int width(unsigned char code) {
-    return ((int (*)(unsigned int, int))0x8009028Cu)(code, 0);
-}
-static void draw(void *game, const unsigned char *text, unsigned int length,
-                 float x, float y, const unsigned char *colour) {
-    ((float (*)(void *, const unsigned char *, int, float, float,
-                int, int, int, int, int, int, float, float, int))0x80090E98u)
-        (game, text, length, x, y, colour[0], colour[1], colour[2], 255, 0, 0, 1.0f, 1.0f, 0);
-}
 #else
 extern void *af_mail_reader_test_allocate(unsigned int);
 extern void af_mail_reader_test_release(void *);
 extern unsigned char *af_mail_view_test_board(void *);
 extern void af_mail_reader_test_copy(unsigned char *, const unsigned char *);
 extern unsigned int af_mail_reader_test_trigger(void);
-extern int af_mail_view_test_width(unsigned char);
-extern void af_mail_view_test_draw(void *, const unsigned char *, unsigned int, float, float, const unsigned char *);
 #define board af_mail_view_test_board
 #define copy_mail af_mail_reader_test_copy
 #define trigger af_mail_reader_test_trigger
-#define width af_mail_view_test_width
-#define draw af_mail_view_test_draw
 #define allocate af_mail_reader_test_allocate
 #define release af_mail_reader_test_release
 #endif
+#define draw af_mail_draw
 
 static int active(const void *state) {
     return state && af_mail_reader.status && af_mail_reader.owner == state;
@@ -173,7 +161,8 @@ static unsigned int decimal(unsigned char *destination, unsigned int number) {
 void af_mail_snapshot_header(void *submenu, void *game, void *menu, float x,
                              float y, const unsigned char *colour) {
     unsigned char *state, header[18], hint[24];
-    unsigned int i, j, split, name, length, pixels;
+    unsigned int i, split, name, length, pixels;
+    AfMailLine line;
     const unsigned char *text;
     AfMailReader *r = &af_mail_reader;
     (void)menu;
@@ -203,8 +192,11 @@ void af_mail_snapshot_header(void *submenu, void *game, void *menu, float x,
         text = s->section ? r->letter.text+r->letter.offsets[s->section] : r->header;
         text += s->offset;
         pixels = 0;
-        if (s->section == 2u)
-            for (j = 0; j < s->length; ++j) pixels += (unsigned int)width(text[j]);
+        if (s->section == 2u) {
+            if (!af_mail_next_line(&line,text,s->length) || line.drawn != s->length)
+                return;
+            pixels = line.width;
+        }
         if (s->length)
             draw(game, text, s->length, s->section == 2u ? x+192.0f-(float)pixels : x,
                  y+(float)s->y, colour);

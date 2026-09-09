@@ -22,6 +22,7 @@ class NpcMailLoaderTests(unittest.TestCase):
         compiler_env = dict(os.environ);compiler_env.pop('LD_PRELOAD',None)
         result = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',*flags,
                                 str(ROOT/'runtime/mail/npc_loader.c'),str(ROOT/'tests/npc_mail_loader_mock.c'),
+                                str(ROOT/'runtime/crc32.c'),
                                 '-o',str(library)],capture_output=True,text=True,env=compiler_env)
         if result.returncode: raise ValueError(result.stderr)
         cls.lib = C.CDLL(str(library))

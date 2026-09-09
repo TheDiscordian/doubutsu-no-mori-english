@@ -71,6 +71,36 @@ int main(void) {
     memset(text,'i',1024);assert(af_glyph_string_width(text,1024)==4096);
     assert(af_glyph_code_width(256,1)==12);
     assert(af_glyph_code_width(~0u,1)==12);
+    {
+        static const unsigned char mail_codes[14] = {
+            0xD0,0xAE,0xA7,0xAB,0xBA,0x2A,0x3B,0x5C,0x60,0x7C,0xBF,0xF7,0x08,0x0A
+        };
+        static const unsigned char mail_advances[14] = {3,6,12,12,12,6,12,12,6,6,12,6,6,6};
+        word(16,14);
+        memcpy(resource+32,mail_codes,14);memcpy(resource+48,mail_advances,14);
+        assert(af_glyph_bind(resource,sizeof(resource)));
+        for (i=0;i<256;++i) {
+            int expected=-1;
+            for (j=0;j<14;++j) if (i==mail_codes[j]) expected=(int)j;
+            text[0]=0x80;text[1]=(unsigned char)i;
+            assert(af_glyph_index(text,2)==expected);
+            previous=af_glyph_begin(text,2);
+            assert(af_glyph_code_width(0x80,0)==(expected<0?12:mail_advances[expected]));
+            assert(af_glyph_texture_code(0x80)==(expected<0?0x80:expected));
+            assert(af_glyph_texture()==(expected<0?native_texture:resource+64));
+            af_glyph_end(previous);
+        }
+        for (i=0;i<16;++i) {
+            memcpy(damaged,resource,sizeof(resource));damaged[32+i]^=1;
+            assert(!af_glyph_bind(damaged,sizeof(resource)));
+            memcpy(damaged,resource,sizeof(resource));damaged[48+i]=i<14?0:1;
+            assert(!af_glyph_bind(damaged,sizeof(resource)));
+        }
+        word(16,5);memset(resource+37,0,11);memset(resource+53,0,11);
+        assert(af_glyph_bind(resource,sizeof(resource)));
+        assert(af_glyph_index((const unsigned char *)"\x80\x60",2)==-1);
+        assert(af_glyph_index((const unsigned char *)"\x80\xD0",2)==0);
+    }
     puts("extended font primitives passed");
     return 0;
 }

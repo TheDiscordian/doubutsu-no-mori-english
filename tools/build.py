@@ -296,7 +296,8 @@ def main():
     if args.catchphrases:
         report["catchphrases"] = install_catchphrases(rom, additions, report.get("runtime_module"), args.catchphrases, replacements)
     if args.mail_catalog:
-        report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'), args.mail_catalog)
+        report['mail_catalog'] = install_mail_catalog(rom, additions, report.get('runtime_module'),
+                                                       args.mail_catalog,glyph_font=args.extended_font)
     if args.npc_mail_generation:
         report['npc_mail_loader'] = install_npc_mail_loader(rom,replacements,additions,report.get('runtime_module'),args.npc_mail_generation)
     if args.english_shared_npc_words:
@@ -306,6 +307,10 @@ def main():
     if args.extended_font:
         from extended_font_cartridge import install as install_font
         report['extended_font'] = install_font(rom,replacements,additions,report.get('runtime_module'),args.extended_font)
+    if report.get('mail_catalog',{}).get('glyph_catalog'):
+        if (not args.english_mail_snapshots or report.get('extended_font',{}).get('blob_sha256') !=
+                report['mail_catalog']['glyph_font_sha256']):
+            raise ValueError('Complete glyph catalogue lacks its exact installed cartridge font')
     if args.english_fortune_slips:
         from fortune_actor import install as install_fortune_actor
         report['fortune_actor'] = install_fortune_actor(rom,replacements,additions,relocations,
