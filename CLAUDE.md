@@ -39,11 +39,14 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   instead of repeatedly attempting them while bulk implementation waits.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
-  all-combinations harnesses without a concrete uncovered risk. For a failing
-  native scenario, allow one initial attempt and one retry after a concrete fix.
-  New harness construction/debugging has a 30-minute budget per implementation
-  batch; record unresolved results and continue unrelated work at that limit.
-  Credible crash/save/memory risks remain blockers, not silently passed tests.
+  all-combinations harnesses without a concrete uncovered risk. For a testing-
+  setup failure, allow one initial attempt and one retry after a concrete setup
+  correction. New harness construction/debugging has a 30-minute budget per
+  implementation batch; record unresolved results and continue unrelated work
+  at that limit. These limits do not apply to fixing actual game defects.
+  Confirmed crashes, save damage, and memory corruption block v0. Unexplained
+  failures that could be game defects remain unresolved until classified;
+  never assume a harness cause or mark an incomplete test passed.
 - Produce and hand over v0 before the human playthrough. Comprehensive gameplay,
   hardware, and polish acceptance cannot block the build that enables that work.
   English title artwork and the GameCube-style keyboard belong to v1.

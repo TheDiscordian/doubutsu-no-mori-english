@@ -215,6 +215,7 @@ def main():
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
+    parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
     parser.add_argument('--english-song-names', action='store_true', help='Complete selected song titles through full item fields; requires English credits, runtime, and extended items')
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
@@ -263,6 +264,8 @@ def main():
         parser.error('--english-gyroid-default requires --runtime-module, --english-runtime, and --translations')
     if args.english_hboard_editor and not (args.english_gyroid_default and args.english_keyboard and args.english_notice_seasonal):
         parser.error('--english-hboard-editor requires --english-gyroid-default, --english-keyboard, and --english-notice-seasonal')
+    if args.english_inventory and not (args.english_hboard_editor and args.extended_items):
+        parser.error('--english-inventory requires --english-hboard-editor and --extended-items')
     if args.english_leaflet_dates and not (args.runtime_module and args.english_runtime):
         parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
     if args.english_renewal_letters and not (args.english_leaflet_dates and args.english_mail_snapshots):
@@ -427,6 +430,10 @@ def main():
         from hboard_overlay import install as install_hboard_editor
         report['hboard_editor'] = install_hboard_editor(rom, replacements, additions, relocations,
             report.get('runtime_module'), args.english_hboard_editor, report['noticeboard'], report['gyroid_default'])
+    if args.english_inventory:
+        from inventory_english import install as install_inventory
+        report['inventory_english'] = install_inventory(rom, replacements, additions, relocations,
+            report.get('runtime_module'), args.english_inventory, report['noticeboard'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

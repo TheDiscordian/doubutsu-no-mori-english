@@ -21,10 +21,21 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [inventory English integration](checkpoints/INVENTORY_ENGLISH.md) installs
+39 complete label records, the ordinary sixteen-byte item-name consumer, and
+font-aware window widths. Native action order/callbacks, separate mail/quest
+fields, and numeric placement remain. The current complete ROM/UPS is
+`build/inventory-english-pilot`. The tag's 896 aligned bytes fit the owner
+editor's existing reservation; no main code, resident, or saved bytes change.
+Core/artifact checks, complete patch reconstruction, and 29 shared-menu
+regressions pass; independent overlay builds agree. Ordinary inventory, price,
+and mail/quest transition execution belong in the combined v0 safety pass.
+Catalogue and other wider consumers remain implementation work.
+
 The [owner-message editor integration](checkpoints/HBOARD_EDITOR.md) installs the
 complete English draft, proportional four-row layout, cursor/edit operations,
 capacity/conflict warnings, save-safe confirmation, and cleanup together.
-The current complete ROM/UPS is `build/hboard-editor-pilot`. Its 20,416-byte
+Its retained complete ROM/UPS is `build/hboard-editor-pilot`. Its 20,416-byte
 owned editor adds 5,568 aligned bytes and a separate 8-KiB submenu reservation;
 saved layout, resident code, and every earlier translation resource remain.
 Eight bridge/artifact/cartridge tests, nine core tests, the 10,000-command core

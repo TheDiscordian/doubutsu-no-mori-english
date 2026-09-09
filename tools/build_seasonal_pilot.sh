@@ -10,6 +10,10 @@ hboard_args=()
 if [[ -n "${AF_HBOARD_EDITOR:-}" ]]; then
   hboard_args=(--english-hboard-editor "$AF_HBOARD_EDITOR")
 fi
+inventory_args=()
+if [[ -n "${AF_INVENTORY_ENGLISH:-}" ]]; then
+  inventory_args=(--english-inventory "$AF_INVENTORY_ENGLISH")
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -33,4 +37,5 @@ exec python3 tools/build.py \
   --english-notice-seasonal build/noticeboard-seasonal/owner \
   "${gyroid_args[@]}" \
   "${hboard_args[@]}" \
+  "${inventory_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

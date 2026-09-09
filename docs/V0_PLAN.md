@@ -43,16 +43,21 @@ the GameCube-style keyboard are v1 stretch goals, not unfinished v0 features.
 - Prefer one representative combined native check over a new per-record or
   all-combinations harness. Add cases for a concrete uncovered risk or reproduced
   defect, not merely to accumulate more proof of already checked behaviour.
-- Allow one initial attempt and at most one retry after a concrete correction
-  for a failing native scenario. Cap new harness construction/debugging at
+- For a testing-setup failure, allow one initial attempt and at most one retry
+  after a concrete setup correction. Cap new harness construction/debugging at
   30 minutes per implementation batch, not per case. Changing a timeout, fixture
   name, or invocation does not reset that budget. Do not replay a completed
   prefix just because a later case fails when a safe focused resume is possible.
+  These limits govern testing infrastructure, not attempts to fix actual game
+  defects. A game crash, save damage, or memory corruption must be fixed before
+  v0, with focused verification of the fix.
 - At that limit, record the build, failing step, evidence, suspected game-versus-
   harness cause, and next useful check. Continue unrelated implementation.
   Inconclusive tests stay inconclusive; they are neither successful tests nor
-  established game defects. Investigate any credible crash/save/memory risk in
-  the combined blocker-fix pass rather than hiding it or retrying indefinitely.
+  established game defects. Do not assume an unexplained failure is a harness
+  problem. Keep possible game failures unresolved until classified, and retain
+  credible crash/save/memory risks as v0 blockers. Continuing unrelated work
+  does not waive those blockers or permit shipping past them.
 - Run the existing full regression suite once for the assembled handoff
   candidate. Fix failures and rerun the affected tests; repeat the full suite
   only when a shared change warrants it. Documentation-only changes require

@@ -301,12 +301,18 @@ def measure(native, built, report):
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
-        from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard
+        from keyboard import EDITOR_VROM, LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard
         keyboard_applied = bool(report.get('keyboard'))
         if keyboard_applied:
             replacements, _ = make_english_keyboard(native, info, report['advance_by_glyph'])
-            if any(extract(vrom) != value for vrom, value in replacements.items()):
-                raise ValueError('Changed installed English keyboard')
+            for vrom, value in replacements.items():
+                if vrom == EDITOR_VROM and report.get('hboard_editor'):
+                    # The complete owner editor moves this DMA pair and keeps
+                    # the original English-first keyboard in its verified prefix.
+                    from hboard_overlay import verify_shared_parts as verify_editor
+                    verify_editor(built, native)
+                elif extract(vrom) != value:
+                    raise ValueError('Changed installed English keyboard')
         source = by_vrom(native)[LEDIT_VROM].extract(native)
         for number in range(5):
             at, size = struct.unpack_from('>II', source, 0xA28+number*0x28)
@@ -331,6 +337,25 @@ def measure(native, built, report):
                     {'route': 'keyboard_graphics', 'sha256': sha256(extract(LABELS_VROM)[at:at+size])})
 
     add_keyboard()
+    # Embedded menu labels are original text too, including in older builds
+    # where no English overlay is installed. One source record counts once,
+    # regardless of how many menu definitions reference that label.
+    from inventory_english import (LABEL_FIRST, LABEL_NAMES, RAM as TAG_RAM, NEW_VROM as TAG_VROM,
+                                   native_sources as tag_sources, verify_shared_parts as verify_inventory)
+    tag_source = tag_sources(native)[0]
+    labels = None
+    if report.get('inventory_english'):
+        verify_inventory(built, native, module, report['inventory_english'])
+        tag = report['inventory_english']
+        data = extract(TAG_VROM)
+        start = tag['overlay']['symbols']['af_tag_labels']
+        labels = [data[start+i*20:start+i*20+16] for i in range(len(LABEL_NAMES))]
+    for i in range(len(LABEL_NAMES)):
+        identity = f'ui_inventory_label:{i:04X}'
+        at = LABEL_FIRST-TAG_RAM+i*12
+        ledger.add(identity, tag_source[at:at+8])
+        if labels is not None:
+            ledger.credit(identity, labels[i], 'inventory_english')
     return ledger
 
 

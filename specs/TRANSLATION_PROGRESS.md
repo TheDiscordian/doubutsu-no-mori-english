@@ -13,7 +13,12 @@ distinct native slots retains each slot's weight. Development labels count too.
 
 The total combines dialogue, choices, general strings, item names, villager and
 special-character names, catchphrases, letter headers/bodies/footers, embedded
-name-entry prompts, and keyboard labels. Wider name resources map back to their
+name-entry prompts, keyboard labels, and 39 embedded inventory label records.
+Inventory records enter the denominator in older builds too; complete English
+credit requires the installed label image, callbacks, full-name loader, font,
+relocation, and shared allocation checks. Repeated references to one menu label
+do not multiply its weight; original numeric-only records add no Japanese weight.
+Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,
 sale/Redd event, Mom, departed-villager, villager-event, HRA welcome/advice/score,

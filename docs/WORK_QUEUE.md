@@ -15,6 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [inventory checkpoint](checkpoints/INVENTORY_ENGLISH.md) supplies all 39
+embedded label records and the ordinary full item-name load/draw path. Continue
+catalogue and remaining wider consumers, residual strings/letters, and accents;
+do not repeat completed inventory host/artifact checks before that work.
+Ordinary inventory, mail/quest transitions, and prices join the combined v0
+safety pass. Confirmed game defects are not subject to the harness retry limit.
+
 ## Full-project scope and evidence
 
 This is the durable queue for the complete translation project. A working

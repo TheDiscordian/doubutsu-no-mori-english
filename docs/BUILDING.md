@@ -23,6 +23,20 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
+The current combined integration build is `build/inventory-english-pilot`.
+Its [checkpoint](checkpoints/INVENTORY_ENGLISH.md) records exact dependencies,
+artifacts, and verification limits. With the retained prerequisite resources:
+
+```sh
+python3 tools/build_inventory_overlay.py
+bash tools/build_inventory_pilot.sh
+```
+
+This wrapper retains the complete seasonal/letter/name/default-message/editor
+integration and adds full inventory labels and ordinary item names. It does not
+run an exhaustive gameplay matrix or constitute a v0 release by itself.
+The smaller recipes below reproduce their named framework milestones.
+
 `make pilot` runs the tests, validates inputs, extracts inventories and GameCube
 reference text, generates candidate edits, and builds the English-first keyboard
 and sixteen-byte choice runtime pilot. It writes the ROM, UPS patch, checksummed build manifest, and diagnostic

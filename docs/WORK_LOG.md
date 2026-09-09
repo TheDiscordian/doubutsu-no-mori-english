@@ -7217,3 +7217,59 @@ local under ignored `build/` and `local/` paths. Current status belongs in
 - This change is documentation only. No runtime, translation, build safeguards,
   test assertions, ROM, or coverage definitions change. Document/diff checks
   apply; no emulator run, full regression suite, or ROM rebuild is warranted.
+
+## 2026-09-09: complete inventory labels and ordinary item names
+
+- Resumed implementation from the retained inventory changes and confirmed the
+  live full-build handle completed successfully. The preceding clarification
+  response alone changed no project state; this batch installs and verifies
+  the concrete inventory integration.
+- Bound 39 native label records to complete supplied GameCube labels, with an
+  original `Delete` translation and explicit native price-layout adaptations.
+  Preserved all 44 definitions, pointer order, callbacks, and the unused fourth
+  money-array entry. Widened label fields and the selected-action offset
+  together, retaining complete options including `Spread on Floor`.
+- Redirected the ordinary inventory name load/draw to sixteen bytes within the
+  branch-specific initialized ten-plus-six-byte span. Kept separate mail/quest
+  fields and rendering unchanged. Added actual-font width measurement, rounded
+  upward to native window units; no global legacy-loader widening or save
+  change is made.
+- Built the 42,800-byte tag and 3,360-byte relocation through the pinned Docker
+  toolchain. Independent image/relocation/report comparisons agree. The added
+  896 aligned bytes share the existing 8-KiB owner-editor reservation; combined
+  growth is 6,464 bytes. Main code, resident module, all earlier translation
+  resources, and saved dimensions are retained.
+- The initial pointer audit was too strict about the unselected `30000` label;
+  the exact native fourth pointer is now preserved without increasing its live
+  count. The first whole-ROM attempt correctly rejected overlapping VROM
+  ranges: a 42,800-byte file does not fit before `03958000`. The relocation file
+  moves to `03960000`; the corrected complete build succeeds. Neither failed
+  attempt produced claimed gameplay evidence.
+- The complete ROM SHA-256 is
+  `236033f34bb70c076bb54780948ec79238f6230905999f9ed1b42799592e3cd6`;
+  UPS SHA-256 is
+  `415561306a95c4f686633d391c8b8882186c0ef57884ed5994701728e6a6d3ce`.
+  The [checkpoint](checkpoints/INVENTORY_ENGLISH.md) retains sizes, source bounds,
+  reproduction, tests, and outstanding gameplay checks.
+- Five host/artifact checks pass, including sanitizer execution of the actual
+  helper C. The complete cartridge/UPS check and 29 shared-menu regressions
+  pass. The new accounting check plus seven counter tests pass. These 43
+  focused tests cover buffer/width bounds, label/callback identities, relocated
+  pointers, retained BSS, allocation, mutation rejection, earlier resources,
+  and single-ID accounting. No exhaustive native harness is constructed.
+- Added inventory labels to the combined counter in both earlier and current
+  builds. The first accounting attempt exposed the owner editor's changed DMA
+  address: the counter incorrectly assumed the original keyboard overlay was
+  still there. It now verifies the complete relocated editor and retained
+  English-first prefix. The corrected test proves unchanged other credits and
+  denominator across the compared builds; only newly installed label text gains
+  credit. No unsolicited percentage is reported.
+- Clarified the working rule after the user's question: setup retry/time limits
+  apply to test infrastructure, not fixing actual game defects. Confirmed
+  crashes, save damage, and memory corruption block v0. Unexplained possible
+  game failures remain unresolved until classified; moving to unrelated work
+  does not authorize shipping past them.
+- Ordinary inventory, long names, prices, and mail/quest transitions join the
+  combined v0 safety pass. Continue catalogue/other full-name consumers and
+  residual text rather than replaying completed host or earlier native batches.
+  No hardware, normal save/reload, v0 delivery, or overall completion is claimed.
