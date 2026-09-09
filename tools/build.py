@@ -222,6 +222,7 @@ def main():
     parser.add_argument('--english-quest-replies',type=Path,help='Complete letter-quest replies; requires quest reply owners, creator, and full item names')
     parser.add_argument('--english-snowman-letters',type=Path,help='Complete fixed Snowman gift actor; requires the glyph catalogue/font and snapshot reader')
     parser.add_argument('--english-secret-letters',type=Path,help='Complete villager secret letters; retains the date/birthday/wider-word conversation overlay')
+    parser.add_argument('--english-noticeboard',type=Path,help='Complete initial board posts and native full-body reader; requires the glyph reader, items, and English keyboard')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -235,6 +236,10 @@ def main():
     parser.add_argument('--npc-mail-generation', type=Path, help='Experimental complete NPC creator overlay directory; enables guarded cartridge loading and delivery; gameplay/save acceptance remains')
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
+    if args.english_noticeboard and not (args.english_keyboard and args.english_runtime and args.runtime_module
+                                        and args.mail_catalog and args.extended_font and args.english_mail_snapshots
+                                        and args.extended_items):
+        parser.error('--english-noticeboard requires the English keyboard/runtime, glyph catalogue/font, snapshot reader, and full item resource')
     if args.english_song_names and not (args.english_credits and args.runtime_module and args.extended_items):
         parser.error('--english-song-names requires --english-credits, --runtime-module, and --extended-items')
     if args.english_dialogue_dates and not args.runtime_module:
@@ -389,6 +394,9 @@ def main():
     if args.english_song_names:
         from song_item_names import install as install_song_item_names
         report['song_item_names'] = install_song_item_names(rom,replacements,additions,report.get('runtime_module'))
+    if args.english_noticeboard:
+        from notice_overlay import install as install_noticeboard
+        report['noticeboard'] = install_noticeboard(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_noticeboard)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

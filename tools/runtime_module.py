@@ -148,6 +148,17 @@ def runtime_source_hashes(source):
             for p in sorted(source.rglob('*')) if p.is_file()}
 
 
+def resident_c_sources(source):
+    """Keep shared on-demand notice helpers outside the bounded resident image.
+
+    Their complete sources still belong to runtime_source_hashes. Exclude only
+    these explicit overlay-owned compilation units; new resident files continue
+    to compile, and an accidental resident call to a notice helper fails to link.
+    """
+    on_demand = {'notice/record.c', 'notice/initial.c', 'notice/page.c'}
+    return [p for p in sorted(source.rglob('*.c')) if p.relative_to(source).as_posix() not in on_demand]
+
+
 def add_runtime_module(rom, replacements, directory):
     gyroid = gyroid_evidence(rom)
     report = json.loads((directory/"module.json").read_text())

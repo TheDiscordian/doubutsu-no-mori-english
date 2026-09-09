@@ -77,8 +77,9 @@ native/reference parts, the complete supplied English banks and decoder,
 catalogue-four identity, original initializer/table, and actual native controls.
 `runtime/notice/initial.c` checks the selected fixed identity, empty field mask,
 complete decoded body length/checksum, and exact controller span before output.
-Both saved capitalization states produce the complete fixed wording. This
-source binding does not install creation or display hooks.
+Both saved capitalization states produce the complete fixed wording. The source
+audit is independent of installation; `tools/notice_overlay.py` installs creation
+and display hooks together and verifies the actual cartridge resources.
 
 The actual reader is submenu program six, overlay VROM `00797A50`, linked at
 `80894250`, with 6,656 file bytes and 128 BSS bytes. Complete file SHA-256 is
@@ -103,8 +104,8 @@ field expansion. Fifty-seven have six explicit visible lines, four have five,
 one has four, and `01AE` has seven. These are source-layout observations, not
 pixel-fit or native-draw proof. Preserve manual breaks and check the seventh
 line, full dynamic names/dates, and existing post-navigation/edit controls.
-The initial-post route is the next installation group; seasonal and treasure
-identity/field review remain part of the complete board requirement.
+The initial-post route is installed. Seasonal and treasure identity/field review
+remain part of the complete board requirement.
 
 ## Implemented compact envelope and full-body page planner
 
@@ -144,42 +145,81 @@ and trailing spaces, and complete registered glyph pairs. The whole body is
 validated before publishing even page zero. A seventh line continues on another
 page; a final newline does not invent an extra empty page. All four initial
 bodies fit one page under the approved metrics. The native `8089542C` body
-drawer still uses sixteen-byte rows and is not yet replaced. Its complete
+drawer retains sixteen-byte rows for editing. The full reader intercepts its
+page-draw caller without replacing the retained function. Its complete
 `8089542C..8089562C` hash is
 `6541da6eea1c047aeb02a666ba10fe7148897459df37f66ccb5b4ad792f8517c`.
 
 The family-prefix test deliberately recognises unsupported versions so a future
 reader can display an error instead of treating encoded data as ordinary text.
-Native integration must first finish the editor/tag-discrimination audit. All
-five original keyboard palettes exclude `7F` and `80`; the actual selector at
+The editor/tag-discrimination audit verifies that all five original keyboard
+palettes exclude `7F` and `80`; the actual selector at
 `80885140..808851D8` reads the pointer/count tables at `808885C8/808885DC`.
-The five counts are 50/30/50/30/10. Case/ornament conversion and existing saved
-manual posts still require explicit compatibility checks. Palette exclusion
-alone is not a complete proof for every editor output or old save.
+The five counts are 50/30/50/30/10. The native case/ornament converter at
+`80886168..808861E0` reads the 256-byte map at `80888710`; that map has SHA-256
+`b362d398e9b519b0e336eb53a2490a5af1ca78ddd426de3c3034153a38bf1e5e`.
+The transitive set of palette/space/newline bytes and repeated conversions has
+253 values, excluding both reserved prefixes. Insertion copies the selected
+byte, deletion shifts it, and down-at-end adds `CD`. This covers native manual
+input; arbitrary third-party saved edits and old Japanese automatic-post
+translation still require separate compatibility handling.
 
-## Native installation and acceptance still required
+## Installed native ownership and remaining acceptance
 
-Complete generated bodies need a lossless representation within the existing
-96-byte saved message and a compatible full-body reader. The current mail
-envelope occupies 122 bytes and is identified through a mail-only split marker;
-neither assumption can be applied directly to a noticeboard record. A compact
-representation may reuse the existing bounded payload if its actual used bytes
-fit, but detection, malformed-record handling, full decoding, page drawing,
-custom-post editing, and old-save compatibility need explicit implementation.
-Profile one is implemented as bounded helpers, but no noticeboard format or
-reader hook is installed in the complete translation ROM.
+`overlays/notice/initial.s` replaces `800A5BC4..800A5CB0` with 188 instruction
+bytes and zero padding. It clears each 96-byte message, installs its canonical
+sixteen-byte compact prefix, and copies the original eight-byte timestamp. The
+four table words at `8010B4A0` become fixed template/checksum words. The native
+clear routine handles the eleven remaining slots. No new initial-creation
+allocation or cartridge read is needed.
 
-Continue by connecting the creator and reader together, with guarded native
-overlay allocation/relocation and lifetime. The submenu loader uses
-`linkedAllocEnd`, loads the declared program range, and advances by the aligned
-declared RAM size; source is `upstream/af/src/overlays/submenu/submenu_ovl/`.
-Any appended code or state must update and verify that owner and its total pool,
-not merely the overlay relocation record. The resident module has no linked
-headroom. An Expansion Pak remains permissible, but these helper objects do not
-change the actual memory requirement or any heap bound.
+The full reader is appended after the original file and 128 zero-backed BSS
+bytes. Its 13,840-byte file resides at VROM `03920000`, with the 560-byte adjacent
+relocation file at `03928000`. The original DMA row indices remain. Original
+section-relative relocations are flattened without reordering, and appended ELF
+relocations include only targets inside the overlay; fixed verified resident
+imports are not moved. Code, initialization, relocations, and exported offsets
+have independent compiled identities. Three relocation bases retain all
+untouched original code/data/BSS.
 
-Preserve original timestamps, insertion order, full-board shifting, manual
-posts, treasure/reward selection, and scheduling. Complete creation must precede
-publication. Native tests must cover full content, retention on failure, all
-saved positions, the real reader/editor boundaries, and save/reload. Normal
-seasonal gameplay and original hardware remain separate acceptance requirements.
+The submenu owner at VROM `007749C0` has program-six metadata at offset `2AD0`.
+It declares the complete new file/RAM range and constructor while retaining
+native destructor/set-procedure offsets. It has no cross-overlay metadata
+relocation rows. The native `linkedAllocEnd` loader advances by the aligned
+declared size; source is `upstream/af/src/overlays/submenu/submenu_ovl/`.
+The pool calculation's instruction at `800C4B10` adds 16,384 bytes to its editor
+term, which is part of the dominant submenu sum. The actual arithmetic yields
+214,400 native bytes and 230,784 expanded bytes, above the unchanged alternative
+199,488 and player 186,240 terms. The added reader's aligned growth is 7,104
+bytes. This reserves space without changing any other program's declared image.
+Native loader/allocation execution still needs validation.
+
+The constructor wrapper clears two 1,216-byte caches and invokes the retained
+constructor. The read dispatch at `80895BC0` wraps the retained controls, and
+calls at `80895750/80895768/808957C0` draw English entry/date/body text. Original
+read/edit functions are not overwritten by wrappers that would recurse into
+themselves. Full RTC dates use day byte three, month byte five, and BE16 year
+at byte six. Complete English month names are right-aligned in the header.
+L/R select additional six-line pages; existing post/navigation/edit controls
+take precedence. The page hint and header placement still need native review.
+
+The reader's aligned decoder workspace is temporary heap storage; only its full
+decoded body stays in a cache. Comparing all 96 input bytes invalidates changed
+slots. Both sides of a post transition can remain cached. Failed restoration
+displays a bounded error without modifying the saved record; reopening retries.
+Editor mode invokes the retained native body/cursor implementation, and a draft
+confirmation never interprets its bytes as a persistent snapshot.
+
+The resident module retains its exact binary, symbols, reservation, and heap
+bounds. The resident compiler excludes only the three explicit on-demand notice
+C units while keeping every nested runtime source/header in its source inventory.
+The full build requires a freshly generated manifest, the English keyboard,
+complete glyph resources, and snapshot reader. An Expansion Pak is permitted,
+but the implemented memory configuration remains four MiB.
+
+Native storage execution passes initial creation, count/clear, all fifteen
+positions, full-board shifting, manual/encoded record retention, timestamps,
+guards, and checkpoint restoration. Actual expanded-owner loading, native full
+decoding/drawing/navigation, normal draft publication, old automatic-post display,
+save/reload, seasonal/treasure meanings and full fields, ordinary gameplay, and
+original hardware remain. See the [integration checkpoint](../docs/checkpoints/NOTICEBOARD_READER.md).

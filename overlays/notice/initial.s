@@ -1,0 +1,53 @@
+.set noreorder
+.set noat
+.text
+.global af_notice_native_init
+af_notice_native_init:
+    addiu $sp,$sp,-40
+    sw $ra,36($sp)
+    sw $s0,32($sp)
+    sw $s1,28($sp)
+    sw $s2,24($sp)
+    lui $s0,0x8013
+    addiu $s0,$s0,-25078
+    lui $s1,0x8011
+    addiu $s1,$s1,-19296
+    addiu $s2,$s0,416
+    jal 0x800D5090
+    addiu $a0,$sp,16
+1:
+    or $a0,$s0,$zero
+    addiu $a1,$zero,96
+    jal 0x8009992C
+    or $a2,$zero,$zero
+    lui $t0,0x7F42
+    ori $t0,$t0,0x4E01
+    swl $t0,0($s0)
+    swr $t0,3($s0)
+    lui $t0,0xAF20
+    ori $t0,$t0,0x0C00
+    swl $t0,4($s0)
+    swr $t0,7($s0)
+    lui $t0,0x0400
+    swl $t0,8($s0)
+    swr $t0,11($s0)
+    lw $t0,0($s1)
+    swl $t0,12($s0)
+    swr $t0,15($s0)
+    addiu $a0,$s0,96
+    addiu $a1,$sp,16
+    jal 0x800998C0
+    addiu $a2,$zero,8
+    addiu $s1,$s1,4
+    addiu $s0,$s0,104
+    bne $s0,$s2,1b
+    nop
+    or $a0,$s0,$zero
+    jal 0x800A5B50
+    addiu $a1,$zero,11
+    lw $ra,36($sp)
+    lw $s0,32($sp)
+    lw $s1,28($sp)
+    lw $s2,24($sp)
+    jr $ra
+    addiu $sp,$sp,40

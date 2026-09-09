@@ -265,6 +265,17 @@ def measure(native, built, report):
             verify_installation(built,native,module,report['secret_actor'])
             credit_mail(0x030A0000,{k:TEMPLATES for k in ('super','mail','ps')},'secret_actor')
 
+        if report.get('noticeboard'):
+            from notice_overlay import INITIAL_IDS, verify_installation
+            from audit_noticeboard import initial_body
+            from mail_catalog import parse
+            from mail_record import Record
+            verify_installation(built, native, module, report['noticeboard'])
+            catalog_banks = parse(extract(0x030A0000))[1]
+            for number in INITIAL_IDS:
+                body = initial_body(Record(4, 0, (number,), ()), catalog_banks)
+                ledger.credit(f'mail:{number:04X}', body, 'noticeboard', mail=True, mail_glyphs=True)
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard

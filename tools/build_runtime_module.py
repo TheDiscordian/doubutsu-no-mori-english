@@ -10,7 +10,7 @@ import subprocess
 from aflib import sha256, verified_rom
 from check_keyboard_assembly import IMAGE
 from runtime_module import (MODULE_INIT, MODULE_RAM, MODULE_VROM, RESERVATION,
-                            audit_watchdog_references, watchdog_bytes, runtime_source_hashes)
+                            audit_watchdog_references, watchdog_bytes, runtime_source_hashes, resident_c_sources)
 from runtime_layout import LINKED_LIMIT
 
 
@@ -35,7 +35,8 @@ def main():
         return result.stdout
     compiler = run("gcc", "--version").splitlines()[0]
     c_objects = []
-    for path in sorted(source.rglob("*.c")):
+    compiled_sources = resident_c_sources(source)
+    for path in compiled_sources:
         relative = path.relative_to(source)
         name = relative.with_suffix('.o').as_posix()
         (out/relative.parent).mkdir(parents=True, exist_ok=True)
@@ -79,7 +80,7 @@ def main():
               "linked_bytes": symbols["__module_end"]-MODULE_RAM, "compiler": compiler, "toolchain_image": IMAGE,
               "runtime_sources": source_hashes,
               "stack_usage": {path.with_suffix('.su').as_posix(): (out/path.with_suffix('.su')).read_text()
-                              for path in (p.relative_to(source) for p in sorted(source.rglob('*.c')))},
+                              for path in (p.relative_to(source) for p in compiled_sources)},
               "symbols": {name: f"{value:08X}" for name, value in sorted(symbols.items())}, "audit": audit,
               "status": "experimental; boot, heap, gameplay, and hardware validation required"}
     (out/"module.json").write_text(json.dumps(report, indent=2)+"\n")

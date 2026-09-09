@@ -16,13 +16,16 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
-The [bulletin-board foundation](checkpoints/NOTICEBOARD_FOUNDATION.md) has complete
-compact storage, source-bound initial bodies with the native C-button wording,
-and a full-body page planner. Eighteen host checks and eighteen sanitizer checks
-pass; independent VR4300 objects agree. No ROM hooks are installed yet. Connect
-the real reader/creator, finish editor/tag compatibility and allocation ownership,
-then implement reviewed seasonal/treasure fields and publication. Preserve native
-post navigation and save layout, and do not credit catalogue-only availability.
+The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
+installs complete initial bodies, English entry/date labels, and a full-body
+reader while preserving native edit handling and saved-record dimensions. Native
+storage passes 36 calls and 46 assertions across all slots and full-board shifts.
+Independent builds, host/sanitizer checks, allocation arithmetic, manual-input
+tag discrimination, full ROM/UPS retention, and combined accounting pass.
+Continue native owner/reader execution and real navigation, then reviewed
+seasonal/treasure bodies, full fields, publication, old automatic-post handling,
+and persistence. Do not repeat the passed storage batch or count catalogue-only
+availability as applied translation.
 
 The [native-specific names](checkpoints/NATIVE_ITEM_NAMES.md) install 22 original
 entries across 63 fields, with source-bound complete wording, honest provenance,
