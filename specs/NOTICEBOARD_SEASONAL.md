@@ -7,8 +7,9 @@
 96-byte notice envelope and eight-byte saved RTC. The immutable supplied English
 catalogue is unchanged. The complete ROM installs creation, failure-safe
 publication, and full reading together. The application counter verifies those
-installed resources before crediting the 41 source bodies once. Native seasonal
-execution, persistence, and hardware acceptance remain separate requirements.
+installed resources before crediting the 41 source bodies once. Controlled native
+creation, posting, same-session retry, and complete reader execution pass.
+Normal gameplay, persistence, and hardware acceptance remain requirements.
 
 Twenty-one bodies retain their matched GameCube wording and manual layout
 unchanged. Fifteen adapt a matched reference for native facts. Five are original
@@ -81,8 +82,8 @@ Japanese suffix and the shop at ten bytes. Those are not acceptable English
 snapshot fields. The original annual preparer `800A6450..800A6548` converts two
 lunar dates from the pairs at `8010B504`: month/day `08/0F` and `09/0D`, then
 derives the October sports date. Do not substitute the donor's autumnal equinox.
-Actual native helper execution and complete date capture remain required; source
-binding is not proof of calendar behaviour.
+The native batch checks actual helper execution and complete date capture for
+2001; source binding alone is not proof of calendar behaviour.
 
 The old combined date formatter has a four-byte temporary, no separating space,
 an eight-byte caller buffer, and a ten-byte handbill setter. Widening one of those
@@ -148,7 +149,13 @@ identity, a twelve-byte descriptor, outgoing arguments, and saved return address
 It copies only the successful 96-byte message into the original pending post,
 retaining the eight-byte timestamp. The unchanged native writer then appends or
 shifts the complete 104-byte post. Only after that return does the bridge store
-the current loop index/year in the saved posting cursor.
+the current loop index/year in the runtime posting cursor.
+
+The posting cursor at `80137918..8013791F` belongs to Common runtime state,
+outside the FlashRAM payload `80126EA0..8013681F`. Native initialization derives
+the cursor from the save-check time. Retaining this cursor proves same-session
+retry, not pending-notice persistence across saving and reloading. Persistence
+of an interrupted backlog remains an explicit acceptance requirement.
 
 The old pre-publication cursor stores at `800A66C4/800A66CC` are removed.
 `800A6778` calls the bridge. The old writer pair at `800A6780/800A6784` becomes
@@ -190,9 +197,25 @@ mixed cached text, failure/retry, and unchanged saved posts.
 Six creator artifact tests and eleven owner/reader/installation/accounting tests
 pass, including independent builds, three relocation bases, precise source
 guards, partial-install rejection, actual-hook removal, full ROM/UPS retention,
-and exactly 41 newly credited source IDs. Native seasonal execution is not claimed.
+and exactly 41 newly credited source IDs.
 
-Next run one bounded native seasonal batch for actual calendar calls, complete
-posting, pending-prefix recovery, and full reading. Normal gameplay, old saves,
+The completed silent native owner batch passes all 78 scheduled body/capital
+cases, four unscheduled direct creations, and five interrupted-backlog positions
+with exact-prefix retention and suffix retry. It executes the original calendar,
+shop getter, scheduler, writer, and cartridge-loaded creator, with 359 calls and
+513 assertions. The controlled year-2001 calendar produces October 1st and
+October 29th for the two lunar dates, and October 8th for the sports date.
+These are observed native results, not an external astronomical claim.
+
+The separate reader batch passes all 82 complete bodies, 84 native draws,
+11,930 glyphs, and 47,720 vertex positions. Its two continuation-page draws
+preserve all source characters. The larger fixture uses a `F000`-byte auxiliary
+allocation with game/graphics state at offset `6000`, beyond the complete reader.
+All 183 calls and 466 assertions pass, with both batches restoring state and
+checkpoints, retaining blank isolated saves, and shutting down gracefully.
+Eight frozen-evidence tests retain these results without replaying game calls.
+The reader uses controlled owned submenu storage, not normal initialization or
+the enlarged production pool. Native fallback-year/date-boundary/all-shop-tier
+and null-allocation edge checks remain, alongside normal gameplay, old saves,
 save/reload, review, hardware,
 patch-only release, and the title/keyboard stretch work remain project requirements.

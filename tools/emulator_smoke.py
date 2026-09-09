@@ -982,6 +982,12 @@ def main():
                     raise ValueError('Treasure transaction probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_notice_treasure'],record))
+            if 'test_notice_seasonal' in action:
+                from notice_seasonal_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Seasonal publication probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_notice_seasonal'],record))
             if 'test_quest_replies' in action:
                 from quest_reply_smoke import exercise
                 if not (out/'test.bs1').is_file():

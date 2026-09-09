@@ -17,7 +17,7 @@ The [complete seasonal notice integration](checkpoints/NOTICEBOARD_SEASONAL.md)
 installs all 41 English bodies in `build/notice-seasonal-pilot`: 21 unchanged
 GameCube references, fifteen native-specific adaptations, and five original
 translations. Complete shop/town names and native lunar/sports dates use private
-capture. Publication advances the saved cursor only after the complete post reaches
+capture. Publication advances the runtime posting cursor only after the complete post reaches
 the native writer. The original schedule, five-post backlog limit, events, speakers,
 shrine venue, and manual layout remain. Creation and reading must be installed
 together before the combined counter credits these source bodies.
@@ -30,8 +30,16 @@ their sanitizer equivalents. Six creator artifact checks and eleven owner/reader
 installation/accounting checks pass. The full ROM/UPS retains every earlier
 translation resource. Five treasure owner, five treasure creator, and five frozen
 native-evidence checks pass without replaying completed native batches.
-Next execute the seasonal calendar, scheduler failure/retry, and full-reader batch.
-Host calendar mocks and compiled installation are not native or hardware proof.
+The silent native owner batch passes 78 scheduled body/capitalization cases,
+four direct unscheduled entries, and all five failed-backlog positions followed by
+successful suffix retries: 359 calls and 513 assertions. Actual native calendar,
+shop, scheduler, writer, and cartridge-loaded creator execute. The separate reader
+batch passes all 82 complete bodies, 84 draws including two continuation pages,
+11,930 glyphs, 47,720 vertex positions, 183 calls, and 466 assertions. Both restore
+state and their checkpoints, keep isolated saves blank, and shut down gracefully.
+These controlled fixtures do not prove normal menu initialization, the enlarged
+submenu pool, save/reload, or hardware. The posting cursor is outside the saved
+payload; interrupted-notice retry is proven within the same session only.
 
 The [complete treasure integration](checkpoints/NOTICEBOARD_TREASURE.md) installs
 all eighteen English posts in `build/notice-treasure-pilot`, including their
@@ -64,7 +72,7 @@ completed initial board batch is replayed. Ordinary-item cases substitute a
 known item at placement; the random furniture selector is not exercised. These
 reader fixtures fit single pages, so they do not add native multi-page evidence.
 
-Continue validating the forty-one seasonal notices and installing other remaining text. Their donor
+Continue installing other remaining text and validating normal gameplay. Seasonal donor
 IDs differ from the N64 IDs, including Valentine's Day, White Day, Doll Festival,
 the two moon-viewing dates, and the sports/festival dates and shrine venue.
 Bind matching text by meaning and retain native-specific events. Save/reload,
@@ -87,11 +95,11 @@ recovery, entry labels, and all twelve months pass. The final edge run restores
 heap/save/input state and its checkpoint, with blank isolated saves and graceful
 shutdown. The [native reader evidence](checkpoints/NOTICEBOARD_NATIVE_READER.md)
 distinguishes completed checks from partial fixture runs. Normal menu entry and
-C-button/edit navigation, old automatic posts, persistence, and the 41 seasonal
-bodies remain active work. Seventeen treasure references have
+C-button/edit navigation, old automatic posts, and persistence remain active
+work; all 41 seasonal bodies use the complete integration above. Seventeen treasure references have
 source/field review; the creator/decoder above also implements the native-specific
 `01F4` heading without revealing the original clue's hidden item. Continue
-bulk seasonal-post implementation and remaining gameplay acceptance, without replaying
+remaining text implementation and gameplay acceptance, without replaying
 passed storage/reader cases.
 
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs

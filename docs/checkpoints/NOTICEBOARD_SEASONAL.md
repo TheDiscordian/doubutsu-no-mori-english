@@ -33,7 +33,7 @@ No translation was shortened to satisfy a test.
 `build/notice-seasonal-pilot` installs all 41 complete bodies and every earlier
 translation resource. Creation captures complete town/shop fields and native
 lunar/sports dates in private storage. The native publication bridge keeps the
-original timestamp and advances the saved cursor only after successful writing.
+original timestamp and advances the runtime posting cursor only after successful writing.
 The complete reader retains initial/treasure/manual text, two caches, and all
 full-body pages. The combined counter verifies installation before crediting
 the 41 Japanese source IDs; sample names do not create extra name credit.
@@ -92,8 +92,56 @@ Logs under `build/noticeboard-seasonal/` include `creator-tests.log`,
 `reader-repeat-build.log`, `owner-repeat-build.log`, `full-build.log`, and
 the three `treasure-*-retention-tests.log` files. The complete native treasure
 owner/reader evidence remains in the [treasure checkpoint](NOTICEBOARD_TREASURE.md).
-Calendar mocks are call-contract tests, not actual calendar execution. No native
-seasonal, normal scheduling, new pool, save/reload, or hardware proof is claimed.
+Calendar mocks are call-contract tests. The native results below add actual
+calendar and controlled scheduler execution, but do not establish normal
+gameplay, the enlarged submenu pool, save/reload, or hardware acceptance.
+
+## Complete native batches
+
+`build/smoke-notice-seasonal-owner-01` completes all 78 scheduled body/capital
+cases, four direct unscheduled creations, and failures at each of five backlog
+positions followed by complete retries. All 359 calls and 513 assertions pass.
+The actual native calendar, shop getter, scheduler, writer, allocator, and
+cartridge-loaded creator execute; no replacement creator code is uploaded.
+Whole saved-payload checks permit only complete posts and the native checked time.
+Every interrupted case keeps the complete prefix and retries only its suffix.
+The two unscheduled IDs remain unscheduled, rather than acquiring invented events.
+
+The year-2001 native lunar calls return `07D10A01` and `07D10A1D`; complete fields
+retain `October 1st` and `October 29th`. The actual weekday call produces the
+native sports date `October 8th`. Town and level-three shop fields stay complete.
+The posting cursor at `80137918` is Common runtime state outside saved payload
+`80126EA0..8013681F`. These results prove same-session interrupted-post retry,
+not persistence of pending work through save/reload.
+
+`build/smoke-notice-seasonal-reader-01` completes all 82 body/capital cases,
+84 draws including two continuation pages, 11,930 glyphs, and 47,720 vertex
+positions. All 183 calls and 466 assertions pass. The fixture places game/graphics
+state at auxiliary offset `6000`, beyond the 24,304-byte reader, in a `F000`-byte
+allocation. Actual loaders, constructor, destructor, callbacks, and glyph drawing
+execute. This controlled owned submenu does not prove normal menu initialization
+or allocation of the enlarged production pool.
+
+Both batches retain heap/code/stack/global guards, restore the entire saved
+payload and checkpoint, keep isolated FlashRAM/Pak files blank, and shut down
+gracefully. No audio or screenshots are enabled. Completed initial and treasure
+native batches are not replayed. Four owner and four reader frozen-evidence
+checks pass; `native-evidence-tests.log` records the combined result. The earlier
+four initial-reader evidence checks also pass without emulator replay.
+
+| Evidence | SHA-256 |
+| --- | --- |
+| Owner results | `17941ccc6c0e645412958fdeeec97fe425c3562a06992d94fa4c75330052bc96` |
+| Owner scenario | `170cf2d074294519048b732d1dda43c4debe7cda180b0286904ac3d2ecf773a4` |
+| Owner checkpoint | `3f739ca7f557a3314c6c8a3ed07050a40baf4b4a42612a1de3f8ee7aadd6156a` |
+| Reader results | `99ff132454c32a72b7c1f1a92d54fa731d689fc3712cf2d93e2391ba21d94687` |
+| Reader scenario | `05f816f7aad1c4a4fa9fb079a8f944fb250d5ee80d180fee95a129e916d9bd4c` |
+| Reader checkpoint | `07fdc7af40011006cfa1ebd3f1fb52dc1d4b5cbaf278542e0447d90f5816909c` |
+
+Native fallback years, date boundaries, other shop tiers, new null-allocation
+faults, normal menu entry, production pool allocation, and save/reload remain
+acceptance work. Host tests cover fallback contracts and all shop tiers; those
+are not substituted for native evidence.
 
 ## Reproduction
 
@@ -114,14 +162,10 @@ path. Inputs and complete ROMs stay local; public release remains patch-only.
 
 ## Next work
 
-1. Run a bounded seasonal native batch: actual lunar/weekday/shop calls, all
-   complete bodies, both capitals, pending-prefix failure/retry, original
-   scheduling/date behaviour, and full reader drawing. Preserve isolated saves,
-   heap/global/code guards, and checkpoint restoration. Do not replay passed
-   initial/treasure native cases.
-2. Grow the native reader fixture's graphics offset beyond the 24,304-byte reader;
-   the treasure fixture's `4000` offset is too early. Validate disjoint regions
-   before execution. Host reader tests already cover all complete seasonal pages.
-3. Continue remaining general text/names, full-name callers, gameplay/save
+1. Continue remaining general text/names and full-name callers. Do not replay
+   the completed seasonal, initial, or treasure batches.
+2. Batch outstanding native edges and normal menu/pool/save checks after bulk
+   text installation, including interrupted-post persistence.
+3. Complete gameplay/save
    compatibility, review, available validation, patch-only release, title art,
    and GameCube-style keyboard work. The overall goal remains active.

@@ -38,8 +38,13 @@ def exercise(debug, request, record):
     proofs = []
     assertions = draws = glyph_count = 0
     treasure = request.get('treasure_only', False)
+    seasonal = request.get('seasonal_only', False)
     if type(treasure) is not bool or (treasure and request['report'].get('treasure') is not True):
         raise ValueError('Invalid native treasure reader profile')
+    if (type(seasonal) is not bool or (seasonal and request['report'].get('seasonal') is not True)
+            or (treasure and seasonal)):
+        raise ValueError('Invalid native seasonal reader profile')
+    complete = treasure or seasonal
 
     def check(label, at, expected):
         nonlocal assertions
@@ -80,7 +85,7 @@ def exercise(debug, request, record):
     call(0x8009C0C0, [0x8019B000, 0x8019B004, 0x8019B008])
     record({'notice_heap_before_fixture': list(struct.unpack('>3I', read(0x8019B000, 12)))})
     allocations = []
-    auxiliary_size = 0xD000 if treasure else 0xC000
+    auxiliary_size = 0xF000 if seasonal else 0xD000 if treasure else 0xC000
     for size in (0x13B00, auxiliary_size):
         pointer = call(0x8009BFC0, [size])
         if pointer & 15 or not MODULE_RAM+RESERVATION <= pointer <= 0x80400000-size:
@@ -91,7 +96,7 @@ def exercise(debug, request, record):
     state_owner = owner_at+len(owner)
     asset_at = state_owner+16
     base = auxiliary+0x10
-    delta = 0x800 if treasure else 0
+    delta = 0x2800 if seasonal else 0x800 if treasure else 0
     game, metrics, end, graph, arena = (
         auxiliary+offset+delta for offset in (0x3800, 0x3920, 0x3940, 0x3A00, 0x3E00))
     arena_end = auxiliary+auxiliary_size-16
@@ -190,7 +195,7 @@ def exercise(debug, request, record):
 
     def draw_body(slot, body, status=2, page=0):
         source = POSTS+slot*104
-        if treasure:
+        if complete:
             from notice_native_layout import rows
             spans = rows(body, widths)
             all_lines = [text for _, text, _ in spans]
@@ -212,7 +217,7 @@ def exercise(debug, request, record):
         check('cache retains complete source and body', at,
               words(source, status, page)+read(source, 96)+words(len(body))+body)
         layout = bytearray(words(total, len(lines)))
-        if treasure:
+        if complete:
             for offset, line, width in spans[page*6:page*6+6]: layout += words(offset, len(line), width)
         else:
             offset = sum(len(line)+1 for line in all_lines[:page*6])
@@ -228,14 +233,14 @@ def exercise(debug, request, record):
         check('native body end coordinates', end, struct.pack('>2f', *expected_end))
         return at
 
-    if treasure:
+    if complete:
         call(0x8007D91C, [0], 0)
         call(0x8007D90C, expected=0)
     for case in request['cases'][request.get('skip_initial', 0):]:
         wire, body = bytes.fromhex(case['wire']), bytes.fromhex(case['body'])
         write(POSTS, wire+rtc)
         draw_body(0, body)
-        if treasure:
+        if complete:
             from notice_native_layout import rows
             pages = max(1, (len(rows(body, widths))+5)//6)
             for page in range(1, pages):
@@ -249,9 +254,9 @@ def exercise(debug, request, record):
         check('reader leaves compact post and timestamp unchanged', POSTS, wire+rtc)
         call(0x8009C0C0, [metrics, metrics+4, metrics+8])
         check('cache miss releases full decoder workspace', metrics, heap)
-        record({('notice_treasure_body' if treasure else 'notice_initial_body'): case['template'],
+        record({('notice_seasonal_body' if seasonal else 'notice_treasure_body' if treasure else 'notice_initial_body'): case['template'],
                 'capital': case['capital'], **({'item': case['item']} if treasure else {}), 'passed': True})
-    if not treasure and not request.get('edges_only'):
+    if not complete and not request.get('edges_only'):
         # Two cached posts must survive alternating animation draws and reopening.
         for slot, case in enumerate(first[:2]): write(POSTS+slot*104, bytes.fromhex(case['wire'])+rtc)
         for slot in (0, 1, 0, 1): draw_body(slot, bytes.fromhex(first[slot]['body']))
@@ -268,7 +273,7 @@ def exercise(debug, request, record):
         write(POSTS, bytes.fromhex(first[0]['wire'])+rtc)
         call(loader, [submenu, metadata])
         draw_body(0, bytes.fromhex(first[0]['body']))
-    if not treasure:
+    if not complete:
         # Retained initial-only edge batch; do not replay it for treasure bodies.
         # Native controller helpers read the paused game's input. The original
         # setter enables ordinary input in this isolated title fixture.
@@ -313,8 +318,9 @@ def exercise(debug, request, record):
         write(at, value)
         check('native global or input restored', at, value)
     for pointer in reversed(allocations): call(0x8009C040, [pointer])
-    return {'notice_initial_bodies': 0 if treasure else 8-request.get('skip_initial', 0),
+    return {'notice_initial_bodies': 0 if complete else 8-request.get('skip_initial', 0),
             **({'notice_treasure_bodies': len(request['cases'])-request.get('skip_initial', 0)} if treasure else {}),
+            **({'notice_seasonal_bodies': len(request['cases'])-request.get('skip_initial', 0)} if seasonal else {}),
             'notice_native_draws': draws,
             'notice_glyphs_verified': glyph_count, 'notice_reader_assertions': assertions,
             'actual_owner_loader': True, 'normal_submenu_initialization': False,
