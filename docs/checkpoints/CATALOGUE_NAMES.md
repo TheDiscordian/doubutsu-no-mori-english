@@ -24,7 +24,8 @@ English error `Name unavailable`, not stale or silently shortened names.
 This supplies another consumer of already installed names, not duplicate text
 credit. The eight unresolved accented name fields remain unresolved. Embedded
 category labels, wrapped-present text, and confirmation prose are not covered
-by this item-name consumer and remain translation work.
+by this item-name consumer; the [embedded text integration](INVENTORY_MENU_TEXT.md)
+supplies those records and their complete width/copy/draw paths.
 
 ## Artifacts and allocation
 
@@ -97,13 +98,14 @@ Do not infer normal-game or hardware acceptance from host/import mocks or
 static relocation checks. Known game failures still block v0 under the
 [verification policy](../V0_PLAN.md).
 
-The next embedded-text batch has concrete native sources: wrapped-present text
+The [embedded-text profile](INVENTORY_MENU_TEXT.md) handles wrapped-present text
 at tag `8087913C` (five bytes), and nine catalogue category names at
-`80879148` (six bytes each). The existing copy/measurement sites at
-`808701DC`, `8087029C`, and `808702AC` retain those original widths.
+`80879148` (six bytes each). The original copy/measurement sites at
+`808701DC`, `8087029C`, and `808702AC` use those native widths; the complete
+profile updates the applicable bounds and measurement.
 The GameCube references are `present_str$820` and the ninety-byte
 `mTG_catalog_str` in the supplied `foresta` symbol table. Native confirmation
-phrases also need their complete wording and width consumers; the donor's
+phrases also use complete wording and width consumers; the donor's
 `mTG_tag_str_hontoni`/`mTG_tag_str_iidesuka` are placeholders, not translations.
-Bind these source records and callers before applying wider English strings.
+Its complete source/caller binding governs the wider English strings.
 No font-atlas investigation or image replacement is part of this batch.

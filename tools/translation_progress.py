@@ -356,6 +356,14 @@ def measure(native, built, report):
         ledger.add(identity, tag_source[at:at+8])
         if labels is not None:
             ledger.credit(identity, labels[i], 'inventory_english')
+    from inventory_menu_text import SOURCES as MENU_SOURCES
+    menu_installed = bool(report.get('inventory_english', {}).get('overlay', {}).get('menu_text'))
+    for name, address, length, offset, size in MENU_SOURCES:
+        identity = 'ui_inventory_text:'+name
+        ledger.add(identity, tag_source[address-TAG_RAM:address-TAG_RAM+length])
+        if menu_installed:
+            # The complete selected inventory profile has already been verified.
+            ledger.credit(identity, data[offset:offset+size], 'inventory_menu_text')
     return ledger
 
 

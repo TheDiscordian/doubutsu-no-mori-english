@@ -7326,3 +7326,57 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   placeholders requiring original translations. Recorded exact copy/measurement
   sites for the next batch. Eight accented names and other wider consumers,
   residual text, review, save/gameplay checks, release, and v1 goals remain.
+
+## 2026-09-09: complete embedded category and confirmation text
+
+- Classified the previous goal turn as progress: inventory and catalogue
+  integrations are committed/pushed through `ac75981`, and the worktree is clean
+  before this batch. Continued implementation from the recorded concrete
+  embedded-text sources rather than restarting prior verification matrices.
+- Installed thirteen records: nine full GameCube catalogue categories, the
+  seven-byte present label, the complete throw-away question, and an original
+  two-line English confirmation where the donor has only placeholders.
+  Categories and present text fit the native ten-byte field; their stride,
+  source pointers, copy bounds, and measurement change together. Question
+  lines draw directly from immutable text with complete explicit lengths.
+- Found and fixed the throw-away question-width omission in the base English
+  action-label profile: Yes/Quit produces a smaller measured width than the
+  question. The new 32-byte assembly clamp raises the type-25 width to seven
+  cells for the full 76-pixel question and retains larger widths. Its height
+  write, original return path, selection order, actions, colours, and line count
+  remain. `Are you` / `really sure?` fits the unchanged six-cell confirmation
+  width and preserves the original two-line question's meaning.
+- Retained the validated 42,800-byte base profile and its exact helpers/action
+  records. The complete image is 42,976 bytes; its 3,376-byte relocation preserves
+  old rows and adds three jumps. Independent Docker assembly and complete
+  image/relocation/report rebuilds agree. Tag growth becomes 1,088 aligned bytes,
+  192 more than the base profile, using 6,656 of the existing 8,192-byte shared
+  reservation. Catalogue allocation now checks the actual selected tag size:
+  202,432 bytes under the same 243,072-byte pool. No main-code, resident, save,
+  or font change is made; older profiles remain independently verifiable.
+- All four new artifact checks and seven existing inventory/catalogue profile
+  checks pass. The fixed clamp's actual instructions execute in a bounded host
+  model for widths zero through sixteen, preserving adjacent data and returning
+  to the native resume address. This is not N64 CPU execution. Three relocation
+  bases cover all retargeted source pointers, hooks, and unchanged base words.
+  Partial/rehashed changes and insufficient reservations are rejected.
+- Both complete-cartridge tests pass: source/output UPS reconstruction, current
+  owner and allocation checks, unchanged main code and unrelated resources,
+  and original-ID accounting. The thirteen original Japanese records enter the
+  denominator in older builds too; only the complete installed profile gains
+  their credit. Every other record/credit remains unchanged. No percentage is
+  volunteered and no completed native batch is replayed.
+- The complete ROM SHA-256 is
+  `8e7033b789d57b115a90701a09dc571e09f09c5e7bfec111c065c8aacdfe443d`;
+  UPS SHA-256 is
+  `77c890adab11974946fadbf606293a7dc5e36ff0ecedcce10f5b8d4894c57c20`.
+  Reproduction, source bounds, current artifacts, and limitations are in the
+  [embedded-text checkpoint](checkpoints/INVENTORY_MENU_TEXT.md).
+- Recorded the next remaining inventory consumer: mail/quest labels retain
+  six-byte names and Japanese phrase composition, including two-byte mother
+  text at `80879144`. The supplied GameCube donor calls that fragment `home`
+  inside its different full English composition; copying that isolated word
+  is not a complete translation. Continue complete sender/quest descriptions,
+  other wider consumers, residual text/accents, and the combined v0 safety pass.
+  No ordinary gameplay, save/reload, hardware, release, or goal completion is
+  claimed by this milestone.

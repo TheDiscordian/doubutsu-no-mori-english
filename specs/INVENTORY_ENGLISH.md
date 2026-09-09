@@ -34,8 +34,10 @@ Question/mail branches retain their separate six-byte name fields and renderer.
 Redirect only the item-name load at `808701EC` to a sixteen-byte adapter for
 the installed full-name resource. The ordinary item renderer's length at
 `808783AC` becomes sixteen. Present and catalogue-name branches retain their
-original copies and the initializer's space padding. Do not globally replace
-the native ten-byte item loader.
+original copies in the base profile. The
+[embedded menu text profile](INVENTORY_MENU_TEXT.md) supplies complete present
+and category text within the original ten-byte field while retaining the
+initializer's space padding. Do not globally replace the native ten-byte loader.
 
 ## Geometry and ownership
 

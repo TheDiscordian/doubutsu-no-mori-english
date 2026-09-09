@@ -13,11 +13,15 @@ distinct native slots retains each slot's weight. Development labels count too.
 
 The total combines dialogue, choices, general strings, item names, villager and
 special-character names, catchphrases, letter headers/bodies/footers, embedded
-name-entry prompts, keyboard labels, and 39 embedded inventory label records.
+name-entry prompts, keyboard labels, 39 embedded inventory action-label records,
+and thirteen category/present/question records.
 Inventory records enter the denominator in older builds too; complete English
 credit requires the installed label image, callbacks, full-name loader, font,
 relocation, and shared allocation checks. Repeated references to one menu label
 do not multiply its weight; original numeric-only records add no Japanese weight.
+Category/present/question credit also requires the complete selected tag profile,
+copy/draw bounds, source pointers, and minimum question width. Older base profiles
+retain the same source denominator without gaining that credit.
 Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,

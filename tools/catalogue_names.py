@@ -143,10 +143,10 @@ def metadata():
     return bytes(value)
 
 
-def allocation():
+def allocation(tag_size=None):
     from inventory_english import allocation as inventory
     from notice_overlay import pool_sizes
-    current = inventory(); align = lambda n: (n+63) & ~63
+    current = inventory(tag_size); align = lambda n: (n+63) & ~63
     growth = align(APPROVED['bytes'])-align(START)
     alternative = pool_sizes(True)['alternative']+current['tag_growth']+growth
     if growth < 0 or alternative > current['combined_pool']:
@@ -157,7 +157,8 @@ def allocation():
 
 def verify_shared_parts(built, native, module, report=None):
     from inventory_english import verify_shared_parts as verify_inventory
-    verify_inventory(built, native, module)
+    inventory = verify_inventory(built, native, module)
+    required = allocation(inventory['resident_bytes'])
     files, originals = by_vrom(built), by_vrom(native)
     if (NEW_VROM not in files or NEW_RELOC not in files or VROM in files or RELOC in files
             or files[NEW_VROM].index != originals[VROM].index
@@ -166,15 +167,16 @@ def verify_shared_parts(built, native, module, report=None):
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOC].extract(built)
     if report is None:
         report = {'overlay': {**APPROVED, 'sources': source_hashes(), 'imports': IMPORTS,
-                             'overlay_sha256': sha256(data)}, 'allocation': allocation()}
+                             'overlay_sha256': sha256(data)}, 'allocation': required}
     validate(native, data, reloc, report['overlay'], module)
-    if files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata() or report.get('allocation') != allocation():
+    if files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata() or report.get('allocation') != required:
         raise ValueError('Incomplete catalogue allocation or ownership')
     return {'owner_offset': OWNER_AT, 'owner_bytes': metadata()}
 
 
 def install(native, replacements, additions, relocations, module, directory, notice_report):
     from notice_overlay import verify_installation as verify_notice
+    from inventory_english import VROM as TAG
     original, original_reloc, _, _ = native_sources(native); files = by_vrom(native)
     if (replacements.get(VROM, original) != original or replacements.get(RELOC, original_reloc) != original_reloc
             or VROM in relocations or RELOC in relocations
@@ -187,7 +189,8 @@ def install(native, replacements, additions, relocations, module, directory, not
     owner = bytearray(replacements.get(OWNER, files[OWNER].extract(native)))
     if owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW: raise ValueError('Changed catalogue owner row')
     owner[OWNER_AT:OWNER_AT+32] = metadata()
-    result = {'overlay': report, 'allocation': allocation(), 'vrom': f'{NEW_VROM:08X}',
+    if TAG not in replacements: raise ValueError('Catalogue requires the complete inventory image')
+    result = {'overlay': report, 'allocation': allocation(len(replacements[TAG])), 'vrom': f'{NEW_VROM:08X}',
               'relocation_vrom': f'{NEW_RELOC:08X}', 'complete_name_slots': 63, 'new_saved_bytes': 0,
               'status': 'Complete catalogue names installed; ordinary gameplay acceptance pending'}
     changes = {VROM: data, RELOC: reloc, OWNER: bytes(owner)}; moves = {VROM: NEW_VROM, RELOC: NEW_RELOC}

@@ -26,9 +26,15 @@ The [catalogue checkpoint](checkpoints/CATALOGUE_NAMES.md) installs complete
 sixteen-byte names in all 63 category/row display slots with private transient
 storage, preserving the packed native pages and original drawing geometry.
 Its focused host, artifact, cartridge, and accounting checks pass. Ordinary
-catalogue navigation/order joins the combined v0 pass. The immediate embedded-
-text batch is the nine category names, wrapped-present label, and remaining
-confirmation prose; exact source/copy sites are recorded at the checkpoint.
+catalogue navigation/order joins the combined v0 pass.
+
+The [embedded inventory text checkpoint](checkpoints/INVENTORY_MENU_TEXT.md)
+supplies nine category names, wrapped-present text, and all three native
+confirmation lines, together with the throw-away width fix. Source/artifact,
+cartridge, and original-ID accounting checks pass. Continue the inventory's
+complete mail/quest name-and-phrase display consumer, other wider callers,
+residual strings/letters, and accents. Reuse these passing profile checks;
+representative ordinary menu execution remains in the combined v0 pass.
 
 ## Full-project scope and evidence
 

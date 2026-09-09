@@ -143,6 +143,9 @@ class Image:
 
 
 def validate(native, data, reloc, report, module):
+    if report.get('menu_text'):
+        from inventory_menu_text import validate as validate_menu_text
+        return validate_menu_text(native, data, reloc, report, module)
     if not APPROVED: raise ValueError('Inventory helper image needs independent approval')
     symbols = APPROVED['symbols']
     size = APPROVED['bytes']
@@ -161,17 +164,19 @@ def validate(native, data, reloc, report, module):
     return Image(RAM, size, struct.unpack_from('>5I', reloc))
 
 
-def metadata():
-    row = bytearray(OWNER_ROW); size = APPROVED['bytes']
+def metadata(size=None):
+    row = bytearray(OWNER_ROW)
+    if size is None: size = APPROVED['bytes']
     struct.pack_into('>4I', row, 0, NEW_VROM, NEW_VROM+size, RAM, RAM+size)
     return bytes(row)
 
 
-def allocation():
+def allocation(size=None):
     from hboard_overlay import APPROVED as editor, ORIGINAL_RESIDENT, POOL_EXTRA
     from notice_overlay import pool_sizes
     align = lambda n: (n+63) & ~63
-    growth = align(APPROVED['bytes'])-align(START)
+    if size is None: size = APPROVED['bytes']
+    growth = align(size)-align(START)
     editor_growth = align(editor['bytes'])-align(ORIGINAL_RESIDENT)
     pool = pool_sizes(True)
     if (growth < 0 or growth+editor_growth > POOL_EXTRA
@@ -192,22 +197,27 @@ def verify_shared_parts(built, native, module, report=None):
         raise ValueError('Missing complete inventory DMA pair')
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOC].extract(built)
     if report is None:
-        report = {'overlay': {**APPROVED, 'sources': source_hashes(),
-                             'overlay_sha256': sha256(data), 'relocation_sha256': sha256(reloc)},
-                  'allocation': allocation()}
+        if len(data) == APPROVED['bytes']:
+            overlay = {**APPROVED, 'sources': source_hashes(),
+                       'overlay_sha256': sha256(data), 'relocation_sha256': sha256(reloc)}
+        else:
+            from inventory_menu_text import make_report, SIZE
+            if len(data) != SIZE: raise ValueError('Unknown inventory image profile')
+            overlay = make_report(native, data, reloc)
+        report = {'overlay': overlay, 'allocation': allocation(len(data))}
     validate(native, data, reloc, report['overlay'], module)
     from extended_items import HEADER, VROM as ITEMS
     from font import WIDTH_BRANCH, WIDTH_TABLE, make_halfwidth
     code = files[CODE_VROM].extract(built)
     expected_code = make_halfwidth(native)[0][CODE_VROM]
-    if (files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata()
+    if (files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata(len(data))
             or files[ITEMS].extract(built)[:32] != HEADER
             or code[WIDTH_BRANCH:WIDTH_BRANCH+4] != bytes(4)
             or code[WIDTH_TABLE:WIDTH_TABLE+256] != expected_code[WIDTH_TABLE:WIDTH_TABLE+256]
             or code[0x800C4B10-CODE_RAM:0x800C4B14-CODE_RAM] != bytes.fromhex('25cefb20')
-            or report.get('allocation') != allocation()):
+            or report.get('allocation') != allocation(len(data))):
         raise ValueError('Incomplete inventory font, item, or allocation dependencies')
-    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata()}
+    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata(len(data)), 'resident_bytes': len(data)}
 
 
 def install(native, replacements, additions, relocations, module, directory, notice_report):
@@ -223,8 +233,8 @@ def install(native, replacements, additions, relocations, module, directory, not
     validate(native, data, reloc, report, module)
     owner = bytearray(replacements.get(OWNER, files[OWNER].extract(native)))
     if owner[OWNER_AT:OWNER_AT+32] != OWNER_ROW: raise ValueError('Changed inventory owner row')
-    owner[OWNER_AT:OWNER_AT+32] = metadata()
-    result = {'overlay': report, 'allocation': allocation(), 'label_records': len(LABEL_NAMES),
+    owner[OWNER_AT:OWNER_AT+32] = metadata(len(data))
+    result = {'overlay': report, 'allocation': allocation(len(data)), 'label_records': len(LABEL_NAMES),
               'vrom': f'{NEW_VROM:08X}', 'relocation_vrom': f'{NEW_RELOC:08X}',
               'new_saved_bytes': 0, 'new_resident_module_bytes': 0,
               'status': 'Complete labels and ordinary item names installed; normal gameplay acceptance pending'}
