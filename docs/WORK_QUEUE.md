@@ -31,10 +31,19 @@ catalogue navigation/order joins the combined v0 pass.
 The [embedded inventory text checkpoint](checkpoints/INVENTORY_MENU_TEXT.md)
 supplies nine category names, wrapped-present text, and all three native
 confirmation lines, together with the throw-away width fix. Source/artifact,
-cartridge, and original-ID accounting checks pass. Continue the inventory's
-complete mail/quest name-and-phrase display consumer, other wider callers,
+cartridge, and original-ID accounting checks pass. The complete inventory
+mail/quest consumer is installed below. Continue other wider callers,
 residual strings/letters, and accents. Reuse these passing profile checks;
 representative ordinary menu execution remains in the combined v0 pass.
+
+The [inventory description checkpoint](checkpoints/INVENTORY_DESCRIPTIONS.md)
+installs the complete GameCube-style letter/delivery/fortune composition,
+eight-byte names, and Museum display mapping without changing saved identities
+or native quest/action behaviour. Focused host/sanitizer, relocation, shared
+allocation, whole-cartridge/UPS, and original-ID accounting checks pass. The
+current full build is `build/tag-descriptions-pilot`; normal menu transitions
+join the combined v0 safety pass. Continue the existing remaining-text and
+name/input-consumer queue without replaying the passed subsystem matrices.
 
 ## Full-project scope and evidence
 

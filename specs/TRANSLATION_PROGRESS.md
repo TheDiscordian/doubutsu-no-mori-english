@@ -14,7 +14,8 @@ distinct native slots retains each slot's weight. Development labels count too.
 The total combines dialogue, choices, general strings, item names, villager and
 special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, keyboard labels, 39 embedded inventory action-label records,
-and thirteen category/present/question records.
+thirteen category/present/question records, and eight inventory mail/quest
+description records (including the canonical Museum spelling).
 Inventory records enter the denominator in older builds too; complete English
 credit requires the installed label image, callbacks, full-name loader, font,
 relocation, and shared allocation checks. Repeated references to one menu label
@@ -22,6 +23,10 @@ do not multiply its weight; original numeric-only records add no Japanese weight
 Category/present/question credit also requires the complete selected tag profile,
 copy/draw bounds, source pointers, and minimum question width. Older base profiles
 retain the same source denominator without gaining that credit.
+Description credit requires the complete English composition, full-name storage,
+drawer, relocated quest resolver, and shared allocation. Native suffix subspans
+do not count again, and displaying a name in another menu adds no duplicate
+name credit. The saved Museum identity remains native while its display is English.
 Wider name resources map back to their
 original source IDs. Letter credit includes installed ordinary replacements and
 the catalogue parts selected by installed NPC-reply, fortune, renewal,

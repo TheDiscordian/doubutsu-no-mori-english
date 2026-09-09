@@ -143,6 +143,9 @@ class Image:
 
 
 def validate(native, data, reloc, report, module):
+    if report.get('descriptions'):
+        from tag_descriptions import validate as validate_descriptions
+        return validate_descriptions(native, data, reloc, report, module)
     if report.get('menu_text'):
         from inventory_menu_text import validate as validate_menu_text
         return validate_menu_text(native, data, reloc, report, module)
@@ -202,11 +205,21 @@ def verify_shared_parts(built, native, module, report=None):
                        'overlay_sha256': sha256(data), 'relocation_sha256': sha256(reloc)}
         else:
             from inventory_menu_text import make_report, SIZE
-            if len(data) != SIZE: raise ValueError('Unknown inventory image profile')
-            overlay = make_report(native, data, reloc)
+            if len(data) == SIZE:
+                overlay = make_report(native, data, reloc)
+            else:
+                import tag_descriptions as desc
+                if len(data) != desc.APPROVED['bytes']: raise ValueError('Unknown inventory image profile')
+                overlay = desc.make_report(native, data, reloc, desc.APPROVED['symbols'], None)
         report = {'overlay': overlay, 'allocation': allocation(len(data))}
     validate(native, data, reloc, report['overlay'], module)
     from extended_items import HEADER, VROM as ITEMS
+    if report['overlay'].get('descriptions'):
+        from display_names import VROM as NAMES, HEADER as NAME_HEADER
+        from runtime_layout import MODULE_VROM
+        if (NAMES not in files or files[NAMES].extract(built)[:32] != NAME_HEADER
+                or files[MODULE_VROM].extract(built)[60:64] != struct.pack('>I', NAMES)):
+            raise ValueError('Inventory descriptions require the complete display-name resource')
     from font import WIDTH_BRANCH, WIDTH_TABLE, make_halfwidth
     code = files[CODE_VROM].extract(built)
     expected_code = make_halfwidth(native)[0][CODE_VROM]

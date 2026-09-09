@@ -7380,3 +7380,51 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   other wider consumers, residual text/accents, and the combined v0 safety pass.
   No ordinary gameplay, save/reload, hardware, release, or goal completion is
   claimed by this milestone.
+
+### 2026-09-09 — Complete inventory mail and delivery descriptions
+
+- Classified the previous implementation turn as progress: `62bbfe1` is the
+  clean, pushed thirteen-record inventory-text checkpoint. The clarification
+  exchange changes no project state. Rechecked `CLAUDE.md` and the v0 plan;
+  both already distinguish testing-setup limits from actual game defects.
+- Replaced the inventory's remaining Japanese mail/quest composition with
+  complete supplied GameCube wording, full eight-byte names, name-colour roles,
+  and the fortune-specific line order. Native window scale/line interval,
+  animation, action definitions, letter status/gifts, quest state, and saved
+  identities remain unchanged. An owned name pair keeps wider writes out of
+  the two native six-byte fields. Drawing performs no resource DMA.
+- Kept native quest selection and first-job behaviour in a source-bound private
+  resolver copy, changing only its four animal-name calls and one special-name
+  call. Reused the replaced Japanese drawer's space for the 928-byte English
+  segment walker, fitting the complete 44,384-byte tag in the existing pool.
+  Tag plus owner editor uses 8,064 of 8,192 reserved bytes; main code, resident
+  code, save format, and the actual four-MiB layout stay unchanged.
+- Source review caught the canonical museum identity retaining Japanese in
+  generated and existing saved letters. Added typed display-only `Museum`
+  resolution from the exact English donor spelling. Its native saved name and
+  identity comparisons remain intact. Eight original Japanese records gain
+  combined-counter credit once, without duplicate credits for name consumers
+  or shorter suffix aliases. Earlier builds receive the same denominator.
+- The first link exposed a missing linker-script assertion terminator; fixing
+  that implementation syntax completed the build. Focused core/artifact tests
+  passed, and the additional Museum path was checked with the final meaningful
+  batch. All fifteen final focused/shared-profile tests pass in 24.722 seconds;
+  both cartridge/accounting tests pass in 51.813 seconds. Exact colour-role
+  assertions also pass under the same sanitizers. No new emulator harness or
+  native retry loop is introduced; ordinary menu transitions remain queued for
+  the combined v0 safety pass.
+- Independent pinned-Docker image, relocation, and report agree. Complete
+  source/output UPS reconstruction, shared owner/allocation, all earlier
+  resources, and original-ID accounting pass. The final current complete build
+  is `build/tag-descriptions-pilot`, ROM SHA-256
+  `34fe328e1871532ca03c63f43792c5da1fa238cb76b30b9111c223b8b359cf16`,
+  UPS SHA-256
+  `15e2b57b8f4459433b775146504fccfa921ff961931c2026b37f509cc5139066`.
+  See the [checkpoint](checkpoints/INVENTORY_DESCRIPTIONS.md) for artifacts,
+  reproduction, exact test scope, and remaining acceptance.
+- Rechecked the GitHub repository and confirmed it remains private. Continue
+  remaining general strings/letters, accents, and wider input/display consumers,
+  followed by the combined v0 safety pass and patch handoff. No gameplay,
+  persistence, original-hardware, public-release, or full-goal completion is
+  claimed. The font-atlas investigation remains paused; title/keyboard work
+  remains in the full v1 goal.

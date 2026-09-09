@@ -91,14 +91,12 @@ confirmation join the combined v0 safety pass. No gameplay, saving, hardware,
 or final visual acceptance is claimed by these source/artifact/host checks.
 Known game defects still block v0 under the [verification policy](../V0_PLAN.md).
 
-Inventory mail/quest labels still use their original six-byte name fields and
-Japanese phrase composition; complete letter bodies do not finish this label
-consumer. Native mother text is two bytes at `80879144`, copied at `80870000`
-with length two at `80870004`. The supplied GameCube tag code instead composes
-complete `Delivery for`, `Letter to`, `from`, `to`, and related descriptions;
-its `mother_str` is `home`, so do not blindly copy that isolated word into the
-native Japanese grammar. Audit the complete sender/quest display path together
-with its wider name resources and copy/draw bounds.
+The [complete description integration](INVENTORY_DESCRIPTIONS.md) translates
+the inventory's mail/quest name-and-phrase consumer together, including complete
+eight-byte names, `Delivery for`, `Letter to`, `from`, fortune line order,
+`home`, and typed Museum display. Its owned fields leave native six-byte saved
+identities intact. Use that full build for continued implementation; ordinary
+transitions remain in the combined v0 safety pass.
 
 Other wider consumers, residual strings/letters, eight accented names, contextual
 review, save/gameplay checks, patch-only release work, and v1 title/keyboard

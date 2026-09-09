@@ -21,6 +21,17 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [inventory description integration](checkpoints/INVENTORY_DESCRIPTIONS.md)
+installs complete English letter/delivery/fortune labels, eight-byte display
+names, and save-safe Museum spelling. It retains GameCube wording, line order,
+and name colours while preserving native actions, quest logic, and saved fields.
+Fifteen focused/shared-profile checks, an exact colour-role check, and both
+cartridge/accounting tests pass; independent builds agree. The current complete
+ROM/UPS is `build/tag-descriptions-pilot`. The tag and owner editor use 8,064 of
+the existing 8,192-byte reservation, with no main-code or memory-layout change.
+Ordinary mail/quest transitions remain in the combined v0 safety pass. Continue
+remaining general strings/letters, accented names, and wider input/display consumers.
+
 The [embedded inventory text integration](checkpoints/INVENTORY_MENU_TEXT.md)
 installs thirteen complete category/present/question records and fixes the
 throw-away question's minimum window width. Native actions, line count, fields,
@@ -28,7 +39,7 @@ and earlier translations remain. All six focused checks and seven prior-profile
 regressions pass; independent builds agree. The current complete ROM/UPS is
 `build/inventory-menu-text-pilot`. Its extra 192 aligned bytes remain inside the
 existing reservation. Ordinary menu execution joins the combined v0 safety pass.
-Continue complete mail/quest label composition and remaining text/consumers.
+Mail/quest descriptions use the integration above; other text/consumers remain.
 
 The [catalogue full-name integration](checkpoints/CATALOGUE_NAMES.md) installs
 all 63 complete display-name slots across nine categories without widening the

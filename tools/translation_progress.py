@@ -364,6 +364,17 @@ def measure(native, built, report):
         if menu_installed:
             # The complete selected inventory profile has already been verified.
             ledger.credit(identity, data[offset:offset+size], 'inventory_menu_text')
+    from tag_descriptions import SOURCES as DESCRIPTION_SOURCES
+    descriptions_installed = bool(report.get('inventory_english', {}).get('overlay', {}).get('descriptions'))
+    for name, address, length, english in DESCRIPTION_SOURCES:
+        identity = 'ui_inventory_description:'+name
+        source, ram = ((tag_source, TAG_RAM) if address >= TAG_RAM else
+                       (by_vrom(native)[CODE_VROM].extract(native), CODE_RAM))
+        ledger.add(identity, source[address-ram:address-ram+length])
+        if descriptions_installed:
+            # The whole composition/draw/name profile is verified above. Native
+            # suffix slices belong to their containing record, not extra IDs.
+            ledger.credit(identity, english, 'inventory_descriptions')
     return ledger
 
 
