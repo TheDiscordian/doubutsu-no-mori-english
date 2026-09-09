@@ -38,7 +38,8 @@ clothing motifs, numbered pool-ball shirts, and established series names.
 Retain supplied spelling/case, including the full `racoon obje` reference;
 its unusual spelling belongs in final wording review, not silent correction.
 
-Unreviewed gyroid families, the priest-cicada comparison, the native hera versus
+The gyroid families have [separate complete approvals](GYROID_ITEM_NAMES.md).
+The priest-cicada comparison, the native hera versus
 English brook-trout comparison, swapped red/blue gym clothes, changed party/
 tuxedo and console-logo designs, blank numbered-shirt references, native game
 slots, figurines, and ambiguous clock/umbrella designs stay unapproved. Those

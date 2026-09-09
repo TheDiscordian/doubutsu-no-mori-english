@@ -6142,5 +6142,1021 @@
     "reference_id": "item_2F:0003",
     "reference_sha256": "1e7e15bf02e3c40dd761b2140a5c629e3d6f0e07cf54fd77707f556ce02bbe8a",
     "evidence": "The native quantity or spoilage state is Spoiled turnips. The complete supplied English spelling is retained. This approves the name, not artwork replacement or unexpanded callers."
+  },
+  {
+    "id": "item_10:05B0",
+    "source_sha256": "7432ccd658369897a844dcd54404c64dec3c71dee6e81798c422cbad0a14e43c",
+    "native_name": "ノッポカクカクはにわ",
+    "reference_id": "furniture:016C",
+    "reference_sha256": "c78a19422eeab564f949435b2f0ff9339e9f727de9f8f20ecefa3108b105babe",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05B4",
+    "source_sha256": "5a67bdb6366516bda83cc480ec5dbc7df41c55893b630a84670c20c1f7d52125",
+    "native_name": "デカカクカクはにわ",
+    "reference_id": "furniture:016D",
+    "reference_sha256": "ee43a164bd8da442fd828bc70cb16c658be656ddbc3e3a1e480c097ee1c26bbf",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05B8",
+    "source_sha256": "c6f0c3a6c58bacaa45868693c8a9a64b6e03b12ba2d5f720b3619ca14e4e6e7d",
+    "native_name": "チビカクカクはにわ",
+    "reference_id": "furniture:016E",
+    "reference_sha256": "f7331ece58567eba68fb61b14fc5dca25298228afb3482c32e16e1c2761c521e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05BC",
+    "source_sha256": "94313e66d7ca2e7fb832e95cd2a0ec23e216762d4b4bd75b9fce8fc175d98ce3",
+    "native_name": "ナミカクカクはにわ",
+    "reference_id": "furniture:016F",
+    "reference_sha256": "f31df7720416eb90c626d0f16c6df0d4dada84c9794161cd7dfe2a9182b98cfb",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05C0",
+    "source_sha256": "e96700a8c981cbcce0d137de9f4d08af4eb4a77e45a8f752b467d41e0cdf6016",
+    "native_name": "チビボンボンはにわ",
+    "reference_id": "furniture:0170",
+    "reference_sha256": "c923a5df2cdb946238ff6eab90b155e0c1d2b6b866e37eee514213205064f7cd",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05C4",
+    "source_sha256": "2028fea358492becab7158296b22da69b07f7bab62de972f14d4f872954af9ec",
+    "native_name": "ナミボンボンはにわ",
+    "reference_id": "furniture:0171",
+    "reference_sha256": "b3b761fa382d360e3d3422a98d389625f8f5e8d1ce073fd659eb7c2179cd6c1e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05C8",
+    "source_sha256": "2ed13a47facca8cd8d74283e795efa0b896df57c553806546c3366be50771e0d",
+    "native_name": "デカボンボンはにわ",
+    "reference_id": "furniture:0172",
+    "reference_sha256": "a597a7c40c073ef0aeb2804544cc122620e81b255af371b4c0f459723b96a515",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05CC",
+    "source_sha256": "a0192290ebbacc3ede3594aa0316b5afbf471a08d2e18161d34a0ae0d3d063e5",
+    "native_name": "ノッポボンボンはにわ",
+    "reference_id": "furniture:0173",
+    "reference_sha256": "0119a365ecf7d0b0667053c749b3956b6576bce87a2f2ea7aaf38a209ad0d6c9",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05D0",
+    "source_sha256": "d75d9d287d6b09bc3dc125f4b47f8a1b75f8d7e571bb5529f370ba50f7adfd1b",
+    "native_name": "デカエコーはにわ",
+    "reference_id": "furniture:0174",
+    "reference_sha256": "c0121f24a5ed061f794fefc5d28e4c098818e0635cb233da9538fed1b3c45463",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05D4",
+    "source_sha256": "9a529b995335e58c5b284d0cfc5227e8e99b89646f4f52998fcf383cb1819cab",
+    "native_name": "チビエコーはにわ",
+    "reference_id": "furniture:0175",
+    "reference_sha256": "8958d5c7063bce6a9073b7b95f59b548181391a6808627683d794f6da1a65be2",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05D8",
+    "source_sha256": "c004b07c6056b30ea1e2b2758eb293d7402cd9e771806b10d731860a2476a7a2",
+    "native_name": "ノッポエコーはにわ",
+    "reference_id": "furniture:0176",
+    "reference_sha256": "09c28abcec4cf7afe5420083cbfe8d8c6e9dda640f18ffcfd5c7a194501fed3b",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05DC",
+    "source_sha256": "06e0488ff5269d2b7ef02430703cdcbc0b3ea66813e704108de11a608eaf1f1a",
+    "native_name": "チビロボはにわ",
+    "reference_id": "furniture:0177",
+    "reference_sha256": "c114b2b28da61da3b78c4701539d39f145ee77b2245d6b4b188f96cbbd32a892",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05E0",
+    "source_sha256": "5bec9fdc1bb7ec323c946b88e5da408091ce96e39b0248d6986ab6354cc63596",
+    "native_name": "ナミロボはにわ",
+    "reference_id": "furniture:0178",
+    "reference_sha256": "74c21fa2043d40b5cf0677044e05d1727c888d779a764a73f72c74548b68f719",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05E4",
+    "source_sha256": "99a3c632ba5d5f3fd973aaf2bbe59ce10a168a27761c5ded4954e2da138a1893",
+    "native_name": "デカロボはにわ",
+    "reference_id": "furniture:0179",
+    "reference_sha256": "deb543b5fa5ca85ebd0f549beaede52e743de669411b5a9b5a03afde3ab37c71",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05E8",
+    "source_sha256": "cc42ed0ab170e836cf3c5e20676b7e18f4837f87a78a804f76bf2b794d7c04e9",
+    "native_name": "ノッポロボはにわ",
+    "reference_id": "furniture:017A",
+    "reference_sha256": "1041d6f32d6818c11ad9c2cfb01241c8aff4a3906548c29ef34b3bab4edc0d23",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05EC",
+    "source_sha256": "c42f556dd957d3f4f99ae48e1d5d4e8044ffcc1f5d9c26eeffd78197fc68efdd",
+    "native_name": "チビピポパはにわ",
+    "reference_id": "furniture:017B",
+    "reference_sha256": "75fbe384f25b950face06b01a89cce11ee899ddc8d2c426474252565faf74f3a",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mini_dinkoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05F0",
+    "source_sha256": "0d04afe9bd3701cd13f878288adca428591e045c1f480d385db2ea4ec6b7f06c",
+    "native_name": "チビギロはにわ",
+    "reference_id": "furniture:017C",
+    "reference_sha256": "e2e80f3445f0c0d8df1d212669dfc235d18d707cfef6a78ebf918d713916013a",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05F4",
+    "source_sha256": "dcbee7c460057d0a259d213b7bd27789e1b083200171f9f4c1718e532eb60fd0",
+    "native_name": "デカギロはにわ",
+    "reference_id": "furniture:017D",
+    "reference_sha256": "9c039686694485f2b48c1624550ce2887e15b066c221f1455bd97d927173021f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05F8",
+    "source_sha256": "6e516f38f1f929d97b900b3cdfcf03d34466c57f99717c48c905fdf416450457",
+    "native_name": "デカピポパはにわ",
+    "reference_id": "furniture:017E",
+    "reference_sha256": "56bd9ca9b8f4bcd1eb1230bd2f20304dc3eb2cd603e13fa88ea1f15f5ad07db5",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mega_dinkoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:05FC",
+    "source_sha256": "7711b51c9c83a6a9f457c22c449d81e93c63b18973f311a2a005b5294fb27fba",
+    "native_name": "チビウガイはにわ",
+    "reference_id": "furniture:017F",
+    "reference_sha256": "00ed93305c1b528290a0f1132901a34daf20c6b76f4d0643f055c15ea1a3dc39",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0600",
+    "source_sha256": "63bc2c9a22cd7c737d24980d364a1aa526db39c7551e28e611845eef3eebe410",
+    "native_name": "ナミウガイはにわ",
+    "reference_id": "furniture:0180",
+    "reference_sha256": "453ebacd49cbba27a8c58472d1e5e80e073c717dc33ebf5f15679a4d59f029b6",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0604",
+    "source_sha256": "470531e445246927bc7e0e343d70fc1c152a71a96034149a682d4610d7d05bc2",
+    "native_name": "ノッポウガイはにわ",
+    "reference_id": "furniture:0181",
+    "reference_sha256": "029728b97d922dac95b484be81bf5696a3d71849b80062c60e94dac4236dec51",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0608",
+    "source_sha256": "16e8671f86e097a80e2d117ad8fcc0c5d2f12e549eaf24face9ae9402a78a063",
+    "native_name": "デカディジはにわ",
+    "reference_id": "furniture:0182",
+    "reference_sha256": "97bb3ac3b49fb6e5935918142482dff6a6ff53939a7120e3d63b7f910d988326",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:060C",
+    "source_sha256": "81462bc01e130ad5b084b64ef9182db7a09aa236e3e61585a0c3272698e556f1",
+    "native_name": "ノッポディジはにわ",
+    "reference_id": "furniture:0183",
+    "reference_sha256": "c7b5df1a228355a4c7d2399feb06204a6a01beb695b0722e635fd6de68c4eec9",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0610",
+    "source_sha256": "4ee0440fb19d64c5b50b140fa0bd58397617136c71fc161d27dc12b8296154a7",
+    "native_name": "ナミディジはにわ",
+    "reference_id": "furniture:0184",
+    "reference_sha256": "a9de0061e3dd26b407f4a9fa92531c8284b494a3c30e420748d2347869f205a7",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0614",
+    "source_sha256": "f6c2b9c8cb6b1ea3dc9df667e2740621d3f9cc43ef7e01aced0df6366e88df4f",
+    "native_name": "チビディジはにわ",
+    "reference_id": "furniture:0185",
+    "reference_sha256": "4bd24a6be02b0ebbb8d8dcefde5f2d95d71398faee983bbd8210024b270e3483",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0618",
+    "source_sha256": "5b8601ef2b37d8c5966e57f9dcf892221e087c6fcca0a4f4749651864624efee",
+    "native_name": "ナミボヨヨンはにわ",
+    "reference_id": "furniture:0186",
+    "reference_sha256": "dfa453ccda924ca166beb911c188eda86f844654d74b6346475c04a7c44bcd5e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:061C",
+    "source_sha256": "9c4cce537e02309a5d4167040b9359dc0513b1b2b3071f8b3f6ef6fb77da57c2",
+    "native_name": "チビボヨヨンはにわ",
+    "reference_id": "furniture:0187",
+    "reference_sha256": "6c973fb0adca9b1a41a53ce1733f667fed4c6cfd223d234deb12452368f15286",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0620",
+    "source_sha256": "ecb477c9f065668cfd52fa8292f4757e893305367cc1d5ab6ccaf00230a32301",
+    "native_name": "デカボヨヨンはにわ",
+    "reference_id": "furniture:0188",
+    "reference_sha256": "4434e60886bb7b80032c48e6407f25a77f91c25e8fdcdd7597b2e3c6279921c3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0624",
+    "source_sha256": "8f7a0e2470b680a2245a3e0e273cc0c4bf8f9121f32eca81ae562f92f7c925b9",
+    "native_name": "ノッポボヨヨンはにわ",
+    "reference_id": "furniture:0189",
+    "reference_sha256": "c3f945825c3f198c7f060b153a597b26a6f2c8986d2542f8c78914e01435d5b3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0628",
+    "source_sha256": "343ef002e8c8a7a9039f31f29263207c175ff96ad5ae5a319dcfb7fa1bd8350c",
+    "native_name": "ナミブーはにわ",
+    "reference_id": "furniture:018A",
+    "reference_sha256": "283e1727465233ae00bc24e3e25254d134478264df739401ca7c01250a4296b5",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:062C",
+    "source_sha256": "154e9c4432859f302421b9040fdd27333498921b514da45dc7483936ebb52f83",
+    "native_name": "チビブーはにわ",
+    "reference_id": "furniture:018B",
+    "reference_sha256": "479623436bc6faebc6d511efd78ce98f1707cfbdecae0ceb118ad9af88f06b84",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0630",
+    "source_sha256": "1d27e99b86b16b3280f835bb9b551e6a008acc938539e7aa1ab34fed2fbe93b0",
+    "native_name": "デカブーはにわ",
+    "reference_id": "furniture:018C",
+    "reference_sha256": "b4f53a77750f00f1686aac1e463046967c78e696bf9a118d3ee8fa5f17621017",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0634",
+    "source_sha256": "6706f5f41ae844b9bd2d34fd0e6b3df6ba4ef4850a6a806ca2cd43a56bce2612",
+    "native_name": "ノッポピョンはにわ",
+    "reference_id": "furniture:018D",
+    "reference_sha256": "2e51332851a5b9386b094ec526139de8ac4c68694492095dbd363cd8745a469d",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0638",
+    "source_sha256": "9d1679bc63167e03232f3670e7a8f570ab04569df1abcd97d09bf77210de6d68",
+    "native_name": "デカモーはにわ",
+    "reference_id": "furniture:018E",
+    "reference_sha256": "a97b9b8ec70640043fef96a5bcfec74b1dc6899dde4a59bc424b8ccc1a54ae86",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:063C",
+    "source_sha256": "4e69f949d7d034e30e60dae651db5b80375a61128b8025970f0b925fbb83b37a",
+    "native_name": "ノッポモーはにわ",
+    "reference_id": "furniture:018F",
+    "reference_sha256": "c0d981528052b167fe78ceff04ffdc2e8356d7980c13fd7d8c3a5ceb4f201679",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0640",
+    "source_sha256": "385400aa84436325f60da8c8a22fb841bc7feb9fea32f80a6ccfbb8995314338",
+    "native_name": "チビカララはにわ",
+    "reference_id": "furniture:0190",
+    "reference_sha256": "6a9fb99c01de3c11b8d826f68c2ea7f7a299ea7c8ecae35ed21d2b657935ad34",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0644",
+    "source_sha256": "d4e3cac837f2dfd6a3cc90b0afd826459a52b39ce8436b85d8f9709a84411884",
+    "native_name": "ナミカララはにわ",
+    "reference_id": "furniture:0191",
+    "reference_sha256": "7c6244df84dc6154848c4c83e6516f0459f2a3e46fc116b6d865f1b28da9f3b3",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Metatoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0648",
+    "source_sha256": "9bba05b018e0073c5cbd258215ca0756032d4a3e1f1dc2ef47e2e91dffcb87a8",
+    "native_name": "チビブラザーはにわ",
+    "reference_id": "furniture:0192",
+    "reference_sha256": "2a4dc2aff5022883bfece56984b21b930b18327e74142aad2280f2a59365b757",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:064C",
+    "source_sha256": "fd3e20b4f64cafd1a9209c9ed0dbe3c86351dad8dff454c5945b6f3e22b09d3f",
+    "native_name": "ナミブラザーはにわ",
+    "reference_id": "furniture:0193",
+    "reference_sha256": "cdd6b25502e8e96f5d93b24f27d89024cbf76bdeb5f0b7b44e4395d629a16b1f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0650",
+    "source_sha256": "6be58a78c5b86e63b8d3541c0601f88463edd8c8c287be884540858833f7de96",
+    "native_name": "デカブラザーはにわ",
+    "reference_id": "furniture:0194",
+    "reference_sha256": "646a5514c8b2ec4449844ea55180a4bd260fe13f6350e13c6b814b37ef63a3ab",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0654",
+    "source_sha256": "34bb6836cf42c68b5627c531605b04cf8671ccc5f5ce4b4980c4af7d2db03a64",
+    "native_name": "ノッポブラザーはにわ",
+    "reference_id": "furniture:0195",
+    "reference_sha256": "bafb2e9c39f0d6f33b5808bfb84374d2fde1235a50565d37c786745b563f7a82",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0658",
+    "source_sha256": "af44fb615964786a52ec26b70f5110d46fc422e4cb8b9bf649478f109c71bd9f",
+    "native_name": "デカガラゴロはにわ",
+    "reference_id": "furniture:0196",
+    "reference_sha256": "f61e5301380f35c896ec4bf3b1ef175a7a29d7bbbe34309c81b417e641666de0",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mega_lamentoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:065C",
+    "source_sha256": "89007158c5959624255ba1326d21041fe9fed958e3a51bf1fa9216aef289cd6e",
+    "native_name": "ノッポガラゴロはにわ",
+    "reference_id": "furniture:0197",
+    "reference_sha256": "0066e26ef18155b1c51a27b2162bbc175bc25c851d87d4617dc962c67ca19315",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0660",
+    "source_sha256": "a2deab85b1185407dac1afa3dab9014371924d93abf295da238c11367ddcd8b3",
+    "native_name": "ナミガラゴロはにわ",
+    "reference_id": "furniture:0198",
+    "reference_sha256": "97f812bdd4519b208d60a1375969e63baeb93c9d1225928f8d087d1fcaed12d3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0664",
+    "source_sha256": "c88e5d03d949e59265d48defb4d60d5d3a8c9dc208f876a09730d050f095f0ff",
+    "native_name": "チビガラゴロはにわ",
+    "reference_id": "furniture:0199",
+    "reference_sha256": "a8d2f56a359bdd0f6fdbc7282748db725ba57d464f9635ba12fb9238dcfcfe8a",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0668",
+    "source_sha256": "4d4d37affd1e16af9fa378a4d9f60fc528282ee37ec8f6ce4c7a339063799471",
+    "native_name": "チビティンパはにわ",
+    "reference_id": "furniture:019A",
+    "reference_sha256": "e6cd2c7bca8c96201981a614389a1cb30e185af79e7f3f2dd7b83a6fcba0e849",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:066C",
+    "source_sha256": "9e32122d13ab25ec3edeab705ff5b3c2d4960aac1c91c7b8b6da16d28521be19",
+    "native_name": "ナミティンパはにわ",
+    "reference_id": "furniture:019B",
+    "reference_sha256": "b2b6b77ce09a5bc77aaf66cee41926160e3f03646fa8d6f2c73d7bbb4913febb",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0670",
+    "source_sha256": "eec633c1b68f125d4846576f130554b0de3c857da90ace52377409dcd6a157f1",
+    "native_name": "デカティンパはにわ",
+    "reference_id": "furniture:019C",
+    "reference_sha256": "79b3c6b32ac30fdfa2d8867caf918fb7303334cb907edd87dbd79a458e8200ee",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0674",
+    "source_sha256": "d99423744205385392af475d33b8ef4bc84c5c8614cbf9f10867fbfa27d4b292",
+    "native_name": "ナミワープはにわ",
+    "reference_id": "furniture:019D",
+    "reference_sha256": "2e65fc0e2c406c66eb2b0c9ff6831843f3437fba13117e9255fc644643a5b8f0",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Quazoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0678",
+    "source_sha256": "acea0fd3a9b5922306659a0cc03ebbb5c24d17cdbfd76755ae7d378fa9098424",
+    "native_name": "デカワープはにわ",
+    "reference_id": "furniture:019E",
+    "reference_sha256": "72064bcf1048d45ba19b4d505903247aa60d49248bd4d0a03355c646c24adf7b",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:067C",
+    "source_sha256": "1d42a7fb5659729e101a02f5e8bb15a2768fbe4d6f5bd3a5b8187e418dadcad1",
+    "native_name": "デカでかはにわ",
+    "reference_id": "furniture:019F",
+    "reference_sha256": "25bc15deceb525ff26179751932e52a6c2b8392f1bfab7176ef6ce22411e0c57",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0680",
+    "source_sha256": "d64e7a49e0c958d1080a63c64415b16d4eb92b463b076e29af1aedbc06b560ac",
+    "native_name": "ナミでかはにわ",
+    "reference_id": "furniture:01A0",
+    "reference_sha256": "dad27e3099cc38a13d6fc3d6ead01d8882b26923c61ebad17520d89e532c76b7",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0684",
+    "source_sha256": "87ead67f0931b9ac1b28da4d80b6e9df8d068c92e759042df4f1fafce2cc453b",
+    "native_name": "チビでかはにわ",
+    "reference_id": "furniture:01A1",
+    "reference_sha256": "269d170e2346522937bd6b1a7df02eba51cb8e6e3c2153a832ab523b78e111f3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0688",
+    "source_sha256": "59580a83803dd49dcff6388bdf303f6fc7b25a87d3284b93ebf7ff4bc980af9b",
+    "native_name": "デカパンはにわ",
+    "reference_id": "furniture:01A2",
+    "reference_sha256": "e05fba796375a9d4b74e6c59c83c2002e7a4188dad8b936fea7e7998d177b0ba",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:068C",
+    "source_sha256": "4a250a3f68e49f6ec3a4d46cb0d88d1097487ab00afcd95c4af0a8b22878a529",
+    "native_name": "ノッポパンはにわ",
+    "reference_id": "furniture:01A3",
+    "reference_sha256": "7afcec564918cc38a9df07a2600f273e8b0adcee80298e22bbeb580bd2069a76",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0690",
+    "source_sha256": "bc03089e5e31638040ed159925bc6034471fec87110a71d783c03a806cc593de",
+    "native_name": "チビパンはにわ",
+    "reference_id": "furniture:01A4",
+    "reference_sha256": "5fffa3d2c472193ec481d59114a63d9db998be025b68c69631e72784049fd40a",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0694",
+    "source_sha256": "d64409eac3d15481d727ce54e8fbc25bffcef88718761109af53310eaf074b81",
+    "native_name": "チビうわーはにわ",
+    "reference_id": "furniture:01A5",
+    "reference_sha256": "bb72e865fb531de5c956760d18cc83a89bc52c37f6bc9d189560884b61bafa27",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0698",
+    "source_sha256": "c037b241d6c5293963d36070b0e669521d947abd1510a9a28d6cc121f59bfaf2",
+    "native_name": "デカうわーはにわ",
+    "reference_id": "furniture:01A6",
+    "reference_sha256": "3d78a16543713f552b436fc916cfd0a7251428fcdb632a2ec8fb035dd1c9b24f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:069C",
+    "source_sha256": "48904c1c3aef0fb6277ad22e4d2f192a4727a7a5507f57f8b2ad1267a54c5230",
+    "native_name": "ノッポワープはにわ",
+    "reference_id": "furniture:01A7",
+    "reference_sha256": "15b45089527508d749dee2ecd04f2a674e663a3ac9a0dd3cf5a99019194ba762",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Tall_quazoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06A0",
+    "source_sha256": "34eae259e624695ac68e6153ca1d8e3230471147201780c0f6c3ea688c528937",
+    "native_name": "チビワープはにわ",
+    "reference_id": "furniture:01A8",
+    "reference_sha256": "f8d9553f048383964049e53175ac77eca6f46e3887f9a958549f4013fe2461cb",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mini_quazoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06A4",
+    "source_sha256": "5529c3206d85658efc6615d35c151a0b2ed8b625df1a8d40b5da9d52c37f794f",
+    "native_name": "デブベルはにわ",
+    "reference_id": "furniture:01A9",
+    "reference_sha256": "8fdaa8ce930dedd7321c9988e590169fd9d7e7b1f15d68a2416b27a64e897bb3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06A8",
+    "source_sha256": "cedea69c8c498e02cf4fecaf63cb73e97f3b4ed87a4efe89b09876fec2a6d2ac",
+    "native_name": "デカベルはにわ",
+    "reference_id": "furniture:01AA",
+    "reference_sha256": "204fdaf399da4d3885365bbe49530854c280d72d78764a428cf4aa6049c69f16",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06AC",
+    "source_sha256": "8a0c9303369fdebbf9efde09be5d8ad1cbb5a9d523a5dc828e7fe60ff9396886",
+    "native_name": "ノッポベルはにわ",
+    "reference_id": "furniture:01AB",
+    "reference_sha256": "0acc0f85f6cb340cd01835c5424910c467fc5f9040915c89e57db884f3eb6409",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06B0",
+    "source_sha256": "c697dd7308e36fe59118abc30505bc688eae91e69d81c116d7df7639d963e5bf",
+    "native_name": "ナミベルはにわ",
+    "reference_id": "furniture:01AC",
+    "reference_sha256": "42aa7dd8949db6e470efb502b9282447fb110d81a939c7506ce00a8b0e83bdf6",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Dingloid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06B4",
+    "source_sha256": "9c3b2c93265818a0e14b7357c24adc43aaf7aca1197243d1349ea096f8274a18",
+    "native_name": "チビベルはにわ",
+    "reference_id": "furniture:01AD",
+    "reference_sha256": "994ee46ed3d27018b2c9f5feeac084251ff358775a6391d82d5da91d443db412",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06B8",
+    "source_sha256": "78693a323f641e069687070cc22413e6ec76599df2947512878c84b88f5018c7",
+    "native_name": "プチベルはにわ",
+    "reference_id": "furniture:01AE",
+    "reference_sha256": "f0a44c10780b857a0fa12b636361caf8e09abf7538d7b9ed2d9dde410a4e172a",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Wee_dingloid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06BC",
+    "source_sha256": "1cda78511c75de95bbe91018e7e01caab9216122d6abc68ee7511c0c09c07d2c",
+    "native_name": "デカバチンはにわ",
+    "reference_id": "furniture:01AF",
+    "reference_sha256": "c8d95ce99cc842fa4a075c5fed1bb7352434775f2c26f5c841f26834c669d0c6",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06C0",
+    "source_sha256": "352bddf859e875e2328ccc8e4400aa6354b345a95fcbb4ec3406d21b25aee73e",
+    "native_name": "ナミバチンはにわ",
+    "reference_id": "furniture:01B0",
+    "reference_sha256": "2dce0ae4660908bf65b8d97351c62cf8287c0dbc187840c8990f0d0de72fe0e3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06C4",
+    "source_sha256": "6634e5446a1bd56ef010350bb5a8e70bcc8169450207d91b525f4e359164a79a",
+    "native_name": "ノッポバチンはにわ",
+    "reference_id": "furniture:01B1",
+    "reference_sha256": "bcaa293ec97a581bb809a936e4b650ee7fe6de2fced2f5c597aeb48b501d9b7e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06C8",
+    "source_sha256": "08074df2bd0596a5e22e33b901fdff92cb61dbb3f96c69dbc67e4987aea887cd",
+    "native_name": "チビバチンはにわ",
+    "reference_id": "furniture:01B2",
+    "reference_sha256": "0210654aac3709c650c66201a588e8b3e15a8c711d77ffc1950733da6fe08e67",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mini_clankoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06CC",
+    "source_sha256": "c560ad536ce6a604ada977eb4015d805185af20e1dbfd6806428505ce1f78278",
+    "native_name": "ナミゲロはにわ",
+    "reference_id": "furniture:01B3",
+    "reference_sha256": "7a6c6626895b1422598bdf2d707e56a16ff772e9d8eee29b18800296102ab5bb",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06D0",
+    "source_sha256": "a208cf631daa14fe26313dd4bbf8be282d13e77a4e1b7514061c07bda4cf9b15",
+    "native_name": "デカゲロはにわ",
+    "reference_id": "furniture:01B4",
+    "reference_sha256": "bb3aa838bb8f90c8935539f127743f356b20015701cf0090c55b9acc28d32c92",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06D4",
+    "source_sha256": "82342d41aed75deec29fd4ea38b47cf6290b4fc440e6afc28b0ce8aa3a4b71c6",
+    "native_name": "ノッポゲロはにわ",
+    "reference_id": "furniture:01B5",
+    "reference_sha256": "1791ab70527e4364430cbc5b97b3b8a6c9f8624b8dd5c623a704e3e335ad6d30",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06D8",
+    "source_sha256": "460b88f07d677bb6da30fe1184d50ada09513da725fdc7233ff52cb491d5f9f1",
+    "native_name": "チビゲロはにわ",
+    "reference_id": "furniture:01B6",
+    "reference_sha256": "051977f41044bb0c54372108c59c0a06aa75f2cf9c9072f7fb94533b0338351c",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06DC",
+    "source_sha256": "6c96400e4b415e15483fa8348d4357a204e3ca2361ab93769e28cab936fdc861",
+    "native_name": "デカカラカラはにわ",
+    "reference_id": "furniture:01B7",
+    "reference_sha256": "059d0df8fcf037bd86624580b4dbfb7d0778e570db12f329f9867cfba37b4c9e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06E0",
+    "source_sha256": "471520fcacc7c0a68849bccc58d94dd10c1fa74494f1bb1333d3ad831fa7a86b",
+    "native_name": "ノッポカラカラはにわ",
+    "reference_id": "furniture:01B8",
+    "reference_sha256": "de61ca49dce335e5b8fb8916d5ce0d5143512f82494dd7d19cde8e297fc11313",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06E4",
+    "source_sha256": "c8853350efa2d8f5dfb0a05fbdcb65b1d8aed16fa4808794e103cd5503fda572",
+    "native_name": "ナミカラカラはにわ",
+    "reference_id": "furniture:01B9",
+    "reference_sha256": "cf3a2cce1d4ea617de3125b29d30cdbf974e385c893bdabdeaedffc1c9822120",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06E8",
+    "source_sha256": "b546c001aebd38a6cb5febce6b3627b7c0dc50752f30c1247727b07776672404",
+    "native_name": "チビカラカラはにわ",
+    "reference_id": "furniture:01BA",
+    "reference_sha256": "cc35589235792b6be3a41feb00029d8f5808603be389117b85746c2ff91f6753",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06EC",
+    "source_sha256": "c23d35b172a8345945a26e7497b7af5bcbf1ccfc7d0af0414be0aec10463fbe5",
+    "native_name": "ノッポうがいコはにわ",
+    "reference_id": "furniture:01BB",
+    "reference_sha256": "c4e8b87e9f5579efb8de898ca62dfa94a94d5328edd36f979b7a720e6e8bd62f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06F0",
+    "source_sha256": "5ccfea6a2d1397de7505556f8938e8d76c521c3dbf052d4a2d5cf26d758b7477",
+    "native_name": "ナミうがいコはにわ",
+    "reference_id": "furniture:01BC",
+    "reference_sha256": "c76f49a0392adb1e061202da2a158766c1a2edd7850a958795862ad70bed2c60",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06F4",
+    "source_sha256": "9b5f0f01310dba63b46d4a64720b028987d6512cdc1c2cc4395be2cfbe01c5f4",
+    "native_name": "チビうがいコはにわ",
+    "reference_id": "furniture:01BD",
+    "reference_sha256": "64b1e1ba9c241e455a83f66719cafa08cc24c609b59e9740c870a84e4b419de2",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mini_warbloid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06F8",
+    "source_sha256": "bb900650ba862750c0566e2314772073521bfd76505fad0908a1515c9e5c602e",
+    "native_name": "デカジャンはにわ",
+    "reference_id": "furniture:01BE",
+    "reference_sha256": "c0eb53af83de68851e808d6af277ef32cf18ea9077875b8df54762f6b9716c20",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:06FC",
+    "source_sha256": "5f674d86f5d8e98d636488d87ffc7f7186945d4d14b38d5cc7b726d30ca0f8cb",
+    "native_name": "ナミジャンはにわ",
+    "reference_id": "furniture:01BF",
+    "reference_sha256": "d6b37e840529c79659b6587eaae6f4e2a42cb2e54fb13ec76d87d806897cfe0c",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0700",
+    "source_sha256": "5fe1efb7d198b337ff2e8dd4c0ee681eb8373e561b31ef62622c0ea4d7ddaa02",
+    "native_name": "チビジャンはにわ",
+    "reference_id": "furniture:01C0",
+    "reference_sha256": "f1141774f84a55b4827b1724459c7f000554a653cc708e5f666ace5c8606ade8",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0704",
+    "source_sha256": "775ffbd42bbe5e8ef44c36e9778e9ac92d536f09a6c4683a670ed1ed7740b525",
+    "native_name": "デカボクはにわ",
+    "reference_id": "furniture:01C1",
+    "reference_sha256": "1195f6d4d59fc5525d57d3843219f26309f8de9325db207bee778189478967f7",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0708",
+    "source_sha256": "e6d6dc19b605d02ff7fe0653f1a1cd42be7b632fdffed003572afb3c50a5082e",
+    "native_name": "ノッポボクはにわ",
+    "reference_id": "furniture:01C2",
+    "reference_sha256": "1b3f7f6f4a0803184cb672301cf5ba8e682b90fa2e47cd47a95d4fb0a5c4cdc3",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:070C",
+    "source_sha256": "a9eca2592d362e92d32fdc09d19cb47a7c183b8f461c56f1c2c9a72c84f6a832",
+    "native_name": "デカボーはにわ",
+    "reference_id": "furniture:01C3",
+    "reference_sha256": "ef3ed7b9008e49f526ee9ab252c3aba74b0c9f3b42875bf9f23d45794520ef7d",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0710",
+    "source_sha256": "ab5fc65df30e6508c866eb97d28c0207daa494e82347110246726f5601b9a188",
+    "native_name": "チビボーはにわ",
+    "reference_id": "furniture:01C4",
+    "reference_sha256": "34b17976568c56502480573803cad8d381501f97db9710f9ddb9370d0c73f58d",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0714",
+    "source_sha256": "6f04252ca2ecd6bb803feb7e38f72e99d42c26589295c37b31deaad6200dcfb9",
+    "native_name": "ノッポボーはにわ",
+    "reference_id": "furniture:01C5",
+    "reference_sha256": "f5b22b4611bcb55e675e8b0683d4d1ebe745815727a29d16ed930207e942e45b",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0718",
+    "source_sha256": "7c5ffb5ba01f3c721f92570a07158bbc102843846075c0a303b437bee82514b5",
+    "native_name": "ナミボンはにわ",
+    "reference_id": "furniture:01C6",
+    "reference_sha256": "47c003bfdc3490ce57c80e97ea0e1e5214ecca17f6a5e82cc1e112f38acdcc96",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:071C",
+    "source_sha256": "8477474cf6f7d296f5fe9dff01046dfb64fd2947d2a89af8f18a4f6808b07953",
+    "native_name": "チビボンはにわ",
+    "reference_id": "furniture:01C7",
+    "reference_sha256": "83c3a28583c31da2e0dbcdc2ff3ddffeb8b66a95cec2426fd990324f9bc1963b",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0720",
+    "source_sha256": "ec04f3e89f7ed393e8125f2340292d7176713170de9b236a55348a5d5fe15c27",
+    "native_name": "ヤセワープはにわ",
+    "reference_id": "furniture:01C8",
+    "reference_sha256": "b6bc93ea5e33e0e3986cd09c709bf46acc3b01bc0c02dd25c43c5938c0fcc681",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Slim_quazoid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0724",
+    "source_sha256": "66dfa0e2654db51657d9f0ffff2193c70670aa5b91f8cb3bafbbf745c76020a6",
+    "native_name": "デカパーはにわ",
+    "reference_id": "furniture:01C9",
+    "reference_sha256": "c7a886e02652c8ac62ed74542b80e4b47f6622be6f4cbc6ab18aa62329776baf",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0728",
+    "source_sha256": "0259d6d8e071d60c292eef065c1b7078fb8d134127e1469f4bf4f3265f43310f",
+    "native_name": "ナミパーはにわ",
+    "reference_id": "furniture:01CA",
+    "reference_sha256": "5b729811904566a143e0fd006a8b4e447ee1b4fb20741f07fb97b3320f1eabbc",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:072C",
+    "source_sha256": "3dafe64d90800e1452a96cb35064180d434d0f9f4400c72d386555d7640139d9",
+    "native_name": "ノッポパーはにわ",
+    "reference_id": "furniture:01CB",
+    "reference_sha256": "6d0b748e133d00c7fc8c8b08521d3bd5387b5f6849a0b3eda7f5d5e2b8429802",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0730",
+    "source_sha256": "f4a68407412d867c65a5401c79da5906ca1e07fcdfc2c433272f3ff9b94eddd9",
+    "native_name": "ノッポティンパはにわ",
+    "reference_id": "furniture:01CC",
+    "reference_sha256": "1169fb32d25f68077ef80f64a4032e983e1e72be4580cc35155499e97c5499b6",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0734",
+    "source_sha256": "9dc96c6b24fed90b85f7159ada9b1c088971f93f7275c651de62d95c3a8d038a",
+    "native_name": "チビふにゃはにわ",
+    "reference_id": "furniture:01CD",
+    "reference_sha256": "68376f797d245efc685ef8bf433305a4fb6d0391a967485a8bcb54e783ddc5af",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0738",
+    "source_sha256": "0fbbaf4fbfe8a2626f57fe06a63400941d444836aa15ba0425862c6242385c18",
+    "native_name": "ナミふにゃはにわ",
+    "reference_id": "furniture:01CE",
+    "reference_sha256": "e08254025ba61a270f04c9f5720888e6ae85ff82ea98693ebd28c7b142688c6c",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:073C",
+    "source_sha256": "b20c7608cd013385de76fd2691b56525455d891b083bd1476c649176517ccfce",
+    "native_name": "デカふにゃはにわ",
+    "reference_id": "furniture:01CF",
+    "reference_sha256": "6530381f329bfde6b7593b28b53e60f7f0f6283db6900d87c733f003a87b3067",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0740",
+    "source_sha256": "6a31850d3e4323f2549c2154c0ac9d08e35bcf828cd3921733003f0e6a70b3b5",
+    "native_name": "デカピローはにわ",
+    "reference_id": "furniture:01D0",
+    "reference_sha256": "c31b37c03e3242b7f6eb74e1a36c5e157e1300ee5d621efc974e06539b9ddc38",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0744",
+    "source_sha256": "535217274bf0424944e8f288797e91a71f8cad615c757c8253d5c83cdfd7d0af",
+    "native_name": "ナミピローはにわ",
+    "reference_id": "furniture:01D1",
+    "reference_sha256": "79d512a8c17ab9c1576975057177c324e96415585dcff93195bb98d65ea425c1",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0748",
+    "source_sha256": "2cb035f949d5f2d64917524031af97d59b992750795f3bcab44740c141642e40",
+    "native_name": "ノッポピローはにわ",
+    "reference_id": "furniture:01D2",
+    "reference_sha256": "9c2de433d683285d5f200b0713cf127814c0dcca623fcb026198bd95987ac275",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:074C",
+    "source_sha256": "0a9a7bb26b2be3cfa2eb41c02c5bd772dd750d6769ead807403061f87d246818",
+    "native_name": "チビピローはにわ",
+    "reference_id": "furniture:01D3",
+    "reference_sha256": "f87f319121b2cc02dc2943be0a2ae5052e2a85b712da180363cf06da6a97f86a",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0750",
+    "source_sha256": "08e297215a755156bc8829a4a2e6e4571b0b503d14ab48d6c4b6c6f2eef40739",
+    "native_name": "ノッポゲンはにわ",
+    "reference_id": "furniture:01D4",
+    "reference_sha256": "d5e71b87739eb48c9bb38ca587d37d0f7a1d30206cd3f041aef4cde5f89b4be0",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0754",
+    "source_sha256": "247f5cd10dc877e3f10869a827a24ff99239ab37e63f31e6ea3b259acc9d7604",
+    "native_name": "デカゲンはにわ",
+    "reference_id": "furniture:01D5",
+    "reference_sha256": "a010a53d798507cbb1884035fd0c66bdc3dda4ad5c716ca0dbff5a2001535973",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0758",
+    "source_sha256": "96ab3d4cb9ecb86cb5c968abe0b979ef6c67fc0545accc337863468dae7c210c",
+    "native_name": "ナミゲンはにわ",
+    "reference_id": "furniture:01D6",
+    "reference_sha256": "8bf27bd00124ccb6d79d86adb303bf52c9b6a9cae6e04ed052be2136ac6859a2",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:075C",
+    "source_sha256": "263dc2ec1c5d73446aef9a3a7b8b7d95bc4ba81534f7c3741263a61e65003a6d",
+    "native_name": "チビゲンはにわ",
+    "reference_id": "furniture:01D7",
+    "reference_sha256": "c83fd17188a8edeeceaac4d2bad5c1396346810da76b33fc828549e3cd7e24d2",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0760",
+    "source_sha256": "76ef8b9d8bb756433f04d2b61620ba35d2e81e575282d0bc5becf01f827d6aa3",
+    "native_name": "デカポーンはにわ",
+    "reference_id": "furniture:01D8",
+    "reference_sha256": "8a02760f38434bda8e822b655f05a859fd445328c3faddb0eb203f29421d2212",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Mega_lullaboid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0764",
+    "source_sha256": "14a76f4f98ba795056e65fb55f1f80a07e54db2d1749182f16f917893e5a6a96",
+    "native_name": "ノッポポーンはにわ",
+    "reference_id": "furniture:01D9",
+    "reference_sha256": "6edfeec9dd6392e4ae842eb764c64ee297577773c328d73db1496e267ed7a2bb",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0768",
+    "source_sha256": "30079ab14146c5525bb1942dcc2255ea9975be5147602a8094ebff19619f3a68",
+    "native_name": "ナミポーンはにわ",
+    "reference_id": "furniture:01DA",
+    "reference_sha256": "062ab387d91d15a46224467ba4b9206a66b5150d5aa459c8120bf3a0a6aa8a65",
+    "evidence": "The first-generation bilingual item entry confirms this exact native spelling and English family/size; the later bilingual list has a spelling discrepancy for this row. https://nookipedia.com/wiki/Item:Lullaboid_(Animal_Crossing) Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:076C",
+    "source_sha256": "6a513c9e248acbf763e38332cc1ee4d254d9a65dc2e46c9427d86afc3a934e36",
+    "native_name": "チビポーンはにわ",
+    "reference_id": "furniture:01DB",
+    "reference_sha256": "cf5d7d9a0a88897c564919ae76f6eff0703c8ab543e02cd1717779766056681e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0770",
+    "source_sha256": "04a9d2f504eceebedc41a4b79d937b6b7176da8ee3f4ca28ec40c7a40cefc279",
+    "native_name": "デカドリルはにわ",
+    "reference_id": "furniture:01DC",
+    "reference_sha256": "268b9863cbaea520ff58beb91f660ee86b56f615a671b4fa126665e1fa381048",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0774",
+    "source_sha256": "cdbad7778c25aa462796e7e083103f7d9b2845d588801a2cd0019453ec6847c5",
+    "native_name": "ナミドリルはにわ",
+    "reference_id": "furniture:01DD",
+    "reference_sha256": "ccb303707c46c048238899c835638c97181681a2d0f93d516909883bce6be56f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0778",
+    "source_sha256": "14f930eaeec4b229bdc86ebb4d59e65daca759eb6d923dc55367443194b7378f",
+    "native_name": "チビドリルはにわ",
+    "reference_id": "furniture:01DE",
+    "reference_sha256": "6196c6fc4ef5a2e31740749734d73e7ee219bd5be9724d58a06ceddd291caa5d",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:077C",
+    "source_sha256": "0f753ff1c3ff29a582d659126081e67159cc52fc9c721b846f607fbfc07bfd85",
+    "native_name": "デカフワフワはにわ",
+    "reference_id": "furniture:01DF",
+    "reference_sha256": "4a0a5fd32cd2d801e9eb4dbf49d3ebf862cab573b2de687452815bdd6279212f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0780",
+    "source_sha256": "9f163d535342ba7135aeba15394e22a690a831747b607b18d6bcbc7f457c889c",
+    "native_name": "ナミフワフワはにわ",
+    "reference_id": "furniture:01E0",
+    "reference_sha256": "0e70a8d9e1cb5a1999a39f31c4b183ed312e12c592224ec0b56bf646d59b11f9",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0784",
+    "source_sha256": "98b63d9f7694ee2807100beb5b560eff806952f9a07b2940ee1e19841f5bb35c",
+    "native_name": "デブフワフワはにわ",
+    "reference_id": "furniture:01E1",
+    "reference_sha256": "a6a5707a95ee02b5f12f80f8da6bc088fd91754150acbdc59d925aa0628e5221",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0788",
+    "source_sha256": "a068e414bceef5c42c3890cae1757bc20c68a12e10fb5518d222938920855cc8",
+    "native_name": "ノッポフワフワはにわ",
+    "reference_id": "furniture:01E2",
+    "reference_sha256": "7343b8173a0329657140950fe349bbf8b1ff02da15680aa837bcb293527f0c09",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:078C",
+    "source_sha256": "47f4886d242e58462de28a13a162fb310a37feb08a4918d6c8b9fdd6df6ace90",
+    "native_name": "チビフワフワはにわ",
+    "reference_id": "furniture:01E3",
+    "reference_sha256": "ad9be69f33e2463c376cf6fa450042dd0e52dbd24c5467d77877c22e56f97813",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0790",
+    "source_sha256": "deb548fd905d2cd312023598cffc7c78a18cdf47d8c4ae55e9f7680085a5df44",
+    "native_name": "ヤセフワフワはにわ",
+    "reference_id": "furniture:01E4",
+    "reference_sha256": "d3aa730378439fe52c6c8f6b28694f1e50ae3ba41ce1c091d9b70fe6a85b927c",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0794",
+    "source_sha256": "2b3af5309cd1f8b3c4effee2b036622905e7b43a9d59b12365e630ace45e1b57",
+    "native_name": "デカクリックはにわ",
+    "reference_id": "furniture:01E5",
+    "reference_sha256": "a84abb675a760b1e8c44c9909b539ac2185b9d505b1ae641108b386b39d37b5f",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:0798",
+    "source_sha256": "5e3be68b08f2a8b5571b9ea7d3caf0894eee914a4a32375f77249d447504b3d6",
+    "native_name": "ナミクリックはにわ",
+    "reference_id": "furniture:01E6",
+    "reference_sha256": "c15f04bd3d36f409e9c7331fefb151b26ca04aee0a8552fbd4eaa2a9bce495cd",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:079C",
+    "source_sha256": "0bea94e5ed4e06eacfd4d33a56039bbf5206906bc97b4b2e373ebab55a8b156f",
+    "native_name": "チビクリックはにわ",
+    "reference_id": "furniture:01E7",
+    "reference_sha256": "38bf32a5f3cb7706321360a60d439dadda9698ded64fbe66b39d635c1da2fcf7",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:07A0",
+    "source_sha256": "d23daca3576b1c9ab72f8ecba7d3a6de38b875e5d15f1e22de7c795999c9c058",
+    "native_name": "ナミギュッはにわ",
+    "reference_id": "furniture:01E8",
+    "reference_sha256": "b91ef767e711a5c417d781741b12650e45c0fc8916d906ae452c1e853fb4828e",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:07A4",
+    "source_sha256": "295dc0012042e4868ee4fb1e30013c7d54698d5211e56c83e43a47ef5e9ee178",
+    "native_name": "デカギュッはにわ",
+    "reference_id": "furniture:01E9",
+    "reference_sha256": "b068352cb9d9a1bd84074d6a3e070565336fb640b8d4b26ce52188409cf80007",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
+  },
+  {
+    "id": "item_10:07A8",
+    "source_sha256": "459a7c73da1199e2c614018f85f0defd4e33e65075624f3b8e037f9ca94ccd32",
+    "native_name": "チビギュッはにわ",
+    "reference_id": "furniture:01EA",
+    "reference_sha256": "9a2cb25099e9a98ef6cbb809f0791cc84b299f5adb2790ca34b7125f9700f593",
+    "evidence": "Exact Japanese and English family/size pair is corroborated by https://animalcrossing.soopoolleaf.com/ja/acnl/Catalog/Gyroids/ . The supplied N64 and GameCube tables contain this complete pair in the corresponding original gyroid group; later-game behaviour and assets are not imported. Retain the complete supplied English name, all four identical native rotations, and the distinct mini/mega/tall/squat/slim/wee variants. See specs/GYROID_ITEM_NAMES.md."
   }
 ]

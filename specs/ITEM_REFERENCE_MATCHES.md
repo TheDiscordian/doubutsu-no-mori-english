@@ -18,9 +18,10 @@ name family; placed-object aliases use their separate native conversion proof.
 
 ## Reviewed furniture groups
 
-The registry contains 487 furniture identities, two ordinary clothing-name
+The registry contains 614 furniture identities, two ordinary clothing-name
 approvals, seventy [flooring/wallpaper approvals](FLOOR_WALL_NAMES.md), and
 209 [song, stationery, seed, ticket, and other ordinary names](ORDINARY_ITEM_NAMES.md).
+The furniture total includes all 127 [gyroid identities](GYROID_ITEM_NAMES.md).
 Of the furniture identities, 179 cover the first 300 groups.
 It covers wardrobes/dressers/cabinets, furniture-series pieces, household and
 school objects, instruments, recognisable plants/bonsai, and outdoor/construction
@@ -49,14 +50,15 @@ including 170 explicit cross-index matches after inserted English entries.
 Two direct ordinary approvals handle explicitly reviewed carried-name spelling
 variants without relaxing exact-source alias matching.
 The mapped groups retain native creatures, object types, fossil parts, and chess pieces,
-not the unrelated names at equal table indices. Gyroids, changed species and
-designs, numbered-shirt filler, and native game slots still require review.
+not the unrelated names at equal table indices. Gyroids have individual bilingual
+family/size approvals. Changed species and designs, numbered-shirt filler, and
+native game slots still require review.
 
 ## Two unchanged capacities
 
-All 487 complete furniture names fit the existing sixteen-byte resource: 1,948 rotation
-slots. Only 134 fit the unchanged ten-byte native fields: 536 slots. The other
-353 names remain complete in the separately installed resource and withheld
+All 614 complete furniture names fit the existing sixteen-byte resource: 2,456 rotation
+slots. Only 165 fit the unchanged ten-byte native fields: 660 slots. The other
+449 names remain complete in the separately installed resource and withheld
 from ten-byte storage. No abbreviations, removed suffixes, punctuation changes,
 or rotation-dependent names are introduced to fit a smaller destination.
 The two ordinary clothing approvals also fit sixteen bytes; bear shirt fits

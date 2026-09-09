@@ -13,6 +13,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [gyroid-name batch](checkpoints/GYROID_ITEM_NAMES.md) installs all 127 complete
+English names in 508 rotation slots; 124 also fit unchanged native fields. Only
+the two item-name files change, with all earlier text/runtime/save structures
+retained. All 51 focused source, capacity, current-ROM/UPS, accounting, and
+regression tests pass. The bounded silent native batch is running. Remaining
+name identities, wider callers, noticeboard/general text, and full acceptance
+continue alongside that batch.
+
 The [selected song-title caller](checkpoints/SONG_ITEM_NAMES.md) now uses full
 sixteen-byte item fields, retaining the entire credits overlay layout and adding
 no resident/saved memory. The complete ROM changes only that actor relative to

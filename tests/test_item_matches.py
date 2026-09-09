@@ -156,7 +156,7 @@ class ItemMatchRetailTests(unittest.TestCase):
         cls.refs = list(map(json.loads, (ROOT/'build/gamecube/names/furniture.jsonl').read_text().splitlines()))
 
     def test_all_reviewed_names_rotations_hashes_and_precise_capacity_totals(self):
-        self.assertEqual(len(self.matches), 768)
+        self.assertEqual(len(self.matches), 895)
         ordinary_banks = sorted({key.split(':')[0] for key in self.matches if not key.startswith('item_10:')})
         ordinary = [row for bank in ordinary_banks for row in
                     map(json.loads, (ROOT/f'build/gamecube/names/{bank}.jsonl').read_text().splitlines())]
@@ -180,7 +180,7 @@ class ItemMatchRetailTests(unittest.TestCase):
             verify_source(match, self.source[bank][first], self.info)
             reference = refs[match['reference_id']]
             self.assertEqual(sha256(encode(reference['text'], self.info).ljust(16, b' ')), match['reference_sha256'])
-        for width, delta in ((10, 536), (16, 1948)):
+        for width, delta in ((10, 660), (16, 2456)):
             old = item_candidates(self.banks['item_10'], self.rows, self.refs, self.info, capacity=width)[0]
             new, _, remaining, report = item_candidates(self.banks['item_10'], self.rows, self.refs,
                                                        self.info, capacity=width, matches=self.matches)
@@ -231,8 +231,8 @@ class ItemMatchRetailTests(unittest.TestCase):
             self.assertNotEqual(match['reference_id'], f'furniture:{group:04X}')
             self.assertNotEqual(refs[f'furniture:{group:04X}'], name)
 
-    def test_unreviewed_gyroids_species_design_changes_and_game_slots_stay_withheld(self):
-        excluded = {*range(364, 491), *range(663, 670), *range(842, 850),
+    def test_unreviewed_species_design_changes_and_game_slots_stay_withheld(self):
+        excluded = {*range(663, 670), *range(842, 850),
                     314, 320, 511, 512, 517, 518, 682, 694, 751, 779,
                     810, 814, 827, 836, 838, 866, 871, 876, 877, 879}
         self.assertTrue(all(f'item_10:{i*4:04X}' not in self.matches for i in excluded))

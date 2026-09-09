@@ -16,6 +16,12 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [gyroid-name batch](checkpoints/GYROID_ITEM_NAMES.md) installs all 127 names,
+508 wide rotation fields, and 124 short fields without changing runtime or saved
+layouts. All 51 focused tests pass, including complete ROM/UPS retention and
+combined accounting. Collect `build/smoke-gyroid-items-01` before claiming native
+acceptance, while continuing remaining names, wider callers, and other text.
+
 The [selected song-title integration](checkpoints/SONG_ITEM_NAMES.md) installs
 full item fields through the native fruit-box actor callback, with no memory or
 save growth and unchanged credits. All 53 focused regressions, independent
