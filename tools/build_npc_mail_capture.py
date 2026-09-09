@@ -15,7 +15,7 @@ from npc_mail_capture import RAM,IMAGE_BYTES_MAX,source_hashes,creator_imports,r
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,item_articles=None):
     if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
     if type(post_office) is not bool: raise ValueError('Invalid post-office creator option')
     if type(museum) is not bool: raise ValueError('Invalid museum creator option')
@@ -28,6 +28,13 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office,museum=museum,shop_notices=shop_notices,quest_replies=quest_replies,notice_treasure=notice_treasure)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
+    if notice_treasure:
+        from item_articles import verify as verify_articles
+        if item_articles is None: raise ValueError('Treasure creator requires approved item articles')
+        verify_articles(item_articles)
+        (out/'articles.bin').write_bytes(item_articles)
+    elif item_articles is not None:
+        raise ValueError('Item articles require treasure creation')
     if academy_scores:
         from academy_score_letters import references,series_resource
         from npc_mail_capture import ACADEMY_SERIES_HASH
@@ -74,7 +81,11 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         for name in ('record', 'treasure'):
             run('gcc', *flags, '/source/runtime/notice/'+name+'.c', '-o', 'notice_'+name+'.o')
         # Fado emits records in object order; retain the linker's text order.
-        objects[-2:-2] = ['notice_record.o', 'notice_treasure.o']
+        run('gcc', *flags, '/source/overlays/mail_generation/item_article.c', '-o', 'item_article.o')
+        run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','item_article_sources.o',
+            '/source/overlays/mail_generation/item_article_sources.s')
+        objects[-2:-2] = ['notice_record.o', 'notice_treasure.o', 'item_article.o']
+        objects.append('item_article_sources.o')
     if academy_scores:
         run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','academy_score_sources.o',
             '/source/overlays/mail_generation/academy_score_sources.s')
@@ -150,6 +161,10 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if quest_replies: report['quest_replies'] = True
     if notice_treasure:
         report['notice_treasure'] = True
+        from item_articles import DATA_HASH, NAMES_HASH
+        report['item_articles_sha256'] = DATA_HASH
+        report['item_names_sha256'] = NAMES_HASH
+        report['stack_usage']['item_article'] = (out/'item_article.su').read_text()
         for name in ('record', 'treasure'):
             report['stack_usage']['notice_'+name] = (out/('notice_'+name+'.su')).read_text()
     if academy_scores:
@@ -180,6 +195,7 @@ def main():
     parser.add_argument('--shop-notices',action='store_true',help='Add complete spotlight/reopening notices; requires --museum')
     parser.add_argument('--quest-replies',action='store_true',help='Add complete letter-quest replies; requires --shop-notices')
     parser.add_argument('--notice-treasure',action='store_true',help='Add complete treasure post creation; requires --quest-replies and --mail-glyphs')
+    parser.add_argument('--item-articles',type=Path,help='Approved articles.bin; required with --notice-treasure')
     parser.add_argument('--mail-glyphs',action='store_true',help='Create new letters with complete glyph catalogue four')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
@@ -192,10 +208,13 @@ def main():
     if args.quest_replies and not args.shop_notices: parser.error('--quest-replies requires --shop-notices')
     if args.notice_treasure and not (args.quest_replies and args.mail_glyphs):
         parser.error('--notice-treasure requires --quest-replies and --mail-glyphs')
+    if args.notice_treasure != bool(args.item_articles):
+        parser.error('--notice-treasure and --item-articles must be supplied together')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
-                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices,quest_replies=args.quest_replies,notice_treasure=args.notice_treasure),indent=2))
+                           academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices,quest_replies=args.quest_replies,notice_treasure=args.notice_treasure,
+                           item_articles=args.item_articles.read_bytes() if args.item_articles else None),indent=2))
 
 
 if __name__ == '__main__': main()

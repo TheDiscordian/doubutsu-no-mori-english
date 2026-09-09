@@ -14,7 +14,7 @@ from npc_mail_capture import validate, source_hashes, creator_imports
 from npc_mail_loader import configuration
 from runtime_module import resident_c_sources, runtime_source_hashes
 
-DIRECTORY = ROOT/'build/noticeboard-treasure/creator'
+DIRECTORY = ROOT/'build/noticeboard-treasure/article-creator'
 
 
 @unittest.skipUnless((DIRECTORY/'overlay.json').is_file(), 'Local compiled treasure creator required')
@@ -28,15 +28,15 @@ class NoticeTreasureArtifactTests(unittest.TestCase):
 
     def test_independent_builds_and_loader_entry(self):
         self.assertEqual((len(self.data), sha256(self.data)),
-                         (37792, '67d7400d4a557bbea2dca29bdcde1cc6e1e06810193c61dcde8b34ba6654033f'))
+                         (46592, 'eda487cce42ace3d63bbbc1709377bc7a51471f0232d11c1add8c80b059be980'))
         self.assertEqual((len(self.reloc), sha256(self.reloc)),
-                         (656, '375654f85296ffa6c13feafcbf0ac7d09bcf9e4c7a84f3c9ceefcb71045c3dfd'))
+                         (672, '2f7a3e1fb6bc95c9c1d63fbe218f5f34581edabfeb291138eb84b71fc9b76212'))
         for filename in ('overlay.bin', 'relocation.bin', 'overlay.json'):
             self.assertEqual((DIRECTORY/filename).read_bytes(),
-                             (ROOT/'build/noticeboard-treasure/creator-repeat'/filename).read_bytes())
+                             (ROOT/'build/noticeboard-treasure/article-creator-repeat'/filename).read_bytes())
         validate(self.data, self.reloc, self.report, self.module)
         config = configuration(self.data, self.reloc, self.report, self.module)
-        self.assertEqual(config[1:4], [38448, 37792, 656])
+        self.assertEqual(config[1:4], [47264, 46592, 672])
         self.assertEqual(config[4], self.report['symbols']['af_notice_treasure_create'])
         text, data, rodata, bss, _ = struct.unpack_from('>5I', self.reloc)
         self.assertEqual((data, bss, text+rodata), (0, 0, len(self.data)))
@@ -49,7 +49,7 @@ class NoticeTreasureArtifactTests(unittest.TestCase):
         sources = [p.relative_to(ROOT/'runtime').as_posix() for p in resident_c_sources(ROOT/'runtime')]
         self.assertNotIn('notice/treasure.c', sources)
         self.assertIn('notice/treasure.c', self.module['runtime_sources'])
-        for name in ('af_crc32', 'af_mail_format', 'af_mail_record_unpack'):
+        for name in ('af_crc32', 'af_mail_format', 'af_mail_record_unpack', 'af_item_name_index'):
             self.assertIn(name, self.report['imports'])
             self.assertEqual(self.report['imports'][name], int(self.module['symbols'][name], 16))
 
@@ -68,6 +68,18 @@ class NoticeTreasureArtifactTests(unittest.TestCase):
         old = ROOT/'build/quest-reply-creator'
         validate((old/'overlay.bin').read_bytes(), (old/'relocation.bin').read_bytes(),
                  json.loads((old/'overlay.json').read_text()), self.module)
+
+    def test_compiled_articles_bound_to_full_names_and_external_approval(self):
+        from item_articles import verify, SIZE, NAMES_HASH
+        at = self.report['symbols']['af_item_article_data']
+        verify(self.data[at:at+SIZE])
+        self.assertEqual(self.report['item_names_sha256'], NAMES_HASH)
+        for field in ('item_names_sha256', 'item_articles_sha256'):
+            report = copy.deepcopy(self.report); report[field] = '0'*64
+            with self.assertRaises(ValueError): validate(self.data, self.reloc, report, self.module)
+        data = bytearray(self.data); data[at+48] ^= 1
+        report = copy.deepcopy(self.report); report['overlay_sha256'] = sha256(data)
+        with self.assertRaises(ValueError): validate(data, self.reloc, report, self.module)
 
 
 if __name__ == '__main__': unittest.main()

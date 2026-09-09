@@ -6,10 +6,10 @@
 /* Optional first dispatcher for the existing synchronous creator loader.
  * player points to the native selected animal identity (at least sixteen
  * readable bytes); animal points to this twelve-byte descriptor:
- *   AFNT | BE16 template | BE16 item | row | column | item article | 245
+ *   AFNT | BE16 template | BE16 item | row | column | zero | 245
  * condition, foreign, and remail are zero. The marker cannot be a personality.
- * Caller supplies the original selected template/item/coordinates and verified
- * English article, never a newly selected reward or inferred vowel heuristic.
+ * Caller supplies the original selected template/item/coordinates. The creator
+ * looks up the article by native item identity and verifies the complete name.
  *
  * Success publishes 96 compact notice bytes plus 68 zero staging bytes to the
  * loader's required 164-byte destination. No timestamp, saved post, buried item,

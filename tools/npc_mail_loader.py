@@ -78,6 +78,9 @@ def install(rom,replacements,additions,module,directory,*,glyph_font=None):
     report = json.loads((directory/'overlay.json').read_text())
     data,reloc = (directory/'overlay.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
     approved = configuration(data,reloc,report,module)
+    if report.get('notice_treasure'):
+        from item_articles import verify_names
+        verify_names(additions.get(0x02A00000, b''), struct.unpack_from('>I', binary, 56)[0])
     if report.get('mail_glyphs'):
         from extended_font_cartridge import mail_capability
         from mail_creator_catalog import identity,vrom

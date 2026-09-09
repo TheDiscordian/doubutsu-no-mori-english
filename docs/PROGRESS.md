@@ -16,15 +16,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 The [complete treasure creator and decoder](checkpoints/NOTICEBOARD_TREASURE.md)
 implement all eighteen bodies with full names, numeric N64 acre coordinates,
 and unchanged 96-byte saved-message capacity. The native-specific `01F4` retains
-the town/row-only clue and all six manual lines. Forty-four creator/dispatcher
-tests, five decoder tests, and the same 49 sanitizer checks pass. The 37,792-byte
-on-demand creator builds identically twice, with 656 relocation bytes, unchanged
-5,344-byte workspace, and unchanged resident code/bootstrap. Four artifact tests
-and four retained native-reader evidence checks pass. These helpers are not yet
-connected to native treasure creation or the installed reader, so they receive
-no text-application credit. Finish native item-article lookup, owner hooks,
-post-burial failure recovery, reader routing, and the complete-ROM installation;
-then continue seasonal posts. Do not rerun the completed initial board batches.
+the town/row-only clue and all six manual lines. Article lookup binds all 3,563
+translated item-name slots to supplied metadata or explicit native-name grammar
+approvals, checks each complete name, and rejects missing translations. Six
+article tests cover every native 16-bit item ID; all 45 creator/dispatcher tests
+and the same 51 sanitizer checks pass. The 46,592-byte creator builds identically
+twice, with 672 relocation bytes, unchanged 5,344-byte workspace, and unchanged
+resident code/bootstrap. Five artifact tests and four retained native-reader
+evidence checks pass. The decoder retains its five passing host/sanitizer checks.
+Native inspection identifies both ordinary and pitfall burial writes and the
+selected acre/flag addresses for exact failure recovery. These helpers are not
+yet connected to native treasure creation or the installed reader, so they
+receive no text-application credit. Finish owner hooks, post-burial undo, reader
+routing, and complete-ROM installation; then continue seasonal posts.
+Do not rerun the completed initial board batches.
 
 The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
 installs all four complete announcements, full-body pages, and English entry/date

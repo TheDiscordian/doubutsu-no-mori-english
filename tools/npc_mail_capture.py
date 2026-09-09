@@ -37,7 +37,7 @@ def call_patches(code,module):
 
 
 def creator_imports(*,villager_events=False,academy_scores=False,notice_treasure=False):
-    return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())+(('af_crc32','af_mail_format','af_mail_record_unpack') if notice_treasure else ())
+    return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())+(('af_crc32','af_mail_format','af_mail_record_unpack','af_item_name_index') if notice_treasure else ())
 
 
 def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False):
@@ -78,7 +78,9 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     if notice_treasure:
         if not quest_replies: raise ValueError('Treasure creator requires complete quest reply dispatch')
         names += ['overlays/mail_generation/'+name for name in
-                  ('notice_treasure_creator.c','notice_treasure_creator.h','notice_treasure_capture.ld')]
+                  ('notice_treasure_creator.c','notice_treasure_creator.h','notice_treasure_capture.ld',
+                   'item_article.c','item_article.h','item_article_sources.s')]
+        names += ['tools/item_articles.py', 'translations/n64-item-articles.json']
         names += ['runtime/notice/'+name for name in ('record.c','record.h','initial.h','treasure.c','treasure.h')]
         names += ['runtime/crc32.h']
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
@@ -146,10 +148,11 @@ def validate(data,reloc,report,module):
         required.update(('af_notice_treasure_create','af_notice_record_tagged','af_notice_record_pack',
                          'af_notice_record_expand','af_notice_treasure_mask','af_notice_treasure_valid',
                          'af_notice_treasure_pack','af_notice_treasure_decode_parts',
-                         'af_notice_treasure_decode','af_notice_treasure_restore'))
+                         'af_notice_treasure_decode','af_notice_treasure_restore',
+                         'af_notice_item_article','af_item_article_data'))
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
-    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id')):
+    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id','af_item_article_data')):
         raise ValueError('NPC capture function points outside text')
     marker = symbols['af_npc_mail_catalog_id']
     if not text <= marker <= len(data)-4 or struct.unpack_from('>I',data,marker)[0] != catalog:
@@ -163,6 +166,14 @@ def validate(data,reloc,report,module):
         if (series&15 or not text <= series or series+1440 != w or sha256(data[series:w]) != ACADEMY_SERIES_HASH
                 or report.get('academy_series_sha256') != ACADEMY_SERIES_HASH):
             raise ValueError('Invalid complete academy series-name resource')
+    if treasure:
+        from item_articles import SIZE, DATA_HASH, NAMES_HASH, verify
+        article = symbols['af_item_article_data']
+        if (article&15 or article < text or article+SIZE != symbols['af_academy_series_data']
+                or report.get('item_articles_sha256') != DATA_HASH
+                or report.get('item_names_sha256') != NAMES_HASH):
+            raise ValueError('Invalid complete item article resource')
+        verify(data[article:article+SIZE])
 
 
 def relocate(data,reloc,base,imports):

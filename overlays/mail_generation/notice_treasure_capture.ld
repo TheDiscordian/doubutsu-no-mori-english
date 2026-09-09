@@ -11,7 +11,8 @@ SECTIONS
         academy_score_creator.o(.text) . = ALIGN(16); post_office_creator.o(.text) . = ALIGN(16);
         museum_creator.o(.text) . = ALIGN(16); shop_notice_creator.o(.text) . = ALIGN(16);
         quest_reply_creator.o(.text) . = ALIGN(16); notice_record.o(.text) . = ALIGN(16);
-        notice_treasure.o(.text) . = ALIGN(16); notice_treasure_creator.o(.text) . = ALIGN(16);
+        notice_treasure.o(.text) . = ALIGN(16); item_article.o(.text) . = ALIGN(16);
+        notice_treasure_creator.o(.text) . = ALIGN(16);
         sources.o(.text) . = ALIGN(16);
     }
     _af_npc_captureSegmentTextSize = SIZEOF(.text);
@@ -25,7 +26,9 @@ SECTIONS
         academy_score_creator.o(.rodata) . = ALIGN(16); post_office_creator.o(.rodata) . = ALIGN(16);
         museum_creator.o(.rodata) . = ALIGN(16); shop_notice_creator.o(.rodata) . = ALIGN(16);
         quest_reply_creator.o(.rodata) . = ALIGN(16); notice_record.o(.rodata) . = ALIGN(16);
-        notice_treasure.o(.rodata) . = ALIGN(16); notice_treasure_creator.o(.rodata) . = ALIGN(16);
+        notice_treasure.o(.rodata) . = ALIGN(16); item_article.o(.rodata) . = ALIGN(16);
+        notice_treasure_creator.o(.rodata) . = ALIGN(16);
+        item_article_sources.o(.rodata) . = ALIGN(16);
         academy_score_sources.o(.rodata) . = ALIGN(16); sources.o(.rodata) . = ALIGN(16);
     }
     _af_npc_captureSegmentRoDataSize = SIZEOF(.rodata);

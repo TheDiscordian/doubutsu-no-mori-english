@@ -1,4 +1,5 @@
 #include "notice_treasure_creator.h"
+#include "item_article.h"
 #include "../../runtime/notice/treasure.h"
 #include "../../runtime/item_name.h"
 
@@ -20,6 +21,7 @@ int af_notice_treasure_create(AfNpcMailCreateWork *work, unsigned char *destinat
     AfMailField name;
     const unsigned char *request, *animal;
     unsigned int i, j, number, npc, item, mask;
+    int article;
     unsigned char text[16], coordinate;
     if (!af_mail_create_guard(work, destination, active, capital, town, 6u)) return 0;
     session = &work->captured.session;
@@ -33,7 +35,7 @@ int af_notice_treasure_create(AfNpcMailCreateWork *work, unsigned char *destinat
     if (!animal || ((__UINTPTR_TYPE__)animal & 1u) || session->condition || session->foreign
             || request[0] != 'A' || request[1] != 'F' || request[2] != 'N' || request[3] != 'T'
             || request[8] < 1u || request[8] > 6u || request[9] < 1u || request[9] > 5u
-            || request[10] > 4u || animal[11] >= 6u) return 0;
+            || request[10] || animal[11] >= 6u) return 0;
     number = ((unsigned int)request[4] << 8) | request[5];
     item = ((unsigned int)request[6] << 8) | request[7];
     npc = ((unsigned int)animal[0] << 8) | animal[1];
@@ -48,8 +50,11 @@ int af_notice_treasure_create(AfNpcMailCreateWork *work, unsigned char *destinat
                 || !af_npc_mail_source_name(&name, &work->captured.sources, npc)
                 || !af_mail_capture_set(capture, 1u, name.text, name.length, 0u)) return 0;
     }
-    if ((mask & (1u << 2)) && (!af_load_item_name(text, 16u, item)
-            || !af_mail_capture_set(capture, 2u, text, 16u, request[10]))) return 0;
+    if (mask & (1u << 2)) {
+        if (!af_load_item_name(text, 16u, item)) return 0;
+        article = af_notice_item_article(item, text);
+        if (article < 0 || !af_mail_capture_set(capture, 2u, text, 16u, (unsigned int)article)) return 0;
+    }
     coordinate = (unsigned char)('0'+request[8]);
     if ((mask & (1u << 3)) && !af_mail_capture_set(capture, 3u, &coordinate, 1u, 0u)) return 0;
     coordinate = (unsigned char)('0'+request[9]);

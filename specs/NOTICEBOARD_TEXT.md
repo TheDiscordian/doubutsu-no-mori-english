@@ -283,7 +283,7 @@ allocation or incompatible-structure casts.
 
 The optional `af_notice_treasure_create` dispatcher preserves the complete earlier
 creator chain. Its twelve-byte request is `AFNT`, BE16 template, BE16 item, row,
-column, item article, and marker `245`. The existing loader's player argument
+column, reserved zero, and marker `245`. The existing loader's player argument
 points to the selected native animal identity with sixteen readable bytes; animal
 points to the request. Remail, condition, and foreign are zero. The template must
 match the original animal personality group; the creator does not choose new RNG,
@@ -295,13 +295,18 @@ publishing exactly 96 message bytes plus 68 zero staging bytes. Its 164-byte out
 is only the existing loader's scratch interface, not a native notice record.
 The owner must copy **only 96 bytes** into the original 104-byte post and retain
 its original timestamp. No saved post, buried object, timestamp, or eligibility
-state is modified by these helpers. Article is currently a validated caller input;
-the GameCube article-table lookup still needs native item-identity binding.
+state is modified by these helpers. [Article lookup](ITEM_ARTICLES.md) uses the
+same native conversion as the full-name loader and verifies the selected complete
+name against immutable supplied metadata or an explicit N64-specific approval.
+Unknown/mismatched names fail before publication. The installer requires the
+matching enabled name resource, not merely a caller-supplied article value.
 
-The complete creator image is 37,792 bytes with 656 relocation bytes, no mutable
+The complete creator image is 46,592 bytes with 672 relocation bytes, no mutable
 global state, and the unchanged 5,344-byte caller workspace. Independent builds,
-49 host/sanitizer checks, and artifact/retention checks pass. The creator remains
+51 article/creator host tests, the same sanitizer checks, and artifact/retention
+checks pass. The unchanged decoder retains its five host/sanitizer results.
+The creator remains
 inside the existing 65,536-byte image limit, and the freshly inventoried resident
-module and bootstrap are unchanged. Native hooks, reader routing, article capture,
+module and bootstrap are unchanged. Native hooks, reader routing,
 post-burial failure recovery, actual execution, and persistence remain uninstalled
 or unverified. See the [treasure checkpoint](../docs/checkpoints/NOTICEBOARD_TREASURE.md).

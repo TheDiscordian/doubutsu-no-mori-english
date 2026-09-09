@@ -32,7 +32,9 @@ class NoticeTreasureCreatorTests(quest_tests.QuestReplyCreatorTests):
         looks = (number-0x1F0)//3
         fixture = self.fixture(foreign=0, good=0, looks=looks, capital=capital)
         C.memmove(fixture[3], struct.pack('>HH6sBB4s', 0xE000+npc, 0x1234, b'AWAY  ', npc, looks, bytes(4)), 16)
-        C.memmove(fixture[4], struct.pack('>4sHHBBBB', b'AFNT', number, 0x11FC, 6, 5, article, 245), 12)
+        C.memmove(fixture[4], struct.pack('>4sHHBBBB', b'AFNT', number, 0x11FC, 6, 5, 0, 245), 12)
+        C.c_int.in_dll(self.lib, 'af_notice_test_article').value = article
+        C.c_uint.in_dll(self.lib, 'af_notice_test_article_calls').value = 0
         C.c_uint.in_dll(self.lib, 'af_event_card_item_calls').value = 0
         return fixture
 
@@ -54,7 +56,7 @@ class NoticeTreasureCreatorTests(quest_tests.QuestReplyCreatorTests):
         number = int.from_bytes(request.raw[4:6], 'big')
         npc = int.from_bytes(animal.raw[:2], 'big')-0xE000
         name = next(row.name for row in self.alias_rows if row.npc_index == npc)
-        values = {1: Field(name), 2: Field(bytes(self.item_name), request.raw[10]),
+        values = {1: Field(name), 2: Field(bytes(self.item_name), C.c_int.in_dll(self.lib, 'af_notice_test_article').value),
                   3: Field(b'6'), 4: Field(b'5'), 5: Field(b'Town  ')}
         record = Record(4, 0, (number,), tuple((i, values[i]) for i in fields_for(number)), bool(before[1]))
         self.assertEqual(destination.raw[16:180], pack(record)+bytes(68))
@@ -63,6 +65,8 @@ class NoticeTreasureCreatorTests(quest_tests.QuestReplyCreatorTests):
                          body(record, self.banks))
         self.assertEqual(capital.value, before[1])
         self.assertEqual(C.c_uint.in_dll(self.lib, 'af_event_card_item_calls').value,
+                         int(2 in fields_for(number)))
+        self.assertEqual(C.c_uint.in_dll(self.lib, 'af_notice_test_article_calls').value,
                          int(2 in fields_for(number)))
 
     def test_notice_all_eighteen_templates_articles_capitals_and_full_names(self):
@@ -75,7 +79,7 @@ class NoticeTreasureCreatorTests(quest_tests.QuestReplyCreatorTests):
 
     def test_notice_invalid_descriptor_identity_and_overlap_retain_output(self):
         for offset, value in ((0, 0), (1, 0), (2, 0), (3, 0), (4, 0), (5, 0xEF),
-                              (8, 0), (8, 7), (9, 0), (9, 6), (10, 5), (10, 255)):
+                              (8, 0), (8, 7), (9, 0), (9, 6), (10, 1), (10, 5), (10, 255)):
             fixture = self.notice_fixture(capital=1)
             C.c_ubyte.from_address(C.addressof(fixture[4])+offset).value = value
             self.notice_invoke(fixture, False, True)
@@ -111,6 +115,12 @@ class NoticeTreasureCreatorTests(quest_tests.QuestReplyCreatorTests):
         for number in range(0x1F0, 0x202):
             self.notice_invoke(self.notice_fixture(number), 2 not in fields_for(number))
         C.c_uint.in_dll(self.lib, 'af_event_card_item_fail').value = 0
+        self.notice_invoke(self.notice_fixture())
+
+    def test_notice_article_failure_preserves_output_and_all_clue_only_posts(self):
+        for number in range(0x1F0, 0x202):
+            fixture = self.notice_fixture(number, article=-1)
+            self.notice_invoke(fixture, 2 not in fields_for(number))
         self.notice_invoke(self.notice_fixture())
 
 
