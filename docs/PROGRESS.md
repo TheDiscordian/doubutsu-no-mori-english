@@ -13,6 +13,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [owner-message editor core](checkpoints/HBOARD_EDITOR.md) implements the
+complete English draft, proportional four-row layout, pixel-based cursor/edit
+operations, and save-safe confirmation. Nine focused tests and the 10,000-command
+sanitizer exercise pass, including comparison with the pinned GameCube layout
+and cursor functions. The 2,344-byte code/read-only core compiles for N64 with
+no external imports or mutable globals. It is not installed in the cartridge
+yet: scoped overlay bridges, drawing/warnings, allocation, and native acceptance
+are the next work. Custom messages retain the native 64-byte saved limit; the
+complete default uses its exact canonical representation without truncation.
+
 The [home-gyroid default integration](checkpoints/GYROID_DEFAULT.md) installs the
 complete four-line GameCube greeting through a source-bound 206-byte message
 variant and exact saved-default selector. The actor grows by 176 bytes; native
