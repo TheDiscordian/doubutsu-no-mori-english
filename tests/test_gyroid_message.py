@@ -168,7 +168,7 @@ int mFont_GetCodeWidth(u8 c, int cut) { (void)cut; return widths[c]; }
 
 @unittest.skipUnless(ROM_PATH.is_file(), 'Local original ROM required')
 class GyroidEvidenceTests(unittest.TestCase):
-    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(), 'Build resident module first')
+    @unittest.skipUnless((ROOT/'build/notice-seasonal-runtime/module.json').is_file(), 'Build current resident module first')
     def test_native_scenario_requires_both_installed_entry_and_original_insertion(self):
         from aflib import replace_dma
         from font import make_halfwidth
@@ -176,7 +176,7 @@ class GyroidEvidenceTests(unittest.TestCase):
         from runtime_module import add_runtime_module
         rom = ROM_PATH.read_bytes()
         replacements, _ = make_halfwidth(rom)
-        additions, module = add_runtime_module(rom, replacements, ROOT/'build/runtime-module')
+        additions, module = add_runtime_module(rom, replacements, ROOT/'build/notice-seasonal-runtime')
         built = replace_dma(rom, replacements, additions=additions)
         actions = scenario(built, module)
         self.assertEqual(sum('call' in a for a in actions), 47)

@@ -2,6 +2,10 @@
 # Complete local integration recipe. Inputs and output ROM/patch remain ignored.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+gyroid_args=()
+if [[ -n "${AF_GYROID_DEFAULT:-}" ]]; then
+  gyroid_args=(--english-gyroid-default "$AF_GYROID_DEFAULT")
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -23,4 +27,5 @@ exec python3 tools/build.py \
   --english-noticeboard build/noticeboard-seasonal/reader \
   --english-notice-treasure build/noticeboard-treasure/owners \
   --english-notice-seasonal build/noticeboard-seasonal/owner \
+  "${gyroid_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

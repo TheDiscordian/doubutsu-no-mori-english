@@ -153,6 +153,11 @@ def measure(native, built, report):
                 seen.add(actor)
                 ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases')
 
+        if report.get('gyroid_default'):
+            from gyroid_default_actor import verify_installation
+            _, default = verify_installation(built, native, module, report['gyroid_default'])
+            ledger.credit('string:055C', default, 'gyroid_default')
+
         if any(report.get(key) for key in ('npc_mail_loader', 'fortune_actor', 'renewal_actor', 'event_actor')):
             from mail_view_patch import install as install_reader
             baseline = bytearray(binary)

@@ -53,7 +53,9 @@ RELOCATED_BANKS = {
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
                        extended_font=None, english_fortunes=False, english_resetti_replies=False,
                        english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
-                       english_credits=False):
+                       english_credits=False, english_gyroid_default=False):
+    if english_gyroid_default and not (runtime_module and english_runtime):
+        raise ValueError('Gyroid default requires the complete English runtime')
     if english_fortunes and not runtime_module:
         raise ValueError('English fortunes require the complete resident runtime')
     if english_resident_words and not runtime_module:
@@ -79,6 +81,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         from extended_font_cartridge import planned_capability
         planned_capability(rom,replacements,module_additions,module_report,extended_font)
     edits = json.loads(path.read_text()) if path else []
+    from gyroid_default import permits as gyroid_permits, feature_matches
+    gyroid_approvals = gyroid_permits(rom, edits, info, enabled=bool(english_gyroid_default))
     if defer_shared_npc_words:
         shared_word_values(rom, edits, info)
         # Long shared words remain native until the final creator/reader checks.
@@ -94,6 +98,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     native_item_names = load_native_item_names()
     item_sources = {bank.name: bank.entries() for bank in source_banks if bank.name.startswith('item_')}
     matches = load_matches(Path(__file__).resolve().parents[1]/"translations/reference_matches.json")
+    if english_gyroid_default:
+        matches = feature_matches(matches)
     verify_requirements(edits, rom, replacements, module_additions, module_report, matches=matches)
     contextual = load_contextual_choices(matches)
     edits_by_id = {edit['id']: edit for edit in edits}
@@ -150,7 +156,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                resetti_permit=reply_permits.get(edit['id']),
                                shop_unit_permit=unit_permits.get(edit['id']),
                                resident_word_permit=word_permits.get(edit['id']),
-                               credits_permit=credit_permits.get(edit['id']))
+                               credits_permit=credit_permits.get(edit['id']),
+                               gyroid_default_permit=gyroid_approvals.get(edit['id']))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -206,6 +213,7 @@ def main():
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
     parser.add_argument('--english-credits', action='store_true', help='Complete native credits and owned twenty-five-byte loader/drawer rows')
+    parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-song-names', action='store_true', help='Complete selected song titles through full item fields; requires English credits, runtime, and extended items')
     parser.add_argument('--english-fortune-slips', type=Path, help='Experimental complete Katrina letter hand-off actor; requires the full snapshot reader and fortune catalog')
     parser.add_argument('--english-leaflet-dates', type=Path, help='Complete shop/Redd leaflet dates and AM/PM; directory containing the compiled native hour formatter')
@@ -250,6 +258,8 @@ def main():
         parser.error('--english-song-names requires --english-credits, --runtime-module, and --extended-items')
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
+    if args.english_gyroid_default and not (args.runtime_module and args.english_runtime and args.translations):
+        parser.error('--english-gyroid-default requires --runtime-module, --english-runtime, and --translations')
     if args.english_leaflet_dates and not (args.runtime_module and args.english_runtime):
         parser.error('--english-leaflet-dates requires --runtime-module and --english-runtime')
     if args.english_renewal_letters and not (args.english_leaflet_dates and args.english_mail_snapshots):
@@ -314,7 +324,8 @@ def main():
         runtime_module=args.runtime_module, module_additions=additions,extended_font=args.extended_font,
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
-        defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits)
+        defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits,
+        english_gyroid_default=bool(args.english_gyroid_default))
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
@@ -397,6 +408,10 @@ def main():
     if args.english_secret_letters:
         from secret_actor import install as install_secret
         report['secret_actor'] = install_secret(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_secret_letters)
+    if args.english_gyroid_default:
+        from gyroid_default_actor import install as install_gyroid_default
+        report['gyroid_default'] = install_gyroid_default(rom, replacements, additions, relocations,
+                                                       report.get('runtime_module'), args.english_gyroid_default)
     if args.english_song_names:
         from song_item_names import install as install_song_item_names
         report['song_item_names'] = install_song_item_names(rom,replacements,additions,report.get('runtime_module'))

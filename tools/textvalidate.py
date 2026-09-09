@@ -14,6 +14,7 @@ from resetti_replies import ResettiReplyPermit
 from shop_units import ShopUnitPermit
 from resident_words import ResidentWordPermit
 from credits_strings import CreditsPermit
+from gyroid_default import GyroidDefaultPermit
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -73,7 +74,17 @@ def expanded_bound(data, info, *, extended_glyphs=False):
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
                    extended_glyphs=False, fortune_permit=None, resetti_permit=None, shop_unit_permit=None,
-                   resident_word_permit=None, credits_permit=None):
+                   resident_word_permit=None, credits_permit=None, gyroid_default_permit=None):
+    if policy == 'gyroid_default' or gyroid_default_permit is not None:
+        if (not isinstance(gyroid_default_permit, GyroidDefaultPermit)
+                or gyroid_default_permit != GyroidDefaultPermit()
+                or bank != 'message' or policy != 'gyroid_default' or not resident_runtime
+                or any(p is not None for p in (sequence_permit, field_permit, catchphrase_permit,
+                       animation_permit, fortune_permit, resetti_permit, shop_unit_permit,
+                       resident_word_permit, credits_permit))
+                or gyroid_default_permit.source_sha256 != sha256(original)
+                or gyroid_default_permit.encoded_sha256 != sha256(replacement)):
+            raise ValueError('Gyroid default requires its exact source-bound resident variant permit')
     if credits_permit is not None:
         if (not isinstance(credits_permit, CreditsPermit) or bank!='string' or policy!='exact'
                 or any(p is not None for p in (fortune_permit,resetti_permit,shop_unit_permit,resident_word_permit))
@@ -111,7 +122,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
             raise ValueError('Fortune capacity requires an exact complete resident string permit')
     if extended_glyphs and (bank != 'message' or not resident_runtime):
         raise ValueError('Extended glyphs require the resident main-dialogue capability')
-    if bank == 'message' and policy != 'reviewed_sequence':
+    if bank == 'message' and policy not in ('reviewed_sequence', 'gyroid_default'):
         validate_placeholder(original, replacement, info)
         validate_diagnostic(original, replacement, info)
     if choice_bytes not in (10, 16, 20) or choice_bytes == 20 and not resident_runtime:
@@ -182,7 +193,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                 or sequence_permit.source_sha256 != sha256(original)
                 or sequence_permit.encoded_sha256 != sha256(replacement)):
             raise ValueError("Reviewed sequence requires complete hash-bound approval")
-    else:
+    elif policy != 'gyroid_default':
         before = signature(original, info, policy, resident_runtime)
         after = signature(replacement, info, policy, resident_runtime)
         if animation_permit is not None:

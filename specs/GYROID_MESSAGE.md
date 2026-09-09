@@ -80,9 +80,9 @@ code. Extracted reference source remains ignored and temporary.
 `tools/gyroid_message_test_scenario.py` checks the installed N64 entry and real
 dialogue insertion, full destination/source guards, exact message-buffer
 capacity, and checkpoint restoration. Actual executed results and hashes live
-in the work log. Ordinary other-owner gyroid interaction, saved custom editing,
-and the complete English default remain required. The
+in the work log. Ordinary other-owner gyroid interaction and saved custom editing
+remain required. The installed complete English
 [default-message design](GYROID_DEFAULT.md) uses the four strings actually
 selected by GameCube initialisation, not the older same-ID eighty-eight-byte
-concatenation. This display change does not solve the larger saved-message
-representation.
+concatenation. Default substitution preserves saved storage; owner-editor
+presentation and the larger custom-message representation remain unfinished.

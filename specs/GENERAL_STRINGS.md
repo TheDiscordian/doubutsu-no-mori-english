@@ -97,8 +97,9 @@ similarly named free-string storage.
 
 The gyroid's other-owner display setter uses measured pixel wrapping while
 preserving manual newlines and its native 68-byte temporary field. It still
-receives the original 64-byte saved message; the full English default and wider
-custom editing remain unimplemented. See [gyroid message](GYROID_MESSAGE.md) and
+receives the original 64-byte saved message. The complete English default uses
+an exact-default actor substitution; owner-editor presentation and wider custom
+editing remain unfinished. See [gyroid message](GYROID_MESSAGE.md) and
 the [four-line default integration](GYROID_DEFAULT.md).
 
 ## Acceptance

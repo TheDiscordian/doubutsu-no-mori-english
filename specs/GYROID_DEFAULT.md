@@ -73,15 +73,38 @@ Keep the resident image, native saved structures, current heap bounds, and
 test scratch addresses unchanged. This is not a restriction against the
 permitted Expansion Pak; this actor-owned feature does not need one.
 
-## Acceptance and implementation state
+## Installation and checks
 
-The pure C selector and assembly source exist but are not installed. Host checks
-must cover the exact original, all 64-by-255 single-byte customisations,
-unchanged sources/guards, unaligned inputs, null inputs, and unrelated IDs.
-Next implement source-bound text permission/generation, native overlay append
-and relocation, atomic builder/measurement integration, and a complete pilot.
-Require independent MIPS compilation, exact prior-resource retention, UPS
-reconstruction, and a bounded silent native actor-selection/load batch.
+`tools/gyroid_default.py` binds the original saved source, native initialisers,
+actual GameCube functions/tables, decoder, raw banks, and all four English rows.
+The 206-byte variant has SHA-256
+`06130e75b09b9cf1cec54660524d30ce41e696c41ec334ac19d60ffb173bbdd4`.
+Only its exact typed permit may replace the reserve's control stream. Ordinary
+placeholder, capacity, and control validation remain strict for every other ID.
+The complete original `0928` remains required. Candidate generation uses
+`--english-gyroid-default`; cartridge builds require the matching actor directory
+through the same flag. Missing, changed, or partial installations fail before
+publishing a cartridge or mutating the caller's installation maps.
+
+`tools/build_gyroid_default_actor.py` links a 6,976-byte actor: the unchanged
+6,800-byte prefix except its one call, 76 selector instruction bytes, 36 adapter
+instruction bytes, and the original 64-byte comparison data. No BSS is added.
+VROM `03930000` holds the actor and `03938000` its 464-byte relocation file.
+Main-code metadata at `80100DD0` changes only its first four allocation/DMA
+words. Original profile, ownership flags, all 105 native relocations, and their
+order remain. Four added rows cover the changed call, internal selector call,
+and comparison-data high/low pair; the native setter tail jump stays absolute.
+Appended instructions are independently checked against the exact intended
+machine words, including their stack contract. Relocation checks cover the heap
+start, a negative-low-half address, and the highest fitting four-MiB allocation.
+
+`tools/build_gyroid_default_pilot.sh` builds the complete integration while
+retaining every earlier resource. Independent Docker compilations agree. Eleven
+host/source/ROM checks cover all 16,320 one-byte customisations, null/unaligned
+inputs, original sources/guards, exact complete text, rejected altered permissions,
+code/relocation mutations, atomic actor-only failure, previous-resource retention,
+UPS reconstruction, and combined accounting. Seventeen sequence regressions pass.
+Native evidence and remaining acceptance are tracked in the checkpoint.
 
 Native acceptance must retain the original owner-state decisions, prove the
 real adapter's stack contract, select custom/default paths correctly, load the

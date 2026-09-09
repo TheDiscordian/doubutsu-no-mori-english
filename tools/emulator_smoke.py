@@ -1012,6 +1012,12 @@ def main():
                     raise ValueError('Native species probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_native_species_words'],record))
+            if 'test_gyroid_default' in action:
+                from gyroid_default_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Gyroid default probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_gyroid_default'], record))
             if 'test_npc_mail_delivery' in action:
                 from npc_mail_delivery_smoke import exercise
                 if not (out/'test.bs1').is_file():

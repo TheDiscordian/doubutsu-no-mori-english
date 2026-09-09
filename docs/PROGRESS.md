@@ -13,14 +13,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
-The [home-gyroid default work](checkpoints/GYROID_DEFAULT.md) identifies the four
-English lines actually selected by GameCube initialisation, preserving their
-92-byte complete presentation. Its actor-side exact-default selector and adapter
-compile for VR4300; three host tests cover all 16,320 one-byte customisations and
-retained sources/guards. Source-bound text generation, overlay/relocation and
-atomic installation, editor presentation, and native/save acceptance remain.
-This code is not installed or credited; the current complete ROM is the
-message-diagnostic build below. No resident or saved allocation has changed.
+The [home-gyroid default integration](checkpoints/GYROID_DEFAULT.md) installs the
+complete four-line GameCube greeting through a source-bound 206-byte message
+variant and exact saved-default selector. The actor grows by 176 bytes; native
+saved storage and resident memory remain unchanged. Independent Docker builds,
+all eleven focused host/source/ROM/accounting tests, and seventeen sequence
+regressions pass. Every earlier translation candidate and resource is retained
+apart from the one repurposed reserve, actor pair, and its allocation metadata.
+The current complete ROM/UPS is `build/gyroid-default-pilot`. The completed
+silent native batch passes 112 calls and 133 assertions: cartridge loading and
+relocation, custom-byte protection, real default/custom selection for all four
+homes, complete native message/continuation loads, retained guards/save RAM,
+restored checkpoint, and blank isolated saves. Eighteen formatter/placeholder
+regressions also pass. Owner-editor presentation, normal interaction, save/reload,
+and hardware remain unfinished.
 
 The [complete diagnostic sequence](checkpoints/MESSAGE_DIAGNOSTIC_SEQUENCE.md)
 installs the last inventoried Japanese message-bank record as `0004 → 2AEB`,

@@ -28,6 +28,13 @@ Catalogue presence alone does not credit unused letters or GameCube-only IDs.
 Reader and NPC capture/delivery patches are checked against installed bytes;
 actor images and resources are bound to the completed build report.
 
+The home-gyroid default credits original `string:055C` once through its complete
+four-line English variant only when the actual selector actor, allocation,
+relocations, custom formatter, and both default/custom messages are verified in
+the cartridge. Reusing a reserve adds no duplicate weight. The owner editor and
+normal save/reload remain acceptance work; alternate-display credit is not a
+claim that every caller of the original saved representation is finished.
+
 This deliberately remains a quick approximation, not an exhaustive new audit.
 Other embedded interface strings and text-bearing artwork still need inventory
 expansion. Unknown glyph/undecodable source categories are reported, not silently

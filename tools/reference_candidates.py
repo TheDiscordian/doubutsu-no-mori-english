@@ -160,6 +160,7 @@ def main():
     parser.add_argument('--english-resident-words', action='store_true', help='Complete source-verified ordinary resident words; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; build also requires cartridge NPC generation')
     parser.add_argument('--english-credits', action='store_true', help='Complete identity-matched native credits with twenty-five-byte callers')
+    parser.add_argument('--english-gyroid-default', action='store_true', help='Complete four-line default; final build requires the matching gyroid actor')
     parser.add_argument("--rom", type=Path, required=True)
     parser.add_argument("--gc-text", type=Path, default=Path("build/gamecube/text"))
     parser.add_argument("--gc-names", type=Path, default=Path("build/gamecube/names"))
@@ -174,6 +175,8 @@ def main():
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='Include drafts requiring English resident-date preparation')
     args = parser.parse_args()
+    if args.english_gyroid_default and not (args.runtime_module and args.english_runtime):
+        parser.error('--english-gyroid-default requires --runtime-module and --english-runtime')
     if args.english_dialogue_dates and not args.runtime_module:
         parser.error('--english-dialogue-dates requires --runtime-module')
     if args.english_fortunes and not args.runtime_module:
@@ -252,6 +255,14 @@ def main():
     drafts, withheld_drafts = select_drafts(drafts, english_dialogue_dates=args.english_dialogue_dates,
                                            resident_runtime=bool(args.runtime_module))
     matches = load_matches(args.matches)
+    gyroid = {}
+    if args.english_gyroid_default:
+        from gyroid_default import candidate, feature_matches, GyroidDefaultPermit
+        edit = candidate(rom, info)
+        if edit['id'] in override_ids:
+            raise ValueError('Gyroid default conflicts with an original draft')
+        gyroid[edit['id']] = edit
+        matches = feature_matches(matches)
     fragment_matches = load_fragment_matches()
     fragment_references, fragment_inventory = {}, {}
     for name in ('maila', 'mailb', 'mailc'):
@@ -323,7 +334,15 @@ def main():
                 counts["original_draft_override"] += 1
                 continue
             original = source[int(id.split(":")[1], 16)]
-            if id in credits:
+            if id in gyroid:
+                edit = gyroid[id]
+                if row['source_sha256'] != edit['source_sha256']:
+                    raise ValueError('Stale gyroid reserve inventory')
+                validate_entry(original, encode(edit['translation'], info), info, name,
+                               'gyroid_default', resident_runtime=True,
+                               gyroid_default_permit=GyroidDefaultPermit())
+                counts['complete_gyroid_default_variant'] += 1
+            elif id in credits:
                 edit = credits[id]
                 validate_entry(original,encode(edit['translation'],info),info,name,
                                credits_permit=credits_approvals[id])
@@ -452,7 +471,7 @@ def main():
                              resident_runtime=bool(args.runtime_module),extended_glyphs=use_glyphs)
         if name == "message":
             aliases, conflicts = confirmed_message_aliases(source, edits, gc, info,
-                skip_ids=override_ids | matches.keys() | fragments.keys() | disabled_birthdays,
+                skip_ids=override_ids | matches.keys() | fragments.keys() | disabled_birthdays | gyroid.keys(),
                 resident_runtime=bool(args.runtime_module))
             for edit in aliases:
                 rejected = [row for row in review if row["id"] == edit["id"]]
