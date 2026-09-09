@@ -20,8 +20,11 @@ short fields, and paper remain. Mailbox copying requires complete creation.
 All 41 host tests and the same sanitizer tests pass; independent creator builds,
 exact wrapper/gate assembly, complete-ROM/UPS retention, and combined accounting
 checks pass. The 34,096-byte creator uses the unchanged resident loader and
-four-MiB layout. Native delivery/readback acceptance is assigned to
-`build/smoke-quest-reply-01`; inspect its terminal results before claiming it.
+four-MiB layout. The completed silent native batch passes all 144 original
+comparisons and home deliveries, 146 complete readbacks, six failure cases,
+two resource retries, and four full-width rank rejections. All 597 calls and
+1,505 assertions pass, including retained inputs/RNG, restored save/globals,
+heap/stack/code guards, checkpoint reload, blank saves, and graceful shutdown.
 Normal conversation, saving, review, and hardware remain unverified.
 
 The [shop-notice integration](checkpoints/SHOP_NOTICE_LETTERS.md) installs all

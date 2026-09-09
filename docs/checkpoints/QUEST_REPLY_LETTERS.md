@@ -63,12 +63,28 @@ known approximation limit, not missing implemented signatures.
 
 ## Native acceptance
 
-`build/quest-reply-scenario.json` prepares 144 original-metadata, home-delivery,
-and complete-readback cases, spanning all templates and capitalization states.
-The batch includes home/slot ownership, resource failure/retry, invalid ranks,
-retained quest inputs, original native fields/RNG, guards, restored live state,
-and checkpoint restoration. `build/smoke-quest-reply-01` is the assigned isolated
-run directory; only terminal results can establish which checks passed.
+`build/smoke-quest-reply-01` completes successfully with 2,420 result records,
+597 native calls, and 1,505 passing assertions. All 144 original-metadata and
+home-delivery cases pass, spanning 72 templates, both capitalization states,
+every home, and every mailbox slot. All 146 complete readbacks pass, including
+two resource-recovery retries. Six owner failures and four full-width invalid
+ranks retain outputs and selected inputs. Original identities, gifts, paper,
+native temporary fields, and random selection remain intact.
+
+The native batch restores all 63,872 saved-state bytes and five globals, retains
+heap accounting, passes twelve fixture/stack guards and five code guards, and
+reloads the checkpoint with a successful scratch-memory assertion. Isolated
+FlashRAM and Pak files retain their blank fixtures; shutdown is graceful. Audio,
+screenshots, Expansion Pak, and game-save writes are disabled. Production creator
+code comes from the cartridge; the only uploaded comparison function is the
+292-byte original creator. `tests/test_quest_reply_results.py` freezes these
+results and verifies the source-bound scenario without repeating native calls.
+
+- Results SHA-256: `85ebdffa4caa1f786dc12cf5140c94d8077812d3192e5a15a3e1d26e2b82da64`.
+- Scenario SHA-256: `7c0322fc47f14114b722be57a9484742e750e5f7c69d22c9ae27cfe145b6f96a`.
+- Native helper SHA-256: `71e073882508fce0a4dcafc5ac4fd89dc57f523186c98930ee46a855523244fd`.
+- Restored checkpoint SHA-256: `013b860253e3a9b216054476f6bd8a77d92f589991d2c1fe560ebbc71c549e8b`.
+
 Normal conversation selection/cleanup, save/reload, presentation review, and
 original hardware remain unverified.
 
@@ -90,9 +106,8 @@ python3 tools/quest_reply_scenario.py --output build/quest-reply-scenario.json \
   --boot-output build/quest-reply-silent-boot.json
 ```
 
-Collect the specific native process's terminal results without restarting an
-unobserved live process. Preserve passed bulk cases if an isolated edge needs
-follow-up. Continue remaining noticeboard/general/name consumers, review,
+Do not repeat the completed native bulk batch. Continue remaining
+noticeboard/general/name consumers, review,
 normal gameplay/save/travel acceptance, title-first artwork, GameCube-style
 keyboard, and patch-only release preparation. This checkpoint is not full
 project completion or hardware certification.

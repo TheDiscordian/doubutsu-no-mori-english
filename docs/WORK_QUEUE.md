@@ -20,8 +20,10 @@ The [letter-quest replies](checkpoints/QUEST_REPLY_LETTERS.md) install all
 72 templates with full names and gift fields, plus a native complete-creation
 check before mailbox copying. Forty-one host tests and the same sanitizer
 tests pass; independent builds, exact assembly, installation/accounting checks,
-full-ROM retention, and UPS reconstruction pass. Collect the assigned
-`build/smoke-quest-reply-01` batch's terminal native evidence. Normal quest
+full-ROM retention, and UPS reconstruction pass. The completed native batch
+passes all 144 original comparisons/home deliveries, 146 complete readbacks,
+six failure cases, two retries, and four rank rejections: 597 calls and 1,505
+assertions, with restored state/checkpoint, blank saves, and graceful shutdown. Normal quest
 selection/cleanup, save/reload, review, and hardware remain. Continue remaining
 noticeboard and other text consumers without rerunning passed bulk cases.
 
@@ -109,7 +111,7 @@ fifteen calls, 53 assertions, and 504 glyphs. Each case occupies one page; no
 backward-page test is claimed for this group. The conversation selection/fallback
 still needs acceptance. Do not repeat completed bulk or window cases. The
 72 letter-quest replies `0075..00BC` have complete signatures and item fields
-through the integration above; native acceptance is in progress.
+through the integration above; its native delivery/readback batch passes.
 Continue remaining text, review, normal conversation/save acceptance, and
 original-hardware validation.
 
