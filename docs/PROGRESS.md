@@ -13,6 +13,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [bulletin-board foundation](checkpoints/NOTICEBOARD_FOUNDATION.md) implements
+lossless 96-byte envelopes, complete decoding of the four source-bound initial
+announcements, and full six-line pagination. The only donor wording change is
+the verified `C Stick` to `C Buttons` adaptation. All 63 scoped reference bodies
+fit compact storage with full dynamic fields; seasonal/treasure meanings still
+need review. Eighteen host checks and the same eighteen sanitizer checks pass.
+Two VR4300 builds agree, with no mutable global state. These helpers are not yet
+installed and receive no text-coverage credit. Current work connects native
+creation and the actual reader/editor boundaries, preserving saves and controls.
+
 The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs
 22 source-bound original entries in 63 complete fields, including 31 unchanged-
 width fields and two clothing aliases. It preserves N64 objects/designs and

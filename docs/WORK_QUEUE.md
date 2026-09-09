@@ -16,6 +16,14 @@ work remains; **external validation** = cannot be claimed without the specified
 hardware or independent permission/evidence. A task becomes complete only when
 its acceptance checks pass, not when a candidate or specification exists.
 
+The [bulletin-board foundation](checkpoints/NOTICEBOARD_FOUNDATION.md) has complete
+compact storage, source-bound initial bodies with the native C-button wording,
+and a full-body page planner. Eighteen host checks and eighteen sanitizer checks
+pass; independent VR4300 objects agree. No ROM hooks are installed yet. Connect
+the real reader/creator, finish editor/tag compatibility and allocation ownership,
+then implement reviewed seasonal/treasure fields and publication. Preserve native
+post navigation and save layout, and do not credit catalogue-only availability.
+
 The [native-specific names](checkpoints/NATIVE_ITEM_NAMES.md) install 22 original
 entries across 63 fields, with source-bound complete wording, honest provenance,
 and independent builder/alias checks. All sixty selected checks have passing

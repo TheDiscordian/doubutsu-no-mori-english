@@ -1,4 +1,4 @@
-# Noticeboard text: native boundary inventory
+# Noticeboard text and lossless storage
 
 ## Verified native storage and owners
 
@@ -61,24 +61,103 @@ and returns that length plus two. The English counterpart returns only the
 town-name length. Complete English capture must not inherit the native suffix
 or assume the donor's coordinate/article preparations already exist.
 
-## Implementation and acceptance still required
+## Initial source binding and controller adaptation
 
 The four initial reference bodies have stored lengths 141, 166, 137, and 154
 bytes respectively. Their headers contain only a newline, and their footers
 are empty. The HRA guide retains the native 10,000/20,000/70,000 thresholds.
 The final instruction body says "C Stick", whereas the native text names the
-C buttons. Preserve the whole reference and its manual breaks, but adapt that
-controller instruction after verifying the native board-navigation input.
-The current immutable mail catalogue does not perform that controller change;
-do not install the unadapted body or mutate an existing saved-mail catalogue.
+C buttons. The source-bound profile changes the seven bytes at body offset 81
+to the nine bytes `C Buttons`. Every other byte and manual break remains. The
+complete output lengths are 141, 166, 137, and 156 bytes. Catalogue four stays
+immutable; the adaptation belongs to the notice decoder, not the mail catalogue.
+
+`tools/audit_noticeboard.py` binds the four Japanese body hashes, all twelve
+native/reference parts, the complete supplied English banks and decoder,
+catalogue-four identity, original initializer/table, and actual native controls.
+`runtime/notice/initial.c` checks the selected fixed identity, empty field mask,
+complete decoded body length/checksum, and exact controller span before output.
+Both saved capitalization states produce the complete fixed wording. This
+source binding does not install creation or display hooks.
+
+The actual reader is submenu program six, overlay VROM `00797A50`, linked at
+`80894250`, with 6,656 file bytes and 128 BSS bytes. Complete file SHA-256 is
+`b7f501e8efe2761f0f0e6fd4c18bd648ceae48658cbfe0f350d8a8386a8f7cb7`.
+Read controls `80894560..80894814` have SHA-256
+`bda6eb0b4479eb456d61b1f88ae3d7acbde5b756cc98a47fd5e02d13ebd6b559`.
+The native trigger masks are C-left/right `0002/0001`, C-down/up `0004/0008`,
+A `8000`, B `4000`, and START `1000`. C-left/right select adjacent posts;
+C-down/up jump to oldest/newest. The analogue-stick directions also select
+posts. Preserve these actions and the native transition animation.
+
+A starts a fresh blank 96-byte draft at notice-state offset eight, copies its
+timestamp to offset `68`, and passes that draft to editor type two. It does not
+copy the selected saved post into the editor. This branch has no visitor check.
+The confirmation path calls the original writer at `80894DA0`, with the same
+draft address in its delay slot, and then performs the first-job completion
+check. Creation, navigation, and editor-publication hooks must retain these
+boundaries. Read-mode state remains separate from editable draft text.
 
 Across the 63 scoped bodies, the longest stored reference is 170 bytes before
 field expansion. Fifty-seven have six explicit visible lines, four have five,
 one has four, and `01AE` has seven. These are source-layout observations, not
 pixel-fit or native-draw proof. Preserve manual breaks and check the seventh
 line, full dynamic names/dates, and existing post-navigation/edit controls.
-The initial-post route is the next bounded implementation group; seasonal and
-treasure identity/field review remain part of the complete board requirement.
+The initial-post route is the next installation group; seasonal and treasure
+identity/field review remain part of the complete board requirement.
+
+## Implemented compact envelope and full-body page planner
+
+`runtime/notice/record.[ch]` and `tools/notice_record.py` implement profile one:
+
+| Message bytes | Meaning |
+| --- | --- |
+| `0..2` | Reserved notice-family prefix `7F 42 4E` |
+| `3` | Profile version one |
+| `4..95` | First 92 bytes of a canonical classic mail snapshot |
+
+The embedded snapshot retains its own version, used length, immutable catalogue
+identity, template ID, capitalization, field mask, exact literal field bytes,
+article choices, and CRC16. Its used length must not exceed 92; remaining bytes
+must be zero. Decoding restores the omitted thirty zero bytes in separate
+122-byte scratch storage before invoking the existing strict mail codec.
+Composite records, incorrect sizes/catalogues, reserved bits, malformed fields,
+checksums, unsupported profiles, and noncanonical padding fail without output.
+Overlapping input/output is supported through staging. Neither codec operation
+writes a timestamp or enlarges a native post.
+
+All 63 scoped templates fit with every used field at sixteen bytes and every
+article retained: the maximum complete stored prefix/payload is 84 bytes.
+Initial records use sixteen bytes, padded to 96. This is capacity evidence, not
+approval of the seasonal/treasure wording or the native field preparers.
+
+`af_notice_initial_restore` uses a disposable aligned workspace and publishes
+only a complete body. It rejects workspace/input/output overlap and leaves
+output unchanged after failed cartridge reads, invalid sources, or unsupported
+identities. The output may overlap its original compact input after decoding.
+The native integration must allocate this workspace off a small nested stack
+and retain a full decoded body only for the active reader's lifetime.
+
+`runtime/notice/page.[ch]` plans complete six-line, 192-pixel pages with the
+existing proportional line scanner. It preserves explicit blank lines, leading
+and trailing spaces, and complete registered glyph pairs. The whole body is
+validated before publishing even page zero. A seventh line continues on another
+page; a final newline does not invent an extra empty page. All four initial
+bodies fit one page under the approved metrics. The native `8089542C` body
+drawer still uses sixteen-byte rows and is not yet replaced. Its complete
+`8089542C..8089562C` hash is
+`6541da6eea1c047aeb02a666ba10fe7148897459df37f66ccb5b4ad792f8517c`.
+
+The family-prefix test deliberately recognises unsupported versions so a future
+reader can display an error instead of treating encoded data as ordinary text.
+Native integration must first finish the editor/tag-discrimination audit. All
+five original keyboard palettes exclude `7F` and `80`; the actual selector at
+`80885140..808851D8` reads the pointer/count tables at `808885C8/808885DC`.
+The five counts are 50/30/50/30/10. Case/ornament conversion and existing saved
+manual posts still require explicit compatibility checks. Palette exclusion
+alone is not a complete proof for every editor output or old save.
+
+## Native installation and acceptance still required
 
 Complete generated bodies need a lossless representation within the existing
 96-byte saved message and a compatible full-body reader. The current mail
@@ -87,7 +166,17 @@ neither assumption can be applied directly to a noticeboard record. A compact
 representation may reuse the existing bounded payload if its actual used bytes
 fit, but detection, malformed-record handling, full decoding, page drawing,
 custom-post editing, and old-save compatibility need explicit implementation.
-No noticeboard snapshot format is installed or approved by this inventory.
+Profile one is implemented as bounded helpers, but no noticeboard format or
+reader hook is installed in the complete translation ROM.
+
+Continue by connecting the creator and reader together, with guarded native
+overlay allocation/relocation and lifetime. The submenu loader uses
+`linkedAllocEnd`, loads the declared program range, and advances by the aligned
+declared RAM size; source is `upstream/af/src/overlays/submenu/submenu_ovl/`.
+Any appended code or state must update and verify that owner and its total pool,
+not merely the overlay relocation record. The resident module has no linked
+headroom. An Expansion Pak remains permissible, but these helper objects do not
+change the actual memory requirement or any heap bound.
 
 Preserve original timestamps, insertion order, full-board shifting, manual
 posts, treasure/reward selection, and scheduling. Complete creation must precede
