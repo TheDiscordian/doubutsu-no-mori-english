@@ -81,5 +81,8 @@ code. Extracted reference source remains ignored and temporary.
 dialogue insertion, full destination/source guards, exact message-buffer
 capacity, and checkpoint restoration. Actual executed results and hashes live
 in the work log. Ordinary other-owner gyroid interaction, saved custom editing,
-and the complete eighty-eight-byte English default remain required. This
-display change does not solve the larger saved-message representation.
+and the complete English default remain required. The
+[default-message design](GYROID_DEFAULT.md) uses the four strings actually
+selected by GameCube initialisation, not the older same-ID eighty-eight-byte
+concatenation. This display change does not solve the larger saved-message
+representation.

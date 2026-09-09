@@ -67,7 +67,7 @@ and seven sites without a straight-line immediate length.
 
 | Caller family | Verified use | Remaining work |
 | --- | --- | --- |
-| `80094664`, `800C31FC` | Default home-gyroid message, string `055C`, sixty-four-byte destination | GameCube entry is eighty-eight bytes; saved gyroid message and editor limits need a separate design |
+| `80094664`, `800C31FC` | Default home-gyroid message, string `055C`, sixty-four-byte destination | Actual GameCube initialisation selects four English lines `076A..076D`; complete display and saved/editor limits use the [default-message design](GYROID_DEFAULT.md) |
 | `80094F3C`, unreachable English-runtime `8009F4AC` | Town suffix, string `01E4` | Audit non-message town-name display separately |
 | `800A6428` | Shop-level name at `0558 + shop level`, ten-byte local and mail free-string copy | Full shop names need larger local storage and handbill substitutions |
 | `800A8D70` | Eleven families of randomized NPC-letter words; native ten-byte fields plus complete selected-ID snapshot capture | Shared import requires the complete creator, catalog, reader, eight hooks, and failure gate; normal delivery remains |
@@ -98,7 +98,8 @@ similarly named free-string storage.
 The gyroid's other-owner display setter uses measured pixel wrapping while
 preserving manual newlines and its native 68-byte temporary field. It still
 receives the original 64-byte saved message; the full English default and wider
-custom editing remain unimplemented. See [gyroid message](GYROID_MESSAGE.md).
+custom editing remain unimplemented. See [gyroid message](GYROID_MESSAGE.md) and
+the [four-line default integration](GYROID_DEFAULT.md).
 
 ## Acceptance
 

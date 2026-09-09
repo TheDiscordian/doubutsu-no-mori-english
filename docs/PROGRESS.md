@@ -13,6 +13,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [home-gyroid default work](checkpoints/GYROID_DEFAULT.md) identifies the four
+English lines actually selected by GameCube initialisation, preserving their
+92-byte complete presentation. Its actor-side exact-default selector and adapter
+compile for VR4300; three host tests cover all 16,320 one-byte customisations and
+retained sources/guards. Source-bound text generation, overlay/relocation and
+atomic installation, editor presentation, and native/save acceptance remain.
+This code is not installed or credited; the current complete ROM is the
+message-diagnostic build below. No resident or saved allocation has changed.
+
 The [complete diagnostic sequence](checkpoints/MESSAGE_DIAGNOSTIC_SEQUENCE.md)
 installs the last inventoried Japanese message-bank record as `0004 → 2AEB`,
 preserving the complete English draft, all 62 native commands, and its existing
