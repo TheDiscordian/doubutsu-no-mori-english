@@ -176,12 +176,13 @@ class ResolvedCartridgeTests(unittest.TestCase):
         self.assertEqual(sha256(new), json.loads((BUILD/'build.json').read_text())['output_sha256'])
         self.assertEqual(apply_ups(native, (BUILD/'animal-forest-halfwidth.ups').read_bytes()), new)
 
-    def test_total_accounting_credits_only_65_previously_japanese_fields(self):
+    def test_resource_inventory_adds_only_65_previously_japanese_fields(self):
         from translation_progress import measure
         native = verified_rom(ROM.read_bytes())
         old, new = [measure(native, (path/'animal-forest-halfwidth.z64').read_bytes(),
                             json.loads((path/'build.json').read_text())) for path in (PREVIOUS, BUILD)]
-        a, b = [{k for k, r in ledger.rows.items() if r['replacements']} for ledger in (old, new)]
+        a, b = [{k for k, r in ledger.rows.items() if r['replacements'] or r['pending_replacements']}
+                for ledger in (old, new)]
         self.assertTrue(a <= b)
         names = json.loads((ROOT/'build/resolved-items-resource/names.json').read_text())
         expected = {r['id'] for r in names['edits'] if r.get('item_reference_match') in KEYS}-{'item_2D:0005'}

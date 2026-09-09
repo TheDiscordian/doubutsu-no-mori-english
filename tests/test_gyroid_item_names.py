@@ -106,15 +106,15 @@ class GyroidItemArtifactTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'127 identities'):
             scenario(native,built,module,bad)
 
-    def test_combined_counter_credits_all_rotations_and_retains_earlier_text(self):
+    def test_counter_inventories_all_rotations_and_retains_earlier_text(self):
         from translation_progress import measure
         native = verified_rom(ROM.read_bytes())
         old = measure(native,(PREVIOUS/'animal-forest-halfwidth.z64').read_bytes(),
                       json.loads((PREVIOUS/'build.json').read_text()))
         new = measure(native,(BUILD/'animal-forest-halfwidth.z64').read_bytes(),
                       json.loads((BUILD/'build.json').read_text()))
-        old_keys = {k for k,v in old.rows.items() if v['replacements']}
-        new_keys = {k for k,v in new.rows.items() if v['replacements']}
+        old_keys = {k for k,v in old.rows.items() if v['replacements'] or v['pending_replacements']}
+        new_keys = {k for k,v in new.rows.items() if v['replacements'] or v['pending_replacements']}
         self.assertTrue(old_keys <= new_keys)
         self.assertEqual(new_keys-old_keys,SLOTS)
         self.assertEqual(new.summary()['total_source_characters'],old.summary()['total_source_characters'])

@@ -7474,3 +7474,31 @@ local under ignored `build/` and `local/` paths. Current status belongs in
   consumers, then the bounded safety pass and patch handoff. Full-name
   consumers do not receive duplicate text credit. The goal, human playthrough,
   public-release preparation, and v1 title/keyboard work remain open.
+
+### 2026-09-09 — Correct applied-translation accounting
+
+- Corrected the combined counter's premature full credit for installed wider
+  item names, character names, and catchphrases whose remaining readers still
+  use Japanese. These resources retain their source-bound inventory and hashes
+  as pending replacements. English already applied to native banks and verified
+  complete letter/interface routes retains credit. Source weights and the
+  denominator are unchanged; no ROM text or game code changes in this correction.
+- Ran one fresh combined measurement against `build/world-names-pilot`:
+  **95.9% applied**, 720,647 of 751,244 inventoried Japanese-source characters,
+  with 16,772 of 20,937 source records credited. The correction withholds 27,639
+  characters across 3,638 partially applied records previously counted in full.
+  The earlier 99.6% overstated application, not the amount of English prepared.
+  ROM SHA-256 remains
+  `df5eb3a45b2997345c6efd590c26a3f13c6c69b96b346d6fc999723279f2f71e`.
+- All eleven focused accounting tests pass, including partial routes, preserved
+  native-name credit, completed-route credit, deduplication, and combined mail/name
+  accounting. Updated historical item-resource assertions to distinguish resource
+  availability from applied credit; those historical ROM comparisons are not
+  rerun for this quick measurement correction. The fresh complete-ROM measurement
+  retains installed-resource and reader checks. Diff checks pass.
+- The schema-two snapshot and per-entry pending reasons are in ignored
+  `build/translation-progress/`. The spec and current workflow require reader
+  verification when removing a pending family rule. Testing, layout polish, and
+  hardware acceptance do not change application credit. Other embedded text and
+  artwork remain explicit inventory gaps. Preserve the unfinished town-suffix
+  implementation separately; resume base translation work after this answer.

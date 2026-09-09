@@ -32,6 +32,41 @@ class TranslationProgressTests(unittest.TestCase):
         self.ledger.credit('mail:0000', encode('Aあ', self.info), 'mail', mail=True)
         self.assertEqual(self.ledger.summary()['percent'], 0)
 
+    def test_partially_connected_resources_do_not_count_as_applied(self):
+        self.add('string:0000', 'あいうえ')
+        for route in ('display_names', 'catchphrases'):
+            self.ledger.credit('string:0000', b'English', route,
+                               pending_reason='A native reader still uses Japanese')
+        result = self.ledger.summary()
+        self.assertEqual(result['percent'], 0)
+        self.assertEqual(result['pending_application_source_characters'], 4)
+        self.assertEqual(result['pending_application_records'], 1)
+        self.assertEqual(len(self.ledger.rows['string:0000']['pending_replacements']), 2)
+
+    def test_native_english_keeps_credit_when_other_resource_is_partial(self):
+        self.add('npc_names:0000', 'あい')
+        self.ledger.credit('npc_names:0000', b'Name  ', 'native_bank')
+        self.ledger.credit('npc_names:0000', b'Name    ', 'display_names',
+                           pending_reason='Other names need wider readers')
+        result = self.ledger.summary()
+        self.assertEqual(result['percent'], 100)
+        self.assertEqual(result['pending_application_source_characters'], 0)
+
+    def test_completed_application_receives_credit_once(self):
+        self.add('string:0000', 'あい')
+        self.ledger.credit('string:0000', b'English', 'display_names',
+                           pending_reason='Shared reader not connected')
+        self.ledger.credit('string:0000', b'English', 'verified_complete_readers')
+        result = self.ledger.summary()
+        self.assertEqual(result['percent'], 100)
+        self.assertEqual(result['replaced_source_characters'], 2)
+        self.assertEqual(result['pending_application_records'], 0)
+
+    def test_pending_application_requires_a_reason(self):
+        self.add('string:0000', 'あい')
+        with self.assertRaises(ValueError):
+            self.ledger.credit('string:0000', b'English', 'display_names', pending_reason='')
+
     def test_letters_and_names_share_the_total(self):
         self.add('mail:0000', 'あいうえ')
         self.add('npc_names:0000', 'あい')

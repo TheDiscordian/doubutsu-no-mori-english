@@ -7,6 +7,10 @@ text-replacement approximation from the newest completed ROM. Dialogue, names,
 catchphrases, letters, and inventoried interface text share one denominator;
 alternate English storage does not count the same source twice. Generated
 results and the per-entry ledger are in `build/translation-progress/`.
+Partially connected wider-name and catchphrase resources are recorded as pending,
+not fully applied. English already replacing the native bank retains its credit;
+verified complete letter and interface routes also retain theirs. Completing the
+remaining name readers must update their verification in the counter.
 The [counting rules](../specs/TRANSLATION_PROGRESS.md) retain the inventory limits
 without mixing testing or polish into the percentage. Use this tool for progress
 questions; ordinary candidate-bank coverage is only a diagnostic.

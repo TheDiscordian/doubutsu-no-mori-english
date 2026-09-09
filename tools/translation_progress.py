@@ -17,6 +17,16 @@ from textbanks import banks
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_CATEGORIES = {'japanese_static_text', 'development_placeholder_text'}
 ENGLISH_CATEGORIES = {'latin_static_text', 'numbers_or_symbols_only'}
+# These resources have working consumers, but also documented consumers still
+# reading the original Japanese fields. Do not count an original ID as fully
+# applied merely because one of its readers can use the English resource.
+# Replace a pending route with credit only alongside verification of its
+# remaining consumers. Native-bank English keeps its independent credit.
+PENDING_NAME_CONSUMERS = {
+    'extended_items': 'Remaining native ten-byte item-name consumers are not connected to the complete resource',
+    'display_names': 'Shared choices and other native six-byte name consumers remain unchanged',
+    'catchphrases': 'Shared choices and default-phrase editing still use the native four-byte field',
+}
 
 
 class CounterLedger:
@@ -35,9 +45,10 @@ class CounterLedger:
             'source_characters': (details['non_whitespace_static_characters']
                                   if details['category'] in SOURCE_CATEGORIES else 0),
             'replacements': [],
+            'pending_replacements': [],
         }
 
-    def credit(self, identity, data, route, *, mail=False, mail_glyphs=False):
+    def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
@@ -46,8 +57,14 @@ class CounterLedger:
         details = classify(data, info, extended_glyphs=identity.startswith('message:'),mail_glyphs=mail_glyphs)
         if (details['category'] in ENGLISH_CATEGORIES
                 and details['non_whitespace_static_characters']):
-            self.rows[identity]['replacements'].append(
-                {'route': route, 'sha256': sha256(data)})
+            replacement = {'route': route, 'sha256': sha256(data)}
+            field = 'replacements'
+            if pending_reason is not None:
+                if not pending_reason.strip():
+                    raise ValueError('Pending application requires a reason')
+                replacement['reason'] = pending_reason
+                field = 'pending_replacements'
+            self.rows[identity][field].append(replacement)
 
     def summary(self):
         relevant = [r for r in self.rows.values() if r['source_characters']]
@@ -56,7 +73,12 @@ class CounterLedger:
         return {'percent': round(100*done/total, 1) if total else None,
                 'replaced_source_characters': done, 'total_source_characters': total,
                 'replaced_records': sum(bool(r['replacements']) for r in relevant),
-                'total_records': len(relevant)}
+                'total_records': len(relevant),
+                'pending_application_source_characters': sum(
+                    r['source_characters'] for r in relevant
+                    if r['pending_replacements'] and not r['replacements']),
+                'pending_application_records': sum(
+                    bool(r['pending_replacements']) and not r['replacements'] for r in relevant)}
 
 
 def latest_build(root):
@@ -126,7 +148,8 @@ def measure(native, built, report):
             for group, count in zip([*range(0x20, 0x30), 0x10], COUNTS):
                 for number in range(count):
                     ledger.credit(f'item_{group:02X}:{number:04X}',
-                                  items[position:position+WIDTH], 'extended_items')
+                                  items[position:position+WIDTH], 'extended_items',
+                                  pending_reason=PENDING_NAME_CONSUMERS['extended_items'])
                     position += WIDTH
 
         names = resource('display_names', 60)
@@ -137,7 +160,8 @@ def measure(native, built, report):
             identities = [f'npc_names:{i:04X}' for i in range(NPC_COUNT)]
             identities += [f'string:{i:04X}' for _, _, i, _ in special_table(native)]
             for number, identity in enumerate(identities):
-                ledger.credit(identity, names[32+number*WIDTH:32+(number+1)*WIDTH], 'display_names')
+                ledger.credit(identity, names[32+number*WIDTH:32+(number+1)*WIDTH], 'display_names',
+                              pending_reason=PENDING_NAME_CONSUMERS['display_names'])
 
         phrases = resource('catchphrases', 64)
         if phrases is not None:
@@ -151,7 +175,8 @@ def measure(native, built, report):
                 if not 0 <= actor < NPC_COUNT or actor in seen:
                     raise ValueError('Invalid catchphrase actor identity')
                 seen.add(actor)
-                ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases')
+                ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases',
+                              pending_reason=PENDING_NAME_CONSUMERS['catchphrases'])
 
         if report.get('gyroid_default'):
             from gyroid_default_actor import verify_installation
@@ -389,11 +414,13 @@ def main():
     report = json.loads(report_bytes)
     ledger = measure(args.native.read_bytes(),
                      (report_path.parent/'animal-forest-halfwidth.z64').read_bytes(), report)
-    result = {'schema': 1, 'measured_at': datetime.now(timezone.utc).isoformat(),
+    result = {'schema': 2, 'measured_at': datetime.now(timezone.utc).isoformat(),
               'build': str(report_path.resolve().relative_to(ROOT)),
               'rom_sha256': report['output_sha256'], 'build_report_sha256': sha256(report_bytes),
               'method': 'Japanese-source non-whitespace character weight; each original ID counted once',
-              'kind': 'combined text replacement approximation, not testing or release completion',
+              'kind': 'combined applied translation approximation, not testing or release completion',
+              'application_rule': 'Native-bank English or verified complete replacement route; partially connected name resources alone receive no credit',
+              'pending_name_consumers': PENDING_NAME_CONSUMERS,
               'inventory_complete': False,
               'inventory_gaps': ['Other embedded interface text and text-bearing artwork need inventory expansion'],
               'source_categories': dict(Counter(r['source_category'] for r in ledger.rows.values())),

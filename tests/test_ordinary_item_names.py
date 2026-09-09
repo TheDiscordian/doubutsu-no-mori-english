@@ -139,11 +139,12 @@ class OrdinaryItemArtifactTests(unittest.TestCase):
             self.assertEqual(native_names[at:at+10], expected, key)
         old = measure(self.native, self.previous, json.loads((PREVIOUS/'build.json').read_text()))
         ledger = measure(self.native, self.built, self.report)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751002)
-        self.assertEqual({k for k,r in ledger.rows.items() if r['replacements']} -
-                         {k for k,r in old.rows.items() if r['replacements']}, self.matches.keys()-{'item_25:0008'})
+        self.assertEqual(ledger.summary()['total_source_characters'], old.summary()['total_source_characters'])
+        self.assertEqual({k for k,r in ledger.rows.items() if r['replacements'] or r['pending_replacements']} -
+                         {k for k,r in old.rows.items() if r['replacements'] or r['pending_replacements']},
+                         self.matches.keys()-{'item_25:0008'})
         for key in self.matches:
-            self.assertTrue(any(r['route'] == 'extended_items' for r in ledger.rows[key]['replacements']), key)
+            self.assertTrue(any(r['route'] == 'extended_items' for r in ledger.rows[key]['pending_replacements']), key)
 
     def test_reproducible_native_batch_and_all_new_short_names(self):
         from ordinary_item_scenario import scenario

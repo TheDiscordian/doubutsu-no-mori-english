@@ -150,7 +150,8 @@ class NativeItemArtifactTests(unittest.TestCase):
         old = measure(native,(PREVIOUS/'animal-forest-halfwidth.z64').read_bytes(),
                       json.loads((PREVIOUS/'build.json').read_text()))
         new = measure(native,built,report)
-        a,b = [{k for k,v in ledger.rows.items() if v['replacements']} for ledger in (old,new)]
+        a,b = [{k for k,v in ledger.rows.items() if v['replacements'] or v['pending_replacements']}
+               for ledger in (old,new)]
         self.assertTrue(a<=b)
         self.assertEqual(b-a,{r['id'] for r in names['edits'] if 'native_item_name' in r})
         self.assertEqual(new.summary()['total_source_characters'],old.summary()['total_source_characters'])

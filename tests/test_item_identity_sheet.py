@@ -167,12 +167,13 @@ class SheetNameArtifactTests(unittest.TestCase):
         names = json.loads((ROOT/'build/sheet-items-resource/names.json').read_text())
         self.assertEqual(new[VROM].extract(built), resource(native, names['edits']))
 
-    def test_combined_counter_credits_exact_new_source_slots_without_losing_earlier_text(self):
+    def test_counter_inventories_exact_new_source_slots_without_losing_earlier_text(self):
         from translation_progress import measure
         native = verified_rom(ROM.read_bytes())
         before, after = [measure(native, (directory/'animal-forest-halfwidth.z64').read_bytes(),
                                  json.loads((directory/'build.json').read_text())) for directory in (PREVIOUS, BUILD)]
-        old, new = [{key for key, value in ledger.rows.items() if value['replacements']}
+        old, new = [{key for key, value in ledger.rows.items()
+                     if value['replacements'] or value['pending_replacements']}
                     for ledger in (before, after)]
         self.assertTrue(old <= new)
         names = json.loads((ROOT/'build/sheet-items-resource/names.json').read_text())

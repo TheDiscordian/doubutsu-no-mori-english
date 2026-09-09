@@ -34,6 +34,10 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   in the same total as dialogue. Do not reuse the bank-only diagnostic or mix
   testing/polish effort into the text-replacement figure. See
   `specs/TRANSLATION_PROGRESS.md` for the counting rules and inventory limits.
+  English resources with known player-facing readers still using Japanese are
+  pending application, not fully credited. Completing those readers also requires
+  updating the counter's installed-route verification; do not leave its pending
+  family rules unchanged after finishing integration.
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.
