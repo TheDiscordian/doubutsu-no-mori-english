@@ -348,6 +348,9 @@ def measure(native, built, report):
         from event_item_names import verify_installation
         verify_installation(built, native, report)
 
+    from stall_choices import measure_labels as measure_stall_labels
+    measure_stall_labels(ledger, native, built, report)
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import EDITOR_VROM, LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard

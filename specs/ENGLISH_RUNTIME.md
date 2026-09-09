@@ -66,7 +66,7 @@ calls in two overlays. They must be patched with the main loader.
 | --- | --- | --- |
 | `849B50` Quest Manager | `80954D80` | Four-row staging array grows from forty to sixty-four stack bytes; both row calculations and all setter lengths change |
 | `8A1F10` Player Select 2 | `809BE720` | Two staging stack frames grow by twenty-four bytes; saved values and incoming argument offsets above the arrays move; name-row helpers and extra menu rows use sixteen-byte strides |
-| `932B60` Festival Stall | `80A728C0` | No ROM choice loader; existing ten-byte item/embedded-label arguments remain valid and are copied into the larger rows |
+| `932B60` Festival Stall | `80A728C0` | No ROM choice loader; the base runtime retains native arguments. The complete [stall integration](STALL_CHOICES.md) supplies sixteen-byte names and English cancellation labels with expanded local storage |
 
 Actor instruction offsets and relocation records remain in place. Stack and
 stride changes do not alter overlay pointers or relocation requirements.

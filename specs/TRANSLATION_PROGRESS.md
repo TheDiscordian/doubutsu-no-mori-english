@@ -16,6 +16,11 @@ special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, keyboard labels, 39 embedded inventory action-label records,
 thirteen category/present/question records, and eight inventory mail/quest
 description records (including the canonical Museum spelling).
+The two embedded festival-stall cancellation labels also enter the shared total.
+They keep their original weights in older builds; English credit requires the
+installed full choice routine, appended labels, allocation metadata, and resident
+choice/name dependencies. Connecting stall item names does not multiply their
+original bank IDs or finish unconnected item readers elsewhere.
 Inventory records enter the denominator in older builds too; complete English
 credit requires the installed label image, callbacks, full-name loader, font,
 relocation, and shared allocation checks. Repeated references to one menu label

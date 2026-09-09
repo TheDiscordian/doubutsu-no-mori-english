@@ -23,23 +23,28 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/event-item-names-pilot`.
-Its [checkpoint](checkpoints/EVENT_ITEM_NAMES.md) records exact dependencies,
+The current combined integration build is `build/stall-choices-pilot`.
+Its [checkpoint](checkpoints/STALL_CHOICES.md) records exact dependencies,
 artifacts, and verification limits. With the retained prerequisite resources:
 
 ```sh
-bash tools/build_event_item_names_pilot.sh
+bash tools/build_stall_choices_pilot.sh
 ```
 
 This wrapper retains the complete seasonal/letter/name/default-message/editor
 integration, complete inventory labels/questions/descriptions, inventory/catalogue
-and world names, the English town suffix, and the shop/player/event/home name connections.
+and world names, the English town suffix, the shop/player/event/home name connections,
+and complete festival-stall item and cancellation choices.
 The base overlay prerequisites are reproduced with
 `python3 tools/build_inventory_overlay.py` and `python3 tools/build_catalogue_overlay.py`.
 The world-font prerequisites and complete retained variants are documented in
 the [world checkpoint](checkpoints/WORLD_ITEM_NAMES.md). The combined wrapper does not
 run an exhaustive gameplay matrix or constitute a v0 release by itself.
 The smaller recipes below reproduce their named framework milestones.
+
+The resident choice-capability regression uses `build/notice-seasonal-runtime`,
+the current combined build's compiled module. `AF_TEST_RUNTIME` can select another
+explicit module directory; source-inventory checks still reject stale modules.
 
 `make pilot` runs the tests, validates inputs, extracts inventories and GameCube
 reference text, generates candidate edits, and builds the English-first keyboard

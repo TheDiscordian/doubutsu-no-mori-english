@@ -2,11 +2,12 @@
 
 ## Installed state
 
-The complete combined build is `build/event-item-names-pilot`, produced by
+The retained event/home build is `build/event-item-names-pilot`, produced by
 `bash tools/build_event_item_names_pilot.sh`. The wrapper retains every prerequisite
 of the [town/shop/player build](TEXT_NAME_CONSUMERS.md) and enables
 `--english-event-item-names`. Generated ROMs, resources, and patches remain local
 and ignored. The private repository stores implementation and verification tools.
+The [festival-stall integration](STALL_CHOICES.md) supplies the current combined build.
 
 Seven item-name preparations across six native actors use the existing complete
 sixteen-byte resource and zero-safe message bridge: two home-room prompts,
@@ -62,13 +63,10 @@ presence with application, or refresh a user-facing percentage unasked.
 
 Continue the existing reader inventory, not another source-matching audit:
 
-- Festival-stall choices use the native ten-byte loader at `80A72E74`. Their
-  four-row stack buffer is `sp+78..A0` inside a 168-byte frame; the live choice
-  pointer at `sp+A0` must move if rows grow. The resident choice setter already
-  accepts twenty bytes. Complete sixteen-byte names can use a larger local array,
-  retained selection logic, and the existing full loader. Two embedded cancellation
-  labels also need the exact English reference. Source disassembly is retained
-  at `build/disassembly/stall-choice/code.asm`; the pinned GC counterpart is
+- Festival-stall choices and both cancellation labels use the complete
+  [stall integration](STALL_CHOICES.md), including expanded local storage and
+  retained selection logic. Source disassembly is retained at
+  `build/disassembly/stall-choice/code.asm`; the pinned GC counterpart is
   `local/ac-decomp/src/actor/npc/event/ac_ev_yomise_move.c_inc`.
 - Native free-string item wrapper `800BB6F0` and direct free-field preparers need
   complete storage and reader connections. The ordinary free setter at `8009D6D0`

@@ -1,6 +1,7 @@
 """Source-independent guards and optional verified-retail integration tests."""
 
 from pathlib import Path
+import os
 import struct
 import sys
 import unittest
@@ -18,6 +19,8 @@ from textbanks import banks
 from textcodec import command_info, tokenize
 from textvalidate import validate_entry
 from test_retail import ROM_PATH
+
+RUNTIME_DIRECTORY = ROOT/os.environ.get('AF_TEST_RUNTIME', 'build/notice-seasonal-runtime')
 
 
 class RuntimeGuardTests(unittest.TestCase):
@@ -156,9 +159,9 @@ class RuntimeRetailTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Missing English runtime"):
             verify_english_runtime(self.rom, runtime)
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(), "Build resident module first")
+    @unittest.skipUnless((RUNTIME_DIRECTORY/"module.json").is_file(), "Build current resident module first")
     def test_resident_choice_capability_requires_both_patch_sets(self):
-        directory = ROOT/"build/runtime-module"
+        directory = RUNTIME_DIRECTORY
         replacements = dict(self.font)
         additions, report = add_runtime_module(self.rom, replacements, directory)
         layout = ChoiceLayout(**report["choice_layout"])

@@ -25,6 +25,18 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [festival-stall integration](checkpoints/STALL_CHOICES.md) installs complete
+sixteen-byte item choices and both exact GameCube English cancellation labels.
+It preserves item order, three/four-choice behaviour, the next-item index,
+messages, and timing. A 24-byte stack increase and 32-byte actor increase keep
+the native saved fields and resident module unchanged. All six focused checks,
+nine choice-runtime regressions, and twelve counter tests pass, including
+independent assembly, relocation, complete cartridge retention, and UPS
+reconstruction. The current combined build is `build/stall-choices-pilot`.
+Continue item free-string and shared dynamic-choice readers, character and
+catchphrase consumers, remaining text, and accents. Normal stall interaction
+remains in the combined v0 smoke; no gameplay or hardware certification is claimed.
+
 The [event/home name integration](checkpoints/EVENT_ITEM_NAMES.md) connects seven
 more complete item-name preparations: Police2 lost-and-found, opening Nook,
 outside Redd, Saharah, the fishing-event reward, and both home-room prompts.
@@ -32,9 +44,8 @@ It retains the original item expressions and message slots, including Redd's
 slot two, and preserves all other actor code, relocation, BSS, saved fields,
 prices, and dialogue timing. Independent assembly, all five focused tests, five
 resident-field regressions, twelve counter tests, and complete ROM/UPS retention
-pass. The current combined build is `build/event-item-names-pilot`. Continue the
-festival-stall name choices, item free-string paths, character/catchphrase
-consumers, and remaining main text. Ordinary gameplay joins the combined v0 smoke;
+pass. Its retained build is `build/event-item-names-pilot`. Continue item free-string
+paths, character/catchphrase consumers, and remaining main text. Ordinary gameplay joins the combined v0 smoke;
 no native gameplay or original-hardware acceptance is claimed for this batch.
 
 The [town/shop/player name integration](checkpoints/TEXT_NAME_CONSUMERS.md)
@@ -42,7 +53,7 @@ omits the Japanese town suffix exactly as the English reference does and
 connects complete item names in six shop/Redd actors and three player capture/dig
 paths. It preserves zero-item clearing, native prices, message selection, timing,
 and saved fields without new RAM allocation. Independent MIPS assembly, focused
-source/argument/relocation checks, and complete ROM/UPS retention pass. The current
+source/argument/relocation checks, and complete ROM/UPS retention pass. Its
 retained build is `build/player-item-names-pilot`. Continue other item, character,
 free-string/choice, and catchphrase consumers, plus remaining text and accents.
 Ordinary shops, catches, digging, and save/restart remain in the combined v0 smoke;
