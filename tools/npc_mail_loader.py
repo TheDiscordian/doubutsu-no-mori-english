@@ -30,6 +30,7 @@ def configuration(data,reloc,report,module):
     if report.get('quest_replies'): entry = 'af_quest_reply_mail_create'
     if report.get('notice_treasure'): entry = 'af_notice_treasure_create'
     if report.get('notice_owner'): entry = 'af_notice_owner_create'
+    if report.get('notice_seasonal'): entry = 'af_notice_seasonal_create'
     return [VROM,len(data)+len(reloc),len(data),len(reloc),report['symbols'][entry],
             struct.unpack_from('>I',reloc)[0],zlib.crc32(data+reloc),ABI]
 

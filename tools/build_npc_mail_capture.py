@@ -15,7 +15,7 @@ from npc_mail_capture import RAM,IMAGE_BYTES_MAX,source_hashes,creator_imports,r
 from runtime_layout import MODULE_RAM,LINKED_LIMIT
 
 
-def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,item_articles=None,notice_owner=False):
+def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,mail_glyphs=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,item_articles=None,notice_owner=False,notice_seasonal=False):
     if type(mail_glyphs) is not bool: raise ValueError('Invalid mail-glyph creator option')
     if type(post_office) is not bool: raise ValueError('Invalid post-office creator option')
     if type(museum) is not bool: raise ValueError('Invalid museum creator option')
@@ -25,10 +25,17 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         raise ValueError('Treasure creation requires the complete glyph catalogue')
     if type(notice_owner) is not bool or (notice_owner and not notice_treasure):
         raise ValueError('Treasure ownership requires complete treasure creation')
+    if type(notice_seasonal) is not bool or (notice_seasonal and not notice_owner):
+        raise ValueError('Seasonal creation requires the complete treasure owner')
     root = Path(__file__).resolve().parents[1]
     verified_resources(words,aliases)
-    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office,museum=museum,shop_notices=shop_notices,quest_replies=quest_replies,notice_treasure=notice_treasure,notice_owner=notice_owner)
+    variants = dict(mother_letters=mother_letters,departed_letters=departed_letters,villager_events=villager_events,academy_letters=academy_letters,academy_scores=academy_scores,post_office=post_office,museum=museum,shop_notices=shop_notices,quest_replies=quest_replies,notice_treasure=notice_treasure,notice_owner=notice_owner,notice_seasonal=notice_seasonal)
     sources = source_hashes(**variants);out.mkdir(parents=True,exist_ok=True)
+    if notice_seasonal:
+        from notice_seasonal import compiled_resource
+        seasonal_resource = compiled_resource((root/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                               (root/'build/mail-glyph-resources/glyph-catalog.bin').read_bytes())
+        (out/'seasonal_data.h').write_text(seasonal_resource['header'])
     (out/'words.bin').write_bytes(words);(out/'aliases.bin').write_bytes(aliases)
     if notice_treasure:
         from item_articles import verify as verify_articles
@@ -65,6 +72,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
              '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
              '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror']
     if mail_glyphs: flags.append('-DAF_MAIL_CREATOR_CATALOG=4')
+    if notice_seasonal: flags.append('-I/out')
     names = ('digest','npc_capture','generate','npc_creator')+(('mother_creator',) if mother_letters else ())
     if departed_letters: names += ('departed_creator',)
     if villager_events: names += ('villager_event_creator',)
@@ -76,6 +84,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if quest_replies: names += ('quest_reply_creator',)
     if notice_treasure: names += ('notice_treasure_creator',)
     if notice_owner: names += ('notice_owner',)
+    if notice_seasonal: names += ('notice_seasonal_creator',)
     for name in names:
         run('gcc',*flags,'/source/overlays/mail_generation/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','sources.o','/source/overlays/mail_generation/sources.s')
@@ -90,6 +99,9 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
         at = objects.index('notice_treasure_creator.o')
         objects[at:at] = ['notice_record.o', 'notice_treasure.o', 'item_article.o']
         objects.append('item_article_sources.o')
+    if notice_seasonal:
+        run('gcc', *flags, '/source/runtime/notice/seasonal.c', '-o', 'notice_seasonal.o')
+        objects.insert(objects.index('notice_seasonal_creator.o'), 'notice_seasonal.o')
     if academy_scores:
         run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','academy_score_sources.o',
             '/source/overlays/mail_generation/academy_score_sources.s')
@@ -110,6 +122,7 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if quest_replies: linker = 'quest_reply_capture.ld'
     if notice_treasure: linker = 'notice_treasure_capture.ld'
     if notice_owner: linker = 'notice_owner_capture.ld'
+    if notice_seasonal: linker = 'notice_seasonal_capture.ld'
     run('ld','-EB','--emit-relocs','-T','/source/overlays/mail_generation/'+linker,'-Map=overlay.map',
         f'--defsym=AF_CREATOR_IMAGE_MAX={IMAGE_BYTES_MAX}',
         *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
@@ -165,6 +178,13 @@ def build(module,words,aliases,out,*,mother_letters=False,departed_letters=False
     if shop_notices: report['shop_notices'] = True
     if quest_replies: report['quest_replies'] = True
     if notice_owner: report['notice_owner'] = True
+    if notice_seasonal:
+        report['notice_seasonal'] = True
+        for name, payload in (('entries', seasonal_resource['table']), ('data', seasonal_resource['data']),
+                              ('shops', b''.join(seasonal_resource['shops']))):
+            report['seasonal_'+name+'_sha256'] = sha256(payload)
+        report['seasonal_header_sha256'] = sha256(seasonal_resource['header'].encode())
+        report['stack_usage']['notice_seasonal'] = (out/'notice_seasonal.su').read_text()
     if notice_treasure:
         report['notice_treasure'] = True
         from item_articles import DATA_HASH, NAMES_HASH
@@ -203,6 +223,7 @@ def main():
     parser.add_argument('--notice-treasure',action='store_true',help='Add complete treasure post creation; requires --quest-replies and --mail-glyphs')
     parser.add_argument('--item-articles',type=Path,help='Approved articles.bin; required with --notice-treasure')
     parser.add_argument('--notice-owner',action='store_true',help='Add transactional treasure owner; requires --notice-treasure')
+    parser.add_argument('--notice-seasonal', action='store_true', help='Add complete seasonal capture; requires --notice-owner')
     parser.add_argument('--mail-glyphs',action='store_true',help='Create new letters with complete glyph catalogue four')
     args = parser.parse_args()
     if args.departed_letters and not args.mother_letters: parser.error('--departed-letters requires --mother-letters')
@@ -218,12 +239,13 @@ def main():
     if args.notice_treasure != bool(args.item_articles):
         parser.error('--notice-treasure and --item-articles must be supplied together')
     if args.notice_owner and not args.notice_treasure: parser.error('--notice-owner requires --notice-treasure')
+    if args.notice_seasonal and not args.notice_owner: parser.error('--notice-seasonal requires --notice-owner')
     print(json.dumps(build(json.loads(args.module.read_text()),args.words.read_bytes(),args.aliases.read_bytes(),args.output.resolve(),
                            mother_letters=args.mother_letters,departed_letters=args.departed_letters,
                            villager_events=args.villager_events,academy_letters=args.academy_letters,
                            academy_scores=args.academy_scores,mail_glyphs=args.mail_glyphs,post_office=args.post_office,museum=args.museum,shop_notices=args.shop_notices,quest_replies=args.quest_replies,notice_treasure=args.notice_treasure,
                            item_articles=args.item_articles.read_bytes() if args.item_articles else None,
-                           notice_owner=args.notice_owner),indent=2))
+                           notice_owner=args.notice_owner,notice_seasonal=args.notice_seasonal),indent=2))
 
 
 if __name__ == '__main__': main()

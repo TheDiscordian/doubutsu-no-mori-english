@@ -38,6 +38,9 @@ class NoticeReaderTests(unittest.TestCase):
     extra_sources = ()
 
     @classmethod
+    def generated_compile_flags(cls, directory): return []
+
+    @classmethod
     def setUpClass(cls):
         cls.data = initial_tests.CATALOG.read_bytes()
         cls.banks = parse(cls.data)[1]
@@ -50,6 +53,7 @@ class NoticeReaderTests(unittest.TestCase):
                    'tests/notice_reader_mock.c', *cls.extra_sources]
         flags = ['-fsanitize=address,undefined', '-fno-sanitize-recover=all',
                  '-fno-omit-frame-pointer', '-g'] if os.environ.get('AF_NOTICE_SANITIZE') == '1' else []
+        flags += cls.generated_compile_flags(Path(cls.temporary.name))
         compiler_env = dict(os.environ)
         compiler_env.pop('LD_PRELOAD', None)
         compiled = subprocess.run(['gcc', '-std=c99', '-O2', '-Wall', '-Wextra', '-Werror', '-shared', '-fPIC',

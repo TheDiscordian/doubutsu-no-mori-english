@@ -48,6 +48,26 @@ TREASURE_SYMBOLS = {
 TREASURE_END, TREASURE_BSS = 13168, 13536
 TREASURE_SUFFIX_HASH = '8b4dbfefe26ff39b938cefa28d1323b5983794a24231f505ec84b71e831934ff'
 TREASURE_RELOC_HASH = '5eac036261e2bda36c9bf5545d800d12bc2621438958eea06def3e98bab1b837'
+SEASONAL_GROWTH = 0x5000
+SEASONAL_SYMBOLS = {
+    'af_notice_cache': 21856, 'af_notice_complete_restore': 11956,
+    'af_notice_construct': 12728, 'af_notice_draw_body': 13120,
+    'af_notice_draw_date': 14272, 'af_notice_draw_entry': 14104,
+    'af_notice_initial_pack': 7284, 'af_notice_initial_restore': 7384,
+    'af_notice_page': 8008, 'af_notice_read_control': 12784,
+    'af_notice_record_expand': 7036, 'af_notice_record_pack': 6848, 'af_notice_record_tagged': 6784,
+    'af_notice_seasonal_data': 15104, 'af_notice_seasonal_decode': 11480,
+    'af_notice_seasonal_decode_parts': 10788, 'af_notice_seasonal_entries': 21248,
+    'af_notice_seasonal_mask': 10212, 'af_notice_seasonal_pack': 10556,
+    'af_notice_seasonal_restore': 11596, 'af_notice_seasonal_shop': 10624,
+    'af_notice_seasonal_shops': 15040, 'af_notice_seasonal_valid': 10264,
+    'af_notice_treasure_decode': 9904, 'af_notice_treasure_decode_parts': 8948,
+    'af_notice_treasure_mask': 8392, 'af_notice_treasure_pack': 8880,
+    'af_notice_treasure_restore': 10020, 'af_notice_treasure_valid': 8432,
+}
+SEASONAL_END, SEASONAL_BSS = 14768, 21856
+SEASONAL_SUFFIX_HASH = 'f1b53b2cfe3e910fa86262a1cd53d262cebb28f1777838bf615f180792853903'
+SEASONAL_RELOC_HASH = 'd407cdd681b0ae42d48f4b0e29b072b0797519829ef7bc6309d28b8ecdc696ad'
 KINDS = {'32': 2, '26': 4, 'HI16': 5, 'LO16': 6}
 NATIVE_IMPORTS = {'af_notice_original_construct': 0x80895B04,
                   'af_notice_original_read': 0x80894560, 'af_notice_original_body': 0x8089542C}
@@ -60,7 +80,7 @@ CALLS = {0x80895750: ('af_notice_draw_entry', 0x80895298),
          0x808957C0: ('af_notice_draw_body', 0x8089542C)}
 
 
-def source_hashes(treasure=False):
+def source_hashes(treasure=False, seasonal=False):
     paths = ['overlays/notice/'+name for name in ('reader.c', 'reader.h', 'reader.s', 'reader.ld', 'initial.s')]
     paths += ['runtime/notice/'+name+suffix for name in ('record', 'initial', 'page') for suffix in ('.c', '.h')]
     paths += ['runtime/mail/'+name+'.h' for name in ('record', 'format', 'catalog', 'glyph', 'view')]
@@ -68,6 +88,10 @@ def source_hashes(treasure=False):
     if treasure:
         paths += ['overlays/notice/reader_treasure.c', 'runtime/notice/treasure.c',
                   'runtime/notice/treasure.h', 'tools/audit_notice_treasure.py', 'tools/notice_treasure.py']
+    if seasonal:
+        if not treasure: raise ValueError('Seasonal reader requires the complete treasure reader')
+        paths += ['overlays/notice/reader_seasonal.c', 'overlays/notice/reader_seasonal.ld',
+                  'runtime/notice/seasonal.c', 'runtime/notice/seasonal.h', 'tools/notice_seasonal.py']
     return {name: sha256((ROOT/name).read_bytes()) for name in paths}
 
 
@@ -135,12 +159,12 @@ def audit_editor(native, current=None):
             'conversion_sha256': sha256(table), 'scope': 'Original and English-first palettes plus repeated native conversion'}
 
 
-def patch_prefix(native, symbols):
+def patch_prefix(native, symbols, seasonal=False):
     original, reloc, _, _ = native_sources(native)
     data = bytearray(original)
     required = set(name for name, _ in CALLS.values()) | {'af_notice_read_control', 'af_notice_construct'}
     if any(type(symbols.get(name)) is not int or symbols[name] & 3
-           or not RESIDENT <= symbols[name] < RESIDENT+GROWTH for name in required):
+           or not RESIDENT <= symbols[name] < RESIDENT+(SEASONAL_GROWTH if seasonal else GROWTH) for name in required):
         raise ValueError('Missing or unowned notice reader entry point')
     expected_rows = {0x80895BC0-RAM: 2}
     for at, (name, before) in CALLS.items():
@@ -200,7 +224,7 @@ def initial_table():
     return b''.join(wire[12:16] for wire in records)
 
 
-def pool_sizes():
+def pool_sizes(seasonal=False):
     # All endpoints below are immediate constants in the source-hashed native
     # allocation function. The patch grows only the editor term in the maximum
     # submenu sum, reserving room for notice growth wherever the board is loaded.
@@ -216,15 +240,17 @@ def pool_sizes():
     alternative = parent+inventory+tag+align(0x808B2B30-0x808A6100)+0x4000
     player = 0x808E04D0-0x808B2D50
     if primary <= max(alternative, player): raise ValueError('Native allocation maximum changed')
-    return {'native': primary, 'expanded': primary+GROWTH, 'alternative': alternative,
-            'player': player, 'additional_bytes': GROWTH}
+    growth = SEASONAL_GROWTH if seasonal else GROWTH
+    return {'native': primary, 'expanded': primary+growth, 'alternative': alternative,
+            'player': player, 'additional_bytes': growth}
 
 
-def main_changes(init):
+def main_changes(init, seasonal=False):
     if len(init) != INIT_END-INIT_START or sha256(init) != INITIAL_HASH:
         raise ValueError('Unapproved in-place notice creator')
-    pool_sizes()
-    return {INIT_START: init, INIT_TABLE: initial_table(), POOL_PATCH: struct.pack('>I', 0x25CECB20)}
+    pool_sizes(seasonal)
+    return {INIT_START: init, INIT_TABLE: initial_table(),
+            POOL_PATCH: struct.pack('>I', 0x25CEDB20 if seasonal else 0x25CECB20)}
 
 
 @dataclass(frozen=True)
@@ -237,16 +263,22 @@ class OverlayImage:
 def validate(native, data, reloc, init, report, module, catalog):
     original, native_reloc, _, _ = native_sources(native)
     treasure = report.get('treasure', False)
-    if type(treasure) is not bool: raise ValueError('Invalid notice reader profile')
+    seasonal = report.get('seasonal', False)
+    if type(treasure) is not bool or type(seasonal) is not bool or (seasonal and not treasure):
+        raise ValueError('Invalid notice reader profile')
     imports(module, treasure)
     audit_editor(native)
     approval = audit(native, catalog)
     if treasure:
         from audit_notice_treasure import audit as audit_treasure
         approval = {'initial': approval, 'treasure': audit_treasure(native, catalog)}
+    if seasonal:
+        from notice_seasonal import compiled_resource
+        resource = compiled_resource(native, catalog)
+        approval['seasonal'] = json.loads(json.dumps(resource['templates']))
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('overlay_sha256') != sha256(data) or report.get('relocation_bytes') != len(reloc)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(treasure)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(treasure, seasonal)
             or report.get('module_sha256') != MODULE_HASH or report.get('imports') != imports(module, treasure)
             or report.get('approval') != approval):
         raise ValueError('Stale or changed notice reader build')
@@ -254,15 +286,25 @@ def validate(native, data, reloc, init, report, module, catalog):
     expected_symbols = TREASURE_SYMBOLS if treasure else EXPECTED_SYMBOLS
     expected_end, expected_bss = (TREASURE_END, TREASURE_BSS) if treasure else (11232, 11392)
     suffix_hash, reloc_hash = (TREASURE_SUFFIX_HASH, TREASURE_RELOC_HASH) if treasure else (SUFFIX_HASH, RELOC_HASH)
+    growth = SEASONAL_GROWTH if seasonal else GROWTH
+    if seasonal:
+        expected_symbols, expected_end, expected_bss = SEASONAL_SYMBOLS, SEASONAL_END, SEASONAL_BSS
+        suffix_hash, reloc_hash = SEASONAL_SUFFIX_HASH, SEASONAL_RELOC_HASH
     if (symbols != expected_symbols or end != expected_end or bss != expected_bss
-            or len(data) & 15 or not RESIDENT < len(data) <= RESIDENT+GROWTH
+            or len(data) & 15 or not RESIDENT < len(data) <= RESIDENT+growth
             or type(end) is not int or type(bss) is not int or end & 15 or bss & 15
             or not RESIDENT < end <= bss < len(data) or any(data[bss:])
-            or data[:PREFIX] != patch_prefix(native, symbols) or any(data[PREFIX:RESIDENT])
+            or data[:PREFIX] != patch_prefix(native, symbols, seasonal) or any(data[PREFIX:RESIDENT])
             or sha256(data[RESIDENT:]) != suffix_hash or report.get('suffix_sha256') != suffix_hash
             or sha256(reloc) != reloc_hash or sha256(init) != INITIAL_HASH
             or report.get('init_sha256') != INITIAL_HASH):
         raise ValueError('Unapproved notice code, initialization, or relocation image')
+    if seasonal:
+        for name, payload in (('entries', resource['table']), ('data', resource['data']),
+                              ('shops', b''.join(resource['shops']))):
+            at = symbols['af_notice_seasonal_'+name]
+            if at & 15 or not end <= at <= bss-len(payload) or data[at:at+len(payload)] != payload:
+                raise ValueError('Changed complete compiled seasonal reader resource')
     if reloc != relocation_bytes(native_reloc, report.get('elf_relocations', []), len(data), module, treasure):
         raise ValueError('Changed notice relocation inventory')
     spec = OverlayImage(RAM, len(data), struct.unpack_from('>5I', reloc))
@@ -274,12 +316,13 @@ def validate(native, data, reloc, init, report, module, catalog):
         for at in range(0, RESIDENT, 4):
             if at+RAM not in changed and moved[at:at+4] != old[at:at+4]:
                 raise ValueError('Notice growth changes retained code, data, or original BSS')
-    main_changes(init)
+    main_changes(init, seasonal)
     return spec
 
 
-def metadata(size, symbols):
-    if size & 15 or not RESIDENT < size <= RESIDENT+GROWTH: raise ValueError('Notice allocation exceeded')
+def metadata(size, symbols, seasonal=False):
+    if size & 15 or not RESIDENT < size <= RESIDENT+(SEASONAL_GROWTH if seasonal else GROWTH):
+        raise ValueError('Notice allocation exceeded')
     return struct.pack('>8I', NEW_VROM, NEW_VROM+size, RAM, RAM+size,
                        RAM+symbols['af_notice_construct'], 0x80895B9C, 0x80895A30, 0)
 
@@ -309,23 +352,48 @@ def verify_treasure_installation(built, native, module, report):
             raise ValueError('Missing or changed native treasure transaction installation')
 
 
+def verify_seasonal_installation(built, native, module, report):
+    from npc_mail_loader import VROM as CREATOR_VROM, verify_configuration
+    from runtime_layout import MODULE_VROM
+    import notice_seasonal_owner as seasonal
+    files = by_vrom(built)
+    creator = files[CREATOR_VROM].extract(built)
+    verify_configuration(files[MODULE_VROM].extract(built), creator, module)
+    if (module['npc_mail_loader']['overlay'].get('notice_seasonal') is not True
+            or report.get('creator_sha256') != sha256(creator)):
+        raise ValueError('Seasonal reader requires the installed complete seasonal creator')
+    original = by_vrom(native)[CODE_VROM].extract(native)
+    expected = seasonal.patch(original, seasonal.expected(int(module['symbols']['af_npc_mail_load'], 16)),
+                              report['bridge'], module)
+    actual = files[CODE_VROM].extract(built)
+    for start, end, _ in seasonal.GUARDS:
+        if actual[start-CODE_RAM:end-CODE_RAM] != expected[start-CODE_RAM:end-CODE_RAM]:
+            raise ValueError('Missing or changed native seasonal publication installation')
+
+
 def verify_installation(built, native, module, report):
     from snowman_actor import verify_resources
     catalog = verify_resources(built, native, module)[0]
     files = by_vrom(built)
     audit_editor(native, files[0x78CB80].extract(built))
     treasure = report.get('overlay', {}).get('treasure', False)
+    seasonal = report.get('overlay', {}).get('seasonal', False)
     templates = list(INITIAL_IDS)
     if treasure:
         from audit_notice_treasure import IDS
         templates += list(IDS)
     if bool(report.get('treasure_owner')) != treasure:
         raise ValueError('Treasure creation and full-body reading must be installed together')
+    if seasonal:
+        from notice_seasonal import IDS
+        templates += list(IDS)
+    if bool(report.get('seasonal_owner')) != seasonal:
+        raise ValueError('Seasonal creation and full-body reading must be installed together')
     if (NEW_VROM not in files or NEW_RELOCATION not in files or VROM in files or RELOCATION in files
             or files[NEW_VROM].index != by_vrom(native)[VROM].index
             or files[NEW_RELOCATION].index != files[NEW_VROM].index+1
             or report.get('catalog') != 4 or report.get('complete_templates') != templates
-            or report.get('pool') != pool_sizes()):
+            or report.get('pool') != pool_sizes(seasonal)):
         raise ValueError('Missing installed notice reader, source IDs, or native DMA positions')
     data, reloc = files[NEW_VROM].extract(built), files[NEW_RELOCATION].extract(built)
     code = files[CODE_VROM].extract(built)
@@ -334,19 +402,21 @@ def verify_installation(built, native, module, report):
     owner, owner_reloc = files[OWNER_VROM].extract(built), files[OWNER_RELOCATION].extract(built)
     _, _, old_owner, old_owner_reloc = native_sources(native)
     expected = bytearray(old_owner)
-    expected[METADATA:METADATA+32] = metadata(len(data), report['overlay']['symbols'])
+    expected[METADATA:METADATA+32] = metadata(len(data), report['overlay']['symbols'], seasonal)
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
-    for at, value in main_changes(init).items():
+    for at, value in main_changes(init, seasonal).items():
         if code[at-CODE_RAM:at-CODE_RAM+len(value)] != value: raise ValueError('Missing notice creator or pool patch')
     original_code = by_vrom(native)[CODE_VROM].extract(native)
     for start, end in ((0x800A5B50, INIT_START), (INIT_END, 0x800A5DF4), (POOL_START, POOL_PATCH), (POOL_PATCH+4, POOL_END)):
         if code[start-CODE_RAM:end-CODE_RAM] != original_code[start-CODE_RAM:end-CODE_RAM]:
             raise ValueError('Changed saved-post layout, insertion, or allocation policy')
     if treasure: verify_treasure_installation(built, native, module, report['treasure_owner'])
+    if seasonal: verify_seasonal_installation(built, native, module, report['seasonal_owner'])
     return spec
 
 
-def install(native, replacements, additions, relocations, module, directory, *, treasure_owner_directory=None):
+def install(native, replacements, additions, relocations, module, directory, *,
+            treasure_owner_directory=None, seasonal_owner_directory=None):
     native_sources(native)
     for address in (VROM, RELOCATION, NEW_VROM, NEW_RELOCATION, OWNER_VROM, OWNER_RELOCATION):
         if any(address in mapping for mapping in (replacements, additions, relocations)):
@@ -355,13 +425,16 @@ def install(native, replacements, additions, relocations, module, directory, *, 
     overlay = json.loads((directory/'overlay.json').read_text())
     if bool(overlay.get('treasure')) != (treasure_owner_directory is not None):
         raise ValueError('Treasure creation and full-body reading must be installed together')
+    seasonal = overlay.get('seasonal', False)
+    if bool(seasonal) != (seasonal_owner_directory is not None):
+        raise ValueError('Seasonal creation and full-body reading must be installed together')
     files = by_vrom(native)
     original = files[CODE_VROM].extract(native)
     code = GuardedCode(original, replacements.get(CODE_VROM, original), CODE_RAM, SOURCE_HASHES[CODE_VROM])
-    for at, value in main_changes(init).items(): code.write(at, value)
+    for at, value in main_changes(init, seasonal).items(): code.write(at, value)
     owner = bytearray(files[OWNER_VROM].extract(native))
-    owner[METADATA:METADATA+32] = metadata(len(data), overlay['symbols'])
-    report = {'overlay': overlay, 'catalog': 4, 'complete_templates': list(INITIAL_IDS), 'pool': pool_sizes(),
+    owner[METADATA:METADATA+32] = metadata(len(data), overlay['symbols'], seasonal)
+    report = {'overlay': overlay, 'catalog': 4, 'complete_templates': list(INITIAL_IDS), 'pool': pool_sizes(seasonal),
               'vrom': f'{NEW_VROM:08X}', 'relocation_vrom': f'{NEW_RELOCATION:08X}',
               'new_saved_bytes': 0, 'new_resident_module_bytes': 0,
               'status': 'Initial notice creation/full-body reader installed; native and persistence acceptance remain'}
@@ -374,6 +447,15 @@ def install(native, replacements, additions, relocations, module, directory, *, 
         report['complete_templates'] += list(IDS)
         report['treasure_owner'] = {'bridges': bridges, 'creator_sha256': sha256(additions[CREATOR_VROM])}
         report['status'] = 'Initial and treasure creation/full-body reader installed; native and persistence acceptance remain'
+    if seasonal_owner_directory is not None:
+        from notice_seasonal import IDS
+        from npc_mail_loader import VROM as CREATOR_VROM
+        from notice_seasonal_owner import patch
+        bridge = json.loads((seasonal_owner_directory/'owner.json').read_text())
+        code.data = bytearray(patch(bytes(code.data), (seasonal_owner_directory/'owner.bin').read_bytes(), bridge, module))
+        report['complete_templates'] += list(IDS)
+        report['seasonal_owner'] = {'bridge': bridge, 'creator_sha256': sha256(additions[CREATOR_VROM])}
+        report['status'] = 'Initial, treasure, and seasonal creation/full-body reader installed; native and persistence acceptance remain'
     changes = {VROM: data, RELOCATION: reloc, OWNER_VROM: bytes(owner), CODE_VROM: bytes(code.data)}
     moves = {VROM: NEW_VROM, RELOCATION: NEW_RELOCATION}
     prospective = replace_dma(native, {**replacements, **changes}, {**relocations, **moves}, additions)

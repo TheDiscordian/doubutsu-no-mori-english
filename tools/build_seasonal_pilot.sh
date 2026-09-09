@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Complete local integration recipe. Inputs and output ROM/patch remain ignored.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+exec python3 tools/build.py \
+  --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
+  --translations build/native-items-candidates/translations.json \
+  --english-keyboard --english-runtime --runtime-module build/notice-seasonal-runtime \
+  --english-fortunes --english-resetti-replies --english-shop-units \
+  --english-resident-words --english-shared-npc-words --english-credits --english-song-names \
+  --english-dialogue-dates --extended-items build/native-items-resource \
+  --display-names build/display-names --catchphrases build/catchphrases \
+  --mail-catalog build/mail-glyph-resources --english-mail-layout \
+  --english-mail-snapshots --english-mail-grading build/mail-grading-npc \
+  --npc-mail-generation build/noticeboard-seasonal/creator --extended-font build/mail-font-cartridge \
+  --english-fortune-slips build/shop-notice-fortune --english-leaflet-dates build/leaflet-dates \
+  --english-renewal-letters build/shop-notice-renewal --english-event-letters build/shop-notice-event \
+  --english-mother-letters --english-departed-letters --english-villager-event-letters \
+  --english-academy-letters --english-academy-scores --english-post-office-letters \
+  --english-museum-letters --english-shop-notices build/shop-notice-owners \
+  --english-snowman-letters build/shop-notice-snowman --english-secret-letters build/secret-actor \
+  --english-quest-replies build/quest-reply-owners \
+  --english-noticeboard build/noticeboard-seasonal/reader \
+  --english-notice-treasure build/noticeboard-treasure/owners \
+  --english-notice-seasonal build/noticeboard-seasonal/owner \
+  --output build/notice-seasonal-pilot

@@ -117,7 +117,7 @@ class NoticeOverlayTests(unittest.TestCase):
         source = ROOT/'runtime'
         compiled = {path.relative_to(source).as_posix() for path in resident_c_sources(source)}
         all_c = {path.relative_to(source).as_posix() for path in source.rglob('*.c')}
-        excluded = {'notice/initial.c', 'notice/page.c', 'notice/record.c', 'notice/treasure.c'}
+        excluded = {'notice/initial.c', 'notice/page.c', 'notice/record.c', 'notice/treasure.c', 'notice/seasonal.c'}
         self.assertEqual(all_c-compiled, excluded)
         self.assertTrue(excluded <= runtime_source_hashes(source).keys())
 

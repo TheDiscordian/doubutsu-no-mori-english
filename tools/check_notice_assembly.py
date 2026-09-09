@@ -18,14 +18,20 @@ HEADERS = ('runtime/mail/record.h', 'runtime/mail/format.h', 'runtime/mail/catal
            'runtime/mail/glyph.h', 'runtime/mail/view.h', 'runtime/crc32.h')
 
 
-def build(output, *, treasure=False):
-    units = UNITS+(('treasure',) if treasure else ())
-    imports = sorted(IMPORTS+(('af_mail_format',) if treasure else ()))
+def build(output, *, treasure=False, seasonal=False):
+    units = UNITS+(('treasure',) if treasure else ())+(('seasonal',) if seasonal else ())
+    imports = sorted(IMPORTS+(('af_mail_format',) if treasure or seasonal else ()))
     paths = [ROOT/'runtime/notice'/f'{name}.{suffix}' for name in units for suffix in ('c', 'h')]
     paths += [ROOT/name for name in HEADERS]
+    if seasonal: paths.append(ROOT/'tools/notice_seasonal.py')
     sources = {p.relative_to(ROOT).as_posix(): sha256(p.read_bytes()) for p in paths}
     output = output.resolve()
     output.mkdir(parents=True, exist_ok=True)
+    if seasonal:
+        from notice_seasonal import compiled_resource
+        resource = compiled_resource((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                     (ROOT/'build/mail-glyph-resources/glyph-catalog.bin').read_bytes())
+        (output/'seasonal_data.h').write_text(resource['header'])
     common = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}/runtime:/source:ro', '-v', f'{output}:/out', '-w', '/out', '--entrypoint']
 
@@ -39,7 +45,7 @@ def build(output, *, treasure=False):
     flags = ['-c', '-Os', '-EB', '-mabi=32', '-march=vr4300', '-mfix4300', '-G0', '-mno-abicalls',
              '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common', '-fno-stack-protector',
              '-ffunction-sections', '-fdata-sections', '-fstack-usage', '-Wall', '-Wextra', '-Werror',
-             '-mno-explicit-relocs', '-mno-split-addresses']
+             '-mno-explicit-relocs', '-mno-split-addresses', '-I/out']
     for name in units:
         run('gcc', *flags, f'/source/notice/{name}.c', '-o', f'{name}.o')
     run('ld', '-EB', '-r', '-o', 'notice.o', *(name+'.o' for name in units))
@@ -59,6 +65,10 @@ def build(output, *, treasure=False):
               'stack_usage': {name: (output/(name+'.su')).read_text() for name in units},
               'symbols': symbols, 'installed': False,
               'scope': 'Relocatable VR4300 objects only; no ROM hooks or native execution'}
+    if seasonal:
+        report['seasonal'] = {'header_sha256': sha256(resource['header'].encode()),
+                              'data_sha256': sha256(resource['data']), 'data_bytes': len(resource['data']),
+                              'table_sha256': sha256(resource['table']), 'table_bytes': len(resource['table'])}
     (output/'notice.asm').write_text(run('objdump', '-dr', 'notice.o'))
     (output/'notice.json').write_text(json.dumps(report, indent=2)+'\n')
     return report
@@ -68,8 +78,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=ROOT/'build/noticeboard-foundation/mips')
     parser.add_argument('--treasure', action='store_true')
+    parser.add_argument('--seasonal', action='store_true')
     args = parser.parse_args()
-    report = build(args.output, treasure=args.treasure)
+    report = build(args.output, treasure=args.treasure, seasonal=args.seasonal)
     print(json.dumps({key: report[key] for key in ('object_sha256', 'imports', 'installed')}))
 
 

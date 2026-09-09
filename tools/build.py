@@ -224,6 +224,7 @@ def main():
     parser.add_argument('--english-secret-letters',type=Path,help='Complete villager secret letters; retains the date/birthday/wider-word conversation overlay')
     parser.add_argument('--english-noticeboard',type=Path,help='Complete initial board posts and native full-body reader; requires the glyph reader, items, and English keyboard')
     parser.add_argument('--english-notice-treasure',type=Path,help='Transactional English treasure posts; requires the treasure reader and matching NPC creator')
+    parser.add_argument('--english-notice-seasonal',type=Path,help='Complete seasonal posts; requires the seasonal reader, treasure bridges, and matching NPC creator')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -237,6 +238,8 @@ def main():
     parser.add_argument('--npc-mail-generation', type=Path, help='Experimental complete NPC creator overlay directory; enables guarded cartridge loading and delivery; gameplay/save acceptance remains')
     parser.add_argument("--output", type=Path, default=Path("build/halfwidth"))
     args = parser.parse_args()
+    if args.english_notice_seasonal and not (args.english_notice_treasure and args.english_noticeboard and args.npc_mail_generation):
+        parser.error('--english-notice-seasonal requires --english-notice-treasure, --english-noticeboard, and --npc-mail-generation')
     if args.english_notice_treasure and not (args.english_noticeboard and args.npc_mail_generation):
         parser.error('--english-notice-treasure requires --english-noticeboard and --npc-mail-generation')
     if args.english_noticeboard and not (args.english_keyboard and args.english_runtime and args.runtime_module
@@ -400,7 +403,8 @@ def main():
     if args.english_noticeboard:
         from notice_overlay import install as install_noticeboard
         report['noticeboard'] = install_noticeboard(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_noticeboard,
-                                                   treasure_owner_directory=args.english_notice_treasure)
+                                                   treasure_owner_directory=args.english_notice_treasure,
+                                                   seasonal_owner_directory=args.english_notice_seasonal)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

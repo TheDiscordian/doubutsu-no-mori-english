@@ -35,6 +35,8 @@ class NpcMailCreatorTests(unittest.TestCase):
     catalog_id = 2
     catalog_path = CATALOG
     @classmethod
+    def generated_compile_flags(cls, directory): return []
+    @classmethod
     def setUpClass(cls):
         cls.catalog = cls.catalog_path.read_bytes();verify_registered(cls.catalog)
         cls.words,cls.aliases = WORDS.read_bytes(),ALIASES.read_bytes()
@@ -48,6 +50,7 @@ class NpcMailCreatorTests(unittest.TestCase):
         sources += ['tests/'+name for name in ('mail_catalog_mock.c','npc_mail_capture_mock.c','npc_mail_creator_mock.c')]
         flags = ['-fsanitize=address,undefined','-fno-sanitize-recover=all','-fno-omit-frame-pointer','-g'] if os.environ.get('AF_NPC_CREATOR_SANITIZE') == '1' else []
         flags += [f'-DAF_MAIL_CREATOR_CATALOG={cls.catalog_id}']
+        flags += cls.generated_compile_flags(Path(cls.temporary.name))
         compiler_env = dict(os.environ);compiler_env.pop('LD_PRELOAD',None)
         compiled = subprocess.run(['gcc','-std=c99','-Wall','-Wextra','-Werror','-O2','-shared','-fPIC',*flags,
                         *(str(ROOT/p) for p in sources),'-o',str(library)],capture_output=True,text=True,env=compiler_env)

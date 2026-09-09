@@ -5,6 +5,7 @@ import argparse
 import json
 from pathlib import Path
 import struct
+import zlib
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom
 from audit_mail_templates import template_fields
@@ -156,6 +157,66 @@ def complete_body(record, approved):
     letter = format_letter(record, Templates(4, 0, record.templates*3, (b'\xcd', body, b'')))
     if letter.header or letter.footer: raise ValueError('Unexpected seasonal mail sections')
     return letter.body
+
+
+def compiled_resource(native, catalog):
+    """Rebuild immutable overlay-local text; never trust a supplied approval JSON."""
+    entries = reviewed_templates(native, catalog)
+    payload = bytearray()
+    table = []
+    for entry in entries:
+        body = bytes.fromhex(entry['body'])
+        table.append((len(payload), len(body), sum(1 << i for i in entry['fields']), zlib.crc32(body)))
+        payload.extend(body)
+    if len(payload) > 65535: raise ValueError('Seasonal text exceeds compiled offset capacity')
+    header = ('/* Generated from verified local sources; do not commit extracted text. */\n'
+              '#ifndef AF_NOTICE_SEASONAL_DATA_H\n#define AF_NOTICE_SEASONAL_DATA_H\n'
+              f'#define AF_NOTICE_SEASONAL_DATA_BYTES {len(payload)}u\n'
+              'typedef struct { unsigned short offset, length; unsigned int mask, crc; } AfNoticeSeasonalEntry;\n'
+              'const AfNoticeSeasonalEntry af_notice_seasonal_entries[41] __attribute__((aligned(16))) = {\n')
+    header += ''.join(f'    {{{offset}u, {length}u, 0x{mask:08X}u, 0x{crc:08X}u}},\n'
+                      for offset, length, mask, crc in table)
+    header += '};\nconst unsigned char af_notice_seasonal_data[AF_NOTICE_SEASONAL_DATA_BYTES] __attribute__((aligned(16))) = {\n'
+    header += ''.join('    '+', '.join(f'0x{b:02X}' for b in payload[i:i+16])+',\n'
+                      for i in range(0, len(payload), 16))
+    shops = shop_names(native)
+    shop_data = b''.join(shops)
+    header += ('};\n' + f'#define AF_NOTICE_SEASONAL_SHOPS_CRC 0x{zlib.crc32(shop_data):08X}u\n'
+               'const unsigned char af_notice_seasonal_shops[64] __attribute__((aligned(16))) = {\n')
+    header += ''.join('    '+', '.join(f'0x{b:02X}' for b in name)+',\n' for name in shops)
+    header += '};\n#endif\n'
+    return {'header': header, 'data': bytes(payload),
+            'table': b''.join(struct.pack('>HHII', *row) for row in table),
+            'templates': entries, 'shops': shops}
+
+
+def shop_names(native, root=ROOT):
+    """Bind the actual four-tier notice names, not names guessed from memory."""
+    from gc_text import decoder_tables
+    from mail_reference import BANK_HASHES, DECODER_SHA256, transcode
+    from textbanks import Bank
+    from textcodec import LATIN
+    verified_rom(native)
+    source = next(b for b in banks(native) if b.name == 'string').entries()
+    expected = ('5dbbfdd11eb3615e52129779e26a7eea664fb92040aca8f2504447e3d47659e4',
+                '7baf0d7bce5120ea6f97452369aea7e9d1fe8b5059da650d35c276b0ce8493e0',
+                '0ffb7b869aace4800e625907c5f2b9abbf790857b542709a89962cc7636ae5cb',
+                '7269a369e8cdd0a2ba8f19b7f255bad891aa5e30ef06a27c56f49de18fd8df4c')
+    directory = root/'build/gamecube/files/forest_1st.arc.unpacked/data'
+    data, table = ((directory/name).read_bytes() for name in ('string_data.bin', 'string_data_table.bin'))
+    decoder = root/'local/ac-decomp/tools/msg_tool.py'
+    if (sha256(data), sha256(table)) != BANK_HASHES['string'] or sha256(decoder.read_bytes()) != DECODER_SHA256:
+        raise ValueError('Changed supplied seasonal shop names or decoder')
+    reference = Bank('string', 0, 0, data, table).entries()
+    tables = decoder_tables(decoder)
+    names = []
+    for i, digest in enumerate(expected):
+        if sha256(source[0x558+i]) != digest: raise ValueError('Changed native seasonal shop identity')
+        text = transcode(reference[0x558+i], tables)
+        if not 1 <= len(text) <= 16 or any(c not in LATIN for c in text):
+            raise ValueError('Invalid complete seasonal shop name')
+        names.append(text.ljust(16, b' '))
+    return tuple(names)
 
 
 def audit(native, catalog):

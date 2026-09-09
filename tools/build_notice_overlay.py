@@ -14,15 +14,20 @@ from notice_overlay import (ROOT, RAM, INIT_START, INIT_END, native_sources, sou
 from audit_noticeboard import audit
 
 
-def build(native, module, catalog, output, *, treasure=False):
+def build(native, module, catalog, output, *, treasure=False, seasonal=False):
     output = output.resolve()
     original, native_reloc, _, _ = native_sources(native)
     approval = audit(native, catalog)
     if treasure:
         from audit_notice_treasure import audit as audit_treasure
         approval = {'initial': approval, 'treasure': audit_treasure(native, catalog)}
-    sources = source_hashes(treasure)
+    sources = source_hashes(treasure, seasonal)
     output.mkdir(parents=True, exist_ok=True)
+    if seasonal:
+        from notice_seasonal import compiled_resource
+        resource = compiled_resource(native, catalog)
+        approval['seasonal'] = json.loads(json.dumps(resource['templates']))
+        (output/'seasonal_data.h').write_text(resource['header'])
     (output/'native.bin').write_bytes(original)
     (output/'imports.ld').write_text(''.join(f'{name} = 0x{value:08X};\n'
                                            for name, value in imports(module, treasure).items()))
@@ -41,10 +46,15 @@ def build(native, module, catalog, output, *, treasure=False):
              '-Wall', '-Wextra', '-Werror']
     units = {name: 'runtime/notice/'+name+'.c' for name in ('record', 'initial', 'page')}
     if treasure: units['treasure'] = 'runtime/notice/treasure.c'
+    if seasonal:
+        units['seasonal'] = 'runtime/notice/seasonal.c'
+        flags += ['-I/out']
     units['reader'] = 'overlays/notice/reader_treasure.c' if treasure else 'overlays/notice/reader.c'
+    if seasonal: units['reader'] = 'overlays/notice/reader_seasonal.c'
     for name, path in units.items(): run('gcc', *flags, '/source/'+path, '-o', name+'.o')
     run('as', '-EB', '-mabi=32', '-march=vr4300', '-I/out', '-o', 'native.o', '/source/overlays/notice/reader.s')
-    run('ld', '-EB', '--emit-relocs', '-T', '/source/overlays/notice/reader.ld', '-Map=overlay.map',
+    linker = 'reader_seasonal.ld' if seasonal else 'reader.ld'
+    run('ld', '-EB', '--emit-relocs', '-T', '/source/overlays/notice/'+linker, '-Map=overlay.map',
         '-o', 'overlay.elf', 'native.o', *(name+'.o' for name in units))
     if run('nm', '--undefined-only', 'overlay.elf').strip(): raise ValueError('Unresolved notice import')
     symbols = {}
@@ -55,7 +65,7 @@ def build(native, module, catalog, output, *, treasure=False):
     data = bytearray((output/'overlay.bin').read_bytes())
     exports = {name: value-RAM for name, value in symbols.items()
                if name.startswith('af_notice_') and name not in imports(module, treasure)}
-    data[:len(original)] = patch_prefix(native, exports)
+    data[:len(original)] = patch_prefix(native, exports, seasonal)
     if symbols['__notice_end'] != RAM+len(data): raise ValueError('Notice linked bounds disagree')
     elf_text = run('readelf', '-rW', 'overlay.elf')
     inventory = elf_inventory(elf_text)
@@ -75,7 +85,8 @@ def build(native, module, catalog, output, *, treasure=False):
               'compiler': run('gcc', '--version').splitlines()[0],
               'stack_usage': {name: (output/(name+'.su')).read_text() for name in units}}
     if treasure: report['treasure'] = True
-    if source_hashes(treasure) != sources: raise ValueError('Notice sources changed during compilation')
+    if seasonal: report['seasonal'] = True
+    if source_hashes(treasure, seasonal) != sources: raise ValueError('Notice sources changed during compilation')
     (output/'overlay.bin').write_bytes(data)
     (output/'relocation.bin').write_bytes(reloc)
     (output/'init.bin').write_bytes(init)
@@ -94,9 +105,11 @@ def main():
     parser.add_argument('--catalog', type=Path, default=ROOT/'build/mail-glyph-resources/glyph-catalog.bin')
     parser.add_argument('--output', type=Path, default=ROOT/'build/noticeboard-reader')
     parser.add_argument('--treasure', action='store_true', help='Include all complete treasure-post bodies')
+    parser.add_argument('--seasonal', action='store_true', help='Include all complete seasonal bodies; requires --treasure')
     args = parser.parse_args()
+    if args.seasonal and not args.treasure: parser.error('--seasonal requires --treasure')
     report = build(verified_rom(args.rom.read_bytes()), json.loads(args.module.read_text()),
-                   args.catalog.read_bytes(), args.output, treasure=args.treasure)
+                   args.catalog.read_bytes(), args.output, treasure=args.treasure, seasonal=args.seasonal)
     print(json.dumps({key: report[key] for key in ('bytes', 'suffix_sha256', 'overlay_sha256',
                      'relocation_bytes', 'relocation_sha256', 'init_sha256', 'symbols', 'stack_usage')}, indent=2))
 

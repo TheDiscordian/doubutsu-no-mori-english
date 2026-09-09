@@ -40,7 +40,7 @@ def creator_imports(*,villager_events=False,academy_scores=False,notice_treasure
     return IMPORTS+(('af_load_item_name',) if villager_events else ())+(('af_format_year','af_format_month','af_format_day') if academy_scores else ())+(('af_crc32','af_mail_format','af_mail_record_unpack','af_item_name_index') if notice_treasure else ())
 
 
-def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,notice_owner=False):
+def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=False,academy_letters=False,academy_scores=False,post_office=False,museum=False,shop_notices=False,quest_replies=False,notice_treasure=False,notice_owner=False,notice_seasonal=False):
     names = ['overlays/mail_generation/'+name for name in
              ('digest.c','digest.h','npc_capture.c','npc_capture.h','generate.c','generate.h',
               'npc_creator.c','npc_creator.h','capture.ld','sources.s')]
@@ -86,6 +86,11 @@ def source_hashes(*,mother_letters=False,departed_letters=False,villager_events=
     if notice_owner:
         if not notice_treasure: raise ValueError('Treasure owner requires complete treasure text and articles')
         names += ['overlays/mail_generation/'+name for name in ('notice_owner.c','notice_owner.h','notice_owner_capture.ld')]
+    if notice_seasonal:
+        if not notice_owner: raise ValueError('Seasonal creator requires the complete treasure owner')
+        names += ['overlays/mail_generation/'+name for name in
+                  ('notice_seasonal_creator.c', 'notice_seasonal_creator.h', 'notice_seasonal_capture.ld')]
+        names += ['runtime/notice/seasonal.c', 'runtime/notice/seasonal.h', 'tools/notice_seasonal.py']
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -125,9 +130,11 @@ def validate(data,reloc,report,module):
     if treasure and catalog != 4: raise ValueError('Treasure creation requires the complete glyph catalogue')
     owner = report.get('notice_owner') is True
     if 'notice_owner' in report and not owner: raise ValueError('Unknown treasure owner variant')
+    seasonal = report.get('notice_seasonal') is True
+    if 'notice_seasonal' in report and not seasonal: raise ValueError('Unknown seasonal creator variant')
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)
             or report.get('relocation_bytes') != len(reloc) or report.get('overlay_sha256') != sha256(data)
-            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner)
+            or report.get('relocation_sha256') != sha256(reloc) or report.get('sources') != source_hashes(mother_letters=mother,departed_letters=departed,villager_events=events,academy_letters=academy,academy_scores=scores,post_office=postal,museum=museum,shop_notices=shop,quest_replies=quest,notice_treasure=treasure,notice_owner=owner,notice_seasonal=seasonal)
             or report.get('module_sha256') != module['module_sha256']
             or report.get('imports') != {name:int(module['symbols'][name],16) for name in creator_imports(villager_events=events,academy_scores=scores,notice_treasure=treasure)}
             or report.get('word_sha256') != WORD_HASH or report.get('alias_sha256') != ALIAS_HASH):
@@ -156,9 +163,14 @@ def validate(data,reloc,report,module):
                          'af_notice_treasure_decode','af_notice_treasure_restore',
                          'af_notice_item_article','af_item_article_data'))
     if owner: required.add('af_notice_owner_create')
+    if seasonal:
+        required.update(('af_notice_seasonal_create', 'af_notice_seasonal_mask', 'af_notice_seasonal_valid',
+                         'af_notice_seasonal_pack', 'af_notice_seasonal_shop', 'af_notice_seasonal_decode_parts',
+                         'af_notice_seasonal_decode', 'af_notice_seasonal_restore',
+                         'af_notice_seasonal_entries', 'af_notice_seasonal_data', 'af_notice_seasonal_shops'))
     if set(symbols) != required or any(type(at) is not int or at&3 or not 0 <= at < len(data) for at in symbols.values()):
         raise ValueError('Invalid NPC capture exports')
-    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id','af_item_article_data')):
+    if any(at >= text for name,at in symbols.items() if name not in ('af_npc_word_data','af_npc_alias_data','af_academy_series_data','af_npc_mail_catalog_id','af_item_article_data','af_notice_seasonal_entries','af_notice_seasonal_data','af_notice_seasonal_shops')):
         raise ValueError('NPC capture function points outside text')
     marker = symbols['af_npc_mail_catalog_id']
     if not text <= marker <= len(data)-4 or struct.unpack_from('>I',data,marker)[0] != catalog:
@@ -180,6 +192,18 @@ def validate(data,reloc,report,module):
                 or report.get('item_names_sha256') != NAMES_HASH):
             raise ValueError('Invalid complete item article resource')
         verify(data[article:article+SIZE])
+    if seasonal:
+        from notice_seasonal import compiled_resource
+        resource = compiled_resource((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
+                                     (ROOT/'build/mail-glyph-resources/glyph-catalog.bin').read_bytes())
+        for name, payload in (('entries', resource['table']), ('data', resource['data']),
+                              ('shops', b''.join(resource['shops']))):
+            at = symbols['af_notice_seasonal_'+name]
+            if (at & 15 or not text <= at <= len(data)-len(payload) or data[at:at+len(payload)] != payload
+                    or report.get('seasonal_'+name+'_sha256') != sha256(payload)):
+                raise ValueError('Changed approved compiled seasonal '+name)
+        if report.get('seasonal_header_sha256') != sha256(resource['header'].encode()):
+            raise ValueError('Changed compiled seasonal text profile')
 
 
 def relocate(data,reloc,base,imports):

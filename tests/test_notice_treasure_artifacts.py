@@ -45,7 +45,11 @@ class NoticeTreasureArtifactTests(unittest.TestCase):
         for name in ('module.bin', 'bootstrap.bin'):
             self.assertEqual((ROOT/'build/notice-treasure-runtime'/name).read_bytes(),
                              (ROOT/'build/noticeboard-runtime'/name).read_bytes())
-        self.assertEqual(self.module['runtime_sources'], runtime_source_hashes(ROOT/'runtime'))
+        # This frozen treasure build predates the separate seasonal units.
+        # Validate all of its recorded sources without relabelling it current.
+        current = runtime_source_hashes(ROOT/'runtime')
+        self.assertEqual(self.module['runtime_sources'],
+                         {name: current[name] for name in self.module['runtime_sources']})
         sources = [p.relative_to(ROOT/'runtime').as_posix() for p in resident_c_sources(ROOT/'runtime')]
         self.assertNotIn('notice/treasure.c', sources)
         self.assertIn('notice/treasure.c', self.module['runtime_sources'])
