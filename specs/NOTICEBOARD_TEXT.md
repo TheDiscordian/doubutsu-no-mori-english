@@ -4,9 +4,12 @@
 
 The board has fifteen 104-byte saved records starting at `80129E0A`, or
 `Save+2F6A`. Each record starts with a 96-byte message, followed by its eight-byte
-RTC timestamp at offset `60` hexadecimal. This differs from the supplied
-GameCube C structure's field order. Preserve the N64 layout and neighbouring
-land/home records; do not copy the donor structure into native storage.
+RTC timestamp at offset `60` hexadecimal. The supplied GameCube C structure
+uses the same field order, but its message is 192 bytes and its timestamp starts
+at `C0` hexadecimal, making each record 200 bytes. Preserve the N64 layout and
+neighbouring land/home records; do not copy the larger donor structure into
+native storage. The donor definition is `local/ac-decomp/include/m_notice.h`,
+SHA-256 `ef58288e87dcd544b50d22b5c6e8fc6d80c6d30f683ee414825fa8520f19d5a1`.
 
 The original main-code functions are:
 
@@ -59,6 +62,23 @@ town-name length. Complete English capture must not inherit the native suffix
 or assume the donor's coordinate/article preparations already exist.
 
 ## Implementation and acceptance still required
+
+The four initial reference bodies have stored lengths 141, 166, 137, and 154
+bytes respectively. Their headers contain only a newline, and their footers
+are empty. The HRA guide retains the native 10,000/20,000/70,000 thresholds.
+The final instruction body says "C Stick", whereas the native text names the
+C buttons. Preserve the whole reference and its manual breaks, but adapt that
+controller instruction after verifying the native board-navigation input.
+The current immutable mail catalogue does not perform that controller change;
+do not install the unadapted body or mutate an existing saved-mail catalogue.
+
+Across the 63 scoped bodies, the longest stored reference is 170 bytes before
+field expansion. Fifty-seven have six explicit visible lines, four have five,
+one has four, and `01AE` has seven. These are source-layout observations, not
+pixel-fit or native-draw proof. Preserve manual breaks and check the seventh
+line, full dynamic names/dates, and existing post-navigation/edit controls.
+The initial-post route is the next bounded implementation group; seasonal and
+treasure identity/field review remain part of the complete board requirement.
 
 Complete generated bodies need a lossless representation within the existing
 96-byte saved message and a compatible full-body reader. The current mail
