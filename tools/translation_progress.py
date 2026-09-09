@@ -52,6 +52,9 @@ def pending_name_consumers(report):
     from display_name_readers import complete
     if complete(report):
         del pending['display_names']
+    from item_name_readers import complete as items_complete
+    if items_complete(report):
+        del pending['extended_items']
     return pending
 
 
@@ -151,6 +154,9 @@ def measure(native, built, report):
     from display_name_readers import complete, verify_main_routes
     if complete(report):
         verify_main_routes(built, report)
+    from item_name_readers import complete as items_complete, verify_additional_routes
+    if items_complete(report):
+        verify_additional_routes(built, native, report)
     pending_names = pending_name_consumers(report)
     info = module_command_info(native)
     ledger = CounterLedger(info)
@@ -196,7 +202,7 @@ def measure(native, built, report):
                 for number in range(count):
                     ledger.credit(f'item_{group:02X}:{number:04X}',
                                   items[position:position+WIDTH], 'extended_items',
-                                  pending_reason=pending_names['extended_items'])
+                                  pending_reason=pending_names.get('extended_items'))
                     position += WIDTH
 
         names = resource('display_names', 60)
@@ -389,8 +395,8 @@ def measure(native, built, report):
     if report.get('shop_item_names'):
         from shop_item_names import verify_installation
         verify_installation(built, native, report)
-        # Connected shop/Redd readers do not finish every item-name consumer.
-        # Resource-only item records remain pending until the rest are connected.
+        # The complete reader gate also requires all remaining display and letter
+        # routes; a shop-only build keeps resource-only records pending.
     if report.get('player_item_names'):
         from player_item_names import verify_installation
         verify_installation(built, native, report)

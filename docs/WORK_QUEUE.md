@@ -15,12 +15,18 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [item-reader checkpoint](checkpoints/ITEM_NAME_READERS.md) closes the known
+item-name display family and enables its installed-route-verified accounting.
+The eight accented resource fields remain untranslated. No ROM is rebuilt for
+the classification alone. Continue ambiguous borrowed catchphrases, residual
+text/letters, accents, and bounded combined v0 smoke.
+
 The [letter-editor checkpoint](checkpoints/LETTER_EDITOR_NAMES.md) completes
 English recipient headers and matching editing geometry, retaining saved fields
 and full snapshot reading. Its combined build is `build/letter-names-pilot`;
 eight focused checks, twelve counter tests, and independent builds pass. The
 known character-name readers now satisfy their complete accounting gate.
-Continue the remaining item-reader classification, borrowed-catchphrase
+Continue borrowed-catchphrase
 ambiguity, residual text/letters, accents, and bounded combined v0 smoke.
 
 The [house-sign checkpoint](checkpoints/HOUSE_NAME.md) supplies complete English

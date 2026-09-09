@@ -100,7 +100,8 @@ class ChoiceArtifactTests(unittest.TestCase):
                          json.loads((BUILD/'build.json').read_text()))
         result = ledger.summary()
         self.assertEqual(result['total_source_characters'], 751284)
-        self.assertEqual(result['replaced_source_characters'], 720661)
+        from item_name_readers import resource_only_weight
+        self.assertEqual(result['replaced_source_characters'], 720661+resource_only_weight(ledger))
         self.assertGreater(result['pending_application_records'], 0)
         for row in ledger.rows.values():
             for pending in row['pending_replacements']:

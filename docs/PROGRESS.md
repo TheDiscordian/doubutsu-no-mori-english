@@ -25,14 +25,22 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [item-reader boundary](checkpoints/ITEM_NAME_READERS.md) closes the existing
+35-call inventory against complete display and letter routes. Four focused
+checks pass, including actual installed verification and combined accounting.
+No new runtime or ROM changes are attributed to this classification. Complete
+item names receive credit once; accented Japanese rows and ambiguous borrowed
+catchphrases remain uncredited. Continue borrowed-catchphrase implementation,
+residual text/letters, and accents before the combined v0 smoke.
+
 The [letter-editor integration](checkpoints/LETTER_EDITOR_NAMES.md) supplies
 complete English recipients, GameCube-style header spacing, and matching cursor
 positions without changing saved fields. Opening/closing headers are independent
 of old snapshot-reader state. All eight focused checks, twelve counter tests,
 independent builds, retained-resource comparisons, and UPS reconstruction pass.
 The current combined ROM/UPS is `build/letter-names-pilot`. The known character-name
-reader family is complete and verified by combined accounting. Continue remaining
-item-reader classification, borrowed-catchphrase ambiguity, residual text/letters,
+reader family is complete and verified by combined accounting. Continue
+borrowed-catchphrase ambiguity, residual text/letters,
 and accents, then bounded combined v0 gameplay/save checks.
 
 The [house-sign integration](checkpoints/HOUSE_NAME.md) supplies complete English
