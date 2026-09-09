@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import struct
 import sys
@@ -9,6 +10,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE',str(ROOT/'build/runtime-module')))
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import sha256
 from dialogue_dates import (SPEC, CALLS, LEAP_HIGH, LEAP_LOW, REMOVED_RELOCATIONS,
@@ -57,15 +59,15 @@ class DialogueDateDraftSelectionTests(unittest.TestCase):
                                   english_dialogue_dates=enabled)
 
 
-@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/runtime-module/module.json').is_file(),
+@unittest.skipUnless(ROM_PATH.is_file() and (MODULE_DIR/'module.json').is_file(),
                      'Retail ROM and compiled runtime remain local')
 class DialogueDateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.rom = ROM_PATH.read_bytes()
         cls.data, cls.reloc = source(cls.rom, 'ordinary')
-        cls.module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
-        cls.binary = (ROOT/'build/runtime-module/module.bin').read_bytes()
+        cls.module = json.loads((MODULE_DIR/'module.json').read_text())
+        cls.binary = (MODULE_DIR/'module.bin').read_bytes()
 
     def test_only_eight_words_and_two_relocations_change(self):
         data, reloc = patch(self.data, self.reloc, self.module)

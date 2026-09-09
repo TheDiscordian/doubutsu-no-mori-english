@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import struct
 import sys
@@ -9,6 +10,7 @@ import tempfile
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
+MODULE_DIR=Path(os.environ.get('AF_TEST_RUNTIME_MODULE',str(ROOT/'build/runtime-module')))
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import CODE_RAM,CODE_VROM,sha256
 from build import apply_translations
@@ -65,7 +67,7 @@ class ResidentWordFixtureTests(unittest.TestCase):
 
 
 @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/gamecube/text/string.jsonl').is_file()
-                     and (ROOT/'build/runtime-module/module.json').is_file(),
+                     and (MODULE_DIR/'module.json').is_file(),
                      'Supplied sources and compiled module remain local')
 class ResidentWordTests(unittest.TestCase):
     @classmethod
@@ -76,7 +78,7 @@ class ResidentWordTests(unittest.TestCase):
         cls.edits=candidates(cls.rom,cls.refs,cls.inventory,cls.info)
         cls.originals=source_entries(cls.rom);cls.data,cls.reloc=source(cls.rom,'ordinary')
         cls.replacements={}
-        cls.additions,cls.module=add_runtime_module(cls.rom,cls.replacements,ROOT/'build/runtime-module')
+        cls.additions,cls.module=add_runtime_module(cls.rom,cls.replacements,MODULE_DIR)
 
     def test_every_complete_value_and_scoped_capacity(self):
         approvals=permits(self.rom,list(self.edits.values()),self.info)
@@ -161,7 +163,7 @@ class ResidentWordTests(unittest.TestCase):
                 replacements=deepcopy(self.replacements);additions=deepcopy(self.additions)
                 if dates:install_dates(self.rom,replacements,additions,self.module)
                 before=deepcopy(replacements)
-                count,mapping=apply_translations(self.rom,replacements,path,runtime_module=ROOT/'build/runtime-module',
+                count,mapping=apply_translations(self.rom,replacements,path,runtime_module=MODULE_DIR,
                     module_additions=additions,english_resident_words=True)
                 self.assertEqual(count,136);self.assertEqual(mapping,{0xD16000:STRING_RELOCATION[0]})
                 expected=list(self.originals)
@@ -174,12 +176,12 @@ class ResidentWordTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'resident runtime'):
                 apply_translations(self.rom,{},path,english_resident_words=True)
             with self.assertRaisesRegex(ValueError,'entry budget'):
-                apply_translations(self.rom,deepcopy(self.replacements),path,runtime_module=ROOT/'build/runtime-module',
+                apply_translations(self.rom,deepcopy(self.replacements),path,runtime_module=MODULE_DIR,
                                    module_additions=self.additions)
             extra={'id':'string:0001','source_sha256':sha256(self.originals[1]),'translation':'x'*16}
             path.write_text(json.dumps(list(self.edits.values())+[extra]))
             with self.assertRaisesRegex(ValueError,'entry budget'):
-                apply_translations(self.rom,deepcopy(self.replacements),path,runtime_module=ROOT/'build/runtime-module',
+                apply_translations(self.rom,deepcopy(self.replacements),path,runtime_module=MODULE_DIR,
                                    module_additions=self.additions,english_resident_words=True)
 
 

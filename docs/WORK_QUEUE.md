@@ -85,14 +85,19 @@ pass. Retain spotlight resource-failure scheduling/recovery, normal gameplay,
 save/reload, review, and hardware acceptance; continue remaining text groups
 without rerunning the completed batch.
 
-The next [villager secret-letter group](../specs/SECRET_LETTERS.md) covers
-`0022..0030`: fifteen complete templates, 45 parts, and thirty fixed snapshots
-in a 600-byte table. Source and snapshot checks pass. Append the creator/table
-to the ordinary-conversation overlay without losing its existing date, wider
-item, or birthday patches. Preserve its native random/paper selection, static
-132-byte compact record, relocation, writable data/BSS, and null-result fallback.
-Install and count only after full reader/creator/dependency validation, then
-batch all choices/capitals with original metadata and ordinary-show checks.
+The [villager secret-letter integration](checkpoints/SECRET_LETTERS.md) installs
+`0022..0030`: fifteen complete templates, 45 parts, and thirty fixed snapshots.
+The complete creator fits the existing conversation allocation and retains
+the date, wider-item, and birthday patches, original static compact metadata,
+and BSS addresses. Thirteen focused tests, four sanitizer tests, independent
+builds/assembly, full-ROM retention, UPS round trip, and combined counting pass.
+All 56 current-runtime regressions pass. The native batch passes both real
+owner-loader bases, thirty selection/metadata comparisons, sixty complete
+readbacks, and three rejections, with 194 calls, 439 assertions, restored state,
+heap/checkpoint checks, blank saves, and graceful shutdown. Test the ordinary
+show-window path and fallback without repeating those completed bulk cases.
+Continue remaining text, review, normal conversation/save acceptance, and
+original-hardware validation.
 
 The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
 installs complete resources for all 114 Mom, 55 villager-event, and 21 score

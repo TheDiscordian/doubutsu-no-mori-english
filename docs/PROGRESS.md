@@ -31,12 +31,19 @@ Normal scheduling, save/reload, review, and hardware remain unverified.
 Spotlight resource-failure recovery beyond its original call still needs
 scheduling evidence. Continue remaining text consumers without repeating this batch.
 
-The next [villager secret-letter group](../specs/SECRET_LETTERS.md) has fifteen
-source-approved templates, 45 complete parts, and thirty prevalidated fixed
-snapshots in 600 bytes. Two source/snapshot tests pass. Its original compact
-record and native selection are identified. Integration must retain existing
-date, wider-item, and birthday fixes in the same ordinary-conversation overlay.
-Prepared snapshots receive no installed-text credit.
+The [villager secret-letter integration](checkpoints/SECRET_LETTERS.md) installs
+fifteen complete templates and all 45 parts. Thirty fixed snapshots retain both
+capitalization states and complete glyphs. The 19,392-byte overlay preserves
+all earlier date, wider-item, and birthday fixes, plus original BSS addresses.
+It fits the existing conversation allocation without resident or saved-layout
+growth. Thirteen focused tests, four sanitizer tests, independent builds and
+assembly, and the complete ROM/UPS checks pass. The combined counter credits
+only the verified installed parts. All 56 current-runtime regressions pass.
+The silent native batch passes both actual quest-manager loading bases, thirty
+original paper/RNG comparisons, sixty full English readbacks, and three
+rejections: 194 calls and 439 assertions, with restored state/heap/checkpoint,
+blank isolated saves, and graceful shutdown. Ordinary show-window acceptance,
+normal conversation, save/reload, review, and hardware remain unverified.
 
 The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
 complete gift letters with full sixteen-byte item fields. Twenty-four fixed

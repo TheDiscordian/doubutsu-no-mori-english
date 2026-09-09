@@ -41,7 +41,53 @@ Table SHA-256 is
 cases. Two source/snapshot tests pass in `build/secret-letter-audit-tests.log`.
 These artifacts are prepared inputs, not installed translation or native proof.
 
-## Integration requirements
+## Installed overlay and ownership
+
+`tools/build_secret_actor.py` builds a 19,392-byte ordinary-conversation image
+and a 2,192-byte relocation file. Original code/data offsets are unchanged.
+The original 352-byte BSS is materialized as zero-filled file bytes, so each
+native load initializes those same addresses before use. A 464-byte creator
+and the 600-byte immutable table follow the original 18,320-byte memory span;
+eight final alignment bytes are zero. The merged relocation describes one
+file-backed section and zero additional BSS. Original relocation row order,
+including reused-high-register behaviour, is retained.
+
+The quest manager at VROM `00849B50`, RAM `80954D80`, already allocates and
+clears `8800` hexadecimal bytes for the shared conversation buffer, and frees
+that allocation during destruction. Its metadata entry at file offset `245C`
+contains five words: file start/end, linked start/end, and initializer. The
+entry has no manager relocation rows. Only its file start/end and linked end
+change; initializer `809218E8` and every other owner byte are retained. The
+native callback at `80955264` selects twenty-byte entries using talk-kind two,
+calls `800263C0`, and stores the relocated initializer at manager offset `8B4`.
+The replacement fits the existing allocation; no resident, saved-layout,
+conversation allocation, or per-letter allocation growth is needed.
+
+The new file uses VROM `03910000`, with its adjacent original relocation DMA
+row remapped to `03918000`. Original DMA row identities and adjacency remain.
+`tools/secret_actor.py` checks the original manager/relocation hashes, unchanged
+allocation/load/clear/free code, the exact prior date/birthday/word prefix,
+complete snapshots, fixed compiled creator hash, and relocation at three
+allocation bases. Its installer validates a prospective complete cartridge
+before changing any output mapping.
+
+The native wrapper retains the original float-random-times-fifteen selection,
+calls the fixed creator, and only on success calls the original paper getter,
+clears selected memory, and returns the original static compact record. The
+creator checks choice, capitalization, pointer bounds/alignment, and overlap
+before writing. Font becomes zero and split becomes snapshot marker `80`;
+the complete envelope replaces only offsets `5..126`. Paper, gift, and trailing
+date/padding remain untouched by the creator. Invalid input returns null before
+paper selection or static-record modification, preserving the existing
+conversation caller's random-stored-letter fallback.
+
+`--english-secret-letters build/secret-actor` requires the complete glyph
+reader/catalogue, full items, dialogue-date fixes, and resident-word fixes.
+The combined counter checks that installation before crediting all 45 parts.
+The [checkpoint](../docs/checkpoints/SECRET_LETTERS.md) records current evidence
+and remaining native/show/gameplay acceptance.
+
+## Acceptance requirements
 
 Append a small fixed-snapshot creator and the immutable table within the
 ordinary overlay's managed allocation. The no-field texts permit complete

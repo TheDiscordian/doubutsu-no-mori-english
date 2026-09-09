@@ -217,6 +217,7 @@ def main():
     parser.add_argument('--english-museum-letters', action='store_true', help='Complete museum notices and fossil letters; requires the museum creator')
     parser.add_argument('--english-shop-notices',type=Path,help='Complete spotlight/reopening notices; requires shop notice owners, creator, and full item names')
     parser.add_argument('--english-snowman-letters',type=Path,help='Complete fixed Snowman gift actor; requires the glyph catalogue/font and snapshot reader')
+    parser.add_argument('--english-secret-letters',type=Path,help='Complete villager secret letters; retains the date/birthday/wider-word conversation overlay')
     parser.add_argument('--extended-font',type=Path,help='Source-verified persistent English glyph cartridge directory')
     parser.add_argument('--english-dialogue-dates', action='store_true',
                         help='English dates prepared by ordinary resident conversations; requires the resident module')
@@ -256,6 +257,8 @@ def main():
         parser.error('--english-shop-notices requires --npc-mail-generation built with --shop-notices and --extended-items')
     if args.english_snowman_letters and not (args.runtime_module and args.mail_catalog and args.extended_font and args.english_mail_snapshots and args.extended_items):
         parser.error('--english-snowman-letters requires --runtime-module, --mail-catalog, --extended-font, --english-mail-snapshots, and --extended-items')
+    if args.english_secret_letters and not (args.runtime_module and args.mail_catalog and args.extended_font and args.english_mail_snapshots and args.extended_items and args.english_dialogue_dates and args.english_resident_words):
+        parser.error('--english-secret-letters requires the complete glyph reader, items, dialogue dates, and resident words')
     if args.english_fortunes and not args.runtime_module:
         parser.error('--english-fortunes requires --runtime-module')
     if args.english_resident_words and not args.runtime_module:
@@ -369,6 +372,9 @@ def main():
     if args.english_snowman_letters:
         from snowman_actor import install as install_snowman
         report['snowman_actor'] = install_snowman(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_snowman_letters)
+    if args.english_secret_letters:
+        from secret_actor import install as install_secret
+        report['secret_actor'] = install_secret(rom,replacements,additions,relocations,report.get('runtime_module'),args.english_secret_letters)
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)

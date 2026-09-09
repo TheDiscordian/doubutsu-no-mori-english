@@ -3,6 +3,7 @@
 import calendar
 import ctypes
 import json
+import os
 from pathlib import Path
 import shutil
 import struct
@@ -12,6 +13,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE',str(ROOT/'build/runtime-module')))
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import sha256, verified_rom
 from dialogue_dates import SPEC
@@ -192,11 +194,11 @@ class NativeBirthdaySourceTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError,'complete unconfigured resident module'):
                     verify_requirements([{'id':id,**metadata}],rom,{},None,None,matches={})
 
-    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(), 'Compiled module stays local')
+    @unittest.skipUnless((MODULE_DIR/'module.json').is_file(), 'Compiled module stays local')
     def test_preparation_dependency_requires_new_entry_hook_even_if_metadata_is_absent(self):
         rom = verified_rom(ROM_PATH.read_bytes());data,_ = source(rom,'ordinary')
-        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
-        additions = {MODULE_VROM:(ROOT/'build/runtime-module/module.bin').read_bytes()}
+        module = json.loads((MODULE_DIR/'module.json').read_text())
+        additions = {MODULE_VROM:(MODULE_DIR/'module.bin').read_bytes()}
         installed = {};install(rom,installed,additions,module)
         verify_requirements([{'id':'message:084A'}],rom,installed,additions,module)
         damaged = bytearray(installed[SPEC.vrom]);at = 0x80921324-SPEC.ram

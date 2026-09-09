@@ -255,6 +255,11 @@ def measure(native, built, report):
             verify_installation(built,native,module,report['snowman_actor'])
             credit_mail(0x030A0000,{k: range(0x202,0x20E) for k in ('super','mail','ps')},'snowman_actor')
 
+        if report.get('secret_actor'):
+            from secret_actor import TEMPLATES,verify_installation
+            verify_installation(built,native,module,report['secret_actor'])
+            credit_mail(0x030A0000,{k:TEMPLATES for k in ('super','mail','ps')},'secret_actor')
+
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
         from keyboard import LEDIT_VROM, LEDIT_RAM, LABELS_VROM, LABELS, make_english_keyboard
