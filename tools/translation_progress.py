@@ -43,6 +43,8 @@ def pending_name_consumers(report):
         pending['display_names'] += '; opening-guide name is connected'
     if report.get('fishing_name'):
         pending['display_names'] += '; saved fishing-winner name is connected'
+    if report.get('conversation_names'):
+        pending['display_names'] += '; request and ordinary-conversation identity names are connected'
     return pending
 
 

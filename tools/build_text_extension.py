@@ -23,6 +23,7 @@ IMPORTS = {
 }
 CHOICE_IMPORTS = {'af_copy_item_string': 0x801966AC, 'af_copy_talk_name': 0x80195E2C,
                   'af_copy_catchphrase': 0x801952F4}
+IDENTITY_IMPORTS = {'af_native_identity_name': 0x800ACD18, 'af_load_display_name': 0x80196044}
 
 
 def relocation(data, size, imports=None):
@@ -51,14 +52,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, default=Path('build/text-extension'))
     parser.add_argument('--choices', action='store_true', help='Include complete bounded shared choice substitutions')
+    parser.add_argument('--identities', action='store_true', help='Include the save-preserving identity-name bridge')
     args = parser.parse_args()
+    if args.identities and not args.choices: parser.error('--identities requires --choices')
     verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     source = ROOT/'overlays/text_extension'
-    imports = {**IMPORTS, **(CHOICE_IMPORTS if args.choices else {})}
+    imports = {**IMPORTS, **(CHOICE_IMPORTS if args.choices else {}), **(IDENTITY_IMPORTS if args.identities else {})}
     with tempfile.TemporaryDirectory(prefix='af-text-extension-') as directory:
         out = Path(directory)
         common = ['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
                   '-v',f'{source}:/source:ro','-v',f'{ROOT}/overlays/text_choices:/choices:ro',
+                  '-v',f'{ROOT}/overlays/text_names:/names:ro',
                   '-v',f'{out}:/out','-w','/out','--entrypoint']
         def run(tool, *args):
             return subprocess.run(common+[f'/n64_toolchain/bin/mips64-elf-{tool}', IMAGE, *args],
@@ -72,8 +76,12 @@ def main():
         run('gcc', *flags, *rename, '-c','/source/fields.c','-o','fields.o')
         objects = ['fields.o']
         if args.choices:
-            run('gcc', *flags, '-I/source', '-c', '/choices/choices.c', '-o', 'choices.o')
+            rename_choices = ['-Daf_text_extension_init=af_text_choices_init'] if args.identities else []
+            run('gcc', *flags, *rename_choices, '-I/source', '-c', '/choices/choices.c', '-o', 'choices.o')
             objects.insert(0, 'choices.o')
+        if args.identities:
+            run('gcc', *flags, '-I/source', '-c', '/names/names.c', '-o', 'names.o')
+            objects.insert(0, 'names.o')
         run('ld','-EB','--emit-relocs','-T','/source/extension.ld',*definitions,'-o','extension.elf',*objects)
         run('objcopy','-O','binary','-j','.text','extension.elf','extension.bin')
         binary = (out/'extension.bin').read_bytes()
@@ -104,10 +112,15 @@ def main():
             report['choices'] = True
             report['sources'].update({'choices/'+p.name:sha256(p.read_bytes())
                                      for p in sorted((ROOT/'overlays/text_choices').iterdir()) if p.is_file()})
+        if args.identities:
+            report['identities'] = True
+            report['sources'].update({'names/'+p.name:sha256(p.read_bytes())
+                                     for p in sorted((ROOT/'overlays/text_names').iterdir()) if p.is_file()})
         args.output.mkdir(parents=True,exist_ok=True)
         for name,data in (('extension.bin',binary),('relocation.bin',rel),('blob.bin',blob),('loader.bin',loader)):
             (args.output/name).write_bytes(data)
         (args.output/'loader.asm').write_text(assembly)
+        (args.output/'extension.asm').write_text(run('objdump', '-d', 'extension.elf'))
         (args.output/'extension.json').write_text(json.dumps(report,indent=2)+'\n')
     print(json.dumps({key:report[key] for key in ('image_bytes','relocation_bytes','loader_bytes','blob_sha256')},indent=2))
 

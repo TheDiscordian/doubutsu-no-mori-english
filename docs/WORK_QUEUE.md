@@ -15,9 +15,17 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [conversation-name checkpoint](checkpoints/CONVERSATION_NAMES.md) connects
+four complete identity-based name fields through the guarded startup bridge.
+The current combined build is `build/conversation-names-pilot`; focused checks,
+independent builds, and the bounded silent native bridge check pass. Continue
+the house-sign name reader, remaining item readers, borrowed-catchphrase
+ambiguity, residual text/letters, accents, and combined v0 smoke. Preserve all
+six-byte saved-name writers and reuse the passing shared-helper evidence.
+
 The [fishing-name checkpoint](checkpoints/FISHING_NAME.md) supplies the complete
 NPC winner-name display with exact saved-key and identity-marker guards.
-The current combined build is `build/fishing-name-pilot`; all six focused and
+The retained combined build is `build/fishing-name-pilot`; all six focused and
 twelve counter checks pass. Continue remaining identity/item readers,
 borrowed-catchphrase ambiguity, residual text/letters, accents, and combined v0
 smoke. The catchphrase editor opens blank rather than displaying native defaults;

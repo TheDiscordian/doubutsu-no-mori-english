@@ -110,6 +110,13 @@ class OverlayImage:
 
 def validate(native,data,reloc,report,module,catalog):
     _,original_reloc = baseline(native,module);table,prepared = snapshots(native,catalog)
+    prefix = patch_prefix(native,module,{'af_secret_create':RESIDENT_BYTES})
+    names = report.get('dialogue_identity_names')
+    if names is not None:
+        if names is not True: raise ValueError('Invalid resident dialogue-name capability')
+        from conversation_names import patch, validate_relocations
+        validate_relocations('resident', reloc)
+        prefix = patch('resident', prefix)
     if (report.get('version')!=1 or report.get('ram')!=RAM or report.get('bytes')!=len(data)
             or report.get('overlay_sha256')!=sha256(data) or report.get('relocation_bytes')!=len(reloc)
             or report.get('relocation_sha256')!=sha256(reloc) or report.get('sources')!=source_hashes()
@@ -123,7 +130,7 @@ def validate(native,data,reloc,report,module,catalog):
             or symbols['af_secret_create']!=RESIDENT_BYTES or symbols['af_secret_templates']!=end
             or len(data)!=end+608 or data[end:]!=table+bytes(8)
             or sha256(data[RESIDENT_BYTES:end])!=CREATOR_SHA256
-            or data[:PREFIX_BYTES]!=patch_prefix(native,module,symbols)
+            or data[:PREFIX_BYTES]!=prefix
             or data[PREFIX_BYTES:RESIDENT_BYTES]!=bytes(SPEC.sections[3])):
         raise ValueError('Changed secret prefix, BSS initialization, code, or immutable table')
     inventory = report.get('elf_relocations',[]);seen,high = set(),{}
@@ -151,6 +158,7 @@ def validate(native,data,reloc,report,module,catalog):
     for base in (MODULE_RAM+RESERVATION,0x802F8010,(0x80400000-LIMIT)&~15):
         moved = relocate_verified_data(spec,data,reloc,base)
         expected = word_relocated(original,original_reloc,base,module=module,dates=True)
+        if names: expected = patch('resident', expected)
         if moved[:START-RAM]!=expected[:START-RAM] or moved[END-RAM:RESIDENT_BYTES]!=expected[END-RAM:]:
             raise ValueError('Secret growth changes unrelated date/item/birthday or BSS relocation')
     return spec
@@ -175,6 +183,9 @@ def verify_installation(built,native,module,report):
             or report.get('catalog')!=4 or report.get('complete_templates')!=list(TEMPLATES)):
         raise ValueError('Missing installed secret-letter route')
     data,reloc = files[NEW_VROM].extract(built),files[NEW_RELOCATION].extract(built)
+    if report['overlay'].get('dialogue_identity_names'):
+        from text_names import verify_installed_bridge
+        verify_installed_bridge(built)
     spec = validate(native,data,reloc,report['overlay'],module,catalog)
     owner = files[OWNER_VROM].extract(built);original = by_vrom(native)[OWNER_VROM].extract(native)
     if owner[METADATA:METADATA+20]!=metadata(len(data)):

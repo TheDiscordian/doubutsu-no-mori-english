@@ -94,6 +94,12 @@ def image_spec(image, reloc):
 
 
 def artifact_profile(artifact):
+    if 'identities' in artifact:
+        if artifact['identities'] is not True or artifact.get('choices') is not True:
+            raise ValueError('Invalid identity-name capability')
+        from text_names import PROFILE as profile, SYMBOLS as symbols, ELF_SHA
+        from build_text_extension import CHOICE_IMPORTS, IDENTITY_IMPORTS
+        return profile, symbols, {**IMPORTS, **CHOICE_IMPORTS, **IDENTITY_IMPORTS}, ELF_SHA
     if 'choices' in artifact:
         if artifact['choices'] is not True:
             raise ValueError('Invalid text-extension choice capability')
@@ -115,6 +121,9 @@ def validate(blob, loader, artifact):
     if artifact.get('choices'):
         sources.update({'choices/'+p.name: sha256(p.read_bytes())
                         for p in sorted((ROOT/'overlays/text_choices').iterdir()) if p.is_file()})
+    if artifact.get('identities'):
+        sources.update({'names/'+p.name: sha256(p.read_bytes())
+                        for p in sorted((ROOT/'overlays/text_names').iterdir()) if p.is_file()})
     if (artifact.get('sources') != sources or artifact.get('imports') != imports
             or artifact.get('symbols') != symbols or artifact.get('compiler_image') != IMAGE
             or artifact.get('blob_crc32') != f'{zlib.crc32(blob):08X}'
@@ -191,6 +200,10 @@ def install(native, replacements, additions, relocations, module, directory=None
     if artifact.get('choices'):
         from text_choices import verify_dependencies
         choice_evidence = verify_dependencies(native, replacements, additions, module)
+    identity_evidence = None
+    if artifact.get('identities'):
+        from text_names import verify_dependencies
+        identity_evidence = verify_dependencies(native, replacements, module)
     intervals = [(relocations.get(v, v), relocations.get(v, v)+len(replacements.get(v, b'')))
                  if v in replacements else (f.vstart, f.vend) for v, f in files.items()]
     intervals += [(v, v+len(data)) for v, data in additions.items()]
@@ -232,6 +245,9 @@ def install(native, replacements, additions, relocations, module, directory=None
     if choice_evidence:
         evidence['choices'] = choice_evidence
         evidence['scope'] = 'Complete general fields, item adapters, and bounded full-English choice substitutions'
+    if identity_evidence:
+        evidence['identities'] = identity_evidence
+        evidence['scope'] += ', with the save-preserving identity-name bridge'
     return evidence
 
 
@@ -268,6 +284,11 @@ def verify_installation(built, native, report):
             at = address-spec.ram
             result[at:at+len(body)] = body
         replacements[spec.vrom] = bytes(result)
+    if report.get('conversation_names'):
+        from conversation_names import verify_installation as verify_names, patch
+        verify_names(built, native, report)
+        spec = ACTORS['letter']
+        replacements[spec.vrom] = patch('conversation', replacements[spec.vrom])
     for vrom, expected in replacements.items():
         if files[vrom].extract(built) != expected:
             raise ValueError('Incomplete installed text-extension code or actor')

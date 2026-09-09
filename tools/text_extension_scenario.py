@@ -86,6 +86,25 @@ def scenario(native, built, report):
         choice(b'12345\x7f\x31', None)
         choice(b'bad\x7f\x00', None)
         choice(b'1234567890123456789\x7f', None)
+    if report['text_extension'].get('identities'):
+        from aflib import CODE_RAM, CODE_VROM
+        from text_names import BRIDGE
+        files = by_vrom(built); names = files[0x02C00000].extract(built)
+        npc, full = next((i, names[32+i*8:40+i*8]) for i in range(216) if names[39+i*8] != 32)
+        native_name = files[0xE04000].extract(built)[8+npc*6:14+npc*6]
+        fallback = files[CODE_VROM].extract(built)[0x8010B810-CODE_RAM:0x8010B810-CODE_RAM+6] + b'  '
+        guard = b'NAME-OUT-GUARD!!'
+        assert len(guard) == 16
+        write(source-16, guard+b'!'*8+guard); write(cursor, struct.pack('>H', 0xE000+npc)+bytes(10))
+        call(BRIDGE, [source, cursor]); check(source-16, guard+full+guard)
+        write(0x8019491C, words(0))  # Disable only the full-name resource; preserve native fallback.
+        call(BRIDGE, [source, cursor]); check(source-16, guard+native_name+b'  '+guard)
+        write(0x8019491C, words(0x02C00000))
+        for identity in (0xD008, 0xEFFF):
+            write(cursor, struct.pack('>H', identity)); call(BRIDGE, [source, cursor])
+            check(source-16, guard+fallback+guard)
+        call(BRIDGE, [source, 0]); check(source-16, guard+fallback+guard)
+        call(BRIDGE, [0, cursor]); check(source-16, guard+fallback+guard)
     check(0x8019C8D0, bytes.fromhex('AF32C0DE'*4))
     actions += [{'load_state': True}, {'resume': True}, {'wait': 2}]
     check(source, bytes(16))
