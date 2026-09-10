@@ -17,6 +17,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [Nookington main-sign candidate](checkpoints/NOOKINGTON_SIGN.md) installs
+the complete supplied English lettering in both seasons, preserving native
+geometry, palettes, doors, and allocation. Five focused checks pass, including
+all 92 seasonal building streams and full prior-resource retention. The separate
+`build/nookington-sign-02` candidate retains the grid and every earlier fix.
+`build/title-nookington-combined-01` adds the unchanged English title with a
+passing combination check and requires an Expansion Pak. Ordinary sign and
+keyboard acceptance remains pending; this is not a new recommended handoff.
+Continue the bounded combined screen/editor check and remaining decorative art.
+
 The [shared keyboard grid](checkpoints/KEYBOARD_GRID.md) is installed in the
 separate `build/keyboard-grid-01` candidate. Eight focused checks pass, including
 sanitizers, independent MIPS compilation, relocation/allocation, complete prior

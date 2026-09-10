@@ -16,10 +16,20 @@ from keyboard_grid_overlay import verify_owned_parts
 @unittest.skipUnless((ROOT/'build/title-grid-combined-01/preview.json').is_file(),'Local title/grid candidate required')
 class TitleGridTests(unittest.TestCase):
     def test_combined_patch_retains_complete_grid_and_identical_title_implementation(self):
+        self.check_combination('keyboard-grid-01', 'title-grid-combined-01',
+            'f2c46b98e4d5748d39bcd17ce697f50c4f6dbeae6b560e2ba4851ad43b46ec8d')
+
+    @unittest.skipUnless((ROOT/'build/title-nookington-combined-01/preview.json').is_file(),
+                         'Local Nookington/title candidate required')
+    def test_nookington_combination_retains_building_loader_and_unchanged_title(self):
+        self.check_combination('nookington-sign-02', 'title-nookington-combined-01',
+            '76757a029aca2d0564daff08e3f2a790bf572b66efb6a2a84fee8f26a8acf4c4')
+
+    def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        base=(ROOT/'build/keyboard-grid-01/animal-forest-halfwidth.z64').read_bytes()
-        previous=json.loads((ROOT/'build/keyboard-grid-01/build.json').read_text())
-        folder=ROOT/'build/title-grid-combined-01'
+        base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()
+        previous=json.loads((ROOT/'build'/baseline/'build.json').read_text())
+        folder=ROOT/'build'/output
         image=(folder/'animal-forest-title-preview.z64').read_bytes()
         report=json.loads((folder/'preview.json').read_text());files=by_vrom(image)
         built,patch,evidence=build(native,base,previous,
@@ -27,7 +37,7 @@ class TitleGridTests(unittest.TestCase):
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(),
             files[NEW_ACTOR].extract(image),files[NEW_RELOC].extract(image),report['actor'])
         self.assertEqual(built,image);self.assertEqual(evidence,report)
-        self.assertEqual(sha256(image),'f2c46b98e4d5748d39bcd17ce697f50c4f6dbeae6b560e2ba4851ad43b46ec8d')
+        self.assertEqual(sha256(image),expected_sha)
         self.assertEqual(apply_ups(native,patch),image)
         self.assertEqual(report['baseline_sha256'],previous['output_sha256'])
         verify_owned_parts(image,native,previous['keyboard_grid'],previous['apology_input'])

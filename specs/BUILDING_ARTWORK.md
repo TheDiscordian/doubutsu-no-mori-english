@@ -42,7 +42,9 @@ ROM checksum, and reconstruction from the original cartridge plus UPS.
 ## Remaining work and verification
 
 Nookington's differs substantially in textures, palette, and model layout and
-is not a direct atlas swap. The post office already contains English lettering;
+is not a direct atlas swap. Its [main-sign adaptation](NOOKINGTON_SIGN.md) uses
+separate source-sized lettering within the native per-building slots, while
+retaining all other seasonal building streams. The post office already contains English lettering;
 GameCube changes also alter the mailbox/sign design, so keep that work separate
 from the shop texture batch. Other signs, bags, buildings, and the remaining
 map/inventory/time-setting screen lettering require their own bindings. A
