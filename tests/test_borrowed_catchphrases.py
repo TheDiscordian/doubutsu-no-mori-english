@@ -84,7 +84,7 @@ class BorrowedCartridgeTests(unittest.TestCase):
         native = ROM.read_bytes();built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((BUILD/'build.json').read_text());ledger = measure(native,built,report)
         self.assertEqual(ledger.summary()['total_source_characters'],751284)
-        self.assertEqual(ledger.summary()['replaced_source_characters'],720689+
+        self.assertEqual(ledger.summary()['replaced_source_characters'],720689+35+
                          resource_only_weight(ledger,('extended_items','display_names','catchphrases')))
         self.assertGreater(resource_only_weight(ledger,('catchphrases',)),0)
         self.assertEqual(pending_name_consumers(report),{})

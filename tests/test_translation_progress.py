@@ -74,6 +74,39 @@ class TranslationProgressTests(unittest.TestCase):
         self.assertEqual(result['pending_application_records'], 1)
         self.assertEqual(len(self.ledger.rows['string:0000']['pending_replacements']), 2)
 
+    def test_sender_only_letter_omissions_require_complete_exact_route(self):
+        from mail_omissions import PARTS
+        for identity,(source,encoded,route) in PARTS.items():
+            self.ledger.add(identity,bytes.fromhex(source))
+            value=bytes.fromhex(encoded)
+            self.ledger.credit(identity,value,route,mail=True)
+            self.assertFalse(self.ledger.rows[identity]['replacements'])
+            self.ledger.credit(identity,value,route,mail=True,english_mail_omission=True)
+            self.assertTrue(self.ledger.rows[identity]['replacements'][0]['intentional_omission'])
+            for changed,changed_route in ((b'',route),(value+b' ',route),(value,'native_bank'),
+                                          (b'\x7f\x26',route)):
+                with self.assertRaises(ValueError):
+                    self.ledger.credit(identity,changed,changed_route,mail=True,english_mail_omission=True)
+            with self.assertRaises(ValueError):
+                self.ledger.credit(identity,value,route,english_mail_omission=True)
+            with self.assertRaises(ValueError):
+                self.ledger.credit(identity,value,route,mail=True,english_mail_omission=True,pending_reason='unconnected')
+        self.assertEqual(self.ledger.summary()['replaced_source_characters'],35)
+        self.add('ps:0000','あい')
+        with self.assertRaises(ValueError):
+            self.ledger.credit('ps:0000',b'\x7f\x25','npc_letters',mail=True,english_mail_omission=True)
+        self.ledger.rows['ps:00D2']['source_sha256']='0'*64
+        with self.assertRaises(ValueError):
+            self.ledger.credit('ps:00D2',b'\x7f\x25','npc_letters',mail=True,english_mail_omission=True)
+
+    def test_standalone_mail_bank_reader_uses_complete_installed_data(self):
+        import struct
+        from textbanks import Bank
+        from translation_progress import installed_entries
+        old=Bank('mail',0x1000,0x2000,b'AB',struct.pack('>3I',1,2,0))
+        files={0x1000:b'ABCD',0x2000:struct.pack('>3I',1,4,0)}
+        self.assertEqual(installed_entries(old,files.__getitem__,{}),[b'A',b'BCD'])
+
     def test_native_english_keeps_credit_when_other_resource_is_partial(self):
         self.add('npc_names:0000', 'あい')
         self.ledger.credit('npc_names:0000', b'Name  ', 'native_bank')

@@ -95,7 +95,7 @@ class ReserveCartridgeTests(unittest.TestCase):
         from translation_progress import measure
         ledger=measure(native,built,report)
         self.assertEqual(ledger.summary()['total_source_characters'],751284)
-        self.assertEqual(ledger.summary()['replaced_source_characters'],748328+154)
+        self.assertEqual(ledger.summary()['replaced_source_characters'],748328+154+35)
         for id in r.IDS:self.assertTrue(ledger.rows[id]['replacements'])
         bad=copy.deepcopy(report);bad['reserve_strings']['stored_bytes']=4
         with self.assertRaises(ValueError):r.verify_installation(built,native,bad)

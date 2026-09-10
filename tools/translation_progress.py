@@ -80,7 +80,7 @@ class CounterLedger:
         }
 
     def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None,
-               apology=False,accent_item=False,english_unit_omission=False):
+               apology=False,accent_item=False,english_unit_omission=False,english_mail_omission=False):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
@@ -91,6 +91,11 @@ class CounterLedger:
             if identity not in TARGETS or data!=TARGETS[identity][2] or route!='apology_input':
                 raise ValueError('Apology credit requires an exact installed symbol target')
         classification_data=data
+        if english_mail_omission:
+            from mail_omissions import verify
+            if not mail or pending_reason or apology or accent_item or english_unit_omission:
+                raise ValueError('English sender-only credit requires a complete verified letter route')
+            verify(identity,self.rows[identity]['source_sha256'],data,route)
         if english_unit_omission:
             from residual_general import EMPTY_SOURCE_HASHES
             if (identity not in EMPTY_SOURCE_HASHES or data!=b'' or route!='native_bank'
@@ -108,9 +113,9 @@ class CounterLedger:
             classification_data=data.replace(b'\x80\x7c',b'e').replace(b'\x80\x87',b'n')
         details = classify(classification_data, info, extended_glyphs=identity.startswith('message:') or apology,mail_glyphs=mail_glyphs)
         if ((details['category'] in ENGLISH_CATEGORIES
-                and details['non_whitespace_static_characters']) or english_unit_omission):
+                and details['non_whitespace_static_characters']) or english_unit_omission or english_mail_omission):
             replacement = {'route': route, 'sha256': sha256(data)}
-            if english_unit_omission:
+            if english_unit_omission or english_mail_omission:
                 replacement['intentional_omission']=True
             field = 'replacements'
             if pending_reason is not None:
@@ -150,7 +155,7 @@ def installed_entries(bank, extract, relocations):
         table = extract(relocations.get(bank.table_vrom, bank.table_vrom))
         if bank.name not in ('message', 'select', 'string'):
             table = table[bank.table_offset:bank.table_offset+len(bank.table)]
-    if bank.name not in ('message', 'select', 'string'):
+    if bank.name not in ('message', 'select', 'string', 'super', 'mail', 'ps'):
         data = data[bank.data_offset:bank.data_offset+len(bank.data)]
     return replace(bank, data=data, table=table).entries()
 
@@ -162,9 +167,12 @@ def measure(native, built, report):
     accent_names={}
     accent_built,accent_report=built,report
     empty_units=()
-    if report.get('residual_general'):
+    if accent_report.get('reserve_letters'):
+        from reserve_letters import verify_installation
+        accent_built,accent_report=verify_installation(accent_built,native,accent_report)
+    if accent_report.get('residual_general'):
         from residual_general import verify_installation
-        accent_built,accent_report,empty_units=verify_installation(built,native,report)
+        accent_built,accent_report,empty_units=verify_installation(accent_built,native,accent_report)
     if accent_report.get('unused_names'):
         from unused_names import verify_installation
         accent_built,accent_report=verify_installation(accent_built,native,accent_report)
@@ -296,6 +304,7 @@ def measure(native, built, report):
 
         def credit_mail(vrom, selected, route):
             from mail_catalog import parse, verify_registered
+            from mail_omissions import PARTS
             data = extract(vrom)
             catalog = verify_registered(data)['catalog']
             contents = parse(data)[1]
@@ -307,7 +316,8 @@ def measure(native, built, report):
                         raise ValueError('Letter mapping has no original source: '+identity)
                     value = contents[name][number]
                     if value is not None:
-                        ledger.credit(identity, value, route, mail=True,mail_glyphs=catalog==4)
+                        ledger.credit(identity, value, route, mail=True,mail_glyphs=catalog==4,
+                                      english_mail_omission=identity in PARTS)
 
         if report.get('npc_mail_loader'):
             import mail_creator_catalog as creator_catalog

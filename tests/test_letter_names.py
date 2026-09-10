@@ -151,7 +151,7 @@ class LetterCartridgeTests(unittest.TestCase):
                          if row['replacements'] and all(r['route'] == 'display_names' for r in row['replacements']))
         self.assertGreater(new_weight,0)
         from item_name_readers import resource_only_weight
-        self.assertEqual(summary['replaced_source_characters'],720689+new_weight+resource_only_weight(ledger))
+        self.assertEqual(summary['replaced_source_characters'],720689+35+new_weight+resource_only_weight(ledger))
         from translation_progress import pending_name_consumers
         self.assertNotIn('display_names',pending_name_consumers(report))
         broken = copy.deepcopy(report); broken['letter_editor_names']['name_bytes'] = 6

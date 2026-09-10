@@ -99,6 +99,12 @@ The thirty [shop quantity omissions](RESIDUAL_GENERAL.md) are another exact
 exception: their native source identities, complete approved counter group,
 empty installed values, and actual five-shop selectors/capacities must pass
 verification. Arbitrary empty text or whitespace does not receive this credit.
+Eleven sender-only letter components are another exact exception. Their English
+reference consists of the captured sender command without the native Japanese
+sign-off. `mail_omissions.py` binds the exact source, complete encoded command,
+and selected NPC/quest-reply route. Credit requires the same installed creator,
+catalogue, reader, and field-source verification as other complete letters;
+an empty template, changed command, or unused catalogue entry is not credited.
 English application is not a judgement of wording quality, gameplay, testing,
 polish, or hardware readiness. Those do not add to or subtract from this
 text-replacement percentage. A missing connection that leaves Japanese text in

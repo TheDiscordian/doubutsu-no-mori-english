@@ -129,7 +129,7 @@ class ActorNameTests(unittest.TestCase):
         summary = ledger.summary()
         self.assertEqual(summary['total_source_characters'], 751284)
         from item_name_readers import resource_only_weight
-        self.assertEqual(summary['replaced_source_characters'], 720661+resource_only_weight(ledger))
+        self.assertEqual(summary['replaced_source_characters'], 720661+35+resource_only_weight(ledger))
         self.assertGreater(summary['pending_application_records'], 0)
         self.assertNotIn('Shared choices', str(pending_name_consumers(report)))
         self.assertIn('identity-based', pending_name_consumers(report)['display_names'])

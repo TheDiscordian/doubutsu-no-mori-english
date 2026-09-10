@@ -15,6 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [reserve-letter checkpoint](checkpoints/RESERVE_LETTERS.md) completes five
+reserve letters and accounts for eleven existing English sender-only signatures
+in `build/reserve-letters-pilot`. Finish the eighteen classic variants through
+their checked generation path without changing live scheduling or saved fields.
+Do not credit the uninstalled candidate or overwrite structural zero-filled slots.
+Then perform the bounded combined v0 checks and hand over the playtest patch.
+
 The [general-string checkpoint](checkpoints/RESIDUAL_GENERAL.md) completes every
 Japanese-bearing general-bank row in `build/residual-general-pilot`. Its focused
 checks and counter regressions pass. Finish remaining classic letter variants

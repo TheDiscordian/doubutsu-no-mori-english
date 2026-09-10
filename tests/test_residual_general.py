@@ -80,7 +80,7 @@ class ResidualGeneralTests(unittest.TestCase):
         from translation_progress import measure
         ledger=measure(self.native,built,report)
         self.assertEqual(ledger.summary()['total_source_characters'],751284)
-        self.assertEqual(ledger.summary()['replaced_source_characters'],750175)
+        self.assertEqual(ledger.summary()['replaced_source_characters'],750175+35)
         self.assertFalse([identity for identity,row in ledger.rows.items()
                           if identity.startswith('string:') and row['source_characters'] and not row['replacements']])
         for identity in empty:

@@ -25,6 +25,14 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [reserve-letter completion](checkpoints/RESERVE_LETTERS.md) applies all fifteen
+parts and corrects accounting for eleven already-translated sender-only
+signatures. The current combined ROM/UPS is `build/reserve-letters-pilot`.
+Three focused tests and sixteen counter regressions pass, including complete
+resource retention and native rounded-read bounds. Continue the eighteen classic
+letter variants, then bounded combined v0 gameplay/save checks. Their adapter is
+a separate candidate until installed and verified; it does not receive credit.
+
 The [general-string completion](checkpoints/RESIDUAL_GENERAL.md) finishes every
 Japanese-bearing general-bank record. The current combined ROM/UPS is
 `build/residual-general-pilot`. Three focused checks and fourteen counter

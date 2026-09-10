@@ -111,7 +111,7 @@ class GuideNameTests(unittest.TestCase):
         report = json.loads((BUILD/'build.json').read_text())
         ledger = measure(self.native, (BUILD/'animal-forest-halfwidth.z64').read_bytes(), report)
         self.assertEqual(ledger.summary()['total_source_characters'], 751284)
-        self.assertEqual(ledger.summary()['replaced_source_characters'], 720661)
+        self.assertEqual(ledger.summary()['replaced_source_characters'], 720661+35)
         self.assertIn('opening-guide name is connected', pending_name_consumers(report)['display_names'])
         broken = copy.deepcopy(report); broken['guide_name']['field_slot'] = 4
         with self.assertRaises(ValueError):

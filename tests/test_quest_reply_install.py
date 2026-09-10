@@ -94,15 +94,14 @@ class QuestReplyInstallTests(unittest.TestCase):
         ledger = measure(self.native,self.built,self.report)
         baseline = deepcopy(self.report);baseline.pop('quest_replies')
         uncredited = measure(self.native,self.built,baseline)
-        self.assertEqual(ledger.summary()['total_source_characters'],751002)
+        self.assertEqual(ledger.summary()['total_source_characters'],751284)
         ids = {f'{bank}:{number:04X}' for bank in ('super','mail','ps') for number in TEMPLATES}
         actual = {k for k,r in ledger.rows.items() if any(v['route']=='quest_replies' for v in r['replacements'])}
-        # Four English signatures contain only a dynamic name insertion. The
-        # existing quick counter requires static English in its replacement;
-        # keep that conservative rule, despite complete signature support.
-        dynamic_only = {'ps:0097','ps:0098','ps:009D','ps:009F'}
+        # Three Japanese sign-offs intentionally become a sender command alone.
+        # The fourth source already contains only a command and adds no weight.
+        dynamic_only = {'ps:009D'}
         self.assertEqual(actual,ids-dynamic_only)
-        self.assertEqual(sum(ledger.rows[k]['source_characters'] for k in dynamic_only),13)
+        self.assertEqual(sum(ledger.rows[k]['source_characters'] for k in dynamic_only),0)
         for key,row in uncredited.rows.items():
             if key not in ids: self.assertEqual(row,ledger.rows[key])
             self.assertTrue(all(r in ledger.rows[key]['replacements'] for r in row['replacements']))

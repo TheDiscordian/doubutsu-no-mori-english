@@ -82,7 +82,7 @@ class UnusedNamesTests(unittest.TestCase):
         summary = ledger.summary()
         self.assertEqual(summary['total_source_characters'], 751284)
         self.assertEqual(summary['replaced_source_characters'],
-                         748567+report['unused_names']['source_characters'])
+                         748567+35+report['unused_names']['source_characters'])
         for identity in u.IDS:
             self.assertTrue(ledger.rows[identity]['replacements'])
         bad = copy.deepcopy(report)
