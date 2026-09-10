@@ -7,21 +7,23 @@ This project is under development. It is not a complete translation or a
 hardware-validated release. See [progress](docs/PROGRESS.md) for verified results
 and remaining work, and [sources](docs/SOURCES.md) for third-party provenance.
 
-The [v0 plan](docs/V0_PLAN.md) targets the base translation and bounded safety
-checks, then a playtest patch. The human playthrough follows that build. English
-title artwork and the GameCube-style keyboard are v1 stretch goals.
+The [current combined playtest](docs/V1_TITLE_PLAYTEST.md) includes the English
+title, GameCube-style keyboard, translated screen/building artwork, and embedded
+menu responses, along with the main English text and progression fixes. It
+requires an Expansion Pak. The [patch-only bundle](docs/V1_PATCH_PLAYTEST.md)
+retains explicit test limits; it is not a completed v1 or public release.
 
-The [current private playtest correction](docs/V0_FIXES_PLAYTEST.md) addresses
+The separate [corrected v0 playtest](docs/V0_FIXES_PLAYTEST.md) addresses
 the furniture-delivery conversation loop, later letter-advice continuation,
 and the native shrine's map label. Its [checkpoint](docs/checkpoints/V0_HARDWARE_BUGS.md)
 records the separate ROM/patch and focused native evidence. Ordinary hardware
 replay and remaining Japanese artwork are still pending.
 
-The experimental pilot includes proportional Latin text, guarded GameCube
-reference imports, and an English-first N64 keyboard with translated labels and
-prompts. It retains the native radial layout and saved-name limits; a
-GameCube-style grid remains a separate upgrade. See [building](docs/BUILDING.md)
-and [keyboard design](specs/KEYBOARD.md).
+Proportional Latin text, complete English names/letters, and guarded GameCube
+reference imports preserve native saved-name limits. The corrected v0 retains
+the English-first radial keyboard; the combined candidate uses the grid. See
+[building](docs/BUILDING.md), [keyboard design](specs/KEYBOARD.md), and the
+[v0 plan](docs/V0_PLAN.md) for the bounded testing and human-playthrough workflow.
 
 The repository stores tools, translation edits, and documentation. A legally
 obtained source ROM is required to build; ROMs and extracted assets stay local.
