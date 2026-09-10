@@ -4,7 +4,7 @@ import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from build_apology_overlay import IMPORTS,HOOKS,RAM,sources,patched_prefix,relocations
-from check_keyboard_assembly import IMAGE
+from toolchain import KNOWN_IMAGES
 import hboard_overlay as previous
 from npc_mail_show import relocate_verified_data
 
@@ -52,7 +52,7 @@ def validate(native,data,reloc,report=None):
     previous.validate(native,prefix,prior_rel)
     if report is not None:
         if (any(report.get(key)!=value for key,value in APPROVED.items())
-                or report.get('version')!=1 or report.get('ram')!=RAM or report.get('toolchain_image')!=IMAGE
+                or report.get('version')!=1 or report.get('ram')!=RAM or report.get('toolchain_image') not in KNOWN_IMAGES
                 or report.get('sources')!=sources() or report.get('imports')!=IMPORTS
                 or sha256(json.dumps(report.get('elf_relocations'),separators=(',',':')).encode())!=ELF_SHA
                 or reloc!=relocations(prior_rel,report['elf_relocations'],len(data))):

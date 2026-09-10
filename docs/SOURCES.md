@@ -14,11 +14,12 @@
 
 - N64 decompilation: `4ddba04604ee7b4c4cfc0b64f8ee4d094bb385be`.
 - GameCube decompilation: `09ca8e8b5b24e6ab44047ee980cf0088ad7ecb4c`.
-- Local MIPS toolchain image: `sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915`
-  (`doom-n64:tc`, GCC 14.2.0). The image is a local dependency, not a published
-  registry artifact; the pure-Python ROM builder does not require it.
-  [Toolchain identity](TOOLCHAIN.md) records inspected executable versions/hashes
-  and the remaining clean public-container setup work.
+- Default MIPS toolchain: `ghcr.io/dragonminded/libdragon@sha256:b68e8dfd393f76ba69c1ba62da6b42dcda8b5b52eaa8fb96adc5aab7865a2d40`
+  (published Linux amd64 image, GCC 14.2.0). The explicit `AF_TOOLCHAIN=legacy`
+  alternative is local image
+  `sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915`.
+  [Toolchain identity and setup](TOOLCHAIN.md) record verified executable hashes,
+  actual report provenance, and the complete-build verification status.
 - AFProjectDistro archive SHA-256:
   `d0f7e708fa2453c9f06714d9d39b1265e02f4878d330dcea99c85c52123838ed`.
 - Legacy UPS SHA-256:

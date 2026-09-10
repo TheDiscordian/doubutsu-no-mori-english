@@ -9,7 +9,7 @@ import tempfile
 from aflib import sha256
 from keyboard import CURSOR_CODE
 
-IMAGE = "sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915"
+from toolchain import IMAGE
 
 
 def main():

@@ -23,6 +23,8 @@ class V1PlaytestPackageTests(unittest.TestCase):
         data,manifest=package.prepare(ROOT/'build/title-stall-combined-01',source.read_bytes(),'a'*40)
         self.assertEqual(manifest['label'],'v1-artwork-playtest-03')
         self.assertEqual(manifest['output_sha256'],package.ROM_SHA)
+        self.assertEqual(manifest['canonical_build_report_sha256'],package.REPORT_SHA)
+        self.assertEqual(manifest['reviewed_profile_sha256'],package.REPORT_SHA)
         self.assertEqual(manifest['required_ram_bytes'],0x800000)
         self.assertEqual(manifest['ordinary_heap_end'],0x80400000)
         self.assertTrue(manifest['expansion_pak_required'])

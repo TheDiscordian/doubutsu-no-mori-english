@@ -14,6 +14,7 @@ import keyboard_grid_overlay as grid
 import apology_overlay as previous
 import hboard_overlay as editor
 from build_keyboard_grid import build as compile_grid
+from toolchain import IMAGE, comparison_profile
 
 
 @unittest.skipUnless((ROOT/'build/keyboard-grid-01/build.json').is_file(),'Local compiled keyboard grid required')
@@ -35,7 +36,8 @@ class KeyboardGridOverlayTests(unittest.TestCase):
         expected=json.loads((current/'overlay.json').read_text())
         with tempfile.TemporaryDirectory(prefix='af-grid-recompile-') as directory:
             profile=compile_grid(self.native,ROOT/'build/apology-input-overlay',Path(directory))
-            self.assertEqual(profile,expected)
+            self.assertEqual(profile['toolchain_image'],IMAGE)
+            self.assertEqual(comparison_profile(profile),comparison_profile(expected))
             self.assertEqual((Path(directory)/'overlay.bin').read_bytes(),(current/'overlay.bin').read_bytes())
             self.assertEqual((Path(directory)/'relocation.bin').read_bytes(),(current/'relocation.bin').read_bytes())
         grid.validate(self.native,(current/'overlay.bin').read_bytes(),(current/'relocation.bin').read_bytes(),expected)

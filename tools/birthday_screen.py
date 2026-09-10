@@ -45,7 +45,7 @@ def source(native):
 
 def compiled(directory):
     from build_birthday_draw import FLAGS
-    from check_keyboard_assembly import IMAGE
+    from toolchain import KNOWN_IMAGES
     draw=(directory/'draw.bin').read_bytes();profile=json.loads((directory/'draw.json').read_text())
     inventory=elf_inventory((directory/'relocations.txt').read_text(),ram=RAM)
     expected=[[at-RAM,4,target,name] for at,target,name in IMPORTS]
@@ -54,7 +54,7 @@ def compiled(directory):
     if (len(draw)!=800 or sha256(draw)!=DRAW_SHA or inventory!=expected
             or profile.get('sources')!=hashes or profile.get('sha256')!=DRAW_SHA
             or profile.get('ram')!=RAM+START or profile.get('bytes')!=800
-            or profile.get('native_capacity')!=END-START or profile.get('toolchain_image')!=IMAGE
+            or profile.get('native_capacity')!=END-START or profile.get('toolchain_image') not in KNOWN_IMAGES
             or profile.get('flags')!=FLAGS or profile.get('fits_native_function') is not True
             or profile.get('stack_usage')!='/source/overlays/birthday/draw.c:45:6:af_birthday_draw\t136\tstatic\n'):
         raise ValueError('Changed birthday renderer compilation or source profile')

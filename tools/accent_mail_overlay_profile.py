@@ -1,9 +1,9 @@
 """Exact compiled accent adapters and retention of their preceding complete images."""
-import json
 import struct
 from aflib import sha256
 from accent_mail_overlays import Overlay,source_hashes
 from npc_mail_show import relocate_verified_data
+from toolchain import profile_sha256
 
 PROFILES={
     'creator':('3191836866095ec469c525c95e967aa3eef246d8a214a2a8dcba3bc6873b9a6a',
@@ -32,8 +32,7 @@ def wrap(extension):
 def validate(kind,data,reloc,report):
     extension=report.get('accent_mail')
     if not isinstance(extension,dict) or kind not in PROFILES:raise ValueError('Missing accent overlay profile')
-    encoded=json.dumps(extension,sort_keys=True,separators=(',',':')).encode()
-    if ((sha256(encoded),sha256(data),sha256(reloc))!=PROFILES[kind]
+    if ((profile_sha256(extension),sha256(data),sha256(reloc))!=PROFILES[kind]
             or extension.get('sources')!=source_hashes() or report!=wrap(extension)):
         raise ValueError('Changed complete accent '+kind+' code, sources, or metadata')
     prefix=extension['prefix_bytes'];original=bytearray(data[:prefix]);changed=bytearray(prefix)

@@ -1,8 +1,8 @@
 # N64 compiler dependency
 
-The checked build dependency is local Docker image
-`sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915`,
-tagged `doom-n64:tc`. Native commands run under `/n64_toolchain/bin/`, with
+The default build dependency is the published Docker image
+`ghcr.io/dragonminded/libdragon@sha256:b68e8dfd393f76ba69c1ba62da6b42dcda8b5b52eaa8fb96adc5aab7865a2d40`
+for Linux amd64. Native commands run under `/n64_toolchain/bin/`, with
 network disabled and the translation source mounted read-only. No host compiler
 installation or libdragon game runtime is required for the translation.
 
@@ -34,7 +34,37 @@ infer an installed C-library version from a separate checkout's build script.
 The executable hashes are a scoped identity record, not an inventory of every
 host shared library or compiler support file.
 
-## Public setup work
+## Setup and report identity
+
+```sh
+python3 tools/setup_toolchain.py --pull --output build/compiler-verification.json
+```
+
+The command pulls the pinned public image only if it is absent, verifies all nine
+executables and the compiler version, and records the actual inspected image and
+platform. Omit `--pull` to require an existing image. Evidence files are exclusive;
+use a new path for another verification. Complete rebuild recipes also perform
+the executable verification before compilation.
+
+`AF_TOOLCHAIN=legacy` explicitly selects the retained local image
+`sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915`
+for historical reproduction. The default is `AF_TOOLCHAIN=public`. Arbitrary
+image selections are rejected. Both images contain the exact executables above;
+the local development image is not a public distribution dependency.
+
+Build reports record the image actually used. Historical approval comparisons
+normalise only recognised `toolchain_image` fields in a temporary comparison
+copy. All other metadata and native/source/relocation hashes remain bound.
+The resulting `reviewed_profile_sha256` is not the checksum of the actual report;
+recipes and packages record that actual canonical JSON hash separately.
+See [the compatibility contract](../specs/PORTABLE_TOOLCHAIN.md).
+
+The setup check and focused compatibility tests pass. Complete source-to-v1
+execution with the public image remains pending in
+[the compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md); the recorded
+legacy-image rebuild does not substitute for that execution.
+
+## Upstream sources and terms
 
 The pinned [libdragon build script](https://github.com/DragonMinded/libdragon/blob/5cb976aab11eb30622c33b112c120a1107eedb5e/tools/build-toolchain.sh)
 and [Dockerfile](https://github.com/DragonMinded/libdragon/blob/5cb976aab11eb30622c33b112c120a1107eedb5e/Dockerfile)
@@ -45,11 +75,9 @@ Their hashes are respectively
 The script specifies GCC 14.2.0 and Binutils 2.44, matching the observed tools.
 That correspondence alone does not prove the exact container's full origin.
 
-A portable setup must pin source downloads/base dependencies, build a clean
-compiler-only image, and preserve the compiler's own source/licence notices.
-It must accommodate a new image identity honestly in build reports and verify
-the existing native output identities. Do not publish the current development
-container or assume its digest is available from a public registry. The local
-image includes prior project execution history and is not a prepared release.
+The published image supplies the pinned build dependency; rebuilding the compiler
+itself from source is outside this setup's verified scope. Preserve upstream
+source/licence notices. Do not publish the local development container or treat
+its additional project layer as part of the public compiler dependency.
 The translation's MIT licence does not relicense GCC, Binutils, upstream SDK
 headers, legacy work, or Nintendo assets.

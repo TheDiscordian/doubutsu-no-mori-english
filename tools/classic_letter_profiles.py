@@ -1,12 +1,12 @@
 """Exact classic adapters with independently validated retained font/creator prefixes."""
 from copy import deepcopy
-import json
 import struct
 
 from aflib import sha256
 from accent_mail_overlays import Overlay
 from build_classic_letters import source_hashes
 from npc_mail_show import relocate_verified_data
+from toolchain import profile_sha256
 
 PROFILES = {
     'font': ('9062cb5f6eaf140b37048a58de15435d40a84ecec346497831678f5dcde15018',
@@ -33,8 +33,7 @@ def validate(kind, data, reloc, report):
     extension = report.get('classic_letters')
     if not isinstance(extension, dict) or kind not in PROFILES:
         raise ValueError('Missing exact classic-letter profile')
-    encoded = json.dumps(extension, sort_keys=True, separators=(',', ':')).encode()
-    if ((sha256(encoded), sha256(data), sha256(reloc)) != PROFILES[kind]
+    if ((profile_sha256(extension), sha256(data), sha256(reloc)) != PROFILES[kind]
             or extension.get('sources') != source_hashes() or report != wrap(extension)):
         raise ValueError('Changed approved classic-letter '+kind+' code, sources, or metadata')
     prefix = extension['prefix_bytes']

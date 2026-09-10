@@ -16,6 +16,8 @@ from check_references import AF_PIN, GC_PIN
 from package_v0 import HARDWARE_FIX_SHA256
 from prepare_inputs import LEGACY_UPS_SHA256
 from rebuild_v1 import BASE_REPORT_SHA, canonical
+from toolchain import TOOLCHAIN, profile_sha256
+from setup_toolchain import verify as verify_toolchain
 
 ROOT = Path(__file__).resolve().parents[1]
 NATIVE = 'local/rom/Doubutsu no Mori (Japan).z64'
@@ -160,8 +162,7 @@ def initialise(output):
         raise ValueError('Commit build sources before cloning the recipe')
     inputs = check_inputs(ROOT)
     sources = source_files(ROOT)
-    subprocess.run(['docker', 'image', 'inspect', IMAGE], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    compiler = verify_toolchain()
     for tool in ('gcc', 'git'):
         if shutil.which(tool) is None:
             raise ValueError('Missing existing host tool: '+tool)
@@ -181,7 +182,8 @@ def initialise(output):
         raise ValueError('Isolated checkout does not match the clean source/input snapshot')
     manifest = {'version': 1, 'source_revision': revision, 'sources': sources,
                 'inputs': inputs, 'af_revision': AF_PIN, 'gc_revision': GC_PIN,
-                'toolchain_image': IMAGE, 'recipe': json.loads(json.dumps(STAGES)),
+                'toolchain_image': IMAGE, 'compiler_verification': compiler,
+                'recipe': json.loads(json.dumps(STAGES)),
                 'retained_build_inputs': [], 'source_directory': 'source',
                 'legacy_scope': 'Reference corroboration; legacy output is not the translation base'}
     write_new(output/'inputs.json', (json.dumps(manifest, indent=2)+'\n').encode())
@@ -215,20 +217,20 @@ def check_final(source):
     base = source/'build/v0-hardware-fixes-02'
     report = json.loads((base/'build.json').read_text())
     if (file_hash(base/'animal-forest-halfwidth.z64') != HARDWARE_FIX_SHA256
-            or canonical(report) != BASE_REPORT_SHA
+            or profile_sha256(report) != BASE_REPORT_SHA
             or file_hash(base/'animal-forest-halfwidth.ups') != report['patch_sha256']):
         raise ValueError('Clean base rebuild differs from corrected v0 ROM/patch/report')
     from aflib import apply_ups
     if apply_ups((source/NATIVE).read_bytes(), (base/'animal-forest-halfwidth.ups').read_bytes()) != (base/'animal-forest-halfwidth.z64').read_bytes():
         raise ValueError('Clean base UPS does not reconstruct the final ROM')
     return {'rom_sha256': HARDWARE_FIX_SHA256, 'patch_sha256': report['patch_sha256'],
-            'canonical_report_sha256': BASE_REPORT_SHA}
+            'canonical_report_sha256': canonical(report), 'reviewed_profile_sha256': BASE_REPORT_SHA}
 
 
 def rebuild(output, through, resume=False):
     manifest = json.loads((output/'inputs.json').read_text()) if resume else initialise(output)
     source = output/'source'
-    if (manifest['recipe'] != json.loads(json.dumps(STAGES))
+    if (manifest['recipe'] != json.loads(json.dumps(STAGES)) or manifest['toolchain_image'] != IMAGE
             or manifest['sources'] != source_files(ROOT)
             or source_files(source) != manifest['sources']
             or check_inputs(source) != manifest['inputs']):
@@ -254,6 +256,7 @@ def rebuild(output, through, resume=False):
         raise ValueError('Requested stage precedes already completed work')
     # Strip inherited feature/output overrides; this recipe supplies its own.
     environment = {key: value for key, value in os.environ.items() if not key.startswith('AF_')}
+    environment['AF_TOOLCHAIN'] = TOOLCHAIN
     for index in range(len(completed)+1, end+1):
         row = STAGES[index-1]
         name, _, destination, _ = row

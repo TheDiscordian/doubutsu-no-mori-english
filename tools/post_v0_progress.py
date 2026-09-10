@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from aflib import sha256
+from toolchain import profile_sha256
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_SHA = '31c85f23c996b70bd7a4779b43f1039716a77c84806dfa5a7dd52e3780d50860'
@@ -47,7 +48,7 @@ APPROVED = {
 
 def predecessor(built, report):
     digest = sha256(built)
-    if digest not in APPROVED or sha256(json.dumps(report, sort_keys=True, separators=(',', ':')).encode()) != APPROVED[digest]:
+    if digest not in APPROVED or profile_sha256(report) != APPROVED[digest]:
         raise ValueError('Post-v0 progress requires an approved complete cartridge/report pair')
     directory = ROOT/'build/classic-letters-pilot'
     base = (directory/'animal-forest-halfwidth.z64').read_bytes()

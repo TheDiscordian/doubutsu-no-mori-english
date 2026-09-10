@@ -23,7 +23,17 @@ comparison is not a claim that every file or host library in both images matches
 
 The [portable integration specification](../../specs/PORTABLE_TOOLCHAIN.md)
 defines actual-image provenance, narrow compatibility with historical metadata
-fingerprints, and the required complete clean build. Implementation and public-image
-rebuild execution remain pending; the passing full source rebuild uses the existing
-local image and is separately recorded in [the base](V0_REBUILD.md) and
-[v1](V1_REBUILD.md) checkpoints.
+fingerprints, and the required complete clean build. The implementation selects
+the public image by default, supports only explicit public/legacy choices, checks
+the executable inventory before complete builds, and preserves actual image
+provenance separately from historical comparison profiles.
+
+`build/toolchain-public-01.json` records successful execution of the public-image
+verifier. All seven focused compiler/profile tests, seven base-recipe tests, and
+six v1-recipe tests pass. The profile tests cover five retained accent/classic
+profiles, reject changed native code or symbols, and verify that unrelated
+metadata remains bound and comparison never rewrites actual provenance.
+
+Complete public-image rebuild execution remains pending. The passing legacy-image
+full source rebuild is separately recorded in [the base](V0_REBUILD.md) and
+[v1](V1_REBUILD.md) checkpoints. No existing ROM, patch, package, or save changed.

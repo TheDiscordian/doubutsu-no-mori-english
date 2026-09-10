@@ -7,6 +7,10 @@ Docker toolchain listed in [sources](SOURCES.md). Compiling runtime, editor,
 title, and artwork commands requires that image; the small text-only builder
 itself is Python-only.
 
+`python3 tools/setup_toolchain.py --pull` obtains the pinned published Linux amd64
+compiler image if absent and verifies its nine executable hashes. See
+[the compiler setup](TOOLCHAIN.md) for the exact digest and explicit legacy option.
+
 ## Inputs
 
 `tools/prepare_inputs.py` accepts `--n64-archive`, `--legacy-zip`, and
@@ -43,9 +47,10 @@ directories. No gameplay scenarios run, and no old artifact or user save changes
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
 [complete pipeline record](checkpoints/V1_REBUILD.md) also verifies all twenty-six
-v1 stages from that freshly generated base, matching the supplied playtest. The local
-toolchain image and pinned source checkouts are still setup prerequisites; this
-is not a published portable compiler image or permission to distribute inputs.
+v1 stages from that freshly generated base, matching the supplied playtest. That
+record uses the legacy compiler image. Public-image execution is tracked in
+[the compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md). The pinned image
+and source checkouts remain setup prerequisites, not permission to distribute inputs.
 
 To rebuild just the base, use `python3 tools/rebuild_v0.py --output <fresh-directory>`.
 An optional `--through <stage>` records a bounded successful prefix; `--resume`
@@ -64,7 +69,9 @@ the keyboard, birthday drawer, title, and native artwork commands. It reads the
 verified corrected v0 ROM/report, original N64 ROM, decoded English GC REL, and
 pinned source/symbol files. It does not need retained intermediate artwork ROMs
 or old compiled overlay directories. The exact current playtest ROM, UPS, and
-title-report hashes must match before a `final/` output is created.
+title-report approval profile must match before a `final/` output is created.
+Actual report hashes retain the selected image's provenance; the separately
+recorded comparison profile changes only the recognised compiler-image fields.
 
 Outputs are exclusive: choose a fresh directory inside the executing source
 checkout's `build/`; generated graphics compilation requires that mount.
@@ -76,8 +83,7 @@ builds, packages, and saves are untouched. The command does not rerun gameplay
 scenarios or imply hardware acceptance.
 
 This shorter command takes corrected v0 and its verified `build.json` as explicit
-prerequisites; the complete recipe above regenerates them. The pinned Docker
-image is local, not a published registry dependency. See the
+prerequisites; the complete recipe above regenerates them. See the
 [recipe specification](../specs/V1_REBUILD.md) and
 [executed rebuild checkpoint](checkpoints/V1_REBUILD.md).
 

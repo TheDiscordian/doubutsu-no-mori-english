@@ -7,7 +7,7 @@ import struct
 
 from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom,replace_dma,make_ups,apply_ups
 from build_keyboard_grid import ROOT,RAM,LIMIT,IMPORTS,HOOKS,sources,jump,patched_prefix,relocations
-from check_keyboard_assembly import IMAGE
+from toolchain import KNOWN_IMAGES
 from npc_mail_show import relocate_verified_data
 import apology_overlay as previous
 import hboard_overlay as owner_editor
@@ -65,7 +65,7 @@ def validate(native,data,reloc,report=None):
         raise ValueError('Grid layout or keycap resource changed')
     if report is not None:
         if (any(report.get(k)!=v for k,v in approved.items()) or report.get('sources')!=sources(version)
-                or report.get('imports')!=IMPORTS or report.get('toolchain_image')!=IMAGE
+                or report.get('imports')!=IMPORTS or report.get('toolchain_image') not in KNOWN_IMAGES
                 or report.get('version')!=version or report.get('ram')!=RAM
                 or report.get('previous_sha256')!=sha256(prefix)
                 or report.get('previous_relocation_sha256')!=sha256(prior_rel)

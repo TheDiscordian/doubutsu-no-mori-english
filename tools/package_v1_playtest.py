@@ -7,6 +7,7 @@ import subprocess
 from aflib import ROM_SHA256,sha256,verified_rom
 from apply_translation import apply_bundle,write_new
 from package_v0 import archive_bytes
+from toolchain import profile_sha256
 
 ROOT=Path(__file__).resolve().parents[1]
 ROM_SHA='128f19b734565e5e0c3af15aaf1fef8fb066155039404a2bfdd29efe8010bf19'
@@ -22,7 +23,7 @@ def prepare(directory,source,revision):
     patch=(directory/'animal-forest-title-preview.ups').read_bytes()
     report=json.loads((directory/'preview.json').read_text())
     report_sha=sha256(json.dumps(report,sort_keys=True,separators=(',',':')).encode())
-    if (sha256(built)!=ROM_SHA or sha256(patch)!=PATCH_SHA or report_sha!=REPORT_SHA
+    if (sha256(built)!=ROM_SHA or sha256(patch)!=PATCH_SHA or profile_sha256(report)!=REPORT_SHA
             or report['output_sha256']!=ROM_SHA or report['patch_sha256']!=PATCH_SHA
             or report['memory']['required_ram_bytes']!=0x800000
             or report['memory']['ordinary_heap_end']!=0x80400000 or len(built)!=0x2000000):
@@ -32,6 +33,7 @@ def prepare(directory,source,revision):
     manifest={'format':1,'label':LABEL,'public_release':False,'complete_v1':False,
         'source_revision':'Doubutsu no Mori (Japan), verified retail','source_sha256':ROM_SHA256,
         'output_sha256':ROM_SHA,'output_bytes':len(built),'patch_sha256':PATCH_SHA,
+        'canonical_build_report_sha256':report_sha,'reviewed_profile_sha256':REPORT_SHA,
         'cartridge_source_revision':CARTRIDGE_REVISION,'packaging_source_revision':revision,
         'required_ram_bytes':0x800000,'emulator_memory_bytes':0x800000,'expansion_pak_required':True,
         'ordinary_heap_end':0x80400000,'save_layout_changed':False,

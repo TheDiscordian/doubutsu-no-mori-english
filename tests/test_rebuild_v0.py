@@ -69,7 +69,8 @@ class BaseRecipeTests(unittest.TestCase):
             resource.parent.mkdir(parents=True)
             resource.write_bytes(b'changed')
             manifest = {'recipe': json.loads(json.dumps(rebuild.STAGES)),
-                        'sources': {}, 'inputs': {}, 'source_revision': 'test'}
+                        'sources': {}, 'inputs': {}, 'source_revision': 'test',
+                        'toolchain_image': rebuild.IMAGE}
             (output/'inputs.json').write_text(json.dumps(manifest))
             record = {'stage': 'inspect', 'command': rebuild.command(rebuild.STAGES[0], source),
                       'outputs': {'build/inspect/code.bin': rebuild.sha256(b'original')}}

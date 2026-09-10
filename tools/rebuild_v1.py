@@ -12,6 +12,8 @@ from check_keyboard_assembly import IMAGE
 from package_v0 import HARDWARE_FIX_SHA256
 from package_v1_playtest import ROM_SHA, PATCH_SHA, REPORT_SHA
 from title_assets import REL_SHA256, SYMBOLS_SHA256
+from toolchain import profile_sha256
+from setup_toolchain import verify as verify_toolchain
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE_REPORT_SHA = '5fe4d9b4731470dd9f095f88165133fc629622d6478d9e0b6dd86e65742606a0'
@@ -69,7 +71,7 @@ def read_inputs(base, rom, rel, symbols):
     image = (base/'animal-forest-halfwidth.z64').read_bytes()
     report = json.loads((base/'build.json').read_text())
     reference, labels = rel.read_bytes(), symbols.read_bytes()
-    if (sha256(image) != HARDWARE_FIX_SHA256 or canonical(report) != BASE_REPORT_SHA
+    if (sha256(image) != HARDWARE_FIX_SHA256 or profile_sha256(report) != BASE_REPORT_SHA
             or report.get('output_sha256') != HARDWARE_FIX_SHA256):
         raise ValueError('Rebuild requires the exact corrected v0 cartridge and report')
     if sha256(reference) != REL_SHA256 or sha256(labels) != SYMBOLS_SHA256:
@@ -97,7 +99,7 @@ def publish(directory, image, patch, report, *, final=False):
 
 def check_final(image, patch, report):
     from keyboard_grid_labels import CURSOR_CORRECTED_SHA
-    if (sha256(image) != ROM_SHA or sha256(patch) != PATCH_SHA or canonical(report) != REPORT_SHA
+    if (sha256(image) != ROM_SHA or sha256(patch) != PATCH_SHA or profile_sha256(report) != REPORT_SHA
             or report['memory']['required_ram_bytes'] != 0x800000
             or report['memory']['ordinary_heap_end'] != 0x80400000
             or sha256(by_vrom(image)[0x3940000].extract(image)) != CURSOR_CORRECTED_SHA):
@@ -115,10 +117,10 @@ def rebuild(inputs, output):
     files = by_vrom(image)
     editor, relocation = files[0x3940000].extract(image), files[0x3948000].extract(image)
     apology_overlay.validate(native, editor, relocation, report['apology_input']['overlay'])
-    subprocess.run(['docker', 'image', 'inspect', IMAGE], check=True,
-                   stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    compiler = verify_toolchain()
     output.mkdir(parents=True, exist_ok=False)
     manifest = {'format': 1, 'source_revision': revision, **source_state(), 'toolchain_image': IMAGE,
+                'compiler_verification': compiler,
                 'source_sha256': sha256(native), 'base_sha256': sha256(image),
                 'base_report_sha256': canonical(report), 'rel_sha256': sha256(rel),
                 'symbols_sha256': sha256(symbols), 'sources': source_hashes,
@@ -171,7 +173,8 @@ def rebuild(inputs, output):
             completed.append(row)
             print(json.dumps(row), flush=True)
         result = {'complete': True, 'stages': completed, 'output_sha256': ROM_SHA,
-                  'patch_sha256': PATCH_SHA, 'report_sha256': REPORT_SHA,
+                  'patch_sha256': PATCH_SHA, 'report_sha256': canonical(report),
+                  'reviewed_profile_sha256': REPORT_SHA,
                   'ordinary_scene_acceptance': False, 'hardware_acceptance': False,
                   'final_directory': 'final', 'clean_clone_base_translation_recipe': False}
         write_new(output/'rebuild.json', (json.dumps(result, indent=2)+'\n').encode())
