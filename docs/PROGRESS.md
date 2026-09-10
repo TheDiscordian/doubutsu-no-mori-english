@@ -32,8 +32,11 @@ combination check passes in 7.921 seconds. Native execution of the correction us
 the documented matching older checkpoint and guarded controller replacement;
 it is not relabelled as a fresh boot of the new ROM. Current [playtest notes](V1_TITLE_PLAYTEST.md)
 state the untested areas. The eighteen inspected station atlases contain no
-lettering requiring replacement. Continue the catalogue first/last labels and
-remaining decorative textures; normal hardware/playthrough feedback remains necessary.
+lettering requiring replacement. The [catalogue batch](checkpoints/CATALOGUE_ARTWORK.md)
+adds top/bottom in `build/catalogue-artwork-01`, with three passing focused
+checks; its next title combination waits for the following screen-art batch.
+Continue the mailbox heading and repayment labels, then birthday and Controller
+Pak screen artwork; normal hardware/playthrough feedback remains necessary.
 
 The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`
 adds the supplied English summer sign and its two exclusively owned red palette

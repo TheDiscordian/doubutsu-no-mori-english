@@ -7,8 +7,9 @@ Current work is the remaining Japanese artwork in the combined
 GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
 Redd signs, bulletin-board labels, and town-tune controls are installed and retain
 both Nook conversation corrections. See [current progress](PROGRESS.md) and
-[the notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md). Continue catalogue
-first/last labels and other uncovered images. Do not repeat completed title,
+[the notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md). Catalogue top/bottom
+labels are installed in the next untitled batch with three passing checks.
+Continue mailbox, repayment, birthday, and Controller Pak images. Do not repeat completed title,
 conversation, or controller probes without a relevant change. Normal player
 acceptance and remaining Japanese art are not claimed complete.
 
