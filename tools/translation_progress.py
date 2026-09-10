@@ -79,6 +79,20 @@ class CounterLedger:
             'pending_replacements': [],
         }
 
+    def add_transcribed_artwork(self, identity, text, source_image):
+        """Count verified bitmap lettering, including kanji absent from the font codec."""
+        if identity in self.rows:raise ValueError('Duplicate original text ID: '+identity)
+        japanese=lambda c: ('\u3040'<=c<='\u30ff' or '\u3400'<=c<='\u4dbf'
+            or '\u4e00'<=c<='\u9fff' or '\uff66'<=c<='\uff9d')
+        if (not isinstance(text,str) or not any(japanese(c) for c in text)
+                or any(not c.isprintable() and not c.isspace() for c in text)
+                or not isinstance(source_image,bytes) or not source_image):
+            raise ValueError('Artwork requires verified Japanese transcription and source pixels')
+        self.rows[identity]={'id':identity,'source_sha256':sha256(source_image),
+            'source_category':'japanese_static_text',
+            'source_characters':sum(not c.isspace() for c in text),
+            'replacements':[],'pending_replacements':[]}
+
     def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None,
                apology=False,accent_item=False,english_unit_omission=False,english_mail_omission=False):
         info = list(self.info)
@@ -492,6 +506,8 @@ def measure(native, built, report):
     measure_gyroid_service(ledger, native, built, report)
     from nookington_details import measure_text as measure_nookington_details
     measure_nookington_details(ledger, native, built, report)
+    from dump_artwork import measure_text as measure_dump_artwork
+    measure_dump_artwork(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

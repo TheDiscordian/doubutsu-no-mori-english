@@ -17,6 +17,12 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [dump artwork candidate](checkpoints/DUMP_ARTWORK.md) adds both exact
+GameCube English signs, retaining collection rules and all Nookington/menu/text
+work. Its focused checks, title combination, and full combined counter pass.
+The separate `build/title-dump-combined-01` is the newest artwork candidate;
+the private packaged handoff below remains unchanged. Continue seasonal props.
+
 The [Nookington detail candidate](checkpoints/NOOKINGTON_DETAILS.md) adds the
 GameCube doorway wordmark and full English clearance banner in both seasons,
 preserving the red offer and native geometry/palettes. Three focused checks,

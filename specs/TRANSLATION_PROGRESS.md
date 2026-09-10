@@ -45,6 +45,15 @@ characters each. Credit requires the complete English texture in every retained
 and actual streamed copy, plus the unchanged native texture readers and palettes.
 Extra storage copies do not add source IDs. The doorway and red offer already
 use Latin/numeric lettering and therefore contribute no Japanese source weight.
+The dump's two original seasonal signs contribute four Japanese characters each,
+including the printed weekdays. Credit requires the exact GC English design in
+the retained and actual streamed objects, unchanged native models, palette,
+seasonal readers, and collection code. Extra object copies add no source IDs.
+Verified bitmap transcriptions can contain kanji absent from the native dialogue
+font encoding. The ledger counts those Unicode source characters directly and
+binds their source-image hash, instead of inventing an encoding or dropping them.
+This route rejects empty source images and text without Japanese characters;
+the owning asset verifier still gates English installation credit.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

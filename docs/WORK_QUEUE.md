@@ -2,6 +2,12 @@
 
 ## V0 execution priority
 
+The [dump sign batch](checkpoints/DUMP_ARTWORK.md) is installed in both seasons
+with passing host, title-combination, and full counter checks. Continue fishing
+and festival props from `build/dump-artwork-01`, preserving native event behaviour.
+The six shrine atlases have no lettering to replace. Food-stall and fortune-booth
+GC geometry differs and needs explicit adaptation, not whole-atlas copying.
+
 The separate [Nookington detail batch](checkpoints/NOOKINGTON_DETAILS.md) completes
 the doorway wordmark and clearance banner in both seasons. Its host, title
 combination, and full counter checks pass. Retain it for the next combined

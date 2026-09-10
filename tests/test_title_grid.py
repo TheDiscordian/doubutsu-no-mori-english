@@ -85,6 +85,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('nookington-details-01', 'title-nookington-details-combined-01',
             '172069ba24d2f6a907006222b5a0743d34dffaa7c319b740dbba21ba8edbb9b7')
 
+    @unittest.skipUnless((ROOT/'build/title-dump-combined-01/preview.json').is_file(),
+                         'Local English dump/title candidate required')
+    def test_dump_combination_retains_complete_nookington_and_menu_work(self):
+        self.check_combination('dump-artwork-01', 'title-dump-combined-01',
+            '9f734ba89b2456e5dce7b79c6cafe33b3017dd22e8d9cec02e5eb70c1533b560')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()
