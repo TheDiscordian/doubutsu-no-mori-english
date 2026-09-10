@@ -76,7 +76,15 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
                    extended_glyphs=False, fortune_permit=None, resetti_permit=None, shop_unit_permit=None,
                    resident_word_permit=None, credits_permit=None, gyroid_default_permit=None,
-                   reserve_permit=None):
+                   reserve_permit=None, apology_permit=None):
+    if apology_permit is not None:
+        from apology_targets import validate_permit
+        validate_permit(apology_permit,original,replacement)
+        if (bank!='string' or policy!='exact' or not resident_runtime
+                or any(p is not None for p in (sequence_permit,field_permit,catchphrase_permit,
+                    animation_permit,fortune_permit,resetti_permit,shop_unit_permit,
+                    resident_word_permit,credits_permit,gyroid_default_permit,reserve_permit))):
+            raise ValueError('Apology glyph permission is limited to its exact native target')
     if reserve_permit is not None:
         if (not isinstance(reserve_permit, ReservePermit) or reserve_permit != ReservePermit()
                 or bank != 'string' or policy != 'exact'
@@ -228,7 +236,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
           and resetti_permit is None and shop_unit_permit is None and resident_word_permit is None
           and credits_permit is None and reserve_permit is None):
         raise ValueError("Translation exceeds current entry budget")
-    if bank != 'message' and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
+    if bank != 'message' and apology_permit is None and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
         raise ValueError('Two-byte message tags need explicit semantic review')
 
 

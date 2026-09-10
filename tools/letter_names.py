@@ -189,12 +189,18 @@ def verify_owned_parts(built, native, module, report=None):
                'overlay_sha256': sha256(data)} if report is None else report['overlay']
     validate(native, data, reloc, overlay, module)
     needed = allocation(len(files[TAG_VROM].extract(built))); code = files[CODE_VROM].extract(built)
+    pool_word = POOL_WORD
+    from hboard_overlay import NEW_VROM as EDITOR_VROM, APPROVED as EDITOR
+    if len(files[EDITOR_VROM].extract(built)) != EDITOR['bytes']:
+        from apology_overlay import verify_owned_parts as verify_apology, POOL_WORD as APOLOGY_POOL
+        verify_apology(built, native)
+        pool_word = APOLOGY_POOL
     if (files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata()
-            or struct.unpack_from('>I', code, POOL_PATCH-CODE_RAM)[0] != POOL_WORD
+            or struct.unpack_from('>I', code, POOL_PATCH-CODE_RAM)[0] != pool_word
             or struct.unpack_from('>I', code, 0x800C4AFC-CODE_RAM)[0] != 0x3C0E8089
             or report is not None and report.get('allocation') != needed):
         raise ValueError('Missing complete letter-editor allocation')
-    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata(), 'pool_patch': struct.pack('>I', POOL_WORD),
+    return {'owner_offset': OWNER_AT, 'owner_bytes': metadata(), 'pool_patch': struct.pack('>I', pool_word),
             'allocation': needed}
 
 

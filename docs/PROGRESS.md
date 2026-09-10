@@ -25,6 +25,16 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [sun/skull apology integration](checkpoints/APOLOGY_INPUT.md) installs both
+remaining exact GC targets and apology-only symbol editing, preserving saved
+fields and prior editors. The current combined ROM/UPS is
+`build/apology-input-pilot`. All five focused checks, twelve counter regressions,
+and eight prior editor regressions pass. Native entry/matching/key drawing passes
+in the first fixture, but complete guard/checkpoint verification is unresolved:
+the corrected retry cannot allocate its separate test workspace. The checkpoint
+records that limitation for the combined v0 smoke. Continue accented
+item names and residual general/letter text, then combined v0 gameplay/save checks.
+
 The [reserve-label integration](checkpoints/RESERVE_STRINGS.md) applies all 77
 native general reserve labels without changing selectors, saved data, or runtime
 code. Four focused checks and the selected capacity/counter/classification

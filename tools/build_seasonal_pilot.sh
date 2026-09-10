@@ -71,6 +71,10 @@ if [[ -n "${AF_LETTER_NAMES:-}" ]]; then
   letter_name_args=(--english-letter-editor-names "$AF_LETTER_NAMES")
 fi
 reserve_args=()
+apology_args=()
+if [[ -n "${AF_APOLOGY_INPUT:-}" ]]; then
+  apology_args=(--english-apology-input "$AF_APOLOGY_INPUT")
+fi
 if [[ "${AF_RESERVE_STRINGS:-0}" == 1 ]]; then
   reserve_args=(--english-reserve-strings)
 fi
@@ -113,4 +117,5 @@ exec python3 tools/build.py \
   "${house_name_args[@]}" \
   "${letter_name_args[@]}" \
   "${reserve_args[@]}" \
+  "${apology_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"

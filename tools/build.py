@@ -54,7 +54,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                        extended_font=None, extended_items=None, english_fortunes=False, english_resetti_replies=False,
                        english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
                        english_credits=False, english_gyroid_default=False, english_town_suffix=False,
-                       english_reserve_strings=False):
+                       english_reserve_strings=False, english_apology_input=None):
     if english_gyroid_default and not (runtime_module and english_runtime):
         raise ValueError('Gyroid default requires the complete English runtime')
     if english_fortunes and not runtime_module:
@@ -86,6 +86,19 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
         planned_capability(rom,replacements,planned_additions,planned_module,extended_font)
     edits = json.loads(path.read_text()) if path else []
     reserve_approvals = {}
+    apology_approvals = {}
+    if english_apology_input:
+        if not (english_resetti_replies and extended_font):
+            raise ValueError('Apology input requires the English matcher and complete font')
+        from apology_overlay import validate as validate_apology
+        validate_apology(rom,(english_apology_input/'overlay.bin').read_bytes(),
+                         (english_apology_input/'relocation.bin').read_bytes(),
+                         json.loads((english_apology_input/'overlay.json').read_text()))
+        from extended_font_cartridge import mail_capability
+        mail_capability(extended_font)
+        from apology_targets import with_candidates, TARGETS, approved
+        edits = with_candidates(rom,edits)
+        apology_approvals = {id:approved(id) for id in TARGETS}
     if english_reserve_strings:
         from reserve_strings import with_candidates, permits as reserve_permits
         edits = with_candidates(rom, edits)
@@ -155,7 +168,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                 validate_choice_candidate(edit["id"], original, checked, matches)
                 validate_actor_request_candidate(edit["id"], original, checked, matches)
                 validate_content_candidate(edit["id"], original, checked, matches)
-                validate_glyph_candidate(edit['id'], original, checked, matches, info)
+                if edit['id'] not in apology_approvals:
+                    validate_glyph_candidate(edit['id'], original, checked, matches, info)
                 validate_fragment_candidate(edit['id'], original, checked, fragment_matches,
                                             fragment_sources, info, edit.get('control_policy', 'exact'))
                 validate_entry(original, checked, info, bank.name, edit.get("control_policy", "exact"),
@@ -170,7 +184,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                resident_word_permit=word_permits.get(edit['id']),
                                credits_permit=credit_permits.get(edit['id']),
                                gyroid_default_permit=gyroid_approvals.get(edit['id']),
-                               reserve_permit=reserve_approvals.get(edit['id']))
+                               reserve_permit=reserve_approvals.get(edit['id']),
+                               apology_permit=apology_approvals.get(edit['id']))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -239,6 +254,7 @@ def main():
     parser.add_argument('--english-conversation-names', action='store_true', help='Four complete identity-based dialogue names; requires the identity text-extension variant')
     parser.add_argument('--english-house-name', action='store_true', help='Complete house-sign name with initialized eight-byte display storage')
     parser.add_argument('--english-letter-editor-names', type=Path, help='Complete letter-editor recipient names and matching header cursor')
+    parser.add_argument('--english-apology-input', type=Path, help='Complete sun/skull apology targets and scoped token-aware input')
     parser.add_argument('--english-gyroid-default', type=Path, help='Actor directory for the complete save-preserving default greeting')
     parser.add_argument('--english-hboard-editor', type=Path, help='Complete proportional owner-message editor; requires the visitor default and seasonal submenu integration')
     parser.add_argument('--english-inventory', type=Path, help='Complete inventory action labels and full ordinary item names; requires the expanded owner-editor submenu')
@@ -356,6 +372,9 @@ def main():
         parser.error('--english-letter-editor-names requires --english-mail-snapshots, --display-names, and --english-inventory')
     if args.extended_font and not (args.runtime_module and args.english_runtime):
         parser.error('--extended-font requires the resident module and English runtime')
+    if args.english_apology_input and not (args.english_letter_editor_names and args.english_hboard_editor
+                                         and args.extended_font and args.english_resetti_replies):
+        parser.error('--english-apology-input requires the complete owner/letter editors, font, and English matcher')
     if args.english_mail_snapshots and not (args.english_mail_layout and args.mail_catalog):
         parser.error('--english-mail-snapshots requires --english-mail-layout and --mail-catalog')
     if args.english_fortune_slips and not (args.runtime_module and args.english_runtime and args.english_mail_snapshots):
@@ -387,7 +406,7 @@ def main():
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
         defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits,
         english_gyroid_default=bool(args.english_gyroid_default), english_town_suffix=args.english_town_suffix,
-        english_reserve_strings=args.english_reserve_strings)
+        english_reserve_strings=args.english_reserve_strings,english_apology_input=args.english_apology_input)
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
@@ -533,6 +552,11 @@ def main():
         from letter_names import install as install_letter_names
         report['letter_editor_names'] = install_letter_names(rom, replacements, additions, relocations,
             report['runtime_module'], args.english_letter_editor_names)
+    if args.english_apology_input:
+        from apology_overlay import install as install_apology
+        from apology_targets import planned as planned_targets
+        report['apology_input'] = install_apology(rom,replacements,relocations,report['runtime_module'],args.english_apology_input)
+        report['apology_input']['targets'] = planned_targets(rom,replacements,report['runtime_module'])
     report["vrom_relocations"] = {f"{a:08X}": f"{b:08X}" for a, b in relocations.items()}
     if args.english_town_suffix:
         from town_suffix import planned
@@ -582,6 +606,9 @@ def main():
         verify_installation(output, rom, report)
         from notice_overlay import verify_installation
         verify_installation(output, rom, report['runtime_module'], report['noticeboard'])
+    if args.english_apology_input:
+        from apology_overlay import verify_installation
+        verify_installation(output,rom,report)
     args.output.mkdir(parents=True, exist_ok=True)
     (args.output / "animal-forest-halfwidth.z64").write_bytes(output)
     patch = make_ups(rom, output)

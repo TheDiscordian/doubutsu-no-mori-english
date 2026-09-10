@@ -166,7 +166,11 @@ def verify_shared_parts(built, native):
             or files[NEW_VROM].index != originals[EDITOR].index
             or files[NEW_RELOCATION].index != files[NEW_VROM].index+1):
         raise ValueError('Missing complete owner-editor DMA ownership')
-    validate(native, files[NEW_VROM].extract(built), files[NEW_RELOCATION].extract(built))
+    data = files[NEW_VROM].extract(built)
+    if len(data) != APPROVED['bytes']:
+        from apology_overlay import verify_owned_parts
+        return verify_owned_parts(built, native)
+    validate(native, data, files[NEW_RELOCATION].extract(built))
     if (files[HBOARD].extract(built) != patch_window(native)
             or files[HBOARD_RELOC].extract(built) != originals[HBOARD_RELOC].extract(native)):
         raise ValueError('Missing complete owner-message window bridge')

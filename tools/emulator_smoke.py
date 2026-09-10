@@ -1066,6 +1066,12 @@ def main():
                     raise ValueError('Resetti reply probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_resetti_replies'],record))
+            if 'test_apology_input' in action:
+                from apology_input_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Apology input probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_apology_input'],record))
             if 'test_fortunes' in action:
                 from fortune_smoke import exercise
                 if not (out/'test.bs1').is_file():

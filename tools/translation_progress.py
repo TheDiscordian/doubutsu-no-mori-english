@@ -79,13 +79,18 @@ class CounterLedger:
             'pending_replacements': [],
         }
 
-    def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None):
+    def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None,
+               apology=False):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
             info[0x74] = info[0x75] = (2, 0)
         if mail_glyphs and not mail: raise ValueError('Mail glyph credit requires a verified mail route')
-        details = classify(data, info, extended_glyphs=identity.startswith('message:'),mail_glyphs=mail_glyphs)
+        if apology:
+            from apology_targets import TARGETS
+            if identity not in TARGETS or data!=TARGETS[identity][2] or route!='apology_input':
+                raise ValueError('Apology credit requires an exact installed symbol target')
+        details = classify(data, info, extended_glyphs=identity.startswith('message:') or apology,mail_glyphs=mail_glyphs)
         if (details['category'] in ENGLISH_CATEGORIES
                 and details['non_whitespace_static_characters']):
             replacement = {'route': route, 'sha256': sha256(data)}
@@ -139,6 +144,9 @@ def measure(native, built, report):
     if report.get('reserve_strings'):
         from reserve_strings import verify_installation
         verify_installation(built, native, report)
+    if report.get('apology_input'):
+        from apology_overlay import verify_installation
+        verify_installation(built,native,report)
     if report.get('text_extension'):
         from text_extension import verify_installation
         verify_installation(built, native, report)
@@ -180,6 +188,8 @@ def measure(native, built, report):
             identity = f'{bank.name}:{number:04X}'
             ledger.add(identity, source)
             ledger.credit(identity, entries[number], 'native_bank')
+            if report.get('apology_input') and identity in report['apology_input']['targets']:
+                ledger.credit(identity,entries[number],'apology_input',apology=True)
 
     module = report.get('runtime_module')
     if module:

@@ -32,11 +32,11 @@ Other general strings do not gain capacity. The general-string data relocation
 to `02600000` is shared with the optional fortune integration, preserving the
 native table, entry count, loader staging, and all caller copy lengths.
 
-This completes the rude-reply dictionary and its matcher, not the entire
-apology editor. Fourteen requested apology targets already have English
-candidates; `048E/0491` still need sun/skull input, display, and matching
-integration. No replacement wording or unavailable keyboard character is
-silently substituted. The normal editor and its saved formats remain unchanged.
+This integration supplies the rude-reply dictionary and its matcher. The
+[apology input extension](APOLOGY_INPUT.md) supplies the remaining two requested
+targets, `048E/0491`, with actual sun/skull input and display. All sixteen targets
+then retain exact GC wording. No replacement wording or unavailable keyboard
+character is silently substituted. Saved formats remain unchanged.
 
 ## Verified scope
 
