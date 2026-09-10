@@ -17,6 +17,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [fortune-booth candidate](checkpoints/FORTUNE_BOOTH_ARTWORK.md) installs the
+complete matching GC table inside the original native allocation, with unchanged
+event code and shrine. Three focused checks, the title combination, and the
+full counter pass. `build/title-fortune-booth-combined-01` is the newest separate
+artwork candidate. Continue the festival stall and remaining seasonal props;
+the packaged playtest stays unchanged during this artwork batch.
+
 The [fishing artwork candidate](checkpoints/FISHING_ARTWORK.md) matches GC's
 Japanese barrel-name and headquarters-placard omissions while preserving the
 event and all remaining geometry. Three focused checks, the title combination,

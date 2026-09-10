@@ -60,6 +60,12 @@ GC design omits the Japanese barrel name and headquarters placard; credit is an
 explicit verified artwork omission, not a fabricated English string. The exact
 textures, remaining geometry, two removed triangle pairs, and native readers
 must all match. Unreferenced Japanese atlas pixels alone do not withhold credit.
+The New Year fortune booth contributes one four-character bitmap label. Its
+complete matching GC model omits that label, with explicit omission credit only
+after verifying the entire converted model, all six donor bindings, bounded
+native graphics, unchanged actor, and both installed object copies. The two
+seasons reuse one original ID. Uncertain decorative shapes receive no invented
+transcription or character weight.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

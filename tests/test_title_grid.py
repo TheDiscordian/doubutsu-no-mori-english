@@ -97,6 +97,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('fishing-artwork-01', 'title-fishing-combined-01',
             'e33f2ead92de74a45a45db22cd8675ea271950d52ed6901f949acc4efbeb7f1e')
 
+    @unittest.skipUnless((ROOT/'build/title-fortune-booth-combined-01/preview.json').is_file(),
+                         'Local fortune-booth/title candidate required')
+    def test_fortune_booth_combination_retains_all_prior_artwork_menu_and_title_work(self):
+        self.check_combination('fortune-booth-artwork-01', 'title-fortune-booth-combined-01',
+            'a4e6f42db32af3031b630decfd73ea0c42b6cb910d02b15a6a4d9eb9c5acbf7a')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()
