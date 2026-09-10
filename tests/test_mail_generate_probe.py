@@ -94,13 +94,13 @@ class MailGenerateProbeTests(unittest.TestCase):
             with self.subTest(base=base),self.assertRaises(ValueError):
                 relocate(self.code,self.report,self.module,base)
 
-    @unittest.skipUnless((ROOT/'build/mail-generation-probe/generate.json').is_file(),
+    @unittest.skipUnless((ROOT/'build/mail-generation-runtime-followup-01/generate.json').is_file(),
                          'Local native generation build required')
     def test_current_native_artifact_has_verified_imports_and_exported_entries(self):
-        directory = ROOT/'build/mail-generation-probe'
+        directory = ROOT/'build/mail-generation-runtime-followup-01'
         code = (directory/'generate.bin').read_bytes()
         report = json.loads((directory/'generate.json').read_text())
-        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
+        module = json.loads((ROOT/'build/notice-seasonal-runtime/module.json').read_text())
         validate(code,report,module)
         for base in (MODULE_RAM+RESERVATION,0x80200000,0x80300000):
             output = relocate(code,report,module,base)

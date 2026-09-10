@@ -13,6 +13,11 @@ ordinary-space marker fix (V1-19). Cross-version
 save compatibility is preferred, not mandatory; loading evidence and unchanged
 saved formats are distinct. The original save remains preserved locally.
 
+The [bounded ordinary-save attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
+does not reach the gyroid menu; saving and cold restart remain unverified.
+Its navigation retry limit is reached. Original and isolated seed-save checksums
+pass; do not repeat this setup or count emulator checkpoints as game saves.
+
 The current private playtest is **V1RC4**, with local ROM
 `build/v1rc4/Animal Forest English V1RC4.z64` and patch-only archive
 `build/v1rc4/V1RC4-patch.zip`. The cartridge matches `v1rc4-rebuild-01` and the
@@ -78,6 +83,10 @@ checks, retaining resource/source guards and the native herabuna correction.
 The [system-letter/glyph follow-up](checkpoints/SYSTEM_LETTER_FIXTURE_FOLLOWUP.md)
 closes twelve further historical errors with 33 passing focused checks and six
 fresh source-built creator variants. The playable ROM and saves are unchanged.
+The [receipt/probe fixture follow-up](checkpoints/MAIL_RECEIPT_PROBE_FIXTURES.md)
+closes two further errors and the shared-word-profile assertion failure with
+14 passing focused checks. It adds a positive matching-profile check and a
+fresh generation-only test build, without changing the playable cartridge.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the

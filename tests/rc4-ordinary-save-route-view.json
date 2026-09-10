@@ -1,0 +1,6 @@
+[
+  {"wait": 2},
+  {"capture": "route.png"},
+  {"snapshot_player": true},
+  {"save_state": true}
+]

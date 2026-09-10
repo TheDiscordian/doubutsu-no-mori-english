@@ -14,6 +14,11 @@ preferred, not mandatory. Resume the remaining artwork review and scoped
 regression-fixture follow-up; RC4 hardware appearance and manual save/restart
 remain unverified. Keep new concrete human defects ahead of speculative work.
 
+The [ordinary-save navigation batch](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
+has reached its setup retry limit without opening the gyroid menu. Do not replay
+its timed route. Retain the explicit unverified save/restart status and recorded
+next useful interaction check; emulator checkpoints are not game saves.
+
 The V1-17/V1-18 follow-up is implemented in the packaged
 [V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
@@ -61,7 +66,12 @@ do not establish acceptance of every reported case. Next:
   closes twelve more historical errors with 33 passing checks. Its six current
   creator variants and verified combined-cartridge selections remain available;
   do not repeat this completed batch. Later letter/probe/actor fixtures and the
-  native-species mismatch test retain their separately recorded unresolved status.
+  native-species accounting test retain their separately recorded unresolved status.
+  The [receipt/probe follow-up](checkpoints/MAIL_RECEIPT_PROBE_FIXTURES.md) closes
+  two further errors and the native-species word-profile failure with 14 passing
+  checks. Its positive matching-profile assertion and fresh generation fixture
+  retain all source guards. Do not repeat these completed checks for unchanged
+  code or infer that other generation variants are repaired.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

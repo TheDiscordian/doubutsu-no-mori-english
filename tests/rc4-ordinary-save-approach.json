@@ -1,0 +1,17 @@
+[
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"snapshot_submenu": true},
+  {"key": "f", "duration": 0.4},
+  {"wait": 0.3},
+  {"key": "w", "duration": 0.5},
+  {"wait": 0.3},
+  {"snapshot_player": true},
+  {"key": "a", "duration": 0.08},
+  {"wait": 4},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

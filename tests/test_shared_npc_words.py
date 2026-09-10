@@ -16,7 +16,7 @@ from fortune_strings import STRING_RELOCATION, source_entries
 from mail_catalog import VROM as CATALOG_VROM, install as install_catalog
 from mail_view_patch import VROM as READER_VROM, RELOC_VROM, install as install_reader
 from native_species import NATIVE_ID, NATIVE_SHA256, DONOR, ENGLISH, SOURCE
-from npc_mail_capture import HOOKS, DESIGN_WORD_HASH
+from npc_mail_capture import HOOKS, DESIGN_WORD_HASH, WORD_HASH
 from npc_mail_delivery import CREATOR_CALL, FAILURE_BRANCH, ARGUMENT_MOVE
 from npc_mail_loader import VROM as CREATOR_VROM, CONFIG_OFFSET, install as install_creator
 from npc_mail_loader_test_scenario import scenario as loader_scenario
@@ -24,7 +24,7 @@ from npc_mail_words import unpack_words
 from resident_words import candidates as resident_candidates, SPEC
 from runtime_module import MODULE_VROM, add_runtime_module, module_command_info
 from shared_npc_words import (IDS, IDENTITIES, ORDINARY_BASES, ENTRY_REFERENCES,
-    candidates, validated_values, verify_values, caller_evidence, install)
+    candidates, validated_values, verify_values, caller_evidence, verify_consumers, install)
 from textbanks import Bank, banks
 from textcodec import encode
 from resident_word_smoke import random_cases, RANDOM_BASES
@@ -82,6 +82,19 @@ class SharedWordTests(unittest.TestCase):
 
     def bank(self, replacements):
         return Bank('string', 0xD16000, 0xD18000, replacements[0xD16000], replacements[0xD18000])
+
+    def test_shared_bank_rejects_mismatched_valid_creator_word_profile(self):
+        # Exercise the current source-built composition before later notice
+        # configuration, not a historical cartridge rejected by source guards.
+        replacements, additions, module = self.fixture()
+        self.assertEqual(module['npc_mail_loader']['overlay']['word_sha256'], DESIGN_WORD_HASH)
+        before = (dict(replacements), dict(additions), deepcopy(module))
+        verify_consumers(self.rom, replacements, additions, module,
+                         expected_word_hash=DESIGN_WORD_HASH)
+        with self.assertRaisesRegex(ValueError, 'matching installed NPC word profile'):
+            verify_consumers(self.rom, replacements, additions, module,
+                             expected_word_hash=WORD_HASH)
+        self.assertEqual((replacements, additions, module), before)
 
     def reject(self, fixture, edits=None):
         before = deepcopy(fixture)

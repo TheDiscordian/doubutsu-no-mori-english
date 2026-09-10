@@ -23,7 +23,7 @@ from runtime_module import module_command_info
 from test_retail import ROM_PATH
 
 
-@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/runtime-module/module.json').is_file(),
+@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/notice-seasonal-runtime/module.json').is_file(),
                      'Local original ROM and current resident module required')
 class PellyReceiptTests(unittest.TestCase):
     @classmethod
@@ -31,7 +31,7 @@ class PellyReceiptTests(unittest.TestCase):
         cls.rom = ROM_PATH.read_bytes()
         cls.files = by_vrom(cls.rom)
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.rom,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.rom,cls.base,ROOT/'build/notice-seasonal-runtime')
         grading_install(cls.rom,cls.base,cls.additions,cls.module,ROOT/'build/mail-grading')
         npc_install(cls.rom,cls.base,cls.additions,cls.module)
 

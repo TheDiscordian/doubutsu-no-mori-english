@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"key": "g", "duration": 0.18},
+  {"wait": 0.2},
+  {"key": "s", "duration": 0.2},
+  {"wait": 0.2},
+  {"key": "w", "duration": 0.025},
+  {"wait": 0.2},
+  {"snapshot_player": true},
+  {"key": "a", "duration": 0.08},
+  {"wait": 3},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

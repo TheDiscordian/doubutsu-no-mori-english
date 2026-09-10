@@ -17,7 +17,7 @@ from native_species import NATIVE_ID, NATIVE_SHA256, DONOR, ENGLISH, correct_wor
 from npc_mail_capture import WORD_HASH, DESIGN_WORD_HASH, verified_resources, validate, word_guard_offset
 from npc_mail_words import prepare, unpack_words, pack_words
 from runtime_module import module_command_info
-from shared_npc_words import validated_values, verify_consumers
+from shared_npc_words import validated_values
 from textbanks import Bank, banks
 from textcodec import encode, tokenize
 
@@ -113,21 +113,6 @@ class NativeSpeciesInstallationTests(unittest.TestCase):
         bad = {**self.approval, 'overlay_sha256': sha256(bad_image)}
         with self.assertRaisesRegex(ValueError, 'initializer rejects'):
             validate(bad_image, self.reloc, bad, self.module)
-
-    def test_shared_bank_rejects_mismatched_valid_creator_word_profile(self):
-        original_files, current_files = by_vrom(self.native), by_vrom(self.built)
-        replacements = {v: f.extract(self.built) for v, f in current_files.items() if v in original_files}
-        additions = {v: f.extract(self.built) for v, f in current_files.items() if v not in original_files}
-        # Full construction already passes the matching profile before later
-        # notice configuration is installed. Verify the actual current creator;
-        # a mismatched bank must fail before the later-stage configuration check.
-        validate(self.image, self.reloc, self.approval, self.module)
-        self.assertEqual(self.module['npc_mail_loader']['overlay']['word_sha256'], DESIGN_WORD_HASH)
-        before = (dict(replacements), dict(additions), deepcopy(self.module))
-        with self.assertRaisesRegex(ValueError, 'matching installed NPC word profile'):
-            verify_consumers(self.native, replacements, additions, self.module, expected_word_hash=WORD_HASH)
-        self.assertEqual((replacements, additions, self.module), before)
-        self.assertEqual(self.report['shared_npc_words']['word_resource_sha256'], DESIGN_WORD_HASH)
 
     def test_only_read_only_articles_word_data_and_bound_digest_change_in_creator(self):
         old = ROOT/'build/resolved-items-creator'
