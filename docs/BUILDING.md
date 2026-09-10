@@ -25,6 +25,36 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Complete post-v0 artwork recipe
 
+To regenerate the base translation and then its v1 layers without any retained
+build outputs:
+
+```sh
+make complete V0_OUT=build/complete-rebuilt
+```
+
+The base recipe creates an isolated source checkout with an empty `build/`,
+copies the three verified inputs listed above, and clones the pinned local
+reference sources. It regenerates all resources and compiles all overlays before
+assembling corrected v0. The second command runs the post-v0 recipe from inside
+that checkout, using the freshly generated base and GC resources. Final v1 files
+are under `build/complete-rebuilt/source/build/v1-complete/final/`. Both recipes refuse existing output
+directories. No gameplay scenarios run, and no old artifact or user save changes.
+
+The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
+clean rebuild and exact corrected-v0 ROM, patch, and report match. The
+[complete pipeline record](checkpoints/V1_REBUILD.md) also verifies all twenty-six
+v1 stages from that freshly generated base, matching the supplied playtest. The local
+toolchain image and pinned source checkouts are still setup prerequisites; this
+is not a published portable compiler image or permission to distribute inputs.
+
+To rebuild just the base, use `python3 tools/rebuild_v0.py --output <fresh-directory>`.
+An optional `--through <stage>` records a bounded successful prefix; `--resume`
+continues it only after checking inputs, sources, commands, and completed outputs.
+Failed-stage evidence is preserved and is not silently overwritten.
+
+If the corrected v0 and extracted GC inputs are already available, rebuild only
+the twenty-six post-v0 layers:
+
 ```sh
 python3 tools/rebuild_v1.py --output build/v1-rebuilt
 ```
@@ -36,16 +66,18 @@ pinned source/symbol files. It does not need retained intermediate artwork ROMs
 or old compiled overlay directories. The exact current playtest ROM, UPS, and
 title-report hashes must match before a `final/` output is created.
 
-Outputs are exclusive: choose a fresh directory. Intermediate files are named
+Outputs are exclusive: choose a fresh directory inside the executing source
+checkout's `build/`; generated graphics compilation requires that mount.
+Unsupported output locations are rejected before compilation. Intermediate files are named
 `replay-only` and are not playtest handoffs; the recipe requires the corrected
 keyboard in the final cartridge. Input/source identities, completed stage
 hashes/timings, and failure evidence remain in the output folder. Existing
 builds, packages, and saves are untouched. The command does not rerun gameplay
 scenarios or imply hardware acceptance.
 
-This is not yet a clean-clone recipe for the base translation: the corrected
-v0 and its verified `build.json` are explicit prerequisites. The pinned Docker
-image is currently local, not a published registry dependency. See the
+This shorter command takes corrected v0 and its verified `build.json` as explicit
+prerequisites; the complete recipe above regenerates them. The pinned Docker
+image is local, not a published registry dependency. See the
 [recipe specification](../specs/V1_REBUILD.md) and
 [executed rebuild checkpoint](checkpoints/V1_REBUILD.md).
 
@@ -77,8 +109,9 @@ python3 tools/build_classic_letters.py
 python3 tools/classic_letters.py
 ```
 
-This is an incremental recipe, not a clean-clone build command: its retained
-predecessors and locally extracted references are required. The classic-letter
+These two commands are incremental: their retained predecessors and locally
+extracted references are required. The complete recipe above regenerates those
+dependencies from source. The classic-letter
 checkpoint links the preceding recipes. All inventoried Japanese phrases have
 installed English replacements or verified English rendering routes; structural
 zero-filled slots stay untouched. The [combined v0 check](checkpoints/V0_SMOKE.md)

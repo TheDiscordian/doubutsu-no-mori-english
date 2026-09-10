@@ -1,6 +1,6 @@
 # Doubutsu no Mori English 🌲
 
-English translation framework for the Japanese Nintendo 64 release of
+English translation project for the Japanese Nintendo 64 release of
 **Doubutsu no Mori**, targeting original hardware.
 
 This project is under development. It is not a complete translation or a
@@ -30,10 +30,14 @@ obtained source ROM is required to build; ROMs and extracted assets stay local.
 
 ## Priorities
 
-1. Reproducible extraction and builds with input verification.
-2. Halfwidth Latin rendering with safe control codes and buffer limits.
-3. Complete text inventory and explicit translation/review status.
-4. Translation, layout review, regression testing, and hardware validation.
+1. Fix concrete playtest bugs, prioritising crashes, saves, and progression.
+2. Review remaining artwork and polish English layout without changing GC intent.
+3. Complete ordinary gameplay and original-hardware acceptance through playtesting.
+4. Prepare the portable public toolchain and patch-only release with provenance review.
+
+`make complete` rebuilds the base and v1 layers from clean source checkouts and
+verified local inputs, without old generated resources or translation ROMs. The
+[build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
 
 Original project tooling is MIT licensed. Third-party material retains its own
 terms; the project licence does not cover Nintendo assets or legacy work.

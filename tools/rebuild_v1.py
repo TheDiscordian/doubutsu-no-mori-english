@@ -77,6 +77,15 @@ def read_inputs(base, rom, rel, symbols):
     return native, image, report, reference, labels
 
 
+def checked_output(path):
+    output = path.resolve()
+    if path.is_symlink() or output.exists():
+        raise ValueError('output must be a fresh directory; previous builds are preserved')
+    if not output.is_relative_to(ROOT.resolve()/'build'):
+        raise ValueError('output must be inside this source checkout\'s build/ for generated graphics compilation')
+    return output
+
+
 def publish(directory, image, patch, report, *, final=False):
     directory.mkdir(parents=True, exist_ok=False)
     name = 'animal-forest-title-preview' if final else 'replay-only'
@@ -96,6 +105,7 @@ def check_final(image, patch, report):
 
 
 def rebuild(inputs, output):
+    output = checked_output(output)
     native, image, report, rel, symbols = inputs
     source_hashes = source_inventory()
     revision = subprocess.run(['git', 'rev-parse', 'HEAD'], cwd=ROOT, check=True,
@@ -180,9 +190,11 @@ def main():
     p.add_argument('--symbols', type=Path, default=ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     p.add_argument('--output', type=Path, default=ROOT/'build/v1-rebuilt-01')
     args = p.parse_args()
-    if args.output.exists():
-        p.error('output must be a fresh directory; previous builds are preserved')
-    result = rebuild(read_inputs(args.base, args.rom, args.rel, args.symbols), args.output.resolve())
+    try:
+        output = checked_output(args.output)
+    except ValueError as error:
+        p.error(str(error))
+    result = rebuild(read_inputs(args.base, args.rom, args.rel, args.symbols), output)
     print(json.dumps({'output': str(args.output/'final'), 'complete': result['complete']}))
 
 

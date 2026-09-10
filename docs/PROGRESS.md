@@ -29,10 +29,13 @@ Existing ROMs, packages, and the user's saves remain untouched.
 The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 26 artwork,
 screen, keyboard, and title stages without retained intermediate artwork ROMs
 or precompiled overlay directories. Its final ROM/UPS/report match package `03`.
-The corrected v0 and source inputs remain prerequisites; the clean-clone base
-translation and public toolchain setup recipes remain release preparation work.
-The [isolated base recipe](checkpoints/V0_REBUILD.md) is implemented and awaiting
-its clean-checkout execution; its command list alone is not rebuild evidence.
+The [isolated base recipe](checkpoints/V0_REBUILD.md) also passes all sixty-one
+stages from an empty build directory, regenerating corrected v0 from clean source
+checkouts and the three supplied inputs. Its final ROM/UPS/report exactly match
+corrected v0. Public toolchain setup remains release preparation work.
+The complete source-to-v1 run also passes all twenty-six post-v0 stages inside
+that clean checkout, matching the supplied v1 ROM/UPS/report. See the
+[combined rebuild evidence](checkpoints/V1_REBUILD.md).
 
 ## Implemented scope
 

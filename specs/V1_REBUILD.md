@@ -6,9 +6,9 @@ REL and pinned symbols. It does not read any retained intermediate artwork ROM
 or compiled grid/title/birthday directory. Native drawing commands and all three
 new overlays are compiled in the pinned local Docker image.
 
-This is a complete post-v0 recipe, not yet a clean-clone recipe for constructing
-the base translation itself. The corrected v0 input and its source-bound report
-remain explicit prerequisites. Do not imply that shipping a patch ZIP publishes
+This is the post-v0 portion of the complete source build. The
+[base recipe](V0_REBUILD.md) regenerates its corrected v0 input and source-bound
+report from an empty build directory. Do not imply that shipping a patch ZIP publishes
 its source inputs, makes the Docker image available publicly, or resolves
 third-party redistribution terms.
 
@@ -19,6 +19,9 @@ definitions: version one exists only to replay exact intermediate hashes, and
 version two must replace it before the final result can pass. The two historical
 source differences are reconstructed in the ignored compiler directory; the
 current checked-in keyboard remains corrected. No existing file is overwritten.
+The output belongs inside the executing checkout's `build/`, because generated
+stall commands compile through the read-only source mount. Reject an existing,
+redirected, or outside-build output before reading inputs or starting compilation.
 
 Replay the existing guarded builders in order: shops, map, inventory, clock,
 collections, grid, Nookington, SOLD OUT/hints, police, Redd, corrected cursor,

@@ -5,8 +5,9 @@ GC_DISC ?= local/gamecube/Animal Crossing (USA, Canada).ciso
 AF_XVFB ?= Xvfb
 SMOKE_OUT ?= build/smoke-pilot
 V1_OUT ?= build/v1-rebuilt
+V0_OUT ?= build/v0-rebuilt
 
-.PHONY: test inspect inventory halfwidth opening references gamecube candidates pilot smoke v1
+.PHONY: test inspect inventory halfwidth opening references gamecube candidates pilot smoke v1 complete
 test:
 	$(PYTHON) -m unittest discover -s tests -v
 
@@ -42,3 +43,7 @@ smoke:
 
 v1:
 	$(PYTHON) tools/rebuild_v1.py --rom "$(ROM)" --output "$(V1_OUT)"
+
+complete:
+	$(PYTHON) tools/rebuild_v0.py --output "$(V0_OUT)"
+	$(PYTHON) "$(V0_OUT)/source/tools/rebuild_v1.py" --output "$(V0_OUT)/source/build/v1-complete"

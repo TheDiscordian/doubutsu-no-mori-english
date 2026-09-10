@@ -44,6 +44,25 @@ class RecipeTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             recipe.check_final(b'wrong cartridge', b'wrong patch', {})
 
+    def test_generated_graphics_output_must_be_inside_checkout_build_directory(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)/'source'
+            root.mkdir()
+            with patch.object(recipe, 'ROOT', root):
+                good = root/'build/new'
+                self.assertEqual(recipe.checked_output(good), good)
+                for path in (root/'unignored', Path(temporary)/'outside'):
+                    with self.assertRaisesRegex(ValueError, 'inside this source checkout'):
+                        recipe.checked_output(path)
+                    self.assertFalse(path.exists())
+                good.mkdir(parents=True)
+                with self.assertRaisesRegex(ValueError, 'fresh directory'):
+                    recipe.checked_output(good)
+                redirected = root/'build/link'
+                redirected.symlink_to(Path(temporary)/'missing')
+                with self.assertRaisesRegex(ValueError, 'fresh directory'):
+                    recipe.checked_output(redirected)
+
     def test_source_inventory_binds_recipe_and_records_uncommitted_state(self):
         inventory = recipe.source_inventory()
         self.assertEqual(inventory['tools/rebuild_v1.py'], sha256((ROOT/'tools/rebuild_v1.py').read_bytes()))
