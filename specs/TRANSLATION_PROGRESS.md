@@ -4,6 +4,11 @@ Run `python3 tools/translation_progress.py` from the repository for the quick
 overall text-replacement approximation. It selects the newest completed ROM
 build and rereads its actual contents. `--build <directory>/build.json` selects
 a particular build. Hash mismatches fail instead of reporting stale results.
+Reviewed post-v0 fixes/artwork use exact cartridge/report pairs in
+`post_v0_progress.py` for compatibility with the unchanged whole-cartridge
+letter-verification chain. Register a new pair only after retained-resource
+checks pass. Current installed-reader checks still inspect the current ROM;
+unknown builds or modified reports fail instead of inheriting prior credit.
 
 The single percentage is the original Japanese text volume with its English
 replacement applied, divided by the total inventoried original Japanese text volume. Weight
@@ -16,6 +21,10 @@ special-character names, catchphrases, letter headers/bodies/footers, embedded
 name-entry prompts, keyboard labels, 39 embedded inventory action-label records,
 thirteen category/present/question records, and eight inventory mail/quest
 description records (including the canonical Museum spelling).
+Four [clock-screen records](TIME_SETTING_ENGLISH.md) also share the inventory,
+including their original Japanese date/time units. Credit requires the exact
+installed owner, relocation, reader lengths, coordinates, and glyph advances.
+The numeric date/time composition replaces those units without omitting fields.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

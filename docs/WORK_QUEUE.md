@@ -2,12 +2,13 @@
 
 ## V0 execution priority
 
-The [screen artwork checkpoint](checkpoints/SCREEN_ARTWORK.md) records the
-installed map/acre and inventory headings in `build/inventory-artwork-02`,
-with all twelve focused artwork checks passing. Continue the time-setting
-owner's four embedded Japanese strings and their English display integration;
-retain the original time/RTC and save logic. Add the newly identified records
-to the shared applied-text inventory when connecting their English display.
+The [clock checkpoint](checkpoints/TIME_SETTING.md) records the combined English
+clock/map/inventory/shop candidate in `build/time-setting-01`. Its four embedded
+Japanese records have installed English and aligned numeric values, with native
+time/RTC and save logic retained. Five focused clock checks and sixteen counter
+regressions pass; the full combined counter accepts the actual current cartridge.
+Continue the Insects/Fish collection headings, then remaining signs/buildings
+and title/keyboard integration.
 
 The [shop artwork checkpoint](checkpoints/BUILDING_ARTWORK.md) records twelve
 installed summer/winter textures and five passing focused checks. Continue

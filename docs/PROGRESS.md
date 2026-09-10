@@ -17,14 +17,23 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [English clock candidate](checkpoints/TIME_SETTING.md) at
+`build/time-setting-01` installs "Adjust the clock.", "OK", and aligned
+`20YY-MM-DD` / `HH:MM` fields. Native selection, time/RTC operations, save layout,
+and allocations remain unchanged. Five focused checks and sixteen counter
+regressions pass; the full combined counter runs successfully on this candidate.
+The four clock records join the shared inventory with installed-reader
+verification. Continue the collection-page Insects/Fish headings, then remaining
+signs/buildings and title/keyboard integration. Ordinary screen/hardware checks
+remain pending; the corrected v0 handoff stays separate.
+
 The [combined map/inventory artwork candidate](checkpoints/SCREEN_ARTWORK.md)
 at `build/inventory-artwork-02` installs the GameCube TOWN MAP/Acre layout and
 Items/Letters/Bells headings, retaining all shop art, conversation fixes,
 Shrine wording, and earlier English. Twelve focused artwork checks pass,
 including compiled native commands and complete resource/patch reconstruction.
-Ordinary screen appearance/navigation remains unverified. Continue the
-time-setting screen's embedded Japanese instructions and date/time labels;
-the checkpoint records the exact native owner, artwork, strings, and renderer.
+Ordinary screen appearance/navigation remains unverified. The clock candidate
+retains this complete batch; its checkpoint records the next artwork bindings.
 
 The [shop artwork candidate](checkpoints/BUILDING_ARTWORK.md) imports twelve
 GameCube textures for Nook's Cranny, Nook 'n' Go, and Nookway in both seasons.

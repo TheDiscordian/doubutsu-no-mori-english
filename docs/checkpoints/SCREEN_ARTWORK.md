@@ -53,7 +53,11 @@ evidence applies to the retained, unchanged conversation code. Normal screen
 appearance/navigation remains an ordinary emulator/hardware check to combine
 with the next completed screen batch.
 
-## Next: time-setting screen
+## Time-setting source investigation
+
+The [clock checkpoint](TIME_SETTING.md) records its implemented English display,
+combined candidate, passing focused checks, and remaining collection headings.
+The native boundaries below are retained as the source record.
 
 The native time-setting owner is submenu index three, VROM `0078AE30`, linked
 RAM `808831A0`, 4,272 bytes, SHA-256

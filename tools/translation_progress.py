@@ -166,6 +166,9 @@ def measure(native, built, report):
         raise ValueError('Build report does not match the source and output ROMs')
     accent_names={}
     accent_built,accent_report=built,report
+    if report.get('first_job_progression'):
+        from post_v0_progress import predecessor
+        accent_built,accent_report=predecessor(built,report)
     empty_units=()
     if accent_report.get('classic_letters'):
         from classic_letters import verify_installation
@@ -474,6 +477,8 @@ def measure(native, built, report):
     measure_stall_labels(ledger, native, built, report)
     from map_labels import measure_labels as measure_map_labels
     measure_map_labels(ledger, native, built, report)
+    from time_setting import measure_text as measure_clock_text
+    measure_clock_text(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
