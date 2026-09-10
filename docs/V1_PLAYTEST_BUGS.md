@@ -9,6 +9,22 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 
 ## Open findings
 
+The V1RC1 hardware follow-up takes priority. The user accepts the keyboard's
+sound feedback, but reports the background as visibly broken. The earlier
+partial drawing test does not establish correct corner sampling or appearance.
+Preserve the supplied V1RC1 and saves while building a separate correction.
+
+| ID | V1RC1 follow-up | Status |
+| --- | --- | --- |
+| V1-13 | Player selection retains an option resembling `はじまて` | Actual `はじめて` reader now copies complete GC `I'm new`; focused relocation checks pass, hardware recheck pending |
+| V1-14 | Keyboard corners are disjointed/flipped, hints escape the bottom-right, and two symbol pages are mostly empty | Rebind the actual GC panel geometry/UVs, contain hints, and combine supported symbols into one page; sound feedback accepted |
+| V1-15 | Two Japanese currency characters remain after the shop cash amount | Separate `ベル` image replaced with exact GC `Bells`; amount/heading retained, hardware recheck pending |
+| V1-16 | Idle `pm` has a vertical line of stray pixels below the `m` | PM wraps its p descender at the right edge; compiled clamp correction installed, hardware recheck pending |
+
+The three text/HUD corrections are in the separate
+[follow-up batch](checkpoints/RC1_TEXT_HUD_FIX.md). They are not yet the combined
+keyboard follow-up or a new release candidate.
+
 | ID | Finding | Status |
 | --- | --- | --- |
 | V1-01 | Press Start shows corrupt graphics on first boot and return | Corrected linear source tiles installed in fix build 01; hardware recheck pending |

@@ -2,6 +2,15 @@
 
 ## Builds
 
+The V1RC1 hardware follow-up takes immediate priority. Three new findings have
+focused corrections in `build/v1rc1-text-hud-fix-01`: the complete GC `I'm new`
+player option, the separate shop `Bells` unit, and PM texture-edge clamping.
+Four focused tests and full patch reconstruction pass. The
+[checkpoint](checkpoints/RC1_TEXT_HUD_FIX.md) records exact hashes and limits.
+Keyboard corner/hint layout and symbol-page consolidation remain in progress;
+the user accepts its sound feedback. Preserve V1RC1 until the combined follow-up
+is ready. This partial batch is not another completed release candidate.
+
 The current private playtest is **V1RC1**, with local ROM
 `build/v1rc1/Animal Forest English V1RC1.z64` and patch-only archive
 `build/v1rc1/V1RC1-patch.zip`. The standalone archived patcher passes, and the

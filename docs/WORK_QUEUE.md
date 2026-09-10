@@ -2,6 +2,13 @@
 
 ## Next work
 
+The V1RC1 hardware follow-up V1-13 through V1-16 in the
+[bug list](V1_PLAYTEST_BUGS.md) is the immediate implementation priority:
+first-time-player wording, GC keyboard panel/corner and hint layout, a single
+supported-symbol page, shop currency units, and idle AM/PM stray pixels.
+Keyboard sound feedback is accepted. Pause unrelated artwork discovery and
+percentage work; preserve V1RC1 and the user's saves.
+
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
 artwork discovery and event acceptance. All twelve findings have scoped
 corrections in the packaged [V1RC1 candidate](V1RC1_PLAYTEST.md), reproduced by
