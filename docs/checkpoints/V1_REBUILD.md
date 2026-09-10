@@ -5,7 +5,11 @@ supplied source inputs. It compiles the two reviewed intermediate/final grid
 versions, birthday drawer, full animated title, and native artwork commands.
 It does not read any old artwork ROM or precompiled overlay folder. Only its
 `final/` cartridge is a playtest result; the recipe requires the corrected
-keyboard and exact approved cartridge/UPS/title-report identities.
+keyboard and exact approved cartridge/UPS/title-report comparison identities.
+
+The [public-compiler checkpoint](PORTABLE_TOOLCHAIN.md) records a complete passing
+source-to-v1 run with the published image, identical final ROM/UPS, and actual
+new report provenance. The legacy-image executions below remain separate evidence.
 
 ## Complete clean-source pipeline
 
@@ -68,6 +72,7 @@ current profile. No native gameplay scenarios are repeated for this build work.
 The original corrected v0, all development artifacts, package `03`, and user
 saves remain untouched. These retained post-v0-only runs take corrected v0 and
 its canonical report as explicit inputs; the complete pipeline above regenerates
-that dependency. The local pinned Docker image needs a portable public setup.
+that dependency. The public-image execution above removes the local development
+Docker image as a build prerequisite.
 Public release approval, third-party provenance, and human/hardware acceptance
 are not supplied by successful cartridge reproduction.

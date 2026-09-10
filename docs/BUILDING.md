@@ -47,10 +47,11 @@ directories. No gameplay scenarios run, and no old artifact or user save changes
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
 [complete pipeline record](checkpoints/V1_REBUILD.md) also verifies all twenty-six
-v1 stages from that freshly generated base, matching the supplied playtest. That
-record uses the legacy compiler image. Public-image execution is tracked in
-[the compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md). The pinned image
-and source checkouts remain setup prerequisites, not permission to distribute inputs.
+v1 stages from that freshly generated base, matching the supplied playtest. The
+[complete public-image execution](checkpoints/PORTABLE_TOOLCHAIN.md) passes all
+87 stages with the same ROM/UPS and actual public-compiler report provenance.
+The pinned image and source checkouts remain setup prerequisites, not permission
+to distribute inputs.
 
 To rebuild just the base, use `python3 tools/rebuild_v0.py --output <fresh-directory>`.
 An optional `--through <stage>` records a bounded successful prefix; `--resume`

@@ -55,10 +55,12 @@ not be replayed unchanged.
   claim the tooling licence covers Nintendo assets.
 - Prepare patch-only reproducible artifacts, verified application, hashes,
   source revisions, compatibility notes, and explicit known issues.
-- Document and verify the portable public toolchain setup. The
+- Preserve the verified [portable compiler setup](checkpoints/PORTABLE_TOOLCHAIN.md).
+  The complete public-image rebuild passes. The
   [61-stage clean base recipe](checkpoints/V0_REBUILD.md) and
   [26-stage post-v0 recipe](checkpoints/V1_REBUILD.md) eliminate retained generated
-  resource, compiled-overlay, and translation-ROM dependencies.
+  resource, compiled-overlay, and translation-ROM dependencies. Do not repeat
+  those complete builds for unchanged code or documentation-only edits.
 - Obtain release approval and record human/hardware acceptance. Private playtest
   packaging does not publish a release or certify the entire game.
 

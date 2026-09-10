@@ -50,5 +50,7 @@ not a game failure. The rejected run and log remain intact; the corrected recipe
 uses a new output directory.
 
 No passing gameplay evidence is repeated for unchanged code. The current
-playtest, earlier artifacts, and the user's saves remain untouched. Portable
-public compiler setup and redistribution review remain separate preparation.
+playtest, earlier artifacts, and the user's saves remain untouched. The
+[public-compiler checkpoint](PORTABLE_TOOLCHAIN.md) separately records successful
+reproduction using the published image and actual new report identity.
+Redistribution review remains separate preparation.

@@ -33,11 +33,13 @@ obtained source ROM is required to build; ROMs and extracted assets stay local.
 1. Fix concrete playtest bugs, prioritising crashes, saves, and progression.
 2. Review remaining artwork and polish English layout without changing GC intent.
 3. Complete ordinary gameplay and original-hardware acceptance through playtesting.
-4. Prepare the portable public toolchain and patch-only release with provenance review.
+4. Prepare the patch-only public release with provenance review.
 
 `make complete` rebuilds the base and v1 layers from clean source checkouts and
 verified local inputs, without old generated resources or translation ROMs. The
 [build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
+The [pinned published compiler](docs/TOOLCHAIN.md) is verified by the complete
+clean-source rebuild; the local development Docker image is not required.
 
 Original project tooling is MIT licensed. Third-party material retains its own
 terms; the project licence does not cover Nintendo assets or legacy work.

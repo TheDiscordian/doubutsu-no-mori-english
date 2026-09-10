@@ -60,10 +60,10 @@ The resulting `reviewed_profile_sha256` is not the checksum of the actual report
 recipes and packages record that actual canonical JSON hash separately.
 See [the compatibility contract](../specs/PORTABLE_TOOLCHAIN.md).
 
-The setup check and focused compatibility tests pass. Complete source-to-v1
-execution with the public image remains pending in
-[the compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md); the recorded
-legacy-image rebuild does not substitute for that execution.
+The setup check, focused compatibility tests, and complete 87-stage source-to-v1
+execution with the public image pass. The final ROM and UPS match the supplied
+playtest exactly. [The compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md)
+records clean source revisions, actual report hashes, and verification limits.
 
 ## Upstream sources and terms
 

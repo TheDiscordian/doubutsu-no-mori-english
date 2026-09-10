@@ -32,10 +32,16 @@ or precompiled overlay directories. Its final ROM/UPS/report match package `03`.
 The [isolated base recipe](checkpoints/V0_REBUILD.md) also passes all sixty-one
 stages from an empty build directory, regenerating corrected v0 from clean source
 checkouts and the three supplied inputs. Its final ROM/UPS/report exactly match
-corrected v0. Public toolchain setup remains release preparation work.
+corrected v0.
 The complete source-to-v1 run also passes all twenty-six post-v0 stages inside
 that clean checkout, matching the supplied v1 ROM/UPS/report. See the
 [combined rebuild evidence](checkpoints/V1_REBUILD.md).
+
+The [published compiler setup and complete clean rebuild](checkpoints/PORTABLE_TOOLCHAIN.md)
+also pass all 87 stages with exact final ROM/UPS matches. Build reports retain
+the actual public image identity; separate comparison fingerprints preserve
+compatibility with the older approvals. Building no longer depends on the local
+development Docker image. Source inputs remain local and separately licensed.
 
 ## Implemented scope
 
