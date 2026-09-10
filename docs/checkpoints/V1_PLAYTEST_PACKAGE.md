@@ -1,6 +1,37 @@
 # Combined private artwork playtest package
 
-## Current package 04
+## Current package 05
+
+The local bundle is `build/releases/v1-artwork-playtest-05.zip`, SHA-256
+`0d31a9e9f10e9c91106338ddcbc38f0bd16abb345ed8657b769af6c9b765d483`.
+Cartridge source revision is `766a1d817814e55bc8e0f8232d2005ba9e15d486`;
+packaging source revision is `067a71d3f23232891ea215d6c0f97f1de270aba9`.
+
+It reconstructs `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
+ROM SHA-256 is `a8072a76783317215ae85afbf31cca77422d5b783512194d8269004f31073780`;
+UPS SHA-256 is `7398d8d3c3bd3b7e234057daabbf61684811e367be583ec4d82045dae2d624bd`.
+Canonical bundled title-report approval is
+`f851e26b4b448f030b0431e9245f6c6ba675a4cdca0d34368ad4f9ddbde57e19`.
+
+All package-04 features remain, with the two English police-interior posters and
+postal MAIL bag from [the civic-interior batch](CIVIC_INTERIOR_ARTWORK.md).
+An Expansion Pak is required. Lucky-bag Japanese decoration remains intentional.
+
+Both current packaging tests pass in 3.699 seconds. The final archive itself
+also passes a separate nine-member/checksum inspection and standalone patcher
+execution from isolated extraction. It reconstructs the approved 32-MiB ROM,
+refuses a second write, and leaves the original ROM unchanged. No ROM, disc,
+save, or private absolute path is bundled. Prior packages remain untouched.
+The complete [28-stage public-image rebuild](V1_REBUILD.md) matches this ROM/UPS
+and passes the same package approval with its actual compiler-report provenance.
+
+This is a private candidate, not hardware certification or a public release.
+Ordinary room appearance and the existing tutorial/menu/editor/transaction/
+save/restart/travel/event/hardware acceptance remain playtest work. The incomplete
+warning drawing probe remains explicitly unverified; no confirmed game defect
+is waived by packaging.
+
+## Retained package 04 record
 
 The current local bundle is `build/releases/v1-artwork-playtest-04.zip`, SHA-256
 `2fac4233c4ffa8c1a73a4f8f3c2936f0a1287d18ea9a8f757337fba1c23a801e`.

@@ -12,7 +12,39 @@ source-to-v1 run with the published image, identical final ROM/UPS, and actual
 new report provenance for package `03`. The legacy-image executions below remain
 separate evidence.
 
-## Current package 04: twenty-seven stages
+## Current package 05: twenty-eight stages
+
+`build/v1-rebuilt-04` passes all 28 stages with the published compiler. Source
+revision is `067a71d3f23232891ea215d6c0f97f1de270aba9`, with no modified build
+sources and 809 source-file hashes. Stage work takes 139.620 seconds. The new
+civic-interior step is stage 27, followed by the unchanged title at stage 28.
+Every post-v0 resource and overlay is rebuilt from corrected v0 and source
+inputs, without retained intermediate artwork ROMs or compiled overlay folders.
+The unchanged 61-stage base is not rebuilt for this texture-only change.
+
+Final identities match package `05`:
+
+- ROM: `a8072a76783317215ae85afbf31cca77422d5b783512194d8269004f31073780`.
+- UPS: `7398d8d3c3bd3b7e234057daabbf61684811e367be583ec4d82045dae2d624bd`.
+- Actual canonical title report: `d3b53216dc4c7d839c5aa7cf5ec49cf682938482420e53ff201fd7e8e006cbdb`.
+- Reviewed comparison profile: `f851e26b4b448f030b0431e9245f6c6ba675a4cdca0d34368ad4f9ddbde57e19`.
+
+Recipe SHA-256 is `3f7c9f93840c1b4bdf834c98612bb0a8579c66dccdcf2e1f8b1cfb09f3065911`.
+The output's `inputs.json` SHA-256 is
+`c3f347da3355bff1bf5b4af4ff9644ecec3629f80b576eb2b2c86672817c9313`;
+`rebuild.json` SHA-256 is
+`cba43501604f1f108cb370a7c15925394b7e83e5fabc9e2c150bb22d846706d3`.
+The stored, non-canonical `final/preview.json` SHA-256 is
+`d833dba8b1b0ae4994e0a0240edb9fa1b362ae7e630c7d430154d24ed64deb92`.
+
+Eight recipe tests pass in 0.455 seconds, covering retained historical records
+and the current complete execution. The civic counter independently verifies
+both complete rooms and all 19 new source characters in the rebuilt final ROM.
+The rebuilt public-image report passes the packager's exact approval and patch
+reconstruction in memory; no second archive replaces the supplied package.
+No emulator, ordinary gameplay, or hardware acceptance is inferred.
+
+## Retained package 04: twenty-seven stages
 
 `build/v1-rebuilt-03` passes all 27 stages using the published compiler, with
 source revision `998d6738fee40ac3bbc6f04bf30b4411e8ffac85`, no modified build

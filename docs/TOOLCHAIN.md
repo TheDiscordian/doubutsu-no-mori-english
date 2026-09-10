@@ -62,7 +62,7 @@ See [the compatibility contract](../specs/PORTABLE_TOOLCHAIN.md).
 
 The setup check, focused compatibility tests, and complete 87-stage source-to-v1
 execution with the public image pass for package `03`. The complete current
-27-stage post-v0 recipe also passes with this image, matching package `04` exactly;
+28-stage post-v0 recipe also passes with this image, matching package `05` exactly;
 see the [current rebuild evidence](checkpoints/V1_REBUILD.md).
 [The compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md)
 records clean source revisions, actual report hashes, and verification limits.

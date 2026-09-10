@@ -3,8 +3,8 @@
 ## Builds
 
 The supplied private artwork playtest is
-`build/releases/v1-artwork-playtest-04.zip`, with local ROM
-`build/title-shop-interior-combined-01/animal-forest-title-preview.z64`.
+`build/releases/v1-artwork-playtest-05.zip`, with local ROM
+`build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
 It requires an Expansion Pak. Its patcher/reconstruction tests pass, and the
 [package checkpoint](checkpoints/V1_PLAYTEST_PACKAGE.md) records hashes,
 source revisions, contents, and limitations. It is not a public release or
@@ -28,16 +28,23 @@ layout, and shop rule remains unchanged. Ordinary room appearance remains
 playtest work; the tiny original information-notice wording remains an explicit
 transcription gap, not an uninstalled English image.
 
+The [civic-interior batch](checkpoints/CIVIC_INTERIOR_ARTWORK.md) installs the
+exact English GC wanted/recruitment posters and postal MAIL bag in two native
+rooms. Five focused checks, seventeen counter unit tests, the complete combined
+counter, title combination, and patch packaging pass. The three images fit
+existing native slots with no palette, geometry, command, gameplay, or save
+changes. Ordinary room appearance remains playtest work.
+
 The corrected four-MiB v0 remains at
 `build/v0-hardware-fixes-02/animal-forest-halfwidth.z64`. Both complete Nook
 conversation fixes and the Shrine wording are retained in every current build.
 See [the hardware-bug checkpoint](checkpoints/V0_HARDWARE_BUGS.md).
 Existing ROMs, packages, and the user's saves remain untouched.
 
-The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 27 artwork,
+The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 28 artwork,
 screen, keyboard, and title stages without retained intermediate artwork ROMs
-or precompiled overlay directories. The complete 27-stage public-image execution
-passes and matches package `04`'s ROM/UPS and approved title-report profile.
+or precompiled overlay directories. The complete 28-stage public-image execution
+passes and matches package `05`'s ROM/UPS and approved title-report profile.
 The [isolated base recipe](checkpoints/V0_REBUILD.md) also passes all sixty-one
 stages from an empty build directory, regenerating corrected v0 from clean source
 checkouts and the three supplied inputs. Its final ROM/UPS/report exactly match
@@ -62,7 +69,8 @@ town tune, birthday, Controller Pak, editor confirmation, warning windows,
 mail/repayment, and gyroid service responses.
 
 Building/event artwork includes seasonal shops, Nookington's main and doorway
-signs and clearance banners, police signs/posters, Redd's summer sign, SOLD OUT,
+signs and clearance banners, police exterior/interior signs/posters, the postal
+MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
 formats remain. The [feature notes](V1_TITLE_PLAYTEST.md) describe the packaged

@@ -1,5 +1,21 @@
 # Remaining artwork
 
+## Police and post-office interiors
+
+The [civic-interior batch](checkpoints/CIVIC_INTERIOR_ARTWORK.md) installs exact
+English GC wanted/recruitment posters and the MAIL bag in two native rooms.
+All visible pixels, alpha, UVs, lighting, and triangles match the donor; native
+palettes, geometry, commands, allocations, gameplay, and saves stay unchanged.
+Source, reconstruction, installed-counter, and title-retention checks pass.
+Ordinary room appearance remains unverified. The Japanese postal symbol on
+this bag is unrelated to the intentionally retained lucky-bag decoration.
+
+The inspected native post-office textures `012C0158`, `012BFA58`, `012BFED8`,
+`012BFFD8`, and `012C00D8`, using palette `012BDAB8`, are wood/counter surfaces,
+not Japanese signs. Retain them. The GC card/card2/mat images at `.data:6138E0`,
+`6140E0`, and `613CE0` belong to the GC device/floor design, not interchangeable
+native counter labels. Other unreviewed room/furniture images remain in scope.
+
 ## Nookington interior signs
 
 The [seven-sign batch](checkpoints/SHOP_INTERIOR_ARTWORK.md) installs the matching
@@ -125,3 +141,21 @@ and streamed copies remain native in the current candidate. The separate
 region-warning image is already English. These findings add no translation
 credit and do not declare furniture, clothing, other images, or ordinary scene
 acceptance complete. Preserve the inspected native artwork.
+
+## Remaining regional donor leads
+
+The source symbol map identifies three additional explicitly US-labelled donor
+textures outside the completed title, civic, and shop-interior batches:
+
+- `obj_s_house_i_3_us_tex_txt`, `.data:52BFC0`, CI4 32×64, palette `501BA0`:
+  a wooden house panel with a log-like circular ornament and blank plaques.
+- `ef_otikomi_us1_int_i4`, `.data:66DD60`, I4 64×32: vertical gloom-effect streaks.
+- `ef_otikomi_us2_int_i4`, `.data:66E160`, I4 16×16: a soft effect-mask pattern.
+
+The decoded GC images have no readable wording. Their filenames alone do not
+prove Japanese text exists in the N64 counterparts. Native ownership, source
+image comparison, and reader binding remain to be established before replacing
+anything or declaring those original assets reviewed. GC model sources are
+`src/data/model/obj_s_house_i.c` and `src/data/model/ef_otikomi_us2.c` in the pinned
+reference. The latter uses two texture units and scrolling commands, not a
+standalone label bitmap. This donor-only review adds no translation credit.

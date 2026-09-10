@@ -2,6 +2,8 @@
 
 ## Implementation and artifacts
 
+Cartridge source revision: `766a1d817814e55bc8e0f8232d2005ba9e15d486`.
+
 The [civic-interior builder](../../tools/civic_interior_artwork.py) installs the
 matching English GC wanted poster, recruitment poster, and postal mailbag
 texture. Their lettering reads `WANTED!`, `I want U!`, and `MAIL`. The
@@ -56,3 +58,17 @@ mutation is used. Ordinary room appearance remains human playtest work.
 The GC post-office card reader has no matching native feature in this batch;
 inspected native counter/wood panels remain unchanged. Tiny lower poster marks
 are retained as in the English donor, without invented transcriptions.
+
+The full counter passes on the complete untitled build: 752,093 / 752,115
+inventoried Japanese-source characters have installed English routes. The three
+new original IDs add 19 characters to both numerator and denominator; the
+22 retained structural-tail characters remain unchanged. This is not exhaustive
+artwork inventory or gameplay review. Counter report
+`build/civic-interior-counter-01/latest.json` has SHA-256
+`c7f586ba867ed035a20e9d7368f4a62d11d3cc8e4973070381da64dd50ad71a5`.
+
+[Private package 05](V1_PLAYTEST_PACKAGE.md) contains the combined build's UPS
+and tested standalone patcher. Previous cartridges and packages remain intact.
+The complete [28-stage public-image rebuild](V1_REBUILD.md) passes from committed
+source, reproducing these ROM/UPS identities. Its actual public compiler report
+has a distinct checksum and matches the reviewed comparison profile above.
