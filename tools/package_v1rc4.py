@@ -62,10 +62,17 @@ def prepare(directory, native, base, revision, parent_raw):
         corrected_findings=[f'V1-{i:02}' for i in range(1, 21)])
     if apply_bundle(native, patch, manifest) != image:
         raise ValueError('RC4 bundle reconstruction failed')
+    sources = (ROOT/'docs/SOURCES.md').read_bytes()
+    toolchain_link = b'](TOOLCHAIN.md)'
+    if sources.count(toolchain_link) != 1:
+        raise ValueError('Changed source-note toolchain link; review the packaged document')
+    # This guide belongs to the source tree, not the standalone patch archive.
+    sources = sources.replace(toolchain_link,
+        f'](https://github.com/TheDiscordian/doubutsu-no-mori-english/blob/{revision}/docs/TOOLCHAIN.md)'.encode())
     members = {'animal-forest-english.ups': patch,
         'manifest.json': (json.dumps(manifest, indent=2, sort_keys=True)+'\n').encode(),
         'README.md': (ROOT/'docs/V1RC4_PLAYTEST.md').read_bytes(),
-        'SOURCES.md': (ROOT/'docs/SOURCES.md').read_bytes(),
+        'SOURCES.md': sources,
         'LICENSE-tooling.txt': (ROOT/'LICENSE').read_bytes(),
         'apply_translation.py': (ROOT/'tools/apply_translation.py').read_bytes(),
         'aflib.py': (ROOT/'tools/aflib.py').read_bytes()}

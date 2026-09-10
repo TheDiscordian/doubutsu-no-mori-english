@@ -2,6 +2,7 @@
 import io
 import json
 from pathlib import Path
+import re
 import sys
 import unittest
 from unittest.mock import patch
@@ -32,6 +33,18 @@ class PackageTests(unittest.TestCase):
             self.assertFalse(any(name.endswith(('.z64','.fla','.flash','.bs1')) for name in archive.namelist()))
             self.assertEqual(apply_bundle(self.native,archive.read('animal-forest-english.ups'),manifest),image)
             self.assertEqual(json.loads(archive.read('manifest.json')),manifest)
+            self.assertIn(
+                f'https://github.com/TheDiscordian/doubutsu-no-mori-english/blob/{self.revision}/docs/TOOLCHAIN.md',
+                archive.read('SOURCES.md').decode())
+            for name in ('README.md', 'SOURCES.md'):
+                for target in re.findall(r'\]\(([^)]+)\)', archive.read(name).decode()):
+                    if not target.startswith(('https://', 'http://', '#')):
+                        self.assertIn(target.split('#', 1)[0], archive.namelist())
+            checksums = archive.read('SHA256SUMS').decode().splitlines()
+            self.assertEqual(len(checksums), len(archive.namelist())-1)
+            for line in checksums:
+                digest, name = line.split('  ', 1)
+                self.assertEqual(sha256(archive.read(name)), digest)
         self.assertEqual(manifest['native_loading_movement_memory_evidence']['load']['scene_free_bytes'],25216)
         self.assertFalse(manifest['ordinary_save_restart_verified'])
         self.assertEqual(manifest['save_compatibility']['forward'],'unverified')
