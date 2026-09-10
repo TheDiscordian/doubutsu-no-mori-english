@@ -3,13 +3,13 @@
 ## V0 execution priority
 
 Current work is the remaining Japanese artwork in the combined
-`build/title-birthday-combined-01` Expansion Pak candidate. The English title,
+`build/title-pak-combined-01` Expansion Pak candidate. The English title,
 GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
 Redd signs, bulletin-board/town-tune/catalogue controls, and mailbox/repayment
-headings, and birthday prompt/months/OK are installed and retain
+headings, birthday prompt/months/OK, and Controller Pak labels are installed and retain
 both Nook conversation corrections. See [current progress](PROGRESS.md) and
-[the birthday checkpoint](checkpoints/BIRTHDAY_SCREEN.md). Continue
-Controller Pak screen translation. Do not repeat completed title,
+[the Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md). Continue
+embedded menu text and remaining decorative art. Do not repeat completed title,
 conversation, or controller probes without a relevant change. Normal player
 acceptance and remaining Japanese art are not claimed complete.
 

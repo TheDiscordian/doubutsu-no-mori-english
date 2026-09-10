@@ -484,6 +484,8 @@ def measure(native, built, report):
     measure_clock_text(ledger, native, built, report)
     from birthday_screen import measure_text as measure_birthday_text
     measure_birthday_text(ledger, native, built, report)
+    from controller_pak_artwork import measure_text as measure_controller_pak_text
+    measure_controller_pak_text(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

@@ -25,6 +25,10 @@ Four [clock-screen records](TIME_SETTING_ENGLISH.md) also share the inventory,
 including their original Japanese date/time units. Credit requires the exact
 installed owner, relocation, reader lengths, coordinates, and glyph advances.
 The numeric date/time composition replaces those units without omitting fields.
+The two embedded birthday prompt/OK records also join the same inventory, with
+the complete installed drawing function, relocations, and string assets checked.
+Four Controller Pak label images contribute their visually transcribed Japanese
+text; credit requires the exact installed English images and unchanged reader.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

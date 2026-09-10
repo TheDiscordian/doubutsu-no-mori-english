@@ -18,12 +18,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 ## Active work
 
 The current combined playtest candidate is
-`build/title-birthday-combined-01/animal-forest-title-preview.z64` and requires an
+`build/title-pak-combined-01/animal-forest-title-preview.z64` and requires an
 Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
 English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
 keyboard, plus English bulletin-board, town-tune, and catalogue controls and
 mailbox/repayment headings. The birthday window has the full English prompt,
-month names, numeric day, and OK, with unchanged date/input/save logic. The
+month names, numeric day, and OK, with unchanged date/input/save logic. Controller
+Pak Done/Free/Notes/Pages are English, with all Pak operations and geometry
+unchanged. The [Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md) records
+three passing focused checks and the 8.396-second complete title combination.
+The
 [birthday checkpoint](checkpoints/BIRTHDAY_SCREEN.md) records passing sanitizer,
 compilation, relocation, retention, and counter checks, plus one silent native
 batch verifying complete ordered font output and intact state/guards. Its title
@@ -42,7 +46,7 @@ it is not relabelled as a fresh boot of the new ROM. Current [playtest notes](V1
 state the untested areas. The eighteen inspected station atlases contain no
 lettering requiring replacement. The [catalogue batch](checkpoints/CATALOGUE_ARTWORK.md)
 adds top/bottom with three passing focused checks and is retained in the current
-title combination. Continue Controller Pak screen translation;
+title combination. Continue embedded menu text and remaining decorative art;
 normal hardware/playthrough feedback remains necessary.
 
 The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`

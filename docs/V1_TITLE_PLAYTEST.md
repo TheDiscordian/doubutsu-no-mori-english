@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-birthday-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-birthday-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-pak-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-pak-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`4849a83ebcff09fa188cfbe4f54a66f2691769c98f4a1dc787b48417e07fc9f7`.
+`d74b8999ed97206f9358597d66de105677af41ee4d4dbd9fcdbff467e38e23d4`.
 Patch SHA-256:
-`0e4508ff472f0db095a397dfb4e2417a2366c5d14ae2c222c705f44352a90437`.
+`6bb899264b10fb0f59bb8dc1c9c2e843a8984c82b1bdb7948a6e26d4b61ae7ef`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -23,7 +23,8 @@ The catalogue has top/bottom controls, the mailbox has a Mail heading, and
 repayment displays Cash:, Payment:, You still owe, and Bells. These use complete
 English source images, with unchanged menu logic and saved fields. The birthday
 window has the full English prompt, month names, day, and OK, preserving native
-date input and saved fields.
+date input and saved fields. The Controller Pak screen has English Done, Free,
+Notes, and Pages images, with unchanged native Pak operations and layout.
 All earlier English dialogue, names, letters, and editor improvements are retained.
 The keyboard uses the GameCube-style 10-column, four-row grid, with native N64
 controls, corrected direction commands, and unchanged saved input capacities.
