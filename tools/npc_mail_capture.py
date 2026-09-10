@@ -151,6 +151,11 @@ def word_guard_offset(data, symbols, text):
 
 
 def validate(data,reloc,report,module):
+    if report.get('classic_letters') is not None:
+        from classic_letter_profiles import validate as validate_classic
+        old,oldrel,previous=validate_classic('creator',data,reloc,report)
+        validate(old,oldrel,previous,module)
+        return
     if report.get('accent_mail') is not None:
         from accent_mail_overlay_profile import validate as validate_accent
         old,oldrel,previous,_=validate_accent('creator',data,reloc,report)

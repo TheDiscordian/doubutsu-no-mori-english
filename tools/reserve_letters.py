@@ -120,6 +120,9 @@ def expected_report(previous, output, evidence):
     # Explicit same-base DMA resize: preserve the native loader's address while
     # extending the checked aligned file end inside its existing free gap.
     report['vrom_relocations']['00D07000'] = '00D07000'
+    # Some letter banks have no earlier in-place translations. Their new
+    # replacements must survive subsequent assemblers that inherit this list.
+    report['replacement_files'] = sorted(set(previous['replacement_files']) | set(evidence['files']))
     report.pop('patch_sha256', None)
     return report
 

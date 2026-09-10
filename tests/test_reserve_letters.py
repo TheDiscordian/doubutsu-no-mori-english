@@ -59,6 +59,7 @@ class ReserveLetterTests(unittest.TestCase):
         built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((BUILD/'build.json').read_text())
         base, previous = r.verify_installation(built, self.native, report)
+        self.assertTrue(set(report['reserve_letters']['files']) <= set(report['replacement_files']))
         self.assertEqual(apply_ups(self.native, (BUILD/'animal-forest-halfwidth.ups').read_bytes()), built)
         files, old = by_vrom(built), by_vrom(base)
         allowed = {int(v, 16) for v in report['reserve_letters']['files']} | {0x19D40}

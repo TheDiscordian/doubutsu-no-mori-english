@@ -15,6 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [classic-letter checkpoint](checkpoints/CLASSIC_LETTERS.md) connects all
+eighteen retained variants in `build/classic-letters-pilot`, with complete host,
+profile, cartridge-retention, combined accounting, and bounded native evidence.
+Move to ordinary v0 gameplay/menu/editor/mail/board/save checks.
+Do not repeat standalone letter or unchanged accent matrices. Retain structural
+zero-filled slots, then hand over the playtest patch before broad human testing.
+
 The [reserve-letter checkpoint](checkpoints/RESERVE_LETTERS.md) completes five
 reserve letters and accounts for eleven existing English sender-only signatures
 in `build/reserve-letters-pilot`. Finish the eighteen classic variants through

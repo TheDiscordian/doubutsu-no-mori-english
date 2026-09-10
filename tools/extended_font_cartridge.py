@@ -93,6 +93,10 @@ def relocate(data,relocations,base,*,mail_literals=False):
 
 
 def validate(data,relocations,report):
+    if report.get('classic_letters') is not None:
+        from classic_letter_profiles import validate as validate_classic
+        validate_classic('font',data,relocations,report)
+        return
     if report.get('unapproved_candidate'):
         raise ValueError('Unapproved font measurement is not an installable profile')
     mail = report.get('mail_glyphs',False)

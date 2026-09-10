@@ -167,6 +167,9 @@ def measure(native, built, report):
     accent_names={}
     accent_built,accent_report=built,report
     empty_units=()
+    if accent_report.get('classic_letters'):
+        from classic_letters import verify_installation
+        accent_built,accent_report=verify_installation(accent_built,native,accent_report)
     if accent_report.get('reserve_letters'):
         from reserve_letters import verify_installation
         accent_built,accent_report=verify_installation(accent_built,native,accent_report)
@@ -318,6 +321,13 @@ def measure(native, built, report):
                     if value is not None:
                         ledger.credit(identity, value, route, mail=True,mail_glyphs=catalog==4,
                                       english_mail_omission=identity in PARTS)
+
+        if report.get('classic_letters'):
+            from classic_letters import IDS
+            # Complete cartridge/profile verification above includes the exact
+            # startup hook, contiguous publication, source masks, and retained
+            # existing creators. Catalogue presence alone grants no credit.
+            credit_mail(0x030A0000, {k: IDS for k in ('super', 'mail', 'ps')}, 'classic_letters')
 
         if report.get('npc_mail_loader'):
             import mail_creator_catalog as creator_catalog

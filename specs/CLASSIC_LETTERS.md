@@ -8,13 +8,13 @@ older shop/museum, and unselected Mom text. Complete English exists in immutable
 catalogue four. Installing the catalogue alone does not complete their application.
 The five reserve variants `00C0..00C4` use their separate native-bank translations.
 
-The candidate adapter leaves all existing live creators, calendar selection,
+The adapter leaves all existing live creators, calendar selection,
 random choices, full-name capture, and saved formats unchanged. It does not make
 the excluded Mom dates eligible or claim that a ten-byte native free-string row
 can recover a longer English name. Live full-name consumers retain their complete
 owner-specific routes.
 
-## Candidate boundaries
+## Installed boundaries
 
 `overlays/classic_letters/creator.c` adds a checked `AFCL`/`F0` request to the
 existing on-demand creator. All other requests delegate to its complete seasonal
@@ -36,13 +36,22 @@ English application for an unreviewed separate-buffer caller.
 
 The startup adapter checks the exact original wrapper entry before calling the
 existing atomic font installer, then publishes and flushes its eight-byte jump.
-The planned appended image must retain all existing font glyphs, state offsets,
+The appended image retains all existing font glyphs, state offsets,
 code, and relocations. No font or creator limit is relaxed merely to fit the
 adapter. Source-bound build, installation, complete applicable caller review,
 and focused native evidence are required before granting progress credit.
 
 ## Status
 
-Candidate source is present; compilation, host checks, installed profiles, and
-native execution remain. No current ROM selects this adapter, and no additional
-classic-letter coverage is credited for the candidate alone.
+`build/classic-letters-pilot` installs the exact source-bound profiles. The font
+image is 12,000 bytes with 704 relocation bytes; the creator image is 61,200 bytes
+with 960 relocation bytes. Both fit the existing limits. Independent MIPS builds
+match, five host tests pass, and three strict profile/retention tests pass.
+
+The native check in `build/classic-letter-native-02` passes nine calls and thirty
+memory assertions, including actual startup installation, on-demand allocation,
+static and dynamic complete letters, full reader output, the translated native
+reserve fallback, saved-payload retention, guards, release, and checkpoint
+restoration. Normal progression and persistent save/restart remain combined v0
+checks. The [checkpoint](../docs/checkpoints/CLASSIC_LETTERS.md) records the exact
+build, integration evidence, and the corrected packaging failure.

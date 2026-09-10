@@ -25,6 +25,18 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [classic-letter integration](checkpoints/CLASSIC_LETTERS.md) connects the final
+eighteen retained variants with complete saved snapshots and text readback.
+The current combined ROM/UPS is `build/classic-letters-pilot`. Five host tests,
+three profile checks, matching independent MIPS builds, full cartridge retention,
+and the silent native check pass. The native run covers nine calls and thirty
+assertions, including the real allocator, complete letters, unchanged saved
+payload, guards, and checkpoint restoration. An inherited replacement-list bug
+is fixed and regression-tested. All three installed/accounting tests pass; only
+three structural zero-filled tail slots remain flagged, not untranslated phrases.
+Continue bounded ordinary v0 gameplay/menu/editor/mail/board/save checks and the
+patch-only handoff.
+
 The [reserve-letter completion](checkpoints/RESERVE_LETTERS.md) applies all fifteen
 parts and corrects accounting for eleven already-translated sender-only
 signatures. The current combined ROM/UPS is `build/reserve-letters-pilot`.

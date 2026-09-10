@@ -33,6 +33,10 @@ HOOKS = {
 
 
 def validate_image(data, reloc, report):
+    if report.get('classic_letters') is not None:
+        from classic_letter_profiles import validate as validate_classic
+        validate_classic('font',data,reloc,report)
+        return
     profile=ACCENT_PROFILE if report.get('accent_glyphs') else {
         'bytes':4560,'image_sha256':IMAGE_SHA,'relocation_sha256':RELOC_SHA,'symbols':SYMBOLS}
     if report.get('mail_literals'):

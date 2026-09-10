@@ -81,6 +81,10 @@ remain uncredited. The denominator and duplicate-ID rules do not change.
 Catalogue presence alone does not credit unused letters or GameCube-only IDs.
 Reader and NPC capture/delivery patches are checked against installed bytes;
 actor images and resources are bound to the completed build report.
+The eighteen [retained classic variants](CLASSIC_LETTERS.md) receive credit only
+with the exact installed startup adapter, transient creator, source field masks,
+and complete retained-resource verification. Their immutable catalogue entries
+alone remain insufficient, and no new scheduler or saved identity adds weight.
 
 The home-gyroid default credits original `string:055C` once through its complete
 four-line English variant only when the actual selector actor, allocation,
