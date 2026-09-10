@@ -1,0 +1,7 @@
+[
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"snapshot_message": true},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
+]

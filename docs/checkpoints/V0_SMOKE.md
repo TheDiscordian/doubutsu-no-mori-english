@@ -39,6 +39,32 @@ orders, corrupt-input rejection, exclusive output creation, deterministic
 archives, and the exact allowed package contents. The notes retain pending
 checks; creating the archive does not mark those checks passed.
 
+The generated private archive is `build/releases/v0-playtest-candidate.zip`,
+SHA-256 `9c5235c4346ba8c3df1013a110946c515b09856204027b53aaabf4ab9303b016`.
+Its packaging revision is `2db8e7f`. The archive is extracted into
+`build/releases/v0-application-check`, and its included command-line patcher
+successfully creates `animal-forest-english.z64` from the verified retail input.
+The resulting SHA-256 equals the candidate above. ROMs remain outside the ZIP.
+
+## Ordinary progression boundary
+
+`build/v0-housing-01` reuses the prior housing inputs without reaching housing:
+the player is still on the arrival platform. It records 63 steps, controller
+movement, intact guards, and graceful shutdown; inventory remains closed. This
+is not a housing or menu pass. The read-only follow-up
+`build/v0-town-observation-01` locates the live station character (`D00E`).
+`build/v0-arrival-guide-01` approaches that character using ordinary controller
+input and observed positions, opens English message `0831`, expands the complete
+town field, closes the dialogue, and retains the memory guard. No actor position,
+schedule, or progression fields are written by the debugger.
+
+The bounded southward route in `build/v0-platform-exit-01` does not leave the
+platform: the player reaches Z 862 while the station character remains active.
+There is no demonstrated crash or memory failure, but these timed routes do not
+prove outdoor/tutorial progression or ordinary saving. Do not loop the same
+route or count the unused submenu as opened. A verified exit route or human
+playtest is needed for further ordinary gameplay evidence.
+
 ## Remaining handoff work
 
 Complete the bounded ordinary menu/editor/mail/board and save/restart checks

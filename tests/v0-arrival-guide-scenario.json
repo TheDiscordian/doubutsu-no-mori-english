@@ -1,0 +1,11 @@
+[
+  {"wait": 2},
+  {"approach_npc": "D00E", "max_steps": 40},
+  {"snapshot_message": true},
+  {"advance_dialogue": {"max_presses": 30, "settle_seconds": 2}},
+  {"snapshot_choices": true},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"save_state": true}
+]
