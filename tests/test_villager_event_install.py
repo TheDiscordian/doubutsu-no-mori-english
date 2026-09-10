@@ -21,18 +21,20 @@ from npc_mail_loader import VROM,CONFIG_OFFSET,configuration,install as install_
 from runtime_module import MODULE_VROM,add_runtime_module,verify_test_module
 from villager_event_letters import GUARDS,COMPLETE,install,patches,verify_installation
 
+CREATOR = ROOT/'build/letter-runtime-fixtures-01/villager-event'
+PILOT = ROOT/'build/v0-hardware-fixes-02'
 
-@unittest.skipUnless((ROOT/'build/villager-event-mail-creator/overlay.json').is_file(),'Compiled event creator required')
+@unittest.skipUnless((CREATOR/'overlay.json').is_file(),'Compiled event creator required')
 class VillagerEventInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/notice-seasonal-runtime')
         install_reader(cls.native,cls.base,cls.additions,cls.module,snapshots=True)
-        install_items(cls.native,cls.additions,cls.module,ROOT/'build/mapped-items-final-resource')
+        install_items(cls.native,cls.additions,cls.module,ROOT/'build/design-items-resource')
         install_catalog(cls.native,cls.additions,cls.module,ROOT/'build/mail-catalog')
-        install_loader(cls.native,cls.base,cls.additions,cls.module,ROOT/'build/villager-event-mail-creator')
+        install_loader(cls.native,cls.base,cls.additions,cls.module,CREATOR)
         install_mother(cls.native,cls.base,cls.additions,cls.module)
         install_departed(cls.native,cls.base,cls.additions,cls.module)
 
@@ -78,10 +80,10 @@ class VillagerEventInstallationTests(unittest.TestCase):
 
     def test_optional_item_import_and_all_legacy_creator_variants_remain_valid(self):
         for folder,mother,departed,events,entry in (
-                ('npc-mail-capture',False,False,False,'af_npc_mail_create'),
-                ('mother-mail-creator',True,False,False,'af_system_mail_create'),
-                ('departed-mail-creator',True,True,False,'af_departed_mail_create'),
-                ('villager-event-mail-creator',True,True,True,'af_villager_event_mail_create')):
+                ('shared-npc-capture-runtime-followup-01',False,False,False,'af_npc_mail_create'),
+                ('letter-runtime-fixtures-01/mother',True,False,False,'af_system_mail_create'),
+                ('letter-runtime-fixtures-01/departed',True,True,False,'af_departed_mail_create'),
+                ('letter-runtime-fixtures-01/villager-event',True,True,True,'af_villager_event_mail_create')):
             directory = ROOT/'build'/folder
             data,reloc = (directory/'overlay.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
             report = json.loads((directory/'overlay.json').read_text())
@@ -94,9 +96,9 @@ class VillagerEventInstallationTests(unittest.TestCase):
         with self.assertRaises(ValueError): configuration(data,reloc,wrong,self.module)
         with self.assertRaises(ValueError): source_hashes(mother_letters=True,villager_events=True)
 
-    @unittest.skipUnless((ROOT/'build/villager-event-letters-pilot/build.json').is_file(),'Completed event pilot required')
+    @unittest.skipUnless((PILOT/'build.json').is_file(),'Completed combined cartridge required')
     def test_actual_built_rom_has_complete_routes_and_unchanged_native_helpers(self):
-        directory = ROOT/'build/villager-event-letters-pilot'
+        directory = PILOT
         built = (directory/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((directory/'build.json').read_text())
         self.assertEqual(sha256(built),report['output_sha256']);verify_test_module(built,report['runtime_module'])

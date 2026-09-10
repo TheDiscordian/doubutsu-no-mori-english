@@ -22,18 +22,20 @@ from npc_mail_loader import VROM,CONFIG_OFFSET,configuration,install as install_
 from runtime_module import MODULE_VROM,add_runtime_module,verify_test_module
 from villager_event_letters import START as EVENT_START,install as install_events
 
+CREATOR = ROOT/'build/letter-runtime-fixtures-01/academy'
+PILOT = ROOT/'build/v0-hardware-fixes-02'
 
-@unittest.skipUnless((ROOT/'build/academy-mail-creator/overlay.json').is_file(),'Compiled academy creator required')
+@unittest.skipUnless((CREATOR/'overlay.json').is_file(),'Compiled academy creator required')
 class AcademyInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/notice-seasonal-runtime')
         install_reader(cls.native,cls.base,cls.additions,cls.module,snapshots=True)
-        install_items(cls.native,cls.additions,cls.module,ROOT/'build/mapped-items-final-resource')
+        install_items(cls.native,cls.additions,cls.module,ROOT/'build/design-items-resource')
         install_catalog(cls.native,cls.additions,cls.module,ROOT/'build/mail-catalog')
-        install_loader(cls.native,cls.base,cls.additions,cls.module,ROOT/'build/academy-mail-creator')
+        install_loader(cls.native,cls.base,cls.additions,cls.module,CREATOR)
         install_mother(cls.native,cls.base,cls.additions,cls.module)
         install_departed(cls.native,cls.base,cls.additions,cls.module)
         install_events(cls.native,cls.base,cls.additions,cls.module)
@@ -76,7 +78,7 @@ class AcademyInstallationTests(unittest.TestCase):
             self.assertEqual(fixture,before)
 
     def test_optional_variant_and_earlier_exports_remain_valid(self):
-        directory = ROOT/'build/academy-mail-creator'
+        directory = CREATOR
         data,reloc = (directory/'overlay.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
         report = json.loads((directory/'overlay.json').read_text())
         self.assertEqual(configuration(data,reloc,report,self.module)[4],report['symbols']['af_academy_mail_create'])
@@ -85,9 +87,9 @@ class AcademyInstallationTests(unittest.TestCase):
             with self.assertRaises(ValueError): configuration(data,reloc,{**report,'academy_letters':value},self.module)
         with self.assertRaises(ValueError): source_hashes(mother_letters=True,departed_letters=True,academy_letters=True)
 
-    @unittest.skipUnless((ROOT/'build/academy-letters-pilot/build.json').is_file(),'Completed academy pilot required')
+    @unittest.skipUnless((PILOT/'build.json').is_file(),'Completed combined cartridge required')
     def test_actual_built_rom_and_changed_report_rejection(self):
-        directory = ROOT/'build/academy-letters-pilot';built = (directory/'animal-forest-halfwidth.z64').read_bytes()
+        directory = PILOT;built = (directory/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((directory/'build.json').read_text());self.assertEqual(sha256(built),report['output_sha256'])
         verify_test_module(built,report['runtime_module'])
         verify_installation(built,self.native,report['runtime_module'],report['academy_letters'])

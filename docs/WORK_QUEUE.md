@@ -57,6 +57,11 @@ do not establish acceptance of every reported case. Next:
   and two freshly compiled capture fixtures. Its 51 selected checks have passing
   evidence, including the source-bound native species and complete shared-bank
   installation. Preserve this batch; remaining fixtures are not passed by association.
+  The [system-letter/glyph follow-up](checkpoints/SYSTEM_LETTER_FIXTURE_FOLLOWUP.md)
+  closes twelve more historical errors with 33 passing checks. Its six current
+  creator variants and verified combined-cartridge selections remain available;
+  do not repeat this completed batch. Later letter/probe/actor fixtures and the
+  native-species mismatch test retain their separately recorded unresolved status.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

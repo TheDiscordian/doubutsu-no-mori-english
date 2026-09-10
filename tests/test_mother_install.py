@@ -18,17 +18,19 @@ from npc_mail_capture import source_hashes
 from npc_mail_loader import VROM,CONFIG_OFFSET,configuration,install as install_loader
 from runtime_module import MODULE_VROM,add_runtime_module,verify_test_module
 
+CREATOR = ROOT/'build/letter-runtime-fixtures-01/mother'
+PILOT = ROOT/'build/v0-hardware-fixes-02'
 
-@unittest.skipUnless((ROOT/'build/mother-mail-creator/overlay.json').is_file(),'Compiled system creator required')
+@unittest.skipUnless((CREATOR/'overlay.json').is_file(),'Compiled system creator required')
 class MotherInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/notice-seasonal-runtime')
         install_reader(cls.native,cls.base,cls.additions,cls.module,snapshots=True)
         install_catalog(cls.native,cls.additions,cls.module,ROOT/'build/mail-catalog')
-        install_loader(cls.native,cls.base,cls.additions,cls.module,ROOT/'build/mother-mail-creator')
+        install_loader(cls.native,cls.base,cls.additions,cls.module,CREATOR)
 
     def fixture(self): return dict(self.base),dict(self.additions),deepcopy(self.module)
 
@@ -70,7 +72,7 @@ class MotherInstallationTests(unittest.TestCase):
             self.assertEqual(fixture,before)
 
     def test_optional_variant_binds_new_entry_and_keeps_legacy_artifacts_valid(self):
-        for directory,mother in (('npc-mail-capture',False),('mother-mail-creator',True)):
+        for directory,mother in (('shared-npc-capture-runtime-followup-01',False),('letter-runtime-fixtures-01/mother',True)):
             folder = ROOT/'build'/directory
             data,reloc = (folder/'overlay.bin').read_bytes(),(folder/'relocation.bin').read_bytes()
             report = json.loads((folder/'overlay.json').read_text())
@@ -83,9 +85,9 @@ class MotherInstallationTests(unittest.TestCase):
             changed = deepcopy(report);changed['sources'] = {}
             with self.assertRaises(ValueError): configuration(data,reloc,changed,self.module)
 
-    @unittest.skipUnless((ROOT/'build/mother-letters-pilot/build.json').is_file(),'Completed Mom pilot required')
+    @unittest.skipUnless((PILOT/'build.json').is_file(),'Completed combined cartridge required')
     def test_built_rom_matches_installed_creator_guards_and_reader(self):
-        directory = ROOT/'build/mother-letters-pilot'
+        directory = PILOT
         built = (directory/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((directory/'build.json').read_text())
         self.assertEqual(sha256(built),report['output_sha256'])

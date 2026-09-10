@@ -75,6 +75,9 @@ across eight test files and unchanged source/provenance guards. The suite as a
 whole is not passed. The [letter/shared-word fixture follow-up](checkpoints/MAIL_RUNTIME_FIXTURE_FOLLOWUP.md)
 closes seven further historical errors with passing evidence for 51 selected
 checks, retaining resource/source guards and the native herabuna correction.
+The [system-letter/glyph follow-up](checkpoints/SYSTEM_LETTER_FIXTURE_FOLLOWUP.md)
+closes twelve further historical errors with 33 passing focused checks and six
+fresh source-built creator variants. The playable ROM and saves are unchanged.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the

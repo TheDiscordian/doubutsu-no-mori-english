@@ -60,3 +60,8 @@ further historical errors and records passing evidence for 51 selected checks.
 Two source-built capture fixtures retain distinct approved word profiles; the
 shared-bank tests use the current native-species correction. Production guards,
 ROMs, and saves remain unchanged. The full-suite result is not replaced.
+
+The [system-letter/glyph follow-up](SYSTEM_LETTER_FIXTURE_FOLLOWUP.md) closes
+twelve further errors: five class setups and all seven glyph-installation cases.
+All 33 selected checks pass with current resources and unchanged production
+guards. The complete historical suite and unrelated failures remain unpassed.

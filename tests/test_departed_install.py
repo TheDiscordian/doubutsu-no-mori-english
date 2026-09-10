@@ -19,17 +19,19 @@ from npc_mail_capture import source_hashes
 from npc_mail_loader import VROM,CONFIG_OFFSET,configuration,install as install_loader
 from runtime_module import MODULE_VROM,add_runtime_module,verify_test_module
 
+CREATOR = ROOT/'build/letter-runtime-fixtures-01/departed'
+PILOT = ROOT/'build/v0-hardware-fixes-02'
 
-@unittest.skipUnless((ROOT/'build/departed-mail-creator/overlay.json').is_file(),'Compiled departed creator required')
+@unittest.skipUnless((CREATOR/'overlay.json').is_file(),'Compiled departed creator required')
 class DepartedInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.native,cls.base,ROOT/'build/notice-seasonal-runtime')
         install_reader(cls.native,cls.base,cls.additions,cls.module,snapshots=True)
         install_catalog(cls.native,cls.additions,cls.module,ROOT/'build/mail-catalog')
-        install_loader(cls.native,cls.base,cls.additions,cls.module,ROOT/'build/departed-mail-creator')
+        install_loader(cls.native,cls.base,cls.additions,cls.module,CREATOR)
         install_mother(cls.native,cls.base,cls.additions,cls.module)
 
     def fixture(self): return dict(self.base),dict(self.additions),deepcopy(self.module)
@@ -71,9 +73,9 @@ class DepartedInstallationTests(unittest.TestCase):
 
     def test_legacy_and_extended_variants_remain_source_bound(self):
         for directory,mother,departed,entry in (
-                ('npc-mail-capture',False,False,'af_npc_mail_create'),
-                ('mother-mail-creator',True,False,'af_system_mail_create'),
-                ('departed-mail-creator',True,True,'af_departed_mail_create')):
+                ('shared-npc-capture-runtime-followup-01',False,False,'af_npc_mail_create'),
+                ('letter-runtime-fixtures-01/mother',True,False,'af_system_mail_create'),
+                ('letter-runtime-fixtures-01/departed',True,True,'af_departed_mail_create')):
             folder = ROOT/'build'/directory
             data,reloc = (folder/'overlay.bin').read_bytes(),(folder/'relocation.bin').read_bytes()
             report = json.loads((folder/'overlay.json').read_text())
@@ -88,9 +90,9 @@ class DepartedInstallationTests(unittest.TestCase):
         changed = deepcopy(report);changed['sources'].pop('overlays/mail_generation/departed_creator.c')
         with self.assertRaises(ValueError): configuration(data,reloc,changed,self.module)
 
-    @unittest.skipUnless((ROOT/'build/departed-letters-pilot/build.json').is_file(),'Completed departed pilot required')
+    @unittest.skipUnless((PILOT/'build.json').is_file(),'Completed combined cartridge required')
     def test_actual_built_rom_matches_creator_and_retained_native_helpers(self):
-        directory = ROOT/'build/departed-letters-pilot'
+        directory = PILOT
         built = (directory/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((directory/'build.json').read_text())
         self.assertEqual(sha256(built),report['output_sha256'])
