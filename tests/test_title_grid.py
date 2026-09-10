@@ -103,6 +103,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('fortune-booth-artwork-01', 'title-fortune-booth-combined-01',
             'a4e6f42db32af3031b630decfd73ea0c42b6cb910d02b15a6a4d9eb9c5acbf7a')
 
+    @unittest.skipUnless((ROOT/'build/title-countdown-combined-01/preview.json').is_file(),
+                         'Local English countdown/title candidate required')
+    def test_countdown_combination_retains_all_prior_artwork_menu_and_title_work(self):
+        self.check_combination('countdown-artwork-01', 'title-countdown-combined-01',
+            '6be7c2a514574a3c9f7eba0e00c45d84cb6f83866b39cd7d1de0b2db8c1f73b7')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

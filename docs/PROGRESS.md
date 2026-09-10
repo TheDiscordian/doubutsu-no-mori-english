@@ -17,6 +17,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [countdown candidate](checkpoints/COUNTDOWN_ARTWORK.md) installs the exact
+GC minute/second labels with unchanged timer, digits, animation, and actors.
+Three focused checks, the title combination, and the full counter pass.
+`build/title-countdown-combined-01` is the newest separate artwork candidate.
+The [remaining artwork queue](ARTWORK_REMAINDER.md) records the festival-stall
+size constraint, pending lucky-bag choice, and inspected neutral seasonal props.
+Continue those remaining artwork tasks; the packaged playtest stays separate.
+
 The [fortune-booth candidate](checkpoints/FORTUNE_BOOTH_ARTWORK.md) installs the
 complete matching GC table inside the original native allocation, with unchanged
 event code and shrine. Three focused checks, the title combination, and the

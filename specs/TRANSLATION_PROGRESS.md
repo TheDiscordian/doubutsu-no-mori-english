@@ -66,6 +66,12 @@ after verifying the entire converted model, all six donor bindings, bounded
 native graphics, unchanged actor, and both installed object copies. The two
 seasons reuse one original ID. Uncertain decorative shapes receive no invented
 transcription or character weight.
+The countdown display contributes three bitmap labels, seven Japanese characters
+total, shared by both seasons. Its two exact GC atlas replacements install
+`min.` and `sec.` and omit the Japanese prefix as in the donor. Credit requires
+the actual donor texture/vertex bindings, all installed native model readers,
+and unchanged digits, animation, palettes, actors, and allocation. The prefix
+uses explicit artwork-omission credit; the units use their exact English strings.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

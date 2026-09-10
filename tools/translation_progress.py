@@ -512,6 +512,8 @@ def measure(native, built, report):
     measure_fishing_artwork(ledger, native, built, report)
     from fortune_booth_artwork import measure_text as measure_fortune_booth_artwork
     measure_fortune_booth_artwork(ledger, native, built, report)
+    from countdown_artwork import measure_text as measure_countdown_artwork
+    measure_countdown_artwork(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():
