@@ -3,16 +3,20 @@
 ## V0 execution priority
 
 Current work is the remaining Japanese artwork in the combined
-`build/title-submenu-combined-01` Expansion Pak candidate. The English title,
+`build/title-gyroid-service-combined-01` Expansion Pak candidate. The English title,
 GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
 Redd signs, bulletin-board/town-tune/catalogue controls, and mailbox/repayment
 headings, birthday prompt/months/OK, Controller Pak labels, editor confirmation,
-and all inventory/Pak warning windows are installed and retain both Nook
+all inventory/Pak warning windows, and gyroid service responses are installed and retain both Nook
 conversation corrections. See [current progress](PROGRESS.md) and
 [the embedded menu checkpoint](checkpoints/EMBEDDED_MENU_TEXT.md). Its focused
 host and title-combination checks pass; the native drawing batch remains
 incomplete after its permitted setup retry. Do not repeat that setup batch.
-Continue remaining embedded interface text and decorative art. Do not repeat completed title,
+The [gyroid service checkpoint](checkpoints/GYROID_SERVICE_TEXT.md) records
+complete English, a safe separate transient buffer, three passing host checks,
+the passing title combination, and passing native composition/drawing with intact
+callback/save/guards. Continue remaining embedded interface text, decorative art,
+and patch-only packaging. Do not repeat completed title,
 conversation, or controller probes without a relevant change. Normal player
 acceptance and remaining Japanese art are not claimed complete.
 

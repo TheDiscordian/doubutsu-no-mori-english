@@ -18,7 +18,7 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 ## Active work
 
 The current combined playtest candidate is
-`build/title-submenu-combined-01/animal-forest-title-preview.z64` and requires an
+`build/title-gyroid-service-combined-01/animal-forest-title-preview.z64` and requires an
 Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
 English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
 keyboard, plus English bulletin-board, town-tune, and catalogue controls and
@@ -32,6 +32,12 @@ in the existing menu pool. The [embedded menu checkpoint](checkpoints/EMBEDDED_M
 records three passing host checks and the 8.747-second title combination.
 Its native batch verifies confirmation loading, then stops at a fixture error;
 warning drawing remains unverified. Do not repeat that setup batch. The
+gyroid's twelve sales/configuration responses also have complete GC English,
+with a separate temporary buffer preserving the native interrupt callback.
+The [gyroid service checkpoint](checkpoints/GYROID_SERVICE_TEXT.md) records three
+passing host checks, the 8.172-second title combination, and a single passing
+native composition/drawing batch with intact save, callback, and memory guards.
+Ordinary gyroid navigation and transactions remain playtest work. The
 [Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md) records
 three passing focused checks and the 8.396-second complete title combination.
 The

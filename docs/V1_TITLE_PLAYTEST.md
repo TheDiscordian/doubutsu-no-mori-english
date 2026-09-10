@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-submenu-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-submenu-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-gyroid-service-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-gyroid-service-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`be9b51bada53c9fc8a3abd6cc53ae054689100e9bee8a595334d5da183febe35`.
+`da66a789341307c625da130ae11e20609b9a023fca82712f303fc59fe95deb94`.
 Patch SHA-256:
-`8c1d147e5917de04f9f692293054e779b622660f30bdf4b77eb3112cbf81c990`.
+`6b423b37fc767c73d3490a2c2e5182509ccdf66c52cba4c663a5ac2d3065edbb`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -29,6 +29,8 @@ Editor confirmation and all inventory/Controller Pak warning windows are English
 including the native 50,000-Bell limit and explicit repair data-loss warning.
 The warning code is unchanged; appended text uses a bounded extra 4 KiB in the
 ordinary menu pool, without expanding the heap or changing saves.
+The gyroid's twelve sales/configuration responses are also English, using a
+separate safe temporary buffer, with native prices and transactions unchanged.
 All earlier English dialogue, names, letters, and editor improvements are retained.
 The keyboard uses the GameCube-style 10-column, four-row grid, with native N64
 controls, corrected direction commands, and unchanged saved input capacities.
@@ -56,6 +58,9 @@ is not inferred from that controlled fixture.
 The embedded warning/confirmation host and combination checks pass. Its native
 fixture verifies confirmation loading but stops before drawing at a test-script
 error; warning drawing is not claimed verified.
+The gyroid service batch passes native loading, complete response composition,
+zero/five-digit prices, and full font output with its callback/save/guards intact.
+This controlled check does not establish ordinary navigation or transactions.
 Original-hardware acceptance, the ordinary first-job replay, all changed menus,
 multi-line editing, normal save/restart, and return-to-title/existing-save cases
 remain playtest work.

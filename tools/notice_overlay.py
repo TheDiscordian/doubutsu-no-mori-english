@@ -460,6 +460,10 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
     if menu_text_present(files):
         menu_text=verify_menu_text(built,native)
         for at,value in menu_text['owner_rows'].items():expected[at:at+32]=value
+    from gyroid_service import present as gyroid_present,verify_shared_parts as verify_gyroid
+    if gyroid_present(files):
+        gyroid=verify_gyroid(built,native);at=gyroid['owner_offset']
+        expected[at:at+32]=gyroid['owner_bytes']
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
         if at == POOL_PATCH and editor_extension and not letter_names:

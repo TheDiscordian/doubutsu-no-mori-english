@@ -73,6 +73,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('submenu-text-01', 'title-submenu-combined-01',
             'be9b51bada53c9fc8a3abd6cc53ae054689100e9bee8a595334d5da183febe35')
 
+    @unittest.skipUnless((ROOT/'build/title-gyroid-service-combined-01/preview.json').is_file(),
+                         'Local gyroid service English/title candidate required')
+    def test_gyroid_service_combination_retains_safe_buffer_and_all_prior_work(self):
+        self.check_combination('gyroid-service-01', 'title-gyroid-service-combined-01',
+            'da66a789341307c625da130ae11e20609b9a023fca82712f303fc59fe95deb94')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

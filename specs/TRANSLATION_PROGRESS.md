@@ -35,6 +35,11 @@ references do not inflate the denominator. All native inventory and Controller
 Pak status/error text is included, with complete installed pointer/length tables,
 relocations, parent ownership, and enlarged shared menu allocation required for
 credit. The same original records remain pending in earlier cartridges.
+The gyroid service menu's twelve responses and shared Japanese prefix contribute
+thirteen original records. Credit requires the complete English response table,
+price composition, relocated transient buffer, retained callback, and bounded
+shared allocation. The original greeting/custom-message resource is not counted
+again as part of these separate native strings.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

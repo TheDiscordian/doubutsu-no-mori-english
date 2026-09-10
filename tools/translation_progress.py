@@ -488,6 +488,8 @@ def measure(native, built, report):
     measure_controller_pak_text(ledger, native, built, report)
     from submenu_text import measure_text as measure_submenu_text
     measure_submenu_text(ledger, native, built, report)
+    from gyroid_service import measure_text as measure_gyroid_service
+    measure_gyroid_service(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

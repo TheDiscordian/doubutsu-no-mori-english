@@ -122,6 +122,8 @@ def verify_owned_parts(built,native,report=None,apology_report=None):
     pool_word=POOL_WORD
     from submenu_text import present as menu_text_present,verify_shared_parts as verify_menu_text
     if menu_text_present(files):pool_word=verify_menu_text(built,native)['pool_word']
+    from gyroid_service import present as gyroid_present,verify_shared_parts as verify_gyroid
+    if gyroid_present(files):verify_gyroid(built,native)
     if (files[owner_editor.OWNER].extract(built)[at:at+32]!=metadata()
             or files[owner_editor.HBOARD].extract(built)!=owner_editor.patch_window(native)
             or files[owner_editor.HBOARD_RELOC].extract(built)!=originals[owner_editor.HBOARD_RELOC].extract(native)
