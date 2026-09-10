@@ -17,6 +17,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [combined English title](checkpoints/TITLE_LOGO.md) at
+`build/title-combined-01` retains all conversation corrections and English
+screen/shop artwork. Eight-MiB native title/START/guard checks pass, and four-MiB
+native checks verify every glyph of the safe Expansion Pak instruction screen.
+Four combined and eleven existing focused checks pass. An isolated captured
+frame shows the complete readable English logo. The candidate requires an
+Expansion Pak; the corrected v0 handoff remains unchanged. Continue the
+GameCube-style keyboard and remaining Japanese signs/buildings/bags. Normal
+menu/save and original-hardware acceptance remain unverified.
+
 The [collection heading candidate](checkpoints/COLLECTION_ARTWORK.md) at
 `build/collection-artwork-01` adds the full GameCube Insects/Fish artwork to the
 clock, map, inventory, shop, and conversation corrections. Three focused checks

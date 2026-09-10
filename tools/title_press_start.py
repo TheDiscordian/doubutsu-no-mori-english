@@ -11,6 +11,8 @@ from title_assets import extract, ROOT
 
 ACTOR, RELOC, ASSETS = 0x0095FEC0, 0x009625A0, 0x01136000
 RAM = 0x80A9FC70
+COLLECTION_BASE_SHA = '27f840aaea2693ac96fbbc084981dd978f8e376cbf8d7a1259666160d29f5f7d'
+TITLE_BASES = {CANDIDATE_SHA256, COLLECTION_BASE_SHA}
 SOURCE_HASHES = {
     ACTOR: '2c91de2e6987199c74b092698a3e656bc023ad0fd924b32e4a7aeb4ffc177a01',
     RELOC: '5642d27903df612f39d052b66682acaf2d4a634d878fcd8da05246fa50d1e29b',
@@ -22,8 +24,8 @@ TEXTURE_OFFSETS = (0x1110, 0x1510, 0x1910)
 
 def replacements(native, base, english):
     verified_rom(native)
-    if sha256(base) != CANDIDATE_SHA256:
-        raise ValueError('Title preview requires the unchanged v0 candidate')
+    if sha256(base) not in TITLE_BASES:
+        raise ValueError('Title preview requires a reviewed complete baseline')
     old, current = by_vrom(native), by_vrom(base)
     for vrom, digest in SOURCE_HASHES.items():
         if sha256(old[vrom].extract(native)) != digest or current[vrom].extract(base) != old[vrom].extract(native):

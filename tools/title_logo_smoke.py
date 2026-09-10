@@ -9,6 +9,7 @@ from title_start_smoke import locate
 from title_memory import BASE, GUARD
 
 PREVIEW_SHA256 = 'a69f8ca9cdde8eece5d85e9b0a97ab70e31ebd58bb8164a16ab84ed29fb440f7'
+COMBINED_SHA256 = 'fd5ea14491387de19229847fdd3fbf5dd46dd14c461bb07a2fe6b9d7515682da'
 
 
 def diagnose(debug):
@@ -54,7 +55,7 @@ def diagnose(debug):
 
 
 def verify(debug, rom, profile):
-    if sha256(rom) != PREVIEW_SHA256:
+    if sha256(rom) not in (PREVIEW_SHA256, COMBINED_SHA256):
         raise ValueError('Title animation observation requires the exact English logo preview')
     files = by_vrom(rom)
     overlay, reloc, assets = [files[v].extract(rom) for v in (NEW_ACTOR, NEW_RELOC, ASSETS)]
@@ -94,3 +95,51 @@ def verify(debug, rom, profile):
             'overlay_bytes': len(overlay), 'asset_bank': f'{bank:08X}', 'animation_frames': frames,
             'draws': draws, 'phase': phase, 'background_alpha': alpha, 'error': error,
             'read_only': True, 'visual_validation': False, 'main_logo_replaced': True}
+
+
+def verify_warning(debug, rom):
+    """Check the actual unsupported-machine framebuffer without a screenshot."""
+    if sha256(rom) != COMBINED_SHA256:
+        raise ValueError('Expansion warning check requires the complete combined title build')
+    if debug.read_memory(0x80000318, 4) != bytes.fromhex('00400000'):
+        raise ValueError('Expansion warning check requires actual four-MiB emulation')
+    if debug.read_memory(0x80102200, 4) != bytes(4):
+        raise ValueError('Unsupported machine has a loaded high-memory title pointer')
+    if debug.read_memory(0x800418D8, 4) != bytes(4):
+        raise ValueError('Expansion warning caused a native fault')
+    state, flags, thread_id = struct.unpack('>2HI', debug.read_memory(0x80145640, 8))
+    if state != 1 or thread_id != 4 or flags:
+        raise ValueError('Expansion warning has not cleanly stopped its graph caller')
+    data = debug.read_memory(0x80041960, 60)
+    fb, width, height, top, bottom, left, right, fg, bg, x, y, font, cw, ch, wp, hp = struct.unpack_from('>I10HI2B2b', data)
+    if (width, height, top, bottom, left, right, fg, bg, font, cw, ch, wp, hp) != (
+            320, 240, 16, 223, 22, 297, 0xFFFF, 0, 0x8003DE50, 8, 8, 0, 0):
+        raise ValueError('Expansion warning drawer differs from the checked native format')
+    if fb & 1 or not 0x80000400 <= fb <= 0x80400000-width*height*2:
+        raise ValueError('Expansion warning framebuffer exceeds four MiB')
+    pixels = bytearray()
+    for start in range(0, width*height*2, 4096):
+        pixels.extend(debug.read_memory(fb+start, min(4096, width*height*2-start)))
+    glyphs = debug.read_memory(font, 2048)
+    message = 'Expansion Pak required.\n\nPower off and install it.'
+    cursor_x, cursor_y, checked = left, top, 0
+    for char in message:
+        if char == '\n':
+            cursor_x, cursor_y = left, cursor_y+8
+            continue
+        code = ord(char)
+        for row in range(8):
+            word = struct.unpack_from('>I', glyphs, ((code//8)*16+((code&4)>>2)+row*2)*4)[0]
+            mask = 0x10000000 << (code%4)
+            for column in range(8):
+                actual = struct.unpack_from('>H', pixels, ((cursor_y+row)*width+cursor_x+column)*2)[0]
+                if actual != (0xFFFF if word & (mask>>(column*4)) else 1):
+                    raise ValueError(f'Expansion instruction framebuffer differs at character {checked}, row {row}, column {column}')
+        cursor_x += 8
+        checked += 1
+    if (x, y) != (cursor_x, cursor_y):
+        raise ValueError('Expansion instruction was not completely printed')
+    return {'title_expansion_warning': 'passed', 'framebuffer': f'{fb:08X}',
+            'message': message, 'verified_glyphs': checked, 'verified_pixels': checked*64,
+            'detected_ram_bytes': 0x400000, 'graph_thread_stopped': True,
+            'faulted_thread': False, 'read_only': True, 'hardware_acceptance': False}

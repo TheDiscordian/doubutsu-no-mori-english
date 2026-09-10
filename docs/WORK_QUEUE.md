@@ -2,6 +2,14 @@
 
 ## V0 execution priority
 
+The [combined title checkpoint](checkpoints/TITLE_LOGO.md) records the current
+Expansion Pak candidate at `build/title-combined-01`, with all current fixes and
+English screen/shop artwork retained. Native animation/START checks and the
+four-MiB instruction screen pass; a captured English title frame is inspected.
+Continue the GameCube-style keyboard and remaining signs/buildings/bags.
+Retain normal save/menu/hardware checks without repeating the passing title
+scenarios. The corrected four-MiB v0 handoff is unchanged.
+
 The [collection checkpoint](checkpoints/COLLECTION_ARTWORK.md) records the full
 Insects/Fish headings in `build/collection-artwork-01`, retaining every previous
 clock/screen/shop change and both conversation fixes. Three focused checks pass.

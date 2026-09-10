@@ -1,0 +1,5 @@
+[
+  {"wait": 8},
+  {"verify_title_expansion_warning": true},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
+]

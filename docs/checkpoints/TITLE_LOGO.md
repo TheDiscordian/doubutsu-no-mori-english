@@ -2,7 +2,51 @@
 
 ## Candidate and implementation
 
-The separate current preview is
+The combined candidate is
+`build/title-combined-01/animal-forest-title-preview.z64`, SHA-256
+`fd5ea14491387de19229847fdd3fbf5dd46dd14c461bb07a2fe6b9d7515682da`.
+UPS SHA-256:
+`e7f271f5e0f6546b5fb9be021926f895eb1955febfe4247bba8f7dc62b75380c`.
+It retains `build/collection-artwork-01`: both first-job conversation fixes,
+Shrine, shop/map/inventory/collection artwork, English clock, and all earlier
+English text. It requires eight MiB and displays a clear power-off/install
+instruction screen without an Expansion Pak. This candidate is separate from
+the unchanged corrected-v0 handoff. The [playtest notes](../V1_TITLE_PLAYTEST.md)
+record exact paths, requirements, and outstanding checks.
+
+Four focused combined-title checks pass across the focused runs. Six existing
+title/relocation/allocator checks pass in 10.340 seconds, and five Press Start
+checks pass in 5.688 seconds. Two test assertions needed correction: the warning
+occupies 204 of the available 208 bytes, and an observational metadata read is
+marked `not_requested`, not a requested assertion. Those corrected checks pass;
+neither required changing the ROM or replaying native scenarios.
+
+`build/title-combined-native-01` passes twelve recorded steps on eight-MiB
+emulation, including the full relocated title/assets, all three animations at
+frame 121, zero graphics error, START into English message `09C7`, released
+title ownership, and retained high-memory/resident guards. The title actor is
+`802CF020`, the loaded image `80400010`, and the tile bank `802CF7E0`.
+`build/title-warning-native-01` passes six recorded steps on four-MiB emulation:
+the actual `803DA7C0` framebuffer contains all 48 printed glyphs/3,072 checked
+pixels, the title pointer is null, graph thread four is stopped normally, no
+faulted thread exists, and the resident guard is intact. Both runs are silent,
+isolated, read-only observations and shut down gracefully. No user save is used.
+
+`build/title-combined-visual-01/english-title.png` is an inspected isolated-
+emulator capture. The complete English logo is readable over the native town
+scene, with the native copyright retained and no visible missing letter or
+clipped logo edge in that frame. The capture is not an animation-wide visual
+comparison or hardware approval; Press Start's blink is off in the sampled frame.
+No desktop capture or report window is used.
+
+Continue the GameCube-style keyboard and remaining Japanese sign/bag artwork.
+Return-to-title/existing-save behaviour, ordinary menu/save round trips, and
+original-hardware acceptance remain unverified. Do not rerun the passing native
+logo/low-memory checks without a relevant change.
+
+## Retained standalone preview
+
+The separate earlier preview is
 `build/title-logo-expansion-preview-03/animal-forest-title-preview.z64`, SHA-256
 `a69f8ca9cdde8eece5d85e9b0a97ab70e31ebd58bb8164a16ab84ed29fb440f7`.
 Its UPS SHA-256 is
@@ -66,8 +110,9 @@ Detected RAM is eight MiB. START reaches complete English message `09C7`
 pointer and zero loaded instances after the transition. Both high-memory guards
 are still intact. The isolated cartridge files are not proof of normal saving.
 
-The host source/command checks and native execution do not prove the title looks
-correct. Complete visual comparison, return-to-title/existing-save behaviour, and a clear
-missing-Expansion-Pak warning. Continue the GameCube-style keyboard and retained
+The host source/command checks and native execution alone do not prove the title
+looks correct. The combined candidate above supplies the warning and a bounded
+visual check; animation-wide comparison and return-to-title/existing-save
+behaviour remain. Continue the GameCube-style keyboard and retained
 v0 regression-fixture cleanup. Ordinary save/restart and original-hardware
 acceptance remain unverified; the title preview does not certify either.

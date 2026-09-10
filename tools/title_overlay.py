@@ -8,7 +8,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom, replace_dma, make_ups, apply_ups, fix_checksum
 from package_v0 import CANDIDATE_SHA256
 from title_assets import ROOT, extract
-from title_press_start import ACTOR, RELOC, ASSETS, RAM, replacements as start_replacements
+from title_press_start import ACTOR, RELOC, ASSETS, RAM, TITLE_BASES, replacements as start_replacements
 from title_memory import BOOT, install as install_memory
 
 NEW_ACTOR, NEW_RELOC = 0x03C00000, 0x03C50000
@@ -39,8 +39,9 @@ def validate(data, reloc, profile):
 
 def build(native, base, report, rel, symbols, data, reloc, profile):
     verified_rom(native); validate(data, reloc, profile)
-    if sha256(base) != CANDIDATE_SHA256 or report.get('output_sha256') != CANDIDATE_SHA256:
-        raise ValueError('English title requires the unchanged handed-off v0 build')
+    baseline_sha = sha256(base)
+    if baseline_sha not in TITLE_BASES or report.get('output_sha256') != baseline_sha:
+        raise ValueError('English title requires a reviewed complete baseline')
     assets = extract(rel, symbols)[0]
     changed = start_replacements(native, base, assets)
     files = by_vrom(base)
@@ -57,7 +58,7 @@ def build(native, base, report, rel, symbols, data, reloc, profile):
     struct.pack_into('>4I', metadata, 0, NEW_ACTOR, NEW_ACTOR+SIZE, RAM, RAM+SIZE)
     struct.pack_into('>H', metadata, 28, 1)  # Native absolute release clears the pointer without heap-freeing it.
     code[METADATA-CODE_RAM:METADATA-CODE_RAM+32] = metadata
-    boot, memory = install_memory(native, base, code, SIZE)
+    boot, memory = install_memory(native, base, code, SIZE, warning=baseline_sha != CANDIDATE_SHA256)
     replacements.update({ACTOR: data, RELOC: reloc, ASSETS: changed[ASSETS], CODE_VROM: bytes(code), BOOT: boot})
     moved.update({ACTOR: NEW_ACTOR, RELOC: NEW_RELOC})
     image = replace_dma(native, replacements, moved, additions)
@@ -89,7 +90,7 @@ def build(native, base, report, rel, symbols, data, reloc, profile):
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('English title UPS reconstruction failed')
-    evidence = {'version': 1, 'baseline_sha256': CANDIDATE_SHA256, 'source_sha256': sha256(native),
+    evidence = {'version': 1, 'baseline_sha256': baseline_sha, 'source_sha256': sha256(native),
                 'output_sha256': sha256(image), 'patch_sha256': sha256(patch), 'rom_bytes': len(image),
                 'actor_vrom': NEW_ACTOR, 'relocation_vrom': NEW_RELOC, 'actor': profile,
                 'memory': memory,
@@ -101,10 +102,11 @@ def build(native, base, report, rel, symbols, data, reloc, profile):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output', type=Path, default=ROOT/'build/title-logo-expansion-preview-03')
+    parser.add_argument('--output', type=Path, default=ROOT/'build/title-combined-01')
+    parser.add_argument('--base', type=Path, default=ROOT/'build/collection-artwork-01')
     parser.add_argument('--overlay', type=Path, default=ROOT/'build/title-overlay-aligned')
     args = parser.parse_args()
-    base, overlay = ROOT/'build/classic-letters-pilot', args.overlay
+    base, overlay = args.base, args.overlay
     image, patch, report = build((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
         (base/'animal-forest-halfwidth.z64').read_bytes(), json.loads((base/'build.json').read_text()),
         (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),

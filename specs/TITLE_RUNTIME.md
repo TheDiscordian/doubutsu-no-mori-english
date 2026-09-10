@@ -2,10 +2,11 @@
 
 ## Scope and ownership
 
-The separate v1 preview uses all three supplied GameCube English skeletons,
+The combined v1 candidate uses all three supplied GameCube English skeletons,
 their 121-frame animations, and the complete losslessly converted artwork.
-It leaves the handed-off v0 ROM, resident translation module, and save layout
-unchanged. The English-first native keyboard remains installed; the GameCube
+It retains the current conversation fixes and screen artwork while leaving
+the handed-off v0 ROM, resident translation module, and save layout unchanged.
+The English-first native keyboard remains installed; the GameCube
 grid is separate pending work.
 
 The appended title overlay contains 292,320 bytes, including the 280,224-byte
@@ -34,8 +35,8 @@ and follow it. The reservation must end below `80450000`, away from the emergenc
 fault framebuffer at the top of detected RAM. No other feature can borrow this
 region while the title owns it.
 
-A 108-byte allocation adapter occupies verified zero space at
-`800D6600..800D666B`, beyond the existing text-loader bootstrap epilogue. The
+A 204-byte allocation adapter occupies verified zero space at
+`800D6600..800D66CB`, beyond the existing text-loader bootstrap epilogue. The
 native call at `80057A10` selects it. All actor metadata except the exact title
 entry at `801021F0` tail-call the unchanged native allocator. The title entry
 receives its fixed address only when the detected RAM size is exactly eight
@@ -50,8 +51,13 @@ contain this change, with recomputed N64 checksums. Changing only a replacement
 DMA entry cannot change the code initially executed by IPL3.
 
 Without an Expansion Pak, the adapter refuses the title allocation and performs
-no upper-memory writes. A clear missing-Pak user interface is still required
-before a v1 handoff; an absent title is not an acceptable final warning.
+no upper-memory writes. It calls the existing CPU framebuffer/font routines to
+show "Expansion Pak required." and "Power off and install it.". Printing writes
+back the framebuffer cache. `osStopThread(NULL)` stops the unsupported graph
+caller after the warning; no CPU fault, save write, or ordinary game continuation
+is triggered. The warning is checked on actual four-MiB emulation, including all
+3,072 glyph pixels, complete text, stopped caller, and absent faulted-thread state.
+The older 108-byte preview allocator remains available for reproducibility only.
 
 ## Animation and graphics
 

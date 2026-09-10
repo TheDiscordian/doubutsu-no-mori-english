@@ -13,9 +13,10 @@ BOOT, BOOT_RAM = 0x1060, 0x80025C60
 HELPER, HELPER_END, CALL = 0x800D6600, 0x800D66D0, 0x80057A10
 BASE, LIMIT, GUARD = 0x80400010, 0x80450000, 0xAF54C0DE
 SOURCE = 'overlays/title/allocation.s'
+WARNING_SOURCE = 'overlays/title/allocation_warning.s'
 
 
-def compile_helper():
+def compile_helper(*, warning=False):
     with tempfile.TemporaryDirectory(prefix='af-title-memory-') as directory:
         output = Path(directory)
         docker = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
@@ -23,7 +24,8 @@ def compile_helper():
         def run(tool, *args):
             subprocess.run(docker+['/n64_toolchain/bin/mips64-elf-'+tool, IMAGE, *args],
                            check=True, capture_output=True, timeout=60)
-        run('as', '-EB', '-mabi=32', '-march=vr4300', '/source/'+SOURCE, '-o', 'memory.o')
+        source = WARNING_SOURCE if warning else SOURCE
+        run('as', '-EB', '-mabi=32', '-march=vr4300', '/source/'+source, '-o', 'memory.o')
         run('ld', '-EB', '-Ttext', f'0x{HELPER:X}', '-e', 'af_title_allocate', '-o', 'memory.elf', 'memory.o')
         run('objcopy', '-O', 'binary', '-j', '.text', 'memory.elf', 'memory.bin')
         result = (output/'memory.bin').read_bytes()
@@ -32,7 +34,7 @@ def compile_helper():
     return result
 
 
-def install(native, base, code, size):
+def install(native, base, code, size, *, warning=False):
     if size & 15 or not 0 < size <= LIMIT-BASE-16:
         raise ValueError('Title image exceeds its dedicated Expansion Pak reservation')
     native_files, files = by_vrom(native), by_vrom(base)
@@ -54,11 +56,12 @@ def install(native, base, code, size):
         raise ValueError('Changed native forced-four-MiB boot store')
     # IPL3 already supplies detected RAM size. Do not manufacture eight MiB.
     boot[at:at+4] = bytes(4)
-    helper = compile_helper()
+    helper = compile_helper(warning=warning)
     code[HELPER-CODE_RAM:HELPER-CODE_RAM+len(helper)] = helper
     struct.pack_into('>I', code, CALL-CODE_RAM, 0x0C000000 | ((HELPER >> 2) & 0x3FFFFFF))
     return bytes(boot), {'required_ram_bytes': 0x800000, 'base': BASE, 'limit': LIMIT,
                         'guard': GUARD, 'helper': HELPER, 'helper_bytes': len(helper),
-                        'helper_sha256': sha256(helper), 'source_sha256': sha256((ROOT/SOURCE).read_bytes()),
+                        'helper_sha256': sha256(helper), 'source_sha256': sha256((ROOT/(WARNING_SOURCE if warning else SOURCE)).read_bytes()),
                         'ordinary_heap_end': 0x80400000, 'title_alloc_type': 1,
-                        'missing_expansion_pak': 'Title allocation refused; this preview requires eight MiB'}
+                        'missing_expansion_pak': ('English power-off/install instruction screen; caller stopped without an exception'
+                            if warning else 'Title allocation refused; this preview requires eight MiB')}
