@@ -17,6 +17,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [small-sign candidate](checkpoints/SHOP_SIGNS.md) at `build/shop-signs-01`
+adds the exact English SOLD OUT sign and corrects three native keyboard-hint
+glyph bytes, retaining Nookington and every earlier fix. Three focused checks
+pass, including strict current editor ownership and all prior resources. The
+combined native screen check verifies empty-name clearing, Q/q input, and the
+visible grid, but stops at a deletion assertion affected by unthrottled frame
+timing. Later input checks remain unverified; do not repeat that setup batch.
+Continue the police station artwork and final title combination.
+
 The [Nookington main-sign candidate](checkpoints/NOOKINGTON_SIGN.md) installs
 the complete supplied English lettering in both seasons, preserving native
 geometry, palettes, doors, and allocation. Five focused checks pass, including

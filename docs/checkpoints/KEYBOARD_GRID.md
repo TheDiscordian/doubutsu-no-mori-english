@@ -97,3 +97,33 @@ and identical title/asset/boot/warning resources compared with the tested title
 candidate. The unchanged title component reuses its recorded native evidence;
 the grid's incomplete native acceptance is not promoted by combining the ROMs.
 This candidate requires an Expansion Pak and is not a new recommended handoff.
+
+## Combined screen check
+
+The Nookington/title batch's `combined-grid-native-01` reaches the English
+opening message but the runner's 70-second process deadline stops it before
+keyboard entry. The one retry, `combined-grid-native-02`, has a 310-second
+deadline and deliberately clears the field using B before assertions.
+
+The retry verifies normal grid ownership and zero draw errors, deletion of the
+opening's accidental `1`, an empty six-character name, selection of Q, insertion
+of Q, case switching, and insertion of q. The retained image shows the complete
+grid and caller's name window. A checkpoint is retained for this exact ROM at
+`build/combined-grid-native-02/test.bs1`, SHA-256
+`7416357e9a824f38b418c79eae54afde84167b9ebf0715ca38eb5cf892c55a02`.
+The 0.08-second B step deletes both characters instead of one. The capture
+reports approximately 210 FPS, so that hold can exceed the native eight-frame
+repeat delay. The result is consistent with unthrottled test timing; it does not
+verify single-frame deletion or the later capacity/cursor/Done assertions.
+
+Both attempts are complete; do not repeat this setup batch. Future input checks
+must control emulated frame duration and resume a matching checkpoint when safe.
+No completed normal save or original-hardware acceptance is claimed.
+
+The image also reveals an actual control-label encoding defect: raw ASCII plus
+and slash bytes select native heart/music glyphs. The bounded label adapter
+encodes plus as native `5C` and uses a space between the movement devices. It
+changes exactly three resource bytes, with unchanged code, relocation, layout,
+and capacities. The [label adapter](../../tools/keyboard_grid_labels.py) binds
+the exact compiled and corrected images; broader grid verification restores
+only those reviewed bytes before checking the compiled profile.

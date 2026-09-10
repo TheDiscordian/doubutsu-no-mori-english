@@ -3,6 +3,9 @@
   {"key":"Return","duration":0.3},
   {"wait":8},
   {"repeat":23,"actions":[{"key":"a","duration":0.2},{"wait":5},{"snapshot_message":true}]},
+  {"snapshot_keyboard":true,"snapshot_keyboard_grid":true,"expect_keyboard":{"mode":3,"columns":6,"rows":1}},
+  {"key":"b","duration":1.5},
+  {"wait":0.5},
   {"snapshot_keyboard":true,"snapshot_keyboard_grid":true,"expect_keyboard":{"mode":3,"columns":6,"rows":1,"length":0}},
   {"save_state":true},
   {"capture":"english-grid-empty.png"},
@@ -36,6 +39,6 @@
   {"wait":5},
   {"snapshot_message":true},
   {"capture":"english-grid-name-confirmed.png"},
-  {"read":["80000318",4],"expect":"00400000"},
+  {"read":["80000318",4],"expect":"00800000"},
   {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
 ]

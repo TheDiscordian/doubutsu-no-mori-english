@@ -42,6 +42,8 @@ def preceding(data,reloc):
 
 
 def validate(native,data,reloc,report=None):
+    from keyboard_grid_labels import compiled_form
+    data=compiled_form(data)
     if (len(data)!=APPROVED['bytes'] or sha256(data)!=APPROVED['overlay_sha256']
             or len(reloc)!=APPROVED['relocation_bytes'] or sha256(reloc)!=APPROVED['relocation_sha256']
             or len(data)>LIMIT or any(data[APPROVED['bss_start']:])):
