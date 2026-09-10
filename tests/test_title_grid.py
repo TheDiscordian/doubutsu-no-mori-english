@@ -43,6 +43,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('keyboard-grid-cursor-01', 'title-cursor-combined-01',
             'b42b63b0c59b9e947338dc3ac477f7c8562dd6cbd9dddbdc3831ca49622b63c6')
 
+    @unittest.skipUnless((ROOT/'build/title-tune-combined-01/preview.json').is_file(),
+                         'Local notice/tune/title candidate required')
+    def test_tune_combination_retains_notice_controls_and_all_earlier_artwork(self):
+        self.check_combination('tune-artwork-01', 'title-tune-combined-01',
+            '41282aa2c64a946a7588cc0434a8ddf1f3b51727b52205ae708b71f16c0b4cca')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

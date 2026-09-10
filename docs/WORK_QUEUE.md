@@ -2,6 +2,16 @@
 
 ## V0 execution priority
 
+Current work is the remaining Japanese artwork in the combined
+`build/title-tune-combined-01` Expansion Pak candidate. The English title,
+GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
+Redd signs, bulletin-board labels, and town-tune controls are installed and retain
+both Nook conversation corrections. See [current progress](PROGRESS.md) and
+[the notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md). Continue catalogue
+first/last labels and other uncovered images. Do not repeat completed title,
+conversation, or controller probes without a relevant change. Normal player
+acceptance and remaining Japanese art are not claimed complete.
+
 The [combined title checkpoint](checkpoints/TITLE_LOGO.md) records the current
 Expansion Pak candidate at `build/title-combined-01`, with all current fixes and
 English screen/shop artwork retained. Native animation/START checks and the
@@ -1274,16 +1284,17 @@ Japanese text-bearing images in the inventory and completion requirements.
 
 The [title source route](../specs/TITLE_ASSETS.md) records the supplied English
 animated letter groups, background/trademark, and separate Press Start tiles,
-with verified English data and native-overlay hashes. No title replacement is
-installed. Audit native drawing/assets and convert source representation without
-changing original menu, clock, save-data, or selected-player transitions.
+with verified English data and native-overlay hashes. The full animated English
+title is installed with title-only Expansion Pak ownership and a safe no-Pak
+instruction screen. Menu, clock, save-data, and selected-player transitions retain
+their native logic; normal existing-save/return-to-title acceptance remains.
 
 | ID | Task | Status | Acceptance/evidence |
 | --- | --- | --- | --- |
-| S01 | Identify every Japanese text-bearing image | pending | Asset IDs, dimensions, texture formats, palette use, and in-game location |
-| S02 | Match English GameCube images, including title screen | pending, title sources located | Scoped English logo/animation/background/prompt source locations and hashes recorded; native drawing/asset binding and complete source extraction remain |
-| S03 | Replace images with matching GameCube artwork | pending | Preserve identical artwork where formats allow; document any necessary conversion; check N64 memory/graphics budgets |
-| S04 | GameCube-style English keyboard | pending, specified | Real 10×4 grid, case/symbol pages, N64 controller mapping, all editor callers and save limits tested |
+| S01 | Identify every Japanese text-bearing image | active | Bound implemented title, shop, and interface assets; catalogue and other uncovered images remain; inspected station atlases contain no lettering |
+| S02 | Match English GameCube images, including title screen | active | Full title and implemented screen/building donors are bound to actual source models; remaining donors require matching |
+| S03 | Replace images with matching GameCube artwork | active | Title, four shop signs, police/Redd/SOLD OUT, map/inventory/collection headings, and notice/tune controls installed; remaining art and ordinary acceptance pending |
+| S04 | GameCube-style English keyboard | installed, broader acceptance pending | Real 10×4 grid with case/symbol pages and native controls; bounded corrected input probe passes; saved capacities unchanged; multi-line/editor-caller playtesting remains |
 
 ## Release
 

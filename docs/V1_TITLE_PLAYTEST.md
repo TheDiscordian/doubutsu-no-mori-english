@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-cursor-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-cursor-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-tune-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-tune-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`b42b63b0c59b9e947338dc3ac477f7c8562dd6cbd9dddbdc3831ca49622b63c6`.
+`41282aa2c64a946a7588cc0434a8ddf1f3b51727b52205ae708b71f16c0b4cca`.
 Patch SHA-256:
-`058429ee60ecd3fd6e78505fbacf8cc394203097470be1f5e0b735c219390615`.
+`540faec94f2b6e4c4ca575d2ba76821b2377624656723ad7e277ced9eba56cc8`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -17,6 +17,8 @@ both corrected Nook first-job conversation paths, the Shrine wording, twelve
 English shop textures, map and inventory headings, Insects/Fish collection
 headings, and the translated native clock screen. Nookington's main sign,
 SOLD OUT, police-station signs/posters, and Redd's summer sign are English.
+Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
+controls use the complete supplied English artwork with native N64 button icons.
 All earlier English dialogue, names, letters, and editor improvements are retained.
 The keyboard uses the GameCube-style 10-column, four-row grid, with native N64
 controls, corrected direction commands, and unchanged saved input capacities.
