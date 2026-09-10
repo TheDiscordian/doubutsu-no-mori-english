@@ -25,6 +25,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('nookington-sign-02', 'title-nookington-combined-01',
             '76757a029aca2d0564daff08e3f2a790bf572b66efb6a2a84fee8f26a8acf4c4')
 
+    @unittest.skipUnless((ROOT/'build/title-police-combined-01/preview.json').is_file(),
+                         'Local police/title candidate required')
+    def test_police_combination_retains_english_signs_and_corrected_grid_labels(self):
+        self.check_combination('police-artwork-01', 'title-police-combined-01',
+            'aa0978ff0efd992face36276e02e867f64c618b1469326ad4904013793e71f95')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

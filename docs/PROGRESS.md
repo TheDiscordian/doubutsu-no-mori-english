@@ -17,6 +17,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [police-station candidate](checkpoints/POLICE_ARTWORK.md) at
+`build/police-artwork-01` installs the GameCube English doorway sign and wanted
+poster in both seasons. Three focused checks pass, including unchanged native
+lighting/remaining geometry, all 92 seasonal building streams, and complete
+prior-resource retention. `build/title-police-combined-01` adds the unchanged
+English title and requires an Expansion Pak. Ordinary scene acceptance remains
+pending, and the keyboard's test limits remain. Continue Redd's summer sign
+and remaining decorative art; keep the recommended playtest handoff unchanged.
+
 The [small-sign candidate](checkpoints/SHOP_SIGNS.md) at `build/shop-signs-01`
 adds the exact English SOLD OUT sign and corrects three native keyboard-hint
 glyph bytes, retaining Nookington and every earlier fix. Three focused checks
