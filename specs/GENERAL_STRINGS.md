@@ -60,6 +60,13 @@ The current selectors do not use these names; live identities remain separate.
 Complete values fit thirteen bytes in the unchanged bounded generic loader, with
 no code, saved-name, or unrelated caller expansion.
 
+The [residual general integration](RESIDUAL_GENERAL.md) completes the remaining
+test/date labels, unused catchphrases, fortune/birthday/trash/shop-name copies,
+and source-bound accounting for intentional English quantity omissions. Existing
+full-text consumers are verified and retained; compact old helper labels do not
+replace full active English dates. All Japanese-bearing general records have
+installed English replacements.
+
 The optional [native credits integration](NATIVE_CREDITS.md) supplies all 110
 rows in `04EA..0557`. Ten twenty-five-byte rows use a separate 256-byte actor
 BSS area, with updated ownership metadata and both load/draw lengths and

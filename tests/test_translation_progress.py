@@ -48,6 +48,21 @@ class TranslationProgressTests(unittest.TestCase):
         self.ledger.credit('string:0000', b'', 'native_bank')
         self.assertEqual(self.ledger.summary()['percent'], 0)
 
+    def test_intentional_unit_omission_requires_exact_source_id_bytes_and_route(self):
+        self.add('string:0593', 'ぽん')
+        self.ledger.credit('string:0593', b'', 'native_bank')
+        self.assertEqual(self.ledger.summary()['replaced_source_characters'],0)
+        self.ledger.credit('string:0593', b'', 'native_bank',english_unit_omission=True)
+        self.assertEqual(self.ledger.summary()['replaced_source_characters'],2)
+        self.assertTrue(self.ledger.rows['string:0593']['replacements'][0]['intentional_omission'])
+        for value,route in ((b' ','native_bank'),(b'', 'mail')):
+            with self.assertRaises(ValueError):
+                self.ledger.credit('string:0593',value,route,english_unit_omission=True)
+        for identity in ('string:0000','string:0594'):
+            self.add(identity,'あい')
+            with self.assertRaises(ValueError):
+                self.ledger.credit(identity,b'','native_bank',english_unit_omission=True)
+
     def test_partially_connected_resources_do_not_count_as_applied(self):
         self.add('string:0000', 'あいうえ')
         for route in ('display_names', 'catchphrases'):

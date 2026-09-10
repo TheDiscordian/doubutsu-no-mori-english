@@ -27,8 +27,10 @@ The first seven families agree completely with the supplied English references
 and legacy bank. They preserve piece/pieces, sheet/sheets, suit/suits,
 bunch/bunches, and bag/bags. Tool/long-object and animal counters are intentionally
 empty in English. All thirty omissions are explicit, source-bound members of
-the group, not missing references or deleted dialogue. They are not counted as
-visible English words in the existing coverage calculation.
+the group, not missing references or deleted dialogue. The combined counter
+credits these thirty exact source-bound omissions after verifying the complete
+installed group and five-shop selection/capacity code; it does not treat them
+as visible English words or grant credit to arbitrary empty translations.
 
 The eighth native family counts saplings: category `29`, index zero, selects
 it in all five actors. The native item is `きのなえ`; its Japanese counter `かぶ`

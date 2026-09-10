@@ -25,6 +25,14 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [general-string completion](checkpoints/RESIDUAL_GENERAL.md) finishes every
+Japanese-bearing general-bank record. The current combined ROM/UPS is
+`build/residual-general-pilot`. Three focused checks and fourteen counter
+regressions pass, including complete installed consumers, all prior resources,
+patch reconstruction, and source-bound intentional omissions. No runtime or saved
+layout changes. Continue the remaining letter variants and command-only letter
+components, then bounded combined v0 gameplay/save checks.
+
 The [retained-name integration](checkpoints/UNUSED_NAMES.md) applies all 200 old
 general name records while preserving live localized names and saved identities.
 The current combined ROM/UPS is `build/unused-names-pilot`. Four focused tests and

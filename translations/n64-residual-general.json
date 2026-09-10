@@ -1,0 +1,290 @@
+[
+  {
+    "id": "string:0003",
+    "source_sha256": "e5d6cead85f369efbb4c17f2c46212f5e8663ed132cd40a5aa44f5a521393df2",
+    "translation": "yr",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0004",
+    "source_sha256": "ac92c1ddcc1eec8964b9d96d816b162c565286e9d026634b66f195be9a20516f",
+    "translation": "mo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0005",
+    "source_sha256": "66ccdeadef729277d7d3d36f241e6806b9d848b591bfdcd04fea98e9a8fab2ca",
+    "translation": "d",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0006",
+    "source_sha256": "f3df1f9c358ae8eceb8fce7c00614288d113ad55315f4ebb909774a7daadfc84",
+    "translation": "h",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0007",
+    "source_sha256": "47c453fe531ba47e1fbdc11c5a5ac6c911b482bc8ebf7e3aaecaf37de75bb38c",
+    "translation": "m",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0008",
+    "source_sha256": "e455bb2c6dea2a991e13fc7e700c83af6383922a71441feaa7caa996d4c13afb",
+    "translation": "s",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Compact English unit fits the retained native formatter; active date paths retain their complete GameCube formatting."
+  },
+  {
+    "id": "string:0009",
+    "source_sha256": "1d25c02c31e873684806107210b2eeed44bfa0652fe6b6f491f010498476b46c",
+    "translation": "Sun",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000A",
+    "source_sha256": "47b7828d32a97cb1e0a904e848a93d1db5681503e8cc74fddd60abe127a64c65",
+    "translation": "Mon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000B",
+    "source_sha256": "8d23c4f672e717e7b42d1e1ba4324b5673c05715cf9385f902978a9491486626",
+    "translation": "Tue",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000C",
+    "source_sha256": "7cc089687a438311e08ae827355c0700fb30592b10775f80e31f1fa1195a3bbc",
+    "translation": "Wed",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000D",
+    "source_sha256": "304db09d53b054371f7557b794b05069177f3df4c39cbd7b2324ae103961aed4",
+    "translation": "Thu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000E",
+    "source_sha256": "623ae393a7fb1b8b7c2571ceb8439f350d337dd588a4454c0440184976099071",
+    "translation": "Fri",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:000F",
+    "source_sha256": "b90ecd6d1ac7847aefbb01828368f1c9b6c1109c26fc8dc0ea72e736b4dcf61b",
+    "translation": "Sat",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Three-letter weekday fits the retained five-byte helper and four-byte length check; active weekday formatting retains complete GameCube names."
+  },
+  {
+    "id": "string:0011",
+    "source_sha256": "f8fc363ad8f629ff1da7b6dbec160b271625f01c7aa468cd64b2e0508b074e48",
+    "translation": "yessir",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0012",
+    "source_sha256": "ec7cb72f1c7f754743b55e08e67f4d5f1e07125dfb29f392391257d203502b22",
+    "translation": "indeed",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0013",
+    "source_sha256": "3da8f24b4bf6fc163aff09ed3479fba376078508b1762a4c37e0d3e5964721e6",
+    "translation": "yessir",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0014",
+    "source_sha256": "bc165ec97bd65a3c37aeaf8ac40ab6c48a2a6c0a666055c91ab49721a00caa81",
+    "translation": "I say",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0019",
+    "source_sha256": "973d0c31251baf861d8bcf6faa7d5ea454ec67fb982e60372c1a7f1e9cba75f1",
+    "translation": "dearie",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0021",
+    "source_sha256": "79ffc6a06d3856f17b9145b327093147d1b447c9725768bb70ecff60850e4b62",
+    "translation": "right?",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:002F",
+    "source_sha256": "67ca0ab5440c6cdcd1a3a300be54e47a983a192de37986fe6eda3f29bf02cca0",
+    "translation": "yo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0037",
+    "source_sha256": "f90bc0c382b6118ae3cb74291e7c4d2055944244dc48b072fca0d3de088fbf6f",
+    "translation": "ahem",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:003A",
+    "source_sha256": "810b6f0869fe3c4ec4f14d025801dee6bbb9b3f79502204ab0eb0f3954351069",
+    "translation": "eh",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0040",
+    "source_sha256": "4215d34b37e41174777ca34084438e616adfbfa28cc7717e3b323c75840ef0d7",
+    "translation": "eh?",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:004F",
+    "source_sha256": "b47df280a66c672b45546f55ad47427b3c2395ab2652e0444ff5e56d2bf73637",
+    "translation": "dear",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0050",
+    "source_sha256": "1d7246255a86cb9b4c74d851f6d8563fa97fc19590fe2baa284674b14a034fd9",
+    "translation": "now",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0053",
+    "source_sha256": "cd44a77916140b8f2d117baef0d17a3d359e024992deadef0ed5b6f6d30c545c",
+    "translation": "yessir",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:005A",
+    "source_sha256": "885dd0169aff3fcfeba4589d9f2415fe6a646355e4d80594565f4f0cd101cc21",
+    "translation": "pooh",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:005D",
+    "source_sha256": "ac0dad5776b933d81893e68e4509bd33ddaab6f212ae501502c4fc091f22fa36",
+    "translation": "meow",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0060",
+    "source_sha256": "fe4783767a4eb07c309c07d466f1fa3ab0d8e52c91ec1b296d84dd5ffeaadad0",
+    "translation": "pah",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0063",
+    "source_sha256": "29560609bd34c76933da014ad45440ec2a076bc6f1acbad27e7254dc4a1632d3",
+    "translation": "pshh",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0065",
+    "source_sha256": "2d91ed520810f088d1feb16701fe823a6c0f139613541eaf9bedc7624311df7f",
+    "translation": "cho",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:006D",
+    "source_sha256": "0a2c6ea0370d1d49c411a6e2396695fcd4eab03d96e9e7a8a3ec1ec312d9ab38",
+    "translation": "yo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0080",
+    "source_sha256": "1e906f852781c5edaec79de1f317ac483fe11933400e0c24bd1294514cb7e7da",
+    "translation": "I say",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0083",
+    "source_sha256": "b8e371cc3f39796baeded74535853209ad849810eada7fae8bd5bc35eefaf62a",
+    "translation": "maru",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0262",
+    "source_sha256": "353c20dfb58638435a0d22345db908dfff5b497bceb24c609b3d194db7aedde9",
+    "translation": "yo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  },
+  {
+    "id": "string:0269",
+    "source_sha256": "8ca3c64d09144c2929d7b0cf684cbf5628f0617cefa03d77756b9041496dc4c6",
+    "translation": "right?",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "evidence": "Translate the native unused catchphrase; the English donor contains a placeholder or no translation, and no native default selector uses this ID."
+  }
+]

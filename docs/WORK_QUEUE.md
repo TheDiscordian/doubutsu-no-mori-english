@@ -15,6 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [general-string checkpoint](checkpoints/RESIDUAL_GENERAL.md) completes every
+Japanese-bearing general-bank row in `build/residual-general-pilot`. Its focused
+checks and counter regressions pass. Finish remaining classic letter variants
+and intentional command-only letter components, preserving immutable catalogues
+and saved layouts. Do not overwrite structural zero-filled tail slots. Then run
+the bounded combined v0 checks and hand over the playtest patch.
+
 The [retained-name checkpoint](checkpoints/UNUSED_NAMES.md) completes all 200
 unselected general name records in `build/unused-names-pilot`. Four focused checks
 and thirteen counter regressions pass; all previous runtime/resources are retained.

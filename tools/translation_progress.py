@@ -80,7 +80,7 @@ class CounterLedger:
         }
 
     def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None,
-               apology=False,accent_item=False):
+               apology=False,accent_item=False,english_unit_omission=False):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
@@ -91,6 +91,12 @@ class CounterLedger:
             if identity not in TARGETS or data!=TARGETS[identity][2] or route!='apology_input':
                 raise ValueError('Apology credit requires an exact installed symbol target')
         classification_data=data
+        if english_unit_omission:
+            from residual_general import EMPTY_SOURCE_HASHES
+            if (identity not in EMPTY_SOURCE_HASHES or data!=b'' or route!='native_bank'
+                    or self.rows[identity]['source_sha256']!=EMPTY_SOURCE_HASHES[identity]
+                    or mail or apology or accent_item or pending_reason):
+                raise ValueError('English counter omission requires its exact source-bound installed unit')
         if accent_item:
             from accent_items import ROWS,ALIASES,encoded
             root=ALIASES.get(identity,identity)
@@ -101,9 +107,11 @@ class CounterLedger:
             # the accent. Exact approval above excludes arbitrary pair permission.
             classification_data=data.replace(b'\x80\x7c',b'e').replace(b'\x80\x87',b'n')
         details = classify(classification_data, info, extended_glyphs=identity.startswith('message:') or apology,mail_glyphs=mail_glyphs)
-        if (details['category'] in ENGLISH_CATEGORIES
-                and details['non_whitespace_static_characters']):
+        if ((details['category'] in ENGLISH_CATEGORIES
+                and details['non_whitespace_static_characters']) or english_unit_omission):
             replacement = {'route': route, 'sha256': sha256(data)}
+            if english_unit_omission:
+                replacement['intentional_omission']=True
             field = 'replacements'
             if pending_reason is not None:
                 if not pending_reason.strip():
@@ -153,9 +161,13 @@ def measure(native, built, report):
         raise ValueError('Build report does not match the source and output ROMs')
     accent_names={}
     accent_built,accent_report=built,report
-    if report.get('unused_names'):
+    empty_units=()
+    if report.get('residual_general'):
+        from residual_general import verify_installation
+        accent_built,accent_report,empty_units=verify_installation(built,native,report)
+    if accent_report.get('unused_names'):
         from unused_names import verify_installation
-        accent_built,accent_report=verify_installation(built,native,report)
+        accent_built,accent_report=verify_installation(accent_built,native,accent_report)
     if report.get('accent_items'):
         from accent_items_install import verify_installation
         accent_names=verify_installation(accent_built,native,accent_report)
@@ -205,7 +217,7 @@ def measure(native, built, report):
         for number, source in enumerate(bank.entries()):
             identity = f'{bank.name}:{number:04X}'
             ledger.add(identity, source)
-            ledger.credit(identity, entries[number], 'native_bank')
+            ledger.credit(identity, entries[number], 'native_bank',english_unit_omission=identity in empty_units)
             if report.get('apology_input') and identity in report['apology_input']['targets']:
                 ledger.credit(identity,entries[number],'apology_input',apology=True)
 
