@@ -121,6 +121,15 @@ not be replayed unchanged.
 - Obtain release approval and record human/hardware acceptance. Private playtest
   packaging does not publish a release or certify the entire game.
 
+## V2, only after V1 is complete
+
+The [N64-inspired keyboard request](../specs/KEYBOARD_V2.md) is deferred:
+retain a GC-like layout, use a greyer N64-controller-inspired background and
+matching N64 button images, and add the stick image on the left. Do not begin
+this redesign during V1 fixes, review, or acceptance. Keep V1-14 focused on
+the current corner orientation/placement, text bounds, glyph positioning,
+and single symbol page.
+
 Current artifacts are in [progress](PROGRESS.md). Exact prior work remains in
 [checkpoints](checkpoints/), [the implementation record](PROGRESS_RECORD.md),
 and [the queue record](WORK_QUEUE_RECORD.md). Those records retain broad evidence
