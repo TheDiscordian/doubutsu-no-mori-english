@@ -60,6 +60,12 @@ formats remain. The [feature notes](V1_TITLE_PLAYTEST.md) describe the packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records the newest work and
 neutral texture sets already inspected.
 
+The [additional structure inspection](checkpoints/NEUTRAL_STRUCTURE_ARTWORK.md)
+finds no readable Japanese wording in the selected train, vacant-lot-sign,
+Katrina-tent, and Gracie-car textures. The region warning is already English.
+Their native artwork is retained and verified in both relevant cartridge copies;
+this is review progress, not newly applied English text.
+
 ## Remaining work and evidence limits
 
 Use [the completion queue](WORK_QUEUE.md). Lucky-bag Japanese decoration is

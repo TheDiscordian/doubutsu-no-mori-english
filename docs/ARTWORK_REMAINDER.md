@@ -101,3 +101,15 @@ entire game has been reviewed.
 The shrine's six inspected seasonal atlases and the eighteen station atlases
 also remain native, as recorded in their existing artwork work. Preserve the
 shrine identity rather than substituting the GameCube wishing well.
+
+## Other inspected structures and warning
+
+The [bounded structure inspection](checkpoints/NEUTRAL_STRUCTURE_ARTWORK.md)
+covers seventeen distinct train, vacant-lot-sign, Katrina-tent, and Gracie-car
+textures in twenty-three seasonal views. No readable Japanese wording is found.
+The small reserve-sign papers contain abstract marks without reliable wording;
+do not invent a transcription. All selected model sections, palette selections,
+and streamed copies remain native in the current candidate. The separate
+region-warning image is already English. These findings add no translation
+credit and do not declare furniture, clothing, other images, or ordinary scene
+acceptance complete. Preserve the inspected native artwork.
