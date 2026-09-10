@@ -17,6 +17,12 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [private patch bundle](checkpoints/V1_PLAYTEST_PACKAGE.md) is ready at
+`build/releases/v1-artwork-playtest-01.zip`. Both focused packaging tests pass,
+including executing the included patcher and reconstructing the exact combined
+ROM without overwriting its source. The bundle retains explicit test limitations
+and is not a public release or completed v1.
+
 The current combined playtest candidate is
 `build/title-gyroid-service-combined-01/animal-forest-title-preview.z64` and requires an
 Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,

@@ -15,8 +15,9 @@ incomplete after its permitted setup retry. Do not repeat that setup batch.
 The [gyroid service checkpoint](checkpoints/GYROID_SERVICE_TEXT.md) records
 complete English, a safe separate transient buffer, three passing host checks,
 the passing title combination, and passing native composition/drawing with intact
-callback/save/guards. Continue remaining embedded interface text, decorative art,
-and patch-only packaging. Do not repeat completed title,
+callback/save/guards. The [private patch package](checkpoints/V1_PLAYTEST_PACKAGE.md)
+is complete with passing reconstruction and standalone patcher checks. Continue
+remaining embedded interface text and decorative art. Do not repeat completed title,
 conversation, or controller probes without a relevant change. Normal player
 acceptance and remaining Japanese art are not claimed complete.
 
