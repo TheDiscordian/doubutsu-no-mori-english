@@ -18,14 +18,21 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 ## Active work
 
 The current combined playtest candidate is
-`build/title-pak-combined-01/animal-forest-title-preview.z64` and requires an
+`build/title-submenu-combined-01/animal-forest-title-preview.z64` and requires an
 Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
 English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
 keyboard, plus English bulletin-board, town-tune, and catalogue controls and
 mailbox/repayment headings. The birthday window has the full English prompt,
 month names, numeric day, and OK, with unchanged date/input/save logic. Controller
 Pak Done/Free/Notes/Pages are English, with all Pak operations and geometry
-unchanged. The [Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md) records
+unchanged. Editor confirmation, sixteen inventory warning windows, and thirteen
+Pak status/error/choice windows are also English. Warning code and saved formats
+stay native; complete strings use bounded appended storage and an extra 4 KiB
+in the existing menu pool. The [embedded menu checkpoint](checkpoints/EMBEDDED_MENU_TEXT.md)
+records three passing host checks and the 8.747-second title combination.
+Its native batch verifies confirmation loading, then stops at a fixture error;
+warning drawing remains unverified. Do not repeat that setup batch. The
+[Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md) records
 three passing focused checks and the 8.396-second complete title combination.
 The
 [birthday checkpoint](checkpoints/BIRTHDAY_SCREEN.md) records passing sanitizer,

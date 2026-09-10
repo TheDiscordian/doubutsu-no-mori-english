@@ -1139,6 +1139,12 @@ def main():
                     raise ValueError('Birthday drawing checks require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_birthday_draw'],record))
+            if 'test_submenu_text' in action:
+                from submenu_text_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Embedded menu checks require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_submenu_text'],record))
             if 'test_apology_input' in action:
                 from apology_input_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-pak-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-pak-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-submenu-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-submenu-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`d74b8999ed97206f9358597d66de105677af41ee4d4dbd9fcdbff467e38e23d4`.
+`be9b51bada53c9fc8a3abd6cc53ae054689100e9bee8a595334d5da183febe35`.
 Patch SHA-256:
-`6bb899264b10fb0f59bb8dc1c9c2e843a8984c82b1bdb7948a6e26d4b61ae7ef`.
+`8c1d147e5917de04f9f692293054e779b622660f30bdf4b77eb3112cbf81c990`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -25,6 +25,10 @@ English source images, with unchanged menu logic and saved fields. The birthday
 window has the full English prompt, month names, day, and OK, preserving native
 date input and saved fields. The Controller Pak screen has English Done, Free,
 Notes, and Pages images, with unchanged native Pak operations and layout.
+Editor confirmation and all inventory/Controller Pak warning windows are English,
+including the native 50,000-Bell limit and explicit repair data-loss warning.
+The warning code is unchanged; appended text uses a bounded extra 4 KiB in the
+ordinary menu pool, without expanding the heap or changing saves.
 All earlier English dialogue, names, letters, and editor improvements are retained.
 The keyboard uses the GameCube-style 10-column, four-row grid, with native N64
 controls, corrected direction commands, and unchanged saved input capacities.
@@ -49,6 +53,9 @@ Captured title, name, and conversation frames are visually inspected. A separate
 native birthday drawing check verifies the complete ordered English font output
 and unchanged birthday/save state with intact memory guards; ordinary date entry
 is not inferred from that controlled fixture.
+The embedded warning/confirmation host and combination checks pass. Its native
+fixture verifies confirmation loading but stops before drawing at a test-script
+error; warning drawing is not claimed verified.
 Original-hardware acceptance, the ordinary first-job replay, all changed menus,
 multi-line editing, normal save/restart, and return-to-title/existing-save cases
 remain playtest work.

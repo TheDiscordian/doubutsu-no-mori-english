@@ -29,6 +29,12 @@ The two embedded birthday prompt/OK records also join the same inventory, with
 the complete installed drawing function, relocations, and string assets checked.
 Four Controller Pak label images contribute their visually transcribed Japanese
 text; credit requires the exact installed English images and unchanged reader.
+The editor's four confirmation strings and both embedded warning overlays share
+this inventory too. Warning records use original string addresses, so repeated
+references do not inflate the denominator. All native inventory and Controller
+Pak status/error text is included, with complete installed pointer/length tables,
+relocations, parent ownership, and enlarged shared menu allocation required for
+credit. The same original records remain pending in earlier cartridges.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

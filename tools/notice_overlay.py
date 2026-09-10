@@ -456,6 +456,10 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
         letter_names = verify_letter_names(built, native, module)
         at = letter_names['owner_offset']
         expected[at:at+32] = letter_names['owner_bytes']
+    from submenu_text import present as menu_text_present,verify_shared_parts as verify_menu_text
+    if menu_text_present(files):
+        menu_text=verify_menu_text(built,native)
+        for at,value in menu_text['owner_rows'].items():expected[at:at+32]=value
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
         if at == POOL_PATCH and editor_extension and not letter_names:

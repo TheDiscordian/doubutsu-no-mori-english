@@ -119,10 +119,13 @@ def verify_owned_parts(built,native,report=None,apology_report=None):
     validate(native,data,reloc,report['overlay'] if report is not None else None)
     needed=allocation(len(files[TAG_VROM].extract(built)));at=owner_editor.METADATA[owner_editor.EDITOR][0]
     code=files[CODE_VROM].extract(built)
+    pool_word=POOL_WORD
+    from submenu_text import present as menu_text_present,verify_shared_parts as verify_menu_text
+    if menu_text_present(files):pool_word=verify_menu_text(built,native)['pool_word']
     if (files[owner_editor.OWNER].extract(built)[at:at+32]!=metadata()
             or files[owner_editor.HBOARD].extract(built)!=owner_editor.patch_window(native)
             or files[owner_editor.HBOARD_RELOC].extract(built)!=originals[owner_editor.HBOARD_RELOC].extract(native)
-            or struct.unpack_from('>I',code,POOL_PATCH-CODE_RAM)[0]!=POOL_WORD
+            or struct.unpack_from('>I',code,POOL_PATCH-CODE_RAM)[0]!=pool_word
             or struct.unpack_from('>I',code,0x800C4AFC-CODE_RAM)[0]!=0x3C0E8089
             or report is not None and report.get('allocation')!=needed):
         raise ValueError('Missing grid owner, retained windows, or shared allocation')
@@ -131,7 +134,7 @@ def verify_owned_parts(built,native,report=None,apology_report=None):
         previous.validate(native,prefix,prior_rel,apology_report['overlay'])
         if apology_report.get('allocation')!=previous.allocation(len(files[TAG_VROM].extract(built))):
             raise ValueError('Changed preceding apology allocation evidence')
-    return {'owner_offset':at,'owner_bytes':metadata(),'pool_word':POOL_WORD,
+    return {'owner_offset':at,'owner_bytes':metadata(),'pool_word':pool_word,
         'pool_extra':owner_editor.POOL_EXTRA+previous.EXTRA_POOL+EXTRA_POOL,'allocation':needed}
 
 

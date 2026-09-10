@@ -67,6 +67,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('controller-pak-artwork-01', 'title-pak-combined-01',
             'd74b8999ed97206f9358597d66de105677af41ee4d4dbd9fcdbff467e38e23d4')
 
+    @unittest.skipUnless((ROOT/'build/title-submenu-combined-01/preview.json').is_file(),
+                         'Local embedded menu English/title candidate required')
+    def test_submenu_combination_retains_warning_storage_pool_and_all_prior_work(self):
+        self.check_combination('submenu-text-01', 'title-submenu-combined-01',
+            'be9b51bada53c9fc8a3abd6cc53ae054689100e9bee8a595334d5da183febe35')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()
