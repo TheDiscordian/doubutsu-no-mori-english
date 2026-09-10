@@ -22,6 +22,10 @@ revision. An Expansion Pak is required. Earlier RCs and the user's saves are pre
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
 
+The [supplementary patch archive](checkpoints/V1RC4_PACKAGE_DOCS.md) fixes a
+source-guide link in the ZIP and passes standalone patch application. It produces
+the identical RC4 ROM; the original handoff and compatibility notes stay intact.
+
 V1-17's [font-edge correction](checkpoints/FONT_POLYGON_EDGES.md) has four
 passing focused tests and controlled native drawing/guard checks. V1-18's
 [transition correction](checkpoints/TRANSITION_EDGES.md) has three passing

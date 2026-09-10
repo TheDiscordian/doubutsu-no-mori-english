@@ -151,6 +151,9 @@ not be replayed unchanged.
   claim the tooling licence covers Nintendo assets.
 - Prepare patch-only reproducible artifacts, verified application, hashes,
   source revisions, compatibility notes, and explicit known issues.
+  Retain the [RC4 package-documentation correction](checkpoints/V1RC4_PACKAGE_DOCS.md)
+  and its passing standalone patcher result. It changes no ROM or save data;
+  do not request another gameplay pass for this documentation-only package.
 - Preserve the verified [portable compiler setup](checkpoints/PORTABLE_TOOLCHAIN.md).
   The complete public-image rebuild passes. The
   [61-stage clean base recipe](checkpoints/V0_REBUILD.md) and
