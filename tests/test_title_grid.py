@@ -31,6 +31,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('police-artwork-01', 'title-police-combined-01',
             'aa0978ff0efd992face36276e02e867f64c618b1469326ad4904013793e71f95')
 
+    @unittest.skipUnless((ROOT/'build/title-redd-combined-01/preview.json').is_file(),
+                         'Local Redd/title candidate required')
+    def test_redd_combination_retains_summer_colours_and_all_earlier_artwork(self):
+        self.check_combination('redd-artwork-01', 'title-redd-combined-01',
+            'b37f9ecf3ccde2344df6c6cad8e39baea73a7c2eaa6ea3f7cad865eeb8aebc9b')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

@@ -17,6 +17,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`
+adds the supplied English summer sign and its two exclusively owned red palette
+entries. All existing pixel colours, the snow-covered winter tent, and previous
+police/Nookington/shop/grid/text work remain. Three focused checks pass; the
+separate `build/title-redd-combined-01` includes the unchanged English title and
+requires an Expansion Pak. No new recommended handoff is claimed. Continue
+remaining decorative art and bounded checkpoint-based input acceptance.
+
 The [police-station candidate](checkpoints/POLICE_ARTWORK.md) at
 `build/police-artwork-01` installs the GameCube English doorway sign and wanted
 poster in both seasons. Three focused checks pass, including unchanged native
