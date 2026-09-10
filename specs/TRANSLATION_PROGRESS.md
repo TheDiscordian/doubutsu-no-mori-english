@@ -88,6 +88,15 @@ not Japanese. Both tiny information notices are installed in English but their
 uncertain original wording receives no invented character weight. These are
 explicit transcription gaps, not missing image replacements. Numeric opening
 hours remain unchanged and receive no new Japanese translation credit.
+The [police/post-office interior images](CIVIC_INTERIOR_ARTWORK.md) add two
+transcribed poster headlines and the mailbag's Japanese postal symbol `〒`,
+totalling 19 source characters. U+3012 is explicitly recognised by the bitmap
+counter; arbitrary symbols or Latin-only artwork still cannot add Japanese
+weight. Credit requires all three exact GC English images, both complete native
+rooms, actual donor bindings, and matching native UV/lighting/triangles. Palettes,
+geometry, gameplay, and saved layouts remain unchanged. Tiny lower poster marks
+remain as in the English donor and receive no invented transcription. The
+postal bag is distinct from the intentionally retained Japanese lucky bags.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

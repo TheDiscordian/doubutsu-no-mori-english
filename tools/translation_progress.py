@@ -83,7 +83,7 @@ class CounterLedger:
         """Count verified bitmap lettering, including kanji absent from the font codec."""
         if identity in self.rows:raise ValueError('Duplicate original text ID: '+identity)
         japanese=lambda c: ('\u3040'<=c<='\u30ff' or '\u3400'<=c<='\u4dbf'
-            or '\u4e00'<=c<='\u9fff' or '\uff66'<=c<='\uff9d')
+            or '\u4e00'<=c<='\u9fff' or '\uff66'<=c<='\uff9d' or c=='\u3012')
         if (not isinstance(text,str) or not any(japanese(c) for c in text)
                 or any(not c.isprintable() and not c.isspace() for c in text)
                 or not isinstance(source_image,bytes) or not source_image):
@@ -518,6 +518,8 @@ def measure(native, built, report):
     verify_stall_artwork(native, built, report)
     from shop_interior_artwork import measure_text as measure_shop_interior_artwork
     measure_shop_interior_artwork(ledger, native, built, report)
+    from civic_interior_artwork import measure_text as measure_civic_interior_artwork
+    measure_civic_interior_artwork(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

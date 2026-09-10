@@ -27,6 +27,19 @@ class TranslationProgressTests(unittest.TestCase):
         self.assertEqual(result['replaced_source_characters'], 4)
         self.assertEqual(result['percent'], 66.7)
 
+    def test_japanese_postal_bitmap_counts_once_but_generic_symbols_do_not(self):
+        self.ledger.add_transcribed_artwork('postal', '〒', b'synthetic source pixels')
+        self.assertEqual(self.ledger.summary()['total_source_characters'], 1)
+        self.ledger.credit('postal', b'MAIL', 'verified_artwork')
+        self.assertEqual(self.ledger.summary()['replaced_source_characters'], 1)
+        with self.assertRaises(ValueError):
+            self.ledger.add_transcribed_artwork('postal', '〒', b'synthetic source pixels')
+        for text in ('', ' ', 'MAIL', '2F', '!', '+', '☆'):
+            with self.assertRaises(ValueError):
+                self.ledger.add_transcribed_artwork('invalid', text, b'synthetic source pixels')
+        with self.assertRaises(ValueError):
+            self.ledger.add_transcribed_artwork('invalid', '〒', b'')
+
     def test_accented_item_credit_is_exact_and_cannot_authorize_other_glyphs(self):
         from accent_items import ROWS,encoded
         identity='item_2A:0033';data=encoded(ROWS[identity][0])
