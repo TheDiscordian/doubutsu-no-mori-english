@@ -17,6 +17,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [Nookington detail candidate](checkpoints/NOOKINGTON_DETAILS.md) adds the
+GameCube doorway wordmark and full English clearance banner in both seasons,
+preserving the red offer and native geometry/palettes. Three focused checks,
+the title combination, and the full combined counter pass. Its separate
+`build/title-nookington-details-combined-01` cartridge retains every earlier fix.
+The packaged handoff below remains unchanged while remaining artwork continues.
+
 The [private patch bundle](checkpoints/V1_PLAYTEST_PACKAGE.md) is ready at
 `build/releases/v1-artwork-playtest-01.zip`. Both focused packaging tests pass,
 including executing the included patcher and reconstructing the exact combined

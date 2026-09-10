@@ -79,6 +79,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('gyroid-service-01', 'title-gyroid-service-combined-01',
             'da66a789341307c625da130ae11e20609b9a023fca82712f303fc59fe95deb94')
 
+    @unittest.skipUnless((ROOT/'build/title-nookington-details-combined-01/preview.json').is_file(),
+                         'Local complete Nookington/title candidate required')
+    def test_nookington_details_combination_retains_complete_menu_and_title_work(self):
+        self.check_combination('nookington-details-01', 'title-nookington-details-combined-01',
+            '172069ba24d2f6a907006222b5a0743d34dffaa7c319b740dbba21ba8edbb9b7')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

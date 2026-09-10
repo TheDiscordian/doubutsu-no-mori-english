@@ -40,6 +40,11 @@ thirteen original records. Credit requires the complete English response table,
 price composition, relocated transient buffer, retained callback, and bounded
 shared allocation. The original greeting/custom-message resource is not counted
 again as part of these separate native strings.
+Both original seasonal Nookington clearance banners contribute six Japanese
+characters each. Credit requires the complete English texture in every retained
+and actual streamed copy, plus the unchanged native texture readers and palettes.
+Extra storage copies do not add source IDs. The doorway and red offer already
+use Latin/numeric lettering and therefore contribute no Japanese source weight.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

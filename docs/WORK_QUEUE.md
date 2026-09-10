@@ -2,6 +2,12 @@
 
 ## V0 execution priority
 
+The separate [Nookington detail batch](checkpoints/NOOKINGTON_DETAILS.md) completes
+the doorway wordmark and clearance banner in both seasons. Its host, title
+combination, and full counter checks pass. Retain it for the next combined
+package while continuing remaining decorative artwork. The English GameCube
+lucky-bag images retain Japanese, and the requested design preference is pending.
+
 Current work is the remaining Japanese artwork in the combined
 `build/title-gyroid-service-combined-01` Expansion Pak candidate. The English title,
 GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
