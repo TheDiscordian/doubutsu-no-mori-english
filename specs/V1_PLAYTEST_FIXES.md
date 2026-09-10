@@ -105,3 +105,25 @@ Move AM/PM X by +36 and the five remaining quads by -15. The total horizontal
 extent remains 84..133; every other vertex component and all display commands
 remain unchanged. Native digit/AM-PM selection, colon blinking, timekeeping,
 date layout, allocation, and saved formats are not patched.
+
+## Notice dates and tune labels
+
+The notice paper's slash is a distinct 16×16 I4 image at asset `00ABA000`
+offset `CE18`. The model at `9F20` uses texture alpha and draws two quads at
+`9B90`, over the date's month/day boundaries. Clear only the 128 texture bytes;
+zero intensity is transparent under that bound combiner. The English date
+reader, paper, draw commands, and geometry stay unchanged.
+
+The unmodified tune overlay `0079C020` has a 16-row note table at `16A0`.
+Each 20-byte row stores frame pointer, segment-C texture pointer, float Y offset,
+and two RGBA colours. GC's `note_moji` at `.data:00080B58` uses 36-byte rows
+with the same note ordering/Y/RGB values. Bind both tables before replacing
+textures; the native segment-9 load at tune asset `00AD1000:0330` samples
+16×16 I4, matching GC's `onp_hyouji_moji1T_model` at `004A2488`.
+
+Install the GC A–G textures and random-note `?` into eight native 128-byte
+slots. Rest and off already match the English source and remain unchanged.
+Preserve note indices, pitches, sounds, animation, colour, frame, and saved
+melody. The English OK model `004A9310` binds its quad at `004A8DE0`;
+copy its XYZ/ST into native `3650`, retaining native flags, colours, and order.
+The corrected X extent is 74..106 and Y is -63..-47. Native N64 controls stay.

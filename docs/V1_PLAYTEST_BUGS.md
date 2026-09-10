@@ -13,15 +13,16 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 | --- | --- | --- |
 | V1-01 | Press Start shows corrupt graphics on first boot and return | Corrected linear source tiles installed in fix build 01; hardware recheck pending |
 | V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Native navigation/page sound call restored in pixel-editor candidate; background and audible hardware check pending |
-| V1-03 | Bulletin-board dates retain unwanted slash graphics | Pending binding of date artwork and draw commands |
+| V1-03 | Bulletin-board dates retain unwanted slash graphics | Separate slash texture cleared in notice/tune candidate; English date reader retained |
 | V1-04 | House camera-control hint is Japanese | Exact English GC Camera texture installed in HUD candidate; hardware recheck pending |
 | V1-05 | Idle clock shows `am 11:36`, not `11:36 am` | Existing digits/AM-PM geometry reordered in HUD candidate; timekeeping and blink unchanged |
-| V1-06 | Town-tune notes are Japanese and OK is too far right | Pending note labels and control placement |
+| V1-06 | Town-tune notes are Japanese and OK is too far right | Exact GC A–G and ? textures plus GC OK placement installed; melody rules unchanged |
 | V1-07 | Opening a letter for editing shows a Japanese bubble | Pending prompt binding |
 | V1-08 | Letter recipient list shows `らっきょ`, expected Limberg | Pending recipient reader and existing-save name handling |
 | V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Pixel-layout candidate built; four host/ROM checks and 16 native calls/45 assertions pass; hardware recheck pending |
 | V1-10 | Letter To/From text remains Japanese | Pending label/reader binding |
 | V1-11 | Nook shop's blue cash bubble still says `もってるおかね` | English GC Your Bells texture, load, and label geometry installed in HUD candidate; hardware recheck pending |
+| V1-12 | Inventory Bells digits are compressed into the left side of their bubbles | Pending money-specific numeric rendering correction; preserve dialogue spacing |
 
 Fix the broken title and editing display first, then the remaining English
 application gaps and keyboard polish. Preserve saved capacities and GameCube

@@ -30,6 +30,12 @@ intermediate is `build/v1-hud-label-fix-02/animal-forest-title-preview.z64`.
 Four focused checks pass; this data-only batch preserves CPU code, allocations,
 timekeeping, and saved data. Remaining playtest findings stay open.
 
+The [notice/tune correction](checkpoints/V1_NOTICE_TUNE_FIXES.md) removes the
+two obsolete date slashes, installs the GC A–G/? note images, and places OK at
+the GC coordinates. The combined intermediate is
+`build/v1-notice-tune-fix-01/animal-forest-title-preview.z64`; four focused checks
+pass. The reported inventory Bells-digit sizing joins the active bug list.
+
 The supplied private artwork playtest is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
