@@ -4,17 +4,22 @@
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
 artwork discovery and event acceptance. All twelve findings have scoped
-corrections in `v1-keyboard-background-fix-01`, reproduced by the complete
-seven-stage `v1-fixes-rebuild-01`. This is implementation progress, not acceptance
-of every reported case. Next:
+corrections in the packaged [V1RC1 candidate](V1RC1_PLAYTEST.md), reproduced by
+the complete seven-stage `v1-fixes-rebuild-01`. The archived standalone patcher
+passes; [the checkpoint](checkpoints/V1RC1_PACKAGE.md) identifies the local ROM
+and patch. This is implementation progress, not acceptance of every reported
+case. Next:
 
 - Update the shared progress counter to select and verify the actual corrected
   cartridge, including the newly identified embedded prompts/defaults and HUD
   wording. Its older `*/build.json` selector misses these `fixes.json` candidates;
   do not report the older artwork-only build as a measurement of current work.
-- Assemble the combined patch-only playtest package with the new receipt and
-  source/ROM/UPS hashes. Run the standalone patcher and the assembled-candidate
-  regression pass. The older package `05` is a retained baseline, not this fix.
+- Finish the running regression pass recorded in
+  `build/v1rc1-regression.log`. Two early academy test setup errors reject stale
+  historical `build/runtime-module` fixtures before exercising V1RC1. Correct
+  fixture selection/generation without weakening source-inventory guards or
+  overwriting retained artifacts; classify other failures and rerun affected
+  checks. Do not restart the entire running suite or claim it passed.
 - Retain passing pixel-editor and letter UI native evidence. The background
   probe has reached its setup retry limit: native drawing returned and geometry
   passed, but later guard checks remain unrun after a classified comparator
@@ -38,8 +43,8 @@ Broader remaining work follows the combined-fix integration:
    and the user's explicit choice. This applies to all three menu icons and the
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
-3. Keep the combined private playtest package aligned with checked artwork
-   batches. Package `05` includes the shared-stall candidate, seven English
+3. Keep the combined private playtest package aligned with checked corrections
+   and artwork batches. V1RC1 retains the shared-stall candidate, seven English
    Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.

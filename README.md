@@ -7,11 +7,13 @@ This project is under development. It is not a complete translation or a
 hardware-validated release. See [progress](docs/PROGRESS.md) for verified results
 and remaining work, and [sources](docs/SOURCES.md) for third-party provenance.
 
-The [current combined playtest](docs/V1_TITLE_PLAYTEST.md) includes the English
+The [current V1RC1 playtest](docs/V1RC1_PLAYTEST.md) includes the English
 title, GameCube-style keyboard, translated screen/building artwork, and embedded
-menu responses, along with the main English text and progression fixes. It
-requires an Expansion Pak. The [patch-only bundle](docs/V1_PATCH_PLAYTEST.md)
-retains explicit test limits; it is not a completed v1 or public release.
+menu responses, along with the main English text and progression fixes. It also
+includes corrections for the twelve reported V1 playtest findings. It requires
+an Expansion Pak. The [package checkpoint](docs/checkpoints/V1RC1_PACKAGE.md)
+identifies the local ROM, verified patch-only bundle, and explicit test limits;
+this is not a completed v1 or public release.
 
 The separate [corrected v0 playtest](docs/V0_FIXES_PLAYTEST.md) addresses
 the furniture-delivery conversation loop, later letter-advice continuation,
@@ -38,6 +40,10 @@ obtained source ROM is required to build; ROMs and extracted assets stay local.
 `make complete` rebuilds the base and v1 layers from clean source checkouts and
 verified local inputs, without old generated resources or translation ROMs. The
 [build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
+The V1RC1 corrections follow that artwork/title baseline through the separate
+seven-stage `tools/rebuild_v1_fixes.py` recipe; `make complete` alone does not
+include that correction suffix. Its verified output is recorded in the
+[V1RC1 checkpoint](docs/checkpoints/V1RC1_PACKAGE.md).
 The [pinned published compiler](docs/TOOLCHAIN.md) is verified by the complete
 clean-source rebuild; the local development Docker image is not required.
 

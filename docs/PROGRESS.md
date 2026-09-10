@@ -2,11 +2,12 @@
 
 ## Builds
 
-The combined human-playtest correction candidate is
-`build/v1-keyboard-background-fix-01/animal-forest-title-preview.z64`.
-Its fresh seven-stage reconstruction at
-`build/v1-fixes-rebuild-01/animal-forest-title-preview.z64` has the same ROM and
-UPS hashes. It requires an Expansion Pak. The [bug list](V1_PLAYTEST_BUGS.md)
+The current private playtest is **V1RC1**, with local ROM
+`build/v1rc1/Animal Forest English V1RC1.z64` and patch-only archive
+`build/v1rc1/V1RC1-patch.zip`. The standalone archived patcher passes, and the
+cartridge matches the fresh seven-stage `v1-fixes-rebuild-01` reconstruction.
+The [package checkpoint](checkpoints/V1RC1_PACKAGE.md) records hashes and source
+revisions. It requires an Expansion Pak. The [bug list](V1_PLAYTEST_BUGS.md)
 tracks implementation and acceptance separately; this is not a completed
 public release or a hardware-certified build.
 
@@ -26,8 +27,10 @@ later save/guard checks from running. Those checks are not marked passed.
 See the [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
 [background](checkpoints/V1_KEYBOARD_BACKGROUND_FIX.md) checkpoints.
 
-Remaining integration includes current-cartridge progress verification, the
-combined patch package, and the assembled-candidate regression pass. Ordinary
+Remaining integration includes current-cartridge progress verification and
+completion of the running full regression pass. Two early regression errors
+are confirmed stale historical runtime-module fixtures; other errors still need
+classification, and the suite is not marked passed. Ordinary
 letter opening, screen appearance, audible keyboard feedback, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
@@ -104,8 +107,8 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [feature notes](V1_TITLE_PLAYTEST.md) describe the packaged
-build; [remaining artwork](ARTWORK_REMAINDER.md) records the newest work and
+formats remain. The [V1RC1 notes](V1RC1_PLAYTEST.md) describe the current packaged
+build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
 The [additional structure inspection](checkpoints/NEUTRAL_STRUCTURE_ARTWORK.md)
@@ -147,11 +150,14 @@ Public release still needs provenance review and explicit release approval.
 
 ## Translation measurement
 
-Run `python3 tools/translation_progress.py` for one fresh combined approximation.
-It verifies the newest completed cartridge and counts installed English against
-inventoried Japanese source characters across dialogue, names, letters, and
-interface/artwork text. Do not report the bank-only diagnostic as whole-game
-progress, reuse an old figure, or mix testing effort into replacement coverage.
+The shared counter is `python3 tools/translation_progress.py`. Its current
+candidate selector misses the correction recipes and V1RC1; updating selection
+and installed-route verification is the next integration task. Do not report an
+older cartridge's result as current. The combined approximation counts installed
+English against inventoried Japanese source characters across dialogue, names,
+letters, and interface/artwork text. Do not report the bank-only diagnostic as
+whole-game progress, reuse an old figure, or mix testing effort into replacement
+coverage.
 
 [Counting rules](../specs/TRANSLATION_PROGRESS.md) retain explicit inventory
 limits, including the tiny untranscribed stall labels. The installed stall model
