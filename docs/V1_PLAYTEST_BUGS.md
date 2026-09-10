@@ -9,10 +9,11 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 
 ## Open findings
 
-The V1RC1 hardware follow-up takes priority. The user accepts the keyboard's
-sound feedback, but reports the background as visibly broken. The earlier
-partial drawing test does not establish correct corner sampling or appearance.
-Preserve the supplied V1RC1 and saves while building a separate correction.
+V1RC1 hardware findings have scoped corrections in V1RC2, with original-
+hardware rechecking pending. The user accepts keyboard sound feedback. The
+corrected frame has complete controlled drawing evidence; neither that check
+nor the earlier partial test establishes ordinary appearance acceptance.
+Preserve both candidates and the user's saves.
 
 | ID | V1RC1 follow-up | Status |
 | --- | --- | --- |
@@ -23,13 +24,13 @@ Preserve the supplied V1RC1 and saves while building a separate correction.
 
 The [text/HUD corrections](checkpoints/RC1_TEXT_HUD_FIX.md) and
 [keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) are combined in
-`build/v1rc1-keyboard-fix-01`. V1RC2 packaging follows the scoped reconstruction;
-the original V1RC1 is preserved.
+the packaged [V1RC2](V1RC2_PLAYTEST.md), reproduced by the complete three-stage
+follow-up. The original V1RC1 is preserved.
 
 | ID | Finding | Status |
 | --- | --- | --- |
 | V1-01 | Press Start shows corrupt graphics on first boot and return | Corrected linear source tiles installed in fix build 01; hardware recheck pending |
-| V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Native navigation/page sound restored; GC shaded frame installed with existing keys/controls retained; native drawing partly checked, audible/appearance hardware recheck pending |
+| V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Sound feedback accepted; GC frame's reported corner/hint defects corrected under V1-14; complete controlled native drawing/guards pass, hardware appearance recheck pending |
 | V1-03 | Bulletin-board dates retain unwanted slash graphics | Separate slash texture cleared in notice/tune candidate; English date reader retained |
 | V1-04 | House camera-control hint is Japanese | Exact English GC Camera texture installed in HUD candidate; hardware recheck pending |
 | V1-05 | Idle clock shows `am 11:36`, not `11:36 am` | Existing digits/AM-PM geometry reordered in HUD candidate; timekeeping and blink unchanged |

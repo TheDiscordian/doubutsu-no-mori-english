@@ -2,32 +2,29 @@
 
 ## Builds
 
-The V1RC1 hardware follow-up takes immediate priority. Three new findings have
-focused corrections in `build/v1rc1-text-hud-fix-01`: the complete GC `I'm new`
-player option, the separate shop `Bells` unit, and PM texture-edge clamping.
-Four focused tests and full patch reconstruction pass. The
-[checkpoint](checkpoints/RC1_TEXT_HUD_FIX.md) records exact hashes and limits.
-The [keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) adds corrected corner
-directions/placement, contained hints, ink-centred key labels, and one supported
-symbol page. Six focused tests and the controlled native drawing check pass
-(five calls/thirty assertions), preserving saves, guards, and accepted sounds.
-The combined artifact is `build/v1rc1-keyboard-fix-01`; V1RC2 packaging is next.
-Preserve V1RC1. Original-hardware appearance remains acceptance work.
+The current private playtest is **V1RC2**, with local ROM
+`build/v1rc2/Animal Forest English V1RC2.z64` and patch-only archive
+`build/v1rc2/V1RC2-patch.zip`. The standalone archived patcher passes, and the
+cartridge matches the complete three-stage `v1rc2-rebuild-01` follow-up.
+The [package checkpoint](checkpoints/V1RC2_PACKAGE.md) records hashes and source
+revision. An Expansion Pak is required. V1RC1 and the user's saves are preserved.
+The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
+acceptance; this is not a completed public release or hardware-certified build.
 
-The current private playtest is **V1RC1**, with local ROM
-`build/v1rc1/Animal Forest English V1RC1.z64` and patch-only archive
-`build/v1rc1/V1RC1-patch.zip`. The standalone archived patcher passes, and the
-cartridge matches the fresh seven-stage `v1-fixes-rebuild-01` reconstruction.
-The [package checkpoint](checkpoints/V1RC1_PACKAGE.md) records hashes and source
-revisions. It requires an Expansion Pak. The [bug list](V1_PLAYTEST_BUGS.md)
-tracks implementation and acceptance separately; this is not a completed
-public release or a hardware-certified build.
+V1RC2 includes the complete GC `I'm new` player option, separate shop `Bells`
+unit, and PM texture-edge clamping. Four focused text/HUD tests pass; their
+[checkpoint](checkpoints/RC1_TEXT_HUD_FIX.md) records bindings and limits.
+The [keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) corrects corner
+directions/placement, contains hints, centres key-label ink, and combines all
+supported symbols into one page. Six focused tests and the controlled native
+drawing check pass (five calls/thirty assertions), preserving save data, memory
+guards, and accepted sound code. The full prior editor and font pixels remain.
 
 The separately built [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
 at `build/v1-shop-notice-fix-03/animal-forest-title-preview.z64` follows V1RC1.
 It omits the Japanese Nook 'n' Go placard as in English GC, changing only its
 two-triangle command. Four focused checks and complete patch reconstruction
-pass. V1RC1 remains unchanged while the user tests it.
+pass. This correction is also included in V1RC2.
 
 Installed corrections cover Press Start pixels, proportional mail/notice editing,
 navigation sound calls, Camera/Your Bells images, AM/PM placement, date slashes,
@@ -39,18 +36,19 @@ hard-coded exception. Player names and saved identities remain unchanged.
 Focused source/ROM/patch checks pass for each batch. The pixel editor has
 passing native call/guard evidence. Letter UI checks verify representative
 recipient names and native prompt/default handling with saved data and guards
-retained. The background has only partial native evidence: its drawing returns
-and geometry checks pass, but a classified test comparison error prevents the
-later save/guard checks from running. Those checks are not marked passed.
-See the [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
-[background](checkpoints/V1_KEYBOARD_BACKGROUND_FIX.md) checkpoints.
+retained. The corrected background has complete controlled native drawing and
+guard evidence; ordinary appearance remains unverified. See the
+[letter](checkpoints/V1_LETTER_UI_FIXES.md) and
+[keyboard](checkpoints/KEYBOARD_RC1_FIX.md) checkpoints. The older RC1 background
+probe remains a separate partial result, not retroactively passed evidence.
 
-Remaining work prioritises concrete V1RC1 defects. The
+Remaining work prioritises concrete human playtest defects. The
 [full regression](checkpoints/V1RC1_REGRESSION.md) finishes with 25 failures and
 75 errors across 2,103 tests, primarily rejecting historical fixtures or older
-accounting expectations. The suite is not passed. Fixture repair remains scoped
-follow-up work; counter maintenance stays deferred. Ordinary
-letter opening, screen appearance, audible keyboard feedback, and hardware
+accounting expectations. A scoped title-metadata correction and independent
+binary comparison pass; the suite as a whole is not passed. Fixture repair
+remains scoped follow-up work, and counter maintenance stays deferred. Ordinary
+letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
 
@@ -126,7 +124,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC1 notes](V1RC1_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC2 notes](V1RC2_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
@@ -177,7 +175,7 @@ Public release still needs provenance review and explicit release approval.
 Percentage-tool maintenance is deferred at the user's request. Use existing
 inventory when it helps find untranslated text, not as a separate progress-tool
 project. The shared counter is `python3 tools/translation_progress.py`; its
-candidate selector misses the correction recipes and V1RC1. Do not report an
+candidate selector misses the correction recipes and named release candidates. Do not report an
 older cartridge's result as current. The combined approximation counts installed
 English against inventoried Japanese source characters across dialogue, names,
 letters, and interface/artwork text. Do not report the bank-only diagnostic as

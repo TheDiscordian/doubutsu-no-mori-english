@@ -2,24 +2,20 @@
 
 ## Next work
 
-The V1RC1 hardware follow-up V1-13 through V1-16 in the
-[bug list](V1_PLAYTEST_BUGS.md) is the immediate implementation priority:
-first-time-player wording, GC keyboard panel/corner and hint layout, a single
-supported-symbol page, shop currency units, and idle AM/PM stray pixels.
-These corrections are implemented together in
-`build/v1rc1-keyboard-fix-01`, with passing focused and controlled native
-keyboard checks. Rebuild the three follow-up stages and package V1RC2 next;
-hardware appearance remains acceptance work. Keyboard sound feedback is
-accepted. Pause unrelated artwork discovery and percentage work; preserve
-V1RC1 and the user's saves.
+The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
+[V1RC2 candidate](V1RC2_PLAYTEST.md): first-time-player wording, GC keyboard
+corner/hint layout and key alignment, one supported-symbol page, shop currency
+units, and idle AM/PM edge clamping. The complete three-stage rebuild, focused
+checks, controlled native keyboard drawing/guards, and standalone patcher pass.
+Hardware appearance remains acceptance work. Keyboard sound feedback is
+accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
-artwork discovery and event acceptance. All twelve findings have scoped
-corrections in the packaged [V1RC1 candidate](V1RC1_PLAYTEST.md), reproduced by
-the complete seven-stage `v1-fixes-rebuild-01`. The archived standalone patcher
-passes; [the checkpoint](checkpoints/V1RC1_PACKAGE.md) identifies the local ROM
-and patch. This is implementation progress, not acceptance of every reported
-case. Next:
+artwork discovery and event acceptance. All sixteen findings have scoped
+corrections retained in V1RC2. The
+[package checkpoint](checkpoints/V1RC2_PACKAGE.md) identifies the exact local
+ROM, patch, and source revision. Implementation and controlled drawing evidence
+do not establish acceptance of every reported case. Next:
 
 - Prioritise remaining Japanese wording/artwork and concrete playtest defects.
   Percentage-tool maintenance is deferred at the user's request; use existing
@@ -30,20 +26,18 @@ case. Next:
   selection/generation without weakening guards or overwriting artifacts;
   inspect remaining failure causes and rerun affected checks. Counter-only
   expectation maintenance stays deferred. Do not restart the entire suite or
-  claim it passed; V1RC1's reported keyboard defects remain the immediate work.
-- Retain passing pixel-editor and letter UI native evidence. The background
-  probe has reached its setup retry limit: native drawing returned and geometry
-  passed, but later guard checks remain unrun after a classified comparator
-  error. Record this limitation; do not repeat the unchanged fixture batch.
+  claim it passed. The title metadata comparison has a passing scoped correction
+  with independently matching overlay/relocation binaries; retain that result.
+- Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
+  The current keyboard probe completes drawing, save/guard checks, fixture
+  release, and checkpoint restoration. Do not repeat unchanged native batches.
+  Preserve the older RC1 partial result separately, without relabelling it.
 - Recheck ordinary letter opening/defaults, recipient selection, all reported
   screen appearances, keyboard feedback, and inventory digits on the playable
   candidate. The shared recipient fix covers all villagers, not only Limberg;
   preserve correct English names, player names, and saved identities.
 - Retain the verified [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
-  for the next combined candidate. It follows V1RC1 in
-  `build/v1-shop-notice-fix-03` without replacing the user's V1RC1 test artifact.
-  Continue remaining artwork and concrete reported defects before packaging
-  another candidate; do not interrupt the current hardware test for one placard.
+  included in V1RC2, without repeating the unchanged room inspection.
 
 Broader remaining work follows the combined-fix integration:
 
@@ -60,7 +54,7 @@ Broader remaining work follows the combined-fix integration:
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked corrections
-   and artwork batches. V1RC1 retains the shared-stall candidate, seven English
+   and artwork batches. V1RC2 retains the shared-stall candidate, seven English
    Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.
