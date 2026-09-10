@@ -14,10 +14,15 @@ preferred, not mandatory. Resume the remaining artwork review and scoped
 regression-fixture follow-up; RC4 hardware appearance and manual save/restart
 remain unverified. Keep new concrete human defects ahead of speculative work.
 
-The [ordinary-save navigation batch](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
-has reached its setup retry limit without opening the gyroid menu. Do not replay
-its timed route. Retain the explicit unverified save/restart status and recorded
-next useful interaction check; emulator checkpoints are not game saves.
+The [source-bound gyroid follow-up](checkpoints/RC4_GYROID_INTERACTION.md)
+opens the English menu within the verified native 43-unit talking limit and
+reaches Save & Quit / Save & Continue. Preserve its active-menu checkpoint and
+passing interaction/fault checks; do not repeat the completed navigation.
+The save-confirmation setup reaches its retry limit before a save is confirmed.
+Its corrected N64 continuation remains unexecuted, and save/restart remains
+unverified. Retain the separately recorded
+[earlier route failures](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md).
+Emulator checkpoints are not game saves; continue unrelated V1 work at this limit.
 
 The V1-17/V1-18 follow-up is implemented in the packaged
 [V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and

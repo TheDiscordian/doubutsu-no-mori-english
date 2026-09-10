@@ -13,10 +13,15 @@ ordinary-space marker fix (V1-19). Cross-version
 save compatibility is preferred, not mandatory; loading evidence and unchanged
 saved formats are distinct. The original save remains preserved locally.
 
-The [bounded ordinary-save attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
-does not reach the gyroid menu; saving and cold restart remain unverified.
-Its navigation retry limit is reached. Original and isolated seed-save checksums
-pass; do not repeat this setup or count emulator checkpoints as game saves.
+The [source-bound gyroid interaction](checkpoints/RC4_GYROID_INTERACTION.md)
+opens the ordinary English menu and reaches Save & Quit / Save & Continue.
+The actual native talking limit is 43 units; the earlier route stops outside it.
+The retained active-menu checkpoint avoids repeated navigation. The confirmation
+driver stops before confirming a save, and its corrected continuation remains
+unexecuted at the setup retry limit. Saving and cold restart remain unverified.
+Original and isolated seed-save checksums pass; emulator checkpoints are not
+game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
+as separate evidence rather than rerunning either completed setup batch.
 
 The current private playtest is **V1RC4**, with local ROM
 `build/v1rc4/Animal Forest English V1RC4.z64` and patch-only archive

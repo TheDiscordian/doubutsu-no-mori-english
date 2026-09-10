@@ -1,0 +1,21 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.15},
+  {"wait": 0.3},
+  {"key": "g", "duration": 0.19},
+  {"wait": 0.3},
+  {"key": "w", "duration": 0.14},
+  {"wait": 0.3},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"read": ["80250C1C", 6]},
+  {"read": ["80233CCC", 8]},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true},
+  {"key": "a", "duration": 0.08},
+  {"advance_to_choice": {"max_presses": 6, "settle_seconds": 2}},
+  {"snapshot_message": true, "expect_message": "0925"},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]
