@@ -1,5 +1,14 @@
 # Remaining artwork
 
+## Nook 'n' Go hiring notice
+
+The [post-V1RC1 correction](checkpoints/SHOP_HIRING_NOTICE.md) removes the native
+hiring-notice placard, matching its omission from the supplied English GC room.
+Only its two-triangle command changes; the matching background wall and all
+other room data remain. Four focused checks and complete ROM/UPS reconstruction
+pass. The correction is separate from the V1RC1 already supplied for testing;
+ordinary room appearance remains acceptance work.
+
 ## Police and post-office interiors
 
 The [civic-interior batch](checkpoints/CIVIC_INTERIOR_ARTWORK.md) installs exact
@@ -168,7 +177,11 @@ English wording or colour equivalence, and unmatched does not imply Japanese.
 Some unmatched originals already have installed English replacements.
 
 Use the report's addresses and neighbouring source names for further review.
-Prioritise unreviewed room owner `012B2000` and remaining screen/item images,
-checking the current candidate first so completed replacements are not repeated.
+The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
+resolves seventeen selected Katrina-interior images in owner `012B2000` and
+thirty further neutral room/item images. Retain those native designs. A further
+image is the hiring notice covered by the correction above. Continue with
+unreviewed screen/item images, checking the current candidate first so completed
+replacements and scoped neutral reviews are not repeated.
 Dynamic/cross-segment textures and unsupported formats still need separate
 binding; the report records those exclusions instead of declaring them complete.

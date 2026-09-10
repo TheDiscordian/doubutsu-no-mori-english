@@ -28,7 +28,10 @@ control hints; it is not an identical replacement of the entire GC controller UI
 Back up existing saves and test with a copy. Saved formats and input capacities
 remain unchanged; English letter snapshots are not a supported migration back
 to an unmodified Japanese ROM. The patcher does not read or alter save files.
-Use the flash cartridge's usual Doubutsu no Mori save/RTC configuration.
+On EverDrive, select **FLASHRAM (128 KB / 1 Mbit)** and enable **RTC**.
+The ROM retains the original `AF` cartridge ID. For OS versions using
+`ED64/save_db.txt`, `AF=51` selects FlashRAM with RTC, as documented in the
+[official manual](https://krikzz.com/pub/support/everdrive-64/x-series/everdrive-64-manual.pdf).
 
 Stick/D-pad selects a key, A types, B deletes, and Start finishes. L changes case,
 Z changes page, L+Z changes QWERTY/alphabetical order, and R inserts a space.

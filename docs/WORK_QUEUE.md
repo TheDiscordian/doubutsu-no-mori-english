@@ -10,10 +10,10 @@ passes; [the checkpoint](checkpoints/V1RC1_PACKAGE.md) identifies the local ROM
 and patch. This is implementation progress, not acceptance of every reported
 case. Next:
 
-- Update the shared progress counter to select and verify the actual corrected
-  cartridge, including the newly identified embedded prompts/defaults and HUD
-  wording. Its older `*/build.json` selector misses these `fixes.json` candidates;
-  do not report the older artwork-only build as a measurement of current work.
+- Prioritise remaining Japanese wording/artwork and concrete playtest defects.
+  Percentage-tool maintenance is deferred at the user's request; use existing
+  inventory only when it helps find text still needing replacement. Do not spend
+  implementation time updating the percentage or its candidate selector.
 - Finish the running regression pass recorded in
   `build/v1rc1-regression.log`. Two early academy test setup errors reject stale
   historical `build/runtime-module` fixtures before exercising V1RC1. Correct
@@ -28,6 +28,11 @@ case. Next:
   screen appearances, keyboard feedback, and inventory digits on the playable
   candidate. The shared recipient fix covers all villagers, not only Limberg;
   preserve correct English names, player names, and saved identities.
+- Retain the verified [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
+  for the next combined candidate. It follows V1RC1 in
+  `build/v1-shop-notice-fix-03` without replacing the user's V1RC1 test artifact.
+  Continue remaining artwork and concrete reported defects before packaging
+  another candidate; do not interrupt the current hardware test for one placard.
 
 Broader remaining work follows the combined-fix integration:
 
@@ -64,8 +69,11 @@ Broader remaining work follows the combined-fix integration:
    the bound native gloom effect contains no Japanese. Three unmatched shop
    drapes are also neutral; retain them without repeating the inspection.
    Use `tools/artwork_matches.py` and the [scoped inventory](ARTWORK_REMAINDER.md)
-   to select additional images, prioritising unreviewed room `012B2000` and
-   remaining screen/item images. Check current installed resources first;
+   to select additional remaining screen/item images. The
+   [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
+   Katrina-interior, clock/furniture, and mechanical-detail textures; retain them
+   without repeating that inspection. The identified hiring notice is corrected
+   to match English GC's omission. Check current installed resources first;
    unmatched originals include images already translated by earlier batches.
 
 ## Human playthrough and polish
@@ -91,7 +99,8 @@ not be replayed unchanged.
 
 ## Public release
 
-- Keep the shared installed-text counter and its inventory limits current.
+- Keep source-inventory limitations explicit. Percentage-tool maintenance is
+  not a release-preparation priority unless it helps locate untranslated text.
 - Complete provenance/redistribution review; do not relicense legacy work or
   claim the tooling licence covers Nintendo assets.
 - Prepare patch-only reproducible artifacts, verified application, hashes,

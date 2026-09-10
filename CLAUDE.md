@@ -35,9 +35,12 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   testing/polish effort into the text-replacement figure. See
   `specs/TRANSLATION_PROGRESS.md` for the counting rules and inventory limits.
   English resources with known player-facing readers still using Japanese are
-  pending application, not fully credited. Completing those readers also requires
-  updating the counter's installed-route verification; do not leave its pending
-  family rules unchanged after finishing integration.
+  pending application, not fully credited. When counter maintenance is in scope,
+  its installed-route verification and pending family rules must reflect the
+  completed readers. A stale counter is not evidence about a newer cartridge.
+- Defer percentage-tool maintenance unless it directly helps find untranslated
+  text. Remaining English application, artwork, and concrete playtest defects
+  take priority. Do not spend a work batch updating percentage reporting alone.
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.

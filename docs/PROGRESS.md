@@ -11,6 +11,12 @@ revisions. It requires an Expansion Pak. The [bug list](V1_PLAYTEST_BUGS.md)
 tracks implementation and acceptance separately; this is not a completed
 public release or a hardware-certified build.
 
+The separately built [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
+at `build/v1-shop-notice-fix-03/animal-forest-title-preview.z64` follows V1RC1.
+It omits the Japanese Nook 'n' Go placard as in English GC, changing only its
+two-triangle command. Four focused checks and complete patch reconstruction
+pass. V1RC1 remains unchanged while the user tests it.
+
 Installed corrections cover Press Start pixels, proportional mail/notice editing,
 navigation sound calls, Camera/Your Bells images, AM/PM placement, date slashes,
 town-tune labels/OK, inventory money sizing, letter prompts/defaults/recipient
@@ -27,7 +33,7 @@ later save/guard checks from running. Those checks are not marked passed.
 See the [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
 [background](checkpoints/V1_KEYBOARD_BACKGROUND_FIX.md) checkpoints.
 
-Remaining integration includes current-cartridge progress verification and
+Remaining work prioritises Japanese wording/artwork and concrete defects, plus
 completion of the running full regression pass. Two early regression errors
 are confirmed stale historical runtime-module fixtures; other errors still need
 classification, and the suite is not marked passed. Ordinary
@@ -128,6 +134,11 @@ this review-only work; the combined playtest-fix build remains the current candi
 
 ## Remaining work and evidence limits
 
+The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
+inspects 48 images: one hiring notice is corrected separately, and 47 neutral
+images remain native. This includes seventeen selected Katrina-interior images;
+it is scoped review evidence, not a claim that every game image is reviewed.
+
 Use [the completion queue](WORK_QUEUE.md). Lucky-bag Japanese decoration is
 intentionally retained at the user's request, matching the English GC donor.
 It is not an outstanding translation task or new English credit. The stall
@@ -150,9 +161,10 @@ Public release still needs provenance review and explicit release approval.
 
 ## Translation measurement
 
-The shared counter is `python3 tools/translation_progress.py`. Its current
-candidate selector misses the correction recipes and V1RC1; updating selection
-and installed-route verification is the next integration task. Do not report an
+Percentage-tool maintenance is deferred at the user's request. Use existing
+inventory when it helps find untranslated text, not as a separate progress-tool
+project. The shared counter is `python3 tools/translation_progress.py`; its
+candidate selector misses the correction recipes and V1RC1. Do not report an
 older cartridge's result as current. The combined approximation counts installed
 English against inventoried Japanese source characters across dialogue, names,
 letters, and interface/artwork text. Do not report the bank-only diagnostic as
