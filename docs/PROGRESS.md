@@ -2,26 +2,25 @@
 
 ## Builds
 
-The active follow-up addresses two new findings: V1-17 name/option glyph edges
-and V1-18 the exposed top rows during building-entry transitions. The
-[font-edge candidate](checkpoints/FONT_POLYGON_EDGES.md) is implemented, with
-four focused tests and controlled native drawing/guard checks passing.
-The [transition correction](checkpoints/TRANSITION_EDGES.md) also passes its
-three focused tests and native reproduction/correction checks for all three
-closed shapes and the open/midpoint states. Both are being packaged as V1RC3.
-Neither finding is accepted on original hardware; the delivered playtest
-remains V1RC2 below until the new package is verified.
-
-The current private playtest is **V1RC2**, with local ROM
-`build/v1rc2/Animal Forest English V1RC2.z64` and patch-only archive
-`build/v1rc2/V1RC2-patch.zip`. The standalone archived patcher passes, and the
-cartridge matches the complete three-stage `v1rc2-rebuild-01` follow-up.
-The [package checkpoint](checkpoints/V1RC2_PACKAGE.md) records hashes and source
-revision. An Expansion Pak is required. V1RC1 and the user's saves are preserved.
+The current private playtest is **V1RC3**, with local ROM
+`build/v1rc3/Animal Forest English V1RC3.z64` and patch-only archive
+`build/v1rc3/V1RC3-patch.zip`. The standalone archived patcher and two package
+tests pass, and the cartridge matches the complete two-stage
+`v1rc3-rebuild-01` follow-up. The
+[package checkpoint](checkpoints/V1RC3_PACKAGE.md) records hashes and source
+revision. An Expansion Pak is required. V1RC1, V1RC2, and the user's saves are preserved.
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
 
-V1RC2 includes the complete GC `I'm new` player option, separate shop `Bells`
+V1-17's [font-edge correction](checkpoints/FONT_POLYGON_EDGES.md) has four
+passing focused tests and controlled native drawing/guard checks. V1-18's
+[transition correction](checkpoints/TRANSITION_EDGES.md) has three passing
+focused tests and native reproduction/correction checks for all three closed
+shapes and the centre open/midpoint states. The original two-row top gap is
+reproduced; corrected closed shapes leave no exposed framebuffer pixels.
+Neither finding is accepted on original hardware.
+
+Retained V1RC2 corrections include the complete GC `I'm new` player option, separate shop `Bells`
 unit, and PM texture-edge clamping. Four focused text/HUD tests pass; their
 [checkpoint](checkpoints/RC1_TEXT_HUD_FIX.md) records bindings and limits.
 The [keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) corrects corner
@@ -134,7 +133,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC2 notes](V1RC2_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC3 notes](V1RC3_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 

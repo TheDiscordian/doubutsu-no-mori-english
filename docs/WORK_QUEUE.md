@@ -2,11 +2,12 @@
 
 ## Next work
 
-Finish the new V1-17/V1-18 follow-up before additional artwork or V2 work.
-The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
+The V1-17/V1-18 follow-up is implemented in the packaged
+[V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
-focused and controlled native checks. Complete the committed two-stage replay
-and standalone-patcher verification, then deliver the combined V1RC3 candidate.
+focused and controlled native checks. The committed two-stage replay, two
+package tests, and archived standalone patcher pass. Use this combined candidate
+for the next original-hardware playtest; do not repeat unchanged native checks.
 Preserve existing ROMs and saves; original-hardware appearance remains pending.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
@@ -19,8 +20,8 @@ accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
 artwork discovery and event acceptance. The first sixteen findings have scoped
-corrections retained in V1RC2. The
-[package checkpoint](checkpoints/V1RC2_PACKAGE.md) identifies the exact local
+corrections retained in V1RC3, alongside the two edge fixes. The
+[package checkpoint](checkpoints/V1RC3_PACKAGE.md) identifies the exact local
 ROM, patch, and source revision. Implementation and controlled drawing evidence
 do not establish acceptance of every reported case. Next:
 
@@ -61,7 +62,7 @@ Broader remaining work follows the combined-fix integration:
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked corrections
-   and artwork batches. V1RC2 retains the shared-stall candidate, seven English
+   and artwork batches. V1RC3 retains the shared-stall candidate, seven English
    Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.

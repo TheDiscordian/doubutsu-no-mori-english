@@ -91,6 +91,28 @@ prerequisites; the complete recipe above regenerates them. See the
 [recipe specification](../specs/V1_REBUILD.md) and
 [executed rebuild checkpoint](checkpoints/V1_REBUILD.md).
 
+## Current private playtest corrections
+
+The complete artwork recipe above is an explicit baseline, not the latest
+human-playtest correction build. The seven-stage `tools/rebuild_v1_fixes.py`
+adds RC1 corrections; the three-stage `tools/rebuild_v1rc2.py` adds the RC1
+hardware follow-up. Their [RC1](checkpoints/V1RC1_PACKAGE.md) and
+[RC2](checkpoints/V1RC2_PACKAGE.md) checkpoints record exact inputs and outputs.
+
+From the preserved, verified RC2 cartridge, rebuild the current two-stage
+font/transition correction suffix into a fresh directory:
+
+```sh
+python3 tools/rebuild_v1rc3.py --output build/v1rc3-rebuilt
+```
+
+The recipe compiles the font extension afresh, verifies the transition's single
+changed constant, and reconstructs the complete ROM/UPS while retaining every
+unrelated resource. Sources must be committed and inputs must match the checked
+revisions. Its [package checkpoint](checkpoints/V1RC3_PACKAGE.md) records the
+passing replay, native evidence, and executed standalone patcher. Packaging binds
+the recorded local native-test receipts; it is not a claim of hardware acceptance.
+
 ## Base translation outputs
 
 The current correction build is `build/v0-hardware-fixes-02`, described in the
