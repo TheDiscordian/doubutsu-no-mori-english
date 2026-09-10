@@ -49,6 +49,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('tune-artwork-01', 'title-tune-combined-01',
             '41282aa2c64a946a7588cc0434a8ddf1f3b51727b52205ae708b71f16c0b4cca')
 
+    @unittest.skipUnless((ROOT/'build/title-service-combined-01/preview.json').is_file(),
+                         'Local catalogue/service/title candidate required')
+    def test_service_combination_retains_mail_repayment_and_catalogue_artwork(self):
+        self.check_combination('service-artwork-01', 'title-service-combined-01',
+            '5353187111c528ecb88e2efa5606e23dfd3a05adc10bb4d1ae16691c31132258')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

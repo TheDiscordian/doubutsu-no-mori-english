@@ -18,25 +18,26 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 ## Active work
 
 The current combined playtest candidate is
-`build/title-tune-combined-01/animal-forest-title-preview.z64` and requires an
+`build/title-service-combined-01/animal-forest-title-preview.z64` and requires an
 Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
 English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
-keyboard, plus English bulletin-board and town-tune controls. The
+keyboard, plus English bulletin-board, town-tune, and catalogue controls and
+mailbox/repayment headings. The [service checkpoint](checkpoints/SERVICE_ARTWORK.md)
+records four passing checks for the complete latest batch and title combination. The
 [notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md) records seven focused
 passing checks and unchanged native controls, storage, and allocations.
 The [cursor correction](checkpoints/KEYBOARD_CURSOR.md) fixes an actual
 native direction-command mismatch found by the frame-controlled input test.
 The corrected native probe completes entry, deletion, capacity, left/right cursor,
 page switching, and Done with intact guards and graceful shutdown. The full
-combination check passes in 7.921 seconds. Native execution of the correction uses
+combination check passes in 7.845 seconds. Native execution of the correction uses
 the documented matching older checkpoint and guarded controller replacement;
 it is not relabelled as a fresh boot of the new ROM. Current [playtest notes](V1_TITLE_PLAYTEST.md)
 state the untested areas. The eighteen inspected station atlases contain no
 lettering requiring replacement. The [catalogue batch](checkpoints/CATALOGUE_ARTWORK.md)
-adds top/bottom in `build/catalogue-artwork-01`, with three passing focused
-checks; its next title combination waits for the following screen-art batch.
-Continue the mailbox heading and repayment labels, then birthday and Controller
-Pak screen artwork; normal hardware/playthrough feedback remains necessary.
+adds top/bottom with three passing focused checks and is retained in the current
+title combination. Continue birthday and Controller Pak screen translation;
+normal hardware/playthrough feedback remains necessary.
 
 The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`
 adds the supplied English summer sign and its two exclusively owned red palette

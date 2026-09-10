@@ -3,13 +3,13 @@
 ## V0 execution priority
 
 Current work is the remaining Japanese artwork in the combined
-`build/title-tune-combined-01` Expansion Pak candidate. The English title,
+`build/title-service-combined-01` Expansion Pak candidate. The English title,
 GameCube-style grid and corrected cursor, screen headings, seasonal shop/police/
-Redd signs, bulletin-board labels, and town-tune controls are installed and retain
+Redd signs, bulletin-board/town-tune/catalogue controls, and mailbox/repayment
+headings are installed and retain
 both Nook conversation corrections. See [current progress](PROGRESS.md) and
-[the notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md). Catalogue top/bottom
-labels are installed in the next untitled batch with three passing checks.
-Continue mailbox, repayment, birthday, and Controller Pak images. Do not repeat completed title,
+[the service checkpoint](checkpoints/SERVICE_ARTWORK.md). Continue birthday
+and Controller Pak screen translation. Do not repeat completed title,
 conversation, or controller probes without a relevant change. Normal player
 acceptance and remaining Japanese art are not claimed complete.
 
