@@ -17,10 +17,10 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 | V1-04 | House camera-control hint is Japanese | Exact English GC Camera texture installed in HUD candidate; hardware recheck pending |
 | V1-05 | Idle clock shows `am 11:36`, not `11:36 am` | Existing digits/AM-PM geometry reordered in HUD candidate; timekeeping and blink unchanged |
 | V1-06 | Town-tune notes are Japanese and OK is too far right | Exact GC A–G and ? textures plus GC OK placement installed; melody rules unchanged |
-| V1-07 | Opening a letter for editing shows a Japanese bubble | Pending prompt binding |
-| V1-08 | Letter recipient list shows `らっきょ`, expected Limberg | Pending recipient reader and existing-save name handling |
+| V1-07 | Opening a letter for editing shows a Japanese bubble | Both native address prompts use GC English wording; native translation/drawing checks pass, ordinary opening recheck pending |
+| V1-08 | Letter recipient list shows `らっきょ`, expected Limberg | Identity-based English reader installed for all 216 villagers; Limberg, an already-correct NPC, and a player pass representative native checks; hardware recheck pending |
 | V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Pixel-layout candidate built; four host/ROM checks and 16 native calls/45 assertions pass; hardware recheck pending |
-| V1-10 | Letter To/From text remains Japanese | Pending label/reader binding |
+| V1-10 | Letter To/From text remains Japanese | Exact stock draft defaults normalised to GC To/from; native helper checks preserve custom text, read mode, and identities; ordinary constructor recheck pending |
 | V1-11 | Nook shop's blue cash bubble still says `もってるおかね` | English GC Your Bells texture, load, and label geometry installed in HUD candidate; hardware recheck pending |
 | V1-12 | Inventory Bells digits are compressed into the left side of their bubbles | Money-only X scale/origin corrected; three focused checks pass, hardware appearance recheck pending |
 
@@ -33,6 +33,12 @@ confirmed bindings in the shared progress verification as they are established.
 The Japanese lucky-bag decoration stays, matching the English GC release and
 the user's explicit choice. It is not an open bug. Keyboard input/layout received
 positive human feedback; this does not validate multi-line editor layout.
+
+The recipient-name report identifies one observed wrong name, not an entirely
+Japanese list or a complete survey of all villagers. The fix must address the
+shared cause across villagers without assuming that all names are wrong or
+hard-coding Limberg as the only possible affected identity. Correct English
+names, player names, and saved identities must remain intact.
 
 ## Verification
 

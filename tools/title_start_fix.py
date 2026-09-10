@@ -26,7 +26,7 @@ def source_tiles(rel, symbols):
     return tiles
 
 
-def reconstruct(native, base, changes, *, resized=()):
+def reconstruct(native, base, changes, *, resized=(), moves=None):
     """Repack from the original without doubling an already padded cartridge."""
     verified_rom(native)
     originals, files = by_vrom(native), by_vrom(base)
@@ -39,13 +39,19 @@ def reconstruct(native, base, changes, *, resized=()):
         raise ValueError('Missing or unknown fix resource')
     if not set(resized) <= set(changes):
         raise ValueError('Missing explicitly resized resource')
-    ordered = sorted(files)
+    moves = {} if moves is None else dict(moves)
+    if not set(moves) <= set(changes) or any(v in (0x1060, 0x19D40) or n & 15
+            or not 0x2000000 <= n < 0x10000000 for v, n in moves.items()):
+        raise ValueError('Invalid explicit DMA move')
+    destinations = {v: moves.get(v, v) for v in files}
+    ordered = sorted((destinations[v], len(changes[v]) if v in changes else e.size, v)
+                     for v, e in files.items())
+    if len(set(destinations.values())) != len(files) or any(
+            a+size > b for (a, size, _), (b, _, _) in zip(ordered, ordered[1:])):
+        raise ValueError('Fix overlaps another owned VROM range')
     for address, data in changes.items():
         if address in (0x1060, 0x19D40) or (len(data) != files[address].size and address not in resized):
             raise ValueError('Fix changes boot data or an owned allocation')
-        following = ordered.index(address)+1
-        if following < len(ordered) and address+len(data) > ordered[following]:
-            raise ValueError('Fix overlaps the next owned VROM range')
     for vrom, old in originals.items():
         entry = by_index[old.index]
         data = changes.get(entry.vstart, entry.extract(base))
@@ -53,13 +59,13 @@ def reconstruct(native, base, changes, *, resized=()):
             if entry.vstart != vrom or entry.size != old.size or data[:16] != old.extract(native)[:16]:
                 raise ValueError('Changed DMA table owner prefix')
             continue
-        if entry.vstart != vrom or entry.size != old.size:
-            moved[vrom] = entry.vstart
+        if destinations[entry.vstart] != vrom or entry.size != old.size:
+            moved[vrom] = destinations[entry.vstart]
         if data != old.extract(native) or vrom in moved:
             replacements[vrom] = data
     for entry in files.values():
         if entry.index not in original_indices:
-            additions[entry.vstart] = changes.get(entry.vstart, entry.extract(base))
+            additions[destinations[entry.vstart]] = changes.get(entry.vstart, entry.extract(base))
     image = bytearray(replace_dma(native, replacements, moved, additions))
     # IPL3 executes this physical copy before the DMA table is used.
     boot = originals[0x1060]
@@ -70,10 +76,10 @@ def reconstruct(native, base, changes, *, resized=()):
     fix_checksum(image)
     image = bytes(image)
     installed = by_vrom(image)
-    if len(image) != len(base) or set(installed) != set(files):
+    if len(image) != len(base) or set(installed) != set(destinations.values()):
         raise ValueError('Fix changes cartridge size or DMA identities')
     for vrom, before in files.items():
-        after = installed[vrom]
+        after = installed[destinations[vrom]]
         actual, expected = after.extract(image), changes.get(vrom, before.extract(base))
         if vrom == 0x19D40:
             actual, expected = actual[:16], expected[:16]

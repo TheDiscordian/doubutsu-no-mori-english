@@ -42,6 +42,15 @@ checks pass. The combined intermediate is
 `build/v1-inventory-money-fix-01/animal-forest-title-preview.z64`; dialogue font
 spacing, digit height, money values, and saved formats remain unchanged.
 
+The [letter UI correction](checkpoints/V1_LETTER_UI_FIXES.md) adds the two GC
+address prompts, identity-based full English recipient display, and bounded
+To/from draft defaults. Three focused checks pass. Native execution verifies
+Limberg, Buzz, and a player name, then thirteen calls/thirty assertions verify
+prompt drawing, defaults, saved-data retention, and memory guards. The combined
+intermediate is `build/v1-letter-ui-fix-02/animal-forest-title-preview.z64`.
+The keyboard background and combined fix packaging remain implementation work;
+ordinary letter opening and hardware rechecking remain acceptance work.
+
 The supplied private artwork playtest is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.

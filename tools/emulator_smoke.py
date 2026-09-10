@@ -195,7 +195,10 @@ class RSP:
                 or not TEST_RETURN <= return_address <= TEST_STACK-0x100):
             raise ValueError('Test return breakpoint must remain inside isolated scratch RAM')
         arguments = [int(value, 16) if isinstance(value, str) else value for value in arguments]
-        if (address % 4 or len(arguments) > 9
+        # Verified native font entries use fourteen o32 arguments. Sixteen words
+        # fit below the existing TEST_STACK+0x40 guard. JSON calls retain nine.
+        argument_limit = 16 if verified_code is not None else 9
+        if (address % 4 or len(arguments) > argument_limit
                 or any(not 0 <= value <= 0xFFFFFFFF for value in arguments)):
             raise ValueError("Invalid test function or o32 arguments")
         if verified_code is None:
@@ -1176,6 +1179,12 @@ def main():
                     raise ValueError('Pixel-editor checks require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, action['test_editor_pixels'], record))
+            if 'test_letter_ui' in action:
+                from letter_ui_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Letter UI checks require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_letter_ui'], record))
             if 'test_fortunes' in action:
                 from fortune_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -1,0 +1,12 @@
+[
+  {"wait": 8},
+  {"key": "Return", "duration": 0.2},
+  {"wait": 10},
+  {"read": ["80000318", 4], "expect": "00800000"},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_letter_ui": {"build": "build/v1-letter-ui-fix-02"}},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2}
+]

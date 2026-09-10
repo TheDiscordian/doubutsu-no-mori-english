@@ -20,6 +20,10 @@ class ThreadDebugger(RSP):
         self.entry = bytes.fromhex("27BDFFE0")
         self.breakpoint, self.commands = None, []
         self.code_base, self.code_bytes = 0x80200000, bytes.fromhex('03E0000800000000')
+        self.writes = []
+
+    def write_memory(self, address, data):
+        self.writes.append((address, data))
 
     def read_memory(self, address, size):
         if address == self.code_base and size == len(self.code_bytes):
@@ -60,6 +64,23 @@ class ThreadDebugger(RSP):
 
 
 class DebuggerThreadTests(unittest.TestCase):
+    def test_verified_font_arguments_fit_the_existing_stack_guard(self):
+        debug = ThreadDebugger()
+        debug.pause_game_thread()
+        proof = (debug.code_base, debug.code_bytes)
+        for count in (14, 16):
+            args = list(range(count))
+            self.assertEqual(debug.call('80200000', args, verified_code=proof)['return_value'], 55)
+            address, data = debug.writes[-1]
+            self.assertEqual(address, TEST_STACK+16)
+            self.assertEqual(data, struct.pack('>'+'I'*(count-4), *args[4:]))
+            self.assertLessEqual(address+len(data), TEST_STACK+0x40)
+        for args, checked in ((list(range(17)), proof), (list(range(10)), None)):
+            debug.commands.clear(); before = list(debug.writes)
+            with self.assertRaisesRegex(ValueError, 'Invalid test function'):
+                debug.call('80200000', args, verified_code=checked)
+            self.assertEqual(debug.commands, []); self.assertEqual(debug.writes, before)
+
     def test_frame_advancement_executes_past_the_current_breakpoint_before_returning(self):
         debug = ThreadDebugger()
         with self.assertRaisesRegex(ValueError,'observed PC'):

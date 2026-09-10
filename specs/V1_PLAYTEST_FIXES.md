@@ -144,3 +144,43 @@ font call, one-digit length, colours, height, five-slot loop, division/remainder
 leading-zero suppression, money value, font resource, other readers, and all
 allocations remain unchanged. No new code space, saved data, or global font
 metrics are required.
+
+## Letter address prompts, names, and draft defaults
+
+`tools/letter_ui_fix.py` appends checked helpers to the address and board
+overlays. The address owner moves from VROM `00792700/00794240` to
+`03E60000/03E68000`, retaining its DMA indices and linked RAM `8088ADB0`.
+Its original 416-byte BSS becomes explicit zeroed prefix storage. Board remains
+at `03B60000/03B70000`, linked `80888E90`. Preserve every prefix word outside
+the three named calls, with independent relocation checks at two heap bases.
+
+Address font calls `8088BB60/8088BEFC` select the prompt and recipient adapters.
+The two exact twelve-byte native prompt arrays at `8088C888/8088C894` select
+the complete GC `.data:0007A5E8/0007A5FC` arrays: "Choose an addressee." and
+"Your address book is empty!". Match content and length, then centre using the
+installed proportional width routine. Preserve bubble, colours, Y, and animation.
+
+The recipient caller passes a complete native eighteen-byte Mail name record.
+Byte `10` identifies NPC type one, and byte `0C` is the NPC identity index.
+For any of the 216 supported villagers, request `E000 | index` from resident
+`af_load_display_name` at `80196044`, into eight temporary bytes. The installed
+table maps index 132 to Limberg and 140 to Buzz. These are test cases, not special
+cases in the implementation. Player/unsupported records retain their six saved
+name bytes. Failed lookups restore the fallback even if the loader partially
+wrote its output. No saved name, identity, town, or recipient-selection byte is
+rewritten. This shared fix covers possible affected villagers beyond the single
+reported Limberg case.
+
+Board constructor call `8088A750` wraps the retained native init `8088A2D0`.
+After init, WRITE/EDIT modes zero/two normalise only exact stock draft defaults.
+The ten-byte header `さんへ` plus padding, with split zero, becomes `To ` plus
+padding with split three. A stock footer equal to the trimmed sender name plus
+`より` and padding becomes `from ` followed by that same player name. The source
+wording is GC `.data:0007B374/0007B378`. Native capacities remain ten/sixteen
+bytes, and the body remains ninety-six. Custom templates, read modes, body,
+recipient/sender identities, and stored mail are not broadly migrated.
+
+Combined aligned overlay growth is 1536 bytes. The submenu pool receives 4096
+bytes (`25CE4620` to `25CE5620` at `800C4B10`); ordinary heap `80400000` and
+eight-MiB cartridge requirement remain. Explicit VROM moves reject collisions,
+unknown owners, unaligned destinations, and startup/DMA-table relocation.
