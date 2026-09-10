@@ -10,30 +10,46 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import CODE_RAM,CODE_VROM,apply_ups,by_vrom,sha256
+from aflib import CODE_RAM,CODE_VROM,apply_ups,by_vrom,sha256,verified_rom,replace_dma
 from snowman_actor import (VROM,RELOCATION,NEW_VROM,NEW_RELOCATION,METADATA,LIMIT,
                            native_sources,metadata,install,validate,verify_installation,relocation_bytes)
 from translation_progress import measure
 
-BUILD,PREVIOUS,ACTOR = (ROOT/'build'/p for p in ('snowman-letters-pilot','museum-letters-pilot','snowman-actor'))
+BUILD,PREVIOUS,LEGACY_ACTOR = (ROOT/'build'/p for p in ('snowman-letters-pilot','museum-letters-pilot','snowman-actor'))
+CURRENT = ROOT/'build/v0-hardware-fixes-02'
+ACTOR = ROOT/'build/shop-notice-snowman'
 
 
-@unittest.skipUnless((BUILD/'build.json').is_file(),'Completed local Snowman build required')
+@unittest.skipUnless((CURRENT/'build.json').is_file() and (ACTOR/'overlay.json').is_file(),
+                     'Current combined cartridge and matching Snowman actor required')
 class SnowmanInstallTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        cls.built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
-        cls.previous = (PREVIOUS/'animal-forest-halfwidth.z64').read_bytes()
-        cls.report = json.loads((BUILD/'build.json').read_text());cls.prior = json.loads((PREVIOUS/'build.json').read_text())
-        cls.module = cls.report['runtime_module'];cls.files = by_vrom(cls.built);cls.old = by_vrom(cls.previous)
-        cls.relocations = {int(k,16):int(v,16) for k,v in cls.prior['vrom_relocations'].items()}
-        cls.base = {int(v,16):cls.old[cls.relocations.get(int(v,16),int(v,16))].extract(cls.previous)
-                    for v in cls.prior['replacement_files']}
-        cls.additions = {int(v,16):cls.old[int(v,16)].extract(cls.previous) for v in cls.prior['added_files']}
+        cls.native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        cls.built = (CURRENT/'animal-forest-halfwidth.z64').read_bytes()
+        cls.report = json.loads((CURRENT/'build.json').read_text())
+        cls.module = cls.report['runtime_module'];cls.files = by_vrom(cls.built)
+        if sha256(cls.built)!=cls.report['output_sha256']:
+            raise ValueError('Changed combined Snowman fixture cartridge')
+        cls.relocations = {int(k,16):int(v,16) for k,v in cls.report['vrom_relocations'].items()}
+        cls.base = {int(v,16):cls.files[cls.relocations.get(int(v,16),int(v,16))].extract(cls.built)
+                    for v in cls.report['replacement_files']}
+        cls.additions = {int(v,16):cls.files[int(v,16)].extract(cls.built) for v in cls.report['added_files']}
         cls.data,cls.reloc = ((ACTOR/p).read_bytes() for p in ('overlay.bin','relocation.bin'))
         cls.actor = json.loads((ACTOR/'overlay.json').read_text())
         cls.catalog,cls.items = (cls.files[v].extract(cls.built) for v in (0x030A0000,0x02A00000))
+        if (cls.actor!=cls.report['snowman_actor']['overlay'] or cls.base[VROM]!=cls.data
+                or cls.base[RELOCATION]!=cls.reloc):
+            raise ValueError('Snowman source-built fixture differs from the installed actor')
+        # Recreate only the pre-Snowman ownership in memory; all other installed
+        # code, readers, resources, and relocations remain current.
+        code = bytearray(cls.base[CODE_VROM]);at = METADATA-CODE_RAM
+        if code[at:at+32]!=metadata(len(cls.data)):
+            raise ValueError('Changed installed Snowman fixture metadata')
+        original = by_vrom(cls.native)[CODE_VROM].extract(cls.native)
+        code[at:at+32] = original[at:at+32];cls.base[CODE_VROM] = bytes(code)
+        for v in (VROM,RELOCATION):
+            cls.base.pop(v);cls.relocations.pop(v)
 
     def fixture(self): return deepcopy((self.base,self.additions,self.relocations,self.module))
 
@@ -47,6 +63,7 @@ class SnowmanInstallTests(unittest.TestCase):
         self.assertEqual(relocations,{**self.relocations,VROM:NEW_VROM,RELOCATION:NEW_RELOCATION})
         self.assertEqual(len(self.data),18384);self.assertEqual(len(self.reloc),1104);self.assertLess(len(self.data),LIMIT)
         self.assertEqual(struct.unpack_from('>5I',self.reloc),(18384,0,0,0,270))
+        self.assertEqual(replace_dma(self.native,replacements,relocations,additions),self.built)
         with self.assertRaises(ValueError): install(self.native,*fixture,ACTOR)
 
     def test_failed_install_is_atomic_before_any_output_mutation(self):
@@ -79,10 +96,30 @@ class SnowmanInstallTests(unittest.TestCase):
             with self.subTest(fault=fault),self.assertRaises(ValueError):
                 validate(self.native,data,reloc,report,self.module,self.catalog,self.items)
 
+    def test_current_installed_actor_resources_and_source_bound_manifest(self):
+        spec = verify_installation(self.built,self.native,self.module,self.report['snowman_actor'])
+        self.assertEqual(spec.sections,(18384,0,0,0,270))
+        self.assertEqual(self.data,self.files[NEW_VROM].extract(self.built))
+        self.assertEqual(self.reloc,self.files[NEW_RELOCATION].extract(self.built))
+
+
+@unittest.skipUnless((BUILD/'build.json').is_file() and (PREVIOUS/'build.json').is_file(),
+                     'Preserved Snowman and preceding museum cartridges required')
+class SnowmanHistoricalArtifactTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        cls.built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
+        cls.previous = (PREVIOUS/'animal-forest-halfwidth.z64').read_bytes()
+        cls.report = json.loads((BUILD/'build.json').read_text());cls.prior = json.loads((PREVIOUS/'build.json').read_text())
+        cls.files = by_vrom(cls.built);cls.old = by_vrom(cls.previous)
+        cls.data = (LEGACY_ACTOR/'overlay.bin').read_bytes()
+
     def test_patch_retains_every_previous_file_and_changes_only_actor_metadata(self):
         self.assertEqual(sha256(self.built),self.report['output_sha256'])
         self.assertEqual(apply_ups(self.native,(BUILD/'animal-forest-halfwidth.ups').read_bytes()),self.built)
-        verify_installation(self.built,self.native,self.module,self.report['snowman_actor'])
+        # Original patch/retention evidence, kept separate from current source
+        # and complete installed-resource approval in the class above.
         self.assertEqual(self.old.keys()-self.files.keys(),{VROM,RELOCATION})
         self.assertEqual(self.files.keys()-self.old.keys(),{NEW_VROM,NEW_RELOCATION})
         self.assertEqual({v for v in self.old.keys()&self.files.keys()
@@ -94,7 +131,7 @@ class SnowmanInstallTests(unittest.TestCase):
         for old,new in ((VROM,NEW_VROM),(RELOCATION,NEW_RELOCATION)):
             self.assertEqual(self.old[old].index,self.files[new].index)
         for name in ('overlay.bin','relocation.bin','overlay.json'):
-            self.assertEqual((ACTOR/name).read_bytes(),(ROOT/'build/snowman-actor-repro'/name).read_bytes())
+            self.assertEqual((LEGACY_ACTOR/name).read_bytes(),(ROOT/'build/snowman-actor-repro'/name).read_bytes())
 
     def test_combined_counter_credits_all_thirty_six_parts_and_retains_denominator(self):
         old = measure(self.native,self.previous,self.prior);new = measure(self.native,self.built,self.report)

@@ -77,8 +77,13 @@ do not establish acceptance of every reported case. Next:
   closes ten further errors with twenty passing checks, two source-built creator
   variants, current combined-installation checks, and separately bound archived
   native evidence. Preserve this completed group; its counter-only failures
-  remain deferred. Next relevant failures include snowman and renewal/event/Miko
-  fixtures, not another run of the postal/museum group or the entire suite.
+  remain deferred. The [Snowman follow-up](checkpoints/SNOWMAN_FIXTURE_FOLLOWUP.md)
+  closes five more errors with eleven passing checks and preserves the failed
+  first native run separately from its corrected edge-only resume. Do not repeat
+  either completed group. Next relevant failures include renewal/event/Miko
+  fixtures. The installed renovation and accented event actors verify; their
+  early installer tests need explicitly pre-later-reader compositions, not
+  weaker reader guards or the unextended event report against the final actor.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

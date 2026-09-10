@@ -94,6 +94,12 @@ English contents and delivery patches are checked on the corrected base;
 earlier native results remain bound to their actual archived cartridges.
 Two fresh creator variants pass current source checks. No playable ROM or
 save data changes.
+The [Snowman follow-up](checkpoints/SNOWMAN_FIXTURE_FOLLOWUP.md) closes five
+further errors with eleven passing checks. It reuses the matching source-built
+actor, reconstructs the entire corrected base through the installer, and keeps
+the historical interrupted/edge-only native runs distinct. Renovation and
+accented event actors also pass read-only installed verification; their early
+reader/actor test compositions remain follow-up work.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the

@@ -11,7 +11,7 @@ from mail_record import unpack
 from snowman_scenario import scenario,choice_for_seed
 from snowman_actor import native_sources
 
-BUILD = ROOT/'build/snowman-letters-pilot'
+BUILD = ROOT/'build/v0-hardware-fixes-02'
 
 
 @unittest.skipUnless((BUILD/'build.json').is_file(),'Complete local Snowman build required')
