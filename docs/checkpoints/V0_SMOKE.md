@@ -16,6 +16,8 @@ The single combined regression invocation is
 `python3 -m unittest discover -s tests -v`, logged in
 `build/v0-regression.log`. Retain the complete first result, classify failures,
 and rerun affected tests after fixes rather than repeating the whole suite.
+The invocation completes with eleven failures and seventy-five errors; the
+[classification and focused corrections](V0_REGRESSION.md) retain its full result.
 Existing legacy-fixture failures are not automatically game defects or passes.
 
 `tools/v0_smoke_scenario.py` reuses the existing name/town/train/arrival scenarios
@@ -65,7 +67,12 @@ prove outdoor/tutorial progression or ordinary saving. Do not loop the same
 route or count the unused submenu as opened. A verified exit route or human
 playtest is needed for further ordinary gameplay evidence.
 
-## Remaining handoff work
+## Playtest handoff and remaining checks
+
+The user has the candidate ROM path for experimental original-hardware
+playtesting. The handoff states that hardware, normal saving/reloading, and
+regression clearance are unverified and asks for a separate backed-up test save.
+Keep this exact ROM stable while collecting reports; v1 title builds are separate.
 
 Complete the bounded ordinary menu/editor/mail/board and save/restart checks
 where existing fixtures permit. Keep the per-batch 30-minute new-harness budget

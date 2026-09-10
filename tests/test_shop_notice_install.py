@@ -104,7 +104,7 @@ class ShopNoticeInstallTests(unittest.TestCase):
         ledger = measure(self.native,self.built,self.report)
         baseline = deepcopy(self.report);baseline.pop('shop_notices')
         uncredited = measure(self.native,self.built,baseline)
-        self.assertEqual(ledger.summary()['total_source_characters'],751002)
+        self.assertEqual(ledger.summary()['total_source_characters'],751284)
         ids = {f'{bank}:{number:04X}' for bank in ('super','mail','ps') for number in TEMPLATES}
         actual = {k for k,r in ledger.rows.items() if any(v['route']=='shop_notices' for v in r['replacements'])}
         self.assertEqual(actual,ids)

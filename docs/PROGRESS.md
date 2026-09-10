@@ -31,8 +31,11 @@ not add or remove main-text credit.
 The [combined v0 check](checkpoints/V0_SMOKE.md) passes fresh-game English
 name/town entry, long choices, and train arrival in the assembled candidate:
 218 recorded steps, ten acceptance checks, intact memory guards, and graceful
-shutdown in four MiB. The full regression invocation is running; its failures
-require classification. Normal save/restart and the broader ordinary menu/editor
+shutdown in four MiB. The [full regression result](checkpoints/V0_REGRESSION.md)
+records 1,874 tests, eleven failures, and seventy-five errors; eight corrected
+assertions pass focused reruns, and historical fixture work remains. The user
+has the stable experimental v0 ROM for hardware playtesting with these limits.
+Normal save/restart and the broader ordinary menu/editor
 checks remain unverified. The guarded patch-only packager passes five focused
 tests; its [private playtest notes](V0_PLAYTEST.md) state those limits explicitly.
 

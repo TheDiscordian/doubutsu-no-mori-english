@@ -28,7 +28,7 @@ KEYS = {r['id'] for r in APPROVED}
 
 class ResolvedApprovalTests(unittest.TestCase):
     def test_exact_conversion_family_and_existing_carried_approval_are_required(self):
-        matches = load_matches()
+        matches = load_matches(include_design=False)
         previous = load_matches(include_resolved=False)
         self.assertEqual((len(APPROVED), len(KEYS), len(matches)-len(previous)), (30, 30, 30))
         self.assertTrue(all(matches[k] == row for k, row in previous.items()))

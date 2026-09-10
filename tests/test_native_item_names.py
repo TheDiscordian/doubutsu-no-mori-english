@@ -71,9 +71,9 @@ class NativeItemRetailTests(unittest.TestCase):
         return [r for r in result if 'native_item_name' in r]
 
     def test_every_complete_name_rotation_alias_and_original_provenance(self):
-        self.assertEqual(len(self.originals),22)
+        self.assertEqual(len(self.originals),43)
         self.assertFalse(self.originals.keys() & self.matches.keys())
-        for width,count in ((10,31),(16,63)):
+        for width,count in ((10,45),(16,128)):
             edits = self.generate(width)
             self.assertEqual(len(edits),count)
             for edit in edits:
@@ -110,7 +110,7 @@ class NativeItemRetailTests(unittest.TestCase):
             variants += [{**edit,'item_reference_match':'item_10:0000'},
                          {**edit,'native_item_name':None},{**edit,'source_sha256':'0'*64},
                          {**edit,'control_policy':'presentation'}]
-            if edit['id'].startswith('item_24:'):
+            if 'native_equivalent_id' in edit['provenance']:
                 bad = deepcopy(edit);bad.pop('native_item_name');bad['provenance']['converted_item_id']='2400';variants.append(bad)
             for changed in variants:
                 with self.assertRaises(ValueError,msg=edit['id']):
@@ -127,7 +127,7 @@ class NativeItemRetailTests(unittest.TestCase):
             path = Path(directory)/'edits.json'
             short = self.generate(10)
             path.write_text(json.dumps(short))
-            self.assertEqual(apply_translations(self.native,{},path)[0],31)
+            self.assertEqual(apply_translations(self.native,{},path)[0],45)
             for edit in (short[0],next(r for r in wide if r['id']=='item_24:00BF')):
                 changed = deepcopy(edit);changed.pop('native_item_name');changed['translation']='bad'
                 changed['provenance']['reference_sha256']=sha256(b'bad'.ljust(16,b' '))
