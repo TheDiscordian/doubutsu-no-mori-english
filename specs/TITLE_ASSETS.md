@@ -11,8 +11,10 @@ textured letter pieces, not one flat title bitmap.
 The source extractor and lossless texture conversion are implemented. A
 [separate Press Start preview](../docs/checkpoints/TITLE_PRESS_START.md) installs
 the two English tiles with reference positions and a transparent third native
-tile. The main logo's native drawing/animation integration remains pending.
-The v0 candidate, actor executable code, font metrics, and transitions are unchanged.
+tile. The separate [animated main-logo runtime](TITLE_RUNTIME.md) installs the
+complete package with title-only Expansion Pak ownership. Native and visual
+acceptance are tracked independently. The v0 candidate and font metrics remain
+unchanged.
 
 ## Supplied English source
 
@@ -145,7 +147,7 @@ These observations are from the source-hash-bound native disassembly at
   and palette formats, and convert only representation where the N64 requires it.
   Retain source dimensions, transparent edges, colours, letter placement, and
   animation intent; keep extracted/repacked assets local.
-- Choose a guarded cartridge asset/drawing integration that fits four MiB and
+- Choose a guarded cartridge asset/drawing integration with explicit detected RAM and
   preserves native actor allocation and transition behaviour. Verify texture
   memory, display-list bounds, relocations, and complete frame guards.
 - Test initial appearance, animation, Press Start, input, menu transitions,

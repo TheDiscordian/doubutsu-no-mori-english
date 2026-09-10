@@ -9,11 +9,12 @@ from title_press_start import ACTOR, RELOC, ASSETS, RAM, SOURCE_HASHES
 PREVIEW_SHA256 = 'f8257e4d9a0625d51965c551541a3a560267f92ff758437b5c74542767a949db'
 
 
-def verify(debug, rom):
-    if sha256(rom) != PREVIEW_SHA256:
-        raise ValueError('Title memory observation requires the exact Press Start preview')
+def locate(debug, *, memory_end=0x80400000):
+    """Locate the native title owner without changing game or debugger state."""
+    if memory_end not in (0x80400000, 0x80800000):
+        raise ValueError('Unsupported title memory boundary')
     def read(address, size):
-        if address % 4 or not 0x8019C8E0 <= address <= 0x80400000-size:
+        if address % 4 or not 0x8019C8E0 <= address <= memory_end-size:
             raise ValueError('Title observation is outside allocated game memory')
         data = debug.read_memory(address, size)
         if len(data) != size:
@@ -43,6 +44,13 @@ def verify(debug, rom):
     update = struct.unpack_from('>I', data, 0x164)[0]
     base = update-(0x80AA1E58-RAM)
     bank = struct.unpack('>I', read(actor+0x2FC, 4))[0]
+    return read, actor, base, bank
+
+
+def verify(debug, rom):
+    if sha256(rom) != PREVIEW_SHA256:
+        raise ValueError('Title memory observation requires the exact Press Start preview')
+    read, actor, base, bank = locate(debug)
     files = by_vrom(rom)
     image, reloc, assets = [files[v].extract(rom) for v in (ACTOR, RELOC, ASSETS)]
     if sha256(reloc) != SOURCE_HASHES[RELOC] or struct.unpack_from('>5I', reloc) != (8912, 992, 48, 0, 145):

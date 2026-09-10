@@ -64,11 +64,13 @@ def relocated(spec,data,reloc,base):
     return relocate_verified_data(spec, data, reloc, base)
 
 
-def relocate_verified_data(spec, data, reloc, base, *, address_constants=(), base_alignment=16):
+def relocate_verified_data(spec, data, reloc, base, *, address_constants=(), base_alignment=16,
+                          memory_end=0x80400000):
     """Relocate caller-verified native files; callers must first bind full hashes."""
-    if (type(base_alignment) is not int or base_alignment not in (8,16) or
+    if (type(memory_end) is not int or memory_end not in (0x80400000, 0x80800000) or
+            type(base_alignment) is not int or base_alignment not in (8,16) or
             type(base) is not int or base % base_alignment or
-            not MODULE_RAM+RESERVATION <= base <= 0x80400000-spec.resident_bytes):
+            not MODULE_RAM+RESERVATION <= base <= memory_end-spec.resident_bytes):
         raise ValueError('Invalid NPC show relocation base')
     text,writable,rodata,bss,count = spec.sections
     result,high = bytearray(data),{}

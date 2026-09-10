@@ -1,0 +1,13 @@
+[
+  {"wait": 12},
+  {"verify_title_logo": true},
+  {"read": ["80000318", 4], "expect": "00800000"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 8},
+  {"snapshot_message": true},
+  {"read": ["801021F0", 32]},
+  {"read": ["80400000", 16], "expect": "AF54C0DEAF54C0DEAF54C0DEAF54C0DE"},
+  {"read": ["804475F0", 16], "expect": "AF54C0DEAF54C0DEAF54C0DEAF54C0DE"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
+]

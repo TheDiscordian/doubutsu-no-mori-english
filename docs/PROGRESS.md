@@ -24,9 +24,12 @@ bounded native loading/START check pass; the v0 candidate is unchanged. All
 The [main logo package](../specs/TITLE_ASSETS.md) binds all 23 models and three
 animations and converts their geometry into 107 TMEM-bounded native strips.
 Eight binding/package tests and the independent native GBI compilation check
-pass. The 280,224-byte package is not installed yet; actor rendering/lifetime
-integration remains v1 work, alongside the GameCube-style keyboard. This does
-not add or remove main-text credit.
+pass. The [animated logo preview](checkpoints/TITLE_LOGO.md) installs the package
+with title-only Expansion Pak ownership, leaving the ordinary four-MiB heap,
+resident translation module, and v0 ROM unchanged. Full loaded-image readback,
+animation completion, START, allocation release, and guards pass the silent
+native check. Visual approval and missing-Pak handling remain. The GameCube-style keyboard is
+still pending. This does not add or remove main-text credit.
 
 The [combined v0 check](checkpoints/V0_SMOKE.md) passes fresh-game English
 name/town entry, long choices, and train arrival in the assembled candidate:

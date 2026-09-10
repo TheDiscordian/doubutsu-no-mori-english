@@ -634,6 +634,7 @@ def main():
     parser.add_argument("--xvfb", default=os.environ.get("AF_XVFB", "Xvfb"))
     parser.add_argument("--ares", default="/usr/bin/ares")
     parser.add_argument("--seconds", type=int, default=40)
+    parser.add_argument('--expansion-pak', action='store_true', help='Enable eight MiB for an explicitly compatible test build')
     parser.add_argument("--scenario", type=Path)
     parser.add_argument('--no-initial-screenshot',action='store_true',
                         help='Skip the diagnostic startup image for memory-only batches; scenario image checks still run')
@@ -657,7 +658,7 @@ def main():
     rom = out / "test.z64"
     shutil.copyfile(args.rom, rom)
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
-    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": False,
+    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": args.expansion_pak,
                   "initial_screenshot": not args.no_initial_screenshot,
                   "allow_test_flash_write": args.allow_test_flash_write,
                   "allow_test_pak_write": args.allow_test_pak_write,
@@ -691,7 +692,7 @@ def main():
                         "General\n  NoFilePrompt: true\n  AutoSaveMemory: true\n"
                         "Hotkey\n  SaveState: 0x1/0/5;;\n  LoadState: 0x1/0/6;;\n"
                         "  QuitEmulator: 0x1/0/12;;\n"
-                        "Nintendo64\n  ExpansionPak: false\n"
+                        f"Nintendo64\n  ExpansionPak: {str(args.expansion_pak).lower()}\n"
                         "  Input\n    Controller.Port.1\n      Gamepad\n"
                         "        A: 0x1/0/35;;\n        B: 0x1/0/36;;\n"
                         "        Start: 0x1/0/89;;\n"
@@ -730,14 +731,14 @@ def main():
                    "--setting", "Audio/Driver=None", "--setting", "Audio/Mute=true",
                    "--setting", "DebugServer/Enabled=true", "--setting", "DebugServer/UseIPv4=true",
                    "--setting", f"DebugServer/Port={args.port}",
-                   "--setting", "Nintendo64/ExpansionPak=false", str(rom)]
+                   "--setting", f"Nintendo64/ExpansionPak={str(args.expansion_pak).lower()}", str(rom)]
         if args.seed_state:
             command[5:5] = ["--save-state", "1"]
         ares = subprocess.Popen(command, env=env, stdout=log, stderr=log, start_new_session=True)
         processes.append(ares)
         time.sleep(3)
         results = [{"rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
-                    "audio": "disabled", "expansion_pak": False,
+                    "audio": "disabled", "expansion_pak": args.expansion_pak,
                     "scenario": str(args.scenario) if args.scenario else "default"}]
         if not args.no_initial_screenshot:
             try:
@@ -764,6 +765,14 @@ def main():
             if action.get('verify_title_start'):
                 from title_start_smoke import verify as verify_title_start
                 record(verify_title_start(debug, args.rom.read_bytes()))
+            if action.get('verify_title_logo'):
+                from title_logo_smoke import diagnose as diagnose_title_logo, verify as verify_title_logo
+                profile = json.loads((args.rom.parent/'preview.json').read_text())['actor']
+                try:
+                    record(verify_title_logo(debug, args.rom.read_bytes(), profile))
+                except ValueError:
+                    record(diagnose_title_logo(debug))
+                    raise
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
             if "key" in action:
