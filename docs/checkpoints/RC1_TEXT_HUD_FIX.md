@@ -65,6 +65,21 @@ Useful verified keyboard source details:
   allocation. The existing pool immediate is `7620`, close to its signed bound.
   Any replacement must preserve earlier pixel-editor hooks and relocations.
 
+The prior 30,272-byte editor prefix is recoverable from the current ROM alone:
+restore the draw call `808882D8` from `RAM+30600` to `RAM+25748`, then retain
+the 542 flattened relocations below offset 30,272 and rebuild the relocation
+header/footer. This is executed read-only and reproduces the complete prior
+owner hash `231fc18359e3ae7c0031aa4571a436f7cdb18c0898a5adfbbbeac94c5149df9d`
+and relocation hash `db23c6b194a7beef0221ab3c235b99fe14740311fa120ad9df6a35f471fe570a`.
+No historical compiled directory is needed to recover that prefix. The two
+existing page-count instructions are verified as `8088AC0C:2C630003` (validity)
+and `8088B074:24030003` (modulo divisor); changing each final immediate to two
+preserves all function locations. These changes are not yet installed.
+
+The original two symbol tables contain 24 distinct supported key codes after
+deduplication, including newline/space and the apology-only sun/skull. One
+forty-key page has sufficient capacity without removing any supported symbol.
+
 Raw GC controller-background images `gc-keyboard-control-{a,b,c,d}.png` and
 `gc-keyboard-bottom.png` are decoded in `build/artwork-inspection/`. They are
 background silhouettes, not translated button labels. The user clarification
