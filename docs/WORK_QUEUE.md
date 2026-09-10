@@ -2,6 +2,12 @@
 
 ## V0 execution priority
 
+The [collection checkpoint](checkpoints/COLLECTION_ARTWORK.md) records the full
+Insects/Fish headings in `build/collection-artwork-01`, retaining every previous
+clock/screen/shop change and both conversation fixes. Three focused checks pass.
+Continue remaining signs/buildings, title integration, and keyboard work; retain
+the corrected v0 handoff and combine ordinary screen checks across batches.
+
 The [clock checkpoint](checkpoints/TIME_SETTING.md) records the combined English
 clock/map/inventory/shop candidate in `build/time-setting-01`. Its four embedded
 Japanese records have installed English and aligned numeric values, with native

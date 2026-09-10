@@ -17,6 +17,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [collection heading candidate](checkpoints/COLLECTION_ARTWORK.md) at
+`build/collection-artwork-01` adds the full GameCube Insects/Fish artwork to the
+clock, map, inventory, shop, and conversation corrections. Three focused checks
+pass, including independent native texture commands and full retained-resource
+verification. Original collection records, tab icons, page layout, and memory
+bounds remain unchanged. Continue remaining signs/buildings, title integration,
+and the GameCube-style keyboard; combine ordinary screen checks across the batch.
+
 The [English clock candidate](checkpoints/TIME_SETTING.md) at
 `build/time-setting-01` installs "Adjust the clock.", "OK", and aligned
 `20YY-MM-DD` / `HH:MM` fields. Native selection, time/RTC operations, save layout,
