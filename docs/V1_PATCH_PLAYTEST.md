@@ -6,6 +6,8 @@ screen/building artwork. It also includes the birthday window, editor
 confirmation, inventory/Pak warnings, and gyroid service responses.
 The seasonal artwork includes Nookington's clearance/door details, both dump
 signs, fishing props, the fortune table, and countdown minute/second labels.
+The festival stall uses a compact GC-style shared mesh with a reflected second
+placement, preserving native memory limits and item behaviour.
 See `FEATURES.md` for the complete feature and verification notes. This is not a
 completed v1, hardware certification, or public release.
 
@@ -46,7 +48,8 @@ character alteration. Unsupported characters are disabled.
 
 The full-conversation furniture-delivery loop and later letter-advice cleanup
 have focused native fixes, but still need the ordinary hardware tutorial replay.
-Some decorative signs/buildings/bags retain Japanese; line layout needs a human
+The GC-style stall needs ordinary appearance/lighting acceptance; lucky-bag
+decorative writing remains Japanese as in GC. Line layout needs a human
 polish pass preserving intentional GC line/page breaks and timing.
 
 The embedded warning/confirmation native drawing probe is incomplete after a

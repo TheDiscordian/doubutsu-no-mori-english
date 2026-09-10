@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-countdown-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-countdown-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-stall-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-stall-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`6be7c2a514574a3c9f7eba0e00c45d84cb6f83866b39cd7d1de0b2db8c1f73b7`.
+`128f19b734565e5e0c3af15aaf1fef8fb066155039404a2bfdd29efe8010bf19`.
 Patch SHA-256:
-`352fcf38e007e69b029ff770c30bbdda6a48e2fb6ccb9a7f289c3e67a9ed9979`.
+`600ec4b132646673ae8f1894b5131b642439b0b82e171c96ba351175cc1ddef0`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -24,6 +24,11 @@ name and headquarters placard, with the remaining geometry and event unchanged.
 The New Year fortune table uses the complete matching GC model inside its native
 allocation; the shrine and fortune outcomes stay native. The countdown display
 uses the exact `min.`/`sec.` artwork, preserving digits, timing, and animation.
+The festival stall uses the GC striped-awning, balloon, and pinwheel design,
+with one shared mesh and a reflected second placement. The complete adaptation
+fits the native allocation and preserves actor/event code, goods, and saves.
+The reflected mesh is not an exact import of the separate GC right-hand mesh;
+the difference is recorded rather than silently changing a shared memory limit.
 Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
 controls use the complete supplied English artwork with native N64 button icons.
 The catalogue has top/bottom controls, the mailbox has a Mail heading, and
@@ -71,13 +76,15 @@ This controlled check does not establish ordinary navigation or transactions.
 Original-hardware acceptance, the ordinary first-job replay, all changed menus,
 multi-line editing, normal save/restart, and return-to-title/existing-save cases
 remain playtest work.
-The Nookington, dump, fishing, fortune-table, and countdown batches pass focused
+The Nookington, dump, fishing, fortune-table, countdown, and stall batches pass focused
 source/graphics/retention/patch checks and title combination checks. These do not
 establish ordinary seasonal-event appearance or gameplay.
-The festival stall retains Japanese signs and needs further adaptation; the
-full GC pair of models does not fit its native streamed slot. The supplied
-English GC game also retains Japanese decorative lucky-bag artwork; that design
-choice remains open. Some artwork therefore remains unfinished. This is a combined
+The stall's complete native-command trace also checks both placements, all
+triangles, the balanced reflection matrix stack, and restored culling. Actual
+in-scene appearance, lighting, and shadow fit remain unverified.
+The supplied English GC game retains Japanese decorative lucky-bag artwork in
+both menu and world designs; that writing choice remains open. Some artwork
+therefore remains unfinished. This is a combined
 experimental build, not a completed v1/public release or exhaustive acceptance.
 
 ROMs and extracted Nintendo assets remain local and ignored. Public distribution
