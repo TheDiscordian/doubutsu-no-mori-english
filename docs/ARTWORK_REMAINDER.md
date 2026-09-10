@@ -23,6 +23,14 @@ credit or replacement is required. Complete house slices, selected palettes,
 and both cartridge copies are verified unchanged in V1RC2. Do not repeat this
 inspection or treat it as coverage of every house variant or game image.
 
+## Additional player-house and winter-windmill textures
+
+The [seven-image review](checkpoints/PLAYER_HOUSE_WINDMILL_REVIEW.md) closes four
+player-house roof/wall atlases and three winter-windmill atlases. No readable
+Japanese wording is found. All selected textures and material ranges remain
+native in both RC4 building-resource copies; retain them without repeating this
+inspection. Other colour variants and ordinary scene appearance are not claimed tested.
+
 ## Nook 'n' Go hiring notice
 
 The [post-V1RC1 correction](checkpoints/SHOP_HIRING_NOTICE.md) removes the native

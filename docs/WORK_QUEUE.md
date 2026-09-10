@@ -110,6 +110,11 @@ Broader remaining work follows the combined-fix integration:
    also closes its four player/effect candidates through verified native palette
    binding and non-text inspection. Do not repeat either completed group or
    claim that those selected groups cover every dynamic material.
+   The [player-house/winter-windmill review](checkpoints/PLAYER_HOUSE_WINDMILL_REVIEW.md)
+   closes seven further non-text atlases, retained in both RC4 building copies.
+   Do not repeat that completed inspection. Unchanged texels in the original
+   owner may belong to a replaced model; check the installed reader before
+   treating retained old storage as untranslated artwork.
    The
    [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
    Katrina-interior, clock/furniture, and mechanical-detail textures; retain them

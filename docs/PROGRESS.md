@@ -185,6 +185,10 @@ the four deferred player/effect images: all inspected views are non-text, native
 palette selection is bound, and the effect palette agrees with a retained RC4
 town state. Their textures/materials/palette sources remain unchanged in RC4.
 
+The [player-house/winter-windmill review](checkpoints/PLAYER_HOUSE_WINDMILL_REVIEW.md)
+closes seven further non-text atlases. Selected palettes, complete textures,
+and material ranges remain native in both RC4 building-resource copies.
+
 The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
 inspects 48 images: one hiring notice is corrected separately, and 47 neutral
 images remain native. This includes seventeen selected Katrina-interior images;
