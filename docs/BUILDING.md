@@ -23,21 +23,30 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/text-extension-pilot`.
-Its [checkpoint](checkpoints/TEXT_EXTENSION.md) records exact dependencies,
-artifacts, and verification limits. With the retained prerequisite resources:
+The current combined integration build is `build/classic-letters-pilot`.
+Its [checkpoint](checkpoints/CLASSIC_LETTERS.md) records exact dependencies,
+artifacts, and verification limits. With the retained reserve-letter predecessor
+and source-bound resources:
 
 ```sh
-python3 tools/build_text_extension.py
-bash tools/build_text_extension_pilot.sh
+python3 tools/build_classic_letters.py
+python3 tools/classic_letters.py
 ```
 
-This wrapper retains the complete seasonal/letter/name/default-message/editor
+This is an incremental recipe, not a clean-clone build command: its retained
+predecessors and locally extracted references are required. The classic-letter
+checkpoint links the preceding recipes. All inventoried Japanese phrases have
+installed English replacements or verified English rendering routes; structural
+zero-filled slots stay untouched. The [combined v0 check](checkpoints/V0_SMOKE.md)
+records actual test results and remaining handoff checks.
+
+The translation framework retains the complete seasonal/letter/name/default-message/editor
 integration, complete inventory labels/questions/descriptions, inventory/catalogue
 and world names, the English town suffix, the shop/player/event/home name connections,
 complete festival-stall item and cancellation choices, and persistent complete
-general dialogue fields with item-name adapters. The extension adds 2,159 bytes
-of system-arena storage and keeps the existing resident and saved layouts.
+general dialogue fields with item-name adapters. The current font and creator
+appendices keep the existing resident reservation and saved layouts; their exact
+allocations are in the classic-letter checkpoint.
 See [the extension checkpoint](checkpoints/TEXT_EXTENSION.md) for source,
 installation, native execution, and retained-resource evidence.
 The base overlay prerequisites are reproduced with

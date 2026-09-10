@@ -17,6 +17,14 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [combined v0 check](checkpoints/V0_SMOKE.md) passes fresh-game English
+name/town entry, long choices, and train arrival in the assembled candidate:
+218 recorded steps, ten acceptance checks, intact memory guards, and graceful
+shutdown in four MiB. The full regression invocation is running; its failures
+require classification. Normal save/restart and the broader ordinary menu/editor
+checks remain unverified. The guarded patch-only packager passes five focused
+tests; its [private playtest notes](V0_PLAYTEST.md) state those limits explicitly.
+
 The [v0 delivery plan](V0_PLAN.md) governs the next implementation and test
 batches. Finish remaining text and consumers before expanding acceptance work;
 reuse passing evidence and apply the explicit harness/retry limits. Assemble and

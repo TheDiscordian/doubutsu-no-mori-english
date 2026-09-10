@@ -2,6 +2,11 @@
 
 ## V0 execution priority
 
+The assembled candidate passes the fresh-game name/town/train/arrival smoke.
+The [combined check](checkpoints/V0_SMOKE.md) tracks the full regression result,
+remaining ordinary save/menu checks, and patch-only packaging. Do not rerun the
+completed train or native classic/accent batches without a relevant change.
+
 Follow the [v0 delivery plan](V0_PLAN.md) for the next work: finish remaining
 text and consumer integration, run bounded combined safety checks, and hand over
 the playtest patch. Player testing follows that handoff. V1 title/image and
