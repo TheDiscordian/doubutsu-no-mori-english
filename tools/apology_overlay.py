@@ -105,6 +105,9 @@ def verify_owned_parts(built,native,report=None):
             or files[previous.NEW_VROM].index!=originals[previous.EDITOR].index
             or files[previous.NEW_RELOCATION].index!=originals[previous.EDITOR_RELOC].index):
         raise ValueError('Missing complete apology editor DMA ownership')
+    if len(files[previous.NEW_VROM].extract(built))!=APPROVED['bytes']:
+        from keyboard_grid_overlay import verify_owned_parts as verify_grid
+        return verify_grid(built,native,apology_report=report)
     validate(native,files[previous.NEW_VROM].extract(built),files[previous.NEW_RELOCATION].extract(built),
              report['overlay'] if report is not None else None)
     at=previous.METADATA[previous.EDITOR][0]
@@ -117,7 +120,7 @@ def verify_owned_parts(built,native,report=None):
             or struct.unpack_from('>I',code,0x800C4AFC-CODE_RAM)[0]!=0x3C0E8089
             or report is not None and report.get('allocation')!=needed):
         raise ValueError('Missing apology editor owner, window, or shared allocation')
-    return {'owner_offset':at,'owner_bytes':metadata(),'pool_extra':previous.POOL_EXTRA+EXTRA_POOL,
+    return {'owner_offset':at,'owner_bytes':metadata(),'pool_word':POOL_WORD,'pool_extra':previous.POOL_EXTRA+EXTRA_POOL,
             'allocation':needed}
 
 

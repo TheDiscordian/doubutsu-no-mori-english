@@ -193,8 +193,7 @@ def verify_owned_parts(built, native, module, report=None):
     from hboard_overlay import NEW_VROM as EDITOR_VROM, APPROVED as EDITOR
     if len(files[EDITOR_VROM].extract(built)) != EDITOR['bytes']:
         from apology_overlay import verify_owned_parts as verify_apology, POOL_WORD as APOLOGY_POOL
-        verify_apology(built, native)
-        pool_word = APOLOGY_POOL
+        pool_word = verify_apology(built, native).get('pool_word', APOLOGY_POOL)
     if (files[OWNER].extract(built)[OWNER_AT:OWNER_AT+32] != metadata()
             or struct.unpack_from('>I', code, POOL_PATCH-CODE_RAM)[0] != pool_word
             or struct.unpack_from('>I', code, 0x800C4AFC-CODE_RAM)[0] != 0x3C0E8089

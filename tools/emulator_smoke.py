@@ -1168,6 +1168,9 @@ def main():
                 results.append(approach_npc(debug, keyboard, action["approach_npc"], action.get("max_steps", 80)))
             if action.get("snapshot_keyboard"):
                 snapshot = keyboard_snapshot(debug)
+                if action.get('snapshot_keyboard_grid'):
+                    from keyboard_grid_smoke import snapshot as grid_snapshot
+                    snapshot['grid']=grid_snapshot(debug,snapshot)
                 results.append(snapshot)
                 for field, expected in action.get("expect_keyboard", {}).items():
                     if snapshot.get(field) != expected:

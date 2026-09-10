@@ -13,7 +13,7 @@ sys.path.insert(0,str(ROOT/'tools'))
 from aflib import sha256
 from check_keyboard_assembly import IMAGE
 from gc_text import decoder_tables
-from keyboard_grid import extract, DISABLED
+from keyboard_grid import extract, keycap, DISABLED
 from textcodec import ENCODE
 
 
@@ -65,6 +65,25 @@ class KeyboardGridTests(unittest.TestCase):
             run('gcc','-c','-Os','-EB','-mabi=32','-march=vr4300','-mfix4300','-G0','-mno-abicalls',
                 '-fno-pic','-ffreestanding','-fno-builtin','-Wall','-Wextra','-Werror','/source/core.c','-o','core.o')
             self.assertEqual(run('nm','--undefined-only','core.o').strip(),'')
+
+    def test_native_bridge_preserves_drafts_and_editor_capacities(self):
+        with tempfile.TemporaryDirectory(prefix='af-grid-editor-host-') as directory:
+            target=str(Path(directory)/'check')
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-I',str(ROOT/'overlays/keyboard_grid'),
+                str(ROOT/'overlays/keyboard_grid/core.c'),str(ROOT/'overlays/keyboard_grid/editor.c'),
+                str(ROOT/'tests/keyboard_grid_editor_check.c'),'-o',target],
+                check=True,capture_output=True,timeout=30)
+            subprocess.run([target],check=True,capture_output=True,timeout=10)
+
+    def test_keycap_preserves_donor_pixels_and_all_cell_positions(self):
+        from title_assets import DATA_BASE,untile
+        from font import pixels
+        data=keycap(self.rel,self.symbols)
+        self.assertEqual(len(data),128)
+        self.assertEqual(bytes(pixels(data)),untile(self.rel[DATA_BASE+0x420AA0:DATA_BASE+0x420B20],16,16,4))
+        with self.assertRaises(ValueError):keycap(self.rel[:-1],self.symbols)
 
 
 if __name__=='__main__':unittest.main()

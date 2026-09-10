@@ -191,6 +191,9 @@ def measure(native, built, report):
     if report.get('apology_input'):
         from apology_overlay import verify_installation
         verify_installation(built,native,report)
+    if report.get('keyboard_grid'):
+        from keyboard_grid_overlay import verify_owned_parts as verify_grid
+        verify_grid(built,native,report['keyboard_grid'],report['apology_input'])
     if report.get('text_extension'):
         from text_extension import verify_installation
         verify_installation(built, native, report)

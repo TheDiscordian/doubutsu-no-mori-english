@@ -8,7 +8,7 @@ import struct
 from aflib import sha256
 from gc_text import decoder_tables
 from textcodec import ENCODE
-from title_assets import DATA_BASE, REL_SHA256, SYMBOLS_SHA256
+from title_assets import DATA_BASE, REL_SHA256, SYMBOLS_SHA256, untile, pack4
 
 ROOT = Path(__file__).resolve().parents[1]
 TABLES = (('letterS_table$440', 0x7F5D8), ('letterS_table2$441', 0x7F600),
@@ -16,6 +16,27 @@ TABLES = (('letterS_table$440', 0x7F5D8), ('letterS_table2$441', 0x7F600),
           ('sign_table$444', 0x7F678), ('mark_table$445', 0x7F6A0))
 DISABLED = 0xFFFF
 GLYPHS_SHA = '027259dafcc1e53f9d65f2039673adf9329f72dd52ee14959ad0f5a613f64d18'
+
+
+def keycap(rel, symbols):
+    if sha256(rel)!=REL_SHA256 or sha256(symbols)!=SYMBOLS_SHA256:
+        raise ValueError('Unexpected keyboard keycap reference')
+    for name,address,size in (('testbutton',0x420AA0,0x80),('kai_sousa2_v',0x420B20,0xA00)):
+        if len(re.findall(r'^'+name+r' = \.data:0x'+f'{address:08X}'+r'; // type:object size:0x'+
+                          f'{size:X}'+r' ',symbols.decode(),re.M))!=1:
+            raise ValueError('Missing scoped keyboard keycap geometry')
+    # The native rectangles retain all 40 donor positions and mirrored UV spans.
+    for index in range(40):
+        left=-100+16*(index%10)+(0,3,7,10)[index//10]
+        top=-13-16*(index//10)
+        vertices=struct.iter_unpack('>3hH2h4B',rel[DATA_BASE+0x420B20+index*64:
+                                                      DATA_BASE+0x420B20+(index+1)*64])
+        if {(x,y,z,s,t) for x,y,z,_,s,t,*_ in vertices}!={
+            (left,top,0,0,0),(left+16,top,0,1024,0),
+            (left,top-16,0,0,1024),(left+16,top-16,0,1024,1024)}:
+            raise ValueError('GameCube key placement or mirrored UV changed')
+    raw=rel[DATA_BASE+0x420AA0:DATA_BASE+0x420B20]
+    return pack4(untile(raw,16,16,4))
 
 
 def extract(rel, symbols, glyphs):

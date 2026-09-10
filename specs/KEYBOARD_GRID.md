@@ -71,6 +71,8 @@ reference. Stick/D-pad moves the grid; C-buttons retain text-cursor movement.
 L changes case, R inserts space, Z changes page, L+Z changes QWERTY/alphabetical,
 A types, B deletes, and Start finishes through the original handler. Labels must
 describe these N64 mappings, not show nonexistent GameCube X/Y buttons.
+L+A invokes the retained native case/ornament exchange for the character before
+the text cursor. Initialization opens the uppercase QWERTY table.
 
 ## Implementation sequence and bounded checks
 
@@ -87,3 +89,26 @@ independent MIPS compilation, relocation and allocation, and complete cartridge
 retention. Reuse existing editor fixtures for a bounded name/letter/owner-message
 native batch; do not repeat the entire tutorial or build a per-character native
 matrix. Normal save/restart and hardware interaction remain human playtest work.
+
+## Installed image and allocation
+
+The compiled grid image is 28,656 bytes. Code ends at image offset `6C80`,
+the 480-byte mapped tables start there, the keycap follows at `6E60`, and the
+36-byte private context starts at `6FC0`, followed by zero alignment padding.
+The relocation resource is 2,096 bytes and preserves every preceding record.
+All four hook targets and the metadata destructor are relocated within this
+complete image; imports outside it are restricted to pinned native routines.
+
+The shared submenu allocation instruction at `800C4B10` is `25CE2220`, adding
+5,632 bytes to the complete preceding reservation. Rounded image growth is
+5,504 bytes, and the combined 253,056-byte pool exceeds the conservative
+252,736-byte bound. Editor VROM/relocation identities remain `03940000` and
+`03948000`, and the original DMA indices are retained. The image ends before
+the adjacent relocation range. The resident translation module and ordinary
+four-MiB heap ceiling are unchanged.
+
+`tools/keyboard_grid_overlay.py` checks exact compiled code/resource identities,
+restores and verifies the complete preceding apology/owner editor, compares
+relocated prefixes at three native heap locations, and binds owner/pool edits.
+Shared inventory/letter checks accept the new pool word only through that
+complete verification. Current-route progress checks validate the grid too.

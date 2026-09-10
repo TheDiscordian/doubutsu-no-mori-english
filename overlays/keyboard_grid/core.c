@@ -86,6 +86,7 @@ int af_grid_update(struct af_grid_state *s, const unsigned short *tables,
     if (!repeat(cursor,&s->cursor_direction,&s->cursor_repeat)) cursor=0;
     erase=repeat((held&BTN_B)!=0,&s->deleting,&s->delete_repeat);
     if (pressed&BTN_START) return AF_GRID_DONE;
+    if ((held&BTN_L) && (pressed&BTN_A)) return AF_GRID_EXCHANGE;
     if ((held&(BTN_L|BTN_Z))==(BTN_L|BTN_Z) && (pressed&(BTN_L|BTN_Z))) {
         s->alphabetical^=1u;return AF_GRID_NONE;
     }

@@ -31,6 +31,7 @@ int main(int argc, char **argv) {
     assert(af_grid_key(s,keys,1,0)=='A');
     assert(step(s,0x8000,0x8000)==AF_GRID_INSERT && output=='A');
     assert(step(s,0x8000,0)==AF_GRID_NONE); /* A never auto-types while held. */
+    assert(step(s,0x8020,0x8000)==AF_GRID_EXCHANGE);
     assert(step(s,0x10,0x10)==AF_GRID_INSERT && output==' ');
     assert(step(s,0x1000,0x1000)==AF_GRID_DONE);
     assert(step(s,0x2000,0x2000)==AF_GRID_NONE && s->page==1);
