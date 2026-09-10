@@ -26,7 +26,7 @@ Replay the existing guarded builders in order: shops, map, inventory, clock,
 collections, grid, Nookington, SOLD OUT/hints, police, Redd, corrected cursor,
 noticeboard, tune, catalogue, service controls, birthday, Controller Pak,
 embedded menu warnings, gyroid responses, Nookington details, dump, fishing,
-fortune table, countdown, shared stall, and title. Each builder retains its
+fortune table, countdown, shared stall, shop-interior signs, and title. Each builder retains its
 source, preceding-cartridge, allocation, other-resource, and UPS assertions.
 
 Record each stage's hashes and duration outside the cartridge's existing build

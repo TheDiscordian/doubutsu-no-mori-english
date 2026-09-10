@@ -8,6 +8,9 @@ The seasonal artwork includes Nookington's clearance/door details, both dump
 signs, fishing props, the fortune table, and countdown minute/second labels.
 The festival stall uses a compact GC-style shared mesh with a reflected second
 placement, preserving native memory limits and item behaviour.
+Seven Nookington interior signs also use the matching English GC designs,
+including welcome/hours, clearance-sale, raffle-day, information, and thank-you
+wording. Room geometry, lighting, shop rules, and saved layouts remain unchanged.
 See `FEATURES.md` for the complete feature and verification notes. This is not a
 completed v1, hardware certification, or public release.
 

@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-stall-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-stall-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-shop-interior-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-shop-interior-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`128f19b734565e5e0c3af15aaf1fef8fb066155039404a2bfdd29efe8010bf19`.
+`d7fbbffc85eb7c311f980c3945cf035de136b130d9fee6214ad096d60b8c8585`.
 Patch SHA-256:
-`600ec4b132646673ae8f1894b5131b642439b0b82e171c96ba351175cc1ddef0`.
+`4dca9b30625ea76350dcc3198835ad9d7b6d226cda77bc0828519fa630e5a31b`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -29,6 +29,12 @@ with one shared mesh and a reflected second placement. The complete adaptation
 fits the native allocation and preserves actor/event code, goods, and saves.
 The reflected mesh is not an exact import of the separate GC right-hand mesh;
 the difference is recorded rather than silently changing a shared memory limit.
+Seven Nookington interior signs use their exact English GC textures: second-floor
+direction, information notices, welcome/opening hours, clearance sale, thank-you
+signs, and the raffle-day board with `RAFFLE-TICKET DAY` and `BIG CHANCE!`.
+The native room geometry, lighting, shop hours, raffle rules, and saved layouts
+remain unchanged. One isolated palette colour matches the donor without changing
+the board edge that shares its palette. Ordinary room appearance remains unverified.
 Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
 controls use the complete supplied English artwork with native N64 button icons.
 The catalogue has top/bottom controls, the mailbox has a Mail heading, and

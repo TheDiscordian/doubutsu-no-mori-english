@@ -10,16 +10,17 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 import rebuild_v1 as recipe
 from aflib import sha256
+from toolchain import profile_sha256
 from build_keyboard_grid import source_bytes, sources
 
 
 class RecipeTests(unittest.TestCase):
     def test_order_and_exclusive_outputs(self):
         stages = [row[0] for row in recipe.STAGES]
-        self.assertEqual(len(stages), 26)
-        self.assertEqual(len(set(stages)), 26)
+        self.assertEqual(len(stages), 27)
+        self.assertEqual(len(set(stages)), 27)
         self.assertLess(stages.index('grid-replay-only'), stages.index('corrected-grid'))
-        self.assertEqual(stages[-2:], ['stall', 'title'])
+        self.assertEqual(stages[-3:], ['stall', 'shop-interiors', 'title'])
         with tempfile.TemporaryDirectory(prefix='af-v1-output-') as directory:
             out = Path(directory)/'result'
             recipe.publish(out, b'rom fixture', b'patch fixture', {})
@@ -81,12 +82,16 @@ class ActualRebuildTests(unittest.TestCase):
         self.assertEqual(inputs['source_revision'], 'd54f2f89bd832bc59957441dc9101010fc52a740')
         report = json.loads((directory/'rebuild.json').read_text())
         self.assertTrue(report['complete'])
-        self.assertEqual([r['stage'] for r in report['stages']], [r[0] for r in recipe.STAGES])
+        self.assertEqual([r['stage'] for r in report['stages']],
+                         [r[0] for r in recipe.STAGES if r[0] != 'shop-interiors'])
         final = directory/'final'
         image, patch_data = [(final/name).read_bytes() for name in
                             ('animal-forest-title-preview.z64', 'animal-forest-title-preview.ups')]
-        recipe.check_final(image, patch_data, json.loads((final/'preview.json').read_text()))
-        self.assertEqual(sha256(image), recipe.ROM_SHA)
+        # This immutable record proves package 03, not the new interior-sign build.
+        self.assertEqual(sha256(image), '128f19b734565e5e0c3af15aaf1fef8fb066155039404a2bfdd29efe8010bf19')
+        self.assertEqual(sha256(patch_data), '600ec4b132646673ae8f1894b5131b642439b0b82e171c96ba351175cc1ddef0')
+        self.assertEqual(profile_sha256(json.loads((final/'preview.json').read_text())),
+                         '20f970392d1d60136613ee439b3cc90bcc2abf77941fcf34f42f900b7877a815')
         self.assertFalse(report['clean_clone_base_translation_recipe'])
         self.assertFalse(report['hardware_acceptance'])
         from keyboard_grid_overlay import validate
@@ -97,6 +102,27 @@ class ActualRebuildTests(unittest.TestCase):
             self.assertEqual(metadata['version'], version)
             validate(native, (compiled/'overlay.bin').read_bytes(),
                      (compiled/'relocation.bin').read_bytes(), metadata)
+
+
+@unittest.skipUnless((ROOT/'build/v1-rebuilt-03/rebuild.json').is_file(), 'Current 27-stage execution required')
+class CurrentRebuildTests(unittest.TestCase):
+    def test_current_recipe_and_final_interiors_are_rebuilt_from_source(self):
+        directory = ROOT/'build/v1-rebuilt-03'
+        inputs = json.loads((directory/'inputs.json').read_text())
+        self.assertFalse(inputs['worktree_modified'])
+        self.assertEqual(inputs['recipe_sha256'], sha256((ROOT/'tools/rebuild_v1.py').read_bytes()))
+        record = json.loads((directory/'rebuild.json').read_text())
+        self.assertTrue(record['complete'])
+        self.assertEqual([s['stage'] for s in record['stages']], [s[0] for s in recipe.STAGES])
+        final = directory/'final'
+        image, ups = [(final/name).read_bytes() for name in
+                      ('animal-forest-title-preview.z64', 'animal-forest-title-preview.ups')]
+        recipe.check_final(image, ups, json.loads((final/'preview.json').read_text()))
+        import shop_interior_artwork as shop
+        interior = json.loads((directory/'replay/26-shop-interiors/build.json').read_text())
+        shop.verify_installed((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(), image, interior,
+            (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
 
 
 if __name__ == '__main__':

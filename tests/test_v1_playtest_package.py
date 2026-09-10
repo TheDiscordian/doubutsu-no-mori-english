@@ -15,13 +15,13 @@ from aflib import sha256
 import package_v1_playtest as package
 
 
-@unittest.skipUnless((ROOT/'build/title-stall-combined-01/preview.json').is_file(),
-    'Local complete title/shared-stall candidate required')
+@unittest.skipUnless((ROOT/'build/title-shop-interior-combined-01/preview.json').is_file(),
+    'Local complete title/shop-interior candidate required')
 class V1PlaytestPackageTests(unittest.TestCase):
     def test_actual_bundle_and_included_patcher_reconstruct_without_overwriting(self):
         source=ROOT/'local/rom/Doubutsu no Mori (Japan).z64'
-        data,manifest=package.prepare(ROOT/'build/title-stall-combined-01',source.read_bytes(),'a'*40)
-        self.assertEqual(manifest['label'],'v1-artwork-playtest-03')
+        data,manifest=package.prepare(ROOT/'build/title-shop-interior-combined-01',source.read_bytes(),'a'*40)
+        self.assertEqual(manifest['label'],'v1-artwork-playtest-04')
         self.assertEqual(manifest['output_sha256'],package.ROM_SHA)
         self.assertEqual(manifest['canonical_build_report_sha256'],package.REPORT_SHA)
         self.assertEqual(manifest['reviewed_profile_sha256'],package.REPORT_SHA)
@@ -39,6 +39,7 @@ class V1PlaytestPackageTests(unittest.TestCase):
             self.assertIn(b'fortune',archive.read('FEATURES.md'))
             self.assertIn(b'festival stall',archive.read('FEATURES.md'))
             self.assertIn(b'reflected',archive.read('FEATURES.md'))
+            self.assertIn(b'RAFFLE-TICKET DAY',archive.read('FEATURES.md'))
             for line in archive.read('SHA256SUMS').decode().splitlines():
                 digest,name=line.split('  ',1);self.assertEqual(sha256(archive.read(name)),digest)
             for name in archive.namelist():
@@ -58,7 +59,7 @@ class V1PlaytestPackageTests(unittest.TestCase):
 
     def test_unknown_report_and_packaging_revision_are_rejected(self):
         source=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        directory=ROOT/'build/title-stall-combined-01'
+        directory=ROOT/'build/title-shop-interior-combined-01'
         with patch.object(package,'REPORT_SHA','0'*64),self.assertRaises(ValueError):
             package.prepare(directory,source,'a'*40)
         with self.assertRaises(ValueError):package.prepare(directory,source,'uncommitted')
