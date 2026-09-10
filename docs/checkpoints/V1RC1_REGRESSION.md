@@ -54,3 +54,9 @@ It records 67 initially passing checks and two affected composition checks
 passing after their additional item-fixture correction. Source/provenance guards
 remain intact. This scoped follow-up does not replace the full-suite result or
 claim the remaining errors resolved.
+
+The [letter/shared-word follow-up](MAIL_RUNTIME_FIXTURE_FOLLOWUP.md) closes seven
+further historical errors and records passing evidence for 51 selected checks.
+Two source-built capture fixtures retain distinct approved word profiles; the
+shared-bank tests use the current native-species correction. Production guards,
+ROMs, and saves remain unchanged. The full-suite result is not replaced.

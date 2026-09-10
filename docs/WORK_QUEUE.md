@@ -52,6 +52,11 @@ do not establish acceptance of every reported case. Next:
   also closes five historical errors with passing evidence for 69 selected
   checks. Preserve the verified fixture selections and unchanged guards; do not
   rerun that completed batch or mark other failures resolved by association.
+  The [letter/shared-word follow-up](checkpoints/MAIL_RUNTIME_FIXTURE_FOLLOWUP.md)
+  closes seven further historical errors through verified module/item selection
+  and two freshly compiled capture fixtures. Its 51 selected checks have passing
+  evidence, including the source-bound native species and complete shared-bank
+  installation. Preserve this batch; remaining fixtures are not passed by association.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.
@@ -101,8 +106,10 @@ Broader remaining work follows the combined-fix integration:
    to select additional remaining screen/item images. The
    [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md) closes
    34 further native textures and confirms the English GC umbrella motif is
-   retained. Do not repeat those images. Its four player/effect candidates need
-   dynamic palette binding before visible artwork can be claimed reviewed.
+   retained. The [dynamic-palette follow-up](checkpoints/DYNAMIC_PROP_ARTWORK_REVIEW.md)
+   also closes its four player/effect candidates through verified native palette
+   binding and non-text inspection. Do not repeat either completed group or
+   claim that those selected groups cover every dynamic material.
    The
    [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
    Katrina-interior, clock/furniture, and mechanical-detail textures; retain them

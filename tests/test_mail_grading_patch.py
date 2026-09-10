@@ -76,7 +76,7 @@ class MailRelocationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'reference'): load_prefixes(b'', '')
 
 
-@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/runtime-module/module.json').is_file()
+@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/notice-seasonal-runtime/module.json').is_file()
                      and (ROOT/'build/mail-grading/overlay.json').is_file(),
                      'Local original ROM and built mail/runtime modules required')
 class MailGradingInstallTests(unittest.TestCase):
@@ -85,7 +85,7 @@ class MailGradingInstallTests(unittest.TestCase):
         from runtime_module import add_runtime_module
         cls.rom = ROM_PATH.read_bytes()
         cls.replacements = {}
-        cls.additions,cls.module = add_runtime_module(cls.rom,cls.replacements,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.rom,cls.replacements,ROOT/'build/notice-seasonal-runtime')
         cls.directory = ROOT/'build/mail-grading'
         cls.files = by_vrom(cls.rom)
 

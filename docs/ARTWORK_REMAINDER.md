@@ -8,8 +8,10 @@ motif also retained by the English GC artwork. Six gradient masks use I8;
 the inspection decoder now supports that format with passing focused tests.
 Selected textures, palettes, and load/tile sequences remain native in V1RC3.
 Do not repeat this review, count it as newly applied English, or treat it as
-complete dynamic-palette coverage. Four explicitly identified player/effect
-candidates still require palette binding.
+complete dynamic-palette coverage. The four deferred player/effect candidates
+are resolved in the [dynamic-palette follow-up](checkpoints/DYNAMIC_PROP_ARTWORK_REVIEW.md):
+native face/season palette loaders are bound, and the inspected images contain
+no lettering. Preserve those images too; other dynamic materials remain in scope.
 
 ## Inspected house textures
 

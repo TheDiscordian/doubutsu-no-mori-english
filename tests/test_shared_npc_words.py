@@ -15,7 +15,8 @@ from build import apply_translations
 from fortune_strings import STRING_RELOCATION, source_entries
 from mail_catalog import VROM as CATALOG_VROM, install as install_catalog
 from mail_view_patch import VROM as READER_VROM, RELOC_VROM, install as install_reader
-from npc_mail_capture import HOOKS, WORD_HASH
+from native_species import NATIVE_ID, NATIVE_SHA256, DONOR, ENGLISH, SOURCE
+from npc_mail_capture import HOOKS, DESIGN_WORD_HASH
 from npc_mail_delivery import CREATOR_CALL, FAILURE_BRANCH, ARGUMENT_MOVE
 from npc_mail_loader import VROM as CREATOR_VROM, CONFIG_OFFSET, install as install_creator
 from npc_mail_loader_test_scenario import scenario as loader_scenario
@@ -29,8 +30,8 @@ from textcodec import encode
 from resident_word_smoke import random_cases, RANDOM_BASES
 from test_retail import ROM_PATH
 
-MODULE = ROOT/'build/runtime-module'
-CREATOR = ROOT/'build/npc-mail-capture'
+MODULE = ROOT/'build/notice-seasonal-runtime'
+CREATOR = ROOT/'build/shared-npc-capture-runtime-followup-01'
 CATALOG = ROOT/'build/mail-catalog'
 
 
@@ -88,17 +89,29 @@ class SharedWordTests(unittest.TestCase):
             install(self.rom, *fixture, self.all_edits if edits is None else edits, self.info)
         self.assertEqual(fixture, before)
 
-    def test_all_families_match_complete_resource_and_both_donors(self):
+    def test_all_families_match_complete_resource_and_source_bound_species_correction(self):
         values = validated_values(self.rom, self.all_edits, self.info)
-        resource = unpack_words((CREATOR/'words.bin').read_bytes(), WORD_HASH)
+        resource = unpack_words((CREATOR/'words.bin').read_bytes(), DESIGN_WORD_HASH)
         self.assertEqual(len(values), 352)
-        self.assertEqual(sum(len(v)>10 for v in values.values()), 83)
+        self.assertEqual(sum(len(v)>10 for v in values.values()), 82)
         self.assertEqual(len(ORDINARY_BASES)*32, 160)
+        corrected = []
         for id, (native, reference, slot), word in zip(IDS, IDENTITIES, resource):
             self.assertEqual(values[id], word.text)
-            self.assertEqual(values[id], encode(self.refs[f'string:{reference:04X}']['text'], self.info))
-            self.assertEqual(values[id], encode(self.inventory[id]['legacy'], self.info))
+            donor = encode(self.refs[f'string:{reference:04X}']['text'], self.info)
+            self.assertEqual(donor, encode(self.inventory[id]['legacy'], self.info))
+            if native == NATIVE_ID:
+                self.assertEqual(sha256(self.originals[native]), NATIVE_SHA256)
+                self.assertEqual((donor, values[id]), (DONOR, ENGLISH))
+                self.assertEqual(self.edits[id]['provenance']['source'], SOURCE)
+                self.assertEqual(self.edits[id]['provenance']['match_basis'],
+                                 'reviewed_native_species_correction')
+                corrected.append(id)
+            else:
+                self.assertEqual(values[id], donor)
+            self.assertEqual(self.edits[id]['provenance']['word_resource_sha256'], DESIGN_WORD_HASH)
             self.assertEqual((native, reference, slot), (word.native_id, word.reference_id, word.slot))
+        self.assertEqual(corrected, ['string:021A'])
         self.assertEqual({reference-native for native, reference, _ in IDENTITIES}, {0, 0x488, 0x494})
         evidence = caller_evidence(self.rom)
         self.assertEqual(set(evidence['entry_references']), {f'{at:08X}' for at in ENTRY_REFERENCES})
@@ -137,7 +150,8 @@ class SharedWordTests(unittest.TestCase):
         report = install(self.rom, replacements, additions, module, self.all_edits, self.info)
         entries = self.bank(replacements).entries()
         self.assertEqual(report['translation_edits'], 352)
-        self.assertEqual(report['words_exceeding_ten_bytes'], 83)
+        self.assertEqual(report['words_exceeding_ten_bytes'], 82)
+        self.assertEqual(report['word_resource_sha256'], DESIGN_WORD_HASH)
         for index, value in enumerate(entries):
             id = f'string:{index:04X}'
             expected = encode(self.edits[id]['translation'], self.info) if id in self.edits else before[index]

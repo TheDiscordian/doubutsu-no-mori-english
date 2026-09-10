@@ -72,12 +72,12 @@ class CaptureRelocationTests(unittest.TestCase):
             data = bytearray(self.data);struct.pack_into('>I',data,at,word)
             with self.assertRaises(ValueError): relocate(data,self.reloc,0x80200000,self.imports)
 
-    @unittest.skipUnless((ROOT/'build/npc-mail-capture/overlay.json').is_file(),'Local native capture overlay required')
+    @unittest.skipUnless((ROOT/'build/npc-mail-capture-runtime-followup-01/overlay.json').is_file(),'Local native capture overlay required')
     def test_native_artifact_and_stale_metadata_are_checked(self):
-        directory = ROOT/'build/npc-mail-capture'
+        directory = ROOT/'build/npc-mail-capture-runtime-followup-01'
         data,reloc = (directory/'overlay.bin').read_bytes(),(directory/'relocation.bin').read_bytes()
         report = json.loads((directory/'overlay.json').read_text())
-        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
+        module = json.loads((ROOT/'build/notice-seasonal-runtime/module.json').read_text())
         validate(data,reloc,report,module)
         for base in (MODULE_RAM+RESERVATION,0x802F8010,0x80400000-len(data)):
             self.assertEqual(len(relocate(data,reloc,base,report['imports'].values())),len(data))

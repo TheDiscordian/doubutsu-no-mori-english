@@ -16,7 +16,7 @@ from runtime_module import MODULE_RAM, MODULE_VROM, add_runtime_module
 from test_retail import ROM_PATH
 
 
-@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/runtime-module/module.json').is_file()
+@unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/notice-seasonal-runtime/module.json').is_file()
                      and (ROOT/'build/mail-grading/overlay.json').is_file(),
                      'Local ROM and current resident/scoring builds required')
 class MailNpcPatchTests(unittest.TestCase):
@@ -24,7 +24,7 @@ class MailNpcPatchTests(unittest.TestCase):
     def setUpClass(cls):
         cls.rom = ROM_PATH.read_bytes()
         cls.base = {}
-        cls.additions,cls.module = add_runtime_module(cls.rom,cls.base,ROOT/'build/runtime-module')
+        cls.additions,cls.module = add_runtime_module(cls.rom,cls.base,ROOT/'build/notice-seasonal-runtime')
         install_grading(cls.rom,cls.base,cls.additions,cls.module,ROOT/'build/mail-grading')
 
     def test_only_two_guarded_entries_change_and_original_frames_are_preserved(self):

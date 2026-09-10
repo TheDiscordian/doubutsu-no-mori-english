@@ -21,8 +21,8 @@ from npc_mail_loader import VROM,CONFIG_OFFSET,configuration,verify_configuratio
 from runtime_module import MODULE_RAM,MODULE_VROM,add_runtime_module,verify_test_module
 from test_retail import ROM_PATH
 
-MODULE = ROOT/'build/runtime-module'
-OVERLAY = ROOT/'build/npc-mail-capture'
+MODULE = ROOT/'build/notice-seasonal-runtime'
+OVERLAY = ROOT/'build/npc-mail-capture-runtime-followup-01'
 CATALOG = ROOT/'build/mail-catalog'
 
 

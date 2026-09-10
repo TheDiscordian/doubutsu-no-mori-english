@@ -3,11 +3,18 @@
 ## Source and identity
 
 The shared import contains all 352 complete English values from the eleven
-native thirty-two-entry reply families. The complete canonical resource digest
-is `698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1`.
-Every value agrees with both the supplied English source and the complete
-legacy value. Commands, empty values, changed order or identity, changed source
-hashes, shortened values, and values exceeding sixteen bytes are rejected.
+native thirty-two-entry reply families. The current native-species resource digest
+is `3e06014a398b03a9ccac58fa8c9ac57ba3c5a5312e39167b288c314cc6dee4f9`.
+All donor values agree with both the supplied English source and the complete
+legacy value. Exactly one source-bound correction changes `string:021A` from
+the GameCube replacement species `brook trout` to the native `herabuna`, as
+specified in [native designs](DESIGN_ITEM_NAMES.md). The other 351 values retain
+complete donor agreement. The original donor-only profile
+`698e26d21c20eddcc25766317aa52024949f4eba51db99d73d58d46f6c5a12c1`
+remains supported for scoped fixtures; installation requires the same approved
+profile in the shared bank and compiled creator. Commands, empty values,
+changed order or identity, changed source hashes, shortened values, and values
+exceeding sixteen bytes are rejected.
 Generated reference text remains in ignored local build directories.
 
 Five families also feed ordinary resident dialogue: `01E5`, `0219`, `02F4`,
@@ -26,7 +33,8 @@ All 136 separately scoped resident values must also be installed. No additional
 resident code, stack, BSS, saved layout, or persistent allocation is introduced.
 
 The mail preparer keeps its original ten-byte temporary and compatibility
-fields. Eighty-three shared values exceed that capacity. The complete creator
+fields. Eighty-two current shared values exceed that capacity (eighty-three
+in the donor-only profile). The complete creator
 captures each original selected ID, resolves its full sixteen-byte word from
 the verified resource, and publishes a complete English snapshot letter. The
 temporary prefix is never treated as the complete letter field. The catalog,

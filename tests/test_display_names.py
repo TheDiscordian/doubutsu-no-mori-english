@@ -145,9 +145,9 @@ class DisplayNameResourceTests(unittest.TestCase):
             bad[512] ^= 1
             with self.assertRaisesRegex(ValueError, "verified module"):
                 install(self.rom, {MODULE_VROM: bytes(bad)}, module, path)
-            if (ROOT/"build/alias-items/names.json").is_file():
+            if (ROOT/"build/design-items-resource/names.json").is_file():
                 result = dict(additions)
-                item_install(self.rom, result, module, ROOT/"build/alias-items")
+                item_install(self.rom, result, module, ROOT/"build/design-items-resource")
                 install(self.rom, result, module, path)
                 self.assertIn(ITEM_VROM, result)
                 self.assertEqual(result[MODULE_VROM][56:64], ITEM_VROM.to_bytes(4, "big")+VROM.to_bytes(4, "big"))

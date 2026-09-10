@@ -68,7 +68,10 @@ accounting expectations. A scoped title-metadata correction and independent
 binary comparison pass. The [core runtime fixture follow-up](checkpoints/RUNTIME_FIXTURE_FOLLOWUP.md)
 closes five historical errors, with passing evidence for 69 selected checks
 across eight test files and unchanged source/provenance guards. The suite as a
-whole is not passed. Further fixture repair remains scoped follow-up work, and
+whole is not passed. The [letter/shared-word fixture follow-up](checkpoints/MAIL_RUNTIME_FIXTURE_FOLLOWUP.md)
+closes seven further historical errors with passing evidence for 51 selected
+checks, retaining resource/source guards and the native herabuna correction.
+Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
@@ -176,8 +179,11 @@ The [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md)
 inspects 34 additional native images and the matching English GC umbrella
 decoration. These designs remain native; no newly applied text or changed ROM
 is claimed. Native/GC I8 inspection support and three focused decoder tests
-resolve six previously unsupported gradient-mask views. Four dynamic-palette
-candidates remain explicit leads, not completed visual inspection.
+resolve six previously unsupported gradient-mask views. The
+[dynamic-palette follow-up](checkpoints/DYNAMIC_PROP_ARTWORK_REVIEW.md) resolves
+the four deferred player/effect images: all inspected views are non-text, native
+palette selection is bound, and the effect palette agrees with a retained RC4
+town state. Their textures/materials/palette sources remain unchanged in RC4.
 
 The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
 inspects 48 images: one hiring notice is corrected separately, and 47 neutral
