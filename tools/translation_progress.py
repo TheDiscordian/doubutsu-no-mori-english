@@ -516,6 +516,8 @@ def measure(native, built, report):
     measure_countdown_artwork(ledger, native, built, report)
     from stall_artwork import verify_current as verify_stall_artwork
     verify_stall_artwork(native, built, report)
+    from shop_interior_artwork import measure_text as measure_shop_interior_artwork
+    measure_shop_interior_artwork(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

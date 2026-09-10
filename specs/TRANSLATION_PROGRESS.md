@@ -78,6 +78,16 @@ original sign labels lack reliable transcriptions, so their character weights
 remain an explicit inventory gap rather than invented credit. The whole model
 replacement and this counting limit are recorded separately; the counter still
 rejects a modified or missing installed model.
+The [Nookington interior signs](SHOP_INTERIOR_ARTWORK.md) add four transcribed
+texture records: the Japanese welcome/clearance wording, raffle-day wording,
+and two distinct thank-you images, totalling 53 source characters. Their credit
+requires all seven English sign images, all three complete room resources,
+actual donor material/vertex bindings, retained native commands/UVs/lighting,
+and the one safely isolated palette-colour change. The original `2F` label is
+not Japanese. Both tiny information notices are installed in English but their
+uncertain original wording receives no invented character weight. These are
+explicit transcription gaps, not missing image replacements. Numeric opening
+hours remain unchanged and receive no new Japanese translation credit.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights
