@@ -31,6 +31,8 @@ screen, keyboard, and title stages without retained intermediate artwork ROMs
 or precompiled overlay directories. Its final ROM/UPS/report match package `03`.
 The corrected v0 and source inputs remain prerequisites; the clean-clone base
 translation and public toolchain setup recipes remain release preparation work.
+The [isolated base recipe](checkpoints/V0_REBUILD.md) is implemented and awaiting
+its clean-checkout execution; its command list alone is not rebuild evidence.
 
 ## Implemented scope
 
