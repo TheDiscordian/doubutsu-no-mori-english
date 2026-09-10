@@ -25,12 +25,19 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [reserve-label integration](checkpoints/RESERVE_STRINGS.md) applies all 77
+native general reserve labels without changing selectors, saved data, or runtime
+code. Four focused checks and the selected capacity/counter/classification
+regressions pass. The current combined ROM/UPS is `build/reserve-strings-pilot`.
+Required sun/skull apology input is next, followed by accented item names and
+residual general/letter text, then bounded combined v0 gameplay/save checks.
+
 The [borrowed-catchphrase integration](checkpoints/BORROWED_CATCHPHRASES.md)
 completes the known default/borrowed display family while retaining four-byte
 saved phrases and each original owner's GC wording. All five focused checks,
 independent builds, cartridge retention, UPS reconstruction, and the silent native
 check pass. The native run covers ten calls and thirty-five assertions in four
-MiB. The current combined ROM/UPS is `build/borrowed-catchphrases-pilot`.
+MiB. Its retained combined ROM/UPS is `build/borrowed-catchphrases-pilot`.
 The combined counter verifies the installed adapter before granting resource
 credit. Continue residual general/interface text, letters, accented names, and
 required symbol input, then bounded combined v0 gameplay/save checks.

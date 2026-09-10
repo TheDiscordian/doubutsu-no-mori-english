@@ -53,7 +53,8 @@ RELOCATED_BANKS = {
 def apply_translations(rom, replacements, path, *, english_runtime=False, runtime_module=None, module_additions=None,
                        extended_font=None, extended_items=None, english_fortunes=False, english_resetti_replies=False,
                        english_shop_units=False, english_resident_words=False, defer_shared_npc_words=False,
-                       english_credits=False, english_gyroid_default=False, english_town_suffix=False):
+                       english_credits=False, english_gyroid_default=False, english_town_suffix=False,
+                       english_reserve_strings=False):
     if english_gyroid_default and not (runtime_module and english_runtime):
         raise ValueError('Gyroid default requires the complete English runtime')
     if english_fortunes and not runtime_module:
@@ -63,7 +64,7 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
     if defer_shared_npc_words and not (runtime_module and english_resident_words):
         raise ValueError('Shared NPC words require the complete resident-word runtime')
     relocated_banks = {**RELOCATED_BANKS, **({'string': STRING_RELOCATION}
-                       if english_fortunes or english_resetti_replies or english_shop_units or english_resident_words or english_credits else {})}
+                       if english_fortunes or english_resetti_replies or english_shop_units or english_resident_words or english_credits or english_reserve_strings else {})}
     layout = ChoiceLayout()
     module_report = None
     if runtime_module:
@@ -84,6 +85,11 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
             install_extended_items(rom,planned_additions,planned_module,extended_items)
         planned_capability(rom,replacements,planned_additions,planned_module,extended_font)
     edits = json.loads(path.read_text()) if path else []
+    reserve_approvals = {}
+    if english_reserve_strings:
+        from reserve_strings import with_candidates, permits as reserve_permits
+        edits = with_candidates(rom, edits)
+        reserve_approvals = reserve_permits(rom, edits)
     if english_town_suffix:
         from town_suffix import with_candidate
         edits = with_candidate(rom,edits)
@@ -163,7 +169,8 @@ def apply_translations(rom, replacements, path, *, english_runtime=False, runtim
                                shop_unit_permit=unit_permits.get(edit['id']),
                                resident_word_permit=word_permits.get(edit['id']),
                                credits_permit=credit_permits.get(edit['id']),
-                               gyroid_default_permit=gyroid_approvals.get(edit['id']))
+                               gyroid_default_permit=gyroid_approvals.get(edit['id']),
+                               reserve_permit=reserve_approvals.get(edit['id']))
             except ValueError as exc:
                 raise ValueError(f"{edit['id']}: {exc}") from exc
             if bank.fixed_size:
@@ -215,6 +222,7 @@ def main():
     parser.add_argument("--runtime-module", type=Path, help="Experimental prebuilt resident-module directory")
     parser.add_argument('--english-fortunes', action='store_true', help='Complete Katrina phrases and sixteen-byte caller; requires resident module')
     parser.add_argument('--english-resetti-replies', action='store_true', help='Complete Resetti rude replies with their native substring lengths')
+    parser.add_argument('--english-reserve-strings', action='store_true', help='Complete source-bound native reserve labels')
     parser.add_argument('--english-shop-units', action='store_true', help='Complete native shop counter families within their ten-byte callers')
     parser.add_argument('--english-resident-words', action='store_true', help='Complete resident word fields and their sixteen-byte callers; requires resident module')
     parser.add_argument('--english-shared-npc-words', action='store_true', help='Complete shared reply words; requires resident words and the complete cartridge NPC creator')
@@ -378,7 +386,8 @@ def main():
         english_fortunes=args.english_fortunes, english_resetti_replies=args.english_resetti_replies,
         english_shop_units=args.english_shop_units, english_resident_words=args.english_resident_words,
         defer_shared_npc_words=args.english_shared_npc_words, english_credits=args.english_credits,
-        english_gyroid_default=bool(args.english_gyroid_default), english_town_suffix=args.english_town_suffix)
+        english_gyroid_default=bool(args.english_gyroid_default), english_town_suffix=args.english_town_suffix,
+        english_reserve_strings=args.english_reserve_strings)
     if args.english_mail_layout:
         report['mail_view'] = install_mail_view(rom, replacements, additions, report.get('runtime_module'),
                                               snapshots=args.english_mail_snapshots)
@@ -528,6 +537,9 @@ def main():
     if args.english_town_suffix:
         from town_suffix import planned
         report['town_suffix'] = planned(rom, replacements)
+    if args.english_reserve_strings:
+        from reserve_strings import planned
+        report['reserve_strings'] = planned(rom, replacements)
     output = replace_dma(rom, replacements, relocations, additions)
     files = by_vrom(output)
     for vrom, data in {**replacements, **additions}.items():
@@ -537,6 +549,9 @@ def main():
         raise ValueError("Output checksum failure")
     if args.english_town_suffix:
         from town_suffix import verify_installation
+        verify_installation(output, rom, report)
+    if args.english_reserve_strings:
+        from reserve_strings import verify_installation
         verify_installation(output, rom, report)
     if args.english_shop_item_names:
         from shop_item_names import verify_installation

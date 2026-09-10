@@ -15,10 +15,16 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [reserve-label checkpoint](checkpoints/RESERVE_STRINGS.md) completes the 77
+general reserve translations with a scoped five-byte permission and unchanged
+runtime/save behaviour. The current combined build is `build/reserve-strings-pilot`.
+All four focused checks pass. Continue required sun/skull apology input, accents,
+and residual general/letter text before the bounded combined v0 smoke.
+
 The [borrowed-catchphrase checkpoint](checkpoints/BORROWED_CATCHPHRASES.md)
 completes the ambiguous-copy adapter with an explicit full-English fallback,
 unchanged saved keys, and retained exact owner defaults. The current combined
-build is `build/borrowed-catchphrases-pilot`. All five focused checks and one
+checkpoint build is `build/borrowed-catchphrases-pilot`. All five focused checks and one
 silent native run pass; complete item/name/catchphrase reader accounting is
 connected. Continue residual general/interface strings, letters, accents, and
 the two required apology symbols before bounded combined v0 checks.

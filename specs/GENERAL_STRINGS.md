@@ -49,6 +49,11 @@ caller. The separate [shared NPC-word import](SHARED_NPC_WORDS.md) installs all
 It requires both the complete resident caller and cartridge letter creator,
 and defers the ordinary bank replacements until all consumers are verified.
 
+The optional [reserve-label integration](RESERVE_STRINGS.md) supplies `spare` in
+the 77 explicit native reserve slots. Its permission binds the complete source,
+caller inventory, five-byte payload, and unchanged bounded loader. It changes
+no selector, save field, or runtime code and grants no general capacity increase.
+
 The optional [native credits integration](NATIVE_CREDITS.md) supplies all 110
 rows in `04EA..0557`. Ten twenty-five-byte rows use a separate 256-byte actor
 BSS area, with updated ownership metadata and both load/draw lengths and

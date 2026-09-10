@@ -15,6 +15,7 @@ from shop_units import ShopUnitPermit
 from resident_words import ResidentWordPermit
 from credits_strings import CreditsPermit
 from gyroid_default import GyroidDefaultPermit
+from reserve_strings import ReservePermit
 
 # Only presentation pauses and text colour may differ under this opt-in policy.
 # Wait-for-button, page clearing, choices, branches, animation, sound, and every
@@ -74,7 +75,17 @@ def expanded_bound(data, info, *, extended_glyphs=False):
 def validate_entry(original, replacement, info, bank, policy="exact", *, choice_bytes=10, resident_runtime=False,
                    sequence_permit=None, field_permit=None, catchphrase_permit=None, animation_permit=None,
                    extended_glyphs=False, fortune_permit=None, resetti_permit=None, shop_unit_permit=None,
-                   resident_word_permit=None, credits_permit=None, gyroid_default_permit=None):
+                   resident_word_permit=None, credits_permit=None, gyroid_default_permit=None,
+                   reserve_permit=None):
+    if reserve_permit is not None:
+        if (not isinstance(reserve_permit, ReservePermit) or reserve_permit != ReservePermit()
+                or bank != 'string' or policy != 'exact'
+                or sha256(original) != reserve_permit.source_sha256
+                or sha256(replacement) != reserve_permit.encoded_sha256
+                or any(p is not None for p in (sequence_permit,field_permit,catchphrase_permit,
+                    animation_permit,fortune_permit,resetti_permit,shop_unit_permit,
+                    resident_word_permit,credits_permit,gyroid_default_permit))):
+            raise ValueError('Reserve capacity requires its exact source-bound label permit')
     if policy == 'gyroid_default' or gyroid_default_permit is not None:
         if (not isinstance(gyroid_default_permit, GyroidDefaultPermit)
                 or gyroid_default_permit != GyroidDefaultPermit()
@@ -215,7 +226,7 @@ def validate_entry(original, replacement, info, bank, policy="exact", *, choice_
             raise ValueError("Dynamic choice expansion requires review")
     elif (len(replacement) > len(original) and fortune_permit is None
           and resetti_permit is None and shop_unit_permit is None and resident_word_permit is None
-          and credits_permit is None):
+          and credits_permit is None and reserve_permit is None):
         raise ValueError("Translation exceeds current entry budget")
     if bank != 'message' and any(t.kind == 'glyph' for t in tokenize(replacement, info)):
         raise ValueError('Two-byte message tags need explicit semantic review')

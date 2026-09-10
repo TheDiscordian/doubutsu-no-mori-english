@@ -70,6 +70,10 @@ letter_name_args=()
 if [[ -n "${AF_LETTER_NAMES:-}" ]]; then
   letter_name_args=(--english-letter-editor-names "$AF_LETTER_NAMES")
 fi
+reserve_args=()
+if [[ "${AF_RESERVE_STRINGS:-0}" == 1 ]]; then
+  reserve_args=(--english-reserve-strings)
+fi
 exec python3 tools/build.py \
   --rom 'local/rom/Doubutsu no Mori (Japan).z64' \
   --translations "${AF_TRANSLATIONS:-build/native-items-candidates/translations.json}" \
@@ -108,4 +112,5 @@ exec python3 tools/build.py \
   "${conversation_name_args[@]}" \
   "${house_name_args[@]}" \
   "${letter_name_args[@]}" \
+  "${reserve_args[@]}" \
   --output "${AF_BUILD_OUTPUT:-build/notice-seasonal-pilot}"
