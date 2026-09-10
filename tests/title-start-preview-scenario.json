@@ -1,0 +1,10 @@
+[
+  {"wait": 12},
+  {"verify_title_start": true},
+  {"read": ["80000318", 4], "expect": "00400000"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"key": "Return", "duration": 0.08},
+  {"wait": 8},
+  {"snapshot_message": true},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
+]

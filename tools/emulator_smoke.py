@@ -761,6 +761,9 @@ def main():
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if action.get('verify_title_start'):
+                from title_start_smoke import verify as verify_title_start
+                record(verify_title_start(debug, args.rom.read_bytes()))
             if "wait" in action:
                 time.sleep(max(0, min(action["wait"], 60)))
             if "key" in action:

@@ -8,9 +8,11 @@ appearance; do not redraw it from memory. Other Japanese text-bearing images
 remain in the image inventory. The main logo is an animated collection of
 textured letter pieces, not one flat title bitmap.
 
-The source extractor and lossless texture conversion are implemented; native
-drawing/animation integration is pending. No title replacement is installed,
-and no actor, font metric, or transition changes.
+The source extractor and lossless texture conversion are implemented. A
+[separate Press Start preview](../docs/checkpoints/TITLE_PRESS_START.md) installs
+the two English tiles with reference positions and a transparent third native
+tile. The main logo's native drawing/animation integration remains pending.
+The v0 candidate, actor executable code, font metrics, and transitions are unchanged.
 
 ## Supplied English source
 
@@ -80,7 +82,7 @@ expansion, and complete real-source extraction. No image or ROM is published.
 ## Native drawing and allocation observations
 
 The constructor at `80AA1C5C` loads the original title asset range
-`01336000..0134BCD0` into separately allocated memory and stores its pointer at
+`01136000..0113BCD0` into separately allocated memory and stores its pointer at
 actor offset `02FC`. The draw body at `80AA19CC` installs that pointer as segment
 six and draws six Japanese logo pieces through `80AA0C98`. The actor size is
 `0328`; its state, transitions, and allocation ownership must remain explicit.
