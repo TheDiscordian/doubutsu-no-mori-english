@@ -30,6 +30,14 @@ class BaseRecipeTests(unittest.TestCase):
         wrapper = next(row for row in rebuild.STAGES if row[0] == 'integration')
         self.assertEqual(rebuild.command(wrapper, source), ['bash', 'tools/build_apology_input_pilot.sh'])
 
+    def test_candidate_font_does_not_require_installed_world_items(self):
+        rows = {row[0]: row for row in rebuild.STAGES}
+        font = rows['candidate-font']
+        self.assertNotIn('--world-names', font[3])
+        args = rows['candidates'][3]
+        self.assertEqual(args[args.index('--extended-font')+1], font[2])
+        self.assertIn('--world-names', rows['world-font'][3])
+
     def test_output_inventory_rejects_symlinks(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
