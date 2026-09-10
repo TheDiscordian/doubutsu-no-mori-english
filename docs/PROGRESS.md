@@ -7,9 +7,12 @@ focused corrections in `build/v1rc1-text-hud-fix-01`: the complete GC `I'm new`
 player option, the separate shop `Bells` unit, and PM texture-edge clamping.
 Four focused tests and full patch reconstruction pass. The
 [checkpoint](checkpoints/RC1_TEXT_HUD_FIX.md) records exact hashes and limits.
-Keyboard corner/hint layout and symbol-page consolidation remain in progress;
-the user accepts its sound feedback. Preserve V1RC1 until the combined follow-up
-is ready. This partial batch is not another completed release candidate.
+The [keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) adds corrected corner
+directions/placement, contained hints, ink-centred key labels, and one supported
+symbol page. Six focused tests and the controlled native drawing check pass
+(five calls/thirty assertions), preserving saves, guards, and accepted sounds.
+The combined artifact is `build/v1rc1-keyboard-fix-01`; V1RC2 packaging is next.
+Preserve V1RC1. Original-hardware appearance remains acceptance work.
 
 The current private playtest is **V1RC1**, with local ROM
 `build/v1rc1/Animal Forest English V1RC1.z64` and patch-only archive

@@ -32,7 +32,13 @@ def exercise(debug, request, record):
     if not directory.is_relative_to(ROOT/'build'): raise ValueError('Keyboard probe needs an owned build')
     rom = (directory/'animal-forest-title-preview.z64').read_bytes()
     report = json.loads((directory/'fixes.json').read_text())
-    if sha256(rom) != ROM_SHA or report['output_sha256'] != ROM_SHA or report['sources'] != source_hashes():
+    followup = request.get('rc1_followup', False)
+    expected_sha, expected_sources = ROM_SHA, source_hashes()
+    if followup:
+        from keyboard_rc1_fix import source_hashes as rc1_sources
+        expected_sha = '7a265fca118e522591085d0f7ce3a926b46d78a86c67e6f07443c64befe005bb'
+        expected_sources = rc1_sources()
+    if sha256(rom) != expected_sha or report['output_sha256'] != expected_sha or report['sources'] != expected_sources:
         raise ValueError('Changed compiled background source/cartridge')
     files = by_vrom(rom); read = debug.read_memory; assertions = calls = 0
     def write(at, data):
@@ -92,6 +98,9 @@ def exercise(debug, request, record):
     (directory/'native-background-commands.bin').write_bytes(commands)
     expected = [([42,170,160,227],[0,0],[555,575]), ([160,113,278,170],[2048,1024],[-555,-575]),
                 ([160,170,278,227],[2048,0],[-555,575]), ([42,113,160,170],[0,0],[555,575])]
+    if followup:
+        expected[1] = ([160,111,278,168],[2048,1024],[-555,-575])
+        expected[2] = ([160,168,278,225],[2048,1024],[-555,-575])
     if len(drawn) != 44 or drawn[:4] != [dict(bounds=b,st=s,delta=d) for b,s,d in expected]:
         raise ValueError('GC frame bounds, clamped directions, or key count changed')
     for i, rect in enumerate(drawn[4:]):

@@ -25,6 +25,15 @@ a freshly compiled public-toolchain report directly against a retained report
 identifying the local legacy compiler. Its assertion precedes the binary checks;
 that test does not establish a generated-code mismatch or a match.
 
+The title comparison receives a scoped correction: compare registered compiler
+identities through `toolchain.comparison_profile`, retaining the actual selected
+image assertion and both complete binary comparisons. A first focused run has
+five passing tests and one test-field `KeyError`; the report uses `toolchain`,
+not `toolchain_image`. Correcting that field and rerunning only the affected
+independent compilation test passes in 2.047 seconds. The independently built
+title overlay and relocation match the retained artifacts. This closes the
+title metadata failure without changing game code or the other suite results.
+
 Percentage-tool maintenance stays deferred. Do not fix those accounting totals
 as a work batch while the reported keyboard defects remain. Fixture generation
 or selection needs repair without replacing retained artifacts or bypassing

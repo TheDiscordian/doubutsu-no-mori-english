@@ -17,13 +17,14 @@ Preserve the supplied V1RC1 and saves while building a separate correction.
 | ID | V1RC1 follow-up | Status |
 | --- | --- | --- |
 | V1-13 | Player selection retains an option resembling `はじまて` | Actual `はじめて` reader now copies complete GC `I'm new`; focused relocation checks pass, hardware recheck pending |
-| V1-14 | Keyboard top-right is too low, bottom-right is upside-down, hints escape the frame, symbol pages are mostly empty, and key glyphs fit poorly (`_`, `1`, `0` are examples) | Correct GC panel geometry/UVs, contain hints, consolidate supported symbols, and review shared glyph positioning; sound feedback accepted |
+| V1-14 | Keyboard top-right is too low, bottom-right is upside-down, hints escape the frame, symbol pages are mostly empty, and key glyphs fit poorly (`_`, `1`, `0` are examples) | Corrected corner UVs/offset, centred hints, shared ink-based glyph placement, and one supported-symbol page installed; six focused tests and native draw/guards pass; sound feedback accepted, hardware appearance recheck pending |
 | V1-15 | Two Japanese currency characters remain after the shop cash amount | Separate `ベル` image replaced with exact GC `Bells`; amount/heading retained, hardware recheck pending |
 | V1-16 | Idle `pm` has a vertical line of stray pixels below the `m` | PM wraps its p descender at the right edge; compiled clamp correction installed, hardware recheck pending |
 
-The three text/HUD corrections are in the separate
-[follow-up batch](checkpoints/RC1_TEXT_HUD_FIX.md). They are not yet the combined
-keyboard follow-up or a new release candidate.
+The [text/HUD corrections](checkpoints/RC1_TEXT_HUD_FIX.md) and
+[keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) are combined in
+`build/v1rc1-keyboard-fix-01`. V1RC2 packaging follows the scoped reconstruction;
+the original V1RC1 is preserved.
 
 | ID | Finding | Status |
 | --- | --- | --- |

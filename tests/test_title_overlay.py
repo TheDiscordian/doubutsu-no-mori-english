@@ -16,6 +16,7 @@ from title_press_start import POSITIONS, RAM
 from title_memory import BASE, BOOT, CALL, HELPER, HELPER_END, LIMIT, install as install_memory
 from catalogue_names import Image
 from npc_mail_show import relocate_verified_data
+from toolchain import IMAGE, comparison_profile
 
 
 PREVIEW = ROOT/'build/title-logo-expansion-preview-03'
@@ -40,7 +41,11 @@ class TitleOverlayTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='af-title-overlay-') as directory:
             out = Path(directory)
             report = compile_overlay(self.native, self.rel, self.symbols, out)
-            self.assertEqual(report, self.profile)
+            # Both registered immutable images contain the verified same
+            # compiler. Retain actual provenance and compare historical metadata
+            # through the existing narrow identity mapping; binary checks remain.
+            self.assertEqual(report['toolchain'], IMAGE)
+            self.assertEqual(comparison_profile(report), comparison_profile(self.profile))
             self.assertEqual((out/'overlay.bin').read_bytes(), self.overlay)
             self.assertEqual((out/'relocation.bin').read_bytes(), self.reloc)
 
