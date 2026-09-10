@@ -27,6 +27,24 @@ HOOKS={0x80888484:('af_grid_editor_init',IMPORTS['af_apology_editor_init']),
        0x808882D8:('af_grid_editor_draw',0x80888024)}
 
 
+def source_bytes(path,version=2):
+    if version not in (1,2):raise ValueError('Unknown keyboard source version')
+    data=path.read_bytes()
+    if version==1:
+        replacements={
+            'core.h':(b'    /* Native 8088547C..808854B8: C-right=1, left=2, up=3, down=4. */\n'
+                b'    AF_GRID_NONE, AF_GRID_RIGHT, AF_GRID_LEFT, AF_GRID_UP, AF_GRID_DOWN,',
+                b'    AF_GRID_NONE, AF_GRID_LEFT, AF_GRID_DOWN, AF_GRID_UP, AF_GRID_RIGHT,'),
+            'overlay.ld':(b'        core.o(.text .text.*)\n'
+                b'        /* Preserve every bridge/data/state address after the shorter ABI fix. */\n'
+                b'        . = 0x5FD8;\n',b'')}
+        if path.name in replacements:
+            before,after=replacements[path.name]
+            if data.count(before)!=1:raise ValueError('Changed reviewed keyboard replay source')
+            data=data.replace(before,after)
+    return data
+
+
 def sources(version=2):
     paths=sorted((ROOT/'overlays/keyboard_grid').iterdir())
     paths += [ROOT/'overlays/hboard/editor.h',ROOT/'runtime/hboard_editor.h',
@@ -34,16 +52,7 @@ def sources(version=2):
     result = {}
     for p in paths:
         if not p.is_file():continue
-        data=p.read_bytes()
-        if version==1 and p.name=='core.h':
-            data=data.replace(b'    /* Native 8088547C..808854B8: C-right=1, left=2, up=3, down=4. */\n'
-                b'    AF_GRID_NONE, AF_GRID_RIGHT, AF_GRID_LEFT, AF_GRID_UP, AF_GRID_DOWN,',
-                b'    AF_GRID_NONE, AF_GRID_LEFT, AF_GRID_DOWN, AF_GRID_UP, AF_GRID_RIGHT,')
-        if version==1 and p.name=='overlay.ld':
-            data=data.replace(b'        core.o(.text .text.*)\n'
-                b'        /* Preserve every bridge/data/state address after the shorter ABI fix. */\n'
-                b'        . = 0x5FD8;\n',b'')
-        result[str(p.relative_to(ROOT))]=sha256(data)
+        result[str(p.relative_to(ROOT))]=sha256(source_bytes(p,version))
     return result
 
 
@@ -86,14 +95,17 @@ def relocations(original,inventory,size):
     return struct.pack('>5I',size,0,0,0,len(rows))+struct.pack('>'+str(len(rows))+'I',*rows)+bytes(length-24-len(rows)*4)+struct.pack('>I',length)
 
 
-def build(native,directory,out):
+def build(native,directory,out,*,version=2):
+    # Version one is only for reproducing checked intermediate build hashes.
+    # The complete v1 recipe must install version two before producing its result.
+    if version not in (1,2):raise ValueError('Unknown keyboard build version')
     prior=(directory/'overlay.bin').read_bytes();rel=(directory/'relocation.bin').read_bytes()
     previous.validate(native,prior,rel,json.loads((directory/'overlay.json').read_text()))
     reference=(ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
     symbols=(ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes()
     keys,layout=extract(reference,symbols,decoder_tables(ROOT/'local/ac-decomp/tools/msg_tool.py')['CHAR_MAP'])
     cap=keycap(reference,symbols)
-    source_hashes=sources();out=out.resolve();out.mkdir(parents=True,exist_ok=True)
+    source_hashes=sources(version);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
     for name,data in (('previous.bin',prior),('keys.bin',keys),('keycap.bin',cap)):
         (out/name).write_bytes(data)
     (out/'imports.ld').write_text(''.join(f'{name} = 0x{value:08X};\n' for name,value in IMPORTS.items()))
@@ -108,10 +120,16 @@ def build(native,directory,out):
            '-ffreestanding','-fno-builtin','-fno-common','-fno-stack-protector','-fno-merge-constants',
            '-mno-explicit-relocs','-mno-split-addresses','-fstack-usage','-Wall','-Wextra','-Werror',
            '-D_LANGUAGE_C','-DF3DEX_GBI_2','-I/source/upstream/af/lib/ultralib/include']
+    replay_flags=[]
+    linker='/source/overlays/keyboard_grid/overlay.ld'
+    if version==1:
+        (out/'replay-core.h').write_bytes(source_bytes(ROOT/'overlays/keyboard_grid/core.h',1))
+        (out/'replay-overlay.ld').write_bytes(source_bytes(ROOT/'overlays/keyboard_grid/overlay.ld',1))
+        replay_flags=['-include','/out/replay-core.h'];linker='/out/replay-overlay.ld'
     for name in ('core','editor','draw'):
-        run('gcc',*flags,'/source/overlays/keyboard_grid/'+name+'.c','-o',name+'.o')
+        run('gcc',*flags,*replay_flags,'/source/overlays/keyboard_grid/'+name+'.c','-o',name+'.o')
     run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o','prefix.o','/source/overlays/keyboard_grid/overlay.s')
-    run('ld','-EB','--emit-relocs','-T','/source/overlays/keyboard_grid/overlay.ld','-Map=overlay.map',
+    run('ld','-EB','--emit-relocs','-T',linker,'-Map=overlay.map',
         '-o','overlay.elf','prefix.o','core.o','editor.o','draw.o')
     if run('nm','--undefined-only','overlay.elf').strip():raise ValueError('Unresolved grid import')
     defined={}
@@ -125,16 +143,16 @@ def build(native,directory,out):
     data[:len(prior)]=patched_prefix(prior,exports)
     elf_text=run('readelf','-rW','overlay.elf');inventory=previous.previous.elf_inventory(elf_text)
     relocation=relocations(rel,inventory,len(data))
-    report={'version':2,'ram':RAM,'bytes':len(data),'overlay_sha256':sha256(data),
+    report={'version':version,'ram':RAM,'bytes':len(data),'overlay_sha256':sha256(data),
         'prefix_bytes':len(prior),'previous_sha256':sha256(prior),'previous_relocation_sha256':sha256(rel),
         'suffix_sha256':sha256(data[len(prior):]),'relocation_bytes':len(relocation),
         'relocation_sha256':sha256(relocation),'sources':source_hashes,'imports':IMPORTS,'symbols':exports,
         'elf_relocations':inventory,'code_end':defined['__grid_code_end']-RAM,
-        'bss_start':defined['__grid_bss_start']-RAM,'toolchain_image':IMAGE,'flags':flags,
+        'bss_start':defined['__grid_bss_start']-RAM,'toolchain_image':IMAGE,'flags':flags+replay_flags,
         'layout':layout,'keycap_sha256':sha256(cap),'compiler':run('gcc','--version').splitlines()[0],
         'stack_usage':{name:(out/(name+'.su')).read_text() for name in ('core','editor','draw')},
         'status':'Compiled grid candidate; complete cartridge installation and native checks pending'}
-    if source_hashes!=sources():raise ValueError('Grid sources changed during build')
+    if source_hashes!=sources(version):raise ValueError('Grid sources changed during build')
     (out/'overlay.bin').write_bytes(data);(out/'relocation.bin').write_bytes(relocation)
     (out/'overlay.json').write_text(json.dumps(report,indent=2)+'\n')
     (out/'elf-relocations.txt').write_text(elf_text)

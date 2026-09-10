@@ -6,8 +6,8 @@ The combined v1 candidate uses all three supplied GameCube English skeletons,
 their 121-frame animations, and the complete losslessly converted artwork.
 It retains the current conversation fixes and screen artwork while leaving
 the handed-off v0 ROM, resident translation module, and save layout unchanged.
-The English-first native keyboard remains installed; the GameCube
-grid is separate pending work.
+The title composes with the complete GameCube-style grid and its corrected
+native N64 cursor commands in the combined artwork playtest.
 
 The appended title overlay contains 292,320 bytes, including the 280,224-byte
 asset package and 1,984 bytes of new executable code. The original 9,952-byte

@@ -4,8 +4,9 @@ PYTHON ?= python3
 GC_DISC ?= local/gamecube/Animal Crossing (USA, Canada).ciso
 AF_XVFB ?= Xvfb
 SMOKE_OUT ?= build/smoke-pilot
+V1_OUT ?= build/v1-rebuilt
 
-.PHONY: test inspect inventory halfwidth opening references gamecube candidates pilot smoke
+.PHONY: test inspect inventory halfwidth opening references gamecube candidates pilot smoke v1
 test:
 	$(PYTHON) -m unittest discover -s tests -v
 
@@ -38,3 +39,6 @@ pilot: test candidates
 
 smoke:
 	$(PYTHON) tools/emulator_smoke.py --rom build/pilot/animal-forest-halfwidth.z64 --output "$(SMOKE_OUT)" --xvfb "$(AF_XVFB)" --seconds 220 --scenario tests/keyboard-scenario.json
+
+v1:
+	$(PYTHON) tools/rebuild_v1.py --rom "$(ROM)" --output "$(V1_OUT)"

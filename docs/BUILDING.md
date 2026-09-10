@@ -3,7 +3,9 @@
 Run commands from the repository root. Python 3 uses only its standard library.
 Input preparation additionally uses `7z`; source bootstrap uses Git. Inventory
 the local machine before installing tools. Disassembly uses the existing pinned
-Docker toolchain listed in [sources](SOURCES.md); ordinary builds do not need it.
+Docker toolchain listed in [sources](SOURCES.md). Compiling runtime, editor,
+title, and artwork commands requires that image; the small text-only builder
+itself is Python-only.
 
 ## Inputs
 
@@ -21,7 +23,33 @@ Expected local files:
 submodule and fetches the pinned GameCube reference checkout if missing.
 `make references` verifies both pins and tracked source cleanliness.
 
-## Outputs
+## Complete post-v0 artwork recipe
+
+```sh
+python3 tools/rebuild_v1.py --output build/v1-rebuilt
+```
+
+This single command recreates all 26 post-v0 stages and independently compiles
+the keyboard, birthday drawer, title, and native artwork commands. It reads the
+verified corrected v0 ROM/report, original N64 ROM, decoded English GC REL, and
+pinned source/symbol files. It does not need retained intermediate artwork ROMs
+or old compiled overlay directories. The exact current playtest ROM, UPS, and
+title-report hashes must match before a `final/` output is created.
+
+Outputs are exclusive: choose a fresh directory. Intermediate files are named
+`replay-only` and are not playtest handoffs; the recipe requires the corrected
+keyboard in the final cartridge. Input/source identities, completed stage
+hashes/timings, and failure evidence remain in the output folder. Existing
+builds, packages, and saves are untouched. The command does not rerun gameplay
+scenarios or imply hardware acceptance.
+
+This is not yet a clean-clone recipe for the base translation: the corrected
+v0 and its verified `build.json` are explicit prerequisites. The pinned Docker
+image is currently local, not a published registry dependency. See the
+[recipe specification](../specs/V1_REBUILD.md) and
+[executed rebuild checkpoint](checkpoints/V1_REBUILD.md).
+
+## Base translation outputs
 
 The current correction build is `build/v0-hardware-fixes-02`, described in the
 [hardware checkpoint](checkpoints/V0_HARDWARE_BUGS.md). Reproduce it from the

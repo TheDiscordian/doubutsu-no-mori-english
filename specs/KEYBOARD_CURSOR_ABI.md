@@ -37,6 +37,10 @@ corrected compiled images retain their own source and relocation identities;
 mixing versions or changing unknown instructions fails. Version-one source
 evidence reconstructs its two reviewed header/linker differences explicitly,
 while every other source hash is checked against the current unchanged file.
+The post-v0 rebuild can compile that version-one intermediate from these exact
+two source transformations in an ignored compiler folder. Normal compilation
+still defaults to version two, and the rebuild's final hash/installed-grid guard
+requires the corrected version. Replay intermediates are not playtest outputs.
 Native hint encoding reverses only the reviewed three data bytes before compiled
 verification; it does not hide a code change.
 

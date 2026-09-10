@@ -26,6 +26,12 @@ conversation fixes and the Shrine wording are retained in every current build.
 See [the hardware-bug checkpoint](checkpoints/V0_HARDWARE_BUGS.md).
 Existing ROMs, packages, and the user's saves remain untouched.
 
+The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 26 artwork,
+screen, keyboard, and title stages without retained intermediate artwork ROMs
+or precompiled overlay directories. Its final ROM/UPS/report match package `03`.
+The corrected v0 and source inputs remain prerequisites; the clean-clone base
+translation and public toolchain setup recipes remain release preparation work.
+
 ## Implemented scope
 
 The combined candidates include proportional Latin rendering, complete known
