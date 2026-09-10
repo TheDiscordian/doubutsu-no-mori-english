@@ -2,12 +2,22 @@
 
 ## Next work
 
+Finish the combined RC4 memory/space-marker handoff. V1-20 is reproduced as
+ordinary-arena exhaustion, and the copied RC2 save loads on the corrected
+candidate with 25,216 free bytes and no faulted thread. Four new loader/resource
+checks pass. Complete the bounded continuation/absent-Expansion-Pak checks and
+committed build/package replay; preserve all preceding evidence and artifacts.
+The V1-19 ordinary-space marker correction also has four passing focused checks.
+Every RC handoff distinguishes unchanged save formats from tested loading and
+warns about known or unresolved incompatibility. Cross-version compatibility is
+preferred, not mandatory. Artwork review resumes after these corrections.
+
 The V1-17/V1-18 follow-up is implemented in the packaged
 [V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
 focused and controlled native checks. The committed two-stage replay, two
-package tests, and archived standalone patcher pass. Use this combined candidate
-for the next original-hardware playtest; do not repeat unchanged native checks.
+package tests, and archived standalone patcher pass. RC3 has the confirmed town-
+loading defect above; use the corrected RC4 after its handoff, not RC3.
 Preserve existing ROMs and saves; original-hardware appearance remains pending.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged

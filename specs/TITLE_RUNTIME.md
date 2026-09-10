@@ -35,6 +35,10 @@ and follow it. The reservation must end below `80450000`, away from the emergenc
 fault framebuffer at the top of detected RAM. No other feature can borrow this
 region while the title owns it.
 
+The production font separately owns `80450000..80457FFF`; see
+[font memory](FONT_EXPANSION_MEMORY.md). The title and font have independent
+guards and lifetimes. Neither owner enlarges the ordinary four-MiB arenas.
+
 A 204-byte allocation adapter occupies verified zero space at
 `800D6600..800D66CB`, beyond the existing text-loader bootstrap epilogue. The
 native call at `80057A10` selects it. All actor metadata except the exact title

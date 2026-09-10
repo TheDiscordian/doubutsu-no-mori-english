@@ -1,0 +1,16 @@
+[
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"key": "b", "duration": 0.15},
+  {"wait": 1},
+  {"key": "s", "duration": 3},
+  {"wait": 3},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"read": ["80450000", 16], "expect": "AF46C0DEAF46C0DEAF46C0DEAF46C0DE"},
+  {"read": ["80457FF0", 16], "expect": "AF46C0DEAF46C0DEAF46C0DEAF46C0DE"},
+  {"save_state": true}
+]

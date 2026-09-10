@@ -40,6 +40,12 @@ relocation, heap bounds, allocation failure, and cache-maintenance checks.
 The new limit must fit a positive signed MIPS immediate. Do not alter saved
 formats or require a new per-frame heap allocation.
 
+This is the intermediate font-edge construction. The combined production
+candidate uses the dedicated [Expansion Pak font owner](FONT_EXPANSION_MEMORY.md)
+so the complete bordered image does not reduce the town's ordinary arena.
+The font blob and drawing implementation remain identical; only startup
+allocation/loading changes.
+
 ## Verification
 
 Bind the exact V1RC2 input, current font, complete native polygon function,

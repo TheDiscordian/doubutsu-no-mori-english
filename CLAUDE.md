@@ -27,6 +27,14 @@ memory requirement; permission to use eight MiB does not itself change heap boun
 - Keep save format changes out of the initial rendering work.
 - Emulator tests must be silent, isolated from existing saves, and time bounded.
 - Document what is complete, what is experimental, and what is untested.
+- Every release-candidate handoff states save compatibility with the preceding
+  candidate. Explicitly warn before using a build whose saves cannot safely be
+  loaded by a previous version; distinguish forward and backward compatibility
+  and any required migration. Do not infer completed save/restart testing merely
+  from unchanged saved formats. Preserve existing saves and candidate ROMs.
+  Cross-version save compatibility is preferred, not mandatory. A necessary
+  format change is acceptable with an explicit warning; unintended crashes
+  remain stability defects independently of that preference.
 - Keep progress updates in chat and describe concrete completed work. Do not
   open repeated status renders or repeat an unchanged completion percentage.
 - When asked for total translation progress, run `python3 tools/translation_progress.py`

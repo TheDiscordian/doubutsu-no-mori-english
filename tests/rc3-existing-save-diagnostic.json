@@ -1,0 +1,15 @@
+[
+  {"wait": 8},
+  {"key": "Return", "duration": 0.2},
+  {"wait": 10},
+  {"snapshot_message": true},
+  {"repeat": 12, "actions": [
+    {"key": "a", "duration": 0.15},
+    {"wait": 4},
+    {"snapshot_message": true}
+  ]},
+  {"wait": 10},
+  {"debug": "g"},
+  {"read": ["80126EA0", 32]},
+  {"save_state": true}
+]

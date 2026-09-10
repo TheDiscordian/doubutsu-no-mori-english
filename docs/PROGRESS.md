@@ -2,6 +2,15 @@
 
 ## Builds
 
+**RC3 town-loading memory failure corrected in an unshipped candidate (V1-20).**
+The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
+after the complete bordered font moves to its own Expansion Pak region. The
+corrected town has 25,216 bytes free, with intact memory guards and no faulted
+thread. Four focused loader/resource checks pass. RC4 packaging is pending;
+the same candidate includes the ordinary-space marker fix (V1-19). Cross-version
+save compatibility is preferred, not mandatory; loading evidence and unchanged
+saved formats are distinct. The original save remains preserved locally.
+
 The current private playtest is **V1RC3**, with local ROM
 `build/v1rc3/Animal Forest English V1RC3.z64` and patch-only archive
 `build/v1rc3/V1RC3-patch.zip`. The standalone archived patcher and two package
