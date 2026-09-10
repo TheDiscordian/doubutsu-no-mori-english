@@ -10,10 +10,10 @@
    host/combination checks and the deliberate reflected-mesh adaptation. The
    [controlled native preview](checkpoints/EVENT_ARTWORK_PREVIEW.md) passes;
    do not rerun it for unchanged models or mistake it for ordinary event proof.
-2. Resolve the lucky-bag decorative-writing choice in
-   [remaining artwork](ARTWORK_REMAINDER.md). The supplied English GC menu
-   images retain the same Japanese decoration. Do not count copying identical
-   artwork as new English. The separate world-bag binding is also recorded.
+2. Preserve the lucky-bag Japanese decoration, matching the English GC release
+   and the user's explicit choice. This applies to all three menu icons and the
+   native world-bag picture. Do not reopen it as missing English or count retained
+   artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked artwork
    batches. Package `03` includes the shared-stall candidate. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/

@@ -48,8 +48,8 @@ character alteration. Unsupported characters are disabled.
 
 The full-conversation furniture-delivery loop and later letter-advice cleanup
 have focused native fixes, but still need the ordinary hardware tutorial replay.
-The GC-style stall needs ordinary appearance/lighting acceptance; lucky-bag
-decorative writing remains Japanese as in GC. Line layout needs a human
+The GC-style stall needs ordinary appearance/lighting acceptance. Lucky-bag
+decorative writing intentionally remains Japanese as in GC. Line layout needs a human
 polish pass preserving intentional GC line/page breaks and timing.
 
 The embedded warning/confirmation native drawing probe is incomplete after a

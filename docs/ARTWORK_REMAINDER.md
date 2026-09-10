@@ -41,9 +41,10 @@ adapter also remains unchanged.
 
 ## Lucky bags
 
-The supplied English GC release retains Japanese decorative lucky-bag artwork.
-The user-facing choice between retaining that design and replacing its writing
-is pending. Continue other work without waiting for that choice.
+Keep the Japanese decorative lucky-bag artwork, as requested by the user, to
+match the supplied English GC release. This choice is resolved: the native menu
+icons and world-bag writing remain unchanged. Retained decoration is not new
+English translation credit.
 
 Exact GC-to-native menu-image matches are `445500 → A58240`,
 `445700 → A58460`, and `452300 → A63BC0`, all 32×32 CI4 in native owner `A58000`.
@@ -69,9 +70,8 @@ The source uses texture `38F140`, palette `38F120`, and 38 vertices at `38F340`.
 Both the native flat image and the decoded English GC world texture retain
 the decorative Japanese `大` character. Copying that texture cannot translate
 the writing, and it is not a direct substitute for the native flat picture.
-Native `8908E0` is a Bell bag, not this lucky-bag asset. If the user chooses to
-replace the writing, cover the native world picture as well as the three menu
-icons, while preserving the existing world model and item behaviour.
+Native `8908E0` is a Bell bag, not this lucky-bag asset. Preserve the native world
+picture, all three menu icons, the existing world model, and item behaviour.
 
 ## Inspected neutral seasonal props
 

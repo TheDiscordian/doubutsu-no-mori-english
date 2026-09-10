@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'tools'))
 import rebuild_v0 as rebuild
@@ -59,6 +60,36 @@ class BaseRecipeTests(unittest.TestCase):
             (base/'build.json').write_text(json.dumps({}))
             with self.assertRaisesRegex(ValueError, 'differs'):
                 rebuild.check_final(source)
+
+    def test_resume_rejects_changed_completed_resource_without_running_a_builder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            source = output/'source'
+            resource = source/'build/inspect/code.bin'
+            resource.parent.mkdir(parents=True)
+            resource.write_bytes(b'changed')
+            manifest = {'recipe': json.loads(json.dumps(rebuild.STAGES)),
+                        'sources': {}, 'inputs': {}, 'source_revision': 'test'}
+            (output/'inputs.json').write_text(json.dumps(manifest))
+            record = {'stage': 'inspect', 'command': rebuild.command(rebuild.STAGES[0], source),
+                      'outputs': {'build/inspect/code.bin': rebuild.sha256(b'original')}}
+            (output/'stage-01.json').write_text(json.dumps(record))
+            with patch.object(rebuild, 'source_files', return_value={}), \
+                    patch.object(rebuild, 'check_inputs', return_value={}), \
+                    patch.object(rebuild, 'clean_revision'), \
+                    patch.object(rebuild.subprocess, 'run') as run:
+                with self.assertRaisesRegex(ValueError, 'completed output changed'):
+                    rebuild.rebuild(output, 'inventory', resume=True)
+                run.assert_not_called()
+
+    def test_resume_rejects_changed_recipe_before_running_a_builder(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp)
+            (output/'inputs.json').write_text(json.dumps({'recipe': []}))
+            with patch.object(rebuild.subprocess, 'run') as run:
+                with self.assertRaisesRegex(ValueError, 'Changed recipe'):
+                    rebuild.rebuild(output, 'inventory', resume=True)
+                run.assert_not_called()
 
 
 if __name__ == '__main__':

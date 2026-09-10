@@ -82,10 +82,11 @@ establish ordinary seasonal-event appearance or gameplay.
 The stall's complete native-command trace also checks both placements, all
 triangles, the balanced reflection matrix stack, and restored culling. Actual
 in-scene appearance, lighting, and shadow fit remain unverified.
-The supplied English GC game retains Japanese decorative lucky-bag artwork in
-both menu and world designs; that writing choice remains open. Some artwork
-therefore remains unfinished. This is a combined
-experimental build, not a completed v1/public release or exhaustive acceptance.
+The Japanese decorative lucky-bag artwork is intentionally retained in both
+menu and world designs, matching the English GC game and the user's choice.
+Other unreviewed artwork and ordinary appearance acceptance remain. This is a
+combined experimental build, not a completed v1/public release or exhaustive
+acceptance.
 
 ROMs and extracted Nintendo assets remain local and ignored. Public distribution
 must use patches after the separate provenance/release review.

@@ -53,8 +53,9 @@ neutral texture sets already inspected.
 
 ## Remaining work and evidence limits
 
-Use [the completion queue](WORK_QUEUE.md). The lucky-bag decorative-writing
-choice is pending; the English GC donor itself retains Japanese. The stall
+Use [the completion queue](WORK_QUEUE.md). Lucky-bag Japanese decoration is
+intentionally retained at the user's request, matching the English GC donor.
+It is not an outstanding translation task or new English credit. The stall
 adaptation still needs ordinary appearance acceptance. Other unreviewed game images
 are not declared complete by the scoped seasonal-prop inspection.
 
