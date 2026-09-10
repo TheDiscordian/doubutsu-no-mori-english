@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-service-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-service-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-birthday-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-birthday-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`5353187111c528ecb88e2efa5606e23dfd3a05adc10bb4d1ae16691c31132258`.
+`4849a83ebcff09fa188cfbe4f54a66f2691769c98f4a1dc787b48417e07fc9f7`.
 Patch SHA-256:
-`6fd37fa2138f965e83a930bc615f79a4383ae75510987844a16da99ed0cb6ecc`.
+`0e4508ff472f0db095a397dfb4e2417a2366c5d14ae2c222c705f44352a90437`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -21,7 +21,9 @@ Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
 controls use the complete supplied English artwork with native N64 button icons.
 The catalogue has top/bottom controls, the mailbox has a Mail heading, and
 repayment displays Cash:, Payment:, You still owe, and Bells. These use complete
-English source images, with unchanged menu logic and saved fields.
+English source images, with unchanged menu logic and saved fields. The birthday
+window has the full English prompt, month names, day, and OK, preserving native
+date input and saved fields.
 All earlier English dialogue, names, letters, and editor improvements are retained.
 The keyboard uses the GameCube-style 10-column, four-row grid, with native N64
 controls, corrected direction commands, and unchanged saved input capacities.
@@ -42,7 +44,10 @@ keyboard probe confirms case, insertion/deletion, the six-character name limit,
 left/right cursor movement, page selection, and Done returning to Rover's English
 conversation. That probe uses a matching older isolated checkpoint with guarded
 replacement of the corrected controller code, not a fresh boot of this ROM.
-Captured title, name, and conversation frames are visually inspected.
+Captured title, name, and conversation frames are visually inspected. A separate
+native birthday drawing check verifies the complete ordered English font output
+and unchanged birthday/save state with intact memory guards; ordinary date entry
+is not inferred from that controlled fixture.
 Original-hardware acceptance, the ordinary first-job replay, all changed menus,
 multi-line editing, normal save/restart, and return-to-title/existing-save cases
 remain playtest work.

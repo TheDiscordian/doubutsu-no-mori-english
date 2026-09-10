@@ -1133,6 +1133,12 @@ def main():
                 needs_checkpoint_restore = True
                 from accent_mail_smoke import exercise
                 results.append(exercise(debug,action['test_accent_mail'],record))
+            if 'test_birthday_draw' in action:
+                from birthday_draw_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Birthday drawing checks require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug,action['test_birthday_draw'],record))
             if 'test_apology_input' in action:
                 from apology_input_smoke import exercise
                 if not (out/'test.bs1').is_file():

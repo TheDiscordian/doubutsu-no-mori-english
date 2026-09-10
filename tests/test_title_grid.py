@@ -55,6 +55,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('service-artwork-01', 'title-service-combined-01',
             '5353187111c528ecb88e2efa5606e23dfd3a05adc10bb4d1ae16691c31132258')
 
+    @unittest.skipUnless((ROOT/'build/title-birthday-combined-01/preview.json').is_file(),
+                         'Local English birthday/title candidate required')
+    def test_birthday_combination_retains_renderer_and_complete_prior_artwork(self):
+        self.check_combination('birthday-screen-01', 'title-birthday-combined-01',
+            '4849a83ebcff09fa188cfbe4f54a66f2691769c98f4a1dc787b48417e07fc9f7')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()
