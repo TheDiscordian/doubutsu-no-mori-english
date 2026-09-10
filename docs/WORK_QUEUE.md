@@ -2,6 +2,12 @@
 
 ## Next work
 
+The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
+artwork discovery and event acceptance. Fix corrupt Press Start graphics and
+mail/board editing layout first, then the remaining labels and keyboard polish.
+The tested cartridge is `title-stall-combined-01`; newer artwork-only builds do
+not establish that these runtime defects are fixed.
+
 1. Perform bounded ordinary appearance acceptance of the shared festival stall
    and fortune table when a suitable isolated scene is available. Retain both
    stall placements, correct lighting/culling, original shadows/collision, and
@@ -31,10 +37,13 @@
    their complete English GC textures are already installed. Do not reopen the
    completed seven-sign batch or rerun its unchanged rendering checks.
    The three civic-interior images are also installed and verified; do not repeat
-   that batch. The remaining donor review identifies a regional house panel and
-   gloom-effect images; their GC textures contain no wording, but their native
-   counterparts need binding before any claim about Japanese originals or a
-   replacement. See [the scoped review](ARTWORK_REMAINDER.md).
+   that batch. The regional house-panel lead is a GC-only island cottage, and
+   the bound native gloom effect contains no Japanese. Three unmatched shop
+   drapes are also neutral; retain them without repeating the inspection.
+   Use `tools/artwork_matches.py` and the [scoped inventory](ARTWORK_REMAINDER.md)
+   to select additional images, prioritising unreviewed room `012B2000` and
+   remaining screen/item images. Check current installed resources first;
+   unmatched originals include images already translated by earlier batches.
 
 ## Human playthrough and polish
 

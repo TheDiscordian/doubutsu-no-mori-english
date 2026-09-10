@@ -805,6 +805,9 @@ def main():
             if action.get('verify_title_start'):
                 from title_start_smoke import verify as verify_title_start
                 record(verify_title_start(debug, args.rom.read_bytes()))
+            if action.get('diagnose_title_start'):
+                from title_start_diagnostic import observe as observe_title_start
+                record(observe_title_start(debug, args.rom.read_bytes()))
             if action.get('verify_title_logo'):
                 from title_logo_smoke import diagnose as diagnose_title_logo, verify as verify_title_logo
                 profile = json.loads((args.rom.parent/'preview.json').read_text())['actor']

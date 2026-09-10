@@ -55,6 +55,12 @@ display-list extensions cannot be copied into the N64 executable.
 
 ## Extracted assets and texture conversion
 
+The Press Start compatibility textures are linear N64 IA8, not GX tiled IA4.
+The older extractor's five `.ia8.bin` outputs apply an inappropriate conversion;
+they are retained only to reproduce earlier artifacts. Correct final prompt
+installation uses [the playtest fix](V1_PLAYTEST_FIXES.md), with unchanged raw
+source pixels. This exception does not alter the 23 tiled main-logo models.
+
 `python3 tools/title_assets.py` writes 80 independently scoped source assets and
 28 converted textures under ignored `build/title-english-assets/`. The manifest
 binds the full supplied REL, the symbol map, the complete title region, every
@@ -64,8 +70,8 @@ retained as source data, not presented as ready-to-execute N64 commands.
 
 The eighteen letter textures expand their scoped RGB5A3 palettes to row-major
 RGBA32 without colour or alpha quantization. The five intensity-only textures
-become row-major I4. Five eight-bit intensity/alpha tiles, including the two
-Press Start tiles and three separately retained notices, become N64 IA8.
+become row-major I4. The five eight-bit compatibility tiles must retain their
+linear N64 storage instead of using that model-texture conversion.
 GX four-bit textures use 8-by-8 blocks; GX IA4 uses 8-by-4 blocks and stores
 alpha above intensity, requiring a nibble exchange for N64 IA8.
 The format interpretation is checked against the

@@ -2,6 +2,19 @@
 
 ## Builds
 
+The first original-hardware V1 playtest of `title-stall-combined-01` reports
+corrupt Press Start graphics, broken mail/board editor spacing, remaining
+Japanese interface/name readers, and keyboard polish needs. The
+[bug list](V1_PLAYTEST_BUGS.md) is the current implementation priority. Existing
+host/emulator checks do not override these observations, and later artwork-only
+packages must not be described as correcting them.
+
+An [intermediate Press Start correction](checkpoints/V1_FIRST_PLAYTEST_FIXES.md)
+is built at `build/v1-playtest-fixes-01/animal-forest-title-preview.z64`. It fixes
+the donor's incorrectly converted pixel storage without code/allocation changes;
+three focused source/retention/patch tests pass. The remaining playtest findings
+stay open, and this is not yet the combined fix handoff.
+
 The supplied private artwork playtest is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
@@ -82,6 +95,15 @@ finds no readable Japanese wording in the selected train, vacant-lot-sign,
 Katrina-tent, and Gracie-car textures. The region warning is already English.
 Their native artwork is retained and verified in both relevant cartridge copies;
 this is review progress, not newly applied English text.
+
+The [regional review and source-matching inventory](checkpoints/REGIONAL_ARTWORK_REVIEW.md)
+resolve the island-cottage donor as GC-only and confirm that the native gloom
+effect and three shop drapes contain no Japanese wording. Their native assets
+remain unchanged. A read-only matching tool now links supported N64 material
+candidates to named GC texels and records unmatched candidates and excluded
+formats/readers. It helps target remaining inspection; it does not grant text
+credit or claim complete artwork coverage. No replacement ROM is needed for
+this review-only work; playtest `05` remains the current candidate.
 
 ## Remaining work and evidence limits
 
