@@ -35,6 +35,42 @@ hints, and consolidate supported symbol pages. Preserve the accepted sounds
 and existing proportional text editor. Do not package this partial batch as
 the completed combined follow-up.
 
+The user's clarification identifies the top-right segment as too low and the
+bottom-right as upside-down, accepts the GC origin of the design, and adds
+poor placement of `_`, `1`, and `0` inside keycaps. Fix the shared key-label
+positioning rather than only those examples. The current atlas inspection
+finds both digits have bounds X=0..4/Y=2..13 and advance six, but their ink
+distribution differs: `1` is strongly right-heavy. Underscore occupies X=0..4,
+Y=14..15; the current key renderer's Y+1 origin puts its last row outside a
+sixteen-pixel key. Review actual ink placement and typographic baseline without
+changing the global font or reviving the deferred atlas-edge investigation.
+
+Useful verified keyboard source details:
+
+- GC panel quads at `.data:0041FFF0`: lower-left uses texture B with
+  S=0..2048/T=0..1024; upper-right uses B with S=2048..0/T=1024..0;
+  lower-right uses A with S=2048..0/T=1024..0 (the installed code wrongly
+  uses T=0..1024); upper-left uses A with S=0..2048/T=0..1024.
+- The donor's upper-right/lower-right sit one pixel above the left pair.
+  The installed equal-half rectangles omit that offset. Donor key-panel bounds
+  are X=55..235/Y=129..202; native keys already use its exact forty placements.
+- Native hints are at Y=202/215 below the key rows. Their bounds must be checked
+  against the visible background, not just the 236×114 rectangular allocation.
+- Source `overlays/keyboard_grid/core.c` uses `page<3` and modulo three;
+  tables four/five are symbols/marks. Consolidate supported entries without
+  losing newline/space or the two apology-only extended glyphs. Preserve the
+  accepted input/page sounds and native saved capacities.
+- Background compilation already owns an appended suffix. Prefer replacing
+  that owned suffix to retaining dead old artwork and consuming another full
+  allocation. The existing pool immediate is `7620`, close to its signed bound.
+  Any replacement must preserve earlier pixel-editor hooks and relocations.
+
+Raw GC controller-background images `gc-keyboard-control-{a,b,c,d}.png` and
+`gc-keyboard-bottom.png` are decoded in `build/artwork-inspection/`. They are
+background silhouettes, not translated button labels. The user clarification
+does not require a new GameCube-controller redesign; prioritise the identified
+corner/label defects and preserve the established N64 controls.
+
 The existing full regression process remains active, advancing through the
 alphabetical suite. Its log is `build/v1rc1-regression.log`; failures remain
 unclassified beyond the previously verified stale fixtures. Do not restart

@@ -17,7 +17,7 @@ Preserve the supplied V1RC1 and saves while building a separate correction.
 | ID | V1RC1 follow-up | Status |
 | --- | --- | --- |
 | V1-13 | Player selection retains an option resembling `はじまて` | Actual `はじめて` reader now copies complete GC `I'm new`; focused relocation checks pass, hardware recheck pending |
-| V1-14 | Keyboard corners are disjointed/flipped, hints escape the bottom-right, and two symbol pages are mostly empty | Rebind the actual GC panel geometry/UVs, contain hints, and combine supported symbols into one page; sound feedback accepted |
+| V1-14 | Keyboard top-right is too low, bottom-right is upside-down, hints escape the frame, symbol pages are mostly empty, and key glyphs fit poorly (`_`, `1`, `0` are examples) | Correct GC panel geometry/UVs, contain hints, consolidate supported symbols, and review shared glyph positioning; sound feedback accepted |
 | V1-15 | Two Japanese currency characters remain after the shop cash amount | Separate `ベル` image replaced with exact GC `Bells`; amount/heading retained, hardware recheck pending |
 | V1-16 | Idle `pm` has a vertical line of stray pixels below the `m` | PM wraps its p descender at the right edge; compiled clamp correction installed, hardware recheck pending |
 
