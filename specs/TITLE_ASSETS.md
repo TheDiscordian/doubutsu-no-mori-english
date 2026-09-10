@@ -81,6 +81,21 @@ expansion, and complete real-source extraction. No image or ROM is published.
 
 ## Native drawing and allocation observations
 
+`python3 tools/title_model.py` resolves the 97 actual title-region REL pointer
+fixups and binds all 23 quads, three skeletons, and their animation arrays. It
+rejects external or missing pointers, wrong scoped palettes, changed triangle
+topology, malformed joint trees, and incomplete animation storage. The source
+quad winding and UV bounds remain explicit, including the M1 piece's intentional
+60-pixel span inside a 64-pixel-wide texture. It is not stretched to fill that
+texture. Four focused tests pass against the supplied source and negative cases.
+
+The animal/cros/sing groups contain 21/14/14 joints, of which 8/5/5 are drawn.
+Their work arrays need 22/15/15 entries; the 121-frame animations contain
+39/27/27 dynamic tracks and 221/264/281 keyframe records. The original data layouts
+match the native `BaseSkeletonR`, `JointElemR`, and `BaseAnimationR` definitions.
+The generated `model.json` remains source binding evidence, not installed
+rendering or proof that animation has executed on the N64.
+
 The constructor at `80AA1C5C` loads the original title asset range
 `01136000..0113BCD0` into separately allocated memory and stores its pointer at
 actor offset `02FC`. The draw body at `80AA19CC` installs that pointer as segment
