@@ -2,6 +2,13 @@
 
 ## Next work
 
+Finish the new V1-17/V1-18 follow-up before additional artwork or V2 work.
+The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
+[building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
+focused and controlled native checks. Complete the committed two-stage replay
+and standalone-patcher verification, then deliver the combined V1RC3 candidate.
+Preserve existing ROMs and saves; original-hardware appearance remains pending.
+
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
 [V1RC2 candidate](V1RC2_PLAYTEST.md): first-time-player wording, GC keyboard
 corner/hint layout and key alignment, one supported-symbol page, shop currency
@@ -11,7 +18,7 @@ Hardware appearance remains acceptance work. Keyboard sound feedback is
 accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
-artwork discovery and event acceptance. All sixteen findings have scoped
+artwork discovery and event acceptance. The first sixteen findings have scoped
 corrections retained in V1RC2. The
 [package checkpoint](checkpoints/V1RC2_PACKAGE.md) identifies the exact local
 ROM, patch, and source revision. Implementation and controlled drawing evidence

@@ -9,6 +9,23 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 
 ## Open findings
 
+V1-17: the user reports clipped left-edge columns on names/options and extra
+bottom pixels on descenders such as `g`; speech usually looks correct. The
+specific cartridge revision for this observation is not confirmed. Compare
+the native polygon and rectangle paths independently. A transparent-border
+polygon correction is implemented in the [font-edge candidate](checkpoints/FONT_POLYGON_EDGES.md),
+with four focused tests and the complete controlled native comparison passing.
+Original glyph ink, speech, advance widths, and saved formats remain unchanged.
+Original-hardware appearance rechecking remains pending.
+
+V1-18: the user reports that the silhouette-shaped transition on building
+entry leaves one or two scene-pixel rows visible along the top instead of
+covering the screen in black. The [transition correction](checkpoints/TRANSITION_EDGES.md)
+enlarges the native mesh beyond all screen edges without changing timing or
+scene logic. The old two-row gap is reproduced; all three corrected closed
+shapes cover the entire framebuffer. Three focused tests and controlled native
+save/guard checks pass. Original-hardware rechecking remains pending.
+
 V1RC1 hardware findings have scoped corrections in V1RC2, with original-
 hardware rechecking pending. The user accepts keyboard sound feedback. The
 corrected frame has complete controlled drawing evidence; neither that check

@@ -789,10 +789,30 @@ def main():
         needs_checkpoint_restore = False
         test_mail_open = None
         event_preview_state = {}
+        font_preview_state = {}
+        transition_preview_state = {}
         def record(snapshot):
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if 'test_transition_preview' in action:
+                from transition_preview import exercise as transition_preview
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Transition preview requires a saved isolated checkpoint')
+                result = transition_preview(debug, action['test_transition_preview'],
+                                            args.rom.read_bytes(), transition_preview_state)
+                if result.get('checkpoint_restore_required'):
+                    needs_checkpoint_restore = True
+                record(result)
+            if 'test_font_sampling_preview' in action:
+                from font_sampling_preview_smoke import exercise as font_preview
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Font preview requires a saved isolated checkpoint')
+                result = font_preview(debug, action['test_font_sampling_preview'],
+                                      args.rom.read_bytes(), font_preview_state)
+                if result.get('checkpoint_restore_required'):
+                    needs_checkpoint_restore = True
+                record(result)
             if 'test_event_artwork_preview' in action:
                 from event_artwork_preview_smoke import exercise as event_preview
                 if not (out/'test.bs1').is_file():

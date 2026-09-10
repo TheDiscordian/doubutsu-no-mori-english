@@ -2,6 +2,16 @@
 
 ## Builds
 
+The active follow-up addresses two new findings: V1-17 name/option glyph edges
+and V1-18 the exposed top rows during building-entry transitions. The
+[font-edge candidate](checkpoints/FONT_POLYGON_EDGES.md) is implemented, with
+four focused tests and controlled native drawing/guard checks passing.
+The [transition correction](checkpoints/TRANSITION_EDGES.md) also passes its
+three focused tests and native reproduction/correction checks for all three
+closed shapes and the open/midpoint states. Both are being packaged as V1RC3.
+Neither finding is accepted on original hardware; the delivered playtest
+remains V1RC2 below until the new package is verified.
+
 The current private playtest is **V1RC2**, with local ROM
 `build/v1rc2/Animal Forest English V1RC2.z64` and patch-only archive
 `build/v1rc2/V1RC2-patch.zip`. The standalone archived patcher passes, and the
@@ -133,6 +143,12 @@ finds no readable Japanese wording in the selected train, vacant-lot-sign,
 Katrina-tent, and Gracie-car textures. The region warning is already English.
 Their native artwork is retained and verified in both relevant cartridge copies;
 this is review progress, not newly applied English text.
+
+The [house artwork review](checkpoints/HOUSE_ARTWORK_REVIEW.md) also retains the
+native walls, roofs, doors, and decorative oval plaques. The inspected English
+GC plaques retain the same central decoration. Both native cartridge copies,
+season/type selection, and copyright artwork are checked; this is completed
+scoped inspection, not newly translated text.
 
 The [regional review and source-matching inventory](checkpoints/REGIONAL_ARTWORK_REVIEW.md)
 resolve the island-cottage donor as GC-only and confirm that the native gloom

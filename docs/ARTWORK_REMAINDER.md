@@ -1,5 +1,15 @@
 # Remaining artwork
 
+## Inspected house textures
+
+The [house review](checkpoints/HOUSE_ARTWORK_REVIEW.md) closes 22 selected native
+textures: twelve surface atlases without readable Japanese wording and ten
+door plaques whose decorative marks are retained in English GC. The native
+crate copyright image reads `©2001 Nintendo`. Preserve these images; no English
+credit or replacement is required. Complete house slices, selected palettes,
+and both cartridge copies are verified unchanged in V1RC2. Do not repeat this
+inspection or treat it as coverage of every house variant or game image.
+
 ## Nook 'n' Go hiring notice
 
 The [post-V1RC1 correction](checkpoints/SHOP_HIRING_NOTICE.md) removes the native
