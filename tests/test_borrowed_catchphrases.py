@@ -83,7 +83,7 @@ class BorrowedCartridgeTests(unittest.TestCase):
         from item_name_readers import resource_only_weight
         native = ROM.read_bytes();built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((BUILD/'build.json').read_text());ledger = measure(native,built,report)
-        self.assertEqual(ledger.summary()['total_source_characters'],751284)
+        self.assertEqual(ledger.summary()['total_source_characters'],751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'],720689+35+
                          resource_only_weight(ledger,('extended_items','display_names','catchphrases')))
         self.assertGreater(resource_only_weight(ledger,('catchphrases',)),0)

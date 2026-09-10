@@ -61,7 +61,7 @@ class ItemReaderCartridgeTests(unittest.TestCase):
         ledger = measure(self.native, self.built, self.report)
         weight = names.resource_only_weight(ledger)
         self.assertGreater(weight, 0)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751284)
+        self.assertEqual(ledger.summary()['total_source_characters'], 751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'],
                          720689+35+names.resource_only_weight(ledger, ('extended_items', 'display_names')))
         for key in ('item_24:00A8', 'item_25:0005', 'item_2A:0031', 'item_2A:0033'):

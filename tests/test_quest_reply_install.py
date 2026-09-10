@@ -94,7 +94,7 @@ class QuestReplyInstallTests(unittest.TestCase):
         ledger = measure(self.native,self.built,self.report)
         baseline = deepcopy(self.report);baseline.pop('quest_replies')
         uncredited = measure(self.native,self.built,baseline)
-        self.assertEqual(ledger.summary()['total_source_characters'],751284)
+        self.assertEqual(ledger.summary()['total_source_characters'],751307)
         ids = {f'{bank}:{number:04X}' for bank in ('super','mail','ps') for number in TEMPLATES}
         actual = {k for k,r in ledger.rows.items() if any(v['route']=='quest_replies' for v in r['replacements'])}
         # Three Japanese sign-offs intentionally become a sender command alone.

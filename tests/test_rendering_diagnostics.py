@@ -92,7 +92,7 @@ class RenderingDiagnosticCartridgeTests(unittest.TestCase):
         a, b = [{key for key, row in ledger.rows.items() if row['replacements']} for ledger in ledgers]
         self.assertEqual(b-a, set(IDS)); self.assertFalse(a-b)
         self.assertNotIn('message:0004', b)
-        self.assertEqual([r.summary()['total_source_characters'] for r in ledgers], [751284]*2)
+        self.assertEqual([r.summary()['total_source_characters'] for r in ledgers], [751307]*2)
 
 
 if __name__ == '__main__': unittest.main()

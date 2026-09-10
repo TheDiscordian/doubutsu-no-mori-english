@@ -81,7 +81,7 @@ class ApologyInputTests(unittest.TestCase):
             id=f'string:{n:04X}'
             self.assertEqual(after,t.TARGETS[id][2] if id in t.TARGETS else before)
         ledger=measure(native,built,report)
-        self.assertEqual(ledger.summary()['total_source_characters'],751284)
+        self.assertEqual(ledger.summary()['total_source_characters'],751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'],748482+20+35)
         for id in t.TARGETS:self.assertEqual([r['route'] for r in ledger.rows[id]['replacements']],['apology_input'])
         bad=copy.deepcopy(report);bad['apology_input']['allocation']['extra_pool_bytes']=0

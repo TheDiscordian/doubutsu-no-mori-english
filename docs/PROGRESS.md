@@ -17,6 +17,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [shared keyboard grid](checkpoints/KEYBOARD_GRID.md) has a source-bound
+GameCube layout and independently tested native-command controller. Three
+focused checks pass, including host sanitizers and MIPS compilation. Native
+input/drawing hooks, allocation, and cartridge integration are in progress;
+no handed-off ROM includes the grid yet. Preserve all existing editing handlers
+and saved capacities while replacing the shared radial interface.
+
 The [combined English title](checkpoints/TITLE_LOGO.md) at
 `build/title-combined-01` retains all conversation corrections and English
 screen/shop artwork. Eight-MiB native title/START/guard checks pass, and four-MiB

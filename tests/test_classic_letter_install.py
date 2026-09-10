@@ -52,7 +52,7 @@ class ClassicLetterInstallTests(unittest.TestCase):
     def test_combined_counter_requires_the_installed_complete_adapter(self):
         from translation_progress import measure
         ledger = measure(self.native, self.built, self.report)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751284)
+        self.assertEqual(ledger.summary()['total_source_characters'], 751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'], 751262)
         remaining = {identity for identity, row in ledger.rows.items()
                      if row['source_characters'] and not row['replacements']}

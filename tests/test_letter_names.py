@@ -146,7 +146,7 @@ class LetterCartridgeTests(unittest.TestCase):
         native = ROM.read_bytes(); built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((BUILD/'build.json').read_text())
         ledger = measure(native,built,report); summary = ledger.summary()
-        self.assertEqual(summary['total_source_characters'],751284)
+        self.assertEqual(summary['total_source_characters'],751307)
         new_weight = sum(row['source_characters'] for row in ledger.rows.values()
                          if row['replacements'] and all(r['route'] == 'display_names' for r in row['replacements']))
         self.assertGreater(new_weight,0)

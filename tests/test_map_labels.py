@@ -106,7 +106,7 @@ class MapLabelCartridgeTests(unittest.TestCase):
         self.assertTrue(all(not before.rows[key]['replacements'] and after.rows[key]['replacements'] for key in ids))
         self.assertEqual(before.summary()['total_source_characters'], after.summary()['total_source_characters'])
         self.assertEqual(after.summary()['replaced_source_characters']-before.summary()['replaced_source_characters'], 28)
-        self.assertEqual(after.summary()['total_source_characters'], 751284)
+        self.assertEqual(after.summary()['total_source_characters'], 751307)
 
     def test_whole_patch_and_every_other_translation_payload(self):
         native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()

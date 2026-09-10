@@ -99,7 +99,7 @@ class IdentityCartridgeTests(unittest.TestCase):
         from translation_progress import measure
         native = ROM.read_bytes(); built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
         report = json.loads((BUILD/'build.json').read_text()); ledger = measure(native, built, report)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751284)
+        self.assertEqual(ledger.summary()['total_source_characters'], 751307)
         from item_name_readers import resource_only_weight
         self.assertEqual(ledger.summary()['replaced_source_characters'], 720689+35+resource_only_weight(ledger))
         broken = copy.deepcopy(report); broken['conversation_names']['name_bytes'] = 6

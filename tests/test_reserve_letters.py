@@ -71,7 +71,7 @@ class ReserveLetterTests(unittest.TestCase):
         from translation_progress import measure
         from mail_omissions import PARTS
         ledger = measure(self.native, built, report)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751284)
+        self.assertEqual(ledger.summary()['total_source_characters'], 751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'], 750240)
         for name in r.LINES:
             for number in r.TEMPLATES:

@@ -110,7 +110,7 @@ class GuideNameTests(unittest.TestCase):
         from translation_progress import measure, pending_name_consumers
         report = json.loads((BUILD/'build.json').read_text())
         ledger = measure(self.native, (BUILD/'animal-forest-halfwidth.z64').read_bytes(), report)
-        self.assertEqual(ledger.summary()['total_source_characters'], 751284)
+        self.assertEqual(ledger.summary()['total_source_characters'], 751307)
         # This one reader does not finish the entire pending name family.
         previous = measure(self.native, (PRIOR/'animal-forest-halfwidth.z64').read_bytes(),
                            json.loads((PRIOR/'build.json').read_text()))

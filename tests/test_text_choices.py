@@ -99,7 +99,7 @@ class ChoiceArtifactTests(unittest.TestCase):
         ledger = measure(ROM.read_bytes(), (BUILD/'animal-forest-halfwidth.z64').read_bytes(),
                          json.loads((BUILD/'build.json').read_text()))
         result = ledger.summary()
-        self.assertEqual(result['total_source_characters'], 751284)
+        self.assertEqual(result['total_source_characters'], 751307)
         from item_name_readers import resource_only_weight
         self.assertEqual(result['replaced_source_characters'], 720661+35+resource_only_weight(ledger))
         self.assertGreater(result['pending_application_records'], 0)

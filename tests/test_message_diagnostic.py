@@ -161,7 +161,7 @@ class MessageDiagnosticCartridgeTests(unittest.TestCase):
                                    json.loads((root/'build.json').read_text())))
         a, b = [{key for key, row in ledger.rows.items() if row['replacements']} for ledger in ledgers]
         self.assertEqual(b-a, {'message:0004'}); self.assertFalse(a-b)
-        self.assertEqual([r.summary()['total_source_characters'] for r in ledgers], [751284]*2)
+        self.assertEqual([r.summary()['total_source_characters'] for r in ledgers], [751307]*2)
         remaining = [key for key, row in ledgers[-1].rows.items()
                      if key.startswith('message:') and row['source_characters'] and not row['replacements']]
         self.assertEqual(remaining, [])

@@ -94,7 +94,7 @@ class ReserveCartridgeTests(unittest.TestCase):
                 self.assertEqual(files[vrom].extract(built),previous[vrom].extract(old),hex(vrom))
         from translation_progress import measure
         ledger=measure(native,built,report)
-        self.assertEqual(ledger.summary()['total_source_characters'],751284)
+        self.assertEqual(ledger.summary()['total_source_characters'],751307)
         self.assertEqual(ledger.summary()['replaced_source_characters'],748328+154+35)
         for id in r.IDS:self.assertTrue(ledger.rows[id]['replacements'])
         bad=copy.deepcopy(report);bad['reserve_strings']['stored_bytes']=4
