@@ -54,6 +54,12 @@ font encoding. The ledger counts those Unicode source characters directly and
 binds their source-image hash, instead of inventing an encoding or dropping them.
 This route rejects empty source images and text without Japanese characters;
 the owning asset verifier still gates English installation credit.
+The left/right fishing props contribute four distinct bitmap records, eight
+Japanese characters total. Seasons reuse the same originals. Their source-bound
+GC design omits the Japanese barrel name and headquarters placard; credit is an
+explicit verified artwork omission, not a fabricated English string. The exact
+textures, remaining geometry, two removed triangle pairs, and native readers
+must all match. Unreferenced Japanese atlas pixels alone do not withhold credit.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

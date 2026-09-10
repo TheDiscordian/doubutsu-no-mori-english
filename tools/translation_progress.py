@@ -508,6 +508,8 @@ def measure(native, built, report):
     measure_nookington_details(ledger, native, built, report)
     from dump_artwork import measure_text as measure_dump_artwork
     measure_dump_artwork(ledger, native, built, report)
+    from fishing_artwork import measure_text as measure_fishing_artwork
+    measure_fishing_artwork(ledger, native, built, report)
 
     # Inventory source prompts even when measuring a build without the patch.
     def add_keyboard():

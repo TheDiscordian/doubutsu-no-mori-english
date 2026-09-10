@@ -2,6 +2,12 @@
 
 ## V0 execution priority
 
+The [fishing-prop batch](checkpoints/FISHING_ARTWORK.md) passes all three focused
+checks, the title combination, and the complete counter. Continue fortune-booth
+and festival-stall artwork from `build/fishing-artwork-01`; preserve native
+event code and test limits. The GC headquarters texture is unused by its model,
+and the native port now reproduces that specific two-triangle omission.
+
 The [dump sign batch](checkpoints/DUMP_ARTWORK.md) is installed in both seasons
 with passing host, title-combination, and full counter checks. Continue fishing
 and festival props from `build/dump-artwork-01`, preserving native event behaviour.

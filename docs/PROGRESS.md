@@ -17,6 +17,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [fishing artwork candidate](checkpoints/FISHING_ARTWORK.md) matches GC's
+Japanese barrel-name and headquarters-placard omissions while preserving the
+event and all remaining geometry. Three focused checks, the title combination,
+and the full counter pass. `build/title-fishing-combined-01` is the newest
+separate artwork candidate. Continue the fortune booth and festival stall;
+the packaged playtest remains unchanged during this artwork batch.
+
 The [dump artwork candidate](checkpoints/DUMP_ARTWORK.md) adds both exact
 GameCube English signs, retaining collection rules and all Nookington/menu/text
 work. Its focused checks, title combination, and full combined counter pass.
