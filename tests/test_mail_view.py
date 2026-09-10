@@ -166,13 +166,13 @@ class MailViewTests(unittest.TestCase):
 
 @unittest.skipUnless(ROM_PATH.is_file(), 'Local native ROM required')
 class MailViewPatchTests(unittest.TestCase):
-    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(), 'Build resident module first')
+    @unittest.skipUnless((ROOT/'build/notice-seasonal-runtime/module.json').is_file(), 'Build resident module first')
     def test_snapshot_option_changes_only_five_calls_and_three_relocations(self):
         from runtime_module import MODULE_VROM
         rom = ROM_PATH.read_bytes()
         files = by_vrom(rom)
-        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
-        additions = {MODULE_VROM:(ROOT/'build/runtime-module/module.bin').read_bytes()}
+        module = json.loads((ROOT/'build/notice-seasonal-runtime/module.json').read_text())
+        additions = {MODULE_VROM:(ROOT/'build/notice-seasonal-runtime/module.bin').read_bytes()}
         replacements = {}
         report = install(rom,replacements,additions,module,snapshots=True)
         self.assertTrue(report['snapshot_reader'])
@@ -208,13 +208,13 @@ class MailViewPatchTests(unittest.TestCase):
         with patch('mail_view_patch.sha256',return_value=RELOC_SHA256), self.assertRaisesRegex(ValueError,'Missing'):
             remove_call_relocations(bytes(invalid))
 
-    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(), 'Build resident module first')
+    @unittest.skipUnless((ROOT/'build/notice-seasonal-runtime/module.json').is_file(), 'Build resident module first')
     def test_installer_binds_targets_and_preserves_every_other_overlay_byte(self):
         from runtime_module import MODULE_VROM
         rom = ROM_PATH.read_bytes()
         files = by_vrom(rom)
-        module = json.loads((ROOT/'build/runtime-module/module.json').read_text())
-        additions = {MODULE_VROM:(ROOT/'build/runtime-module/module.bin').read_bytes()}
+        module = json.loads((ROOT/'build/notice-seasonal-runtime/module.json').read_text())
+        additions = {MODULE_VROM:(ROOT/'build/notice-seasonal-runtime/module.bin').read_bytes()}
         replacements = {}
         report = install(rom,replacements,additions,module)
         self.assertEqual(report['read_mode'],1)

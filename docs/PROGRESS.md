@@ -55,9 +55,11 @@ Remaining work prioritises concrete human playtest defects. The
 [full regression](checkpoints/V1RC1_REGRESSION.md) finishes with 25 failures and
 75 errors across 2,103 tests, primarily rejecting historical fixtures or older
 accounting expectations. A scoped title-metadata correction and independent
-binary comparison pass; the suite as a whole is not passed. Fixture repair
-remains scoped follow-up work, and counter maintenance stays deferred. Ordinary
-letter opening, screen appearance, and hardware
+binary comparison pass. The [core runtime fixture follow-up](checkpoints/RUNTIME_FIXTURE_FOLLOWUP.md)
+closes five historical errors, with passing evidence for 69 selected checks
+across eight test files and unchanged source/provenance guards. The suite as a
+whole is not passed. Further fixture repair remains scoped follow-up work, and
+counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
 
@@ -159,6 +161,13 @@ credit or claim complete artwork coverage. No replacement ROM is needed for
 this review-only work; the combined playtest-fix build remains the current candidate.
 
 ## Remaining work and evidence limits
+
+The [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md)
+inspects 34 additional native images and the matching English GC umbrella
+decoration. These designs remain native; no newly applied text or changed ROM
+is claimed. Native/GC I8 inspection support and three focused decoder tests
+resolve six previously unsupported gradient-mask views. Four dynamic-palette
+candidates remain explicit leads, not completed visual inspection.
 
 The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
 inspects 48 images: one hiring notice is corrected separately, and 47 neutral

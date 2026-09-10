@@ -91,7 +91,7 @@ class MailCatalogTests(unittest.TestCase):
                 resource(banks, 2)
 
     @unittest.skipUnless(CATALOG_PATH.is_file() and ROM_PATH.is_file()
-                         and (ROOT/'build/runtime-module/module.json').is_file(), 'Registered resource and module required')
+                         and (ROOT/'build/notice-seasonal-runtime/module.json').is_file(), 'Registered resource and module required')
     def test_installer_binds_registered_resource_and_all_configuration_words(self):
         from runtime_module import add_runtime_module, MODULE_VROM, verify_test_module
         from aflib import replace_dma, sha256
@@ -99,8 +99,8 @@ class MailCatalogTests(unittest.TestCase):
         from display_names import install as names
         from catchphrases import install as catchphrases
         rom = ROM_PATH.read_bytes()
-        additions, module = add_runtime_module(rom, {}, ROOT/'build/runtime-module')
-        for installer, path in ((items, 'build/alias-items'), (names, 'build/display-names'),
+        additions, module = add_runtime_module(rom, {}, ROOT/'build/notice-seasonal-runtime')
+        for installer, path in ((items, 'build/design-items-resource'), (names, 'build/display-names'),
                                 (catchphrases, 'build/catchphrases')):
             if not (ROOT/path).is_dir():
                 self.skipTest('Combined optional resources are local-only inputs')

@@ -47,3 +47,10 @@ V1RC1 original-hardware playthrough, and its guard failures are not evidence
 that the reported corner, glyph-placement, or other hardware bugs are fixed.
 Current implementation priority remains V1-14; the user accepts keyboard audio
 feedback and supplies direct observations of its remaining visual defects.
+
+The [core runtime fixture follow-up](RUNTIME_FIXTURE_FOLLOWUP.md) closes five
+of the historical errors through verified fixture selection in eight test files.
+It records 67 initially passing checks and two affected composition checks
+passing after their additional item-fixture correction. Source/provenance guards
+remain intact. This scoped follow-up does not replace the full-suite result or
+claim the remaining errors resolved.

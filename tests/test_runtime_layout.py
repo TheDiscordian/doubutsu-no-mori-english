@@ -57,9 +57,9 @@ class RuntimeLayoutTests(unittest.TestCase):
                      'mail/page.c', 'mail/page.h', 'mail/reader.c', 'mail/reader.h', 'mail_view_hooks.s'):
             self.assertIn(name, sources)
 
-    @unittest.skipUnless((ROOT/'build/runtime-module/bootstrap.bin').is_file(), 'Build the resident module first')
+    @unittest.skipUnless((ROOT/'build/notice-seasonal-runtime/bootstrap.bin').is_file(), 'Build the resident module first')
     def test_assembled_bootstrap_loads_unsigned_reservation_and_mail_symbols_fit(self):
-        directory = ROOT/'build/runtime-module'
+        directory = ROOT/'build/notice-seasonal-runtime'
         data = (directory/'bootstrap.bin').read_bytes()
         words = struct.unpack('>'+str(len(data)//4)+'I', data)
         self.assertIn(0x34068000, words)  # ori a2,zero,8000, DMA length

@@ -138,10 +138,10 @@ class ModuleRetailTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             list(tokenize(b"\x7f\x67", info))
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(),
+    @unittest.skipUnless((ROOT/"build/notice-seasonal-runtime/module.json").is_file(),
                          "Build resident-module artifacts to exercise guarded insertion")
     def test_module_artifacts_guards_and_insertion(self):
-        directory = ROOT/"build/runtime-module"
+        directory = ROOT/"build/notice-seasonal-runtime"
         replacements = {}
         additions, report = add_runtime_module(self.rom, replacements, directory)
         self.assertEqual(len(additions[MODULE_VROM]), RESERVATION)

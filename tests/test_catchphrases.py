@@ -212,13 +212,13 @@ class CatchphraseResourceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complete verified default"):
             validate_saved_defaults(self.rom, {bank.data_vrom: data, bank.table_vrom: table}, self.edits)
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file()
+    @unittest.skipUnless((ROOT/"build/notice-seasonal-runtime/module.json").is_file()
                          and (ROOT/"build/catchphrases/catchphrases.json").is_file(),
                          "Native-call scenarios bind to the local experimental ROM")
     def test_native_scenario_uses_unsigned_o32_arguments_and_restores_checkpoint(self):
         from catchphrase_test_scenario import scenario
         replacements = {}
-        additions, module = add_runtime_module(self.rom, replacements, ROOT/"build/runtime-module")
+        additions, module = add_runtime_module(self.rom, replacements, ROOT/"build/notice-seasonal-runtime")
         reference = json.loads((ROOT/"build/catchphrases/catchphrases.json").read_text())
         install(self.rom, additions, module, ROOT/"build/catchphrases")
         # Bind the current source-built module and resource together; a historical
@@ -233,11 +233,11 @@ class CatchphraseResourceTests(unittest.TestCase):
         self.assertTrue(any(a.get("load_state") for a in actions))
         self.assertEqual(actions[2], {"pause_game_thread": True})
 
-    @unittest.skipUnless((ROOT/"build/runtime-module/module.json").is_file(), "Build the resident module first")
+    @unittest.skipUnless((ROOT/"build/notice-seasonal-runtime/module.json").is_file(), "Build the resident module first")
     def test_resource_configuration_and_mutation_guards(self):
         from display_names import install as display_install
         from extended_items import install as item_install
-        additions, module = add_runtime_module(self.rom, {}, ROOT/"build/runtime-module")
+        additions, module = add_runtime_module(self.rom, {}, ROOT/"build/notice-seasonal-runtime")
         data = resource(self.rom, self.edits)
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
@@ -259,9 +259,9 @@ class CatchphraseResourceTests(unittest.TestCase):
             changed[512] ^= 1
             with self.assertRaisesRegex(ValueError, "verified module"):
                 install(self.rom, {MODULE_VROM: changed}, module, directory)
-            if (ROOT/"build/alias-items/names.json").is_file() and (ROOT/"build/display-names/names.json").is_file():
+            if (ROOT/"build/design-items-resource/names.json").is_file() and (ROOT/"build/display-names/names.json").is_file():
                 enabled = dict(additions)
-                item_install(self.rom, enabled, module, ROOT/"build/alias-items")
+                item_install(self.rom, enabled, module, ROOT/"build/design-items-resource")
                 display_install(self.rom, enabled, module, ROOT/"build/display-names")
                 install(self.rom, enabled, module, directory)
                 self.assertEqual(enabled[MODULE_VROM][56:68], struct.pack(">3I", 0x02A00000, 0x02C00000, VROM))

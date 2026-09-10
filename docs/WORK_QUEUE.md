@@ -36,6 +36,10 @@ do not establish acceptance of every reported case. Next:
   expectation maintenance stays deferred. Do not restart the entire suite or
   claim it passed. The title metadata comparison has a passing scoped correction
   with independently matching overlay/relocation binaries; retain that result.
+  The [core runtime fixture follow-up](checkpoints/RUNTIME_FIXTURE_FOLLOWUP.md)
+  also closes five historical errors with passing evidence for 69 selected
+  checks. Preserve the verified fixture selections and unchanged guards; do not
+  rerun that completed batch or mark other failures resolved by association.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.
@@ -83,6 +87,11 @@ Broader remaining work follows the combined-fix integration:
    drapes are also neutral; retain them without repeating the inspection.
    Use `tools/artwork_matches.py` and the [scoped inventory](ARTWORK_REMAINDER.md)
    to select additional remaining screen/item images. The
+   [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md) closes
+   34 further native textures and confirms the English GC umbrella motif is
+   retained. Do not repeat those images. Its four player/effect candidates need
+   dynamic palette binding before visible artwork can be claimed reviewed.
+   The
    [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
    Katrina-interior, clock/furniture, and mechanical-detail textures; retain them
    without repeating that inspection. The identified hiring notice is corrected

@@ -12,7 +12,7 @@ import tempfile
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE', str(ROOT/'build/runtime-module')))
+MODULE_DIR = Path(os.environ.get('AF_TEST_RUNTIME_MODULE', str(ROOT/'build/notice-seasonal-runtime')))
 sys.path.insert(0, str(ROOT/"tools"))
 from aflib import sha256
 from extended_items import COUNTS, HEADER, WIDTH, VROM, install, resource

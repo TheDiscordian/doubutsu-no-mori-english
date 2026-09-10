@@ -25,9 +25,9 @@ def rgba5551(value):
 
 
 def decode(data, width, height, fmt, palette=None, *, gamecube=False):
-    if fmt not in ('ci4', 'i4', 'ia8') or width <= 0 or height <= 0:
+    if fmt not in ('ci4', 'i4', 'i8', 'ia8') or width <= 0 or height <= 0:
         raise ValueError('Unsupported preview texture')
-    bits = 8 if fmt == 'ia8' else 4
+    bits = 8 if fmt in ('i8', 'ia8') else 4
     if len(data)*8 != width*height*bits:
         raise ValueError('Incorrect texture size')
     if gamecube:
@@ -45,6 +45,8 @@ def decode(data, width, height, fmt, palette=None, *, gamecube=False):
         raise ValueError('Intensity preview must not have a palette')
     if fmt == 'i4':
         return b''.join(bytes([v*17, v*17, v*17, 255]) for v in samples)
+    if fmt == 'i8':
+        return b''.join(bytes([v, v, v, 255]) for v in samples)
     return b''.join(bytes([(v >> 4)*17]*3+[(v & 15)*17]) for v in samples)
 
 
@@ -69,7 +71,7 @@ def main():
     parser.add_argument('--palette', type=lambda x: int(x, 16))
     parser.add_argument('--width', type=int, required=True)
     parser.add_argument('--height', type=int, required=True)
-    parser.add_argument('--format', choices=('ci4', 'i4', 'ia8'), required=True)
+    parser.add_argument('--format', choices=('ci4', 'i4', 'i8', 'ia8'), required=True)
     parser.add_argument('--scale', type=int, default=4)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -85,7 +87,7 @@ def main():
         data = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         def read(address, size):
             return native_range(data, address, size)
-    size = args.width*args.height*(8 if args.format == 'ia8' else 4)//8
+    size = args.width*args.height*(8 if args.format in ('i8', 'ia8') else 4)//8
     rgba = decode(read(args.address, size), args.width, args.height, args.format,
                   None if args.palette is None else read(args.palette, 32), gamecube=args.gamecube)
     args.output.parent.mkdir(parents=True, exist_ok=True)
