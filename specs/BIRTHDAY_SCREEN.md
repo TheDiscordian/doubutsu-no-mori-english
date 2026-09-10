@@ -62,5 +62,9 @@ original reader blocks, and all preserved resources. Verify relocation at
 multiple ordinary-heap addresses, drawing output, text lengths, read-only state,
 and allocation/stack guards. Add the two discovered embedded strings to the
 common text inventory, with installed-renderer verification before credit.
+Measurement reads the 800-byte renderer from the cartridge, requires its exact
+approved hash, and verifies the complete reconstructed owner, relocation, assets,
+and source-bound report. It must not require a retained development compilation
+folder. Compilation itself still checks its ELF call inventory and metadata.
 Native screen execution and ordinary hardware/date entry remain separate
 acceptance; neither compilation nor a host drawing check implies those passed.

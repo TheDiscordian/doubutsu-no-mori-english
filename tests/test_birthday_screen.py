@@ -5,6 +5,7 @@ import sys
 import struct
 import tempfile
 import unittest
+from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
@@ -64,6 +65,26 @@ class BirthdayScreenTests(unittest.TestCase):
         self.assertEqual(pending.summary()['total_source_characters'],13)
         self.assertEqual(pending.summary()['replaced_source_characters'],0)
         with self.assertRaises(ValueError):measure_text(CounterLedger(ledger.info),self.native,self.base,report)
+
+    def test_counter_uses_installed_code_without_a_development_compile_folder(self):
+        from textcodec import command_info
+        from aflib import CODE_VROM
+        from translation_progress import CounterLedger
+        info=command_info(by_vrom(self.native)[CODE_VROM].extract(self.native))
+        with patch('birthday_screen.compiled',side_effect=AssertionError('Counter must read the ROM')):
+            ledger=CounterLedger(info)
+            measure_text(ledger,self.native,self.image,self.report)
+            self.assertEqual(ledger.summary()['replaced_source_characters'],13)
+            files=by_vrom(self.image)
+            for v,offset in ((OWNER,START),(OWNER,START+800),(OWNER,0x10),(RELOC,20),(ASSET,0x2DB8)):
+                with self.subTest(vrom=v,offset=offset):
+                    self.assertEqual(files[v].pend,0)
+                    altered=bytearray(self.image);altered[files[v].pstart+offset]^=1
+                    with self.assertRaises(ValueError):
+                        measure_text(CounterLedger(info),self.native,bytes(altered),self.report)
+            changed={**self.report,'birthday_screen':{**self.report['birthday_screen'],'sources':{}}}
+            with self.assertRaises(ValueError):
+                measure_text(CounterLedger(info),self.native,self.image,changed)
 
 
 if __name__=='__main__':unittest.main()

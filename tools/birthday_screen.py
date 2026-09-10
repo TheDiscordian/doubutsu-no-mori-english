@@ -43,14 +43,18 @@ def source(native):
     return old
 
 
+def source_hashes():
+    paths=(ROOT/'overlays/birthday/draw.c',ROOT/'overlays/birthday/draw.ld')
+    return {str(p.relative_to(ROOT)):sha256(p.read_bytes()) for p in paths}
+
+
 def compiled(directory):
     from build_birthday_draw import FLAGS
     from toolchain import KNOWN_IMAGES
     draw=(directory/'draw.bin').read_bytes();profile=json.loads((directory/'draw.json').read_text())
     inventory=elf_inventory((directory/'relocations.txt').read_text(),ram=RAM)
     expected=[[at-RAM,4,target,name] for at,target,name in IMPORTS]
-    paths=(ROOT/'overlays/birthday/draw.c',ROOT/'overlays/birthday/draw.ld')
-    hashes={str(p.relative_to(ROOT)):sha256(p.read_bytes()) for p in paths}
+    hashes=source_hashes()
     if (len(draw)!=800 or sha256(draw)!=DRAW_SHA or inventory!=expected
             or profile.get('sources')!=hashes or profile.get('sha256')!=DRAW_SHA
             or profile.get('ram')!=RAM+START or profile.get('bytes')!=800
@@ -121,8 +125,13 @@ def build(native,base,report,rel,symbols,directory):
 def measure_text(ledger,native,built,report):
     old=source(native);installed=report.get('birthday_screen')
     if installed:
-        draw,hashes=compiled(ROOT/'build/birthday-draw-03');changed=replacements(native,draw)
-        if installed!=profile(changed,hashes) or any(by_vrom(built)[v].extract(built)!=data for v,data in changed.items()):
+        files=by_vrom(built)
+        draw=files[OWNER].extract(built)[START:START+800]
+        # Replacements binds the exact approved native code, full relocation,
+        # preserved owner, string payload, and removed Japanese texture readers.
+        # Measurement must not depend on a retained development compiler folder.
+        changed=replacements(native,draw)
+        if installed!=profile(changed,source_hashes()) or any(files[v].extract(built)!=data for v,data in changed.items()):
             raise ValueError('Changed installed birthday translation or reader')
     for index,(offset,length,english) in enumerate(((0x8FC,10,PROMPT),(0x908,3,b'OK'))):
         identity=f'ui_birthday:{index:04X}'
