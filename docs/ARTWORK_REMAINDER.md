@@ -48,9 +48,30 @@ is pending. Continue other work without waiting for that choice.
 Exact GC-to-native menu-image matches are `445500 → A58240`,
 `445700 → A58460`, and `452300 → A63BC0`, all 32×32 CI4 in native owner `A58000`.
 GC palettes are `4454C0`, `4454E0`, and `4520C0`. These images are not newly
-translated merely by copying the identical GC resource. GC world-bag texture
-`38F140`, palette `38F120`, needs separate binding; native `8908E0` is a Bell
-bag, not the lucky bag. Local reference images are in `build/artwork-inspection/`.
+translated merely by copying the identical GC resource. Local reference images
+are in `build/artwork-inspection/`.
+
+The native world bag uses a different flat image, not the GC three-dimensional
+mesh. Native shop-goods table row `858864` binds item range `2E00..2E02` to
+material `06001300` and geometry `060013A8`, both variants. Object ID `1E` is
+`140C000`. Its material loads palette `140D3C0` and 32×32 CI4 texture `140D3E0`;
+its geometry loads four vertices at `140D2C0` and draws two triangles. The texture
+SHA-256 is `412bc588478c5c742dc87eca1c47d014bd687523f200f90e1fd67fc63b9a3f7c`;
+palette SHA-256 is `d5af0032c0bfa9e6f5cff66560b93f49d7b9f4e6572c435428333592e5330fcb`.
+The entire 16144-byte object has SHA-256
+`e0e87769178c5593175d0d69a395190693dc1cd6481ae9fc1a327de82dd84f06`.
+The table row, both lists, vertices, texture, and palette remain unchanged in
+the current shared-stall candidate.
+
+The matching English GC shop-goods row binds its bag/present types to
+`obj_fukuT_mat_model` at `.data:38F5A0` and `obj_fukuT_gfx_model` at `38F5E8`.
+The source uses texture `38F140`, palette `38F120`, and 38 vertices at `38F340`.
+Both the native flat image and the decoded English GC world texture retain
+the decorative Japanese `大` character. Copying that texture cannot translate
+the writing, and it is not a direct substitute for the native flat picture.
+Native `8908E0` is a Bell bag, not this lucky-bag asset. If the user chooses to
+replace the writing, cover the native world picture as well as the three menu
+icons, while preserving the existing world model and item behaviour.
 
 ## Inspected neutral seasonal props
 
