@@ -10,11 +10,11 @@ from package_v0 import archive_bytes
 from toolchain import profile_sha256
 
 ROOT=Path(__file__).resolve().parents[1]
-ROM_SHA='d7fbbffc85eb7c311f980c3945cf035de136b130d9fee6214ad096d60b8c8585'
-PATCH_SHA='4dca9b30625ea76350dcc3198835ad9d7b6d226cda77bc0828519fa630e5a31b'
-REPORT_SHA='79b6ee72a933a52a72b918f9c6099ece453b04babe0a2e6d7e9ba81d6017b029'
-CARTRIDGE_REVISION='76f49551ee106953ba1afb61566b599ccc5ad12c'
-LABEL='v1-artwork-playtest-04'
+ROM_SHA='a8072a76783317215ae85afbf31cca77422d5b783512194d8269004f31073780'
+PATCH_SHA='7398d8d3c3bd3b7e234057daabbf61684811e367be583ec4d82045dae2d624bd'
+REPORT_SHA='f851e26b4b448f030b0431e9245f6c6ba675a4cdca0d34368ad4f9ddbde57e19'
+CARTRIDGE_REVISION='766a1d817814e55bc8e0f8232d2005ba9e15d486'
+LABEL='v1-artwork-playtest-05'
 
 
 def prepare(directory,source,revision):
@@ -27,7 +27,7 @@ def prepare(directory,source,revision):
             or report['output_sha256']!=ROM_SHA or report['patch_sha256']!=PATCH_SHA
             or report['memory']['required_ram_bytes']!=0x800000
             or report['memory']['ordinary_heap_end']!=0x80400000 or len(built)!=0x2000000):
-        raise ValueError('Package requires the approved title/shop-interior/shared-stall candidate')
+        raise ValueError('Package requires the approved title/civic-interior/shared-stall candidate')
     if len(revision)!=40 or any(c not in '0123456789abcdef' for c in revision):
         raise ValueError('Packaging revision must identify a complete git commit')
     manifest={'format':1,'label':LABEL,'public_release':False,'complete_v1':False,
@@ -54,7 +54,7 @@ def prepare(directory,source,revision):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--build',type=Path,default=ROOT/'build/title-shop-interior-combined-01')
+    p.add_argument('--build',type=Path,default=ROOT/'build/title-civic-interior-combined-01')
     p.add_argument('--rom',type=Path,default=ROOT/'local/rom/Doubutsu no Mori (Japan).z64')
     p.add_argument('--output',type=Path,default=ROOT/'build/releases'/f'{LABEL}.zip');a=p.parse_args()
     revision=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,check=True,capture_output=True,text=True).stdout.strip()

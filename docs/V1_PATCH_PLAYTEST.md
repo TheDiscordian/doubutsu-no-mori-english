@@ -11,6 +11,9 @@ placement, preserving native memory limits and item behaviour.
 Seven Nookington interior signs also use the matching English GC designs,
 including welcome/hours, clearance-sale, raffle-day, information, and thank-you
 wording. Room geometry, lighting, shop rules, and saved layouts remain unchanged.
+The police interior includes the matching English wanted/recruitment posters,
+and the post-office mailbag says MAIL. Native palettes, models, and gameplay
+remain unchanged. Lucky-bag Japanese decoration is a different, retained design.
 See `FEATURES.md` for the complete feature and verification notes. This is not a
 completed v1, hardware certification, or public release.
 

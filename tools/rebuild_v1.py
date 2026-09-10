@@ -44,6 +44,7 @@ STAGES = (
     ('countdown', 'countdown_artwork', 'reference'),
     ('stall', 'stall_artwork', 'stall_commands'),
     ('shop-interiors', 'shop_interior_artwork', 'reference'),
+    ('civic-interiors', 'civic_interior_artwork', 'reference'),
     ('title', 'title_overlay', 'title'),
 )
 
@@ -104,7 +105,7 @@ def check_final(image, patch, report):
             or report['memory']['required_ram_bytes'] != 0x800000
             or report['memory']['ordinary_heap_end'] != 0x80400000
             or sha256(by_vrom(image)[0x3940000].extract(image)) != CURSOR_CORRECTED_SHA):
-        raise ValueError('Rebuild differs from the approved complete title/shop-interior/corrected-grid result')
+        raise ValueError('Rebuild differs from the approved complete title/civic-interior/corrected-grid result')
 
 
 def rebuild(inputs, output):

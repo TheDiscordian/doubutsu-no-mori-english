@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-shop-interior-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-shop-interior-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-civic-interior-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`d7fbbffc85eb7c311f980c3945cf035de136b130d9fee6214ad096d60b8c8585`.
+`a8072a76783317215ae85afbf31cca77422d5b783512194d8269004f31073780`.
 Patch SHA-256:
-`4dca9b30625ea76350dcc3198835ad9d7b6d226cda77bc0828519fa630e5a31b`.
+`7398d8d3c3bd3b7e234057daabbf61684811e367be583ec4d82045dae2d624bd`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -35,6 +35,11 @@ signs, and the raffle-day board with `RAFFLE-TICKET DAY` and `BIG CHANCE!`.
 The native room geometry, lighting, shop hours, raffle rules, and saved layouts
 remain unchanged. One isolated palette colour matches the donor without changing
 the board edge that shares its palette. Ordinary room appearance remains unverified.
+The police-station interior posters use the exact English GC `WANTED!` and
+`I want U!` images; the post-office mailbag reads `MAIL`. All three fit existing
+native texture slots, with identical donor colours, UVs, and lighting. Room
+palettes, geometry, commands, gameplay, and saved layouts remain unchanged.
+This postal bag is unrelated to the retained Japanese lucky-bag decoration.
 Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
 controls use the complete supplied English artwork with native N64 button icons.
 The catalogue has top/bottom controls, the mailbox has a Mail heading, and

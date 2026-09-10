@@ -17,10 +17,10 @@ from build_keyboard_grid import source_bytes, sources
 class RecipeTests(unittest.TestCase):
     def test_order_and_exclusive_outputs(self):
         stages = [row[0] for row in recipe.STAGES]
-        self.assertEqual(len(stages), 27)
-        self.assertEqual(len(set(stages)), 27)
+        self.assertEqual(len(stages), 28)
+        self.assertEqual(len(set(stages)), 28)
         self.assertLess(stages.index('grid-replay-only'), stages.index('corrected-grid'))
-        self.assertEqual(stages[-3:], ['stall', 'shop-interiors', 'title'])
+        self.assertEqual(stages[-4:], ['stall', 'shop-interiors', 'civic-interiors', 'title'])
         with tempfile.TemporaryDirectory(prefix='af-v1-output-') as directory:
             out = Path(directory)/'result'
             recipe.publish(out, b'rom fixture', b'patch fixture', {})
@@ -83,7 +83,7 @@ class ActualRebuildTests(unittest.TestCase):
         report = json.loads((directory/'rebuild.json').read_text())
         self.assertTrue(report['complete'])
         self.assertEqual([r['stage'] for r in report['stages']],
-                         [r[0] for r in recipe.STAGES if r[0] != 'shop-interiors'])
+                         [r[0] for r in recipe.STAGES if r[0] not in ('shop-interiors', 'civic-interiors')])
         final = directory/'final'
         image, patch_data = [(final/name).read_bytes() for name in
                             ('animal-forest-title-preview.z64', 'animal-forest-title-preview.ups')]
@@ -104,10 +104,36 @@ class ActualRebuildTests(unittest.TestCase):
                      (compiled/'relocation.bin').read_bytes(), metadata)
 
 
-@unittest.skipUnless((ROOT/'build/v1-rebuilt-03/rebuild.json').is_file(), 'Current 27-stage execution required')
-class CurrentRebuildTests(unittest.TestCase):
-    def test_current_recipe_and_final_interiors_are_rebuilt_from_source(self):
+@unittest.skipUnless((ROOT/'build/v1-rebuilt-03/rebuild.json').is_file(), 'Retained 27-stage execution required')
+class ShopRebuildTests(unittest.TestCase):
+    def test_retained_shop_interiors_are_rebuilt_from_source(self):
         directory = ROOT/'build/v1-rebuilt-03'
+        inputs = json.loads((directory/'inputs.json').read_text())
+        self.assertFalse(inputs['worktree_modified'])
+        self.assertEqual(inputs['recipe_sha256'], '7608ae76328cde78f3f2558839841cdd9576cc8021de37478292f88ab30c65e7')
+        self.assertEqual(inputs['recipe_sha256'], inputs['sources']['tools/rebuild_v1.py'])
+        record = json.loads((directory/'rebuild.json').read_text())
+        self.assertTrue(record['complete'])
+        self.assertEqual([s['stage'] for s in record['stages']],
+                         [s[0] for s in recipe.STAGES if s[0] != 'civic-interiors'])
+        final = directory/'final'
+        image, ups = [(final/name).read_bytes() for name in
+                      ('animal-forest-title-preview.z64', 'animal-forest-title-preview.ups')]
+        self.assertEqual(sha256(image), 'd7fbbffc85eb7c311f980c3945cf035de136b130d9fee6214ad096d60b8c8585')
+        self.assertEqual(sha256(ups), '4dca9b30625ea76350dcc3198835ad9d7b6d226cda77bc0828519fa630e5a31b')
+        self.assertEqual(profile_sha256(json.loads((final/'preview.json').read_text())),
+                         '79b6ee72a933a52a72b918f9c6099ece453b04babe0a2e6d7e9ba81d6017b029')
+        import shop_interior_artwork as shop
+        interior = json.loads((directory/'replay/26-shop-interiors/build.json').read_text())
+        shop.verify_installed((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(), image, interior,
+            (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+
+
+@unittest.skipUnless((ROOT/'build/v1-rebuilt-04/rebuild.json').is_file(), 'Current 28-stage execution required')
+class CurrentRebuildTests(unittest.TestCase):
+    def test_current_recipe_and_civic_interiors_are_rebuilt_from_source(self):
+        directory = ROOT/'build/v1-rebuilt-04'
         inputs = json.loads((directory/'inputs.json').read_text())
         self.assertFalse(inputs['worktree_modified'])
         self.assertEqual(inputs['recipe_sha256'], sha256((ROOT/'tools/rebuild_v1.py').read_bytes()))
@@ -118,9 +144,9 @@ class CurrentRebuildTests(unittest.TestCase):
         image, ups = [(final/name).read_bytes() for name in
                       ('animal-forest-title-preview.z64', 'animal-forest-title-preview.ups')]
         recipe.check_final(image, ups, json.loads((final/'preview.json').read_text()))
-        import shop_interior_artwork as shop
-        interior = json.loads((directory/'replay/26-shop-interiors/build.json').read_text())
-        shop.verify_installed((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(), image, interior,
+        import civic_interior_artwork as civic
+        interior = json.loads((directory/'replay/27-civic-interiors/build.json').read_text())
+        civic.verify_installed((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(), image, interior,
             (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
 
