@@ -17,6 +17,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [combined map/inventory artwork candidate](checkpoints/SCREEN_ARTWORK.md)
+at `build/inventory-artwork-02` installs the GameCube TOWN MAP/Acre layout and
+Items/Letters/Bells headings, retaining all shop art, conversation fixes,
+Shrine wording, and earlier English. Twelve focused artwork checks pass,
+including compiled native commands and complete resource/patch reconstruction.
+Ordinary screen appearance/navigation remains unverified. Continue the
+time-setting screen's embedded Japanese instructions and date/time labels;
+the checkpoint records the exact native owner, artwork, strings, and renderer.
+
 The [shop artwork candidate](checkpoints/BUILDING_ARTWORK.md) imports twelve
 GameCube textures for Nook's Cranny, Nook 'n' Go, and Nookway in both seasons.
 `build/shop-artwork-02` retains the complete hardware fixes and all English

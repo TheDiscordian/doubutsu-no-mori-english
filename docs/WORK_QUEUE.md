@@ -2,6 +2,13 @@
 
 ## V0 execution priority
 
+The [screen artwork checkpoint](checkpoints/SCREEN_ARTWORK.md) records the
+installed map/acre and inventory headings in `build/inventory-artwork-02`,
+with all twelve focused artwork checks passing. Continue the time-setting
+owner's four embedded Japanese strings and their English display integration;
+retain the original time/RTC and save logic. Add the newly identified records
+to the shared applied-text inventory when connecting their English display.
+
 The [shop artwork checkpoint](checkpoints/BUILDING_ARTWORK.md) records twelve
 installed summer/winter textures and five passing focused checks. Continue
 remaining map, inventory, and time-setting screen lettering, then the other

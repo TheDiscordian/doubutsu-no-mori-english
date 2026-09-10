@@ -60,7 +60,7 @@ def palette_equivalent(native, gc, used):
             raise ValueError(f'Shop palette changes visible index {index}')
 
 
-def donor_texture_pointers(rel):
+def donor_texture_pointers(rel, rows=None):
     """Resolve the actual REL fixup for each selected model's texture command."""
     if sha256(rel) != REL_SHA256:
         raise ValueError('Unexpected GameCube artwork source')
@@ -68,7 +68,7 @@ def donor_texture_pointers(rel):
     if sections[5][0] != DATA_BASE:
         raise ValueError('Unexpected GameCube data section')
     wanted = {}
-    for row in TEXTURES:
+    for row in TEXTURES if rows is None else rows:
         model = rel[DATA_BASE+row.gc_model:DATA_BASE+row.gc_model+row.model_bytes]
         positions = [row.gc_model+i*8+4 for i, (a, b) in enumerate(struct.iter_unpack('>2I', model))
                      if a >> 24 == 0xFD]
