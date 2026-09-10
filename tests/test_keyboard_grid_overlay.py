@@ -31,11 +31,14 @@ class KeyboardGridOverlayTests(unittest.TestCase):
         cls.report=json.loads((ROOT/'build/keyboard-grid-01/build.json').read_text())
 
     def test_independent_compilation_and_relocations_retain_complete_editor(self):
+        current=ROOT/'build/keyboard-grid-cursor-aligned'
+        expected=json.loads((current/'overlay.json').read_text())
         with tempfile.TemporaryDirectory(prefix='af-grid-recompile-') as directory:
             profile=compile_grid(self.native,ROOT/'build/apology-input-overlay',Path(directory))
-            self.assertEqual(profile,self.profile)
-            self.assertEqual((Path(directory)/'overlay.bin').read_bytes(),self.data)
-            self.assertEqual((Path(directory)/'relocation.bin').read_bytes(),self.reloc)
+            self.assertEqual(profile,expected)
+            self.assertEqual((Path(directory)/'overlay.bin').read_bytes(),(current/'overlay.bin').read_bytes())
+            self.assertEqual((Path(directory)/'relocation.bin').read_bytes(),(current/'relocation.bin').read_bytes())
+        grid.validate(self.native,(current/'overlay.bin').read_bytes(),(current/'relocation.bin').read_bytes(),expected)
         grid.validate(self.native,self.data,self.reloc,self.profile)
         prefix,reloc=grid.preceding(self.data,self.reloc)
         self.assertEqual(sha256(prefix),previous.APPROVED['overlay_sha256'])

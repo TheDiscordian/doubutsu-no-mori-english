@@ -69,10 +69,11 @@ int main(int argc, char **argv) {
     for(i=0;i<7;++i) assert(step(s,0x4000,0)==AF_GRID_NONE);
     assert(step(s,0x4000,0)==AF_GRID_BACKSPACE);
     step(s,0,0);
-    assert(step(s,1,1)==AF_GRID_RIGHT);
-    step(s,0,0);assert(step(s,2,2)==AF_GRID_LEFT);
-    step(s,0,0);assert(step(s,4,4)==AF_GRID_DOWN);
-    step(s,0,0);assert(step(s,8,8)==AF_GRID_UP);
+    /* Numeric native ABI checks must not derive expectations from our enum. */
+    assert(step(s,1,1)==1);
+    step(s,0,0);assert(step(s,2,2)==2);
+    step(s,0,0);assert(step(s,4,4)==4);
+    step(s,0,0);assert(step(s,8,8)==3);
     s->column=255;assert(step(s,0x8000,0x8000)==AF_GRID_NONE);assert(s->column==0);
     assert(guarded.before==0xBADCAFEu && guarded.after==0x12345678u);
     return 0;

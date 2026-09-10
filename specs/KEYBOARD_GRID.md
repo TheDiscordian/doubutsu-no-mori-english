@@ -9,6 +9,11 @@ Do not change saved capacities or replace complete hboard/apology adapters.
 The grid selects a key and emits the existing native command; the existing
 handler decides whether that edit fits and whether Done may close the editor.
 
+The [native direction ABI](KEYBOARD_CURSOR_ABI.md) fixes the emitted cursor
+numbers at right=1, left=2, up=3, and down=4. Controller enum names alone are not
+evidence of compatibility; regression checks bind the numbers to the original
+ROM's selector. The corrected controller preserves the complete installed layout.
+
 The current full editor is the 23,168-byte apology image at VROM `03940000`,
 adjacent relocation `03948000`, linked RAM `80885140`. Its 48-byte original
 state and earlier hboard/apology contexts retain their addresses. Append owned

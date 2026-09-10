@@ -17,6 +17,20 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The current combined playtest candidate is
+`build/title-cursor-combined-01/animal-forest-title-preview.z64` and requires an
+Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
+English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
+keyboard. The [cursor correction](checkpoints/KEYBOARD_CURSOR.md) fixes an actual
+native direction-command mismatch found by the frame-controlled input test.
+The corrected native probe completes entry, deletion, capacity, left/right cursor,
+page switching, and Done with intact guards and graceful shutdown. The full
+combination check passes in 8.353 seconds. Native execution of the correction uses
+the documented matching older checkpoint and guarded controller replacement;
+it is not relabelled as a fresh boot of the new ROM. Current [playtest notes](V1_TITLE_PLAYTEST.md)
+state the untested areas. Continue remaining Japanese art, especially station and
+decorative textures; normal hardware/playthrough feedback remains necessary.
+
 The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`
 adds the supplied English summer sign and its two exclusively owned red palette
 entries. All existing pixel colours, the snow-covered winter tent, and previous

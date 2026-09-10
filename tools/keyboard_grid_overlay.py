@@ -28,6 +28,10 @@ APPROVED={
         'af_grid_editor_prepare':24888,'af_grid_key':23388,'af_grid_keycap':28256,
         'af_grid_owned':24620,'af_grid_reset':23352,'af_grid_tables':27776,'af_grid_update':23604},
 }
+CURSOR_APPROVED = dict(APPROVED, overlay_sha256='3f1c6fd50c06695d114dcd94785c26f80408493c74b7c4ccd8f644746c46c00c',
+    suffix_sha256='06549f382d04cf0e3bab429d099ed7d63e0ca347c18f5c7abedb00c160442a51',
+    relocation_sha256='6fc26aa496a5407b0af08239d0cf85c8cb5c602dc269fe85ad54699b8c01597f')
+CURSOR_ELF_SHA = 'fa5fdce52953bc365a28c5f733d218998d1a179a0043dbd90c17f51ecec88cd9'
 
 
 def preceding(data,reloc):
@@ -44,9 +48,12 @@ def preceding(data,reloc):
 def validate(native,data,reloc,report=None):
     from keyboard_grid_labels import compiled_form
     data=compiled_form(data)
-    if (len(data)!=APPROVED['bytes'] or sha256(data)!=APPROVED['overlay_sha256']
-            or len(reloc)!=APPROVED['relocation_bytes'] or sha256(reloc)!=APPROVED['relocation_sha256']
-            or len(data)>LIMIT or any(data[APPROVED['bss_start']:])):
+    cursor = sha256(data)==CURSOR_APPROVED['overlay_sha256']
+    approved = CURSOR_APPROVED if cursor else APPROVED
+    version = 2 if cursor else 1
+    if (len(data)!=approved['bytes'] or sha256(data)!=approved['overlay_sha256']
+            or len(reloc)!=approved['relocation_bytes'] or sha256(reloc)!=approved['relocation_sha256']
+            or len(data)>LIMIT or any(data[approved['bss_start']:])):
         raise ValueError('Changed bounded grid code, state, or relocation')
     prefix,prior_rel=preceding(data,reloc)
     previous.validate(native,prefix,prior_rel)
@@ -57,12 +64,12 @@ def validate(native,data,reloc,report=None):
             or sha256(data[cap:cap+128])!=APPROVED['keycap_sha256']):
         raise ValueError('Grid layout or keycap resource changed')
     if report is not None:
-        if (any(report.get(k)!=v for k,v in APPROVED.items()) or report.get('sources')!=sources()
+        if (any(report.get(k)!=v for k,v in approved.items()) or report.get('sources')!=sources(version)
                 or report.get('imports')!=IMPORTS or report.get('toolchain_image')!=IMAGE
-                or report.get('version')!=1 or report.get('ram')!=RAM
+                or report.get('version')!=version or report.get('ram')!=RAM
                 or report.get('previous_sha256')!=sha256(prefix)
                 or report.get('previous_relocation_sha256')!=sha256(prior_rel)
-                or sha256(json.dumps(report.get('elf_relocations'),separators=(',',':')).encode())!=ELF_SHA
+                or sha256(json.dumps(report.get('elf_relocations'),separators=(',',':')).encode())!=(CURSOR_ELF_SHA if cursor else ELF_SHA)
                 or reloc!=relocations(prior_rel,report['elf_relocations'],len(data))):
             raise ValueError('Stale grid source, profile, or relocation evidence')
     spec=owner_editor.Image(RAM,len(data),struct.unpack_from('>5I',reloc))

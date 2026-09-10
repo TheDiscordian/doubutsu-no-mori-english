@@ -6,6 +6,9 @@ SECTIONS {
     .text : {
         KEEP(*(.native))
         __grid_start = .;
+        core.o(.text .text.*)
+        /* Preserve every bridge/data/state address after the shorter ABI fix. */
+        . = 0x5FD8;
         *(.text .text.*)
         . = ALIGN(16);
         __grid_code_end = .;

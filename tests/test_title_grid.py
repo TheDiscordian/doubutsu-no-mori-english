@@ -37,6 +37,12 @@ class TitleGridTests(unittest.TestCase):
         self.check_combination('redd-artwork-01', 'title-redd-combined-01',
             'b37f9ecf3ccde2344df6c6cad8e39baea73a7c2eaa6ea3f7cad865eeb8aebc9b')
 
+    @unittest.skipUnless((ROOT/'build/title-cursor-combined-01/preview.json').is_file(),
+                         'Local corrected cursor/title candidate required')
+    def test_cursor_combination_retains_corrected_commands_and_complete_artwork(self):
+        self.check_combination('keyboard-grid-cursor-01', 'title-cursor-combined-01',
+            'b42b63b0c59b9e947338dc3ac477f7c8562dd6cbd9dddbdc3831ca49622b63c6')
+
     def check_combination(self, baseline, output, expected_sha):
         native=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         base=(ROOT/'build'/baseline/'animal-forest-halfwidth.z64').read_bytes()

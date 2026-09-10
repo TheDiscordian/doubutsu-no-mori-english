@@ -15,7 +15,8 @@ struct af_grid_state {
 };
 
 enum af_grid_command {
-    AF_GRID_NONE, AF_GRID_LEFT, AF_GRID_DOWN, AF_GRID_UP, AF_GRID_RIGHT,
+    /* Native 8088547C..808854B8: C-right=1, left=2, up=3, down=4. */
+    AF_GRID_NONE, AF_GRID_RIGHT, AF_GRID_LEFT, AF_GRID_UP, AF_GRID_DOWN,
     AF_GRID_DONE, AF_GRID_BACKSPACE, AF_GRID_EXCHANGE, AF_GRID_INSERT
 };
 

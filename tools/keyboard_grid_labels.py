@@ -3,6 +3,9 @@ from aflib import sha256
 
 ORIGINAL_SHA = 'aa6807c5ebe327c295da87c62b23d4758adf56f6a4262f53d2477c7e31c1277f'
 CORRECTED_SHA = '0844b5da4ce74e41045f9dcfb5d115314a86da8196e97036af41d64506ae42ac'
+CURSOR_ORIGINAL_SHA = '3f1c6fd50c06695d114dcd94785c26f80408493c74b7c4ccd8f644746c46c00c'
+CURSOR_CORRECTED_SHA = 'd087dd33e57659e933b88f4d41bbe2a05623a07fb09a41ee7b98737e21f25579'
+PROFILES = {ORIGINAL_SHA:CORRECTED_SHA, CURSOR_ORIGINAL_SHA:CURSOR_CORRECTED_SHA}
 LABELS = ((0x6F00, b'L: Case   Z: Page   L+Z: ABC'),
           (0x6F4C, b'Move: Stick/D-pad   Cursor: C   L+A: Alter'))
 
@@ -14,7 +17,8 @@ def encode_label(value):
 
 
 def install(data):
-    if sha256(data) != ORIGINAL_SHA:
+    expected = PROFILES.get(sha256(data))
+    if expected is None:
         raise ValueError('Control labels require the exact compiled grid')
     result = bytearray(data)
     for at, label in LABELS:
@@ -22,14 +26,15 @@ def install(data):
             raise ValueError('Grid control label binding changed')
         result[at:at+len(label)] = encode_label(label)
     result = bytes(result)
-    if sha256(result) != CORRECTED_SHA:
+    if sha256(result) != expected:
         raise ValueError('Unexpected encoded grid labels')
     return result
 
 
 def compiled_form(data):
     """Retain strict compiled-code verification for the reviewed data-only fix."""
-    if sha256(data) != CORRECTED_SHA:
+    expected = {encoded:compiled for compiled,encoded in PROFILES.items()}.get(sha256(data))
+    if expected is None:
         return data
     result = bytearray(data)
     for at, label in LABELS:
@@ -37,6 +42,6 @@ def compiled_form(data):
             raise ValueError('Changed native-encoded grid labels')
         result[at:at+len(label)] = label
     result = bytes(result)
-    if sha256(result) != ORIGINAL_SHA:
+    if sha256(result) != expected:
         raise ValueError('Label correction changes compiled grid code')
     return result

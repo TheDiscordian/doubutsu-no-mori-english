@@ -27,11 +27,24 @@ HOOKS={0x80888484:('af_grid_editor_init',IMPORTS['af_apology_editor_init']),
        0x808882D8:('af_grid_editor_draw',0x80888024)}
 
 
-def sources():
+def sources(version=2):
     paths=sorted((ROOT/'overlays/keyboard_grid').iterdir())
     paths += [ROOT/'overlays/hboard/editor.h',ROOT/'runtime/hboard_editor.h',
               ROOT/'tools/keyboard_grid.py']
-    return {str(p.relative_to(ROOT)):sha256(p.read_bytes()) for p in paths if p.is_file()}
+    result = {}
+    for p in paths:
+        if not p.is_file():continue
+        data=p.read_bytes()
+        if version==1 and p.name=='core.h':
+            data=data.replace(b'    /* Native 8088547C..808854B8: C-right=1, left=2, up=3, down=4. */\n'
+                b'    AF_GRID_NONE, AF_GRID_RIGHT, AF_GRID_LEFT, AF_GRID_UP, AF_GRID_DOWN,',
+                b'    AF_GRID_NONE, AF_GRID_LEFT, AF_GRID_DOWN, AF_GRID_UP, AF_GRID_RIGHT,')
+        if version==1 and p.name=='overlay.ld':
+            data=data.replace(b'        core.o(.text .text.*)\n'
+                b'        /* Preserve every bridge/data/state address after the shorter ABI fix. */\n'
+                b'        . = 0x5FD8;\n',b'')
+        result[str(p.relative_to(ROOT))]=sha256(data)
+    return result
 
 
 def jump(target):
@@ -112,7 +125,7 @@ def build(native,directory,out):
     data[:len(prior)]=patched_prefix(prior,exports)
     elf_text=run('readelf','-rW','overlay.elf');inventory=previous.previous.elf_inventory(elf_text)
     relocation=relocations(rel,inventory,len(data))
-    report={'version':1,'ram':RAM,'bytes':len(data),'overlay_sha256':sha256(data),
+    report={'version':2,'ram':RAM,'bytes':len(data),'overlay_sha256':sha256(data),
         'prefix_bytes':len(prior),'previous_sha256':sha256(prior),'previous_relocation_sha256':sha256(rel),
         'suffix_sha256':sha256(data[len(prior):]),'relocation_bytes':len(relocation),
         'relocation_sha256':sha256(relocation),'sources':source_hashes,'imports':IMPORTS,'symbols':exports,

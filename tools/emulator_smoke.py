@@ -304,19 +304,46 @@ class Keyboard:
         if not self.display:
             raise RuntimeError("Cannot open isolated X display")
 
-    def press(self, name, duration=0.15):
+    def set_pressed(self, name, pressed):
         names = [name] if isinstance(name, str) else name
         keys = [self.x11.XKeysymToKeycode(self.display, self.x11.XStringToKeysym(n.encode()))
                 for n in names]
         if not keys or not all(keys):
             raise ValueError(f"Unknown key: {name}")
-        for key in keys:
-            self.xtst.XTestFakeKeyEvent(self.display, key, 1, 0)
+        for key in keys if pressed else reversed(keys):
+            self.xtst.XTestFakeKeyEvent(self.display, key, int(pressed), 0)
         self.x11.XFlush(self.display)
-        time.sleep(duration)
-        for key in reversed(keys):
-            self.xtst.XTestFakeKeyEvent(self.display, key, 0, 0)
-        self.x11.XFlush(self.display)
+
+    def press(self, name, duration=0.15):
+        self.set_pressed(name,True)
+        try:
+            time.sleep(duration)
+        finally:
+            self.set_pressed(name,False)
+
+    def advance_frames(self, frames):
+        if type(frames) is not int or not 1 <= frames <= 300:
+            raise ValueError('Invalid bounded emulator frame count')
+        # ares Frame Advance pauses ordinary execution, then runs one frame.
+        # Paused UI polling still needs to observe separate press/release edges.
+        for _ in range(frames):
+            self.press('F7',0.06)
+            time.sleep(0.06)
+
+    def press_frames(self, name, frames=4):
+        if type(frames) is not int or not 1 <= frames <= 120:
+            raise ValueError('Invalid frame-bounded controller hold')
+        if name == 'F7' or isinstance(name,list) and 'F7' in name:
+            raise ValueError('Controller hold cannot include the frame-advance hotkey')
+        self.advance_frames(1)
+        self.set_pressed(name,True)
+        try:
+            time.sleep(0.06)
+            self.advance_frames(frames)
+        finally:
+            self.set_pressed(name,False)
+        time.sleep(0.06)
+        self.advance_frames(4)
 
 
 def expand_actions(actions):
@@ -691,7 +718,7 @@ def main():
                         "Input\n  Driver: SDL\n  Defocus: Allow\n"
                         "General\n  NoFilePrompt: true\n  AutoSaveMemory: true\n"
                         "Hotkey\n  SaveState: 0x1/0/5;;\n  LoadState: 0x1/0/6;;\n"
-                        "  QuitEmulator: 0x1/0/12;;\n"
+                        "  QuitEmulator: 0x1/0/12;;\n  FrameAdvance: 0x1/0/7;;\n"
                         f"Nintendo64\n  ExpansionPak: {str(args.expansion_pak).lower()}\n"
                         "  Input\n    Controller.Port.1\n      Gamepad\n"
                         "        A: 0x1/0/35;;\n        B: 0x1/0/36;;\n"
@@ -780,6 +807,13 @@ def main():
                 time.sleep(max(0, min(action["wait"], 60)))
             if "key" in action:
                 keyboard.press(action["key"], action.get("duration", 0.15))
+            if "advance_frames" in action:
+                keyboard.advance_frames(action['advance_frames'])
+                record({'requested_emulator_frames':action['advance_frames']})
+            if "key_frames" in action:
+                keyboard.press_frames(action['key_frames'],action.get('frames',4))
+                record({'frame_bounded_key':action['key_frames'],'held_frames':action.get('frames',4),
+                        'release_frames':4})
             if "advance_to_choice" in action:
                 advance_to_choice(debug, keyboard, action["advance_to_choice"], record)
             if "advance_dialogue" in action:
