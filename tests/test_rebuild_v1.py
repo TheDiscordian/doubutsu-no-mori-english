@@ -52,10 +52,14 @@ class RecipeTests(unittest.TestCase):
         self.assertIsInstance(state['worktree_modified'], bool)
 
 
-@unittest.skipUnless((ROOT/'build/v1-rebuilt-01/rebuild.json').is_file(), 'Local complete recipe execution required')
+@unittest.skipUnless((ROOT/'build/v1-rebuilt-02/rebuild.json').is_file(), 'Local committed recipe execution required')
 class ActualRebuildTests(unittest.TestCase):
     def test_all_stages_and_exact_packaged_result(self):
-        directory = ROOT/'build/v1-rebuilt-01'
+        directory = ROOT/'build/v1-rebuilt-02'
+        inputs = json.loads((directory/'inputs.json').read_text())
+        self.assertFalse(inputs['worktree_modified'])
+        self.assertEqual(inputs['recipe_sha256'], inputs['sources']['tools/rebuild_v1.py'])
+        self.assertEqual(inputs['source_revision'], 'd54f2f89bd832bc59957441dc9101010fc52a740')
         report = json.loads((directory/'rebuild.json').read_text())
         self.assertTrue(report['complete'])
         self.assertEqual([r['stage'] for r in report['stages']], [r[0] for r in recipe.STAGES])

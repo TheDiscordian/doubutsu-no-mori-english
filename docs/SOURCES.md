@@ -17,6 +17,8 @@
 - Local MIPS toolchain image: `sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915`
   (`doom-n64:tc`, GCC 14.2.0). The image is a local dependency, not a published
   registry artifact; the pure-Python ROM builder does not require it.
+  [Toolchain identity](TOOLCHAIN.md) records inspected executable versions/hashes
+  and the remaining clean public-container setup work.
 - AFProjectDistro archive SHA-256:
   `d0f7e708fa2453c9f06714d9d39b1265e02f4878d330dcea99c85c52123838ed`.
 - Legacy UPS SHA-256:
@@ -40,3 +42,12 @@ rotation slots per item in retail, while the legacy lookup collapses rotations.
 Extracted Nintendo text, textures, and executable binaries are generated locally.
 Original code in this repository is MIT licensed; that does not grant rights to
 third-party material. Translation reuse requires a recorded source and review.
+
+The N64 decompilation's README explicitly excludes `lib/ultralib` and its other
+listed subrepositories from the root licence. The GBI/MBI headers used for native
+command compilation carry their own notices. Keep that distinction in source
+packages; the root CC0 declaration is not blanket permission for every dependency.
+The supplied legacy notes identify Zoinkity and invite script work, but the
+inspected distribution has no general licence file. Do not replace its notices
+with this project's MIT licence or treat that invitation as completed release
+review. The legacy archive and bundled executable utilities remain local.
