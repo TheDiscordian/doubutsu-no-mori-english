@@ -81,3 +81,27 @@ Their aligned combined growth is 4160 bytes. The existing submenu pool word
 `25CE3220` becomes `25CE4620`, reserving 5120 additional bytes. The ordinary heap
 ceiling remains `80400000`; the complete cartridge still requires an Expansion Pak.
 This is an explicit allocation change, not an increase to any saved text field.
+
+## Camera, cash, and idle clock
+
+The shared `gameplay_keep` bank at VROM `00A22000`, segment `04`, contains all
+three surfaces. `tools/hud_label_fix.py` modifies only this same-size asset after
+the title/editor correction. The camera's native IA8 64×16 load at offset `04A0`
+reads `08F8`. The English GC `cam_win_mojiT_model` at `.data:00880490` binds
+the genuinely tiled IA8 donor `cam_win_camera_tex` at `0087EE40`. Convert its
+storage, keep its complete pixels, and preserve native camera controls/geometry.
+
+The cash label uses native 96×16 I4 at `B4D0`, with a load at `B480` and quad
+at `B320`. GC `mny_win_mojiT_model` at `008972D0` binds the 64×16 I4
+`mny_win_money_tex` at `008966A0` and four vertices at `008971E0`. Install the
+complete English "Your Bells" image, zero the unused 256 bytes, compile the
+64×16 clamped load into the existing 56-byte command space, and copy donor
+XYZ/ST geometry while retaining native flags, vertex order, and colours. The
+blue bubble, amount display, cash rules, and saved data stay unchanged.
+
+The clock's six native display lists bind quads `29E0`, `2A20`, `2A60`, `2AA0`,
+`2AE0`, and `2B20` to AM/PM, hour tens/ones, colon, and minute tens/ones.
+Move AM/PM X by +36 and the five remaining quads by -15. The total horizontal
+extent remains 84..133; every other vertex component and all display commands
+remain unchanged. Native digit/AM-PM selection, colon blinking, timekeeping,
+date layout, allocation, and saved formats are not patched.
