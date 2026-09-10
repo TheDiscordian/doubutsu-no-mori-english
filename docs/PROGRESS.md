@@ -102,6 +102,10 @@ the historical interrupted/edge-only native runs distinct. The
 closes six further errors with sixteen passing checks. Early installer stages
 use current source-bound dependencies; separate checks retain the final readers,
 accented event actor, and payment safeguards. No playable build changes.
+The [date/fortune/glyph fixture follow-up](checkpoints/DATE_FORTUNE_GLYPH_FIXTURES.md)
+closes four further errors with six passing checks. Current module selection and
+an isolated date installation retain complete text, font capability, source,
+capacity, and transactional rejection checks. No playable ROM or save changes.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the

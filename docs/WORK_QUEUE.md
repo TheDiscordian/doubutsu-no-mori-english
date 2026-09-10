@@ -85,8 +85,12 @@ do not establish acceptance of every reported case. Next:
   closes six further errors with sixteen passing checks, using current early
   installer compositions and separate final-actor/reader verification. Preserve
   the accent adapter, payment safeguards, source checks, and completed batch.
-  Next relevant source/resource fixtures include leaflet dates and fortune
-  resources/strings; counter-only expectation maintenance remains deferred.
+  The [date/fortune/glyph follow-up](checkpoints/DATE_FORTUNE_GLYPH_FIXTURES.md)
+  closes four further errors with six passing checks. Preserve its current
+  module selections, independent date composition, complete English contents,
+  and required font capability; do not repeat the completed batch. Remaining
+  resource/provenance fixtures retain their unresolved status, and counter-only
+  expectation maintenance remains deferred.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

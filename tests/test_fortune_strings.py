@@ -21,6 +21,8 @@ from textvalidate import validate_entry
 from test_retail import ROM_PATH
 from fortune_smoke import seed_for, relocated
 
+CURRENT_MODULE = ROOT/'build/notice-seasonal-runtime'
+
 
 class FortuneSeedTests(unittest.TestCase):
     def test_all_native_random_pool_indices_without_extra_draws(self):
@@ -34,7 +36,7 @@ class FortuneSeedTests(unittest.TestCase):
 
 
 @unittest.skipUnless(ROM_PATH.is_file() and (ROOT/'build/gamecube/text/string.jsonl').is_file()
-                     and (ROOT/'build/runtime-module/module.json').is_file(),
+                     and (CURRENT_MODULE/'module.json').is_file(),
                      'Supplied retail inputs and compiled module remain local')
 class FortuneTests(unittest.TestCase):
     @classmethod
@@ -128,10 +130,10 @@ class FortuneTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory)/'edits.json'; path.write_text(json.dumps(edits))
             replacements = {}
-            additions, _ = add_runtime_module(self.rom, replacements, ROOT/'build/runtime-module')
+            additions, _ = add_runtime_module(self.rom, replacements, CURRENT_MODULE)
             before = deepcopy(replacements)
             count, relocations = apply_translations(self.rom, replacements, path,
-                runtime_module=ROOT/'build/runtime-module', module_additions=additions, english_fortunes=True)
+                runtime_module=CURRENT_MODULE, module_additions=additions, english_fortunes=True)
             self.assertEqual(count, 128)
             self.assertEqual(relocations, {0xD16000: STRING_RELOCATION[0]})
             entries = Bank('string', 0xD16000, 0xD18000,
@@ -146,7 +148,7 @@ class FortuneTests(unittest.TestCase):
             self.assertEqual(restored, before[CODE_VROM])
             with self.assertRaisesRegex(ValueError, 'entry budget'):
                 apply_translations(self.rom, deepcopy(before), path,
-                    runtime_module=ROOT/'build/runtime-module', module_additions=additions)
+                    runtime_module=CURRENT_MODULE, module_additions=additions)
             with self.assertRaisesRegex(ValueError, 'resident runtime'):
                 apply_translations(self.rom, {}, path, english_fortunes=True)
             # A different string cannot borrow this group's capacity.
@@ -154,7 +156,7 @@ class FortuneTests(unittest.TestCase):
                 'source_sha256':sha256(self.originals[1]), 'translation':'x'*16}]))
             with self.assertRaisesRegex(ValueError, 'entry budget'):
                 apply_translations(self.rom, deepcopy(before), path,
-                    runtime_module=ROOT/'build/runtime-module', module_additions=additions, english_fortunes=True)
+                    runtime_module=CURRENT_MODULE, module_additions=additions, english_fortunes=True)
 
 
 if __name__ == '__main__': unittest.main()

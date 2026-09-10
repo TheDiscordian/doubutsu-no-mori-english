@@ -23,6 +23,7 @@ from textvalidate import expanded_bound, layout_issues, validate_entry
 from test_retail import ROM_PATH
 
 IDS = {'message:'+n for n in '04D2 04FA 08A2 08A6 0A15 0E2A'.split()}
+CURRENT_MODULE = ROOT/'build/notice-seasonal-runtime'
 
 
 class GlyphImportTests(unittest.TestCase):
@@ -98,14 +99,14 @@ class GlyphImportTests(unittest.TestCase):
                      'Supplied game data stays local')
 class RetailGlyphImportTests(unittest.TestCase):
     @unittest.skipUnless((ROOT/'build/extended-font-cartridge/font.json').is_file()
-                         and (ROOT/'build/runtime-module/module.json').is_file(), 'Generated runtime stays local')
+                         and (CURRENT_MODULE/'module.json').is_file(), 'Generated runtime stays local')
     def test_builder_requires_verified_resource_even_if_edit_metadata_is_omitted(self):
         from build import apply_translations
         from font import make_halfwidth
         from english_runtime import make_english_runtime, ChoiceLayout
         rom=verified_rom(ROM_PATH.read_bytes())
         replacements,_=make_halfwidth(rom)
-        module_path=ROOT/'build/runtime-module';font_path=ROOT/'build/extended-font-cartridge'
+        module_path=CURRENT_MODULE;font_path=ROOT/'build/extended-font-cartridge'
         additions,module=add_runtime_module(rom,replacements,module_path)
         runtime,_=make_english_runtime(rom,replacements,ChoiceLayout(**module['choice_layout']))
         replacements.update(runtime)

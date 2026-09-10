@@ -24,6 +24,7 @@ from test_mail_format import CText
 
 ROM = ROOT/'local/rom/Doubutsu no Mori (Japan).z64'
 CATALOG = ROOT/'build/mail-catalog/catalog.bin'
+CURRENT_MODULE = ROOT/'build/notice-seasonal-runtime'
 
 
 class Choice(C.Structure):
@@ -81,7 +82,7 @@ class FortuneSlipSourceTests(unittest.TestCase):
             changed = dict(self.inventory);changed[id] = {**changed[id],'legacy':changed[id]['legacy']+' '}
             with self.assertRaises(ValueError): catalog_three(self.rom,CATALOG.read_bytes(),changed,self.info)
 
-    @unittest.skipUnless((ROOT/'build/runtime-module/module.json').is_file(),'Current native module required')
+    @unittest.skipUnless((CURRENT_MODULE/'module.json').is_file(),'Current native module required')
     def test_two_catalog_installation_is_explicit_guarded_and_transactional(self):
         from build_fortune_slips import build
         from mail_catalog import install
@@ -91,7 +92,7 @@ class FortuneSlipSourceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(prefix='af-fortune-install-') as temporary:
             out = Path(temporary)
             build(self.rom,original,original_report,self.inventory,self.references,out)
-            additions,module = add_runtime_module(self.rom,{},ROOT/'build/runtime-module')
+            additions,module = add_runtime_module(self.rom,{},CURRENT_MODULE)
             before = dict(additions)
             installed = dict(additions)
             report = install(self.rom,installed,module,out)
