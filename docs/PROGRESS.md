@@ -84,9 +84,10 @@ The [system-letter/glyph follow-up](checkpoints/SYSTEM_LETTER_FIXTURE_FOLLOWUP.m
 closes twelve further historical errors with 33 passing focused checks and six
 fresh source-built creator variants. The playable ROM and saves are unchanged.
 The [receipt/probe fixture follow-up](checkpoints/MAIL_RECEIPT_PROBE_FIXTURES.md)
-closes two further errors and the shared-word-profile assertion failure with
-14 passing focused checks. It adds a positive matching-profile check and a
-fresh generation-only test build, without changing the playable cartridge.
+closes four further errors and the word-profile/date-target assertion failures
+with 18 passing focused checks. It adds a positive matching-profile check,
+a fresh generation-only test build, and current date-installation fixtures,
+without changing the playable cartridge.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the

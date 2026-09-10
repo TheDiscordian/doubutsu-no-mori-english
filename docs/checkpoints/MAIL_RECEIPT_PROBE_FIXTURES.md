@@ -1,6 +1,6 @@
-# Receipt, generation, and shared-word fixture follow-up
+# Receipt, generation, shared-word, and date fixture follow-up
 
-Fourteen focused checks pass. This closes two errors and one assertion failure
+Eighteen focused checks pass. This closes four errors and two assertion failures
 from the retained [full regression](V1RC1_REGRESSION.md), without changing
 production validators, game code, translations, ROMs, or saved data.
 
@@ -29,6 +29,21 @@ bounds, synthetic jump relocation, unknown-target rejection, alignment, and
 memory limits. This closes its historical actual-artifact error. No production
 generation hook or enabled game feature changes.
 
+The date-inventory tests construct their two scoped cartridges in memory with
+`add_runtime_module`, `dialogue_dates.install`, and `leaflet_dates.install`.
+This replaces obsolete recovery/leaflet pilot fixtures whose unrelated mail
+creators fail current source guards. All four date tests pass, closing two
+historical errors and the masked unknown-target assertion failure. The original
+expected caller identities/counts and all rejection assertions remain intact.
+No production audit or installation guard changes.
+
+The base test composition intentionally has ten resident date calls and thirteen
+native calls. The leaflet composition has seventeen resident calls, two verified
+English hour-body calls, and four native calls. These are partial test-fixture
+expectations, not remaining-Japanese counts for RC4. The malformed month call
+must fail for its unexpected day-formatter target, and a changed hour body must
+fail despite retaining its original address. Both unmodified compositions pass.
+
 ## Build and test evidence
 
 Module digest:
@@ -51,13 +66,23 @@ Compiler: GCC 14.2.0, existing public image
 `ghcr.io/dragonminded/libdragon@sha256:b68e8dfd393f76ba69c1ba62da6b42dcda8b5b52eaa8fb96adc5aab7865a2d40`.
 The original fixture is preserved; reproduction uses a fresh output directory.
 
+The unchanged `build/leaflet-dates/hour.bin` has SHA-256
+`eeb382edeeda4fb8ab3f7c070118a40ae224ee647b5a36b17294c924bec3bfaf`;
+its manifest has SHA-256
+`d85b051dc59b58350f75c294cb8c438151e69cebdd0eccc02a16d5887e3bae23`.
+The full hour code/source checks pass during fixture construction. Older pilot
+ROMs remain preserved; these generated in-memory fixtures are not new playable
+RCs or replacements for ordinary date/calendar acceptance.
+
 ```sh
 PYTHONPATH=tools:tests python3 -m unittest test_shared_npc_words.SharedWordTests.test_shared_bank_rejects_mismatched_valid_creator_word_profile test_pelly_receipt -v
 PYTHONPATH=tools:tests python3 -m unittest test_mail_generate_probe -v
+PYTHONPATH=tools:tests python3 -m unittest test_date_caller_audit -v
 ```
 
 The first command passes eight checks in 9.388 seconds; the second passes six
-in 0.006 seconds. These are host/build checks, not fresh native receipt/delivery
-execution or hardware validation. Other generation variants, postal/museum/
+in 0.006 seconds; the third passes four in 15.225 seconds. These are host/build
+checks, not fresh native receipt/delivery/date execution or hardware validation.
+Other generation variants, postal/museum/
 actor fixtures, and counter-only failures remain separate work. The complete
 historical suite is neither rerun nor declared passed.

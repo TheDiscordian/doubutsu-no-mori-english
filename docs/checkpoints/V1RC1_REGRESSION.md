@@ -66,8 +66,10 @@ twelve further errors: five class setups and all seven glyph-installation cases.
 All 33 selected checks pass with current resources and unchanged production
 guards. The complete historical suite and unrelated failures remain unpassed.
 
-The [receipt/probe follow-up](MAIL_RECEIPT_PROBE_FIXTURES.md) closes two further
-errors and the shared-word-profile assertion failure with 14 passing checks.
+The [receipt/probe follow-up](MAIL_RECEIPT_PROBE_FIXTURES.md) closes four further
+errors and the word-profile/date-target assertion failures with 18 passing checks.
 The profile case moves to the current construction fixture and additionally
 proves that the matching profile passes. Production guards, ROMs, and saved data
 remain unchanged; other failures are not passed by association.
+The date cases use actual guarded installers to construct their partial test
+compositions; original caller identities/counts and negative assertions remain.

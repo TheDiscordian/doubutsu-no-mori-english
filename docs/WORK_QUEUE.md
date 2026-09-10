@@ -68,9 +68,10 @@ do not establish acceptance of every reported case. Next:
   do not repeat this completed batch. Later letter/probe/actor fixtures and the
   native-species accounting test retain their separately recorded unresolved status.
   The [receipt/probe follow-up](checkpoints/MAIL_RECEIPT_PROBE_FIXTURES.md) closes
-  two further errors and the native-species word-profile failure with 14 passing
-  checks. Its positive matching-profile assertion and fresh generation fixture
-  retain all source guards. Do not repeat these completed checks for unchanged
+  four further errors and the word-profile/date-target failures with 18 passing
+  checks. Its positive matching-profile assertion, fresh generation fixture,
+  and current date compositions retain all source guards and expected callers.
+  Do not repeat these completed checks for unchanged
   code or infer that other generation variants are repaired.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture

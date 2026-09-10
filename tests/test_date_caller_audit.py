@@ -1,6 +1,5 @@
 """Date caller inventories distinguish real installed targets from intentions."""
 
-import json
 from pathlib import Path
 import struct
 import sys
@@ -10,6 +9,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 from aflib import by_vrom, replace_dma
 from audit_date_callers import call_target, inventory
+from dialogue_dates import install as install_dialogue_dates
+from leaflet_dates import install as install_leaflet_dates
+from runtime_module import add_runtime_module
+
+NATIVE = ROOT/'local/rom/Doubutsu no Mori (Japan).z64'
+MODULE = ROOT/'build/notice-seasonal-runtime'
+HOUR_FIXTURE = ROOT/'build/leaflet-dates'
 
 
 class DateCallTargetTests(unittest.TestCase):
@@ -21,14 +27,19 @@ class DateCallTargetTests(unittest.TestCase):
                 call_target(word)
 
 
-@unittest.skipUnless((ROOT/'build/fortune-recovery-pilot/build.json').is_file(),
-                     'Installed recovery cartridge required')
+@unittest.skipUnless(NATIVE.is_file() and (MODULE/'module.json').is_file(),
+                     'Native ROM and current resident-module fixture required')
 class DateCallerAuditTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        cls.installed = (ROOT/'build/fortune-recovery-pilot/animal-forest-halfwidth.z64').read_bytes()
-        cls.build = json.loads((ROOT/'build/fortune-recovery-pilot/build.json').read_text())
+        cls.native = NATIVE.read_bytes()
+        cls.replacements = {}
+        cls.additions, cls.module = add_runtime_module(cls.native, cls.replacements, MODULE)
+        install_dialogue_dates(cls.native, cls.replacements, cls.additions, cls.module)
+        # Construct the scoped date fixture with the real guarded installers.
+        # Unrelated historical mail creators must not mask date-target failures.
+        cls.installed = replace_dma(cls.native, cls.replacements, additions=cls.additions)
+        cls.build = {'runtime_module': cls.module}
 
     def test_current_direct_calls_are_classified_from_installed_instructions(self):
         result = inventory(self.native, self.installed, self.build)
@@ -50,14 +61,16 @@ class DateCallerAuditTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Unrecognised installed date target'):
             inventory(self.native, replace_dma(self.installed, {0x84D180: bytes(changed)}), self.build)
 
-    @unittest.skipUnless((ROOT/'build/leaflet-dates-pilot/build.json').is_file(),
-                         'Installed full leaflet date fixture required')
+    @unittest.skipUnless((HOUR_FIXTURE/'hour.json').is_file(),
+                         'Compiled English leaflet-hour fixture required')
     def test_same_address_hour_body_is_counted_only_when_its_complete_english_code_is_verified(self):
         from aflib import CODE_RAM,CODE_VROM
         from leaflet_dates import HOUR
-        directory = ROOT/'build/leaflet-dates-pilot'
-        rom = (directory/'animal-forest-halfwidth.z64').read_bytes()
-        build = json.loads((directory/'build.json').read_text())
+        replacements = dict(self.replacements)
+        report = install_leaflet_dates(self.native, replacements, self.additions, {},
+                                       self.module, HOUR_FIXTURE)
+        rom = replace_dma(self.native, replacements, additions=self.additions)
+        build = {**self.build, 'leaflet_dates': report}
         result = inventory(self.native,rom,build)
         self.assertEqual(result['states'], {'resident_formatter_installed':17,
                          'english_leaflet_formatter_installed':2,'native_formatter_remaining':4})
