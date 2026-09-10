@@ -15,30 +15,26 @@ from fortune_actor import (RAM,VROM,RELOCATION,NEW_VROM,NEW_RELOCATION,METADATA,
                            validate,metadata,verify_installation,install,elf_inventory,
                            RECOVERY_CODE_GUARDS,verify_recovery_code)
 from npc_mail_show import relocate_verified_data
+from current_letter_actor_fixture import current_actor_fixture
 
 
-@unittest.skipUnless((ROOT/'build/fortune-recovery-pilot/build.json').is_file(),
-                     'Compiled installed Miko actor fixture required')
+@unittest.skipUnless((ROOT/'build/v0-hardware-fixes-02/build.json').is_file()
+                     and (ROOT/'build/shop-notice-fortune/overlay.json').is_file(),
+                     'Current combined cartridge and Miko actor required')
 class FortuneActorInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        cls.rom = (ROOT/'build/fortune-recovery-pilot/animal-forest-halfwidth.z64').read_bytes()
-        cls.build = json.loads((ROOT/'build/fortune-recovery-pilot/build.json').read_text())
-        cls.module = cls.build['runtime_module']
-        cls.directory = ROOT/'build/fortune-recovery-actor'
-        cls.data = (cls.directory/'overlay.bin').read_bytes()
-        cls.reloc = (cls.directory/'relocation.bin').read_bytes()
-        cls.report = json.loads((cls.directory/'overlay.json').read_text())
-        # Reconstruct the preceding configured cartridge's replacement maps.
-        baseline = ROOT/'build/fortune-slip-foundation-pilot'
-        cls.previous = (baseline/'animal-forest-halfwidth.z64').read_bytes()
-        previous_report = json.loads((baseline/'build.json').read_text())
-        files = by_vrom(cls.previous)
-        cls.moved = {int(k,16):int(v,16) for k,v in previous_report['vrom_relocations'].items()}
-        cls.replacements = {int(k,16):files[cls.moved.get(int(k,16),int(k,16))].extract(cls.previous)
-                            for k in previous_report['replacement_files']}
-        cls.additions = {int(k,16):files[int(k,16)].extract(cls.previous) for k in previous_report['added_files']}
+        cls.fixture = f = current_actor_fixture(ROOT,'fortune')
+        cls.native,cls.rom,cls.build,cls.module = f.native,f.rom,f.build,f.module
+        cls.directory,cls.data,cls.reloc,cls.report = f.directory,f.data,f.reloc,f.report
+        cls.replacements,cls.additions,cls.moved = f.replacements,f.additions,f.moved
+
+    def test_actual_combined_actor_retains_payment_recovery_and_pool_bounds(self):
+        f = self.fixture
+        spec = verify_installation(f.current,f.native,f.current_build['fortune_actor']['overlay'],f.module)
+        self.assertEqual(spec.sections,(6944,0,1104,0,77))
+        self.assertEqual(spec.resident_bytes,8048)
+        self.assertNotEqual(f.current,f.rom)  # In-memory early-reader fixture only.
 
     def test_installed_actor_retains_dma_adjacency_and_native_pool_bounds(self):
         spec = verify_installation(self.rom,self.native,self.report,self.module)
@@ -123,6 +119,7 @@ class FortuneActorInstallationTests(unittest.TestCase):
         self.assertEqual(replacements[VROM],self.data);self.assertEqual(replacements[RELOCATION],self.reloc)
         changed = [v for v in replacements if replacements[v] != self.replacements.get(v)]
         self.assertEqual(set(changed),{CODE_VROM,VROM,RELOCATION})
+        self.assertEqual(replace_dma(self.native,replacements,moved,additions),self.rom)
         for mutation in ('catalog','reader','occupied','native_metadata','payment_helper','module'):
             replacements,additions,moved = dict(self.replacements),dict(self.additions),dict(self.moved)
             module = deepcopy(self.module)

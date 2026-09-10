@@ -14,26 +14,26 @@ from renewal_actor import (RAM,VROM,RELOCATION,NEW_VROM,NEW_RELOCATION,METADATA,
                            native_sources,validate,verify_installation,install,elf_inventory,load,
                            CODE_GUARDS,verify_code)
 from npc_mail_show import relocate_verified_data
+from current_letter_actor_fixture import current_actor_fixture
 
 
-@unittest.skipUnless((ROOT/'build/renewal-actor-pilot/build.json').is_file(),
-                     'Compiled installed renewal actor fixture required')
+@unittest.skipUnless((ROOT/'build/v0-hardware-fixes-02/build.json').is_file()
+                     and (ROOT/'build/shop-notice-renewal/overlay.json').is_file(),
+                     'Current combined cartridge and renewal actor required')
 class RenewalActorInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        pilot = ROOT/'build/renewal-actor-pilot'
-        cls.rom = (pilot/'animal-forest-halfwidth.z64').read_bytes()
-        cls.build = json.loads((pilot/'build.json').read_text());cls.module = cls.build['runtime_module']
-        cls.directory = ROOT/'build/renewal-actor'
-        cls.data,cls.reloc,cls.report,cls.creator_code = load(cls.directory)
-        previous = ROOT/'build/leaflet-dates-pilot'
-        cls.previous = (previous/'animal-forest-halfwidth.z64').read_bytes()
-        report = json.loads((previous/'build.json').read_text());files = by_vrom(cls.previous)
-        cls.moved = {int(k,16):int(v,16) for k,v in report['vrom_relocations'].items()}
-        cls.replacements = {int(k,16):files[cls.moved.get(int(k,16),int(k,16))].extract(cls.previous)
-                            for k in report['replacement_files']}
-        cls.additions = {int(k,16):files[int(k,16)].extract(cls.previous) for k in report['added_files']}
+        cls.fixture = f = current_actor_fixture(ROOT,'renewal')
+        cls.native,cls.rom,cls.build,cls.module = f.native,f.rom,f.build,f.module
+        cls.directory,cls.data,cls.reloc,cls.report = f.directory,f.data,f.reloc,f.report
+        cls.creator_code = f.creator
+        cls.replacements,cls.additions,cls.moved = f.replacements,f.additions,f.moved
+
+    def test_actual_combined_actor_retains_final_readers_and_ownership(self):
+        f = self.fixture
+        spec = verify_installation(f.current,f.native,f.current_build['renewal_actor']['overlay'],f.module,f.creator)
+        self.assertEqual(spec.sections,(7488,0,0,0,44))
+        self.assertNotEqual(f.current,f.rom)  # In-memory early-reader fixture only.
 
     def validate(self,data=None,reloc=None,report=None):
         return validate(self.native,self.data if data is None else data,self.reloc if reloc is None else reloc,

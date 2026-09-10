@@ -13,26 +13,27 @@ from aflib import CODE_RAM,CODE_VROM,by_vrom,replace_dma,sha256
 from event_actor import (RAM,VROM,RELOCATION,NEW_VROM,NEW_RELOCATION,METADATA,PREFIX_BYTES,
                          CALLS,POINTERS,GATE,validate,verify_installation,install,elf_inventory,load)
 from npc_mail_show import relocate_verified_data
+from current_letter_actor_fixture import current_actor_fixture
 
 
-@unittest.skipUnless((ROOT/'build/event-actor-pilot/build.json').is_file(),
-                     'Installed event actor artifact required')
+@unittest.skipUnless((ROOT/'build/v0-hardware-fixes-02/build.json').is_file()
+                     and (ROOT/'build/shop-notice-event/overlay.json').is_file(),
+                     'Current combined cartridge and event actor required')
 class EventActorInstallationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        pilot = ROOT/'build/event-actor-pilot'
-        cls.rom = (pilot/'animal-forest-halfwidth.z64').read_bytes()
-        cls.build = json.loads((pilot/'build.json').read_text());cls.module = cls.build['runtime_module']
-        cls.directory = ROOT/'build/event-actor'
-        cls.data,cls.reloc,cls.report,cls.creator = load(cls.directory)
-        prior = ROOT/'build/renewal-actor-pilot'
-        cls.previous = (prior/'animal-forest-halfwidth.z64').read_bytes()
-        report = json.loads((prior/'build.json').read_text());files = by_vrom(cls.previous)
-        cls.moved = {int(k,16):int(v,16) for k,v in report['vrom_relocations'].items()}
-        cls.replacements = {int(k,16):files[cls.moved.get(int(k,16),int(k,16))].extract(cls.previous)
-                            for k in report['replacement_files']}
-        cls.additions = {int(k,16):files[int(k,16)].extract(cls.previous) for k in report['added_files']}
+        cls.fixture = f = current_actor_fixture(ROOT,'event')
+        cls.native,cls.rom,cls.build,cls.module = f.native,f.rom,f.build,f.module
+        cls.directory,cls.data,cls.reloc,cls.report = f.directory,f.data,f.reloc,f.report
+        cls.creator = f.creator
+        cls.replacements,cls.additions,cls.moved = f.replacements,f.additions,f.moved
+
+    def test_actual_combined_actor_keeps_final_accent_adapter(self):
+        f = self.fixture
+        spec = verify_installation(f.current,f.native,f.current_build['event_actor']['overlay'],f.module,f.creator)
+        self.assertEqual(spec.sections,(38128,0,0,0,433))
+        self.assertIn('accent_mail',f.current_build['event_actor']['overlay'])
+        self.assertNotEqual(f.current,f.rom)  # Early-reader/pre-accent fixture only.
 
     def validate(self,data=None,reloc=None,report=None):
         return validate(self.native,self.data if data is None else data,self.reloc if reloc is None else reloc,

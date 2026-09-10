@@ -80,10 +80,13 @@ do not establish acceptance of every reported case. Next:
   remain deferred. The [Snowman follow-up](checkpoints/SNOWMAN_FIXTURE_FOLLOWUP.md)
   closes five more errors with eleven passing checks and preserves the failed
   first native run separately from its corrected edge-only resume. Do not repeat
-  either completed group. Next relevant failures include renewal/event/Miko
-  fixtures. The installed renovation and accented event actors verify; their
-  early installer tests need explicitly pre-later-reader compositions, not
-  weaker reader guards or the unextended event report against the final actor.
+  either completed group. The
+  [renovation/event/fortune follow-up](checkpoints/LETTER_ACTOR_FIXTURE_FOLLOWUP.md)
+  closes six further errors with sixteen passing checks, using current early
+  installer compositions and separate final-actor/reader verification. Preserve
+  the accent adapter, payment safeguards, source checks, and completed batch.
+  Next relevant source/resource fixtures include leaflet dates and fortune
+  resources/strings; counter-only expectation maintenance remains deferred.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.
