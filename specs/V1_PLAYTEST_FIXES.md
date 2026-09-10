@@ -50,3 +50,34 @@ field capacities; do not enlarge the 96-byte mail/notice body merely by doubling
 columns. Preserve letter header/body/footer selection, recipient identities,
 confirmation, publication, and saved formats. Names and gyroid/apology editors
 already have separate adapters and must not be accidentally replaced.
+
+`overlays/editor_pixels/` shares the resident `af_mail_next_line` scanner between
+byte-indexed cursor positions, native insertion-fit checks, vertical navigation,
+and caller-window drawing. The native sixteen-column/six-row allocation remains
+96 bytes; only these two multiline modes use the new layout. One-row inputs and
+the 32-by-four gyroid adapter retain their existing cursor routes. A terminal
+newline or exactly full last line keeps the native final-row boundary convention.
+
+The shared editor replaces entries `80885AEC` (position), `80885F6C` (up), and
+`80885FCC` (down). Each has an inspected two-instruction trampoline for other
+input modes. Native insertion, deletion, capacity multiplication, field selection,
+confirmation, and save writers stay unchanged. The mail draft body/footer entries
+`80889A9C/808899E4` call the existing proportional classic reader functions; the
+outer snapshot/read hooks keep their original callers and return-address contract.
+The letter cursor call at `8088A114` corrects only body/footer geometry before
+delegating to the existing recipient-aware adapter. The notice draft body entry
+`8089542C` and caret call `80895850` share the same pixel layout.
+
+The grid-input wrapper recognises native header/body/footer pointer changes only
+when the active mail field and actual editor pointer agree. Grid ownership cannot
+remain tied to the initial body address after native field selection. Keyboard
+movement and page/case/order changes call native sound `0032`, the original page
+selection feedback ID. Successful typing/deleting/Done/caret feedback remains
+owned by the native processed-command handler. Tests do not play audible sound.
+
+The three overlays retain their VROM slots and relocation neighbours. All existing
+prefix words outside explicit hooks are preserved at both tested relocation bases.
+Their aligned combined growth is 4160 bytes. The existing submenu pool word
+`25CE3220` becomes `25CE4620`, reserving 5120 additional bytes. The ordinary heap
+ceiling remains `80400000`; the complete cartridge still requires an Expansion Pak.
+This is an explicit allocation change, not an increase to any saved text field.

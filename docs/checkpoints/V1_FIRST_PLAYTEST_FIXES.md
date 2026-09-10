@@ -71,3 +71,47 @@ the native 96-byte body storage, header/body/footer selection, manual newlines,
 confirmation, and publication. Do not simply double the saved column count or
 halve only the cursor constant. Names, gyroid drafts, and apology input retain
 their separate existing adapters. See the [fix contract](../../specs/V1_PLAYTEST_FIXES.md).
+
+## Pixel-editor candidate
+
+`tools/editor_pixel_fix.py` builds
+`build/v1-editor-pixel-fix-03/animal-forest-title-preview.z64` on the corrected
+title ROM. ROM SHA-256:
+`7c43f742009e391cae42bdf410f239f8a9c3aaf58003fd4f27371561109313ad`.
+UPS SHA-256:
+`3d683fddb0189b999ef6035688d9e9c2e942ea1cbe179d569c39ecf363b000b3`.
+The complete images grow by 4160 aligned bytes across the shared editor,
+letter window, and notice window. The shared pool reserves 5120 extra bytes.
+All previous text/artwork resources, physical boot code, DMA identities, and
+saved capacities are retained.
+
+Four tests pass in 3.062 seconds under `test_editor_pixels.py`. The host bridge
+runs with address/undefined-behaviour sanitizers and checks field switching,
+96-byte insertion bounds, manual blank lines, pixel-based vertical movement,
+body/footer caret alignment, and silent sound-call accounting. An independent
+per-glyph check uses the actual installed width table. ROM checks verify both
+relocation bases, every untouched resource, pool instruction arithmetic, and UPS
+reconstruction. Resizing requires explicit resource ownership and rejects VROM
+overlap. No original save is edited.
+
+The first compilation attempt rejects an unconfigured resident-module report;
+the builder uses the complete cartridge's configured report. The next attempt
+rejects an obsolete pool predecessor; the current embedded-menu-text reservation
+is retained before adding the new allowance. Neither failed attempt writes a
+candidate cartridge. The three successful images and their source/relocation/
+stack records are in the candidate's `editor/`, `letter/`, and `notice/` folders.
+
+Native checking uses the real loader and editing functions in disposable owned
+RAM. The first attempt requests its fixture allocation at the title, receives a
+clean null allocation, and stops before testing editor code. The single setup
+retry enters the game before taking its checkpoint and passes: 16 native calls,
+45 assertions, all three complete cartridge loads/relocations, actual native
+insertion at 31/95/96-byte boundaries, pixel-position queries and vertical
+movement, native body-to-header selection, refreshed grid ownership, and actual
+mail/notice font drawing into bounded command buffers. All allocation/stack/
+resident guards and the complete live save remain unchanged. The fixture frees
+its allocation, restores its checkpoint, resumes, and shuts down gracefully.
+Evidence is `build/v1-editor-pixel-native-02/results.json` (135 records).
+No code is uploaded and no audio is played. This is controlled native execution,
+not an original-hardware recheck. Remaining labels/background work continues
+without replaying the passing setup.

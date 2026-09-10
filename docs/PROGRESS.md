@@ -15,6 +15,15 @@ the donor's incorrectly converted pixel storage without code/allocation changes;
 three focused source/retention/patch tests pass. The remaining playtest findings
 stay open, and this is not yet the combined fix handoff.
 
+The next [editor correction](checkpoints/V1_FIRST_PLAYTEST_FIXES.md) is built at
+`build/v1-editor-pixel-fix-03/animal-forest-title-preview.z64`. It retains that
+title correction and aligns draft wrapping, caret, and vertical navigation with
+the English read layout. Four focused sanitizer/font/ROM checks pass, along with
+16 native calls and 45 assertions with intact guards and restored checkpoint.
+Original-hardware rechecking remains; Japanese labels and the keyboard
+background are still open. This is an intermediate candidate, not a completed
+playtest-fix package.
+
 The supplied private artwork playtest is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.

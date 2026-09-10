@@ -12,14 +12,14 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 | ID | Finding | Status |
 | --- | --- | --- |
 | V1-01 | Press Start shows corrupt graphics on first boot and return | Corrected linear source tiles installed in fix build 01; hardware recheck pending |
-| V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Pending native sound integration and source-backed background |
+| V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Native navigation/page sound call restored in pixel-editor candidate; background and audible hardware check pending |
 | V1-03 | Bulletin-board dates retain unwanted slash graphics | Pending binding of date artwork and draw commands |
 | V1-04 | House camera-control hint is Japanese | Pending native reader/image binding |
 | V1-05 | Idle clock shows `am 11:36`, not `11:36 am` | Pending layout correction |
 | V1-06 | Town-tune notes are Japanese and OK is too far right | Pending note labels and control placement |
 | V1-07 | Opening a letter for editing shows a Japanese bubble | Pending prompt binding |
 | V1-08 | Letter recipient list shows `らっきょ`, expected Limberg | Pending recipient reader and existing-save name handling |
-| V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Investigating shared layout versus caller-window rendering |
+| V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Pixel-layout candidate built; four host/ROM checks and 16 native calls/45 assertions pass; hardware recheck pending |
 | V1-10 | Letter To/From text remains Japanese | Pending label/reader binding |
 | V1-11 | Nook shop's blue cash bubble still says `もってるおかね` | Pending label/reader binding |
 

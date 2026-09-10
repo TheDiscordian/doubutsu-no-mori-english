@@ -1170,6 +1170,12 @@ def main():
                     raise ValueError('Apology input probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_apology_input'],record))
+            if 'test_editor_pixels' in action:
+                from editor_pixels_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Pixel-editor checks require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_editor_pixels'], record))
             if 'test_fortunes' in action:
                 from fortune_smoke import exercise
                 if not (out/'test.bs1').is_file():

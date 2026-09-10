@@ -26,7 +26,7 @@ def source_tiles(rel, symbols):
     return tiles
 
 
-def reconstruct(native, base, changes):
+def reconstruct(native, base, changes, *, resized=()):
     """Repack from the original without doubling an already padded cartridge."""
     verified_rom(native)
     originals, files = by_vrom(native), by_vrom(base)
@@ -37,9 +37,15 @@ def reconstruct(native, base, changes):
         raise ValueError('Missing or duplicate native DMA identity')
     if not changes or not set(changes) <= set(files):
         raise ValueError('Missing or unknown fix resource')
+    if not set(resized) <= set(changes):
+        raise ValueError('Missing explicitly resized resource')
+    ordered = sorted(files)
     for address, data in changes.items():
-        if address in (0x1060, 0x19D40) or len(data) != files[address].size:
+        if address in (0x1060, 0x19D40) or (len(data) != files[address].size and address not in resized):
             raise ValueError('Fix changes boot data or an owned allocation')
+        following = ordered.index(address)+1
+        if following < len(ordered) and address+len(data) > ordered[following]:
+            raise ValueError('Fix overlaps the next owned VROM range')
     for vrom, old in originals.items():
         entry = by_index[old.index]
         data = changes.get(entry.vstart, entry.extract(base))
@@ -71,7 +77,8 @@ def reconstruct(native, base, changes):
         actual, expected = after.extract(image), changes.get(vrom, before.extract(base))
         if vrom == 0x19D40:
             actual, expected = actual[:16], expected[:16]
-        if before.index != after.index or before.size != after.size or actual != expected:
+        if (before.index != after.index or (vrom != 0x19D40 and after.size != len(expected))
+                or actual != expected):
             raise ValueError(f'Fix loses unrelated resource {vrom:08X}')
     if image[boot.pstart:boot.pstart+boot.size] != boot_data:
         raise ValueError('Fix changes physical startup code')
