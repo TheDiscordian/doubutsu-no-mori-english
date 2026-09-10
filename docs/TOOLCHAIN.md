@@ -61,8 +61,10 @@ recipes and packages record that actual canonical JSON hash separately.
 See [the compatibility contract](../specs/PORTABLE_TOOLCHAIN.md).
 
 The setup check, focused compatibility tests, and complete 87-stage source-to-v1
-execution with the public image pass. The final ROM and UPS match the supplied
-playtest exactly. [The compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md)
+execution with the public image pass for package `03`. The complete current
+27-stage post-v0 recipe also passes with this image, matching package `04` exactly;
+see the [current rebuild evidence](checkpoints/V1_REBUILD.md).
+[The compiler checkpoint](checkpoints/PORTABLE_TOOLCHAIN.md)
 records clean source revisions, actual report hashes, and verification limits.
 
 ## Upstream sources and terms

@@ -3,8 +3,8 @@
 ## Builds
 
 The supplied private artwork playtest is
-`build/releases/v1-artwork-playtest-03.zip`, with local ROM
-`build/title-stall-combined-01/animal-forest-title-preview.z64`.
+`build/releases/v1-artwork-playtest-04.zip`, with local ROM
+`build/title-shop-interior-combined-01/animal-forest-title-preview.z64`.
 It requires an Expansion Pak. Its patcher/reconstruction tests pass, and the
 [package checkpoint](checkpoints/V1_PLAYTEST_PACKAGE.md) records hashes,
 source revisions, contents, and limitations. It is not a public release or
@@ -20,25 +20,34 @@ restored checkpoint. The visible surfaces are inspected; the stall preview's
 lowest edge is clipped by its framing. Ordinary
 stall appearance, lighting, both placements, and event acceptance remain.
 
+The [shop-interior batch](checkpoints/SHOP_INTERIOR_ARTWORK.md) installs seven
+exact GC English sign textures across the ordinary, raffle-day, and upstairs
+Nookington rooms. Five focused checks, title combination, and the full counter
+pass. Every unrelated resource, native room vertex, drawing command, saved
+layout, and shop rule remains unchanged. Ordinary room appearance remains
+playtest work; the tiny original information-notice wording remains an explicit
+transcription gap, not an uninstalled English image.
+
 The corrected four-MiB v0 remains at
 `build/v0-hardware-fixes-02/animal-forest-halfwidth.z64`. Both complete Nook
 conversation fixes and the Shrine wording are retained in every current build.
 See [the hardware-bug checkpoint](checkpoints/V0_HARDWARE_BUGS.md).
 Existing ROMs, packages, and the user's saves remain untouched.
 
-The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 26 artwork,
+The [post-v0 rebuild command](checkpoints/V1_REBUILD.md) recreates all 27 artwork,
 screen, keyboard, and title stages without retained intermediate artwork ROMs
-or precompiled overlay directories. Its final ROM/UPS/report match package `03`.
+or precompiled overlay directories. The complete 27-stage public-image execution
+passes and matches package `04`'s ROM/UPS and approved title-report profile.
 The [isolated base recipe](checkpoints/V0_REBUILD.md) also passes all sixty-one
 stages from an empty build directory, regenerating corrected v0 from clean source
 checkouts and the three supplied inputs. Its final ROM/UPS/report exactly match
 corrected v0.
-The complete source-to-v1 run also passes all twenty-six post-v0 stages inside
-that clean checkout, matching the supplied v1 ROM/UPS/report. See the
+The retained complete source-to-v1 run passes all twenty-six package-`03` stages
+inside that clean checkout. See the
 [combined rebuild evidence](checkpoints/V1_REBUILD.md).
 
 The [published compiler setup and complete clean rebuild](checkpoints/PORTABLE_TOOLCHAIN.md)
-also pass all 87 stages with exact final ROM/UPS matches. Build reports retain
+also pass all 87 package-`03` stages with exact final ROM/UPS matches. Build reports retain
 the actual public image identity; separate comparison fingerprints preserve
 compatibility with the older approvals. Building no longer depends on the local
 development Docker image. Source inputs remain local and separately licensed.

@@ -15,7 +15,8 @@
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked artwork
-   batches. Package `03` includes the shared-stall candidate. Preserve
+   batches. Package `04` includes the shared-stall candidate and seven English
+   Nookington interior signs. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.
 4. Address concrete human playtest bugs immediately, prioritising crashes,
@@ -26,6 +27,9 @@
    Preserve native cultural structures and GC source intent. The scoped neutral
    prop inventory is not a claim that every image in the game is reviewed.
    Obtain reliable tiny-label transcriptions before assigning character weight.
+   The two original interior information notices share this transcription limit;
+   their complete English GC textures are already installed. Do not reopen the
+   completed seven-sign batch or rerun its unchanged rendering checks.
 
 ## Human playthrough and polish
 
@@ -58,7 +62,7 @@ not be replayed unchanged.
 - Preserve the verified [portable compiler setup](checkpoints/PORTABLE_TOOLCHAIN.md).
   The complete public-image rebuild passes. The
   [61-stage clean base recipe](checkpoints/V0_REBUILD.md) and
-  [26-stage post-v0 recipe](checkpoints/V1_REBUILD.md) eliminate retained generated
+  [27-stage post-v0 recipe](checkpoints/V1_REBUILD.md) eliminate retained generated
   resource, compiled-overlay, and translation-ROM dependencies. Do not repeat
   those complete builds for unchanged code or documentation-only edits.
 - Obtain release approval and record human/hardware acceptance. Private playtest

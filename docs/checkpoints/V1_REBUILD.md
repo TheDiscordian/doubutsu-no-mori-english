@@ -9,7 +9,42 @@ keyboard and exact approved cartridge/UPS/title-report comparison identities.
 
 The [public-compiler checkpoint](PORTABLE_TOOLCHAIN.md) records a complete passing
 source-to-v1 run with the published image, identical final ROM/UPS, and actual
-new report provenance. The legacy-image executions below remain separate evidence.
+new report provenance for package `03`. The legacy-image executions below remain
+separate evidence.
+
+## Current package 04: twenty-seven stages
+
+`build/v1-rebuilt-03` passes all 27 stages using the published compiler, with
+source revision `998d6738fee40ac3bbc6f04bf30b4411e8ffac85`, no modified build
+sources, and 808 source-file hashes. Stage work takes 140.781 seconds. The new
+shop-interior step is stage 26; the unchanged title follows at stage 27.
+Every resource and overlay is recreated from corrected v0 and the source inputs,
+without old artwork ROMs or compiled overlay directories. The unchanged 61-stage
+base is not rebuilt again for this data-only change; its complete clean-source
+evidence remains separate.
+
+The final ROM/UPS match package `04` exactly:
+
+- ROM: `d7fbbffc85eb7c311f980c3945cf035de136b130d9fee6214ad096d60b8c8585`.
+- UPS: `4dca9b30625ea76350dcc3198835ad9d7b6d226cda77bc0828519fa630e5a31b`.
+- Actual canonical title report: `6a4a0c374bb065d8de6b94dd0c197cf3f8eaa39fa70941624b42b3e8448e8ee9`.
+- Reviewed comparison profile: `79b6ee72a933a52a72b918f9c6099ece453b04babe0a2e6d7e9ba81d6017b029`.
+
+Recipe SHA-256 is `7608ae76328cde78f3f2558839841cdd9576cc8021de37478292f88ab30c65e7`.
+The output's `inputs.json` SHA-256 is
+`b25ed82e9f1c9379b608a22da9bd8aadeda61c228c59ec126a7b9d8a676e7570`;
+`rebuild.json` SHA-256 is
+`800ce7e7cbdc7231b73753394a52e473e1dc725bca0089d82b60982d22d6005f`.
+The stored, non-canonical `final/preview.json` SHA-256 is
+`59a34f5e12d932bc391b8d8b24f515f4289225bce5f3866674d562be20d3ae9e`.
+
+All seven recipe tests pass in 0.336 seconds, including the historical package-03
+record and the fresh complete package-04 execution. The installed shop-interior
+counter verifies all seven signs in the rebuilt final title ROM; its four
+transcribed records retain 53 applied source characters. The public-image report
+also passes the private packager's exact approval and patch reconstruction.
+No new archive is generated from that in-memory compatibility check. The supplied
+archive remains the separately tested package-04 artifact.
 
 ## Complete clean-source pipeline
 

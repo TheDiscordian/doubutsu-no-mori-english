@@ -1,5 +1,17 @@
 # Remaining artwork
 
+## Nookington interior signs
+
+The [seven-sign batch](checkpoints/SHOP_INTERIOR_ARTWORK.md) installs the matching
+GC second-floor, information, welcome/hours, clearance-sale, raffle-day, and
+thank-you images in three native room resources. It preserves room vertices,
+UVs, lighting, commands, allocations, shop rules, and saves. Source/pixel,
+retention, title-combination, patch, and counter checks pass. Ordinary room
+appearance remains unverified. The two tiny original information notices lack
+reliable complete transcriptions; their English images are installed, but no
+character weight is invented for that wording. Other shop/interior textures
+are not declared reviewed by this focused batch.
+
 ## Festival stall
 
 The [shared GC-style candidate](checkpoints/STALL_ARTWORK.md) replaces the native

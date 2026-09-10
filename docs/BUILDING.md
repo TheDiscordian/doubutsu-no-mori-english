@@ -46,10 +46,13 @@ directories. No gameplay scenarios run, and no old artifact or user save changes
 
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
-[complete pipeline record](checkpoints/V1_REBUILD.md) also verifies all twenty-six
-v1 stages from that freshly generated base, matching the supplied playtest. The
+[complete pipeline record](checkpoints/V1_REBUILD.md) verifies the 27-stage current
+v1 build from corrected v0. The separately retained clean-source run verifies
+all twenty-six package-`03` v1 stages from its freshly generated base. The
 [complete public-image execution](checkpoints/PORTABLE_TOOLCHAIN.md) passes all
-87 stages with the same ROM/UPS and actual public-compiler report provenance.
+87 package-`03` stages with matching ROM/UPS and actual public-compiler provenance.
+The current extra shop-interior stage and following title also pass the complete
+27-stage post-v0 run; the unchanged 61-stage base is not rerun for that image change.
 The pinned image and source checkouts remain setup prerequisites, not permission
 to distribute inputs.
 
@@ -59,13 +62,13 @@ continues it only after checking inputs, sources, commands, and completed output
 Failed-stage evidence is preserved and is not silently overwritten.
 
 If the corrected v0 and extracted GC inputs are already available, rebuild only
-the twenty-six post-v0 layers:
+the twenty-seven post-v0 layers:
 
 ```sh
 python3 tools/rebuild_v1.py --output build/v1-rebuilt
 ```
 
-This single command recreates all 26 post-v0 stages and independently compiles
+This single command recreates all 27 post-v0 stages and independently compiles
 the keyboard, birthday drawer, title, and native artwork commands. It reads the
 verified corrected v0 ROM/report, original N64 ROM, decoded English GC REL, and
 pinned source/symbol files. It does not need retained intermediate artwork ROMs
