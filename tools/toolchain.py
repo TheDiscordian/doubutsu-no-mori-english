@@ -7,6 +7,7 @@ LEGACY_IMAGE = 'sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b0
 PUBLIC_IMAGE = 'ghcr.io/dragonminded/libdragon@sha256:b68e8dfd393f76ba69c1ba62da6b42dcda8b5b52eaa8fb96adc5aab7865a2d40'
 IMAGES = {'public': PUBLIC_IMAGE, 'legacy': LEGACY_IMAGE}
 KNOWN_IMAGES = tuple(IMAGES.values())
+IMAGE_FIELDS = ('toolchain_image', 'compiler_image', 'toolchain')
 TOOLCHAIN = os.environ.get('AF_TOOLCHAIN', 'public')
 if TOOLCHAIN not in IMAGES:
     raise ValueError('AF_TOOLCHAIN must select public or legacy; arbitrary images are not accepted')
@@ -32,7 +33,7 @@ def comparison_profile(value):
     if isinstance(value, dict):
         result = {}
         for key, child in value.items():
-            if key == 'toolchain_image':
+            if key in IMAGE_FIELDS:
                 if child not in KNOWN_IMAGES:
                     raise ValueError('Unknown compiler image in approved metadata')
                 result[key] = LEGACY_IMAGE

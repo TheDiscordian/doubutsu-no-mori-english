@@ -7,6 +7,7 @@ from pathlib import Path
 import subprocess
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, verified_rom
+from toolchain import IMAGE, KNOWN_IMAGES
 
 
 def main():
@@ -15,7 +16,7 @@ def main():
     parser.add_argument("--output", type=Path, default=Path("build/disassembly"))
     parser.add_argument("--vrom", type=lambda x: int(x, 0), default=CODE_VROM)
     parser.add_argument("--ram", type=lambda x: int(x, 0))
-    parser.add_argument("--image", default="sha256:281fbf9b787994c0d9454a5d8bdcaba5e23407d53f2206c75ebdc97b09d29915")
+    parser.add_argument("--image", choices=KNOWN_IMAGES, default=IMAGE)
     args = parser.parse_args()
     if args.ram is None:
         if args.vrom != CODE_VROM:

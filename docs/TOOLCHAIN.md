@@ -53,7 +53,8 @@ image selections are rejected. Both images contain the exact executables above;
 the local development image is not a public distribution dependency.
 
 Build reports record the image actually used. Historical approval comparisons
-normalise only recognised `toolchain_image` fields in a temporary comparison
+normalise only recognised `toolchain_image`, `compiler_image`, and `toolchain`
+fields in a temporary comparison
 copy. All other metadata and native/source/relocation hashes remain bound.
 The resulting `reviewed_profile_sha256` is not the checksum of the actual report;
 recipes and packages record that actual canonical JSON hash separately.

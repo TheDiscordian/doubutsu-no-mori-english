@@ -7,7 +7,7 @@ import zlib
 
 from aflib import CODE_RAM, CODE_VROM, DMA_START, DMA_END, by_vrom, sha256, verified_rom
 from build_text_extension import IMPORTS, RAM
-from check_keyboard_assembly import IMAGE
+from toolchain import KNOWN_IMAGES
 from code_sections import code_segments
 from extended_items import VROM as ITEMS_VROM
 from npc_mail_show import relocate_verified_data
@@ -134,7 +134,7 @@ def validate(blob, loader, artifact):
         sources.update({'phrases/'+p.name: sha256(p.read_bytes())
                         for p in sorted((ROOT/'overlays/text_catchphrases').iterdir()) if p.is_file()})
     if (artifact.get('sources') != sources or artifact.get('imports') != imports
-            or artifact.get('symbols') != symbols or artifact.get('compiler_image') != IMAGE
+            or artifact.get('symbols') != symbols or artifact.get('compiler_image') not in KNOWN_IMAGES
             or artifact.get('blob_crc32') != f'{zlib.crc32(blob):08X}'
             or sha256(json.dumps(artifact.get('elf_relocations'), sort_keys=True).encode())
             != elf_sha):

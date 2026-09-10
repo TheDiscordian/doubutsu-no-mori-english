@@ -16,7 +16,7 @@ import setup_toolchain as setup
 
 def actual_public_report(value):
     if isinstance(value, dict):
-        return {k: tc.PUBLIC_IMAGE if k == 'toolchain_image' else actual_public_report(v)
+        return {k: tc.PUBLIC_IMAGE if k in tc.IMAGE_FIELDS else actual_public_report(v)
                 for k, v in value.items()}
     if isinstance(value, (tuple, list)):
         return [actual_public_report(child) for child in value]
@@ -25,7 +25,8 @@ def actual_public_report(value):
 
 class ToolchainTests(unittest.TestCase):
     def test_only_registered_field_is_compared_and_original_is_untouched(self):
-        old = {'toolchain_image': tc.LEGACY_IMAGE, 'nested': [{'toolchain_image': tc.LEGACY_IMAGE}],
+        old = {'toolchain_image': tc.LEGACY_IMAGE, 'nested': [
+                   {'compiler_image': tc.LEGACY_IMAGE}, {'toolchain': tc.LEGACY_IMAGE}],
                'source': tc.LEGACY_IMAGE, 'sha256': 'native-code'}
         public = actual_public_report(old)
         before = deepcopy(public)
@@ -47,9 +48,10 @@ class ToolchainTests(unittest.TestCase):
                 self.assertNotEqual(tc.profile_sha256(original), tc.profile_sha256(altered))
 
     def test_unknown_or_missing_image_is_not_an_equivalent_profile(self):
-        for value in ('arbitrary:latest', None, [], 1):
-            with self.subTest(value=value), self.assertRaisesRegex(ValueError, 'Unknown compiler'):
-                tc.profile_sha256({'toolchain_image': value})
+        for field in tc.IMAGE_FIELDS:
+            for value in ('arbitrary:latest', None, [], 1):
+                with self.subTest(field=field,value=value), self.assertRaisesRegex(ValueError, 'Unknown compiler'):
+                    tc.profile_sha256({field: value})
         self.assertNotEqual(tc.profile_sha256({}), tc.profile_sha256({'toolchain_image': tc.PUBLIC_IMAGE}))
 
     def test_verifier_rejects_arbitrary_images_without_docker(self):
@@ -77,6 +79,20 @@ class ToolchainTests(unittest.TestCase):
 
 @unittest.skipUnless((ROOT/'build/classic-letters-candidate').is_dir(), 'Retained local profiles required')
 class RetainedProfiles(unittest.TestCase):
+    def test_text_extension_accepts_both_images_without_relaxing_source_or_blob(self):
+        from text_extension import validate
+        directory = ROOT/'build/text-catchphrases'
+        artifact = json.loads((directory/'extension.json').read_text())
+        blob, loader = [(directory/name).read_bytes() for name in ('blob.bin', 'loader.bin')]
+        for metadata in (artifact, actual_public_report(artifact)):
+            validate(blob, loader, metadata)
+            with self.assertRaises(ValueError):
+                validate(b'\xFF'+blob[1:], loader, metadata)
+            with self.assertRaises(ValueError):
+                validate(blob, loader, {**metadata, 'sources': {}})
+        with self.assertRaises(ValueError):
+            validate(blob, loader, {**artifact, 'compiler_image': 'unapproved'})
+
     def test_accent_profiles_accept_known_image_only_with_unchanged_native_parts(self):
         from accent_mail_overlay_profile import wrap, validate
         for kind in ('creator', 'notice', 'event'):

@@ -31,7 +31,8 @@ flags, and saved-layout assertions remain unchanged.
 
 Some existing approvals fingerprint a complete metadata object, including its
 compiler image. Allow compatibility with those historical approvals only through
-a separate comparison fingerprint: recursively map a `toolchain_image` field
+a separate comparison fingerprint: recursively map any of the three existing
+image-field names (`toolchain_image`, `compiler_image`, and `toolchain`)
 from either of the two explicitly verified images to the legacy comparison
 identity, and leave every other value untouched. Unknown image values fail.
 Do not mutate the original report, rewrite stored provenance, or describe this
@@ -41,7 +42,7 @@ these two images; the native code and all other metadata still match exactly.
 
 Apply that narrow comparison to the frozen accent/classic metadata profiles,
 approved whole-cartridge report checks, and the final base/v1 packaging gates.
-The apology, grid, and birthday validators accept either explicitly verified
+The apology, grid, birthday, and text-extension validators accept either explicitly verified
 image while retaining all of their existing native-image assertions. Existing
 legacy reports and the current measured-progress path must continue to validate.
 
