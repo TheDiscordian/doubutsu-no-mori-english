@@ -395,9 +395,9 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
     else:
         from hboard_overlay import verify_shared_parts
         editor_extension = verify_shared_parts(built, native)
-        # The extension verifier binds the complete image to the English-first
-        # prefix with only its three scoped hooks. All palettes, conversion,
-        # and notice-mode input remain native; retain their exclusion audit.
+        # The extension verifier binds each approved complete editor, including
+        # a grid's changed input/drawing hooks. Notice text-editing handlers
+        # remain native; retain their exclusion audit.
         audit_editor(native)
     treasure = report.get('overlay', {}).get('treasure', False)
     seasonal = report.get('overlay', {}).get('seasonal', False)
@@ -458,13 +458,16 @@ def verify_installation(built, native, module, report, *, inventory_report=None,
         expected[at:at+32] = letter_names['owner_bytes']
     if owner != expected or owner_reloc != old_owner_reloc: raise ValueError('Changed notice owner or loader')
     for at, value in main_changes(init, seasonal).items():
-        if at == POOL_PATCH and editor_extension:
+        if at == POOL_PATCH and editor_extension and not letter_names:
             word = struct.unpack('>I', value)[0]
             extra = editor_extension['pool_extra']
             if not 0x8000 <= (word & 65535)+extra <= 0xFFFF:
                 raise ValueError('Combined submenu reservation changes the native high-half contract')
             value = struct.pack('>I', word+extra)
         if at == POOL_PATCH and letter_names:
+            # This verifier has already checked the full current pool word,
+            # including any explicit high-half transition and grid allocation.
+            # Do not first apply the obsolete editor-only signed-half bound.
             value = letter_names['pool_patch']
         if code[at-CODE_RAM:at-CODE_RAM+len(value)] != value: raise ValueError('Missing notice creator or pool patch')
     original_code = by_vrom(native)[CODE_VROM].extract(native)

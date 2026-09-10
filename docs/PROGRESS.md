@@ -20,10 +20,13 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 The [shared keyboard grid](checkpoints/KEYBOARD_GRID.md) is installed in the
 separate `build/keyboard-grid-01` candidate. Eight focused checks pass, including
 sanitizers, independent MIPS compilation, relocation/allocation, complete prior
-resource retention, and strict shared-editor verifiers. A silent ordinary-name
-check is in progress; native display/input acceptance is not claimed yet. The
-title handoff is unchanged. Complete bounded native checks and combine the
-title after resolving actual defects; saved capacities and handlers stay native.
+resource retention, and strict shared-editor verifiers. The noticeboard check
+and whole combined counter also pass. Two native attempts reach the grid but
+stop at an unreliable empty-name setup assertion; subsequent input checks and
+visual acceptance remain unverified. Continue remaining artwork instead of
+repeating that setup this batch. `build/title-grid-combined-01` retains the
+unchanged English title and grid with a passing combination check, but is not
+a new recommended handoff. Saved capacities and handlers stay native.
 
 The [combined English title](checkpoints/TITLE_LOGO.md) at
 `build/title-combined-01` retains all conversation corrections and English

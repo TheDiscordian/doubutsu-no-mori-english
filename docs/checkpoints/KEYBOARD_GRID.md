@@ -52,9 +52,48 @@ from its patch, and exercise the strict shared apology/letter/inventory
 verifiers. A keycap fixture initially compared a list to bytes; the corrected
 type-normalised comparison passes without changing the texture or ROM.
 
-The bounded silent ordinary-name scenario at `tests/keyboard-grid-scenario.json`
-is running against this candidate. It checks fresh native loading/drawing,
-case/deletion/cursor controls, capacity, Done, and resident guards. Actual
-display/input acceptance is not yet claimed. Letter/message native checks,
-normal save/restart, and original-hardware acceptance remain pending. Continue
-those bounded checks, fix actual defects, and then combine the title and grid.
+The strict noticeboard verifier also passes a focused check after its obsolete
+editor-only signed-half bound is restricted to editor-only builds. Complete
+letter/grid builds use their already-verified exact pool instruction and
+high-half guard. The whole combined text counter succeeds on the grid candidate;
+the new keyboard does not remove preceding translated text or application credit.
+
+## Native scenario limit
+
+`keyboard-grid-native-01` and its one corrected setup retry,
+`keyboard-grid-native-02`, both reach the normally loaded grid, pass the hook,
+ownership, nonzero-draw, and zero-error checks, but stop at the initial empty-name
+assertion: the observed lengths are four and one, respectively. The old fixed-
+count opening script presses A after entry opens, which selects an actual key
+on this grid instead of doing nothing at the old radial neutral position.
+Reducing the opening count from 27 to 23 does not produce a reliable empty
+starting field. The retained message trace also differs in opening variants.
+Neither run proves the subsequent case/deletion/cursor/capacity/Done sequence.
+
+The snapshot writer now publishes keyboard observations before evaluating their
+assertions, so future failures retain the complete state. These two earlier
+logs retain their message prefix and terminal assertion, not the unpublished
+keyboard row. No screenshot or checkpoint is reached; no visual approval,
+normal shutdown, or completed input sequence is claimed. The candidate remains
+experimental, and the handed-off title build is unchanged.
+
+Stop retrying this opening setup during this batch. Continue remaining artwork.
+The next useful combined screen/editor check must use a state-based keyboard
+arrival or a deliberate clear-field setup, not another guessed A-press count.
+Letter/message native checks, normal save/restart, and original-hardware
+acceptance remain pending. Actual game defects remain mandatory fixes.
+
+## Title combination
+
+`build/title-grid-combined-01/animal-forest-title-preview.z64` combines this
+grid with the unchanged English title and Expansion Pak instruction screen.
+ROM SHA-256 is
+`f2c46b98e4d5748d39bcd17ce697f50c4f6dbeae6b560e2ba4851ad43b46ec8d`;
+UPS SHA-256 is
+`e9672ca364a27ab4a970570bd9d0b2ecb78119c47007cca2835c6f3692db4d62`.
+One focused combination check passes: full rebuild/patch reconstruction,
+complete retained grid/artwork/text resources, strict current grid ownership,
+and identical title/asset/boot/warning resources compared with the tested title
+candidate. The unchanged title component reuses its recorded native evidence;
+the grid's incomplete native acceptance is not promoted by combining the ROMs.
+This candidate requires an Expansion Pak and is not a new recommended handoff.

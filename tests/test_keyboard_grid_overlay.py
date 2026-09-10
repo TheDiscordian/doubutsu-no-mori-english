@@ -68,6 +68,8 @@ class KeyboardGridOverlayTests(unittest.TestCase):
 
     def test_shared_apology_letter_inventory_verifiers_accept_only_installed_grid(self):
         previous.verify_installation(self.built,self.native,self.report)
+        from notice_overlay import verify_installation as verify_notice
+        verify_notice(self.built,self.native,self.report['runtime_module'],self.report['noticeboard'])
         self.assertEqual(editor.verify_shared_parts(self.built,self.native)['owner_bytes'],grid.metadata())
         report=copy.deepcopy(self.report['apology_input']);report['allocation']['editor_growth']+=1
         with self.assertRaises(ValueError):previous.verify_owned_parts(self.built,self.native,report)
