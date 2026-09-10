@@ -1,4 +1,4 @@
-"""Audit the completed silent postal batch against its exact cartridge and cases."""
+"""Audit preserved postal execution, not a new run of the current cartridge."""
 
 import json
 from pathlib import Path
@@ -7,8 +7,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import sha256
-from post_office_scenario import scenario
+from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
+from post_office_letters import START,END,GUARDS,verify_templates
+from post_office_scenario import case
+import mail_creator_catalog as creator_catalog
 
 BUILD = ROOT/'build/post-office-letters-pilot'
 RUN = ROOT/'build/smoke-post-office-01'
@@ -17,15 +19,37 @@ RUN = ROOT/'build/smoke-post-office-01'
 @unittest.skipUnless((RUN/'results.json').is_file(),'Completed local postal native evidence required')
 class PostOfficeResultsTests(unittest.TestCase):
     def test_all_cases_receipts_stack_guards_state_and_silent_shutdown(self):
-        native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         built = (BUILD/'animal-forest-halfwidth.z64').read_bytes();report = json.loads((BUILD/'build.json').read_text())
-        actions = scenario(native,built,report);request = actions[3]['test_post_office_letters']
+        # This exact scenario was executed with the historical compiled creator.
+        # Regenerating it through current source guards would misrepresent that
+        # evidence. Bind the archived request to its approved digest and ROM;
+        # current source/installation checks live in the scenario/install tests.
+        scenario_data = (ROOT/'build/post-office-scenario.json').read_bytes()
+        self.assertEqual(sha256(scenario_data),'03d957a108eaf69fae84d20220b18fc9eea6a42c83f955682e660a10c15fae54')
+        actions = json.loads(scenario_data);request = actions[3]['test_post_office_letters']
+        self.assertEqual(sha256(built),'44d3ecea7bf4688eb35afe66c918b4bf10fd5ee6be3ce577b2221d1969947ff8')
+        self.assertEqual(sha256(built),report['output_sha256'])
+        self.assertEqual(request['module'],report['runtime_module'])
+        files = by_vrom(built)
+        catalog = files[creator_catalog.vrom(creator_catalog.selected(request['module']))].extract(built)
+        items = files[0x02A00000].extract(built)
+        self.assertEqual(bytes.fromhex(request['catalog']),catalog)
+        self.assertEqual(bytes.fromhex(request['items']),items)
+        self.assertEqual(len(verify_templates(native,catalog)['parts']),15)
+        expected = [case(catalog,items,n,0x11FC,c) for n in range(0x49,0x4D) for c in (0,1)]
+        expected += [case(catalog,items,0x57,0x2C00+(month-1)*8+count-1,(month+count)%2)
+                     for month in range(1,13) for count in range(1,6)]
+        self.assertEqual(request['cases'],expected)
+        original = by_vrom(native)[CODE_VROM].extract(native)
+        code = files[CODE_VROM].extract(built)
+        self.assertEqual(request['original_creator'],original[START-CODE_RAM:END-CODE_RAM].hex())
+        self.assertEqual(request['guards'],{f'{a:08X}':code[a-CODE_RAM:b-CODE_RAM].hex() for a,b,_ in GUARDS})
         run = json.loads((RUN/'run.json').read_text());results_data = (RUN/'results.json').read_bytes()
         self.assertEqual(sha256(results_data),'0fb0275f9c52a9abc2f61b1258e103d8b3d6ce7950f29c831123c5c608084798')
         results = json.loads(results_data)
         self.assertEqual(sha256(built),run['rom_sha256'])
-        self.assertEqual(run['post_scenario_sha256'],sha256((ROOT/'build/post-office-scenario.json').read_bytes()))
-        self.assertEqual(json.loads((ROOT/'build/post-office-scenario.json').read_text()),json.loads(json.dumps(actions)))
+        self.assertEqual(run['post_scenario_sha256'],sha256(scenario_data))
         self.assertEqual(run['audio'],'disabled');self.assertFalse(run['initial_screenshot'])
         self.assertFalse(run['expansion_pak']);self.assertFalse(run['allow_test_flash_write']);self.assertFalse(run['allow_test_pak_write'])
         cases = [r for r in results if 'native_post_office_case' in r]

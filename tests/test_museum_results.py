@@ -1,4 +1,4 @@
-"""Bind completed museum native evidence to the actual cartridge and cases."""
+"""Audit preserved museum execution, not a new run of the current cartridge."""
 
 import json
 from pathlib import Path
@@ -7,8 +7,10 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import sha256
-from museum_scenario import scenario
+from aflib import CODE_RAM,CODE_VROM,by_vrom,sha256,verified_rom
+from museum_letters import START,END,GUARDS,FOSSILS,NAME,TABLE,verify_templates
+from museum_scenario import case
+import mail_creator_catalog as creator_catalog
 
 BUILD = ROOT/'build/museum-letters-pilot'
 RUN = ROOT/'build/smoke-museum-01'
@@ -17,15 +19,35 @@ RUN = ROOT/'build/smoke-museum-01'
 @unittest.skipUnless((RUN/'results.json').is_file(),'Completed local museum native evidence required')
 class MuseumResultsTests(unittest.TestCase):
     def test_complete_cases_original_metadata_pending_loops_and_restored_state(self):
-        native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         built = (BUILD/'animal-forest-halfwidth.z64').read_bytes();report = json.loads((BUILD/'build.json').read_text())
-        actions = scenario(native,built,report);request = actions[3]['test_museum_letters']
+        # Preserve the exact executed request and independently bind its code,
+        # catalogue, cases, and module to the historical cartridge. Current
+        # source/installation approval runs in the scenario/install tests.
+        scenario_data = (ROOT/'build/museum-scenario.json').read_bytes()
+        self.assertEqual(sha256(scenario_data),'0de640f0240be9389357b31001d9338e07bfb2dc2458395f050afab803570de6')
+        actions = json.loads(scenario_data);request = actions[3]['test_museum_letters']
+        self.assertEqual(sha256(built),'c357c13e9886072d4ae12fe1aa4ae8dbd715131aead2e788e5afcdca013ada86')
+        self.assertEqual(sha256(built),report['output_sha256'])
+        self.assertEqual(request['module'],report['runtime_module'])
+        files = by_vrom(built)
+        catalog = files[creator_catalog.vrom(creator_catalog.selected(request['module']))].extract(built)
+        self.assertEqual(bytes.fromhex(request['catalog']),catalog)
+        self.assertEqual(len(verify_templates(native,catalog)['parts']),81)
+        pairs = [(0xBD,0),(0xBE,0)]+[(number,0x1E3C+index*4+index%4) for index,number in enumerate(FOSSILS)]
+        self.assertEqual(request['cases'],[case(catalog,number,gift,capital)
+                         for number,gift in pairs for capital in (0,1)])
+        original = by_vrom(native)[CODE_VROM].extract(native)
+        code = files[CODE_VROM].extract(built)
+        self.assertEqual(request['original_creator'],original[START-CODE_RAM:END-CODE_RAM].hex())
+        guards = {f'{a:08X}':code[a-CODE_RAM:b-CODE_RAM].hex() for a,b,_ in GUARDS}
+        guards.update({f'{a:08X}':code[a-CODE_RAM:a-CODE_RAM+size].hex() for a,size in ((NAME,6),(TABLE,100))})
+        self.assertEqual(request['guards'],guards)
         run = json.loads((RUN/'run.json').read_text());results_data = (RUN/'results.json').read_bytes()
         self.assertEqual(sha256(results_data),'e947e22d0013c41317e1695826b11e5c8a26e2d0de9c2722a8267eaa52b346ee')
         results = json.loads(results_data)
         self.assertEqual(sha256(built),run['rom_sha256'])
-        self.assertEqual(run['post_scenario_sha256'],sha256((ROOT/'build/museum-scenario.json').read_bytes()))
-        self.assertEqual(json.loads((ROOT/'build/museum-scenario.json').read_text()),json.loads(json.dumps(actions)))
+        self.assertEqual(run['post_scenario_sha256'],sha256(scenario_data))
         self.assertEqual(sha256((ROOT/'tools/museum_smoke.py').read_bytes()),'8ed848a5f3721279b9a94d7909819a9ae026658c5916ee313fc3b38d911efdf7')
         self.assertEqual(run['audio'],'disabled');self.assertFalse(run['initial_screenshot'])
         self.assertFalse(run['expansion_pak']);self.assertFalse(run['allow_test_flash_write']);self.assertFalse(run['allow_test_pak_write'])

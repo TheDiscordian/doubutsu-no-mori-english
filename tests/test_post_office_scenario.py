@@ -12,7 +12,7 @@ from mail_record import unpack
 from post_office_scenario import scenario,case
 from post_office_smoke import CACHE_GUARDS
 
-BUILD = ROOT/'build/post-office-letters-pilot'
+BUILD = ROOT/'build/v0-hardware-fixes-02'
 
 
 @unittest.skipUnless((BUILD/'build.json').is_file(),'Complete local postal build required')

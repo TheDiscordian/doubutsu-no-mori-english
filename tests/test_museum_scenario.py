@@ -13,7 +13,7 @@ from museum_letters import FOSSILS,TEMPLATES,START,END
 from museum_scenario import scenario,case
 from museum_smoke import CACHE_GUARDS
 
-BUILD = ROOT/'build/museum-letters-pilot'
+BUILD = ROOT/'build/v0-hardware-fixes-02'
 
 
 @unittest.skipUnless((BUILD/'build.json').is_file(),'Complete local museum build required')

@@ -10,7 +10,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
-from aflib import CODE_RAM,CODE_VROM,apply_ups,by_vrom,sha256
+from aflib import CODE_RAM,CODE_VROM,apply_ups,by_vrom,sha256,verified_rom
 from post_office_letters import GUARDS,START,END,ORDER_GATE,TICKET_GATE,TEMPLATES,install,patches,verify_installation,verify_templates
 from npc_mail_capture import source_hashes
 from npc_mail_loader import VROM,CONFIG_OFFSET,configuration
@@ -19,20 +19,32 @@ from translation_progress import measure
 
 BUILD = ROOT/'build/post-office-letters-pilot'
 PREVIOUS = ROOT/'build/mail-shared-guards-pilot'
+CURRENT = ROOT/'build/v0-hardware-fixes-02'
+CREATOR = ROOT/'build/letter-runtime-fixtures-02/post-office'
 
 
-@unittest.skipUnless((BUILD/'build.json').is_file() and (PREVIOUS/'build.json').is_file(),
-                     'Completed postal and preceding guard builds required')
+@unittest.skipUnless((CURRENT/'build.json').is_file() and (CREATOR/'overlay.json').is_file(),
+                     'Current combined cartridge and source-built postal creator required')
 class PostOfficeInstallTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        cls.built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
-        cls.previous = (PREVIOUS/'animal-forest-halfwidth.z64').read_bytes()
-        cls.report = json.loads((BUILD/'build.json').read_text())
+        cls.native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        cls.built = (CURRENT/'animal-forest-halfwidth.z64').read_bytes()
+        cls.report = json.loads((CURRENT/'build.json').read_text())
         cls.module = cls.report['runtime_module']
         cls.files = by_vrom(cls.built)
-        cls.base = {CODE_VROM:by_vrom(cls.previous)[CODE_VROM].extract(cls.previous)}
+        if sha256(cls.built) != cls.report['output_sha256']:
+            raise ValueError('Changed combined postal fixture cartridge')
+        original = by_vrom(cls.native)[CODE_VROM].extract(cls.native)
+        before = bytearray(cls.files[CODE_VROM].extract(cls.built))
+        # Recreate only this installer's preceding code in an in-memory map.
+        # Every other current translation/resource remains in the real cartridge.
+        for at,value in patches(original,int(cls.module['symbols']['af_npc_mail_load'],16)).items():
+            offset = at-CODE_RAM
+            if before[offset:offset+len(value)] != value:
+                raise ValueError('Current postal fixture does not contain the expected patch')
+            before[offset:offset+len(value)] = original[offset:offset+len(value)]
+        cls.base = {CODE_VROM:bytes(before)}
         cls.additions = {int(v,16):cls.files[int(v,16)].extract(cls.built) for v in cls.report['added_files']}
 
     def fixture(self): return dict(self.base),dict(self.additions),deepcopy(self.module)
@@ -72,7 +84,7 @@ class PostOfficeInstallTests(unittest.TestCase):
             self.assertEqual(fixture,before)
 
     def test_compiled_variant_source_bindings_and_earlier_guard_build(self):
-        for directory,postal in ((ROOT/'build/post-office-creator',True),(ROOT/'build/mail-shared-guards-creator',False)):
+        for directory,postal in ((CREATOR,True),(ROOT/'build/letter-runtime-fixtures-01/glyph',False)):
             data,reloc = ((directory/n).read_bytes() for n in ('overlay.bin','relocation.bin'))
             report = json.loads((directory/'overlay.json').read_text())
             config = configuration(data,reloc,report,self.module)
@@ -83,11 +95,30 @@ class PostOfficeInstallTests(unittest.TestCase):
                 with self.assertRaises(ValueError): configuration(data,reloc,{**report,'post_office':value},self.module)
         with self.assertRaises(ValueError): source_hashes(post_office=True)
 
+    def test_current_complete_cartridge_installation_and_report_corruption(self):
+        verify_test_module(self.built,self.module)
+        verify_installation(self.built,self.native,self.module,self.report['post_office_letters'])
+        for name in ('complete_templates','item_resource_sha256','patches','catalog'):
+            report = deepcopy(self.report['post_office_letters']);report.pop(name)
+            with self.assertRaises(ValueError): verify_installation(self.built,self.native,self.module,report)
+
+
+@unittest.skipUnless((BUILD/'build.json').is_file() and (PREVIOUS/'build.json').is_file(),
+                     'Preserved postal and preceding guard cartridges required')
+class PostOfficeHistoricalArtifactTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+        cls.built = (BUILD/'animal-forest-halfwidth.z64').read_bytes()
+        cls.previous = (PREVIOUS/'animal-forest-halfwidth.z64').read_bytes()
+        cls.report = json.loads((BUILD/'build.json').read_text())
+        cls.files = by_vrom(cls.built)
+
     def test_complete_rom_existing_resources_and_original_rom_patch(self):
         self.assertEqual(sha256(self.built),self.report['output_sha256'])
         self.assertEqual(apply_ups(self.native,(BUILD/'animal-forest-halfwidth.ups').read_bytes()),self.built)
-        verify_test_module(self.built,self.module)
-        verify_installation(self.built,self.native,self.module,self.report['post_office_letters'])
+        # Historical patch-retention evidence only. Current creator/source/font
+        # validation and malformed-report rejection run in the class above.
         old,new = by_vrom(self.previous),self.files;self.assertEqual(old.keys(),new.keys())
         self.assertEqual({v for v in old if old[v].extract(self.previous)!=new[v].extract(self.built)},
                          {0x19D40,CODE_VROM,MODULE_VROM,VROM})
@@ -103,9 +134,6 @@ class PostOfficeInstallTests(unittest.TestCase):
         old_module = bytearray(old[MODULE_VROM].extract(self.previous));new_module = bytearray(new[MODULE_VROM].extract(self.built))
         old_module[0x48:0x68] = new_module[0x48:0x68] = bytes(32)
         self.assertEqual(old_module,new_module)
-        for name in ('complete_templates','item_resource_sha256','patches','catalog'):
-            report = deepcopy(self.report['post_office_letters']);report.pop(name)
-            with self.assertRaises(ValueError): verify_installation(self.built,self.native,self.module,report)
 
     def test_counter_credits_only_installed_postal_ids_and_retains_old_total(self):
         old_report = json.loads((PREVIOUS/'build.json').read_text())

@@ -73,6 +73,12 @@ do not establish acceptance of every reported case. Next:
   and current date compositions retain all source guards and expected callers.
   Do not repeat these completed checks for unchanged
   code or infer that other generation variants are repaired.
+  The [postal/museum follow-up](checkpoints/POSTAL_MUSEUM_FIXTURE_FOLLOWUP.md)
+  closes ten further errors with twenty passing checks, two source-built creator
+  variants, current combined-installation checks, and separately bound archived
+  native evidence. Preserve this completed group; its counter-only failures
+  remain deferred. Next relevant failures include snowman and renewal/event/Miko
+  fixtures, not another run of the postal/museum group or the entire suite.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

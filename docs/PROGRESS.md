@@ -88,6 +88,12 @@ closes four further errors and the word-profile/date-target assertion failures
 with 18 passing focused checks. It adds a positive matching-profile check,
 a fresh generation-only test build, and current date-installation fixtures,
 without changing the playable cartridge.
+The [postal/museum follow-up](checkpoints/POSTAL_MUSEUM_FIXTURE_FOLLOWUP.md)
+closes ten further historical errors with twenty passing checks. Complete
+English contents and delivery patches are checked on the corrected base;
+earlier native results remain bound to their actual archived cartridges.
+Two fresh creator variants pass current source checks. No playable ROM or
+save data changes.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
