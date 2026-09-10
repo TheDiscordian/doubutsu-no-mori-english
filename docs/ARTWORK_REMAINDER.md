@@ -2,7 +2,11 @@
 
 ## Festival stall
 
-The native stand retains Japanese lettering. Do not mark this resource English.
+The [shared GC-style candidate](checkpoints/STALL_ARTWORK.md) replaces the native
+stand's Japanese lettering using one complete GC mesh and a reflected second
+placement. Its focused and title-combination checks pass. Ordinary appearance,
+lighting, both placements, and event acceptance remain; tiny source-label
+transcriptions are still an explicit character-inventory gap.
 Its type `1D` slice is `92A98..95478` within object `D5E000`, SHA-256
 `608bf509e44565573def8b38d3cc79eff8ccca42a9711da5093ed1f464fd7900`.
 The three 128×32 CI4 atlases are `DF1380`, `DF1B80`, and `DF2380`;
@@ -27,11 +31,13 @@ lists. A direct whole-model import does not fit. Both GC variants have bounds
 X `−6000..6000`, Y `0..9500`, Z `−2000..10000`; the native combined model has
 X `−6173..6046`, Y `0..9000`, Z `−2173..10046`.
 
-Choose a bounded adaptation of the source materials/geometry, or translate
-the native lettering after reliable transcription. Do not invent source words
-or counter weights from the small raw atlas. Keep native goods, purchase
-behaviour, collision, and both placements. The finished stall-choice text
-adapter remains unrelated to this unfinished artwork.
+The shared adaptation fits the original slice with a 1392-byte native model,
+without loader or allocation changes. The reflected source surface boundaries
+match on all shared planes; the meshes differ in triangulation and one small
+non-coplanar detail. Do not claim an exact import of both GC meshes. Do not invent
+source words or counter weights from the small raw atlas. Native goods, purchase
+behaviour, collision, and both placements remain. The finished stall-choice text
+adapter also remains unchanged.
 
 ## Lucky bags
 

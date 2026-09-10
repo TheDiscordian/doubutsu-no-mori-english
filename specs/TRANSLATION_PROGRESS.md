@@ -72,6 +72,12 @@ total, shared by both seasons. Its two exact GC atlas replacements install
 the actual donor texture/vertex bindings, all installed native model readers,
 and unchanged digits, animation, palettes, actors, and allocation. The prefix
 uses explicit artwork-omission credit; the units use their exact English strings.
+The installed GC-style festival-stall model receives complete source, native
+command, actor, allocation, and actual streamed-copy verification. Its tiny
+original sign labels lack reliable transcriptions, so their character weights
+remain an explicit inventory gap rather than invented credit. The whole model
+replacement and this counting limit are recorded separately; the counter still
+rejects a modified or missing installed model.
 The two embedded festival-stall cancellation labels also enter the shared total.
 Eight embedded map records also enter the total, including landmark labels,
 the post-office continuation, and the vacant-house label. Their source weights

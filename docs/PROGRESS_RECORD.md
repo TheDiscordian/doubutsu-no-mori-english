@@ -1,0 +1,2729 @@
+# Accumulated implementation record
+
+This is the preserved detailed work record. Its build-specific next-step notes
+are historical, not the current queue. Use [current progress](PROGRESS.md) and
+[remaining work](WORK_QUEUE.md) for the active state.
+
+## Translation measurement
+
+`python3 tools/translation_progress.py` produces one fresh combined
+text-replacement approximation from the newest completed ROM. Dialogue, names,
+catchphrases, letters, and inventoried interface text share one denominator;
+alternate English storage does not count the same source twice. Generated
+results and the per-entry ledger are in `build/translation-progress/`.
+Partially connected wider-name and catchphrase resources are recorded as pending,
+not fully applied. English already replacing the native bank retains its credit;
+verified complete letter and interface routes also retain theirs. Completing the
+remaining name readers must update their verification in the counter.
+The [counting rules](../specs/TRANSLATION_PROGRESS.md) retain the inventory limits
+without mixing testing or polish into the percentage. Use this tool for progress
+questions; ordinary candidate-bank coverage is only a diagnostic.
+
+## Active work
+
+The [current private playtest bundle](checkpoints/V1_PLAYTEST_PACKAGE.md) is
+`build/releases/v1-artwork-playtest-02.zip`, with combined ROM
+`build/title-countdown-combined-01/animal-forest-title-preview.z64`.
+It requires an Expansion Pak and includes every completed artwork and text
+batch below. Both package tests pass, including actual standalone patcher
+execution and exact reconstruction. Earlier packages and the corrected v0 remain
+untouched. Continue the festival-stall adaptation and pending lucky-bag design
+choice in the [remaining artwork queue](ARTWORK_REMAINDER.md); ordinary human
+playtesting and hardware acceptance remain explicit limitations.
+
+The [countdown candidate](checkpoints/COUNTDOWN_ARTWORK.md) installs the exact
+GC minute/second labels with unchanged timer, digits, animation, and actors.
+Three focused checks, the title combination, and the full counter pass.
+`build/title-countdown-combined-01` is the newest separate artwork candidate.
+The [remaining artwork queue](ARTWORK_REMAINDER.md) records the festival-stall
+size constraint, pending lucky-bag choice, and inspected neutral seasonal props.
+Continue those remaining artwork tasks; the packaged playtest stays separate.
+
+The [fortune-booth candidate](checkpoints/FORTUNE_BOOTH_ARTWORK.md) installs the
+complete matching GC table inside the original native allocation, with unchanged
+event code and shrine. Three focused checks, the title combination, and the
+full counter pass. `build/title-fortune-booth-combined-01` is the newest separate
+artwork candidate. Continue the festival stall and remaining seasonal props;
+the packaged playtest stays unchanged during this artwork batch.
+
+The [fishing artwork candidate](checkpoints/FISHING_ARTWORK.md) matches GC's
+Japanese barrel-name and headquarters-placard omissions while preserving the
+event and all remaining geometry. Three focused checks, the title combination,
+and the full counter pass. `build/title-fishing-combined-01` is the newest
+separate artwork candidate. Continue the fortune booth and festival stall;
+the packaged playtest remains unchanged during this artwork batch.
+
+The [dump artwork candidate](checkpoints/DUMP_ARTWORK.md) adds both exact
+GameCube English signs, retaining collection rules and all Nookington/menu/text
+work. Its focused checks, title combination, and full combined counter pass.
+The separate `build/title-dump-combined-01` is the newest artwork candidate;
+the private packaged handoff below remains unchanged. Continue seasonal props.
+
+The [Nookington detail candidate](checkpoints/NOOKINGTON_DETAILS.md) adds the
+GameCube doorway wordmark and full English clearance banner in both seasons,
+preserving the red offer and native geometry/palettes. Three focused checks,
+the title combination, and the full combined counter pass. Its separate
+`build/title-nookington-details-combined-01` cartridge retains every earlier fix.
+The packaged handoff below remains unchanged while remaining artwork continues.
+
+The [private patch bundle](checkpoints/V1_PLAYTEST_PACKAGE.md) is ready at
+`build/releases/v1-artwork-playtest-01.zip`. Both focused packaging tests pass,
+including executing the included patcher and reconstructing the exact combined
+ROM without overwriting its source. The bundle retains explicit test limitations
+and is not a public release or completed v1.
+
+The current combined playtest candidate is
+`build/title-gyroid-service-combined-01/animal-forest-title-preview.z64` and requires an
+Expansion Pak. It contains the corrected Nook conversation paths, Shrine wording,
+English title, screen headings, seasonal shop/police/Redd art, and GameCube-style
+keyboard, plus English bulletin-board, town-tune, and catalogue controls and
+mailbox/repayment headings. The birthday window has the full English prompt,
+month names, numeric day, and OK, with unchanged date/input/save logic. Controller
+Pak Done/Free/Notes/Pages are English, with all Pak operations and geometry
+unchanged. Editor confirmation, sixteen inventory warning windows, and thirteen
+Pak status/error/choice windows are also English. Warning code and saved formats
+stay native; complete strings use bounded appended storage and an extra 4 KiB
+in the existing menu pool. The [embedded menu checkpoint](checkpoints/EMBEDDED_MENU_TEXT.md)
+records three passing host checks and the 8.747-second title combination.
+Its native batch verifies confirmation loading, then stops at a fixture error;
+warning drawing remains unverified. Do not repeat that setup batch. The
+gyroid's twelve sales/configuration responses also have complete GC English,
+with a separate temporary buffer preserving the native interrupt callback.
+The [gyroid service checkpoint](checkpoints/GYROID_SERVICE_TEXT.md) records three
+passing host checks, the 8.172-second title combination, and a single passing
+native composition/drawing batch with intact save, callback, and memory guards.
+Ordinary gyroid navigation and transactions remain playtest work. The
+[Pak checkpoint](checkpoints/CONTROLLER_PAK_ARTWORK.md) records
+three passing focused checks and the 8.396-second complete title combination.
+The
+[birthday checkpoint](checkpoints/BIRTHDAY_SCREEN.md) records passing sanitizer,
+compilation, relocation, retention, and counter checks, plus one silent native
+batch verifying complete ordered font output and intact state/guards. Its title
+combination check passes in 8.010 seconds. Ordinary birthday entry and date
+selection remain playtest work. The [service checkpoint](checkpoints/SERVICE_ARTWORK.md)
+records four passing checks for the complete latest batch and title combination. The
+[notice/tune checkpoint](checkpoints/NOTICE_TUNE_ARTWORK.md) records seven focused
+passing checks and unchanged native controls, storage, and allocations.
+The [cursor correction](checkpoints/KEYBOARD_CURSOR.md) fixes an actual
+native direction-command mismatch found by the frame-controlled input test.
+The corrected native probe completes entry, deletion, capacity, left/right cursor,
+page switching, and Done with intact guards and graceful shutdown. The full
+service combination check passes in 7.845 seconds. Native execution of the correction uses
+the documented matching older checkpoint and guarded controller replacement;
+it is not relabelled as a fresh boot of the new ROM. Current [playtest notes](V1_TITLE_PLAYTEST.md)
+state the untested areas. The eighteen inspected station atlases contain no
+lettering requiring replacement. The [catalogue batch](checkpoints/CATALOGUE_ARTWORK.md)
+adds top/bottom with three passing focused checks and is retained in the current
+title combination. Continue embedded menu text and remaining decorative art;
+normal hardware/playthrough feedback remains necessary.
+
+The [Redd sign candidate](checkpoints/REDD_ARTWORK.md) at `build/redd-artwork-01`
+adds the supplied English summer sign and its two exclusively owned red palette
+entries. All existing pixel colours, the snow-covered winter tent, and previous
+police/Nookington/shop/grid/text work remain. Three focused checks pass; the
+separate `build/title-redd-combined-01` includes the unchanged English title and
+requires an Expansion Pak. No new recommended handoff is claimed. Continue
+remaining decorative art and bounded checkpoint-based input acceptance.
+
+The [police-station candidate](checkpoints/POLICE_ARTWORK.md) at
+`build/police-artwork-01` installs the GameCube English doorway sign and wanted
+poster in both seasons. Three focused checks pass, including unchanged native
+lighting/remaining geometry, all 92 seasonal building streams, and complete
+prior-resource retention. `build/title-police-combined-01` adds the unchanged
+English title and requires an Expansion Pak. Ordinary scene acceptance remains
+pending, and the keyboard's test limits remain. Continue Redd's summer sign
+and remaining decorative art; keep the recommended playtest handoff unchanged.
+
+The [small-sign candidate](checkpoints/SHOP_SIGNS.md) at `build/shop-signs-01`
+adds the exact English SOLD OUT sign and corrects three native keyboard-hint
+glyph bytes, retaining Nookington and every earlier fix. Three focused checks
+pass, including strict current editor ownership and all prior resources. The
+combined native screen check verifies empty-name clearing, Q/q input, and the
+visible grid, but stops at a deletion assertion affected by unthrottled frame
+timing. Later input checks remain unverified; do not repeat that setup batch.
+Continue the police station artwork and final title combination.
+
+The [Nookington main-sign candidate](checkpoints/NOOKINGTON_SIGN.md) installs
+the complete supplied English lettering in both seasons, preserving native
+geometry, palettes, doors, and allocation. Five focused checks pass, including
+all 92 seasonal building streams and full prior-resource retention. The separate
+`build/nookington-sign-02` candidate retains the grid and every earlier fix.
+`build/title-nookington-combined-01` adds the unchanged English title with a
+passing combination check and requires an Expansion Pak. Ordinary sign and
+keyboard acceptance remains pending; this is not a new recommended handoff.
+Continue the bounded combined screen/editor check and remaining decorative art.
+
+The [shared keyboard grid](checkpoints/KEYBOARD_GRID.md) is installed in the
+separate `build/keyboard-grid-01` candidate. Eight focused checks pass, including
+sanitizers, independent MIPS compilation, relocation/allocation, complete prior
+resource retention, and strict shared-editor verifiers. The noticeboard check
+and whole combined counter also pass. Two native attempts reach the grid but
+stop at an unreliable empty-name setup assertion; subsequent input checks and
+visual acceptance remain unverified. Continue remaining artwork instead of
+repeating that setup this batch. `build/title-grid-combined-01` retains the
+unchanged English title and grid with a passing combination check, but is not
+a new recommended handoff. Saved capacities and handlers stay native.
+
+The [combined English title](checkpoints/TITLE_LOGO.md) at
+`build/title-combined-01` retains all conversation corrections and English
+screen/shop artwork. Eight-MiB native title/START/guard checks pass, and four-MiB
+native checks verify every glyph of the safe Expansion Pak instruction screen.
+Four combined and eleven existing focused checks pass. An isolated captured
+frame shows the complete readable English logo. The candidate requires an
+Expansion Pak; the corrected v0 handoff remains unchanged. Continue the
+GameCube-style keyboard and remaining Japanese signs/buildings/bags. Normal
+menu/save and original-hardware acceptance remain unverified.
+
+The [collection heading candidate](checkpoints/COLLECTION_ARTWORK.md) at
+`build/collection-artwork-01` adds the full GameCube Insects/Fish artwork to the
+clock, map, inventory, shop, and conversation corrections. Three focused checks
+pass, including independent native texture commands and full retained-resource
+verification. Original collection records, tab icons, page layout, and memory
+bounds remain unchanged. Continue remaining signs/buildings, title integration,
+and the GameCube-style keyboard; combine ordinary screen checks across the batch.
+
+The [English clock candidate](checkpoints/TIME_SETTING.md) at
+`build/time-setting-01` installs "Adjust the clock.", "OK", and aligned
+`20YY-MM-DD` / `HH:MM` fields. Native selection, time/RTC operations, save layout,
+and allocations remain unchanged. Five focused checks and sixteen counter
+regressions pass; the full combined counter runs successfully on this candidate.
+The four clock records join the shared inventory with installed-reader
+verification. Continue the collection-page Insects/Fish headings, then remaining
+signs/buildings and title/keyboard integration. Ordinary screen/hardware checks
+remain pending; the corrected v0 handoff stays separate.
+
+The [combined map/inventory artwork candidate](checkpoints/SCREEN_ARTWORK.md)
+at `build/inventory-artwork-02` installs the GameCube TOWN MAP/Acre layout and
+Items/Letters/Bells headings, retaining all shop art, conversation fixes,
+Shrine wording, and earlier English. Twelve focused artwork checks pass,
+including compiled native commands and complete resource/patch reconstruction.
+Ordinary screen appearance/navigation remains unverified. The clock candidate
+retains this complete batch; its checkpoint records the next artwork bindings.
+
+The [shop artwork candidate](checkpoints/BUILDING_ARTWORK.md) imports twelve
+GameCube textures for Nook's Cranny, Nook 'n' Go, and Nookway in both seasons.
+`build/shop-artwork-02` retains the complete hardware fixes and all English
+resources. Five focused checks pass, including donor pointers, all 328 affected
+vertex uses, visible palette colours, full resource retention, and patch recovery.
+Native geometry, palettes, code, and RAM use remain unchanged. Ordinary visual/
+hardware acceptance remains pending. Continue the map, inventory, and time-
+setting screen artwork; keep the corrected v0 handoff separate.
+
+The [hardware correction](checkpoints/V0_HARDWARE_BUGS.md) fixes the whole-
+conversation loop during Nook's furniture-delivery job and the related premature
+cleanup of later letter-sharing advice. The separate combined ROM is
+`build/v0-hardware-fixes-02/animal-forest-halfwidth.z64`; the handed-off
+`build/classic-letters-pilot` ROM remains unchanged. Native comparisons reproduce
+both original failures, then verify complete corrected continuations and normal
+message closure: all six furniture personalities, both long letter explanations,
+and one unsplit letter explanation. Full English, completed quest state, reward
+behaviour, and guards are retained. The map label is corrected to one-line
+"Shrine". Ordinary tutorial replay on hardware remains unverified.
+
+All nineteen focused checks pass, and the private patch package is complete at
+`build/releases/v0-hardware-fixes-02.zip`, bound to source revision `5e711a6`.
+Continue the reported Japanese interface/artwork. Classify each screen as runtime text,
+texture, or both, and use matching supplied GameCube English assets while
+preserving N64-specific locations. Further actual progression defects retain
+priority over the separate title and keyboard work.
+
+The [separate English Press Start preview](checkpoints/TITLE_PRESS_START.md)
+uses the supplied GameCube tiles and positions. Five focused checks and the
+bounded native loading/START check pass; the v0 candidate is unchanged. All
+80 title source assets and 28 texture conversions are extracted and checked.
+The [main logo package](../specs/TITLE_ASSETS.md) binds all 23 models and three
+animations and converts their geometry into 107 TMEM-bounded native strips.
+Eight binding/package tests and the independent native GBI compilation check
+pass. The [animated logo preview](checkpoints/TITLE_LOGO.md) installs the package
+with title-only Expansion Pak ownership, leaving the ordinary four-MiB heap,
+resident translation module, and v0 ROM unchanged. Full loaded-image readback,
+animation completion, START, allocation release, and guards pass the silent
+native check. Visual approval and missing-Pak handling remain. The GameCube-style keyboard is
+still pending. This does not add or remove main-text credit.
+
+The [combined v0 check](checkpoints/V0_SMOKE.md) passes fresh-game English
+name/town entry, long choices, and train arrival in the assembled candidate:
+218 recorded steps, ten acceptance checks, intact memory guards, and graceful
+shutdown in four MiB. The [full regression result](checkpoints/V0_REGRESSION.md)
+records 1,874 tests, eleven failures, and seventy-five errors; eight corrected
+assertions pass focused reruns, and historical fixture work remains. The user
+has the stable experimental v0 ROM for hardware playtesting with these limits.
+Normal save/restart and the broader ordinary menu/editor
+checks remain unverified. The guarded patch-only packager passes five focused
+tests; its [private playtest notes](V0_PLAYTEST.md) state those limits explicitly.
+
+The [v0 delivery plan](V0_PLAN.md) governs the next implementation and test
+batches. Finish remaining text and consumers before expanding acceptance work;
+reuse passing evidence and apply the explicit harness/retry limits. Assemble and
+hand over the base translation after bounded safety checks. The human playthrough
+uses that build; full gameplay/hardware review, polish, and v1 title/keyboard work
+are not prerequisites for producing it. This workflow does not mark any pending
+implementation or test as completed.
+
+The [classic-letter integration](checkpoints/CLASSIC_LETTERS.md) connects the final
+eighteen retained variants with complete saved snapshots and text readback.
+The current combined ROM/UPS is `build/classic-letters-pilot`. Five host tests,
+three profile checks, matching independent MIPS builds, full cartridge retention,
+and the silent native check pass. The native run covers nine calls and thirty
+assertions, including the real allocator, complete letters, unchanged saved
+payload, guards, and checkpoint restoration. An inherited replacement-list bug
+is fixed and regression-tested. All three installed/accounting tests pass; only
+three structural zero-filled tail slots remain flagged, not untranslated phrases.
+Continue bounded ordinary v0 gameplay/menu/editor/mail/board/save checks and the
+patch-only handoff.
+
+The [reserve-letter completion](checkpoints/RESERVE_LETTERS.md) applies all fifteen
+parts and corrects accounting for eleven already-translated sender-only
+signatures. The current combined ROM/UPS is `build/reserve-letters-pilot`.
+Three focused tests and sixteen counter regressions pass, including complete
+resource retention and native rounded-read bounds. Continue the eighteen classic
+letter variants, then bounded combined v0 gameplay/save checks. Their adapter is
+a separate candidate until installed and verified; it does not receive credit.
+
+The [general-string completion](checkpoints/RESIDUAL_GENERAL.md) finishes every
+Japanese-bearing general-bank record. The current combined ROM/UPS is
+`build/residual-general-pilot`. Three focused checks and fourteen counter
+regressions pass, including complete installed consumers, all prior resources,
+patch reconstruction, and source-bound intentional omissions. No runtime or saved
+layout changes. Continue the remaining letter variants and command-only letter
+components, then bounded combined v0 gameplay/save checks.
+
+The [retained-name integration](checkpoints/UNUSED_NAMES.md) applies all 200 old
+general name records while preserving live localized names and saved identities.
+The current combined ROM/UPS is `build/unused-names-pilot`. Four focused tests and
+thirteen counter regressions pass, including full resource retention, cartridge
+and patch reconstruction, and accounting. This data-only batch reuses unchanged
+native loader evidence. Continue residual general/interface strings and letter
+variants, then the bounded combined v0 gameplay/save checks.
+
+The [accented-item integration](checkpoints/ACCENTED_ITEMS.md) installs all eight
+complete fields, matching font/article data, immutable catalogue-five mail, both
+creators, and the treasure reader. The current combined ROM/UPS is
+`build/accent-items-pilot`. Focused tests, independent MIPS builds, complete
+cartridge retention, patch reconstruction, and installed-route accounting pass.
+The silent native check passes 36 calls and 45 memory assertions, including actual
+startup, accented letters, both treasure readers, sale letters, saved-payload
+retention, and checkpoint restoration. The cartridge remains 32 MiB and runs in
+four MiB; native font pixels and saved formats are unchanged. Continue residual
+general/letter text, then the bounded combined v0 gameplay/save checks.
+
+The [sun/skull apology integration](checkpoints/APOLOGY_INPUT.md) installs both
+remaining exact GC targets and apology-only symbol editing, preserving saved
+fields and prior editors. The current combined ROM/UPS is
+`build/apology-input-pilot`. All five focused checks, twelve counter regressions,
+and eight prior editor regressions pass. Native entry/matching/key drawing passes
+in the first fixture, but complete guard/checkpoint verification is unresolved:
+the corrected retry cannot allocate its separate test workspace. The checkpoint
+records that limitation for the combined v0 smoke. Continue accented
+item names and residual general/letter text, then combined v0 gameplay/save checks.
+
+The [reserve-label integration](checkpoints/RESERVE_STRINGS.md) applies all 77
+native general reserve labels without changing selectors, saved data, or runtime
+code. Four focused checks and the selected capacity/counter/classification
+regressions pass. The current combined ROM/UPS is `build/reserve-strings-pilot`.
+Required sun/skull apology input is next, followed by accented item names and
+residual general/letter text, then bounded combined v0 gameplay/save checks.
+
+The [borrowed-catchphrase integration](checkpoints/BORROWED_CATCHPHRASES.md)
+completes the known default/borrowed display family while retaining four-byte
+saved phrases and each original owner's GC wording. All five focused checks,
+independent builds, cartridge retention, UPS reconstruction, and the silent native
+check pass. The native run covers ten calls and thirty-five assertions in four
+MiB. Its retained combined ROM/UPS is `build/borrowed-catchphrases-pilot`.
+The combined counter verifies the installed adapter before granting resource
+credit. Continue residual general/interface text, letters, accented names, and
+required symbol input, then bounded combined v0 gameplay/save checks.
+
+The [item-reader boundary](checkpoints/ITEM_NAME_READERS.md) closes the existing
+35-call inventory against complete display and letter routes. Four focused
+checks pass, including actual installed verification and combined accounting.
+No new runtime or ROM changes are attributed to this classification. Complete
+item names receive credit once; accented Japanese rows remain untranslated.
+The borrowed-catchphrase build above also completes the catchphrase reader gate.
+
+The [letter-editor integration](checkpoints/LETTER_EDITOR_NAMES.md) supplies
+complete English recipients, GameCube-style header spacing, and matching cursor
+positions without changing saved fields. Opening/closing headers are independent
+of old snapshot-reader state. All eight focused checks, twelve counter tests,
+independent builds, retained-resource comparisons, and UPS reconstruction pass.
+The current combined ROM/UPS is `build/letter-names-pilot`. The known character-name
+reader family is complete and verified by combined accounting. Continue
+borrowed-catchphrase ambiguity, residual text/letters,
+and accents, then bounded combined v0 gameplay/save checks.
+
+The [house-sign integration](checkpoints/HOUSE_NAME.md) supplies complete English
+villager names in existing eight-byte stack storage, including a blank fallback
+when no house matches. Actor/save layouts, messages, colours, and timing remain.
+All six focused checks and twelve counter tests pass, including independent MIPS
+assembly, relocation, retained prior payloads, and UPS reconstruction. The current
+combined ROM/UPS is retained in `build/house-name-pilot`. Its house-sign reader
+is also retained by the letter-editor build above.
+
+The [conversation-name integration](checkpoints/CONVERSATION_NAMES.md) supplies
+complete names in three request/conversation fields and the ordinary resident's
+other-villager field, preserving saved identities and all prior translations.
+All six focused checks, the selected secret-actor regression, twelve counter
+tests, and independent builds pass. The silent native startup/bridge check passes
+twenty-six calls and thirty-six assertions with restored guards/checkpoint and
+blank isolated saves. Its retained combined ROM/UPS is
+`build/conversation-names-pilot`. Continue the villager house-sign reader,
+remaining item readers, borrowed-catchphrase ambiguity, residual text/letters,
+and accents. Ordinary interaction and save/restart remain in combined v0 smoke.
+
+The [fishing winner-name reader](checkpoints/FISHING_NAME.md) installs complete
+English NPC winner names while preserving six-byte saved identities, player
+names, score logic, and every prior translation. All six focused checks and
+twelve counter tests pass; independent builds agree. The current combined
+ROM/UPS is retained in `build/fishing-name-pilot`. Continue the remaining identity/item
+readers, borrowed-catchphrase ambiguity, residual text/letters, and accents.
+The native catchphrase editor opens blank; its four-byte custom-input limit
+is not a Japanese-default display reader. Ordinary gameplay and save/restart
+remain in the combined v0 smoke.
+
+The [English map labels](checkpoints/MAP_LABELS.md) install the complete GC
+landmark words, reference one/two-line positions, and vacant-house label while
+retaining full villager names and every prior translation. All six focused
+checks, three base-map regressions, and twelve counter tests pass; independent
+builds agree. Its retained ROM/UPS is `build/map-labels-pilot`.
+The eight embedded source records join combined accounting once, with installed
+reader verification. Continue the fishing-record display reader, remaining
+identity/catchphrase/item consumers, residual text/letters, and accents.
+Ordinary gameplay and save/restart remain in the combined v0 smoke.
+
+The [map/opening-guide integration](checkpoints/MAP_GUIDE_NAMES.md) supplies complete
+map villager names and the opening guide's coloured name field without widening
+packed map records or saved identities. All twelve focused implementation,
+assembly, relocation, cartridge, and accounting checks pass; independent map
+builds agree. The map fits the existing submenu pool, and the guide actor adds
+112 bytes. Its retained ROM/UPS is `build/guide-name-pilot`.
+Continue the fishing-record display reader, remaining
+identity/catchphrase/item consumers, residual text/letters, and accents.
+Ordinary interaction and save/restart remain in the combined v0 smoke.
+The checkpoint records one unresolved legacy regression-fixture rejection;
+neither that check nor unperformed gameplay is reported as passed.
+
+The [festival/reserve character-name integration](checkpoints/ACTOR_DISPLAY_NAMES.md)
+connects four actor preparations to complete eight-byte names within their
+original stack frames. Actor selection, field slots, messages, timing, saved
+fields, permanent allocations, and all prior translation resources remain.
+All six focused source/assembly/relocation/cartridge/accounting checks and
+seventeen name/counter regressions pass. Unchanged full-name/general-field
+helpers reuse the recorded native evidence; ordinary actor interactions remain
+in the combined v0 smoke. Its retained ROM/UPS is `build/actor-names-pilot`.
+Continue identity-based fishing-event name readers, catchphrase
+input/display, other item readers, residual text/letters, and accents.
+
+The [choice-capable text extension](checkpoints/CHOICE_SUBSTITUTIONS.md) installs
+complete bounded shared-choice substitutions alongside the twenty sixteen-byte
+general fields, plain/coloured dialogue insertion, native item-to-free-field
+wrapper, and three actor adapters. Its 3,263-byte startup-owned allocation leaves
+the resident module and save layout intact. Independent builds and all five
+focused checks pass, as do nine choice-runtime regressions, twelve counter tests,
+and two baseline field/artifact checks. The silent native check passes twenty
+calls and thirty memory assertions, including actual startup, full item/character
+names, default catchphrases, selected answers, overflow/control rejection, guards,
+and checkpoint restoration. Its retained combined ROM/UPS is
+`build/text-choices-pilot`. Continue remaining identity-based name preparations,
+catchphrase input/display consumers, other full-item readers, residual
+text/letters, and accents. Normal interaction/save/restart and original hardware
+remain unverified; the actual build still uses four MiB.
+
+The [festival-stall integration](checkpoints/STALL_CHOICES.md) installs complete
+sixteen-byte item choices and both exact GameCube English cancellation labels.
+It preserves item order, three/four-choice behaviour, the next-item index,
+messages, and timing. A 24-byte stack increase and 32-byte actor increase keep
+the native saved fields and resident module unchanged. All six focused checks,
+nine choice-runtime regressions, and twelve counter tests pass, including
+independent assembly, relocation, complete cartridge retention, and UPS
+reconstruction. Its retained build is `build/stall-choices-pilot`.
+Continue shared dynamic-choice readers, character and
+catchphrase consumers, remaining text, and accents. Normal stall interaction
+remains in the combined v0 smoke; no gameplay or hardware certification is claimed.
+
+The [event/home name integration](checkpoints/EVENT_ITEM_NAMES.md) connects seven
+more complete item-name preparations: Police2 lost-and-found, opening Nook,
+outside Redd, Saharah, the fishing-event reward, and both home-room prompts.
+It retains the original item expressions and message slots, including Redd's
+slot two, and preserves all other actor code, relocation, BSS, saved fields,
+prices, and dialogue timing. Independent assembly, all five focused tests, five
+resident-field regressions, twelve counter tests, and complete ROM/UPS retention
+pass. Its retained build is `build/event-item-names-pilot`. Continue item free-string
+paths, character/catchphrase consumers, and remaining main text. Ordinary gameplay joins the combined v0 smoke;
+no native gameplay or original-hardware acceptance is claimed for this batch.
+
+The [town/shop/player name integration](checkpoints/TEXT_NAME_CONSUMERS.md)
+omits the Japanese town suffix exactly as the English reference does and
+connects complete item names in six shop/Redd actors and three player capture/dig
+paths. It preserves zero-item clearing, native prices, message selection, timing,
+and saved fields without new RAM allocation. Independent MIPS assembly, focused
+source/argument/relocation checks, and complete ROM/UPS retention pass. Its
+retained build is `build/player-item-names-pilot`. Continue other item, character,
+free-string/choice, and catchphrase consumers, plus remaining text and accents.
+Ordinary shops, catches, digging, and save/restart remain in the combined v0 smoke;
+these installed routes do not imply gameplay or hardware certification.
+
+The [world item-label integration](checkpoints/WORLD_ITEM_NAMES.md) installs
+complete sixteen-byte names, reset, proportional sizing, and centred drawing
+without widening the native field or overwriting its adjacent display flag.
+The startup-owned rendering allocation grows by 1,040 bytes; existing font
+pixels, saved fields, main-code file, resident code, and every earlier
+translation resource remain. All six focused/core/cartridge/accounting checks
+and four font/loader regressions pass; independent builds agree. The retained
+world-label ROM/UPS is `build/world-names-pilot`. Ordinary startup, labels, and scene
+transitions join the combined v0 smoke. Continue remaining general strings,
+letters, accented names, and wider input/display consumers.
+
+The [inventory description integration](checkpoints/INVENTORY_DESCRIPTIONS.md)
+installs complete English letter/delivery/fortune labels, eight-byte display
+names, and save-safe Museum spelling. It retains GameCube wording, line order,
+and name colours while preserving native actions, quest logic, and saved fields.
+Fifteen focused/shared-profile checks, an exact colour-role check, and both
+cartridge/accounting tests pass; independent builds agree. The retained complete
+ROM/UPS checkpoint is `build/tag-descriptions-pilot`. The tag and owner editor use 8,064 of
+the existing 8,192-byte reservation, with no main-code or memory-layout change.
+Ordinary mail/quest transitions remain in the combined v0 safety pass. Continue
+remaining general strings/letters, accented names, and wider input/display consumers.
+
+The [embedded inventory text integration](checkpoints/INVENTORY_MENU_TEXT.md)
+installs thirteen complete category/present/question records and fixes the
+throw-away question's minimum window width. Native actions, line count, fields,
+and earlier translations remain. All six focused checks and seven prior-profile
+regressions pass; independent builds agree. The current complete ROM/UPS is
+`build/inventory-menu-text-pilot`. Its extra 192 aligned bytes remain inside the
+existing reservation. Ordinary menu execution joins the combined v0 safety pass.
+Mail/quest descriptions use the integration above; other text/consumers remain.
+
+The [catalogue full-name integration](checkpoints/CATALOGUE_NAMES.md) installs
+all 63 complete display-name slots across nine categories without widening the
+packed native pages. Both loaders, re-entry reset, and the item-name drawer
+are installed together. All six focused checks pass, including sanitizers,
+relocation, full-ROM/UPS retention, and unchanged combined accounting; independent
+builds agree. Its retained complete ROM/UPS is `build/catalogue-names-pilot`.
+The catalogue fits the existing submenu pool, with no main-code, resident, or
+save growth. Ordinary navigation/order remains in the combined v0 safety pass.
+Embedded category/present/confirmation text uses the integration above;
+other wider consumers remain.
+
+The [inventory English integration](checkpoints/INVENTORY_ENGLISH.md) installs
+39 complete label records, the ordinary sixteen-byte item-name consumer, and
+font-aware window widths. Native action order/callbacks, separate mail/quest
+fields, and numeric placement remain. Its retained complete ROM/UPS is
+`build/inventory-english-pilot`. The tag's 896 aligned bytes fit the owner
+editor's existing reservation; no main code, resident, or saved bytes change.
+Core/artifact checks, complete patch reconstruction, and 29 shared-menu
+regressions pass; independent overlay builds agree. Ordinary inventory, price,
+and mail/quest transition execution belong in the combined v0 safety pass.
+Other wider consumers remain implementation work.
+
+The [owner-message editor integration](checkpoints/HBOARD_EDITOR.md) installs the
+complete English draft, proportional four-row layout, cursor/edit operations,
+capacity/conflict warnings, save-safe confirmation, and cleanup together.
+Its retained complete ROM/UPS is `build/hboard-editor-pilot`. Its 20,416-byte
+owned editor adds 5,568 aligned bytes and a separate 8-KiB submenu reservation;
+saved layout, resident code, and every earlier translation resource remain.
+Eight bridge/artifact/cartridge tests, nine core tests, the 10,000-command core
+sanitizer exercise, and twenty-one notice regressions pass. Independent builds
+agree. The source-bound cursor/layout comparisons retain GameCube manual breaks.
+Representative native editor execution and normal interaction/save/reload belong
+in the combined v0 safety pass, not an exhaustive editor matrix before other
+translation work. No hardware or visual acceptance is claimed. Custom messages
+retain the native 64-byte saved limit; the complete default uses its exact canonical representation
+without truncation.
+
+The [home-gyroid default integration](checkpoints/GYROID_DEFAULT.md) installs the
+complete four-line GameCube greeting through a source-bound 206-byte message
+variant and exact saved-default selector. The actor grows by 176 bytes; native
+saved storage and resident memory remain unchanged. Independent Docker builds,
+all eleven focused host/source/ROM/accounting tests, and seventeen sequence
+regressions pass. Every earlier translation candidate and resource is retained
+apart from the one repurposed reserve, actor pair, and its allocation metadata.
+Its retained ROM/UPS checkpoint is `build/gyroid-default-pilot`. The completed
+silent native batch passes 112 calls and 133 assertions: cartridge loading and
+relocation, custom-byte protection, real default/custom selection for all four
+homes, complete native message/continuation loads, retained guards/save RAM,
+restored checkpoint, and blank isolated saves. Eighteen formatter/placeholder
+regressions also pass. Owner-editor presentation, normal interaction, save/reload,
+and hardware remain unfinished.
+
+The [complete diagnostic sequence](checkpoints/MESSAGE_DIAGNOSTIC_SEQUENCE.md)
+installs the last inventoried Japanese message-bank record as `0004 → 2AEB`,
+preserving the complete English draft, all 62 native commands, and its existing
+page boundary. Six source/capacity/slot/ROM/accounting checks and seventeen
+sequence regressions pass. The silent native batch passes seventeen calls and
+51 assertions, including actual loaded transitions, cancellation/field retention,
+complete buffers, restored guards/checkpoint, blank saves, and graceful shutdown.
+All earlier resources remain; three reserve labels also adopt their unambiguous
+complete English reference. No inventoried Japanese message-bank text remains,
+but general strings, letters, accented names, full-name callers, review/gameplay,
+release, and title/keyboard work continue. The actual build still uses four MiB.
+
+The [rendering diagnostic batch](checkpoints/RENDERING_DIAGNOSTICS.md) installs
+four more complete English records, preserving their native control streams,
+line/page boundaries, note patterns, and test parameters. All previous edits
+and non-message resources remain unchanged. Four source/ROM/accounting checks
+pass; the silent native batch passes four complete loads and fourteen assertions,
+with restored guards/checkpoint, blank saves, and graceful shutdown. The remaining
+`0004` diagnostic uses the guarded two-record integration above; its 961-byte
+complete English draft still correctly fails single-buffer validation at an
+expanded bound of 1,581 bytes. Remaining general strings, letters, accented names,
+full-name callers, review/gameplay, release, and title/keyboard work continue.
+
+The [native-design integration](checkpoints/DESIGN_ITEM_NAMES.md) adds 74 complete
+name fields, corrects the native herabuna species across names, two messages,
+general strings, and dynamic letters, and leaves eight accented name fields.
+Its compile-time word profile and actual MIPS digest-argument verification keep
+the letter initializer consistent with the corrected resource. Eight host C
+capture tests pass, including full resources, local/foreign herabuna capture,
+and rejection of the old profile. Full-ROM rebuild, final artifact checks, and
+the ten source/ROM/accounting checks pass. The completed silent native batch
+passes all 137 calls and 129 assertions, including the ordinary herabuna word
+load, restored stack/checkpoint, blank isolated saves, and graceful shutdown.
+Frozen new and preceding native evidence stays checked without replay. Creator
+machine code, sizes, symbols, relocations, reader, saved layout, and memory bounds
+remain unchanged. The corrected C initializer also passes its focused cartridge
+batch: thirteen calls and 22 assertions cover actual DMA/relocation, the complete
+herabuna field, rejection/recovery, freed allocation, restored heap/checkpoint,
+and blank isolated saves. Both frozen evidence checks pass without replay; normal
+full-letter delivery and hardware remain outside that focused test. Remaining accents, general/letter text,
+full-name callers, gameplay/review, release, and title/keyboard work continue.
+
+The [resolved-name integration](checkpoints/RESOLVED_ITEM_NAMES.md) installs
+65 more complete fields: seventeen stationery names, four totems, seven numbered
+shirts, and the placed cicada. Thirty explicit approvals resolve repeated paper
+quantity groups, totem dot spelling, and native carried-item conversions. Every
+prior English name stays unchanged; 35 new fields also fit native short storage.
+The matching article profile covers 4,462 wider fields, with 82 still pending.
+The complete ROM changes only name/article data and creator-CRC configuration.
+All seven source/ROM/accounting checks and eight article/creator checks pass,
+including the latter under sanitizers. Independent creator builds agree. The
+silent native batch in `build/smoke-resolved-items-01` passes all 157 calls and
+149 assertions, with restored stack/checkpoint, blank isolated saves, and graceful
+shutdown. Its frozen evidence and exact source-bound plan pass without replay.
+
+The [bilingual item-name batch](checkpoints/SHEET_ITEM_NAMES.md) installs 327
+additional source-bound identities in 834 full fields, with 112 also fitting
+native short storage. The complete `build/sheet-items-pilot` retains every
+earlier edit and adds the matching treasure article profile. All eight final
+source/resource/ROM/accounting checks, nine article/creator tests and their
+sanitizer equivalents pass. Independent creator builds agree; only read-only
+article data changes within its unchanged code/size. The full ROM also changes
+the two name files and creator-CRC configuration; no saved layout, font, reader,
+other actor, or memory bound changes. The completed silent native batch in
+`build/smoke-sheet-items-01` passes all 527 calls and 519 memory assertions, with
+restored stack/checkpoint, blank isolated saves, and graceful shutdown. Its frozen
+evidence and source-bound plan remain checked without replaying earlier batches.
+Remaining names, full-name callers, general/letter text, review, save/gameplay,
+release, and title/keyboard work continue.
+
+The [complete seasonal notice integration](checkpoints/NOTICEBOARD_SEASONAL.md)
+installs all 41 English bodies in `build/notice-seasonal-pilot`: 21 unchanged
+GameCube references, fifteen native-specific adaptations, and five original
+translations. Complete shop/town names and native lunar/sports dates use private
+capture. Publication advances the runtime posting cursor only after the complete post reaches
+the native writer. The original schedule, five-post backlog limit, events, speakers,
+shrine venue, and manual layout remain. Creation and reading must be installed
+together before the combined counter credits these source bodies.
+
+The 58,144-byte creator and 24,304-byte reader compile reproducibly. The reader
+uses a 20-KiB submenu growth reservation, 4 KiB more than the treasure profile;
+resident code, four-MiB heap bounds, and saved structures remain unchanged.
+All 54 creator, six decoder, and fourteen combined-reader host tests pass, as do
+their sanitizer equivalents. Six creator artifact checks and eleven owner/reader/
+installation/accounting checks pass. The full ROM/UPS retains every earlier
+translation resource. Five treasure owner, five treasure creator, and five frozen
+native-evidence checks pass without replaying completed native batches.
+The silent native owner batch passes 78 scheduled body/capitalization cases,
+four direct unscheduled entries, and all five failed-backlog positions followed by
+successful suffix retries: 359 calls and 513 assertions. Actual native calendar,
+shop, scheduler, writer, and cartridge-loaded creator execute. The separate reader
+batch passes all 82 complete bodies, 84 draws including two continuation pages,
+11,930 glyphs, 47,720 vertex positions, 183 calls, and 466 assertions. Both restore
+state and their checkpoints, keep isolated saves blank, and shut down gracefully.
+These controlled fixtures do not prove normal menu initialization, the enlarged
+submenu pool, save/reload, or hardware. The posting cursor is outside the saved
+payload; interrupted-notice retry is proven within the same session only.
+
+The [complete treasure integration](checkpoints/NOTICEBOARD_TREASURE.md) installs
+all eighteen English posts in `build/notice-treasure-pilot`, including their
+transactional creator, native burial/publication bridges, and full-body reader.
+The build requires both sides together and verifies the actual installed creator,
+article/name resources, reader relocations, and original scheduling instructions.
+The combined counter credits the eighteen installed bodies once, alongside the
+four initial announcements; its unchanged denominator still includes remaining
+names, letters, dialogue, and other inventoried text.
+
+The 15,984-byte reader adds 2,144 bytes within the existing submenu reservation.
+The 48,752-byte creator, 5,344-byte workspace, resident module, and native saved
+layout remain unchanged. All manual breaks and full names are retained; `01F4`
+keeps the town/row-only clue without revealing the item. Ten combined-reader host
+tests and their sanitizer equivalents pass, covering all eighteen bodies, both
+capitalizations, all five article modes, complete pages, mixed-post caching, and
+resource failure/retry. Eight new compilation/installation/accounting tests pass,
+including independent builds, the full ROM/UPS, atomic failures, and retained
+resources. Ten initial installation checks, five owner artifact checks, and four
+retained native-reader evidence checks also pass without replaying native batches.
+
+The completed silent native treasure owner batch passes all 72 publications and
+eleven failure/eligibility cases: 171 calls and 1,829 assertions. Actual native
+burial, all 25 pitfall shapes, both cartridge-loaded transaction phases, null
+allocator returns, exact undo, and unchanged unrelated save state are verified.
+The separate reader batch passes the same 72 records, 157 calls, 410 assertions,
+9,148 glyphs, and 36,592 vertex positions. Both restore heap/save/global state and
+their checkpoints, retain blank isolated saves, and shut down gracefully. No
+completed initial board batch is replayed. Ordinary-item cases substitute a
+known item at placement; the random furniture selector is not exercised. These
+reader fixtures fit single pages, so they do not add native multi-page evidence.
+
+Continue installing other remaining text and validating normal gameplay. Seasonal donor
+IDs differ from the N64 IDs, including Valentine's Day, White Day, Doll Festival,
+the two moon-viewing dates, and the sports/festival dates and shrine venue.
+Bind matching text by meaning and retain native-specific events. Save/reload,
+normal gameplay, human review, hardware acceptance, patch-only release, and
+title/keyboard stretch goals remain.
+
+The [initial bulletin-board integration](checkpoints/NOTICEBOARD_READER.md)
+installs all four complete announcements, full-body pages, and English entry/date
+labels. Source wording and manual breaks remain, with only `C Stick` adapted to
+`C Buttons`. The 13,840-byte overlay retains original BSS addresses, reserves
+16 KiB more submenu space, and leaves the resident module and saved layout
+unchanged. Six reader host/sanitizer checks and ten compilation/installation
+checks have passing results; independent builds agree. Native storage passes
+36 calls and 46 assertions, including every saved slot, full-board shifting,
+guards, checkpoint restoration, blank saves, and graceful shutdown. The combined
+counter credits only the four installed bodies. The native owner/reader batch
+verifies all eight complete body/capitalization cases, 33 draws, 2,210 glyphs,
+and 8,840 vertex positions. L/R page limits, two-post caching, corrupt-record
+recovery, entry labels, and all twelve months pass. The final edge run restores
+heap/save/input state and its checkpoint, with blank isolated saves and graceful
+shutdown. The [native reader evidence](checkpoints/NOTICEBOARD_NATIVE_READER.md)
+distinguishes completed checks from partial fixture runs. Normal menu entry and
+C-button/edit navigation, old automatic posts, and persistence remain active
+work; all 41 seasonal bodies use the complete integration above. Seventeen treasure references have
+source/field review; the creator/decoder above also implements the native-specific
+`01F4` heading without revealing the original clue's hidden item. Continue
+remaining text implementation and gameplay acceptance, without replaying
+passed storage/reader cases.
+
+The [native-specific name integration](checkpoints/NATIVE_ITEM_NAMES.md) installs
+22 source-bound original entries in 63 complete fields, including 31 unchanged-
+width fields and two clothing aliases. It preserves N64 objects/designs and
+unused labels where donor names differ, with explicit original provenance.
+Both builders reject shortened, relabelled, or misattributed output even when
+approval metadata is removed. All sixty selected host/artifact/regression checks
+have passing results; only the two name resources change in the full ROM.
+The silent native batch passes 143 calls and 135 assertions, including restored
+checkpoint, blank saves, and graceful shutdown. Remaining names, full-name
+callers, noticeboard/general text, review, and full acceptance continue.
+
+The [gyroid-name batch](checkpoints/GYROID_ITEM_NAMES.md) installs all 127 complete
+English names in 508 rotation slots; 124 also fit unchanged native fields. Only
+the two item-name files change, with all earlier text/runtime/save structures
+retained. All 51 focused source, capacity, current-ROM/UPS, accounting, and
+regression tests pass. The bounded silent native batch passes all 344 calls and
+336 assertions, with restored checkpoint, blank saves, and graceful shutdown. Remaining
+name identities, wider callers, noticeboard/general text, and full acceptance
+continue without repeating that completed batch.
+
+The [selected song-title caller](checkpoints/SONG_ITEM_NAMES.md) now uses full
+sixteen-byte item fields, retaining the entire credits overlay layout and adding
+no resident/saved memory. The complete ROM changes only that actor relative to
+the ordinary-name build. Independent assembly, current-ROM/UPS checks, and all
+53 focused regressions pass. The completed silent native batch passes all 55
+full-title fields and native insertions, five rejections, three eight-bit argument
+cases, and fallback/recovery: 125 calls and 326 assertions. Live actor ownership,
+save memory, heap/stack guards, restored globals/checkpoint, blank isolated saves,
+and graceful shutdown pass. Typed song requests, the two accented song names,
+normal gameplay, and hardware remain.
+
+The [ordinary item-name batch](checkpoints/ORDINARY_ITEM_NAMES.md) installs 209
+additional complete English names: songs, stationery, tools, quest items, seeds,
+raffle tickets, Bell denominations, mushroom/candy, grab bags, and turnips.
+All earlier candidates remain; fifty also fit unchanged native fields. Only
+the two item-name resources change in the full quest-reply ROM. All 38 focused
+host/artifact/scenario tests pass, including exact full output and the UPS round
+trip. The silent `build/smoke-ordinary-items-01` batch passes all 392 calls and
+385 assertions, with retained guards, restored checkpoint, blank isolated saves,
+and graceful shutdown. Remaining accents/designs, full-name callers, and review remain.
+
+The [letter-quest reply integration](checkpoints/QUEST_REPLY_LETTERS.md) installs
+all 72 templates `0075..00BC` and 216 complete parts, including full villager
+signatures and required item names. Original rewards, ranks, identities, native
+short fields, and paper remain. Mailbox copying requires complete creation.
+All 41 host tests and the same sanitizer tests pass; independent creator builds,
+exact wrapper/gate assembly, complete-ROM/UPS retention, and combined accounting
+checks pass. The 34,096-byte creator uses the unchanged resident loader and
+four-MiB layout. The completed silent native batch passes all 144 original
+comparisons and home deliveries, 146 complete readbacks, six failure cases,
+two resource retries, and four full-width rank rejections. All 597 calls and
+1,505 assertions pass, including retained inputs/RNG, restored save/globals,
+heap/stack/code guards, checkpoint reload, blank saves, and graceful shutdown.
+Normal conversation, saving, review, and hardware remain unverified.
+
+The [shop-notice integration](checkpoints/SHOP_NOTICE_LETTERS.md) installs all
+nine spotlight/reopening templates and 27 complete parts, including full
+sixteen-byte item fields. Reopening prepares the full letter before any home
+copy or notification clear; original selectors and eligibility remain. The
+33,008-byte creator uses a checked 65,536-byte image limit. The resident change
+is one instruction, with identical size, symbols, bootstrap, reservation, and
+four-MiB heap bounds. Thirty-seven creator tests, eight loader tests, all 45
+corresponding sanitizer tests, six installation/accounting tests, and 24
+scenario/reader/relocation/accounting regressions pass. The full ROM retains
+every earlier text resource and actor. Independent creator/owner builds agree.
+The silent native batch passes all 32 spotlight cases, eight four-home reopening
+cases, 64 full readbacks, seventeen owner-fault cases, resource retries, and
+duplicate-notice checks. All 172 calls and 376 assertions pass, with restored
+state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown.
+Normal scheduling, save/reload, review, and hardware remain unverified.
+Spotlight resource-failure recovery beyond its original call still needs
+scheduling evidence. Continue remaining text consumers without repeating this batch.
+
+The [villager secret-letter integration](checkpoints/SECRET_LETTERS.md) installs
+fifteen complete templates and all 45 parts. Thirty fixed snapshots retain both
+capitalization states and complete glyphs. The 19,392-byte overlay preserves
+all earlier date, wider-item, and birthday fixes, plus original BSS addresses.
+It fits the existing conversation allocation without resident or saved-layout
+growth. Thirteen focused tests, four sanitizer tests, independent builds and
+assembly, and the complete ROM/UPS checks pass. The combined counter credits
+only the verified installed parts. All 56 current-runtime regressions pass.
+The silent native batch passes both actual quest-manager loading bases, thirty
+original paper/RNG comparisons, sixty full English readbacks, and three
+rejections: 194 calls and 439 assertions, with restored state/heap/checkpoint,
+blank isolated saves, and graceful shutdown. Three additional ordinary
+unknown-sender windows pass complete text and glyph-position checks: fifteen
+calls, 53 assertions, 504 glyphs, and 2,016 vertex positions. The cases cover
+the longest header/body/footer and extended glyphs, each on one complete page.
+Normal conversation selection/fallback, save/reload, review, and hardware remain
+unverified. The letter-quest integration above adds the 72 replies `0075..00BC`,
+including full villager signatures and gift-item fields.
+
+The [Snowman integration](checkpoints/SNOWMAN_LETTERS.md) builds all twelve
+complete gift letters with full sixteen-byte item fields. Twenty-four fixed
+snapshots preserve both capitalization states and require no new per-letter
+allocation or text reads. The 18,384-byte actor adds 1,472 bytes within its native
+allocation lifetime, with no resident or saved-layout growth. Independent builds
+and wrapper/gate assembly agree; all eighteen final focused/evidence tests,
+four sanitizer tests, and 24 reader/relocation/accounting regressions pass.
+Silent native execution passes all 24 original metadata/RNG comparisons and
+reward-queue deliveries, with 48 complete readbacks. The first run then stops on
+a visitor-fixture address error. Its corrected edge-only resume passes all five
+owner cases, four creator rejections, an additional full readback, restored
+state/heap/stack/checkpoint, blank isolated saves, and graceful shutdown. The
+completed text cases are not rerun. Native full-mailbox/queue failure still has no durable reward
+retry; that is the original policy, not new translation resource failure.
+Normal gameplay, save/reload, review, and hardware remain unverified.
+
+The [museum integration](checkpoints/MUSEUM_LETTERS.md) installs complete English
+introduction, non-fossil, and 25 fossil-result letters. All 81 source-bound parts
+are retained without free-field or saved-layout changes. Thirty-three host tests,
+the same sanitizer tests, six installer/accounting/actual-ROM tests, three native
+scenario tests, 32 reader/loader/accounting regressions, and independent creator
+builds and assembly pass. The completed silent native batch passes 54 original
+comparisons/complete home deliveries, 75 full readbacks, five fallback cases,
+twenty pending-notice/fossil cases, resource retries, and duplicate-notice checks.
+All 313 calls and 666 assertions pass, with restored state/heap/stack/checkpoint,
+blank isolated saves, and graceful shutdown. The creator is 32,224 image bytes with 544 bytes free under
+its current limit; the resident size and four-MiB layout remain unchanged.
+Normal scheduling, save/reload, the museum's sender display mapping, review, and
+original hardware remain unverified.
+
+The [post-office integration](checkpoints/POST_OFFICE_LETTERS.md) installs all
+four catalogue-order letters and the raffle-ticket letter with complete supplied
+English wording, sixteen-byte item names, and full expiry-month names. Native
+order and ticket loops retain their pending gifts/counts until successful mailbox
+receipt. Thirty host creator tests, the same thirty sanitizer tests, six installer
+and actual-ROM checks, thirty-five reader/loader/accounting regressions, and
+independent creator builds and native assembly pass. The silent native batch
+passes all 68 original comparisons/creations/receipts/readbacks, ten pending-loop
+cases, five invalid requests, 364 calls, and 615 assertions. Restored state,
+heap/stack guards, checkpoint reload, blank isolated saves, and graceful shutdown
+pass. Normal scheduling, save/reload, review, and original hardware remain.
+Shared creator guards recover enough space for this group: the new complete
+creator has 1,264 image bytes free, with no resident or saved-layout growth.
+An Expansion Pak requirement is permitted if the finished translation needs it;
+the implemented memory layout remains four-MiB until explicitly rebuilt/tested.
+
+The [flooring/wallpaper batch](checkpoints/FLOOR_WALL_NAMES.md) installs seventy
+additional complete GameCube names in the full translation ROM. Ten also fit
+native ten-byte fields; all other names remain complete in the existing wider
+resource. Every previous candidate and every non-item DMA file is unchanged.
+Forty host/artifact tests and eleven scenario/regression tests pass. The silent
+native batch passes 189 calls and 181 assertions, with checkpoint restoration,
+blank isolated saves, and graceful shutdown. Remaining name identities, wider
+callers, letters, other text, review, and full-project acceptance continue.
+
+The [catalogue-four creator integration](checkpoints/MAIL_GLYPH_CREATORS.md)
+builds the complete translation ROM with all 114 Mom, 55 villager-event, and
+21 HRA score templates, plus the glyph-bearing ordinary reply footer. The
+compiled catalogue choice, exact font/catalogue installation, source approvals,
+and combined text counter retain legacy catalogue semantics. All 57 host and
+installer tests, 26 sanitizer tests, and 75 reader/accounting regressions pass.
+Independent creator builds agree. Native runs pass all 114 Mom deliveries,
+110 villager-event comparisons/readbacks, 42 score comparisons, and 44 score
+readbacks. An independently resumed NPC group passes all 56 complete creations,
+eight rejections, checkpoint restoration, and blank isolated saves. The earlier
+ordinary-NPC rejection does not recur in this matching-town fixture; its cause
+is not established. The score scheduler leaves mail/date state unchanged when
+the test expects delivery, so overall scheduling acceptance remains open. The creator
+uses the shared guard in the current postal build; the resident has no linked
+headroom. Remaining text consumers,
+ordinary NPC delivery, review, real saves, release, and both stretch goals remain.
+
+The [complete mail-glyph framework](../specs/MAIL_GLYPHS.md) transcodes all 4,866
+reference parts, retaining every original word, command, and manual break. Its
+new immutable catalogue supports the 59 unavailable parts and donor accented
+capitalization. The fourteen-cell font retains every existing separate glyph
+and leaves the native atlas unchanged. Formatting, field scanning, line/page
+boundaries, and footer alignment retain complete pairs. All 80 final focused
+tests pass. The silent cartridge batch passes 114 glyph-bearing reconstructions,
+eight old-catalogue reconstructions, 28 native line scans, 44 native draws,
+seventeen cursor cases, 346 calls, and 1,224 assertions. Checkpoint restoration,
+erased FlashRAM, and the unchanged blank Pak fixture pass. The resident image
+fits exactly within the existing 24 KiB limit
+after sharing checksum and draw routines; the RAM reservation and saved layouts
+do not grow. Creator routing and the complete translation build use the
+integration above; native and wider acceptance remain. Reference availability is not
+installed-translation credit. The [glyph checkpoint](checkpoints/MAIL_GLYPHS.md)
+records current artifacts and the next implementation steps.
+
+The catalogue-two [HRA score integration](../specs/ACADEMY_SCORE_LETTERS.md) has twenty
+complete supported letters with full dates, comma-separated points, and complete
+selected item/series names. Native scoring and rewards remain unchanged; delivery
+success crosses the original scoring return and scheduler cleanup before the
+evaluation date updates. The integrated ROM builds, 25 host/sanitizer tests and
+five installer tests pass, and independent builds/assembly agree. All 1,047
+regression tests pass, with five further fixture/audit tests passing separately.
+The complete silent native batch passes forty original comparisons, forty-four
+full readbacks, four scheduler cases, thirteen rejections, two retries, 159 calls,
+and 450 memory assertions. Checkpoint restoration and blank isolated saves pass.
+Successful scheduling uses the original NULL-game allocation path; the
+game-owned allocation fails in this checkpoint and retains eligibility correctly.
+The [score checkpoint](checkpoints/ACADEMY_SCORE_LETTERS.md) tracks evidence and
+remaining work. The glyph framework and creator integration above support all
+selected bodies. The broader translation/review remains active.
+
+The [HRA welcome/advice integration](../specs/ACADEMY_LETTERS.md) installs twenty
+complete letters and preserves membership/date eligibility when delivery fails.
+All 21 host creator tests, sanitizers, five installer tests, independent builds,
+and independent assembly pass. The silent native batch passes forty original
+metadata comparisons, forty-four complete readbacks, six real scheduler cases,
+nine rejections, two resource retries, 152 calls, and 436 memory assertions.
+All four homes and ten mailbox slots are covered; same-day duplicates are rejected.
+Live save/globals and the checkpoint are restored, with blank isolated saves and
+graceful shutdown. All 1,013 regression tests pass. Catalogue-four acceptance,
+normal gameplay/save acceptance, and the wider project remain.
+The [checkpoint](checkpoints/ACADEMY_LETTERS.md) records artifacts and limits.
+
+The catalogue-two [villager-event integration](../specs/VILLAGER_EVENT_LETTERS.md)
+installs 54 complete supported friendship-gift, birthday, moving-away, and
+Christmas letters. The complete creator retains original selection routines,
+uses full villager and selected item names, and checks success before native
+publication. The integrated ROM builds, seventeen host tests and sanitizers pass,
+and five installer tests and independent builds/assembly pass. Catalogue four
+supplies the remaining birthday body. All 987 catalogue-two tests pass. The silent
+native batch passes 108 original-selection comparisons, 108 complete delivered
+readbacks, eighteen rejections, four resource retries, 573 calls, and 1,956 memory
+assertions including checkpoint restoration. Live save/globals are restored and
+isolated saves remain blank. Normal scheduling, top-level goodbye pending-bit
+handling, saving/reloading, and hardware remain unverified. The
+[checkpoint](checkpoints/VILLAGER_EVENT_LETTERS.md) records current artifacts.
+
+The [departed-villager integration](../specs/DEPARTED_VILLAGER_LETTERS.md)
+installs all eighteen complete English letters with full villager names and
+remembered town identity. All 36 native comparisons preserve original metadata,
+temporary fields, and RNG; all eighteen delivered letters reconstruct completely.
+Six rejections and a resource-recovery retry pass, with 177 calls and 474 memory
+assertions. Live save/globals and the checkpoint are restored; isolated saves
+remain blank. Thirteen creator tests, the sanitizer run, six installer tests,
+independent builds, and independent assembly pass. No resident or saved-layout
+growth is added. All 965 regression tests pass. Failed delivery retains the
+remembered villager, but exact selected template/paper retry is not made durable.
+Normal scheduling, queue
+draining, saving/reloading, and hardware remain acceptance work. The
+[checkpoint](checkpoints/DEPARTED_VILLAGER_LETTERS.md) pins artifacts and test
+scope. Birthday/Christmas creators and remaining general/item text follow.
+
+The catalogue-two [Mom-letter integration](../specs/MOTHER_LETTERS.md) has 113 complete
+supported letters through native home-mailbox delivery. Ten host creator tests,
+the sanitizer run, five installer tests, independent builds, and independent
+entry/gate assembly pass, along with all 945 regression tests. The silent native batch passes all 113 complete
+mailbox-to-reader cases, seven rejections, a retry, 239 calls, and 730 memory
+assertions, including the resumed-checkpoint check. Original save memory is
+restored, isolated saves stay blank, and shutdown is graceful. No resident code
+or saved structure grows; the optional system creator preserves ordinary NPC
+reply creation. Catalogue four supplies the remaining Mom body. Normal
+scheduling, save/reload, and hardware remain unverified. The
+[integration checkpoint](checkpoints/MOTHER_LETTERS.md) pins the complete build
+and test evidence. Other letter creators and remaining general/item text are next.
+
+The [sale/Redd event-manager owner](../specs/EVENT_LEAFLET_PUBLICATION.md)
+installs all nineteen complete letter templates, resolves full sixteen-byte
+selected item names, and retains native event timestamps. It prepares the whole
+letter before the mode-two saved-event receipt and retains selected inputs on
+failure. Seven focused host owner/installer tests and all 930 regression tests
+pass; independent 38,112-byte actor builds agree. The silent native batch passes
+78 combinations, two cache-loss retries, 80 complete readbacks, 322 calls, and
+1,292 memory assertions including the post-restore check. Graceful shutdown and
+blank isolated saves pass. The integrated pilot preserves all 13,383 ordinary
+edits and earlier resources. Its saved pending flag uses additional values; real save/reload,
+normal scheduling, and event replacement remain unverified. The
+[integration checkpoint](checkpoints/EVENT_LEAFLET_PUBLICATION.md) records
+the native batch, exact artifacts, and remaining acceptance work. Remaining
+general text and letter consumers are next; defer broader edge-case acceptance
+to the batch/playthrough pass without claiming it complete.
+
+The [renewal delivery actor](../specs/RENEWAL_LETTERS.md) installs all three complete
+English renovation letters in eligible native home mailboxes. Preparation completes
+before any copy, and the original caller retains its notification on failure.
+Nine host tests and the 918-test renewal regression batch pass; independent actor
+builds agree. The silent native batch
+passes 24 complete combinations, five eligibility cases, failed-preparation retry,
+duplicate prevention, 165 calls, and 532 memory assertions. Live state and the
+checkpoint are restored, and isolated saves stay blank. The 7,472-byte actor keeps
+native profile/DMA ownership and adds no resident or saved-layout growth. Normal
+scheduling, gameplay, and hardware remain unverified. The
+[work record](checkpoints/RENEWAL_LETTERS.md) pins artifacts and remaining work;
+the event-manager sale/Redd owner above extends publication to those notices.
+
+The [complete leaflet creator](../specs/LEAFLET_LETTERS.md) supports all 22 renewal,
+sale, and Redd templates, with all 66 source-bound English header/body/footer
+parts. It captures full dates and sixteen-byte selected item names and publishes
+only after complete snapshot creation and reader validation. Renewal wording
+names the closed day, so its text date is calculated from the original planned
+reopening date without changing event scheduling. Seven focused tests, six probe
+regressions, and ten fortune-creator regressions pass. The silent native batch
+passes 77 complete creations/readbacks, six rejected inputs, disabled-catalogue
+retention, 165 calls, and 1,418 memory assertions, with restored checkpoint,
+retained RNG/handbill/save/heap state, blank isolated saves, and graceful shutdown.
+Independent 3,100-byte builds agree. The renewal actor uses this creator;
+sale/Redd item lookup, allocation/owner lifetime, event registration, and normal
+delivery remain. The [creation work record](checkpoints/LEAFLET_LETTERS.md)
+pins the evidence and integration boundaries. The event-manager owner above
+now provides sale/Redd item lookup, publication, and selected-input retry;
+normal routing and save acceptance remain separate checks.
+
+The [leaflet date integration](../specs/LEAFLET_DATES.md) installs complete
+month/day/year and AM/PM preparation for renewal, sale, and Redd letters. Seven
+call words, two Redd scratch pointers, and the original hour formatter change;
+resident size, actor frames/BSS, saved layouts, approved font, and ordinary text
+remain unchanged. All 895 regression tests, six focused formatter/installer tests,
+and four final date-audit tests pass. The silent native batch passes 256 hours,
+twelve renewal date blocks, twelve sale preparations, 33 Redd preparations,
+354 calls, and 1,141 memory assertions, with a restored checkpoint, unchanged
+live save/heap accounting, blank isolated saves, and graceful shutdown. Independent
+hour builds and UPS/installed-text checks agree. Full letter creation/publication,
+wider sale-item capture, notice/fishing consumers, normal scheduling/delivery,
+and hardware remain. The [date work record](checkpoints/LEAFLET_DATES.md) tracks
+exact artifacts and test limits. Native complete-leaflet publication is the next task.
+
+The [complete fortune-slip creator](../specs/FORTUNE_SLIP_LETTERS.md) preserves
+all 68 phrase/outcome values and all three English letter templates. The optional
+native actor now stores the complete letter before announcing hand-off, retains
+selected values across failed attempts, and frees temporary work on every path.
+It fits the unchanged overlay/instance pools and preserves original DMA-row
+adjacency. Sixteen adapter/installer host tests pass. The silent native batch passes
+24 complete outcome/template/capitalization combinations, every pocket position,
+full-pocket rejection, failed-resource retries, duplicate prevention, complete
+reader restoration, 64 exact interrupted-payment recoveries, and 1,255 memory
+assertions. All 886 regression tests pass;
+independent actor builds and installed-text/UPS checks agree. Heap accounting, live save,
+checkpoint restoration, and blank isolated saves pass. The original payment helper
+and luck timing remain intact. Guarded end/save/destructor/reinitialization
+callbacks refund an unfinished payment exactly once, including the original Bell
+bag and pocket when applicable. Changed owners, balances, or reused pockets are
+rejected without writes. The already revealed fortune is not undone; there is
+no persistent letter recovery. Resident module, font, and all 13,383 ordinary
+applied edits remain unchanged. Normal interaction, scene-removal routing, and
+hardware acceptance remain unverified. The [recovery work record](checkpoints/FORTUNE_RECOVERY.md)
+tracks current artifacts, regression evidence, and remaining work; the
+[foundation record](checkpoints/FORTUNE_SLIP_FOUNDATION.md) retains the independent
+creator/catalogue evidence.
+
+The [native English credits](../specs/NATIVE_CREDITS.md) install all 110 complete
+rows, adding 106 translated entries. Explicit identities correct swapped,
+missing, and substituted legacy contributors while preserving native pages and
+timing. A separate twenty-five-byte row buffer fits the existing structure slot.
+All 860 host tests pass. The silent native batch passes sixteen pages, 26 draws,
+3,425 glyphs, fade boundaries, and 97 memory assertions, with a restored
+checkpoint and blank isolated saves. Independent reconstruction verifies all
+13,383 applied edits and the UPS round trip. General strings total 920/1,562,
+leaving 642 without candidates. Normal K.K. performance, final visual/editorial
+review, and hardware remain unverified. Fortune-slip letters and remaining
+general-string consumers follow; the title screen remains the first image task.
+
+The [shared NPC-word integration](../specs/SHARED_NPC_WORDS.md) installs all
+352 complete English reply words, including 160 used by ordinary resident
+dialogue. Full candidates total 13,383; general strings are 920/1,562, leaving
+642 without candidates. All 860 host tests pass, and independent reconstruction
+verifies every installed edit and the original-ROM UPS round trip. Only string
+data, offsets, and DMA metadata change from the resident-word pilot. The silent
+dialogue portion passes all 288 random words, 118 complete messages, and 447
+insertions, with its checkpoint restored. The first complete letter-creator
+call rejects its fixture after native preparation; that failure is under
+investigation and the combined batch does not pass. Generation stays opt-in,
+normal delivery and semantic review remain,
+and the title screen stays the first image task after the main port.
+
+The [ordinary resident-word integration](../specs/RESIDENT_WORDS.md) installs
+136 complete English values for drinks, colours, places, reading material,
+shop types, and item categories. Seven guarded instruction words use existing
+sixteen-byte temporary/item storage and a larger shop-name local, preserving
+the date/birthday patch, native RNG, saved layout, and resident size. The silent
+native batch passes all 128 random words, four complete shop types, category
+field insertion, 118 unique message loads, 287 insertions, and 1,097 memory
+assertions. Checkpoint restoration and blank isolated saves pass. The 836-test
+regression batch and final eleven focused tests pass. The additional shared
+families use the complete NPC-word integration above; normal interactions and
+category selection remain gameplay checks.
+
+All 120 [shop quantity counters](../specs/SHOP_UNITS.md) are installed with
+complete English singular/plural values and thirty intentional empty counters.
+The native sapling family uses sapling/saplings, not the same-ID GameCube turnip
+wording. No shop actor instruction or saved layout changes. The silent five-shop
+batch passes 120 complete loads, 120 preparations, 250 field insertions, and
+746 memory assertions, with restored checkpoint and blank isolated saves.
+All installed payloads pass independent reconstruction. These counts do not
+establish semantic review, normal transactions, or hardware compatibility.
+Fortune-slip letter creation, other general-string destinations,
+and the remaining native sample scripts follow the shared-word batch.
+
+Fifteen [native engine tests and shopping labels](../specs/ENGINE_DIAGNOSTICS.md)
+have complete English drafts with every native command, menu target, page,
+printed number, and ending retained. Five focused tests and fifteen complete
+native cartridge loads pass, including 47 memory assertions and restored blank
+isolated saves. Both generation modes add exactly fifteen records and retain all
+earlier edits unchanged. Full/basic candidates are 13,383/12,015, with 10,825
+main-bank candidates. The five remaining Japanese main-bank records are larger
+test scripts with deliberate glyph/sound samples; those samples need an explicit
+preservation policy, not deletion for coverage. Shared strings and their callers
+remain next; the title screen is the main image replacement after the main port.
+The 836-test regression batch and final eleven resident-word tests pass.
+
+The [Resetti reply dictionary](../specs/RESETTI_REPLIES.md) installs all 32
+complete English rude replies with matching substring lengths. The unchanged
+ten-byte input needs only two actor-instruction changes and compact boundaries
+in the existing table. All 817 host tests pass. The silent native batch passes
+227 detector cases, fourteen installed English apology targets, thirty result
+classifications, and 302 memory assertions with restored checkpoint and blank
+saves. Ordinary strings total 920, including the complete shop-counter,
+scoped resident-word, shared NPC-word, and native-credit groups.
+The two sun/skull apology targets and ordinary editor input/retry remain
+unimplemented or unverified. Broader shared strings, those editor consumers,
+and the five larger native test scripts remain; title artwork stays first after the
+main translation/runtime port.
+
+The [Katrina fortune integration](../specs/FORTUNE_STRINGS.md) installs all 128
+complete supplied English phrase fragments through a sixteen-byte native caller.
+This adds 108 ordinary string candidates; the other twenty already fit the old
+limits. Its 128-record group is included in the full candidate build. Seven
+actor-frame/length words and the general-string data-address
+pair change; no resident growth, font metric, RNG selection, saved field, or
+fortune effect changes. All 810 host tests pass. The silent native batch passes
+128 complete phrase loads, 128 actual preparations, 32 original RNG comparisons,
+32 complete readings, and 128 field insertions: 459 calls and 888 memory
+assertions with restored checkpoint and blank saves. Paid readings, luck effects,
+visual presentation, and hardware remain gameplay checks. Broader shared strings,
+apology matching, and remaining native diagnostics follow this batch.
+
+The [three-round number game](../specs/NUMBER_GAME_CHOICES.md) has complete
+English questions and dedicated Less/More answers without changing the clothing
+menu. The silent native batch passes all 29 contextual menus, the clothing/shape
+regressions, and eight table boundaries: 73 unique messages, 66 answer cases,
+510 native calls, and 817 memory assertions, with restored checkpoint and blank
+saves. Only two choice-count instructions change; no new resident allocation,
+font metric, saved field, or random-outcome command changes. Normal rounds,
+prizes, clothing actions, final wording/layout, and hardware remain separate
+gameplay/playthrough checks. General strings/callers, apology matching, and
+remaining native diagnostics are the next content targets.
+
+The complete [snooty letter-sharing explanation](../specs/SNOOTY_LETTER_SEQUENCE.md)
+is installed as `0912 → 2B47`, retaining every GameCube word and splitting only
+at an existing page boundary. Both full cartridge loads, the continuation, both
+ending phases, and fifteen memory assertions pass in a silent restored
+checkpoint with blank isolated saves. Focused sequence and placeholder checks
+pass; normal first-job interaction and expression rendering remain playthrough
+checks. Current full/basic candidates are 13,383/12,015. All three number-game
+questions use dedicated Less/More labels while the clothing menu's shared
+labels remain unchanged. Title artwork remains the first
+image replacement after the main text/runtime work.
+
+Complete the main translation/runtime port, then the matching GameCube image
+replacements and GameCube-style keyboard. Immediate work covers broader missing
+dialogue, normal gameplay/save validation, unsupported text controls,
+and the general-string/name/mail destinations. Candidate review remains required.
+The birthday preparer supplies full English animal/sign names, month names, and
+ordinal days to all 33 native request conversations. Its 24 native boundary cases,
+48 original RNG comparisons, 57 complete message loads, and 190 field insertions
+pass; normal birthday-entry, gift, and horoscope gameplay remain unverified.
+The 836-test host regression batch passes, including the cartridge-font,
+number-game, full-fortune, Resetti-dictionary, shop-counter, resident-word, and engine-diagnostic integrations. The final 26
+choice tests and seven reply tests also pass.
+The silent birthday/date/choice batch
+passes 913 native calls and 1,588 memory assertions; the fresh train-to-town and
+cartridge-mail batch passes 245 calls and 546 memory assertions. Both restore
+their isolated checkpoints, retain blank cartridge/Pak saves, and shut down cleanly.
+The [completion queue](WORK_QUEUE.md) tracks all required work;
+partial milestones do not complete the project.
+
+Six native storage, raffle, and offering drafts preserve the original menus,
+prize ranks, pauses, and four paired shop-twin exchanges. Their combined native
+batch passes eleven complete messages, six menu labels, and 41 memory assertions.
+Normal service actions and twin-echo rendering remain gameplay/polish checks.
+Four complete GameCube references retain the original native random response
+commands. Fifteen further native-specific drafts cover shop services, moving,
+gift refusal, catchphrase advice, paint, and resident reactions. Five focused
+draft tests and all 104 reference tests pass. Normal actions remain unverified.
+The combined cartridge batch passes 39 complete messages, eighteen menu labels,
+and 137 memory assertions with restored checkpoint and blank isolated saves.
+Eleven complete special-actor conversations retain all GameCube wording and
+presentation; three use checked continuation slots at existing page breaks.
+Their silent cartridge batch passes eighteen message loads, eight choice labels,
+and 109 memory assertions, including the complete plus-glyph controller tip.
+Normal actor traversal and service/gift outcomes remain gameplay checks.
+Five further complete Booker, Gulliver, and Rover references use individually
+checked expressions from the same characters' native conversations. Their five
+full cartridge loads and both ending phases pass 27 memory assertions; all
+other native actions remain exact. Name-entry progression and actor presentation
+remain normal-play checks.
+
+Both long Rover train phone calls retain their full English wording through
+existing page-boundary splits. Their protected openings stay together, and
+actual native message changes preserve cancellation-enabled state. Five focused
+tests, ten pacing/advice tests, 110 reference tests, and ten special-actor tests
+pass. The silent 42-call native batch passes 104 memory assertions with restored
+checkpoint and blank saves. Ordinary train progression and real input timing
+remain gameplay checks; production runtime and fonts are unchanged.
+
+Nine [native menu/dialogue follow-ups](../specs/NATIVE_MENU_FOLLOWUPS.md) retain
+the complete music-player actions, sound retry, fortune offer, NES prompt,
+seat-refusal introduction, snowfall observation, and sleeping apology. Five
+focused tests, 110 reference tests, and seven native-menu tests pass. Their
+silent cartridge batch passes twenty complete messages, 21 choice labels, and
+83 memory assertions with restored checkpoint and blank saves. Normal menu
+actions and actor progression remain gameplay checks. Shared number-game/clothing answer labels use the separate
+[number-game integration](../specs/NUMBER_GAME_CHOICES.md); no global label
+change is made.
+
+Six [complete Resetti/Gulliver scripts](../specs/RESETTI_GULLIVER_SEQUENCES.md)
+retain all GameCube wording and presentation, using three checked continuations.
+Explicit sound-cue approvals preserve repeated English cues only within the same
+native actor/action intervals; two timed endings retain native `5808`. Eight
+focused tests, 110 reference tests, ten earlier special-actor tests, and five
+train-phone tests pass. The silent cartridge batch passes all nine parts,
+35 cue dispatches, both timed endings, and 143 memory assertions. Checkpoint
+restoration, blank saves, and graceful shutdown pass. Ordinary Resetti/Gulliver
+progression, audible presentation, and hardware remain separate checks.
+
+Four [special-dialogue follow-ups](../specs/NATIVE_SPECIAL_FOLLOWUPS.md) supply
+the complete native apology prompt, Gulliver waking/rescue story, reset warning,
+and full GameCube furniture-sale reference with its original zero-duration mood.
+Five focused tests and all 111 reference tests pass. The silent combined batch
+passes forty complete cartridge loads, four labels, 52 mood/timer order writes,
+and 237 memory assertions, with restored checkpoint and blank saves. Ordinary
+actions remain gameplay checks. The apology target bank still needs two glyphs
+and their input integration. Its complete English rude-reply dictionary and
+matching lengths are installed and pass the scoped native detector batch.
+
+Five [separate English glyphs](../specs/EXTENDED_GLYPHS.md) load from the cartridge
+into a persistent system allocation before rendering starts. The native atlas
+and approved spacing remain unchanged. Guarded drawing, prefix widths, reveal
+timing, and main-dialogue import support enable six complete English references:
+`04D2/04FA/08A2/08A6/0A15/0E2A`. Every GameCube word, line, page, and pause remains.
+The silent cartridge batch passes 26 native draws, eight cursor cases, six full
+message loads, 54 calls, and 324 memory assertions. Complete font/width/save
+retention, allocation guards, checkpoint restoration, and blank isolated saves
+pass. Independent module/font/ROM/UPS builds match, and all 12,601 installed edits
+pass reconstruction. The resident image uses 24,192 linked bytes with 384 free;
+the separate font allocation requests 3,983 bytes. Editors, mail glyphs, ordinary
+glyph-bearing conversations, and hardware remain unverified. This does not resume
+the paused atlas-edge investigation. Title artwork remains the first image task.
+
+Prioritise bulk English coverage and complete playable sections, batching useful
+crash/save/text checks across changes. Difficult isolated edge cases stay in the
+follow-up queue. A human playthrough drives the broad gameplay bug and polish
+pass after the main port; planned human testing is not completed validation.
+
+Pelly's receipt-failure patch returns rejected letters to their original pockets
+and selects accurate English errors. Native tests pass 48 receipt cases, eight
+hand-back initializer cases, sixteen refusal selectors, and ten index boundaries.
+The tests use the actual action initializers and cover both reason-indexed
+message lookups. Normal animation, subsequent input, and rendered error
+progression remain unverified. Follow-up mail work covers those interactions
+and remaining readers/metadata before generation. Read-only letter headers
+resolve complete English villager names without changing saved identities.
+All 216 names pass host checks; eight native letter windows pass complete text,
+page, glyph, source-retention, and preference checks. The ordinary-header native
+regression also passes ten header cases, body/footer rendering, and non-read
+mode forwarding across 1,010 recorded steps.
+The three native NPC letter-show paths also pass nine complete isolated window
+cases, including unknown sender handling. No additional production patch is
+needed for these callers. Normal actor interactions, post-office progression,
+remaining inline readers/metadata, and ordinary save-menu/post-load gameplay remain.
+The isolated native FlashRAM round trip passes all 192 stored letter slots in
+both save banks. A separate fresh process reads only the cartridge save and
+reconstructs complete English letters from both formats and both record layouts.
+This does not establish normal saving, edited-letter persistence, or hardware
+compatibility. See [persistence scope](../specs/FLASH_MAIL.md).
+Isolated native Controller Pak writing and fresh-process reading also pass the
+17 passport letter slots and all 160 stored-letter slots. Complete files,
+checksums, player/NPC imports, and English reconstruction pass without changing
+the live save payload. The ordinary station-travel and storage-menu flows remain
+unverified. See [Pak persistence scope](../specs/PAK_MAIL.md).
+The original letter-menu selector passes 120 isolated status/gift/marker/context
+cases with unchanged complete letters. All 44 static menu-label definitions pass
+native length calls; that shared text helper is not a snapshot reader. Received
+letters select Read, while player-written drafts select Rewrite. Normal UI
+transitions, generated status assignments, and custom editing remain separate
+requirements. See [menu evidence](../specs/MAIL_MENU.md).
+The isolated whole-letter generation API passes all 6,398 supported host
+reference assembly cases. Native calls pass 46 complete English reference cases,
+seven rejected generations, and 42 capture cases, with complete save retention
+and intact guards. Publication changes only validated text/split bytes and the
+transient capital state. The 1,380-byte generation probe is separate from the
+resident image, which has 384 linked bytes free. NPC resident allocation and
+on-demand loading are implemented; delivery integration tests and semantic
+template approval remain. Default builds leave snapshot generation disabled;
+an explicit experimental option installs NPC generation. See
+[generation contract](../specs/MAIL_GENERATION.md) and
+[receipt evidence](../specs/PELLY_RECEIPT.md).
+The [NPC creator binding audit](../specs/NPC_MAIL_GENERATION.md) checks seven
+native functions, six native tables, and corresponding English executable
+evidence. All 24 composite group/gift contexts and 36 classic reply selections
+use supplied source slots; composite footer `psz:004D` remains unavailable.
+The native caller ignores assembly failure. A source-guarded submission gate
+passes 41 isolated native cases using actual receipt/copy/capacity routines and
+a controlled creator fixture. Twenty cases deliver complete records into the
+native queue; rejected cases retain all save data and never use older staging
+text. The gate is connected to the cartridge creator in the optional experimental
+build. Real creator-to-receipt and pending-loop validation remain follow-up work.
+The separate [NPC reply-word resource](../specs/NPC_MAIL_WORDS.md) contains all
+352 complete phrases with exact legacy/English agreement and explicit native
+ID mappings. Eighty-three need more than the native ten bytes; all fit sixteen.
+The resource is connected to scoped capture and the optional cartridge creator.
+The [saved-name alias resource](../specs/NPC_MAIL_NAMES.md) recovers full English
+names for all 216 villagers from 394 exact known saved-name keys. It rejects
+ambiguous mappings and leaves unknown names unresolved. Complete native lookup
+and generation-time capture are implemented and optionally installed.
+The reader releases its 3,552-byte decode workspace immediately after opening
+a snapshot. Its complete 2,236-byte display cache remains resident; the 32 KiB
+reservation and heap boundary are unchanged. Host allocation/error tests, the
+four-MiB train-to-town run, and all eight native letter windows pass. Independent
+module, ROM, and patch builds match.
+The [scoped capture implementation](../specs/NPC_MAIL_CAPTURE.md) retains full
+English source values beside the original native preparation calls. Host tests
+cover all 352 phrases and 394 saved-name aliases, ordered capture, unchanged
+native temporary fields, and failure rejection. The relocatable code builds with
+the existing VR4300 toolchain; the resident image uses 24,192 linked bytes.
+The new module passes the four-MiB train-to-town regression, and independent
+module, ROM, and patch builds match. All 48 native creator comparisons pass,
+including complete English generation, unchanged random state and native fields,
+all six personalities, both reply types/origins, thirteen retained gifts, and
+complete save retention. The 197-call run also checks source validation, native
+relocation/cache maintenance, guards, and checkpoint restoration. Ordinary
+delivery remains a follow-up integration check. The
+[whole-creator transaction](../specs/NPC_MAIL_CREATOR.md) now stages complete native
+metadata and English text and publishes all 164 bytes only after validation.
+It resets stale capture, rejects nested/intersecting requests, detaches its
+session, and retains caller text/capitalization on failure. Host sanitizer checks
+pass. The native transaction passes 48 reply comparisons, eight successive
+letters, and six rejected requests, with 163 calls and 898 assertions. Complete
+save retention, shared capitalization, scope cleanup, and checkpoint restoration
+pass. The [resident loader](../specs/NPC_MAIL_LOADER.md) passes 56 complete native
+cartridge-created letters and eight failures, with no debugger-uploaded creator
+code/resources. Whole-letter reconstruction, original metadata/RNG, shared
+capitalization, heap release, full save retention, and checkpoint restoration
+pass. The optional generation ROM also passes all ten four-MiB train-to-town
+checks. Independent module and creator builds match. Thirteen loader/installer
+tests and the seven loader sanitizer tests pass. The complete 389-test regression
+suite passes, including the rebuilt module-bound generation probe. Main work covers missing dialogue and
+normal-play coverage; remaining delivery and edge cases are tracked for batching.
+All eight letter windows pass the capture-module regression across fourteen pages, including
+1,705 glyphs and 6,820 vertex positions. The tested failure gate
+provides the required return boundary; it does not replace source or semantic
+review, normal reader/editor interactions, or save/hardware acceptance.
+
+GameCube line breaks, page breaks, emphasis, and pause timing are the presentation
+reference. Do not automatically reflow text to fill a bubble. Deliberate layout
+polish follows translation and command handling. The reported atlas-edge defect
+in `font-halfwidth.png` remains unresolved; font investigation is paused at the
+user's direction. The production build retains the approved spacing metrics.
+
+## Implemented
+
+- Private GitHub repository, pinned reference sources, and local-only inputs.
+- Verified extraction of all 3,374 retail DMA entries; checksummed UPS generation
+  and application directly to the original 16 MiB ROM.
+- Lossless text codec and unchanged round trips for 29 banks, including dialogue,
+  choices, strings, mail components, NPC names, and fixed-width item-name groups.
+- Proportional Latin rendering for 81 glyphs, at most six pixels advance. Narrow
+  `i`, `I`, `l`, and apostrophe advance four pixels. Japanese glyphs are preserved.
+- Relocatable dialogue and choice banks, guarded loader patches, command checks,
+  source hashes, and conservative runtime expansion bounds.
+- GameCube CISO/FST/RARC/Yaz0 extraction and decoding of all 16,273 main messages.
+  Fixed-width GameCube item and NPC names are also extracted as local references.
+- Reference import retains GameCube presentation commands and restores matching
+  N64 actor-demo arguments. Read-only text insertions may differ only when the
+  N64 message already supplies the requested fields or an individually hash-bound
+  current-player/current-town or resident-speaker approval establishes the added fields. Flow commands
+  stay ordered; actor-prepared fields retain their original restrictions.
+- Dialogue-only reference delivery accepts the GameCube's own page and button-wait
+  layout when gameplay commands still agree. It does not reflow or remove English
+  pages. Manifests record native/reference counts and retain candidate review status.
+- Native formatting consumers pass colour-span, line-offset, line-anchor, and
+  character/line-scale tests. The reference-layout policy retains English
+  formatting with argument checks; it does not modify the font atlas or reflow.
+- English-first native keyboard, translated name-entry prompts and ten texture
+  labels, with the original 6/6/4/10/10 input limits and unchanged overlay sizes.
+- Silent isolated ares test runner, debugger memory assertions, controller input,
+  repeated scenarios, and incremental message-state recording.
+- 792 passing portable-C, synthetic, and retail-input full-suite regression tests,
+  including the repeatable text-volume report.
+  The complete run includes the item/name checks, startup errors, thirteen
+  native-mood checks, nine native-topic checks, twelve contextual-choice checks,
+  and thirteen date/dependency checks. All 96 reference-group tests also pass
+  independently. The birthday checkpoint reruns the full runtime/C suite with
+  the complete new preparer and rebuilt module-bound mail overlays. The font
+  atlas and approved spacing remain unchanged.
+  The renovation sequence also passes eight numeric/source/draft checks, all 96
+  reference checks, eleven placeholder checks, and seven coverage checks.
+  Retail tests require
+  the local ROM; calendar-reference checks use the local English disc extraction.
+- Keyboard UI inventory identifies six embedded text entries and ten graphical
+  labels, with per-entry source hashes and verified texture formats/dimensions.
+- English runtime removes the Japanese town suffix and supports sixteen
+  plain choice bytes, including actor-specific staging buffers. Source guards,
+  complete-capability checks, and independently assembled width code pass.
+  Main-dialogue runtime regressions pass; actor-specific runtime tests remain.
+- Resident twenty-byte choice capacity imports the thirteen longer reference
+  choices without truncation. Native MIPS tests pass real DMA loading, all four
+  rows, width calculation, overflow rejection, selection, insertion, and guards.
+  Actor frames grow by forty bytes with their saved values and arguments adjusted.
+- Reviewed multi-message reference sequences retain GameCube record boundaries
+  within the native message buffer. Nook's house explanation uses four approved,
+  hash-bound records. Partial installation, stale placeholders, incoming native
+  script branches, altered gameplay controls, and changed payloads are rejected.
+  Nook's work offer also has a reviewed split at an existing English page boundary;
+  complete reference coverage and the native final terminator are checked.
+  The purchase confirmation has a one-record approval preserving its small-print
+  radio aside, repeated native emotions, and unchanged outgoing explanation link.
+- Experimental resident runtime module with a verified new DMA entry, 32 KiB
+  heap reservation, preserved watchdog, source/build guards, and linker bounds.
+  Four-MiB boot and the complete train-to-town regression pass with intact guards,
+  including the actual malloc arena start. The observed-arrival scenario passes
+  188 recorded steps and all ten acceptance checks on the mail-view build.
+- Seven English message date/time substitutions, including full month/weekday
+  names, ordinal days, twelve-hour time, and zero-padded minutes/seconds. Portable
+  exhaustive tests and native MIPS insertion calls pass. Other UI callers remain.
+- Ordinary resident year/month/day preparation uses English in the unchanged
+  ten-byte free fields. Native lunar conversion is retained, including the leap
+  month branch. All 53 format preparations, thirteen conversions, six complete
+  festival-message loads, and eight date insertions pass native checks. Other
+  actors and out-of-table years remain separate audits. The birthday item
+  preparer supplies full English animal/sign names, months, and ordinal days
+  through the existing sixteen-byte display fields; saved fields remain native.
+- GameCube AM/PM insertion, one-shot capitalization, and protected text pacing
+  in the resident module. Targeted MIPS tests verify the latched meridiem,
+  unchanged source strings, flag consumption, B-button/cancel gating, timer
+  behaviour, and retained explicit pauses. Unsupported extension codes stay
+  rejected. Whole-game command and actor coverage remains incomplete.
+- GameCube choice cancellation (`62`), including native B-to-last selection,
+  closing-sound decisions, duplicate-sound suppression, and flag resets. Targeted
+  MIPS tests pass without host audio output. Four inventory prompts become
+  candidates; storage/music menus with changed actions remain withheld.
+- GameCube pixel-space (`67`) through both message cursor and sentence renderer.
+  Native tests verify scaled width, complete token advancement, missing-argument
+  handling, unchanged native formatting handlers, and memory guards.
+- 178 complete English villager-name candidates within the unchanged six-byte
+  native fields. All 216 names have confirmed reference identities; 38 longer
+  names remain withheld for wider-name work. All native name loads and their
+  adjacent guards pass, including the no-write invalid-ID path.
+- Legacy item references recovered from the shipped loader's verified tables.
+  All seventeen banks reconstruct unchanged, and 947 furniture groups map to
+  their four native rotation slots. These are references, not approved imports.
+- 242 distinct reference IDs for complete English item-name candidates in 779 native storage
+  slots, retaining GameCube spelling/case and the original ten-byte fields.
+  Thirty-five direct item-loader calls and their contexts are inventoried.
+  Wider imports remain gated on name, message, handbill, and UI destinations.
+- Standalone sixteen-byte item-name API and separately configured DMA resource.
+  All sixteen-bit item IDs pass portable index/conversion/guard tests. Native
+  DMA tests cover every confirmed reference identity, group boundaries, invalid
+  inputs, unaligned destinations, resource disabling, and header validation.
+  The resource has 771 candidate reference IDs in 2,713 slots. This API alone does
+  not enable wider names at a destination. A verified placed-clothing alias fills
+  its ordinary-name destination; direct loading and all four rotations pass.
+- Sixteen-byte main-message item fields with unchanged native structure/save
+  layout. All five rows retain complete values, clear shorter replacements,
+  and reject overflows. The message insertion hook and item-ID wrapper pass
+  429 native calls and 1,634 recorded steps, including capitalization, real DMA,
+  disabled-resource fallback, exact message limits, and memory guards. The
+  wrapper's five identified callers are integrated; other direct item loaders,
+  free-string fields, handbills, and dynamic-choice insertion remain gated.
+  The full train-to-town regression passes all 225 steps and ten acceptance checks.
+- Hash-bound controller-text adaptations preserve the English reference except
+  for individually approved button spans. Nook's clothing reminder uses START
+  instead of GameCube Y, as does the unfinished-planting reminder. The highlighted
+  span lengths are corrected and all
+  surrounding GameCube layout/timing preserved. Portable and native DMA/end
+  tests pass; ordinary gameplay of the adapted reminders remains.
+- Token-aware coverage classification for all 29 native banks. Command-only
+  records, exact placeholder labels, visible kana, Latin text, unknown glyphs,
+  and candidate presence stay distinct. Source hashes and unique IDs are checked;
+  candidate presence never implies review or unreachable code.
+- Complete-native-record alias matching supplies 41 unambiguous dialogue candidates.
+  Source/reference hashes, the entire adapted output, and normal command/capacity
+  checks are retained. No unresolved alias conflicts remain after exact native
+  development labels are handled separately; drafts,
+  special approvals, and sequence permissions do not transfer automatically.
+  All 41 native DMA loads pass full-content and adjacent-guard checks.
+- The planting-job acknowledgement has a one-record, hash-bound GameCube
+  approval retaining its repeated native emotions, full text, and continuing
+  terminator. Two N64-specific greeting-job drafts avoid the GameCube-only
+  mayor/wishing-well instructions and retain every native control and pause.
+  Native loading tests pass; English ordinary actor traversal remains.
+- Read-only village records expose home coordinates and recorded NPC positions
+  for normal navigation, without changing greetings, schedules, or progression.
+- A separate eight-byte display-name resource contains all 216 confirmed villager
+  names and 64 special-actor rows covering 23 distinct names. All native ID and
+  real-DMA row tests pass, including unaligned destinations, rejected inputs,
+  disabled resources, malformed-header checks, and adjacent/module guards.
+  Two nameplate consumers and the main-dialogue insertion now use the complete
+  names. Native consumer tests cover full output, centering, stack guards, exact
+  message limits, capitalization dispatch, and all eight rendered character quads.
+  The combined build passes all 225 train-to-town steps and ten acceptance checks. Shared
+  choice insertion and saved-name consumers retain six-byte formats.
+- Injected native tests now require the verified graph-thread frame boundary.
+  Arbitrary idle-thread injection can block the scheduler's idle fallback and
+  caused a display-name test stop. The guarded-context run passes all 1,204 steps;
+  The previously failing 451-case item batch also passes in this context;
+  attribution of that older failure remains qualified by its missing register log.
+  Read-only live NPC actor observations support outdoor navigation.
+- Bounded controller navigation approaches a moving NPC from observed actor and
+  player coordinates, without position, schedule, or greeting writes. It stops
+  when dialogue opens, a target disappears, the route stalls, or its step limit
+  is reached. Normal gameplay completes Cousteau's English introduction at `04E7`.
+  The bounded page-advance helper stops at a closed conversation or active choice,
+  without reopening a conversation. This older checkpoint still has native
+  catchphrase text; ordinary conversations on the new catchphrase build remain.
+- A separate ten-byte default-catchphrase resource covers all 216 confirmed
+  villagers using the actual native/GameCube default tables and legacy agreement.
+  Display lookup preserves four-byte saved/custom text and distinguishes a
+  villager's own default from an unambiguous borrowed default. One ambiguous
+  borrowed key remains native. Portable tests cover every default on every
+  villager. Native tests pass 261 calls, 501 memory assertions, and 1,505 steps,
+  including actual capitalization dispatch, exact message limits, unchanged
+  saved bytes, resource disabling, and checkpoint restoration. The new build
+  also passes all 225 train-to-town steps, ten acceptance checks, the eight-byte
+  nameplate consumer regression, and the 429-call item-field regression.
+  Shared choices, ten-character custom editing, mail, save/reload, and hardware
+  remain separate work.
+- Exact debugger reads account for one-, two-, four-, and eight-byte access
+  alignment, including cached reads. Writes preserve neighbouring bytes.
+  Incremental result files are atomically replaced for concurrent observers.
+- The mail audit verifies the 164-byte native record and contiguous 10/96/16-byte
+  header/body/footer fields against actual instructions. Ten routine inventories
+  cover assembly, free strings, the separate gyroid/demo message setter,
+  clearing, and copying; eight bank-size
+  reports distinguish shared numeric IDs from GameCube-only records. Complete
+  command-table validation rejects unsupported mail opcodes independently of
+  main-dialogue capabilities, preventing unsupported-token conversion stalls.
+  This withholds one previously accepted composite-mail candidate. Complete
+  English mail still requires a lossless storage/display/editor design and
+  delivery/save validation. See [mail requirements](../specs/MAIL.md).
+- A lossless generated-mail snapshot prototype stores immutable template IDs,
+  exact literal substitutions, article choices, and a checksum within the native
+  122-byte text area. Python and freestanding C codecs agree, reject malformed
+  inputs without partial writes, and preserve full-width fields. Every possible
+  field union in the twelve native composite-reply groups fits; 981 of 982
+  classic English records fit the conservative sixteen-byte field bound, with
+  the remaining record requiring actual source bounds. All 287 native command/
+  copy calls pass, including complete ordinary/villager mail record copying.
+  The codec is linked into the resident module and passes isolated N64 CPU calls.
+  Record discrimination, full-text reader integration, custom editing, and save
+  integration remain.
+- The native mail-viewer audit verifies the board object's complete layout,
+  field scans, read-mode branch, header-split clamp, and six-line/sixteen-character
+  body limits against the actual overlay. It also distinguishes the read-wait
+  handler and pointer-clearing destructor from the edit-acceptance path that
+  copies mail and header/footer preferences back into persistent destinations.
+  Shared callbacks and opening callers remain under review. Full-text viewer
+  integration must decode before native normalization and preserve GameCube
+  newline/width intent.
+- Full-letter assembly in Python and resident C preserves complete template
+  wording, explicit line breaks, header-name placement, and captured substitutions
+  and articles. Thirteen actual English executable routines are hash-guarded;
+  the supplied GameCube release's sticky capitalization is captured in snapshot
+  version two, so rereading a letter cannot change its case. Python, C, and an
+  independent in-place reference model agree on 6,398 retail-template probes,
+  all field/length/article/state combinations, malformed input, and guarded
+  output tests. The reference preparation tool converts 4,807 of 4,866 mail
+  parts; 59 require glyph support and remain rejected. Two probes of classic
+  `0001` still require actual source-width evidence. Both C files cross-compile
+  for VR4300 with no undefined symbols or mutable globals. All 287 native
+  command/copy calls also pass with version-two envelopes and captured capital
+  state; the machine checkpoint is restored. The installed codec passes 215
+  N64 CPU calls and 303 memory assertions; the formatter passes 350 calls and
+  544 assertions, including every opcode and complete output. A separate run
+  passes 92 calls and 280 assertions for 46 English reference cases. Linked code
+  and display state occupy 23,488 bytes within a 32 KiB reservation, with a separate 8 KiB test
+  area and intact stack guards. Catalog identity review, generation/viewer hooks,
+  editing, and normal save validation remain. Optional NPC generation emits
+  complete snapshots, and the full reader calls restoration for tagged records.
+- An immutable cartridge mail catalog contains 4,807 complete reference parts
+  with all 4,866 original indices preserved; 59 unavailable glyph rows remain
+  explicit failures. Its 319,344-byte content is registered by complete hashes.
+  The restoration API connects snapshot decoding, actual cartridge reads, and
+  full-letter assembly without changing the saved record or publishing partial
+  output. Host execution agrees on all 6,398 reference probes. Targeted N64 CPU
+  tests pass 84 calls and 259 assertions, including 46 English reference cases,
+  disabled resources, malformed headers, and guards. Catalog identities are
+  immutable storage identities, not native semantic-match approvals. Generation,
+  record discrimination, the full-text viewer/editor, and saving remain.
+- Optional read-only mail body/footer hooks use actual pixel widths and retain
+  explicit newlines, spaces, six-line geometry, and the approved font. Only two
+  draw calls and their obsolete relocations change; editor modes tail-call the
+  unchanged native routines. Host tests and 22 N64 CPU calls pass, including all
+  264 vertex-position assertions for 66 rendered glyphs, graphics/stack guards,
+  and argument forwarding. An isolated synthetic letter opens through the actual
+  submenu loader, verifies execution at both installed hooks, and closes with A,
+  B, and START with unchanged source mail and saved header/footer preferences.
+  The complete train-to-town regression
+  also passes. These hooks still read native 96/16-byte fields; snapshot decoding,
+  longer generated letters, pagination where required, and editing remain.
+  See [mail reader design](../specs/MAIL_VIEW.md).
+- The separately enabled full snapshot reader decodes before native scans and
+  normalization, preserving the source letter and clearing only its temporary
+  display copy. A bounded resident cache holds full text, recipient placement,
+  and complete pages. Explicit newlines/spaces remain; long bodies and signatures
+  continue without truncation. Left/Right changes pages; A/B/START retain closing.
+  Corrupt snapshots show an English error. Generated snapshots cannot enter the
+  lossy native editor. Host tests pass, and four long classic/composite reference
+  letters and two rejected snapshots pass actual window drawing across ten
+  pages, including 1,134 glyphs and 4,536 vertex coordinates. An edit-open request
+  safely becomes read-only. Ordinary letter opening/closing, ordinary header
+  drawing, and non-read forwarding regressions also pass. The experimental split marker is not a released
+  save format: generation, all other readers, editing, delivery, and persistence
+  remain. See [full reader design](../specs/MAIL_READER.md).
+- Home-gyroid owner-message display uses GameCube-style measured wrapping in
+  its unchanged sixty-eight-byte temporary field. Explicit newlines and spaces
+  remain, the original sixty-four-byte saved/editor limit is unchanged, and
+  overlapping source/destination is safe. Three thousand host cases match the
+  pinned English formatter with the native capacity. Native tests pass 47 calls
+  and 165 assertions, including real dialogue insertion at the exact message
+  limit, source preservation, and stack/module guards. The new build passes
+  train-to-town and the complete snapshot-reader and ordinary-layout regressions.
+  Ordinary other-owner interaction, the longer English default, and wider custom
+  storage/editing remain. The audit distinguishes this routine from actual
+  stored-letter consumers; the separate NPC reply and letter-quest grading paths
+  use the complete-record integration below. See [gyroid display](../specs/GYROID_MESSAGE.md)
+  and [NPC letter readers](../specs/MAIL_NPC.md).
+- Optional English ordinary-letter grading uses the GameCube's seven-rule
+  scorer, with bounded English prefix tables in the original on-demand overlay
+  allocation. The distinct native letter-quest length/rate path is retained.
+  All 776 prefixes, 3,000 independent GameCube C comparisons, exact rank
+  boundaries, sanitizer checks through 1,024 bytes, and installer/relocation
+  rejection tests pass. Native tests pass 91 calls and 157 assertions, including
+  actual cartridge loading, quest gifts/ranks, and local reply flags. The
+  combined build passes train-to-town and all six complete-letter reader probes.
+  Native ordinary bodies remain ninety-six bytes; the combined snapshot build
+  connects complete decoded bodies through the send integration below.
+  Generation, normal delivery, and saving remain. See [English grading](../specs/MAIL_GRADING.md).
+- Whole-record NPC sending decodes tagged letters before native mutation and
+  supplies distinct complete-body ordinary/quest grades through an exact-pointer
+  context. Ordinary records retain native handling. Local and visiting-player
+  reply flags, dates, friendship, gifts, and quest updates execute their original
+  code. A guarded post-office result hook preserves failed letters and counters
+  instead of discarding rejected snapshots. All 6,398 host reference cases pass;
+  the N64 integration passes thirty-two controlled send cases, eighty native
+  calls, and 313 assertions across 649 steps. Source records, unrelated NPC/player
+  state, allocation ownership, nested contexts, and memory guards are checked.
+  The combined build passes all 188 train-to-town steps and ten acceptance checks.
+  Its full-letter reader regression passes all six windows and ten pages, with
+  1,134 glyphs and 4,536 vertex positions checked.
+  These tests restore isolated checkpoints; normal Pelly interaction, actual
+  saving, complete metadata handling, semantic approvals, generation, and lossless
+  editing remain. See [complete-letter sending](../specs/MAIL_NPC_SEND.md).
+- Selected metadata and storage paths pass 140 isolated N64 cases, 217 native
+  calls, and 267 assertions. Snapshot markers do not affect slot/send/gift
+  predicates. Both record kinds retain complete contents through NPC conversion,
+  both leaflet slots, all five post-office queue positions, and all ten slots
+  in each of four home mailboxes. Full-storage failures retain their source;
+  leaflet flags, neighbouring memory, and guards pass. The arrays and full
+  checkpoint are restored. These checks do not establish ordinary delivery or
+  save/reload; the actor-specific checks are described separately below.
+- Pelly/Phyllis receipt failures use the native pocket-return flow and two new
+  original English errors without changing any existing message or its pacing.
+  Forty-eight native receipt cases pass, covering both record kinds, both
+  sisters, successful delivery, and rejection across every player pocket.
+  Eight hand-back initializer cases, sixteen refusal selectors, ten index
+  boundaries, and 152 complete loaded-message checks pass. The native loader's
+  complete relocated overlay, 407 function calls, 760 memory assertions, and
+  2,084 recorded steps pass with checkpoint restoration and blank FlashRAM.
+  The fixture runs actual action initializers but does not run the normal
+  hand-back animation. The build also passes the 188-step town regression and
+  all ten acceptance checks; independent module, ROM, and patch builds match.
+- Read-only ordinary and snapshot letter headers resolve complete eight-byte
+  English villager names from native saved identities. All 216 villagers pass
+  host tests; player names, unsupported identities, disabled/bad resources, and
+  suppressed-name header types retain their intended fallback behaviour.
+  Native windows pass eight letters across fourteen pages, checking 1,705
+  glyphs, 6,820 vertex positions, and all source/preference guards. Two probes
+  use the original native NPC identity setter. The cache occupies 2,236 bytes;
+  decode scratch is allocated only during restoration and freed before drawing;
+  saved names, source records, font metrics, and reference layout are unchanged.
+  The ordinary-header regression passes ten cases, body/footer glyph checks,
+  and all non-read-mode forwarding checks: 36 calls and 842 memory assertions
+  across 1,010 steps, with checkpoint restoration and blank FlashRAM.
+  The 188-step town regression and all ten acceptance checks pass. Ordinary
+  gameplay, save/reload, and hardware remain.
+- All three direct NPC stored-letter show paths pass isolated native execution:
+  first-job, ordinary known-sender, and ordinary unknown-sender. Nine windows
+  cover ordinary letters and both snapshot kinds; six snapshot windows verify
+  twelve pages, 1,713 glyphs, and 6,852 vertex positions. The 510-step run passes
+  45 native calls and 151 assertions, checking complete native overlay relocation,
+  zeroed BSS, source retention, unchanged player/NPC data during calls, and safe
+  allocation lifetime through window close. Ordinary windows reach all three
+  draw hooks with complete retained records and expected text lengths. All
+  allocations are freed after close; checkpoint restoration and blank FlashRAM
+  pass. No production change to these callers is needed. Normal actor gameplay,
+  inline/computed-pointer readers, travel, editing, and normal saving remain.
+- Native FlashRAM persistence passes with synthetic classic/composite snapshots
+  in all 192 saved mail slots: forty player pockets, forty home-mailbox slots,
+  five post-office records, two leaflets, and 105 NPC compact letters. The
+  original asynchronous save pipeline writes and verifies both complete banks.
+  A separate fresh emulator process receives only that cartridge save, verifies
+  both native reads/checksums/town identities and all 384 complete stored
+  records, and reconstructs full English output in eight native decoder calls.
+  Memory guards, restored checkpoints, and graceful shutdown pass. The writer
+  requires an entirely blank isolated chip and explicit opt-in; existing user
+  saves are untouched. This is not ordinary save-menu/post-load gameplay,
+  custom editing, travel, or original-hardware validation. No production code,
+  saved record size, font, candidate translation, or generation setting changes.
+
+## Current reference candidates
+
+The current experimental resident-module pilot in `build/native-credits-pilot/`
+contains 13,383 edits, including
+9,812 reference main-bank candidates, all 460 original choices, 618 original dialogue
+drafts, one original-dialogue continuation, 280 original development-label drafts,
+and 114 complete diagnostic/sample drafts.
+Two additional original
+Pelly/Phyllis error messages extend the main bank
+to 11,754 records; they do not change the existing candidate counts. Candidates
+still require review. Two additional complete numeric labels extend the choice
+bank to 462 entries without increasing the native candidate count.
+The original main-bank audit leaves 927
+records without candidates; the classification and remaining restrictions are
+listed below. The 1,491 conservative layout-warning records include full default
+catchphrase width and do not trigger automatic
+reflow. Detailed candidate, rejection, and coverage reports remain local in
+`build/native-credits-candidates/` and `build/native-credits-coverage/`.
+The full pilot enables the complete fortune, Resetti, shop-counter, resident-word,
+shared NPC-word, and native-credit options in generation and construction. Basic generation
+includes the Resetti and shop-counter groups without a resident module. These
+source-bound groups use the native general-string bank, not separately counted
+display resources. The engine-test drafts require none of these options; all
+fifteen retain the ordinary exact-control policy.
+Original drafts retain separate warnings, including the meal greetings and
+the complete raffle and service echoes; these do not increase the reference count.
+The independent
+mail control gate withholds `mailb:00BB` until native mail supports its
+capitalization command. Layout warnings account for the wider catchphrase display.
+
+All functional records in Nook's introductory range `07E0..083D` have English
+candidates. Fourteen added records close ten functional gaps and provide four
+reserved continuation slots. The complete job-ending speech and HRA explanation
+retain GameCube wording, manual layout, and pauses, splitting only at existing
+page transitions. The map handoff names the native R button. The short debt
+insistence uses an original translation with all native commands unchanged.
+Opening-reserve labels `083F/0840` have English label drafts; `083E` supplies the guarded
+late-night resident introduction continuation described below.
+All fourteen complete cartridge message loads pass in one fresh four-MiB run,
+including buffer/module guards and checkpoint restoration. Ordinary job
+traversal, HRA choices, and the HRA invitation's line-width warning remain queued
+for the combined gameplay and human bug/polish passes. Existing candidates,
+font assets/metrics, and saved structures are unchanged by this batch.
+
+Twenty-two shop-service, sale, order, and disposal messages retain complete
+English wording with the original native choice IDs and selection order.
+Individually source/reference/payload-bound choice approvals prevent accidental
+import of GameCube menu actions. Native choice `0009` has an original
+fourteen-byte translation, `Turnip prices?`, replacing the incompatible GameCube
+Other things label. All 460 native choices have candidates: 451 supplied
+reference labels and nine original drafts, including the shared-label corrections
+in the broader native-menu batch. The twins' `172A/1737` remain withheld
+for their separate speaker/echo differences. All 22 complete messages and six
+referenced choice labels pass native cartridge loads with buffer/module guards
+and checkpoint restoration. The 32-test reference batch passes, including four
+new native-choice tests. See [native choice contract](../specs/REFERENCE_CHOICES.md).
+Ordinary selection, selling/ordering, echo rendering, and line-width warnings
+remain gameplay and human-playthrough checks.
+
+The earlier N64 shop range `02DC..02F0` also has candidates throughout. Five
+cross-ID GameCube matches and eleven native-command-preserving original drafts
+cover its remaining text. The draft purchase prompts retain exits `02E6/02E5`;
+the three-choice service menu gains no catalog action. Existing candidates stay
+unchanged. These records have unestablished reachability and are counted as
+text coverage, not additional proven gameplay interactions. The 33-test reference
+batch and all sixteen complete native cartridge loads pass, with buffer/module
+guards and checkpoint restoration. Original draft layout/presentation review remains separate from
+the reference-candidate warning count.
+
+Twenty-five favour/task-response messages retain the original native actor
+request destination and value through individually hash-bound approvals. The
+GameCube quest-row command is not imported into the native NPC0 actor row.
+Complete native actor-command sequences, surrounding English wording/layout,
+and normal field/flow/capacity checks remain enforced. All 25 complete cartridge
+loads and actual request dispatches pass in one fresh four-MiB batch: fifty
+native calls and 132 assertions. Complete order tables, adjacent/module guards,
+and checkpoint restoration pass; the separate quest row remains unchanged.
+All 44 reference-group tests pass. Existing candidates, font metrics, runtime,
+and saved layouts are unchanged. Ordinary NPC actions and quest progression
+remain combined gameplay/human-playthrough work. See
+[native actor-request contract](../specs/ACTOR_REQUESTS.md).
+
+Twenty-six further messages have individually reviewed current-player/current-town
+field permissions, retaining complete GameCube wording/layout and all ordinary
+flow, actor, and expansion guards. Native `1A` and `2F` read verified current
+player/village sources, not actor-prepared free strings. The complete final hashes
+and exact added-field sets are independently checked by the builder. All 26
+cartridge loads and 27 actual insertions pass in a fresh four-MiB run, including
+complete resulting text/headers, player-name colour spans, cursor positions,
+unchanged source names, buffer/module guards, and checkpoint restoration.
+Existing candidates and production runtime/font/save structures are unchanged.
+Seventeen additional conservative layout-warning records remain for polish.
+The complete 440-test suite passes with the shared validation changes.
+Different GameCube festival, tailor, and travel-rule records stay withheld for
+native-specific translation. See [reviewed field contract](../specs/REFERENCE_FIELDS.md).
+
+Seven [original N64-specific drafts](../specs/NATIVE_ADVICE_TRAVEL.md) cover
+errand notes, telling time by sunlight, post-wait conversations, the travel
+record-erasure warning, and both post-office original-Pak requirements.
+All native commands/arguments are preserved except seven explicitly checked
+colour-span lengths for the full term `Controller Pak`. The warning retains
+its original choices, branches, and clear erasure wording. The 52-test reference
+batch passes, and all seven complete native cartridge loads pass with guards
+and checkpoint restoration. Ordinary travel/post-office actions and draft
+presentation review remain. Existing candidates and production code are unchanged.
+
+Twenty-seven [resident catchphrase approvals](../specs/REFERENCE_CATCHPHRASES.md)
+retain the full English reference where the native speaker supplies the added
+phrase. The normal talk request preserves its actor through requested window
+`2E0`, native appearance initialization, and client `20`. The permission adds
+only `1C`, binds complete source/reference/output hashes, and cannot combine with
+other added-field or control approvals. All 27 messages pass actual native
+appearance requests, complete initializer/DMA loads, and catchphrase dispatch.
+The batch includes two distinct ten-character defaults, custom input, and a null
+request clearing the previous client: 91 native calls and 432 assertions pass.
+Complete actor/animal sources, message/window/stack/module guards, and checkpoint
+restoration pass. The full 440-test regression suite passes. All existing 10,515
+edits remain unchanged, as do production runtime, font, and saved structures.
+Ordinary NPC traversal and final dialogue/presentation review remain.
+
+Four [native festival drafts](../specs/NATIVE_FESTIVALS.md) retain the N64 carp
+streamers and moon-viewing events instead of incompatible GameCube holidays.
+All native commands, choices, branches, pauses, and pages are preserved.
+The dated messages require the complete [resident-date patch](../specs/DIALOGUE_DATES.md),
+which redirects three preparation calls and the leap-month literal without
+changing the native calendar calculation, field sizes, or saves. The actual
+cartridge overlay loader, 53 preparations, thirteen conversions across six
+years and a leap month, six message loads, and eight date insertions pass:
+102 native calls and 184 assertions, with full save retention and guards.
+The resident-date build passes all ten train-to-town checks over 188 steps.
+The complete 714-test suite passes. The resident image uses 23,488 linked bytes
+with 1,088 bytes free. Final draft review and normal seasonal gameplay remain.
+
+Twenty-one [native seasonal conversations](../specs/NATIVE_SEASONAL_CONVERSATIONS.md)
+cover shrine/queue dialogue, moon-viewing food jokes, returning insects, winter
+activities, and related fullness/travel-stock advice. The spring bug-catching
+question and both responses retain the original choices, branches, and quest
+values. All 21 drafts preserve every native command and argument, including
+pauses/pages and the inviter field. All complete cartridge loads pass in one
+four-MiB batch: 21 native calls, 65 assertions, and 114 recorded steps, with
+adjacent/module guards and checkpoint restoration. Existing 10,546 edits,
+production runtime, font, and saved structures are unchanged. Normal seasonal
+actions and final draft wording/layout remain for the combined gameplay and
+human-playthrough review. No additional train or mail-window run is needed for
+this text-only batch.
+
+207 [resident-animation approvals](../specs/RESIDENT_ANIMATIONS.md) retain
+complete English introductions, moon conversations, clothing errands, and other
+resident exchanges. The [broader conversation batch](../specs/RESIDENT_CONVERSATIONS.md)
+covers 65 complete references, including clothes-delivery requests, recipients
+trying on clothes, failed-errand returns, and furniture/roof-colour responses.
+Four references remove only a redundant pre-field article-suppression command;
+all English wording and presentation remain. Five original drafts retain the
+complete fishing tip, winter flowers, March 14 White Day, and May carp streamers
+where the English reference omits instructions or describes a different event.
+All seventy complete cartridge loads pass in one four-MiB batch: seventy
+calls, 212 assertions, and 359 recorded steps, with adjacent/module guards,
+checkpoint restoration, and blank FlashRAM. All 457 host tests pass. Ordinary
+clothing handoff/animation/return, sale/painting actions, dynamic-field display,
+and final wording/layout remain in the gameplay/playthrough queue.
+Only reviewed NPC0 slot-zero expression delivery differs; fields, other actor
+requests, gameplay decisions, source identity, and complete payloads remain
+guarded. The native batch passes 213 expression-selection cases, eighteen
+cartridge loads, and 88 command dispatches: 322 calls and 654 assertions, with
+complete save retention, allocation/stack/module guards, and restored checkpoint.
+The test records calls at the animation-initializer boundary, so actual poses
+and normal resident playback remain gameplay checks. Production animation code,
+font data/metrics, and saved layouts are unchanged.
+
+The [parcel and town-advice batch](../specs/PARCELS_TOWN_ADVICE.md) supplies
+49 more complete English references and eight native-specific drafts. These
+retain borrowed-item returns, cancelled searches, deferred rewards, shared-town
+advice, White Day/May/Thirteenth Night, rain, native paint colour, and Nook's
+498,000-Bell final renovation. All 57 complete cartridge loads pass with 173
+assertions and 294 recorded steps; all 457 host tests pass. Every previous
+candidate edit and all executable/font/runtime resources remain unchanged.
+Normal handoffs, actions, dates, debt payment, final wording/layout, saves, and
+hardware acceptance remain.
+
+The [community conversation batch](../specs/COMMUNITY_CONVERSATIONS.md) supplies
+75 complete English references and eighteen native-specific drafts. It covers
+more introductions, trades, games, rewards, letters, seasonal remarks, and
+advice. Native originals retain White Day, actual fireworks/blossom dates, the
+shrine venue, home creature care, moon viewing, the countdown invitation, and
+Nook's self-made free monument. All 93 complete cartridge loads pass with 281
+assertions and 474 recorded steps; all 457 host tests pass. Code, fonts, runtime
+bindings, saved layouts, and all earlier candidate edits remain unchanged.
+The read-only expression-difference queue contains twelve remaining
+special-actor, sleeping-resident, and title-menu comparisons; these contexts
+are not covered by the standing-resident permission. Other identity, field,
+control, overflow, gameplay, and final review work remain active.
+
+The [native-context batch](../specs/NATIVE_CONTEXT_REFERENCES.md) adds 73 more
+messages: 64 individually bound references, Copper's R-button map instruction,
+and eight native originals. Local wording spans correct shrine venues, native
+sports dates, Controller Pak instructions, cartridge warnings, and absent GC
+actors while retaining complete reference newline/page/pause sequences. Native
+drafts retain actual travel rules, October Sports Day, and Nook loan advice.
+All 73 complete cartridge loads pass with 221 assertions across 374 recorded
+steps, unchanged adjacent/module guards, checkpoint restoration, and blank
+FlashRAM. All earlier candidate edits and executable/font/resource data remain
+unchanged. These loader checks do not execute erasure, travel, seasonal events,
+map handoffs, Resetti animations, or normal saves.
+The complete 477-test regression suite passes. Basic generation admits 72 of
+the new messages and correctly withholds `16A5` without capitalization command
+`75`; all eight native-context drafts remain available.
+The read-only unconfirmed same-ID comparison pool is empty under the existing
+rules; broader matching and incompatible topics/fields/controls remain. The
+reference typos in `0670/08BF` remain explicit wording-polish tasks.
+
+The [Pak and festival batch](../specs/PAK_FESTIVAL_DIALOGUE.md) adds 50 missing
+messages and corrects the existing carp-streamer reply `0BC4`. Its 26 Pak drafts
+distinguish absent storage, unreadable data, capacity, note slots, removal,
+repair, and recovery. Data-loss warnings precede the unchanged repair choices;
+the native three-service menus gain no GameCube-only action. Its 25 seasonal
+drafts retain native carp-streamer jokes and fireworks dates/venues, including
+the tunnel-game reply and shrine-plaza viewing remark. All original commands
+remain exact except explicit colour counts for the full `Controller Pak` name.
+All 56 complete cartridge loads pass with 170 assertions over 289 recorded
+steps, including five connected unchanged replies. All 485 regression tests
+pass. Basic generation admits every new draft. No repair, deletion, storage
+interaction, seasonal selection, or normal saving is executed by this loader
+test; those actions and final wording/layout remain gameplay acceptance work.
+All earlier edits except the deliberate `0BC4` correction remain unchanged,
+as do code, fonts, runtime resources, and saved structures.
+
+Five [complete phone/furniture/letter conversations](../specs/LONG_ADVICE_SEQUENCES.md)
+fit through ten individually approved records. Each splits only at an existing
+English page transition; no wording, manual line, pause, or other page is lost.
+Rover's phone-mode pair stays together, and its original final `046F` link
+remains. Three furniture explanations retain all A-button instructions and
+gift/work context. The letter-sharing explanation retains capitalization with
+its catchphrase and requires the resident runtime. Only redundant article
+suppression before an already-native item field is removed from `08FA`.
+All ten cartridge loads, five internal links, the external phone link, and both
+termination phases pass: 36 native calls, 70 assertions, and 169 recorded steps.
+Complete text/headers, adjacent/module guards, checkpoint restoration, blank
+FlashRAM, and the UPS round trip pass. All 494 regression tests pass.
+Every earlier candidate and all production
+code/font/save resources remain unchanged. Two conservative layout-warning
+records remain for polish. Ordinary conversation, phone animation, furniture
+handoffs, and rendered presentation remain gameplay/playthrough work.
+
+The [native service/save batch](../specs/SERVICE_SAVE_DIALOGUE.md) supplies 47
+original drafts: ten post-office messages, four gyroid messages, fifteen station
+and Pak messages, and eighteen save-question/acknowledgement variants. Native
+three- and four-service menus retain their actual choices and targets. Phyllis's
+queue-full response and greeting keep every original expression and muted aside.
+Repair refusal, success, failure, write failure, free space, and note slots stay
+distinct; power/removal/data-loss warnings retain their native placement. The
+six save pairs distinguish quitting from continuing. Every original command
+remains except exact highlight lengths for Controller Pak, town data, and station.
+All nine focused checks and all 503 regression tests pass. All 64 complete
+cartridge loads pass with 194 assertions over 329 recorded steps, including
+seventeen connected unchanged messages, guards, restored checkpoint, and blank
+FlashRAM. This test loads text only, without performing saving or repair.
+Basic generation admits all 47 drafts. Every earlier candidate, code/font/runtime resource, and
+save structure remains unchanged, and the UPS round trip passes. Payment amount
+width warnings remain explicit; ordinary menus, payments, repair, saving, dynamic
+rendering, and final draft review remain gameplay/playthrough requirements.
+
+The [seasonal topics batch](../specs/SEASONAL_TOPICS.md) supplies 29 original
+drafts: 26 missing conversations and three corrected replies. Native moon
+viewings, lunar dates, Sports Day, fishing rules, aerobics, matsutake, and seasonal
+jokes retain every native command and argument. Ten questions keep their choice
+and reply order. Six second-moon date drafts require the ordinary-dialogue date
+patch; basic generation withholds them. All seven generic date-width warnings
+remain visible, while all 372 English month/day combinations fit the affected
+draft lines in host checks. All 511 regression tests, eight focused tests, and
+46 complete cartridge loads pass, with 140 assertions over 239 recorded steps.
+The load-only test restores
+its checkpoint and leaves blank FlashRAM. Apart from the three explicit reply
+corrections, all existing candidates remain unchanged. Code, fonts, runtime
+resources, saved layouts, and event schedules remain unchanged. Ordinary event
+selection, date rendering, shared choice-label wording, and full draft review
+remain gameplay/playthrough work.
+
+The [startup/Pak batch](../specs/STARTUP_PAK_DIALOGUE.md) adds 35 original drafts
+for capacity, write failure, duplicate returns, accepted transfers, cancellation,
+and mid-operation removal. The native overwrite warning stays before confirmation;
+power/removal warnings stay before transfer requests. Start and post-transfer
+targets remain exact. Only five explicit hardware/button highlight lengths
+change. All 519 regression tests and 48 complete cartridge loads pass, including
+thirteen connected unchanged messages, with 146 assertions and checkpoint
+restoration. All new drafts fit without layout warnings in both full and basic
+generation. Every earlier candidate remains unchanged. No storage operation is
+executed by the test; actual startup/travel, confirmation/cancellation, dynamic
+warning rendering, storage recovery, and final wording remain acceptance work.
+
+The [startup greetings batch](../specs/STARTUP_GREETINGS.md) adds fifty original
+drafts for player recognition, new faces, returning travellers, visitors,
+retained-record preparation, menus, and clock acknowledgements. Full native
+post-wait dialogue stays within ordinary preparations; travel paths keep their
+different fields and continuations. The away-player warning, town-reset
+cancellation, and identity retry retain their actions. No rumble option or
+GameCube card field is imported. All 527 tests and 92 complete cartridge loads
+pass, with 278 assertions and checkpoint restoration, covering all new messages
+and 42 unchanged connected candidates. Seventeen generic town-width warnings
+remain; all fifty drafts fit when checked with the native six-fullwidth-cell
+town limit. Every earlier candidate and runtime/font/save resource remains
+unchanged. Actual startup, storage actions, dynamic rendering, and final review
+remain gameplay/playthrough requirements.
+
+The six [opening clock references](../specs/STARTUP_CLOCKS.md) close the remaining
+Japanese-static-text candidate gaps within `13F2..14E1`. They retain GameCube
+greetings, calendar order, AM/PM, all manual lines/pages/pauses, and native
+continuations, omitting only each unavailable storage-location clause. Full
+source/reference/output hashes and exact allowed spans guard this narrow change.
+All twelve cartridge loads pass for the greetings and their unchanged successors,
+with 38 assertions, intact guards, restored checkpoint, and blank isolated saves.
+All earlier candidates remain identical. Six new records have conservative
+field-width warnings for presentation review; they do not trigger automatic reflow. Basic generation
+withholds all six runtime-dependent references, and original-draft selection
+also withholds actual module tokens without the module. Production runtime,
+fonts, and saved structures remain unchanged. Normal startup selection, live
+date rendering, full presentation review, and hardware acceptance remain.
+
+The [resident-topic batch](../specs/RESIDENT_GAPS.md) fills 22 further records:
+eighteen native-specific drafts and four complete cross-ID GameCube introductions.
+It preserves letter/gift instructions, both bulletin boards, native moving rules,
+errands, inventory refusal, train-delay fields, and related conversation. All
+native controls remain except seven highlight lengths and AM/PM in the bedtime
+draft. The four introductions preserve complete GameCube wording and delivery,
+bound to identical native sources. All 31 complete cartridge loads pass, including
+nine connected replies, with 95 assertions and restored isolated state. All
+546 regression tests and eight focused tests pass. Every
+earlier candidate remains unchanged. Basic generation admits 21 additions and
+withholds the bedtime draft without its runtime. Five original drafts retain
+conservative width warnings. Normal actions, live fields, final wording/layout,
+saves, and hardware remain acceptance work.
+
+The [development-label batch](../specs/PLACEHOLDER_TEXT.md) covers all 360 exact
+native labels: 346 English label candidates and fourteen complete approved
+continuation pages. The label drafts add 283 missing entries and correct eight
+unrelated GameCube imports; all other existing edits remain unchanged. Exact
+recognition, source hashes, importer/builder guards, and protected sequence
+allocations prevent labels from becoming arbitrary gameplay dialogue. All 346
+unallocated labels fit with their native commands, endings, and expression resets.
+The 52-load native sample passes 158 assertions and checkpoint restoration;
+all 557 full-suite tests pass. No font/runtime/save change or new continuation
+allocation is made. Labels are not counted as additional gameplay conversations.
+
+The [late-night introduction](../specs/REFERENCE_SEQUENCES.md) retains the complete
+English `04F7` through `04F7 → 083E`. Its 1,174-byte conservative expansion bound
+becomes two bounds of 773 and 419 by splitting only at the existing page break
+after the clock joke. The buffer remains 1,024 bytes; no wording, pause, manual
+line break, or clock read is removed. AM/PM requires the verified English runtime
+and a preceding hour within the same record. Both native cartridge loads, the
+continuation target, both termination phases, and memory/checkpoint guards pass
+across seven calls and fifteen assertions. Normal resident progression and
+rendered clock/presentation checks remain. Basic candidate generation completes
+while withholding both runtime-dependent sequence members.
+
+General strings, mail, saved names, dates, and item names have separate caller
+restrictions. The independent wider item, display-name, catchphrase, and mail-catalog resources are not
+additional ordinary-bank edits, and an API resource does not imply that every
+gameplay destination uses its wider names.
+
+The [gyroid/resident-state batch](../specs/GYROID_CHARM_DIALOGUE.md) adds 21
+native-complete drafts and two full GameCube police-station explanations.
+Every native draft control remains exact, including earlier gyroid menus,
+owner-message insertion, power-off warning, state command `41`, and original
+actor requests. The complete resident responses do not acquire GameCube-only
+continuation targets. Both police explanations retain all GameCube wording,
+layout, and timing, changing only their menus to original native choice IDs.
+All 567 full-suite tests and 33 native cartridge loads pass, including ten connected unchanged responses,
+with 101 assertions, complete guards, restored checkpoint, and blank saves.
+All earlier candidates remain unchanged. Basic generation admits all 23 additions.
+One generic owner-message field-width warning remains; the actual custom-message
+formatter has its separate contract. Normal gyroid, saving, state transitions,
+police choices, final wording/layout, and hardware remain acceptance work.
+
+The [letter-message fragments](../specs/LETTER_MESSAGE_FRAGMENTS.md) supply 74
+complete GameCube references and two native originals across
+`1BFF..1C3E/1C53..1C5E`. Sixty-six Japanese bodies have exact cross-bank
+equivalents after only outer whitespace and dialogue-ending removal; eight
+source variations are individually reviewed. The separate importer and builder
+bind both native sources and the complete reference/output, permit no added
+fields, and append only the original ending. The originals preserve the actual
+writer field and a joke missing from the mail counterpart. Basic generation
+admits all 76 additions. All 577 full-suite tests pass before the final adjacent
+fragment addition; all ten focused tests pass on the complete final batch.
+All 76 final cartridge loads pass with 230 assertions, full guards, restored
+checkpoint, and blank saves. Every earlier candidate, production code, font,
+runtime resource, and saved layout remains unchanged. Eight generic field-width
+warning records and two explicit reference typos remain for polish. Normal
+callers, live fields, complete wording/layout review, and hardware remain;
+this main-bank work does not approve stored-mail generation or delivery.
+
+The [native-menu batch](../specs/NATIVE_MENUS.md) adds 135 complete GameCube
+references and five native-specific questions, and corrects five connected
+replies and eight shared labels. All 167 native-choice approvals bind exact
+source/reference/menu/output hashes. English reference wording, manual lines,
+pages, emphasis, and pauses remain; original N64 selection order and gameplay
+branches are retained. Ten native dialogue drafts preserve every original
+command and argument. Event answers retain native fireworks, April/October
+Sports Fairs, and both moon viewings. The first eye chart displays M for its
+actual third-choice answer; the bathing question and shared reply retain the
+native yesterday/general-response context.
+All 585 full-suite tests and seven focused tests pass. A combined native batch
+loads all 145 new or corrected dialogue records, 23 unchanged connected replies,
+and 126 actual referenced choice labels, including all eight corrections:
+294 native calls and 632 assertions pass over 1,353 recorded steps, with full
+text, adjacent/module guards, restored checkpoint, and blank isolated saves.
+All 10,403 candidate main records and 460 choice records match their complete
+built-bank payloads. Only the main/choice text, their pointers, and the DMA
+directory change; code, fonts, runtime resources, and saved structures remain
+unchanged. The UPS round trip passes. Basic generation admits 134 new references
+and all eighteen original edits, withholding `0A0A` without cancellation support;
+its candidate file does not establish that longer labels fit a retail buffer.
+Nineteen new reference warning-bearing records and two original formatting
+warnings remain for polish. Shared Circle/X labels stay available for shape
+games; the contextual-label implementation supplies English answers for seventeen
+approved quiz questions without changing their answer order. Further label
+contexts, live fields, ordinary answer actions,
+final wording/layout, saving, and hardware remain.
+
+The [contextual-choice implementation](../specs/CONTEXTUAL_CHOICES.md) gives
+twenty-six questions complete English answer labels without changing their answer
+indices or actions. Seventeen quiz questions no longer display ambiguous shape
+labels; actual shape games retain Circle/X. Five additional complete reference
+questions and four native-specific connected replies fill nine missing messages.
+All surrounding reference wording, lines, pages, emphasis, and pauses remain.
+Every original draft command stays exact, including the native two-way trade
+continuation and the moving conversation's final ending.
+Twenty-four mappings require a complete reviewed reference parent; two native-original
+quiz mappings independently retain every canonical native command and argument.
+Two birthday references already use native menu IDs and bind the complete
+unchanged donor through their explicit source kind. All thirteen contextual
+tests pass within the 714-test full suite. The native fixture checks fifty-four
+complete messages, 57 selected labels/insertions, and 53 contextual branches,
+alongside actual birthday and calendar preparation. Exact executed results and
+restoration evidence are recorded in the work log. Ordinary
+trades, moving, quiz actions, rendering, and gameplay remain separate checks.
+All 12,532 ordinary edits match the current built ROM. Contextual mappings alter
+only their approved menu spans; all referenced labels, fonts, and saved layouts
+remain unchanged. The birthday runtime is documented separately. The UPS round
+trip passes. Basic generation withholds eighteen
+otherwise eligible contextual messages because complete required English labels
+are absent; it does not shorten labels or silently restore misleading answers.
+It separately withholds the old-calendar and birthday references when the required
+English preparation patch is unavailable, leaving three complete contextual mappings.
+Further native dialogue, fields, and caller review
+remain active.
+
+The [native return greetings](../specs/RETURN_GREETINGS.md) fill 35 missing
+conversations in `00B0..00D2`. Their supplied same-ID GameCube records contain
+only termination, so these are original translations of the native Japanese.
+Every original command, month/week field, catchphrase occurrence, page transition,
+per-page line count, and continuing ending remains. All full conservative
+expansion and layout bounds fit; no font or runtime change is needed.
+All 602 full-suite regression tests and seven focused tests pass. The complete
+native loader batch passes all 35 messages and 107 assertions
+over 184 recorded steps, with guards, restored checkpoint, and blank isolated
+saves. All 11,692 ordinary edits match their actual built-bank entries, and
+the UPS round trip passes. Both full and basic generation add exactly these
+35 messages without changing or removing any earlier candidate. Ordinary
+greeting selection, actual absence-field preparation, rendered names/catchphrases,
+final wording review, saves, and hardware remain separate requirements.
+The adjacent `00A3..00AF` month-return conversations belong to the complete
+daily-greeting batch. The earlier `0013..005A` introductions/reunions have their
+own complete draft batch below. The distinct `0001..0012` samples remain
+untranslated and require individual content/control review; their position
+in the bank does not establish reachability.
+
+The [native daily greetings](../specs/DAILY_GREETINGS.md) add 85 complete original
+drafts for `005B..00AF`: 24 recent-move conversations, 24 daily greetings, 24
+repeat greetings, and thirteen month-return conversations. All same-ID English
+slots are empty. Every native command, field/page sequence, per-page line count,
+wait/clear, and continuing ending remains. English preserves the separate old
+and current town fields, repeated names, month counts, native jokes, sleepiness,
+day/night distinctions, and the three-kilogram remark.
+Full and basic generation add only these 85 messages; all earlier candidates
+remain unchanged. All 11,777 ordinary edits match their complete built-bank
+entries, and the UPS round trip passes. Only main text, its pointers, and the DMA
+directory change; code, fonts, runtime resources, and saved structures remain
+unchanged. Six explicit generic current-town width warnings remain for polish;
+all 85 layouts fit with the verified six-fullwidth-cell current-town limit and
+every other field's full conservative bound. No global validator is narrowed.
+The combined `005B..00D2` range has 120 complete English drafts. Actual callers,
+normal greeting/move selection, live fields, final wording/presentation, saves,
+and hardware remain separate acceptance requirements.
+The isolated native batch passes all 85 complete cartridge loads, 257 assertions,
+and 434 recorded steps, with complete headers, adjacent/module guards, restored
+checkpoint, and blank FlashRAM/Pak files. It does not execute ordinary greetings
+or change any player, NPC, or saved progression.
+All 610 full-suite regression tests pass, including the eight focused
+daily-greeting checks on the final drafts.
+
+The [native introductions and reunions](../specs/REUNION_GREETINGS.md) add 72
+complete drafts for `0013..005A`: 24 introductions, 24 long-absence reunions,
+and 24 short-absence reunions. All same-ID English slots contain only termination;
+native and legacy Japanese agree, with no identical visible native duplicate.
+Every original command, field occurrence/order/page, wait/clear, page count, and
+continuing ending remains. Literal one-month wording, dynamic month/week units,
+repeated names/catchphrases, delayed recognition, and native jokes stay distinct.
+Only `002C` page zero changes its five native lines to four English lines by
+combining the interrupted greeting and surprise, without dropping any meaning,
+field, page, or pause. No actual GameCube reference is reflowed.
+Both generation modes add exactly these 72 records and leave every earlier edit
+unchanged. All 11,849 ordinary edits match their complete built-bank payloads;
+UPS application reconstructs the verified ROM. Changes are confined to main
+text, its pointers, and the DMA directory; code, font/runtime resources, and
+saved structures remain unchanged. All expansion bounds fit at 148–620 bytes.
+Nine explicit generic current-town width warnings remain; all 72 layouts fit
+with only `2F` substituted by six fullwidth cells and all other fields retaining
+their conservative bounds. The global validator stays unchanged.
+All ten focused tests and all 620 full-suite regression tests pass. The silent
+four-MiB cartridge batch passes 72 complete loader calls, 218 assertions, and
+369 recorded steps, with complete headers, adjacent/module guards, restored
+checkpoint, and blank FlashRAM/Pak files. These checks do not execute ordinary
+introductions/reunions or their field preparation, nor establish final wording,
+presentation, saving, or hardware acceptance. The complete `0013..00D2` range
+has 192 English drafts; full review remains required.
+
+The [moving and game-launch drafts](../specs/NATIVE_MOVING_AND_LAUNCH.md) supply
+eight native conversations and seven NES prompts. The town-satisfaction question
+retains its original answers/replies; native moving remarks gain no GameCube-only
+menus or actions. The launch prompts retain all seven exact supplied GameCube
+furniture titles, original choice order, and the existing quit-button explanation.
+Only the seven prompts' title/question-mark colour lengths change. The moving
+drafts retain every native command and field placement by page. All fifteen fit;
+two generic current-town warnings remain, with the verified six-cell check passing.
+
+The [complete diagnostic guard](../specs/NATIVE_DIAGNOSTICS.md) covers 99 records:
+28 rumour-pattern labels, 68 script-bug labels, and three gyroid debug notices.
+It fills 73 missing entries and corrects 26 partial English labels, preserving
+printed numbers, the debug-report request, native credit, and every command.
+These are diagnostics, not 99 additional gameplay conversations. The builder
+rejects partial labels, changed numbers, and unrelated save/menu imports.
+Diagnostic recognition does not change the coverage categories or denominator;
+the 26 corrections earn no extra source-volume credit.
+
+Both generation modes add 88 records and correct exactly those 26 labels, with
+all other edits unchanged. All 11,937 installed payloads and the UPS round trip
+pass. The twelve focused checks and complete 632-test suite pass. One silent
+four-MiB batch passes all 114 new/corrected cartridge loads and unchanged
+connections `0FA9/17B5`: 116 calls, 350 assertions, and 589 recorded steps.
+Headers, adjacent/module guards, checkpoint restoration, graceful shutdown,
+and blank isolated FlashRAM/Pak files pass. Production code, fonts, runtime
+resources, and saved layouts remain unchanged. Actual moving, game launching
+and quitting, diagnostic callers, final wording/layout, and hardware remain
+outside these loader checks.
+
+Four [complete native travel explanations](../specs/NATIVE_TRAVEL_ADVICE.md)
+retain the Controller Pak instructions and native personalities instead of
+importing GameCube-only Memory Card travel rules. All native pauses, fields,
+page order, actor commands, and endings remain, with only explicit colour-length
+corrections. `0848` retains every detail of its travel and bulletin-board advice
+through `0848 → 0A27`. Its full 1,134-byte expansion bound becomes 663 and 489
+bytes by splitting only at the existing page boundary before bulletin-board
+advice. The original translation and both complete parts are hash-bound.
+
+The independent builder supports an explicit native-original sequence source,
+checks the complete native command sequence, and reconstructs every original
+English byte from ordered slices. Original work is not attributed to the supplied
+disc; GameCube sequence permissions stay unchanged. The exact `0A27` reserve has
+no native message-script target, matching audited instruction immediate, or
+aligned non-executable halfword reference. This is not an exhaustive indirect-
+caller proof. Both generation modes install the complete group and all three
+ordinary drafts. Every other candidate is unchanged; the reserve's old label
+is the only replaced existing edit.
+
+All twelve focused checks and all 644 regression tests pass. One silent native
+batch verifies five complete cartridge loads, the internal link, both termination
+phases, memory guards, and restored state: ten calls, 25 assertions, and 56 steps.
+All 11,941 actual installed edits and the UPS round trip pass. Code, fonts,
+runtime/name/mail/choice resources, buffers, and saves remain unchanged.
+The three ordinary drafts fit at 861, 695, and 828 expanded bytes. Three generic
+current-town warnings remain; all four complete layouts fit the verified six-cell
+town limit with every other field bound unchanged. Normal conversation, travel,
+board posting, final wording/presentation, and hardware validation remain.
+
+## Complete item-name identities
+
+The [reviewed item-name registry](../specs/ITEM_REFERENCE_MATCHES.md) supplies
+179 complete GameCube furniture names where legacy wording alone did not match.
+Each approval binds the native Japanese spelling, source hash, English reference
+and full padded hash, and all four rotation names. Both candidate generation
+and independent ROM/resource construction enforce the approval. Removing its
+metadata or re-hashing shortened text cannot bypass the complete-name check.
+Ambiguous artwork, species, figurine, and unused-name differences stay unapproved.
+
+All 179 names fit sixteen bytes, adding 716 resource slots. Fifty-three fit the
+unchanged ten-byte fields, adding 212 ordinary slots. Current full generation has
+13,383 edits; basic generation has 12,015, including both startup-error drafts,
+all twenty-six mood-preserving references, the later renovation dialogue, and
+the complete native-topic drafts whose full answer labels fit that configuration.
+Basic generation omits runtime-dependent phone sequences and their allocated
+reserve-label candidates; full output contains every complete phone part.
+Name approvals leave unrelated dialogue unchanged.
+Ordinary item storage contains 779 slots from 242 distinct references; the wide
+resource contains 2,713 slots from 771 references. Four rotations are one name,
+not four distinct translations. The 126 new names longer than ten bytes remain
+complete in the wide resource, not shortened for unexpanded callers.
+
+All 12,532 actual installed edits, source/candidate/build hashes, the complete
+wide-resource reconstruction, and the UPS round trip pass. The name-only pilot
+changes only the native item-name file and the existing wide-name resource
+relative to the travel pilot; their dimensions and DMA entries remain unchanged.
+Runtime code, main text,
+fonts, save structures, and caller capacities are unchanged by the name edits.
+The 700-test suite includes all fifteen item checks. The first-300-group native loader
+batch passes 757 calls and 749 memory assertions over 2,271 steps, including all
+461 wider-name reference identities and all 212 new ten-byte slots. Complete
+names, unaligned wide destinations, capacity/header failures, guards, and restored
+state pass. The earlier shorter-time-limit run remains recorded as incomplete.
+Normal item display and remaining wider destinations still need their own
+integration and gameplay checks.
+
+The [mapped-name review](../specs/MAPPED_ITEM_NAMES.md) supplies 308 additional
+furniture identities, including 170 explicit cross-index matches. English table
+insertions do not replace native insects with mannequins or fossils with clocks.
+Japanese queen/king, tail/torso, and right/left-wing names select the correct
+English parts where legacy glosses disagree. Full names and exact native
+conversions supply 1,348 additional wide slots and 336 ordinary edits, including
+two independently approved carried-clothing spelling variants. The complete
+registry has 487 furniture and two ordinary approvals.
+
+The native batches pass 850 wider-loader/header calls and 335 original-width
+loads; a fourteen-call final refinement covers both clothing variants in carried
+and placed form. All three checkpoints restore with intact guards and blank
+isolated saves. The final refinement changes only one original-width name and
+two wider fields; every other tested byte remains unchanged. All 2,713 wider
+slots resolve to their complete selected English name after the native conversion.
+The full 714-test checkpoint and all 12,532 installed ordinary payloads pass. Gyroids,
+changed species/designs, game slots, remaining identities, and all unexpanded
+destinations stay in the completion queue.
+
+## Native startup errors
+
+The [cartridge-clock and town-data drafts](../specs/STARTUP_ERRORS.md) translate
+`09CC/09D1` without importing the GameCube's different hardware and actions.
+The clock warning retains playing immediately or waiting, native choices
+`00E7/00E8`, and successors `09CD/09CF`. The corrupted-town notice retains its
+original request and normal ending, without adding erasure or card-slot choices.
+Every native command remains except the exact highlighted booklet-name length.
+Both complete drafts fit at 361 and 178 expanded bytes with no layout warnings.
+
+All five focused checks and the 700-test full suite pass. One silent four-MiB
+native batch passes the two drafts and three connected messages: five complete
+loads, seventeen memory assertions, guards, and restored state. The final ROM
+retains every earlier edit, all name resources, code, fonts, and saved structures.
+Normal error selection, clock recovery, date entry, final wording, saving, and
+original hardware remain separate acceptance requirements.
+
+## Native mood effects in complete English references
+
+Twenty-six [complete English conversations](../specs/NATIVE_MOOD_REFERENCES.md)
+retain the original resident mood and duration commands at individually reviewed
+corresponding pages or phrases. Every supplied English word, newline, page, and pause stays
+intact. The sun-contest message places its effect after the fourth English page
+clear, not the third native page clear. The approval requires complete original
+actor-command order before adaptation and the unchanged native mood consumer.
+Five phrase rules require either the exact following original expression or
+only the final newline/normal ending. Unanchored page-start rules remain strict.
+The separate `203C` sale anchor retains duration zero precisely between its
+original initial quest and surprise expression; it does not generalise zero
+duration to other anchors or change the native timer value.
+No gameplay code, saved structure, font, or buffer capacity changes.
+
+All fourteen mood tests pass within the 111-test reference batch. The separate
+unchanged full-runtime checkpoint passes 714 tests. The silent four-MiB special
+follow-up batch includes all 26 complete mood-message loads and 52 actual
+mood/timer order dispatches. Combined with the new drafts, connected replies,
+and menu labels, it passes 96 calls and 237 memory assertions, guards, restored
+state, and blank saves. All 12,595 installed edits and the UPS reconstruction
+pass. The mood import preserves resources outside the main text/table. Normal resident
+mood progression, rendered conversation, final wording, saving, and original
+hardware remain separate acceptance requirements.
+
+The complete snow reply `2773` is reviewed with its parent `207A` and connected
+`2771/2772`. All four retain the coherent GameCube girls/fluffy-snow joke; the
+last reply keeps every English word and presentation control while restoring
+the native happy mood at the final page's matching expression. This individual
+approval does not permit unrelated topic or actor changes.
+
+## Complete renovation invoice and native room choices
+
+The [first-enlargement invoice](../specs/NOOK_RENOVATIONS.md) preserves the complete
+GameCube reference with the native 49,800-Bell price, using `107E → 083F` at one
+existing page boundary. A numeric-only approval checks the original amount,
+complete corrected English, full slice coverage, and each final payload. The
+two parts fit at 574 and 483 expanded bytes. No buffer, font, save, or gameplay
+code change is needed.
+
+Two complete original drafts retain the native costly-enlargement agreement and
+refusal-to-roof-colour flow in `107F/1081`, without importing the GameCube basement
+choice. Every native control remains exact, with no draft layout warnings.
+Eight focused, 96 reference, eleven placeholder, and seven coverage checks pass.
+The silent four-MiB native run passes all four message loads, invoice continuation
+and termination, and six agreement/roof branch selections: 33 calls, 51 memory
+assertions, 142 steps, intact guards, restored checkpoint, and blank isolated
+saves. All installed payloads and patch reconstruction pass. Normal repayment,
+rendered choice selection, final wording, saving, and hardware remain unverified.
+
+## Complete native topics and connected replies
+
+The [native-topic batch](../specs/NATIVE_TOPIC_GAPS.md) supplies ten original
+drafts: nine missing conversations and one corrected connected greeting reply.
+The texts preserve the native sign quiz, train-dependent moving request, seasonal
+romance, net technique, shovel-hole warning, positive item-attachment question,
+ocean row-six quiz, and both complete meal-greeting jokes. Every gameplay command
+and branch remains. Let's eat! and Thanks for the meal! retain the original
+per-character scale and colour, expanded across the complete English phrases.
+Two individually guarded contextual mappings supply complete English quiz
+answers; shared shape labels remain unchanged. The snow-reference approval adds
+one further missing record. Only existing candidate `25FD` changes wording.
+
+Nine focused topic tests, twelve contextual tests, 96 reference tests, seven
+native-menu tests, and seven coverage tests pass. All 12,532 actual ROM payloads
+and the UPS reconstruction pass. One isolated four-MiB checkpoint combines
+107 actual cartridge message loads, 46 selected-label/insertion cases, 42 contextual
+branch cases, and all 25 mood messages/50 orders: 423 native calls, 309 explicit
+return assertions, 763 memory assertions, and 1,754 recorded steps. Every call,
+argument, declared expected return, and complete memory read is independently
+checked. Guards, restoration, silent shutdown, and blank isolated saves pass.
+Normal conversation selection/actions, shout rendering, actual rewards,
+poster/map artwork, calendar selection, final wording, and hardware remain.
+
+## Complete old-calendar quiz and required date fields
+
+The [old-calendar quiz](../specs/DIALOGUE_DATES.md#actual-old-calendar-quiz-request)
+retains the complete supplied English `246D`, including every manual line and
+pause. Its original calendar request prepares current-date free fields 15/16
+through the real native calendar conversion. The existing guarded English date
+patch supplies full month names, ordinal days, and leap month. Both complete
+patched files are required by the reviewed identity, even if candidate metadata
+is removed. Complete contextual answers retain affirmative success at `2472`
+and negative failure at `2476`. No runtime code, font, saved format, or earlier
+candidate changes.
+
+All 700 regression tests pass. Thirteen focused date/dependency tests and the
+96-test reference group also pass independently. The full quiz is 81 stored/157
+conservatively expanded bytes. All 403 complete month/day combinations fit;
+the widest date line is 88 pixels. The generic two-free-field warning remains
+recorded without shortening text. All 12,532 installed payloads and complete
+UPS reconstruction pass. Basic generation withholds required calendar/birthday
+features; unrelated candidates retain their earlier payloads.
+Normal request polling, conversation selection, actual rewards, rendering,
+out-of-table dates, saving, and original hardware remain separate requirements.
+
+The silent four-MiB combined native run passes 496 calls, 294 explicit expected
+returns, and 822 memory assertions over 2,039 recorded steps. Six real quiz
+request/dispatcher cases prepare and insert complete dates; two non-one orders
+leave all fields untouched. It also checks 53 date preparations, thirteen
+earlier calendar conversions, eighteen direct quiz-reference conversions,
+twelve date-message loads, and twenty date insertions. All 48 contextual/shape
+answer selections and 44 actual contextual branches pass. Complete saved game,
+clock, manager, code, heap/stack/module guards, freed allocation, single restored
+checkpoint, and unchanged blank isolated FlashRAM/Pak pass. These are injected
+native handlers, not normal gameplay or hardware acceptance.
+
+## Complete birthday fields and connected answers
+
+The [birthday preparer](../specs/BIRTHDAY_FIELDS.md) supplies complete animal-year
+and Western-sign names, month names, and ordinal days in the existing sixteen-byte
+message fields. It preserves the two original RNG draws and native constellation
+boundaries, including invalid saved-byte behaviour, without changing saved data.
+All 33 native request conversations require the complete installed patch,
+independently of candidate metadata. Basic output withholds these conversations;
+the full build includes them. The shared general-string bank is not widened or
+credited as translated by this display-only change.
+
+Complete English `088B/2586` and corrected acknowledgements in `088A/088C` preserve
+native answer indices and complete reference wording, layout, and timing.
+Acknowledgement no longer displays the unrelated shared greeting. The incorrect
+random-sign question retains distinct confidence, modesty, and wrong-sign replies.
+Original `1C6F` preserves the native two-answer letter question and both branches;
+the GameCube-only third answer and empty native destination are not imported.
+
+All 714 full-suite tests pass. The new resident image is 23,488 linked bytes with
+1,088 bytes free; the 32 KiB reservation, eight KiB test area, and saved layouts
+are unchanged. Independent module, NPC creator, ROM, and UPS builds match.
+All 12,532 installed ordinary edits and complete patch reconstruction pass.
+Both font atlases and approved spacing are unchanged.
+
+`build/smoke-birthday-dates-02/` passes 4,083 recorded steps, 913 calls, 1,588
+memory assertions, and 150 actual cartridge message loads. It includes 24
+birthday preparations, 48 original RNG calls, all 33 complete related messages,
+190 birthday insertions, all ordinary/calendar cases, 57 selected answers, and
+53 contextual branches. The fresh train-to-town and mail run in
+`build/smoke-birthday-arrival-mail-02/` passes 1,947 steps, 245 calls, and 546
+assertions, including 48 original creator comparisons, eight successive letters,
+and eight rejected requests. Creator code/resources are cartridge-loaded, not
+debugger-uploaded. Both runs preserve guards, restore one checkpoint, shut down
+silently, and retain blank isolated FlashRAM/Pak files. Exact hashes and the
+independent execution audit are recorded in the work log. Normal birthday entry,
+gifts, conversations, mail delivery/editing/saving, and hardware remain required.
+
+## Complete storage, raffle, and offering dialogue
+
+The [storage/raffle batch](../specs/STORAGE_RAFFLE_DIALOGUE.md) supplies six
+complete native-specific drafts. Storage retains Remove / Never mind... / Swap,
+the three raffle announcements retain their prize ranks and full item fields,
+and the offering question retains its give/refuse branches without renaming
+the native shrine. The twins retain all four paired exchanges, original pauses,
+and complete scaled/coloured English echoes. Their explicit layout warning
+remains for the polish pass. No special-actor permission is added.
+
+Five focused tests and all 96 reference tests pass. Every earlier full/basic
+candidate is unchanged. All 12,538 installed edits and UPS reconstruction pass;
+only the main message data, pointer table, and corresponding DMA table change.
+Both font atlases and all runtime/name/item/mail resources remain unchanged.
+The full runtime-suite evidence remains the 714-test birthday checkpoint; the
+content batch is not a new full-suite run.
+
+`build/smoke-storage-raffle-01/` passes 88 steps, seventeen native calls, eleven
+declared expected returns, and 41 memory assertions. All six drafts, five
+connected messages, and six menu labels load completely from the cartridge.
+Guards, one restored checkpoint, silent graceful shutdown, and blank isolated
+FlashRAM/Pak pass. Normal storage swaps, raffle entry/prize delivery, offering
+deductions, twin-echo rendering, and hardware remain separate requirements.
+
+## Native service replies and complete random-response references
+
+Four [complete random-response references](../specs/NATIVE_RANDOM_REFERENCES.md)
+keep the native branch commands in `263E/2646/2650/26C5`. The English versions
+repeat one destination in a three-entry command; the installed messages retain
+the original native two-entry command. Complete English wording, manual layout,
+pauses, and all other gameplay commands remain. Each source/reference/span/output
+is independently hash-bound; no runtime or general flow permission changes.
+
+Fifteen [connected service drafts](../specs/CONNECTED_SERVICE_DIALOGUE.md)
+preserve the remaining twin-shopkeeper exchanges, two-answer moving question,
+gift refusal loop, catchphrase editor/reassurance choices, native rain/brown-paint
+comments, and complete resident reactions. No extra GameCube mood/quest request,
+third answer, unavailable field, or empty native branch is introduced.
+All ten service echoes are complete; their three formatting warnings remain
+for the polish pass. The other twelve original layouts have no warning.
+
+Five focused draft tests and all 104 reference tests pass, including eight new
+random-reference checks. All 12,557 installed payloads and complete UPS
+reconstruction pass. Every earlier full/basic candidate is unchanged. Only
+main message data, its pointer table, and the associated DMA table change;
+all runtime/font/name/item/mail resources remain unchanged. The full runtime
+suite retains its separate 714-test birthday checkpoint, not a new full run.
+
+`build/smoke-connected-services-01/` passes 276 recorded steps, 57 native calls,
+39 declared expected returns, and 137 memory assertions. The nineteen new
+messages and twenty directly connected replies all load completely, as do
+eighteen menu labels. Independent scenario regeneration, all call arguments,
+expected returns, complete memory reads, guards, single restored checkpoint,
+silent graceful shutdown, and blank isolated FlashRAM/Pak pass. These are
+cartridge text loads, not executed trades, gifts, mood changes, random selections,
+editor input, normal saving, rendered twins, or hardware acceptance.
+
+## Complete controller tip and source glyph encoding
+
+The [source-encoding approval](../specs/REFERENCE_GLYPH_ENCODING.md) imports
+complete GameCube `14FD`. Its + Control Pad uses GameCube byte `B4`; the
+unchanged native plus glyph uses `5C`. A single token-aligned approval at byte
+112 reconstructs the actual English hash without installing the wrong native
+glyph. Full wording, manual layout, timing, expressions, and catchphrase remain.
+No font change or general missing-glyph permission is introduced.
+
+All 109 reference tests pass, including five dedicated encoding checks against
+the actual supplied English bytes. All earlier full/basic candidates are
+unchanged by that import. The 254-byte record fits both configurations and
+passes its complete cartridge load in the special-actor batch. Normal
+conversation/rendering remains playthrough work.
+
+## Complete special-actor conversations
+
+Eleven [complete references](../specs/SPECIAL_ACTOR_SEQUENCES.md) cover Gracie,
+Redd, Jingle, Gulliver, Rover, and sound settings. Eight remain single records;
+Redd's complaint and two Gulliver stories split at existing English page breaks.
+Fourteen parts retain every English word, manual line, pause, and emphasis.
+Only existing speaker-zero expressions may repeat or move; all other actor
+requests retain exact native order and multiplicity across every approved group.
+Three checked reserve labels become continuations; no other existing candidate,
+runtime resource, font, caller allocation, or saved format changes.
+
+Five focused tests, 110 reference tests, and nine long-advice tests pass.
+The silent cartridge batch passes 59 native calls, 51 expected returns, eighteen
+complete message loads, eight menu labels, and 109 memory assertions. Internal
+and external links, both ending phases, full buffers, guards, restored checkpoint,
+and blank isolated FlashRAM/Pak pass. This also checks `14FD` and the original
+connected `072A/09CA` messages. Normal actor progression, gift/service outcomes,
+sound-setting UI, final presentation, saving, and original hardware remain.
+
+Five [contextual-expression references](../specs/CONTEXTUAL_ACTOR_SEQUENCES.md)
+retain Booker's lost-property explanation, Gulliver's weekly falls and sea tales,
+and Rover's seat refusal and money/arrival encouragement. Supporting native
+messages bind only the exact same-character speaker expressions required by
+the complete English. Full native actions, name-entry request/control, endings,
+town field, wording, and presentation remain. No continuation slot is allocated.
+Five focused tests, 110 reference tests, and all five earlier special-actor tests
+pass. The silent five-message batch passes fifteen native calls/returns and
+27 memory assertions with restored checkpoint and blank isolated saves.
+Actual name entry, expressions, actor progression, collection, and final layout
+remain gameplay/playthrough checks.
+
+## Text-volume measurement
+
+The generated coverage report measures 650,464 covered source characters out of
+746,978 across all 29 native text banks. The denominator counts non-whitespace
+visible characters in Japanese-static-text records; each native record ID counts
+separately. Commands, exact development labels, already-English records, and
+symbol-only sources are excluded. The numerator uses the original source weight
+when a complete decoded Latin or punctuation/symbol candidate is installed;
+longer English wording does not earn extra weight. English letter-header commas
+and punctuation-only dynamic responses remain candidate replacements.
+
+`tools/text_coverage.py` writes both per-bank and aggregate volume values with
+the source/candidate hashes and measurement definition. Empty, still-Japanese,
+or undecodable replacements receive no credit. Separate runtime resources do
+not add credit for incompletely integrated destinations. Embedded UI strings
+and image text are outside the extracted-bank denominator. This is candidate
+replacement coverage, not semantic review, gameplay acceptance, total discovered
+asset coverage, or overall project completion. Report percentages only when
+explicitly requested, and retain this definition for comparable text measurements.
+
+## Validation and release status
+
+The resident-module experiment contains 13,383 edits, including
+9,812 reference main-bank candidates, 280 original development-label drafts,
+114 original diagnostic/sample drafts,
+all 460 choices, 178 villager names,
+779 item-name slots, four N64-specific exercise drafts, two greeting-job drafts,
+four other introductory drafts, eleven earlier-shop drafts, seven native
+advice/travel drafts, four native festival drafts, 26 native seasonal
+conversation drafts, eight native town-advice drafts, eighteen native
+community drafts, eight native-context drafts, 26 Pak drafts, 25 carp/fireworks
+drafts, 47 native service/save drafts, 29 seasonal-topic drafts, 35 startup/Pak
+drafts, fifty startup-greeting drafts, eighteen resident-topic drafts,
+21 gyroid/resident-state drafts, two letter-fragment drafts, ten native-menu
+dialogue drafts (including five connected reply corrections), four
+contextual-menu reply drafts, 35 native return greetings, 85 native daily,
+move, repeat, and month-return greetings, 72 native introductions/reunions,
+eight native moving conversations, seven game-launch prompts, and four complete
+native travel explanations using five records, two native startup errors,
+two native renovation drafts, ten native-topic drafts including the
+connected `25FD` correction, one native two-answer letter question, and six
+native storage, raffle, and offering drafts, plus fifteen native connected
+service/reaction drafts, nine native menu/dialogue follow-ups, and three native
+special-dialogue follow-ups.
+It retains the GameCube calendar wording in Rover's opening
+question and admits reference capitalization and protected-pacing spans.
+Its reference/label generator rejects 928 main records; one receives an original
+fallback dialogue draft. The final candidate-file audit finds 927 main records without
+candidates: five with Japanese text, no exact placeholders, 919 with no static
+text, one with Latin text, and two with only numbers/symbols. Ten command-only
+records contain dynamic insertions. All 919 retain their control-flow review
+requirement; none is deemed unreachable from this classification.
+Matching, actor fields, flow controls,
+and review are still required. This experimental count does not replace the
+ordinary pilot's coverage or establish translation completion.
+The final choice identity is individually reviewed and hash-bound; complete
+choice translation review and actor-runtime coverage still remain. The twenty-byte
+build passes the complete train-to-town regression. Separate pacing-build gameplay
+continues through Nook's escort, house entry, and the home-gyroid explanation.
+Nook's introductory work offer also completes. The gyroid remains in its job-time
+state and does not expose the normal save menu yet. A separate native test passes
+all house-explanation loads, continuation links, both choice branches, the repeat
+response, and memory guards. Normal actor traversal reaches all four English
+records and the active final choice. Choosing repeat traverses all four records
+again; choosing continue reaches the invoice and the native work-offer entry.
+The sequence build passes name/town entry and a continuation to
+arrival. The cancellation build passes the complete long-choice/train-to-town
+regression and all ten acceptance checks, as does the delivery build. Its 366
+page-delivery candidates still need broader gameplay review. The work-offer split
+passes native DMA, continuation, final-termination, and guard tests. Normal actor
+progression also traverses `07EC` and `2AE9`, finishes the English work offer,
+and returns control to the player. The work-offer build
+also passes all 225 full train-to-town steps and ten acceptance checks. The layout
+build adds 264 formatting candidates with 1,308 total conservative layout warnings;
+the layout build also passes the complete train-to-town regression and all ten
+acceptance checks. The space build has 1,310 total conservative layout warnings.
+Its native formatting/space test passes 476 recorded steps without modifying the
+font assets. The space build also passes the full train-to-town regression, the
+twenty-byte-choice regression, and cancellation tests. Six additional reviewed
+identities use identical native shop/reward records at confirmed reference IDs;
+their caller-specific gameplay review remains open. The name build passes all 216
+real cartridge name loads and the invalid-ID no-write check, with 660 recorded
+steps. Native name storage, identity structures, and file size stay unchanged.
+The item build has passing runs covering all 4,547 native item-ID cases across
+nine bounded scenarios, including every ordinary item, furniture rotation,
+placed-item conversion, and empty/unsupported type. The final batch's first
+attempt stopped unexpectedly at its first injected call; its complete rerun
+passes, but that unexplained failure remains open for repeatability work.
+Normal gameplay on the space build traverses
+the English purchase confirmation and all four home-explanation records.
+The exercise drafts retain every native command; seasonal-event testing remains.
+Normal gameplay also enters Nook's shop and reaches the English uniform handoff.
+The uniform is equipped through the inventory, acknowledged by Nook, and confirmed
+by the native clothing item ID. The English planting-job instructions complete.
+All seven supplied flowers and three saplings are planted through normal
+inventory actions, with native pocket consumption checked after each item in
+the final batches. Nook acknowledges the completed work at `07F9`, then requests
+introductions at `0821`; `0822` reminds the player that villagers remain unmet.
+The English versions of these three records pass native DMA tests, but their
+ordinary actor traversal remains. The greeting break and later jobs are active.
+The message-alias build passes all 225 train-to-town steps and all ten acceptance
+checks. Native draft loading covers all nine current original dialogue drafts.
+The following clothing reminder has an approved GameCube Y-to-N64-START button
+adaptation in the controller build. Read-only player coordinates support navigation
+without position edits. START opens the inventory during the normal shop test.
+The [general-string audit](../specs/GENERAL_STRINGS.md) identifies thirty-four
+direct loader calls and their destination constraints; wider imports remain gated.
+
+Silent emulator runs confirm a four-MiB configuration, active relocated text
+loaders, intro dialogue, English-first input, case conversion, single-character
+deletion, cursor movement, six-character enforcement, all five mode transitions,
+and successful name confirmation. The proportional name-cursor correction passes
+the same regression and has been visually checked during entry. Destination-name
+entry, its six-character limit, and confirmation also pass. A 218-step run reaches
+town arrival and verifies long choices, selected text, and the English town field.
+No hardware-certified build or
+release candidate exists. Save/reload, travel, mail, board, RTC, calendar, credits,
+seasonal events, and original hardware tests remain outstanding.
+
+The runtime changes the town insertion command `7F2F`; recorded message assertions
+confirm the supplied town name appears without the Japanese village suffix.
+Catchphrase, song, mail, and board editor callers also need their own regressions.
+
+The GameCube-style grid is a separate implementation task; the current keyboard
+still uses the N64 radial layout. See [keyboard design](../specs/KEYBOARD.md),
+[validation](VALIDATION.md), and [build instructions](BUILDING.md).
+
+The [title asset route](../specs/TITLE_ASSETS.md) identifies the supplied English
+logo's three animated letter groups, background, trademark, and separate Press
+Start tiles, with native-overlay and English-data hashes. These are source
+locations, not an installed replacement. The title screen remains the first
+image priority; native drawing integration and graphics/hardware checks remain.
+
+Public release requires completed translation review, stability testing,
+original-hardware results, and third-party provenance review. Only patches and
+original tooling may be published; ROMs and extracted assets stay local.
