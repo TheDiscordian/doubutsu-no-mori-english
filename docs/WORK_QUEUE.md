@@ -2,15 +2,17 @@
 
 ## Next work
 
-Finish the combined RC4 memory/space-marker handoff. V1-20 is reproduced as
-ordinary-arena exhaustion, and the copied RC2 save loads on the corrected
-candidate with 25,216 free bytes and no faulted thread. Four new loader/resource
-checks pass. Complete the bounded continuation/absent-Expansion-Pak checks and
-committed build/package replay; preserve all preceding evidence and artifacts.
-The V1-19 ordinary-space marker correction also has four passing focused checks.
+The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
+packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
+faulted thread. Controller movement, complete loaded font, owner guards, and
+clean four-MiB stopping pass. Eight implementation tests, three package tests,
+the committed rebuild, and the archived standalone patcher pass. Preserve these
+results and all preceding artifacts; do not repeat the completed reproduction.
 Every RC handoff distinguishes unchanged save formats from tested loading and
 warns about known or unresolved incompatibility. Cross-version compatibility is
-preferred, not mandatory. Artwork review resumes after these corrections.
+preferred, not mandatory. Resume the remaining artwork review and scoped
+regression-fixture follow-up; RC4 hardware appearance and manual save/restart
+remain unverified. Keep new concrete human defects ahead of speculative work.
 
 The V1-17/V1-18 follow-up is implemented in the packaged
 [V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and

@@ -88,10 +88,9 @@ acceptance. Cross-version compatibility is a preference, not a mandatory gate;
 the fixed allocation crash is a stability defect independently of that preference.
 The original seed is never modified; loading writes only isolated working saves.
 
-## Handoff work
+## Handoff
 
-Commit the source, run `tools/rebuild_v1rc4.py`, and package with
-`tools/package_v1rc4.py`. Packaging binds the complete native loading/movement/
-unsupported-memory evidence, independently reconstructs the patch, and executes
-the archived standalone patcher. Record the resulting revisions/archive hash
-in the package checkpoint before handing over the fresh V1RC4 path.
+The committed `tools/rebuild_v1rc4.py` replay and `tools/package_v1rc4.py`
+packaging pass. Three package tests and the archived standalone patcher pass.
+The [package checkpoint](V1RC4_PACKAGE.md) records source/output/archive hashes,
+explicit save-compatibility limits, and the ready V1RC4 ROM path.

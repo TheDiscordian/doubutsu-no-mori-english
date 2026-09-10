@@ -7,12 +7,14 @@ This project is under development. It is not a complete translation or a
 hardware-validated release. See [progress](docs/PROGRESS.md) for verified results
 and remaining work, and [sources](docs/SOURCES.md) for third-party provenance.
 
-The [current V1RC3 playtest](docs/V1RC3_PLAYTEST.md) includes the English
+The [current V1RC4 playtest](docs/V1RC4_PLAYTEST.md) includes the English
 title, GameCube-style keyboard, translated screen/building artwork, and embedded
 menu responses, along with the main English text and progression fixes. It also
-includes corrections for the eighteen reported V1 playtest findings, including
-name/option font edges and the exposed building-transition strip. It requires
-an Expansion Pak. The [package checkpoint](docs/checkpoints/V1RC3_PACKAGE.md)
+includes corrections for the twenty reported V1 findings, including the RC3
+town-loading memory crash, stray name-space markers, font edges, and transition
+strip. The supplied RC2 save loads and the player moves in the emulator; save
+formats remain unchanged. It requires
+an Expansion Pak. The [package checkpoint](docs/checkpoints/V1RC4_PACKAGE.md)
 identifies the local ROM, verified patch-only bundle, and explicit test limits;
 this is not a completed v1 or public release.
 
@@ -48,7 +50,10 @@ include that correction suffix. Its verified output is recorded in the
 The three-stage `tools/rebuild_v1rc2.py` adds the RC1 hardware follow-up and
 matches the [V1RC2 package](docs/checkpoints/V1RC2_PACKAGE.md).
 The two-stage `tools/rebuild_v1rc3.py` adds font/transition edge corrections and
-matches the [V1RC3 package](docs/checkpoints/V1RC3_PACKAGE.md). The
+matches the [V1RC3 package](docs/checkpoints/V1RC3_PACKAGE.md).
+`tools/rebuild_v1rc4.py` adds the dedicated font-memory owner and ordinary-space
+marker correction; its output matches [V1RC4](docs/checkpoints/V1RC4_PACKAGE.md).
+RC3 has a known town-loading memory defect; use RC4 for further playtesting. The
 [N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) remains deferred until V1 is
 fully complete.
 The [pinned published compiler](docs/TOOLCHAIN.md) is verified by the complete

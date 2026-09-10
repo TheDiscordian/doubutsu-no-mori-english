@@ -1,5 +1,9 @@
 # Animal Forest English V1RC3 — private playtest
 
+**Known town-loading memory crash: use [V1RC4](V1RC4_PLAYTEST.md) for further
+playtesting.** RC3 can run out of ordinary memory while loading an existing
+town. The corrected build retains this candidate's font and transition fixes.
+
 V1RC3 retains all V1RC2 translation, artwork, keyboard, editor, and tutorial
 corrections, and adds two fixes:
 

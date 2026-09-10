@@ -17,7 +17,8 @@ in RC2. Moving the unchanged bordered font into its own Expansion Pak region
 allows the corrected candidate to load that save with 25,216 bytes free and no
 faulted thread. Native font/title/module guards remain intact; four focused
 loader/resource checks pass. See [the memory specification](../specs/FONT_EXPANSION_MEMORY.md).
-Package/replay and further bounded checks remain before RC4 handoff. The original
+The committed replay, package tests, and archived standalone patcher pass;
+V1RC4 is available for hardware rechecking. The original
 save is preserved locally; the SD card is no longer needed. Cross-version
 compatibility is preferred, not required, and must not be confused with fixing
 this unintended allocation crash. Save formats are unchanged; untested loading
@@ -29,8 +30,8 @@ name-window draw loop at `80884794` still draws these markers using twelve
 pixels per character. English GC `mLE_set_dl` draws markers only for its separate
 wide-space code, not ordinary spaces. Correct the shared name-window rendering
 without changing stored names, the proportional caret, or keyboard Space labels.
-The single-branch correction has four passing focused instruction/resource tests.
-It is not packaged or handed off; V1-20 takes priority. Native drawing and
+The single-branch correction has four passing focused instruction/resource tests
+and is packaged with the memory correction in V1RC4. Native marker drawing and
 original-hardware rechecking remain pending.
 
 V1-17: the user reports clipped left-edge columns on names/options and extra

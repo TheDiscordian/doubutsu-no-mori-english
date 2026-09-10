@@ -2,22 +2,23 @@
 
 ## Builds
 
-**RC3 town-loading memory failure corrected in an unshipped candidate (V1-20).**
+**RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
 after the complete bordered font moves to its own Expansion Pak region. The
 corrected town has 25,216 bytes free, with intact memory guards and no faulted
-thread. Four focused loader/resource checks pass. RC4 packaging is pending;
-the same candidate includes the ordinary-space marker fix (V1-19). Cross-version
+thread. Controller movement and clean unsupported-memory stopping also pass.
+Eight focused implementation checks, three package checks, a committed rebuild,
+and the archived standalone patcher pass. The same candidate includes the
+ordinary-space marker fix (V1-19). Cross-version
 save compatibility is preferred, not mandatory; loading evidence and unchanged
 saved formats are distinct. The original save remains preserved locally.
 
-The current private playtest is **V1RC3**, with local ROM
-`build/v1rc3/Animal Forest English V1RC3.z64` and patch-only archive
-`build/v1rc3/V1RC3-patch.zip`. The standalone archived patcher and two package
-tests pass, and the cartridge matches the complete two-stage
-`v1rc3-rebuild-01` follow-up. The
-[package checkpoint](checkpoints/V1RC3_PACKAGE.md) records hashes and source
-revision. An Expansion Pak is required. V1RC1, V1RC2, and the user's saves are preserved.
+The current private playtest is **V1RC4**, with local ROM
+`build/v1rc4/Animal Forest English V1RC4.z64` and patch-only archive
+`build/v1rc4/V1RC4-patch.zip`. The cartridge matches `v1rc4-rebuild-01` and the
+tested memory/marker correction. The
+[package checkpoint](checkpoints/V1RC4_PACKAGE.md) records hashes and source
+revision. An Expansion Pak is required. Earlier RCs and the user's saves are preserved.
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
 
@@ -144,7 +145,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC3 notes](V1RC3_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC4 notes](V1RC4_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
