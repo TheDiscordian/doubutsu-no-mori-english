@@ -17,6 +17,15 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [shop artwork candidate](checkpoints/BUILDING_ARTWORK.md) imports twelve
+GameCube textures for Nook's Cranny, Nook 'n' Go, and Nookway in both seasons.
+`build/shop-artwork-02` retains the complete hardware fixes and all English
+resources. Five focused checks pass, including donor pointers, all 328 affected
+vertex uses, visible palette colours, full resource retention, and patch recovery.
+Native geometry, palettes, code, and RAM use remain unchanged. Ordinary visual/
+hardware acceptance remains pending. Continue the map, inventory, and time-
+setting screen artwork; keep the corrected v0 handoff separate.
+
 The [hardware correction](checkpoints/V0_HARDWARE_BUGS.md) fixes the whole-
 conversation loop during Nook's furniture-delivery job and the related premature
 cleanup of later letter-sharing advice. The separate combined ROM is
@@ -28,8 +37,9 @@ and one unsplit letter explanation. Full English, completed quest state, reward
 behaviour, and guards are retained. The map label is corrected to one-line
 "Shrine". Ordinary tutorial replay on hardware remains unverified.
 
-Finish the correction's focused checks and private patch package, then continue
-the reported Japanese interface/artwork. Classify each screen as runtime text,
+All nineteen focused checks pass, and the private patch package is complete at
+`build/releases/v0-hardware-fixes-02.zip`, bound to source revision `5e711a6`.
+Continue the reported Japanese interface/artwork. Classify each screen as runtime text,
 texture, or both, and use matching supplied GameCube English assets while
 preserving N64-specific locations. Further actual progression defects retain
 priority over the separate title and keyboard work.

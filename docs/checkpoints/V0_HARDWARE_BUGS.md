@@ -123,5 +123,11 @@ map-label checks, and six patch/package checks. These include independent MIPS
 assembly for both corrections, source rejection, two-base relocation,
 complete resource retention across both combined builds, recorded native-result
 validation, final patch reconstruction, and separate correction playtest notes.
-The GitHub repository remains private. The patch archive is being prepared from
-the committed source revision; no ROM or extracted game art is committed.
+The GitHub repository remains private. The completed patch archive is
+`build/releases/v0-hardware-fixes-02.zip`, SHA-256
+`26eb2d52f6eba6c93537e65bdcd1e09293baebc205dd2c8d5e46e9f6eec6f9c7`.
+Its source and packaging revision is
+`5e711a62267ef8713ae84dbbfb56cc042683170e`. The packager reconstructs the complete
+corrected ROM and verifies its boot checksums. The archive contains the UPS,
+patcher, manifest, instructions, provenance, tooling licence, and checksums;
+no full ROM is included. No ROM or extracted game art is committed.

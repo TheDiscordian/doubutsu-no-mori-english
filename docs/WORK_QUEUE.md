@@ -2,12 +2,20 @@
 
 ## V0 execution priority
 
+The [shop artwork checkpoint](checkpoints/BUILDING_ARTWORK.md) records twelve
+installed summer/winter textures and five passing focused checks. Continue
+remaining map, inventory, and time-setting screen lettering, then the other
+signs/buildings and title/keyboard work. Reuse unchanged loader evidence; do not
+construct a gameplay matrix for each texture. The artwork candidate retains the
+complete hardware fixes but remains separate from the corrected v0 handoff.
+
 The [hardware bug checkpoint](checkpoints/V0_HARDWARE_BUGS.md) governs the current
 correction batch. The furniture whole-conversation loop has a three-instruction
 owner fix with passing focused native evidence. The related premature cleanup
 of long letter advice also has a verified one-instruction fix. The Shrine label
-and both owner corrections are combined in `build/v0-hardware-fixes-02`. Finish
-the focused checks and patch package, keep the original v0 unchanged, then
+and both owner corrections are combined in `build/v0-hardware-fixes-02`.
+All nineteen focused checks pass; the private patch package is complete at
+`build/releases/v0-hardware-fixes-02.zip`. Keep the original v0 unchanged and
 continue the reported Japanese interface/artwork.
 Do not restart the whole tutorial automation or full regression suite.
 
