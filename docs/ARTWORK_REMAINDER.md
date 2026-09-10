@@ -142,20 +142,33 @@ region-warning image is already English. These findings add no translation
 credit and do not declare furniture, clothing, other images, or ordinary scene
 acceptance complete. Preserve the inspected native artwork.
 
-## Remaining regional donor leads
+## Resolved regional donors and shop drapes
 
-The source symbol map identifies three additional explicitly US-labelled donor
-textures outside the completed title, civic, and shop-interior batches:
+The [regional review](checkpoints/REGIONAL_ARTWORK_REVIEW.md) binds the
+US-labelled `obj_s_house_i_3_us_tex_txt` panel to the GameCube-only island NPC
+cottage, not an N64 player-house sign. No cottage is added to the native game.
+The native gloom effect is traced through effect ID `0B`, its actual code,
+model table, streaming loader, and 64×32 IA8 image at `0141D020`. It contains
+vertical lines without Japanese wording. The complete native effect remains
+unchanged; the GC scrolling-mask redesign is not a required translation.
 
-- `obj_s_house_i_3_us_tex_txt`, `.data:52BFC0`, CI4 32×64, palette `501BA0`:
-  a wooden house panel with a log-like circular ornament and blank plaques.
-- `ef_otikomi_us1_int_i4`, `.data:66DD60`, I4 64×32: vertical gloom-effect streaks.
-- `ef_otikomi_us2_int_i4`, `.data:66E160`, I4 16×16: a soft effect-mask pattern.
+The unmatched shop-room images `013B4B88`, `013CA410`, and `013DAB30` contain
+red-and-white drapes and rosettes, not Japanese signs. Preserve all three native
+textures and palettes. These scoped reviews add no English text credit and do
+not establish ordinary scene acceptance or a full native-house artwork review.
 
-The decoded GC images have no readable wording. Their filenames alone do not
-prove Japanese text exists in the N64 counterparts. Native ownership, source
-image comparison, and reader binding remain to be established before replacing
-anything or declaring those original assets reviewed. GC model sources are
-`src/data/model/obj_s_house_i.c` and `src/data/model/ef_otikomi_us2.c` in the pinned
-reference. The latter uses two texture units and scrolling commands, not a
-standalone label bitmap. This donor-only review adds no translation credit.
+## Source-matching inventory
+
+`tools/artwork_matches.py` creates a new read-only candidate report in `build/`.
+The [specification](../specs/ARTWORK_MATCH_INVENTORY.md) defines its supported
+formats, actual GC source bindings, and explicit exclusions. The recorded run
+finds 1170 native material candidates, of which 942 match named GC texels and
+228 do not. This is not a translation percentage: matching does not establish
+English wording or colour equivalence, and unmatched does not imply Japanese.
+Some unmatched originals already have installed English replacements.
+
+Use the report's addresses and neighbouring source names for further review.
+Prioritise unreviewed room owner `012B2000` and remaining screen/item images,
+checking the current candidate first so completed replacements are not repeated.
+Dynamic/cross-segment textures and unsupported formats still need separate
+binding; the report records those exclusions instead of declaring them complete.
