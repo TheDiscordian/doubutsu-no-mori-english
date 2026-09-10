@@ -42,10 +42,11 @@ later save/guard checks from running. Those checks are not marked passed.
 See the [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
 [background](checkpoints/V1_KEYBOARD_BACKGROUND_FIX.md) checkpoints.
 
-Remaining work prioritises Japanese wording/artwork and concrete defects, plus
-completion of the running full regression pass. Two early regression errors
-are confirmed stale historical runtime-module fixtures; other errors still need
-classification, and the suite is not marked passed. Ordinary
+Remaining work prioritises concrete V1RC1 defects. The
+[full regression](checkpoints/V1RC1_REGRESSION.md) finishes with 25 failures and
+75 errors across 2,103 tests, primarily rejecting historical fixtures or older
+accounting expectations. The suite is not passed. Fixture repair remains scoped
+follow-up work; counter maintenance stays deferred. Ordinary
 letter opening, screen appearance, audible keyboard feedback, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.

@@ -21,12 +21,12 @@ case. Next:
   Percentage-tool maintenance is deferred at the user's request; use existing
   inventory only when it helps find text still needing replacement. Do not spend
   implementation time updating the percentage or its candidate selector.
-- Finish the running regression pass recorded in
-  `build/v1rc1-regression.log`. Two early academy test setup errors reject stale
-  historical `build/runtime-module` fixtures before exercising V1RC1. Correct
-  fixture selection/generation without weakening source-inventory guards or
-  overwriting retained artifacts; classify other failures and rerun affected
-  checks. Do not restart the entire running suite or claim it passed.
+- Retain the [completed full regression result](checkpoints/V1RC1_REGRESSION.md):
+  2,103 tests, 25 failures, and 75 errors. Fix relevant historical fixture
+  selection/generation without weakening guards or overwriting artifacts;
+  inspect remaining failure causes and rerun affected checks. Counter-only
+  expectation maintenance stays deferred. Do not restart the entire suite or
+  claim it passed; V1RC1's reported keyboard defects remain the immediate work.
 - Retain passing pixel-editor and letter UI native evidence. The background
   probe has reached its setup retry limit: native drawing returned and geometry
   passed, but later guard checks remain unrun after a classified comparator
