@@ -21,8 +21,12 @@ The [separate English Press Start preview](checkpoints/TITLE_PRESS_START.md)
 uses the supplied GameCube tiles and positions. Five focused checks and the
 bounded native loading/START check pass; the v0 candidate is unchanged. All
 80 title source assets and 28 texture conversions are extracted and checked.
-The main logo's geometry/animation/rendering remains v1 work, alongside the
-GameCube-style keyboard. This does not add or remove main-text credit.
+The [main logo package](../specs/TITLE_ASSETS.md) binds all 23 models and three
+animations and converts their geometry into 107 TMEM-bounded native strips.
+Eight binding/package tests and the independent native GBI compilation check
+pass. The 280,224-byte package is not installed yet; actor rendering/lifetime
+integration remains v1 work, alongside the GameCube-style keyboard. This does
+not add or remove main-text credit.
 
 The [combined v0 check](checkpoints/V0_SMOKE.md) passes fresh-game English
 name/town entry, long choices, and train arrival in the assembled candidate:

@@ -96,6 +96,32 @@ match the native `BaseSkeletonR`, `JointElemR`, and `BaseAnimationR` definitions
 The generated `model.json` remains source binding evidence, not installed
 rendering or proof that animation has executed on the N64.
 
+## Native graphics package
+
+`python3 tools/title_graphics.py` creates `build/title-graphics/title.bin` and
+its source-bound layout report. The 280,224-byte package contains the 23 source
+textures, all model geometry, three skeletons, and complete animation arrays.
+Its SHA-256 is `b2a2b8c06ee01ee33a276882b93f33f71c38c9b92c75afa8e9f63312969221d0`.
+CPU skeleton/animation pointers and RSP texture/model pointers use segment eleven;
+the eventual actor must own that mapping during use and restore other consumers'
+mapping afterwards. The asset package alone does not reserve that segment.
+
+Eighteen RGBA32 letter models use twelve-row drawing strips with one neighbouring
+texture row on either side where available. The texture coordinates remain in
+the original image space. Shared geometry boundaries use identical nearest-integer
+rounding; original outer corners, winding, cropped UV bounds, and every converted
+texel remain unchanged. The largest RGBA32 load uses 3,584 bytes, split across the
+RDP's two banks. The four I4 backgrounds each fit the 4,096-byte texture memory;
+the trademark uses 512 bytes. No copied Dolphin display list is executable.
+
+The package has 107 strips and 8,928 bytes of model display lists. Four focused
+tests pass for exact source textures/animation, strip continuity and filtering
+rows, segment-pointer bounds, and unsafe texture/geometry rejection.
+`python3 tools/check_title_graphics.py` also compiles every model command using
+the pinned native `PR/mbi.h` macros and the existing MIPS Docker toolchain. All
+generated command bytes match. This is a format/compilation check, not native
+rendering, visual approval, or original-hardware evidence.
+
 The constructor at `80AA1C5C` loads the original title asset range
 `01136000..0113BCD0` into separately allocated memory and stores its pointer at
 actor offset `02FC`. The draw body at `80AA19CC` installs that pointer as segment
