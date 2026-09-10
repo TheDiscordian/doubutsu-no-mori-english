@@ -15,6 +15,12 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) has the exact font
+and eight full-name candidates ready. Complete their literal capture, immutable
+letter reconstruction, and installed reader verification before enabling them.
+No text credit is granted for these uninstalled candidates. Keep existing saved
+catalogues unchanged and continue residual text after this integration.
+
 The [apology-input checkpoint](checkpoints/APOLOGY_INPUT.md) installs the remaining
 sun/skull targets and apology-only editing in `build/apology-input-pilot`.
 All five focused and selected counter/owner-editor regressions pass. Native

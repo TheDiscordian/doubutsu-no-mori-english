@@ -11,6 +11,14 @@ RELOC_SHA = '247d442a7cd6c957ce097fe6845818582a98f411810c310be03223761e03353e'
 SYMBOLS = {'af_world_reset':1884, 'af_world_load':1964, 'af_world_measure':2088,
            'af_world_draw':2256, 'af_world_font_install':2356,
            'world_hooks':4376, 'world_pixels':4536, 'world_name':4540}
+ACCENT_PROFILE = {
+    'bytes':4576,
+    'image_sha256':'f6fc16ac0f62ad4f6be19bd372dc45fcac35b0810d6e9a23ac71a5a4c09addff',
+    'relocation_sha256':'0f137f772732eeef360aecb807de2b1e0f5f1b720db040c96799d13ccaca8d61',
+    'symbols':{'af_world_reset':1896,'af_world_load':1976,'af_world_measure':2100,
+               'af_world_draw':2268,'af_world_font_install':2368,
+               'world_hooks':4392,'world_pixels':4552,'world_name':4556},
+}
 HOOKS = {
     0x800CBF90: (0x0C00BD30, 'af_world_reset'),
     0x800CC324: (0x0C0259D0, 'af_world_load'),
@@ -25,11 +33,14 @@ HOOKS = {
 
 
 def validate_image(data, reloc, report):
-    if len(data)!=4560 or len(reloc)!=464 or sha256(data)!=IMAGE_SHA or sha256(reloc)!=RELOC_SHA:
+    profile=ACCENT_PROFILE if report.get('accent_glyphs') else {
+        'bytes':4560,'image_sha256':IMAGE_SHA,'relocation_sha256':RELOC_SHA,'symbols':SYMBOLS}
+    if (len(data)!=profile['bytes'] or len(reloc)!=464
+            or sha256(data)!=profile['image_sha256'] or sha256(reloc)!=profile['relocation_sha256']):
         raise ValueError('Changed approved complete world font image')
     text, writable, rodata = struct.unpack_from('>3I', reloc)
     symbols = report['symbols']
-    if any(symbols.get(name)!=offset for name,offset in SYMBOLS.items()):
+    if any(symbols.get(name)!=offset for name,offset in profile['symbols'].items()):
         raise ValueError('Changed approved world-label symbol layout')
     for name in ('af_world_font_install', 'af_world_reset', 'af_world_load',
                  'af_world_measure', 'af_world_draw'):

@@ -13,14 +13,18 @@ ROOT = Path(__file__).resolve().parents[1]
 RAM, VROM, CONFIG_OFFSET, ABI = 0x80C00000,0x03400000,0x68,0x41464701
 RESOURCE_HASH = '30dddc658038fea1a4abc359121e1e4fa110edac5f5757ad6001703eff8aae7e'
 MAIL_RESOURCE_HASH = '12a90673f21a6c0bfa3fc05039279b1efc65d96319460ae36993eafa0822c105'
+ACCENT_RESOURCE_HASH = '24ae623d2917a2370ec70504daf372be327c830d24fb37bacc68ad84f0bbe90e'
 
 
-def source_hashes(world_names=False):
+def source_hashes(world_names=False, accents=False):
     names = ['overlays/extended_font/'+name for name in ('font.c','font.h','native.c','texture.s')]
     names += ['overlays/extended_font_cartridge/'+name for name in ('entry.s','install.c','font.ld')]
     if world_names:
         names.remove('overlays/extended_font_cartridge/entry.s')
         names += ['overlays/world_names/'+name for name in ('entry.s','install.c','names.c','names.h')]
+    if accents:
+        names.remove('overlays/extended_font/font.c')
+        names.append('overlays/accent_font/font.c')
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
@@ -82,15 +86,19 @@ def relocate(data,relocations,base):
 
 
 def validate(data,relocations,report):
+    if report.get('unapproved_candidate'):
+        raise ValueError('Unapproved font measurement is not an installable profile')
     mail = report.get('mail_glyphs',False)
     world = report.get('world_names',False)
-    if type(mail) is not bool or type(world) is not bool or (world and not mail):
+    accents = report.get('accent_glyphs',False)
+    if (type(mail) is not bool or type(world) is not bool or type(accents) is not bool
+            or (world and not mail) or (accents and not world)):
         raise ValueError('Invalid persistent font glyph capability')
-    resource_hash = MAIL_RESOURCE_HASH if mail else RESOURCE_HASH
+    resource_hash = ACCENT_RESOURCE_HASH if accents else MAIL_RESOURCE_HASH if mail else RESOURCE_HASH
     if (report.get('ram')!=RAM or report.get('bytes')!=len(data)
             or report.get('relocation_bytes')!=len(relocations)
             or report.get('sha256')!=sha256(data) or report.get('relocation_sha256')!=sha256(relocations)
-            or report.get('sources')!=source_hashes(world) or report.get('resource_sha256')!=resource_hash):
+            or report.get('sources')!=source_hashes(world,accents) or report.get('resource_sha256')!=resource_hash):
         raise ValueError('Stale or altered persistent font build')
     relocate(data,relocations,0x801A0010)
     symbols=report['symbols'];text=struct.unpack_from('>I',relocations)[0]
@@ -102,7 +110,7 @@ def validate(data,relocations,report):
         if not 0<=symbols.get(name,len(data))<text: raise ValueError('Missing persistent font entry')
     at=symbols.get('af_font_resource',len(data))
     resource=data[at:at+1600]
-    if at&15 or at<text or sha256(validate_resource(resource,mail=mail))!=resource_hash:
+    if at&15 or at<text or sha256(validate_resource(resource,mail=mail,accents=accents))!=resource_hash:
         raise ValueError('Changed persistent font pixels or mapping')
     state=struct.unpack_from('>3I',relocations)
     for name in ('glyph_resource','active_glyph'):

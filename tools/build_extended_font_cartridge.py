@@ -11,20 +11,22 @@ import subprocess
 
 from aflib import sha256
 from check_keyboard_assembly import IMAGE
-from extended_font_cartridge import RAM,RESOURCE_HASH,MAIL_RESOURCE_HASH,source_hashes,validate
+from extended_font_cartridge import RAM,RESOURCE_HASH,MAIL_RESOURCE_HASH,ACCENT_RESOURCE_HASH,source_hashes,validate,relocate
 from extended_glyphs import validate_resource
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def build(resource,out,world_names=False):
+def build(resource,out,world_names=False,*,unapproved_candidate=False):
     digest = sha256(resource)
-    mail = digest == MAIL_RESOURCE_HASH
-    if digest not in (RESOURCE_HASH,MAIL_RESOURCE_HASH):
+    accents = digest == ACCENT_RESOURCE_HASH
+    mail = digest in (MAIL_RESOURCE_HASH,ACCENT_RESOURCE_HASH)
+    if digest not in (RESOURCE_HASH,MAIL_RESOURCE_HASH,ACCENT_RESOURCE_HASH):
         raise ValueError('Unapproved complete English glyph resource')
-    validate_resource(resource,mail=mail)
+    validate_resource(resource,mail=mail,accents=accents)
+    if accents and not world_names:raise ValueError('Accent glyphs require complete world-name consumers')
     if world_names and not mail: raise ValueError('World-name profile requires the complete mail font')
-    sources=source_hashes(world_names);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
+    sources=source_hashes(world_names,accents);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
     (out/'glyphs.bin').write_bytes(resource)
     common=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
             '-v',f'{ROOT}/overlays:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
@@ -39,6 +41,7 @@ def build(resource,out,world_names=False):
            '-I/source/extended_font']
     for name in ('font','native','install'):
         directory='extended_font_cartridge' if name=='install' else 'extended_font'
+        if name=='font' and accents:directory='accent_font'
         run('gcc',*flags,f'/source/{directory}/{name}.c','-o',name+'.o')
     extra=[]
     if world_names:
@@ -82,7 +85,7 @@ def build(resource,out,world_names=False):
     raw_reloc=struct.pack('>5I',text,writable,rodata,bss,len(entries))+struct.pack('>'+str(len(entries))+'I',*entries)
     length=(len(raw_reloc)+4+15)&~15
     reloc=raw_reloc.ljust(length-4,b'\0')+struct.pack('>I',length)
-    if sources!=source_hashes(world_names): raise ValueError('Font sources changed while compiling')
+    if sources!=source_hashes(world_names,accents): raise ValueError('Font sources changed while compiling')
     report={'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),'sha256':sha256(data),
             'relocation_sha256':sha256(reloc),'resource_sha256':digest,'sources':sources,
             'symbols':{name:value-RAM for name,value in symbols.items() if RAM<=value<RAM+total},
@@ -91,11 +94,18 @@ def build(resource,out,world_names=False):
             'scope':'Persistent cartridge image; requires the matching guarded startup loader'}
     if mail:
         report['mail_glyphs'] = True
+    if accents:report['accent_glyphs']=True
     if world_names:
         report['world_names'] = True
         report['stack_usage'].update({name:(out/(name+'.su')).read_text()
                                      for name in ('world_names','world_install')})
-    validate(data,reloc,report)
+    if unapproved_candidate:
+        # Artifact measurement only. Production validation still requires the
+        # independently pinned exact profile and never accepts this marker.
+        report['unapproved_candidate']=True
+        relocate(data,reloc,0x801A0010)
+    else:
+        validate(data,reloc,report)
     (out/'font.bin').write_bytes(data);(out/'relocation.bin').write_bytes(reloc)
     (out/'font-relocations.txt').write_text(elf_relocs)
     (out/'font.asm').write_text(run('objdump','-d','font.elf'))
@@ -108,5 +118,7 @@ if __name__=='__main__':
     parser.add_argument('--resource',type=Path,default=Path('build/extended-glyphs/glyphs.bin'))
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--world-names',action='store_true',help='Install the complete world-label consumers')
+    parser.add_argument('--unapproved-candidate',action='store_true',help='Measure a new compiler profile; not installable')
     args=parser.parse_args()
-    print(json.dumps(build(args.resource.read_bytes(),args.output,args.world_names),indent=2))
+    print(json.dumps(build(args.resource.read_bytes(),args.output,args.world_names,
+                           unapproved_candidate=args.unapproved_candidate),indent=2))
