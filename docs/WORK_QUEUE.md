@@ -15,12 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
-The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) has the exact font,
-eight names, immutable literal-mail core, treasure adapters, and article data
-ready. Connect the shared/sale creators and notice reader, then complete installed
-verification before enabling the names.
-No text credit is granted for these uninstalled candidates. Keep existing saved
-catalogues unchanged and continue residual text after this integration.
+The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) completes all eight
+names, font/article data, shared and sale creators, and both treasure readers in
+`build/accent-items-pilot`. Installed verification, focused tests, independent
+builds, patch reconstruction, and the silent native check pass. Existing saved
+catalogues and native font pixels stay unchanged. Continue residual general and
+letter text; do not repeat the completed accent harness. Ordinary progression,
+menus, and normal save/restart remain in the combined v0 smoke.
 
 The [apology-input checkpoint](checkpoints/APOLOGY_INPUT.md) installs the remaining
 sun/skull targets and apology-only editing in `build/apology-input-pilot`.

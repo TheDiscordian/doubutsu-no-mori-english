@@ -80,7 +80,7 @@ class CounterLedger:
         }
 
     def credit(self, identity, data, route, *, mail=False, mail_glyphs=False, pending_reason=None,
-               apology=False):
+               apology=False,accent_item=False):
         info = list(self.info)
         if mail:
             # The full-letter formatter consumes these controls as two bytes.
@@ -90,7 +90,17 @@ class CounterLedger:
             from apology_targets import TARGETS
             if identity not in TARGETS or data!=TARGETS[identity][2] or route!='apology_input':
                 raise ValueError('Apology credit requires an exact installed symbol target')
-        details = classify(data, info, extended_glyphs=identity.startswith('message:') or apology,mail_glyphs=mail_glyphs)
+        classification_data=data
+        if accent_item:
+            from accent_items import ROWS,ALIASES,encoded
+            root=ALIASES.get(identity,identity)
+            if (root not in ROWS or data!=encoded(ROWS[root][0]) or route!='extended_items'
+                    or mail or apology or pending_reason):
+                raise ValueError('Accent item credit requires an exact completely installed name')
+            # Classification only: actual stored spelling and its checksum retain
+            # the accent. Exact approval above excludes arbitrary pair permission.
+            classification_data=data.replace(b'\x80\x7c',b'e').replace(b'\x80\x87',b'n')
+        details = classify(classification_data, info, extended_glyphs=identity.startswith('message:') or apology,mail_glyphs=mail_glyphs)
         if (details['category'] in ENGLISH_CATEGORIES
                 and details['non_whitespace_static_characters']):
             replacement = {'route': route, 'sha256': sha256(data)}
@@ -141,6 +151,10 @@ def measure(native, built, report):
     native = verified_rom(native)
     if report['source_sha256'] != sha256(native) or report['output_sha256'] != sha256(built):
         raise ValueError('Build report does not match the source and output ROMs')
+    accent_names={}
+    if report.get('accent_items'):
+        from accent_items_install import verify_installation
+        accent_names=verify_installation(built,native,report)
     if report.get('reserve_strings'):
         from reserve_strings import verify_installation
         verify_installation(built, native, report)
@@ -215,9 +229,10 @@ def measure(native, built, report):
             position = 32
             for group, count in zip([*range(0x20, 0x30), 0x10], COUNTS):
                 for number in range(count):
-                    ledger.credit(f'item_{group:02X}:{number:04X}',
+                    identity=f'item_{group:02X}:{number:04X}'
+                    ledger.credit(identity,
                                   items[position:position+WIDTH], 'extended_items',
-                                  pending_reason=pending_names.get('extended_items'))
+                                  pending_reason=pending_names.get('extended_items'),accent_item=identity in accent_names)
                     position += WIDTH
 
         names = resource('display_names', 60)

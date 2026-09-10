@@ -261,6 +261,12 @@ class OverlayImage:
 
 
 def validate(native, data, reloc, init, report, module, catalog):
+    if report.get('accent_mail') is not None:
+        from accent_mail_overlay_profile import validate as validate_accent
+        old,oldrel,previous,spec=validate_accent('notice',data,reloc,report)
+        validate(native,old,oldrel,init,previous,module,catalog)
+        if len(data)>RESIDENT+SEASONAL_GROWTH:raise ValueError('Accented notices exceed the existing pool reservation')
+        return spec
     original, native_reloc, _, _ = native_sources(native)
     treasure = report.get('treasure', False)
     seasonal = report.get('seasonal', False)
@@ -337,8 +343,15 @@ def verify_treasure_installation(built, native, module, report):
     creator = files[CREATOR_VROM].extract(built)
     verify_configuration(resident, creator, module)
     approval = module['npc_mail_loader']
-    verify_names(files[0x02A00000].extract(built), struct.unpack_from('>I', resident, 56)[0],
-                 approval['overlay']['item_names_sha256'])
+    if approval['overlay'].get('accent_mail'):
+        from accent_mail_overlay_profile import NAMES_SHA
+        if (sha256(files[0x02A00000].extract(built))!=NAMES_SHA
+                or approval['overlay']['item_names_sha256']!=NAMES_SHA
+                or struct.unpack_from('>I',resident,56)[0]!=0x02A00000):
+            raise ValueError('Accent treasure articles require the exact complete item names')
+    else:
+        verify_names(files[0x02A00000].extract(built), struct.unpack_from('>I', resident, 56)[0],
+                     approval['overlay']['item_names_sha256'])
     if (approval['overlay'].get('notice_owner') is not True
             or report.get('creator_sha256') != sha256(creator)):
         raise ValueError('Treasure reader requires the installed complete transaction creator')

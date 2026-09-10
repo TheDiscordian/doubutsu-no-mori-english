@@ -1,78 +1,90 @@
 # Accented item implementation
 
-## Completed foundation
+## Installed result
 
-The exact separate sixteen-cell font resource is built in `build/accent-glyphs`.
-Its SHA-256 is
-`24ae623d2917a2370ec70504daf372be327c830d24fb37bacc68ad84f0bbe90e`.
-The fourteen preceding cells and every original native atlas pixel remain
-unchanged. Added ñ/Ñ cells use the verified donor codes `87/12` and six-pixel
-advances. Existing five/fourteen-cell profiles still validate independently.
+`build/accent-items-pilot/animal-forest-halfwidth.{z64,ups}` installs café shirt
+and its four placed rotations, Pokémon Pikachu, Café K.K., and Señor K.K., with
+complete display and generated-letter consumers. Rebuild with
+`python3 tools/accent_items_install.py` after preparing its checked accent
+artifacts and apology baseline. The cartridge is 33,554,432 bytes and uses the
+existing four-MiB configuration; no Expansion Pak requirement is added.
 
-The complete font/world-label artifact in `build/accent-font` is 4,576 bytes,
-with a 464-byte relocation table: sixteen additional image bytes. Independent
-builds agree. Its image SHA-256 is
-`f6fc16ac0f62ad4f6be19bd372dc45fcac35b0810d6e9a23ac71a5a4c09addff`;
-relocation SHA-256 is
-`0f137f772732eeef360aecb807de2b1e0f5f1b720db040c96799d13ccaca8d61`.
-The pinned profile verifies source/imported world-name code, complete hook tables,
-resource mapping, relocation bounds, and prior font capabilities. Candidate-only
-compiler measurements carry a marker that production validation rejects.
+- ROM SHA-256: `e09680bf156ae1b2662aca16878e056070f4acb07f26b5043a6789d9890ebb0e`.
+- UPS SHA-256: `8e2dab236923fe38d49efe65451eacf7ecf08e29a3db8bbfce434acb17bfecf1`.
+- Full-name SHA-256: `693ef2c0749822d07062114ffff0b35b4bb8a56d3b2617c932d9220dcc92165b`.
+- Font-resource SHA-256: `24ae623d2917a2370ec70504daf372be327c830d24fb37bacc68ad84f0bbe90e`.
+- Catalogue-five SHA-256: `26b2e95b10b8ae049853ecc6180e41c12b86efc677e39ee03f9742077e9005be`.
+- Article-resource SHA-256: `b218119460fdbb472e641cbbc6d77ff809d489bda8b8622f0157562294d575ff`.
 
-`tools/accent_items.py` prepares all eight source-bound fields: café shirt and
-its four placed rotations, Pokémon Pikachu, Café K.K., and Señor K.K. It verifies
-the actual donor table bytes, exact native hashes, full spelling/encoding, and
-the placed/carried conversion. All 4,536 preceding English resource fields stay
-unchanged. The candidate resource SHA-256 is
-`693ef2c0749822d07062114ffff0b35b4bb8a56d3b2617c932d9220dcc92165b`.
-It is deliberately not installable through the ordinary resource installer.
+All 4,536 preceding English name fields, fourteen preceding separate glyph cells,
+and original native atlas pixels remain unchanged. The two added ñ/Ñ cells use
+actual donor codes `87/12`, both six pixels wide. Ordinary short-bank imports and
+custom-input fields do not gain general permission for extended pairs.
 
-Three font tests and two item-candidate tests pass, including sanitizers,
-complete cell comparisons, all byte-code bindings, old-profile rejection, full
-resource retention, and capacity/source failures. Eight of nine existing glyph
-regressions pass. The remaining legacy fixture rejects its obsolete
-`build/runtime-module` source inventory before constructing a native scenario;
-no resident source changed in this batch. Do not rebuild an obsolete prototype
-or repeat that fixture instead of completing the current integration.
+## Complete consumers
 
-## Active integration
-
-Accented fields remain uninstalled and receive no translation credit. The
-current playable build remains `build/apology-input-pilot`.
-
-The catalogue-five core and treasure-notice adapters are implemented in
-`overlays/accent_mail/`. Seven focused host tests pass: exact capture, full
-assembly/restoration, accented capitals/articles, old interpretation retention,
-malformed-input rejection, atomic generation/startup, line widths, and complete
-treasure packing/reading. The native 122-byte mail snapshot and 96-byte notice
-envelopes remain unchanged. All sixteen catalogue-two sale templates are verified
-identical to their catalogue-five counterparts before allowing an accent upgrade.
-
-`build/accent-mail-font` is the production-validated compiler artifact, not an
-installed ROM. Two independent candidate compilations match it. Its image is
-11,344 bytes, with 672 relocation bytes; the existing loader needs 12,031 total
-allocation bytes. Image SHA-256 is
+The font/world/mail owner contains 11,344 image bytes and 672 relocation bytes,
+requiring 12,031 allocated bytes within the existing loader limits. Four resident
+mail entry guards precede startup installation; no fallible step follows old
+font/world installation. Its image SHA-256 is
 `f2bbd23684cb682ef38712e6d2dc5b5b971b5f8ec2c1e2feb756b09631078d98`;
 relocation SHA-256 is
 `6c9fda4a52beb4dfbe5aa57e1e39693f2ce2d67be8edcc26e24048216a11d657`.
-This includes shared capture/generation and four startup-installed resident mail
-hooks; treasure-specific adapters remain on-demand integration work. Both
-compiler-profile/article-resource tests and three preceding accent-font tests
-pass. No native execution of this new mail core is claimed yet.
 
-`build/accent-mail-catalog` retains every catalogue-four payload and registers
-catalogue five/semantics three. SHA-256 is
-`26b2e95b10b8ae049853ecc6180e41c12b86efc677e39ee03f9742077e9005be`.
-`build/accent-item-articles` changes only the five accented-name article/checksum
-rows and their bound full-name hash. SHA-256 is
-`b218119460fdbb472e641cbbc6d77ff809d489bda8b8622f0157562294d575ff`.
-All existing catalogues, source translations, and article rows remain intact.
+The shared and sale-event capture/generation entries bridge through the actual
+owned font pointer, preserving stack arguments. The shared creator and separate
+board reader append the same checked treasure adapter. Shared creator image and
+relocation sizes are 60,400 and 944 bytes; board sizes are 26,560 and 816 bytes.
+The board fits its existing 27,264-byte seasonal reservation. The sale actor
+keeps its 38,128-byte image size. The resident image, heap boundaries, shared
+submenu pool, 122-byte mail envelope, and 96-byte treasure envelope stay intact.
 
-Next connect the shared creator's capture/generation entries, its treasure
-packer/validator/decoder and article resource, the separate sale-event creator,
-and the notice reader. The actual preceding creator is `build/design-items-creator`,
-not the older seasonal prototype. Preserve its full 58,144-byte prefix except
-the exact new entry/data patches. The current board reader is 24,304 bytes;
-retain its native owner/cache and update the checked submenu-pool budget for any
-appended code. Complete combined installation/resource verification before
-enabling the eight full item fields. Do not globally permit pairs in custom input.
+Catalogue five changes only the two catalogue-four header words. Old catalogues
+retain every payload and saved interpretation. Only used, exact accented item
+fields upgrade newly generated catalogue-four letters. Catalogue-two upgrading
+is limited to the sixteen sale templates whose complete parts match catalogue
+five. Treasure packing leaves the caller's record unchanged, and both readers
+retain native field masks, checksums, lengths, and town-heading correction.
+The article resource changes five exact rows and the bound full-name hash only.
+
+The installer reconstructs from the guarded original cartridge, retaining native
+DMA indices and every unrelated resource. Exact approved updates include name
+and article data, font/mail owner, three on-demand profiles, catalogue five, and
+existing loader/owner metadata. Rebuilding from the original avoids appending
+another payload after the already padded 32-MiB baseline. All existing letter,
+shop, and notice resource-hash bindings identify the installed complete names.
+
+## Verification
+
+Seven host mail tests, two compiler/article tests, three accent-font tests,
+three on-demand/installation tests, and thirteen counter regressions pass.
+Independent font and all three on-demand builds agree. Checks cover exact
+sources, old-profile retention, malformed pairs, atomic failure, capacities,
+relocation at two bases, all unchanged cartridge payloads, and UPS reconstruction.
+Combined accounting verifies every installed accent route and credits only the
+eight exact fields. Its ledger is `build/accent-items-progress/entries.jsonl`.
+
+The silent native run `build/accent-mail-native-02` passes 36 calls and 45 memory
+assertions on the installed ROM. It verifies actual startup and all four hooks,
+loads the shared creator, board reader, and sale actor from the cartridge through
+native DMA/relocation/cache routines, and exercises all four exact item names.
+Captured letters restore their complete English; invalid pairs fail; articles
+match the donor; treasure packing and both decoding paths work; sale letters
+upgrade correctly. No executable code is uploaded by the debugger.
+
+The 81,920-byte isolated test allocation, stack, and module guards survive.
+The complete saved payload remains unchanged, the test workspace is freed, and
+the owned font pointer is retained. Checkpoint restoration completes, test scratch
+returns to zero, and the emulator exits normally. The run uses blank isolated
+saves, no flash-write opt-in, no audio, no screenshot, and four MiB.
+
+The initial fixture passes startup checks but is rejected before its first DMA
+call because the debugger requires exact verified bytes for kernel helpers below
+its ordinary admission range. Adding those existing source-guarded helper ranges
+is the single justified fixture retry; that corrected run passes completely.
+This admission failure is not a game crash. Do not repeat the accent harness.
+
+Ordinary gameplay and normal save/restart remain in the assembled v0 smoke;
+checkpoint restoration does not substitute for persistent-save testing. Continue
+the residual general/interface strings and letter variants. The separate apology
+checkpoint retains its ordinary-submenu verification requirement.

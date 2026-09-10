@@ -38,7 +38,7 @@ conversion, both complete encodings, and sixteen-byte capacity. Ordinary short
 bank imports must not gain extended-glyph permission from the wider resource.
 
 All complete item readers must retain complete pairs and use the matching font.
-The installed generated-letter capture rejects `7F/80` literals, and catalogue-four
+The original generated-letter capture rejects `7F/80` literals, and catalogue-four
 assembly deliberately retains that restriction. Adding accented item bytes to
 the item resource without connecting capture/restoration would fail letter
 creation. A new immutable assembly identity must support registered literal
@@ -59,7 +59,7 @@ Catalogue five uses assembly semantics three and retains every catalogue-four
 template, part identity, payload checksum, and manual break. Only the catalogue
 and semantics header words differ. Its 326,288-byte resource SHA-256 is
 `26b2e95b10b8ae049853ecc6180e41c12b86efc677e39ee03f9742077e9005be`;
-the proposed VROM is `03100000`. Installation must check the actual DMA ranges.
+the installed VROM is `03100000`. Installation checks the actual DMA ranges.
 Catalogues two through four remain unchanged and keep their literal restrictions.
 
 The new capture accepts complete pairs only inside the four exact item names,
@@ -87,7 +87,7 @@ placed-clothing group. Actual donor tables give `a` for café shirt and Pokémon
 Pikachu, and no article for either K.K. song. Each row retains the full encoded
 sixteen-byte name checksum, and every other row remains unchanged.
 
-## Owned code and installation work
+## Owned code and installation
 
 `build/accent-mail-font` contains the complete font/world-label/mail core:
 11,344 image bytes and 672 relocation bytes. The system allocation is 12,031
@@ -98,8 +98,22 @@ hooks without a later fallible operation. The unchanged snapshot codec and CRC
 functions remain exact resident imports. The production validator rejects
 candidate-only reports and altered code, imports, sources, hook tables, or cells.
 
-The common creator, sale-event creator, and notice-reader installations still
-need their matching adapters. The creator's embedded article resource must match
-the new full-name resource. Reuse the existing complete images and ownership;
-preserve unrelated code/data and saved structures. Do not install names or claim
-application credit until all these routes are connected and verified together.
+The common and sale-event creators use forty-byte tail bridges through the
+existing owned font pointer at `80199F04`. The bridges preserve all argument
+registers and stack arguments; an absent owner returns failure without writing.
+Common-creator and board-reader treasure adapters append 2,256 code bytes and
+retain every unrelated prefix byte and relocation. The common creator is 60,400
+image bytes with 944 relocation bytes. The board reader is 26,560 image bytes
+with 816 relocation bytes, within its existing 27,264-byte reservation. Its
+native owner metadata uses the existing seasonal allocation. The sale actor
+retains its 38,128-byte image size. Neither the shared submenu pool nor resident
+image grows.
+
+`tools/accent_mail_overlay_profile.py` binds each complete image, relocation,
+metadata report, and reconstructed prior prefix. `tools/accent_items_install.py`
+rebuilds from the exact original cartridge, retains original native DMA indices,
+orders appended resources by VROM, and verifies all prior payloads except the
+explicitly approved updates. It binds the exact full-name hash across existing
+letter/shop consumers and verifies patch reconstruction. The combined counter
+requires this complete installation before accepting the eight exact source-bound
+accent fields; ordinary bank imports still reject extended pairs.

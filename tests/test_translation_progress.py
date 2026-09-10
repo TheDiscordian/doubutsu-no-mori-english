@@ -27,6 +27,17 @@ class TranslationProgressTests(unittest.TestCase):
         self.assertEqual(result['replaced_source_characters'], 4)
         self.assertEqual(result['percent'], 66.7)
 
+    def test_accented_item_credit_is_exact_and_cannot_authorize_other_glyphs(self):
+        from accent_items import ROWS,encoded
+        identity='item_2A:0033';data=encoded(ROWS[identity][0])
+        self.add(identity,'セニョールけけ')
+        self.ledger.credit(identity,data,'extended_items')
+        self.assertEqual(self.ledger.summary()['replaced_records'],0)
+        self.ledger.credit(identity,data,'extended_items',accent_item=True)
+        self.assertEqual(self.ledger.summary()['replaced_records'],1)
+        for changed,route in ((data.replace(b'\x87',b'\x00'),'extended_items'),(data,'native_bank')):
+            with self.assertRaises(ValueError):self.ledger.credit(identity,changed,route,accent_item=True)
+
     def test_japanese_candidate_is_not_english(self):
         self.add('mail:0000', 'あい')
         self.ledger.credit('mail:0000', encode('Aあ', self.info), 'mail', mail=True)

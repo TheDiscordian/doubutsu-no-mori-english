@@ -139,6 +139,11 @@ class ActorImage:
 
 
 def validate(rom,data,reloc,report,module,creator_code,creator):
+    if report.get('accent_mail') is not None:
+        from accent_mail_overlay_profile import validate as validate_accent
+        old,oldrel,previous,spec=validate_accent('event',data,reloc,report)
+        validate(rom,old,oldrel,previous,module,creator_code,creator)
+        return spec
     _,native_reloc = native_sources(rom);imports = imports_for(module)
     embedded = creator_image(creator_code,creator,module)
     if (report.get('version') != 1 or report.get('ram') != RAM or report.get('bytes') != len(data)

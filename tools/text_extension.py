@@ -187,7 +187,12 @@ def install(native, replacements, additions, relocations, module, directory=None
     current = replacements.get(CODE_VROM, original)
     verify_imports(current, additions.get(MODULE_VROM, b''), additions.get(ITEMS_VROM, b''), module)
     font = module.get('extended_font', {})
-    if (font.get('blob_sha256') != FONT_SHA or sha256(additions.get(0x03400000, b'')) != FONT_SHA
+    font_sha=FONT_SHA
+    if font.get('font',{}).get('mail_literals'):
+        from extended_font_cartridge import verify_configuration
+        verify_configuration(additions[MODULE_VROM],additions.get(0x03400000,b''),module)
+        font_sha=font['blob_sha256']
+    if (font.get('blob_sha256') != font_sha or sha256(additions.get(0x03400000, b'')) != font_sha
             or module.get('bootstrap_sha256') != BOOT_SHA):
         raise ValueError('Text extension requires the approved startup and font owner')
     for start, end in NATIVE_SPANS:

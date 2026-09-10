@@ -25,14 +25,16 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
-The [accented-item integration](checkpoints/ACCENTED_ITEMS.md) has exact font/name
-resources, an immutable catalogue-five mail core, treasure-notice adapters, and
-matching article metadata. Seven focused host checks, two compiler/resource
-checks, and three prior font checks pass; independent MIPS builds match within
-the existing loader limits. Connect the shared/sale creators and notice reader,
-then verify the combined installation before enabling the eight names. Existing
-saved interpretations and native font pixels remain unchanged. The current ROM
-remains `build/apology-input-pilot`; these candidates receive no application credit.
+The [accented-item integration](checkpoints/ACCENTED_ITEMS.md) installs all eight
+complete fields, matching font/article data, immutable catalogue-five mail, both
+creators, and the treasure reader. The current combined ROM/UPS is
+`build/accent-items-pilot`. Focused tests, independent MIPS builds, complete
+cartridge retention, patch reconstruction, and installed-route accounting pass.
+The silent native check passes 36 calls and 45 memory assertions, including actual
+startup, accented letters, both treasure readers, sale letters, saved-payload
+retention, and checkpoint restoration. The cartridge remains 32 MiB and runs in
+four MiB; native font pixels and saved formats are unchanged. Continue residual
+general/letter text, then the bounded combined v0 gameplay/save checks.
 
 The [sun/skull apology integration](checkpoints/APOLOGY_INPUT.md) installs both
 remaining exact GC targets and apology-only symbol editing, preserving saved

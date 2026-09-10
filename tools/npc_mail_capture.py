@@ -151,6 +151,11 @@ def word_guard_offset(data, symbols, text):
 
 
 def validate(data,reloc,report,module):
+    if report.get('accent_mail') is not None:
+        from accent_mail_overlay_profile import validate as validate_accent
+        old,oldrel,previous,_=validate_accent('creator',data,reloc,report)
+        validate(old,oldrel,previous,module)
+        return
     catalog = catalog_id(report)
     mother = report.get('mother_letters') is True
     if 'mother_letters' in report and not mother: raise ValueError('Unknown system creator variant')
