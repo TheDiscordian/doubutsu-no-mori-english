@@ -1,5 +1,15 @@
 # Remaining artwork
 
+## Home mailbox
+
+The [home-mailbox review](checkpoints/HOME_MAILBOX_ARTWORK_REVIEW.md) verifies
+sixteen summer/winter textures against the English GC donor, including four
+separately bound flag-animation images. The side marking and envelope artwork
+already match the donor; preserve them. Only invisible RGB in transparent
+palette entry zero differs. The complete native object, actor, and relocation
+remain unchanged in RC4. No text replacement or translation credit is needed.
+Ordinary animation/hardware acceptance remains separate from this asset review.
+
 ## Inspected props, shadows, and effects
 
 The [additional review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md) closes 34

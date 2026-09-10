@@ -206,6 +206,11 @@ The [player-house/winter-windmill review](checkpoints/PLAYER_HOUSE_WINDMILL_REVI
 closes seven further non-text atlases. Selected palettes, complete textures,
 and material ranges remain native in both RC4 building-resource copies.
 
+The [home-mailbox review](checkpoints/HOME_MAILBOX_ARTWORK_REVIEW.md) closes
+sixteen static/animated seasonal textures. Their visible colours and markings
+already match the English GC donor. The complete object and actor remain native
+in RC4; this is review progress, not newly applied English or gameplay acceptance.
+
 The [additional room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md)
 inspects 48 images: one hiring notice is corrected separately, and 47 neutral
 images remain native. This includes seventeen selected Katrina-interior images;

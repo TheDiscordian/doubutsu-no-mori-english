@@ -131,6 +131,10 @@ Broader remaining work follows the combined-fix integration:
    Do not repeat that completed inspection. Unchanged texels in the original
    owner may belong to a replaced model; check the installed reader before
    treating retained old storage as untranslated artwork.
+   The [home-mailbox review](checkpoints/HOME_MAILBOX_ARTWORK_REVIEW.md) verifies
+   sixteen seasonal/static/animated images and their palettes against English
+   GC. Preserve the matching markings, complete object, actor, and relocation;
+   do not reopen this asset family as missing English or repeat its inspection.
    The
    [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
    Katrina-interior, clock/furniture, and mechanical-detail textures; retain them
