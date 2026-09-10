@@ -1,0 +1,2402 @@
+[
+  {
+    "id": "string:009C",
+    "source_sha256": "c70df9a622b1e20c3c2edf37bbd0cfcb161ccf01e2f4daf93617746e26a1a57d",
+    "translation": "Anman",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:009D",
+    "source_sha256": "1c0e7c9f838818e28dfb097ea42c5a9fe7a82bdd3b2deb6837075fc10873a1ef",
+    "translation": "Asekusa",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:009E",
+    "source_sha256": "46769fc1e56dfd968cb35326ce962378cb247c6c0e70567c19a6427349790237",
+    "translation": "Anchovy",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:009F",
+    "source_sha256": "1d0756bee1124df9dd734c7500dc53deb16a0446929385c65661e36aae31cd44",
+    "translation": "Achotto",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A0",
+    "source_sha256": "e5cdc92f8a6f6c3d70d5fb9ec355cb06b03aeb7809002f4f2715816bb939eb3a",
+    "translation": "Andu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A1",
+    "source_sha256": "89720b77632884d70ce66bb8b94bef6f525e8fc2996f01c568e8efd98956ccf5",
+    "translation": "Arimo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A2",
+    "source_sha256": "49965626b722beb9c8ae27b70f1d62bf09790e850a917ac810aadcc98e0e9348",
+    "translation": "Assam",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A3",
+    "source_sha256": "266bab873190634f8ef0aa4c763cc4ca5287903ae24cdaa40373667f0e76fde5",
+    "translation": "Ashindo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A4",
+    "source_sha256": "58054e07ceae914a0fbfb0913eb8926639dcf0116d339c7b9a8081a1b46d48e1",
+    "translation": "Arikick",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A5",
+    "source_sha256": "a7d538784ede1384bf9d81ed9319dd90e5bd8fc07e224a1e19e5ca49dd4832e4",
+    "translation": "Borscht",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A6",
+    "source_sha256": "c2fc3ea13f196b3c5873c15319d42a967a60287224411cc72c56a96477d8bdf4",
+    "translation": "Viewer",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A7",
+    "source_sha256": "1c490f807d01ce9ca6a46fa6221d9bb635f87ed482bbf8ca015e45cdf41545ad",
+    "translation": "Bacchino",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A8",
+    "source_sha256": "9fac6f104960b866d9ce72d05970bced26978e65f3df69eb85e8bcb70dfb9121",
+    "translation": "Boot",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00A9",
+    "source_sha256": "4dc916fdb215749a1a0dc2916c8677a625129598ab035842ec314564ddb953ee",
+    "translation": "Benchara",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AA",
+    "source_sha256": "167295270d14a4f43f262acd93c836c197d4ab7420cb395330b515fc5dd2db4d",
+    "translation": "Byzantine",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AB",
+    "source_sha256": "1ba21aebcffb713097741cee4777504661f71364040cba9b901428bff8e6e0d6",
+    "translation": "Browser",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AC",
+    "source_sha256": "b9e4663d0067590e3459fc3f750d7ec4daee8c00ccfb1f8ef03aa6d3e870cf8b",
+    "translation": "Vinegar",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AD",
+    "source_sha256": "19d419886d4818b1a045b7145cda3df5a1fcd5409df9ff8a813c84468fe4527f",
+    "translation": "Bifun",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AE",
+    "source_sha256": "69f6379767b69f0785fa1ff996a15cfce84f5a6d7ff24918c5fd946f85a04851",
+    "translation": "Vintage",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00AF",
+    "source_sha256": "7f91db4cc8973c838e7dd9cfe52654cb4aa39c656b66293d93cd1b4a9f0d9c20",
+    "translation": "Binta",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B0",
+    "source_sha256": "990205bd84d924950b25f3307ef9d3022f370c56c387f609c7f80def86ae8272",
+    "translation": "Kaffi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B1",
+    "source_sha256": "0ef52a5f99d98a4519c33c190a89f77338027acaea0c693185bbe093b6fbd56b",
+    "translation": "Chimutaku",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B2",
+    "source_sha256": "5ede039fa4c796b92e4e86199c2d3c54a5e37c86c202a90c1bc10676aacaf4ca",
+    "translation": "Chomoran",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B3",
+    "source_sha256": "31bbd0badc4e9b436a620e5038395ab8efa17b0ae568d5653bd2a02c44b8dcc2",
+    "translation": "Chanta",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B4",
+    "source_sha256": "6a1b60724584e30559dd6b1729b2fe6b249933d33473ad08bc3e3a68f7faf623",
+    "translation": "Kucchane",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B5",
+    "source_sha256": "35de1713645b8ac6fa3d42ba436be95cd5b0a9c2af0c99b2106297338b746bed",
+    "translation": "Kanchiko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B6",
+    "source_sha256": "4c975d8ada09c48bee32aa30c30a02d5644e93ef828b80f1bd6779614048b5fe",
+    "translation": "Chauyan",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B7",
+    "source_sha256": "6c7a80106cfd634b897ae593e06ae4ca972d8bee24a2a3676fa99be99a1c0bf3",
+    "translation": "Chudon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B8",
+    "source_sha256": "91010e469cc2c1b2aa7637b0802dbafbfea0d8cdbe595bc5d44cb9a293db0db8",
+    "translation": "Darjeeling",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00B9",
+    "source_sha256": "45544c30cdf6d2af3f39b69d3cd120822cea7610e78eb0728cbc2abcab757aa2",
+    "translation": "Danke",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BA",
+    "source_sha256": "f1d0fba62323cb81c261659bc1b768e3bd886b0cce93e6faf1df1ca24de120eb",
+    "translation": "Duo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BB",
+    "source_sha256": "ea7eb7b8c8655006cd4df61a610325a8caf1399b684c05dbcf8bb9d6bd5f1d50",
+    "translation": "Dribble",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BC",
+    "source_sha256": "2114c65cdf212cc9d3ddab11eea37bda164aa8fbd08f2bcef8dbd9311f22baeb",
+    "translation": "Easy",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BD",
+    "source_sha256": "e39ef095dc886242d79dcd35279732faeb19d059ceb45b0ae02194d6830a3a62",
+    "translation": "Error",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BE",
+    "source_sha256": "e1ad78c392c13d7a7093409d302c93aa2675cf46c695052584da690f4da521be",
+    "translation": "Devon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00BF",
+    "source_sha256": "841675f5c0057e092c63b1d3fd6d759e854bf29b082b07301832e1a221913add",
+    "translation": "Fondue",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C0",
+    "source_sha256": "ba183abcf59a8794dea46d76d9793a9fc776c4f05bd665dd2a7ebac137d0dc0b",
+    "translation": "Focaccio",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C1",
+    "source_sha256": "aa21703466634b533b0680b36f8aae61a8c0988c3d0325b5e88143c040e47788",
+    "translation": "Fumble",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C2",
+    "source_sha256": "42c45bb47b739f2eba27feca19411842935326cea8c9d980266b2415b06b607f",
+    "translation": "Fortissimo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C3",
+    "source_sha256": "b1b954b1793556cccbe0a4ccabecdc6c8c3193ad8f8b71ca3662624a22857e46",
+    "translation": "Gonti",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C4",
+    "source_sha256": "d853b0024a84dea61a4365260b8f2db4313ae1ac81745b6ce0783bf7fe425b24",
+    "translation": "Gen",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C5",
+    "source_sha256": "5a04fae077fb59947aff752b1489887ebfc0039e993a3d10e6ce1b3cbeb39f54",
+    "translation": "Gallon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C6",
+    "source_sha256": "021eed645914c750a17c754433d4826c209c9c2e0782b76deaf3a36603ea6bf3",
+    "translation": "Gonta",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C7",
+    "source_sha256": "f1637223c293e5d0c9d1e50b0a1767737aa2eed6d6bf38c0cc276218c77824c3",
+    "translation": "George",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C8",
+    "source_sha256": "d9bbd44e71619de24d17acb06fce4837fdc34a3aea3c2e408cc3fa050764a750",
+    "translation": "Jersey",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00C9",
+    "source_sha256": "ebc8395a019f28ce880ce73985ee77b2558695a52eb5aae738675f9567361db6",
+    "translation": "Gingham",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CA",
+    "source_sha256": "4536322ceefd3d0af8b4bae546fcac8587e2485983d542946abf2dac1b540a87",
+    "translation": "Hugh",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CB",
+    "source_sha256": "aa6597508fdbf494e430e24e2b3a7968d74643fbcf560e91378b075f5d25f0c9",
+    "translation": "Hambakka",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CC",
+    "source_sha256": "b05a9f6620871d5fd27598e0070f37bc7b49e440234074f8d2c8cb16f149cf74",
+    "translation": "Haron",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CD",
+    "source_sha256": "a5d39472bc8779842eef7c4ab97a2c529ddb9f845a4af148ef42fdc386ec0afc",
+    "translation": "Harentino",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CE",
+    "source_sha256": "f0570a384c3a7f59358dd0676213e05ae0064eeded26c4e4060599a7dd6a979d",
+    "translation": "Jun",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00CF",
+    "source_sha256": "d8e6e1b3863b0f1d181f3baaa6ea8e1e2eabd0b889b1070c606b72ea29dc8bae",
+    "translation": "John",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D0",
+    "source_sha256": "155e510f3be2fc8def95a586c7ab1b1308734925b255110a35a5cdcff7b3bff2",
+    "translation": "Carpaccio",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D1",
+    "source_sha256": "ff98caa870fc61813a54113874696fc9fb12027d41c4c0cf183f642e58322893",
+    "translation": "Gochujang",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D2",
+    "source_sha256": "66ac9fa1e17d6b173ad22c6fe6b35d15b96014b6fc1251cd47f77cbe42b98e2e",
+    "translation": "Kenshiro",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D3",
+    "source_sha256": "1df7fea4464b03203b81e3941803188c90032ce138d4d5fa84deba907896047a",
+    "translation": "Casablanca",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D4",
+    "source_sha256": "75c48b7dbd3f50bf4c774c534ce45249e1db2b79bbb28fb60318d1dce3e0249b",
+    "translation": "Carotene",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D5",
+    "source_sha256": "89f406eb6a67537467253779b1b72d5bf65b761196bfaa4e31f110501c729881",
+    "translation": "Rurero",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D6",
+    "source_sha256": "1202e2c1cfa41999e3f029400c79403c7e81a94ecc6224313011860ea5dd8238",
+    "translation": "Regatta",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D7",
+    "source_sha256": "76f180058000d23d1e07af2231a33996b5fb23775b37f432c5eefde5837425a5",
+    "translation": "Kecha",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D8",
+    "source_sha256": "41cace7f2e5bb8acb19ea3bd7cb18e41957f550e6b5ad2bc1de7205bcb5c9c2d",
+    "translation": "Mottsu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00D9",
+    "source_sha256": "758fe1848022a23fb7356ecd1abd4c838a1124363c81b7dbf6d2722ad6da42a6",
+    "translation": "Morokyu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DA",
+    "source_sha256": "ef846a7e3b6a568085faa1bdb226a25f542f7b7a1846dacc63df3df217dd5f8c",
+    "translation": "Manjiro",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DB",
+    "source_sha256": "ea6daa681f90d9e2894b503548fd4866e753e92860999b9fe0a6f9dfefc460d3",
+    "translation": "Monomono",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DC",
+    "source_sha256": "5994e97249847ab52cb1a6cd5f175fb0ad9cb01a6732e9d0605bd7fedbee8026",
+    "translation": "Minegi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DD",
+    "source_sha256": "8e57fcd1cb57642a467d53c005e9faca55d0201488abcb3a98e3259d5765db1a",
+    "translation": "Munoru",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DE",
+    "source_sha256": "ba2ab6d7de9de09e43dd91bce9876e7ff71ad98533476165c7eb9e035fbddaf5",
+    "translation": "Madagascar",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00DF",
+    "source_sha256": "96a4b5472399470ae5cb37a96d0f61889ea367958bf46fc2f34d4c359eaabe23",
+    "translation": "Motan",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E0",
+    "source_sha256": "fcc1e8200192d721a3c02815445d28f23611d015bd2442ed49eae1b0114052be",
+    "translation": "Masakari",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E1",
+    "source_sha256": "a54b21232cdab7929e276f80d5d374f11d4fc9fc01e76bc9fa205ebb90423d5a",
+    "translation": "Nirvana",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E2",
+    "source_sha256": "857ca4b1507a17271b62722666be2f246ccf76693879d285c056c058c51ced84",
+    "translation": "Nam Pla",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E3",
+    "source_sha256": "4ee6f0b887fa9b1a09ae3f9521ffc793aa7d32c1447c532b52be939a706ba1fa",
+    "translation": "Nijo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E4",
+    "source_sha256": "57266782db32b28c925a4705244341068cf5ff32dfc9a16a07854b4b31efb4be",
+    "translation": "Nyet",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E5",
+    "source_sha256": "2cb4cf8ecd0d94f65d335727429f3a8394e4cebd2b2c63a3c5424d5666f03711",
+    "translation": "Noppy",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E6",
+    "source_sha256": "c7cdb92ba92b5ec57fa13ec24c336f3f924085c7aa1bba4e73e390f9311eaeaa",
+    "translation": "Orasu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E7",
+    "source_sha256": "b010273f73f32bf57633f49311e89e8f63141a08415412a1ba79fa15dea9fd04",
+    "translation": "Oyaman",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E8",
+    "source_sha256": "6731c387e53715dea5fdad61c5749a5e1bf8406f1238848cc9722de02615aeab",
+    "translation": "Pipu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00E9",
+    "source_sha256": "2bb50acece5fd17f56df316a1b9c95b4920899ce3f99a16797665cd6c9b9d72c",
+    "translation": "Pudding",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00EA",
+    "source_sha256": "116cd81a580d405eeba40908fcd4c59286186c74bfc9917a502b296e9038c29d",
+    "translation": "Fileo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00EB",
+    "source_sha256": "7346b00c1b4b61ddf794702b7b566f8c70919afdfe9198aec9db076a0c3dc94d",
+    "translation": "Paul",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00EC",
+    "source_sha256": "520b5c734414084cea1b992307e8abaf1f3bc884d1200d2c4a85a5e9802833d5",
+    "translation": "Popokichi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00ED",
+    "source_sha256": "78456417af285d83525e2837a0ab57b3dca09b50c210b9e0226a55869f5ae6f1",
+    "translation": "Root",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00EE",
+    "source_sha256": "b28e3933f54c2ef292c8478fa6dc25512789207b0d3933e3d662aa3294bf76dc",
+    "translation": "Ringo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00EF",
+    "source_sha256": "3e2fdb2610a87067f2c5fd04069f2585ab322dcd8b8457814b0c162f8810cefc",
+    "translation": "Le Mans",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F0",
+    "source_sha256": "08250746a490f46e2dd359ff2e48294e45a4a19b2554d1e01c69a4d48bef84a2",
+    "translation": "Ritter",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F1",
+    "source_sha256": "2f907f354a9f60a8a682ff2d40a77ac87af3df12a4244fbabeba252b58382007",
+    "translation": "Megachoro",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F2",
+    "source_sha256": "2032c4941cd9d9883a1284aa547a8c8d940c1a1cfff1a51c83ceee6a8707c49e",
+    "translation": "Champagne",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F3",
+    "source_sha256": "672515c6988ae2e7b2be3a8365aa3aca68e37d444d073b56a5296ad10ee578be",
+    "translation": "Sus Four",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F4",
+    "source_sha256": "be01cd23ce67c4583fd95752c83c81c8bb6ae1e27524466368a16ea8e0d31b36",
+    "translation": "Shigeru",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F5",
+    "source_sha256": "da306908ceab493608d162bf12ec6af819e68a06902186db3dbb10f242b949cc",
+    "translation": "Shiomaru",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F6",
+    "source_sha256": "87270a40a72046df63d7cb1ce3aece54da7b5bb8ab8828b10688997eabe57d43",
+    "translation": "Shishamo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F7",
+    "source_sha256": "aaff316ec3529228ccf9e9ca5fb1f21a364e0b78c95611ea450fe3b973d5ec45",
+    "translation": "Tanshone",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F8",
+    "source_sha256": "671812f5964545f13adf4e8529f94777c6e2dbc56383419d1f983d087e363f76",
+    "translation": "Tenten",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00F9",
+    "source_sha256": "62934802f334149d979b0a97928abbaa5562a40dad4bc61bdb05362a74372909",
+    "translation": "Terepin",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FA",
+    "source_sha256": "b0a726748e87dce25ded130aaec35789647d91ec40f8ad632f40829ce6ef000f",
+    "translation": "Texel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FB",
+    "source_sha256": "c14585548acec87da42b7fd9eab2c7579c202e7d8213d9277f1db7473673620b",
+    "translation": "Taroban",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FC",
+    "source_sha256": "04726eaca3c7ceae0157f4b26e2873fd95fedee5edb00be589a267418f93e8fd",
+    "translation": "Verify",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FD",
+    "source_sha256": "944b64bfad722bf9182c39ad8b89ae4011fd28c443fa705aa13435a5ee4fd913",
+    "translation": "Beshimichi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FE",
+    "source_sha256": "7d952f4eb22c671742694c9a439e504caa00c385886650ebb572925043f2c411",
+    "translation": "Yodel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:00FF",
+    "source_sha256": "ae57da301d41530d4c3beba71182cf0f31b3ed1889a6fec1a3a4d46520814eed",
+    "translation": "Hiroshi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0100",
+    "source_sha256": "c128a61ebbc1a9df36ac8e59f0dd4133c9e089fecb95b8c80eab85cc1eb12ae2",
+    "translation": "Arwen",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0101",
+    "source_sha256": "c87f96f39dff919c74497189bece6736f1b637e1fcc8bf0a5e4c6d323cd9a2b7",
+    "translation": "Arinko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0102",
+    "source_sha256": "ad28223677de1295c3b50a878d0ba3b94d7d3f6dc65659de332c64f62fc0f21c",
+    "translation": "Anyo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0103",
+    "source_sha256": "2c1c4de369234b5c46b9cfb163da33e08c2a5d2a68210c6edec4bc3da7513b0c",
+    "translation": "Apura",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0104",
+    "source_sha256": "5e5ff5ce481eefd9be40deb2fc9fd632405708034c76f23801c7551326dbe940",
+    "translation": "Achicchi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0105",
+    "source_sha256": "be65cad9023a16a7435fb7a899a36b8b7428736eed4ea9c90550acae004dc0c2",
+    "translation": "Ancheli",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0106",
+    "source_sha256": "9fddd9d4b7587001fff9ac0053ec3a1bc13fe60af727ccb2e336b66fbfc9e418",
+    "translation": "Bouillon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0107",
+    "source_sha256": "77f65dbbfd32a85048e6b21088ce3625c5227757183148aa01afdc32ac2b047a",
+    "translation": "Bechamel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0108",
+    "source_sha256": "60e20bdf2aef0c1920c3338b44a182dbb92736a24501f460a2e93afb3f7db9aa",
+    "translation": "Bouquet",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0109",
+    "source_sha256": "f23849bb6f0a916be5b21bfae7b7105c28287a3a3e544aae98961d1b42a89468",
+    "translation": "Brenda",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010A",
+    "source_sha256": "d5a5b1a8b0fe3b40cbb9d328c0ef23ace361da8b0db580285a697812b0d2bf9e",
+    "translation": "Bagel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010B",
+    "source_sha256": "8e04d619cfd53922e4aa7bbe312efb3b9a35ff346234529743a47ec95e033f6e",
+    "translation": "Caviar",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010C",
+    "source_sha256": "42b503fcf022835916d9ee83cbc1b7714f8cd89214d0c840fa9d3fd8278bb7db",
+    "translation": "Chima Chogori",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010D",
+    "source_sha256": "384bdff334403bda3a019df3571f3b727da80b418bf7d7125dead740680f5848",
+    "translation": "Chagall",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010E",
+    "source_sha256": "6dddaa9c6b5a0a4c0c547bf1acd91471192a4934fd201d29f223a9e533794693",
+    "translation": "Chanrin",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:010F",
+    "source_sha256": "4cd3996a90d0b3ee95dfbbb98aaa27ff8d2c0b57e22e08fdf201b8dd6f15f083",
+    "translation": "Kurakurara",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0110",
+    "source_sha256": "c4eef125f0084ec08892f2aa68b2c97b8d07f101eb85d4e9acf2e79272f9357d",
+    "translation": "Choki",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0111",
+    "source_sha256": "cc92fd7cd9bfb78287271f4f755ce52a88c95e7cc717caade20d810da69e535e",
+    "translation": "Chirorin",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0112",
+    "source_sha256": "b1247c9e656585032b90e275ba2d64055162cdab6a47b16db7671bf484c84f84",
+    "translation": "Doradora",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0113",
+    "source_sha256": "e5de93f81c657f307f87473bd9f6d8d64040c6d193fcf7137e3a932f1a94612a",
+    "translation": "Diminu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0114",
+    "source_sha256": "adb8fed2c2b4caa4aa7435ec6583795ae8dbbf8e71ef89adfe86fcc7f61dd90e",
+    "translation": "Demigla",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0115",
+    "source_sha256": "d26a58d343a6ba9e78229a80a7943be38d0daaea6c3d2cbc3543eeb431e44240",
+    "translation": "Ether",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0116",
+    "source_sha256": "90f507619cb7db97b204da322f9174eda3377eae996b7722094bbad3a8e44c7f",
+    "translation": "Easel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0117",
+    "source_sha256": "c15822917d1cf1c9e240176ba7a22f61ba67acf2cf29df389aafb6b3340c2b72",
+    "translation": "Echo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0118",
+    "source_sha256": "316eef64b4308d74d7a0d5e49063895b9997415dfa24b4ea4f4890603e9903f3",
+    "translation": "April",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0119",
+    "source_sha256": "b352a480b42eb1afc99afa614e5c8fb91e50aadb4ad2b417ea13b88f8efde38c",
+    "translation": "Eirin",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011A",
+    "source_sha256": "8f13fefe587e4a4a6cd717e2084eb837c91f1681fd74fb0ccc5e77e027b3a91a",
+    "translation": "Eclair",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011B",
+    "source_sha256": "9543eee94e2221545dac9127740afb7d1eaf1734e70ad484b423db67569f4d03",
+    "translation": "Flan",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011C",
+    "source_sha256": "ff9ce2e4f04ecc12af4a5ea7c809af8cef24f07f5b6904187bd8077a550782a7",
+    "translation": "Flavono",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011D",
+    "source_sha256": "e4c5fe43299c6385a56d4dc78cb7985dcfd6003ec3665b8e6dd387995297925b",
+    "translation": "Fasola",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011E",
+    "source_sha256": "b008ad23031765746da81cd7f7401273e0b52406973631a233edc6dea365a1a1",
+    "translation": "Fingis",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:011F",
+    "source_sha256": "4e5d03535a92d07d1c5140a016b7c878590474ec7f6e7113d297d2cc9ac089d5",
+    "translation": "Fechicchi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0120",
+    "source_sha256": "7f4adf318ef3f841fbcfdb9c5612e88124e15bd9f6885d50acdeb21e0ac52cbb",
+    "translation": "Gurigura",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0121",
+    "source_sha256": "7f3523d8bb3c02d762b23629a490825ad0366f0d384a2b356285ab409911f540",
+    "translation": "Hyururu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0122",
+    "source_sha256": "60fea3f368cc28499adeb0a1780d4efae3e224482e2b37e34af538efbd58a201",
+    "translation": "Hachame",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0123",
+    "source_sha256": "c0bd93a0d27100a886cd95d4b85a54c42b6f171f2878f8942f0c635d094d41d4",
+    "translation": "Homey",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0124",
+    "source_sha256": "cba92ea7a343d28b3b27c89c9a00d08ffc1878578adbf3c7c133ad6202068d4e",
+    "translation": "Hana",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0125",
+    "source_sha256": "8b368ec04d7d3835cce606bda970f0f52e0f14ee02aef2e474fd51b3d4a9992e",
+    "translation": "Isucchi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0126",
+    "source_sha256": "36695e3dfa44951c110a69b1c5d619406402a169e27bf87ea716f8847f6e4681",
+    "translation": "Icchora",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0127",
+    "source_sha256": "f90c2718040d1b83e8234bc632112e14a9259f26f12c7eae8d3a0ad0e7c24be3",
+    "translation": "Ikasumi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0128",
+    "source_sha256": "c8cfc9aaa02ff42310ab966e25c3c862b13e7d5f1d481eb19b4eaa25df2c14c1",
+    "translation": "Installer",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0129",
+    "source_sha256": "a443f865c8582a5fd0347e78a07c1f6efeb006513c3573792107ec1dc8cf02cb",
+    "translation": "Isoko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012A",
+    "source_sha256": "9bc1d6a65ba892154bfd42e5e503d60a4f67f8c2aa962a75362de19f27bdaf2d",
+    "translation": "Julia",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012B",
+    "source_sha256": "2dd02708582071d59a32248c863a00bf6763251facb1b71b5b5b22277a5947ed",
+    "translation": "Kokoichi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012C",
+    "source_sha256": "d61a31bbcee903bbd16b58f9b9bd3f252f498207550bd6ce470cf9af15d6d60a",
+    "translation": "Kanyu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012D",
+    "source_sha256": "dba1552bd8bc7ebd3ac3c18ecafa4cb346564b79d4d280807b3a965d67be0ba6",
+    "translation": "Kei",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012E",
+    "source_sha256": "28104388cf0607ef8bd7b02a3f51d0c715dea86d57ab2c59b338f023e4fc1fd9",
+    "translation": "Corazon",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:012F",
+    "source_sha256": "eaf546f8eff371f7cea439e70205d5d81fb694c5f3a7aea392c3bdd3799b2f37",
+    "translation": "Lemonade",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0130",
+    "source_sha256": "f6869c2e03e865f351bbe9d081a65a339af04944e6e51fbcafbb60d72e316690",
+    "translation": "Raparapa",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0131",
+    "source_sha256": "f430b3b31e88bf25722461b53272771d64df877adf440f134ead2a5ff561a676",
+    "translation": "Ran",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0132",
+    "source_sha256": "7a3f35d442d52668841aa778858dc32b9426df2f00f72119b647fca9a6843580",
+    "translation": "Ramerame",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0133",
+    "source_sha256": "8d2bb1900c27861924c74ea36c917c5acf46cde20e4c216a1a27e0633c491a78",
+    "translation": "Lilian",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0134",
+    "source_sha256": "a290f71efe345bdbd5c6b29c2ff4f7d880517fd8d6f90c132dabc0b4c8fb1e44",
+    "translation": "Laurel",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0135",
+    "source_sha256": "d1825d02dce36593eb24561c9b638d1aa03a94fbff51adc37eef00f6a5eb5133",
+    "translation": "Radish",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0136",
+    "source_sha256": "3cbee6a8d278bdb5cdef0d746848fa95d095ee2968782ac51ac142f2fe1bc4ca",
+    "translation": "Rococo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0137",
+    "source_sha256": "a538714886b29d50c4be5f947c568156f13c149d7d9de92a09b632389869cd70",
+    "translation": "Rambutan",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0138",
+    "source_sha256": "b5fe51c55cacff0b6f0e9ea7e29120e8dff7fb4139ae91b0dbcd4367dea84dc8",
+    "translation": "Rimi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0139",
+    "source_sha256": "9a7343c009942b6b6d1c8eb087ec7f10aff46213b27f56edc92cbda531984ae2",
+    "translation": "Maimai",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013A",
+    "source_sha256": "b50f22614abd9ea2df31c6273b3fcc6e5ddc5bce5380be09e1fe08d76b56abb8",
+    "translation": "Munmun",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013B",
+    "source_sha256": "893530129b04df33131a760f775a45a216cfd3de81811040939940d59e4e7d39",
+    "translation": "Marble",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013C",
+    "source_sha256": "41bd041c6eea864aef82a35f72da19accf874de2dfe755cc0c3bdc492802da12",
+    "translation": "Maisonette",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013D",
+    "source_sha256": "7c03500e70753991d951034fc0e1e5525452a9f205373b510a34f7b59cc870b9",
+    "translation": "Maple",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013E",
+    "source_sha256": "87dbcb17481f5f36e6821ee76c3addacd7817d25f9e26d0beed0507818da56fc",
+    "translation": "Mannya",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:013F",
+    "source_sha256": "bafba4e3e00d9cd7381d6e6ee532b5494ac3d277f02255309d193cae2735c39b",
+    "translation": "Meno Mosso",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0140",
+    "source_sha256": "f76f2c7544eb0cc28f6f4f833b34725d2c88fdb3c81b8a173579bb2609aefdf5",
+    "translation": "Mei",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0141",
+    "source_sha256": "0c24300c50c9fdc0acea03529badedd92e7faeb846ffd6919d569f3474fc67a6",
+    "translation": "Mii",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0142",
+    "source_sha256": "d6cc6cf6343d7cd0ca4974c5aaf01e91f84ffb96f78fca8b45df107486654f65",
+    "translation": "Miki",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0143",
+    "source_sha256": "020aa94cac6741935dbcdd3295b8a99e18f320d3f28c0dc62fbe06380d9b4d6a",
+    "translation": "Mirumail",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0144",
+    "source_sha256": "74cf0f30ceebcae04538cf6e808c8a0edb4c2b479e340be7205fdc95eecd1457",
+    "translation": "Moromi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0145",
+    "source_sha256": "ef829081440acd9040291011edaab3a2dea77c9029f3345ea63a412ab5a34adb",
+    "translation": "Mahara",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0146",
+    "source_sha256": "89edf96575bd19c6d2de61622943a7f0452a87bd21a1ddb0e2100e822e83455d",
+    "translation": "Gnocchi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0147",
+    "source_sha256": "d2f279df81aba78a13799c004bd82e50ea83118474c8c57a9b11b18eded83f1c",
+    "translation": "Nori",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0148",
+    "source_sha256": "6ed962a03033152048aa2614857d9ab99ccd8abb3deb5f2cab8bc28bd9dddf4e",
+    "translation": "Nuoc Mam",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0149",
+    "source_sha256": "1856ca465515a775f448fc92ad20f5babd4bd51c42543b6e6f7163298bd74db8",
+    "translation": "Ntekurukko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014A",
+    "source_sha256": "6d88ca9748ee2a1996086559cebc0ef7c734a836cd301bc905b3e1db59eceb54",
+    "translation": "Otsu",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014B",
+    "source_sha256": "5478f7c214d93a01ae380d07556b61a24122db9e28172731e6683d697f45928c",
+    "translation": "Potechi",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014C",
+    "source_sha256": "44e5d4d9f2da7ab65ab07b1bdeaba95ef6571cf19819f53bd14abfccbb3a4bb2",
+    "translation": "Paruki",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014D",
+    "source_sha256": "59daa9277cd55eb9a815733657fc43fd9596bd2579db4a5c7692144af08ff267",
+    "translation": "Pitan",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014E",
+    "source_sha256": "8737590f97f51d0efefe03554bf98dd81f308faa5192abed265a1f68185014fd",
+    "translation": "Poripora",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:014F",
+    "source_sha256": "fd87088ae2b347985cc970a1ee1992cb34c2eeda7d9ac3806b3506a10a33eddf",
+    "translation": "Pichika",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0150",
+    "source_sha256": "12e9df2469484460ee7d6039045073c1e8574116d410364fecd897af246cfa69",
+    "translation": "Piroko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0151",
+    "source_sha256": "7b05bc573eef53b270a6b04cbe13f4dc405a9e6790478e90695e4602ba110b53",
+    "translation": "Palette",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0152",
+    "source_sha256": "996fe5a3f51e7d2287c36b52edb8999ef92f2eae44b0d127a55b50172261d42f",
+    "translation": "Pachiku",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0153",
+    "source_sha256": "198df01986ada1f2248127b56d34a2e440d127c2198fa6b2296bc26d6b5e0c4d",
+    "translation": "Pichiku",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0154",
+    "source_sha256": "866e5b53bb4b1c102d949c2b755421c71ead51383f124459f31a86f0940d7bc3",
+    "translation": "Pescatore",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0155",
+    "source_sha256": "c35be808da9d0fcfb42b0cfe4a56605e8b4875b50592049e479e9f529eed4b18",
+    "translation": "Staccato",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0156",
+    "source_sha256": "cdffec8e408398ba5f34e3b7fb275c2a19e733de532879e41e29406d1b362966",
+    "translation": "Sonata",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0157",
+    "source_sha256": "817fc93ccc732f18685f3b0c0f7d1ba74a4ac5cc0f90e7271b28589977d2349b",
+    "translation": "Silhouette",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0158",
+    "source_sha256": "5d8c61afad4b4ae1c71a4ffe09a1838648ed2795975a036f9b1b51ba65f6de22",
+    "translation": "Shiniko",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0159",
+    "source_sha256": "1c54aac3d697beae03e03e4f82755cd22996741f5273bd520812a06748671ebb",
+    "translation": "Sally",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015A",
+    "source_sha256": "b011a1609ce740051f6378019c90d70778e3288c61a0697215e3b209a51ee4f6",
+    "translation": "Shiruru",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015B",
+    "source_sha256": "2e8c93b5d18d098687d78076ca818132b0c2c71e99c88cf4e43f53f205faf9c0",
+    "translation": "Sherbet",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015C",
+    "source_sha256": "24874c9874e627ac9dbff2c62d43ee3a63c0ce595b6e69964700735cef9fbd15",
+    "translation": "Sumimomo",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015D",
+    "source_sha256": "a5e72a4290886a7b0cfcef037246401cb8c27d5db7b00ec194356b2290142e58",
+    "translation": "Chocolat",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015E",
+    "source_sha256": "a4c9291ddc89cec06445ec6a3416fd74c560a5a14fa6eb0ffb04e08a923bd115",
+    "translation": "Shaggy",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:015F",
+    "source_sha256": "c6fb2152cd5626f275930b19797baa5018bf267e889c98e66801cb3eb0dc1a9b",
+    "translation": "Sue",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0160",
+    "source_sha256": "36f069bc94f5dcd4e212fa08cd5fb680d159fc6b5e97eee690b0efd7e5df4899",
+    "translation": "Treble",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0161",
+    "source_sha256": "af025783e323405bd92f58ff72c9959c54a53b979a710783d9ee06b94a04e8e8",
+    "translation": "Vicky",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0162",
+    "source_sha256": "6dfadabc2b5fb8a592337740bd1c92d2b148daef171bebb059d899bcf0853ba5",
+    "translation": "Tiara",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  },
+  {
+    "id": "string:0163",
+    "source_sha256": "117a15072b41d7a90c7809573ecdf44c8b2e83b1164212c92e2d4ada340fcdec",
+    "translation": "Witchy",
+    "control_policy": "exact",
+    "status": "original_translation",
+    "provenance": {
+      "source": "native retained name list",
+      "method": "Readable loanword spelling or romanization; not an asserted live villager identity",
+      "capacity_contract": "specs/UNUSED_NAMES.md"
+    }
+  }
+]

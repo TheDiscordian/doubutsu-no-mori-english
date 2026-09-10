@@ -54,6 +54,12 @@ the 77 explicit native reserve slots. Its permission binds the complete source,
 caller inventory, five-byte payload, and unchanged bounded loader. It changes
 no selector, save field, or runtime code and grants no general capacity increase.
 
+The [retained-name integration](UNUSED_NAMES.md) supplies 200 original English
+spellings in `009C..0163`, where the English donor retains native Japanese bytes.
+The current selectors do not use these names; live identities remain separate.
+Complete values fit thirteen bytes in the unchanged bounded generic loader, with
+no code, saved-name, or unrelated caller expansion.
+
 The optional [native credits integration](NATIVE_CREDITS.md) supplies all 110
 rows in `04EA..0557`. Ten twenty-five-byte rows use a separate 256-byte actor
 BSS area, with updated ownership metadata and both load/draw lengths and

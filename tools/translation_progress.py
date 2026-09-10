@@ -152,9 +152,13 @@ def measure(native, built, report):
     if report['source_sha256'] != sha256(native) or report['output_sha256'] != sha256(built):
         raise ValueError('Build report does not match the source and output ROMs')
     accent_names={}
+    accent_built,accent_report=built,report
+    if report.get('unused_names'):
+        from unused_names import verify_installation
+        accent_built,accent_report=verify_installation(built,native,report)
     if report.get('accent_items'):
         from accent_items_install import verify_installation
-        accent_names=verify_installation(built,native,report)
+        accent_names=verify_installation(accent_built,native,accent_report)
     if report.get('reserve_strings'):
         from reserve_strings import verify_installation
         verify_installation(built, native, report)

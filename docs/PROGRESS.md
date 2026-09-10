@@ -25,6 +25,14 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
+The [retained-name integration](checkpoints/UNUSED_NAMES.md) applies all 200 old
+general name records while preserving live localized names and saved identities.
+The current combined ROM/UPS is `build/unused-names-pilot`. Four focused tests and
+thirteen counter regressions pass, including full resource retention, cartridge
+and patch reconstruction, and accounting. This data-only batch reuses unchanged
+native loader evidence. Continue residual general/interface strings and letter
+variants, then the bounded combined v0 gameplay/save checks.
+
 The [accented-item integration](checkpoints/ACCENTED_ITEMS.md) installs all eight
 complete fields, matching font/article data, immutable catalogue-five mail, both
 creators, and the treasure reader. The current combined ROM/UPS is

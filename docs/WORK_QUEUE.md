@@ -15,6 +15,13 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [retained-name checkpoint](checkpoints/UNUSED_NAMES.md) completes all 200
+unselected general name records in `build/unused-names-pilot`. Four focused checks
+and thirteen counter regressions pass; all previous runtime/resources are retained.
+Continue residual general strings, intentional English omissions, and letter
+variants before the bounded combined v0 smoke. Do not alter structural zero-filled
+tail slots or retest unchanged native code to increase text completion.
+
 The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) completes all eight
 names, font/article data, shared and sale creators, and both treasure readers in
 `build/accent-items-pilot`. Installed verification, focused tests, independent
