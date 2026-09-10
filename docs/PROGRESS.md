@@ -17,6 +17,16 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [current private playtest bundle](checkpoints/V1_PLAYTEST_PACKAGE.md) is
+`build/releases/v1-artwork-playtest-02.zip`, with combined ROM
+`build/title-countdown-combined-01/animal-forest-title-preview.z64`.
+It requires an Expansion Pak and includes every completed artwork and text
+batch below. Both package tests pass, including actual standalone patcher
+execution and exact reconstruction. Earlier packages and the corrected v0 remain
+untouched. Continue the festival-stall adaptation and pending lucky-bag design
+choice in the [remaining artwork queue](ARTWORK_REMAINDER.md); ordinary human
+playtesting and hardware acceptance remain explicit limitations.
+
 The [countdown candidate](checkpoints/COUNTDOWN_ARTWORK.md) installs the exact
 GC minute/second labels with unchanged timer, digits, animation, and actors.
 Three focused checks, the title combination, and the full counter pass.
