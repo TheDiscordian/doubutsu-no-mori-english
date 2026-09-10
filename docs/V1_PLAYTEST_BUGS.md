@@ -22,7 +22,7 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 | V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Pixel-layout candidate built; four host/ROM checks and 16 native calls/45 assertions pass; hardware recheck pending |
 | V1-10 | Letter To/From text remains Japanese | Pending label/reader binding |
 | V1-11 | Nook shop's blue cash bubble still says `もってるおかね` | English GC Your Bells texture, load, and label geometry installed in HUD candidate; hardware recheck pending |
-| V1-12 | Inventory Bells digits are compressed into the left side of their bubbles | Pending money-specific numeric rendering correction; preserve dialogue spacing |
+| V1-12 | Inventory Bells digits are compressed into the left side of their bubbles | Money-only X scale/origin corrected; three focused checks pass, hardware appearance recheck pending |
 
 Fix the broken title and editing display first, then the remaining English
 application gaps and keyboard polish. Preserve saved capacities and GameCube

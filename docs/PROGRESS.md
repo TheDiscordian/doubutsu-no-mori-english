@@ -36,6 +36,12 @@ the GC coordinates. The combined intermediate is
 `build/v1-notice-tune-fix-01/animal-forest-title-preview.z64`; four focused checks
 pass. The reported inventory Bells-digit sizing joins the active bug list.
 
+The [inventory money correction](checkpoints/V1_INVENTORY_MONEY_FIX.md) widens
+and repositions only the digits inside their five native bubbles. Three focused
+checks pass. The combined intermediate is
+`build/v1-inventory-money-fix-01/animal-forest-title-preview.z64`; dialogue font
+spacing, digit height, money values, and saved formats remain unchanged.
+
 The supplied private artwork playtest is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.

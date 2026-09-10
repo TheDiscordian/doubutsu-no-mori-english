@@ -127,3 +127,20 @@ Preserve note indices, pitches, sounds, animation, colour, frame, and saved
 melody. The English OK model `004A9310` binds its quad at `004A8DE0`;
 copy its XYZ/ST into native `3650`, retaining native flags, colours, and order.
 The corrected X extent is 74..106 and Y is -63..-47. Native N64 controls stay.
+
+## Inventory money bubbles
+
+The native money renderer at `808802A8` in overlay `00785700` draws each of
+five digits separately, stepping 12 pixels, at scale 0.75 on both axes. The
+halfwidth atlas leaves five ink columns starting at zero, so each digit occupies
+only 3.75 pixels at the left edge of its slot. This is not a string-spacing bug.
+
+`tools/inventory_money_fix.py` changes this caller's X scale to 1.25 and first
+origin from 122 to 123.5. Ink becomes 6.25 pixels wide inside each original
+12-pixel slot; Y scale stays 0.75. Four non-relocated instructions change.
+The duplicate `t2=255` becomes the float 1.25 bit pattern; alpha reuses the
+existing `t0=255`, and only the X-scale stack argument uses `t2`. The original
+font call, one-digit length, colours, height, five-slot loop, division/remainder,
+leading-zero suppression, money value, font resource, other readers, and all
+allocations remain unchanged. No new code space, saved data, or global font
+metrics are required.
