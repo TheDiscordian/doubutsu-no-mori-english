@@ -9,11 +9,11 @@ from apply_translation import apply_bundle,write_new
 from package_v0 import archive_bytes
 
 ROOT=Path(__file__).resolve().parents[1]
-ROM_SHA='da66a789341307c625da130ae11e20609b9a023fca82712f303fc59fe95deb94'
-PATCH_SHA='6b423b37fc767c73d3490a2c2e5182509ccdf66c52cba4c663a5ac2d3065edbb'
-REPORT_SHA='dea15128dbb5969ce2ad485acc5573ce210dea666b1a0cce7f0bde0c30ff9d1a'
-CARTRIDGE_REVISION='a5e9eebbf3e36e736e6d806f5288623769b5b0bf'
-LABEL='v1-artwork-playtest-01'
+ROM_SHA='6be7c2a514574a3c9f7eba0e00c45d84cb6f83866b39cd7d1de0b2db8c1f73b7'
+PATCH_SHA='352fcf38e007e69b029ff770c30bbdda6a48e2fb6ccb9a7f289c3e67a9ed9979'
+REPORT_SHA='c71a8df7c809aacf60698b567b8d8dd8252b46d28b9ac573929e7f1474b4f067'
+CARTRIDGE_REVISION='991a5d6ccd5144a73baf1faca5b39cebbf79eebe'
+LABEL='v1-artwork-playtest-02'
 
 
 def prepare(directory,source,revision):
@@ -26,7 +26,7 @@ def prepare(directory,source,revision):
             or report['output_sha256']!=ROM_SHA or report['patch_sha256']!=PATCH_SHA
             or report['memory']['required_ram_bytes']!=0x800000
             or report['memory']['ordinary_heap_end']!=0x80400000 or len(built)!=0x2000000):
-        raise ValueError('Package requires the approved complete title/gyroid/menu candidate')
+        raise ValueError('Package requires the approved title/countdown/seasonal-artwork candidate')
     if len(revision)!=40 or any(c not in '0123456789abcdef' for c in revision):
         raise ValueError('Packaging revision must identify a complete git commit')
     manifest={'format':1,'label':LABEL,'public_release':False,'complete_v1':False,
@@ -52,7 +52,7 @@ def prepare(directory,source,revision):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__)
-    p.add_argument('--build',type=Path,default=ROOT/'build/title-gyroid-service-combined-01')
+    p.add_argument('--build',type=Path,default=ROOT/'build/title-countdown-combined-01')
     p.add_argument('--rom',type=Path,default=ROOT/'local/rom/Doubutsu no Mori (Japan).z64')
     p.add_argument('--output',type=Path,default=ROOT/'build/releases'/f'{LABEL}.zip');a=p.parse_args()
     revision=subprocess.run(['git','rev-parse','HEAD'],cwd=ROOT,check=True,capture_output=True,text=True).stdout.strip()

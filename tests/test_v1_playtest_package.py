@@ -15,12 +15,13 @@ from aflib import sha256
 import package_v1_playtest as package
 
 
-@unittest.skipUnless((ROOT/'build/title-gyroid-service-combined-01/preview.json').is_file(),
-    'Local complete title/menu candidate required')
+@unittest.skipUnless((ROOT/'build/title-countdown-combined-01/preview.json').is_file(),
+    'Local complete title/countdown candidate required')
 class V1PlaytestPackageTests(unittest.TestCase):
     def test_actual_bundle_and_included_patcher_reconstruct_without_overwriting(self):
         source=ROOT/'local/rom/Doubutsu no Mori (Japan).z64'
-        data,manifest=package.prepare(ROOT/'build/title-gyroid-service-combined-01',source.read_bytes(),'a'*40)
+        data,manifest=package.prepare(ROOT/'build/title-countdown-combined-01',source.read_bytes(),'a'*40)
+        self.assertEqual(manifest['label'],'v1-artwork-playtest-02')
         self.assertEqual(manifest['output_sha256'],package.ROM_SHA)
         self.assertEqual(manifest['required_ram_bytes'],0x800000)
         self.assertEqual(manifest['ordinary_heap_end'],0x80400000)
@@ -32,6 +33,9 @@ class V1PlaytestPackageTests(unittest.TestCase):
             self.assertEqual(set(archive.namelist()),{'animal-forest-english.ups','manifest.json','README.md',
                 'FEATURES.md','SOURCES.md','LICENSE-tooling.txt','apply_translation.py','aflib.py','SHA256SUMS'})
             self.assertEqual(json.loads(archive.read('manifest.json')),manifest)
+            self.assertIn(b'min.',archive.read('FEATURES.md'))
+            self.assertIn(b'fortune',archive.read('FEATURES.md'))
+            self.assertIn(b'festival stall',archive.read('FEATURES.md'))
             for line in archive.read('SHA256SUMS').decode().splitlines():
                 digest,name=line.split('  ',1);self.assertEqual(sha256(archive.read(name)),digest)
             for name in archive.namelist():
@@ -51,7 +55,7 @@ class V1PlaytestPackageTests(unittest.TestCase):
 
     def test_unknown_report_and_packaging_revision_are_rejected(self):
         source=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
-        directory=ROOT/'build/title-gyroid-service-combined-01'
+        directory=ROOT/'build/title-countdown-combined-01'
         with patch.object(package,'REPORT_SHA','0'*64),self.assertRaises(ValueError):
             package.prepare(directory,source,'a'*40)
         with self.assertRaises(ValueError):package.prepare(directory,source,'uncommitted')

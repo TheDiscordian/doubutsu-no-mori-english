@@ -3,8 +3,10 @@
 This experimental build combines the English translation, corrected Nook
 first-job conversations, English title, GameCube-style keyboard, and translated
 screen/building artwork. It also includes the birthday window, editor
-confirmation, inventory/Pak warnings, and gyroid service responses. See
-`FEATURES.md` for the complete feature and verification notes. This is not a
+confirmation, inventory/Pak warnings, and gyroid service responses.
+The seasonal artwork includes Nookington's clearance/door details, both dump
+signs, fishing props, the fortune table, and countdown minute/second labels.
+See `FEATURES.md` for the complete feature and verification notes. This is not a
 completed v1, hardware certification, or public release.
 
 ## Apply the patch

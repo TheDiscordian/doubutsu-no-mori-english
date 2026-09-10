@@ -1,11 +1,11 @@
 # Combined English artwork and keyboard playtest candidate
 
-Local ROM: `build/title-gyroid-service-combined-01/animal-forest-title-preview.z64`.
-Local patch: `build/title-gyroid-service-combined-01/animal-forest-title-preview.ups`.
+Local ROM: `build/title-countdown-combined-01/animal-forest-title-preview.z64`.
+Local patch: `build/title-countdown-combined-01/animal-forest-title-preview.ups`.
 ROM SHA-256:
-`da66a789341307c625da130ae11e20609b9a023fca82712f303fc59fe95deb94`.
+`6be7c2a514574a3c9f7eba0e00c45d84cb6f83866b39cd7d1de0b2db8c1f73b7`.
 Patch SHA-256:
-`6b423b37fc767c73d3490a2c2e5182509ccdf66c52cba4c663a5ac2d3065edbb`.
+`352fcf38e007e69b029ff770c30bbdda6a48e2fb6ccb9a7f289c3e67a9ed9979`.
 
 An **Expansion Pak is required**. Without it, the game displays an English
 instruction to power off and install one. The ordinary game heap and all saved
@@ -17,6 +17,13 @@ both corrected Nook first-job conversation paths, the Shrine wording, twelve
 English shop textures, map and inventory headings, Insects/Fish collection
 headings, and the translated native clock screen. Nookington's main sign,
 SOLD OUT, police-station signs/posters, and Redd's summer sign are English.
+Both Nookington seasons include the small GameCube doorway wordmark and full
+CLEARANCE banner, retaining the native red offer. Both dump signs use the exact
+English GC design. The fishing props match GC's omission of the Japanese barrel
+name and headquarters placard, with the remaining geometry and event unchanged.
+The New Year fortune table uses the complete matching GC model inside its native
+allocation; the shrine and fortune outcomes stay native. The countdown display
+uses the exact `min.`/`sec.` artwork, preserving digits, timing, and animation.
 Bulletin-board latest entry/entry 1/Quit/Write and town-tune Play/Erase/OK
 controls use the complete supplied English artwork with native N64 button icons.
 The catalogue has top/bottom controls, the mailbox has a Mail heading, and
@@ -64,7 +71,13 @@ This controlled check does not establish ordinary navigation or transactions.
 Original-hardware acceptance, the ordinary first-job replay, all changed menus,
 multi-line editing, normal save/restart, and return-to-title/existing-save cases
 remain playtest work.
-Some signs, buildings, and bags still have Japanese artwork. This is a combined
+The Nookington, dump, fishing, fortune-table, and countdown batches pass focused
+source/graphics/retention/patch checks and title combination checks. These do not
+establish ordinary seasonal-event appearance or gameplay.
+The festival stall retains Japanese signs and needs further adaptation; the
+full GC pair of models does not fit its native streamed slot. The supplied
+English GC game also retains Japanese decorative lucky-bag artwork; that design
+choice remains open. Some artwork therefore remains unfinished. This is a combined
 experimental build, not a completed v1/public release or exhaustive acceptance.
 
 ROMs and extracted Nintendo assets remain local and ignored. Public distribution
