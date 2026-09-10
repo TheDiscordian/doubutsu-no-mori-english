@@ -11,9 +11,9 @@
 2. Resolve the lucky-bag decorative-writing choice in
    [remaining artwork](ARTWORK_REMAINDER.md). The supplied English GC menu
    images retain the same Japanese decoration. Do not count copying identical
-   artwork as new English. Bind the world-bag model separately if needed.
-3. Keep the combined private playtest package aligned with accepted artwork
-   batches, including the separate stall candidate when appropriate. Preserve
+   artwork as new English. The separate world-bag binding is also recorded.
+3. Keep the combined private playtest package aligned with checked artwork
+   batches. Package `03` includes the shared-stall candidate. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.
 4. Address concrete human playtest bugs immediately, prioritising crashes,

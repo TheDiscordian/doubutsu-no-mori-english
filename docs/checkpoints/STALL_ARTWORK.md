@@ -25,8 +25,9 @@ The title combination is
 `128f19b734565e5e0c3af15aaf1fef8fb066155039404a2bfdd29efe8010bf19`;
 its UPS SHA-256 is `600ec4b132646673ae8f1894b5131b642439b0b82e171c96ba351175cc1ddef0`.
 The combination requires an Expansion Pak and preserves all earlier translation,
-conversation, keyboard, title, menu, and building-artwork batches. The packaged
-playtest remains separate until its next explicit update.
+conversation, keyboard, title, menu, and building-artwork batches. The combined
+cartridge is included in `build/releases/v1-artwork-playtest-03.zip`; the
+[package checkpoint](V1_PLAYTEST_PACKAGE.md) records its standalone patcher check.
 
 Three focused tests pass in 8.660 seconds. They independently compile the native
 macros, trace all source-equivalent triangles through both installed roots,

@@ -3,20 +3,18 @@
 ## Builds
 
 The supplied private artwork playtest is
-`build/releases/v1-artwork-playtest-02.zip`, with local ROM
-`build/title-countdown-combined-01/animal-forest-title-preview.z64`.
+`build/releases/v1-artwork-playtest-03.zip`, with local ROM
+`build/title-stall-combined-01/animal-forest-title-preview.z64`.
 It requires an Expansion Pak. Its patcher/reconstruction tests pass, and the
 [package checkpoint](checkpoints/V1_PLAYTEST_PACKAGE.md) records hashes,
 source revisions, contents, and limitations. It is not a public release or
 original-hardware certification.
 
-The newest separate candidate is
-`build/title-stall-combined-01/animal-forest-title-preview.z64`. It adds the
+The package includes the
 [GC-style festival stall](checkpoints/STALL_ARTWORK.md), using one shared mesh
 and a reflected second placement inside the original allocation. Three focused
 tests, the title combination, and the full combined counter pass. Ordinary
 stall appearance, lighting, both placements, and event acceptance remain.
-The private package does not yet contain this separate stall batch.
 
 The corrected four-MiB v0 remains at
 `build/v0-hardware-fixes-02/animal-forest-halfwidth.z64`. Both complete Nook
@@ -36,7 +34,7 @@ mail/repayment, and gyroid service responses.
 Building/event artwork includes seasonal shops, Nookington's main and doorway
 signs and clearance banners, police signs/posters, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
-separate shared-stall candidate. Native shrine identity, event rules, and saved
+shared stall. Native shrine identity, event rules, and saved
 formats remain. The [feature notes](V1_TITLE_PLAYTEST.md) describe the packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records the newest work and
 neutral texture sets already inspected.
