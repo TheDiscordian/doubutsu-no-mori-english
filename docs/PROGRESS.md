@@ -17,6 +17,23 @@ questions; ordinary candidate-bank coverage is only a diagnostic.
 
 ## Active work
 
+The [hardware correction](checkpoints/V0_HARDWARE_BUGS.md) fixes the whole-
+conversation loop during Nook's furniture-delivery job and the related premature
+cleanup of later letter-sharing advice. The separate combined ROM is
+`build/v0-hardware-fixes-02/animal-forest-halfwidth.z64`; the handed-off
+`build/classic-letters-pilot` ROM remains unchanged. Native comparisons reproduce
+both original failures, then verify complete corrected continuations and normal
+message closure: all six furniture personalities, both long letter explanations,
+and one unsplit letter explanation. Full English, completed quest state, reward
+behaviour, and guards are retained. The map label is corrected to one-line
+"Shrine". Ordinary tutorial replay on hardware remains unverified.
+
+Finish the correction's focused checks and private patch package, then continue
+the reported Japanese interface/artwork. Classify each screen as runtime text,
+texture, or both, and use matching supplied GameCube English assets while
+preserving N64-specific locations. Further actual progression defects retain
+priority over the separate title and keyboard work.
+
 The [separate English Press Start preview](checkpoints/TITLE_PRESS_START.md)
 uses the supplied GameCube tiles and positions. Five focused checks and the
 bounded native loading/START check pass; the v0 candidate is unchanged. All

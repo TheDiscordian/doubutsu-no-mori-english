@@ -24,7 +24,9 @@ checks the package files. Extract `.7z` archives before applying the patch.
 
 The ROM is 32 MiB. Native execution and fresh-game entry/arrival checks run in
 4 MiB; an Expansion Pak is permitted but is not a verified requirement of this
-candidate. Original-hardware behaviour is unverified. Use the flash cartridge's
+candidate. The first original-hardware playtest reaches the furniture-delivery
+job but encounters the critical conversation loop listed below; this is not
+complete hardware acceptance. Use the flash cartridge's
 normal Doubutsu no Mori save/RTC configuration; no cartridge-specific settings
 are asserted by this package.
 
@@ -46,6 +48,14 @@ the combined candidate. These missing checks are not reported as passes.
 
 ## Known limitations and bug reports
 
+- **Critical:** Nook's furniture delivery to Buzz loops the whole conversation,
+  including the furniture reward, instead of finishing. The handed-off candidate
+  retains this defect; a separately verified correction is required.
+- The map incorrectly calls the native shrine "Wishing Well". The label must be
+  "Shrine", preserving the N64 location rather than its GameCube replacement.
+- Japanese text remains visible on signs, bags, buildings, and screens including
+  the map, inventory, and time settings. Classify text versus image assets before
+  replacement; use matching supplied GameCube art where appropriate.
 - English title artwork and a GameCube-style grid keyboard are not included.
 - Native input/storage limits remain for custom player names and catchphrases.
 - Line layout needs a human polish pass. Preserve deliberate GameCube line/page

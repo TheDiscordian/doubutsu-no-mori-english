@@ -13,6 +13,7 @@ from apply_translation import apply_bundle, write_new
 ROOT = Path(__file__).resolve().parents[1]
 CANDIDATE_SHA256 = '31c85f23c996b70bd7a4779b43f1039716a77c84806dfa5a7dd52e3780d50860'
 CANDIDATE_REVISION = 'e5fbf80'
+HARDWARE_FIX_SHA256 = 'b93a54b8804f262e1c05e7dabcd6aac4f5b47d637c69d94264f058c12dbdbd35'
 
 
 def archive_bytes(members):
@@ -33,14 +34,16 @@ def prepare(directory, source, revision):
     built = (directory/'animal-forest-halfwidth.z64').read_bytes()
     patch = (directory/'animal-forest-halfwidth.ups').read_bytes()
     report = json.loads((directory/'build.json').read_text())
-    if sha256(built) != CANDIDATE_SHA256 or report.get('output_sha256') != CANDIDATE_SHA256:
-        raise ValueError('Package requires the verified complete classic-letter candidate')
+    digest = sha256(built)
+    if digest not in (CANDIDATE_SHA256, HARDWARE_FIX_SHA256) or report.get('output_sha256') != digest:
+        raise ValueError('Package requires an approved complete v0 candidate')
+    fixed = digest == HARDWARE_FIX_SHA256
     manifest = {
-        'format': 1, 'label': 'v0-playtest-candidate', 'public_release': False,
+        'format': 1, 'label': 'v0-hardware-fixes-02' if fixed else 'v0-playtest-candidate', 'public_release': False,
         'source_revision': 'Doubutsu no Mori (Japan), verified retail',
         'source_sha256': ROM_SHA256, 'output_sha256': sha256(built),
         'output_bytes': len(built), 'patch_sha256': sha256(patch),
-        'cartridge_source_revision': CANDIDATE_REVISION, 'packaging_source_revision': revision,
+        'cartridge_source_revision': revision if fixed else CANDIDATE_REVISION, 'packaging_source_revision': revision,
         'emulator_memory_bytes': 4 * 1024 * 1024,
         'original_hardware_verified': False, 'human_playthrough_complete': False,
     }
@@ -49,7 +52,7 @@ def prepare(directory, source, revision):
     members = {
         'animal-forest-english.ups': patch,
         'manifest.json': (json.dumps(manifest, indent=2, sort_keys=True)+'\n').encode(),
-        'README.md': (ROOT/'docs/V0_PLAYTEST.md').read_bytes(),
+        'README.md': (ROOT/'docs'/('V0_FIXES_PLAYTEST.md' if fixed else 'V0_PLAYTEST.md')).read_bytes(),
         'SOURCES.md': (ROOT/'docs/SOURCES.md').read_bytes(),
         'LICENSE-tooling.txt': (ROOT/'LICENSE').read_bytes(),
         'apply_translation.py': (ROOT/'tools/apply_translation.py').read_bytes(),

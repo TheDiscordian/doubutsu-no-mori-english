@@ -1,5 +1,24 @@
 # English map landmark labels
 
+## Native shrine correction
+
+The native location is labelled **Shrine**, on one line at the existing one-line
+offset `-25`. It is not the GameCube wishing well. `shrine_labels.py` supplies
+this explicit N64 variant over the source-bound GC-derived image described
+below. Only the shrine's sixteen-byte text record, first-line length (six), and
+first-line Y position change. The second line is entirely zero-filled. The
+renderer, icons, full-name cache, relocation table, allocation, and saved data
+remain unchanged.
+
+The supplied GC "Wishing/Well" data remains donor evidence, not the desired
+N64 output. A `native_shrine` profile retains its complete predecessor profile;
+validation restores just the three approved fields and checks that predecessor
+through the original strict validator. The combined counter records "Shrine"
+for the installed variant. Existing experimental builds with "Wishing/Well"
+remain identifiable and independently verifiable.
+
+## GC-derived baseline
+
 The map-label variant extends the complete villager-name image. It retains its
 native prefix/BSS layout, all four resident-name hooks, compiled cache helpers,
 and fifteen cache positions. It appends a bounded two-line drawer and six

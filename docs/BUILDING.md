@@ -23,7 +23,23 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Outputs
 
-The current combined integration build is `build/classic-letters-pilot`.
+The current correction build is `build/v0-hardware-fixes-02`, described in the
+[hardware checkpoint](checkpoints/V0_HARDWARE_BUGS.md). Reproduce it from the
+unchanged complete classic-letter v0 and the supplied local source inputs:
+
+```sh
+python3 tools/first_job_progression.py --shrine --letter-advice --output build/v0-hardware-fixes-rebuilt
+python3 tools/package_v0.py --build build/v0-hardware-fixes-rebuilt --output build/releases/v0-hardware-fixes-rebuilt.zip
+```
+
+Both commands refuse existing outputs. The correction changes only four native
+first-job owner instructions and three map-label fields; all prior English
+resources, memory allocations, and saved layouts remain. Its native tests reuse
+the checkpointed runner with `first_job_smoke.py`; `--letters` selects the
+post-letter-view continuation cases. Do not rerun the entire tutorial or full
+regression suite for these unchanged resources.
+
+The complete base integration build is `build/classic-letters-pilot`.
 Its [checkpoint](checkpoints/CLASSIC_LETTERS.md) records exact dependencies,
 artifacts, and verification limits. With the retained reserve-letter predecessor
 and source-bound resources:

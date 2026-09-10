@@ -11,6 +11,12 @@ The [v0 plan](docs/V0_PLAN.md) targets the base translation and bounded safety
 checks, then a playtest patch. The human playthrough follows that build. English
 title artwork and the GameCube-style keyboard are v1 stretch goals.
 
+The [current private playtest correction](docs/V0_FIXES_PLAYTEST.md) addresses
+the furniture-delivery conversation loop, later letter-advice continuation,
+and the native shrine's map label. Its [checkpoint](docs/checkpoints/V0_HARDWARE_BUGS.md)
+records the separate ROM/patch and focused native evidence. Ordinary hardware
+replay and remaining Japanese artwork are still pending.
+
 The experimental pilot includes proportional Latin text, guarded GameCube
 reference imports, and an English-first N64 keyboard with translated labels and
 prompts. It retains the native radial layout and saved-name limits; a

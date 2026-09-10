@@ -103,11 +103,17 @@ def relocation_data(native, inventory, size):
 
 def installed_report(data):
     if not APPROVED: raise ValueError('Map labels require independent image approval')
+    from shrine_labels import LABEL_AT, transform, profile
+    if data[LABEL_AT:LABEL_AT+16] == b'Shrine\0\0'+bytes(8):
+        return profile(installed_report(transform(data, reverse=True)), data)
     return {**APPROVED, 'labels': True, 'sources': source_hashes(), 'imports': m.IMPORTS,
             'overlay_sha256': sha256(data), 'references': reference()}
 
 
 def validate(native, data, reloc, report, module):
+    if report.get('native_shrine'):
+        from shrine_labels import validate as validate_shrine
+        return validate_shrine(native, data, reloc, report, module)
     if not APPROVED: raise ValueError('Map labels require independent image approval')
     if (not report.get('labels') or report.get('bytes') != len(data) or len(data) != APPROVED['bytes']
             or report.get('symbols') != APPROVED['symbols'] or report.get('sources') != source_hashes()
@@ -138,6 +144,8 @@ def measure_labels(ledger, native, built, report):
     applied = report.get('map_names', {}).get('overlay', {}).get('labels', False)
     if applied: m.verify_shared_parts(built, native, report['runtime_module'], report['map_names'])
     english = {kind: b' '.join(w for w in words if w) for kind, words in zip(KINDS, WORDS)}
+    if report.get('map_names', {}).get('overlay', {}).get('native_shrine'):
+        english['shrine'] = b'Shrine'
     english.update(post=b'Post', post_continuation=b'Office', vacant=b'free  ')
     for kind, raw in native_labels(native):
         identity = 'ui_map:'+kind

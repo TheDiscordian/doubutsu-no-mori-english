@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'tools'))
 import aflib
 from apply_translation import apply_bundle, write_new
-from package_v0 import archive_bytes, prepare, CANDIDATE_SHA256
+from package_v0 import archive_bytes, prepare, CANDIDATE_SHA256, HARDWARE_FIX_SHA256
 
 
 class PatchApplicationTests(unittest.TestCase):
@@ -78,6 +78,21 @@ class PatchApplicationTests(unittest.TestCase):
 
 @unittest.skipUnless((ROOT/'build/classic-letters-pilot/build.json').is_file(), 'Complete candidate required')
 class CandidatePackageTests(unittest.TestCase):
+    @unittest.skipUnless((ROOT/'build/v0-hardware-fixes-02/build.json').is_file(), 'Combined hardware fix required')
+    def test_hardware_fix_package_has_its_own_revision_and_playtest_notes(self):
+        source = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        package, manifest = prepare(ROOT/'build/v0-hardware-fixes-02', source, 'fix-revision')
+        self.assertEqual(manifest['output_sha256'], HARDWARE_FIX_SHA256)
+        self.assertEqual(manifest['cartridge_source_revision'], 'fix-revision')
+        self.assertEqual(manifest['label'], 'v0-hardware-fixes-02')
+        self.assertFalse(manifest['original_hardware_verified'])
+        with zipfile.ZipFile(io.BytesIO(package)) as archive:
+            self.assertEqual(archive.read('README.md'), (ROOT/'docs/V0_FIXES_PLAYTEST.md').read_bytes())
+            self.assertFalse(any(name.endswith(('.z64', '.n64', '.v64')) for name in archive.namelist()))
+            for line in archive.read('SHA256SUMS').decode().splitlines():
+                digest, name = line.split('  ', 1)
+                self.assertEqual(aflib.sha256(archive.read(name)), digest)
+
     def test_actual_package_reconstructs_candidate_and_contains_no_rom(self):
         source = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         package, manifest = prepare(ROOT/'build/classic-letters-pilot', source, 'test-revision')

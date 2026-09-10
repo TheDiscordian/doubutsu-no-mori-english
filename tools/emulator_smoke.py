@@ -1042,6 +1042,12 @@ def main():
                     raise ValueError('Cartridge loader probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_npc_mail_loader'],record))
+            if 'test_first_job_progression' in action:
+                from first_job_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('First-job probes require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_first_job_progression'], record))
             if 'test_npc_mail_show' in action:
                 from npc_mail_show_smoke import exercise
                 if not (out/'test.bs1').is_file():
