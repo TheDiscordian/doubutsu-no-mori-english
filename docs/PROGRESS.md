@@ -13,7 +13,11 @@ original-hardware certification.
 The package includes the
 [GC-style festival stall](checkpoints/STALL_ARTWORK.md), using one shared mesh
 and a reflected second placement inside the original allocation. Three focused
-tests, the title combination, and the full combined counter pass. Ordinary
+tests, the title combination, and the full combined counter pass. A
+[controlled native graphics preview](checkpoints/EVENT_ARTWORK_PREVIEW.md)
+renders both placements and the fortune table with intact memory guards and
+restored checkpoint. The visible surfaces are inspected; the stall preview's
+lowest edge is clipped by its framing. Ordinary
 stall appearance, lighting, both placements, and event acceptance remain.
 
 The corrected four-MiB v0 remains at
@@ -43,7 +47,7 @@ neutral texture sets already inspected.
 
 Use [the completion queue](WORK_QUEUE.md). The lucky-bag decorative-writing
 choice is pending; the English GC donor itself retains Japanese. The stall
-adaptation needs ordinary appearance acceptance. Other unreviewed game images
+adaptation still needs ordinary appearance acceptance. Other unreviewed game images
 are not declared complete by the scoped seasonal-prop inspection.
 
 The embedded warning drawing probe remains incomplete after its permitted setup

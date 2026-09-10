@@ -45,6 +45,11 @@ transcriptions, so they remain an explicit character-inventory gap rather than
 invented weight. Their full model is replaced; that installation fact does not
 make an uncertain transcription reliable.
 
-Continue bounded appearance acceptance and the lucky-bag design decision.
+The [controlled native preview](EVENT_ARTWORK_PREVIEW.md) renders both installed
+placements with intact memory guards and checkpoint restoration. The visible
+surfaces and lighting are inspected, but its framing clips the lowest model
+edge. Native seasonal appearance, shadows, and event acceptance remain.
+Continue the lucky-bag design decision and concrete playtest feedback; do not
+repeat the passing controlled graphics probe for unchanged models.
 The [specification](../../specs/STALL_ARTWORK.md) documents native memory layout,
 source constraints, and the reflected-placement trade-off.

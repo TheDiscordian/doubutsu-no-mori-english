@@ -7,7 +7,9 @@
    stall placements, correct lighting/culling, original shadows/collision, and
    unchanged event behaviour. Do not turn scene setup into an exhaustive event
    harness. The [stall checkpoint](checkpoints/STALL_ARTWORK.md) records passing
-   host/combination checks and the deliberate reflected-mesh adaptation.
+   host/combination checks and the deliberate reflected-mesh adaptation. The
+   [controlled native preview](checkpoints/EVENT_ARTWORK_PREVIEW.md) passes;
+   do not rerun it for unchanged models or mistake it for ordinary event proof.
 2. Resolve the lucky-bag decorative-writing choice in
    [remaining artwork](ARTWORK_REMAINDER.md). The supplied English GC menu
    images retain the same Japanese decoration. Do not count copying identical

@@ -785,10 +785,20 @@ def main():
             actions += json.loads(args.post_scenario.read_text())
         needs_checkpoint_restore = False
         test_mail_open = None
+        event_preview_state = {}
         def record(snapshot):
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if 'test_event_artwork_preview' in action:
+                from event_artwork_preview_smoke import exercise as event_preview
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Event preview requires a saved isolated checkpoint')
+                result = event_preview(debug, action['test_event_artwork_preview'],
+                                       args.rom.read_bytes(), event_preview_state)
+                if result.get('checkpoint_restore_required'):
+                    needs_checkpoint_restore = True
+                record(result)
             if action.get('verify_title_expansion_warning'):
                 from title_logo_smoke import verify_warning
                 record(verify_warning(debug, args.rom.read_bytes()))
