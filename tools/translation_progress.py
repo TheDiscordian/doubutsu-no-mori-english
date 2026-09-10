@@ -55,6 +55,8 @@ def pending_name_consumers(report):
     from item_name_readers import complete as items_complete
     if items_complete(report):
         del pending['extended_items']
+    if report.get('text_extension', {}).get('borrowed') and report['text_extension'].get('choices'):
+        del pending['catchphrases']
     return pending
 
 
@@ -229,7 +231,7 @@ def measure(native, built, report):
                     raise ValueError('Invalid catchphrase actor identity')
                 seen.add(actor)
                 ledger.credit(f'string:{defaults[actor][1]:04X}', phrases[at+6:at+16], 'catchphrases',
-                              pending_reason=pending_names['catchphrases'])
+                              pending_reason=pending_names.get('catchphrases'))
 
         if report.get('gyroid_default'):
             from gyroid_default_actor import verify_installation

@@ -15,11 +15,19 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
+The [borrowed-catchphrase checkpoint](checkpoints/BORROWED_CATCHPHRASES.md)
+completes the ambiguous-copy adapter with an explicit full-English fallback,
+unchanged saved keys, and retained exact owner defaults. The current combined
+build is `build/borrowed-catchphrases-pilot`. All five focused checks and one
+silent native run pass; complete item/name/catchphrase reader accounting is
+connected. Continue residual general/interface strings, letters, accents, and
+the two required apology symbols before bounded combined v0 checks.
+
 The [item-reader checkpoint](checkpoints/ITEM_NAME_READERS.md) closes the known
 item-name display family and enables its installed-route-verified accounting.
 The eight accented resource fields remain untranslated. No ROM is rebuilt for
-the classification alone. Continue ambiguous borrowed catchphrases, residual
-text/letters, accents, and bounded combined v0 smoke.
+the classification alone. The borrowed-catchphrase integration above retains
+this verified item family.
 
 The [letter-editor checkpoint](checkpoints/LETTER_EDITOR_NAMES.md) completes
 English recipient headers and matching editing geometry, retaining saved fields

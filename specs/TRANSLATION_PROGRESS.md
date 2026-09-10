@@ -40,8 +40,12 @@ do not count again, and displaying a name in another menu adds no duplicate
 name credit. The saved Museum identity remains native while its display is English.
 Wider name resources map back to their original source IDs. Merely installing
 the English resource is insufficient: an ID with known readers still using its
-Japanese representation is not fully applied. Catchphrase resources retain
-pending credit until ambiguous borrowed phrases are integrated. Wider item names
+Japanese representation is not fully applied. Catchphrase resources receive
+credit only with complete shared choices and the exact installed
+[ambiguous-copy adapter](BORROWED_CATCHPHRASES.md). The counter verifies its code,
+loader, imports, original resident call, and canonical reference rows; earlier
+variants retain pending catchphrase credit. No saved identity or repeated
+display creates another source ID. Wider item names
 receive credit only with their complete [verified reader family](ITEM_NAME_READERS.md),
 including inventory, catalogue, world labels, dialogue/choices, actors, and letter
 creators. Untranslated accented item rows receive no credit. Wider character names receive credit only

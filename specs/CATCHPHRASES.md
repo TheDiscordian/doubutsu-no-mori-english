@@ -28,9 +28,10 @@ The loader validates the header and uses aligned sixteen-byte DMA reads with a
 bounded binary search. It never modifies the saved source or writes a destination
 smaller than ten bytes. A matching default for the current villager takes
 precedence. A phrase borrowed from a different villager resolves only when every
-matching row has the same English text. Ambiguous borrowed phrases remain native
-pending a separately reviewed policy; do not infer a unique English source from
-identical Japanese bytes. Custom phrases with no key match retain their saved
+matching row has the same English text. The complete text-extension variant
+adds the [explicit ambiguous-copy fallback](BORROWED_CATCHPHRASES.md); the base
+loader alone retains native text for that case. Neither infers a unique English
+donor from identical Japanese bytes. Custom phrases with no key match retain their saved
 text. Original keys must contain a non-Latin byte, so English custom input is
 not mistaken for a Japanese default. Already imported complete defaults of four
 or fewer English bytes remain plain native text.
@@ -68,11 +69,12 @@ limit is a saved-storage constraint, not a remaining Japanese-default reader.
 
 The pinned default resource has one ambiguous saved key: `D0 90 20 20` (`グー`).
 Dozer (`E014`) uses the GC English `zzzzzz`; Bea (`E0C5`) uses `bingo`. Own-ID
-display succeeds. An unrelated villager holding that key falls back to native
-text because four saved bytes contain no donor identity. Native greeting
-copies propagate those same four bytes. All other key groups have a single
-English value. Complete borrowed-phrase application requires an explicit policy
-and installed implementation for this ambiguity, not a guessed donor identity.
+display succeeds. Four saved bytes contain no donor identity. The complete
+borrowed-phrase extension displays Dozer's full `zzzzzz` for an unrelated
+villager holding that key, using the first native owner's reference as an
+explicit canonical fallback. Native greeting copies still propagate the same
+four bytes. All other key groups have a single English value. Complete resource
+credit requires the installed adapter, not the base lookup resource alone.
 
 ## Validation requirements
 

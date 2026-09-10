@@ -6,7 +6,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom
 from catalogue_names import Image
 from code_sections import code_segments
 from shop_item_names import jump
-from text_names import BRIDGE, PROFILE, verify_installed_bridge
+from text_names import BRIDGE, bridge_profile, verify_installed_bridge
 from text_extension import VROM as TEXT_VROM, SETTER
 
 VROM, RELOC, RAM = 0x00956630, 0x00956830, 0x80A963C0
@@ -100,9 +100,10 @@ def patch_code(code, *, reverse=False):
 def install(native, replacements, additions, report):
     original, reloc, native_code = source(native); reference = audit_references(native)
     code = replacements.get(CODE_VROM, native_code)
+    profile = bridge_profile(additions.get(TEXT_VROM, b''))
     if (not report.get('text_extension', {}).get('identities')
-            or sha256(additions.get(TEXT_VROM, b'')) != PROFILE['blob_sha256']
-            or sha256(code[SETTER-CODE_RAM:SETTER-CODE_RAM+PROFILE['loader_bytes']]) != PROFILE['loader_sha256']
+            or profile is None
+            or sha256(code[SETTER-CODE_RAM:SETTER-CODE_RAM+profile['loader_bytes']]) != profile['loader_sha256']
             or code[HELPER-CODE_RAM:HELPER_END-CODE_RAM] != native_code[HELPER-CODE_RAM:HELPER_END-CODE_RAM]
             or code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM] != native_code[0x800ACD18-CODE_RAM:0x800ACD74-CODE_RAM]
             or code[METADATA-CODE_RAM:METADATA-CODE_RAM+32] != METADATA_BYTES

@@ -29,11 +29,17 @@ def verify_dependencies(native, replacements, module):
             'valid_ids': ['E000', 'E0D7'], 'saved_layout_changes': False}
 
 
+def bridge_profile(blob):
+    from text_catchphrases import PROFILE as borrowed_profile
+    return {p['blob_sha256']: p for p in (PROFILE, borrowed_profile)}.get(sha256(blob))
+
+
 def verify_installed_bridge(built):
     # Layered secret-letter verification has only its own report. Bind the
     # complete startup variant directly; the whole-build verifier checks sources.
     from text_extension import VROM, SETTER
     files = by_vrom(built); code = files[CODE_VROM].extract(built)
-    if (VROM not in files or sha256(files[VROM].extract(built)) != PROFILE['blob_sha256']
-            or sha256(code[SETTER-CODE_RAM:SETTER-CODE_RAM+PROFILE['loader_bytes']]) != PROFILE['loader_sha256']):
+    profile = bridge_profile(files[VROM].extract(built)) if VROM in files else None
+    if (profile is None
+            or sha256(code[SETTER-CODE_RAM:SETTER-CODE_RAM+profile['loader_bytes']]) != profile['loader_sha256']):
         raise ValueError('Conversation name reader lacks its complete startup bridge')

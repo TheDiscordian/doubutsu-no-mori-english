@@ -24,6 +24,7 @@ IMPORTS = {
 CHOICE_IMPORTS = {'af_copy_item_string': 0x801966AC, 'af_copy_talk_name': 0x80195E2C,
                   'af_copy_catchphrase': 0x801952F4}
 IDENTITY_IMPORTS = {'af_native_identity_name': 0x800ACD18, 'af_load_display_name': 0x80196044}
+BORROWED_IMPORTS = {'af_get_catchphrase': 0x8019521C, 'af_load_catchphrase': 0x80194FDC}
 
 
 def relocation(data, size, imports=None):
@@ -53,16 +54,20 @@ def main():
     parser.add_argument('--output', type=Path, default=Path('build/text-extension'))
     parser.add_argument('--choices', action='store_true', help='Include complete bounded shared choice substitutions')
     parser.add_argument('--identities', action='store_true', help='Include the save-preserving identity-name bridge')
+    parser.add_argument('--borrowed', action='store_true', help='Resolve ambiguous borrowed defaults with the documented English fallback')
     args = parser.parse_args()
     if args.identities and not args.choices: parser.error('--identities requires --choices')
+    if args.borrowed and not args.identities: parser.error('--borrowed requires --identities')
     verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
     source = ROOT/'overlays/text_extension'
-    imports = {**IMPORTS, **(CHOICE_IMPORTS if args.choices else {}), **(IDENTITY_IMPORTS if args.identities else {})}
+    imports = {**IMPORTS, **(CHOICE_IMPORTS if args.choices else {}), **(IDENTITY_IMPORTS if args.identities else {}),
+               **(BORROWED_IMPORTS if args.borrowed else {})}
     with tempfile.TemporaryDirectory(prefix='af-text-extension-') as directory:
         out = Path(directory)
         common = ['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
                   '-v',f'{source}:/source:ro','-v',f'{ROOT}/overlays/text_choices:/choices:ro',
                   '-v',f'{ROOT}/overlays/text_names:/names:ro',
+                  '-v',f'{ROOT}/overlays/text_catchphrases:/phrases:ro',
                   '-v',f'{out}:/out','-w','/out','--entrypoint']
         def run(tool, *args):
             return subprocess.run(common+[f'/n64_toolchain/bin/mips64-elf-{tool}', IMAGE, *args],
@@ -80,8 +85,12 @@ def main():
             run('gcc', *flags, *rename_choices, '-I/source', '-c', '/choices/choices.c', '-o', 'choices.o')
             objects.insert(0, 'choices.o')
         if args.identities:
-            run('gcc', *flags, '-I/source', '-c', '/names/names.c', '-o', 'names.o')
+            rename_names = ['-Daf_text_extension_init=af_text_names_init'] if args.borrowed else []
+            run('gcc', *flags, *rename_names, '-I/source', '-c', '/names/names.c', '-o', 'names.o')
             objects.insert(0, 'names.o')
+        if args.borrowed:
+            run('gcc', *flags, '-I/source', '-c', '/phrases/phrases.c', '-o', 'phrases.o')
+            objects.insert(0, 'phrases.o')
         run('ld','-EB','--emit-relocs','-T','/source/extension.ld',*definitions,'-o','extension.elf',*objects)
         run('objcopy','-O','binary','-j','.text','extension.elf','extension.bin')
         binary = (out/'extension.bin').read_bytes()
@@ -116,6 +125,10 @@ def main():
             report['identities'] = True
             report['sources'].update({'names/'+p.name:sha256(p.read_bytes())
                                      for p in sorted((ROOT/'overlays/text_names').iterdir()) if p.is_file()})
+        if args.borrowed:
+            report['borrowed'] = True
+            report['sources'].update({'phrases/'+p.name:sha256(p.read_bytes())
+                                     for p in sorted((ROOT/'overlays/text_catchphrases').iterdir()) if p.is_file()})
         args.output.mkdir(parents=True,exist_ok=True)
         for name,data in (('extension.bin',binary),('relocation.bin',rel),('blob.bin',blob),('loader.bin',loader)):
             (args.output/name).write_bytes(data)
