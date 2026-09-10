@@ -39,9 +39,40 @@ or repeat that fixture instead of completing the current integration.
 
 Accented fields remain uninstalled and receive no translation credit. The
 current playable build remains `build/apology-input-pilot`.
-The [accent specification](../../specs/ACCENTED_ITEM_NAMES.md) requires a new
-immutable letter-assembly identity for captured accent pairs, complete restoration
-and line widths, and a matching creator extension. Existing catalogues and their
-saved meaning remain unchanged. Add these consumers in checked owned code before
-enabling the full item resource, then verify the actual combined installation.
-Do not globally permit glyph pairs in player/town/custom editor input.
+
+The catalogue-five core and treasure-notice adapters are implemented in
+`overlays/accent_mail/`. Seven focused host tests pass: exact capture, full
+assembly/restoration, accented capitals/articles, old interpretation retention,
+malformed-input rejection, atomic generation/startup, line widths, and complete
+treasure packing/reading. The native 122-byte mail snapshot and 96-byte notice
+envelopes remain unchanged. All sixteen catalogue-two sale templates are verified
+identical to their catalogue-five counterparts before allowing an accent upgrade.
+
+`build/accent-mail-font` is the production-validated compiler artifact, not an
+installed ROM. Two independent candidate compilations match it. Its image is
+11,344 bytes, with 672 relocation bytes; the existing loader needs 12,031 total
+allocation bytes. Image SHA-256 is
+`f2bbd23684cb682ef38712e6d2dc5b5b971b5f8ec2c1e2feb756b09631078d98`;
+relocation SHA-256 is
+`6c9fda4a52beb4dfbe5aa57e1e39693f2ce2d67be8edcc26e24048216a11d657`.
+This includes shared capture/generation and four startup-installed resident mail
+hooks; treasure-specific adapters remain on-demand integration work. Both
+compiler-profile/article-resource tests and three preceding accent-font tests
+pass. No native execution of this new mail core is claimed yet.
+
+`build/accent-mail-catalog` retains every catalogue-four payload and registers
+catalogue five/semantics three. SHA-256 is
+`26b2e95b10b8ae049853ecc6180e41c12b86efc677e39ee03f9742077e9005be`.
+`build/accent-item-articles` changes only the five accented-name article/checksum
+rows and their bound full-name hash. SHA-256 is
+`b218119460fdbb472e641cbbc6d77ff809d489bda8b8622f0157562294d575ff`.
+All existing catalogues, source translations, and article rows remain intact.
+
+Next connect the shared creator's capture/generation entries, its treasure
+packer/validator/decoder and article resource, the separate sale-event creator,
+and the notice reader. The actual preceding creator is `build/design-items-creator`,
+not the older seasonal prototype. Preserve its full 58,144-byte prefix except
+the exact new entry/data patches. The current board reader is 24,304 bytes;
+retain its native owner/cache and update the checked submenu-pool budget for any
+appended code. Complete combined installation/resource verification before
+enabling the eight full item fields. Do not globally permit pairs in custom input.

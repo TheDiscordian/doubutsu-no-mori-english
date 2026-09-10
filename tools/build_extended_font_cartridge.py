@@ -17,7 +17,7 @@ from extended_glyphs import validate_resource
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def build(resource,out,world_names=False,*,unapproved_candidate=False):
+def build(resource,out,world_names=False,*,unapproved_candidate=False,mail_literals=False):
     digest = sha256(resource)
     accents = digest == ACCENT_RESOURCE_HASH
     mail = digest in (MAIL_RESOURCE_HASH,ACCENT_RESOURCE_HASH)
@@ -26,10 +26,12 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
     validate_resource(resource,mail=mail,accents=accents)
     if accents and not world_names:raise ValueError('Accent glyphs require complete world-name consumers')
     if world_names and not mail: raise ValueError('World-name profile requires the complete mail font')
-    sources=source_hashes(world_names,accents);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
+    if mail_literals and not (accents and world_names):raise ValueError('Literal mail requires the full accent/world font')
+    sources=source_hashes(world_names,accents,mail_literals);out=out.resolve();out.mkdir(parents=True,exist_ok=True)
     (out/'glyphs.bin').write_bytes(resource)
     common=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
-            '-v',f'{ROOT}/overlays:/source:ro','-v',f'{out}:/out','-w','/out','--entrypoint']
+            '-v',f'{ROOT}/overlays:/source:ro','-v',f'{ROOT}/runtime:/runtime:ro',
+            '-v',f'{out}:/out','-w','/out','--entrypoint']
     def run(tool,*args):
         result=subprocess.run(common+['/n64_toolchain/bin/mips64-elf-'+tool,IMAGE,*args],
                               capture_output=True,text=True,timeout=60)
@@ -49,10 +51,23 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
             obj='world_'+name
             run('gcc',*flags,f'/source/world_names/{name}.c','-o',obj+'.o')
             extra.append(obj+'.o')
+    imports={}
+    if mail_literals:
+        imports={'af_crc32':0x80195938,'af_mail_record_pack':0x80198DD4,'af_mail_record_unpack':0x80198FDC}
+        module=json.loads((ROOT/'build/notice-seasonal-runtime/module.json').read_text())
+        if (module.get('module_sha256')!='493bc25a922bbd9d321759677134520bbb179413985f0e047df45e6e432664c6'
+                or any(int(module['symbols'].get(k,'0'),16)!=v for k,v in imports.items())):
+            raise ValueError('Changed literal-mail resident imports')
+        for name in ('format','catalog','generate','literal','view','install'):
+            obj='mail_'+name
+            run('gcc',*flags,f'/source/accent_mail/{name}.c','-o',obj+'.o')
+            extra.append(obj+'.o')
     for name,directory in (('texture','extended_font'),('entry','extended_font_cartridge')):
         if name=='entry' and world_names: directory='world_names'
+        if name=='entry' and mail_literals: directory='accent_mail'
         run('as','-EB','-mabi=32','-march=vr4300','-I/out','-o',name+'.o',f'/source/{directory}/{name}.s')
     run('ld','-EB','--emit-relocs','-T','/source/extended_font_cartridge/font.ld','-Map=font.map',
+        *(f'--defsym={name}=0x{value:08X}' for name,value in imports.items()),
         '-o','font.elf','entry.o','font.o','native.o','texture.o','install.o',*extra)
     if run('nm','--undefined-only','font.elf').strip(): raise ValueError('Undefined persistent font symbol')
     symbols={}
@@ -75,7 +90,11 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
         match=re.fullmatch(r'\s*([0-9a-fA-F]+)\s+[0-9a-fA-F]+\s+R_MIPS_(32|26|HI16|LO16)\s+([0-9a-fA-F]+)\s+(\S+)\s*',line)
         if not match: raise ValueError('Unsupported complete font ELF relocation: '+line)
         at,kind,target=int(match[1],16)-RAM,match[2],int(match[3],16)
-        if not RAM<=target<RAM+total: raise ValueError('Unexpected external font ELF relocation')
+        if not RAM<=target<RAM+total:
+            if (kind!='26' or imports.get(match[4])!=target or not 0<=at<text
+                    or 0x80000000|((struct.unpack_from('>I',data,at)[0]&0x3FFFFFF)<<2)!=target):
+                raise ValueError('Unexpected external font ELF relocation')
+            continue
         if 0<=at<text: section,offset=1,at
         elif text<=at<text+writable: section,offset=2,at-text
         elif text+writable<=at<total-bss: section,offset=3,at-text-writable
@@ -85,7 +104,7 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
     raw_reloc=struct.pack('>5I',text,writable,rodata,bss,len(entries))+struct.pack('>'+str(len(entries))+'I',*entries)
     length=(len(raw_reloc)+4+15)&~15
     reloc=raw_reloc.ljust(length-4,b'\0')+struct.pack('>I',length)
-    if sources!=source_hashes(world_names,accents): raise ValueError('Font sources changed while compiling')
+    if sources!=source_hashes(world_names,accents,mail_literals): raise ValueError('Font sources changed while compiling')
     report={'ram':RAM,'bytes':len(data),'relocation_bytes':len(reloc),'sha256':sha256(data),
             'relocation_sha256':sha256(reloc),'resource_sha256':digest,'sources':sources,
             'symbols':{name:value-RAM for name,value in symbols.items() if RAM<=value<RAM+total},
@@ -95,6 +114,11 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
     if mail:
         report['mail_glyphs'] = True
     if accents:report['accent_glyphs']=True
+    if mail_literals:
+        report['mail_literals']=True
+        report['imports']=imports
+        report['stack_usage'].update({name:(out/(name+'.su')).read_text()
+                                     for name in ('mail_format','mail_catalog','mail_generate','mail_literal','mail_view','mail_install')})
     if world_names:
         report['world_names'] = True
         report['stack_usage'].update({name:(out/(name+'.su')).read_text()
@@ -103,7 +127,7 @@ def build(resource,out,world_names=False,*,unapproved_candidate=False):
         # Artifact measurement only. Production validation still requires the
         # independently pinned exact profile and never accepts this marker.
         report['unapproved_candidate']=True
-        relocate(data,reloc,0x801A0010)
+        relocate(data,reloc,0x801A0010,mail_literals=mail_literals)
     else:
         validate(data,reloc,report)
     (out/'font.bin').write_bytes(data);(out/'relocation.bin').write_bytes(reloc)
@@ -119,6 +143,7 @@ if __name__=='__main__':
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--world-names',action='store_true',help='Install the complete world-label consumers')
     parser.add_argument('--unapproved-candidate',action='store_true',help='Measure a new compiler profile; not installable')
+    parser.add_argument('--mail-literals',action='store_true',help='Include immutable catalogue-five captured accents')
     args=parser.parse_args()
     print(json.dumps(build(args.resource.read_bytes(),args.output,args.world_names,
-                           unapproved_candidate=args.unapproved_candidate),indent=2))
+                           unapproved_candidate=args.unapproved_candidate,mail_literals=args.mail_literals),indent=2))

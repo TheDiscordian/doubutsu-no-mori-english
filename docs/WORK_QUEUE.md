@@ -15,9 +15,10 @@ next work. Remaining broad acceptance is not automatically an implementation
 gap. Record deferred test issues at the affected checkpoint with build, failure,
 risk classification, and next useful check; keep actual v0 blockers explicit.
 
-The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) has the exact font
-and eight full-name candidates ready. Complete their literal capture, immutable
-letter reconstruction, and installed reader verification before enabling them.
+The [accented-item checkpoint](checkpoints/ACCENTED_ITEMS.md) has the exact font,
+eight names, immutable literal-mail core, treasure adapters, and article data
+ready. Connect the shared/sale creators and notice reader, then complete installed
+verification before enabling the names.
 No text credit is granted for these uninstalled candidates. Keep existing saved
 catalogues unchanged and continue residual text after this integration.
 

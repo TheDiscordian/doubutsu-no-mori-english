@@ -25,12 +25,14 @@ uses that build; full gameplay/hardware review, polish, and v1 title/keyboard wo
 are not prerequisites for producing it. This workflow does not mark any pending
 implementation or test as completed.
 
-The [accented-item foundation](checkpoints/ACCENTED_ITEMS.md) completes exact
-sixteen-cell font artifacts and all eight remaining full-name candidates, with
-independent MIPS builds and five focused tests passing. Existing native font
-pixels and prior resource fields remain unchanged. Connect captured accent pairs
-to a new immutable letter interpretation and its readers before installing these
-names; the current ROM remains `build/apology-input-pilot`.
+The [accented-item integration](checkpoints/ACCENTED_ITEMS.md) has exact font/name
+resources, an immutable catalogue-five mail core, treasure-notice adapters, and
+matching article metadata. Seven focused host checks, two compiler/resource
+checks, and three prior font checks pass; independent MIPS builds match within
+the existing loader limits. Connect the shared/sale creators and notice reader,
+then verify the combined installation before enabling the eight names. Existing
+saved interpretations and native font pixels remain unchanged. The current ROM
+remains `build/apology-input-pilot`; these candidates receive no application credit.
 
 The [sun/skull apology integration](checkpoints/APOLOGY_INPUT.md) installs both
 remaining exact GC targets and apology-only symbol editing, preserving saved

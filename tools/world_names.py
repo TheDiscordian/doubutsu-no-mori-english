@@ -35,7 +35,11 @@ HOOKS = {
 def validate_image(data, reloc, report):
     profile=ACCENT_PROFILE if report.get('accent_glyphs') else {
         'bytes':4560,'image_sha256':IMAGE_SHA,'relocation_sha256':RELOC_SHA,'symbols':SYMBOLS}
-    if (len(data)!=profile['bytes'] or len(reloc)!=464
+    if report.get('mail_literals'):
+        from accent_mail_font import PROFILE,validate
+        validate(data,reloc,report)
+        profile=PROFILE
+    if (len(data)!=profile['bytes'] or len(reloc)!=profile.get('relocation_bytes',464)
             or sha256(data)!=profile['image_sha256'] or sha256(reloc)!=profile['relocation_sha256']):
         raise ValueError('Changed approved complete world font image')
     text, writable, rodata = struct.unpack_from('>3I', reloc)
@@ -54,7 +58,8 @@ def validate_image(data, reloc, report):
                             0x80C00000+symbols[new] if isinstance(new, str) else 0)
     at = symbols.get('world_hooks', len(data))
     if data[at:at+len(rows)] != rows: raise ValueError('Changed complete world hook table')
-    target = 0x08000000 | ((0x80C00000+symbols['af_world_font_install']) >> 2) & 0x3FFFFFF
+    entry='af_accent_font_install' if report.get('mail_literals') else 'af_world_font_install'
+    target = 0x08000000 | ((0x80C00000+symbols[entry]) >> 2) & 0x3FFFFFF
     if data[:8] != struct.pack('>2I', target, 0): raise ValueError('World startup entry not installed')
 
 

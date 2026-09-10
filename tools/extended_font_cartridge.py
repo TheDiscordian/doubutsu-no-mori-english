@@ -16,7 +16,7 @@ MAIL_RESOURCE_HASH = '12a90673f21a6c0bfa3fc05039279b1efc65d96319460ae36993eafa08
 ACCENT_RESOURCE_HASH = '24ae623d2917a2370ec70504daf372be327c830d24fb37bacc68ad84f0bbe90e'
 
 
-def source_hashes(world_names=False, accents=False):
+def source_hashes(world_names=False, accents=False, mail_literals=False):
     names = ['overlays/extended_font/'+name for name in ('font.c','font.h','native.c','texture.s')]
     names += ['overlays/extended_font_cartridge/'+name for name in ('entry.s','install.c','font.ld')]
     if world_names:
@@ -25,10 +25,16 @@ def source_hashes(world_names=False, accents=False):
     if accents:
         names.remove('overlays/extended_font/font.c')
         names.append('overlays/accent_font/font.c')
+    if mail_literals:
+        names.remove('overlays/world_names/entry.s')
+        names += ['overlays/accent_mail/'+name for name in
+                  ('entry.s','install.c','accent_mail.h','format.c','catalog.c','generate.c','literal.c','view.c')]
+        names += ['runtime/mail/'+name for name in ('catalog.h','format.h','record.h','glyph.h','view.h')]
+        names += ['runtime/crc32.h','overlays/mail_generation/generate.h']
     return {name:sha256((ROOT/name).read_bytes()) for name in names}
 
 
-def relocate(data,relocations,base):
+def relocate(data,relocations,base,*,mail_literals=False):
     if (not 0<len(data)<=0x3000 or len(data)&15 or not 32<=len(relocations)<=0x1000
             or len(relocations)&15 or type(base) is not int or base&15
             or not MODULE_RAM+RESERVATION<=base<=0x80400000-len(data)):
@@ -80,7 +86,8 @@ def relocate(data,relocations,base):
         if word>>26 not in (2,3): continue
         target=0x80000000|((word&0x3FFFFFF)<<2)
         if RAM<=target<RAM+text: seen.add(at)
-        elif target!=0x800906B4: raise ValueError('Unapproved external font jump')
+        elif target not in ({0x800906B4,0x80195938,0x80198DD4,0x80198FDC} if mail_literals else {0x800906B4}):
+            raise ValueError('Unapproved external font jump')
     if seen!=jumps: raise ValueError('Missing complete font jump inventory')
     return bytes(out)
 
@@ -91,16 +98,18 @@ def validate(data,relocations,report):
     mail = report.get('mail_glyphs',False)
     world = report.get('world_names',False)
     accents = report.get('accent_glyphs',False)
+    literals = report.get('mail_literals',False)
     if (type(mail) is not bool or type(world) is not bool or type(accents) is not bool
+            or type(literals) is not bool or (literals and not accents)
             or (world and not mail) or (accents and not world)):
         raise ValueError('Invalid persistent font glyph capability')
     resource_hash = ACCENT_RESOURCE_HASH if accents else MAIL_RESOURCE_HASH if mail else RESOURCE_HASH
     if (report.get('ram')!=RAM or report.get('bytes')!=len(data)
             or report.get('relocation_bytes')!=len(relocations)
             or report.get('sha256')!=sha256(data) or report.get('relocation_sha256')!=sha256(relocations)
-            or report.get('sources')!=source_hashes(world,accents) or report.get('resource_sha256')!=resource_hash):
+            or report.get('sources')!=source_hashes(world,accents,literals) or report.get('resource_sha256')!=resource_hash):
         raise ValueError('Stale or altered persistent font build')
-    relocate(data,relocations,0x801A0010)
+    relocate(data,relocations,0x801A0010,mail_literals=literals)
     symbols=report['symbols'];text=struct.unpack_from('>I',relocations)[0]
     if symbols.get('af_font_entry')!=0 or any(type(value) is not int or value&3
             or not 0<=value<len(data) for value in symbols.values()):
