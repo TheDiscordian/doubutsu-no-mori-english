@@ -184,3 +184,37 @@ Combined aligned overlay growth is 1536 bytes. The submenu pool receives 4096
 bytes (`25CE4620` to `25CE5620` at `800C4B10`); ordinary heap `80400000` and
 eight-MiB cartridge requirement remain. Explicit VROM moves reject collisions,
 unknown owners, unaligned destinations, and startup/DMA-table relocation.
+
+## GameCube keyboard background
+
+`tools/keyboard_background_fix.py` replaces the plain beige panel with the
+English GC `kai_sousa_mojibanT_model` material (`.data:00420730`, 104 bytes).
+Its active pointers bind two genuinely tiled 32×32 IA8 textures at
+`004124C0/004128C0`, and sixteen vertices at `0041FFF0`. Two four-triangle
+groups assign the complementary upper/lower corners. The donor clamps both
+texture axes; half-panels sample 64×32 texels of each 32×32 image.
+
+Keep the complete converted texture pixels, GC primitive colour 225/205/225,
+environment colour 160/90/245, texture alpha, bilinear filtering, and corner
+directions. Adapt the four quadrants from the GC 180×73 key background to the
+existing 236×114 N64 panel, so native control hints remain backed and readable.
+This is a sized adaptation, not a claim of identical complete GC keyboard art.
+The 40 key positions, keycaps, selection colours, labels, all input handlers,
+pixel-editor fixes, and saved capacities stay unchanged.
+
+The N64 combine words `FC30FE61 55FEF379` encode the same equation in both
+RDP cycles. The GC command `FC30FFFF 5FFEF238` encodes the material only in its
+first cycle. Comparing the full packed words is incorrect; both native cycles
+must match that donor equation. Each RGB channel is primitive times intensity
+plus environment times one minus intensity, with alpha directly from texture.
+
+Derive the new drawing function mechanically from the hash-checked prior grid
+source, changing only its name and panel helper. Preserve the prior installed
+editor in full except call `808882D8`, and retain native encodings of the two
+control hints in the appended copy. Imports into the prior editor receive local
+relocations; resident font imports remain absolute. The new 35,392-byte editor
+moves from `03940000/03948000` to `03E70000/03E80000`, preserving DMA indices
+and linked RAM `80885140`. Its 2,512-byte relocation resource and owner metadata
+are updated together. Aligned growth is 5,120 bytes; the shared pool receives
+8,192 (`25CE5620` to `25CE7620`). Guard the signed immediate against crossing
+`8000`; the ordinary heap remains `80400000` and requires an Expansion Pak.

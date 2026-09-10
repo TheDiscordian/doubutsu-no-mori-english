@@ -48,8 +48,9 @@ def reference(rel, symbols):
             raise ValueError('Changed complete English letter UI wording')
 
 
-def compile_part(name, base, out):
-    spec = PARTS[name]; ram = spec['ram']; files = by_vrom(base)
+def compile_part(name, base, out, *, spec=None, source=None, generated=None, flags=()):
+    spec = PARTS[name] if spec is None else spec
+    ram = spec['ram']; files = by_vrom(base)
     old, old_rel = (files[spec[k]].extract(base) for k in ('vrom', 'reloc'))
     if sha256(old) != spec['sha'] or sha256(old_rel) != spec['reloc_sha']:
         raise ValueError('Changed preceding letter UI owner')
@@ -67,6 +68,9 @@ def compile_part(name, base, out):
         if (ram <= target < ram+len(prefix)) != (0x44000000 | (at-ram) in original_rows):
             raise ValueError('Changed letter UI call relocation')
     out.mkdir(parents=True, exist_ok=False)
+    for filename, data in (generated or {}).items():
+        if Path(filename).name != filename: raise ValueError('Generated suffix input must be local')
+        (out/filename).write_bytes(data)
     (out/'previous.bin').write_bytes(prefix)
     (out/'prefix.s').write_text('.section .native,"ax",@progbits\n.incbin "previous.bin"\n')
     (out/'imports.ld').write_text(''.join(f'{n} = 0x{v:08X};\n' for n, v in spec['imports'].items()))
@@ -90,7 +94,8 @@ SECTIONS {{
     run('gcc', '-c', '-Os', '-EB', '-mabi=32', '-march=vr4300', '-mfix4300', '-G0', '-mno-abicalls',
         '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common', '-fno-stack-protector',
         '-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses', '-fstack-usage',
-        '-Wall', '-Wextra', '-Werror', '/source/overlays/letter_ui/'+name+'.c', '-o', 'helper.o')
+        '-Wall', '-Wextra', '-Werror', *flags,
+        source or '/source/overlays/letter_ui/'+name+'.c', '-o', 'helper.o')
     run('as', '-EB', '-mabi=32', '-march=vr4300', '-o', 'prefix.o', 'prefix.s')
     run('ld', '-EB', '--emit-relocs', '-T', 'image.ld', '-Map=image.map', '-o', 'image.elf', 'prefix.o', 'helper.o')
     if run('nm', '--undefined-only', 'image.elf').strip(): raise ValueError('Unresolved letter UI import')

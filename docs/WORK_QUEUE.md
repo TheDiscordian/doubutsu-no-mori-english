@@ -3,10 +3,28 @@
 ## Next work
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
-artwork discovery and event acceptance. Fix corrupt Press Start graphics and
-mail/board editing layout first, then the remaining labels and keyboard polish.
-The tested cartridge is `title-stall-combined-01`; newer artwork-only builds do
-not establish that these runtime defects are fixed.
+artwork discovery and event acceptance. All twelve findings have scoped
+corrections in `v1-keyboard-background-fix-01`, reproduced by the complete
+seven-stage `v1-fixes-rebuild-01`. This is implementation progress, not acceptance
+of every reported case. Next:
+
+- Update the shared progress counter to select and verify the actual corrected
+  cartridge, including the newly identified embedded prompts/defaults and HUD
+  wording. Its older `*/build.json` selector misses these `fixes.json` candidates;
+  do not report the older artwork-only build as a measurement of current work.
+- Assemble the combined patch-only playtest package with the new receipt and
+  source/ROM/UPS hashes. Run the standalone patcher and the assembled-candidate
+  regression pass. The older package `05` is a retained baseline, not this fix.
+- Retain passing pixel-editor and letter UI native evidence. The background
+  probe has reached its setup retry limit: native drawing returned and geometry
+  passed, but later guard checks remain unrun after a classified comparator
+  error. Record this limitation; do not repeat the unchanged fixture batch.
+- Recheck ordinary letter opening/defaults, recipient selection, all reported
+  screen appearances, keyboard feedback, and inventory digits on the playable
+  candidate. The shared recipient fix covers all villagers, not only Limberg;
+  preserve correct English names, player names, and saved identities.
+
+Broader remaining work follows the combined-fix integration:
 
 1. Perform bounded ordinary appearance acceptance of the shared festival stall
    and fortune table when a suitable isolated scene is available. Retain both

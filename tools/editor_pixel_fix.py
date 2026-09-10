@@ -175,11 +175,12 @@ SECTIONS {{
     return bytes(data), relocation, report
 
 
-def build(native, base, out):
+def build(native, base, out, *, module=None):
     verified_rom(native)
     if sha256(base) != BASE_SHA: raise ValueError('Pixel editor requires the corrected title baseline')
     from runtime_module import MODULE_VROM, verify_test_module
-    module = json.loads((ROOT/'build/civic-interior-artwork-01/build.json').read_text())['runtime_module']
+    if module is None:
+        module = json.loads((ROOT/'build/civic-interior-artwork-01/build.json').read_text())['runtime_module']
     verify_test_module(base, module)
     for symbol, address in dict(COMMON, af_mail_read_body=0x80199434, af_mail_read_footer=0x80199650).items():
         if int(module['symbols'][symbol], 16) != address: raise ValueError('Changed resident layout import')

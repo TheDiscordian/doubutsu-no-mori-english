@@ -2,59 +2,41 @@
 
 ## Builds
 
-The first original-hardware V1 playtest of `title-stall-combined-01` reports
-corrupt Press Start graphics, broken mail/board editor spacing, remaining
-Japanese interface/name readers, and keyboard polish needs. The
-[bug list](V1_PLAYTEST_BUGS.md) is the current implementation priority. Existing
-host/emulator checks do not override these observations, and later artwork-only
-packages must not be described as correcting them.
+The combined human-playtest correction candidate is
+`build/v1-keyboard-background-fix-01/animal-forest-title-preview.z64`.
+Its fresh seven-stage reconstruction at
+`build/v1-fixes-rebuild-01/animal-forest-title-preview.z64` has the same ROM and
+UPS hashes. It requires an Expansion Pak. The [bug list](V1_PLAYTEST_BUGS.md)
+tracks implementation and acceptance separately; this is not a completed
+public release or a hardware-certified build.
 
-An [intermediate Press Start correction](checkpoints/V1_FIRST_PLAYTEST_FIXES.md)
-is built at `build/v1-playtest-fixes-01/animal-forest-title-preview.z64`. It fixes
-the donor's incorrectly converted pixel storage without code/allocation changes;
-three focused source/retention/patch tests pass. The remaining playtest findings
-stay open, and this is not yet the combined fix handoff.
+Installed corrections cover Press Start pixels, proportional mail/notice editing,
+navigation sound calls, Camera/Your Bells images, AM/PM placement, date slashes,
+town-tune labels/OK, inventory money sizing, letter prompts/defaults/recipient
+display, and the GC-style shaded keyboard background. The recipient reader
+supports all 216 villager identities; Limberg is the reported example, not a
+hard-coded exception. Player names and saved identities remain unchanged.
 
-The next [editor correction](checkpoints/V1_FIRST_PLAYTEST_FIXES.md) is built at
-`build/v1-editor-pixel-fix-03/animal-forest-title-preview.z64`. It retains that
-title correction and aligns draft wrapping, caret, and vertical navigation with
-the English read layout. Four focused sanitizer/font/ROM checks pass, along with
-16 native calls and 45 assertions with intact guards and restored checkpoint.
-Original-hardware rechecking remains; Japanese labels and the keyboard
-background are still open. This is an intermediate candidate, not a completed
-playtest-fix package.
+Focused source/ROM/patch checks pass for each batch. The pixel editor has
+passing native call/guard evidence. Letter UI checks verify representative
+recipient names and native prompt/default handling with saved data and guards
+retained. The background has only partial native evidence: its drawing returns
+and geometry checks pass, but a classified test comparison error prevents the
+later save/guard checks from running. Those checks are not marked passed.
+See the [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
+[background](checkpoints/V1_KEYBOARD_BACKGROUND_FIX.md) checkpoints.
 
-The [HUD correction](checkpoints/V1_HUD_LABEL_FIXES.md) adds the English GC
-Camera and Your Bells images and moves AM/PM after the idle time. The combined
-intermediate is `build/v1-hud-label-fix-02/animal-forest-title-preview.z64`.
-Four focused checks pass; this data-only batch preserves CPU code, allocations,
-timekeeping, and saved data. Remaining playtest findings stay open.
+Remaining integration includes current-cartridge progress verification, the
+combined patch package, and the assembled-candidate regression pass. Ordinary
+letter opening, screen appearance, audible keyboard feedback, and hardware
+rechecking remain acceptance work. Broad human playtesting cannot block the
+build that enables it; confirmed game crashes or data corruption must be fixed.
 
-The [notice/tune correction](checkpoints/V1_NOTICE_TUNE_FIXES.md) removes the
-two obsolete date slashes, installs the GC A–G/? note images, and places OK at
-the GC coordinates. The combined intermediate is
-`build/v1-notice-tune-fix-01/animal-forest-title-preview.z64`; four focused checks
-pass. The reported inventory Bells-digit sizing joins the active bug list.
-
-The [inventory money correction](checkpoints/V1_INVENTORY_MONEY_FIX.md) widens
-and repositions only the digits inside their five native bubbles. Three focused
-checks pass. The combined intermediate is
-`build/v1-inventory-money-fix-01/animal-forest-title-preview.z64`; dialogue font
-spacing, digit height, money values, and saved formats remain unchanged.
-
-The [letter UI correction](checkpoints/V1_LETTER_UI_FIXES.md) adds the two GC
-address prompts, identity-based full English recipient display, and bounded
-To/from draft defaults. Three focused checks pass. Native execution verifies
-Limberg, Buzz, and a player name, then thirteen calls/thirty assertions verify
-prompt drawing, defaults, saved-data retention, and memory guards. The combined
-intermediate is `build/v1-letter-ui-fix-02/animal-forest-title-preview.z64`.
-The keyboard background and combined fix packaging remain implementation work;
-ordinary letter opening and hardware rechecking remain acceptance work.
-
-The supplied private artwork playtest is
+The retained artwork-only reference package is
 `build/releases/v1-artwork-playtest-05.zip`, with local ROM
 `build/title-civic-interior-combined-01/animal-forest-title-preview.z64`.
-It requires an Expansion Pak. Its patcher/reconstruction tests pass, and the
+It does not include these human-playtest corrections. Its patcher/reconstruction
+tests pass, and the
 [package checkpoint](checkpoints/V1_PLAYTEST_PACKAGE.md) records hashes,
 source revisions, contents, and limitations. It is not a public release or
 original-hardware certification.
@@ -139,7 +121,7 @@ remain unchanged. A read-only matching tool now links supported N64 material
 candidates to named GC texels and records unmatched candidates and excluded
 formats/readers. It helps target remaining inspection; it does not grant text
 credit or claim complete artwork coverage. No replacement ROM is needed for
-this review-only work; playtest `05` remains the current candidate.
+this review-only work; the combined playtest-fix build remains the current candidate.
 
 ## Remaining work and evidence limits
 

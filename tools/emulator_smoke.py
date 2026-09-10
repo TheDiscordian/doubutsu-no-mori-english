@@ -1185,6 +1185,12 @@ def main():
                     raise ValueError('Letter UI checks require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, action['test_letter_ui'], record))
+            if 'test_keyboard_background' in action:
+                from keyboard_background_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Keyboard background checks require a saved emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, action['test_keyboard_background'], record))
             if 'test_fortunes' in action:
                 from fortune_smoke import exercise
                 if not (out/'test.bs1').is_file():
