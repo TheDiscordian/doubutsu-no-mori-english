@@ -35,6 +35,10 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   Cross-version save compatibility is preferred, not mandatory. A necessary
   format change is acceptable with an explicit warning; unintended crashes
   remain stability defects independently of that preference.
+- Do not create further release candidates. Finish remaining V1 work in the
+  development build, then name the next release `V1 Final`. Preserve existing
+  RC artifacts and accepted results. Package once the V1 implementation and
+  bounded verification are complete; keep public publication approval separate.
 - Keep progress updates in chat and describe concrete completed work. Do not
   open repeated status renders or repeat an unchanged completion percentage.
 - When asked for total translation progress, run `python3 tools/translation_progress.py`

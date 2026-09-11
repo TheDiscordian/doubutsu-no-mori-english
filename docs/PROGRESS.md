@@ -12,6 +12,11 @@ menu labels and genuinely untested areas retain their own limits.
 
 ## Builds
 
+The next release is `V1 Final`. Remaining implementation and review use the
+development build; no further RCs are created. Final packaging follows completed
+V1 work rather than each individual batch. Existing RCs and their accepted
+results remain preserved.
+
 The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) applies
 V1-29: eleven generation stages, the Famicom index label, and an unused reserve
 literal. All thirteen fit their existing slots without changed instructions,
@@ -19,8 +24,9 @@ pointers, allocations, or saved formats. Four focused checks, the clean committe
 construction from RC8, and complete UPS reconstruction pass. The development
 ROM is `build/main-diagnostic-text-01/animal-forest-diagnostic-text.z64`.
 `make complete` includes this final data-only step; the composed 109-stage
-command is not rerun end to end. RC8 remains the named handoff until the next
-combined package includes this stage. No old build or gameplay test is repeated.
+command is not rerun end to end. RC8 remains the existing named handoff; the
+diagnostic stage is included when `V1 Final` is ready. No old build or gameplay
+test is repeated.
 
 The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects the
 nineteen correction stages after the artwork/title baseline, including the new

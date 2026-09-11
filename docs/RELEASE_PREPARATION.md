@@ -4,6 +4,8 @@ The current deliverable is the private playtest identified in
 [progress](PROGRESS.md), not a public release.
 The repository remains private. This document separates technical packaging
 evidence from attribution, redistribution review, and gameplay acceptance.
+The next release is named `V1 Final`; no additional RC packages are produced.
+Complete remaining V1 work in the development build before final packaging.
 The [provenance checkpoint](checkpoints/RELEASE_PROVENANCE_REVIEW.md) binds the
 inspected source versions, archive contents, and remaining limits.
 

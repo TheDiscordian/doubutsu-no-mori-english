@@ -2,6 +2,12 @@
 
 ## Next work
 
+Finish remaining V1 content and release preparation in the development build.
+Do not create more RCs or spend a batch repackaging each completed change. The
+next release is named `V1 Final`; assemble its final patch package after the
+remaining implementation and bounded verification are complete. Keep public
+publication approval separate and preserve all existing RC artifacts.
+
 All user-reported issues (V1-01 through V1-23 and the reported v0 corrections)
 and the ordinary save/restart/reload cycle have
 [explicit human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md). They are closed,
@@ -20,7 +26,7 @@ The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) adds
 thirteen complete English literals beyond RC8 (V1-29). Four focused checks,
 the committed construction, and full UPS reconstruction pass. No instruction,
 pointer, allocation, or saved-format change is made. Include this completed
-stage in the next combined patch package; do not repeat its checks or launch
+stage in `V1 Final` when the remaining work is complete; do not repeat its checks or launch
 the full 109-stage command. Its new final command already follows the existing
 correction runner in `make complete`.
 
@@ -37,8 +43,8 @@ nineteen correction stages to `make complete`. The committed correction run and
 its completed-run check pass; `build/v1-current-01/final/` matches the independent
 scene-menu ROM and UPS. Preserve those results. Do not re-test old builds or
 launch the full 108-stage historical replay; it is not a final-V1 task.
-The RC8 patch package is complete; add the later diagnostic stage to the next
-package and finish remaining release/content work. Preserve completed direct-font
+The RC8 patch package is complete; finish remaining release/content work before
+packaging `V1 Final` with the later diagnostic stage. Preserve completed direct-font
 scans, scene-menu review, and rejected
 old-reader/padding classifications. New concrete bugs take precedence; historical
 fixture repair is not work to resume without a relevant current failure.
@@ -191,11 +197,12 @@ Broader remaining work follows the combined-fix integration:
    and the user's explicit choice. This applies to all three menu icons and the
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
-3. Keep the combined private playtest package aligned with checked corrections
-   and artwork batches. V1RC8 retains the shared-stall candidate, seven English
-   Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
-   earlier artifacts and all explicit evidence limits; use verified source/ROM/
-   UPS/report hashes and execute the standalone patcher before handoff.
+3. Complete V1 in the development build, then prepare the `V1 Final` patch-only
+   package. Do not produce further RCs. Retain the shared stall, seven English
+   Nookington interior signs, police-interior posters, postal MAIL bag, and all
+   later corrections. Preserve earlier artifacts and explicit evidence limits;
+   use verified source/ROM/UPS/report hashes and execute the standalone patcher
+   on the final package before handoff.
 4. Address concrete human playtest bugs immediately, prioritising crashes,
    save damage, memory corruption, and blocked progression. The Nook furniture
    whole-conversation loop and letter-advice cleanup are already fixed and
