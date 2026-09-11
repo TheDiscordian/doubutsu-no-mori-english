@@ -24,10 +24,11 @@ and its source-bound receipt; keep RC7 as the named handoff until a subsequent
 combined package is checked. Do not enable the
 debug menu or invoke its state-changing initializer to validate wording.
 
-Integrate the accumulated RC correction stages into the documented reproducible
-final-candidate build path: `make complete` currently stops before those fixes.
-Reuse existing guarded builders and clean-rebuild evidence; do not replay
-completed historical recipes merely to refresh evidence. Preserve completed
+The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) implements
+the missing correction suffix and connects it to `make complete`. Execute the
+committed correction-only recipe, then the complete 108-stage isolated command
+once to verify the new integration. Preserve successful boundaries and diagnose
+failures without repeating completed unrelated tests. Preserve completed
 direct-font scans, scene-menu review, and rejected old-reader/padding classifications.
 Prioritise new human findings, then remaining English readers/artwork and scoped
 fixture follow-up. V2 stays deferred until V1 completion.

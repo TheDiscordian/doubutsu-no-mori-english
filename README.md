@@ -40,12 +40,11 @@ obtained source ROM is required to build; ROMs and extracted assets stay local.
 3. Complete ordinary gameplay and original-hardware acceptance through playtesting.
 4. Prepare the patch-only public release with provenance review.
 
-`make complete` rebuilds the base and v1 layers from clean source checkouts and
-verified local inputs, without old generated resources or translation ROMs. The
+`make complete` rebuilds the base, v1 artwork, and all current correction layers
+from clean source checkouts and verified local inputs. The
 [build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
-The V1RC1 corrections follow that artwork/title baseline through the separate
-seven-stage `tools/rebuild_v1_fixes.py` recipe; `make complete` alone does not
-include that correction suffix. Its verified output is recorded in the
+The seven-stage `tools/rebuild_v1_fixes.py` recipe provides the V1RC1 corrections
+after the artwork/title baseline. Its verified output is recorded in the
 [V1RC1 checkpoint](docs/checkpoints/V1RC1_PACKAGE.md).
 The three-stage `tools/rebuild_v1rc2.py` adds the RC1 hardware follow-up and
 matches the [V1RC2 package](docs/checkpoints/V1RC2_PACKAGE.md).
@@ -55,7 +54,9 @@ matches the [V1RC3 package](docs/checkpoints/V1RC3_PACKAGE.md).
 marker correction; its output matches [V1RC4](docs/checkpoints/V1RC4_PACKAGE.md).
 The catalogue/repayment, tune/Pak, title-warning, and gamestate-label correction
 stages extend that recipe to the [current RC7](docs/checkpoints/V1RC7_PACKAGE.md).
-`make complete` alone does not include these correction stages.
+The [current correction runner](specs/CURRENT_V1_REBUILD.md) combines those
+recipes and the scene-menu translation without retained RC inputs. Its complete
+execution status is recorded in [the checkpoint](docs/checkpoints/CURRENT_V1_REBUILD.md).
 RC3 has a known town-loading memory defect; use the current RC7 handoff. The
 [N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) remains deferred until V1 is
 fully complete.

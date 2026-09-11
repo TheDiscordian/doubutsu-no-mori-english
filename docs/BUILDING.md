@@ -27,10 +27,10 @@ Expected local files:
 submodule and fetches the pinned GameCube reference checkout if missing.
 `make references` verifies both pins and tracked source cleanliness.
 
-## Complete post-v0 artwork recipe
+## Complete current V1 recipe
 
-To regenerate the base translation and then its v1 layers without any retained
-build outputs:
+To regenerate the base translation, artwork/title, and all current corrections
+without retained build outputs:
 
 ```sh
 make complete V0_OUT=build/complete-rebuilt
@@ -39,10 +39,18 @@ make complete V0_OUT=build/complete-rebuilt
 The base recipe creates an isolated source checkout with an empty `build/`,
 copies the three verified inputs listed above, and clones the pinned local
 reference sources. It regenerates all resources and compiles all overlays before
-assembling corrected v0. The second command runs the post-v0 recipe from inside
-that checkout, using the freshly generated base and GC resources. Final v1 files
-are under `build/complete-rebuilt/source/build/v1-complete/final/`. Both recipes refuse existing output
-directories. No gameplay scenarios run, and no old artifact or user save changes.
+assembling corrected v0. The second command runs the 28-stage artwork/title
+recipe inside that checkout. The third adds all nineteen current correction
+stages, using those freshly generated inputs. Final files are under
+`build/complete-rebuilt/source/build/v1-current/final/`: the named
+`Animal Forest English V1-current.z64`, original-ROM UPS, and build report.
+The default commands refuse existing outputs. No gameplay scenarios run, and
+no old artifact or user save changes.
+
+The [current integration checkpoint](checkpoints/CURRENT_V1_REBUILD.md) records
+verification of the complete 108-stage command and correction-only runner,
+including explicit pending execution where applicable. Do not treat earlier
+base/artwork evidence as execution of the new correction suffix.
 
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
@@ -72,8 +80,9 @@ This single command recreates all 28 post-v0 stages and independently compiles
 the keyboard, birthday drawer, title, and native artwork commands. It reads the
 verified corrected v0 ROM/report, original N64 ROM, decoded English GC REL, and
 pinned source/symbol files. It does not need retained intermediate artwork ROMs
-or old compiled overlay directories. The exact current playtest ROM, UPS, and
-title-report approval profile must match before a `final/` output is created.
+or old compiled overlay directories. The exact artwork-baseline ROM, UPS, and title-report approval profile must
+match before that component's `final/` output is created. This artwork-only
+command does not include the subsequent human-playtest corrections.
 Actual report hashes retain the selected image's provenance; the separately
 recorded comparison profile changes only the recognised compiler-image fields.
 
@@ -91,27 +100,38 @@ prerequisites; the complete recipe above regenerates them. See the
 [recipe specification](../specs/V1_REBUILD.md) and
 [executed rebuild checkpoint](checkpoints/V1_REBUILD.md).
 
-## Current private playtest corrections
+## Current correction-only recipe
 
-The complete artwork recipe above is an explicit baseline, not the latest
-human-playtest correction build. The seven-stage `tools/rebuild_v1_fixes.py`
-adds RC1 corrections; the three-stage `tools/rebuild_v1rc2.py` adds the RC1
-hardware follow-up. Their [RC1](checkpoints/V1RC1_PACKAGE.md) and
-[RC2](checkpoints/V1RC2_PACKAGE.md) checkpoints record exact inputs and outputs.
-
-From the preserved, verified RC2 cartridge, rebuild the current two-stage
-font/transition correction suffix into a fresh directory:
+With a verified complete artwork build and supplied GC inputs, run just the
+nineteen correction stages:
 
 ```sh
-python3 tools/rebuild_v1rc3.py --output build/v1rc3-rebuilt
+python3 tools/rebuild_v1_current.py --artwork build/v1-rebuilt --output build/v1-current
 ```
 
-The recipe compiles the font extension afresh, verifies the transition's single
-changed constant, and reconstructs the complete ROM/UPS while retaining every
-unrelated resource. Sources must be committed and inputs must match the checked
-revisions. Its [package checkpoint](checkpoints/V1RC3_PACKAGE.md) records the
-passing replay, native evidence, and executed standalone patcher. Packaging binds
-the recorded local native-test receipts; it is not a claim of hardware acceptance.
+This invokes the existing RC1–RC4 grouped builders, then catalogue/repayment,
+tune confirmation, Pak heading, controller warning, gamestate labels, and the
+complete scene-menu translation. Every compiler helper is rebuilt; no retained
+RC ROM or compiled correction directory is used. The artwork baseline remains
+an explicit input to this shorter command.
+
+Sources must be committed and both reference checkouts must be clean and pinned.
+Only the checked final ROM/UPS can be published in the output's `final/`.
+Intermediate RC3 output retains its known loading defect and is not a playtest
+handoff. Keep previous candidates and original saves untouched.
+
+An optional `--through <group>` stops at a successful boundary. `--resume`
+requires the same output, inputs, source hashes, compiler selection, and recipe;
+all completed group artifacts and patch reconstruction are checked before reuse.
+An incomplete failed group is preserved for diagnosis, not overwritten or
+treated as passed. See [the recipe specification](../specs/CURRENT_V1_REBUILD.md)
+and [execution checkpoint](checkpoints/CURRENT_V1_REBUILD.md).
+
+The individual `rebuild_v1_fixes.py`, `rebuild_v1rc2.py`,
+`rebuild_v1rc3.py`, and `rebuild_v1rc4.py` tools remain available for scoped
+reproduction. Their standalone defaults require their named predecessor
+builds; the current runner supplies newly constructed predecessors instead.
+Construction is separate from patch packaging and human acceptance.
 
 ## Base translation outputs
 

@@ -47,3 +47,4 @@ v1:
 complete:
 	$(PYTHON) tools/rebuild_v0.py --output "$(V0_OUT)"
 	$(PYTHON) "$(V0_OUT)/source/tools/rebuild_v1.py" --output "$(V0_OUT)/source/build/v1-complete"
+	$(PYTHON) "$(V0_OUT)/source/tools/rebuild_v1_current.py"

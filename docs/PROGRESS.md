@@ -12,6 +12,13 @@ menu labels and genuinely untested areas retain their own limits.
 
 ## Builds
 
+The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects the
+nineteen correction stages after the artwork/title baseline, including the new
+scene-menu text. `make complete` invokes this suffix inside its isolated source
+checkout. Six focused orchestration checks pass; committed correction-only and
+complete clean execution remain pending. This does not change game content or
+reopen accepted gameplay tests.
+
 The [development scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) implements
 V1-28: 76 Japanese scene, loading, and setting strings in the native selector.
 Six focused checks pass, plus the targeted unsupported-control rejection check.
