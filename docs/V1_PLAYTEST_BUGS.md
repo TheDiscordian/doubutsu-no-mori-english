@@ -72,6 +72,7 @@ access. None requires deleting data or invoking a save action to inspect wording
 | V1-26 | Native title controller warning and erase label | Complete English in committed title-warning stage; four focused checks pass; appearance pending |
 | V1-27 | Nine labels in separate player/save gamestates | Complete English in committed gamestate stage; six focused checks pass; access and appearance unverified |
 | V1-28 | Japanese development scene/loading/setting text | All 76 strings translated in scene-menu follow-up; focused checks pass; native appearance/access unverified |
+| V1-29 | Main-program generation/Famicom diagnostics and unused reserve literal | Thirteen complete in-place English strings; four focused checks and committed build/UPS pass; no debug control enabled or ordinary appearance claim |
 
 The [RC6 handoff](checkpoints/V1RC6_PACKAGE.md) contains V1-24/V1-25.
 The [V1RC7 handoff](checkpoints/V1RC7_PACKAGE.md) adds the committed
@@ -83,6 +84,9 @@ The [scene-menu follow-up](checkpoints/SCENE_MENU_TEXT.md) closes that owner's
 Japanese text without enabling its controls. The [current RC8 package](checkpoints/V1RC8_PACKAGE.md)
 contains this batch and every preceding correction, with verified standalone
 patch application and offline instructions.
+The [main-program diagnostic follow-up](checkpoints/MAIN_DIAGNOSTIC_TEXT.md)
+is a completed later stage awaiting the next combined package. It changes only
+literal storage, not reader instructions, generation, item spawning, or saves.
 Lucky-bag Japanese decoration is intentionally retained, matching English GC
 and the user's explicit choice. It is not an open bug.
 The N64-grey keyboard redesign remains V2 work.

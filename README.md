@@ -44,6 +44,10 @@ obtained source ROM is required to build; ROMs and extracted assets stay local.
 `make complete` rebuilds the base, v1 artwork, and all current correction layers
 from clean source checkouts and verified local inputs. The
 [build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
+The later [main-program diagnostic batch](docs/checkpoints/MAIN_DIAGNOSTIC_TEXT.md)
+adds thirteen in-place English literals and is included as the final source-build
+step. Its committed build and patch reconstruction pass; the named RC8 package
+does not yet include this later batch.
 The seven-stage `tools/rebuild_v1_fixes.py` recipe provides the V1RC1 corrections
 after the artwork/title baseline. Its verified output is recorded in the
 [V1RC1 checkpoint](docs/checkpoints/V1RC1_PACKAGE.md).

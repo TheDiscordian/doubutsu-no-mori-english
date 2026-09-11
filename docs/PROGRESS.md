@@ -12,6 +12,16 @@ menu labels and genuinely untested areas retain their own limits.
 
 ## Builds
 
+The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) applies
+V1-29: eleven generation stages, the Famicom index label, and an unused reserve
+literal. All thirteen fit their existing slots without changed instructions,
+pointers, allocations, or saved formats. Four focused checks, the clean committed
+construction from RC8, and complete UPS reconstruction pass. The development
+ROM is `build/main-diagnostic-text-01/animal-forest-diagnostic-text.z64`.
+`make complete` includes this final data-only step; the composed 109-stage
+command is not rerun end to end. RC8 remains the named handoff until the next
+combined package includes this stage. No old build or gameplay test is repeated.
+
 The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects the
 nineteen correction stages after the artwork/title baseline, including the new
 scene-menu text. `make complete` invokes this suffix inside its isolated source

@@ -4,8 +4,12 @@
 
 `make complete V0_OUT=<fresh-build-directory>` runs the isolated base recipe,
 the 28-stage artwork/title recipe inside that checkout, and
-`tools/rebuild_v1_current.py` inside the same checkout. The complete chain has
-61 base stages, 28 artwork stages, and 19 correction stages: 108 in total.
+`tools/rebuild_v1_current.py` inside the same checkout. These three commands
+contain 61 base stages, 28 artwork stages, and 19 correction stages through
+RC8: 108 in total. A fourth command adds the
+[main-program diagnostic text](MAIN_DIAGNOSTIC_TEXT.md), making 109 stages
+and placing the latest result in the isolated checkout's `build/v1-final/`.
+The nineteen-stage runner's own output remains the bound RC8 baseline below.
 The only initial game inputs remain the original N64 ROM, supplied legacy
 reference patch, and English GC disc. Source references and the published
 compiler retain their existing pinned identities.

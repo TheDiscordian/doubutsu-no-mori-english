@@ -16,6 +16,14 @@ longer depends on a private guide link. Preserve `build/v1rc8` and all earlier
 artifacts. RC7 save compatibility is expected in both directions without migration.
 Do not confuse retained human acceptance with fresh execution of RC8's new labels.
 
+The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) adds
+thirteen complete English literals beyond RC8 (V1-29). Four focused checks,
+the committed construction, and full UPS reconstruction pass. No instruction,
+pointer, allocation, or saved-format change is made. Include this completed
+stage in the next combined patch package; do not repeat its checks or launch
+the full 109-stage command. Its new final command already follows the existing
+correction runner in `make complete`.
+
 The [scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) translates all 76 Japanese
 scene/loading/setting strings in that owner, retaining 25 English/neutral strings.
 Its six focused tests, strengthened control-rejection check, clean committed
@@ -29,8 +37,9 @@ nineteen correction stages to `make complete`. The committed correction run and
 its completed-run check pass; `build/v1-current-01/final/` matches the independent
 scene-menu ROM and UPS. Preserve those results. Do not re-test old builds or
 launch the full 108-stage historical replay; it is not a final-V1 task.
-The current combined patch package is complete; finish remaining release/content
-work. Preserve completed direct-font scans, scene-menu review, and rejected
+The RC8 patch package is complete; add the later diagnostic stage to the next
+package and finish remaining release/content work. Preserve completed direct-font
+scans, scene-menu review, and rejected
 old-reader/padding classifications. New concrete bugs take precedence; historical
 fixture repair is not work to resume without a relevant current failure.
 V2 stays deferred until V1 completion.

@@ -40,26 +40,31 @@ The base recipe creates an isolated source checkout with an empty `build/`,
 copies the three verified inputs listed above, and clones the pinned local
 reference sources. It regenerates all resources and compiles all overlays before
 assembling corrected v0. The second command runs the 28-stage artwork/title
-recipe inside that checkout. The third adds all nineteen current correction
-stages, using those freshly generated inputs. Final files are under
-`build/complete-rebuilt/source/build/v1-current/final/`: the named
-`Animal Forest English V1-current.z64`, original-ROM UPS, and build report.
+recipe inside that checkout. The third adds the nineteen correction stages
+through the scene-menu translation, using those freshly generated inputs.
+The fourth applies the thirteen main-program diagnostic literals. Final files
+are under `build/complete-rebuilt/source/build/v1-final/`:
+`animal-forest-diagnostic-text.z64`, its original-ROM UPS, and `fixes.json`.
 The default commands refuse existing outputs. No gameplay scenarios run, and
 no old artifact or user save changes.
 
 The [current integration checkpoint](checkpoints/CURRENT_V1_REBUILD.md) records
 the passing nineteen-stage correction run and its completed-run check. The
-composed 108-stage command has a passing dry run, not fresh end-to-end execution;
-no complete historical replay is queued. Preserve earlier base/artwork evidence
+new [main-diagnostic stage](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) also executes
+successfully from RC8. The composed 109-stage command has a passing dry run,
+not fresh end-to-end execution; no complete historical replay is queued.
+Preserve earlier base/artwork evidence
 separately. Do not re-test old builds or repeat accepted gameplay checks.
 
-The completed current build is packaged with
+The completed RC8 build is packaged with
 `python3 tools/package_v1_current.py --output build/v1rc8-new` from a clean
 committed checkout. The default input is `build/v1-current-01/final`; the
 packager checks only the final current build and executes the new ZIP's patcher,
 without rebuilding or opening historical candidates. The
 [RC8 checkpoint](checkpoints/V1RC8_PACKAGE.md) records the completed package and
-its offline documentation. Existing outputs are never overwritten.
+its offline documentation. This RC8 packager does not yet include the later
+main-diagnostic stage; the next combined package must include it. Existing
+outputs are never overwritten.
 
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
