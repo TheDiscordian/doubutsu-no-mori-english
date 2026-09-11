@@ -69,7 +69,8 @@ static Gfx *af_v2_controls(Gfx *g, float dx, float dy) {
 static void af_v2_labels(void *graph, void *game, float dx, float dy) {
     label(graph,game,"Case",132+dx,117-dy);
     label(graph,game,"Page",173+dx,117-dy);
-    label(graph,game,"Move",29+dx,178-dy);
+    /* The left margin has room for the stick, not another full-size label.
+       Movement is labelled in the bottom control hint. */
     label(graph,game,"Cursor",244+dx,180-dy);
     label(graph,game,"Type",86+dx,200-dy);
     label(graph,game,"Del",129+dx,200-dy);

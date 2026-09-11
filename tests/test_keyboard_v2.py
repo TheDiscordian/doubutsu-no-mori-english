@@ -16,7 +16,7 @@ from keyboard_v2 import (BASE_SHA,VROM,RELOC,OWNER,PREFIX,RAM,CALL,SPEC,BOTTOM,
                          source_hashes,recover,ASSETS,ART_VROM,FRAME_COLOURS,draw_source)
 from npc_mail_show import relocate_verified_data
 
-OUT=ROOT/os.environ.get('AF_V2_BUILD','build/v2-keyboard-03')
+OUT=ROOT/os.environ.get('AF_V2_BUILD','build/v2-keyboard-05')
 
 
 class KeyboardV2Tests(unittest.TestCase):
@@ -77,6 +77,8 @@ class KeyboardV2Tests(unittest.TestCase):
             self.assertFalse(self.report[flag])
         helper,panel=draw_source()
         self.assertIn(b'g=af_v2_controls(g,dx,dy);',helper)
+        controls=(ROOT/'overlays/keyboard_v2/controls.c').read_text()
+        self.assertNotIn('label(graph,game,"Move",',controls)
         for colour in FRAME_COLOURS:
             self.assertIn((','.join(map(str,colour))+',255').encode(),panel)
         # The changed source does not alter the accepted grid coordinates.

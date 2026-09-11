@@ -45,6 +45,24 @@ def write_results(directory, results):
     temporary.replace(directory/"results.json")
 
 
+@contextmanager
+def hold_capture_keys(keyboard, keys, *, pause=time.sleep):
+    """Capture ordinary held-button artwork, releasing inputs even on failure."""
+    if keys is None:
+        yield
+        return
+    if not ((isinstance(keys, str) and keys) or
+            (isinstance(keys, list) and keys and
+             all(isinstance(key, str) and key for key in keys))):
+        raise ValueError("capture_keys must name a key or a nonempty list of keys")
+    try:
+        keyboard.set_pressed(keys, True)
+        pause(0.12)
+        yield
+    finally:
+        keyboard.set_pressed(keys, False)
+
+
 def require_program_counter(registers, expected):
     if (not isinstance(registers,str) or len(registers) != 71*16
             or any(c not in '0123456789abcdefABCDEF' for c in registers)):
@@ -1306,12 +1324,14 @@ def main():
                         raise ValueError(f"Choice {field}: {snapshot.get(field)!r}, expected {expected!r}")
             if "capture" in action:
                 target = out / Path(action["capture"]).name
-                subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
-                                "-draw_mouse", "0" if action.get('hide_cursor') else "1",
-                                "-video_size", "800x640", "-i", display, "-frames:v", "1", str(target)],
-                               env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
-                               stderr=subprocess.PIPE)
-                results.append({"capture": target.name})
+                with hold_capture_keys(keyboard, action.get("capture_keys")):
+                    subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
+                                    "-draw_mouse", "0" if action.get('hide_cursor') else "1",
+                                    "-video_size", "800x640", "-i", display, "-frames:v", "1", str(target)],
+                                   env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.PIPE)
+                results.append({"capture": target.name,
+                                "held_keys": action.get("capture_keys")})
             if action.get("save_state"):
                 keyboard.press("F5", 0.08)
                 time.sleep(1)

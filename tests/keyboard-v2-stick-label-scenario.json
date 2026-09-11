@@ -1,0 +1,10 @@
+[
+  {"wait":10},
+  {"key":"Return","duration":0.3},
+  {"wait":8},
+  {"repeat":23,"actions":[{"key":"a","duration":0.2},{"wait":5},{"snapshot_message":true}]},
+  {"capture":"name-stick-label.png","hide_cursor":true},
+  {"snapshot_keyboard":true,"expect_keyboard":{"mode":3,"columns":6,"rows":1}},
+  {"read":["80000318",4],"expect":"00800000"},
+  {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"}
+]

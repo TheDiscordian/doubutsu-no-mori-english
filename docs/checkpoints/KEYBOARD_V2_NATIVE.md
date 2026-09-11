@@ -1,5 +1,9 @@
 # V2 native verification and contrast work record
 
+The [ordinary-entry follow-up](KEYBOARD_V2_ORDINARY.md) records subsequent
+normal input checks, the final label adjustment, and the current V2 artifact.
+This record preserves the controlled `v2-keyboard-03` evidence.
+
 ## Result
 
 The preceding goal turn makes implementation progress: commit `fe79d8f` adds

@@ -3,22 +3,24 @@
 ## Active development
 
 V2's N64-inspired keyboard is implemented in
-`build/v2-keyboard-03/Animal Forest English V2 Development.z64` on the preserved
+`build/v2-keyboard-05/Animal Forest English V2 Development.z64` on the preserved
 V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
 feedback, and a left-side stick graphic. The complete input/editor prefix,
 key positions, glyph metrics, sound code, and saved formats are retained.
-The suffix uses 7,808 of the existing 8,192 reserved bytes; no pool allocation
+The suffix uses 7,744 of the existing 8,192 reserved bytes; no pool allocation
 changes. Four focused cartridge checks pass on this build; the four decoder
 checks remain applicable to the unchanged decoder.
 
-The controlled native preview passes 155 draws, with all forty key rectangles
-retained, intact guards, and unchanged editor/save data. Screenshot review
-confirms the English keys and hints, N64 icons, and lighter grey panel. The
-panel shading is adjusted after identifying weak contrast in the first build.
-The [native work record](checkpoints/KEYBOARD_V2_NATIVE.md) records exact
-evidence; initial fixture failures are closed as setup issues, not game bugs.
-Ordinary-menu/pressed-state appearance and V2 hardware acceptance remain open
-for human playtesting. No additional preview loop or old-build replay is queued.
+Ordinary name entry passes: letters, spaces, caret movement, deletion, and
+Start confirmation back to Rover. Isolated screenshots cover the panel and
+representative held N64 controls. Review identifies a crowded left-side `Move`
+label; the current build removes it and retains the stick and bottom movement
+hint. The final removal passes artifact checks without another native replay.
+The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) distinguishes
+each executed build from this final adjustment. The earlier 155-draw controlled
+preview retains its guard/geometry/material evidence and is not repeated.
+Other keyboard callers, remaining pressed states, and V2 hardware acceptance
+remain playtest limits. No additional preview loop or old-build replay is queued.
 V1 Final remains unchanged. No public release is authorised; all artifacts
 remain private. Expected V1 Final ↔ V2 save compatibility needs no migration,
 but those particular loading directions are not independently executed.

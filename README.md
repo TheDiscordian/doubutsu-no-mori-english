@@ -7,21 +7,24 @@ The repository and release artifacts remain private; no public upload is made.
 ## V2 development
 
 The N64-inspired keyboard is implemented in
-`build/v2-keyboard-03/Animal Forest English V2 Development.z64`, with a matching
+`build/v2-keyboard-05/Animal Forest English V2 Development.z64`, with a matching
 UPS alongside it. It adds grey panel shading, native N64 control artwork,
 pressed-button feedback, and a left-side stick image. Accepted key positions,
 font metrics, input behaviour, sounds, and saved formats are retained.
 
-Four focused cartridge/retention checks pass on this build. The controlled
-native preview passes 155 draws with intact guards and unchanged editor/save
-data; screenshot review confirms visible English keys, control labels, and
-N64 icons. The panel uses lighter grey shading for readable hints. The four
-decoder checks remain applicable to the unchanged decoder.
+Four focused cartridge/retention checks pass on this build. Ordinary name
+entry, spaces, caret movement, deletion, and Start confirmation pass on the
+same keyboard before its final redundant-label removal. Isolated screenshots
+cover the grey panel, N64 icons, and representative held controls. The final
+adjustment removes the crowded left-side `Move` label while retaining the
+stick graphic and bottom movement hint. It has focused artifact checks, not
+another native replay. The earlier controlled preview and decoder evidence
+remain applicable to the retained geometry/materials and decoder.
 
-Ordinary-menu appearance, pressed-state appearance, and V2 hardware/save-load
-acceptance remain human-playtest work, not completed proof. V1 Final stays
-untouched. See the [V2 native work record](docs/checkpoints/KEYBOARD_V2_NATIVE.md)
-for exact hashes and verification limits. No public release is authorised.
+Other keyboard callers, remaining pressed states, and V2 hardware/save-load
+acceptance remain playtest limits. V1 Final stays untouched. See the
+[V2 ordinary work record](docs/checkpoints/KEYBOARD_V2_ORDINARY.md) for exact
+hashes and verification limits. No public release is authorised.
 
 ## V1 Final
 

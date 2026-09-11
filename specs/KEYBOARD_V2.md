@@ -59,11 +59,14 @@ transparent margins leave the visible stick to the left of the key grid.
 The stick is a static illustration, not a new input-control implementation.
 English hints retain case, page, order, movement, caret, insert, delete, space,
 completion, and alteration instructions. Plus signs use the native font code.
+Movement is explained in the bottom control hint. Do not place a separate
+full-size `Move` label beside the stick: the curved panel edge and staggered
+keys leave insufficient readable space for that redundant hint.
 
 Every icon is clipped before emitting an unsigned RDP rectangle. Frame/icon/key
 commands reserve 8,192 graphics bytes before emission; each subsequent font
-call retains its own existing buffer check. The current suffix occupies 7,808
-rounded bytes inside the existing 8,192-byte overlay reservation, leaving 384
+call retains its own existing buffer check. The current suffix occupies 7,744
+rounded bytes inside the existing 8,192-byte overlay reservation, leaving 448
 bytes. No additional pool allocation, resident module, or saved fields change.
 
 ## Ownership
@@ -86,7 +89,8 @@ DMA identity, and its UPS must reconstruct the complete output.
 ## Current verification boundary
 
 Four current artifact checks pass, and the unchanged decoder retains its four
-passing checks. Controlled native drawing and screenshot review pass. The
+passing checks. Controlled native drawing and screenshot review pass on the
+recorded `v2-keyboard-03` build before the redundant-label removal. The
 checkpoint-restored preview uses verified-empty Expansion Pak scratch, with
 the relocation model explicitly configured for eight MiB. The preview binds
 the cartridge loader, loads the installed keyboard and native matrix callback,
@@ -100,8 +104,11 @@ Use the isolated emulator display to judge appearance: debugger RAM framebuffer
 reads can contain unfinished GPU output. Do not mistake a partially drawn RAM
 image or omitted title-fixture menu setup for a cartridge rendering defect.
 
-The [native work record](../docs/checkpoints/KEYBOARD_V2_NATIVE.md) contains the
-current hashes, successful checks, and inspected screenshot. Ordinary menu
-integration, pressed-state appearance, and original-hardware acceptance remain
-human-playtest limits. Unchanged saved formats support expected V1 Final ↔ V2
+The [ordinary work record](../docs/checkpoints/KEYBOARD_V2_ORDINARY.md) contains
+the current hashes and exact executed builds. Ordinary name entry, spaces,
+caret movement, deletion, and Start confirmation pass. Representative held
+controls are reviewed in isolated screenshots. The final redundant-label
+removal receives focused cartridge checks, without another native replay.
+Other keyboard callers, remaining pressed states, and original hardware remain
+playtest limits. Unchanged saved formats support expected V1 Final ↔ V2
 compatibility, not a claim that those loading directions have been executed.
