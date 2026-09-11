@@ -11,6 +11,16 @@ arguments, not screen pixels. Distinguish expected RC4 save compatibility from
 untested RC5 loading/save cycles. Prioritise new human findings, then remaining
 English artwork and scoped fixture follow-up; V2 stays deferred until V1 acceptance.
 
+The separate [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
+V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
+instruction. Eight focused checks and both committed builds pass. Include
+`build/menu-text-followup-01/animal-forest-menu-followup.z64` in the next named
+candidate without overwriting RC5, and execute that package's standalone patcher.
+Preserve these checks instead of rerunning unchanged readers. Ordinary appearance
+is pending; do not invoke destructive Pak operations to validate a heading.
+The source review covers selected unchanged small submenu owners, not every
+embedded string or artwork image. Continue other unreviewed readers as useful.
+
 The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
 packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
 faulted thread. Controller movement, complete loaded font, owner guards, and

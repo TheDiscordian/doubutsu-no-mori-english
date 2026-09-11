@@ -10,6 +10,15 @@ the native check; screen appearance is not claimed verified. The committed
 rebuild, two package checks, and archived standalone patcher pass. Prices,
 transactions, save formats, and previous fixes are retained.
 
+The [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) corrects two more
+source-identified omissions: the town-tune confirmation's complete GC
+`Are you sure?` / `Yes` / `No`, and the N64-only `Erase a Pak note` instruction.
+Eight focused checks and both committed construction stages pass. The separate
+combined development ROM is `build/menu-text-followup-01/animal-forest-menu-followup.z64`.
+It retains all RC5 fixes and introduces no allocation, relocation, transaction,
+or save-format changes. Ordinary appearance remains pending; RC5 stays the
+named handoff until these corrections are included in the next package.
+
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
 after the complete bordered font moves to its own Expansion Pak region. The
@@ -191,8 +200,8 @@ development Docker image. Source inputs remain local and separately licensed.
 
 ## Implemented scope
 
-The combined candidates include proportional Latin rendering, complete known
-English text and its name/letter/editor consumers, the English animated title,
+The combined candidates include proportional Latin rendering, English dialogue
+and its integrated name/letter/editor consumers, the English animated title,
 and GameCube-style keyboard with native N64 controls and saved capacities.
 Screen work covers map, inventory, clock, collections, catalogue, bulletin board,
 town tune, birthday, Controller Pak, editor confirmation, warning windows,
@@ -203,7 +212,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC4 notes](V1RC4_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC5 notes](V1RC5_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
