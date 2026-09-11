@@ -209,6 +209,13 @@ not establish ordinary scene acceptance or a full native-house artwork review.
 
 ## Source-matching inventory
 
+The [matching detail review](checkpoints/MATCHED_DETAIL_ARTWORK_REVIEW.md)
+closes 35 selected phone, police/postal, Redd, register/sign-edge, and book images.
+All selected visible pixels already match English GC and remain intact in RC4.
+Retain their neutral surfaces and small donor-retained decorative marks; no new
+English wording is claimed. The existing welcome-sign palette correction also
+preserves the reviewed sign edge. Do not repeat this selected group.
+
 `tools/artwork_matches.py` creates a new read-only candidate report in `build/`.
 The [specification](../specs/ARTWORK_MATCH_INVENTORY.md) defines its supported
 formats, actual GC source bindings, and explicit exclusions. The recorded run

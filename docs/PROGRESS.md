@@ -250,6 +250,13 @@ It is not an outstanding translation task or new English credit. The stall
 adaptation still needs ordinary appearance acceptance. Other unreviewed game images
 are not declared complete by the scoped seasonal-prop inspection.
 
+The [matching detail review](checkpoints/MATCHED_DETAIL_ARTWORK_REVIEW.md)
+closes 35 further selected room/prop images. Their visible pixels already match
+English GC, and all selected material sequences and visible pixels are retained
+in RC4. No readable Japanese wording is identified; small donor-retained marks
+receive no invented transcription. This is review progress, not newly applied
+English text, a changed ROM, or ordinary scene acceptance.
+
 The embedded warning drawing probe remains incomplete after its permitted setup
 retry; do not repeat that setup batch. Birthday and gyroid controlled drawing,
 title/START/low-memory, and corrected keyboard input have passing native evidence

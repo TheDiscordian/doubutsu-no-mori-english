@@ -169,6 +169,11 @@ Broader remaining work follows the combined-fix integration:
    without repeating that inspection. The identified hiring notice is corrected
    to match English GC's omission. Check current installed resources first;
    unmatched originals include images already translated by earlier batches.
+   The [matching detail review](checkpoints/MATCHED_DETAIL_ARTWORK_REVIEW.md)
+   closes 35 selected phone, police/postal, Redd, register/sign-edge, and book
+   textures. Complete visible-colour matches and RC4 retention pass; preserve
+   these images without repeating their inspection. Their small decorative
+   marks are retained in English GC, not newly translated wording.
 
 ## Human playthrough and polish
 
