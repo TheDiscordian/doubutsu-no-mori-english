@@ -30,6 +30,15 @@ are recorded in the checkpoint. This correction is not yet in the named RC6
 handoff. No save format, artwork, or allocation changes;
 native rendering and hardware appearance remain unverified.
 
+The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
+V1-27: nine complete labels in the separate native player-selection/save-menu
+gamestates. Six focused checks pass for original text, longer display copies,
+stack/field boundaries, relocated pointers, unchanged metadata/actions, and
+complete cartridge/UPS retention. No allocations or saved formats change.
+These labels follow the title-warning stage and are not yet in the named RC6.
+Ordinary accessibility and hardware appearance remain unverified; no save
+operation is executed to test their wording.
+
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
 after the complete bordered font moves to its own Expansion Pak region. The

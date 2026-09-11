@@ -2,6 +2,14 @@
 
 ## Next work
 
+The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
+nine complete native labels (V1-27), with six focused checks passing. Build the
+committed stage and retain its receipt, then package it with the completed title
+warning into the next named candidate. RC6 remains the existing handoff. Keep
+save compatibility expectations separate from unverified loading/save cycles;
+do not invoke save/deletion actions merely to test labels. The separate debug
+scene-name table is an unreviewed lead, using a different graphics-print encoding.
+
 The [title-warning follow-up](checkpoints/TITLE_WARNING_TEXT.md) implements the
 live native missing-controller warning and retained erase-save label (V1-26).
 Four focused checks, committed construction, and UPS reconstruction pass. Retain
@@ -9,8 +17,8 @@ Four focused checks, committed construction, and UPS reconstruction pass. Retain
 corrections into the next named candidate. RC6 remains the existing handoff,
 without this later correction. Do not rerun unchanged title
 animation or low-memory scenarios, and do not execute a delete operation to
-validate a label. The checkpoint also records separate gamestate
-text leads and rejected old-reader/padding hits; use those classifications to
+validate a label. Its separate gamestate leads have the correction above;
+retain its rejected old-reader/padding classifications to
 avoid repeating discovery work.
 
 The current named handoff is [V1RC6](checkpoints/V1RC6_PACKAGE.md), containing

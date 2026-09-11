@@ -50,6 +50,14 @@ all three warning lines. Four focused checks pass; native rendering and hardware
 appearance remain unverified. This follow-up is not yet in the named RC6 handoff.
 Controller detection, menu actions, and saved formats are unchanged.
 
+V1-27 is a source finding in the separate player-selection and save-menu
+gamestates: nine headings, status labels, and destination labels retain Japanese.
+The [gamestate correction](checkpoints/GAMESTATE_MENU_TEXT.md) applies complete
+English with six passing focused checks. It retains saved identities, actions,
+metadata, allocation, and original slot numbers, with longer display copies
+bounded inside existing storage. Ordinary access and hardware appearance remain
+unverified; this follow-up is not yet in the named RC6 handoff.
+
 V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
 load both the user's RC1 and RC2 saves, while a new file works. The copied RC2
 save reproduces an overlay-manager out-of-memory fault in RC3, with only 304
