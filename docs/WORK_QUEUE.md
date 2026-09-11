@@ -8,20 +8,20 @@ and the ordinary save/restart/reload cycle have
 not repeat-test tasks. Prioritise the remaining source-identified labels,
 unreviewed content, and release preparation; new concrete bugs take precedence.
 
-The current named handoff is [V1RC7](checkpoints/V1RC7_PACKAGE.md), containing
-all RC6 corrections plus the controller-warning and player/save-gamestate labels
-(V1-26/V1-27). Ten focused correction checks, both committed builds, three package
-checks, and the archived standalone patcher pass. Preserve these results and
-`build/title-warning-text-01`, `build/gamestate-menu-text-01`, and `build/v1rc7`.
-RC6 save compatibility is expected in both directions without migration. Do not
-confuse retained human acceptance with fresh execution of RC7's new labels.
+The current named handoff is [V1RC8](checkpoints/V1RC8_PACKAGE.md), containing
+all RC7 corrections and the 76 scene/loading/settings translations (V1-28).
+Three package checks and the archived standalone patcher pass. The ten-file ZIP
+includes offline application/source guides and bug-report notes; package use no
+longer depends on a private guide link. Preserve `build/v1rc8` and all earlier
+artifacts. RC7 save compatibility is expected in both directions without migration.
+Do not confuse retained human acceptance with fresh execution of RC8's new labels.
 
 The [scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) translates all 76 Japanese
 scene/loading/setting strings in that owner, retaining 25 English/neutral strings.
 Its six focused tests, strengthened control-rejection check, clean committed
 construction, and full UPS reconstruction pass. Preserve `build/scene-menu-text-01`
-and its source-bound receipt; keep RC7 as the named handoff until a subsequent
-combined package is checked. Do not enable the
+and its source-bound receipt; this batch is included in the checked RC8 package.
+Do not enable the
 debug menu or invoke its state-changing initializer to validate wording.
 
 The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects all
@@ -29,7 +29,7 @@ nineteen correction stages to `make complete`. The committed correction run and
 its completed-run check pass; `build/v1-current-01/final/` matches the independent
 scene-menu ROM and UPS. Preserve those results. Do not re-test old builds or
 launch the full 108-stage historical replay; it is not a final-V1 task.
-Prepare the current combined patch package and finish remaining release/content
+The current combined patch package is complete; finish remaining release/content
 work. Preserve completed direct-font scans, scene-menu review, and rejected
 old-reader/padding classifications. New concrete bugs take precedence; historical
 fixture repair is not work to resume without a relevant current failure.
@@ -76,7 +76,7 @@ The V1-17/V1-18 follow-up is implemented in the packaged
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
 focused and controlled native checks. The committed two-stage replay, two
 package tests, and archived standalone patcher pass. RC3 has the confirmed town-
-loading defect above; use the current RC7 handoff, not RC3.
+  loading defect above; use the current RC8 handoff, not RC3.
 Preserve existing ROMs and saves; both reported appearance fixes are human-accepted.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
@@ -175,7 +175,7 @@ Broader remaining work follows the combined-fix integration:
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked corrections
-   and artwork batches. V1RC7 retains the shared-stall candidate, seven English
+   and artwork batches. V1RC8 retains the shared-stall candidate, seven English
    Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.
@@ -254,8 +254,9 @@ not be replayed unchanged.
   Preserve the [scoped provenance review](checkpoints/RELEASE_PROVENANCE_REVIEW.md)
   and [release-preparation checklist](RELEASE_PREPARATION.md). The exact private
   archive contents/checksums and inspected input roles are checked; attribution
-  and technical packaging do not supply redistribution permission. Public
-  documentation access and the user's release approval remain explicit decisions.
+  and technical packaging do not supply redistribution permission. The current
+  package includes offline documentation; source publication and the user's
+  release approval remain explicit decisions.
 - Prepare patch-only reproducible artifacts, verified application, hashes,
   source revisions, compatibility notes, and explicit known issues.
   Retain the [RC4 package-documentation correction](checkpoints/V1RC4_PACKAGE_DOCS.md)

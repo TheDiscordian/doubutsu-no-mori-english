@@ -61,14 +61,14 @@ Reproduce into a fresh directory with
 The complete output retains all RC7 corrections and prior human-accepted fixes.
 RC7 saves are expected compatible in both directions, with no migration or
 saved-format change; these particular directions are not independently tested.
-The new development menu is not entered or enabled. RC7 remains the named
-hardware handoff until a subsequent combined patch package is checked.
+The new development menu is not entered or enabled. The complete result is
+included in the checked [V1RC8 package](V1RC8_PACKAGE.md).
 
 ## Next work
 
 The [current correction recipe](CURRENT_V1_REBUILD.md) includes this batch and
 all preceding RC corrections; its nineteen-stage committed run passes and
-matches this ROM and UPS. Prepare the current combined patch package and finish
+matches this ROM and UPS. The combined RC8 patch package is complete; finish
 remaining release/content work. Do not re-test old builds or queue a complete
 historical replay. Public distribution requirements remain explicit; V2 stays
 deferred.

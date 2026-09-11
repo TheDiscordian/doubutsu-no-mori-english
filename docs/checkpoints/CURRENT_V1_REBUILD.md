@@ -49,6 +49,7 @@ dry-run evidence, not a fresh end-to-end execution claim. Earlier base/artwork
 results and this successful correction run remain separate recorded evidence.
 Do not rerun either solely to renew verification.
 
-Current-candidate packaging and remaining release/content work take priority.
-RC7 remains the named hardware handoff; accepted fixes and saving/reloading stay
-closed. No existing candidate, package, or save is modified.
+The completed output is packaged as [V1RC8](V1RC8_PACKAGE.md), with checked
+offline instructions and standalone patch application. Remaining release/content
+work takes priority; accepted fixes and saving/reloading stay closed. No existing
+candidate, package, or save is modified.

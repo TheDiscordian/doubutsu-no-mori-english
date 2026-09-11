@@ -30,7 +30,7 @@ and only one scene-list X origin changes beyond text/pointers. Native actions,
 initialization, allocations, and saved data remain unchanged. The clean committed
 construction and full UPS reconstruction pass at
 `build/scene-menu-text-01/animal-forest-scene-text.z64`; the checkpoint records
-exact hashes. RC7 remains the named handoff. This is
+exact hashes. The batch is included in the named RC8 handoff. This is
 source-identified text, not an accepted user defect being reopened.
 
 The RC4 catalogue/repayment findings V1-21 through V1-23 have
@@ -94,15 +94,18 @@ Original and isolated seed-save checksums pass; emulator checkpoints are not
 game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
 as separate evidence rather than rerunning either completed setup batch.
 
-The current private playtest is **V1RC7**, with local ROM
-`build/v1rc7/Animal Forest English V1RC7.z64` and patch-only archive
-`build/v1rc7/V1RC7-patch.zip`. The cartridge matches `gamestate-menu-text-01`
-and retains every RC6 fix. Three package checks and the archived standalone
-patcher pass. The [package checkpoint](checkpoints/V1RC7_PACKAGE.md) records
-hashes and committed sources. RC6 save compatibility is expected in both
+The current private playtest is **V1RC8**, with local ROM
+`build/v1rc8/Animal Forest English V1RC8.z64` and patch-only archive
+`build/v1rc8/V1RC8-patch.zip`. The cartridge matches the completed current V1
+build and retains every RC7 fix, adding all 76 scene-menu translations.
+Three package checks pass in 0.443 seconds, and the archived standalone
+patcher recreates the exact current ROM. The ten-file ZIP includes offline
+application/source guides and bug-report notes, closing the private-guide-link
+dependency. The [package checkpoint](checkpoints/V1RC8_PACKAGE.md) records
+hashes and committed sources. RC7 save compatibility is expected in both
 directions, with no migration; these particular loading directions are not
 independently tested. Ordinary save/restart/reload and all reported fixes have
-prior human acceptance, retained separately from RC7's new menu-label changes.
+prior human acceptance, retained separately from RC8's new menu-label changes.
 An Expansion Pak is required. Earlier RCs and the user's saves are preserved.
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
@@ -269,7 +272,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC7 notes](V1RC7_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC8 notes](V1RC8_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 

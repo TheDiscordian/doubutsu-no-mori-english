@@ -32,11 +32,12 @@ save result does not claim a matrix of every old/new candidate combination.
 
 ## Separate remaining scope
 
-V1-24 through V1-27 are source-identified menu omissions, not bugs reported by
+V1-24 through V1-28 are source-identified menu omissions, not bugs reported by
 the user. Their construction checks remain valid; this statement alone does not
 establish their ordinary appearance or the reachability of development menus.
-RC7 is not yet part of the user's hardware sessions. Preserve prior acceptance
-for retained fixes without labelling it fresh RC7 execution.
+The newer RC7/RC8 menu labels are not part of these confirmed hardware sessions.
+Preserve prior acceptance for retained fixes without labelling it fresh candidate
+execution.
 
 Untested seasonal/travel/Pak cases, undiscovered wording/artwork omissions,
 source review, and release preparation keep their actual status. This evidence

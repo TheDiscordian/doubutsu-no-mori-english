@@ -20,9 +20,10 @@ inspected source versions, archive contents, and remaining limits.
 | Compiler and emulator | Separately obtained tools; not bundled in the patch archive |
 | User saves and emulator checkpoints | Local validation inputs; never release material |
 
-The existing archive has only the UPS, manifest, README, source notes, tooling
-licence, two Python files, and checksums. Its standalone application is already
-verified. Keep earlier artifacts intact; review the exact archive selected for
+The [current RC8 archive](checkpoints/V1RC8_PACKAGE.md) has only the UPS,
+manifest, README, source notes, optional toolchain/source guide, bug-report guide,
+tooling licence, two Python files, and checksums. Its standalone application and
+offline-document links are verified. Keep earlier artifacts intact; review the exact archive selected for
 publication rather than treating all files in a build directory as distributable.
 
 The source tree includes translation strings, native command/instruction records,
@@ -55,10 +56,11 @@ the generated resource lacks attribution.
   an absent licence nor a permissive tooling licence is an affirmative clearance.
 - Obtain the user's public-release approval. Do not change repository visibility,
   upload a public patch, or distribute input archives as a side effect of preparation.
-- Decide how public documentation is supplied while the source repository stays
-  private. The private archive's toolchain-guide link requires repository
-  access; it is not a publicly accessible source guide. The patcher itself works
-  offline and does not depend on that link.
+- Preserve the self-contained documentation included in the current package.
+  Patch instructions, credits, compatibility, known limits, and the optional
+  source-build guide need no private documentation link. Source compilation
+  still requires access to the private checkout and separately supplied inputs;
+  publishing that checkout remains a separate decision.
 - Select the final checked candidate and publish only its patch package, source/
   output hashes, required memory/save type, known issues, and compatibility notes.
   A docs-only archive change does not require another gameplay pass or a new ROM.

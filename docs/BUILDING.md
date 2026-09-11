@@ -53,6 +53,14 @@ composed 108-stage command has a passing dry run, not fresh end-to-end execution
 no complete historical replay is queued. Preserve earlier base/artwork evidence
 separately. Do not re-test old builds or repeat accepted gameplay checks.
 
+The completed current build is packaged with
+`python3 tools/package_v1_current.py --output build/v1rc8-new` from a clean
+committed checkout. The default input is `build/v1-current-01/final`; the
+packager checks only the final current build and executes the new ZIP's patcher,
+without rebuilding or opening historical candidates. The
+[RC8 checkpoint](checkpoints/V1RC8_PACKAGE.md) records the completed package and
+its offline documentation. Existing outputs are never overwritten.
+
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The
 [complete pipeline record](checkpoints/V1_REBUILD.md) verifies the 28-stage current

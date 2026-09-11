@@ -11,7 +11,7 @@ checks of these unchanged fixes. Earlier ROMs, saves, and test records stay inta
 
 The confirmation does not identify an exact ROM checksum or every cross-version
 loading direction. It is real-game hardware evidence, not inferred acceptance
-from emulator checks or unchanged formats. RC7's new labels are outside those
+from emulator checks or unchanged formats. The newer RC7/RC8 labels are outside those
 earlier sessions.
 
 ## Accepted reported fixes
@@ -80,7 +80,9 @@ The [V1RC7 handoff](checkpoints/V1RC7_PACKAGE.md) adds the committed
 Controller detection, menu actions, allocations, and saved formats are unchanged.
 
 The [scene-menu follow-up](checkpoints/SCENE_MENU_TEXT.md) closes that owner's
-Japanese text without enabling its controls; it is not yet in named RC7.
+Japanese text without enabling its controls. The [current RC8 package](checkpoints/V1RC8_PACKAGE.md)
+contains this batch and every preceding correction, with verified standalone
+patch application and offline instructions.
 Lucky-bag Japanese decoration is intentionally retained, matching English GC
 and the user's explicit choice. It is not an open bug.
 The N64-grey keyboard redesign remains V2 work.

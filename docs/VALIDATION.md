@@ -26,6 +26,9 @@ cannot block its creation. Untested areas remain labelled, not claimed passed.
   new harness construction/debugging per batch. Record difficult cases for the
   combined bug pass and continue unrelated implementation. Do not weaken guards
   or conceal credible crash/save/memory risks to meet that limit.
+- Do not re-test old builds. Preserve accepted hardware fixes and existing
+  source/native results. Package-only changes require current-package checks,
+  not historical rebuilds or another unchanged gameplay session.
 
 The user plans a human playthrough after the main translation work, reporting
 bugs for the final fix and polish pass. Prepare a broadly complete playable build
@@ -103,6 +106,10 @@ Pak, RTC behaviour, patch and source hashes, and saved-game migration results.
 Run the same menu, name, save, travel, and long-dialogue cases on hardware.
 An emulator boot cannot establish original-hardware stability.
 
-No public release until remaining translations and graphics are reviewed, known
-crashes are reproduced or disproved with evidence, save compatibility is tested,
-and provenance review permits the proposed patch distribution.
+Do not release with known unresolved crashes, save damage, or broken progression.
+Preserve accepted fixes without repeating their reproduction. Complete the
+remaining translation/graphics review and distribution review before public
+release. Document expected and actually tested save compatibility separately;
+cross-version compatibility is preferred, not mandatory, and any incompatibility
+requires an explicit warning. The accepted ordinary save/restart/reload cycle
+does not need repeating for unchanged save code.
