@@ -96,6 +96,11 @@ do not establish acceptance of every reported case. Next:
   and required font capability; do not repeat the completed batch. Remaining
   resource/provenance fixtures retain their unresolved status, and counter-only
   expectation maintenance remains deferred.
+  The [native-item follow-up](checkpoints/NATIVE_ITEM_FIXTURE_FOLLOWUP.md) closes
+  one further error with two passing checks. Preserve the bound historical
+  retention check, explicit current-import rejection, and complete RC4 resource/
+  native-original field checks. The old combined counter/scenario method and
+  other item families retain their unresolved status; do not repeat this batch.
 - Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.

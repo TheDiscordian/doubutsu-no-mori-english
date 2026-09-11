@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'tools'))
 from aflib import apply_ups,by_vrom,sha256,verified_rom
 from build import apply_translations
-from extended_items import VROM,resource
+from extended_items import COUNTS,HEADER,WIDTH,VROM,resource
 from item_aliases import confirmed_aliases
 from item_candidates import item_candidates
 from item_matches import load_matches,validate_candidate
@@ -180,8 +180,38 @@ class NativeItemArtifactTests(unittest.TestCase):
                          {0x010F4000,VROM})
         self.assertEqual(sha256(built),report['output_sha256'])
         self.assertEqual(apply_ups(native,(BUILD/'animal-forest-halfwidth.ups').read_bytes()),built)
-        names = json.loads((ROOT/'build/native-items-resource/names.json').read_text())
-        self.assertEqual(files[VROM].extract(built),resource(native,names['edits']))
+        raw = (ROOT/'build/native-items-resource/names.json').read_bytes()
+        self.assertEqual(sha256(raw),'4546a33ca0ce19089192eefb7abf94107b20ebab2219360395e0f111bbee19a7')
+        names = json.loads(raw)
+        archived = files[VROM].extract(built)
+        self.assertEqual(sha256(archived),'69e7bf2e099e652463deecd3a1416f09774c9b4b4810bfc3cfd104956eff4add')
+        self.assertEqual(sha256(archived),names['data_sha256'])
+        self.assertEqual(names['source_sha256'],sha256(native))
+        # This is a frozen early resource, not a current import approval.
+        # Reconstruct every stored field from the bound historical manifest
+        # and actual native sources; keep current rejection explicit below.
+        info = module_command_info(native)
+        grouped = {r['id']:r for r in names['edits']}
+        self.assertEqual(len(grouped),len(names['edits']))
+        expected_resource = bytearray(HEADER)
+        selected = [b for b in banks(native) if b.name.startswith('item_')]
+        for bank,count in zip(selected,COUNTS,strict=True):
+            self.assertEqual(len(bank.entries()),count+(bank.name=='item_10'))
+            for index,source in enumerate(bank.entries()[:count]):
+                row = grouped.pop(f'{bank.name}:{index:04X}',None)
+                value = source
+                if row is not None:
+                    self.assertEqual(row['source_sha256'],sha256(source))
+                    value = encode(row['translation'],info)
+                    self.assertTrue(0<len(value)<=WIDTH)
+                    self.assertEqual(sha256(value.ljust(WIDTH,b' ')),row['provenance']['reference_sha256'])
+                expected_resource.extend(value.ljust(WIDTH,b' '))
+        self.assertFalse(grouped)
+        self.assertEqual(archived,bytes(expected_resource))
+        # Later native-identity approvals deliberately reject the old donor
+        # metadata. Do not loosen the production importer to rebuild this ROM.
+        with self.assertRaisesRegex(ValueError,'complete original translation and provenance'):
+            resource(native,names['edits'])
         expected = {r['id'] for r in names['edits'] if 'native_item_name' in r}
         self.assertEqual(len(expected),63)
         for kind,field,oldcount,newcount in (('candidates/translations.json',None,13567,13598),
@@ -193,6 +223,49 @@ class NativeItemArtifactTests(unittest.TestCase):
             self.assertTrue(all(b.get(k)==v for k,v in a.items()))
             self.assertEqual(len(b.keys()-a.keys()),newcount-oldcount)
             self.assertTrue(b.keys()-a.keys() <= expected)
+
+
+@unittest.skipUnless((ROOT/'build/v1rc4/Animal Forest English V1RC4.z64').is_file()
+                    and (ROOT/'build/design-items-resource/names.json').is_file(),
+                    'Current cartridge and source-bound item resource required')
+class CurrentNativeItemArtifactTests(unittest.TestCase):
+    def test_current_full_resource_original_names_rotations_and_short_fields(self):
+        from accent_items import build as accented_resource,offset
+        native = verified_rom(ROM.read_bytes())
+        built = (ROOT/'build/v1rc4/Animal Forest English V1RC4.z64').read_bytes()
+        self.assertEqual(sha256(built),'5930435f588947df35313ae9cc2ea301af9fc7e68d59a7d8e13a48741d4f3067')
+        directory = ROOT/'build/design-items-resource'
+        names = json.loads((directory/'names.json').read_text())
+        data = (directory/'names.bin').read_bytes()
+        # The real current builder checks all 4,536 preceding edits and the
+        # eight complete source-bound accent fields; nothing uses old permits.
+        expected,report = accented_resource(native,
+            (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_text(),data,names)
+        self.assertEqual(report['previous_candidate_slots'],4536)
+        self.assertEqual(report['accent_candidate_slots'],8)
+        installed = by_vrom(built)[VROM].extract(built)
+        self.assertEqual(installed,expected)
+        originals = load_names()
+        edits = [r for r in names['edits'] if 'native_item_name' in r]
+        self.assertEqual({r['native_item_name'] for r in edits},set(originals))
+        self.assertEqual((len(originals),len(edits)),(43,128))
+        native_banks = {b.name:b for b in banks(native)}
+        short = by_vrom(built)[0x10F4000].extract(built)
+        info = module_command_info(native)
+        narrow_count = 0
+        for row in edits:
+            self.assertEqual(row['provenance']['source'],SOURCE)
+            self.assertEqual(row['translation'],originals[row['native_item_name']]['translation'])
+            value = encode(row['translation'],info)
+            at = offset(row['id'])
+            self.assertEqual(installed[at:at+WIDTH],value.ljust(WIDTH,b' '))
+            if len(value)<=10:
+                bank,index = row['id'].split(':')
+                at = native_banks[bank].data_offset+int(index,16)*10
+                self.assertEqual(short[at:at+10],value.ljust(10,b' '))
+                narrow_count += 1
+        self.assertEqual(narrow_count,45)
 
 
 @unittest.skipUnless((ROOT/'build/smoke-native-items-01/results.json').is_file(),

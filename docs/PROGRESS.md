@@ -111,6 +111,11 @@ The [date/fortune/glyph fixture follow-up](checkpoints/DATE_FORTUNE_GLYPH_FIXTUR
 closes four further errors with six passing checks. Current module selection and
 an isolated date installation retain complete text, font capability, source,
 capacity, and transactional rejection checks. No playable ROM or save changes.
+The [native-item fixture follow-up](checkpoints/NATIVE_ITEM_FIXTURE_FOLLOWUP.md)
+closes one further historical error with two passing checks. It retains strict
+rejection of obsolete imports, verifies archived retention separately, and
+matches the full current RC4 item-name resource, N64-specific names, rotations,
+aliases, and short fields against source-bound construction. No text changes.
 Further fixture repair remains scoped follow-up work, and
 counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
 rechecking remain acceptance work. Broad human playtesting cannot block the
