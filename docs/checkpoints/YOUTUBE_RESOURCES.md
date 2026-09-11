@@ -99,3 +99,27 @@ The user likes the green text background but rejects the cartoon lettering in
 creative approval. Future thumbnail handoffs contain one upload-ready image,
 not multiple sizes. Preserve the current artifacts; this feedback record does
 not generate a replacement or claim the font is fixed.
+
+## Typography revision
+
+On the user's explicit instruction to implement the feedback, the built-in
+image tool edits the original generated master using the
+[recorded edit prompt](../promotion/thumbnail-revision-prompt.txt). The revised
+headline uses flat sans-serif letters, straight baselines, and no extruded
+black shadows. Visual inspection confirms the green patterned panel, curved
+gold divider, and recognisable game scene remain. This is an AI image edit,
+not a claim that every unaffected source pixel is identical.
+
+The single upload deliverable is
+`build/youtube-promo-02/Animal-Crossing-N64-thumbnail.jpg`: 3840×2160, RGB,
+773,658 bytes, SHA-256
+`ef16f1c6268db0667124f4177b06759c7a03966f7b828d74d2901add523837fc`.
+Its decoder, dimensions, colour mode, and sub-2-MB check pass. The source PNG
+is retained privately as `thumbnail-source.png`, SHA-256
+`130a45745d51cd7fa5985a1f9f1503ea2c76301927c86d019418586b2e773089`.
+Only the upload JPG is handed over; no size variants or preview exports are
+generated. The source is 1672×941; FFmpeg upscales the delivery copy with the
+same Lanczos conversion and quality 3 settings as the initial export.
+The source/master is not a second thumbnail choice. No trailer, ROM, portal,
+or upload copy changes. The revision is delivered for review, not recorded as
+human-approved.

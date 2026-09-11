@@ -5,10 +5,10 @@
 The [YouTube upload resources](promotion/YOUTUBE.md) include a title-screen-led
 thumbnail, unlisted and release descriptions, a suggested title, and an optional
 pinned comment. Copy and image verification are recorded in the
-[production checkpoint](checkpoints/YOUTUBE_RESOURCES.md). The thumbnail's green
-background direction is accepted, but its cartoon lettering is not; the
-typography brief calls for clean, flat lettering. Future thumbnail handoffs
-contain one file, not multiple export sizes.
+[production checkpoint](checkpoints/YOUTUBE_RESOURCES.md). The current thumbnail
+uses clean, flat lettering over the retained green background and title scene,
+addressing the user's font feedback. The handoff contains one upload-ready file,
+not multiple export sizes. User approval of the revision is not assumed.
 The public patcher URL remains the only release-copy placeholder. No video is
 uploaded or changed, and no public publication is performed.
 

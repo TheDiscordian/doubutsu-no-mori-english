@@ -1,0 +1,12 @@
+Use case: text-localization / precise typography edit.
+Input image 1: EDIT TARGET, the existing Animal Crossing N64 promotional thumbnail.
+Change ONLY the added headline typography on the LEFT green panel. Preserve the entire RIGHT game's title scene, its existing gold Animal Crossing logo, red-hatted player, pavement, foliage, crop, and placement. Preserve the LEFT green paper texture, subtle repeating leaf pattern, gold curved divider, overall palette, and composition.
+Remove the existing chunky, irregular cartoon "N64 IN ENGLISH" lettering and its black shadows/extrusions. Replace it with refined, FLAT, restrained sans-serif typography, like a well-typeset modern editorial headline using Helvetica Neue / Inter. Exact words and line breaks:
+"N64"
+"IN"
+"ENGLISH"
+N64: large bold flat warm gold letters, regular geometric forms with straight baseline.
+IN: smaller medium-weight flat warm ivory letters, centred.
+ENGLISH: large semibold flat warm ivory letters, straight baseline, normal evenly spaced letter shapes, clean kerning; fit comfortably within the panel with substantial horizontal padding.
+Balance the three lines as a centred vertical block. Readability at thumbnail size is important, but the lettering must feel professional and calm, not childish, inflated, playful, warped, tilted, outlined, beveled, embossed, textured, or 3D. NO drop shadows. No Comic Sans, no cartoon font, no exaggerated shapes. All replacement text is crisp 2D flat ink with consistent strokes.
+Do NOT restyle the original gold Animal Crossing game logo on the right; that is not the typography being changed. Do NOT add new images, text, labels, controllers, or decorations. Deliver one finished landscape 16:9 thumbnail, not a comparison sheet, not several options.

@@ -21,15 +21,15 @@ repository visibility, or alter the existing trailer. The trailer remains
 
 ## Thumbnail direction
 
-The [current draft](../../build/youtube-promo-01/Animal-Crossing-N64-thumbnail-4k.jpg)
-is not approved: its green text background fits the desired direction, but its
-cartoon-style lettering does not. The typography brief is clean, flat, regular
-lettering without chunky extrusion or exaggerated letter shapes. Preserve the
-green background direction when a revision is requested.
+The [current thumbnail](../../build/youtube-promo-02/Animal-Crossing-N64-thumbnail.jpg)
+uses clean, flat sans-serif lettering for `N64 / IN / ENGLISH`, with straight
+baselines and no cartoon extrusion or heavy shadow. It retains the green
+patterned panel, curved gold divider, and title-screen composition. The revision
+addresses the user's typography feedback; user approval is not assumed.
 
 Hand over **one upload-ready thumbnail file**, not a selection of export sizes.
-Keep any source masters or small inspection images internal. The current draft
-is 3840×2160, RGB, and 931,134 bytes; earlier exports remain preserved locally.
+Keep any source masters or small inspection images internal. The current file
+is 3840×2160, RGB, and 773,658 bytes; earlier exports remain preserved locally.
 
 The thumbnail pairs the translated title screen with the short headline
 `N64 / IN / ENGLISH`. Forest green, warm ivory, and the existing gold title
@@ -42,11 +42,11 @@ Keep the actual N64-era appearance, generous margins, and two clear visual
 groups. Avoid a menu collage, tiny feature lists, a fake modern remaster,
 unsupported `first ever` or `100%` claims, and text under the lower-right duration
 badge. The generated artwork and its upload exports belong in ignored
-`build/youtube-promo-01/`; the prompt and production record are versioned.
+`build/youtube-promo-02/`; the prompt and production record are versioned.
 
 The built-in image-generation tool produces a 1672×941 PNG master; the 4K JPG
 is an upscaled delivery export, not a claim of native 4K screenshot detail.
-FFmpeg performs size/format conversion only. The [final prompt](thumbnail-prompt.txt)
+FFmpeg performs size/format conversion only. The [final edit prompt](thumbnail-revision-prompt.txt)
 and [production record](../checkpoints/YOUTUBE_RESOURCES.md) preserve the method,
 reference, hashes, and verification results.
 
@@ -90,8 +90,8 @@ experiment. [YouTube thumbnail testing](https://support.google.com/youtube/answe
 
 1. Use the existing trailer MP4, the supplied title, and the unlisted description.
    Keep visibility unlisted until release is approved.
-2. Use a thumbnail whose lettering the user approves; the current draft needs
-   typography feedback addressed before selection. Check its crop in Studio.
+2. Use the revised thumbnail and check its crop in Studio. Creative approval
+   remains the user's decision.
 3. Review YouTube's upload checks for the game's soundtrack. Attribution is
    included; it does not determine whether a claim or restriction will occur.
 4. At release, replace `[PUBLIC_PATCHER_URL]` in the release description and
