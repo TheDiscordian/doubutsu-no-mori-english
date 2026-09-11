@@ -2,15 +2,31 @@
 
 English translation of the Japanese Nintendo 64 release, targeting original
 hardware. **V1 Final is available locally**, with a verified patch-only package.
-The repository and release artifacts remain private; no public upload is made.
+The repository and patch artifacts remain private. The user has released the
+trailer; public patch hosting is not enabled.
+
+## Browser patcher
+
+The local portal is running at **http://127.0.0.1:8073/**. Supply the original
+Japanese N64 ROM and English USA/Canada GameCube disc, then download the verified
+English N64 ROM. Both files are processed on your device, with no uploads.
+
+The portal produces **V2-07**, including the map's removed Japanese town suffix.
+It supports extracted N64 `.z64`/`.v64`/`.n64` and GC `.iso`/`.gcm`/`.ciso`.
+See [portal operation and static hosting](docs/WEB_PORTAL.md) and the
+[correction/checkpoint](docs/checkpoints/MAP_SUFFIX_AND_PORTAL.md). The exported
+site is prepared for static hosting; nothing is published as part of this work.
 
 ## V2 development
 
 The N64-inspired keyboard is implemented in
-`build/v2-keyboard-06/Animal Forest English V2 Development.z64`, with a matching
+`build/v2-map-suffix-07/Animal Forest English V2.z64`, with a matching
 UPS alongside it. It adds grey panel shading, native N64 control artwork,
 pressed-button feedback, and an eight-direction animated stick. Key positions,
 font metrics, input behaviour, sounds, and saved formats are retained.
+The map's independent `むら` bitmap is omitted to match the English GameCube
+town label. Four focused data-only correction checks pass; the released trailer
+is untouched. V2-06 saves remain compatible in format, without migration.
 
 The current keyboard corrects the reported horizontal letter drift across
 the bubbles, shifts the Cursor label/C-button cluster left, and aligns A/L/R
@@ -32,13 +48,13 @@ patcher targets `v2-keyboard-05`, not the current correction build; three
 package checks pass. The ZIP contains no ROM or save, and needs no source
 checkout, GameCube disc, Docker, or network for patch application.
 
-The [private trailer](docs/checkpoints/TRAILER_TOWN_REVISION.md) is rendered and visually
+The [released trailer](docs/checkpoints/TRAILER_TOWN_REVISION.md) is rendered and visually
 reviewed at `build/trailer-cut-05/Animal Forest English - Trailer.mp4`: 66.5
 seconds, 1080p, with the native opening music, English title and dialogue,
 one N64-inspired keyboard sequence, Nook's Cranny, the post office, and
 translated map, catalogue, loan, inventory, and notice-board screens. Production sources and
-verification are tracked privately. No public upload of the trailer, patch,
-repository, or ROM is authorised.
+verification are tracked privately. The user's released video is preserved
+unchanged. Public patch, repository, and ROM uploads are not authorised.
 
 ## V1 Final
 
@@ -81,7 +97,8 @@ appearance of both adapted stall placements remain playtest work, not completed
 proof. See [progress](docs/PROGRESS.md), [tracked findings](docs/V1_PLAYTEST_BUGS.md),
 and the [completion queue](docs/WORK_QUEUE.md). Concrete new crashes, save damage,
 blocked progression, or text defects take priority. The
-[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) is the active development work.
+[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) and local browser patcher are
+implemented; concrete playtest and portal feedback guide further changes.
 
 ## Source and reproduction
 

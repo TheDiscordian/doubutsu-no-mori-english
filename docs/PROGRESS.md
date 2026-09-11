@@ -2,8 +2,16 @@
 
 ## Active development
 
+The [local browser patcher](WEB_PORTAL.md) is running at
+**http://127.0.0.1:8073/**. It builds the current V2-07 from the original N64 ROM
+and actual English GC donor data inside the browser, without uploads. The
+corrected output includes the reported map `むら` omission. The
+[combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
+cartridge checks, eleven JavaScript checks, real browser-output verification,
+and private static-hosting preparation. Public patch hosting is not enabled.
+
 V2's N64-inspired keyboard is implemented in
-`build/v2-keyboard-06/Animal Forest English V2 Development.z64` on the preserved
+`build/v2-map-suffix-07/Animal Forest English V2.z64` on the preserved
 V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
 feedback, and an eight-direction left-side stick graphic. The complete input/editor prefix,
 key positions, glyph metrics, sound code, and saved formats are retained.
@@ -34,7 +42,7 @@ build. The package contains offline guides,
 credits, source/compatibility records, and checksums, but no ROM or save. This
 does not change the cartridge or claim additional gameplay/hardware acceptance.
 
-The authorised [private trailer](checkpoints/TRAILER_TOWN_REVISION.md) is rendered and
+The [released trailer](checkpoints/TRAILER_TOWN_REVISION.md) is rendered and
 visually reviewed at `build/trailer-cut-05/Animal Forest English - Trailer.mp4`.
 The 66.5-second 1080p edit follows the native opening music through the English
 title, K.K., Fae's single keyboard sequence, Rover's reaction, the town map,
@@ -43,7 +51,8 @@ inventory, and notice board. Seven focused production checks pass on the current
 edit, along with full video/audio decode and the recorded visual inspection of
 all four timeline sheets, all 15 transition strips, and selected full-size frames. Final audio
 measures −18.06 LUFS / −1.26 dBTP. No listening audition through physical outputs
-or public publication occurs. User review of the creative result remains separate.
+occurs during production checks. The user has published the trailer and requests
+that it remain unchanged; the new map correction belongs only in the ROM.
 
 ## Human acceptance
 

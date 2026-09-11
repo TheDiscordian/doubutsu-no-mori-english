@@ -1,15 +1,25 @@
 # Completion queue
 
-## Private trailer: ready for review
+## Local browser patcher and map correction
 
-The authorised [private trailer](checkpoints/TRAILER_TOWN_REVISION.md) is rendered at
+The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
+`build/web-portal-02/site`. Browser-only patching of both verified game inputs
+produces current V2-07. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
+omits the independent Japanese `むら` image beside the town name without save,
+code, allocation, or unrelated-art changes. The released trailer is untouched.
+Implementation and focused verification are complete; user portal feedback,
+new hardware findings, and separate public-hosting approval guide further work.
+Do not publish the private repository or game inputs.
+
+## Released trailer
+
+The [released trailer](checkpoints/TRAILER_TOWN_REVISION.md) is preserved at
 `build/trailer-cut-05/Animal Forest English - Trailer.mp4` and visually reviewed.
 It uses the native opening music, one name-entry keyboard sequence, translated
 storefronts and interiors, and the map, catalogue, loan, inventory, and notice-board
 screens. Opening and closing identifiers are the only added captions. Production checks and
-full decode pass. Nothing is published or played through physical audio outputs.
-The creative result is ready for the user's review; no further speculative
-production or game changes are queued.
+full decode pass. The user has released the video; do not edit or re-render it.
+No further trailer production is queued, and no physical audio playback occurs.
 The [V2 hardware feedback batch](checkpoints/KEYBOARD_V2_FEEDBACK.md) is
 implemented in `build/v2-keyboard-06`: directional stick tilt, visibly held
 buttons, keyboard-wide horizontal glyph alignment, and leftward label/control
@@ -23,7 +33,8 @@ The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
 and saved capacities remain intact. The private development ROM is
-`build/v2-keyboard-06/Animal Forest English V2 Development.z64`.
+`build/v2-map-suffix-07/Animal Forest English V2.z64`, with the map-suffix
+correction layered over the unchanged V2-06 keyboard.
 
 The [current feedback record](checkpoints/KEYBOARD_V2_FEEDBACK.md) owns fresh
 checks, exact artifacts, and limits. The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md)

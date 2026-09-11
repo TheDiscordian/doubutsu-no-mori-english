@@ -1,0 +1,15 @@
+[Unit]
+Description=Animal Forest English local browser patcher
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/Programming/doubutsu-no-mori-english
+ExecStart=/usr/bin/python3 %h/Programming/doubutsu-no-mori-english/tools/serve_portal.py --directory %h/Programming/doubutsu-no-mori-english/build/web-portal-02/site --port 8073
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+PrivateTmp=yes
+
+[Install]
+WantedBy=default.target

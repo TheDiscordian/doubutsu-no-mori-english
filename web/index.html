@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Make your own English Animal Forest ROM, right in your browser. Your games stay on your device.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta name="theme-color" content="#254d3f">
+  <title>Animal Forest English · A ticket to town</title>
+  <link rel="icon" href="mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#patcher">Skip to the patcher</a>
+  <header class="site-header wrap">
+    <a class="brand" href="./" aria-label="Animal Forest English home">
+      <img src="mark.svg" width="46" height="46" alt="">
+      <span>Animal Forest<small>THE ENGLISH TRANSLATION</small></span>
+    </a>
+    <span class="preview-badge"><span aria-hidden="true">●</span> LOCAL PREVIEW</span>
+  </header>
+  <main class="wrap">
+    <div class="hero">
+      <section class="welcome" aria-labelledby="welcome-heading">
+        <p class="eyebrow"><span class="rule"></span> A LITTLE TOWN. A WHOLE NEW WORLD.</p>
+        <h1 id="welcome-heading">Make yourself<br><em>at home.</em></h1>
+        <p class="intro">Meet your neighbours. Find your favourite fishing spot.
+          Get a little too attached to a tiny house.</p>
+        <p class="description">The Nintendo 64 original, now in English — with familiar
+          words from Animal Crossing and a keyboard made for your N64 controller.</p>
+        <figure class="postcard">
+          <div class="tape" aria-hidden="true"></div>
+          <img src="media/town.webp" width="800" height="600" alt="The English Animal Forest title screen on Nintendo 64">
+          <figcaption><span>Next stop: your new hometown.</span><span aria-hidden="true">✦</span></figcaption>
+        </figure>
+      </section>
+
+      <section id="patcher" class="patch-card" aria-labelledby="patch-heading">
+        <div class="ticket-top"><span>YOUR TICKET TO TOWN</span><span aria-hidden="true">N64 ↔ GC</span></div>
+        <div class="ticket-body">
+          <div class="card-heading"><h2 id="patch-heading">Let’s get you settled.</h2><span id="build-label" class="version">V2</span></div>
+          <p class="card-intro">Bring your two game files. We’ll put together your English Nintendo 64 ROM.</p>
+          <p class="privacy"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 10V7a6 6 0 0 1 12 0v3m-13 0h14v11H5zm7 4v3"/></svg> Files stay on your device. Nothing is uploaded.</p>
+
+          <div class="file-field" id="n64-field">
+            <div class="file-title"><span class="step">1</span><label for="n64">Doubutsu no Mori</label><span class="platform">NINTENDO 64</span></div>
+            <p>Original Japanese game · 16 MiB</p>
+            <input type="file" id="n64" accept=".z64,.n64,.v64" aria-describedby="n64-hint n64-name">
+            <span class="file-name" id="n64-name">No file chosen</span>
+            <small id="n64-hint">.z64, .v64, or .n64</small>
+          </div>
+          <div class="file-field" id="gc-field">
+            <div class="file-title"><span class="step">2</span><label for="gamecube">Animal Crossing</label><span class="platform">GAMECUBE</span></div>
+            <p>USA / Canada · GAFE01, revision 0</p>
+            <input type="file" id="gamecube" accept=".iso,.gcm,.ciso" aria-describedby="gc-hint gc-name">
+            <span class="file-name" id="gc-name">No file chosen</span>
+            <small id="gc-hint">.iso, .gcm, or .ciso · English donor data</small>
+          </div>
+          <p class="archive-hint">Have a .7z or .zip? Extract it first. For RVZ, use Dolphin to convert it to ISO.</p>
+
+          <button class="primary" id="build" disabled>Build my English ROM <span aria-hidden="true">→</span></button>
+          <div id="working" hidden>
+            <progress id="progress" value="0" max="100" aria-label="Patching progress"></progress>
+            <button id="cancel" class="text-button">Cancel</button>
+          </div>
+          <p id="status" class="status" role="status" aria-live="polite">Loading release information…</p>
+          <p id="error" class="error" role="alert" hidden></p>
+          <section id="success" class="success" aria-labelledby="success-heading" hidden>
+            <h3 id="success-heading" tabindex="-1">Welcome to the neighbourhood.</h3>
+            <p>Your ROM passed the final checksum. It matches the corrected V2 build.</p>
+            <a id="download" class="primary" download>Download English ROM <span aria-hidden="true">↓</span></a>
+            <a id="receipt" class="receipt" download="Animal-Forest-build-receipt.json">Save verification receipt</a>
+            <details class="checksum"><summary>Finished ROM SHA-256</summary><code id="output-sha"></code></details>
+          </section>
+          <noscript><p class="error">Enable JavaScript to patch your files locally in this browser.</p></noscript>
+        </div>
+        <div class="ticket-bottom"><span aria-hidden="true">✳</span> Two originals. One English adventure.</div>
+      </section>
+    </div>
+
+    <section class="hardware" aria-labelledby="hardware-heading">
+      <div class="section-label"><p class="eyebrow">BEFORE YOU PACK YOUR BAGS</p><h2 id="hardware-heading">Playing on a real N64?</h2></div>
+      <div class="hardware-grid">
+        <article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory is required.</p></div></article>
+        <article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Use this save type on your EverDrive.</p></div></article>
+        <article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>A clock that keeps ticking</h3><p>RTC support keeps your town on time.</p></div></article>
+      </div>
+      <p class="save-note" id="save-note">Back up your save before changing builds. Keep the save filename matched to your ROM.</p>
+    </section>
+
+    <section class="more" aria-label="A look around and common questions">
+      <div class="trailer-panel">
+        <p class="eyebrow">THERE’S PLENTY TO DO HERE</p>
+        <h2>A little look around.</h2>
+        <p>From your first hello to a letter from home — a familiar world, in your language.</p>
+        <video controls muted playsinline preload="none" poster="media/town.webp" aria-label="Animal Forest English trailer">
+          <source src="media/trailer.mp4" type="video/mp4">
+          Your browser does not support this video.
+        </video>
+        <small>The released trailer. Audio starts muted.</small>
+      </div>
+      <div class="questions">
+        <p class="eyebrow">A FEW GOOD THINGS TO KNOW</p>
+        <h2>Before you move in.</h2>
+        <details><summary>Why do I need both games?</summary><p>Your Japanese N64 ROM is the base. Your English GameCube disc supplies real donor data used to reconstruct the translation. Both are checked before a ROM is offered for download. No game files are supplied here.</p></details>
+        <details><summary>Do my files leave my computer?</summary><p>No. Your browser reads them locally and creates a new file. The only downloads are this page, its media, and the translation patch. There are no uploads, accounts, analytics, or cloud processing, and your originals are never overwritten.</p></details>
+        <details><summary>Will this work with my existing town?</summary><p>Saved formats are unchanged from V1 Final and the preceding V2 build. Compatibility is expected in both directions, but keep a backup. This patcher never reads or changes your saves. RC3 is not a safe fallback.</p></details>
+        <details><summary>What if my file is rejected?</summary><p>Use an original Japanese Doubutsu no Mori ROM and USA/Canada Animal Crossing, GAFE01 revision 0. Extract .7z/.zip archives before choosing files. Convert RVZ/GCZ/NKit to a full ISO in Dolphin. Modified, damaged, or unsupported revisions cannot be patched.</p></details>
+        <details><summary>Is this the public release?</summary><p>This is a local preview of the V2 patcher. The translation and N64-inspired keyboard are implemented; continued playtesting can still uncover bugs. Public patch distribution and hosting are not enabled.</p></details>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap site-footer">
+    <p>A fan translation, made with care. Not affiliated with Nintendo.<br>Animal Forest and Animal Crossing belong to their respective rights holders.</p>
+    <nav aria-label="Project notes"><a href="SOURCE_NOTES.txt">Credits &amp; sources</a><a href="LICENSE-tooling.txt">Tooling licence</a></nav>
+  </footer>
+</body>
+</html>
