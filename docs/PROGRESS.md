@@ -34,8 +34,10 @@ The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
 V1-27: nine complete labels in the separate native player-selection/save-menu
 gamestates. Six focused checks pass for original text, longer display copies,
 stack/field boundaries, relocated pointers, unchanged metadata/actions, and
-complete cartridge/UPS retention. No allocations or saved formats change.
-These labels follow the title-warning stage and are not yet in the named RC6.
+complete cartridge/UPS retention. The committed combined development build is
+`build/gamestate-menu-text-01/animal-forest-gamestate-text.z64`; its build and
+patch reconstruction pass. No allocations or saved formats change. These labels
+follow the title-warning stage and are not yet in the named RC6.
 Ordinary accessibility and hardware appearance remain unverified; no save
 operation is executed to test their wording.
 

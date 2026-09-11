@@ -44,11 +44,29 @@ or saved-data operations. No emulator, Flash/Pak write, deletion, save-confirmat
 harness, full-suite rerun, or percentage-tool maintenance is performed. Ordinary
 appearance, access, saving, and original-hardware acceptance remain unverified.
 
+## Committed construction
+
+The combined development ROM is
+`build/gamestate-menu-text-01/animal-forest-gamestate-text.z64`, constructed from
+clean revision `0df08406fc9b6eaaedb58cf68721c0d61a23ef4f` on the complete
+title-warning baseline. The receipt records `worktree_modified: false`.
+
+- ROM SHA-256: `3a2e8b4241837daa7cea094deb2f2d229b2fa34755cf9103e493e27b1cf3fd8a`.
+- UPS SHA-256: `c477bd1e5fdeb7e36621bd7c594d23b369e9d97216eb2df68473c31a8a796427`.
+- Receipt SHA-256: `979d949273d09a860851c6bb1669c216fd91bc21db0ae61c259a71a98c426a72`.
+- Builder SHA-256: `11de8c43235548860c05f221a131e0a460fa92dc96a4a676bd94f2969f5a5f0f`.
+- Player owner SHA-256: `fa823486752fc29884acbba8213cb0c5a4b8df0e4c4ada843e8b0e98a0aa762e`.
+- Save owner SHA-256: `f62abcfeda93b6b9b95f72a040760435160f68ec1af94cf072929dca0dc1888a`.
+
+The committed build and complete UPS reconstruction pass. Reproduce into a fresh
+directory with `python3 tools/gamestate_menu_text.py --output build/gamestate-menu-text-new`.
+The input is the committed title-warning ROM, never an original save or a file
+to overwrite. Native gamestate code is not executed by this construction.
+
 ## Follow-up
 
-Build this committed stage on `build/title-warning-text-01`, then package both
-stages into the next named candidate with complete receipts and the standalone
-patcher check. RC6 remains the existing named handoff without these later
+Package both committed stages into the next named candidate with complete
+receipts and the archived standalone-patcher check. RC6 remains the existing named handoff without these later
 corrections. Preserve earlier ROMs and all original saves. Expected forward/
 backward RC6 compatibility follows unchanged formats and save readers/writers;
 it is not a verified loading or save/restart cycle. V2 remains deferred.

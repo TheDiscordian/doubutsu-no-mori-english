@@ -3,9 +3,10 @@
 ## Next work
 
 The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
-nine complete native labels (V1-27), with six focused checks passing. Build the
-committed stage and retain its receipt, then package it with the completed title
-warning into the next named candidate. RC6 remains the existing handoff. Keep
+nine complete native labels (V1-27), with six focused checks, committed
+construction, and UPS reconstruction passing. Preserve `build/gamestate-menu-text-01`
+and its bound receipt; package it with the completed title warning into the next
+named candidate. RC6 remains the existing handoff. Keep
 save compatibility expectations separate from unverified loading/save cycles;
 do not invoke save/deletion actions merely to test labels. The separate debug
 scene-name table is an unreviewed lead, using a different graphics-print encoding.
