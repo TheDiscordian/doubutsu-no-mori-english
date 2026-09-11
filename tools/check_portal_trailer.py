@@ -25,7 +25,7 @@ def main():
                                                  body='<!doctype html><title>Embed check</title>'))
         page = context.new_page()
         page.on('pageerror', lambda error: errors.append(str(error)))
-        for width in (375, 768, 1440):
+        for width in (320, 375, 768, 1440):
             requests.clear()
             page.set_viewport_size({'width': width, 'height': 1050})
             response = page.goto(args.url)
@@ -38,6 +38,9 @@ def main():
             assert all(urlsplit(r.url).netloc == origin and r.method == 'GET'
                        and not r.post_data_buffer for r in requests)
             assert not any('trailer.mp4' in r.url for r in requests)
+            assert page.evaluate('() => document.documentElement.scrollWidth <= innerWidth')
+            assert page.locator('.site-footer nav a').count() == 4
+            page.locator('#input-checksums').evaluate('(element) => { element.open = true; }')
             assert page.evaluate('() => document.documentElement.scrollWidth <= innerWidth')
             link = page.locator('#trailer-link')
             assert link.get_attribute('href') == 'https://www.youtube.com/watch?v=UloFru4K4Q8'

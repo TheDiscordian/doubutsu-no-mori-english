@@ -64,11 +64,16 @@ history; the website allowlist does not conceal them.
   unreviewed-file/symlink rejection, changed-patch rejection, and output preservation.
 - Eleven JavaScript patch-engine tests pass under Node 22.
 - Five visitor-copy/server tests pass, including input MD5s and no-upload serving.
-- Browser integration passes at 375, 768, and 1440 pixels: dormant YouTube
+- Browser integration passes at 320, 375, 768, and 1440 pixels: dormant YouTube
   loading, mouse/keyboard activation, sound parameters, origin referrer, and layout.
   The browser is physically muted; the deterministic iframe response is synthetic.
-- README local links resolve. A final current-page check verifies all four footer
-  links and no horizontal overflow at 320, 375, 768, and 1440 pixels.
+- README local links resolve. The additional 320-pixel check identifies the
+  trailer/FAQ grid's automatic minimum width expanding beyond the viewport.
+  Allowing those grid children to shrink fixes the overflow. The final checker
+  verifies all four footer links and no horizontal overflow at all four widths,
+  with the checksum FAQ both closed and expanded. Its first failed 320-pixel
+  attempt is not a passing result; the earlier premature pass note is corrected
+  by this fresh execution after the CSS change.
 - A fresh `build/pages-review-01` artifact stages successfully without game
   inputs. Recipe SHA-256 remains
   `b36af1b824e0e1c09ca3634429fe46b8d075a6e1a6b62b0bb07c591ff91eeaa6`.

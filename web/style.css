@@ -12,6 +12,7 @@
 .input-hashes dt:first-child{margin-top:0}
 .input-hashes dd{margin:5px 0 0;font-size:12px;line-height:1.6}
 .input-hashes code{overflow-wrap:anywhere;user-select:all}
+.more > *{min-width:0}
 .preview-badge{text-decoration:none}
 @media(max-width:740px){.site-header .preview-badge{display:none}}
 .trailer-player{position:relative;width:100%;aspect-ratio:16/9;min-height:200px;background:#142c22;border-radius:12px;margin-top:22px;overflow:hidden}

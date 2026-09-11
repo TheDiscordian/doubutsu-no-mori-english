@@ -133,7 +133,7 @@ remaining game-derived patch material. The released trailer is unchanged.
 - `python3 -m unittest tests.test_prepare_pages -v` checks private/public staging,
   the exact file set, input preservation, and rejection of changed patches,
   unexpected files, and symlinks. It requires no private input files.
-- `python3 tools/check_portal_trailer.py` checks the live page at three widths,
+- `python3 tools/check_portal_trailer.py` checks the live page at four widths,
   no pre-click third-party requests, mouse/keyboard activation, unmuted playback
   parameters, origin-only Referer, minimum player size, and the direct link.
   It substitutes a silent iframe response; it does not claim a YouTube playback
