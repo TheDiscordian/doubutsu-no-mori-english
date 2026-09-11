@@ -22,7 +22,7 @@ check confirms intact memory guards and no native fault. See the
 hashes, the corrected test-sequence assumption, and precise evidence limits.
 
 Other keyboard callers and hardware/save-load acceptance of these corrections
-acceptance remain playtest limits. V1 Final stays untouched. See the
+remain playtest limits. V1 Final stays untouched. See the
 [V2 ordinary work record](docs/checkpoints/KEYBOARD_V2_ORDINARY.md) for exact
 hashes and verification limits. No public release is authorised.
 
@@ -32,8 +32,12 @@ patcher targets `v2-keyboard-05`, not the current correction build; three
 package checks pass. The ZIP contains no ROM or save, and needs no source
 checkout, GameCube disc, Docker, or network for patch application.
 
-The [private trailer](specs/TRAILER.md) is the active production task. No public
-upload of the trailer, patch, repository, or ROM is authorised.
+The [private trailer](docs/checkpoints/TRAILER_WORK.md) is rendered and visually
+reviewed at `build/trailer-cut-04/Animal Forest English - Trailer.mp4`: 66.5
+seconds, 1080p, with the native opening music, English title and dialogue,
+N64-inspired keyboard, and translated interfaces. Production sources and
+verification are tracked privately. No public upload of the trailer, patch,
+repository, or ROM is authorised.
 
 ## V1 Final
 

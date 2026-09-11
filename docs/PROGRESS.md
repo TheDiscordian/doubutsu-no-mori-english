@@ -34,9 +34,14 @@ build. The package contains offline guides,
 credits, source/compatibility records, and checksums, but no ROM or save. This
 does not change the cartridge or claim additional gameplay/hardware acceptance.
 
-The active next task is the authorised [private trailer](../specs/TRAILER.md):
-clean real gameplay footage, a catchy edit, and a soundtrack rendered to file.
-No speaker/headphone playback or public publication is authorised.
+The authorised [private trailer](checkpoints/TRAILER_WORK.md) is rendered and
+visually reviewed at `build/trailer-cut-04/Animal Forest English - Trailer.mp4`.
+The 66.5-second 1080p edit follows the native opening music through the English
+title, K.K., Fae's keyboard entry, Rover's reaction, daytime town footage,
+inventory, and notice board. Seven production checks, four capture-input checks,
+full video/audio decode, and the recorded visual inspection pass. Final audio
+measures −18.06 LUFS / −1.26 dBTP. No listening audition through physical outputs
+or public publication occurs. User review of the creative result remains separate.
 
 ## Human acceptance
 

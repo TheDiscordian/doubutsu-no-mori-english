@@ -1,9 +1,14 @@
 # Completion queue
 
-## Active work: private trailer
+## Private trailer: ready for review
 
-Build the authorised [private trailer](../specs/TRAILER.md) using real gameplay,
-clean framing, a catchy edit, and a fitting soundtrack rendered only to file.
+The authorised [private trailer](checkpoints/TRAILER_WORK.md) is rendered at
+`build/trailer-cut-04/Animal Forest English - Trailer.mp4` and visually reviewed.
+It uses the native opening music, a coherent introduction to the translated game,
+and brief feature labels over real current-build footage. Production checks and
+full decode pass. Nothing is published or played through physical audio outputs.
+The creative result is ready for the user's review; no further speculative
+production or game changes are queued.
 The [V2 hardware feedback batch](checkpoints/KEYBOARD_V2_FEEDBACK.md) is
 implemented in `build/v2-keyboard-06`: directional stick tilt, visibly held
 buttons, keyboard-wide horizontal glyph alignment, and leftward label/control

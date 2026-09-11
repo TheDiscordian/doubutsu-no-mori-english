@@ -45,7 +45,7 @@
   {"wait":2},
   {"record_mark":"name-confirm"},
   {"key":"Return","duration":0.08},
-  {"wait":6},
+  {"wait":11},
   {"capture":"rover.png","hide_cursor":true},
   {"snapshot_message":true},
   {"record_mark":"rover-chat"},

@@ -1,0 +1,16 @@
+[
+  {"wait":1},
+  {"key":"w","duration":1.2},
+  {"key":"a","duration":0.12},
+  {"wait":4},
+  {"capture":"notice.png","hide_cursor":true},
+  {"key":"a","duration":0.12},
+  {"wait":4},
+  {"capture":"notice-reading.png","hide_cursor":true},
+  {"snapshot_message":true},
+  {"key":"g","duration":0.12},
+  {"wait":4},
+  {"capture":"notice-next.png","hide_cursor":true},
+  {"save_state":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

@@ -61,8 +61,33 @@ Available takes:
   explicitly excludes that name from the trailer. Never select any frame or
   clip from this take. Use an explicit footage allowlist, not directory globs.
 
-Further scenic footage and the finished edit are in progress. Do not claim
-that a recorded scenario's successful exit alone proves usable footage.
+The approved game-led edit uses these inspected takes instead of the initial
+nighttime exploration:
+
+| Source directory | Selected content |
+| --- | --- |
+| `build/trailer-opening-01` | Native N64 chime, actual title music, opening train arrival, and English logo |
+| `build/trailer-kk-01` | Complete K.K. welcome and “You can do what you like” dialogue, held for reading |
+| `build/trailer-keyboard-03` | Verified `Fae` entry, lowercase switching, native controls, and a longer Rover reaction |
+| `build/trailer-daytime-02` | Leaving home and opening the English inventory |
+| `build/trailer-daytime-03` | Walking into the town square towards the translated notice sign |
+| `build/trailer-board-02` | Existing town note followed by the native English board instructions |
+
+The keyboard's final native snapshot is `466165202020`; no rejected-name
+footage is an input. Native captures remain 59–60 VPS around the observed
+frames, with ordinary small pacing variation. The board and longer dialogue
+takes deliberately leave reading time before advancing. The finished edit is
+66.5 seconds, using the native theme's opening and final phrase, with no tempo
+change. The soundtrack measures approximately −17.95 LUFS / −1.50 dBTP after
+mastering. This is a measurement, not a listening-review claim.
+
+`tools/trailer_edit.py` crops clean gameplay into a full-height 4:3 foreground,
+with a soft extension of the same shot at the sides. Short, settling feature
+labels replace the presentation cards. No added text covers the dialogue.
+The keyboard close view includes the entire stick and all keyboard edges.
+The final title identifies the unofficial project and Expansion Pak requirement.
+The rejected rough composition remains reproducible from commit `823c358`;
+its synthetic soundtrack is not used in the active edit.
 
 ## Rejected original music experiment
 
@@ -90,11 +115,34 @@ game log distinguish this from an observed running-game defect. A sequential,
 muted train capture uses the already recorded opening song rather than starting
 another simultaneous audible-to-null-sink emulator. No historical ROM is tested.
 
-## Remaining
+## Finished private edit
 
-- Choose inspected current-build shots, excluding the rejected name take.
-- Build the typography, motion, cut sequence, soundtrack mix, and final MP4.
-- Check representative frames, all transitions, duration, audio levels, and
-  absence of emulator borders, rejected name, or unsupported release claims.
-- Commit/push production sources and hand over the local video without
-  automatic physical audio playback or public publication.
+File: `build/trailer-cut-04/Animal Forest English - Trailer.mp4`.
+
+- SHA-256: `17cf6e6e53656e58e3d0bf376e76be5e94f675698e43a18b4a298de4fda5179c`.
+- Size: 63,746,621 bytes; duration 66.5 seconds / 1,995 video frames.
+- 1920×1080, 30 fps, H.264 / yuv420p, stereo AAC, MP4 fast-start.
+- Final encoded audio: −18.06 LUFS, −1.26 dBTP; no sample/peak clipping is indicated.
+- Seven focused trailer checks pass in 0.609 seconds. Four capture-input checks
+  pass in 0.002 seconds. Neither suite runs an emulator or historical ROM.
+- Complete video/audio decode finishes without errors. All four one-second
+  timeline sheets and all ten four-frame transition strips are inspected.
+  Full-size final Rover, keyboard, and closing frames, plus source dialogue,
+  inventory, and notice-board frames, receive separate visual inspection.
+- The English title is central to both opening and closing. Dialogue is held
+  long enough to finish its selected passages. The selected keyboard close-up
+  includes the stick and all edges, and shows lowercase input rather than the
+  mostly empty part of the symbol page. The final uses only the approved `Fae`
+  name-entry footage; the town player is `Disco`.
+- All temporary recording sinks are removed. The original copied user saves
+  retain SHA-256 `d489736e39abc7eff1c5b5085bf52e679186f2882a0247339e11603799b80b60`.
+
+`edit.json`, `music.json`, `video.json`, and `review/checks.json` beside the
+output retain the exact inputs, timing, source hashes, audio provenance, and
+verification. Local footage and generated audio/video are ignored by Git.
+The script and documentation changes are version-tracked in the private repo.
+The prior rough cuts are not the handoff.
+
+No physical listening audition or public release is claimed. Human review of
+the trailer's creative result remains the next decision. The video is complete
+for that review; no user action is required to finish rendering it.

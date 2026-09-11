@@ -1,0 +1,12 @@
+[
+  {"wait":16},
+  {"key":"Return","duration":0.15},
+  {"wait":19},
+  {"capture":"welcome.png","hide_cursor":true},
+  {"key":"a","duration":0.12},
+  {"wait":7},
+  {"key":"a","duration":0.12},
+  {"wait":8},
+  {"capture":"your-own-pace.png","hide_cursor":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

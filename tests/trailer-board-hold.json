@@ -1,0 +1,12 @@
+[
+  {"wait":1},
+  {"key":"w","duration":1.2},
+  {"key":"a","duration":0.12},
+  {"wait":9},
+  {"capture":"notice.png","hide_cursor":true},
+  {"key":"f","duration":0.12},
+  {"wait":6},
+  {"capture":"previous-notice.png","hide_cursor":true},
+  {"save_state":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

@@ -1,0 +1,18 @@
+[
+  {"wait":1},
+  {"record_mark":"town-stroll"},
+  {"key":"s","duration":2.5},
+  {"wait":0.3},
+  {"key":"f","duration":2},
+  {"wait":0.3},
+  {"capture":"town-stroll.png","hide_cursor":true},
+  {"snapshot_player":true},
+  {"key":"w","duration":1.1},
+  {"key":"a","duration":0.12},
+  {"wait":4},
+  {"capture":"board.png","hide_cursor":true},
+  {"snapshot_player":true},
+  {"snapshot_message":true},
+  {"save_state":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]
