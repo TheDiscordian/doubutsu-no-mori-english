@@ -15,9 +15,12 @@ menu labels and genuinely untested areas retain their own limits.
 The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects the
 nineteen correction stages after the artwork/title baseline, including the new
 scene-menu text. `make complete` invokes this suffix inside its isolated source
-checkout. Six focused orchestration checks pass; committed correction-only and
-complete clean execution remain pending. This does not change game content or
-reopen accepted gameplay tests.
+checkout. Six focused orchestration checks, the committed nineteen-stage run,
+and the completed-run check pass. `build/v1-current-01/final/` contains the ROM
+and UPS matching the independently built scene-menu candidate. No full historical
+replay is queued; the composed 108-stage command has not been executed end to end.
+Old builds are not re-tested. This does not change game content or reopen
+accepted gameplay tests.
 
 The [development scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) implements
 V1-28: 76 Japanese scene, loading, and setting strings in the native selector.
@@ -188,8 +191,9 @@ closes one further historical error with two passing checks. It retains strict
 rejection of obsolete imports, verifies archived retention separately, and
 matches the full current RC4 item-name resource, N64-specific names, rotations,
 aliases, and short fields against source-bound construction. No text changes.
-Further fixture repair remains scoped follow-up work, and
-counter maintenance stays deferred. Reported letter/editor and screen defects
+Historical fixture repair is not a remaining V1 task unless a concrete current
+failure makes an affected check relevant. Do not re-test old builds. Counter
+maintenance stays deferred. Reported letter/editor and screen defects
 are human-accepted. Broader untested gameplay cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
 

@@ -48,9 +48,10 @@ The default commands refuse existing outputs. No gameplay scenarios run, and
 no old artifact or user save changes.
 
 The [current integration checkpoint](checkpoints/CURRENT_V1_REBUILD.md) records
-verification of the complete 108-stage command and correction-only runner,
-including explicit pending execution where applicable. Do not treat earlier
-base/artwork evidence as execution of the new correction suffix.
+the passing nineteen-stage correction run and its completed-run check. The
+composed 108-stage command has a passing dry run, not fresh end-to-end execution;
+no complete historical replay is queued. Preserve earlier base/artwork evidence
+separately. Do not re-test old builds or repeat accepted gameplay checks.
 
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The

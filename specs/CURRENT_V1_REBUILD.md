@@ -73,12 +73,13 @@ and UPS SHA-256
 
 ## Validation scope
 
-Exercise order/input/rejection/resume checks, then execute the correction recipe.
-Run the complete isolated command once for the new integration; its final ROM
-must match the independently constructed scene-menu candidate. Preserve the
-earlier clean rebuilds as their own evidence, not proof that this new suffix
-has already run. A later failing stage does not justify repeatedly replaying
-an unchanged completed prefix when a verified resume is available.
+Preserve the passing order/input/rejection/resume checks and executed nineteen-
+stage correction recipe. Its final ROM and UPS match the independently built
+scene-menu candidate. Earlier clean base/artwork rebuilds retain their own
+recorded evidence. The composed 108-stage command is available, but a fresh
+end-to-end execution is not claimed or queued. Do not re-test old candidates or
+replay unchanged historical recipes. Verification targets relevant changes to
+the current deliverable, not repetition of accepted results.
 
 This work changes build orchestration, not the ROM's content, saved formats,
 memory requirement, or human acceptance. It runs no emulator or debug-menu

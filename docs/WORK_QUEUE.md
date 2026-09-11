@@ -24,14 +24,16 @@ and its source-bound receipt; keep RC7 as the named handoff until a subsequent
 combined package is checked. Do not enable the
 debug menu or invoke its state-changing initializer to validate wording.
 
-The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) implements
-the missing correction suffix and connects it to `make complete`. Execute the
-committed correction-only recipe, then the complete 108-stage isolated command
-once to verify the new integration. Preserve successful boundaries and diagnose
-failures without repeating completed unrelated tests. Preserve completed
-direct-font scans, scene-menu review, and rejected old-reader/padding classifications.
-Prioritise new human findings, then remaining English readers/artwork and scoped
-fixture follow-up. V2 stays deferred until V1 completion.
+The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects all
+nineteen correction stages to `make complete`. The committed correction run and
+its completed-run check pass; `build/v1-current-01/final/` matches the independent
+scene-menu ROM and UPS. Preserve those results. Do not re-test old builds or
+launch the full 108-stage historical replay; it is not a final-V1 task.
+Prepare the current combined patch package and finish remaining release/content
+work. Preserve completed direct-font scans, scene-menu review, and rejected
+old-reader/padding classifications. New concrete bugs take precedence; historical
+fixture repair is not work to resume without a relevant current failure.
+V2 stays deferred until V1 completion.
 
 The packaged [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
 V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
@@ -53,8 +55,8 @@ the committed rebuild, and the archived standalone patcher pass. Preserve these
 results and all preceding artifacts; do not repeat the completed reproduction.
 Every RC handoff distinguishes unchanged save formats from tested loading and
 warns about known or unresolved incompatibility. Cross-version compatibility is
-preferred, not mandatory. Resume the remaining artwork review and scoped
-regression-fixture follow-up. The reported hardware fixes and ordinary
+preferred, not mandatory. Continue current release/content work, not old-build
+tests or historical fixture maintenance. The reported hardware fixes and ordinary
 save/restart/reload are human-accepted. Keep new concrete human defects ahead of
 speculative work.
 
@@ -97,10 +99,11 @@ implementation and controlled drawing evidence. Next:
   inventory only when it helps find text still needing replacement. Do not spend
   implementation time updating the percentage or its candidate selector.
 - Retain the [completed full regression result](checkpoints/V1RC1_REGRESSION.md):
-  2,103 tests, 25 failures, and 75 errors. Fix relevant historical fixture
-  selection/generation without weakening guards or overwriting artifacts;
-  inspect remaining failure causes and rerun affected checks. Counter-only
-  expectation maintenance stays deferred. Do not restart the entire suite or
+  2,103 tests, 25 failures, and 75 errors. Preserve the report and completed
+  follow-ups; do not repair or re-test historical fixtures as a remaining V1
+  task. A concrete current build/game failure can justify a focused check on
+  the current deliverable. Counter-only expectation maintenance stays deferred.
+  Do not restart the entire suite or
   claim it passed. The title metadata comparison has a passing scoped correction
   with independently matching overlay/relocation binaries; retain that result.
   The [core runtime fixture follow-up](checkpoints/RUNTIME_FIXTURE_FOLLOWUP.md)

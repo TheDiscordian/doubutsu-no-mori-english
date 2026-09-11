@@ -62,6 +62,12 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   Confirmed crashes, save damage, and memory corruption block v0. Unexplained
   failures that could be game defects remain unresolved until classified;
   never assume a harness cause or mark an incomplete test passed.
+- Do not re-test old candidate builds. Preserve recorded results and target
+  verification at changed code and the current deliverable. Do not queue a
+  complete historical-build replay as final-V1 work. Historical fixture
+  maintenance is not a release task unless a concrete current build/game
+  failure makes the affected check relevant. Human-accepted fixes and ordinary
+  save/restart/reload stay closed unless a new defect is reported.
 - Produce and hand over v0 before the human playthrough. Comprehensive gameplay,
   hardware, and polish acceptance cannot block the build that enables that work.
   English title artwork and the GameCube-style keyboard belong to v1.

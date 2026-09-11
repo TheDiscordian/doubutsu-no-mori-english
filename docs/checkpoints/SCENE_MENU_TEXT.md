@@ -66,11 +66,9 @@ hardware handoff until a subsequent combined patch package is checked.
 
 ## Next work
 
-The separate release-build gap is concrete: the documented `make complete`
-path ends after `rebuild_v0.py` and `rebuild_v1.py` in the isolated source tree;
-it does not include the accumulated RC correction stages. Integrate the
-current correction sequence into a reproducible final-candidate recipe with
-checked stage inputs/outputs, using the verified existing builders and clean
-rebuild evidence. Do not rerun unchanged full historical recipes merely to
-refresh their timestamps. Keep remaining content review and public distribution
-requirements explicit; V2 remains deferred.
+The [current correction recipe](CURRENT_V1_REBUILD.md) includes this batch and
+all preceding RC corrections; its nineteen-stage committed run passes and
+matches this ROM and UPS. Prepare the current combined patch package and finish
+remaining release/content work. Do not re-test old builds or queue a complete
+historical replay. Public distribution requirements remain explicit; V2 stays
+deferred.
