@@ -1,5 +1,19 @@
 # Remaining artwork
 
+## Household surfaces and igloo detail
+
+The [household review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes 28 selected
+tree, fan, wardrobe, clock, and chest images. All visible colours already match
+the English GC donor, and their complete owners remain native in RC8. This
+includes the CI8 tabletop, decoded with its actual 256-entry palette. Preserve
+these images without repeating the inspection or awarding English text credit.
+
+The igloo `0138DA28` material-role lead is resolved separately in the same
+record: the brown pattern covers tops/sides of two small food-like blocks and
+has no reliably readable wording. The proposed GC pot image is a different
+8×32 surface on different geometry, not an interchangeable 16×16 donor.
+Retain the native detail; do not reopen the rejected pot match.
+
 ## Home mailbox
 
 The [home-mailbox review](checkpoints/HOME_MAILBOX_ARTWORK_REVIEW.md) verifies

@@ -35,6 +35,14 @@ old-reader/padding classifications. New concrete bugs take precedence; historica
 fixture repair is not work to resume without a relevant current failure.
 V2 stays deferred until V1 completion.
 
+The [household/igloo review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes
+28 further household images and the unresolved igloo material-role lead. Their
+current RC8 resources remain native; household visible colours match English
+GC, including the CI8 tabletop. Preserve this review and its three passing
+synthetic decoder checks. Do not revisit these images, the rejected GC pot
+donor, or their unchanged gameplay merely to refresh evidence. Continue only
+genuinely unreviewed content and remaining release work.
+
 The packaged [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
 V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
 instruction. The RC6 stage matches

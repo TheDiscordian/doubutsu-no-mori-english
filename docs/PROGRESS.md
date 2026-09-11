@@ -299,6 +299,15 @@ this review-only work; the combined playtest-fix build remains the current candi
 
 ## Remaining work and evidence limits
 
+The [household review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes 28 further
+selected images through direct inspection and exact visible-colour matches to
+English GC. The current RC8 retains their complete native owners. New CI8
+inspection support resolves the blue tabletop with its 256-entry palette;
+three synthetic decoder checks pass. The igloo detail's actual material/vertices
+also resolve the wrong-donor lead; preserve its native food-surface pattern.
+No text is newly applied and no ROM changes; RC8 remains the handoff. Do not
+repeat this group or claim that it reviews every image in the game.
+
 The [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md)
 inspects 34 additional native images and the matching English GC umbrella
 decoration. These designs remain native; no newly applied text or changed ROM

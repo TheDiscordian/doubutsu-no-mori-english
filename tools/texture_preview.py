@@ -25,9 +25,9 @@ def rgba5551(value):
 
 
 def decode(data, width, height, fmt, palette=None, *, gamecube=False):
-    if fmt not in ('ci4', 'i4', 'i8', 'ia8') or width <= 0 or height <= 0:
+    if fmt not in ('ci4', 'ci8', 'i4', 'i8', 'ia8') or width <= 0 or height <= 0:
         raise ValueError('Unsupported preview texture')
-    bits = 8 if fmt in ('i8', 'ia8') else 4
+    bits = 8 if fmt in ('ci8', 'i8', 'ia8') else 4
     if len(data)*8 != width*height*bits:
         raise ValueError('Incorrect texture size')
     if gamecube:
@@ -36,10 +36,11 @@ def decode(data, width, height, fmt, palette=None, *, gamecube=False):
             samples = bytes((v << 4 & 240) | v >> 4 for v in samples)
     else:
         samples = data if bits == 8 else bytes(v for b in data for v in (b >> 4, b & 15))
-    if fmt == 'ci4':
-        if palette is None or len(palette) != 32:
-            raise ValueError('CI4 preview requires sixteen palette entries')
-        colours = [(rgb5a3 if gamecube else rgba5551)(v) for v in struct.unpack('>16H', palette)]
+    if fmt in ('ci4', 'ci8'):
+        count = 256 if fmt == 'ci8' else 16
+        if palette is None or len(palette) != count*2:
+            raise ValueError(f'{fmt.upper()} preview requires {count} palette entries')
+        colours = [(rgb5a3 if gamecube else rgba5551)(v) for v in struct.unpack(f'>{count}H', palette)]
         return b''.join(colours[v] for v in samples)
     if palette is not None:
         raise ValueError('Intensity preview must not have a palette')
@@ -71,7 +72,7 @@ def main():
     parser.add_argument('--palette', type=lambda x: int(x, 16))
     parser.add_argument('--width', type=int, required=True)
     parser.add_argument('--height', type=int, required=True)
-    parser.add_argument('--format', choices=('ci4', 'i4', 'i8', 'ia8'), required=True)
+    parser.add_argument('--format', choices=('ci4', 'ci8', 'i4', 'i8', 'ia8'), required=True)
     parser.add_argument('--scale', type=int, default=4)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -87,9 +88,10 @@ def main():
         data = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         def read(address, size):
             return native_range(data, address, size)
-    size = args.width*args.height*(8 if args.format in ('i8', 'ia8') else 4)//8
+    size = args.width*args.height*(8 if args.format in ('ci8', 'i8', 'ia8') else 4)//8
     rgba = decode(read(args.address, size), args.width, args.height, args.format,
-                  None if args.palette is None else read(args.palette, 32), gamecube=args.gamecube)
+                  None if args.palette is None else read(args.palette, 512 if args.format == 'ci8' else 32),
+                  gamecube=args.gamecube)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open('xb') as target:
         target.write(png_rgba(args.width, args.height, rgba, args.scale))
