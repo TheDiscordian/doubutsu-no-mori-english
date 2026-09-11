@@ -1,0 +1,12 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 1.5},
+  {"key": "g", "duration": 9.2},
+  {"snapshot_player": true},
+  {"capture": "east-path.png", "hide_cursor": true},
+  {"key": "w", "duration": 5.0},
+  {"snapshot_player": true},
+  {"capture": "shop-approach.png", "hide_cursor": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

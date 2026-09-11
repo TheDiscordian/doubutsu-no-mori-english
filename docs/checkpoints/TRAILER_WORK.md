@@ -1,5 +1,9 @@
 # Private trailer work record
 
+The current town/interface revision and cut 05 handoff are recorded in
+[TRAILER_TOWN_REVISION.md](TRAILER_TOWN_REVISION.md). This work record preserves
+the opening/music production and cut 04 evidence.
+
 ## Active production
 
 The current game build is `build/v2-keyboard-06`, ROM SHA-256

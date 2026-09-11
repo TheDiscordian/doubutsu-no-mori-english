@@ -1,0 +1,9 @@
+[
+  {"wait": 1},
+  {"advance_to_choice": {"max_presses": 24, "settle_seconds": 1.0}},
+  {"wait": 4},
+  {"capture": "nook-choice.png", "hide_cursor": true},
+  {"snapshot_choices": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

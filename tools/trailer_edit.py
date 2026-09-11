@@ -15,7 +15,11 @@ DURATION=TOTAL_FRAMES/FPS
 # Every source is explicitly approved. No wildcard can admit the rejected name take.
 FOOTAGE={'opening':'build/trailer-opening-01','kk':'build/trailer-kk-01',
          'keyboard':'build/trailer-keyboard-03','day':'build/trailer-daytime-02',
-         'stroll':'build/trailer-daytime-03','board':'build/trailer-board-02'}
+         'board':'build/trailer-board-02','map':'build/trailer-map-01',
+         'nook_exterior':'build/trailer-nook-04','shop':'build/trailer-nook-08',
+         'catalogue':'build/trailer-catalogue-03','bridge':'build/trailer-post-route-03',
+         'post_exterior':'build/trailer-post-01','post':'build/trailer-post-02',
+         'payment':'build/trailer-post-04'}
 # Boundaries follow the original recording's approximately 118-BPM phrasing,
 # quantised to video frames. K.K.'s actual words replace promotional copy.
 CUTS=[
@@ -27,19 +31,29 @@ CUTS=[
      'purpose':'You can do what you like, whenever you feel like it'},
     {'source':'keyboard','start':6.65,'frames':244,'kind':'game','transition':'circleopen',
      'purpose':'Enter Fae using the corrected English keyboard, with case switching'},
-    {'source':'keyboard','start':21.4,'frames':244,'kind':'game',
+    {'source':'keyboard','start':25.9,'frames':122,'kind':'game',
      'purpose':'Rover reacts to the same name and laughs in English'},
-    {'source':'day','start':1.7,'frames':122,'kind':'game','transition':'circleopen',
-     'purpose':'Leave home and walk through the daytime town'},
-    {'source':'stroll','start':3.6,'frames':122,'kind':'game',
-     'purpose':'Walk into the town square towards the translated notice sign'},
-    {'source':'day','start':7.8,'frames':122,'kind':'inventory','transition':'fade',
+    {'source':'map','start':3.0,'frames':61,'kind':'game','transition':'circleopen',
+     'purpose':'Orient the town tour with the English map and player-home labels'},
+    {'source':'nook_exterior','start':9.8,'frames':61,'kind':'game',
+     'purpose':"Visit the translated Nook's Cranny storefront"},
+    {'source':'shop','start':24.45,'frames':122,'kind':'game',
+     'purpose':'Tom Nook offers the English shop choices beside the translated funds bubble'},
+    {'source':'catalogue','start':11.7,'frames':122,'kind':'game','transition':'fade',
+     'purpose':'Browse English catalogue names and Bells prices with a real selection change'},
+    {'source':'bridge','start':5.3,'frames':61,'kind':'game','transition':'fade',
+     'purpose':'Cross the river on the way to the next town service'},
+    {'source':'post_exterior','start':10.0,'frames':61,'kind':'game',
+     'purpose':'Show the English Post Office and Melody signs before going inside'},
+    {'source':'post','start':17.1,'frames':61,'kind':'game',
+     'purpose':'Pelly presents the English mail and deposit choices inside the post office'},
+    {'source':'payment','start':6.7,'frames':122,'kind':'game','transition':'fade',
+     'purpose':'Show the translated repayment amount entry and confirmation labels'},
+    {'source':'day','start':8.5,'frames':61,'kind':'game','transition':'fade',
      'purpose':'Native inventory opens with English labels and item name'},
     {'source':'board','start':11.1,'frames':122,'kind':'game','transition':'fade',
      'purpose':'Read an actual translated notice on the bulletin board'},
-    {'source':'keyboard','start':8.5,'frames':122,'kind':'keyboard','transition':'smoothleft',
-     'purpose':'Close view of the full N64-inspired keyboard, with case switching and stick movement'},
-    {'source':'opening','start':53.5,'frames':286,'kind':'ending','transition':'circleopen',
+    {'source':'opening','start':57.5,'frames':164,'kind':'ending','transition':'circleopen',
      'purpose':'Return to the English title over the final musical phrase'},
 ]
 for cut in CUTS:cut['duration']=cut['frames']/FPS
@@ -63,11 +77,6 @@ def artwork(cut):
     if kind=='opening':
         parts+=['<rect x="590" y="40" width="740" height="82" rx="41" fill="#173A29" fill-opacity=".94"/>',
                 line(95,'The N64 original, in English.',40)]
-    elif kind=='inventory':
-        parts+=['<rect x="624" y="40" width="672" height="82" rx="41" fill="#173A29" fill-opacity=".94"/>',
-                line(95,'English menus & item names',38)]
-    elif kind=='keyboard':
-        parts+=[line(110,'English keys. N64 controls.',52)]
     elif kind=='ending':
         parts+=['<defs><linearGradient id="shade" x1="0" y1="0" x2="0" y2="1">'
                 '<stop offset="0" stop-color="#0E281F" stop-opacity="0"/>'
@@ -132,15 +141,10 @@ def render_cut(index,cut,out):
     filters=['[0:v]crop=752:564:8:34,fps=30,setsar=1,settb=AVTB,setpts=PTS-STARTPTS,split=2[wide][native]',
              '[wide]scale=480:360:flags=bilinear,crop=480:270,gblur=sigma=18,eq=brightness=-0.14:saturation=0.8,'
              'scale=1920:1080:flags=bilinear[back]']
-    if cut['kind']=='keyboard':
-        # All four sides of the actual keyboard remain visible, including the left stick.
-        filters+=['[native]crop=640:300:52:250,scale=1728:810:flags=lanczos[front]',
-                  '[back][front]overlay=96:180:shortest=1[scene]']
-    else:
-        filters+=['[native]scale=1440:1080:flags=lanczos[front]',
-                  '[back][front]overlay=240:0:shortest=1[scene]']
+    filters+=['[native]scale=1440:1080:flags=lanczos[front]',
+              '[back][front]overlay=240:0:shortest=1[scene]']
     result='scene'
-    if cut['kind'] in ('opening','inventory','keyboard','ending'):
+    if cut['kind'] in ('opening','ending'):
         svg=out/f'{index:02d}.svg';png=out/f'{index:02d}.png'
         svg.write_text(artwork(cut))
         subprocess.run(['rsvg-convert',str(svg),'-o',str(png)],check=True,capture_output=True,timeout=20)

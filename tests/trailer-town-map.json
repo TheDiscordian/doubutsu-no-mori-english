@@ -1,0 +1,14 @@
+[
+  {"wait":1},
+  {"key":"r","duration":0.12},
+  {"wait":6},
+  {"capture":"map.png","hide_cursor":true},
+  {"key":"s","duration":0.12},
+  {"wait":3},
+  {"capture":"map-selection.png","hide_cursor":true},
+  {"key":"b","duration":0.12},
+  {"wait":2},
+  {"snapshot_player":true},
+  {"save_state":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

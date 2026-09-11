@@ -1,0 +1,16 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.12},
+  {"wait": 0.3},
+  {"key": "a", "duration": 0.12},
+  {"advance_dialogue": {"max_presses": 16, "settle_seconds": 1.0}},
+  {"wait": 2},
+  {"key": "a", "duration": 0.12},
+  {"advance_to_choice": {"max_presses": 16, "settle_seconds": 1.0}},
+  {"record_mark": "shopping-menu"},
+  {"wait": 6},
+  {"capture": "shopping-menu.png", "hide_cursor": true},
+  {"snapshot_choices": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

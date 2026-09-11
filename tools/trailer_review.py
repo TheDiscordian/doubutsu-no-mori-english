@@ -33,11 +33,16 @@ def main():
         run(['ffmpeg','-nostdin','-v','error','-ss',str(seconds-.10),'-i',str(final),
              '-vf','fps=10,scale=480:270,tile=4x1','-frames:v','1',
              str(review/f'transition-{index+1:02d}.png')])
-    for seconds in (10,14,19,27,34,39,43,47,50,55,62,66):
+    seconds_at=0;midpoints=[]
+    for cut in edit['cuts']:
+        midpoints.append(round(seconds_at+cut['frames']/60,1))
+        seconds_at+=cut['frames']/30
+    for seconds in sorted(set([10,66,*midpoints])):
         run(['ffmpeg','-nostdin','-v','error','-ss',str(seconds),'-i',str(final),
-             '-frames:v','1',str(review/f'frame-{seconds:02d}.png')])
+             '-frames:v','1',str(review/f'frame-{seconds:05.1f}.png')])
     report={'video_sha256':hashlib.sha256(final.read_bytes()).hexdigest(),
-            'full_decode':'passed','duration':66.5,'transition_times':boundaries,
+            'full_decode':'passed','duration':seconds_at,'transition_times':boundaries,
+            'full_frame_review_times':sorted(set([10,66,*midpoints])),
             'audio_integrated_lufs':levels['input_i'],'audio_true_peak_dbtp':levels['input_tp'],
             'physical_playback':False,'visual_inspection':'pending; inspect generated frames'}
     (review/'checks.json').write_text(json.dumps(report,indent=2)+'\n')

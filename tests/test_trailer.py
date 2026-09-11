@@ -19,11 +19,16 @@ class TrailerTests(unittest.TestCase):
         self.assertEqual(FOOTAGE['keyboard'],'build/trailer-keyboard-03')
         self.assertNotIn('build/trailer-keyboard-01',FOOTAGE.values())
         self.assertEqual(sum(c['frames'] for c in CUTS),TOTAL_FRAMES)
-        self.assertTrue(all(c['duration']>=4 for c in CUTS))
+        self.assertTrue(all(c['duration']>=2 for c in CUTS))
+        keyboard_shots=[c for c in CUTS if c['source']=='keyboard' and c['start']<20]
+        self.assertEqual(len(keyboard_shots),1)
+        self.assertEqual(keyboard_shots[0]['start'],6.65)
+        self.assertTrue({'map','nook_exterior','shop','catalogue','post_exterior','post','payment'}
+                        <= {c['source'] for c in CUTS})
         self.assertEqual(set(inputs()),set(FOOTAGE))
 
     def test_soundtrack_comes_from_the_current_games_opening(self):
-        directory=ROOT/os.environ.get('AF_TRAILER_BUILD','build/trailer-cut-04')
+        directory=ROOT/os.environ.get('AF_TRAILER_BUILD','build/trailer-cut-05')
         report=json.loads((directory/'music.json').read_text())
         self.assertEqual(report['source'],FOOTAGE['opening']+'/footage.mkv')
         self.assertFalse(report['speaker_playback'])
@@ -69,7 +74,7 @@ class TrailerTests(unittest.TestCase):
         self.assertNotIn('Download now',end)
 
     def test_current_video_format(self):
-        directory=ROOT/os.environ.get('AF_TRAILER_BUILD','build/trailer-cut-04')
+        directory=ROOT/os.environ.get('AF_TRAILER_BUILD','build/trailer-cut-05')
         info=probe(directory/'Animal Forest English - Trailer.mp4')
         video=next(s for s in info['streams'] if s['codec_type']=='video')
         audio=next(s for s in info['streams'] if s['codec_type']=='audio')

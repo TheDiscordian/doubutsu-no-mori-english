@@ -32,10 +32,11 @@ patcher targets `v2-keyboard-05`, not the current correction build; three
 package checks pass. The ZIP contains no ROM or save, and needs no source
 checkout, GameCube disc, Docker, or network for patch application.
 
-The [private trailer](docs/checkpoints/TRAILER_WORK.md) is rendered and visually
-reviewed at `build/trailer-cut-04/Animal Forest English - Trailer.mp4`: 66.5
+The [private trailer](docs/checkpoints/TRAILER_TOWN_REVISION.md) is rendered and visually
+reviewed at `build/trailer-cut-05/Animal Forest English - Trailer.mp4`: 66.5
 seconds, 1080p, with the native opening music, English title and dialogue,
-N64-inspired keyboard, and translated interfaces. Production sources and
+one N64-inspired keyboard sequence, Nook's Cranny, the post office, and
+translated map, catalogue, loan, inventory, and notice-board screens. Production sources and
 verification are tracked privately. No public upload of the trailer, patch,
 repository, or ROM is authorised.
 

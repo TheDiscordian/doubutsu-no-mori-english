@@ -1,0 +1,18 @@
+[
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 6},
+  {"capture": "post-interior.png", "hide_cursor": true},
+  {"key": "w", "duration": 1.2},
+  {"wait": 0.3},
+  {"key": "a", "duration": 0.12},
+  {"wait": 5},
+  {"capture": "pelly-welcome.png", "hide_cursor": true},
+  {"advance_to_choice": {"max_presses": 12, "settle_seconds": 1.0}},
+  {"record_mark": "post-services"},
+  {"wait": 5},
+  {"capture": "post-services.png", "hide_cursor": true},
+  {"snapshot_choices": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

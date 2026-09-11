@@ -1,0 +1,11 @@
+[
+  {"wait": 1},
+  {"key": "f", "duration": 0.9},
+  {"wait": 0.2},
+  {"key": "w", "duration": 3.4},
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"capture": "post-front.png", "hide_cursor": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

@@ -26,6 +26,11 @@ Match each feature to footage that visibly demonstrates it. Keep added text
 short, natural, and secondary to the game. No numbered feature cards or generic
 marketing claims. The title screen is a central highlight, not a brief footnote.
 
+Show the keyboard once, during name entry. Use the remaining montage to reveal
+the breadth of the translation: building signs, interiors, map/menu screens,
+and the notice board. Preserve the opening and musical journey, but do not
+spend multiple feature shots demonstrating the same keyboard.
+
 Use installed tools and existing Docker images before obtaining more tooling.
 Keep scripts, edit decisions, captions, music source, and build instructions in
 the private repository. Generated footage, extracted art, audio, and final

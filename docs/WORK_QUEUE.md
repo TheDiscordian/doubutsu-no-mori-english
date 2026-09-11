@@ -2,10 +2,11 @@
 
 ## Private trailer: ready for review
 
-The authorised [private trailer](checkpoints/TRAILER_WORK.md) is rendered at
-`build/trailer-cut-04/Animal Forest English - Trailer.mp4` and visually reviewed.
-It uses the native opening music, a coherent introduction to the translated game,
-and brief feature labels over real current-build footage. Production checks and
+The authorised [private trailer](checkpoints/TRAILER_TOWN_REVISION.md) is rendered at
+`build/trailer-cut-05/Animal Forest English - Trailer.mp4` and visually reviewed.
+It uses the native opening music, one name-entry keyboard sequence, translated
+storefronts and interiors, and the map, catalogue, loan, inventory, and notice-board
+screens. Opening and closing identifiers are the only added captions. Production checks and
 full decode pass. Nothing is published or played through physical audio outputs.
 The creative result is ready for the user's review; no further speculative
 production or game changes are queued.

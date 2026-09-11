@@ -1,0 +1,15 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.12},
+  {"wait": 0.3},
+  {"key": "a", "duration": 0.12},
+  {"wait": 5},
+  {"capture": "repayment-prompt.png", "hide_cursor": true},
+  {"key": "a", "duration": 0.12},
+  {"record_mark": "repayment-screen"},
+  {"wait": 6},
+  {"capture": "repayment.png", "hide_cursor": true},
+  {"snapshot_submenu": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

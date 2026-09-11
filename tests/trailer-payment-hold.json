@@ -1,0 +1,13 @@
+[
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 4},
+  {"capture": "payment-question.png", "hide_cursor": true},
+  {"key": "a", "duration": 0.12},
+  {"record_mark": "payment-menu"},
+  {"wait": 6},
+  {"capture": "payment-menu.png", "hide_cursor": true},
+  {"snapshot_submenu": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

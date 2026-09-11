@@ -1,0 +1,20 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.12},
+  {"wait": 0.3},
+  {"key": "s", "duration": 0.12},
+  {"wait": 0.3},
+  {"key": "a", "duration": 0.12},
+  {"repeat": 6, "actions": [
+    {"wait": 1},
+    {"key": "a", "duration": 0.08}
+  ]},
+  {"wait": 5},
+  {"capture": "catalogue-held.png", "hide_cursor": true},
+  {"record_mark": "catalogue-held"},
+  {"key": "s", "duration": 0.12},
+  {"wait": 4},
+  {"capture": "catalogue-scroll.png", "hide_cursor": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

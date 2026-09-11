@@ -34,12 +34,14 @@ build. The package contains offline guides,
 credits, source/compatibility records, and checksums, but no ROM or save. This
 does not change the cartridge or claim additional gameplay/hardware acceptance.
 
-The authorised [private trailer](checkpoints/TRAILER_WORK.md) is rendered and
-visually reviewed at `build/trailer-cut-04/Animal Forest English - Trailer.mp4`.
+The authorised [private trailer](checkpoints/TRAILER_TOWN_REVISION.md) is rendered and
+visually reviewed at `build/trailer-cut-05/Animal Forest English - Trailer.mp4`.
 The 66.5-second 1080p edit follows the native opening music through the English
-title, K.K., Fae's keyboard entry, Rover's reaction, daytime town footage,
-inventory, and notice board. Seven production checks, four capture-input checks,
-full video/audio decode, and the recorded visual inspection pass. Final audio
+title, K.K., Fae's single keyboard sequence, Rover's reaction, the town map,
+Nook's Cranny and catalogue, a bridge crossing, the post office and loan screen,
+inventory, and notice board. Seven focused production checks pass on the current
+edit, along with full video/audio decode and the recorded visual inspection of
+all four timeline sheets, all 15 transition strips, and selected full-size frames. Final audio
 measures −18.06 LUFS / −1.26 dBTP. No listening audition through physical outputs
 or public publication occurs. User review of the creative result remains separate.
 

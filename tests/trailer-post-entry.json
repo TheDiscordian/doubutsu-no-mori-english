@@ -1,0 +1,17 @@
+[
+  {"wait": 1},
+  {"key": "f", "duration": 1.2},
+  {"record_mark": "post-office-exterior"},
+  {"wait": 5},
+  {"capture": "post-office.png", "hide_cursor": true},
+  {"key": "w", "duration": 0.45},
+  {"wait": 0.2},
+  {"key": ["g", "w"], "duration": 0.65},
+  {"record_mark": "post-office-entry"},
+  {"wait": 7},
+  {"capture": "post-inside.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

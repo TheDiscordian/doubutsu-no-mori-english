@@ -1,0 +1,17 @@
+[
+  {"wait": 1},
+  {"key": "g", "duration": 1.15},
+  {"key": "s", "duration": 0.35},
+  {"record_mark": "shop-exterior"},
+  {"wait": 5},
+  {"capture": "nooks-cranny.png", "hide_cursor": true},
+  {"key": "w", "duration": 2.1},
+  {"record_mark": "shop-entry"},
+  {"wait": 8},
+  {"capture": "shop-inside.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]

@@ -1,0 +1,18 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.2},
+  {"wait": 0.2},
+  {"record_mark": "nook-front"},
+  {"wait": 5},
+  {"capture": "nook-sign.png", "hide_cursor": true},
+  {"key": "w", "duration": 0.65},
+  {"wait": 0.2},
+  {"key": ["w", "g"], "duration": 0.65},
+  {"record_mark": "nook-entry"},
+  {"wait": 8},
+  {"capture": "nook-welcome.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"save_state": true},
+  {"read": ["800418D8", 4], "expect": "00000000"}
+]
