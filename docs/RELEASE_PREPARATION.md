@@ -62,10 +62,12 @@ the generated resource lacks attribution.
 - Select the final checked candidate and publish only its patch package, source/
   output hashes, required memory/save type, known issues, and compatibility notes.
   A docs-only archive change does not require another gameplay pass or a new ROM.
-- Retain the unresolved [playtest findings and acceptance](V1_PLAYTEST_BUGS.md),
-  [save/restart limit](checkpoints/RC4_GYROID_INTERACTION.md), remaining artwork,
-  and scoped test failures. Do not turn pending human playtesting into a reason
-  to withhold the private build that enables it, or claim it has already happened.
+- Preserve [human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md) of all reported
+  fixes and ordinary save/restart/reload. Keep source-identified menu findings,
+  remaining artwork, untested gameplay, and scoped test failures at their actual
+  status. The incomplete gyroid automation is not an outstanding ordinary-save
+  gate. Do not withhold private builds for broader playtesting or claim untested
+  cases have passed.
 
 Successful compilation, archive checks, and patch application prove their own
 technical results. They do not certify the full game, original hardware, saved

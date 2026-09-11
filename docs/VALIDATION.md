@@ -54,7 +54,7 @@ four-MiB compatibility is not a prerequisite for an Expansion Pak build.
 | English keyboard | Default ABC, case, delete, cursor, confirmation, all modes | Tested with memory assertions in ares 148 |
 | Name cursor geometry | Rendered prefix width, mixed-width letters, correct selection position | Basic entry visually checked; mixed-width runtime cases outstanding |
 | Name limits | Six-character player/town, four-character catchphrase, ten-character request | Player and town limits runtime-tested; others have static invariants |
-| Saved text | Enter names/mail/board text, save, restart, recover correctly | Native FlashRAM round trip passes 192 synthetic stored-letter slots in both banks and full English reconstruction in a fresh process; normal entry/save-menu/post-load gameplay remains |
+| Saved text | Enter names/mail/board text, save, restart, recover correctly | Native FlashRAM round trip passes 192 synthetic stored-letter slots in both banks and full English reconstruction in a fresh process; ordinary save/restart/reload and reported editor fixes are separately human-accepted; exhaustive stored-text cases are not claimed |
 | Choice menus | All lengths, four entries, cancellation, branch outcome | Twenty-byte capacity, thirteen long reference loads, four rows, selected text, and cancellation pass isolated native tests; corrected shop labels and messages pass cartridge loads; ordinary actor-specific selection remains outstanding |
 | Town arrival | Train dialogue completes and arrival message runs | Tested in ares 148 |
 | Dialogue controls | Page/wait, animation, sound, fields, selection, RNG, branches | Partial intro coverage; 25 approved task-response messages pass complete cartridge loads and actual native actor-request dispatch with exact values/destinations; subsequent ordinary actor progression remains |
@@ -62,7 +62,7 @@ four-MiB compatibility is not a prerequisite for an Expansion Pak build.
 | Added resident catchphrases | Native appearance actor binding, complete insertion, defaults/custom/null behaviour, source retention | 27 approved messages pass real requests and initializer/DMA loads; 30 insertions, 91 calls, and 432 assertions pass, including clearing an old client; no generic catchphrase permission or ordinary traversal claim |
 | Native text formatting | Colour spans, offsets, anchors, character/line scales | Actual renderer dispatch, restoration, argument extremes, and guards tested; individual layouts need review |
 | Separate English glyphs | Startup ownership, actual native drawing/reveal, complete source-bound imports | 26 draws, eight cursor cases, six complete message loads, and 324 assertions pass with no font-code upload; native atlas/widths/saves retained; ordinary glyph-bearing conversations, mail/editor consumers, and hardware remain |
-| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM and both Controller Pak letter-file persistence tests pass fresh-process reads; normal saving, travel/storage UI, RTC, and calendar remain |
+| Travel and persistence | FlashRAM, Controller Pak, RTC and calendar | Isolated native FlashRAM and both Controller Pak letter-file persistence tests pass fresh-process reads; ordinary saving is separately human-accepted; untested travel/storage UI, RTC, and calendar cases remain |
 | Long-play content | Shops, items, mail, board, credits, seasons and events | Outstanding |
 
 The smoke runner's XTest mappings are A=`a`, B=`b`, Start=`Return`, Z=`z`,
@@ -87,6 +87,13 @@ labelled a PC. The bulk `g` response follows the N64 core's 71-register ordering
 the checkpoint probe records both forms for comparison.
 
 ## Original hardware and release
+
+The [human acceptance record](checkpoints/V1_HUMAN_ACCEPTANCE.md) confirms
+ordinary save/restart/reload across repeated real-game sessions and every
+user-reported defect (V1-01 through V1-23). Those hardware checks are complete;
+the emulator matrix's narrower historical results do not reopen them. The
+confirmation is not a claim that every candidate pair or seasonal/Pak case is
+tested, nor fresh execution of a candidate the user has not received.
 
 These are broader acceptance/public-release requirements, not prerequisites for
 the private v0 playtest handoff. Hardware results follow access to that build.

@@ -1,159 +1,92 @@
 # V1 human playtest fixes
 
-## Reported build
+## Human acceptance
 
-The user tested `build/title-stall-combined-01/animal-forest-title-preview.z64`
-on original hardware. The Press Start corruption occurs on both first boot and
-returning to the title. Later artwork-only packages are not evidence that these
-reported runtime defects are corrected. Preserve this ROM and the user's saves.
+**All user-reported findings V1-01 through V1-23 are fixed and human-accepted.**
+The user explicitly confirms every reported issue is fixed and ordinary
+save → restart → reload works across many reloads of the same save.
+[The acceptance record](checkpoints/V1_HUMAN_ACCEPTANCE.md) preserves the report
+and its scope, including the reported v0 corrections. Do not request repeat
+checks of these unchanged fixes. Earlier ROMs, saves, and test records stay intact.
 
-## Open findings
+The confirmation does not identify an exact ROM checksum or every cross-version
+loading direction. It is real-game hardware evidence, not inferred acceptance
+from emulator checks or unchanged formats. RC7's new labels are outside those
+earlier sessions.
 
-The user reports a further original-hardware session on RC4. New catalogue and
-repayment findings take priority over remaining speculative artwork discovery.
-That session is not treated as acceptance of every earlier finding or as a
-documented save/restart test.
+## Accepted reported fixes
 
-| ID | RC4 finding | Status |
+| ID | Reported issue | Accepted correction |
 | --- | --- | --- |
-| V1-21 | Catalogue currency text beside prices remains Japanese | Exact 32×16 GC Bells image installed; source/retention checks pass, hardware recheck pending |
-| V1-22 | Unorderable catalogue items show `ひばいひん` | Complete GC `Not for Sale` reader bypasses the small native buffer; both adapter branches pass native argument capture, hardware recheck pending |
-| V1-23 | Post-office repayment screen retains Japanese heading and confirmation text | Complete GC `Your Loan` / `OK` installed and centred in existing slots; focused checks pass, hardware recheck pending |
+| V1-01 | Press Start corruption on boot and return | Corrected linear source tiles |
+| V1-02 | Missing keyboard sounds/background | Sound feedback and corrected GC frame |
+| V1-03 | Bulletin-date slash graphics | Separate slash texture cleared |
+| V1-04 | Japanese house camera hint | Exact English GC Camera texture |
+| V1-05 | AM/PM precedes the time | Reordered geometry, native timekeeping retained |
+| V1-06 | Japanese tune notes and misplaced OK | GC A–G / ? textures and OK placement |
+| V1-07 | Japanese letter-editing bubble | GC English address prompts |
+| V1-08 | Recipient list shows らっきょ instead of Limberg | Shared identity-based English reader for all 216 villagers |
+| V1-09 | Mail/board caret spacing, early wraps, and jumbled editor text | Proportional pixel layout |
+| V1-10 | Japanese letter To/From | GC stock defaults, custom text retained |
+| V1-11 | Japanese shop cash heading | GC Your Bells texture and geometry |
+| V1-12 | Inventory money digits compressed left | Money-only scale/origin correction |
+| V1-13 | Japanese first-time-player option | Complete GC I'm new |
+| V1-14 | Keyboard corners, escaping hints, misaligned glyphs, and sparse symbol pages | Corrected UVs/offset, contained hints, ink-based placement, and one symbol page |
+| V1-15 | Japanese shop currency unit | Separate GC Bells texture |
+| V1-16 | Stray pixels below idle pm | Texture-edge clamping |
+| V1-17 | Clipped glyph edges and descender artifacts in names/options | Transparent-border polygon correction |
+| V1-18 | Exposed top rows in building transitions | Enlarged native transition mesh |
+| V1-19 | Displaced SP blocks for ordinary spaces | Ordinary-space marker suppression |
+| V1-20 | RC3 crashes loading existing RC1/RC2 towns | Dedicated Expansion Pak font region |
+| V1-21 | Japanese catalogue currency unit | Exact GC Bells texture |
+| V1-22 | Japanese catalogue Not for Sale | Complete English reader with bounded display |
+| V1-23 | Japanese repayment heading and confirmation | Complete GC Your Loan / OK |
 
-See [the RC4 menu-label specification](../specs/RC4_MENU_LABELS.md). Preserve
-the already installed repayment Cash/Payment/You still owe/Bells images and
-catalogue top/bottom controls; inspect the remaining reader paths as part of
-this correction. Currency arithmetic, item availability, and saves stay native.
-The [correction checkpoint](checkpoints/RC4_MENU_LABEL_FIXES.md) records five
-passing focused checks and the bounded native adapter run. The latter captures
-font arguments without drawing; it is not screen-appearance acceptance.
-All three corrections are included in the packaged
-[V1RC5 handoff](checkpoints/V1RC5_PACKAGE.md).
+The recipient result accepts the reported defect and shared fix; it does not
+claim the user separately tested all 216 villagers. Correct English names,
+player names, saved identities, and saved capacities remain preserved.
 
-Two further omissions are identified by source review, not a new human report:
+V1-20 remains a defect in the preserved RC3 cartridge itself; do not use RC3
+as a fallback. The copied RC2 save reproduces RC3's 304-byte-free allocation
+failure and loads with 25,216 bytes free after the font moves. Human acceptance
+closes the reported loading defect and ordinary persistence check, not a matrix
+of every possible version pair. See the [memory specification](../specs/FONT_EXPANSION_MEMORY.md)
+and [RC4 package evidence](checkpoints/V1RC4_PACKAGE.md).
 
-| ID | Additional source finding | Status |
+Implementation and native evidence remain in the [letter UI](checkpoints/V1_LETTER_UI_FIXES.md),
+[keyboard](checkpoints/KEYBOARD_RC1_FIX.md), [HUD](checkpoints/RC1_TEXT_HUD_FIX.md),
+[font](checkpoints/FONT_POLYGON_EDGES.md), [transition](checkpoints/TRANSITION_EDGES.md),
+and [catalogue/repayment](checkpoints/RC4_MENU_LABEL_FIXES.md) checkpoints.
+Their historical pending-human-test statements do not override current acceptance.
+
+## Source-identified findings
+
+These omissions come from source review, not human bug reports. The user's
+confirmation does not establish their ordinary appearance or development-menu
+access. None requires deleting data or invoking a save action to inspect wording.
+
+| ID | Additional finding | Implementation and remaining check |
 | --- | --- | --- |
-| V1-24 | Town-tune confirmation retains `ホントに?`, `うん`, and `やっぱやめる` | Complete GC `Are you sure?` / `Yes` / `No` installed in separate follow-up; four focused checks pass, ordinary appearance pending |
-| V1-25 | Controller Pak manager retains its Japanese note-deletion instruction | N64-specific `Erase a Pak note` installed and centred in separate follow-up; four focused checks pass, ordinary appearance pending |
+| V1-24 | Japanese tune confirmation | Complete GC Are you sure? / Yes / No in RC6; four focused checks pass; ordinary appearance pending |
+| V1-25 | Japanese Pak note-deletion instruction | Centred Erase a Pak note in RC6; four focused checks pass; ordinary appearance pending |
+| V1-26 | Native title controller warning and erase label | Complete English in committed title-warning stage; four focused checks pass; appearance pending |
+| V1-27 | Nine labels in separate player/save gamestates | Complete English in committed gamestate stage; six focused checks pass; access and appearance unverified |
 
-The [V1RC6 handoff](checkpoints/V1RC6_PACKAGE.md) includes both corrections and
-retains all RC5 fixes. The earlier named RC5 remains unchanged. Note-selection/
-deletion and save behaviour remain native; no destructive Pak operation is run
-as a test. Both findings still require ordinary appearance acceptance.
+The [RC6 handoff](checkpoints/V1RC6_PACKAGE.md) contains V1-24/V1-25.
+The [title-warning](checkpoints/TITLE_WARNING_TEXT.md) and
+[gamestate](checkpoints/GAMESTATE_MENU_TEXT.md) stages are ready for RC7 packaging.
+Controller detection, menu actions, allocations, and saved formats are unchanged.
 
-V1-26 is a further source finding, not a human report: the native title's
-missing-controller warning and retained erase-save menu label remain Japanese
-in RC6. The [title-wording correction](checkpoints/TITLE_WARNING_TEXT.md)
-installs complete English, preserves the power-off instruction, and centres
-all three warning lines. Four focused checks pass; native rendering and hardware
-appearance remain unverified. This follow-up is not yet in the named RC6 handoff.
-Controller detection, menu actions, and saved formats are unchanged.
+The separate development scene-name table remains an unreviewed text lead.
+Lucky-bag Japanese decoration is intentionally retained, matching English GC
+and the user's explicit choice. It is not an open bug.
+The N64-grey keyboard redesign remains V2 work.
 
-V1-27 is a source finding in the separate player-selection and save-menu
-gamestates: nine headings, status labels, and destination labels retain Japanese.
-The [gamestate correction](checkpoints/GAMESTATE_MENU_TEXT.md) applies complete
-English with six passing focused checks. It retains saved identities, actions,
-metadata, allocation, and original slot numbers, with longer display copies
-bounded inside existing storage. Ordinary access and hardware appearance remain
-unverified; this follow-up is not yet in the named RC6 handoff.
+## Verification policy
 
-V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
-load both the user's RC1 and RC2 saves, while a new file works. The copied RC2
-save reproduces an overlay-manager out-of-memory fault in RC3, with only 304
-bytes free for a requested 528-byte relocation allocation. The same save loads
-in RC2. Moving the unchanged bordered font into its own Expansion Pak region
-allows the corrected candidate to load that save with 25,216 bytes free and no
-faulted thread. Native font/title/module guards remain intact; four focused
-loader/resource checks pass. See [the memory specification](../specs/FONT_EXPANSION_MEMORY.md).
-The committed replay, package tests, and archived standalone patcher pass;
-V1RC4 is available for hardware rechecking. The original
-save is preserved locally; the SD card is no longer needed. Cross-version
-compatibility is preferred, not required, and must not be confused with fixing
-this unintended allocation crash. Save formats are unchanged; untested loading
-directions and manual save/restart remain explicitly unverified.
-
-V1-19: on V1RC3, entering spaces in a name inserts the correct spaces and moves
-the caret correctly, but also draws one displaced `SP` block per space. The
-name-window draw loop at `80884794` still draws these markers using twelve
-pixels per character. English GC `mLE_set_dl` draws markers only for its separate
-wide-space code, not ordinary spaces. Correct the shared name-window rendering
-without changing stored names, the proportional caret, or keyboard Space labels.
-The single-branch correction has four passing focused instruction/resource tests
-and is packaged with the memory correction in V1RC4. Native marker drawing and
-original-hardware rechecking remain pending.
-
-V1-17: the user reports clipped left-edge columns on names/options and extra
-bottom pixels on descenders such as `g`; speech usually looks correct. The
-specific cartridge revision for this observation is not confirmed. Compare
-the native polygon and rectangle paths independently. A transparent-border
-polygon correction is implemented in the [font-edge candidate](checkpoints/FONT_POLYGON_EDGES.md),
-with four focused tests and the complete controlled native comparison passing.
-Original glyph ink, speech, advance widths, and saved formats remain unchanged.
-Original-hardware appearance rechecking remains pending.
-
-V1-18: the user reports that the silhouette-shaped transition on building
-entry leaves one or two scene-pixel rows visible along the top instead of
-covering the screen in black. The [transition correction](checkpoints/TRANSITION_EDGES.md)
-enlarges the native mesh beyond all screen edges without changing timing or
-scene logic. The old two-row gap is reproduced; all three corrected closed
-shapes cover the entire framebuffer. Three focused tests and controlled native
-save/guard checks pass. Original-hardware rechecking remains pending.
-
-V1RC1 hardware findings have scoped corrections in V1RC2, with original-
-hardware rechecking pending. The user accepts keyboard sound feedback. The
-corrected frame has complete controlled drawing evidence; neither that check
-nor the earlier partial test establishes ordinary appearance acceptance.
-Preserve both candidates and the user's saves.
-
-| ID | V1RC1 follow-up | Status |
-| --- | --- | --- |
-| V1-13 | Player selection retains an option resembling `はじまて` | Actual `はじめて` reader now copies complete GC `I'm new`; focused relocation checks pass, hardware recheck pending |
-| V1-14 | Keyboard top-right is too low, bottom-right is upside-down, hints escape the frame, symbol pages are mostly empty, and key glyphs fit poorly (`_`, `1`, `0` are examples) | Corrected corner UVs/offset, centred hints, shared ink-based glyph placement, and one supported-symbol page installed; six focused tests and native draw/guards pass; sound feedback accepted, hardware appearance recheck pending |
-| V1-15 | Two Japanese currency characters remain after the shop cash amount | Separate `ベル` image replaced with exact GC `Bells`; amount/heading retained, hardware recheck pending |
-| V1-16 | Idle `pm` has a vertical line of stray pixels below the `m` | PM wraps its p descender at the right edge; compiled clamp correction installed, hardware recheck pending |
-
-The [text/HUD corrections](checkpoints/RC1_TEXT_HUD_FIX.md) and
-[keyboard follow-up](checkpoints/KEYBOARD_RC1_FIX.md) are combined in
-the packaged [V1RC2](V1RC2_PLAYTEST.md), reproduced by the complete three-stage
-follow-up. The original V1RC1 is preserved.
-
-| ID | Finding | Status |
-| --- | --- | --- |
-| V1-01 | Press Start shows corrupt graphics on first boot and return | Corrected linear source tiles installed in fix build 01; hardware recheck pending |
-| V1-02 | Keyboard lacks navigation/button sounds and a GC-style background | Sound feedback accepted; GC frame's reported corner/hint defects corrected under V1-14; complete controlled native drawing/guards pass, hardware appearance recheck pending |
-| V1-03 | Bulletin-board dates retain unwanted slash graphics | Separate slash texture cleared in notice/tune candidate; English date reader retained |
-| V1-04 | House camera-control hint is Japanese | Exact English GC Camera texture installed in HUD candidate; hardware recheck pending |
-| V1-05 | Idle clock shows `am 11:36`, not `11:36 am` | Existing digits/AM-PM geometry reordered in HUD candidate; timekeeping and blink unchanged |
-| V1-06 | Town-tune notes are Japanese and OK is too far right | Exact GC A–G and ? textures plus GC OK placement installed; melody rules unchanged |
-| V1-07 | Opening a letter for editing shows a Japanese bubble | Both native address prompts use GC English wording; native translation/drawing checks pass, ordinary opening recheck pending |
-| V1-08 | Letter recipient list shows `らっきょ`, expected Limberg | Identity-based English reader installed for all 216 villagers; Limberg, an already-correct NPC, and a player pass representative native checks; hardware recheck pending |
-| V1-09 | Mail/board editor caret advances too far, wraps early, and jumbles text; saved display is correct | Pixel-layout candidate built; four host/ROM checks and 16 native calls/45 assertions pass; hardware recheck pending |
-| V1-10 | Letter To/From text remains Japanese | Exact stock draft defaults normalised to GC To/from; native helper checks preserve custom text, read mode, and identities; ordinary constructor recheck pending |
-| V1-11 | Nook shop's blue cash bubble still says `もってるおかね` | English GC Your Bells texture, load, and label geometry installed in HUD candidate; hardware recheck pending |
-| V1-12 | Inventory Bells digits are compressed into the left side of their bubbles | Money-only X scale/origin corrected; three focused checks pass, hardware appearance recheck pending |
-
-Fix the broken title and editing display first, then the remaining English
-application gaps and keyboard polish. Preserve saved capacities and GameCube
-wording, line/page breaks, and timing. Do not count an installed English resource
-as a completed reader when this report demonstrates Japanese output. Record
-confirmed bindings in the shared progress verification as they are established.
-
-The Japanese lucky-bag decoration stays, matching the English GC release and
-the user's explicit choice. It is not an open bug. Keyboard input/layout received
-positive human feedback; this does not validate multi-line editor layout.
-
-The recipient-name report identifies one observed wrong name, not an entirely
-Japanese list or a complete survey of all villagers. The fix must address the
-shared cause across villagers without assuming that all names are wrong or
-hard-coding Limberg as the only possible affected identity. Correct English
-names, player names, and saved identities must remain intact.
-
-## Verification
-
-Use focused checks for changed code and shared consumers, plus one combined
-private fix candidate. Do not repeat unrelated event/artwork tests. Sound calls
-can be checked without playing audio through the user's equipment. Original-
-hardware rechecking follows delivery; it does not block producing the fix build.
-No reported issue is marked fixed merely because a host or emulator test passed
-before this human report.
+Prioritise new concrete crashes, save damage, blocked progression, or visual/text
+defects. Preserve accepted fixes and GC wording, line/page breaks, and timing.
+Use focused checks for changed code and shared consumers; do not rerun accepted
+unchanged workflows or maintain the percentage tool as a separate project.
+Sound calls can be checked without playing audio through the user's equipment.
+Source checks, native execution, and human acceptance retain distinct evidence.

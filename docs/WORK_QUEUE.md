@@ -2,6 +2,12 @@
 
 ## Next work
 
+All user-reported issues (V1-01 through V1-23 and the reported v0 corrections)
+and the ordinary save/restart/reload cycle have
+[explicit human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md). They are closed,
+not repeat-test tasks. Prioritise the remaining source-identified labels,
+unreviewed content, and release preparation; new concrete bugs take precedence.
+
 The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
 nine complete native labels (V1-27), with six focused checks, committed
 construction, and UPS reconstruction passing. Preserve `build/gamestate-menu-text-01`
@@ -51,16 +57,17 @@ results and all preceding artifacts; do not repeat the completed reproduction.
 Every RC handoff distinguishes unchanged save formats from tested loading and
 warns about known or unresolved incompatibility. Cross-version compatibility is
 preferred, not mandatory. Resume the remaining artwork review and scoped
-regression-fixture follow-up; RC4 hardware appearance and manual save/restart
-remain unverified. Keep new concrete human defects ahead of speculative work.
+regression-fixture follow-up. The reported hardware fixes and ordinary
+save/restart/reload are human-accepted. Keep new concrete human defects ahead of speculative work.
 
 The [source-bound gyroid follow-up](checkpoints/RC4_GYROID_INTERACTION.md)
 opens the English menu within the verified native 43-unit talking limit and
 reaches Save & Quit / Save & Continue. Preserve its active-menu checkpoint and
 passing interaction/fault checks; do not repeat the completed navigation.
 The save-confirmation setup reaches its retry limit before a save is confirmed.
-Its corrected N64 continuation remains unexecuted, and save/restart remains
-unverified. Retain the separately recorded
+Its corrected N64 continuation remains unexecuted. The human save/restart/reload
+confirmation closes the ordinary workflow check; do not resume this harness
+solely to duplicate that evidence. Retain the separately recorded
 [earlier route failures](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md).
 Emulator checkpoints are not game saves; continue unrelated V1 work at this limit.
 
@@ -70,22 +77,21 @@ The V1-17/V1-18 follow-up is implemented in the packaged
 focused and controlled native checks. The committed two-stage replay, two
 package tests, and archived standalone patcher pass. RC3 has the confirmed town-
 loading defect above; use the corrected RC6 handoff, not RC3.
-Preserve existing ROMs and saves; original-hardware appearance remains pending.
+Preserve existing ROMs and saves; both reported appearance fixes are human-accepted.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
 [V1RC2 candidate](V1RC2_PLAYTEST.md): first-time-player wording, GC keyboard
 corner/hint layout and key alignment, one supported-symbol page, shop currency
 units, and idle AM/PM edge clamping. The complete three-stage rebuild, focused
 checks, controlled native keyboard drawing/guards, and standalone patcher pass.
-Hardware appearance remains acceptance work. Keyboard sound feedback is
-accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
+Hardware appearance and sound feedback are human-accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
 artwork discovery and event acceptance. The first sixteen findings have scoped
 corrections retained in V1RC3, alongside the two edge fixes. The
 [package checkpoint](checkpoints/V1RC3_PACKAGE.md) identifies the exact local
-ROM, patch, and source revision. Implementation and controlled drawing evidence
-do not establish acceptance of every reported case. Next:
+ROM, patch, and source revision. Human acceptance is recorded separately from
+implementation and controlled drawing evidence. Next:
 
 - Prioritise remaining Japanese wording/artwork and concrete playtest defects.
   Percentage-tool maintenance is deferred at the user's request; use existing
@@ -145,9 +151,9 @@ do not establish acceptance of every reported case. Next:
   The current keyboard probe completes drawing, save/guard checks, fixture
   release, and checkpoint restoration. Do not repeat unchanged native batches.
   Preserve the older RC1 partial result separately, without relabelling it.
-- Recheck ordinary letter opening/defaults, recipient selection, all reported
-  screen appearances, keyboard feedback, and inventory digits on the playable
-  candidate. The shared recipient fix covers all villagers, not only Limberg;
+- Preserve human acceptance of ordinary letter opening/defaults, recipient
+  selection, reported screen appearances, keyboard feedback, and inventory
+  digits. The shared recipient fix covers all villagers, not only Limberg;
   preserve correct English names, player names, and saved identities.
 - Retain the verified [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
   included in V1RC2, without repeating the unchanged room inspection.
@@ -223,10 +229,11 @@ build that enables testing. Keep these outstanding checks explicit:
 - Ordinary tutorial progression, including both corrected Nook advice paths.
 - All changed menus and editor callers, including mail, board, catchphrases,
   apology, and song input; gyroid navigation and transactions.
-- Normal save/restart, existing-save and return-to-title paths, longer displayed
-  names, RTC, travel, and Controller Pak workflows.
+- Untested longer-name, RTC, travel, and Controller Pak workflows. Ordinary
+  save/restart/reload and the reported existing-save/title defects are accepted.
 - Dates, seasons, events, and both placements of changed seasonal props.
-- Real console, flash cartridge, Expansion Pak, and Controller Pak behaviour.
+- Hardware configurations and Controller Pak cases outside the user's accepted
+  ordinary EverDrive playtests.
 - English wording and line layout, preserving GC line/page/timing intent.
 
 Use the existing [bounded testing policy](V0_PLAN.md). Reuse passing evidence

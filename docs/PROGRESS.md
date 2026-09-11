@@ -1,12 +1,22 @@
 # Current progress
 
+## Human acceptance
+
+The user confirms all reported bugs are fixed and ordinary save → restart →
+reload works across many reloads of the same save. All V1-01 through V1-23
+findings are human-accepted, including visual/editor fixes and existing-town
+loading. [The acceptance record](checkpoints/V1_HUMAN_ACCEPTANCE.md) also covers
+the reported v0 corrections. These checks are complete; do not repeat the
+exhausted save harness or keep reported appearance fixes open. Source-identified
+menu labels and genuinely untested areas retain their own limits.
+
 ## Builds
 
 The RC4 catalogue/repayment findings V1-21 through V1-23 have
 [implemented corrections](checkpoints/RC4_MENU_LABEL_FIXES.md): exact GC Bells
 artwork, complete `Not for Sale`, and centred `Your Loan` / `OK`. Five focused
 checks and both native price-adapter routes pass. Font arguments are captured in
-the native check; screen appearance is not claimed verified. The committed
+the native check; screen appearance is separately human-accepted. The committed
 rebuild, two package checks, and archived standalone patcher pass. Prices,
 transactions, save formats, and previous fixes are retained.
 
@@ -57,7 +67,8 @@ opens the ordinary English menu and reaches Save & Quit / Save & Continue.
 The actual native talking limit is 43 units; the earlier route stops outside it.
 The retained active-menu checkpoint avoids repeated navigation. The confirmation
 driver stops before confirming a save, and its corrected continuation remains
-unexecuted at the setup retry limit. Saving and cold restart remain unverified.
+unexecuted at the setup retry limit. Ordinary saving and restart/reload are
+separately human-confirmed; this incomplete automation is not an open save gate.
 Original and isolated seed-save checksums pass; emulator checkpoints are not
 game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
 as separate evidence rather than rerunning either completed setup batch.
@@ -83,7 +94,7 @@ passing focused tests and controlled native drawing/guard checks. V1-18's
 focused tests and native reproduction/correction checks for all three closed
 shapes and the centre open/midpoint states. The original two-row top gap is
 reproduced; corrected closed shapes leave no exposed framebuffer pixels.
-Neither finding is accepted on original hardware.
+Both findings are human-accepted on original hardware.
 
 Retained V1RC2 corrections include the complete GC `I'm new` player option, separate shop `Bells`
 unit, and PM texture-edge clamping. Four focused text/HUD tests pass; their
@@ -111,7 +122,7 @@ Focused source/ROM/patch checks pass for each batch. The pixel editor has
 passing native call/guard evidence. Letter UI checks verify representative
 recipient names and native prompt/default handling with saved data and guards
 retained. The corrected background has complete controlled native drawing and
-guard evidence; ordinary appearance remains unverified. See the
+guard evidence; the reported ordinary appearance is human-accepted. See the
 [letter](checkpoints/V1_LETTER_UI_FIXES.md) and
 [keyboard](checkpoints/KEYBOARD_RC1_FIX.md) checkpoints. The older RC1 background
 probe remains a separate partial result, not retroactively passed evidence.
@@ -158,8 +169,8 @@ rejection of obsolete imports, verifies archived retention separately, and
 matches the full current RC4 item-name resource, N64-specific names, rotations,
 aliases, and short fields against source-bound construction. No text changes.
 Further fixture repair remains scoped follow-up work, and
-counter maintenance stays deferred. Ordinary letter opening, screen appearance, and hardware
-rechecking remain acceptance work. Broad human playtesting cannot block the
+counter maintenance stays deferred. Reported letter/editor and screen defects
+are human-accepted. Broader untested gameplay cannot block the
 build that enables it; confirmed game crashes or data corruption must be fixed.
 
 The retained artwork-only reference package is
@@ -305,9 +316,9 @@ on the exact builds/checkpoints documented in their records. Retention checks
 preserve unchanged implementations; they do not turn that evidence into a fresh
 ordinary playthrough of a newer ROM.
 
-Normal tutorial replay, menu/editor/transaction use, save/restart,
-return-to-title/existing-save cases, travel, events, and original-hardware
-acceptance remain human playtest work. Confirmed crashes, save damage, and
+Ordinary save/restart/reload and all reported fixes are human-accepted. Broader
+unreported tutorial/transaction cases, travel, events, and other untested
+hardware workflows remain playtest work. Confirmed crashes, save damage, and
 memory corruption must be fixed; test-infrastructure limits do not waive them.
 Preserve GameCube wording, intentional line/page breaks, and timing during polish.
 Public release still needs provenance review and explicit release approval.
