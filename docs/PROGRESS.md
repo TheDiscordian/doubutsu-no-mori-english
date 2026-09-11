@@ -20,6 +20,14 @@ It retains all RC5 fixes and introduces no allocation, relocation, transaction,
 or save-format changes. Both corrections are included in the named RC6 handoff;
 ordinary appearance remains pending.
 
+The [title-warning follow-up](checkpoints/TITLE_WARNING_TEXT.md) implements
+V1-26: complete English for the native missing-controller warning and retained
+erase-save menu label. Four focused checks pass, including actual Expansion Pak
+relocation, centred complete lines, unchanged controller/menu actions, retention
+of every other resource, and UPS reconstruction. This development correction is
+not yet in the named RC6 handoff. No save format, artwork, or allocation changes;
+native rendering and hardware appearance remain unverified.
+
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
 after the complete bordered font moves to its own Expansion Pak region. The

@@ -42,6 +42,14 @@ retains all RC5 fixes. The earlier named RC5 remains unchanged. Note-selection/
 deletion and save behaviour remain native; no destructive Pak operation is run
 as a test. Both findings still require ordinary appearance acceptance.
 
+V1-26 is a further source finding, not a human report: the native title's
+missing-controller warning and retained erase-save menu label remain Japanese
+in RC6. The [title-wording correction](checkpoints/TITLE_WARNING_TEXT.md)
+installs complete English, preserves the power-off instruction, and centres
+all three warning lines. Four focused checks pass; native rendering and hardware
+appearance remain unverified. This follow-up is not yet in the named RC6 handoff.
+Controller detection, menu actions, and saved formats are unchanged.
+
 V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
 load both the user's RC1 and RC2 saves, while a new file works. The copied RC2
 save reproduces an overlay-manager out-of-memory fault in RC3, with only 304

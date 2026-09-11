@@ -2,6 +2,16 @@
 
 ## Next work
 
+The [title-warning follow-up](checkpoints/TITLE_WARNING_TEXT.md) implements the
+live native missing-controller warning and retained erase-save label (V1-26).
+Four focused checks pass. Build this committed stage and retain its exact receipt
+before combining further corrections into the next named candidate. RC6 remains
+the existing handoff, without this later correction. Do not rerun unchanged title
+animation or low-memory scenarios, and do not execute a delete operation to
+validate a label. The checkpoint also records separate development-gamestate
+text leads and rejected old-reader/padding hits; use those classifications to
+avoid repeating discovery work.
+
 The current named handoff is [V1RC6](checkpoints/V1RC6_PACKAGE.md), containing
 all RC5 corrections plus the tune/Pak text follow-up. Eight focused correction
 checks, both committed builds, three package checks, and the archived standalone
