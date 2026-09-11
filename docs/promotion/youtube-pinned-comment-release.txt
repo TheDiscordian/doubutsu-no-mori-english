@@ -1,4 +1,4 @@
-🌳 Ready to move in? Patch your game here: [PUBLIC_PATCHER_URL]
+🌳 Ready to move in? Patch your game here: https://thediscordian.github.io/animal-crossing-n64/
 
 You'll need your own Japanese N64 ROM and the North American GameCube game. Supported files and instructions are on the website; no ROMs are provided.
 

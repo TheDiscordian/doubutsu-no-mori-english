@@ -3,17 +3,20 @@
 ## Copy
 
 - [Title](youtube-title.txt): `Animal Crossing N64 — English Translation Trailer`.
-- [Unlisted description](youtube-description-unlisted.txt): ready for the
-  pre-release upload; no non-working URL or availability claim.
-- [Release description](youtube-description-release.txt): replace its single
-  `[PUBLIC_PATCHER_URL]` with the actual public HTTPS patcher address.
+- [Unlisted description](youtube-description-unlisted.txt): includes the planned
+  public address and a single line explaining that the patcher launches at release.
+- [Release description](youtube-description-release.txt): complete release copy
+  with the planned public HTTPS patcher address already filled in.
 - [Optional release pinned comment](youtube-pinned-comment-release.txt): use the
   same public address. This comment is for release, not the unlisted upload.
 
 Copy the contents of the appropriate plain-text file into YouTube Studio.
-The public address is not assigned; do not substitute localhost or a link to
-the private development repository. The main patcher page supplies file hashes
-and instructions, keeping the video description short enough to scan.
+The planned public address is
+`https://thediscordian.github.io/animal-crossing-n64/`. It is not live; deployment
+targets a separate site-only `TheDiscordian/animal-crossing-n64` repository when
+publication is authorised. Do not expose the private development repository.
+If that destination changes, replace the exact URL once in each description and
+the pinned comment. The public main page supplies file hashes and instructions.
 
 These resources do not upload a video, post a comment, publish a patch, change
 repository visibility, or alter the existing trailer. The trailer remains
@@ -94,9 +97,9 @@ experiment. [YouTube thumbnail testing](https://support.google.com/youtube/answe
    remains the user's decision.
 3. Review YouTube's upload checks for the game's soundtrack. Attribution is
    included; it does not determine whether a claim or restriction will occur.
-4. At release, replace `[PUBLIC_PATCHER_URL]` in the release description and
-   optional pinned comment. Check the public patcher works and the saved link
-   opens correctly. Do not publish an unresolved placeholder.
+4. At release, use the release description and optional pinned comment. Verify
+   the planned public address works and the saved link opens correctly. If a
+   different address is deployed, replace the one URL in each copy first.
 
 The thumbnail has no launch date or `out now` label, so it is suitable for both
 the unlisted upload and the eventual public trailer.

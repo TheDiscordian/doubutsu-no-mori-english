@@ -9,6 +9,12 @@ The portal is running at **http://127.0.0.1:8073/** through the enabled
 `animal-forest-portal.service` user service. It remains local-only. The service
 serves `build/web-portal-02/site`, not the repository or its game inputs.
 
+The planned public address is
+**https://thediscordian.github.io/animal-crossing-n64/**, matching the YouTube
+upload copy. This targets a separate site-only `TheDiscordian/animal-crossing-n64`
+repository, not a visibility change to the private translation repository.
+The destination is not created or live; publication still requires approval.
+
 ## Use
 
 Choose an extracted original Japanese **Doubutsu no Mori** N64 ROM and an

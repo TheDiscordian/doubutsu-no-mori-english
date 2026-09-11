@@ -123,3 +123,15 @@ same Lanczos conversion and quality 3 settings as the initial export.
 The source/master is not a second thumbnail choice. No trailer, ROM, portal,
 or upload copy changes. The revision is delivered for review, not recorded as
 human-approved.
+
+## Planned public link
+
+The user requests a concrete estimated public address rather than missing-link
+copy. Both descriptions and the pinned comment now contain
+`https://thediscordian.github.io/animal-crossing-n64/`. The portal operator guide
+records that destination for a separate site-only repository. GitHub's repository
+lookup does not resolve `TheDiscordian/animal-crossing-n64`; no repository is
+created, no Pages deployment is performed, and the URL is not claimed live.
+The unlisted description has one removable launch-status line; release copy is
+ready without a placeholder. If the final destination changes, the exact URL
+occurs once in each upload text. The saved handoff copies are refreshed to match.

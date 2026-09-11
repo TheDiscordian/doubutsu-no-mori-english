@@ -17,8 +17,9 @@ The [YouTube upload resources](promotion/YOUTUBE.md) include a revised thumbnail
 a suggested title, unlisted/release descriptions, and an optional pinned comment.
 The thumbnail uses flat, regular lettering and the retained green background;
 handoffs contain one upload image, and user approval remains separate. The user handles the
-unlisted YouTube upload. Release copy needs the
-actual public patcher address; no placeholder or localhost link is published.
+unlisted YouTube upload. Release copy includes the planned public patcher address,
+`https://thediscordian.github.io/animal-crossing-n64/`; deploy the site there on
+approval and verify that address before public release.
 This resource work does not edit the trailer or authorise public patch hosting.
 
 The [released trailer](checkpoints/TRAILER_TOWN_REVISION.md) is preserved at

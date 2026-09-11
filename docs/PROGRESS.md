@@ -9,8 +9,9 @@ pinned comment. Copy and image verification are recorded in the
 uses clean, flat lettering over the retained green background and title scene,
 addressing the user's font feedback. The handoff contains one upload-ready file,
 not multiple export sizes. User approval of the revision is not assumed.
-The public patcher URL remains the only release-copy placeholder. No video is
-uploaded or changed, and no public publication is performed.
+The upload copy includes the planned public patcher address,
+`https://thediscordian.github.io/animal-crossing-n64/`, which is not live yet.
+No video is uploaded or changed, and no public publication is performed.
 
 The [local browser patcher](WEB_PORTAL.md) is running at
 **http://127.0.0.1:8073/**. It builds the current V2-07 from the original N64 ROM
