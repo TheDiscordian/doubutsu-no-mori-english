@@ -51,7 +51,7 @@ are retained old readers, not new application gaps:
   RC6's keyboard caller `808882D8` selects `8088C9E8` through `0C22327A`.
 
 The companion `80090E1C` scan finds eighteen native calls and identifies the
-actual title warning above. Its other leads include the separate development
+actual title warning above. Its other leads include the separate
 player-selection and save-menu gamestates at `00747AA0` / `007486E0`. Their
 Japanese labels are not the ordinary already-corrected player-selection option.
 Review reachability and original reader lengths before changing those resources;
@@ -64,6 +64,22 @@ contain zero padding, not additional live Japanese names. Their native encoding
 renders byte zero as `あ` only when treated as counted text. Existing name/item
 specifications preserve these reserved slots. They are not modified to make a
 counter increase.
+
+## Committed construction
+
+`build/title-warning-text-01/animal-forest-title-warning.z64` is constructed
+from clean revision `7b6eddc23503f8172e972534972eb572924711f9` on the exact RC6
+baseline. Its receipt records `worktree_modified: false`.
+
+- ROM SHA-256: `614e387ee7591d935c091852512f7a60dc181fe25892843a2458c70a69e87037`.
+- UPS SHA-256: `c41973cd35632e5ed511021c826f9d64705b0dcff4e92713c564694a6bd19941`.
+- Receipt SHA-256: `49e04f4b2603673d413b6c17b4f0af398451761bddcdb8d4332a2037dde099d2`.
+- Builder SHA-256: `430131ad33af441433c6456875587de7d8eed0c69d28fa119050caa92c61a984`.
+- Installed title owner SHA-256: `0363362712461f6a30bfe487a2cf4936bdf21a4fcb81cc62f56f9c2fb9e1b379`.
+
+The committed build and full UPS reconstruction pass. Reproduce into a fresh
+output directory with `python3 tools/title_warning_text.py --output build/title-warning-text-new`.
+The input remains the named RC6 ROM; never overwrite an earlier build or save.
 
 ## Handoff state
 

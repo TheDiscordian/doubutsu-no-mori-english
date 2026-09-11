@@ -24,8 +24,10 @@ The [title-warning follow-up](checkpoints/TITLE_WARNING_TEXT.md) implements
 V1-26: complete English for the native missing-controller warning and retained
 erase-save menu label. Four focused checks pass, including actual Expansion Pak
 relocation, centred complete lines, unchanged controller/menu actions, retention
-of every other resource, and UPS reconstruction. This development correction is
-not yet in the named RC6 handoff. No save format, artwork, or allocation changes;
+of every other resource, and UPS reconstruction. The clean committed build is
+`build/title-warning-text-01/animal-forest-title-warning.z64`; its exact hashes
+are recorded in the checkpoint. This correction is not yet in the named RC6
+handoff. No save format, artwork, or allocation changes;
 native rendering and hardware appearance remain unverified.
 
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
