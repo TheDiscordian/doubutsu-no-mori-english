@@ -28,6 +28,7 @@ CALL = 0x808882D8-RAM
 SPEC = dict(PREVIOUS_SPEC, vrom=VROM, reloc=RELOC, sha=RECOVERED_SHA,
             imports=dict(PREVIOUS_SPEC['imports'], af_grid_get_button=0x80078D78))
 BOTTOM = b'D-pad: Move   L+A: Alter   L+Z: ABC'
+FRAME_COLOURS = ((235,235,235),(174,177,181))
 
 # Offsets are bound to native pointer tables and the actual RDP materials.
 # Tuple: name, editor table offset, released/pressed, dimensions, format, texture-load command.
@@ -110,7 +111,10 @@ def draw_source():
     old_panel=(ROOT/'overlays/keyboard_rc1/panel.c').read_text()
     if sha256(old_panel.encode())!='f876b937dac8eb6899e8ec4ecdeb145f24b0bb3ee8e874d6066990c970289bc5':
         raise ValueError('Changed accepted GC panel source')
-    panel=old_panel.replace('225,205,225,255','225,225,225,255').replace('160,90,245,255','105,110,115,255')
+    panel=old_panel.replace('225,205,225,255',','.join(map(str,FRAME_COLOURS[0]))+',255')
+    panel=panel.replace('160,90,245,255',','.join(map(str,FRAME_COLOURS[1]))+',255')
+    panel=panel.replace('Correct GC corner directions; retain the V1 colours and native key grid.',
+                        'Accepted GC corners and key grid, with N64-style grey shading.')
     changes={
         '#include "/source/overlays/keyboard_rc1/panel.c"':'#include "panel.inc"',
         'void af_bg_editor_draw(':'#include "/source/overlays/keyboard_v2/controls.c"\n\nvoid af_bg_editor_draw(',
@@ -175,7 +179,7 @@ def build(native, base, rel, symbols, out):
     (out/'editor/image.json').write_text(json.dumps(compiled,indent=2)+'\n')
     return image,patch,dict(version=2,baseline_sha256=BASE_SHA,source_sha256=sha256(native),
         output_sha256=sha256(image),patch_sha256=sha256(patch),sources=sources,editor=compiled,
-        native_artwork=artwork,frame=frame_report,frame_colours=[[225,225,225],[105,110,115]],
+        native_artwork=artwork,frame=frame_report,frame_colours=[list(c) for c in FRAME_COLOURS],
         shared_growth_bytes=growth,existing_pool_extra_bytes=8192,additional_pool_bytes=0,
         key_positions_changed=False,font_pixels_changed=False,sound_code_changed=False,
         input_code_changed=False,save_format_changed=False,required_ram_bytes=0x800000,

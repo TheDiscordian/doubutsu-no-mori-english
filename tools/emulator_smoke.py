@@ -1307,6 +1307,7 @@ def main():
             if "capture" in action:
                 target = out / Path(action["capture"]).name
                 subprocess.run(["ffmpeg", "-nostdin", "-loglevel", "error", "-f", "x11grab",
+                                "-draw_mouse", "0" if action.get('hide_cursor') else "1",
                                 "-video_size", "800x640", "-i", display, "-frames:v", "1", str(target)],
                                env=env, check=True, timeout=15, stdout=subprocess.DEVNULL,
                                stderr=subprocess.PIPE)

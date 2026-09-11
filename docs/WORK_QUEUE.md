@@ -6,16 +6,20 @@ The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
 and saved capacities remain intact. The private development ROM is
-`build/v2-keyboard-02/Animal Forest English V2 Development.z64`.
+`build/v2-keyboard-03/Animal Forest English V2 Development.z64`.
 
-Remaining V2 work is visual/native acceptance and any concrete resulting
-adjustments, not untranslated content or a further public-release package.
-Four cartridge checks and four decoder checks pass. The controlled preview
-stops during setup before executing the keyboard; do not loop on its fixture
-or mistake it for a game failure. The [work record](checkpoints/KEYBOARD_V2.md)
-contains the bounded attempts and the single corrected setup to resume when
-this check is next justified. Keep V1 Final unchanged. No public release is
-authorised or queued.
+Four current cartridge checks and the controlled native preview pass. The
+preview verifies 155 draws, all forty accepted key rectangles, intact guards,
+and unchanged editor/save data. The isolated screenshot confirms complete
+English keys/hints and native controller artwork. Panel shading is lighter
+for readable control labels. The [native work record](checkpoints/KEYBOARD_V2_NATIVE.md)
+owns the current evidence; do not repeat the resolved preview-setup attempts.
+
+Remaining V2 work is ordinary-menu/pressed-state and hardware acceptance,
+plus concrete resulting adjustments. This does not reopen V1 save testing or
+block the available development build. Do not invent further RCs, public
+packages, or speculative artwork tasks while awaiting findings. Keep V1 Final
+unchanged. No public release is authorised or queued.
 
 ## V1 Final
 

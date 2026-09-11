@@ -40,7 +40,8 @@ candidate tests, the full suite, or previously accepted save/editor workflows.
 
 `tools/keyboard_v2.py` replaces the existing suffix, not the complete editor.
 The source uses the accepted corrected GC panel geometry and textures with
-primitive colour `(225,225,225)` and environment colour `(105,110,115)`.
+primitive colour `(235,235,235)` and environment colour `(174,177,181)`.
+The light grey body keeps the existing dark control hints readable.
 All forty keys and the complete quarter-pixel glyph-origin table retain their
 accepted positions. There are still two pages and the existing input bindings.
 
@@ -84,9 +85,23 @@ DMA identity, and its UPS must reconstruct the complete output.
 
 ## Current verification boundary
 
-Four artifact checks and four decoder checks pass. Controlled native appearance
-is not yet established. The checkpoint-restored preview uses verified-empty
-Expansion Pak scratch, with the relocation model explicitly configured for
-eight MiB. That final setup correction is unexecuted; the previous setup stopped
-before the V2 drawing routine. Keep the exact attempts and next check in the
-[work record](../docs/checkpoints/KEYBOARD_V2.md), not an implied passed test.
+Four current artifact checks pass, and the unchanged decoder retains its four
+passing checks. Controlled native drawing and screenshot review pass. The
+checkpoint-restored preview uses verified-empty Expansion Pak scratch, with
+the relocation model explicitly configured for eight MiB. The preview binds
+the cartridge loader, loads the installed keyboard and native matrix callback,
+and checks retained key geometry, the grey material, guards, and editor/save RAM.
+
+The fixture supplies the normal native menu projection and routes its drawing
+after the title world. It stores commands/vertices in the large opaque arena,
+skips that block in the ordinary opaque stream, then calls the block from the
+final overlay stream. These changes exist only in the fixture, not the ROM.
+Use the isolated emulator display to judge appearance: debugger RAM framebuffer
+reads can contain unfinished GPU output. Do not mistake a partially drawn RAM
+image or omitted title-fixture menu setup for a cartridge rendering defect.
+
+The [native work record](../docs/checkpoints/KEYBOARD_V2_NATIVE.md) contains the
+current hashes, successful checks, and inspected screenshot. Ordinary menu
+integration, pressed-state appearance, and original-hardware acceptance remain
+human-playtest limits. Unchanged saved formats support expected V1 Final ↔ V2
+compatibility, not a claim that those loading directions have been executed.

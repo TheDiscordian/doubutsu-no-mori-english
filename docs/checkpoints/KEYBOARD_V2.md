@@ -1,5 +1,9 @@
 # V2 keyboard development work record
 
+This is the initial construction record. The
+[native verification and contrast follow-up](KEYBOARD_V2_NATIVE.md) owns the
+current V2 build and validation state; the setup failures below are resolved.
+
 ## Scope and result
 
 The user authorises V2 development and explicitly withholds public release.

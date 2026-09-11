@@ -1,5 +1,6 @@
 """Focused checks of the current V2 artifact, without replaying older builds."""
 import json
+import os
 from pathlib import Path
 import struct
 import sys
@@ -12,10 +13,10 @@ from catalogue_names import Image
 from keyboard_rc1_fix import metrics
 from keyboard_grid_labels import encode_label
 from keyboard_v2 import (BASE_SHA,VROM,RELOC,OWNER,PREFIX,RAM,CALL,SPEC,BOTTOM,
-                         source_hashes,recover,ASSETS,ART_VROM,draw_source)
+                         source_hashes,recover,ASSETS,ART_VROM,FRAME_COLOURS,draw_source)
 from npc_mail_show import relocate_verified_data
 
-OUT=ROOT/'build/v2-keyboard-02'
+OUT=ROOT/os.environ.get('AF_V2_BUILD','build/v2-keyboard-03')
 
 
 class KeyboardV2Tests(unittest.TestCase):
@@ -76,8 +77,8 @@ class KeyboardV2Tests(unittest.TestCase):
             self.assertFalse(self.report[flag])
         helper,panel=draw_source()
         self.assertIn(b'g=af_v2_controls(g,dx,dy);',helper)
-        self.assertIn(b'225,225,225,255',panel)
-        self.assertIn(b'105,110,115,255',panel)
+        for colour in FRAME_COLOURS:
+            self.assertIn((','.join(map(str,colour))+',255').encode(),panel)
         # The changed source does not alter the accepted grid coordinates.
         self.assertIn(b'60+16*(i%10)+slide[i/10]+dx',helper)
         self.assertIn(b'60+16*cell.column+slide[cell.row]+dx',helper)

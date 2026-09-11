@@ -11,10 +11,9 @@ from birthday_draw_scenario import CALLBACK
 from catalogue_names import Image
 from flash_mail import SAVE_RAM,SAVE_BYTES
 from keyboard_background_smoke import rectangles
-from keyboard_v2 import ROOT,VROM,RELOC,RAM,ART_VROM,source_hashes
+from keyboard_v2 import ROOT,VROM,RELOC,RAM,ART_VROM,FRAME_COLOURS,source_hashes
 from npc_mail_show import relocate_verified_data
 from runtime_layout import GUARD_ADDRESS,GUARD_WORD
-from texture_preview import rgba5551,png_rgba
 from title_start_smoke import locate
 from toolchain import IMAGE
 
@@ -27,8 +26,12 @@ def words(*v): return struct.pack('>'+'I'*len(v),*v)
 def exercise(debug,request,rom,state):
     directory=(ROOT/request['build']).resolve()
     if not directory.is_relative_to(ROOT/'build'): raise ValueError('Unowned V2 fixture')
+    preview_name=request.get('preview','preview')
+    if Path(preview_name).name!=preview_name or preview_name in ('.','..'):
+        raise ValueError('Preview must be a direct child of the current build')
+    preview=directory/preview_name
     report=json.loads((directory/'build.json').read_text())
-    fixture=json.loads((directory/'preview/preview.json').read_text())
+    fixture=json.loads((preview/'preview.json').read_text())
     if sha256(rom)!=report['output_sha256'] or report['sources']!=source_hashes():
         raise ValueError('Changed current V2 cartridge or source')
     read,write=debug.read_memory,debug.write_memory
@@ -39,7 +42,7 @@ def exercise(debug,request,rom,state):
     if title!=0x80400010: raise ValueError('Unexpected title allocation')
     if request.get('setup'):
         if state: raise ValueError('V2 fixture already installed')
-        code=(directory/'preview/preview.bin').read_bytes()
+        code=(preview/'preview.bin').read_bytes()
         if (not 4<=len(code)<=0x2000 or sha256(code)!=fixture['code_sha256'] or
             fixture['sources']!={p:sha256((ROOT/p).read_bytes()) for p in SOURCES}):
             raise ValueError('Changed V2 fixture code')
@@ -105,17 +108,17 @@ def exercise(debug,request,rom,state):
             if rect!=dict(bounds=[x,y,x+16,y+16],st=[0,0],delta=[2048,2048]):
                 raise ValueError('V2 changed an accepted key position')
         rows=list(struct.iter_unpack('>2I',commands))
-        if (0xFA0000FF,0xE1E1E1FF) not in rows or (0xFB000000,0x696E73FF) not in rows:
+        colours=[int.from_bytes(bytes(c)+b'\xff','big') for c in FRAME_COLOURS]
+        if any((command,value) not in rows for command,value in zip((0xFA0000FF,0xFB000000),colours)):
             raise ValueError('V2 grey panel material is missing')
         fb|=0x80000000
         if not 0x80000000<=fb<=0x80800000-153600: raise ValueError('Unknown V2 framebuffer')
-        frame=b''.join(read(fb+i,min(4096,153600-i)) for i in range(0,153600,4096))
-        output=directory/'preview'
-        for name,data in (('commands.bin',commands),('framebuffer.bin',frame),
-            ('framebuffer.png',png_rgba(320,240,b''.join(rgba5551(v) for (v,) in struct.iter_unpack('>H',frame)),3))):
-            with (output/name).open('xb') as f:f.write(data)
+        # Debugger RAM reads can observe an unfinished GPU-backed framebuffer.
+        # Use the isolated display capture for appearance, not a decoded RAM PNG.
+        with (preview/'commands.bin').open('xb') as f:f.write(commands)
         return {'v2_native_draws':draws,'rectangles':rects,'display_list_bytes':len(commands),
-                'guards_intact':True,'input_and_save_unchanged':True,'ordinary_screen_tested':False}
+                'guards_intact':True,'input_and_save_unchanged':True,'ordinary_screen_tested':False,
+                'framebuffer_address':f'{fb:08X}','appearance_source':'isolated display capture'}
     if request.get('restored'):
         if read(actor+0x168,4)!=state['callback'] or read(SAVE_RAM,SAVE_BYTES)!=state['saved']:
             raise ValueError('V2 checkpoint did not restore')
@@ -129,7 +132,12 @@ def exercise(debug,request,rom,state):
 
 def main():
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--build',type=Path,required=True)
-    a=p.parse_args();out=a.build/'preview';out.mkdir(parents=True,exist_ok=False)
+    p.add_argument('--preview',default='preview')
+    p.add_argument('--capture',action='store_true',help='Capture only the isolated emulator display')
+    a=p.parse_args()
+    if Path(a.preview).name!=a.preview or a.preview in ('.','..'):
+        p.error('preview must be a direct child of the current build')
+    out=a.build/a.preview;out.mkdir(parents=True,exist_ok=False)
     docker=['docker','run','--rm','--network','none','--user',f'{os.getuid()}:{os.getgid()}',
             '-v',f'{ROOT}:/source:ro','-v',f'{out.resolve()}:/out','-w','/out','--entrypoint']
     def run(tool,*args):
@@ -142,12 +150,13 @@ def main():
     report={'code_sha256':sha256((out/'preview.bin').read_bytes()),
             'sources':{p:sha256((ROOT/p).read_bytes()) for p in SOURCES},'toolchain':IMAGE}
     (out/'preview.json').write_text(json.dumps(report,indent=2)+'\n')
-    req={'build':str(a.build.resolve().relative_to(ROOT))}
+    req={'build':str(a.build.resolve().relative_to(ROOT)),'preview':a.preview}
     actions=[{'wait':12},{'save_state':True},{'pause_game_thread':True},
         {'test_keyboard_v2_preview':dict(req,setup=True)},{'resume':True},{'wait':2},
         {'pause_game_thread':True},{'test_keyboard_v2_preview':dict(req,verify=True)},
         {'load_state':True},{'wait':2},{'pause_game_thread':True},
         {'test_keyboard_v2_preview':dict(req,restored=True)},{'resume':True}]
+    if a.capture:actions.insert(6,{'capture':'v2-keyboard-display.png','hide_cursor':True})
     (out/'scenario.json').write_text(json.dumps(actions,indent=2)+'\n')
     print(out/'scenario.json')
 
