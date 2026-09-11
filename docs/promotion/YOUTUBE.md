@@ -21,11 +21,15 @@ repository visibility, or alter the existing trailer. The trailer remains
 
 ## Thumbnail direction
 
-Upload [the 3840×2160 JPG](../../build/youtube-promo-01/Animal-Crossing-N64-thumbnail-4k.jpg)
-(931,134 bytes). A [1280×720 JPG](../../build/youtube-promo-01/Animal-Crossing-N64-thumbnail-720p.jpg)
-(318,970 bytes) is also available. Both are RGB, 16:9, and under 2 MB.
-The [320×180 inspection copy](../../build/youtube-promo-01/thumbnail-small-preview.jpg)
-checks small-size legibility; do not upload that preview.
+The [current draft](../../build/youtube-promo-01/Animal-Crossing-N64-thumbnail-4k.jpg)
+is not approved: its green text background fits the desired direction, but its
+cartoon-style lettering does not. The typography brief is clean, flat, regular
+lettering without chunky extrusion or exaggerated letter shapes. Preserve the
+green background direction when a revision is requested.
+
+Hand over **one upload-ready thumbnail file**, not a selection of export sizes.
+Keep any source masters or small inspection images internal. The current draft
+is 3840×2160, RGB, and 931,134 bytes; earlier exports remain preserved locally.
 
 The thumbnail pairs the translated title screen with the short headline
 `N64 / IN / ENGLISH`. Forest green, warm ivory, and the existing gold title
@@ -86,7 +90,8 @@ experiment. [YouTube thumbnail testing](https://support.google.com/youtube/answe
 
 1. Use the existing trailer MP4, the supplied title, and the unlisted description.
    Keep visibility unlisted until release is approved.
-2. Upload the thumbnail. Check its crop and lettering in the small preview.
+2. Use a thumbnail whose lettering the user approves; the current draft needs
+   typography feedback addressed before selection. Check its crop in Studio.
 3. Review YouTube's upload checks for the game's soundtrack. Attribution is
    included; it does not determine whether a claim or restriction will occur.
 4. At release, replace `[PUBLIC_PATCHER_URL]` in the release description and

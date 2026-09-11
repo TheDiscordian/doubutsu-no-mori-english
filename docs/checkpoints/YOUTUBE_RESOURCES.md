@@ -91,3 +91,11 @@ The raw generated dimensions are approximately 16:9; the exports use exact
 Audience performance, YouTube's final thumbnail rendering, channel feature
 eligibility, and upload/music checks are not claimed as tested. Those require
 the actual upload/channel; they do not block the local resource deliverables.
+
+## User design feedback
+
+The user likes the green text background but rejects the cartoon lettering in
+`N64 / IN / ENGLISH`. Record that distinction: technical image checks are not
+creative approval. Future thumbnail handoffs contain one upload-ready image,
+not multiple sizes. Preserve the current artifacts; this feedback record does
+not generate a replacement or claim the font is fixed.

@@ -4,8 +4,11 @@
 
 The [YouTube upload resources](promotion/YOUTUBE.md) include a title-screen-led
 thumbnail, unlisted and release descriptions, a suggested title, and an optional
-pinned comment. Both upload JPGs are under 1 MB; copy and image verification are
-recorded in the [production checkpoint](checkpoints/YOUTUBE_RESOURCES.md).
+pinned comment. Copy and image verification are recorded in the
+[production checkpoint](checkpoints/YOUTUBE_RESOURCES.md). The thumbnail's green
+background direction is accepted, but its cartoon lettering is not; the
+typography brief calls for clean, flat lettering. Future thumbnail handoffs
+contain one file, not multiple export sizes.
 The public patcher URL remains the only release-copy placeholder. No video is
 uploaded or changed, and no public publication is performed.
 

@@ -13,9 +13,11 @@ Do not publish the private repository or game inputs.
 
 ## Released trailer
 
-The [YouTube upload resources](promotion/YOUTUBE.md) are ready locally: thumbnail
-exports, a suggested title, unlisted/release descriptions, and an optional pinned
-comment. The user handles the unlisted YouTube upload. Release copy needs the
+The [YouTube upload resources](promotion/YOUTUBE.md) include a draft thumbnail,
+a suggested title, unlisted/release descriptions, and an optional pinned comment.
+Thumbnail feedback accepts the green background direction, but rejects the
+cartoon lettering; future handoffs contain one image file. The user handles the
+unlisted YouTube upload. Release copy needs the
 actual public patcher address; no placeholder or localhost link is published.
 This resource work does not edit the trailer or authorise public patch hosting.
 
