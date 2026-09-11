@@ -44,15 +44,31 @@ appearance remain unverified. The menu initializer writes player state; it is
 not executed, and no original user save or SD-card file is touched. Existing
 human acceptance of saving/reloading and all reported fixes remains closed.
 
-## Construction and next work
+## Committed construction
 
-Build the final committed source into fresh `build/scene-menu-text-01`, retaining
-RC7 and every earlier candidate. The output and source hashes belong here after
-construction succeeds. RC7 remains the named hardware handoff until a subsequent
-combined patch package is checked.
+`build/scene-menu-text-01/animal-forest-scene-text.z64` is constructed from clean
+revision `a87e682a431d26a7f2a533adca7af6a24dfc37dd` on the exact RC7 baseline.
+The receipt records `worktree_modified: false`; construction and full original-
+ROM UPS reconstruction pass.
+
+- ROM SHA-256: `2a04f6e5c54dc2d5ed03009395af815b464bebdef51d67d899554deb54b3bcb4`.
+- UPS SHA-256: `c3931b2e029bf4182864306ed2cbf28ea4c1d6c9d609cd33d68047132029b769`.
+- Receipt SHA-256: `8ea67e5a9948c78fd219cd2da989c09986c78de99dbd1ffe104a11dddbc5d160`.
+- Builder SHA-256: `d0530c869d840258119281e2984228a8883cbc2e903a720be93ea1ca23fad6a2`.
+
+Reproduce into a fresh directory with
+`python3 tools/scene_menu_text.py --output build/scene-menu-text-new`.
+The complete output retains all RC7 corrections and prior human-accepted fixes.
+RC7 saves are expected compatible in both directions, with no migration or
+saved-format change; these particular directions are not independently tested.
+The new development menu is not entered or enabled. RC7 remains the named
+hardware handoff until a subsequent combined patch package is checked.
+
+## Next work
 
 The separate release-build gap is concrete: the documented `make complete`
-path does not include the accumulated RC correction stages. Integrate the
+path ends after `rebuild_v0.py` and `rebuild_v1.py` in the isolated source tree;
+it does not include the accumulated RC correction stages. Integrate the
 current correction sequence into a reproducible final-candidate recipe with
 checked stage inputs/outputs, using the verified existing builders and clean
 rebuild evidence. Do not rerun unchanged full historical recipes merely to

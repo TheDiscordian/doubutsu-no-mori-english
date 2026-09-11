@@ -17,8 +17,10 @@ V1-28: 76 Japanese scene, loading, and setting strings in the native selector.
 Six focused checks pass, plus the targeted unsupported-control rejection check.
 Complete text uses existing storage, all 101 reader pointers retain relocation,
 and only one scene-list X origin changes beyond text/pointers. Native actions,
-initialization, allocations, and saved data remain unchanged. The final source
-is ready for committed construction; RC7 remains the named handoff. This is
+initialization, allocations, and saved data remain unchanged. The clean committed
+construction and full UPS reconstruction pass at
+`build/scene-menu-text-01/animal-forest-scene-text.z64`; the checkpoint records
+exact hashes. RC7 remains the named handoff. This is
 source-identified text, not an accepted user defect being reopened.
 
 The RC4 catalogue/repayment findings V1-21 through V1-23 have

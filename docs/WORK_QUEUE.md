@@ -18,9 +18,10 @@ confuse retained human acceptance with fresh execution of RC7's new labels.
 
 The [scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) translates all 76 Japanese
 scene/loading/setting strings in that owner, retaining 25 English/neutral strings.
-Its six focused tests and strengthened control-rejection check pass. Construct
-the final committed stage into fresh `build/scene-menu-text-01`; keep RC7 as the
-named handoff until a subsequent combined package is checked. Do not enable the
+Its six focused tests, strengthened control-rejection check, clean committed
+construction, and full UPS reconstruction pass. Preserve `build/scene-menu-text-01`
+and its source-bound receipt; keep RC7 as the named handoff until a subsequent
+combined package is checked. Do not enable the
 debug menu or invoke its state-changing initializer to validate wording.
 
 Integrate the accumulated RC correction stages into the documented reproducible
