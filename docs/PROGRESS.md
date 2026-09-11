@@ -1,5 +1,22 @@
 # Current progress
 
+## Active development
+
+V2's N64-inspired keyboard is implemented in
+`build/v2-keyboard-02/Animal Forest English V2 Development.z64` on the preserved
+V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
+feedback, and a left-side stick graphic. The complete input/editor prefix,
+key positions, glyph metrics, sound code, and saved formats are retained.
+The suffix uses 7,808 of the existing 8,192 reserved bytes; no pool allocation
+changes. Four focused cartridge checks and four decoder checks pass.
+
+Native visual verification remains incomplete. The isolated preview stops in
+setup before running the new keyboard; its setup limitations are recorded,
+not counted as successful game execution. See the [V2 work record](checkpoints/KEYBOARD_V2.md).
+V1 Final remains unchanged. No public release is authorised; all artifacts
+remain private. Expected V1 Final ↔ V2 save compatibility needs no migration,
+but those particular loading directions are not independently executed.
+
 ## Human acceptance
 
 The user confirms all reported bugs are fixed and ordinary save → restart →

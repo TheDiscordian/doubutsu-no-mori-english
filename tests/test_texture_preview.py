@@ -8,6 +8,12 @@ sys.path.insert(0,str(ROOT/'tools'))
 from texture_preview import decode
 
 class TexturePreviewTests(unittest.TestCase):
+    def test_native_rgba16_decodes_colour_and_one_bit_alpha(self):
+        self.assertEqual(decode(bytes.fromhex('f80107c1003effff'),4,1,'rgba16'),
+                         bytes((255,0,0,255,0,255,0,255,0,0,255,0,255,255,255,255)))
+        with self.assertRaises(ValueError):decode(bytes(4),1,1,'rgba16')
+        with self.assertRaises(ValueError):decode(bytes(2),1,1,'rgba16',gamecube=True)
+
     def test_native_i8_is_eight_bit_intensity_without_nibble_swap(self):
         samples=bytes(range(256))
         expected=b''.join(bytes((v,v,v,255)) for v in samples)

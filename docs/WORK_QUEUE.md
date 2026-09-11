@@ -1,5 +1,22 @@
 # Completion queue
 
+## Active work: V2 keyboard
+
+The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
+grey shading, native N64 button icons and pressed feedback, and a left-side
+stick graphic. The accepted key layout, sounds, proportional editor, controls,
+and saved capacities remain intact. The private development ROM is
+`build/v2-keyboard-02/Animal Forest English V2 Development.z64`.
+
+Remaining V2 work is visual/native acceptance and any concrete resulting
+adjustments, not untranslated content or a further public-release package.
+Four cartridge checks and four decoder checks pass. The controlled preview
+stops during setup before executing the keyboard; do not loop on its fixture
+or mistake it for a game failure. The [work record](checkpoints/KEYBOARD_V2.md)
+contains the bounded attempts and the single corrected setup to resume when
+this check is next justified. Keep V1 Final unchanged. No public release is
+authorised or queued.
+
 ## V1 Final
 
 All tracked findings V1-01 through V1-29 have implementations. The
@@ -86,8 +103,8 @@ technical readiness from redistribution rights.
 
 ## V2
 
-The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) stays deferred until V1 is
-complete. Its grey N64-controller background, matching button art, and left
+The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is the active work. Its
+grey N64-controller background, matching button art, and left
 control-stick image must preserve V1's accepted sounds, key positioning,
 proportional editing, N64 controls, and saved capacities.
 

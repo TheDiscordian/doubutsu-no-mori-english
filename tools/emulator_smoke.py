@@ -791,10 +791,20 @@ def main():
         event_preview_state = {}
         font_preview_state = {}
         transition_preview_state = {}
+        keyboard_v2_preview_state = {}
         def record(snapshot):
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if 'test_keyboard_v2_preview' in action:
+                from keyboard_v2_preview import exercise as keyboard_v2_preview
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V2 preview requires an isolated saved checkpoint')
+                result = keyboard_v2_preview(debug, action['test_keyboard_v2_preview'],
+                                             args.rom.read_bytes(), keyboard_v2_preview_state)
+                if result.get('checkpoint_restore_required'):
+                    needs_checkpoint_restore = True
+                record(result)
             if 'test_rc4_menu_labels' in action:
                 from rc4_menu_label_smoke import exercise as menu_label_check
                 if not (out/'test.bs1').is_file():

@@ -25,6 +25,10 @@ def rgba5551(value):
 
 
 def decode(data, width, height, fmt, palette=None, *, gamecube=False):
+    if fmt == 'rgba16' and not gamecube:
+        if width <= 0 or height <= 0 or len(data) != width*height*2 or palette is not None:
+            raise ValueError('Incorrect native RGBA16 texture')
+        return b''.join(rgba5551(v) for (v,) in struct.iter_unpack('>H', data))
     if fmt not in ('ci4', 'ci8', 'i4', 'i8', 'ia8') or width <= 0 or height <= 0:
         raise ValueError('Unsupported preview texture')
     bits = 8 if fmt in ('ci8', 'i8', 'ia8') else 4
@@ -72,7 +76,7 @@ def main():
     parser.add_argument('--palette', type=lambda x: int(x, 16))
     parser.add_argument('--width', type=int, required=True)
     parser.add_argument('--height', type=int, required=True)
-    parser.add_argument('--format', choices=('ci4', 'ci8', 'i4', 'i8', 'ia8'), required=True)
+    parser.add_argument('--format', choices=('ci4', 'ci8', 'i4', 'i8', 'ia8', 'rgba16'), required=True)
     parser.add_argument('--scale', type=int, default=4)
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
@@ -88,7 +92,8 @@ def main():
         data = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
         def read(address, size):
             return native_range(data, address, size)
-    size = args.width*args.height*(8 if args.format in ('ci8', 'i8', 'ia8') else 4)//8
+    size = args.width*args.height*(16 if args.format == 'rgba16' else
+                                  8 if args.format in ('ci8', 'i8', 'ia8') else 4)//8
     rgba = decode(read(args.address, size), args.width, args.height, args.format,
                   None if args.palette is None else read(args.palette, 512 if args.format == 'ci8' else 32),
                   gamecube=args.gamecube)

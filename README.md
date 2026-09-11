@@ -4,6 +4,21 @@ English translation of the Japanese Nintendo 64 release, targeting original
 hardware. **V1 Final is available locally**, with a verified patch-only package.
 The repository and release artifacts remain private; no public upload is made.
 
+## V2 development
+
+The N64-inspired keyboard is implemented in
+`build/v2-keyboard-02/Animal Forest English V2 Development.z64`, with a matching
+UPS alongside it. It adds grey panel shading, native N64 control artwork,
+pressed-button feedback, and a left-side stick image. Accepted key positions,
+font metrics, input behaviour, sounds, and saved formats are retained.
+
+Four focused cartridge/retention checks and four texture-decoder checks pass.
+Native visual verification remains incomplete: the isolated preview stops in
+test setup before the new keyboard runs. V1 Final remains untouched and is the
+stable baseline. See the [V2 work record](docs/checkpoints/KEYBOARD_V2.md) for
+exact build hashes, test limits, and the next useful check. No public release
+is authorised.
+
 ## V1 Final
 
 - ROM: `build/v1-final/Animal Forest English V1 Final.z64`.
@@ -45,7 +60,7 @@ appearance of both adapted stall placements remain playtest work, not completed
 proof. See [progress](docs/PROGRESS.md), [tracked findings](docs/V1_PLAYTEST_BUGS.md),
 and the [completion queue](docs/WORK_QUEUE.md). Concrete new crashes, save damage,
 blocked progression, or text defects take priority. The
-[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) remains deferred.
+[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) is the active development work.
 
 ## Source and reproduction
 
