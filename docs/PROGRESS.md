@@ -25,6 +25,13 @@ V1 Final remains unchanged. No public release is authorised; all artifacts
 remain private. Expected V1 Final ↔ V2 save compatibility needs no migration,
 but those particular loading directions are not independently executed.
 
+The [private offline V2 package](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
+at `build/v2-private-bundle/V2-Development-patch.zip`. Three package checks and
+its archived standalone patcher pass; the patcher recreates the exact current
+ROM from the original Japanese input. The package contains offline guides,
+credits, source/compatibility records, and checksums, but no ROM or save. This
+does not change the cartridge or claim additional gameplay/hardware acceptance.
+
 ## Human acceptance
 
 The user confirms all reported bugs are fixed and ordinary save → restart →

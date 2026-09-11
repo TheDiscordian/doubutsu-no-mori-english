@@ -26,6 +26,12 @@ acceptance remain playtest limits. V1 Final stays untouched. See the
 [V2 ordinary work record](docs/checkpoints/KEYBOARD_V2_ORDINARY.md) for exact
 hashes and verification limits. No public release is authorised.
 
+The [private offline V2 handoff](docs/checkpoints/V2_PRIVATE_PACKAGE.md) is
+`build/v2-private-bundle/V2-Development-patch.zip`. Its included standalone
+patcher reconstructs the exact V2 ROM from the original Japanese input; three
+package checks pass. The ZIP contains no ROM or save, and needs no source
+checkout, GameCube disc, Docker, or network for patch application.
+
 ## V1 Final
 
 - ROM: `build/v1-final/Animal Forest English V1 Final.z64`.

@@ -23,6 +23,12 @@ block the available development build. Do not invent further RCs, public
 packages, or speculative artwork tasks while awaiting findings. Keep V1 Final
 unchanged. No public release is authorised or queued.
 
+The [private offline V2 handoff](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
+at `build/v2-private-bundle/V2-Development-patch.zip`. Its three package checks
+and bundled standalone patcher pass. No further packaging is queued without
+a concrete cartridge or documentation correction; preserve this handoff and
+do not use packaging as a substitute for the remaining human acceptance.
+
 ## V1 Final
 
 All tracked findings V1-01 through V1-29 have implementations. The
