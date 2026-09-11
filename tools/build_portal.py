@@ -14,6 +14,31 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET_SHA = '400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25'
 DONORS = ('forest_1st.arc', 'forest_2nd.arc', 'foresta.rel.szs')
 WEB_FILES = ('index.html', 'style.css', 'app.mjs', 'core.mjs', 'worker.mjs', 'mark.svg')
+SAVE_NOTE = 'Back up existing saves before playing a patched game. The patcher does not read or change save files.'
+DOWNLOAD_NAME = 'Animal Crossing N64 - English.z64'
+
+
+def refresh_web(out):
+    """Refresh the live page without regenerating game data or the released video."""
+    site = out/'site'
+    manifest = json.loads((site/'release/manifest.json').read_text())
+    report = json.loads((out/'build.json').read_text())
+    if (manifest['output_sha256'] != TARGET_SHA or report['target_sha256'] != TARGET_SHA
+            or sha256((site/'release/patch.afwp.gz').read_bytes()) != manifest['recipe']['sha256']
+            or report['recipe_sha256'] != manifest['recipe']['sha256']):
+        raise ValueError('Refresh requires the verified current portal export')
+    for name in WEB_FILES:
+        if sha256((site/name).read_bytes()) != report['site_source_sha256'][name]:
+            raise ValueError('Preserve unrecorded live-site edits before refreshing: '+name)
+    for name in WEB_FILES:
+        shutil.copyfile(ROOT/'web'/name, site/name)
+    manifest['save_compatibility'] = SAVE_NOTE
+    manifest['output_name'] = DOWNLOAD_NAME
+    (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
+    report['site_source_sha256'] = {name: sha256((site/name).read_bytes()) for name in WEB_FILES}
+    (out/'build.json').write_text(json.dumps(report, indent=2)+'\n')
+    print(json.dumps({'site': str(site.relative_to(ROOT)), 'web_refreshed': True,
+                      'patch_sha256': report['recipe_sha256'], 'game_data_changed': False}))
 
 
 def donor_resources(path):
@@ -104,12 +129,18 @@ def make_recipe(source, target, donors):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--refresh-web', action='store_true', help='Refresh an existing verified site without rebuilding its patch or media')
     parser.add_argument('--rom', type=Path, default=ROOT/'local/rom/Doubutsu no Mori (Japan).z64')
     parser.add_argument('--disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--target', type=Path, default=ROOT/'build/v2-map-suffix-07/Animal Forest English V2.z64')
     args = parser.parse_args()
     out = args.output.resolve()
-    if not out.is_relative_to(ROOT/'build') or out.exists():
+    if not out.is_relative_to(ROOT/'build'):
+        raise ValueError('Portal exports must be inside ignored build/')
+    if args.refresh_web:
+        refresh_web(out)
+        return
+    if out.exists():
         raise ValueError('Choose a fresh directory under ignored build/')
     source = verified_rom(args.rom.read_bytes())
     target = args.target.read_bytes()
@@ -126,12 +157,12 @@ def main():
     manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-07',
         'public_release': False, 'source_sha256': ROM_SHA256, 'source_size': len(source),
         'output_sha256': TARGET_SHA, 'output_size': len(target),
-        'output_name': 'Animal Forest English V2.z64',
+        'output_name': DOWNLOAD_NAME,
         'disc_id': 'GAFE01', 'disc_revision': 0, 'resources': resources,
         'recipe': {'file': 'patch.afwp.gz', 'sha256': sha256(compressed), 'size': len(compressed),
                    'decoded_sha256': sha256(recipe), 'decoded_size': len(recipe)},
         'requirements': {'expansion_pak': True, 'save_type': 'FlashRAM', 'save_bytes': 131072, 'rtc': True},
-        'save_compatibility': 'Saved formats are unchanged from V1 Final. Back up your save before switching builds.',
+        'save_compatibility': SAVE_NOTE,
         'stats': stats}
     (site/'release/patch.afwp.gz').write_bytes(compressed)
     (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')

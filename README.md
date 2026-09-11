@@ -7,9 +7,11 @@ trailer; public patch hosting is not enabled.
 
 ## Browser patcher
 
-The local portal is running at **http://127.0.0.1:8073/**. Supply the original
+The **Animal Crossing N64** portal is running at **http://127.0.0.1:8073/**. Supply the original
 Japanese N64 ROM and English USA/Canada GameCube disc, then download the verified
 English N64 ROM. Both files are processed on your device, with no uploads.
+Its FAQ lists format-specific input MD5s. The browser download is named
+`Animal Crossing N64 - English.z64`; the local cartridge artifact remains intact.
 
 The portal produces **V2-07**, including the map's removed Japanese town suffix.
 It supports extracted N64 `.z64`/`.v64`/`.n64` and GC `.iso`/`.gcm`/`.ciso`.

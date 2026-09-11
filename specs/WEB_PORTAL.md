@@ -38,6 +38,13 @@ Generated recipes, media, and site exports remain in ignored `build/` paths.
 
 ## Browser and interface
 
+Use the public-facing name **Animal Crossing N64**. Explain the required games,
+patching, downloads, privacy, and hardware needs without private candidate names
+or local-preview FAQs. Keep the staging/deployment status in operator documents
+and release metadata. The input FAQ presents exact, format-labelled MD5 values,
+including file sizes for GameCube disc representations and the catalogued source
+of the full-disc hash. Manual MD5 comparisons do not replace SHA-256 verification.
+
 Use a module worker for file reads, hashing, decoding, and patch application.
 Read GameCube slices through the File API, including CISO's allocation map.
 Cancel terminates the worker. Changing inputs invalidates the previous download;

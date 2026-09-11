@@ -1,5 +1,10 @@
 # Local browser patcher 🌿
 
+The visitor-facing site is branded **Animal Crossing N64 · English Translation**.
+Its copy is written for the public audience, without private build history or
+local-preview explanations. Local-only hosting is an operational setting, not
+part of the site's visitor instructions.
+
 The portal is running at **http://127.0.0.1:8073/** through the enabled
 `animal-forest-portal.service` user service. It remains local-only. The service
 serves `build/web-portal-02/site`, not the repository or its game inputs.
@@ -19,9 +24,10 @@ Select **Build my English ROM**, then download the verified result.
   storage of game files. Original files and saves are never changed.
 - The optional released trailer starts muted and does not autoplay.
 
-The output is **Animal Forest English V2.z64**, build **V2-07**, including the
+The browser download is **Animal Crossing N64 - English.z64**, build **V2-07**, including the
 map's omitted Japanese village-suffix image and the current N64 keyboard.
-It is an N64 ROM; this does not patch the GameCube game.
+It is an N64 ROM; this does not patch the GameCube game. The existing local
+cartridge artifact keeps its filename under `build/v2-map-suffix-07/`.
 
 Output SHA-256:
 `400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25`.
@@ -46,6 +52,20 @@ its result against the existing target ROM, and copies only explicitly selected
 website/media/source-note files. Do not serve the repository or the parent of
 `build/`. Point the local unit at the new export's `site` directory when switching.
 
+For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-02
+--refresh-web` updates the verified live export from `web/`, including current
+download metadata. It rejects unrecorded edits to the served files and checks
+the existing patch identity. It does not rebuild the ROM, regenerate the patch,
+or change the trailer. Source hashes in the export receipt are refreshed.
+
+The FAQ lists six MD5 reference checksums: three N64 byte orders, the catalogued
+full GC ISO/GCM, the locally verified scrubbed ISO/GCM, and the verified CISO.
+File format and size identify each entry. The full-disc value is attributed to
+[GameTDB](https://www.gametdb.com/Wii/GAFE01); the others are measured directly
+from the private inputs and the successful sparse-ISO browser fixture. The
+patcher retains SHA-256 input/resource/output validation; displayed MD5s are
+for manual file identification, not a replacement for those safeguards.
+
 The GameCube input supplies **2,783,500 bytes** used in the output. The browser
 reads and hashes `forest_1st.arc`, `forest_2nd.arc`, and Yaz0-decoded
 `foresta.rel.szs`. The recipe contains 23,082 copy/literal commands and is
@@ -67,12 +87,14 @@ the existing [redistribution review](RELEASE_PREPARATION.md). There is no active
 Pages workflow and no public patch upload. Requiring both games does not by
 itself establish redistribution rights for the remaining patch literals/media.
 
-The page's local-preview wording and release manifest must be deliberately
+The release manifest and deployment approval must be deliberately
 updated for any authorised public release. The released trailer itself is not
 altered by the portal or map fix.
 
 ## Verification
 
+- `python3 -m unittest tests.test_portal_copy -v` checks visitor-facing wording,
+  branding, and the measured reference MD5s without rebuilding the cartridge.
 - `node --test tests/web_portal.test.mjs` uses Node 22 or newer for synthetic
   parser, endian, bounds, Yaz0, gzip, donor, and checksum checks.
 - `python3 tools/check_portal.py --output build/web-portal-check-N` uses the

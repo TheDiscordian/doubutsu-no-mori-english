@@ -70,8 +70,6 @@ async function init() {
     const response = await fetch(new URL('./release/manifest.json', import.meta.url), { cache: 'no-store', credentials: 'omit', redirect: 'error' });
     if (!response.ok) throw new Error('Release information is unavailable. Reload the page and try again.');
     manifest = validateManifest(await response.json());
-    $('build-label').textContent = manifest.build;
-    $('save-note').textContent = manifest.save_compatibility + ' Keep the save filename matched to your ROM.';
     stop(); status('Choose both game files to begin.');
   } catch (error) { manifest = null; stop(); showError(error.message); }
 }

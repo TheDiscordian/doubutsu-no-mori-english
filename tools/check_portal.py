@@ -48,6 +48,10 @@ def main():
         page.on('pageerror', lambda e: errors.append(str(e)))
         page.goto(args.url)
         page.wait_for_function("() => document.getElementById('status').textContent.includes('Choose both')")
+        assert page.title() == 'Animal Crossing N64 · English Translation'
+        assert 'Animal Crossing N64' in page.locator('.brand').inner_text()
+        body = page.locator('body').inner_text()
+        assert not any(old in body for old in ('V1 Final', 'LOCAL PREVIEW', 'Is this the public release?', 'Audio starts muted'))
         assert page.locator('#build').is_disabled()
         assert page.locator('video').evaluate('(v) => v.paused && v.muted && !v.autoplay')
         page.screenshot(path=out/'desktop.png', full_page=True)
@@ -72,6 +76,7 @@ def main():
             download.save_as(path)
             digest = sha256(path.read_bytes())
             assert digest == TARGET_SHA
+            assert download.suggested_filename == 'Animal Crossing N64 - English.z64'
             results[label] = {'sha256': digest, 'seconds': round(time.monotonic()-start, 2),
                 'download_filename': download.suggested_filename}
             print(json.dumps({label: results[label]}), flush=True)
@@ -96,6 +101,10 @@ def main():
         results['archive_rejected'] = 'passed'
         page.reload()
         page.wait_for_function("() => document.getElementById('status').textContent.includes('Choose both')")
+        page.locator('#input-checksums summary').click()
+        assert page.locator('[data-input-md5]').count() == 6
+        assert all(node.is_visible() for node in page.locator('[data-input-md5]').all())
+        results['visitor_copy_and_visible_hashes'] = 'passed'
         for width in (375, 768, 1440):
             page.set_viewport_size({'width': width, 'height': 900})
             assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'), f'Overflow at {width}'

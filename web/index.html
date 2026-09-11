@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Make your own English Animal Forest ROM, right in your browser. Your games stay on your device.">
+  <meta name="description" content="Play Animal Crossing’s Nintendo 64 beginnings in English. Patch your game in your browser, with no uploads.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="theme-color" content="#254d3f">
-  <title>Animal Forest English · A ticket to town</title>
+  <title>Animal Crossing N64 · English Translation</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
   <script type="module" src="app.mjs"></script>
@@ -14,11 +14,11 @@
 <body>
   <a class="skip" href="#patcher">Skip to the patcher</a>
   <header class="site-header wrap">
-    <a class="brand" href="./" aria-label="Animal Forest English home">
+    <a class="brand" href="./" aria-label="Animal Crossing N64 English translation home">
       <img src="mark.svg" width="46" height="46" alt="">
-      <span>Animal Forest<small>THE ENGLISH TRANSLATION</small></span>
+      <span>Animal Crossing N64<small>ENGLISH TRANSLATION</small></span>
     </a>
-    <span class="preview-badge"><span aria-hidden="true">●</span> LOCAL PREVIEW</span>
+    <a class="preview-badge" href="#patcher">PATCH YOUR GAME <span aria-hidden="true">↓</span></a>
   </header>
   <main class="wrap">
     <div class="hero">
@@ -27,11 +27,11 @@
         <h1 id="welcome-heading">Make yourself<br><em>at home.</em></h1>
         <p class="intro">Meet your neighbours. Find your favourite fishing spot.
           Get a little too attached to a tiny house.</p>
-        <p class="description">The Nintendo 64 original, now in English — with familiar
-          words from Animal Crossing and a keyboard made for your N64 controller.</p>
+        <p class="description">Experience Animal Crossing’s Nintendo 64 beginnings in English,
+          with translated dialogue, menus, and artwork, plus an English keyboard inspired by the N64 controller.</p>
         <figure class="postcard">
           <div class="tape" aria-hidden="true"></div>
-          <img src="media/town.webp" width="800" height="600" alt="The English Animal Forest title screen on Nintendo 64">
+          <img src="media/town.webp" width="800" height="600" alt="The English Animal Crossing title screen on Nintendo 64">
           <figcaption><span>Next stop: your new hometown.</span><span aria-hidden="true">✦</span></figcaption>
         </figure>
       </section>
@@ -39,13 +39,13 @@
       <section id="patcher" class="patch-card" aria-labelledby="patch-heading">
         <div class="ticket-top"><span>YOUR TICKET TO TOWN</span><span aria-hidden="true">N64 ↔ GC</span></div>
         <div class="ticket-body">
-          <div class="card-heading"><h2 id="patch-heading">Let’s get you settled.</h2><span id="build-label" class="version">V2</span></div>
-          <p class="card-intro">Bring your two game files. We’ll put together your English Nintendo 64 ROM.</p>
+          <div class="card-heading"><h2 id="patch-heading">Let’s get you settled.</h2><span class="version">English</span></div>
+          <p class="card-intro">Choose your Japanese N64 ROM and English GameCube disc image to create an English N64 ROM.</p>
           <p class="privacy"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M6 10V7a6 6 0 0 1 12 0v3m-13 0h14v11H5zm7 4v3"/></svg> Files stay on your device. Nothing is uploaded.</p>
 
           <div class="file-field" id="n64-field">
             <div class="file-title"><span class="step">1</span><label for="n64">Doubutsu no Mori</label><span class="platform">NINTENDO 64</span></div>
-            <p>Original Japanese game · 16 MiB</p>
+            <p>Japan · Original, unpatched ROM · 16 MiB</p>
             <input type="file" id="n64" accept=".z64,.n64,.v64" aria-describedby="n64-hint n64-name">
             <span class="file-name" id="n64-name">No file chosen</span>
             <small id="n64-hint">.z64, .v64, or .n64</small>
@@ -55,7 +55,7 @@
             <p>USA / Canada · GAFE01, revision 0</p>
             <input type="file" id="gamecube" accept=".iso,.gcm,.ciso" aria-describedby="gc-hint gc-name">
             <span class="file-name" id="gc-name">No file chosen</span>
-            <small id="gc-hint">.iso, .gcm, or .ciso · English donor data</small>
+            <small id="gc-hint">.iso, .gcm, or .ciso</small>
           </div>
           <p class="archive-hint">Have a .7z or .zip? Extract it first. For RVZ, use Dolphin to convert it to ISO.</p>
 
@@ -64,13 +64,13 @@
             <progress id="progress" value="0" max="100" aria-label="Patching progress"></progress>
             <button id="cancel" class="text-button">Cancel</button>
           </div>
-          <p id="status" class="status" role="status" aria-live="polite">Loading release information…</p>
+          <p id="status" class="status" role="status" aria-live="polite">Loading the patcher…</p>
           <p id="error" class="error" role="alert" hidden></p>
           <section id="success" class="success" aria-labelledby="success-heading" hidden>
             <h3 id="success-heading" tabindex="-1">Welcome to the neighbourhood.</h3>
-            <p>Your ROM passed the final checksum. It matches the corrected V2 build.</p>
+            <p>Your English ROM is ready and has passed verification.</p>
             <a id="download" class="primary" download>Download English ROM <span aria-hidden="true">↓</span></a>
-            <a id="receipt" class="receipt" download="Animal-Forest-build-receipt.json">Save verification receipt</a>
+            <a id="receipt" class="receipt" download="Animal-Crossing-N64-patch-details.json">Download patch details</a>
             <details class="checksum"><summary>Finished ROM SHA-256</summary><code id="output-sha"></code></details>
           </section>
           <noscript><p class="error">Enable JavaScript to patch your files locally in this browser.</p></noscript>
@@ -83,10 +83,10 @@
       <div class="section-label"><p class="eyebrow">BEFORE YOU PACK YOUR BAGS</p><h2 id="hardware-heading">Playing on a real N64?</h2></div>
       <div class="hardware-grid">
         <article><span class="hardware-icon" aria-hidden="true">8</span><div><h3>Expansion Pak</h3><p>8 MiB of memory is required.</p></div></article>
-        <article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Use this save type on your EverDrive.</p></div></article>
-        <article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>A clock that keeps ticking</h3><p>RTC support keeps your town on time.</p></div></article>
+        <article><span class="hardware-icon small-icon" aria-hidden="true">SAVE</span><div><h3>FlashRAM · 128 KiB</h3><p>Select this save type if your flashcart asks.</p></div></article>
+        <article><span class="hardware-icon" aria-hidden="true">◷</span><div><h3>Real-time clock</h3><p>Your flashcart needs RTC support.</p></div></article>
       </div>
-      <p class="save-note" id="save-note">Back up your save before changing builds. Keep the save filename matched to your ROM.</p>
+      <p class="save-note">Keep a backup of any existing saves before playing a patched game.</p>
     </section>
 
     <section class="more" aria-label="A look around and common questions">
@@ -94,20 +94,36 @@
         <p class="eyebrow">THERE’S PLENTY TO DO HERE</p>
         <h2>A little look around.</h2>
         <p>From your first hello to a letter from home — a familiar world, in your language.</p>
-        <video controls muted playsinline preload="none" poster="media/town.webp" aria-label="Animal Forest English trailer">
+        <video controls muted playsinline preload="none" poster="media/town.webp" aria-label="Animal Crossing N64 English translation trailer">
           <source src="media/trailer.mp4" type="video/mp4">
           Your browser does not support this video.
         </video>
-        <small>The released trailer. Audio starts muted.</small>
       </div>
       <div class="questions">
-        <p class="eyebrow">A FEW GOOD THINGS TO KNOW</p>
+        <p class="eyebrow">COMMON QUESTIONS</p>
         <h2>Before you move in.</h2>
-        <details><summary>Why do I need both games?</summary><p>Your Japanese N64 ROM is the base. Your English GameCube disc supplies real donor data used to reconstruct the translation. Both are checked before a ROM is offered for download. No game files are supplied here.</p></details>
-        <details><summary>Do my files leave my computer?</summary><p>No. Your browser reads them locally and creates a new file. The only downloads are this page, its media, and the translation patch. There are no uploads, accounts, analytics, or cloud processing, and your originals are never overwritten.</p></details>
-        <details><summary>Will this work with my existing town?</summary><p>Saved formats are unchanged from V1 Final and the preceding V2 build. Compatibility is expected in both directions, but keep a backup. This patcher never reads or changes your saves. RC3 is not a safe fallback.</p></details>
-        <details><summary>What if my file is rejected?</summary><p>Use an original Japanese Doubutsu no Mori ROM and USA/Canada Animal Crossing, GAFE01 revision 0. Extract .7z/.zip archives before choosing files. Convert RVZ/GCZ/NKit to a full ISO in Dolphin. Modified, damaged, or unsupported revisions cannot be patched.</p></details>
-        <details><summary>Is this the public release?</summary><p>This is a local preview of the V2 patcher. The translation and N64-inspired keyboard are implemented; continued playtesting can still uncover bugs. Public patch distribution and hosting are not enabled.</p></details>
+        <details><summary>Why do I need both games?</summary><p>The Japanese N64 game is the base for the patch. The English GameCube game provides text and artwork used in the translation. You’ll get a new N64 ROM; your GameCube game stays unchanged. You need to supply both games yourself.</p></details>
+        <details id="input-checksums"><summary>How can I check that I have the right files?</summary>
+          <p>The patcher checks both games automatically. To compare files yourself, use the MD5 checksums below. Hash the extracted game file, not its .7z or .zip archive.</p>
+          <h3 class="hash-heading">Doubutsu no Mori (Japan)</h3>
+          <p>16,777,216 bytes. Each N64 byte order has its own checksum:</p>
+          <dl class="input-hashes">
+            <dt>.z64 · Big-endian</dt><dd><code data-input-md5="z64">a4f7c57c180297b2e7ba5a5feb44fe0b</code></dd>
+            <dt>.v64 · Byte-swapped</dt><dd><code data-input-md5="v64">a6ef34bd225f22bbf737d61b839ae1b0</code></dd>
+            <dt>.n64 · Little-endian</dt><dd><code data-input-md5="n64">5a6a8590b4a318b7374a6d216c5914c6</code></dd>
+          </dl>
+          <h3 class="hash-heading">Animal Crossing (USA, Canada)</h3>
+          <p>Game ID <code>GAFE01</code>, revision 0. Match your file to one of these MD5s:</p>
+          <dl class="input-hashes">
+            <dt>.iso / .gcm · Full disc · 1,459,978,240 bytes</dt><dd><code data-input-md5="iso-full">7853049ccd0c1e2bffeb5b12393a5409</code></dd>
+            <dt>.iso / .gcm · Scrubbed disc · 1,459,978,240 bytes</dt><dd><code data-input-md5="iso-scrubbed">7ede3658d87319b64cdbd5ae90a2f32d</code></dd>
+            <dt>.ciso · 31,490,624 bytes</dt><dd><code data-input-md5="ciso">3e5a8787c5c2f20f08532edc4cb825c0</code></dd>
+          </dl>
+          <p>Full-disc reference: <a href="https://www.gametdb.com/Wii/GAFE01" target="_blank" rel="noopener noreferrer">GameTDB</a>. The scrubbed ISO and CISO above are verified with this patcher.</p>
+        </details>
+        <details><summary>Do my files leave my computer?</summary><p>No. Patching happens in your browser, with no uploads or accounts. Your original files are never overwritten, and the patcher doesn’t read or change your saves.</p></details>
+        <details><summary>What if my file is rejected?</summary><p>Check the game, region, and revision against the details above. Use an unpatched N64 ROM, and extract .7z or .zip archives first. For RVZ, GCZ, or NKit images, convert to a full ISO in Dolphin. The error message will tell you which file needs attention.</p></details>
+        <details><summary>How do I play the patched game?</summary><p>Download the finished .z64 file and open it in an N64 emulator, or copy it to a compatible flashcart. On original hardware, you’ll need an Expansion Pak, FlashRAM saves, and real-time clock support.</p></details>
       </div>
     </section>
   </main>

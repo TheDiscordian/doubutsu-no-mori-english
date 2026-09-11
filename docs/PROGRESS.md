@@ -9,6 +9,10 @@ corrected output includes the reported map `むら` omission. The
 [combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
 cartridge checks, eleven JavaScript checks, real browser-output verification,
 and private static-hosting preparation. Public patch hosting is not enabled.
+The [visitor-copy pass](checkpoints/PORTAL_VISITOR_COPY.md) uses **Animal Crossing
+N64** branding, removes private release/version prose, and adds six explicit
+input MD5 references to the FAQ. The live browser download uses that public-facing
+name, with unchanged V2-07 contents.
 
 V2's N64-inspired keyboard is implemented in
 `build/v2-map-suffix-07/Animal Forest English V2.z64` on the preserved
