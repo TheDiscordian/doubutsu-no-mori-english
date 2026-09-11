@@ -1,310 +1,92 @@
 # Completion queue
 
-## Next work
+## V1 Final
 
-Finish remaining V1 content and release preparation in the development build.
-Do not create more RCs or spend a batch repackaging each completed change. The
-next release is named `V1 Final`; assemble its final patch package after the
-remaining implementation and bounded verification are complete. Keep public
-publication approval separate and preserve all existing RC artifacts.
+All tracked findings V1-01 through V1-29 have implementations. The
+[human acceptance record](checkpoints/V1_HUMAN_ACCEPTANCE.md) closes every
+reported V1-01 through V1-23 issue, the reported v0 corrections, and repeated
+ordinary save/restart/reload. Do not reopen those accepted cases.
 
-All user-reported issues (V1-01 through V1-23 and the reported v0 corrections)
-and the ordinary save/restart/reload cycle have
-[explicit human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md). They are closed,
-not repeat-test tasks. Prioritise the remaining source-identified labels,
-unreviewed content, and release preparation; new concrete bugs take precedence.
+The complete development ROM is
+`build/main-diagnostic-text-01/animal-forest-diagnostic-text.z64`. It retains
+all RC8 content and adds the [thirteen diagnostic literals](checkpoints/MAIN_DIAGNOSTIC_TEXT.md).
+That stage has passing focused checks, committed construction, and full UPS
+reconstruction. No known tracked V1 finding awaits implementation.
 
-The current named handoff is [V1RC8](checkpoints/V1RC8_PACKAGE.md), containing
-all RC7 corrections and the 76 scene/loading/settings translations (V1-28).
-Three package checks and the archived standalone patcher pass. The ten-file ZIP
-includes offline application/source guides and bug-report notes; package use no
-longer depends on a private guide link. Preserve `build/v1rc8` and all earlier
-artifacts. RC7 save compatibility is expected in both directions without migration.
-Do not confuse retained human acceptance with fresh execution of RC8's new labels.
+The next release is named `V1 Final`. Do not create more RCs or repackage every
+completed change. Finish the [final package](../specs/V1_FINAL_PACKAGE.md) from
+the completed development output, check its own standalone patcher once, and
+record the exact final hashes and compatibility in the handoff. Preserve all
+existing RC artifacts and saves. Publication approval is separate from producing
+the local final deliverable.
 
-The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) adds
-thirteen complete English literals beyond RC8 (V1-29). Four focused checks,
-the committed construction, and full UPS reconstruction pass. No instruction,
-pointer, allocation, or saved-format change is made. Include this completed
-stage in `V1 Final` when the remaining work is complete; do not repeat its checks or launch
-the full 109-stage command. Its new final command already follows the existing
-correction runner in `make complete`.
+## Work that can change V1
 
-The [scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) translates all 76 Japanese
-scene/loading/setting strings in that owner, retaining 25 English/neutral strings.
-Its six focused tests, strengthened control-rejection check, clean committed
-construction, and full UPS reconstruction pass. Preserve `build/scene-menu-text-01`
-and its source-bound receipt; this batch is included in the checked RC8 package.
-Do not enable the
-debug menu or invoke its state-changing initializer to validate wording.
+- Fix concrete new text, layout, artwork, or gameplay defects when identified.
+  Crashes, save damage, memory corruption, and blocked progression take priority.
+- Preserve GameCube wording, intentional line/page breaks, and timing. Do not
+  reflow dialogue broadly or redesign the accepted keyboard during finalisation.
+- Keep the final package self-contained: offline patch instructions, sources,
+  compiler/source guide, manifest, checksums, save/memory requirements, and
+  explicit known limits. The source-build guide points to the final diagnostic
+  suffix output, not the older correction-only directory.
 
-The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects all
-nineteen correction stages to `make complete`. The committed correction run and
-its completed-run check pass; `build/v1-current-01/final/` matches the independent
-scene-menu ROM and UPS. Preserve those results. Do not re-test old builds or
-launch the full 108-stage historical replay; it is not a final-V1 task.
-The RC8 patch package is complete; finish remaining release/content work before
-packaging `V1 Final` with the later diagnostic stage. Preserve completed direct-font
-scans, scene-menu review, and rejected
-old-reader/padding classifications. New concrete bugs take precedence; historical
-fixture repair is not work to resume without a relevant current failure.
-V2 stays deferred until V1 completion.
+Neutral tools, room surfaces, effects, and fish/insect artwork stay unchanged
+unless actual lettering or a concrete translation defect is identified.
+Broad inspection of those assets is not V1 work and does not delay the final
+release. Preserve [completed artwork findings](ARTWORK_REMAINDER.md) without
+repeating them. Lucky-bag Japanese decoration intentionally matches English GC
+and the user's explicit choice; the shrine remains the native shrine.
 
-The [household/igloo review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes
-28 further household images and the unresolved igloo material-role lead. Their
-current RC8 resources remain native; household visible colours match English
-GC, including the CI8 tabletop. Preserve this review and its three passing
-synthetic decoder checks. Do not revisit these images, the rejected GC pot
-donor, or their unchanged gameplay merely to refresh evidence. Continue only
-genuinely unreviewed content and remaining release work.
+## Verification boundaries
 
-The packaged [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
-V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
-instruction. The RC6 stage matches
-`build/menu-text-followup-01/animal-forest-menu-followup.z64`; RC7 retains it.
-Preserve the passing checks instead of rerunning unchanged readers. Ordinary appearance
-is pending; do not invoke destructive Pak operations to validate a heading.
-The source review covers selected unchanged small submenu owners, not every
-embedded string or artwork image. Continue other unreviewed readers as useful.
-Retained Japanese storage in the moved address/gyroid/warning owners is not
-itself a missing reader: inspect the installed English pointer/hook before
-reopening those already corrected families.
+Use existing passing source/native evidence for unchanged code and resources.
+Do not re-test old builds, launch the full historical construction chain, repair
+old test fixtures, resume exhausted harnesses, or maintain the percentage tool
+without a concrete current need. Preserve the actual historical full-suite
+result; do not claim it passed.
 
-The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
-packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
-faulted thread. Controller movement, complete loaded font, owner guards, and
-clean four-MiB stopping pass. Eight implementation tests, three package tests,
-the committed rebuild, and the archived standalone patcher pass. Preserve these
-results and all preceding artifacts; do not repeat the completed reproduction.
-Every RC handoff distinguishes unchanged save formats from tested loading and
-warns about known or unresolved incompatibility. Cross-version compatibility is
-preferred, not mandatory. Continue current release/content work, not old-build
-tests or historical fixture maintenance. The reported hardware fixes and ordinary
-save/restart/reload are human-accepted. Keep new concrete human defects ahead of
-speculative work.
+The 61-stage base, 28-stage artwork, nineteen-stage correction, and final
+data-only suffix have recorded construction evidence. The composed 109-stage
+command is not presented as a newly executed end-to-end run. Package checks
+target only the final artifact and its bundled patcher.
 
-The [source-bound gyroid follow-up](checkpoints/RC4_GYROID_INTERACTION.md)
-opens the English menu within the verified native 43-unit talking limit and
-reaches Save & Quit / Save & Continue. Preserve its active-menu checkpoint and
-passing interaction/fault checks; do not repeat the completed navigation.
-The save-confirmation setup reaches its retry limit before a save is confirmed.
-Its corrected N64 continuation remains unexecuted. The human save/restart/reload
-confirmation closes the ordinary workflow check; do not resume this harness
-solely to duplicate that evidence. Retain the separately recorded
-[earlier route failures](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md).
-Emulator checkpoints are not game saves; continue unrelated V1 work at this limit.
+Source-identified V1-24 through V1-29 labels retain their recorded verification
+limits. Do not enable debug controls, create a town, spawn items, delete Pak
+data, or invoke save operations merely to inspect wording. Prior human
+acceptance is not fresh execution of these additional labels.
 
-The V1-17/V1-18 follow-up is implemented in the packaged
-[V1RC3 candidate](V1RC3_PLAYTEST.md). The [polygon font correction](checkpoints/FONT_POLYGON_EDGES.md) and
-[building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
-focused and controlled native checks. The committed two-stage replay, two
-package tests, and archived standalone patcher pass. RC3 has the confirmed town-
-  loading defect above; use the current RC8 handoff, not RC3.
-Preserve existing ROMs and saves; both reported appearance fixes are human-accepted.
+Broader seasonal/event/travel/Pak combinations, individual dialogue layouts,
+and ordinary appearance of both adapted festival-stall placements remain
+human-playtest work. The controlled stall preview already passes. These
+untested cases are not automatically passed, but they do not block the build
+that enables further testing. The [validation record](VALIDATION.md) and
+[bounded policy](V0_PLAN.md) preserve the evidence and safety requirements.
 
-The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
-[V1RC2 candidate](V1RC2_PLAYTEST.md): first-time-player wording, GC keyboard
-corner/hint layout and key alignment, one supported-symbol page, shop currency
-units, and idle AM/PM edge clamping. The complete three-stage rebuild, focused
-checks, controlled native keyboard drawing/guards, and standalone patcher pass.
-Hardware appearance and sound feedback are human-accepted. Preserve V1RC1,
-V1RC2, and the user's saves. V2 stays deferred.
+## Public publication
 
-The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
-artwork discovery and event acceptance. The first sixteen findings have scoped
-corrections retained in V1RC3, alongside the two edge fixes. The
-[package checkpoint](checkpoints/V1RC3_PACKAGE.md) identifies the exact local
-ROM, patch, and source revision. Human acceptance is recorded separately from
-implementation and controlled drawing evidence. Next:
+The source repository remains private. The [release checklist](RELEASE_PREPARATION.md)
+and [provenance review](checkpoints/RELEASE_PROVENANCE_REVIEW.md) distinguish
+technical readiness from redistribution rights.
 
-- Prioritise remaining Japanese wording/artwork and concrete playtest defects.
-  Percentage-tool maintenance is deferred at the user's request; use existing
-  inventory only when it helps find text still needing replacement. Do not spend
-  implementation time updating the percentage or its candidate selector.
-- Retain the [completed full regression result](checkpoints/V1RC1_REGRESSION.md):
-  2,103 tests, 25 failures, and 75 errors. Preserve the report and completed
-  follow-ups; do not repair or re-test historical fixtures as a remaining V1
-  task. A concrete current build/game failure can justify a focused check on
-  the current deliverable. Counter-only expectation maintenance stays deferred.
-  Do not restart the entire suite or
-  claim it passed. The title metadata comparison has a passing scoped correction
-  with independently matching overlay/relocation binaries; retain that result.
-  The [core runtime fixture follow-up](checkpoints/RUNTIME_FIXTURE_FOLLOWUP.md)
-  also closes five historical errors with passing evidence for 69 selected
-  checks. Preserve the verified fixture selections and unchanged guards; do not
-  rerun that completed batch or mark other failures resolved by association.
-  The [letter/shared-word follow-up](checkpoints/MAIL_RUNTIME_FIXTURE_FOLLOWUP.md)
-  closes seven further historical errors through verified module/item selection
-  and two freshly compiled capture fixtures. Its 51 selected checks have passing
-  evidence, including the source-bound native species and complete shared-bank
-  installation. Preserve this batch; remaining fixtures are not passed by association.
-  The [system-letter/glyph follow-up](checkpoints/SYSTEM_LETTER_FIXTURE_FOLLOWUP.md)
-  closes twelve more historical errors with 33 passing checks. Its six current
-  creator variants and verified combined-cartridge selections remain available;
-  do not repeat this completed batch. Later letter/probe/actor fixtures and the
-  native-species accounting test retain their separately recorded unresolved status.
-  The [receipt/probe follow-up](checkpoints/MAIL_RECEIPT_PROBE_FIXTURES.md) closes
-  four further errors and the word-profile/date-target failures with 18 passing
-  checks. Its positive matching-profile assertion, fresh generation fixture,
-  and current date compositions retain all source guards and expected callers.
-  Do not repeat these completed checks for unchanged
-  code or infer that other generation variants are repaired.
-  The [postal/museum follow-up](checkpoints/POSTAL_MUSEUM_FIXTURE_FOLLOWUP.md)
-  closes ten further errors with twenty passing checks, two source-built creator
-  variants, current combined-installation checks, and separately bound archived
-  native evidence. Preserve this completed group; its counter-only failures
-  remain deferred. The [Snowman follow-up](checkpoints/SNOWMAN_FIXTURE_FOLLOWUP.md)
-  closes five more errors with eleven passing checks and preserves the failed
-  first native run separately from its corrected edge-only resume. Do not repeat
-  either completed group. The
-  [renovation/event/fortune follow-up](checkpoints/LETTER_ACTOR_FIXTURE_FOLLOWUP.md)
-  closes six further errors with sixteen passing checks, using current early
-  installer compositions and separate final-actor/reader verification. Preserve
-  the accent adapter, payment safeguards, source checks, and completed batch.
-  The [date/fortune/glyph follow-up](checkpoints/DATE_FORTUNE_GLYPH_FIXTURES.md)
-  closes four further errors with six passing checks. Preserve its current
-  module selections, independent date composition, complete English contents,
-  and required font capability; do not repeat the completed batch. Remaining
-  resource/provenance fixtures retain their unresolved status, and counter-only
-  expectation maintenance remains deferred.
-  The [native-item follow-up](checkpoints/NATIVE_ITEM_FIXTURE_FOLLOWUP.md) closes
-  one further error with two passing checks. Preserve the bound historical
-  retention check, explicit current-import rejection, and complete RC4 resource/
-  native-original field checks. The old combined counter/scenario method and
-  other item families retain their unresolved status; do not repeat this batch.
-- Retain passing pixel-editor, letter UI, and corrected keyboard native evidence.
-  The current keyboard probe completes drawing, save/guard checks, fixture
-  release, and checkpoint restoration. Do not repeat unchanged native batches.
-  Preserve the older RC1 partial result separately, without relabelling it.
-- Preserve human acceptance of ordinary letter opening/defaults, recipient
-  selection, reported screen appearances, keyboard feedback, and inventory
-  digits. The shared recipient fix covers all villagers, not only Limberg;
-  preserve correct English names, player names, and saved identities.
-- Retain the verified [hiring-notice correction](checkpoints/SHOP_HIRING_NOTICE.md)
-  included in V1RC2, without repeating the unchanged room inspection.
+- Preserve third-party attribution, licence exclusions, and actual input roles.
+  Tooling licences and patch checks do not grant Nintendo-content permissions.
+- Obtain the user's public-publication approval and resolve the recorded
+  redistribution review before a public upload or repository visibility change.
+- Publish only the approved patch package and accompanying documentation/hashes,
+  never ROMs, input archives, extracted assets, saves, or emulator checkpoints.
 
-Broader remaining work follows the combined-fix integration:
+## V2
 
-1. Perform bounded ordinary appearance acceptance of the shared festival stall
-   and fortune table when a suitable isolated scene is available. Retain both
-   stall placements, correct lighting/culling, original shadows/collision, and
-   unchanged event behaviour. Do not turn scene setup into an exhaustive event
-   harness. The [stall checkpoint](checkpoints/STALL_ARTWORK.md) records passing
-   host/combination checks and the deliberate reflected-mesh adaptation. The
-   [controlled native preview](checkpoints/EVENT_ARTWORK_PREVIEW.md) passes;
-   do not rerun it for unchanged models or mistake it for ordinary event proof.
-2. Preserve the lucky-bag Japanese decoration, matching the English GC release
-   and the user's explicit choice. This applies to all three menu icons and the
-   native world-bag picture. Do not reopen it as missing English or count retained
-   artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
-3. Complete V1 in the development build, then prepare the `V1 Final` patch-only
-   package. Do not produce further RCs. Retain the shared stall, seven English
-   Nookington interior signs, police-interior posters, postal MAIL bag, and all
-   later corrections. Preserve earlier artifacts and explicit evidence limits;
-   use verified source/ROM/UPS/report hashes and execute the standalone patcher
-   on the final package before handoff.
-4. Address concrete human playtest bugs immediately, prioritising crashes,
-   save damage, memory corruption, and blocked progression. The Nook furniture
-   whole-conversation loop and letter-advice cleanup are already fixed and
-   natively tested; do not restart those investigations without new evidence.
-5. Translate additional genuinely unreviewed text-bearing artwork as identified.
-   Preserve native cultural structures and GC source intent. The scoped neutral
-   prop inventory is not a claim that every image in the game is reviewed.
-   Obtain reliable tiny-label transcriptions before assigning character weight.
-   The two original interior information notices share this transcription limit;
-   their complete English GC textures are already installed. Do not reopen the
-   completed seven-sign batch or rerun its unchanged rendering checks.
-   The three civic-interior images are also installed and verified; do not repeat
-   that batch. The regional house-panel lead is a GC-only island cottage, and
-   the bound native gloom effect contains no Japanese. Three unmatched shop
-   drapes are also neutral; retain them without repeating the inspection.
-   Use `tools/artwork_matches.py` and the [scoped inventory](ARTWORK_REMAINDER.md)
-   to select additional remaining screen/item images. The
-   [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md) closes
-   34 further native textures and confirms the English GC umbrella motif is
-   retained. The [dynamic-palette follow-up](checkpoints/DYNAMIC_PROP_ARTWORK_REVIEW.md)
-   also closes its four player/effect candidates through verified native palette
-   binding and non-text inspection. Do not repeat either completed group or
-   claim that those selected groups cover every dynamic material.
-   The [player-house/winter-windmill review](checkpoints/PLAYER_HOUSE_WINDMILL_REVIEW.md)
-   closes seven further non-text atlases, retained in both RC4 building copies.
-   Do not repeat that completed inspection. Unchanged texels in the original
-   owner may belong to a replaced model; check the installed reader before
-   treating retained old storage as untranslated artwork.
-   The [home-mailbox review](checkpoints/HOME_MAILBOX_ARTWORK_REVIEW.md) verifies
-   sixteen seasonal/static/animated images and their palettes against English
-   GC. Preserve the matching markings, complete object, actor, and relocation;
-   do not reopen this asset family as missing English or repeat its inspection.
-   The
-   [room/item review](checkpoints/ROOM_ITEM_ARTWORK_REVIEW.md) closes the selected
-   Katrina-interior, clock/furniture, and mechanical-detail textures; retain them
-   without repeating that inspection. The identified hiring notice is corrected
-   to match English GC's omission. Check current installed resources first;
-   unmatched originals include images already translated by earlier batches.
-   The [matching detail review](checkpoints/MATCHED_DETAIL_ARTWORK_REVIEW.md)
-   closes 35 selected phone, police/postal, Redd, register/sign-edge, and book
-   textures. Complete visible-colour matches and RC4 retention pass; preserve
-   these images without repeating their inspection. Their small decorative
-   marks are retained in English GC, not newly translated wording.
+The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) stays deferred until V1 is
+complete. Its grey N64-controller background, matching button art, and left
+control-stick image must preserve V1's accepted sounds, key positioning,
+proportional editing, N64 controls, and saved capacities.
 
-## Human playthrough and polish
+## Evidence
 
-The build exists so the user can test it. Broad acceptance does not block the
-build that enables testing. Keep these outstanding checks explicit:
-
-- Unreported tutorial, transaction, and editor cases beyond the accepted fixes,
-  including catchphrase/apology callers not explicitly covered by a report.
-  Do not reopen the accepted Nook loops, mail/board editor, or tune-label defects.
-- Untested longer-name, RTC, travel, and Controller Pak workflows. Ordinary
-  save/restart/reload and the reported existing-save/title defects are accepted.
-- Dates, seasons, events, and both placements of changed seasonal props.
-- Hardware configurations and Controller Pak cases outside the user's accepted
-  ordinary EverDrive playtests.
-- English wording and line layout, preserving GC line/page/timing intent.
-
-Use the existing [bounded testing policy](V0_PLAN.md). Reuse passing evidence
-for unchanged implementations. A setup failure gets one justified retry, with
-at most thirty minutes of new harness work per implementation batch; unresolved
-checks stay unresolved. Actual game defects do not get a retry cap or waiver.
-The embedded-warning native setup batch has reached its retry limit and must
-not be replayed unchanged.
-
-## Public release
-
-- Keep source-inventory limitations explicit. Percentage-tool maintenance is
-  not a release-preparation priority unless it helps locate untranslated text.
-- Complete provenance/redistribution review; do not relicense legacy work or
-  claim the tooling licence covers Nintendo assets.
-  Preserve the [scoped provenance review](checkpoints/RELEASE_PROVENANCE_REVIEW.md)
-  and [release-preparation checklist](RELEASE_PREPARATION.md). The exact private
-  archive contents/checksums and inspected input roles are checked; attribution
-  and technical packaging do not supply redistribution permission. The current
-  package includes offline documentation; source publication and the user's
-  release approval remain explicit decisions.
-- Prepare patch-only reproducible artifacts, verified application, hashes,
-  source revisions, compatibility notes, and explicit known issues.
-  Retain the [RC4 package-documentation correction](checkpoints/V1RC4_PACKAGE_DOCS.md)
-  and its passing standalone patcher result. It changes no ROM or save data;
-  do not request another gameplay pass for this documentation-only package.
-- Preserve the verified [portable compiler setup](checkpoints/PORTABLE_TOOLCHAIN.md).
-  The complete public-image rebuild passes. The
-  [61-stage clean base recipe](checkpoints/V0_REBUILD.md) and
-  [28-stage post-v0 recipe](checkpoints/V1_REBUILD.md) eliminate retained generated
-  resource, compiled-overlay, and translation-ROM dependencies. Do not repeat
-  those complete builds for unchanged code or documentation-only edits.
-- Obtain release approval and record human/hardware acceptance. Private playtest
-  packaging does not publish a release or certify the entire game.
-
-## V2, only after V1 is complete
-
-The [N64-inspired keyboard request](../specs/KEYBOARD_V2.md) is deferred:
-retain a GC-like layout, use a greyer N64-controller-inspired background and
-matching N64 button images, and add the stick image on the left. Do not begin
-this redesign during V1 fixes, review, or acceptance. Keep V1-14 focused on
-the current corner orientation/placement, text bounds, glyph positioning,
-and single symbol page.
-
-Current artifacts are in [progress](PROGRESS.md). Exact prior work remains in
-[checkpoints](checkpoints/), [the implementation record](PROGRESS_RECORD.md),
-and [the queue record](WORK_QUEUE_RECORD.md). Those records retain broad evidence
-and historical task IDs without directing completed work to be repeated.
+Current artifacts are in [progress](PROGRESS.md). Exact implementation and
+verification results are retained in [checkpoints](checkpoints/),
+[the implementation record](PROGRESS_RECORD.md), and
+[the queue record](WORK_QUEUE_RECORD.md). Historical instructions in those
+records do not direct completed work to be repeated.

@@ -315,6 +315,13 @@ this review-only work; the combined playtest-fix build remains the current candi
 
 ## Remaining work and evidence limits
 
+Neutral tools, room surfaces, effects, and fish/insect artwork remain unchanged
+unless actual lettering or a concrete defect is identified. Their broad review
+is not a V1 completion task. All tracked V1-01 through V1-29 findings have
+implementations; the later diagnostic stage belongs in the final assembled
+deliverable. Remaining broad playtesting is distinct from unfinished translation
+code and does not block the build that enables that testing.
+
 The [household review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes 28 further
 selected images through direct inspection and exact visible-colour matches to
 English GC. The current RC8 retains their complete native owners. New CI8

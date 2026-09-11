@@ -49,14 +49,16 @@ make complete V0_OUT=build/complete-rebuilt
 Use a fresh output directory. The recipe copies the verified inputs into an
 isolated source checkout, builds the base translation, adds the artwork/title,
 and applies all current corrections. Final files are in
-`build/complete-rebuilt/source/build/v1-current/final/`.
+`build/complete-rebuilt/source/build/v1-final/`; the ROM is
+`animal-forest-diagnostic-text.z64`.
 The source guide documents a reproduction command; it does not request that
 playtesters rebuild or re-test old candidates.
 
 The 61-stage base and 28-stage artwork recipes have recorded passing builds.
-The current nineteen-stage correction run also passes, producing the exact
-ROM/UPS hashes in the included README and manifest. The composed 108-stage
-command has not had a fresh end-to-end execution. These separate results are
+The nineteen-stage correction run and final data-only diagnostic stage also
+pass. The latter produces the exact final ROM/UPS hashes in the included README
+and manifest. The composed 109-stage command has not had a fresh end-to-end
+execution. These separate results are
 not presented as one new full run or as hardware certification.
 
 The manifest separates the cartridge build revision from the packaging

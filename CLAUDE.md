@@ -39,6 +39,10 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   development build, then name the next release `V1 Final`. Preserve existing
   RC artifacts and accepted results. Package once the V1 implementation and
   bounded verification are complete; keep public publication approval separate.
+- Do not expand V1 into a review of neutral tools, room surfaces, effects, or
+  fish/insect artwork. Leave those assets unchanged unless actual lettering or
+  a concrete translation defect is identified. Hypothetical untranslated art
+  is not a reason to delay `V1 Final` or build more inspection tooling.
 - Keep progress updates in chat and describe concrete completed work. Do not
   open repeated status renders or repeat an unchanged completion percentage.
 - When asked for total translation progress, run `python3 tools/translation_progress.py`

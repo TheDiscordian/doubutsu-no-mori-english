@@ -1,5 +1,14 @@
 # Remaining artwork
 
+## V1 scope
+
+Leave neutral tools, room surfaces, effects, and fish/insect artwork unchanged
+unless actual lettering or a concrete translation defect is identified. Broad
+inspection of those assets is not remaining V1 work and does not delay
+`V1 Final`. Retain the completed English title, screen, building/sign, and
+keyboard changes and their recorded acceptance. The records below preserve
+specific findings, not an instruction to inspect every neutral image.
+
 ## Household surfaces and igloo detail
 
 The [household review](checkpoints/HOUSEHOLD_ARTWORK_REVIEW.md) closes 28 selected
