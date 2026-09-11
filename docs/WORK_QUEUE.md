@@ -192,6 +192,11 @@ not be replayed unchanged.
   not a release-preparation priority unless it helps locate untranslated text.
 - Complete provenance/redistribution review; do not relicense legacy work or
   claim the tooling licence covers Nintendo assets.
+  Preserve the [scoped provenance review](checkpoints/RELEASE_PROVENANCE_REVIEW.md)
+  and [release-preparation checklist](RELEASE_PREPARATION.md). The exact private
+  archive contents/checksums and inspected input roles are checked; attribution
+  and technical packaging do not supply redistribution permission. Public
+  documentation access and the user's release approval remain explicit decisions.
 - Prepare patch-only reproducible artifacts, verified application, hashes,
   source revisions, compatibility notes, and explicit known issues.
   Retain the [RC4 package-documentation correction](checkpoints/V1RC4_PACKAGE_DOCS.md)

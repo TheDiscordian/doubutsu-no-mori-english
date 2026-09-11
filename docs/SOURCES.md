@@ -3,7 +3,7 @@
 | Source | Purpose | Distribution policy |
 | --- | --- | --- |
 | User-supplied Japanese N64 ROM | Build input and original text | Local only |
-| User-supplied AFProjectDistro.zip | Legacy patch, tools, and reverse-engineering notes | Local only pending explicit licence review |
+| User-supplied AFProjectDistro.zip | Legacy patch for text-identity corroboration, and reverse-engineering notes | Archive, patch, extracted resources, and bundled utilities stay local; no general licence established |
 | https://github.com/zeldaret/af | N64 decompilation and symbol reference | Pinned submodule; preserve upstream terms |
 | User-supplied GAFE01 revision 0 GameCube CISO | English script and matching reference | Local extraction; no full disc distribution |
 | https://github.com/ACreTeam/ac-decomp | GameCube structures, symbols, and character/command tables | CC0; pinned local reference |
@@ -40,6 +40,15 @@ all match the supplied patched ROM; item candidates from those offsets must not
 be imported without additional verification. Furniture names also use four
 rotation slots per item in retail, while the legacy lookup collapses rotations.
 
+The legacy-patched ROM is a reference, not this translation's base cartridge.
+The clean recipe applies the old UPS only to a separate local inspection copy.
+The inspected dialogue, name, item, and shared-word builders obtain English
+payloads from the supplied GC references or source-bound project translations;
+legacy agreement corroborates identity. Complete mail catalogues come from the
+verified GC banks. An identity match does not transfer authorship to the legacy
+patch, and it does not remove the dependency on that local reference. Preserve
+these distinctions when describing reused text or changing the build inputs.
+
 Extracted Nintendo text, textures, and executable binaries are generated locally.
 Original code in this repository is MIT licensed; that does not grant rights to
 third-party material. Translation reuse requires a recorded source and review.
@@ -52,3 +61,18 @@ The supplied legacy notes identify Zoinkity and invite script work, but the
 inspected distribution has no general licence file. Do not replace its notices
 with this project's MIT licence or treat that invitation as completed release
 review. The legacy archive and bundled executable utilities remain local.
+
+Credit Zoinkity for the supplied patch and reverse-engineering notes. Those
+notes separately identify byuu's UPS patcher, _Demo_'s Zextract, Shevious's Yaz0
+utilities, and Obsidian's macetII. These bundled programs are not included in
+this project's patch archive; the standalone Python patcher is project tooling.
+Acknowledging the programs is not a licence grant or a claim that they are
+required build dependencies.
+
+Patch archives, source-repository publication, and redistribution of local input
+archives are separate decisions. A patch contains game-derived changes even
+when it contains no full ROM or loose textures. The MIT tooling licence, CC0
+decompilation notices, and successful patch reconstruction do not establish
+permission to distribute Nintendo content or third-party translation work.
+Keep the repository and playtest private until the outstanding release review
+and approval are resolved.

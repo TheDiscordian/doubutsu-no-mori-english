@@ -258,6 +258,13 @@ acceptance remain human playtest work. Confirmed crashes, save damage, and
 memory corruption must be fixed; test-infrastructure limits do not waive them.
 Preserve GameCube wording, intentional line/page breaks, and timing during polish.
 Public release still needs provenance review and explicit release approval.
+The [scoped provenance review](checkpoints/RELEASE_PROVENANCE_REVIEW.md)
+checks the private archive's exact contents/checksums and distinguishes legacy
+identity corroboration from actual GC/project payload sources. Source notices
+retain upstream exclusions and legacy utility authorship. The
+[release-preparation checklist](RELEASE_PREPARATION.md) separates packaging,
+redistribution review, public documentation access, and release approval; it
+does not grant permission or change the playable build.
 
 ## Translation measurement
 
