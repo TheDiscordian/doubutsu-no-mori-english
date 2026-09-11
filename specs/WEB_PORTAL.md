@@ -6,7 +6,9 @@ Create the exact current V2-07 N64 cartridge in a static website using the user'
 Japanese N64 ROM and English USA/Canada GameCube disc. Both files stay in the
 browser. There is no upload endpoint, patcher telemetry, or account. Patcher
 assets are local; the optional trailer loads a YouTube frame only after Play.
-The local service binds to loopback. Public hosting is not authorised.
+The local service binds to loopback. The user controls public publication by
+changing the existing development repository's visibility; preparation does not
+change visibility or deploy the private repository's website.
 
 Supported inputs are extracted `.z64`, `.v64`, and `.n64` cartridges, and
 `.iso`, `.gcm`, and sparse GameCube `.ciso` discs. Archives and RVZ are rejected
@@ -35,7 +37,8 @@ The manifest binds source/output sizes and hashes, cartridge version, donor
 paths and raw/decoded hashes, recipe identity, and required hardware. The builder
 verifies the recipe recreates the existing cartridge; it does not rebuild the
 translation. The browser verifies the complete output before exposing a download.
-Generated recipes, media, and site exports remain in ignored `build/` paths.
+Working recipes, media, and exports remain in ignored `build/` paths. The exact
+reviewed recipe, manifest, and poster are committed under `web/` for deployment.
 
 ## Browser and interface
 
@@ -63,14 +66,33 @@ Automated browser checks suppress physical audio independently of that setting.
 All local assets use relative paths so a repository subpath works on static hosting.
 The generated site is the entire server root; never serve the repository, source
 ROMs, saves, or local research directories. A restrictive CSP and a read-only
-local server support the no-upload design. Publication is a separate explicit
-action; no active Pages deployment workflow is installed. CSP permits only
+local server support the no-upload design. The Pages workflow validates the
+12-file website while the repository is private and deploys only after the
+user makes the repository public. CSP permits only
 `https://www.youtube-nocookie.com` as a frame origin; parent scripts, workers,
 and connections remain same-origin. The iframe uses
 `strict-origin-when-cross-origin` so YouTube receives the required origin-only
 Referer; no file contents or names are sent to the frame. No MP4 is included in
 new site exports. Refresh moves the known old export copy outside the served
 folder after verifying its hash, preserving the original trailer.
+
+## Deployment
+
+Use `TheDiscordian/doubutsu-no-mori-english` for both source and Pages; do not
+rename it or introduce a second repository. Its Pages source is GitHub Actions.
+The workflow runs on main-branch pushes, the private-to-public event, and manual
+dispatch. `tools/prepare_pages.py` requires the exact website file allowlist,
+rejects symlinks and an existing output, and verifies the reviewed patch and
+output hashes, decoded recipe, and tooling licence. The workflow tests the
+packager and browser engine before uploading the Pages artifact. It requires
+no ROMs, disc images, developer paths, or external token secrets.
+
+The deploy job requires public repository visibility and receives only Pages
+and OIDC write permissions. Only its staged manifest has `public_release: true`;
+the committed and local-preview manifests remain false. No source directories,
+development notes, saves, or game inputs are part of the website artifact.
+Making the repository public does expose the repository and its Git history;
+the website allowlist does not hide tracked development records from GitHub.
 
 ## Verification
 

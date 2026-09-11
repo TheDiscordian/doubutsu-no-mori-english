@@ -1,5 +1,14 @@
 # Completion queue
 
+## Publication
+
+The existing development repository contains the complete website and reviewed
+patch data. GitHub Pages uses Actions; the workflow verifies while private and
+deploys only after the user makes the repository public. Keep the repository
+name. The [publication guide](WEB_PORTAL.md) describes the automatic workflow
+and matching YouTube description URL. Repository visibility and video publication
+are the user's remaining actions, not preparation steps for the assistant.
+
 ## Local browser patcher and map correction
 
 The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
@@ -9,7 +18,7 @@ omits the independent Japanese `むら` image beside the town name without save,
 code, allocation, or unrelated-art changes. The released trailer is untouched.
 Implementation and focused verification are complete; user portal feedback,
 new hardware findings, and separate public-hosting approval guide further work.
-Do not publish the private repository or game inputs.
+Do not change repository visibility or publish game inputs.
 
 ## Released trailer
 
@@ -21,9 +30,9 @@ verification are recorded in [the YouTube checkpoint](checkpoints/PORTAL_YOUTUBE
 The [YouTube upload resources](promotion/YOUTUBE.md) include a revised thumbnail,
 a suggested title, unlisted/release descriptions, and an optional pinned comment.
 The thumbnail uses flat, regular lettering and the retained green background;
-handoffs contain one upload image, and user approval remains separate. The user handles the
-unlisted YouTube upload. Release copy includes the planned public patcher address,
-`https://thediscordian.github.io/animal-crossing-n64/`; deploy the site there on
+handoffs contain one upload image, and the user accepts the revision. The user's
+YouTube upload is linked in the portal. Release copy includes the patcher address,
+`https://thediscordian.github.io/doubutsu-no-mori-english/`; deploy the site there on
 approval and verify that address before public release.
 This resource work does not edit the trailer or authorise public patch hosting.
 
@@ -59,7 +68,8 @@ callers and hardware acceptance of the corrections. No known V2 game change
 is awaiting implementation. This does not reopen V1 save testing or
 block the available development build. Do not invent further RCs, public
 packages, or speculative artwork tasks while awaiting findings. Keep V1 Final
-unchanged. No public release is authorised or queued.
+unchanged. Website/source publication is prepared above; the user controls when
+the repository becomes public.
 
 The [private offline V2 handoff](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
 at `build/v2-private-bundle/V2-Development-patch.zip` targets `v2-keyboard-05`;

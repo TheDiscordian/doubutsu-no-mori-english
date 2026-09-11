@@ -1,5 +1,5 @@
 Animal Crossing N64: the original Nintendo 64 adventure, in English.
-🌳 Patch your game in your browser: https://thediscordian.github.io/animal-crossing-n64/
+🌳 Patch your game in your browser: https://thediscordian.github.io/doubutsu-no-mori-english/
 The patcher launches here when the translation is released.
 
 Before the GameCube, there was Doubutsu no Mori. Come home to the game that started it all: meet your neighbours, decorate your house, write a letter, and settle into town life. Tom Nook still expects his money, of course.

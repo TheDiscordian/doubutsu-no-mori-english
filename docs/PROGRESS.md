@@ -2,6 +2,20 @@
 
 ## Active development
 
+V2 game implementation is complete for the tracked scope; remaining game work
+comes from concrete playtest findings. The README introduces the current V2
+translation to public readers, with patching instructions, hardware requirements,
+credits, and bug reporting rather than private V1/RC handoffs.
+
+The existing `TheDiscordian/doubutsu-no-mori-english` repository contains the
+complete website, reviewed patch recipe, and GitHub Pages workflow. Pages is
+configured for Actions. The workflow validates while private and deploys only
+when the user makes this repository public; no rename or separate repo is needed.
+The publication address is
+`https://thediscordian.github.io/doubutsu-no-mori-english/`.
+The [publication checkpoint](checkpoints/PAGES_PREPARATION.md) records the
+bounded history review, exact deployment package, and focused verification.
+
 The local portal uses the user's [YouTube trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)
 through a click-to-load, sound-enabled embed and a direct viewing link. The
 53.9-MB MP4 copy is preserved outside the served site, and fresh exports omit
@@ -14,9 +28,9 @@ pinned comment. Copy and image verification are recorded in the
 [production checkpoint](checkpoints/YOUTUBE_RESOURCES.md). The current thumbnail
 uses clean, flat lettering over the retained green background and title scene,
 addressing the user's font feedback. The handoff contains one upload-ready file,
-not multiple export sizes. User approval of the revision is not assumed.
+not multiple export sizes. The user accepts the revised thumbnail.
 The upload copy includes the planned public patcher address,
-`https://thediscordian.github.io/animal-crossing-n64/`, which is not live yet.
+`https://thediscordian.github.io/doubutsu-no-mori-english/`, which is not live yet.
 No video is uploaded or changed, and no public publication is performed.
 
 The [local browser patcher](WEB_PORTAL.md) is running at
@@ -25,7 +39,8 @@ and actual English GC donor data inside the browser, without uploads. The
 corrected output includes the reported map `むら` omission. The
 [combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
 cartridge checks, eleven JavaScript checks, real browser-output verification,
-and private static-hosting preparation. Public patch hosting is not enabled.
+and static-hosting preparation. Public deployment waits for the user's
+repository visibility change.
 The [visitor-copy pass](checkpoints/PORTAL_VISITOR_COPY.md) uses **Animal Crossing
 N64** branding, removes private release/version prose, and adds six explicit
 input MD5 references to the FAQ. The live browser download uses that public-facing
@@ -51,8 +66,8 @@ a test assumption about the caret and trailing spaces. No old build is replayed.
 The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) preserves earlier
 entry, space, caret, deletion, and Start-confirmation evidence. Other keyboard
 callers and hardware acceptance of the new corrections remain playtest limits.
-V1 Final remains unchanged. No public release is authorised; all artifacts
-remain private. Expected V1 Final ↔ V2 save compatibility needs no migration,
+V1 Final remains unchanged. The repository remains private until the user
+publishes it. Expected V1 Final ↔ V2 save compatibility needs no migration,
 but those particular loading directions are not independently executed.
 
 The [private offline V2 package](checkpoints/V2_PRIVATE_PACKAGE.md) is complete

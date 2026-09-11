@@ -12,9 +12,9 @@
 
 Copy the contents of the appropriate plain-text file into YouTube Studio.
 The planned public address is
-`https://thediscordian.github.io/animal-crossing-n64/`. It is not live; deployment
-targets a separate site-only `TheDiscordian/animal-crossing-n64` repository when
-publication is authorised. Do not expose the private development repository.
+`https://thediscordian.github.io/doubutsu-no-mori-english/`. It is not live;
+deployment uses the existing development repository, which the user plans to
+make public. Keep its name and history; no second repository is needed.
 If that destination changes, replace the exact URL once in each description and
 the pinned comment. The public main page supplies file hashes and instructions.
 

@@ -1,119 +1,100 @@
-# Doubutsu no Mori English 🌲
+# Animal Crossing N64 🌳
 
-English translation of the Japanese Nintendo 64 release, targeting original
-hardware. **V1 Final is available locally**, with a verified patch-only package.
-The repository and patch artifacts remain private. The user has released the
-trailer; public patch hosting is not enabled.
+An English fan translation of **Doubutsu no Mori**, the original Nintendo 64
+Animal Crossing game. Meet your neighbours, decorate your house, write letters,
+and experience where the series began—with the familiar English localisation
+from the GameCube release adapted to the N64 game.
 
-## Browser patcher
+**[Open the browser patcher](https://thediscordian.github.io/doubutsu-no-mori-english/)**
+· **[Watch the trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)**
+· **[Report a bug](https://github.com/TheDiscordian/doubutsu-no-mori-english/issues)**
 
-The **Animal Crossing N64** portal is running at **http://127.0.0.1:8073/**. Supply the original
-Japanese N64 ROM and English USA/Canada GameCube disc, then download the verified
-English N64 ROM. Both files are processed on your device, with no uploads.
-Its FAQ lists format-specific input MD5s. The browser download is named
-`Animal Crossing N64 - English.z64`; the local cartridge artifact remains intact.
+## What’s included
 
-The portal produces **V2-07**, including the map's removed Japanese town suffix.
-It supports extracted N64 `.z64`/`.v64`/`.n64` and GC `.iso`/`.gcm`/`.ciso`.
-See [portal operation and static hosting](docs/WEB_PORTAL.md) and the
-[correction/checkpoint](docs/checkpoints/MAP_SUFFIX_AND_PORTAL.md). The exported
-site is prepared for static hosting; nothing is published as part of this work.
+The current V2 translation includes:
 
-## V2 development
+- English dialogue, letters, character and item names, menus, and interface text.
+- Proportional Latin lettering and text editors adapted for English.
+- English title artwork and translated signs and screen graphics.
+- An N64-inspired English keyboard with navigation sounds, an animated control
+  stick, and pressed-button feedback.
+- Fixes identified through playtesting on original N64 hardware.
 
-The N64-inspired keyboard is implemented in
-`build/v2-map-suffix-07/Animal Forest English V2.z64`, with a matching
-UPS alongside it. It adds grey panel shading, native N64 control artwork,
-pressed-button feedback, and an eight-direction animated stick. Key positions,
-font metrics, input behaviour, sounds, and saved formats are retained.
-The map's independent `むら` bitmap is omitted to match the English GameCube
-town label. Four focused data-only correction checks pass; the released trailer
-is untouched. V2-06 saves remain compatible in format, without migration.
+This is a translation of the N64 game, not a port of all GameCube content.
+N64-specific places and gameplay remain intact. Some decorative Japanese
+markings are intentionally retained where the English GameCube artwork keeps
+them too.
 
-The current keyboard corrects the reported horizontal letter drift across
-the bubbles, shifts the Cursor label/C-button cluster left, and aligns A/L/R
-lettering. Button labels depress with their native held artwork. Six focused
-checks pass. Current-build captures cover eight stick directions, release,
-uppercase/lowercase/symbols, and all ten pictured buttons. The final bounded
-check confirms intact memory guards and no native fault. See the
-[playtest correction record](docs/checkpoints/KEYBOARD_V2_FEEDBACK.md) for
-hashes, the corrected test-sequence assumption, and precise evidence limits.
+## Patch your game
 
-Other keyboard callers and hardware/save-load acceptance of these corrections
-remain playtest limits. V1 Final stays untouched. See the
-[V2 ordinary work record](docs/checkpoints/KEYBOARD_V2_ORDINARY.md) for exact
-hashes and verification limits. No public release is authorised.
+Bring your own copies of both original games:
 
-The [private offline V2 archive](docs/checkpoints/V2_PRIVATE_PACKAGE.md) is
-`build/v2-private-bundle/V2-Development-patch.zip`. Its included standalone
-patcher targets `v2-keyboard-05`, not the current correction build; three
-package checks pass. The ZIP contains no ROM or save, and needs no source
-checkout, GameCube disc, Docker, or network for patch application.
+1. **Doubutsu no Mori (Japan)** for N64: an original, unpatched 16-MiB ROM in
+   `.z64`, `.v64`, or `.n64` format.
+2. **Animal Crossing (USA, Canada)** for GameCube: game ID `GAFE01`, revision 0,
+   in `.iso`, `.gcm`, or `.ciso` format.
 
-The [released trailer](docs/checkpoints/TRAILER_TOWN_REVISION.md) is rendered and visually
-reviewed at `build/trailer-cut-05/Animal Forest English - Trailer.mp4`: 66.5
-seconds, 1080p, with the native opening music, English title and dialogue,
-one N64-inspired keyboard sequence, Nook's Cranny, the post office, and
-translated map, catalogue, loan, inventory, and notice-board screens. Production sources and
-verification are tracked privately. The user's released video is preserved
-unchanged. Public patch, repository, and ROM uploads are not authorised.
+Open the [patcher](https://thediscordian.github.io/doubutsu-no-mori-english/),
+choose both files, and download the English N64 ROM. The patcher checks the
+inputs and finished result. Everything is processed on your device; your game
+files are not uploaded or overwritten. The GameCube image supplies English
+text and artwork but is not itself patched.
 
-## V1 Final
+Extract `.7z` or `.zip` archives first. For RVZ, GCZ, or NKit images, convert
+to ISO before patching. The patcher’s FAQ lists supported input sizes and MD5
+checksums. **No ROMs or disc images are provided by this project.**
 
-- ROM: `build/v1-final/Animal Forest English V1 Final.z64`.
-- Patch archive: `build/v1-final/V1-Final-patch.zip`.
-- Requirements: Expansion Pak, 128-KiB FlashRAM, and RTC.
-- ROM SHA-256:
-  `0561182044c1526010ed77b1b9c72ac268794c2f7b615f8fa70c007f366483bf`.
+## Playing on an N64
 
-The [final guide](docs/V1_FINAL.md) covers patch application, compatibility,
-included changes, and known limits. The [handoff checkpoint](docs/checkpoints/V1_FINAL_PACKAGE.md)
-records exact artifact/source hashes and passing final-package verification.
-The archive includes offline instructions, credits, source-build notes, and a
-standalone Python patcher; no private checkout is needed to apply the patch.
+- An **Expansion Pak** is required: 8 MiB of RAM.
+- Your flash cartridge needs **FlashRAM saves (128 KiB)** and **real-time clock
+  support**. Select FlashRAM if the cartridge asks for a save type.
+- Back up existing saves before using a patched game.
 
-V1 includes proportional Latin text, English dialogue/names/items/letters,
-translated menus and screen/building artwork, the English animated title, and
-the GC-style keyboard. All tracked V1-01 through V1-29 fixes are implemented.
-The user confirms all reported V1-01 through V1-23 and v0 corrections are fixed
-and repeated ordinary saving/restarting/reloading works on hardware. Preserve
-that [human acceptance](docs/checkpoints/V1_HUMAN_ACCEPTANCE.md); later source-
-identified labels are not claimed as part of those playtest sessions.
+An N64 emulator can also run the patched ROM. Hardware playtesting has verified
+ordinary saving and reloading and the reported gameplay and interface fixes.
+Broader player testing continues.
 
-RC8 saves are expected compatible with V1 Final in both directions without
-migration; those particular loading directions are not independently tested.
-Keep backups and use the appropriate EverDrive save filename for the renamed
-ROM. RC3 retains its known existing-town loading defect and is not a fallback.
+## Feedback and known limits
 
-## Scope and continuing work
+[Open an issue](https://github.com/TheDiscordian/doubutsu-no-mori-english/issues)
+with what happened, what you expected, how to reproduce it, and your emulator
+or flash cartridge. Include a screenshot or short clip if it helps. The patcher
+can download patch details identifying your build. **Do not attach ROMs, disc
+images, or personal save files to public issues.**
 
-GameCube wording, intentional breaks, and timing guide the translation, while
-native N64 structures, identities, and saved capacities remain. Lucky-bag
-Japanese decoration is intentionally retained to match English GC. Neutral
-artwork is not changed or exhaustively reviewed without an actual translation
-defect. No further RCs, old-build retesting, or speculative neutral-image sweeps
-are queued.
+Seasonal events, travel and Controller Pak interactions, and individual text
+layouts still benefit from player testing. See the
+[current progress](docs/PROGRESS.md) and [work queue](docs/WORK_QUEUE.md) for
+implementation status and the limits of recorded tests.
 
-Broader seasonal/travel/Pak cases, individual dialogue layouts, and ordinary
-appearance of both adapted stall placements remain playtest work, not completed
-proof. See [progress](docs/PROGRESS.md), [tracked findings](docs/V1_PLAYTEST_BUGS.md),
-and the [completion queue](docs/WORK_QUEUE.md). Concrete new crashes, save damage,
-blocked progression, or text defects take priority. The
-[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) and local browser patcher are
-implemented; concrete playtest and portal feedback guide further changes.
+## Source and development
 
-## Source and reproduction
+This repository contains the translation tools, runtime changes, translation
+edits, specifications, test records, and the complete browser patcher.
 
-The repository tracks tools, translation edits, specifications, and evidence.
-ROMs, extracted assets, saves, and generated patches remain local and ignored.
-[Sources](docs/SOURCES.md) records third-party provenance.
+- [Build the translation](docs/BUILDING.md): original inputs and the pinned
+  Docker toolchain are required.
+- [Run or deploy the website](docs/WEB_PORTAL.md): `web/` contains the site;
+  the Pages workflow publishes only the verified website artifact.
+- [Formats and implementation specifications](specs/).
+- [Source provenance and acknowledgements](docs/SOURCES.md).
 
-`make complete` rebuilds the base, artwork, corrections, and final diagnostic
-suffix from verified local inputs using the pinned published Docker compiler.
-The [build guide](docs/BUILDING.md) describes the final output and recorded
-component runs. The composed 109-stage command is not claimed as a new complete
-end-to-end execution; unchanged historical builds are not replayed.
+ROMs, disc images, saves, extracted working assets, and emulator recordings stay
+outside version control. The reviewed browser patch recipe, its manifest, and
+the site poster are included so GitHub Pages can deploy without original game
+inputs or access to a developer’s computer.
 
-Original tooling is MIT licensed; that licence does not cover Nintendo content
-or legacy work. Public patch/source publication requires the separate
-[redistribution review and approval](docs/RELEASE_PREPARATION.md).
+## Credits and licence
+
+Project by **TheDiscordian**, with AI-assisted development. Thanks to **Zoinkity**
+for earlier translation work and reverse-engineering notes, and to the
+**zeldaret/af** and **ACreTeam/ac-decomp** contributors for their research.
+[Full credits](web/SOURCE_NOTES.txt) identify additional references and tools.
+
+Original games, English localisation, artwork, and music are Nintendo’s work.
+This is an unofficial fan translation, not affiliated with or endorsed by Nintendo.
+
+Original project tooling uses the [MIT licence](LICENSE). That licence does not
+cover Nintendo content or third-party work; the referenced projects retain
+their own notices and exclusions.

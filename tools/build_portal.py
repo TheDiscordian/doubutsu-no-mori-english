@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TARGET_SHA = '400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25'
 DONORS = ('forest_1st.arc', 'forest_2nd.arc', 'foresta.rel.szs')
 WEB_FILES = ('index.html', 'style.css', 'app.mjs', 'core.mjs', 'worker.mjs', 'mark.svg')
+NOTICE_FILES = ('SOURCE_NOTES.txt', 'LICENSE-tooling.txt', '.nojekyll')
 SAVE_NOTE = 'Back up existing saves before playing a patched game. The patcher does not read or change save files.'
 DOWNLOAD_NAME = 'Animal Crossing N64 - English.z64'
 TRAILER_URL = 'https://www.youtube.com/watch?v=UloFru4K4Q8'
@@ -31,6 +32,14 @@ def refresh_web(out):
     for name in WEB_FILES:
         if sha256((site/name).read_bytes()) != report['site_source_sha256'][name]:
             raise ValueError('Preserve unrecorded live-site edits before refreshing: '+name)
+    previous_notices = report.get('site_notice_sha256', {
+        'SOURCE_NOTES.txt': sha256((ROOT/'docs/SOURCES.md').read_bytes()),
+        'LICENSE-tooling.txt': sha256((ROOT/'LICENSE').read_bytes()),
+        '.nojekyll': sha256(b''),
+    })
+    for name in NOTICE_FILES:
+        if sha256((site/name).read_bytes()) != previous_notices[name]:
+            raise ValueError('Preserve unrecorded live-site edits before refreshing: '+name)
     # Retire only the known redundant export copy; preserve it outside the site.
     old_video, archive = site/'media/trailer.mp4', out/'retired-site-trailer.mp4'
     if old_video.exists():
@@ -38,12 +47,13 @@ def refresh_web(out):
                 or archive.exists()):
             raise ValueError('Preserve unexpected trailer copies before refreshing')
         old_video.rename(archive)
-    for name in WEB_FILES:
+    for name in WEB_FILES + NOTICE_FILES:
         shutil.copyfile(ROOT/'web'/name, site/name)
     manifest['save_compatibility'] = SAVE_NOTE
     manifest['output_name'] = DOWNLOAD_NAME
     (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     report['site_source_sha256'] = {name: sha256((site/name).read_bytes()) for name in WEB_FILES}
+    report['site_notice_sha256'] = {name: sha256((site/name).read_bytes()) for name in NOTICE_FILES}
     report['trailer_url'] = TRAILER_URL
     (out/'build.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps({'site': str(site.relative_to(ROOT)), 'web_refreshed': True,
@@ -161,7 +171,7 @@ def main():
     site = out/'site'
     (site/'release').mkdir(parents=True)
     (site/'media').mkdir()
-    for name in WEB_FILES:
+    for name in WEB_FILES + NOTICE_FILES:
         shutil.copyfile(ROOT/'web'/name, site/name)
     manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-07',
         'public_release': False, 'source_sha256': ROM_SHA256, 'source_size': len(source),
@@ -175,18 +185,16 @@ def main():
         'stats': stats}
     (site/'release/patch.afwp.gz').write_bytes(compressed)
     (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
-    (site/'.nojekyll').touch()
     # The trailer is hosted on YouTube; export only its local poster, never a ROM.
     trailer = ROOT/'build/trailer-cut-05/Animal Forest English - Trailer.mp4'
     subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-ss', '10', '-i', str(trailer),
                     '-vf', 'crop=1440:1080:240:0,scale=800:600', '-frames:v', '1',
                     str(site/'media/town.webp')], check=True, timeout=30)
-    (site/'SOURCE_NOTES.txt').write_text((ROOT/'docs/SOURCES.md').read_text())
-    (site/'LICENSE-tooling.txt').write_text((ROOT/'LICENSE').read_text())
     report = {'site': str(site.relative_to(ROOT)), 'target_sha256': TARGET_SHA,
         'trailer_url': TRAILER_URL,
         'recipe_roundtrip': 'passed', 'recipe_sha256': sha256(compressed), **stats,
         'site_source_sha256': {name: sha256((site/name).read_bytes()) for name in WEB_FILES},
+        'site_notice_sha256': {name: sha256((site/name).read_bytes()) for name in NOTICE_FILES},
         'public_release': False, 'contains_roms_or_saves': False}
     (out/'build.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps(report, indent=2))

@@ -18,6 +18,12 @@ memory requirement; permission to use eight MiB does not itself change heap boun
   generated patches in ignored directories. Commit original tools, translation
   edits, specifications, provenance records, and test fixtures made for testing.
 - Never distribute a full ROM. Public releases contain patches and instructions.
+- The existing development repository is the public source and GitHub Pages
+  repository; keep its name. The exact reviewed browser recipe, manifest, and
+  poster under `web/` are the only generated game-derived publication assets
+  tracked for Pages. Other generated patches/assets and all ROMs/saves stay
+  ignored. The Pages workflow validates while private and deploys only when
+  the user makes this repository public. Never change visibility as preparation.
 - Preserve third-party licensing and authorship; do not assume an unlicensed
   archive grants permission to relicense its code or translations.
 - Validate the input ROM hash before modifying anything. Build into a new file.

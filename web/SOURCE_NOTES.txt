@@ -1,0 +1,47 @@
+Animal Crossing N64 — credits and sources
+
+Project by TheDiscordian, with AI-assisted development.
+
+Nintendo
+Original Doubutsu no Mori and Animal Crossing games, English localisation,
+artwork, and music. This is an unofficial fan translation, not affiliated with
+or endorsed by Nintendo. Supply your own Japanese N64 game and North American
+GameCube game; no full ROM or disc image is distributed here.
+
+Zoinkity
+Earlier Animal Forest translation work and reverse-engineering notes supplied
+with AFProjectDistro. That patch is a research reference, not this project's
+base cartridge. English text and artwork are drawn from the verified GameCube
+input or project translations; agreement with the earlier patch helps identify
+matching text. The original archive and its bundled utilities are not distributed.
+
+Decompilation and format research
+  zeldaret/af — Nintendo 64 structures and symbols
+  https://github.com/zeldaret/af
+
+  ACreTeam/ac-decomp — GameCube structures, symbols, and text formats
+  https://github.com/ACreTeam/ac-decomp
+
+  Cuyler36 — Animal Crossing text-format research
+  Dolphin contributors — GameCube sparse-disc format research
+  https://github.com/dolphin-emu/dolphin
+
+  ares contributors — emulator and debugger used during validation
+  https://github.com/ares-emulator/ares
+
+Zoinkity's accompanying notes also credit byuu's UPS patcher, _Demo_'s Zextract,
+Shevious's Yaz0 utilities, and Obsidian's macetII. These programs are not included
+in the browser patcher or required as downloads for players.
+
+Licences
+Original project tooling is MIT licensed; see LICENSE-tooling.txt. That licence
+does not apply to Nintendo's games, extracted content, or third-party work.
+The decompilation projects retain their own notices and exclusions; in particular,
+zeldaret/af's root licence does not cover its excluded SDK and subrepositories.
+Requiring both original games and providing a patch does not itself establish
+redistribution rights for game-derived material.
+
+Source, technical records, and bug reports
+https://github.com/TheDiscordian/doubutsu-no-mori-english
+
+—Claude

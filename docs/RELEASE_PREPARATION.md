@@ -1,77 +1,74 @@
-# Patch-only release preparation
+# V2 publication preparation
 
-The current deliverable is the local [V1 Final](V1_FINAL.md), not a public upload.
-The repository remains private. This document separates technical packaging
-evidence from attribution, redistribution review, and gameplay acceptance.
-`V1 Final` is assembled and its standalone patcher passes; no additional RC
-packages are produced. Keep the final artifact and recorded results intact.
-The [provenance checkpoint](checkpoints/RELEASE_PROVENANCE_REVIEW.md) binds the
-inspected source versions, archive contents, and remaining limits.
+The release is the **V2 browser patcher** and this source repository. The browser
+produces the reviewed V2-07 N64 build, including the N64-inspired keyboard and
+map town-label correction. Earlier V1 and private offline packages remain
+development records, not the public download route.
 
-## Distribution boundaries
+## Publication controls
 
-| Material | Current treatment |
+Use the existing **TheDiscordian/doubutsu-no-mori-english** repository, without
+renaming it or introducing a separate website repo. The repository remains
+private during review. The user changes its visibility when ready.
+
+Pages is configured for GitHub Actions. The committed workflow validates the
+complete website and patch data while private, with deployment skipped. Making
+the repository public triggers validation and deployment automatically. The
+[deployment guide](WEB_PORTAL.md) gives the expected URL and sequence. YouTube
+release descriptions use that same address.
+
+## What becomes public
+
+Making this repository public exposes its tracked files **and Git history**.
+The website's file allowlist is not a privacy boundary for repository contents.
+
+| Material | Treatment |
 | --- | --- |
-| Japanese N64 ROM and English GC disc | User-supplied local inputs; never included in a release |
-| Legacy archive, UPS, extracted assets, and bundled programs | Local research/reference inputs; not republished |
-| Translation UPS | Private patch artifact; contains game-derived changes, not a rights clearance |
-| Standalone Python patcher and helper | Project tooling with `LICENSE-tooling.txt`; no game files required until the user supplies the original ROM |
-| Project translations and source-derived records | Tracked in the private repository; not automatically covered by the tooling-only licence statement |
-| N64/GC decompilation references | Pinned sources with their own notices; preserve root-licence exclusions and dependency terms |
-| Compiler and emulator | Separately obtained tools; not bundled in the patch archive |
-| User saves and emulator checkpoints | Local validation inputs; never release material |
+| Original N64 ROM and English GC disc | Supplied by each player; never committed or hosted |
+| Legacy archive, extracted working assets, and bundled programs | Ignored local research inputs; not republished |
+| Browser patch recipe, manifest, and poster | Exact reviewed files committed under `web/` for Pages |
+| Translation source, tools, specifications, and development records | Included in the public source repository |
+| Decompilation references | Public upstream projects with their own notices and exclusions |
+| User saves, emulator checkpoints, and recordings | Ignored local files; not publication material |
+| Earlier offline patch archives | Preserved locally; not included in the website |
+| Raw publication-audit output | Ignored under `local/`; not included in the website or repository |
 
-The [V1 Final archive](checkpoints/V1_FINAL_PACKAGE.md) has only the UPS,
-manifest, README, source notes, optional toolchain/source guide, bug-report guide,
-tooling licence, two Python files, and checksums. Its standalone application and
-offline-document links are verified. Keep earlier artifacts intact; review the exact archive selected for
-publication rather than treating all files in a build directory as distributable.
+Only the 12 files checked by `tools/prepare_pages.py` enter the website artifact.
+The repository does not contain a full ROM, disc image, or player save as a
+release asset. Keep future game inputs and test outputs ignored.
 
-The source tree includes translation strings, native command/instruction records,
-and derived layout information. A file-extension check for ROMs/images does not
-establish that the tree contains no third-party material. Publishing the source
-repository is a separate decision from publishing a patch.
+## Attribution
 
-## Attribution and input provenance
+[Public credits](../web/SOURCE_NOTES.txt) and [research provenance](SOURCES.md)
+distinguish project tooling, Nintendo content, Zoinkity's earlier work, and the
+decompilation references. The supplied legacy patch is a research reference,
+not the base cartridge used for this translation.
 
-The [source notes](SOURCES.md) distinguish original project tooling, the supplied
-Nintendo games, Zoinkity's legacy work, and the pinned decompilations. Legacy
-utilities retain their identified authors even though those programs are not
-shipped. A general licence for the supplied legacy distribution is not established
-by its invitation to work on the script. No Nintendo-content redistribution
-permission is inferred from the decompilation licences.
+English resources come from verified GameCube payloads or recorded project
+translations. The browser actually copies matching spans from the supplied GC
+disc; it does not simply check ownership and apply an unrelated patch.
 
-The inspected builders use legacy text to corroborate reference identity, not
-as the base ROM. English dialogue/names/items come from independently bound GC
-payloads or native original-translation approvals; the mail catalogue binds GC
-banks directly. Preserve actual payload sources separately from matching evidence.
-Item approval files have a source-specific schema: the generated edits receive
-their required provenance through `native_item_names` and `item_candidates`.
-A missing generic `provenance` key in those approval records is not proof that
-the generated resource lacks attribution.
+The MIT licence covers original project tooling, not Nintendo content or
+third-party work. The decompilation projects retain their own licence exclusions.
+The patch recipe and source records contain game-derived material; requiring
+original games and avoiding full ROM distribution do not establish permission
+to redistribute that material. No rights clearance is claimed.
 
-## Outstanding public-release decisions
+## Verification and remaining testing
 
-- Resolve the redistribution review for game-derived material and any reused
-  third-party work. Keep the actual source and uncertainty recorded; neither
-  an absent licence nor a permissive tooling licence is an affirmative clearance.
-- Obtain the user's public-release approval. Do not change repository visibility,
-  upload a public patch, or distribute input archives as a side effect of preparation.
-- Preserve the self-contained documentation included in the current package.
-  Patch instructions, credits, compatibility, known limits, and the optional
-  source-build guide need no private documentation link. Source compilation
-  still requires access to the private checkout and separately supplied inputs;
-  publishing that checkout remains a separate decision.
-- Select the final checked candidate and publish only its patch package, source/
-  output hashes, required memory/save type, known issues, and compatibility notes.
-  A docs-only archive change does not require another gameplay pass or a new ROM.
-- Preserve [human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md) of all reported
-  fixes and ordinary save/restart/reload. Keep source-identified menu findings,
-  concrete artwork findings, untested gameplay, and scoped test failures at their actual
-  status. The incomplete gyroid automation is not an outstanding ordinary-save
-  gate. Do not withhold private builds for broader playtesting or claim untested
-  cases have passed.
+The reviewed output SHA-256 is
+`400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25`.
+The [portal checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records real browser
+reconstruction from supported original inputs. Packaging changes do not change
+that cartridge or require replaying old builds.
 
-Successful compilation, archive checks, and patch application prove their own
-technical results. They do not certify the full game, original hardware, saved
-data round trips, or redistribution permission.
+Preserve [human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md) of reported
+gameplay/interface fixes and ordinary saving/reloading. Broader seasonal events,
+travel, Controller Pak interactions, and V2 keyboard contexts retain their
+recorded playtest limits. These are not prerequisites for the build that lets
+players test them. Concrete crashes, save damage, and blocked progression take
+priority when reported.
+
+The [publication checkpoint](checkpoints/PAGES_PREPARATION.md) records the source
+review and fresh website checks. Technical tests do not certify every game
+scenario, original-hardware configuration, or redistribution right.

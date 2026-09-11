@@ -1,4 +1,4 @@
-# Local browser patcher 🌿
+# Browser patcher and GitHub Pages 🌿
 
 The visitor-facing site is branded **Animal Crossing N64 · English Translation**.
 Its copy is written for the public audience, without private build history or
@@ -10,10 +10,10 @@ The portal is running at **http://127.0.0.1:8073/** through the enabled
 serves `build/web-portal-02/site`, not the repository or its game inputs.
 
 The planned public address is
-**https://thediscordian.github.io/animal-crossing-n64/**, matching the YouTube
-upload copy. This targets a separate site-only `TheDiscordian/animal-crossing-n64`
-repository, not a visibility change to the private translation repository.
-The destination is not created or live; publication still requires approval.
+**https://thediscordian.github.io/doubutsu-no-mori-english/**, matching the YouTube
+upload copy. The existing development repository contains the Pages setup and
+is the repository the user reviews and makes public. No rename or second
+repository is needed. Public deployment waits for that visibility change.
 
 ## Use
 
@@ -49,9 +49,12 @@ implied by an exact patch-output checksum.
 
 ## Source and local operation
 
-`web/` contains the original static page, CSS, SVG mark, UI module, module
-worker, and dependency-free patch engine. `tools/build_portal.py` creates a
-fresh ignored export from verified local source games and the corrected target.
+`web/` contains the complete deployable source: HTML, CSS, SVG mark, UI module,
+module worker, dependency-free patch engine, public credits and licence, poster,
+manifest, and reviewed patch recipe. `tools/prepare_pages.py --output build/pages-N`
+stages and verifies this site without original game inputs. Use an unused output
+directory. `tools/build_portal.py` creates a new recipe/export from verified
+local source games and the corrected target when the game build changes.
 `tools/serve_portal.py` supplies the read-only loopback server. Its unit is
 tracked in `systemd/animal-forest-portal.service`; the installed copy matches.
 
@@ -68,7 +71,9 @@ the existing patch identity. It does not rebuild the ROM, regenerate the patch,
 or edit the trailer. It retires the known redundant MP4 export copy to
 `build/web-portal-02/retired-site-trailer.mp4`, outside the served folder, after
 checking the file identity. New exports contain no MP4. Source hashes and the
-YouTube destination in the export receipt are refreshed. Server CSP changes
+YouTube destination and public-credit hashes in the export receipt are refreshed.
+Public credits come from `web/SOURCE_NOTES.txt`, not the longer research notes.
+Server CSP changes
 require restarting `animal-forest-portal.service`; the page CSP matches it.
 
 The FAQ lists six MD5 reference checksums: three N64 byte orders, the catalogued
@@ -85,7 +90,7 @@ reads and hashes `forest_1st.arc`, `forest_2nd.arc`, and Yaz0-decoded
 1,889,613 bytes compressed. This is a genuine two-input reconstruction, not a
 disc-header gate in front of an otherwise independent patch.
 
-## Static hosting later
+## GitHub Pages publication
 
 The generated **`site/` directory** is the deployable static artifact. It
 contains relative URLs, a `.nojekyll` marker, a manifest, patch recipe, and
@@ -93,19 +98,41 @@ selected media. No server-side runtime or database is required. Module workers,
 file reads, hashing, and patching run on the visitor's device. Hosting must use
 HTTPS; localhost is supported for local development.
 
-Keep `site/` as the deployment root or mount it below a project path. Do not
-deploy the private repository, `local/`, the wider `build/` tree, source ROMs,
-saves, or browser-test downloads. Public hosting needs separate approval and
-the existing [redistribution review](RELEASE_PREPARATION.md). There is no active
-Pages workflow and no public patch upload. Requiring both games does not by
-itself establish redistribution rights for the remaining patch literals/media.
+The existing repository is **TheDiscordian/doubutsu-no-mori-english**. Pages is
+configured to use GitHub Actions, and `.github/workflows/pages.yml` handles
+validation and deployment. No repository rename or separate website repository
+is involved. The complete website and recipe are committed; deployment requires
+no ROMs, developer computer, or extra secret token.
 
-The release manifest and deployment approval must be deliberately
-updated for any authorised public release. The released trailer itself is not
-altered by the portal or map fix.
+The publication sequence is:
+
+1. Review the repository and its history. Making it public exposes the source
+   and development records as well as the website files.
+2. Change the repository from private to public. GitHub's `public` event starts
+   the workflow automatically. Main-branch pushes also run it.
+3. Wait for **Validate and deploy website** to succeed, then visit
+   **https://thediscordian.github.io/doubutsu-no-mori-english/**.
+4. Make the YouTube trailer public when the live patcher is ready. Its release
+   description already uses this address.
+
+While private, the workflow stages and tests the website and preserves the
+verified artifact, but skips deployment. A manual workflow run is available if
+needed; it obeys the same visibility guard. The public artifact's manifest has
+`public_release: true`; the tracked and local-preview manifests remain false.
+
+Only the 12 explicitly allowed website files are deployed. The staging tool
+rejects extra files, symlinks, a changed recipe, a changed output identity, and
+an existing output directory. Never deploy `local/`, the wider `build/` tree,
+source ROMs, saves, or browser-test downloads. See the
+[publication review](RELEASE_PREPARATION.md) for distribution boundaries.
+Requiring both games does not itself establish redistribution rights for the
+remaining game-derived patch material. The released trailer is unchanged.
 
 ## Verification
 
+- `python3 -m unittest tests.test_prepare_pages -v` checks private/public staging,
+  the exact file set, input preservation, and rejection of changed patches,
+  unexpected files, and symlinks. It requires no private input files.
 - `python3 tools/check_portal_trailer.py` checks the live page at three widths,
   no pre-click third-party requests, mouse/keyboard activation, unmuted playback
   parameters, origin-only Referer, minimum player size, and the direct link.
