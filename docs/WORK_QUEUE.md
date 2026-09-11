@@ -8,38 +8,26 @@ and the ordinary save/restart/reload cycle have
 not repeat-test tasks. Prioritise the remaining source-identified labels,
 unreviewed content, and release preparation; new concrete bugs take precedence.
 
-The [gamestate-menu follow-up](checkpoints/GAMESTATE_MENU_TEXT.md) implements
-nine complete native labels (V1-27), with six focused checks, committed
-construction, and UPS reconstruction passing. Preserve `build/gamestate-menu-text-01`
-and its bound receipt; package it with the completed title warning into the next
-named candidate. RC6 remains the existing handoff. Keep
-save compatibility expectations separate from unverified loading/save cycles;
-do not invoke save/deletion actions merely to test labels. The separate debug
-scene-name table is an unreviewed lead, using a different graphics-print encoding.
+The current named handoff is [V1RC7](checkpoints/V1RC7_PACKAGE.md), containing
+all RC6 corrections plus the controller-warning and player/save-gamestate labels
+(V1-26/V1-27). Ten focused correction checks, both committed builds, three package
+checks, and the archived standalone patcher pass. Preserve these results and
+`build/title-warning-text-01`, `build/gamestate-menu-text-01`, and `build/v1rc7`.
+RC6 save compatibility is expected in both directions without migration. Do not
+confuse retained human acceptance with fresh execution of RC7's new labels.
 
-The [title-warning follow-up](checkpoints/TITLE_WARNING_TEXT.md) implements the
-live native missing-controller warning and retained erase-save label (V1-26).
-Four focused checks, committed construction, and UPS reconstruction pass. Retain
-`build/title-warning-text-01` and its bound receipt when combining further
-corrections into the next named candidate. RC6 remains the existing handoff,
-without this later correction. Do not rerun unchanged title
-animation or low-memory scenarios, and do not execute a delete operation to
-validate a label. Its separate gamestate leads have the correction above;
-retain its rejected old-reader/padding classifications to
-avoid repeating discovery work.
-
-The current named handoff is [V1RC6](checkpoints/V1RC6_PACKAGE.md), containing
-all RC5 corrections plus the tune/Pak text follow-up. Eight focused correction
-checks, both committed builds, three package checks, and the archived standalone
-patcher pass. Preserve this evidence instead of rerunning unchanged code.
-Distinguish expected RC5 save compatibility from untested RC6 loading/save cycles.
+The next text lead is the separate development scene-name table in
+`upstream/af/src/overlays/gamestates/ovl_select/m_select.c`. Review its actual
+graphics-print encoding and installed owner; do not assume ordinary access,
+enable debug menus, or invoke saves/deletions to validate labels. Preserve the
+completed direct-font scans and rejected old-reader/padding classifications.
 Prioritise new human findings, then remaining English readers/artwork and scoped
-fixture follow-up; V2 stays deferred until V1 acceptance.
+fixture follow-up. V2 stays deferred until V1 completion.
 
 The packaged [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
 V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
-instruction. The named candidate matches
-`build/menu-text-followup-01/animal-forest-menu-followup.z64` and preserves RC5.
+instruction. The RC6 stage matches
+`build/menu-text-followup-01/animal-forest-menu-followup.z64`; RC7 retains it.
 Preserve the passing checks instead of rerunning unchanged readers. Ordinary appearance
 is pending; do not invoke destructive Pak operations to validate a heading.
 The source review covers selected unchanged small submenu owners, not every
@@ -58,7 +46,8 @@ Every RC handoff distinguishes unchanged save formats from tested loading and
 warns about known or unresolved incompatibility. Cross-version compatibility is
 preferred, not mandatory. Resume the remaining artwork review and scoped
 regression-fixture follow-up. The reported hardware fixes and ordinary
-save/restart/reload are human-accepted. Keep new concrete human defects ahead of speculative work.
+save/restart/reload are human-accepted. Keep new concrete human defects ahead of
+speculative work.
 
 The [source-bound gyroid follow-up](checkpoints/RC4_GYROID_INTERACTION.md)
 opens the English menu within the verified native 43-unit talking limit and
@@ -76,7 +65,7 @@ The V1-17/V1-18 follow-up is implemented in the packaged
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
 focused and controlled native checks. The committed two-stage replay, two
 package tests, and archived standalone patcher pass. RC3 has the confirmed town-
-loading defect above; use the corrected RC6 handoff, not RC3.
+loading defect above; use the current RC7 handoff, not RC3.
 Preserve existing ROMs and saves; both reported appearance fixes are human-accepted.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
@@ -84,7 +73,8 @@ The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
 corner/hint layout and key alignment, one supported-symbol page, shop currency
 units, and idle AM/PM edge clamping. The complete three-stage rebuild, focused
 checks, controlled native keyboard drawing/guards, and standalone patcher pass.
-Hardware appearance and sound feedback are human-accepted. Preserve V1RC1, V1RC2, and the user's saves. V2 stays deferred.
+Hardware appearance and sound feedback are human-accepted. Preserve V1RC1,
+V1RC2, and the user's saves. V2 stays deferred.
 
 The [V1 human playtest findings](V1_PLAYTEST_BUGS.md) take priority over additional
 artwork discovery and event acceptance. The first sixteen findings have scoped
@@ -173,7 +163,7 @@ Broader remaining work follows the combined-fix integration:
    native world-bag picture. Do not reopen it as missing English or count retained
    artwork as translated; [the bindings](ARTWORK_REMAINDER.md) are documented.
 3. Keep the combined private playtest package aligned with checked corrections
-   and artwork batches. V1RC3 retains the shared-stall candidate, seven English
+   and artwork batches. V1RC7 retains the shared-stall candidate, seven English
    Nookington interior signs, police-interior posters, and postal MAIL bag. Preserve
    earlier artifacts and all explicit evidence limits; use verified source/ROM/
    UPS/report hashes and execute the standalone patcher before handoff.
@@ -226,9 +216,9 @@ Broader remaining work follows the combined-fix integration:
 The build exists so the user can test it. Broad acceptance does not block the
 build that enables testing. Keep these outstanding checks explicit:
 
-- Ordinary tutorial progression, including both corrected Nook advice paths.
-- All changed menus and editor callers, including mail, board, catchphrases,
-  apology, and song input; gyroid navigation and transactions.
+- Unreported tutorial, transaction, and editor cases beyond the accepted fixes,
+  including catchphrase/apology callers not explicitly covered by a report.
+  Do not reopen the accepted Nook loops, mail/board editor, or tune-label defects.
 - Untested longer-name, RTC, travel, and Controller Pak workflows. Ordinary
   save/restart/reload and the reported existing-save/title defects are accepted.
 - Dates, seasons, events, and both placements of changed seasonal props.

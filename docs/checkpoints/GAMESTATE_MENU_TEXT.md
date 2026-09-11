@@ -65,11 +65,13 @@ to overwrite. Native gamestate code is not executed by this construction.
 
 ## Follow-up
 
-Package both committed stages into the next named candidate with complete
-receipts and the archived standalone-patcher check. RC6 remains the existing named handoff without these later
-corrections. Preserve earlier ROMs and all original saves. Expected forward/
-backward RC6 compatibility follows unchanged formats and save readers/writers;
-it is not a verified loading or save/restart cycle. V2 remains deferred.
+Both committed stages are included in the [verified RC7 package](V1RC7_PACKAGE.md),
+with checked receipts and successful archived standalone patch application.
+Preserve earlier ROMs and all original saves. Expected forward/backward RC6
+compatibility follows unchanged formats and save readers/writers. The particular
+RC6/RC7 directions are not independently tested. [Human acceptance](V1_HUMAN_ACCEPTANCE.md)
+closes ordinary save/restart/reload and all reported fixes on earlier playtests,
+without claiming fresh execution of the new labels. V2 remains deferred.
 
 The read source also exposes Japanese scene labels in the separate `ovl_select`
 development scene table. That path uses the debug graphics-print encoding, not

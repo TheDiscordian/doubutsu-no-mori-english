@@ -83,9 +83,10 @@ The input remains the named RC6 ROM; never overwrite an earlier build or save.
 
 ## Handoff state
 
-The named private handoff remains RC6. The title correction is a follow-up
-development stage; package it together with further verified corrections before
-replacing the named candidate. RC6 saves are expected compatible in both
-directions because formats and readers/writers are unchanged. Loading and
-save/restart remain independently unverified. Preserve all previous ROMs and
+The title correction is included in the [verified RC7 package](V1RC7_PACKAGE.md)
+with the gamestate-label follow-up. RC6 saves are expected compatible in both
+directions because formats and readers/writers are unchanged. The particular
+RC6/RC7 directions are not independently tested. [Human acceptance](V1_HUMAN_ACCEPTANCE.md)
+confirms ordinary save/restart/reload and all reported fixes on earlier playtests;
+it is not fresh execution of these new labels. Preserve all previous ROMs and
 the user's original save backups. V2 and public distribution remain deferred.

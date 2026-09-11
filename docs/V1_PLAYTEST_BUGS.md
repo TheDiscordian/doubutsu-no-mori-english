@@ -73,8 +73,9 @@ access. None requires deleting data or invoking a save action to inspect wording
 | V1-27 | Nine labels in separate player/save gamestates | Complete English in committed gamestate stage; six focused checks pass; access and appearance unverified |
 
 The [RC6 handoff](checkpoints/V1RC6_PACKAGE.md) contains V1-24/V1-25.
-The [title-warning](checkpoints/TITLE_WARNING_TEXT.md) and
-[gamestate](checkpoints/GAMESTATE_MENU_TEXT.md) stages are ready for RC7 packaging.
+The [V1RC7 handoff](checkpoints/V1RC7_PACKAGE.md) adds the committed
+[title-warning](checkpoints/TITLE_WARNING_TEXT.md) and
+[gamestate](checkpoints/GAMESTATE_MENU_TEXT.md) stages with verified packaging.
 Controller detection, menu actions, allocations, and saved formats are unchanged.
 
 The separate development scene-name table remains an unreviewed text lead.
