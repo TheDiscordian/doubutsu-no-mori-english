@@ -27,6 +27,8 @@ this correction. Currency arithmetic, item availability, and saves stay native.
 The [correction checkpoint](checkpoints/RC4_MENU_LABEL_FIXES.md) records five
 passing focused checks and the bounded native adapter run. The latter captures
 font arguments without drawing; it is not screen-appearance acceptance.
+All three corrections are included in the packaged
+[V1RC5 handoff](checkpoints/V1RC5_PACKAGE.md).
 
 V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
 load both the user's RC1 and RC2 saves, while a new file works. The copied RC2

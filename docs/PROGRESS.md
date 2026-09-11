@@ -6,8 +6,9 @@ The RC4 catalogue/repayment findings V1-21 through V1-23 have
 [implemented corrections](checkpoints/RC4_MENU_LABEL_FIXES.md): exact GC Bells
 artwork, complete `Not for Sale`, and centred `Your Loan` / `OK`. Five focused
 checks and both native price-adapter routes pass. Font arguments are captured in
-the native check; screen appearance is not claimed verified. RC5 packaging is
-in progress. Prices, transactions, save formats, and previous fixes are retained.
+the native check; screen appearance is not claimed verified. The committed
+rebuild, two package checks, and archived standalone patcher pass. Prices,
+transactions, save formats, and previous fixes are retained.
 
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
@@ -30,16 +31,18 @@ Original and isolated seed-save checksums pass; emulator checkpoints are not
 game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
 as separate evidence rather than rerunning either completed setup batch.
 
-The current private playtest is **V1RC4**, with local ROM
-`build/v1rc4/Animal Forest English V1RC4.z64` and patch-only archive
-`build/v1rc4/V1RC4-patch.zip`. The cartridge matches `v1rc4-rebuild-01` and the
-tested memory/marker correction. The
-[package checkpoint](checkpoints/V1RC4_PACKAGE.md) records hashes and source
-revision. An Expansion Pak is required. Earlier RCs and the user's saves are preserved.
+The current private playtest is **V1RC5**, with local ROM
+`build/v1rc5/Animal Forest English V1RC5.z64` and patch-only archive
+`build/v1rc5/V1RC5-patch.zip`. The cartridge matches `rc4-menu-labels-03` and the
+tested menu corrections, retaining RC4's memory/marker correction. The
+[package checkpoint](checkpoints/V1RC5_PACKAGE.md) records hashes and source
+revision. RC4 save compatibility is expected in both directions, with no
+migration; RC5 loading and save/restart are not independently verified.
+An Expansion Pak is required. Earlier RCs and the user's saves are preserved.
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
 
-The [supplementary patch archive](checkpoints/V1RC4_PACKAGE_DOCS.md) fixes a
+The retained RC4 [supplementary patch archive](checkpoints/V1RC4_PACKAGE_DOCS.md) fixes a
 source-guide link in the ZIP and passes standalone patch application. It produces
 the identical RC4 ROM; the original handoff and compatibility notes stay intact.
 

@@ -2,14 +2,14 @@
 
 ## Next work
 
-Finish the named RC5 handoff for the
+The current named handoff is [V1RC5](checkpoints/V1RC5_PACKAGE.md), containing the
 [RC4 catalogue/repayment corrections](checkpoints/RC4_MENU_LABEL_FIXES.md).
-Five focused checks and the first native adapter attempt pass; preserve that
+Five focused checks, the first native adapter attempt, the committed replay,
+two package checks, and the archived standalone patcher pass. Preserve that
 evidence instead of rerunning unchanged code. The adapter check captures font
-arguments, not screen pixels. Reproduce from committed sources, verify the
-standalone patch archive, and distinguish expected RC4 save compatibility from
-untested RC5 loading/save cycles. New human findings stay ahead of artwork or
-historical-fixture follow-up.
+arguments, not screen pixels. Distinguish expected RC4 save compatibility from
+untested RC5 loading/save cycles. Prioritise new human findings, then remaining
+English artwork and scoped fixture follow-up; V2 stays deferred until V1 acceptance.
 
 The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
 packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
@@ -38,7 +38,7 @@ The V1-17/V1-18 follow-up is implemented in the packaged
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
 focused and controlled native checks. The committed two-stage replay, two
 package tests, and archived standalone patcher pass. RC3 has the confirmed town-
-loading defect above; use the corrected RC4 after its handoff, not RC3.
+loading defect above; use the corrected RC5 handoff, not RC3.
 Preserve existing ROMs and saves; original-hardware appearance remains pending.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged
