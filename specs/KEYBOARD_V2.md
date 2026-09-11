@@ -112,3 +112,24 @@ removal receives focused cartridge checks, without another native replay.
 Other keyboard callers, remaining pressed states, and original hardware remain
 playtest limits. Unchanged saved formats support expected V1 Final ↔ V2
 compatibility, not a claim that those loading directions have been executed.
+
+## Private offline handoff
+
+`tools/package_v2.py` packages the recorded development ROM's existing UPS,
+without compiling or changing the cartridge. It binds the complete ROM/patch
+and construction-receipt hashes, verifies every recorded builder source at
+the cartridge revision, and requires committed package documents and patcher
+sources. The standalone patcher must reconstruct the exact current ROM from
+the original Japanese input before the package is written.
+
+The archive contains the UPS, offline instructions, source/build guides,
+credits, tooling licence, standalone Python patcher and library, manifest,
+and checksums. Only the allowlisted files are included: never ROMs, saves,
+checkpoints, or extracted artwork. Output paths must be fresh and inside the
+ignored build directory. Keep V1 Final and all existing artifacts unchanged.
+
+The manifest distinguishes cartridge and packaging revisions, retained native
+evidence and exact-output execution, hardware limits, and expected save loading
+in both directions. V2 Development is a private handoff, not an RC sequence,
+public release, or claim of exhaustive acceptance. Packaging does not authorise
+an upload or repository visibility change.
