@@ -53,7 +53,7 @@ def main():
         body = page.locator('body').inner_text()
         assert not any(old in body for old in ('V1 Final', 'LOCAL PREVIEW', 'Is this the public release?', 'Audio starts muted'))
         assert page.locator('#build').is_disabled()
-        assert page.locator('video').evaluate('(v) => v.paused && v.muted && !v.autoplay')
+        assert page.locator('video').evaluate('(v) => v.paused && !v.muted && !v.defaultMuted && !v.autoplay')
         page.screenshot(path=out/'desktop.png', full_page=True)
         results['initial_state'] = 'passed'
         page.locator('#n64').set_input_files(str(native))

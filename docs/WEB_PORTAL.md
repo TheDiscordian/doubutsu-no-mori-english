@@ -22,7 +22,7 @@ Select **Build my English ROM**, then download the verified result.
 - Extract `.7z` and `.zip` first. Convert RVZ/GCZ/NKit to a full ISO with Dolphin.
 - No account, uploads, analytics, external font/asset service, or persistent
   storage of game files. Original files and saves are never changed.
-- The optional released trailer starts muted and does not autoplay.
+- The trailer plays with sound when the visitor presses Play. It does not autoplay.
 
 The browser download is **Animal Crossing N64 - English.z64**, build **V2-07**, including the
 map's omitted Japanese village-suffix image and the current N64 keyboard.

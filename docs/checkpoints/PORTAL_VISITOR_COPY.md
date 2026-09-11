@@ -34,3 +34,12 @@ without rebuilding the recipe, ROM, or trailer. The patch SHA-256 stays
 ROM stays `400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25`.
 No saved format, native code, game artwork, server visibility, or public
 deployment setting changes.
+
+## Trailer click-to-play audio
+
+The user's follow-up enables trailer sound by default: the HTML `muted`
+attribute is removed, while no-autoplay and `preload="none"` remain. The live
+page is refreshed without changing the video file, patch, or ROM. The focused
+copy test and a silent browser property check verify that the video is paused,
+not muted, not default-muted, and not set to autoplay. No physical playback is
+used for verification.

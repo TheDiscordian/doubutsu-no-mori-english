@@ -51,6 +51,8 @@ Cancel terminates the worker. Changing inputs invalidates the previous download;
 temporary object URLs are revoked. Errors identify the relevant input/stage,
 and progress remains visible to assistive technology. No automatic download,
 file overwrite, persistent ROM storage, or audio autoplay occurs.
+The trailer is unmuted by default and starts only when the visitor presses Play.
+Automated browser checks suppress physical audio independently of that setting.
 
 All assets use relative paths so a repository subpath works on static hosting.
 The generated site is the entire server root; never serve the repository, source
