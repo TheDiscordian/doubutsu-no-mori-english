@@ -21,6 +21,13 @@ do not create more RCs, repackage without a change, or repeat final verification
 Existing RC artifacts and saves remain intact. Public publication approval and
 the recorded redistribution decisions remain separate from the local handoff.
 
+The [requirements audit](checkpoints/V1_FINAL_REQUIREMENTS_AUDIT.md) confirms
+the implemented and packaged scope, separates retained evidence from fresh
+execution, and records the remaining whole-game-review/publication limits.
+It identifies no unapplied tracked V1 finding and does not queue more testing,
+neutral-artwork inspection, or repackaging. Public publication needs the user's
+direction; new concrete playtest findings can justify further V1 changes.
+
 ## Work that can change V1
 
 - Fix concrete new text, layout, artwork, or gameplay defects when identified.
