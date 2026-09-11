@@ -13,6 +13,12 @@ Do not publish the private repository or game inputs.
 
 ## Released trailer
 
+The [YouTube upload resources](promotion/YOUTUBE.md) are ready locally: thumbnail
+exports, a suggested title, unlisted/release descriptions, and an optional pinned
+comment. The user handles the unlisted YouTube upload. Release copy needs the
+actual public patcher address; no placeholder or localhost link is published.
+This resource work does not edit the trailer or authorise public patch hosting.
+
 The [released trailer](checkpoints/TRAILER_TOWN_REVISION.md) is preserved at
 `build/trailer-cut-05/Animal Forest English - Trailer.mp4` and visually reviewed.
 It uses the native opening music, one name-entry keyboard sequence, translated

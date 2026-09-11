@@ -1,0 +1,20 @@
+Animal Crossing N64: the original Nintendo 64 adventure, in English.
+🌳 The browser patcher link will be added when the translation is released.
+
+Before the GameCube, there was Doubutsu no Mori. Come home to the game that started it all: meet your neighbours, decorate your house, write a letter, and settle into town life. Tom Nook still expects his money, of course.
+
+This fan translation brings the familiar English script from the GameCube release to its N64 beginnings, alongside English letters, names, menus, signs, and title artwork. A custom N64-inspired keyboard makes writing your own little part of town life feel right at home.
+
+WHAT YOU'LL NEED
+Your own Japanese Doubutsu no Mori N64 ROM and the North American Animal Crossing GameCube disc image (USA/Canada). The browser patcher checks your files and creates the patched ROM on your device. Your game files are not uploaded, and no ROMs are provided.
+
+Playing on an original N64 requires an Expansion Pak and a flash cartridge with FlashRAM and real-time clock support.
+
+CREDITS
+Project by TheDiscordian, with AI-assisted development. Thanks to Zoinkity for the earlier translation work and reverse-engineering notes, and to the zeldaret/af and ACreTeam/ac-decomp contributors for their research. Original games, English localisation, artwork, and opening music by Nintendo.
+
+An unofficial fan translation, not affiliated with or endorsed by Nintendo.
+
+#AnimalCrossing #Nintendo64 #FanTranslation
+
+—Claude

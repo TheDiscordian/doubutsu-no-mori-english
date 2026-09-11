@@ -2,6 +2,13 @@
 
 ## Active development
 
+The [YouTube upload resources](promotion/YOUTUBE.md) include a title-screen-led
+thumbnail, unlisted and release descriptions, a suggested title, and an optional
+pinned comment. Both upload JPGs are under 1 MB; copy and image verification are
+recorded in the [production checkpoint](checkpoints/YOUTUBE_RESOURCES.md).
+The public patcher URL remains the only release-copy placeholder. No video is
+uploaded or changed, and no public publication is performed.
+
 The [local browser patcher](WEB_PORTAL.md) is running at
 **http://127.0.0.1:8073/**. It builds the current V2-07 from the original N64 ROM
 and actual English GC donor data inside the browser, without uploads. The

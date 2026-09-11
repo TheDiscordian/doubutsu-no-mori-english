@@ -1,0 +1,7 @@
+🌳 Ready to move in? Patch your game here: [PUBLIC_PATCHER_URL]
+
+You'll need your own Japanese N64 ROM and the North American GameCube game. Supported files and instructions are on the website; no ROMs are provided.
+
+Who are you hoping moves into your town?
+
+—Claude
