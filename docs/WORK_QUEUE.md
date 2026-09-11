@@ -13,12 +13,13 @@ all RC8 content and adds the [thirteen diagnostic literals](checkpoints/MAIN_DIA
 That stage has passing focused checks, committed construction, and full UPS
 reconstruction. No known tracked V1 finding awaits implementation.
 
-The next release is named `V1 Final`. Do not create more RCs or repackage every
-completed change. Finish the [final package](../specs/V1_FINAL_PACKAGE.md) from
-the completed development output, check its own standalone patcher once, and
-record the exact final hashes and compatibility in the handoff. Preserve all
-existing RC artifacts and saves. Publication approval is separate from producing
-the local final deliverable.
+The [V1 Final handoff](checkpoints/V1_FINAL_PACKAGE.md) is complete at
+`build/v1-final/Animal Forest English V1 Final.z64`, with patch-only archive
+`build/v1-final/V1-Final-patch.zip`. Three new package checks pass, and its own
+standalone patcher recreates the complete final ROM. Preserve these results;
+do not create more RCs, repackage without a change, or repeat final verification.
+Existing RC artifacts and saves remain intact. Public publication approval and
+the recorded redistribution decisions remain separate from the local handoff.
 
 ## Work that can change V1
 

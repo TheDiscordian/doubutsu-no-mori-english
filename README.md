@@ -1,74 +1,64 @@
 # Doubutsu no Mori English 🌲
 
-English translation project for the Japanese Nintendo 64 release of
-**Doubutsu no Mori**, targeting original hardware.
+English translation of the Japanese Nintendo 64 release, targeting original
+hardware. **V1 Final is available locally**, with a verified patch-only package.
+The repository and release artifacts remain private; no public upload is made.
 
-This project is under development, with original-hardware playtesting and
-accepted fixes. It is not a final public release. See [progress](docs/PROGRESS.md) for verified results
-and remaining work, and [sources](docs/SOURCES.md) for third-party provenance.
+## V1 Final
 
-The [current V1RC8 playtest](docs/V1RC8_PLAYTEST.md) includes the English
-title, GameCube-style keyboard, translated screen/building artwork, and embedded
-menu responses, along with the main English text and progression fixes. It also
-includes all 23 human-reported V1 corrections and additional source-identified
-menu translations. The user confirms all reported fixes and repeated ordinary
-save/restart/reload cycles on hardware. [Human acceptance](docs/checkpoints/V1_HUMAN_ACCEPTANCE.md)
-is recorded separately from the newer, not-yet-playtested menu labels. Save formats
-remain unchanged, and an Expansion Pak is required. The
-[package checkpoint](docs/checkpoints/V1RC8_PACKAGE.md) identifies the local ROM,
-verified patch-only bundle, compatibility, and remaining limits. The package
-includes all 76 scene-menu translations and offline application/source guides.
+- ROM: `build/v1-final/Animal Forest English V1 Final.z64`.
+- Patch archive: `build/v1-final/V1-Final-patch.zip`.
+- Requirements: Expansion Pak, 128-KiB FlashRAM, and RTC.
+- ROM SHA-256:
+  `0561182044c1526010ed77b1b9c72ac268794c2f7b615f8fa70c007f366483bf`.
 
-The separate [corrected v0 playtest](docs/V0_FIXES_PLAYTEST.md) addresses
-the furniture-delivery conversation loop, later letter-advice continuation,
-and the native shrine's map label. Its [checkpoint](docs/checkpoints/V0_HARDWARE_BUGS.md)
-records the separate ROM/patch and focused native evidence. The reported v0
-defects are also human-accepted; current V1 builds retain those corrections.
+The [final guide](docs/V1_FINAL.md) covers patch application, compatibility,
+included changes, and known limits. The [handoff checkpoint](docs/checkpoints/V1_FINAL_PACKAGE.md)
+records exact artifact/source hashes and passing final-package verification.
+The archive includes offline instructions, credits, source-build notes, and a
+standalone Python patcher; no private checkout is needed to apply the patch.
 
-Proportional Latin text, complete English names/letters, and guarded GameCube
-reference imports preserve native saved-name limits. The corrected v0 retains
-the English-first radial keyboard; the combined candidate uses the grid. See
-[building](docs/BUILDING.md), [keyboard design](specs/KEYBOARD.md), and the
-[v0 plan](docs/V0_PLAN.md) for the bounded testing and human-playthrough workflow.
+V1 includes proportional Latin text, English dialogue/names/items/letters,
+translated menus and screen/building artwork, the English animated title, and
+the GC-style keyboard. All tracked V1-01 through V1-29 fixes are implemented.
+The user confirms all reported V1-01 through V1-23 and v0 corrections are fixed
+and repeated ordinary saving/restarting/reloading works on hardware. Preserve
+that [human acceptance](docs/checkpoints/V1_HUMAN_ACCEPTANCE.md); later source-
+identified labels are not claimed as part of those playtest sessions.
 
-The repository stores tools, translation edits, and documentation. A legally
-obtained source ROM is required to build; ROMs and extracted assets stay local.
+RC8 saves are expected compatible with V1 Final in both directions without
+migration; those particular loading directions are not independently tested.
+Keep backups and use the appropriate EverDrive save filename for the renamed
+ROM. RC3 retains its known existing-town loading defect and is not a fallback.
 
-## Priorities
+## Scope and continuing work
 
-1. Fix concrete playtest bugs, prioritising crashes, saves, and progression.
-2. Review remaining artwork and polish English layout without changing GC intent.
-3. Complete ordinary gameplay and original-hardware acceptance through playtesting.
-4. Prepare the patch-only public release with provenance review.
+GameCube wording, intentional breaks, and timing guide the translation, while
+native N64 structures, identities, and saved capacities remain. Lucky-bag
+Japanese decoration is intentionally retained to match English GC. Neutral
+artwork is not changed or exhaustively reviewed without an actual translation
+defect. No further RCs, old-build retesting, or speculative neutral-image sweeps
+are queued.
 
-`make complete` rebuilds the base, v1 artwork, and all current correction layers
-from clean source checkouts and verified local inputs. The
-[build guide](docs/BUILDING.md) describes prerequisites, outputs, and evidence.
-The later [main-program diagnostic batch](docs/checkpoints/MAIN_DIAGNOSTIC_TEXT.md)
-adds thirteen in-place English literals and is included as the final source-build
-step. Its committed build and patch reconstruction pass; the named RC8 package
-does not yet include this later batch.
-The seven-stage `tools/rebuild_v1_fixes.py` recipe provides the V1RC1 corrections
-after the artwork/title baseline. Its verified output is recorded in the
-[V1RC1 checkpoint](docs/checkpoints/V1RC1_PACKAGE.md).
-The three-stage `tools/rebuild_v1rc2.py` adds the RC1 hardware follow-up and
-matches the [V1RC2 package](docs/checkpoints/V1RC2_PACKAGE.md).
-The two-stage `tools/rebuild_v1rc3.py` adds font/transition edge corrections and
-matches the [V1RC3 package](docs/checkpoints/V1RC3_PACKAGE.md).
-`tools/rebuild_v1rc4.py` adds the dedicated font-memory owner and ordinary-space
-marker correction; its output matches [V1RC4](docs/checkpoints/V1RC4_PACKAGE.md).
-The catalogue/repayment, tune/Pak, title-warning, and gamestate-label correction
-stages extend that recipe through [RC7](docs/checkpoints/V1RC7_PACKAGE.md).
-The [current correction runner](specs/CURRENT_V1_REBUILD.md) combines those
-recipes and the scene-menu translation without retained RC inputs. Its complete
-execution status is recorded in [the checkpoint](docs/checkpoints/CURRENT_V1_REBUILD.md).
-`tools/package_v1_current.py` packages the completed current build without old
-candidate inputs or gameplay retesting. RC3 has a known town-loading memory
-defect; use the current RC8 handoff. The
-[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) remains deferred until V1 is
-fully complete.
-The [pinned published compiler](docs/TOOLCHAIN.md) is verified by the complete
-clean-source rebuild; the local development Docker image is not required.
+Broader seasonal/travel/Pak cases, individual dialogue layouts, and ordinary
+appearance of both adapted stall placements remain playtest work, not completed
+proof. See [progress](docs/PROGRESS.md), [tracked findings](docs/V1_PLAYTEST_BUGS.md),
+and the [completion queue](docs/WORK_QUEUE.md). Concrete new crashes, save damage,
+blocked progression, or text defects take priority. The
+[N64-inspired V2 keyboard](specs/KEYBOARD_V2.md) remains deferred.
 
-Original project tooling is MIT licensed. Third-party material retains its own
-terms; the project licence does not cover Nintendo assets or legacy work.
+## Source and reproduction
+
+The repository tracks tools, translation edits, specifications, and evidence.
+ROMs, extracted assets, saves, and generated patches remain local and ignored.
+[Sources](docs/SOURCES.md) records third-party provenance.
+
+`make complete` rebuilds the base, artwork, corrections, and final diagnostic
+suffix from verified local inputs using the pinned published Docker compiler.
+The [build guide](docs/BUILDING.md) describes the final output and recorded
+component runs. The composed 109-stage command is not claimed as a new complete
+end-to-end execution; unchanged historical builds are not replayed.
+
+Original tooling is MIT licensed; that licence does not cover Nintendo content
+or legacy work. Public patch/source publication requires the separate
+[redistribution review and approval](docs/RELEASE_PREPARATION.md).

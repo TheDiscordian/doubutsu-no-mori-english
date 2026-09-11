@@ -1,11 +1,10 @@
 # Patch-only release preparation
 
-The current deliverable is the private playtest identified in
-[progress](PROGRESS.md), not a public release.
+The current deliverable is the local [V1 Final](V1_FINAL.md), not a public upload.
 The repository remains private. This document separates technical packaging
 evidence from attribution, redistribution review, and gameplay acceptance.
-The next release is named `V1 Final`; no additional RC packages are produced.
-Complete remaining V1 work in the development build before final packaging.
+`V1 Final` is assembled and its standalone patcher passes; no additional RC
+packages are produced. Keep the final artifact and recorded results intact.
 The [provenance checkpoint](checkpoints/RELEASE_PROVENANCE_REVIEW.md) binds the
 inspected source versions, archive contents, and remaining limits.
 
@@ -22,7 +21,7 @@ inspected source versions, archive contents, and remaining limits.
 | Compiler and emulator | Separately obtained tools; not bundled in the patch archive |
 | User saves and emulator checkpoints | Local validation inputs; never release material |
 
-The [current RC8 archive](checkpoints/V1RC8_PACKAGE.md) has only the UPS,
+The [V1 Final archive](checkpoints/V1_FINAL_PACKAGE.md) has only the UPS,
 manifest, README, source notes, optional toolchain/source guide, bug-report guide,
 tooling licence, two Python files, and checksums. Its standalone application and
 offline-document links are verified. Keep earlier artifacts intact; review the exact archive selected for
@@ -68,7 +67,7 @@ the generated resource lacks attribution.
   A docs-only archive change does not require another gameplay pass or a new ROM.
 - Preserve [human acceptance](checkpoints/V1_HUMAN_ACCEPTANCE.md) of all reported
   fixes and ordinary save/restart/reload. Keep source-identified menu findings,
-  remaining artwork, untested gameplay, and scoped test failures at their actual
+  concrete artwork findings, untested gameplay, and scoped test failures at their actual
   status. The incomplete gyroid automation is not an outstanding ordinary-save
   gate. Do not withhold private builds for broader playtesting or claim untested
   cases have passed.

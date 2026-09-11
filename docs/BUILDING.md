@@ -56,15 +56,15 @@ not fresh end-to-end execution; no complete historical replay is queued.
 Preserve earlier base/artwork evidence
 separately. Do not re-test old builds or repeat accepted gameplay checks.
 
-The completed RC8 build is packaged with
-`python3 tools/package_v1_current.py --output build/v1rc8-new` from a clean
-committed checkout. The default input is `build/v1-current-01/final`; the
-packager checks only the final current build and executes the new ZIP's patcher,
-without rebuilding or opening historical candidates. The
-[RC8 checkpoint](checkpoints/V1RC8_PACKAGE.md) records the completed package and
-its offline documentation. This RC8 packager does not yet include the later
-main-diagnostic stage; the next combined package must include it. Existing
-outputs are never overwritten.
+`tools/package_v1_final.py` packages the completed diagnostic-stage ROM and UPS
+from clean committed source, binding that stage's receipt and the recorded
+correction-baseline receipt. It executes only the final ZIP's patcher, without
+rebuilding or opening older candidates. The [V1 Final checkpoint](checkpoints/V1_FINAL_PACKAGE.md)
+records the completed package under `build/v1-final/`, exact hashes, and
+self-contained offline documentation. Existing outputs are never overwritten.
+The final handoff is already packaged and checked; do not rerun packaging or
+make another RC merely to refresh its evidence. The older RC8 packager remains
+historical tooling, not the current handoff command.
 
 The [base checkpoint](checkpoints/V0_REBUILD.md) records the passing sixty-one-stage
 clean rebuild and exact corrected-v0 ROM, patch, and report match. The

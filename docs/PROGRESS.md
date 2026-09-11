@@ -12,10 +12,15 @@ menu labels and genuinely untested areas retain their own limits.
 
 ## Builds
 
-The next release is `V1 Final`. Remaining implementation and review use the
-development build; no further RCs are created. Final packaging follows completed
-V1 work rather than each individual batch. Existing RCs and their accepted
-results remain preserved.
+The [V1 Final handoff](checkpoints/V1_FINAL_PACKAGE.md) is ready locally:
+`build/v1-final/Animal Forest English V1 Final.z64`, with patch-only archive
+`build/v1-final/V1-Final-patch.zip`. It contains all tracked V1-01 through V1-29
+implementations. Three new package checks and the bundled standalone patcher
+pass; no older build, game code, or accepted gameplay case is re-tested. RC8
+save compatibility is expected both ways without migration, not independently
+executed. Expansion Pak, 128-KiB FlashRAM, and RTC are required. Existing RCs
+and saves remain intact. Public publication/redistribution decisions remain
+separate; this is not exhaustive gameplay or hardware certification.
 
 The [main-program diagnostic batch](checkpoints/MAIN_DIAGNOSTIC_TEXT.md) applies
 V1-29: eleven generation stages, the Famicom index label, and an unused reserve
@@ -24,9 +29,8 @@ pointers, allocations, or saved formats. Four focused checks, the clean committe
 construction from RC8, and complete UPS reconstruction pass. The development
 ROM is `build/main-diagnostic-text-01/animal-forest-diagnostic-text.z64`.
 `make complete` includes this final data-only step; the composed 109-stage
-command is not rerun end to end. RC8 remains the existing named handoff; the
-diagnostic stage is included when `V1 Final` is ready. No old build or gameplay
-test is repeated.
+command is not rerun end to end. The diagnostic stage is included in `V1 Final`.
+No old build or gameplay test is repeated.
 
 The [current-build integration](checkpoints/CURRENT_V1_REBUILD.md) connects the
 nineteen correction stages after the artwork/title baseline, including the new
@@ -110,7 +114,7 @@ Original and isolated seed-save checksums pass; emulator checkpoints are not
 game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
 as separate evidence rather than rerunning either completed setup batch.
 
-The current private playtest is **V1RC8**, with local ROM
+The preserved preceding private playtest is **V1RC8**, with local ROM
 `build/v1rc8/Animal Forest English V1RC8.z64` and patch-only archive
 `build/v1rc8/V1RC8-patch.zip`. The cartridge matches the completed current V1
 build and retains every RC7 fix, adding all 76 scene-menu translations.
@@ -288,7 +292,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC8 notes](V1RC8_PLAYTEST.md) describe the current packaged
+formats remain. The [V1 Final notes](V1_FINAL.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
@@ -318,7 +322,7 @@ this review-only work; the combined playtest-fix build remains the current candi
 Neutral tools, room surfaces, effects, and fish/insect artwork remain unchanged
 unless actual lettering or a concrete defect is identified. Their broad review
 is not a V1 completion task. All tracked V1-01 through V1-29 findings have
-implementations; the later diagnostic stage belongs in the final assembled
+implementations, including the later diagnostic stage in the final assembled
 deliverable. Remaining broad playtesting is distinct from unfinished translation
 code and does not block the build that enables that testing.
 
@@ -328,7 +332,7 @@ English GC. The current RC8 retains their complete native owners. New CI8
 inspection support resolves the blue tabletop with its 256-entry palette;
 three synthetic decoder checks pass. The igloo detail's actual material/vertices
 also resolve the wrong-donor lead; preserve its native food-surface pattern.
-No text is newly applied and no ROM changes; RC8 remains the handoff. Do not
+No text is newly applied and no ROM changes in this review. Do not
 repeat this group or claim that it reviews every image in the game.
 
 The [prop/shadow/effect review](checkpoints/PROP_EFFECT_ARTWORK_REVIEW.md)

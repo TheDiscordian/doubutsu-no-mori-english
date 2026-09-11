@@ -85,7 +85,7 @@ Japanese text without enabling its controls. The [current RC8 package](checkpoin
 contains this batch and every preceding correction, with verified standalone
 patch application and offline instructions.
 The [main-program diagnostic follow-up](checkpoints/MAIN_DIAGNOSTIC_TEXT.md)
-is a completed later stage awaiting the next combined package. It changes only
+is included in [V1 Final](checkpoints/V1_FINAL_PACKAGE.md). It changes only
 literal storage, not reader instructions, generation, item spawning, or saves.
 Lucky-bag Japanese decoration is intentionally retained, matching English GC
 and the user's explicit choice. It is not an open bug.
