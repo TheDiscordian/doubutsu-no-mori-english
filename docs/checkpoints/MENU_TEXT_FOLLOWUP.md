@@ -63,9 +63,9 @@ python3 tools/tune_confirmation.py --output build/tune-confirmation-new
 python3 tools/pak_erase_heading.py --base build/tune-confirmation-new/animal-forest-tune-confirmation.z64 --output build/menu-text-followup-new
 ```
 
-RC5 remains the named private playtest. This combined development build and
-its UPS are ready for the next candidate's packaging and standalone-patcher
-check. These changes require no save migration; compatibility with RC5 is
+The [V1RC6 package](V1RC6_PACKAGE.md) includes this exact combined development
+build and UPS, with passing package and standalone-patcher checks. RC5 remains
+preserved separately. These changes require no save migration; compatibility with RC5 is
 expected in both directions, not independently load/save-cycle verified.
 Expansion Pak, FlashRAM, and RTC requirements remain unchanged. Preserve
 original save backups, and do not use RC3 as a fallback. Ordinary appearance,

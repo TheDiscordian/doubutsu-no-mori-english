@@ -2,24 +2,25 @@
 
 ## Next work
 
-The current named handoff is [V1RC5](checkpoints/V1RC5_PACKAGE.md), containing the
-[RC4 catalogue/repayment corrections](checkpoints/RC4_MENU_LABEL_FIXES.md).
-Five focused checks, the first native adapter attempt, the committed replay,
-two package checks, and the archived standalone patcher pass. Preserve that
-evidence instead of rerunning unchanged code. The adapter check captures font
-arguments, not screen pixels. Distinguish expected RC4 save compatibility from
-untested RC5 loading/save cycles. Prioritise new human findings, then remaining
-English artwork and scoped fixture follow-up; V2 stays deferred until V1 acceptance.
+The current named handoff is [V1RC6](checkpoints/V1RC6_PACKAGE.md), containing
+all RC5 corrections plus the tune/Pak text follow-up. Eight focused correction
+checks, both committed builds, three package checks, and the archived standalone
+patcher pass. Preserve this evidence instead of rerunning unchanged code.
+Distinguish expected RC5 save compatibility from untested RC6 loading/save cycles.
+Prioritise new human findings, then remaining English readers/artwork and scoped
+fixture follow-up; V2 stays deferred until V1 acceptance.
 
-The separate [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
+The packaged [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) implements
 V1-24/V1-25: complete town-tune confirmation and the N64 Pak note-deletion
-instruction. Eight focused checks and both committed builds pass. Include
-`build/menu-text-followup-01/animal-forest-menu-followup.z64` in the next named
-candidate without overwriting RC5, and execute that package's standalone patcher.
-Preserve these checks instead of rerunning unchanged readers. Ordinary appearance
+instruction. The named candidate matches
+`build/menu-text-followup-01/animal-forest-menu-followup.z64` and preserves RC5.
+Preserve the passing checks instead of rerunning unchanged readers. Ordinary appearance
 is pending; do not invoke destructive Pak operations to validate a heading.
 The source review covers selected unchanged small submenu owners, not every
 embedded string or artwork image. Continue other unreviewed readers as useful.
+Retained Japanese storage in the moved address/gyroid/warning owners is not
+itself a missing reader: inspect the installed English pointer/hook before
+reopening those already corrected families.
 
 The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
 packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
@@ -48,7 +49,7 @@ The V1-17/V1-18 follow-up is implemented in the packaged
 [building-transition correction](checkpoints/TRANSITION_EDGES.md) have passing
 focused and controlled native checks. The committed two-stage replay, two
 package tests, and archived standalone patcher pass. RC3 has the confirmed town-
-loading defect above; use the corrected RC5 handoff, not RC3.
+loading defect above; use the corrected RC6 handoff, not RC3.
 Preserve existing ROMs and saves; original-hardware appearance remains pending.
 
 The V1RC1 hardware follow-up V1-13 through V1-16 is implemented in the packaged

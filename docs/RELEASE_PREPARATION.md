@@ -1,6 +1,7 @@
 # Patch-only release preparation
 
-The current deliverable is the private V1RC4 playtest, not a public release.
+The current deliverable is the private playtest identified in
+[progress](PROGRESS.md), not a public release.
 The repository remains private. This document separates technical packaging
 evidence from attribution, redistribution review, and gameplay acceptance.
 The [provenance checkpoint](checkpoints/RELEASE_PROVENANCE_REVIEW.md) binds the
@@ -55,7 +56,7 @@ the generated resource lacks attribution.
 - Obtain the user's public-release approval. Do not change repository visibility,
   upload a public patch, or distribute input archives as a side effect of preparation.
 - Decide how public documentation is supplied while the source repository stays
-  private. The private RC4 archive's toolchain-guide link requires repository
+  private. The private archive's toolchain-guide link requires repository
   access; it is not a publicly accessible source guide. The patcher itself works
   offline and does not depend on that link.
 - Select the final checked candidate and publish only its patch package, source/

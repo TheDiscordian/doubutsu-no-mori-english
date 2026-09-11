@@ -37,10 +37,10 @@ Two further omissions are identified by source review, not a new human report:
 | V1-24 | Town-tune confirmation retains `ホントに?`, `うん`, and `やっぱやめる` | Complete GC `Are you sure?` / `Yes` / `No` installed in separate follow-up; four focused checks pass, ordinary appearance pending |
 | V1-25 | Controller Pak manager retains its Japanese note-deletion instruction | N64-specific `Erase a Pak note` installed and centred in separate follow-up; four focused checks pass, ordinary appearance pending |
 
-The [combined development build](checkpoints/MENU_TEXT_FOLLOWUP.md) includes
-both corrections and retains all RC5 fixes. These are not included in the
-unchanged named RC5 handoff. Note-selection/deletion and save behaviour remain
-native; no destructive Pak operation is run as a test.
+The [V1RC6 handoff](checkpoints/V1RC6_PACKAGE.md) includes both corrections and
+retains all RC5 fixes. The earlier named RC5 remains unchanged. Note-selection/
+deletion and save behaviour remain native; no destructive Pak operation is run
+as a test. Both findings still require ordinary appearance acceptance.
 
 V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
 load both the user's RC1 and RC2 saves, while a new file works. The copied RC2

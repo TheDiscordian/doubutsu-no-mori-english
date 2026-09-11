@@ -13,11 +13,12 @@ transactions, save formats, and previous fixes are retained.
 The [menu-text follow-up](checkpoints/MENU_TEXT_FOLLOWUP.md) corrects two more
 source-identified omissions: the town-tune confirmation's complete GC
 `Are you sure?` / `Yes` / `No`, and the N64-only `Erase a Pak note` instruction.
-Eight focused checks and both committed construction stages pass. The separate
-combined development ROM is `build/menu-text-followup-01/animal-forest-menu-followup.z64`.
+Eight focused checks, both committed construction stages, three package checks,
+and standalone patch application pass. The combined development ROM is
+`build/menu-text-followup-01/animal-forest-menu-followup.z64`.
 It retains all RC5 fixes and introduces no allocation, relocation, transaction,
-or save-format changes. Ordinary appearance remains pending; RC5 stays the
-named handoff until these corrections are included in the next package.
+or save-format changes. Both corrections are included in the named RC6 handoff;
+ordinary appearance remains pending.
 
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
@@ -40,13 +41,13 @@ Original and isolated seed-save checksums pass; emulator checkpoints are not
 game saves. Preserve the [earlier attempt](checkpoints/RC4_ORDINARY_SAVE_ATTEMPT.md)
 as separate evidence rather than rerunning either completed setup batch.
 
-The current private playtest is **V1RC5**, with local ROM
-`build/v1rc5/Animal Forest English V1RC5.z64` and patch-only archive
-`build/v1rc5/V1RC5-patch.zip`. The cartridge matches `rc4-menu-labels-03` and the
-tested menu corrections, retaining RC4's memory/marker correction. The
-[package checkpoint](checkpoints/V1RC5_PACKAGE.md) records hashes and source
-revision. RC4 save compatibility is expected in both directions, with no
-migration; RC5 loading and save/restart are not independently verified.
+The current private playtest is **V1RC6**, with local ROM
+`build/v1rc6/Animal Forest English V1RC6.z64` and patch-only archive
+`build/v1rc6/V1RC6-patch.zip`. The cartridge matches `menu-text-followup-01` and
+retains every RC5 fix, including RC4's memory/marker correction. The
+[package checkpoint](checkpoints/V1RC6_PACKAGE.md) records hashes and source
+revisions. RC5 save compatibility is expected in both directions, with no
+migration; RC6 loading and save/restart are not independently verified.
 An Expansion Pak is required. Earlier RCs and the user's saves are preserved.
 The [bug list](V1_PLAYTEST_BUGS.md) separates implementation from hardware
 acceptance; this is not a completed public release or hardware-certified build.
@@ -212,7 +213,7 @@ signs and clearance banners, police exterior/interior signs/posters, the postal
 MAIL bag, Redd's summer sign, SOLD OUT,
 both dump signs, fishing props, the fortune table, countdown units, and the
 shared stall. Native shrine identity, event rules, and saved
-formats remain. The [V1RC5 notes](V1RC5_PLAYTEST.md) describe the current packaged
+formats remain. The [V1RC6 notes](V1RC6_PLAYTEST.md) describe the current packaged
 build; [remaining artwork](ARTWORK_REMAINDER.md) records artwork work and
 neutral texture sets already inspected.
 
