@@ -21,6 +21,8 @@ the pinned comment. The public main page supplies file hashes and instructions.
 These resources do not upload a video, post a comment, publish a patch, change
 repository visibility, or alter the existing trailer. The trailer remains
 `build/trailer-cut-05/Animal Forest English - Trailer.mp4`.
+The user's uploaded video is `https://www.youtube.com/watch?v=UloFru4K4Q8`;
+the local portal embeds that upload on Play. Do not upload another copy.
 
 ## Thumbnail direction
 

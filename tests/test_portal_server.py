@@ -43,6 +43,7 @@ class PortalServerTests(unittest.TestCase):
             self.assertEqual(response.headers['Content-Type'], 'text/javascript')
             self.assertEqual(response.headers['X-Content-Type-Options'], 'nosniff')
             self.assertIn("connect-src 'self'", response.headers['Content-Security-Policy'])
+            self.assertIn('frame-src https://www.youtube-nocookie.com;', response.headers['Content-Security-Policy'])
             self.assertEqual(response.headers['Cache-Control'], 'no-store')
 
     def test_no_uploads(self):

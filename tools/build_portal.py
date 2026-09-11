@@ -16,6 +16,7 @@ DONORS = ('forest_1st.arc', 'forest_2nd.arc', 'foresta.rel.szs')
 WEB_FILES = ('index.html', 'style.css', 'app.mjs', 'core.mjs', 'worker.mjs', 'mark.svg')
 SAVE_NOTE = 'Back up existing saves before playing a patched game. The patcher does not read or change save files.'
 DOWNLOAD_NAME = 'Animal Crossing N64 - English.z64'
+TRAILER_URL = 'https://www.youtube.com/watch?v=UloFru4K4Q8'
 
 
 def refresh_web(out):
@@ -30,12 +31,20 @@ def refresh_web(out):
     for name in WEB_FILES:
         if sha256((site/name).read_bytes()) != report['site_source_sha256'][name]:
             raise ValueError('Preserve unrecorded live-site edits before refreshing: '+name)
+    # Retire only the known redundant export copy; preserve it outside the site.
+    old_video, archive = site/'media/trailer.mp4', out/'retired-site-trailer.mp4'
+    if old_video.exists():
+        if (sha256(old_video.read_bytes()) != '3d3bc78875eefe98b0b0d8ed1499a86222fc44139b8ae1697e9128d87fdaf00a'
+                or archive.exists()):
+            raise ValueError('Preserve unexpected trailer copies before refreshing')
+        old_video.rename(archive)
     for name in WEB_FILES:
         shutil.copyfile(ROOT/'web'/name, site/name)
     manifest['save_compatibility'] = SAVE_NOTE
     manifest['output_name'] = DOWNLOAD_NAME
     (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     report['site_source_sha256'] = {name: sha256((site/name).read_bytes()) for name in WEB_FILES}
+    report['trailer_url'] = TRAILER_URL
     (out/'build.json').write_text(json.dumps(report, indent=2)+'\n')
     print(json.dumps({'site': str(site.relative_to(ROOT)), 'web_refreshed': True,
                       'patch_sha256': report['recipe_sha256'], 'game_data_changed': False}))
@@ -167,15 +176,15 @@ def main():
     (site/'release/patch.afwp.gz').write_bytes(compressed)
     (site/'release/manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
     (site/'.nojekyll').touch()
-    # Only the approved finished trailer and a clean frame are copied, never a ROM.
+    # The trailer is hosted on YouTube; export only its local poster, never a ROM.
     trailer = ROOT/'build/trailer-cut-05/Animal Forest English - Trailer.mp4'
-    shutil.copyfile(trailer, site/'media/trailer.mp4')
     subprocess.run(['ffmpeg', '-nostdin', '-v', 'error', '-ss', '10', '-i', str(trailer),
                     '-vf', 'crop=1440:1080:240:0,scale=800:600', '-frames:v', '1',
                     str(site/'media/town.webp')], check=True, timeout=30)
     (site/'SOURCE_NOTES.txt').write_text((ROOT/'docs/SOURCES.md').read_text())
     (site/'LICENSE-tooling.txt').write_text((ROOT/'LICENSE').read_text())
     report = {'site': str(site.relative_to(ROOT)), 'target_sha256': TARGET_SHA,
+        'trailer_url': TRAILER_URL,
         'recipe_roundtrip': 'passed', 'recipe_sha256': sha256(compressed), **stats,
         'site_source_sha256': {name: sha256((site/name).read_bytes()) for name in WEB_FILES},
         'public_release': False, 'contains_roms_or_saves': False}

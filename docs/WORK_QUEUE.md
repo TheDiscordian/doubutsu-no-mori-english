@@ -13,6 +13,11 @@ Do not publish the private repository or game inputs.
 
 ## Released trailer
 
+The local portal uses the user's YouTube upload `UloFru4K4Q8`, loading only on
+Play with sound requested. Its redundant MP4 export is preserved outside the
+served folder; the original trailer remains unchanged. The integration and
+verification are recorded in [the YouTube checkpoint](checkpoints/PORTAL_YOUTUBE.md).
+
 The [YouTube upload resources](promotion/YOUTUBE.md) include a revised thumbnail,
 a suggested title, unlisted/release descriptions, and an optional pinned comment.
 The thumbnail uses flat, regular lettering and the retained green background;

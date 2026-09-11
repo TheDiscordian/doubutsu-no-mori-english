@@ -4,7 +4,8 @@
 
 Create the exact current V2-07 N64 cartridge in a static website using the user's
 Japanese N64 ROM and English USA/Canada GameCube disc. Both files stay in the
-browser. There is no upload endpoint, telemetry, account, or external asset CDN.
+browser. There is no upload endpoint, patcher telemetry, or account. Patcher
+assets are local; the optional trailer loads a YouTube frame only after Play.
 The local service binds to loopback. Public hosting is not authorised.
 
 Supported inputs are extracted `.z64`, `.v64`, and `.n64` cartridges, and
@@ -51,14 +52,25 @@ Cancel terminates the worker. Changing inputs invalidates the previous download;
 temporary object URLs are revoked. Errors identify the relevant input/stage,
 and progress remains visible to assistive technology. No automatic download,
 file overwrite, persistent ROM storage, or audio autoplay occurs.
-The trailer is unmuted by default and starts only when the visitor presses Play.
+The trailer is `https://www.youtube.com/watch?v=UloFru4K4Q8`. A local poster and
+accessible Play button create a privacy-enhanced `youtube-nocookie.com` frame
+only after a click or keyboard activation. The frame requests unmuted playback
+(`mute=0`); `autoplay=1` applies only to the newly created, user-requested frame,
+never to page load. A permanent Watch on YouTube link supports blocked embeds
+and visitors without JavaScript. YouTube/browser settings can affect playback.
 Automated browser checks suppress physical audio independently of that setting.
 
-All assets use relative paths so a repository subpath works on static hosting.
+All local assets use relative paths so a repository subpath works on static hosting.
 The generated site is the entire server root; never serve the repository, source
 ROMs, saves, or local research directories. A restrictive CSP and a read-only
 local server support the no-upload design. Publication is a separate explicit
-action; no active Pages deployment workflow is installed.
+action; no active Pages deployment workflow is installed. CSP permits only
+`https://www.youtube-nocookie.com` as a frame origin; parent scripts, workers,
+and connections remain same-origin. The iframe uses
+`strict-origin-when-cross-origin` so YouTube receives the required origin-only
+Referer; no file contents or names are sent to the frame. No MP4 is included in
+new site exports. Refresh moves the known old export copy outside the served
+folder after verifying its hash, preserving the original trailer.
 
 ## Verification
 
@@ -75,3 +87,5 @@ emulator replay or old-cartridge testing is needed for this portal.
 - [Native gzip decompression](https://developer.mozilla.org/en-US/docs/Web/API/DecompressionStream)
 - [Module workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers)
 - [Static GitHub Pages sites](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site)
+- [YouTube player parameters](https://developers.google.com/youtube/player_parameters)
+- [YouTube privacy-enhanced embeds and required Referer](https://support.google.com/youtube/answer/171780?hl=en)

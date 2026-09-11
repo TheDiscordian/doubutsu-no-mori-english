@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Play Animal Crossing’s Nintendo 64 beginnings in English. Patch your game in your browser, with no uploads.">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; connect-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="theme-color" content="#254d3f">
   <title>Animal Crossing N64 · English Translation</title>
   <link rel="icon" href="mark.svg" type="image/svg+xml">
@@ -94,10 +94,13 @@
         <p class="eyebrow">THERE’S PLENTY TO DO HERE</p>
         <h2>A little look around.</h2>
         <p>From your first hello to a letter from home — a familiar world, in your language.</p>
-        <video controls playsinline preload="none" poster="media/town.webp" aria-label="Animal Crossing N64 English translation trailer">
-          <source src="media/trailer.mp4" type="video/mp4">
-          Your browser does not support this video.
-        </video>
+        <div class="trailer-player" id="trailer-player">
+          <button class="trailer-play" id="trailer-play" type="button" aria-label="Play the Animal Crossing N64 trailer on YouTube">
+            <img src="media/town.webp" width="800" height="600" alt="" loading="lazy">
+            <span class="trailer-play-label"><span aria-hidden="true">▶</span> Play trailer</span>
+          </button>
+        </div>
+        <p class="trailer-link"><a id="trailer-link" href="https://www.youtube.com/watch?v=UloFru4K4Q8" target="_blank" rel="noopener noreferrer">Watch on YouTube <span aria-hidden="true">↗</span></a></p>
       </div>
       <div class="questions">
         <p class="eyebrow">COMMON QUESTIONS</p>

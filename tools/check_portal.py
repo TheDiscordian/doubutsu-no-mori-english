@@ -53,7 +53,9 @@ def main():
         body = page.locator('body').inner_text()
         assert not any(old in body for old in ('V1 Final', 'LOCAL PREVIEW', 'Is this the public release?', 'Audio starts muted'))
         assert page.locator('#build').is_disabled()
-        assert page.locator('video').evaluate('(v) => v.paused && !v.muted && !v.defaultMuted && !v.autoplay')
+        assert page.locator('#trailer-play').count() == 1
+        assert page.locator('video, iframe').count() == 0
+        assert page.locator('#trailer-link').get_attribute('href') == 'https://www.youtube.com/watch?v=UloFru4K4Q8'
         page.screenshot(path=out/'desktop.png', full_page=True)
         results['initial_state'] = 'passed'
         page.locator('#n64').set_input_files(str(native))

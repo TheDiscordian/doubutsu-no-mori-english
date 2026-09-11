@@ -1,6 +1,19 @@
 import { validateManifest, rejectArchive } from './core.mjs';
 
 const $ = id => document.getElementById(id);
+// Only a visitor's Play action contacts YouTube. Never share file or patch state.
+$('trailer-play').addEventListener('click', () => {
+  const frame = document.createElement('iframe');
+  frame.src = 'https://www.youtube-nocookie.com/embed/UloFru4K4Q8?autoplay=1&mute=0&playsinline=1&rel=0';
+  frame.title = 'Animal Crossing N64 English translation trailer';
+  frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+  frame.allowFullscreen = true;
+  // YouTube requires a Referer; send only the page origin across origins.
+  frame.referrerPolicy = 'strict-origin-when-cross-origin';
+  $('trailer-player').replaceChildren(frame);
+  frame.focus();
+}, { once: true });
+
 const input = { n64: $('n64'), gamecube: $('gamecube') };
 let manifest, worker, generation = 0, romURL, receiptURL;
 const status = message => { $('status').textContent = message; };

@@ -6,7 +6,8 @@ from pathlib import Path
 from urllib.parse import unquote, urlsplit
 
 CSP = ("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; "
-       "media-src 'self' blob:; connect-src 'self'; worker-src 'self'; object-src 'none'; "
+       "media-src 'self' blob:; frame-src https://www.youtube-nocookie.com; "
+       "connect-src 'self'; worker-src 'self'; object-src 'none'; "
        "base-uri 'self'; form-action 'none'; frame-ancestors 'none'")
 
 

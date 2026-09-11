@@ -2,6 +2,12 @@
 
 ## Active development
 
+The local portal uses the user's [YouTube trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)
+through a click-to-load, sound-enabled embed and a direct viewing link. The
+53.9-MB MP4 copy is preserved outside the served site, and fresh exports omit
+it. Four focused checks and three-width browser integration checks pass;
+the [checkpoint](checkpoints/PORTAL_YOUTUBE.md) records playback limits.
+
 The [YouTube upload resources](promotion/YOUTUBE.md) include a title-screen-led
 thumbnail, unlisted and release descriptions, a suggested title, and an optional
 pinned comment. Copy and image verification are recorded in the

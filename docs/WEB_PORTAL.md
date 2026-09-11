@@ -26,9 +26,12 @@ Select **Build my English ROM**, then download the verified result.
 - GameCube: `.iso`, `.gcm`, and sparse `.ciso`. The patcher checks the disc
   identity and each required donor resource, without loading an entire ISO.
 - Extract `.7z` and `.zip` first. Convert RVZ/GCZ/NKit to a full ISO with Dolphin.
-- No account, uploads, analytics, external font/asset service, or persistent
-  storage of game files. Original files and saves are never changed.
-- The trailer plays with sound when the visitor presses Play. It does not autoplay.
+- No patcher account, uploads, analytics, or persistent storage of game files.
+  Original files and saves are never changed. Patcher assets remain local.
+- Play loads [the YouTube trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)
+  in a privacy-enhanced embed, requesting sound. Nothing autoplays or contacts
+  YouTube before Play. A direct Watch on YouTube link is always available.
+  YouTube controls its player/network behaviour after the visitor opens it.
 
 The browser download is **Animal Crossing N64 - English.z64**, build **V2-07**, including the
 map's omitted Japanese village-suffix image and the current N64 keyboard.
@@ -62,7 +65,11 @@ For copy/style changes, `python3 tools/build_portal.py --output build/web-portal
 --refresh-web` updates the verified live export from `web/`, including current
 download metadata. It rejects unrecorded edits to the served files and checks
 the existing patch identity. It does not rebuild the ROM, regenerate the patch,
-or change the trailer. Source hashes in the export receipt are refreshed.
+or edit the trailer. It retires the known redundant MP4 export copy to
+`build/web-portal-02/retired-site-trailer.mp4`, outside the served folder, after
+checking the file identity. New exports contain no MP4. Source hashes and the
+YouTube destination in the export receipt are refreshed. Server CSP changes
+require restarting `animal-forest-portal.service`; the page CSP matches it.
 
 The FAQ lists six MD5 reference checksums: three N64 byte orders, the catalogued
 full GC ISO/GCM, the locally verified scrubbed ISO/GCM, and the verified CISO.
@@ -99,6 +106,11 @@ altered by the portal or map fix.
 
 ## Verification
 
+- `python3 tools/check_portal_trailer.py` checks the live page at three widths,
+  no pre-click third-party requests, mouse/keyboard activation, unmuted playback
+  parameters, origin-only Referer, minimum player size, and the direct link.
+  It substitutes a silent iframe response; it does not claim a YouTube playback
+  test. The browser always uses `--mute-audio` to suppress physical sound.
 - `python3 -m unittest tests.test_portal_copy -v` checks visitor-facing wording,
   branding, and the measured reference MD5s without rebuilding the cartridge.
 - `node --test tests/web_portal.test.mjs` uses Node 22 or newer for synthetic
