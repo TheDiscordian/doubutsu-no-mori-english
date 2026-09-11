@@ -7,30 +7,33 @@ The repository and release artifacts remain private; no public upload is made.
 ## V2 development
 
 The N64-inspired keyboard is implemented in
-`build/v2-keyboard-05/Animal Forest English V2 Development.z64`, with a matching
+`build/v2-keyboard-06/Animal Forest English V2 Development.z64`, with a matching
 UPS alongside it. It adds grey panel shading, native N64 control artwork,
-pressed-button feedback, and a left-side stick image. Accepted key positions,
+pressed-button feedback, and an eight-direction animated stick. Key positions,
 font metrics, input behaviour, sounds, and saved formats are retained.
 
-Four focused cartridge/retention checks pass on this build. Ordinary name
-entry, spaces, caret movement, deletion, and Start confirmation pass on the
-same keyboard before its final redundant-label removal. Isolated screenshots
-cover the grey panel, N64 icons, and representative held controls. The final
-adjustment removes the crowded left-side `Move` label while retaining the
-stick graphic and bottom movement hint. It has focused artifact checks, not
-another native replay. The earlier controlled preview and decoder evidence
-remain applicable to the retained geometry/materials and decoder.
+The current keyboard corrects the reported horizontal letter drift across
+the bubbles, shifts the Cursor label/C-button cluster left, and aligns A/L/R
+lettering. Button labels depress with their native held artwork. Six focused
+checks pass. Current-build captures cover eight stick directions, release,
+uppercase/lowercase/symbols, and all ten pictured buttons. The final bounded
+check confirms intact memory guards and no native fault. See the
+[playtest correction record](docs/checkpoints/KEYBOARD_V2_FEEDBACK.md) for
+hashes, the corrected test-sequence assumption, and precise evidence limits.
 
-Other keyboard callers, remaining pressed states, and V2 hardware/save-load
+Other keyboard callers and hardware/save-load acceptance of these corrections
 acceptance remain playtest limits. V1 Final stays untouched. See the
 [V2 ordinary work record](docs/checkpoints/KEYBOARD_V2_ORDINARY.md) for exact
 hashes and verification limits. No public release is authorised.
 
-The [private offline V2 handoff](docs/checkpoints/V2_PRIVATE_PACKAGE.md) is
+The [private offline V2 archive](docs/checkpoints/V2_PRIVATE_PACKAGE.md) is
 `build/v2-private-bundle/V2-Development-patch.zip`. Its included standalone
-patcher reconstructs the exact V2 ROM from the original Japanese input; three
+patcher targets `v2-keyboard-05`, not the current correction build; three
 package checks pass. The ZIP contains no ROM or save, and needs no source
 checkout, GameCube disc, Docker, or network for patch application.
+
+The [private trailer](specs/TRAILER.md) is the active production task. No public
+upload of the trailer, patch, repository, or ROM is authorised.
 
 ## V1 Final
 

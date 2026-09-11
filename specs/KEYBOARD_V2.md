@@ -13,7 +13,10 @@ all patch artifacts remain private. Publication approval is not the active task.
 - Use a greyer background inspired by the Nintendo 64 controller.
 - Use button images matching the N64 controller and the actual input bindings.
 - Include a control-stick image on the left, as in the GC layout and original
-  N64 keyboard. Prefer the existing native artwork where suitable.
+  N64 keyboard, tilting with the player's input in eight directions.
+- Show held/released artwork for every pictured button, with matching lettering.
+- Keep letters centred in their bubbles across the full keyboard width, with
+  the Cursor label and C cluster shifted left and A/L/R lettering aligned.
 
 ## Retained behaviour
 
@@ -25,7 +28,7 @@ texture loads, inspect them, and reuse their pixels where suitable. Prefer
 renderer tint/geometry changes and native artwork to unnecessary redraws.
 
 Replace only the keyboard's owned presentation suffix. Preserve its complete
-editing/input prefix, existing key positions and glyph metrics, page tables,
+editing/input prefix, existing key positions and optical glyph metrics, page tables,
 sound calls, saved fields, native callbacks, and all unrelated ROM resources.
 Respect the existing 8-KiB suffix reservation where possible; any additional
 memory requirement must be explicitly checked before installation. Bound all
@@ -42,8 +45,13 @@ candidate tests, the full suite, or previously accepted save/editor workflows.
 The source uses the accepted corrected GC panel geometry and textures with
 primitive colour `(235,235,235)` and environment colour `(174,177,181)`.
 The light grey body keeps the existing dark control hints readable.
-All forty keys and the complete quarter-pixel glyph-origin table retain their
-accepted positions. There are still two pages and the existing input bindings.
+All forty keycaps and the quarter-pixel optical glyph-origin table retain their
+positions. The keyboard-only text wrapper compensates for horizontal shrink in
+the native polygon projection: its 16.16 X coefficient truncates 25.6 to 25,
+so text positions and horizontal scale are multiplied by 128/125 about X=160.
+This aligns letters with the screen-space bubbles across all columns, without
+changing global font pixels, vertical placement, or editor advances. There are
+still two pages and the existing input bindings.
 
 The native resource at VROM `00A40000` supplies all controller textures without
 pixel edits. Its native editor tables and each material's texture load and
@@ -52,11 +60,19 @@ colour textures with the separate I4 soft alpha mask; drawing the colour alone
 would create opaque coloured squares. Four separate yellow C buttons identify
 caret control. The blank native R shoulder is mirrored for L, with L/R labels
 drawn by the existing font. Z retains its native labelled texture. Held buttons
-select the original pressed frames using the read-only button getter.
+select the original pressed frames using the read-only button getter. A/B/L/R
+lettering lowers one pixel with its button; release restores the ordinary pose.
+The C-button cluster moves four pixels left; `Cursor` moves two pixels left.
+A/L/R lettering receives an additional half-pixel leftward adjustment.
 
 The centre stick texture is placed at `(18,137)` in a 48×48 rectangle; its
 transparent margins leave the visible stick to the left of the key grid.
-The stick is a static illustration, not a new input-control implementation.
+Six native textures supply neutral and eight directional poses, with the right
+poses mirrored from the left. Read-only joystick getters use the editor's
+25-unit dead zone; D-pad input has priority and also tilts the graphic.
+Conflicting opposite D-pad directions display neutral. Diagonals show the
+physical input direction while the unchanged grid moves one axis at a time.
+The graphic returns to neutral on release; input handling itself is unchanged.
 English hints retain case, page, order, movement, caret, insert, delete, space,
 completion, and alteration instructions. Plus signs use the native font code.
 Movement is explained in the bottom control hint. Do not place a separate
@@ -65,9 +81,10 @@ keys leave insufficient readable space for that redundant hint.
 
 Every icon is clipped before emitting an unsigned RDP rectangle. Frame/icon/key
 commands reserve 8,192 graphics bytes before emission; each subsequent font
-call retains its own existing buffer check. The current suffix occupies 7,744
-rounded bytes inside the existing 8,192-byte overlay reservation, leaving 448
-bytes. No additional pool allocation, resident module, or saved fields change.
+call retains its own existing buffer check. The current suffix occupies all
+8,192 rounded bytes in its existing overlay reservation. Future code growth
+requires a verified size reduction or an explicitly checked allocation change.
+No additional pool allocation, resident module, or saved fields change.
 
 ## Ownership
 
@@ -88,8 +105,9 @@ DMA identity, and its UPS must reconstruct the complete output.
 
 ## Current verification boundary
 
-Four current artifact checks pass, and the unchanged decoder retains its four
-passing checks. Controlled native drawing and screenshot review pass on the
+Six current artifact/feedback checks pass, including sanitised host execution
+of the actual direction selector and projection compensation. The unchanged
+decoder retains its passing checks. Controlled native drawing and review pass on the
 recorded `v2-keyboard-03` build before the redundant-label removal. The
 checkpoint-restored preview uses verified-empty Expansion Pak scratch, with
 the relocation model explicitly configured for eight MiB. The preview binds
@@ -104,13 +122,16 @@ Use the isolated emulator display to judge appearance: debugger RAM framebuffer
 reads can contain unfinished GPU output. Do not mistake a partially drawn RAM
 image or omitted title-fixture menu setup for a cartridge rendering defect.
 
-The [ordinary work record](../docs/checkpoints/KEYBOARD_V2_ORDINARY.md) contains
-the current hashes and exact executed builds. Ordinary name entry, spaces,
+The [playtest correction record](../docs/checkpoints/KEYBOARD_V2_FEEDBACK.md)
+owns current hashes, fresh execution, and outstanding limits. The
+[ordinary work record](../docs/checkpoints/KEYBOARD_V2_ORDINARY.md) preserves
+earlier evidence. Ordinary name entry, spaces,
 caret movement, deletion, and Start confirmation pass. Representative held
 controls are reviewed in isolated screenshots. The final redundant-label
 removal receives focused cartridge checks, without another native replay.
-Other keyboard callers, remaining pressed states, and original hardware remain
-playtest limits. Unchanged saved formats support expected V1 Final ↔ V2
+Other keyboard callers and hardware acceptance of the new corrections remain
+playtest limits. The user accepts the overall N64-inspired appearance, subject
+to the recorded corrections. Unchanged saved formats support expected V1 Final ↔ V2
 compatibility, not a claim that those loading directions have been executed.
 
 ## Private offline handoff

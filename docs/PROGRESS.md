@@ -3,24 +3,25 @@
 ## Active development
 
 V2's N64-inspired keyboard is implemented in
-`build/v2-keyboard-05/Animal Forest English V2 Development.z64` on the preserved
+`build/v2-keyboard-06/Animal Forest English V2 Development.z64` on the preserved
 V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
-feedback, and a left-side stick graphic. The complete input/editor prefix,
+feedback, and an eight-direction left-side stick graphic. The complete input/editor prefix,
 key positions, glyph metrics, sound code, and saved formats are retained.
-The suffix uses 7,744 of the existing 8,192 reserved bytes; no pool allocation
-changes. Four focused cartridge checks pass on this build; the four decoder
+The keyboard compensates for horizontal font-projection shrink so letters
+remain centred across the bubbles. Cursor/C-button positions and A/L/R labels
+are adjusted left; A/B/L/R lettering depresses with the button art.
+The suffix uses all 8,192 reserved bytes; no pool allocation
+changes. Six focused cartridge/feedback checks pass on this build; the four decoder
 checks remain applicable to the unchanged decoder.
 
-Ordinary name entry passes: letters, spaces, caret movement, deletion, and
-Start confirmation back to Rover. Isolated screenshots cover the panel and
-representative held N64 controls. Review identifies a crowded left-side `Move`
-label; the current build removes it and retains the stick and bottom movement
-hint. The final removal passes artifact checks without another native replay.
-The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) distinguishes
-each executed build from this final adjustment. The earlier 155-draw controlled
-preview retains its guard/geometry/material evidence and is not repeated.
-Other keyboard callers, remaining pressed states, and V2 hardware acceptance
-remain playtest limits. No additional preview loop or old-build replay is queued.
+The [current feedback record](checkpoints/KEYBOARD_V2_FEEDBACK.md) records
+ordinary current-build captures of all eight stick directions, neutral return,
+uppercase/lowercase/symbols, and all ten pictured buttons. A short same-build
+checkpoint continuation finishes the final guard/fault checks after correcting
+a test assumption about the caret and trailing spaces. No old build is replayed.
+The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) preserves earlier
+entry, space, caret, deletion, and Start-confirmation evidence. Other keyboard
+callers and hardware acceptance of the new corrections remain playtest limits.
 V1 Final remains unchanged. No public release is authorised; all artifacts
 remain private. Expected V1 Final ↔ V2 save compatibility needs no migration,
 but those particular loading directions are not independently executed.
@@ -28,9 +29,14 @@ but those particular loading directions are not independently executed.
 The [private offline V2 package](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
 at `build/v2-private-bundle/V2-Development-patch.zip`. Three package checks and
 its archived standalone patcher pass; the patcher recreates the exact current
-ROM from the original Japanese input. The package contains offline guides,
+`v2-keyboard-05` ROM from the original Japanese input, not the current correction
+build. The package contains offline guides,
 credits, source/compatibility records, and checksums, but no ROM or save. This
 does not change the cartridge or claim additional gameplay/hardware acceptance.
+
+The active next task is the authorised [private trailer](../specs/TRAILER.md):
+clean real gameplay footage, a catchy edit, and a soundtrack rendered to file.
+No speaker/headphone playback or public publication is authorised.
 
 ## Human acceptance
 

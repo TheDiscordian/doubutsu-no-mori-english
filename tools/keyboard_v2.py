@@ -26,7 +26,8 @@ ART_SHA = '39b26c60392e75e5988f25788e1eac2cc3996583bdbc3ccb7d50de809cbf2b76'
 NATIVE_ART_SHA = '0445bb9fdb4634ccfe31cce544695a98c471a77266d94455390868324bf87f17'
 CALL = 0x808882D8-RAM
 SPEC = dict(PREVIOUS_SPEC, vrom=VROM, reloc=RELOC, sha=RECOVERED_SHA,
-            imports=dict(PREVIOUS_SPEC['imports'], af_grid_get_button=0x80078D78))
+            imports=dict(PREVIOUS_SPEC['imports'], af_grid_get_button=0x80078D78,
+                         af_grid_get_x=0x80078E28, af_grid_get_y=0x80078E5C))
 BOTTOM = b'D-pad: Move   L+A: Alter   L+Z: ABC'
 FRAME_COLOURS = ((235,235,235),(174,177,181))
 
@@ -44,11 +45,17 @@ ASSETS = (
     ('z',0x374C,0xCE48,0xC648,32,64,'ia8',0x11E8),
     ('shoulder',0x3754,0x8E48,0x8648,64,32,'ia8',0x13F0),
     ('stick',0x3788,0xD648,None,64,64,'ia8',0x1610),
+    ('stick_up',0x3770,0xE648,None,64,64,'ia8',0x1610),
+    ('stick_down',0x3780,0xF648,None,64,64,'ia8',0x1610),
+    ('stick_up_left',0x376C,0x10648,None,64,64,'ia8',0x1610),
+    ('stick_left',0x3768,0x11648,None,64,64,'ia8',0x1610),
+    ('stick_down_left',0x3784,0x12648,None,64,64,'ia8',0x1610),
 )
 
 
 def source_hashes():
     names = ('tools/keyboard_v2.py','overlays/keyboard_v2/controls.c',
+             'overlays/keyboard_v2/feedback.h',
              'tools/keyboard_rc1_fix.py','overlays/keyboard_rc1/panel.c',
              'overlays/keyboard_grid/draw.c','overlays/keyboard_grid/editor.h',
              'overlays/keyboard_grid/core.h','overlays/hboard/editor.h',
@@ -116,6 +123,9 @@ def draw_source():
     panel=panel.replace('Correct GC corner directions; retain the V1 colours and native key grid.',
                         'Accepted GC corners and key grid, with N64-style grey shading.')
     changes={
+        '#include "editor.h"':'#include "editor.h"\n#include "/source/overlays/keyboard_v2/feedback.h"',
+        'af_hboard_font_line(game,s,length,x,y,r,g,b,255,0,1,scale,scale,0);':
+            'af_hboard_font_line(game,s,length,af_v2_text_x(x),y,r,g,b,255,0,1,af_v2_text_scale(scale),scale,0);',
         '#include "/source/overlays/keyboard_rc1/panel.c"':'#include "panel.inc"',
         'void af_bg_editor_draw(':'#include "/source/overlays/keyboard_v2/controls.c"\n\nvoid af_bg_editor_draw(',
         '!space(graph,4096)':'!space(graph,8192)',
@@ -182,6 +192,7 @@ def build(native, base, rel, symbols, out):
         native_artwork=artwork,frame=frame_report,frame_colours=[list(c) for c in FRAME_COLOURS],
         shared_growth_bytes=growth,existing_pool_extra_bytes=8192,additional_pool_bytes=0,
         key_positions_changed=False,font_pixels_changed=False,sound_code_changed=False,
+        keyboard_text_projection_corrected=True,stick_direction_feedback=True,
         input_code_changed=False,save_format_changed=False,required_ram_bytes=0x800000,
         toolchain_image=IMAGE,public_release=False,native_tests='pending',hardware_tests='pending')
 

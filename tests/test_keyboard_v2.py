@@ -3,7 +3,9 @@ import json
 import os
 from pathlib import Path
 import struct
+import subprocess
 import sys
+import tempfile
 import unittest
 
 ROOT=Path(__file__).resolve().parents[1]
@@ -16,7 +18,7 @@ from keyboard_v2 import (BASE_SHA,VROM,RELOC,OWNER,PREFIX,RAM,CALL,SPEC,BOTTOM,
                          source_hashes,recover,ASSETS,ART_VROM,FRAME_COLOURS,draw_source)
 from npc_mail_show import relocate_verified_data
 
-OUT=ROOT/os.environ.get('AF_V2_BUILD','build/v2-keyboard-05')
+OUT=ROOT/os.environ.get('AF_V2_BUILD','build/v2-keyboard-06')
 
 
 class KeyboardV2Tests(unittest.TestCase):
@@ -84,6 +86,37 @@ class KeyboardV2Tests(unittest.TestCase):
         # The changed source does not alter the accepted grid coordinates.
         self.assertIn(b'60+16*(i%10)+slide[i/10]+dx',helper)
         self.assertIn(b'60+16*cell.column+slide[cell.row]+dx',helper)
+
+    def test_keyboard_only_projection_and_direction_feedback(self):
+        helper,_=draw_source()
+        self.assertIn(b'af_v2_text_x(x),y',helper)
+        self.assertIn(b'af_v2_text_scale(scale),scale,0)',helper)
+        self.assertTrue(self.report['keyboard_text_projection_corrected'])
+        self.assertTrue(self.report['stick_direction_feedback'])
+        with tempfile.TemporaryDirectory(prefix='af-v2-feedback-') as directory:
+            target=str(Path(directory)/'check')
+            subprocess.run(['cc','-std=c11','-O1','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                '-I',str(ROOT/'overlays/keyboard_v2'),
+                str(ROOT/'tests/keyboard_v2_feedback_check.c'),'-o',target],
+                check=True,capture_output=True,timeout=30)
+            subprocess.run([target],check=True,capture_output=True,timeout=10)
+
+    def test_every_button_uses_its_distinct_native_pressed_art(self):
+        for asset in self.report['native_artwork']:
+            if len(asset['offsets'])==2:
+                self.assertNotEqual(*asset['sha256'],asset['name'])
+        controls=(ROOT/'overlays/keyboard_v2/controls.c').read_text()
+        self.assertIn('down ? p->pressed : p->texture',controls)
+        self.assertIn('down ? 0x16C48 : p->mask',controls)
+        self.assertIn('mirror ? -ds : ds',controls)
+        # Bind all ten visible buttons, including the four C directions.
+        self.assertEqual(struct.calcsize('>IIIHBBHHBBBB'),24)
+        at=self.report['editor']['symbols']['af_v2_icons']
+        rows=list(struct.iter_unpack('>IIIHBBHHBBBB',self.data[at:at+11*24]))
+        self.assertEqual([r[3] for r in rows],[0,0x20,0x2000,0x8000,0x4000,0x10,0x1000,8,2,1,4])
+        for r in rows[1:]: self.assertNotEqual(r[0],r[1])
+        self.assertEqual([(r[6],r[7]) for r in rows[-4:]],[(248,147),(238,157),(258,157),(248,167)])
 
 
 if __name__=='__main__': unittest.main()

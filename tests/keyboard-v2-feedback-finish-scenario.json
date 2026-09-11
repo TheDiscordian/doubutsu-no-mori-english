@@ -1,0 +1,10 @@
+[
+  {"wait":2},
+  {"snapshot_keyboard":true,"expect_keyboard":{"mode":3,"length":0}},
+  {"capture":"start-pressed-empty.png","capture_keys":"Return","hide_cursor":true},
+  {"wait":0.5},
+  {"capture":"buttons-released.png","hide_cursor":true},
+  {"read":["80000318",4],"expect":"00800000"},
+  {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

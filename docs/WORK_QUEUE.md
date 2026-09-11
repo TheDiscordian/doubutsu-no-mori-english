@@ -1,30 +1,38 @@
 # Completion queue
 
-## Active work: V2 keyboard
+## Active work: private trailer
+
+Build the authorised [private trailer](../specs/TRAILER.md) using real gameplay,
+clean framing, a catchy edit, and a fitting soundtrack rendered only to file.
+The [V2 hardware feedback batch](checkpoints/KEYBOARD_V2_FEEDBACK.md) is
+implemented in `build/v2-keyboard-06`: directional stick tilt, visibly held
+buttons, keyboard-wide horizontal glyph alignment, and leftward label/control
+adjustments. Six focused checks and the bounded current-build native check
+pass within the documented limits. The user has not yet accepted these fixes
+on hardware; that does not block private trailer production.
+
+## V2 keyboard
 
 The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
 and saved capacities remain intact. The private development ROM is
-`build/v2-keyboard-05/Animal Forest English V2 Development.z64`.
+`build/v2-keyboard-06/Animal Forest English V2 Development.z64`.
 
-Four current cartridge checks pass. Ordinary name entry, space/caret/deletion,
-and Start completion pass before the final redundant-label removal. Isolated
-screenshots cover representative held N64 controls. The final change removes
-the crowded left-side `Move` label while retaining the stick and bottom hint;
-artifact checks cover that removal without another native replay. The
-[ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) owns the evidence.
-Retain the earlier controlled native checks; do not repeat resolved setup work.
+The [current feedback record](checkpoints/KEYBOARD_V2_FEEDBACK.md) owns fresh
+checks, exact artifacts, and limits. The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md)
+retains the earlier accepted editor evidence. Do not repeat resolved setup work.
 
-Remaining V2 work is concrete playtest feedback, including other keyboard
-callers, remaining pressed states, and hardware acceptance. No known V2 change
+Remaining V2 game work is concrete playtest feedback, including other keyboard
+callers and hardware acceptance of the corrections. No known V2 game change
 is awaiting implementation. This does not reopen V1 save testing or
 block the available development build. Do not invent further RCs, public
 packages, or speculative artwork tasks while awaiting findings. Keep V1 Final
 unchanged. No public release is authorised or queued.
 
 The [private offline V2 handoff](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
-at `build/v2-private-bundle/V2-Development-patch.zip`. Its three package checks
+at `build/v2-private-bundle/V2-Development-patch.zip` targets `v2-keyboard-05`;
+use the current ROM/adjacent UPS for the feedback corrections. Its three package checks
 and bundled standalone patcher pass. No further packaging is queued without
 a concrete cartridge or documentation correction; preserve this handoff and
 do not use packaging as a substitute for the remaining human acceptance.
