@@ -2,6 +2,13 @@
 
 ## Builds
 
+The RC4 catalogue/repayment findings V1-21 through V1-23 have
+[implemented corrections](checkpoints/RC4_MENU_LABEL_FIXES.md): exact GC Bells
+artwork, complete `Not for Sale`, and centred `Your Loan` / `OK`. Five focused
+checks and both native price-adapter routes pass. Font arguments are captured in
+the native check; screen appearance is not claimed verified. RC5 packaging is
+in progress. Prices, transactions, save formats, and previous fixes are retained.
+
 **RC3 town-loading memory failure corrected in V1RC4 (V1-20).**
 The supplied RC2 save reproduces RC3's out-of-memory crash and loads successfully
 after the complete bordered font moves to its own Expansion Pak region. The

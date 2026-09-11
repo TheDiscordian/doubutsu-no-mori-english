@@ -9,6 +9,25 @@ reported runtime defects are corrected. Preserve this ROM and the user's saves.
 
 ## Open findings
 
+The user reports a further original-hardware session on RC4. New catalogue and
+repayment findings take priority over remaining speculative artwork discovery.
+That session is not treated as acceptance of every earlier finding or as a
+documented save/restart test.
+
+| ID | RC4 finding | Status |
+| --- | --- | --- |
+| V1-21 | Catalogue currency text beside prices remains Japanese | Exact 32×16 GC Bells image installed; source/retention checks pass, hardware recheck pending |
+| V1-22 | Unorderable catalogue items show `ひばいひん` | Complete GC `Not for Sale` reader bypasses the small native buffer; both adapter branches pass native argument capture, hardware recheck pending |
+| V1-23 | Post-office repayment screen retains Japanese heading and confirmation text | Complete GC `Your Loan` / `OK` installed and centred in existing slots; focused checks pass, hardware recheck pending |
+
+See [the RC4 menu-label specification](../specs/RC4_MENU_LABELS.md). Preserve
+the already installed repayment Cash/Payment/You still owe/Bells images and
+catalogue top/bottom controls; inspect the remaining reader paths as part of
+this correction. Currency arithmetic, item availability, and saves stay native.
+The [correction checkpoint](checkpoints/RC4_MENU_LABEL_FIXES.md) records five
+passing focused checks and the bounded native adapter run. The latter captures
+font arguments without drawing; it is not screen-appearance acceptance.
+
 V1-20 (critical, corrected candidate; hardware recheck pending): RC3 fails to
 load both the user's RC1 and RC2 saves, while a new file works. The copied RC2
 save reproduces an overlay-manager out-of-memory fault in RC3, with only 304

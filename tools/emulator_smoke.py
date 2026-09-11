@@ -795,6 +795,12 @@ def main():
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if 'test_rc4_menu_labels' in action:
+                from rc4_menu_label_smoke import exercise as menu_label_check
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Menu-label check requires an isolated emulator checkpoint')
+                needs_checkpoint_restore = True
+                record(menu_label_check(debug, action['test_rc4_menu_labels'], args.rom.read_bytes(), record))
             if 'test_transition_preview' in action:
                 from transition_preview import exercise as transition_preview
                 if not (out/'test.bs1').is_file():

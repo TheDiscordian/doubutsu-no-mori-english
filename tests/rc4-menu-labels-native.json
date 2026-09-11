@@ -1,0 +1,10 @@
+[
+  {"wait": 12},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_rc4_menu_labels": {"build": "build/rc4-menu-labels-02"}},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

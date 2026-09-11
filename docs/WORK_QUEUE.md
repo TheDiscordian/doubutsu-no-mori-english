@@ -2,6 +2,15 @@
 
 ## Next work
 
+Finish the named RC5 handoff for the
+[RC4 catalogue/repayment corrections](checkpoints/RC4_MENU_LABEL_FIXES.md).
+Five focused checks and the first native adapter attempt pass; preserve that
+evidence instead of rerunning unchanged code. The adapter check captures font
+arguments, not screen pixels. Reproduce from committed sources, verify the
+standalone patch archive, and distinguish expected RC4 save compatibility from
+untested RC5 loading/save cycles. New human findings stay ahead of artwork or
+historical-fixture follow-up.
+
 The combined [RC4 memory/space-marker handoff](checkpoints/V1RC4_PACKAGE.md) is
 packaged and checked. The copied RC2 save loads with 25,216 free bytes and no
 faulted thread. Controller movement, complete loaded font, owner guards, and
