@@ -1,0 +1,12 @@
+[
+  {"wait":16},
+  {"key":"Return","duration":0.15},
+  {"wait":8},
+  {"repeat":16,"actions":[{"key":"a","duration":0.12},{"wait":3}]},
+  {"wait":14},
+  {"capture":"arrival.png","hide_cursor":true},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"save_state":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]

@@ -686,6 +686,10 @@ def main():
     parser.add_argument("--scenario", type=Path)
     parser.add_argument('--no-initial-screenshot',action='store_true',
                         help='Skip the diagnostic startup image for memory-only batches; scenario image checks still run')
+    parser.add_argument('--record-video',action='store_true',
+                        help='Record the isolated display, with muted real-time null-sink audio pacing')
+    parser.add_argument('--record-game-audio',action='store_true',
+                        help='With --record-video, capture game audio from its private null sink only')
     parser.add_argument("--post-scenario", type=Path, help="Additional assertions after the main scenario")
     parser.add_argument("--port", type=int, default=19264)
     parser.add_argument("--seed-save", type=Path, help="Copy this isolated test directory's cartridge saves")
@@ -697,6 +701,8 @@ def main():
     args = parser.parse_args()
     if args.seed_save and args.seed_state:
         parser.error("choose cartridge saves or a matching-ROM state, not both")
+    if args.record_game_audio and not args.record_video:
+        parser.error('--record-game-audio requires --record-video and its private null sink')
     if not 1 <= args.seconds <= 1200:
         parser.error("seconds must be between 1 and 1200")
     if args.output.exists():
@@ -706,7 +712,8 @@ def main():
     rom = out / "test.z64"
     shutil.copyfile(args.rom, rom)
     rom_hash = hashlib.sha256(rom.read_bytes()).hexdigest()
-    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": "disabled", "expansion_pak": args.expansion_pak,
+    audio_mode = 'private null-sink capture, no hardware playback' if args.record_game_audio else 'disabled'
+    provenance = {"rom_sha256": rom_hash, "seed_files": [], "audio": audio_mode, "expansion_pak": args.expansion_pak,
                   "initial_screenshot": not args.no_initial_screenshot,
                   "allow_test_flash_write": args.allow_test_flash_write,
                   "allow_test_pak_write": args.allow_test_pak_write,
@@ -753,6 +760,7 @@ def main():
                         "        Up: 0x1/0/84;;\n        Down: 0x1/0/85;;\n"
                         "        Left: 0x1/0/86;;\n        Right: 0x1/0/87;;\n")
     logs, processes, debug = [], [], None
+    recording=None
     readfd, writefd = os.pipe()
     try:
         log = (out / "xvfb.log").open("wb")
@@ -772,6 +780,10 @@ def main():
         env = dict(os.environ, DISPLAY=display, GDK_BACKEND="x11",
                    SDL_AUDIODRIVER="dummy", PULSE_SERVER="unix:/nonexistent-af-audio")
         env.pop("WAYLAND_DISPLAY", None)
+        if args.record_video:
+            from trailer_capture import Recording
+            recording=Recording(out,audio=args.record_game_audio)
+            recording.configure(env)
         log = (out / "ares.log").open("wb")
         logs.append(log)
         command = ["timeout", "-s", "KILL", str(args.seconds+10), args.ares,
@@ -782,11 +794,20 @@ def main():
                    "--setting", f"Nintendo64/ExpansionPak={str(args.expansion_pak).lower()}", str(rom)]
         if args.seed_state:
             command[5:5] = ["--save-state", "1"]
+        if recording:
+            # Audio goes only to the verified private null sink. Ordinary
+            # recording also retains both internal mute and zero volume.
+            command[command.index('Audio/Driver=None')]='Audio/Driver=PulseAudio'
+            if args.record_game_audio:
+                command[command.index('Audio/Mute=true')]='Audio/Mute=false'
+            command[-1:-1]=['--setting','Audio/Blocking=true','--setting',
+                           'Audio/Volume=1.0' if args.record_game_audio else 'Audio/Volume=0.0']
         ares = subprocess.Popen(command, env=env, stdout=log, stderr=log, start_new_session=True)
         processes.append(ares)
         time.sleep(3)
+        if recording: recording.start(display,env,args.seconds)
         results = [{"rom_sha256": hashlib.sha256(rom.read_bytes()).hexdigest(),
-                    "audio": "disabled", "expansion_pak": args.expansion_pak,
+                    "audio": audio_mode, "expansion_pak": args.expansion_pak,
                     "scenario": str(args.scenario) if args.scenario else "default"}]
         if not args.no_initial_screenshot:
             try:
@@ -814,6 +835,9 @@ def main():
             results.append(snapshot)
             write_results(out, results)
         for action in expand_actions(actions):
+            if 'record_mark' in action:
+                if not recording: raise ValueError('Recording marker requires --record-video')
+                recording.mark(action['record_mark'])
             if 'test_keyboard_v2_preview' in action:
                 from keyboard_v2_preview import exercise as keyboard_v2_preview
                 if not (out/'test.bs1').is_file():
@@ -1354,6 +1378,7 @@ def main():
         # Register numbering has changed across ares builds; retain the raw
         # response without claiming this is a trustworthy PC measurement.
         results.append({"raw_register_p25": debug.command("p25"), "process_alive": ares.poll() is None})
+        if recording: recording.stop()
         debug.sock.close()
         debug = None
         keyboard.press("F12", 0.08)
@@ -1376,6 +1401,7 @@ def main():
             process.wait(timeout=5)
         for log in logs:
             log.close()
+        if recording: recording.close()
 
 
 if __name__ == "__main__":

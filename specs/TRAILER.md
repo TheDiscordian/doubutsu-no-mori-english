@@ -14,8 +14,17 @@ Do not invent gameplay or show an emulated feature as proof of hardware testing.
 
 Capture in an isolated background emulator using copied test data. Preserve
 the user's cartridge saves and desktop session. Encode the soundtrack to a
-file without playing audio through speakers or headphones. Prefer an original
-retro-inspired instrumental or source-cleared music, and record its provenance.
+file without playing audio through speakers or headphones. Use the actual Animal
+Crossing opening music to carry the journey through the translated game. Record
+the source and keep copyrighted recordings in ignored local outputs only.
+
+The creative direction is entering Animal Crossing, not a product presentation.
+Open with the game's opening and English title, then follow a coherent sequence
+through meeting Rover, entering a name on the N64-inspired English keyboard,
+reading English conversations, and exploring the town and translated interfaces.
+Match each feature to footage that visibly demonstrates it. Keep added text
+short, natural, and secondary to the game. No numbered feature cards or generic
+marketing claims. The title screen is a central highlight, not a brief footnote.
 
 Use installed tools and existing Docker images before obtaining more tooling.
 Keep scripts, edit decisions, captions, music source, and build instructions in

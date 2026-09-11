@@ -1,0 +1,10 @@
+[
+  {"record_mark":"opening"},
+  {"wait":10},
+  {"capture":"opening.png","hide_cursor":true},
+  {"wait":10},
+  {"capture":"title.png","hide_cursor":true},
+  {"wait":55},
+  {"capture":"title-end.png","hide_cursor":true},
+  {"read":["800418D8",4],"expect":"00000000"}
+]
