@@ -16,11 +16,18 @@ checks, and the archived standalone patcher pass. Preserve these results and
 RC6 save compatibility is expected in both directions without migration. Do not
 confuse retained human acceptance with fresh execution of RC7's new labels.
 
-The next text lead is the separate development scene-name table in
-`upstream/af/src/overlays/gamestates/ovl_select/m_select.c`. Review its actual
-graphics-print encoding and installed owner; do not assume ordinary access,
-enable debug menus, or invoke saves/deletions to validate labels. Preserve the
-completed direct-font scans and rejected old-reader/padding classifications.
+The [scene-menu batch](checkpoints/SCENE_MENU_TEXT.md) translates all 76 Japanese
+scene/loading/setting strings in that owner, retaining 25 English/neutral strings.
+Its six focused tests and strengthened control-rejection check pass. Construct
+the final committed stage into fresh `build/scene-menu-text-01`; keep RC7 as the
+named handoff until a subsequent combined package is checked. Do not enable the
+debug menu or invoke its state-changing initializer to validate wording.
+
+Integrate the accumulated RC correction stages into the documented reproducible
+final-candidate build path: `make complete` currently stops before those fixes.
+Reuse existing guarded builders and clean-rebuild evidence; do not replay
+completed historical recipes merely to refresh evidence. Preserve completed
+direct-font scans, scene-menu review, and rejected old-reader/padding classifications.
 Prioritise new human findings, then remaining English readers/artwork and scoped
 fixture follow-up. V2 stays deferred until V1 completion.
 

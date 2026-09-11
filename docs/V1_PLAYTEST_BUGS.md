@@ -71,6 +71,7 @@ access. None requires deleting data or invoking a save action to inspect wording
 | V1-25 | Japanese Pak note-deletion instruction | Centred Erase a Pak note in RC6; four focused checks pass; ordinary appearance pending |
 | V1-26 | Native title controller warning and erase label | Complete English in committed title-warning stage; four focused checks pass; appearance pending |
 | V1-27 | Nine labels in separate player/save gamestates | Complete English in committed gamestate stage; six focused checks pass; access and appearance unverified |
+| V1-28 | Japanese development scene/loading/setting text | All 76 strings translated in scene-menu follow-up; focused checks pass; native appearance/access unverified |
 
 The [RC6 handoff](checkpoints/V1RC6_PACKAGE.md) contains V1-24/V1-25.
 The [V1RC7 handoff](checkpoints/V1RC7_PACKAGE.md) adds the committed
@@ -78,7 +79,8 @@ The [V1RC7 handoff](checkpoints/V1RC7_PACKAGE.md) adds the committed
 [gamestate](checkpoints/GAMESTATE_MENU_TEXT.md) stages with verified packaging.
 Controller detection, menu actions, allocations, and saved formats are unchanged.
 
-The separate development scene-name table remains an unreviewed text lead.
+The [scene-menu follow-up](checkpoints/SCENE_MENU_TEXT.md) closes that owner's
+Japanese text without enabling its controls; it is not yet in named RC7.
 Lucky-bag Japanese decoration is intentionally retained, matching English GC
 and the user's explicit choice. It is not an open bug.
 The N64-grey keyboard redesign remains V2 work.
