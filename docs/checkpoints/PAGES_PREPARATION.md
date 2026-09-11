@@ -43,6 +43,8 @@ history; the website allowlist does not conceal them.
   Gitleaks, pinned image digest
   `sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f`.
   The scan covers all refs and uses redacted output.
+  A second scan through implementation commit `dedbf77` covers 358 commits and
+  reports the same two reviewed findings, with no additional matches.
 - Both scanner matches are reviewed SHA-256 identity constants, not credentials:
   `tools/keyboard_grid_overlay.py` at `35583d8`, and
   `tools/item_articles.py` at `5a270f3`. No credential is identified by this scan.
@@ -65,14 +67,21 @@ history; the website allowlist does not conceal them.
 - Browser integration passes at 375, 768, and 1440 pixels: dormant YouTube
   loading, mouse/keyboard activation, sound parameters, origin referrer, and layout.
   The browser is physically muted; the deterministic iframe response is synthetic.
+- README local links resolve. A final current-page check verifies all four footer
+  links and no horizontal overflow at 320, 375, 768, and 1440 pixels.
 - A fresh `build/pages-review-01` artifact stages successfully without game
   inputs. Recipe SHA-256 remains
   `b36af1b824e0e1c09ca3634429fe46b8d075a6e1a6b62b0bb07c591ff91eeaa6`.
   Target ROM SHA-256 remains
   `400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25`.
 
-Private GitHub Actions verification is pending the push. Public deployment
-remains intentionally unexecuted until the user changes repository visibility.
+Private [GitHub Actions run 34638150393](https://github.com/TheDiscordian/doubutsu-no-mori-english/actions/runs/34638150393)
+passes on implementation commit `dedbf77`: staging, five packaging tests, eleven
+browser-engine tests, and artifact upload all succeed. The stored `github-pages`
+artifact is 1,949,837 bytes. The deploy job is **skipped**, as required while
+private. Repository visibility is rechecked as private, Pages remains configured
+for workflows at the expected URL, and the deployment list is empty. Public
+deployment remains intentionally unexecuted until the user changes visibility.
 
 ## Platform references
 

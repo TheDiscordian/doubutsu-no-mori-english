@@ -15,6 +15,8 @@ The publication address is
 `https://thediscordian.github.io/doubutsu-no-mori-english/`.
 The [publication checkpoint](checkpoints/PAGES_PREPARATION.md) records the
 bounded history review, exact deployment package, and focused verification.
+Private GitHub Actions validation passes and preserves the website artifact;
+the deployment job is correctly skipped. No public deployment is performed.
 
 The local portal uses the user's [YouTube trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)
 through a click-to-load, sound-enabled embed and a direct viewing link. The
