@@ -10,8 +10,12 @@ behind the reported screen freezes while K.K. Dirge audio continues.
 All sixteen credits pages fit the real command limit in the native emulator
 check: at most 1,295 of 1,792 commands, versus 2,054 for the reproduced untrimmed
 page. Visible geometry, complete text, fades, guards, and saved data pass.
-The [verification record](checkpoints/V2_PERFORMANCE_FIXES.md) distinguishes
-these results from the pending original-hardware performance confirmation.
+The [ordinary performance check](checkpoints/KK_ORDINARY_PERFORMANCE.md) also
+passes: a copied town after 8 p.m. Saturday reaches K.K. through normal controls,
+declines a request, and completes K.K. Western through the return to dialogue.
+Continuous analysis of 156 seconds finds no frozen game-picture interval of
+0.5 seconds or longer. The user reports improved appearance; exhaustive hardware
+and all-song testing are not claimed.
 Save formats are unchanged; V2-07 and existing saves remain preserved.
 The README introduces the current V2
 translation to public readers, with patching instructions, hardware requirements,

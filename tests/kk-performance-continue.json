@@ -1,0 +1,14 @@
+[
+  {"wait":2},
+  {"capture":"resumed.png","hide_cursor":true},
+  {"record_mark":"ordinary-town-controls"},
+  {"repeat":10,"actions":[{"wait":50}]},
+  {"record_mark":"ordinary-observation-end"},
+  {"capture":"ending.png","hide_cursor":true},
+  {"snapshot_player":true},
+  {"snapshot_message":true},
+  {"snapshot_choices":true},
+  {"read":["800418D8",4],"expect":"00000000"},
+  {"read":["8019B000",4],"expect":"00000000"},
+  {"save_state":true}
+]

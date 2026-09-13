@@ -6,8 +6,10 @@
 drawing-buffer correction. The [focused verification](checkpoints/V2_PERFORMANCE_FIXES.md)
 passes on the current cartridge, including all sixteen credits pages, sampled
 fades, unchanged geometry, and native museum/villager/player identity handling.
-Original-hardware confirmation of the reported long screen freezes remains
-pending. No save migration is required; do not reopen accepted V1 save tests.
+The [ordinary K.K. Western performance](checkpoints/KK_ORDINARY_PERFORMANCE.md)
+also completes, with no measured frozen interval of at least 0.5 seconds across
+the recorded 156-second sequence. No all-song or exhaustive hardware test is
+claimed. No save migration is required; do not reopen accepted V1 save tests.
 
 ## Publication
 
