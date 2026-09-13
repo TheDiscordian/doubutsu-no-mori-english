@@ -3,20 +3,23 @@
 ## Compact N64 keyboard presentation
 
 The [key-only tray and attached N64-style sections](../specs/KEYBOARD_V2_LAYOUT.md)
-are complete in **V2-10**, at `build/v2-keyboard-polish-10-final/`.
+are complete in **V2-11**, at `build/v2-keyboard-fit-11/`.
+The Cursor shell is eight pixels narrower and four pixels left, with its
+contents re-centred. Page/Done and their icons sit four pixels lower inside
+a 30-pixel-high shell. Only position/size tables change from V2-10.
 R Space and Z Page exchange places, as do the A/B and C-button groups.
 Analytic antialiased corners give the grey shells smooth edges without the
-bright top stripes. Seven cartridge checks and one ordinary native input and
+bright top stripes. Eight cartridge checks and one ordinary native input and
 appearance pass verify the changes; existing memory allocation is retained.
 N64 button colours/shapes, animated stick and held-button feedback, complete
 editor/input behaviour, and museum/credits fixes remain intact. Only the
 visible case-alteration/order combo hints are removed, not their shortcuts.
-The [polish checkpoint](checkpoints/KEYBOARD_V2_POLISH.md) owns exact evidence
+The [fit checkpoint](checkpoints/KEYBOARD_V2_FIT.md) owns exact evidence
 and remaining hardware/other-caller acceptance; no implementation is pending.
 
 ## Current V2 corrections
 
-**V2-10** retains the faraway museum recipient label and the credits
+**V2-11** retains the faraway museum recipient label and the credits
 drawing-buffer correction. The [focused verification](checkpoints/V2_PERFORMANCE_FIXES.md)
 passes on V2-08's unchanged resources, including all sixteen credits pages, sampled
 fades, unchanged geometry, and native museum/villager/player identity handling.
@@ -37,8 +40,8 @@ edit the released trailer.
 ## Local browser patcher and map correction
 
 The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
-`build/web-portal-05/site`. Browser-only patching of both verified game inputs
-produces current V2-10. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
+`build/web-portal-06/site`. Browser-only patching of both verified game inputs
+produces current V2-11. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
 omits the independent Japanese `むら` image beside the town name without save,
 code, allocation, or unrelated-art changes. The released trailer is untouched.
 Implementation and focused verification are complete; user portal feedback,
@@ -80,10 +83,10 @@ The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
 and saved capacities remain intact. The current development ROM is
-`build/v2-keyboard-polish-10-final/Animal Forest English V2.z64`, retaining the
+`build/v2-keyboard-fit-11/Animal Forest English V2.z64`, retaining the
 map-suffix correction and adding the compact N64-style layout.
 
-The [polish record](checkpoints/KEYBOARD_V2_POLISH.md) owns current checks,
+The [fit record](checkpoints/KEYBOARD_V2_FIT.md) owns current checks,
 exact artifacts, and limits. The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md)
 retains the earlier accepted editor evidence. Do not repeat resolved setup work.
 

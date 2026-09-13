@@ -28,8 +28,8 @@ static Gfx *af_bg_panel(Gfx *g, int x, int y, int width, int height) {
     /* Nine-slice a shared antialiased quarter-circle at each shell's radius. */
     static const unsigned char sections[][5]={
         {42,112,62,24,12}, {108,112,64,20,10}, {176,112,62,24,12},
-        {12,150,54,70,24}, {236,114,64,61,20},
-        {228,175,76,56,22}, {87,198,148,36,18}
+        {12,150,54,70,24}, {232,114,56,61,20},
+        {228,175,76,56,22}, {87,198,148,30,15}
     };
     unsigned int i,j,k;
     (void)width; (void)height;

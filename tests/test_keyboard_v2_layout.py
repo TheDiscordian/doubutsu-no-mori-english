@@ -14,7 +14,9 @@ import keyboard_v2_layout as layout
 from keyboard_rc1_fix import metrics
 from npc_mail_show import relocate_verified_data
 
-OUT=ROOT/os.environ.get('AF_LAYOUT_BUILD','build/v2-keyboard-polish-10-final')
+OUT=ROOT/os.environ.get('AF_LAYOUT_BUILD','build/v2-keyboard-fit-11')
+PREVIOUS=ROOT/'build/v2-keyboard-polish-10-final'
+PREVIOUS_SHA='64335524d2159b5715a73f331c741e11ea12b9a98c67a5903905e406765ddb01'
 
 
 class KeyboardLayoutTests(unittest.TestCase):
@@ -44,10 +46,10 @@ class KeyboardLayoutTests(unittest.TestCase):
         struct.pack_into('>4I',owner,layout.v2.SPEC['owner_at'],layout.VROM,
             layout.VROM+len(self.data),layout.RAM,layout.RAM+len(self.data))
         self.assertEqual(owner,self.new[layout.OWNER].extract(self.rom))
-        previous=(ROOT/'build/v2-keyboard-layout-09-final/Animal Forest English V2.z64').read_bytes()
-        self.assertEqual(sha256(previous),'980760ee4153490ad4041b4424795167ddd2e078616261f17e93bac1924551a6')
+        previous=(PREVIOUS/'Animal Forest English V2.z64').read_bytes()
+        self.assertEqual(sha256(previous),PREVIOUS_SHA)
         for v,entry in by_vrom(previous).items():
-            if v not in (layout.VROM,layout.RELOC,layout.OWNER,0x19D40):
+            if v not in (layout.VROM,0x19D40):
                 self.assertEqual(entry.extract(previous),self.new[v].extract(self.rom),hex(v))
 
     def test_complete_editor_input_prefix_at_two_load_addresses(self):
@@ -70,8 +72,8 @@ class KeyboardLayoutTests(unittest.TestCase):
         self.assertEqual([r[3] for r in icons],[0,0x20,0x2000,0x8000,0x4000,0x10,0x1000,8,2,1,4])
         for row in icons[1:]:self.assertNotEqual(row[0],row[1])
         positions={r[3]:r[6:8] for r in icons}
-        for button,position in ((0x10,(180,118)),(0x2000,(104,202)),
-                                (0x8000,(242,181)),(0x4000,(254,203)),(8,(263,119))):
+        for button,position in ((0x10,(180,118)),(0x2000,(104,206)),(0x1000,(170,208)),
+                                (0x8000,(242,181)),(0x4000,(254,203)),(8,(255,119))):
             self.assertEqual(positions[button],position)
         for value in (b'L+A:',b'L+Z:',b'Alter'):
             self.assertNotIn(value,self.data[layout.PREFIX:])
@@ -100,7 +102,7 @@ class KeyboardLayoutTests(unittest.TestCase):
             return self.data[matches[0]:matches[0]+size]
         sections=list(struct.iter_unpack('>5B',table('sections',35)))
         self.assertEqual(sections,[(42,112,62,24,12),(108,112,64,20,10),(176,112,62,24,12),
-            (12,150,54,70,24),(236,114,64,61,20),(228,175,76,56,22),(87,198,148,36,18)])
+            (12,150,54,70,24),(232,114,56,61,20),(228,175,76,56,22),(87,198,148,30,15)])
         for x,y,w,h,radius in sections:
             self.assertTrue(0<radius<=min(w,h)//2)
             self.assertTrue(0<=x<x+w<=320 and 0<=y<y+h<=240)
@@ -122,13 +124,29 @@ class KeyboardLayoutTests(unittest.TestCase):
         self.assertEqual(pixels[0],0)
         self.assertEqual(pixels[-1],15)
         self.assertTrue(all(pixels[y*16+x]==pixels[x*16+y] for x in range(16) for y in range(16)))
-        old_dir=ROOT/'build/v2-keyboard-layout-09-final'
+        old_dir=PREVIOUS
         old_report=json.loads((old_dir/'build.json').read_text())
         old_rom=(old_dir/'Animal Forest English V2.z64').read_bytes()
         old_data=by_vrom(old_rom)[layout.VROM].extract(old_rom)
         for name in ('af_bg_frame_a','af_bg_frame_b'):
             a,b=old_report['editor']['symbols'][name],symbols[name]
             self.assertEqual(old_data[a:a+1024],self.data[b:b+1024])
+
+    def test_only_position_tables_change_from_previous_keyboard(self):
+        previous=(PREVIOUS/'Animal Forest English V2.z64').read_bytes()
+        before=by_vrom(previous)[layout.VROM].extract(previous)
+        symbols=self.report['editor']['symbols']
+        old_report=json.loads((PREVIOUS/'build.json').read_text())
+        self.assertEqual(symbols,old_report['editor']['symbols'])
+        self.assertEqual(len(before),len(self.data))
+        allowed=set()
+        for prefix,size in (('af_v2_icons',264),('labels.',64),('sections.',35)):
+            addresses=[v for k,v in symbols.items() if k==prefix or k.startswith(prefix)]
+            self.assertEqual(len(addresses),1)
+            allowed.update(range(addresses[0],addresses[0]+size))
+        changed={i for i,(a,b) in enumerate(zip(before,self.data)) if a!=b}
+        self.assertTrue(changed)
+        self.assertFalse(changed-allowed)
 
 
 if __name__=='__main__':unittest.main()

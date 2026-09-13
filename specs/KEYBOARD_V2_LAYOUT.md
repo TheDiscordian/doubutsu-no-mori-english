@@ -17,6 +17,9 @@ page indicator. This is presentation work, not an input or save-format change.
 R Space occupies the upper-right shoulder, with Z Page below the key tray.
 The C-button cluster and Cursor caption sit above the A/B Type/Del section on
 the right. Captions and button-letter press feedback move with their artwork.
+The Cursor shell occupies `(232,114)`, width 56 and height 61, with its contents
+centred at X=260. Page/Done sit four pixels lower, inside a 148×30 shell at
+`(87,198)` with 15-pixel corners; the caption position is Y=209.
 
 ## Drawing and ownership
 

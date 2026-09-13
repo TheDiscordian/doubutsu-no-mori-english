@@ -120,7 +120,7 @@ def build(native,base,out):
     patch=make_ups(native,image)
     if apply_ups(native,patch)!=image or sources()!=before:
         raise ValueError('Layout patch reconstruction or source consistency failed')
-    return image,patch,{'build':'V2-10','output_sha256':sha256(image),'patch_sha256':sha256(patch),
+    return image,patch,{'build':'V2-11','output_sha256':sha256(image),'patch_sha256':sha256(patch),
         'baseline_sha256':BASE_SHA,'sources':before,'editor':compiled,'frame':frame_report,
         'native_artwork':artwork,'shared_growth_bytes':growth,'additional_pool_bytes':0,
         'input_code_changed':False,'save_format_changed':False,'key_positions_changed':False,
@@ -130,7 +130,7 @@ def build(native,base,out):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,default=ROOT/'build/v2-keyboard-polish-10-final')
+    parser.add_argument('--output',type=Path,default=ROOT/'build/v2-keyboard-fit-11')
     args=parser.parse_args(); out=args.output.resolve()
     if not out.is_relative_to(ROOT/'build') or out.exists(): raise ValueError('Choose a fresh ignored output')
     out.mkdir(parents=True)

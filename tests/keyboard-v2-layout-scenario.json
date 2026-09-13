@@ -20,6 +20,8 @@
   {"load_state":true},
   {"capture":"layout-restored.png","hide_cursor":true},
   {"snapshot_keyboard":true,"expect_keyboard":{"length":0}},
+  {"capture":"layout-done.png","capture_keys":"Return","hide_cursor":true},
+  {"load_state":true},
   {"read":["80000318",4],"expect":"00800000"},
   {"read":["8019C8D0",16],"expect":"AF32C0DEAF32C0DEAF32C0DEAF32C0DE"},
   {"read":["800418D8",4],"expect":"00000000"}
