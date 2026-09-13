@@ -1,23 +1,32 @@
 # Completion queue
 
+## Current V2 corrections
+
+**V2-08** implements the faraway museum recipient label and the credits
+drawing-buffer correction. The [focused verification](checkpoints/V2_PERFORMANCE_FIXES.md)
+passes on the current cartridge, including all sixteen credits pages, sampled
+fades, unchanged geometry, and native museum/villager/player identity handling.
+Original-hardware confirmation of the reported long screen freezes remains
+pending. No save migration is required; do not reopen accepted V1 save tests.
+
 ## Publication
 
 The existing development repository contains the complete website and reviewed
-patch data. GitHub Pages uses Actions; the workflow verifies while private and
-deploys only after the user makes the repository public. Keep the repository
+patch data. The repository is public; GitHub Pages validates and deploys
+main-branch pushes through Actions. Keep the repository
 name. The [publication guide](WEB_PORTAL.md) describes the automatic workflow
-and matching YouTube description URL. Repository visibility and video publication
-are the user's remaining actions, not preparation steps for the assistant.
+and matching YouTube description URL. Do not change repository visibility or
+edit the released trailer.
 
 ## Local browser patcher and map correction
 
 The [portal](WEB_PORTAL.md) is running at **http://127.0.0.1:8073/**, serving
-`build/web-portal-02/site`. Browser-only patching of both verified game inputs
-produces current V2-07. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
+`build/web-portal-03/site`. Browser-only patching of both verified game inputs
+produces current V2-08. The [map correction](../specs/MAP_TOWN_SUFFIX_FIX.md)
 omits the independent Japanese `むら` image beside the town name without save,
 code, allocation, or unrelated-art changes. The released trailer is untouched.
 Implementation and focused verification are complete; user portal feedback,
-new hardware findings, and separate public-hosting approval guide further work.
+and new hardware findings guide further work.
 Do not change repository visibility or publish game inputs.
 
 ## Released trailer
@@ -32,9 +41,8 @@ a suggested title, unlisted/release descriptions, and an optional pinned comment
 The thumbnail uses flat, regular lettering and the retained green background;
 handoffs contain one upload image, and the user accepts the revision. The user's
 YouTube upload is linked in the portal. Release copy includes the patcher address,
-`https://thediscordian.github.io/doubutsu-no-mori-english/`; deploy the site there on
-approval and verify that address before public release.
-This resource work does not edit the trailer or authorise public patch hosting.
+`https://thediscordian.github.io/doubutsu-no-mori-english/`.
+This resource work does not edit the trailer.
 
 The [released trailer](checkpoints/TRAILER_TOWN_REVISION.md) is preserved at
 `build/trailer-cut-05/Animal Forest English - Trailer.mp4` and visually reviewed.
@@ -55,9 +63,9 @@ on hardware; that does not block private trailer production.
 The [N64-inspired keyboard](../specs/KEYBOARD_V2.md) is implemented on V1 Final:
 grey shading, native N64 button icons and pressed feedback, and a left-side
 stick graphic. The accepted key layout, sounds, proportional editor, controls,
-and saved capacities remain intact. The private development ROM is
-`build/v2-map-suffix-07/Animal Forest English V2.z64`, with the map-suffix
-correction layered over the unchanged V2-06 keyboard.
+and saved capacities remain intact. The current development ROM is
+`build/v2-performance-fix-08/Animal Forest English V2.z64`, retaining the
+map-suffix correction and unchanged V2-06 keyboard.
 
 The [current feedback record](checkpoints/KEYBOARD_V2_FEEDBACK.md) owns fresh
 checks, exact artifacts, and limits. The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md)
@@ -68,8 +76,7 @@ callers and hardware acceptance of the corrections. No known V2 game change
 is awaiting implementation. This does not reopen V1 save testing or
 block the available development build. Do not invent further RCs, public
 packages, or speculative artwork tasks while awaiting findings. Keep V1 Final
-unchanged. Website/source publication is prepared above; the user controls when
-the repository becomes public.
+unchanged. Publish only the reviewed website files, not local game inputs.
 
 The [private offline V2 handoff](checkpoints/V2_PRIVATE_PACKAGE.md) is complete
 at `build/v2-private-bundle/V2-Development-patch.zip` targets `v2-keyboard-05`;

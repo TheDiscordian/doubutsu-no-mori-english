@@ -7,13 +7,13 @@ part of the site's visitor instructions.
 
 The portal is running at **http://127.0.0.1:8073/** through the enabled
 `animal-forest-portal.service` user service. It remains local-only. The service
-serves `build/web-portal-02/site`, not the repository or its game inputs.
+serves `build/web-portal-03/site`, not the repository or its game inputs.
 
-The planned public address is
+The public address is
 **https://thediscordian.github.io/doubutsu-no-mori-english/**, matching the YouTube
-upload copy. The existing development repository contains the Pages setup and
-is the repository the user reviews and makes public. No rename or second
-repository is needed. Public deployment waits for that visibility change.
+upload copy. The public development repository contains the Pages setup;
+main-branch pushes validate and deploy the website. No rename or second
+repository is needed.
 
 ## Use
 
@@ -33,16 +33,17 @@ Select **Build my English ROM**, then download the verified result.
   YouTube before Play. A direct Watch on YouTube link is always available.
   YouTube controls its player/network behaviour after the visitor opens it.
 
-The browser download is **Animal Crossing N64 - English.z64**, build **V2-07**, including the
-map's omitted Japanese village-suffix image and the current N64 keyboard.
+The browser download is **Animal Crossing N64 - English.z64**, build **V2-08**,
+including the museum recipient and credits-buffer corrections, the map-suffix
+fix, and the current N64 keyboard.
 It is an N64 ROM; this does not patch the GameCube game. The existing local
-cartridge artifact keeps its filename under `build/v2-map-suffix-07/`.
+cartridge artifact keeps its filename under `build/v2-performance-fix-08/`.
 
 Output SHA-256:
-`400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25`.
+`08aa1c4418848138803059a68de667f473f9da490d7c0866ee501c58b8d0896b`.
 
 Expansion Pak, 128-KiB FlashRAM, and RTC remain required. Saved formats are
-unchanged from V1 Final and V2-06; compatibility is expected both ways without
+unchanged from V1 Final and V2-07; compatibility is expected both ways without
 migration. Back up saves and match the EverDrive save filename to the ROM name.
 The page does not inspect or migrate saves. New hardware acceptance is not
 implied by an exact patch-output checksum.
@@ -64,13 +65,11 @@ its result against the existing target ROM, and copies only explicitly selected
 website/media/source-note files. Do not serve the repository or the parent of
 `build/`. Point the local unit at the new export's `site` directory when switching.
 
-For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-02
+For copy/style changes, `python3 tools/build_portal.py --output build/web-portal-03
 --refresh-web` updates the verified live export from `web/`, including current
 download metadata. It rejects unrecorded edits to the served files and checks
 the existing patch identity. It does not rebuild the ROM, regenerate the patch,
-or edit the trailer. It retires the known redundant MP4 export copy to
-`build/web-portal-02/retired-site-trailer.mp4`, outside the served folder, after
-checking the file identity. New exports contain no MP4. Source hashes and the
+or edit the trailer. Exports contain no MP4. Source hashes and the
 YouTube destination and public-credit hashes in the export receipt are refreshed.
 Public credits come from `web/SOURCE_NOTES.txt`, not the longer research notes.
 Server CSP changes
@@ -84,10 +83,10 @@ from the private inputs and the successful sparse-ISO browser fixture. The
 patcher retains SHA-256 input/resource/output validation; displayed MD5s are
 for manual file identification, not a replacement for those safeguards.
 
-The GameCube input supplies **2,783,500 bytes** used in the output. The browser
+The GameCube input supplies **2,783,748 bytes** used in the output. The browser
 reads and hashes `forest_1st.arc`, `forest_2nd.arc`, and Yaz0-decoded
-`foresta.rel.szs`. The recipe contains 23,082 copy/literal commands and is
-1,889,613 bytes compressed. This is a genuine two-input reconstruction, not a
+`foresta.rel.szs`. The recipe contains 23,086 copy/literal commands and is
+1,889,726 bytes compressed. This is a genuine two-input reconstruction, not a
 disc-header gate in front of an otherwise independent patch.
 
 ## GitHub Pages publication
@@ -104,16 +103,10 @@ validation and deployment. No repository rename or separate website repository
 is involved. The complete website and recipe are committed; deployment requires
 no ROMs, developer computer, or extra secret token.
 
-The publication sequence is:
-
-1. Review the repository and its history. Making it public exposes the source
-   and development records as well as the website files.
-2. Change the repository from private to public. GitHub's `public` event starts
-   the workflow automatically. Main-branch pushes also run it.
-3. Wait for **Validate and deploy website** to succeed, then visit
-   **https://thediscordian.github.io/doubutsu-no-mori-english/**.
-4. Make the YouTube trailer public when the live patcher is ready. Its release
-   description already uses this address.
+For game corrections, rebuild and verify the recipe from the corrected cartridge,
+update `web/release/` and the staging tool's pinned hashes, and push the complete
+change to `main`. Confirm **Validate and deploy website** succeeds and the live
+manifest and recipe match the new build. The released trailer stays unchanged.
 
 While private, the workflow stages and tests the website and preserves the
 verified artifact, but skips deployment. A manual workflow run is available if
@@ -146,8 +139,9 @@ remaining game-derived patch material. The released trailer is unchanged.
   installed Playwright/Chromium silently against the running portal. It checks
   real CISO and sparse-ISO patch downloads, cancellation, invalid inputs,
   stale-download removal, narrow layouts, and Pages-style subpath patching.
-- `python3 -m unittest tests.test_map_town_suffix_fix -v` checks the corrected
-  cartridge, independent texture reader, complete retained resources, checksum,
-  and original-input UPS.
+- `python3 -m unittest tests.test_v2_performance_fix tests.test_letter_ui_fix.LetterUiHostTests -v`
+  checks the current corrected cartridge and museum helper. The
+  [native verification record](checkpoints/V2_PERFORMANCE_FIXES.md) records all
+  credits pages against the actual drawing-buffer capacity.
 
 These checks do not replay old game builds or replace human hardware testing.

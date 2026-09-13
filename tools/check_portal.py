@@ -20,6 +20,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url', default='http://127.0.0.1:8073/')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--export', type=Path, default=ROOT/'build/web-portal-03',
+                        help='Current export whose site/ is checked at a project subpath')
     args = parser.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT/'build') or out.exists():
@@ -118,7 +120,7 @@ def main():
         class QuietHandler(SimpleHTTPRequestHandler):
             def log_message(self, *args):
                 pass
-        export_parent = ROOT/'build/web-portal-02'
+        export_parent = args.export.resolve()
         with ThreadingHTTPServer(('127.0.0.1', 0), partial(QuietHandler, directory=str(export_parent))) as server:
             thread = Thread(target=server.serve_forever, daemon=True); thread.start()
             subpath_origin = f'127.0.0.1:{server.server_port}'

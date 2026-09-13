@@ -1,0 +1,10 @@
+[
+  {"wait": 8},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_v2_performance": {"build": "build/v2-performance-fix-08"}},
+  {"load_state": true},
+  {"resume": true},
+  {"wait": 2},
+  {"read": ["8019B000", 4], "expect": "00000000"}
+]

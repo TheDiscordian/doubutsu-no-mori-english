@@ -2,21 +2,30 @@
 
 ## Active development
 
-V2 game implementation is complete for the tracked scope; remaining game work
-comes from concrete playtest findings. The README introduces the current V2
+The current cartridge is **V2-08** at
+`build/v2-performance-fix-08/Animal Forest English V2.z64`. It displays the faraway
+museum as `Museum` in the recipient list and removes invisible trailing-space
+drawing from the credits. This resolves the identified font-buffer overflow
+behind the reported screen freezes while K.K. Dirge audio continues.
+All sixteen credits pages fit the real command limit in the native emulator
+check: at most 1,295 of 1,792 commands, versus 2,054 for the reproduced untrimmed
+page. Visible geometry, complete text, fades, guards, and saved data pass.
+The [verification record](checkpoints/V2_PERFORMANCE_FIXES.md) distinguishes
+these results from the pending original-hardware performance confirmation.
+Save formats are unchanged; V2-07 and existing saves remain preserved.
+The README introduces the current V2
 translation to public readers, with patching instructions, hardware requirements,
 credits, and bug reporting rather than private V1/RC handoffs.
 
 The existing `TheDiscordian/doubutsu-no-mori-english` repository contains the
 complete website, reviewed patch recipe, and GitHub Pages workflow. Pages is
-configured for Actions. The workflow validates while private and deploys only
-when the user makes this repository public; no rename or separate repo is needed.
+configured for Actions. The repository is public, and main-branch pushes validate
+and deploy the website; no rename or separate repo is needed.
 The publication address is
 `https://thediscordian.github.io/doubutsu-no-mori-english/`.
 The [publication checkpoint](checkpoints/PAGES_PREPARATION.md) records the
 bounded history review, exact deployment package, and focused verification.
-Private GitHub Actions validation passes and preserves the website artifact;
-the deployment job is correctly skipped. No public deployment is performed.
+Only the reviewed website files are deployed, never ROMs or saves.
 
 The local portal uses the user's [YouTube trailer](https://www.youtube.com/watch?v=UloFru4K4Q8)
 through a click-to-load, sound-enabled embed and a direct viewing link. The
@@ -32,24 +41,24 @@ uses clean, flat lettering over the retained green background and title scene,
 addressing the user's font feedback. The handoff contains one upload-ready file,
 not multiple export sizes. The user accepts the revised thumbnail.
 The upload copy includes the planned public patcher address,
-`https://thediscordian.github.io/doubutsu-no-mori-english/`, which is not live yet.
-No video is uploaded or changed, and no public publication is performed.
+`https://thediscordian.github.io/doubutsu-no-mori-english/`.
+The published trailer remains unchanged.
 
 The [local browser patcher](WEB_PORTAL.md) is running at
-**http://127.0.0.1:8073/**. It builds the current V2-07 from the original N64 ROM
+**http://127.0.0.1:8073/**. It builds the current V2-08 from the original N64 ROM
 and actual English GC donor data inside the browser, without uploads. The
 corrected output includes the reported map `むら` omission. The
 [combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
 cartridge checks, eleven JavaScript checks, real browser-output verification,
-and static-hosting preparation. Public deployment waits for the user's
-repository visibility change.
+and static-hosting preparation. The current museum/credits correction preserves
+the map and keyboard fixes.
 The [visitor-copy pass](checkpoints/PORTAL_VISITOR_COPY.md) uses **Animal Crossing
 N64** branding, removes private release/version prose, and adds six explicit
 input MD5 references to the FAQ. The live browser download uses that public-facing
-name, with unchanged V2-07 contents.
+name.
 
 V2's N64-inspired keyboard is implemented in
-`build/v2-map-suffix-07/Animal Forest English V2.z64` on the preserved
+`build/v2-performance-fix-08/Animal Forest English V2.z64` on the preserved
 V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
 feedback, and an eight-direction left-side stick graphic. The complete input/editor prefix,
 key positions, glyph metrics, sound code, and saved formats are retained.
@@ -68,8 +77,7 @@ a test assumption about the caret and trailing spaces. No old build is replayed.
 The [ordinary work record](checkpoints/KEYBOARD_V2_ORDINARY.md) preserves earlier
 entry, space, caret, deletion, and Start-confirmation evidence. Other keyboard
 callers and hardware acceptance of the new corrections remain playtest limits.
-V1 Final remains unchanged. The repository remains private until the user
-publishes it. Expected V1 Final ↔ V2 save compatibility needs no migration,
+V1 Final remains unchanged. Expected V1 Final ↔ V2 save compatibility needs no migration,
 but those particular loading directions are not independently executed.
 
 The [private offline V2 package](checkpoints/V2_PRIVATE_PACKAGE.md) is complete

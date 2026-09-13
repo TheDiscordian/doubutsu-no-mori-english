@@ -50,6 +50,14 @@ int main(void) {
     assert(af_ui_address_name(name, saved) == 8);
     assert(memcmp(name, "Limberg ", 8) == 0 && identity == 0xE084);
     assert(memcmp(saved, original, 18) == 0);
+    /* A canonical museum identity must not depend on its saved Japanese name. */
+    saved[0x10] = 2; memcpy(original, saved, sizeof(saved)); i = (unsigned int)lookups;
+    assert(af_ui_address_name(name, saved) == 6 && memcmp(name, "Museum", 6) == 0);
+    assert(memcmp(saved, original, 18) == 0 && (unsigned int)lookups == i);
+    saved[0x10] = 7;
+    assert(af_ui_address_name(name, saved) == 6 && memcmp(name, saved, 6) == 0);
+    assert((unsigned int)lookups == i);
+    saved[0x10] = 1;
     /* A correct stored NPC name remains the same visible English name. */
     memcpy(saved, "Buzz  ", 6); saved[0xC] = 140;
     assert(af_ui_address_name(name, saved) == 8 && memcmp(name, "Buzz    ", 8) == 0);

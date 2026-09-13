@@ -27,6 +27,16 @@ Expected local files:
 submodule and fetches the pinned GameCube reference checkout if missing.
 `make references` verifies both pins and tracked source cleanliness.
 
+## Current V2 correction
+
+`python3 tools/v2_performance_fix.py --output build/v2-performance-rebuilt`
+applies the museum recipient and credits drawing-buffer fixes to the verified
+`build/v2-map-suffix-07/Animal Forest English V2.z64`, using the original N64
+input and pinned Docker compiler. It refuses changed inputs and existing output
+directories. The result includes a full original-ROM UPS; no historical gameplay
+tests run. The [correction record](checkpoints/V2_PERFORMANCE_FIXES.md) gives
+the current handoff, output hashes, focused checks, and hardware-testing limits.
+
 ## Complete current V1 recipe
 
 To regenerate the base translation, artwork/title, and all current corrections

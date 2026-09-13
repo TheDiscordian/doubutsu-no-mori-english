@@ -3,8 +3,13 @@
 unsigned int af_ui_address_name(unsigned char *out, const unsigned char *saved) {
     unsigned int i;
     if (!out || !saved) return 0;
-    for (i = 0; i < 8; ++i) out[i] = i < 6 ? saved[i] : ' ';
+    out[6] = out[7] = ' ';
     /* This hook receives an entire 18-byte Mail_nm, not a loose string. */
+    if (saved[0x10] == 2) {
+        static const unsigned char museum[] = "Museum";
+        for (i = 0; i < 6; ++i) out[i] = museum[i];
+        return 6;
+    }
     if (saved[0x10] == 1 && saved[0xC] < 216 &&
             af_ui_load_name(out, 8, 0xE000u | saved[0xC])) return 8;
     /* A failed lookup must not leak partially filled output into fallback. */
