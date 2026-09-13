@@ -11,6 +11,7 @@
   {"capture":"layout-neutral.png","hide_cursor":true},
   {"capture":"layout-stick.png","capture_keys":["w","g"],"hide_cursor":true},
   {"capture":"layout-type.png","capture_keys":"a","hide_cursor":true},
+  {"capture":"layout-delete.png","capture_keys":"b","hide_cursor":true},
   {"load_state":true},
   {"capture":"layout-lower.png","capture_keys":"q","hide_cursor":true},
   {"capture":"layout-symbols.png","capture_keys":"z","hide_cursor":true},

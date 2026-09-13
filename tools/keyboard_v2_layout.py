@@ -1,6 +1,7 @@
 """Install the compact key tray and attached controller sections on exact V2-08."""
 import argparse
 import json
+import math
 from pathlib import Path
 import struct
 
@@ -20,6 +21,18 @@ BASE_SHA='08aa1c4418848138803059a68de667f473f9da490d7c0866ee501c58b8d0896b'
 EDITOR_SHA='74a81fd14005a48ab2a16a6f560aae48aee868066c76a57393352f1240ddd3ff'
 REL_SHA='7890a5c797402f2ec7ac06df7f50eb1eccc3b3b6902089fa1c352be325eecda1'
 VROM,RELOC,OWNER,RAM,PREFIX,CALL=v2.VROM,v2.RELOC,v2.OWNER,v2.RAM,v2.PREFIX,v2.CALL
+
+
+def corner_texture():
+    """Analytic quarter-circle: 8x8 coverage samples and a 16-level I4 mask."""
+    pixels=bytearray()
+    for y in range(16):
+        for x in range(16):
+            covered=sum(math.hypot(16-x-(sx+0.5)/8,16-y-(sy+0.5)/8)<=15.5
+                        for sy in range(8) for sx in range(8))
+            alpha=(covered*15+32)//64
+            pixels.append(alpha)
+    return bytes(pixels[i]<<4|pixels[i+1] for i in range(0,len(pixels),2))
 
 
 def sources():
@@ -66,7 +79,8 @@ def build(native,base,out):
         (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
     frame_report.update(native_panel_bounds=[52,128,236,204],
         adaptation='Unedited frame textures around the key grid only; separate code-drawn N64-style shells',
-        controller_shells='Seven rounded/tapered grey sections, drawn before the key tray')
+        controller_shells='Seven antialiased nine-slice grey shells, drawn before the key tray',
+        corner_sha256=sha256(corner_texture()),corner_format='I4',corner_size=[16,16])
     artwork=v2.assets(native,base,out/'artwork'); origins,_=metrics(base)
     helper,panel=draw_source()
     controls=(ROOT/'overlays/keyboard_v2/controls.c').read_text()
@@ -74,6 +88,8 @@ def build(native,base,out):
     textures='\n'.join('static const unsigned char af_bg_frame_'+name+
         '[1024] __attribute__((aligned(8))) = {'+','.join(map(str,data))+'};'
         for name,data in zip(('a','b'),frames)).encode()+b'\n'
+    textures+=('static const unsigned char af_bg_corner[128] __attribute__((aligned(8))) = {'+
+               ','.join(map(str,corner_texture()))+'};\n').encode()
     metric_source=('static const signed char af_key_origins[258][2] = {'+
         ','.join('{'+f'{a},{b}'+'}' for a,b in struct.iter_unpack('>2b',origins))+'};\n').encode()
     recovered=reconstruct(native,base,{VROM:prefix,RELOC:relocation},resized=(VROM,RELOC))
@@ -104,7 +120,7 @@ def build(native,base,out):
     patch=make_ups(native,image)
     if apply_ups(native,patch)!=image or sources()!=before:
         raise ValueError('Layout patch reconstruction or source consistency failed')
-    return image,patch,{'build':'V2-09','output_sha256':sha256(image),'patch_sha256':sha256(patch),
+    return image,patch,{'build':'V2-10','output_sha256':sha256(image),'patch_sha256':sha256(patch),
         'baseline_sha256':BASE_SHA,'sources':before,'editor':compiled,'frame':frame_report,
         'native_artwork':artwork,'shared_growth_bytes':growth,'additional_pool_bytes':0,
         'input_code_changed':False,'save_format_changed':False,'key_positions_changed':False,
@@ -114,7 +130,7 @@ def build(native,base,out):
 
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,default=ROOT/'build/v2-keyboard-layout-09-final')
+    parser.add_argument('--output',type=Path,default=ROOT/'build/v2-keyboard-polish-10-final')
     args=parser.parse_args(); out=args.output.resolve()
     if not out.is_relative_to(ROOT/'build') or out.exists(): raise ValueError('Choose a fresh ignored output')
     out.mkdir(parents=True)

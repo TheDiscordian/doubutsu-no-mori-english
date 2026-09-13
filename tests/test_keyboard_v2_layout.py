@@ -14,7 +14,7 @@ import keyboard_v2_layout as layout
 from keyboard_rc1_fix import metrics
 from npc_mail_show import relocate_verified_data
 
-OUT=ROOT/os.environ.get('AF_LAYOUT_BUILD','build/v2-keyboard-layout-09-final')
+OUT=ROOT/os.environ.get('AF_LAYOUT_BUILD','build/v2-keyboard-polish-10-final')
 
 
 class KeyboardLayoutTests(unittest.TestCase):
@@ -44,6 +44,11 @@ class KeyboardLayoutTests(unittest.TestCase):
         struct.pack_into('>4I',owner,layout.v2.SPEC['owner_at'],layout.VROM,
             layout.VROM+len(self.data),layout.RAM,layout.RAM+len(self.data))
         self.assertEqual(owner,self.new[layout.OWNER].extract(self.rom))
+        previous=(ROOT/'build/v2-keyboard-layout-09-final/Animal Forest English V2.z64').read_bytes()
+        self.assertEqual(sha256(previous),'980760ee4153490ad4041b4424795167ddd2e078616261f17e93bac1924551a6')
+        for v,entry in by_vrom(previous).items():
+            if v not in (layout.VROM,layout.RELOC,layout.OWNER,0x19D40):
+                self.assertEqual(entry.extract(previous),self.new[v].extract(self.rom),hex(v))
 
     def test_complete_editor_input_prefix_at_two_load_addresses(self):
         old=self.old[layout.VROM].extract(self.base); rel=self.old[layout.RELOC].extract(self.base)
@@ -64,6 +69,10 @@ class KeyboardLayoutTests(unittest.TestCase):
         icons=list(struct.iter_unpack('>IIIHBBHHBBBB',self.data[at:at+264]))
         self.assertEqual([r[3] for r in icons],[0,0x20,0x2000,0x8000,0x4000,0x10,0x1000,8,2,1,4])
         for row in icons[1:]:self.assertNotEqual(row[0],row[1])
+        positions={r[3]:r[6:8] for r in icons}
+        for button,position in ((0x10,(180,118)),(0x2000,(104,202)),
+                                (0x8000,(242,181)),(0x4000,(254,203)),(8,(263,119))):
+            self.assertEqual(positions[button],position)
         for value in (b'L+A:',b'L+Z:',b'Alter'):
             self.assertNotIn(value,self.data[layout.PREFIX:])
         for flag in ('input_code_changed','save_format_changed','key_positions_changed',
@@ -79,7 +88,8 @@ class KeyboardLayoutTests(unittest.TestCase):
         self.assertIn(b'52+x-42,128+y-113,184,76',panel)
         self.assertIn(b'x+width>320 || y+height>240',panel)
         self.assertIn(b'!space(graph,8192)',helper)
-        self.assertIn(b'gDPFillRectangle(g++,px+edge,top,px+p[2]-edge,bottom)',panel)
+        self.assertNotIn(b'gDPFillRectangle',panel)
+        self.assertIn(b'G_TF_BILERP',panel)
         self.assertEqual(self.report['frame']['native_panel_bounds'],[52,128,236,204])
 
     def test_compiled_grips_and_button_letter_positions(self):
@@ -89,17 +99,36 @@ class KeyboardLayoutTests(unittest.TestCase):
             self.assertEqual(len(matches),1)
             return self.data[matches[0]:matches[0]+size]
         sections=list(struct.iter_unpack('>5B',table('sections',35)))
-        rounded,grip=table('rounded',16),table('grip',16)
-        self.assertEqual(sections,[(42,112,62,24,0),(108,112,64,20,0),(176,112,62,24,0),
-            (12,150,54,70,1),(228,115,76,50,0),(234,158,66,72,1),(87,198,148,36,1)])
-        for x,y,w,h,taper in sections:
-            for row in range(16):
-                edge=(grip if taper else rounded)[row]*w//64
-                self.assertTrue(0<=x+edge<x+w-edge<=320)
-                self.assertTrue(0<=y+row*h//16<y+(row+1)*h//16<=240)
+        self.assertEqual(sections,[(42,112,62,24,12),(108,112,64,20,10),(176,112,62,24,12),
+            (12,150,54,70,24),(236,114,64,61,20),(228,175,76,56,22),(87,198,148,36,18)])
+        for x,y,w,h,radius in sections:
+            self.assertTrue(0<radius<=min(w,h)//2)
+            self.assertTrue(0<=x<x+w<=320 and 0<=y<y+h<=240)
+            xs,ys=[x,x+radius,x+w-radius,x+w],[y,y+radius,y+h-radius,y+h]
+            self.assertEqual(sum((xs[c+1]-xs[c])*(ys[r+1]-ys[r])
+                                 for r in range(3) for c in range(3)),w*h)
         letters=list(struct.iter_unpack('>HHBB2s',table('letters',32)))
-        self.assertEqual(letters,[(0x20,107,115,0,b'L\0'),(0x10,215,206,0,b'R\0'),
-            (0x8000,493,121,1,b'A\0'),(0x4000,518,143,1,b'B\0')])
+        self.assertEqual(letters,[(0x20,107,115,0,b'L\0'),(0x10,371,115,0,b'R\0'),
+            (0x8000,493,181,1,b'A\0'),(0x4000,518,203,1,b'B\0')])
+
+    def test_antialiased_corner_and_unedited_gc_tray(self):
+        symbols=self.report['editor']['symbols']; at=symbols['af_bg_corner']
+        packed=self.data[at:at+128]
+        self.assertEqual(packed,layout.corner_texture())
+        self.assertEqual(sha256(packed),self.report['frame']['corner_sha256'])
+        self.assertEqual(self.report['frame']['corner_format'],'I4')
+        pixels=[alpha for p in packed for alpha in (p>>4,p&15)]
+        self.assertTrue(any(0<p<15 for p in pixels))
+        self.assertEqual(pixels[0],0)
+        self.assertEqual(pixels[-1],15)
+        self.assertTrue(all(pixels[y*16+x]==pixels[x*16+y] for x in range(16) for y in range(16)))
+        old_dir=ROOT/'build/v2-keyboard-layout-09-final'
+        old_report=json.loads((old_dir/'build.json').read_text())
+        old_rom=(old_dir/'Animal Forest English V2.z64').read_bytes()
+        old_data=by_vrom(old_rom)[layout.VROM].extract(old_rom)
+        for name in ('af_bg_frame_a','af_bg_frame_b'):
+            a,b=old_report['editor']['symbols'][name],symbols[name]
+            self.assertEqual(old_data[a:a+1024],self.data[b:b+1024])
 
 
 if __name__=='__main__':unittest.main()

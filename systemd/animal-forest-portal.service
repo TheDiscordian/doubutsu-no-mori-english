@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=%h/Programming/doubutsu-no-mori-english
-ExecStart=/usr/bin/python3 %h/Programming/doubutsu-no-mori-english/tools/serve_portal.py --directory %h/Programming/doubutsu-no-mori-english/build/web-portal-04/site --port 8073
+ExecStart=/usr/bin/python3 %h/Programming/doubutsu-no-mori-english/tools/serve_portal.py --directory %h/Programming/doubutsu-no-mori-english/build/web-portal-05/site --port 8073
 Restart=on-failure
 RestartSec=3
 NoNewPrivileges=yes

@@ -14,17 +14,24 @@ reference guides the separated layout, not the controller design.
 Remove the visible `L+A: Alter` and `L+Z: ABC` combination hints. Keep those
 shortcuts operational, along with ordinary case/page controls and the current
 page indicator. This is presentation work, not an input or save-format change.
+R Space occupies the upper-right shoulder, with Z Page below the key tray.
+The C-button cluster and Cursor caption sit above the A/B Type/Del section on
+the right. Captions and button-letter press feedback move with their artwork.
 
 ## Drawing and ownership
 
 Reuse the verified GC frame textures without pixel edits around the key grid
-at `(52,128)`, width 184 and height 76. Seven code-drawn grey shells support the
-stick, case/page shoulders, page indicator, typing/deletion buttons, caret
-buttons, and space/completion controls. Rounded shoulders and tapered left,
-centre, and right grips use sixteen contiguous shaded bands each; one-cycle
-RDP rectangles have exclusive lower/right edges. Draw shells before the key
-tray so their joins sit underneath its rim. All parts follow the existing
-menu slide coordinates and reject out-of-screen rectangles.
+at `(52,128)`, width 184 and height 76. Seven grey shells support the stick,
+case/space shoulders, page indicator, typing/deletion buttons, caret buttons,
+and page/completion controls. Each uses a shared 16×16 I4 quarter-circle
+generated analytically with 8×8 coverage samples per texel. Nine-slice drawing
+and bilinear filtering retain smooth curves at each shell's corner radius.
+The native I4 combiner uses the sixteen coverage levels for soft alpha and
+edge shading, without a separate bright top stripe. The shells and tray use
+primitive `(223,226,230)` and environment `(174,177,181)` for grey plastic.
+No native button, font, or tray pixels are edited.
+Draw shells before the key tray so their joins sit underneath its rim. All
+parts follow the existing menu slide coordinates and reject off-screen shapes.
 
 Preserve all 30,272 input/editor prefix bytes except its existing four-byte
 drawing hook. Recover the checked prefix solely for suffix compilation. Retain

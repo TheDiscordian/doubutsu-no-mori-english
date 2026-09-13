@@ -30,10 +30,12 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 ## Current V2 correction
 
 `python3 tools/keyboard_v2_layout.py --output build/v2-layout-rebuilt` installs
-the compact key tray and attached N64-style controller sections on the exact
+the compact key tray and smoothly rounded N64-style controller sections on the exact
 V2-08 cartridge at `build/v2-performance-fix-08/Animal Forest English V2.z64`.
 It retains the complete editor/input prefix except its drawing hook, removes
-only the combination labels, and keeps the existing allocation. The builder
+only the combination labels, swaps the requested control groups, and keeps
+the existing allocation. Corner opacity comes from a small analytic I4 mask;
+the native buttons, stick, and GC tray textures retain their pixels. The builder
 requires the decoded GC frame donor and pinned Docker compiler, checks source
 identity and full UPS reconstruction, and refuses existing output directories.
 The [layout specification](../specs/KEYBOARD_V2_LAYOUT.md) describes the current

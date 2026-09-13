@@ -13,8 +13,8 @@ FILES = (
     '.nojekyll', 'SOURCE_NOTES.txt', 'LICENSE-tooling.txt', 'media/town.webp',
     'release/manifest.json', 'release/patch.afwp.gz',
 )
-PATCH_SHA = '06181af88864856eb38125870a7e485ef45f939755b5890bfb9a0fe15c01531b'
-OUTPUT_SHA = '980760ee4153490ad4041b4424795167ddd2e078616261f17e93bac1924551a6'
+PATCH_SHA = 'c97f4986ea30ec07519e7f6653fc0f155667f2c85b21abf278248cd98e70be8d'
+OUTPUT_SHA = '64335524d2159b5715a73f331c741e11ea12b9a98c67a5903905e406765ddb01'
 
 
 def prepare(source, output, public=False):

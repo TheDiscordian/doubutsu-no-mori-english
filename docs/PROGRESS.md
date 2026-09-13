@@ -2,15 +2,17 @@
 
 ## Active development
 
-The current cartridge is **V2-09** at
-`build/v2-keyboard-layout-09-final/Animal Forest English V2.z64`.
+The current cartridge is **V2-10** at
+`build/v2-keyboard-polish-10-final/Animal Forest English V2.z64`.
 The [compact keyboard layout](../specs/KEYBOARD_V2_LAYOUT.md) uses a key-only
 grey tray with separate attached N64-style shoulders and grips, native coloured
 buttons, and the animated N64 stick. Case-alteration/order combination hints
-are hidden; their shortcuts remain active. Six focused cartridge checks and
-ordinary in-game appearance/input checks pass. The 8,000-byte suffix fits the
-existing 8-KiB reservation without pool growth. The
-[layout checkpoint](checkpoints/KEYBOARD_V2_LAYOUT.md) records exact outputs,
+are hidden; their shortcuts remain active. R Space sits above the keys, Z Page
+below, and the C-button section above A/B. Antialiased rounded shells replace
+coarse edges and the bright top stripes. Seven focused cartridge checks and
+ordinary in-game appearance/input checks pass. The suffix fits the existing
+8-KiB reservation without pool growth. The
+[polish checkpoint](checkpoints/KEYBOARD_V2_POLISH.md) records exact outputs,
 the native pass, browser reconstruction, and hardware-testing limits.
 
 The cartridge retains the V2-08 museum/credits corrections. It displays the faraway
@@ -26,7 +28,7 @@ declines a request, and completes K.K. Western through the return to dialogue.
 Continuous analysis of 156 seconds finds no frozen game-picture interval of
 0.5 seconds or longer. The user reports improved appearance; exhaustive hardware
 and all-song testing are not claimed.
-Save formats are unchanged; compatibility with V2-08 is expected both ways
+Save formats are unchanged; compatibility with V2-09 is expected both ways
 without migration. Existing builds and saves remain preserved.
 The README introduces the current V2
 translation to public readers, with patching instructions, hardware requirements,
@@ -60,7 +62,7 @@ The upload copy includes the planned public patcher address,
 The published trailer remains unchanged.
 
 The [local browser patcher](WEB_PORTAL.md) is running at
-**http://127.0.0.1:8073/**. It builds the current V2-09 from the original N64 ROM
+**http://127.0.0.1:8073/**. It builds the current V2-10 from the original N64 ROM
 and actual English GC donor data inside the browser, without uploads. The
 corrected output includes the reported map `むら` omission. The
 [combined checkpoint](checkpoints/MAP_SUFFIX_AND_PORTAL.md) records four
@@ -73,15 +75,15 @@ input MD5 references to the FAQ. The live browser download uses that public-faci
 name.
 
 V2's N64-inspired keyboard is implemented in
-`build/v2-keyboard-layout-09-final/Animal Forest English V2.z64` on the preserved
+`build/v2-keyboard-polish-10-final/Animal Forest English V2.z64` on the preserved
 V1 Final baseline. It adds grey shading, native N64 button artwork and pressed
 feedback, and an eight-direction left-side stick graphic. The complete input/editor prefix,
 key positions, glyph metrics, sound code, and saved formats are retained.
 The keyboard compensates for horizontal font-projection shrink so letters
 remain centred across the bubbles. Cursor/C-button positions and A/L/R labels
 are adjusted left; A/B/L/R lettering depresses with the button art.
-The suffix uses 8,000 of 8,192 reserved bytes; no pool allocation changes.
-Six focused layout checks pass on this build; the decoder and direction-helper
+The suffix uses all 8,192 reserved bytes; no pool allocation changes.
+Seven focused layout checks pass on this build; the decoder and direction-helper
 evidence remain applicable to the unchanged implementations.
 
 The [feedback record](checkpoints/KEYBOARD_V2_FEEDBACK.md) records

@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--url', default='http://127.0.0.1:8073/')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--export', type=Path, default=ROOT/'build/web-portal-04',
+    parser.add_argument('--export', type=Path, default=ROOT/'build/web-portal-05',
                         help='Current export whose site/ is checked at a project subpath')
     args = parser.parse_args()
     out = args.output.resolve()
