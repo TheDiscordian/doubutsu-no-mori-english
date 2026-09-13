@@ -1,11 +1,11 @@
 {
   "format": 1,
   "label": "V2 \u00b7 N64 keyboard edition",
-  "build": "V2-08",
+  "build": "V2-09",
   "public_release": false,
   "source_sha256": "d9417be056534fcc0bdff2e6cd5f1135511be7c0a4dace04a96a2649596ce908",
   "source_size": 16777216,
-  "output_sha256": "08aa1c4418848138803059a68de667f473f9da490d7c0866ee501c58b8d0896b",
+  "output_sha256": "980760ee4153490ad4041b4424795167ddd2e078616261f17e93bac1924551a6",
   "output_size": 33554432,
   "output_name": "Animal Crossing N64 - English.z64",
   "disc_id": "GAFE01",
@@ -38,10 +38,10 @@
   ],
   "recipe": {
     "file": "patch.afwp.gz",
-    "sha256": "5d78bca089e2589e5647074662374b2096f10960cf934e27ecc916dbc43b0081",
-    "size": 1889726,
-    "decoded_sha256": "ae774f47c8270417075a9fd678e78e16814fa1ce9a8a42a42e2c22f9c6dd97ea",
-    "decoded_size": 5456620
+    "sha256": "06181af88864856eb38125870a7e485ef45f939755b5890bfb9a0fe15c01531b",
+    "size": 1889751,
+    "decoded_sha256": "cb9076b0d3549f4a1ab53906777b8bff7e5ff6c848fd04f22999e301d77fe28e",
+    "decoded_size": 5457364
   },
   "requirements": {
     "expansion_pak": true,
@@ -51,13 +51,13 @@
   },
   "save_compatibility": "Back up existing saves before playing a patched game. The patcher does not read or change save files.",
   "stats": {
-    "commands": 23086,
-    "literal_bytes": 5087228,
-    "gc_copy_bytes": 2783748,
+    "commands": 23085,
+    "literal_bytes": 5087988,
+    "gc_copy_bytes": 2783500,
     "gc_copy_bytes_by_resource": [
       647282,
       1902877,
-      233589
+      233341
     ]
   }
 }

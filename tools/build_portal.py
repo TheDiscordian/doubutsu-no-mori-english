@@ -11,7 +11,7 @@ from aflib import ROM_SHA256, verified_rom, sha256, yaz0_decode, n64_checksum
 from gamecube import Disc
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGET_SHA = '08aa1c4418848138803059a68de667f473f9da490d7c0866ee501c58b8d0896b'
+TARGET_SHA = '980760ee4153490ad4041b4424795167ddd2e078616261f17e93bac1924551a6'
 DONORS = ('forest_1st.arc', 'forest_2nd.arc', 'foresta.rel.szs')
 WEB_FILES = ('index.html', 'style.css', 'app.mjs', 'core.mjs', 'worker.mjs', 'mark.svg')
 NOTICE_FILES = ('SOURCE_NOTES.txt', 'LICENSE-tooling.txt', '.nojekyll')
@@ -151,7 +151,7 @@ def main():
     parser.add_argument('--refresh-web', action='store_true', help='Refresh an existing verified site without rebuilding its patch or media')
     parser.add_argument('--rom', type=Path, default=ROOT/'local/rom/Doubutsu no Mori (Japan).z64')
     parser.add_argument('--disc', type=Path, default=ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
-    parser.add_argument('--target', type=Path, default=ROOT/'build/v2-performance-fix-08/Animal Forest English V2.z64')
+    parser.add_argument('--target', type=Path, default=ROOT/'build/v2-keyboard-layout-09-final/Animal Forest English V2.z64')
     args = parser.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT/'build'):
@@ -164,7 +164,7 @@ def main():
     source = verified_rom(args.rom.read_bytes())
     target = args.target.read_bytes()
     if sha256(target) != TARGET_SHA or struct.unpack_from('>2I', target, 0x10) != n64_checksum(target):
-        raise ValueError('Expected the checksummed V2-08 museum/credits correction cartridge')
+        raise ValueError('Expected the checksummed V2-09 compact N64 keyboard cartridge')
     resources, buffers = donor_resources(args.disc)
     recipe, stats = make_recipe(source, target, buffers)
     compressed = gzip.compress(recipe, compresslevel=9, mtime=0)
@@ -173,7 +173,7 @@ def main():
     (site/'media').mkdir()
     for name in WEB_FILES + NOTICE_FILES:
         shutil.copyfile(ROOT/'web'/name, site/name)
-    manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-08',
+    manifest = {'format': 1, 'label': 'V2 · N64 keyboard edition', 'build': 'V2-09',
         'public_release': False, 'source_sha256': ROM_SHA256, 'source_size': len(source),
         'output_sha256': TARGET_SHA, 'output_size': len(target),
         'output_name': DOWNLOAD_NAME,

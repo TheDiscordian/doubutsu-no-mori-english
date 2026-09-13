@@ -29,13 +29,23 @@ submodule and fetches the pinned GameCube reference checkout if missing.
 
 ## Current V2 correction
 
+`python3 tools/keyboard_v2_layout.py --output build/v2-layout-rebuilt` installs
+the compact key tray and attached N64-style controller sections on the exact
+V2-08 cartridge at `build/v2-performance-fix-08/Animal Forest English V2.z64`.
+It retains the complete editor/input prefix except its drawing hook, removes
+only the combination labels, and keeps the existing allocation. The builder
+requires the decoded GC frame donor and pinned Docker compiler, checks source
+identity and full UPS reconstruction, and refuses existing output directories.
+The [layout specification](../specs/KEYBOARD_V2_LAYOUT.md) describes the current
+geometry and verification boundary.
+
 `python3 tools/v2_performance_fix.py --output build/v2-performance-rebuilt`
 applies the museum recipient and credits drawing-buffer fixes to the verified
 `build/v2-map-suffix-07/Animal Forest English V2.z64`, using the original N64
 input and pinned Docker compiler. It refuses changed inputs and existing output
 directories. The result includes a full original-ROM UPS; no historical gameplay
 tests run. The [correction record](checkpoints/V2_PERFORMANCE_FIXES.md) gives
-the current handoff, output hashes, focused checks, and hardware-testing limits.
+the museum/credits output hashes, focused checks, and hardware-testing limits.
 
 ## Complete current V1 recipe
 

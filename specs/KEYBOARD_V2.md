@@ -2,10 +2,12 @@
 
 ## Active scope
 
-V2 implementation is authorised. Keep V1 Final and its accepted results intact,
-use its exact cartridge as the development baseline, and create V2 outputs in
-new ignored directories. No public release is authorised; the repository and
-all patch artifacts remain private. Publication approval is not the active task.
+Keep V1 Final and its accepted results intact and create V2 outputs in new
+ignored directories. The repository and browser patcher are public; ROMs,
+saves, and extracted assets remain private. The
+[compact-layout specification](KEYBOARD_V2_LAYOUT.md) owns the current tray,
+N64 shell geometry, control positions, and visible hints. This document defines
+the underlying native artwork, input, and rendering behaviour it retains.
 
 ## Requested presentation
 
