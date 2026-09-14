@@ -297,8 +297,13 @@ Five focused checks and the corrected 103-record native run pass: complete
 poses, hit/retrigger/stop timing, native state-based sound dispatch, both matrix
 banks' drawing commands, and memory/save guards. The complete hit-sound program,
 instrument, envelopes, loop, predictor book, and 11,062-byte sample are converted;
-five audio checks pass. Native sound registration/allocation and synthesis,
-callback/profile installation, stable item readers, ordinary gameplay, and GPU
+five audio checks pass. The [sound installer](checkpoints/V3_SPEED_BAG_SOUND.md)
+adds the real hit through the original native audio loader, preserves all original
+audio, and leaves 608 bytes of conservative permanent-heap spare capacity.
+Four focused checks and the corrected build's first 58-step native run pass,
+including actual trigger/retrigger, completed imported-sample transfers, and
+guards. Native testing found and fixed an unaligned envelope read. PCM/listening
+verification, callback/profile installation, stable item readers, ordinary gameplay, and GPU
 appearance remain work. These components do not enable Punchy's house or declare
 the item playable.
 No import is enabled for players yet.

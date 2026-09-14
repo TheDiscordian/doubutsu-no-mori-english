@@ -167,7 +167,8 @@ class RSP:
             if (stopped[:3] not in ("T05", "S05") or len(registers) != 71*16
                     or int(registers[37*16:38*16], 16) & 0xFFFFFFFF != 0x800D334C
                     or thread != {"pointer": "80145630", "state": 4, "id": 4}):
-                raise ValueError("Could not establish the native graph-thread test context")
+                raise ValueError("Could not establish the native graph-thread test context: "
+                                 f"stop={stopped}, pc={registers[37*16:38*16]}, thread={thread}")
             return {"test_call_context": "native_graph_frame_entry", "pc": "800D334C",
                     "thread": thread, "previous_context": origin}
         finally:
@@ -1437,6 +1438,12 @@ def main():
                 from v3_speed_bag_callback_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 callback probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_speed_bag_sound'):
+                from v3_speed_bag_sound_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 sound probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture'):

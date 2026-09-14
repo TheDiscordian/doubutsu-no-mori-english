@@ -113,7 +113,8 @@ def compose(native, base, changes, added, *, resized=(), relocated=None):
     relocated = relocated or {}
     scoring_moves = {0x0081D9D0: 0x03F40000, 0x00821740: 0x03F48000}
     all_moves = {**scoring_moves, 0x00827DE0: 0x03F50000, 0x00828C00: 0x03F54000}
-    if (relocated not in ({}, scoring_moves, all_moves)
+    from v3_speed_bag_sound_runtime import RELOCATIONS as sound_moves
+    if (relocated not in ({}, scoring_moves, all_moves, {**all_moves, **sound_moves})
             or not set(relocated) <= set(resized) or set(relocated.values()) & (set(current) | set(added))):
         raise ValueError('Unreviewed V3 resource relocation')
     if not changes and not added and not relocated:
@@ -169,7 +170,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
           save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
           shop_actors=False, shop_floor=False, hra=False, feng_shui=False, houses=False,
-          villager_readers=False, villager_selection=False, villager_rewards=False, clothing=False):
+          villager_readers=False, villager_selection=False, villager_rewards=False, clothing=False,
+          speed_bag_sound=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -213,6 +215,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_display_items
     import v3_display_conversion
     import v3_clothing_catalogue
+    import v3_speed_bag_sound_runtime
+    if speed_bag_sound and not clothing:
+        raise ValueError('Speed-bag sound requires the current complete V3 foundation')
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -292,7 +297,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
                        + v3_clothing_display.SOURCES + v3_display_items.SOURCES + v3_display_conversion.SOURCES
                        + v3_clothing_catalogue.SOURCES
-                       if clothing else ()))
+                       if clothing else ())
+                    + (v3_speed_bag_sound_runtime.SOURCES if speed_bag_sound else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -351,6 +357,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
                   v3_furniture_tables.ABI, v3_clothing_display.ABI, v3_display_items.ABI,
                   v3_display_conversion.ABI, v3_clothing_catalogue.ABI)
+    if speed_bag_sound:
+        abi = max(abi, v3_speed_bag_sound_runtime.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -801,21 +809,39 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         blob_file.extend(bytes(offset-len(blob_file)))
         blob_file.extend(extended_resource)
     additions[BLOB] = bytes(blob_file)
+    sound_changes, sound_report = {}, None
+    if speed_bag_sound:
+        for vrom in v3_speed_bag_sound_runtime.RELOCATIONS:
+            if files[vrom].extract(base) != originals[vrom].extract(native):
+                raise ValueError('Stable audio resources changed before the V3 append')
+        sound_changes, sound_report = v3_speed_bag_sound_runtime.prepare(native, code, audio_donor)
+        relocated.update(v3_speed_bag_sound_runtime.RELOCATIONS)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
                **catalogue_changes, **shop_changes, **shop_actor_changes, **shop_floor_changes,
                **hra_changes, **feng_changes, **house_changes, **reader_changes, **clothing_wear_changes,
-               **clothing_stock_changes, **mannequin_changes}
+               **clothing_stock_changes, **mannequin_changes, **sound_changes}
     resized = (((v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ())
                + ((v3_shops.VROM,) if shops else ()) + ((v3_clothing_stock.VROM,) if clothing else ()) + tuple(relocated)
                + ((v3_villager_houses.HOUSE, v3_villager_houses.FOREGROUND) if houses else ()))
     image = compose(native, base, changes, additions, resized=resized, relocated=relocated)
+    if speed_bag_sound:
+        # Physical placement is known only after composition. The second pass
+        # changes six same-sized instructions, never audio file sizes or order.
+        v3_speed_bag_sound_runtime.bind_physical(native, code, image, sound_report)
+        changes[CODE_VROM] = bytes(code)
+        image = compose(native, base, changes, additions, resized=resized, relocated=relocated)
+        placed = by_vrom(image)
+        for row in sound_report['files'].values():
+            if placed[row['vrom']].pstart != row['physical_rom']:
+                raise ValueError('Audio physical locations changed during final binding')
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 expanded furniture tables 01' if clothing else
+    label = ('V3 speed-bag native sound 01' if speed_bag_sound else
+             'V3 expanded furniture tables 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else
@@ -842,6 +868,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
              'V3 NPC draw development 02' if npc_draw else 'V3 asset-loader development 02')
     return image, patch, {'build': label,
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
+        'speed_bag_sound': sound_report,
         'villager_text': text_report, 'furniture': furniture_report, 'furniture_items': items_report,
         'furniture_room': room_report,
         'furniture_identity': identity_report,
@@ -897,6 +924,7 @@ def main():
     p.add_argument('--villager-selection', action='store_true', help='Integrate subset-aware selection with imports disabled')
     p.add_argument('--villager-rewards', action='store_true', help='Include imported furniture in villager house gifts')
     p.add_argument('--clothing', action='store_true', help='Add the cherry-shirt resource and shared reader; gameplay is not enabled')
+    p.add_argument('--speed-bag-sound', action='store_true', help='Install the actual speed-bag sound; furniture installation remains pending')
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
@@ -918,6 +946,8 @@ def main():
     p.add_argument('--hra', action='store_true', help='Include imported furniture in native HRA scoring and recommendations')
     p.add_argument('--feng-shui', action='store_true', help='Include actual imported furniture colours in native feng shui scoring')
     args = p.parse_args()
+    if args.speed_bag_sound:
+        args.clothing = True
     if args.clothing:
         args.villager_rewards = True
     if args.villager_rewards:
@@ -985,7 +1015,7 @@ def main():
         shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra, feng_shui=args.feng_shui,
         houses=args.villager_houses, villager_readers=args.villager_readers,
         villager_selection=args.villager_selection, villager_rewards=args.villager_rewards,
-        clothing=args.clothing)
+        clothing=args.clothing, speed_bag_sound=args.speed_bag_sound)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

@@ -218,8 +218,12 @@ with later e/e+ donor support investigated separately.
   corrected 103-record native run passing actual interpolation, first hit,
   retrigger/stop timing, sound eligibility, and drawing in both matrix banks.
   The full donor hit sound is converted with five passing audio checks.
-  Next install its sequence/font/wave resources within verified audio capacity,
-  bind the real sound callback, register the profile and stable item readers,
+  The [sound installer](checkpoints/V3_SPEED_BAG_SOUND.md) adds the actual
+  sequence/font/wave data without replacing native resources or enlarging the
+  audio heap. Four focused checks and the corrected build's first 58-step native
+  run pass, including real trigger/retrigger and completed sample transfers.
+  The native envelope-alignment defect is fixed; PCM/listening remains unverified.
+  Next bind the real sound callback, register the profile and stable item readers,
   and connect Punchy's house. Ordinary gameplay and GPU appearance remain open;
   the component checks do not enable the item or villager.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.

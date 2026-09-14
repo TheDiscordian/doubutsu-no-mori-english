@@ -12,9 +12,12 @@ in `overlays/v3/speed_bag.c`; their actual N64 execution passes in private test
 storage. The complete donor hit sound is extracted and assembled into bounded
 native-compatible resources by `tools/v3_speed_bag_audio.py`.
 
-This is not a playable import. Sound registration/allocation, callback/profile
-installation, item registration/readers, and Punchy's house placement remain
-uninstalled. Do not enable Punchy or substitute a static decoration for this
+`tools/v3_speed_bag_sound_runtime.py` installs the real sound through the native
+audio loader, without increasing its heap or replacing existing sounds.
+
+This is not a playable import. Callback/profile installation, item registration/
+readers, and Punchy's house placement remain uninstalled. Do not enable Punchy
+or substitute a static decoration for this
 item. Both served patchers remain V2 until the user tests and approves V3.
 
 ## Verified source identity
@@ -158,10 +161,58 @@ The local audio output consists of:
 - A 27-byte channel/layer/envelope fragment whose sequence offsets, bank selector,
   and instrument slot are explicitly rebound by `bind_program`.
 
-The zero-based fragment and standalone font are conversion artifacts, not a
-registered sound. The installer must integrate the sequence dispatch, font and
-wave data, IDs, DMA metadata, and actual audio-memory capacity before binding
-the callback. Appending bytes to ROM does not enlarge a native audio allocation.
-An existing-font append can reuse these extracted resources; introducing a new
-font also requires reviewing the native font tables and readers. Native synthesis
-and sound lifetime remain unverified. No physical audio is emitted by tests.
+The zero-based fragment and standalone font are conversion artifacts, not
+independently registered sounds. The installer uses the existing sequence 199,
+bank 140, and streamed wave bank 5. No new permanent resource identity is added.
+The complete original three audio files remain unchanged prefixes; appended
+resources retain every original instrument, sample, and sound dispatch.
+
+## Native sound registration and allocation
+
+Native sound **`0169`** has the same trigger priority 70 as donor `0176`.
+Its numeric identity is fixed, not selected by checkbox order. The 128-byte
+native priority table and actual donor priority are verified before installation.
+The expanded group-one table at sequence offset `4C30` retains all 97 original
+entries. Eight reserved entries, `0161..0168`, point to a one-byte `FF`
+terminator at `4D04`; `0169` points to its complete program at `4D05`.
+The program's layer is at `4D0C`, and its custom envelope is at `4D14`.
+
+**The envelope requires even alignment.** The native evaluator at `800F2624`
+uses a signed halfword load. Because the envelope is 15 bytes into the donor
+fragment, the program itself must start at an odd offset. Place the reserved-ID
+terminator before the program to satisfy both this requirement and the unchanged
+240-byte append budget. The sequence's final size is `4D20`.
+
+Bank 140 keeps all 71 original instrument pointers and pointed-to resources.
+Its spare table word at `124` points to new instrument 71 at `29F0`; all
+original resources begin at or after `130`. Complete instrument/sample/loop/
+predictor span checks protect that spare word. The 192-byte append ends at
+`2AB0`. The new sample references the appended waveform at wave-five-relative
+`2D03A0`. The full 11,062-byte sample receives ten alignment bytes; waveform
+data remains streamed from the cartridge, not copied wholesale into RAM.
+
+The full files move within the verified unused virtual ROM interval:
+
+| File | Original VROM | New VROM | Reserved bytes |
+| --- | --- | --- | --- |
+| Sequences | `00027130` | `01920000` | `D0000` |
+| Banks | `000E4D10` | `019F0000` | `60000` |
+| Waveforms | `0013D9A0` | `01A50000` | `5B0000` |
+
+The existing DMA directory rows retain their indices. Native audio also needs
+physical ROM positions: its initializer does not use those virtual identities.
+After composition determines the actual positions, a second composition binds
+the same-size LUI/ADDIU pairs at `800D28E8/800D28F4`, `800D28EC/800D28F0`, and
+`800D28DC/800D28E0`. Full initializer-window checks and unchanged second-pass
+physical positions are required. No startup instruction count is increased.
+
+All seven permanent sequence/bank entries are included in the capacity check,
+not just the new sound's two resources. Conservative 32-byte-aligned allocation
+increases by 416 bytes, leaving **608 bytes** of the native `1A800`-byte permanent
+heap. Total audio heap, temporary cache sizes, and cache policies remain
+unchanged. Exceeding capacity fails the build.
+
+The [sound checkpoint](../docs/checkpoints/V3_SPEED_BAG_SOUND.md) records native
+loading/playback evidence and its limits. Callback installation and ordinary
+furniture interaction are separate unfinished work. No physical audio is emitted
+by tests.
