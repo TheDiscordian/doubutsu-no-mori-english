@@ -19,7 +19,7 @@ def pixels(texture, palette):
     return tuple(colours[index] for byte in texture for index in (byte >> 4, byte & 15))
 
 
-def clothing(native, first):
+def clothing(native, first, *, all_villagers=False):
     # Metadata's caller verifies both complete sources before calling here.
     files, members = by_vrom(native), dict(rarc_files(first))
     textures, palettes = (files[v].extract(native) for v in (TEXTURES, PALETTES))
@@ -29,14 +29,17 @@ def clothing(native, first):
     native_pixels = [pixels(textures[i * 512:(i + 1) * 512], palettes[i * 32:(i + 1) * 32])
                      for i in range(256)]
     result = {}
-    for item, approved in ((0x2498, 0x2498), (0x24BF, None)):
+    reviewed = ((0x2498, 0x2498), (0x24BF, None))
+    if all_villagers:
+        reviewed = ((0x241A, None), (0x241B, None)) + reviewed
+    for item, approved in reviewed:
         i = item - 0x2400
         raw_tex, raw_pal = donor_tex[i * 512:(i + 1) * 512], donor_pal[i * 32:(i + 1) * 32]
         tex, pal = pack4(untile(raw_tex, 32, 32, 4)), native_palette(raw_pal)
         wanted = pixels(tex, pal)
         matches = [0x2400 + j for j, candidate in enumerate(native_pixels) if candidate == wanted]
         if matches != ([] if approved is None else [approved]):
-            raise ValueError('Pilot clothing identity no longer matches its reviewed mapping')
+            raise ValueError('Villager clothing identity no longer matches its reviewed mapping')
         result[item] = {'donor_item_id': f'{item:04X}',
             'native_item_id': f'{approved:04X}' if approved is not None else None,
             'status': 'verified_existing_artwork' if approved else 'new_clothing_import_required',

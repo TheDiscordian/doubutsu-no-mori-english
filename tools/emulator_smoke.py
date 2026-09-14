@@ -1559,7 +1559,8 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 villager text probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, args.rom, record))
+                results.append(exercise(debug, args.rom, record,
+                    representative_roster=action['test_v3_villager_text'] == 'representative-roster'))
             if action.get('test_v3_audio'):
                 from v3_audio_smoke import exercise
                 if not (out/'test.bs1').is_file():

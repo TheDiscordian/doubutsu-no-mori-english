@@ -2,6 +2,12 @@
 
 ## Implemented scope
 
+The [complete-roster installation](V3_COMPLETE_VILLAGER_TEXT.md) supplies all
+twenty names and catchphrases through these readers, retaining donor personality
+and growth values. It expands the saved dependency profile, but does not enable
+move-ins. Its eighteen islanders still require their two actual aloha shirts,
+houses, and explicit town behaviour.
+
 `tools/v3_asset_loader.py --villager-text` includes the pilot artwork, draw,
 and audio paths, then installs Cheri/Punchy's shared full-name and catchphrase
 readers, six-byte compatibility-name reader, and native catchphrase-reset hook.
@@ -34,8 +40,9 @@ the slot: N64 actor minus `E0DA`. Missing imports contain zero rows.
 | 26…29 | Four-byte saved default reference |
 | 30…31 | Verified native clothing ID, or zero if pending |
 
-Only the two ordinary pilots have present rows. Cheri (`E0EA`) has `tralala`;
-Punchy (`E0ED`) has `mrmpht`. Present metadata is not move-in eligibility.
+The pilot variant has two present rows. The complete-roster variant fills all
+twenty rows, preserving Cheri (`E0EA`, `tralala`) and Punchy (`E0ED`, `mrmpht`).
+Present metadata is not move-in eligibility.
 
 ## Saved default references
 
@@ -83,8 +90,10 @@ Full readers retain resource-enabled flags and destination-capacity checks.
 Imported lookup requires completed V3 startup, the assigned actor ID, and a
 present row. Missing imports/invalid IDs do not write display output. The
 six-byte reader preserves native/test identities 0–217 and low-eight-bit argument
-conversion; `FF` stays no-write. Both pilot names fit six bytes. Wider future
-names need complete display readers and a reviewed saved-name alias policy.
+conversion; `FF` stays no-write. Both pilot names fit six bytes. The complete
+roster's Flossie and Annalise use verified unique six-byte saved keys; full display
+and generated-mail readers recover their entire names. The complete installer
+rejects collisions against all installed native aliases and imported keys.
 
 The 216-entry name/catchphrase resources and original house/default resources
 remain unchanged. Secondary readers with their own 216-ID guards, including

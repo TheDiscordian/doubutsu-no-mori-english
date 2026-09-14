@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-all-audio-runtime-01/animal-forest-v3-asset-loader.z64`, ABI 53, SHA-256
-`0e8335fa88c5da9800d6c38adf5c1d8fc08ebe86680bcaa88d2fbff5fbc3ff4f`.
+`build/v3-all-villager-text-01/animal-forest-v3-asset-loader.z64`, ABI 54, SHA-256
+`eb611e2bade707270d8c72cd11349b344fecb3cd262918c31a4ffc1303ac8101`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -413,6 +413,22 @@ the final post-audio guards remain unresolved. This is not a confirmed fixture
 failure or a playable-import claim. Continue text/defaults, houses, and town
 behaviour; inspect note-layer progress and sample requests in the next meaningful
 combined native check. Both V2 patchers remain unchanged.
+
+The [complete villager text](checkpoints/V3_COMPLETE_VILLAGER_TEXT.md) installs
+all twenty names, full catchphrases, personality values, and donor-default
+references without changing reader code or increasing memory allocations.
+Six focused checks pass, including all installed rows through sanitized text/mail
+readers and actual save-codec subset acceptance and missing-profile rejection.
+The initial native run passes 168 records / 90 assertions: O'Hare, Flossie,
+Annalise, and Plucky's complete text, real dialogue insertions, phrase reset and
+borrowing, unchanged save state, guards, and checkpoint restoration.
+The eighteen islanders still require two actual aloha shirts (`241A`, `241B`),
+neither of which matches any original N64 garment. Their default initialization
+and move-ins remain disabled. The saved dependency profile includes all twenty
+text identities; earlier pilot-only builds reject its saves, although the format
+is unchanged. Ordinary cross-build loading remains unverified. Continue the two
+shirt imports, houses, and explicit islander town behaviour. The audio playback
+issue remains recorded, and both web patchers stay V2.
 
 ## Stable V2 deliverable
 

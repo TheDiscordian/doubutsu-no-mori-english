@@ -29,6 +29,12 @@ pixels. Compare against all 256 native candidates, not only the same item ID.
   an existing native shirt globally or use a superficially similar shirt. Add
   its real clothing/item support as a selectable import dependency.
 
+The [complete-roster text variant](V3_COMPLETE_VILLAGER_TEXT.md) preserves all
+eighteen islanders' donor personality, growth, clothing, and umbrella values.
+Their two aloha shirts, `241A` and `241B`, have no matching original N64 colour
+image among all 256 candidates. Their applied outfit fields stay zero until
+those actual garments are imported; no incomplete initializer or move-in is enabled.
+
 The builder pins complete input sources and the reviewed mappings. Build reports
 record donor/converted/bank hashes. The native shared loader at `800B1EDC`
 accepts a clothing index below 256 and transfers 512 texture bytes and 32 palette

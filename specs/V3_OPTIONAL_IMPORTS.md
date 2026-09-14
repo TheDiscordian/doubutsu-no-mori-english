@@ -179,6 +179,11 @@ The [complete audio runtime](V3_COMPLETE_AUDIO_RUNTIME.md) installs all sources
 and expanded bank/wave resources, with native loading, font relocation, melody
 copying, and allocation checks passing. Playback of the four new instruments
 and the final post-audio guards remain unresolved; move-in flags stay off.
+The [complete text installation](V3_COMPLETE_VILLAGER_TEXT.md) supplies all
+twenty names and full phrases, preserving personality and donor growth values.
+Full-name aliases, actual dialogue insertions, borrowed phrases, and profile
+handling have focused/native evidence. The eighteen islanders need their actual
+two aloha shirts, houses, and explicit town behaviour before move-ins can be enabled.
 
 ### Items
 

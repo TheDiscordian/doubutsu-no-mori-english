@@ -39,7 +39,7 @@ def read_text_donor(path):
     return data
 
 
-def metadata(native, donor, first, symbols):
+def metadata(native, donor, first, symbols, *, all_villagers=False):
     verified_rom(native)
     if (sha256(donor['rel']) != REL_SHA or sha256(first) != FIRST_SHA
             or sha256(donor['forest_2nd.arc']) != DONOR_FILES['forest_2nd.arc'][1]
@@ -60,12 +60,11 @@ def metadata(native, donor, first, symbols):
     growth = symbol_data(donor['rel'], symbols, 'npc_grow_list')
     if (len(defaults), len(looks), len(growth)) != (238 * 6, 238, 238):
         raise ValueError('Changed donor metadata table sizes')
-    outfits = clothing(native, first)
+    outfits = clothing(native, first, all_villagers=all_villagers)
     files = by_vrom(native)
     info = command_info(files[CODE_VROM].extract(native))
     result, rows = bytearray(20 * STRIDE), []
-    # Pilot content only; other registry slots stay unavailable.
-    for index in (232, 235):
+    for index in (range(216, 236) if all_villagers else (232, 235)):
         actor = villager_actor(index)
         raw_name = names[index * 8:(index + 1) * 8]
         default = defaults[index * 6:(index + 1) * 6]
@@ -74,8 +73,9 @@ def metadata(native, donor, first, symbols):
         name, phrase = (encode(decode_gc(data, tables).rstrip(' '), info) for data in (raw_name, raw_phrase))
         if (not 1 <= len(name) <= 8 or not 1 <= len(phrase) <= 10
                 or any(c not in LATIN for c in name + phrase) or padding
-                or looks[index] >= 6 or growth[index] != 0 or umbrella >= 32):
-            raise ValueError('Pilot text or ordinary-villager defaults need adaptation')
+                or looks[index] >= 6 or growth[index] != (0 if index in (232, 235) else 2)
+                or umbrella >= 32):
+            raise ValueError('Villager text or donor defaults differ from the reviewed format')
         key = bytes((0xFE, 0xF3, actor & 255, 0x20))
         outfit = outfits[cloth]
         native_cloth = int(outfit['native_item_id'], 16) if outfit['native_item_id'] else 0
@@ -91,6 +91,10 @@ def metadata(native, donor, first, symbols):
             'record_sha256': sha256(record), 'clothing_applied': bool(native_cloth),
             'initial_defaults_applied': bool(native_cloth), 'clothing_identity': outfit,
             'move_in_enabled': False})
+        if all_villagers:
+            rows[-1].update({'donor_growth_permission': growth[index],
+                            'town_behaviour_adapted': False,
+                            'compatibility_name_hex': name.ljust(8, b' ')[:6].hex()})
     return bytes(result), rows
 
 

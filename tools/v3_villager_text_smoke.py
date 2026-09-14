@@ -9,12 +9,23 @@ from v3_asset_loader import BLOB, BLOB_RAM
 from v3_villager_text import DATA, STRIDE
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, representative_roster=False):
     path = Path(rom_path)
     rom = path.read_bytes(); report = json.loads((path.parent / 'build.json').read_text())
     if sha256(rom) != report['output_sha256'] or not report['villager_text']:
         raise ValueError('Villager text probe needs its exact current cartridge')
-    files = by_vrom(rom); blob = files[BLOB].extract(rom)
+    files = by_vrom(rom); resource = files[BLOB].extract(rom)
+    resident_bytes = struct.unpack_from('>I', resource, 8)[0]
+    if not 0 < resident_bytes <= 0xC000:
+        raise ValueError('Unexpected current text resident size')
+    blob = resource[:resident_bytes]
+    rows = report['villager_text']['imports']
+    if representative_roster:
+        if report.get('runtime_abi') != 54 or len(rows) != 20:
+            raise ValueError('Representative full-name check needs the complete roster')
+        rows = [r for r in rows if r['name'] in ("O'Hare", 'Flossie', 'Annalise', 'Plucky')]
+        if len(rows) != 4:
+            raise ValueError('Missing full-width/apostrophe/long-phrase representatives')
     actor, animal = MODULE_RAM + 0x6500, MODULE_RAM + 0x6690
     output, temporary, text = MODULE_RAM + 0x6D01, MODULE_RAM + 0x6DC0, MODULE_RAM + 0x6E00
     edge = b'V3TX' * 4
@@ -48,6 +59,11 @@ def exercise(debug, rom_path, record):
 
     check('complete startup blob', BLOB_RAM, blob)
     check('startup installed', 0x8019ACD0, struct.pack('>I', 1))
+    saved_state = None
+    if representative_roster:
+        saved_state = debug.read_memory(0x8046C000, 864)
+        check('complete text profile loaded', 0x8046C010,
+              bytes.fromhex(report['save_runtime']['profile_hex']))
     actor_data = bytearray(0x180); actor_data[2] = 3
     struct.pack_into('>I', actor_data, 0x174, animal)
     debug.write_memory(actor, actor_data)
@@ -58,7 +74,7 @@ def exercise(debug, rom_path, record):
                         if phrase_resource[at + 4:at + 6] == b'\xE0\x00')
     if len(original_row[6:].rstrip(b' ')) <= 4:
         raise ValueError('Original-reset fixture needs a retained native default key')
-    for row in report['villager_text']['imports']:
+    for row in rows:
         npc = int(row['actor_id'], 16)
         name = row['name'].encode().ljust(8, b' ')
         phrase = row['catchphrase'].encode().ljust(10, b' ')
@@ -76,8 +92,8 @@ def exercise(debug, rom_path, record):
         output_call('full default phrase', 0x80194FDC, [output, 10, npc, animal + 0x4E5], phrase, 1)
         output_call('actor default phrase', 0x8019521C, [output, actor], phrase)
         insert('actual catchphrase insertion', 0x801952F4, 0x1C, phrase)
-        # Borrow the other pilot's phrase through the real native four-byte setter.
-        other = next(r for r in report['villager_text']['imports'] if r != row)
+        # Borrow another installed phrase through the real native four-byte setter.
+        other = next(r for r in rows if r != row)
         other_id = int(other['actor_id'], 16)
         key_pointer = BLOB_RAM + DATA + (other_id - 0xE0DA) * STRIDE + 26
         call(0x800A9E54, [animal, key_pointer])
@@ -98,7 +114,7 @@ def exercise(debug, rom_path, record):
     original_name = files[0x2C00000].extract(rom)[32:40]
     output_call('original actor name retained', 0x80195D20, [output, actor], original_name)
     output_call('original default retained', 0x8019521C, [output, actor], original_row[6:])
-    for row in report['villager_text']['imports']:
+    for row in rows:
         debug.write_memory(temporary, bytes.fromhex(row['saved_default_key']))
         call(0x800A9E54, [animal, temporary])
         output_call('original villager borrows imported phrase', 0x8019521C,
@@ -108,13 +124,17 @@ def exercise(debug, rom_path, record):
     debug.write_memory(actor, actor_data)
     special_name = files[0x2C00000].extract(rom)[32 + 216 * 8:40 + 216 * 8]
     output_call('special actor name retained', 0x80195D20, [output, actor], special_name)
-    output_call('missing import causes no name write', 0x80196044, [output, 8, 0xE0DA], b'', 0)
+    installed = {int(r['actor_id'], 16) for r in report['villager_text']['imports']}
+    missing = next((npc for npc in range(0xE0DA, 0xE0EE) if npc not in installed), 0xE0EE)
+    output_call('missing import causes no name write', 0x80196044, [output, 8, missing], b'', 0)
     output_call('short destination causes no write', 0x80196044, [output, 7, 0xE0EA], b'', 0)
     for address in (actor - 16, actor + 0x180, animal + 0x540, TEST_STACK - 0x800, TEST_STACK + 0x40):
         check('fixture guard', address, edge)
     check('complete immutable V3 blob', BLOB_RAM, blob)
+    if saved_state is not None:
+        check('complete save/profile state retained', 0x8046C000, saved_state)
     check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
     check('no faulted thread', 0x8003CE34, bytes(4))
-    return {'imported_text_identities': 2, 'native_reset_and_setter_tested': True,
+    return {'imported_text_identities': len(rows), 'native_reset_and_setter_tested': True,
             'native_insertions_tested': True, 'ordinary_move_in_tested': False,
             'save_reload_tested': False, 'requires_checkpoint_restore': True}
