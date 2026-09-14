@@ -53,7 +53,7 @@ def table(base, rel, donor_symbols, furniture):
     records = []
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
-        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198)):
+        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)):
             raise ValueError('New catalogue import needs reviewed preview and shop rules')
         found = [(n, mode) for n, (i, mode) in enumerate(struct.iter_unpack('>HH', donor)) if i == index]
         if len(found) != 1 or found[0][1] != 0 or draw[:8] != data[0x808AF87C - RAM:0x808AF87C - RAM + 8]:

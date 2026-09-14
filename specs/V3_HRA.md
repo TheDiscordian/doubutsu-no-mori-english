@@ -77,8 +77,8 @@ The small missing-item search retains native series/group matching but converts
 an imported runtime index back into its real `3xxx` item ID. It checks the actual
 enabled import profile using a runtime index. Unselected, unassigned, and invalid
 matches do not return a substitute item. The complete English name reader used
-by HRA letters already accepts these imported item IDs. The independent
-score-letter series-name translator still needs the new boxing name.
+by HRA letters accepts these imported item IDs. The independent
+score-letter series-name translator includes the new boxing name.
 
 ## Boxing-theme storage
 
@@ -103,15 +103,36 @@ Its native descriptor explicitly uses `FF` for no matching surface, so an
 unrelated native wall/floor cannot award completion or produce a bogus item
 recommendation. Matching donor surfaces can be added by their own import
 adapter; they are not mandatory dependencies for selecting a standalone item.
-The ten-byte boxing key contains its complete English name. The existing
-English score-letter creator recognises only the original 55 name keys and
-needs an extension before boxing is enabled for ordinary gameplay.
+The ten-byte boxing key contains its complete English name. The
+[score-letter extension](#english-boxing-score-letters) recognises it alongside
+all original name keys.
 
-The experimental model row remains disabled and absent from the saved profile.
-Its HRA row is installed for private integration checks, but ordinary item
-queries and missing-item recommendations reject it while that flag is off.
+The model row is enabled in the private gameplay build and included in its
+selected save profile. Missing-item recommendations still reject it when the
+profile's runtime row is disabled.
 The [boxing checkpoint](../docs/checkpoints/V3_SPEED_BAG_HRA.md) owns the current
 native scoring evidence and remaining integration limits.
+
+## English boxing score letters
+
+`tools/v3_hra_mail.py` preserves the complete V3 generated-letter creator at
+VROM `03200000`, including its full-name readers, dispatcher, and every
+original template. It appends a 1,456-byte table containing all 55 original
+ten-byte keys and sixteen-byte English names, followed by boxing. Lookup row
+55 is independent of the game's series index 58. Both name references and
+four loop/sentinel bounds are patched, together with the guarded resource
+length. The nearby literal 55 for template `37` remains unchanged.
+
+The image grows from 61,200 to 62,656 bytes, within the native loader's
+65,536-byte image limit. Its 960-byte relocation table retains every record;
+the complete blob is 63,616 bytes. The module-approved lengths and CRC are
+updated. Independent relocation at three addresses verifies unrelated code
+and data. No saved record format or original English wording changes.
+
+The [gameplay-connections checkpoint](../docs/checkpoints/V3_SPEED_BAG_GAMEPLAY.md)
+records passing native creation and complete text restoration for both boxing
+templates, an original exotic-series letter, and a speed-bag item recommendation.
+Unknown name keys leave the output untouched.
 
 ## Allocation and relocation
 

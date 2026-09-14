@@ -60,15 +60,18 @@ def table(base, rel, symbols, furniture, display=None):
     records, seen = [], set()
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
-        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198)) or index in seen:
+        colours = {(0x3224, 1161): (2, 'red'), (0x32B8, 1198): (3, 'orange'),
+                   (0x3350, 1236): (0, 'none')}
+        if (item, index) not in colours or index in seen:
             raise ValueError('Unreviewed or duplicate feng shui import')
         seen.add(index)
         metadata = donor[index * 2:index * 2 + 2]
-        if metadata != bytes((2 if item == 0x3224 else 3, 0)):
+        colour, label = colours[item, index]
+        if metadata != bytes((colour, 0)):
             raise ValueError('Changed pilot colour or facing penalty')
         output[index * 2:index * 2 + 2] = metadata
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
-                        'metadata': metadata.hex(), 'colour': 'red' if item == 0x3224 else 'orange'})
+                        'metadata': metadata.hex(), 'colour': label})
     if display is not None:
         from v3_display_items import scoring_identity
         donor_index = scoring_identity(rel, symbols, display)

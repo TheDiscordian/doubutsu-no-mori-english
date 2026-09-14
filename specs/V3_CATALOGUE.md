@@ -9,6 +9,12 @@ and price display. It preserves all 436 native furniture rows in their original
 order and appends haz-mat barrel and oil drum in donor order: 438 rows total.
 The existing 444-slot category limit is enforced. Additional imports require
 reviewed capacity expansion; increasing a loop count alone is not sufficient.
+The animated variant also adds speed bag `3350`, yielding 439 furniture rows.
+Its donor position 175 puts it before the barrel (195) and oil drum (202),
+after all retained native rows. It uses catalogue index 2260, room index 1236,
+preview mode zero, and its actual price of 2,990 Bells. The existing native
+preview constructor invokes the installed custom callback with the same
+`740`-byte furniture layout, resolving the real skeleton/animation and pose.
 The clothing variant also appends cherry shirt to the separate clothing page,
 preserving all 245 native garment entries. Its [clothing adapter](V3_CLOTHING_CATALOGUE.md)
 connects canonical ownership, full names, the native mannequin preview, clothing
@@ -66,6 +72,12 @@ bytes, with 688- and 720-byte relocation resources respectively.
 Both resources retain 16-byte alignment. The parent descriptor at VROM `7749C0`,
 offset `2C90`, receives only the new end addresses after preserving the installed
 V3 icon edits.
+
+The animated variant's extra four-byte row fits existing suffix alignment:
+its image remains 56,560 bytes and relocation 720 bytes, with no additional
+pool growth. The native combined check covers all 439 rows, full names,
+all three model banks, real animated construction, and preview-buffer switching.
+It does not submit the preview to the GPU or perform an ordinary purchase.
 
 The conservative shared-menu requirement is 273,408 bytes without clothing
 and 274,176 with clothing, within the existing 274,560-byte reservation.

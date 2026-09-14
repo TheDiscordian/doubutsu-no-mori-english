@@ -157,9 +157,11 @@ def exercise(debug, rom_path, record):
     for row in animated:
         index, item = row['runtime_index'], int(row['item_id'], 16)
         row_ram = int(row['row_ram'], 16)
-        if row['enabled'] or row['selectable'] or row['saved_profile_included']:
-            raise ValueError('Animated fixture requires the explicitly disabled integration item')
-        check('animated item starts unavailable', row_ram+4, bytes(4))
+        if row['selectable'] or row['enabled'] and not row['saved_profile_included']:
+            raise ValueError('Animated fixture requires a private, profile-bound development item')
+        initial_enabled = int(row['enabled'])
+        check('animated item has its recorded initial eligibility', row_ram+4, struct.pack('>I',initial_enabled))
+        write_word(row_ram+4,0)
         native(0x8093678C, [index], 0)
         call(0x800A5630, [item], 0)
         start = int(row['object_vrom'], 16)
@@ -232,6 +234,7 @@ def exercise(debug, rom_path, record):
         native(0x809374C4, [index], 0xFFFFFFFF)
         write_word(row_ram+4, 0)
         call(0x800A5630, [item], 0)
+        write_word(row_ram+4,initial_enabled)
         check('animated component retains the complete save runtime', 0x8046C000, saved_state)
 
     if displays:

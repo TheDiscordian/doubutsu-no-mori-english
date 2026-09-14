@@ -1,4 +1,4 @@
-"""Install the real animated model/callbacks, keeping incomplete gameplay disabled."""
+"""Install the animated model/callbacks and explicitly bound gameplay profile."""
 import struct
 
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
@@ -8,15 +8,17 @@ from v3_speed_bag import SOURCE_FILES as CALLBACK_SOURCES, build as build_callba
 from v3_speed_bag_art import build as build_art
 from v3_speed_bag_sound_runtime import SOUND_ID
 
-ABI, PROGRAM, SOUND, VTABLE, ROW, END = 47, 0x6F20, 0x7100, 0x7110, 0x7130, 0x7180
+ABI, PROGRAM, SOUND, VTABLE, ROW, END = 49, 0x6F20, 0x7100, 0x7110, 0x7130, 0x7180
 SOURCES = CALLBACK_SOURCES + ('tools/v3_speed_bag_runtime.py', 'tools/v3_speed_bag_art.py',
                              'overlays/v3/speed_bag.h')
 
 
-def install(native, code, blob, rel, symbols, out):
+def install(native, code, blob, rel, symbols, out, *, gameplay=False):
     index, item, vrom = furniture_slot(0x3350)
     if (index, item) != (1236, 0x3350) or len(blob) != 0xC000:
         raise ValueError('Changed speed-bag identity or resident reservation')
+    if type(gameplay) is not bool or (gameplay and not blob[0x20+32+26] & 16):
+        raise ValueError('Speed-bag gameplay requires its selected save dependency')
     # The expanded profile/index tables no longer use this seed's tail. Two
     # collection bridges at 6F00..6F1F remain live and are not reclaimed.
     before = b'\xFF'*(0x70F3-PROGRAM)+bytes(END-0x70F3)
@@ -51,9 +53,9 @@ def install(native, code, blob, rel, symbols, out):
                           0x06000000+len(asset), *([0]*8))+scalar+struct.pack('>I', 0x80460000+VTABLE)
     if len(profile) != 68 or u32(profile, 64) != 0x80460000+VTABLE:
         raise ValueError('Invalid complete animated furniture profile')
-    # Default disabled: scoring/acquisition and complete house integration are
-    # still required. Private native fixtures may enable only this checked row.
-    record = struct.pack('>HHI', index, item, 0)+profile+bytes(4)
+    # The composer enables gameplay only with the installed shop, catalogue,
+    # scoring, score-letter, and save dependencies. Component callers stay off.
+    record = struct.pack('>HHI', index, item, int(gameplay))+profile+bytes(4)
     names = symbol_data(rel, symbols.decode(), 'ftrName2_table')
     name = names[(item-0x3000)//4*16:((item-0x3000)//4+1)*16]
     price = symbol_data(rel, symbols.decode(), 'ftr_price_table')[index*2:(index+1)*2]
@@ -77,7 +79,6 @@ def install(native, code, blob, rel, symbols, out):
         'sound_adapter_ram': 0x80460000+SOUND, 'sound_adapter_hex': sound.hex(),
         'native_positional_sound_sha256': sha256(sound_native),
         'metadata_ram': '804672E0', 'metadata_sha256': sha256(metadata), 'price': 2990,
-        'runtime_installed': True, 'enabled': False, 'selectable': False,
-        'saved_profile_included': False, 'ordinary_gameplay_tested': False,
-        'pending': ['boxing score-letter name', 'acquisition/catalogue',
-                    'saved-profile inclusion and ordinary persistence', 'Punchy house integration']}
+        'runtime_installed': True, 'enabled': gameplay, 'selectable': False,
+        'saved_profile_included': gameplay, 'ordinary_gameplay_tested': False,
+        'pending': ['ordinary acquisition/interaction and persistence', 'Punchy house integration']}

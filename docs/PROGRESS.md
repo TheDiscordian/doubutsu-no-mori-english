@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-speed-bag-hra-01/animal-forest-v3-asset-loader.z64`, ABI 47, SHA-256
-`e98ffd4b040a0fc664d7dff80f68ef46ecbcc9f35faeeb47793fc678343e442f`.
+`build/v3-speed-bag-gameplay-02/animal-forest-v3-asset-loader.z64`, ABI 49, SHA-256
+`7c0cbcf9a5f0b8c13d2aa7cbd38f253a2864bd30e2027a23e29ccc0a29972a2c`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -318,10 +318,17 @@ entries. Four focused checks and the first 68-record native run pass, including
 complete grouping, all four scoring loops, points, disabled-item rejection,
 no false matching-surface bonus, and preserved storage/guards. The HRA image
 uses 31,296 of its 32,768-byte bound without permanent RAM growth.
-The new item stays disabled while the separate English score-letter name,
-acquisition/catalogue, selected save dependency, and Punchy's house are
-completed. These components do not declare the item playable.
-No import is enabled for players yet.
+The [gameplay connections](checkpoints/V3_SPEED_BAG_GAMEPLAY.md) add the boxing
+score-letter name, donor-order catalogue entry, group-A stock, neutral feng shui
+properties, and selected save dependency. The combined native run passes 149
+records / 103 assertions, including four complete English letters and restored
+text, actual stock selection/acquisition, all 439 catalogue rows, full English
+names, and animated preview construction. All seven current host checks and
+the enabled build's 12-record cold-boot check pass. The private build enables the speed
+bag with these dependencies; ordinary purchase, placed interaction/persistence,
+final GPU appearance, and Punchy's house remain work. No V3 import is selectable
+in either web patcher. The new profile requires speed-bag support: older builds
+without that dependency reject its saves, although the format remains version 2.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
 the switch; publishing development source does not grant patcher approval.

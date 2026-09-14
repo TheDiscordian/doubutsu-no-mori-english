@@ -20,6 +20,13 @@ def exercise(debug, rom_path, record):
         raise ValueError('Catalogue probe needs the exact current cartridge')
     files, boot = by_vrom(rom), boot_proofs(rom)
     blob = files[BLOB].extract(rom)[:0xC000]
+    selected = cat['imports']
+    item_ids = [int(row['item_id'],16) for row in selected]
+    models = {int(row['item_id'],16):row for row in report['furniture']['imports']}
+    metadata = {int(row['item_id'],16):row for row in report['furniture_items']['imports']}
+    speed_bag = report.get('speed_bag') if 0x3350 in item_ids else None
+    if speed_bag:
+        models[0x3350] = metadata[0x3350] = speed_bag
     calls = 0
 
     def check(label, at, expected):
@@ -78,7 +85,11 @@ def exercise(debug, rom_path, record):
         debug.write_memory(at, edge)
     player, active_at, runtime_at = 0x80126EC0, 0x80136FD8, 0x8046C000
     old_player, old_active = debug.read_memory(player, 0xBD0), debug.read_memory(active_at, 4)
-    old_runtime = debug.read_memory(runtime_at, 704)
+    profile_bytes = len(bytes.fromhex(report['save_runtime']['profile_hex']))
+    runtime_bytes = report['save_runtime']['state_bytes']
+    ownership_bytes = 640 if profile_bytes==192 else 512
+    old_runtime = debug.read_memory(runtime_at, runtime_bytes)
+    old_speed_bag_flag = debug.read_memory(0x80467134,4) if speed_bag else None
     old_segment = debug.read_memory(0x801458B8, 4)
     old_debug = debug.read_memory(0x8010FD60, 4)
     init = APPROVED['symbols']['af_catalog_init']
@@ -92,8 +103,7 @@ def exercise(debug, rom_path, record):
 
     def preview(n, item):
         at = state + 8 + n * 0x760
-        row = next(r for r in report['furniture']['imports'] if int(r['item_id'], 16) == item)
-        meta = next(r for r in report['furniture_items']['imports'] if int(r['item_id'], 16) == item)
+        row, meta = models[item], metadata[item]
         profile = int.from_bytes(blob[0x5800 + row['runtime_index'] * 4:0x5804 + row['runtime_index'] * 4], 'big')
         check('actual imported preview profile', at + 0x748, struct.pack('>I', profile))
         check('original catalogue index encoding', at, struct.pack('>H', (item - 0x1000) >> 2))
@@ -105,40 +115,49 @@ def exercise(debug, rom_path, record):
         start = int(row['object_vrom'], 16) - BLOB
         check('complete actual model bank DMA', banks[n],
               files[BLOB].extract(rom)[start:start + row['object_bytes']])
+        if item==0x3350:
+            check('catalogue invokes the installed animated constructor',at+0x14C,
+                  struct.pack('>II',banks[n]+0xE84,banks[n]+0xE58))
+            check('animated catalogue preview has its complete initial pose',at+0x1A4,
+                  struct.pack('>9h',800,6508,800,0,0,-16384,0,0,0))
 
     try:
+        if speed_bag: put(0x80467134,1)
         put(active_at, player); put(0x8010FD60, 0)
         debug.write_memory(player + 0xAF0, bytes(0x98))
-        debug.write_memory(runtime_at + 16 + 160, bytes(512))
+        debug.write_memory(runtime_at + 16 + profile_bytes, bytes(ownership_bytes))
         initialize()
         check('uncollected imports stay out of catalogue', page, bytes(2))
-        call(0x800B88EC, [0x3225]); call(0x800B88EC, [0x32BB])
+        for item in item_ids: call(0x800B88EC,[item])
         initialize()
-        check('both collected imports appear', page, bytes.fromhex('0002'))
-        check('stable real item IDs in catalogue order', page + 8, bytes.fromhex('322432B8'))
+        check('all collected imports appear', page, struct.pack('>H',len(item_ids)))
+        order = struct.pack('>'+'H'*len(item_ids),*item_ids)
+        check('stable real item IDs in donor catalogue order', page + 8, order)
         check('partial collection is not marked complete', page + 6, bytes(1))
-        for n, name in enumerate(('haz-mat barrel', 'oil drum')):
+        for n, item in enumerate(item_ids):
             address = call(root + name_at, [page + 0x380 + n * 10],
                            (root + name_at, loaded[name_at:name_at + 92]))
             if not root + 0x9910 <= address <= root + len(data) - 16:
                 raise ValueError('Catalogue full name escaped owned storage')
-            check('complete displayed English catalogue name', address, name.encode().ljust(16, b' '))
-        preview(0, 0x3224)
-        debug.write_memory(page + 4, bytes.fromhex('0001'))
-        call(root + 0x808A6A8C - RAM, [submenu, 0], core_proof)
-        check('native selection switches preview buffers', state, bytes([1]))
-        preview(1, 0x32B8)
-        # Test the true maximum with all native furniture plus both additions.
+            check('complete displayed English catalogue name', address, metadata[item]['name'].encode().ljust(16, b' '))
+        preview(0,item_ids[0])
+        for n,item in enumerate(item_ids[1:],1):
+            debug.write_memory(page+4,struct.pack('>H',n))
+            call(root + 0x808A6A8C - RAM, [submenu, 0], core_proof)
+            check('native selection switches preview buffers', state, bytes([n & 1]))
+            preview(n & 1,item)
+        # Test the true maximum with all native furniture plus selected additions.
         # Native category construction and full-name storage retain their sizes.
         debug.write_memory(player + 0xAF0, b'\xFF' * 120)
         initialize()
-        check('complete additive furniture list count', page, struct.pack('>H', 438))
+        check('complete additive furniture list count', page, struct.pack('>H',436+len(item_ids)))
         check('complete collection indicator', page + 6, bytes([1]))
-        check('last two entries fit the native category', page + 8 + 436 * 2, bytes.fromhex('322432B8'))
+        check('last imported entries fit the native category', page + 8 + 436 * 2, order)
         # Original complete program and model loaders still run through fallback.
         call(root + 0x808A627C - RAM, [state + 8, 0x1004], core_proof)
         check('original preview keeps original index', state + 8, bytes.fromhex('0001'))
         check('original preview keeps original furniture type', state + 8 + 0x750, bytes(2))
+        if speed_bag: debug.write_memory(0x80467134,old_speed_bag_flag)
         check('complete resident prefix retained', BLOB_RAM, blob)
         check('catalogue executable prefix unchanged by menu work', root, loaded[:14048])
         check('catalogue suffix retained', root + SIZE, loaded[SIZE:])
@@ -147,12 +166,13 @@ def exercise(debug, rom_path, record):
         check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
         check('no faulted thread', 0x8003CE34, bytes(4))
     finally:
+        if speed_bag: debug.write_memory(0x80467134,old_speed_bag_flag)
         debug.write_memory(player, old_player); debug.write_memory(active_at, old_active)
         debug.write_memory(runtime_at, old_runtime); debug.write_memory(0x801458B8, old_segment)
         debug.write_memory(0x8010FD60, old_debug)
     call(0x8009C040, [allocation])
     return {'catalogue_native_calls': calls, 'native_list_and_full_name_cases': 3,
-            'imported_complete_previews': 2, 'native_selection_tested': True,
+            'imported_complete_previews': len(item_ids), 'native_selection_tested': True,
             'original_preview_fallback_tested': True, 'gpu_rendered': False,
             'ordinary_order_delivery_tested': False, 'saved_data_written': False,
             'requires_checkpoint_restore': True}

@@ -1,0 +1,11 @@
+[
+  {"wait": 10},
+  {"read": ["8019ACD0", 4], "expect": "00000001"},
+  {"read": ["80467134", 4], "expect": "00000001"},
+  {"read": ["8046005A", 1], "expect": "10"},
+  {"read": ["8046C04A", 1], "expect": "10"},
+  {"read": ["80471360", 4], "expect": "80467138"},
+  {"read": ["8046C350", 16], "expect": "af53c0deaf53c0deaf53c0deaf53c0de"},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"}
+]

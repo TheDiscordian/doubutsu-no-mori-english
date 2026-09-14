@@ -123,7 +123,7 @@ def compose(native, base, changes, added, *, resized=(), relocated=None):
     if not set(changes) <= set(current) or set(added) & set(current):
         raise ValueError('Unknown change or colliding V3 addition')
     if not set(resized) <= set(changes) or not set(resized) <= {
-            0x03970000, 0x03980000, 0x011E6000, 0x011E5000, 0xE02000, 0x11AB000, *relocated}:
+            0x03970000, 0x03980000, 0x03200000, 0x011E6000, 0x011E5000, 0xE02000, 0x11AB000, *relocated}:
         raise ValueError('Unreviewed V3 resource resize')
     if any((len(data) != current[v].size and v not in resized) or v in (0x1060, 0x19D40)
            for v, data in changes.items()):
@@ -223,6 +223,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_clothing_catalogue
     import v3_speed_bag_sound_runtime
     import v3_speed_bag_runtime
+    import v3_hra_mail
     if speed_bag and not speed_bag_sound:
         raise ValueError('Speed-bag callbacks require their complete installed sound')
     if speed_bag_sound and not clothing:
@@ -308,7 +309,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_clothing_catalogue.SOURCES
                        if clothing else ())
                     + (v3_speed_bag_sound_runtime.SOURCES if speed_bag_sound else ())
-                    + (v3_speed_bag_runtime.SOURCES if speed_bag else ()))
+                    + (v3_speed_bag_runtime.SOURCES+v3_hra_mail.SOURCES if speed_bag else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -536,6 +537,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             pockets_code_report['symbols'], room_code_report['symbols'])
         pockets_report['code'] = pockets_code_report
     save_report = None
+    gameplay_imports = (furniture_report['imports'] +
+        ([{'item_id': '3350', 'runtime_index': 1236}] if speed_bag else [])) if furniture else []
     if clothing:
         clothing_resource, clothing_record, clothing_row = v3_clothing.convert(
             native, text_donor[1], rel, symbols)
@@ -548,7 +551,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         runtime_code, runtime_report = compile_part('save_runtime', out / 'save_runtime', defines=clothing_defines)
         save_runtime_report = v3_save_runtime.install(native, base, code, blob, runtime_code,
             runtime_report['symbols'], save_code_report, room_code_report,
-            draw_report['imports'], furniture_report['imports'] +
+            draw_report['imports'], gameplay_imports +
             ([v3_clothing_display.profile_dependency()] if clothing else []),
             [clothing_row] if clothing else None)
         save_runtime_report['code'] = runtime_report
@@ -561,7 +564,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         collection_report['code'] = collection_code_report
     catalogue_changes, catalogue_report = {}, None
     if catalogue:
-        ordering, catalogue_records = v3_catalogue.table(base, rel, symbols, furniture_report['imports'])
+        ordering, catalogue_records = v3_catalogue.table(base, rel, symbols, gameplay_imports)
         table_path = out / 'catalogue-order.bin'
         write_new(table_path, ordering)
         generated = out / 'catalogue-order.S'
@@ -589,7 +592,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         shop_code, shop_code_report = compile_part('shops', out / 'shops',
             defines=('AF_V3_CLOTHING_PROFILE',) if clothing else ())
         shop_changes, shop_report = v3_shops.install(base, code, blob, shop_code, shop_code_report,
-            collection_code_report, furniture_code_report, rel, symbols, furniture_report['imports'],
+            collection_code_report, furniture_code_report, rel, symbols, gameplay_imports,
             clothing_items=item_code_report if clothing else None)
         shop_report['code'] = shop_code_report
     shop_actor_changes, shop_actor_report = {}, None
@@ -647,7 +650,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         relocated = {v3_hra.VROM: v3_hra.NEW_VROM, v3_hra.RELOC: v3_hra.NEW_RELOC}
     feng_changes, feng_report = {}, None
     if feng_shui:
-        metadata, records = v3_feng_shui.table(base, rel, symbols, furniture_report['imports'],
+        metadata, records = v3_feng_shui.table(base, rel, symbols, gameplay_imports,
             v3_clothing_display.profile_dependency() if clothing else None)
         metadata_path, generated = out / 'feng-metadata.bin', out / 'feng-hooks.S'
         write_new(metadata_path, metadata)
@@ -796,8 +799,19 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             owner['patched_sha256'] = sha256(draw_changes[int(owner['vrom'], 16)])
     speed_bag_report = None
     if speed_bag:
+        reader_changes[v3_hra_mail.VROM], hra_mail_report = v3_hra_mail.install(
+            reader_changes[v3_hra_mail.VROM], module, rel, symbols)
+        hra_report['score_letters'] = hra_mail_report
+        hra_report['series']['boxing']['score_letter_name_installed'] = True
+        if (not all(any(row['item_id']=='3350' for row in owner['imports'])
+                    for owner in (hra_report,feng_report,catalogue_report,shop_report))
+                or not bytes.fromhex(save_runtime_report['profile_hex'])[58] & 16):
+            raise ValueError('Speed-bag gameplay lacks a complete installed dependency')
         speed_bag_asset, speed_bag_report = v3_speed_bag_runtime.install(
-            native, code, blob, rel, symbols, out/'speed-bag')
+            native, code, blob, rel, symbols, out/'speed-bag', gameplay=True)
+        speed_bag_report.update({'saved_profile_included': True,
+            'catalogue_row_installed': True, 'shop_stock_installed': True,
+            'hra_score_letter_name_installed': True, 'feng_shui_installed': True})
         furniture_added[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
         additions[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
     if len(blob) != blob_size:
@@ -836,6 +850,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                **hra_changes, **feng_changes, **house_changes, **reader_changes, **clothing_wear_changes,
                **clothing_stock_changes, **mannequin_changes, **sound_changes}
     resized = (((v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ())
+               + ((v3_hra_mail.VROM,) if speed_bag else ())
                + ((v3_shops.VROM,) if shops else ()) + ((v3_clothing_stock.VROM,) if clothing else ()) + tuple(relocated)
                + ((v3_villager_houses.HOUSE, v3_villager_houses.FOREGROUND) if houses else ()))
     image = compose(native, base, changes, additions, resized=resized, relocated=relocated)
@@ -942,7 +957,7 @@ def main():
     p.add_argument('--villager-rewards', action='store_true', help='Include imported furniture in villager house gifts')
     p.add_argument('--clothing', action='store_true', help='Add the cherry-shirt resource and shared reader; gameplay is not enabled')
     p.add_argument('--speed-bag-sound', action='store_true', help='Install the actual speed-bag sound; furniture installation remains pending')
-    p.add_argument('--speed-bag', action='store_true', help='Install the animated item for private integration testing; acquisition remains disabled')
+    p.add_argument('--speed-bag', action='store_true', help='Install the animated item and gameplay dependencies for private testing')
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')

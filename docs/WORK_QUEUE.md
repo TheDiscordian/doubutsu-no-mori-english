@@ -233,11 +233,19 @@ with later e/e+ donor support investigated separately.
   storage to 59 entries with the actual donor series 58 and unchanged scoring
   formulas. Four focused checks and the first 68-record native run pass,
   including all four scoring loops, real group/point data, disabled-item
-  rejection, original storage retention, and guards. Next extend the separate
-  English score-letter series-name reader, connect catalogue/group-A acquisition
-  and the selected save dependency, and install Punchy's house.
-  The new row stays disabled; ordinary gameplay, persistence,
-  and GPU appearance remain open. Component checks do not enable the item or villager.
+  rejection, original storage retention, and guards. The
+  [gameplay connections](checkpoints/V3_SPEED_BAG_GAMEPLAY.md) add complete boxing
+  score letters, catalogue/group-A acquisition, actual neutral feng shui data,
+  and the selected save dependency. The combined 149-record native run passes
+  stock selection, pocket ownership, four complete letters/readbacks, all 439
+  catalogue rows, and animated preview construction. The item is enabled in
+  the private build; its seven host checks and 12-record cold-boot check pass.
+  Neither web patcher exposes V3 options.
+  Next: ordinary speed-bag placement/interaction/save, and Punchy's house/defaults.
+  His two additional foreground layers exceed the current file's gap before
+  `011E2000`; move the complete foreground resource with checked loader/DMA
+  references instead of overwriting the next file. GPU/hardware acceptance,
+  ordinary purchase, and complete villager persistence remain open.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

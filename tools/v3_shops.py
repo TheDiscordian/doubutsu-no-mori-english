@@ -29,7 +29,8 @@ def goods(base, rel, symbols, imports):
     for row in imports:
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),
-                 0x32B8: (1198, 'ftr_listA', 0, 0xCA)}
+                 0x32B8: (1198, 'ftr_listA', 0, 0xCA),
+                 0x3350: (1236, 'ftr_listA', 0, 0xCA)}
         if item not in rules or row['runtime_index'] != rules[item][0]:
             raise ValueError('Unreviewed ordinary-stock item')
         _, name, group, at = rules[item]

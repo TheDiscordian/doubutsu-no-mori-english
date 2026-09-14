@@ -16,8 +16,11 @@ assembled into bounded native-compatible resources by `tools/v3_speed_bag_audio.
 `tools/v3_speed_bag_sound_runtime.py` installs the real sound through the native
 audio loader, without increasing its heap or replacing existing sounds.
 
-This is not a playable import. The new row is disabled until its scoring,
-acquisition/catalogue, saved-profile, and house dependencies are complete.
+The item is enabled in the private development build with scoring, English
+score-letter names, group-A stock, catalogue, and saved-profile connections.
+Ordinary interaction/persistence and final GPU/hardware acceptance remain
+unverified; it is not selectable in either web patcher. Punchy's house is a
+separate remaining villager dependency, not a condition for the standalone item.
 Do not enable Punchy or substitute a static decoration for this item.
 Both served patchers remain V2 until the user tests and approves V3.
 
@@ -223,7 +226,7 @@ No physical audio is emitted by tests.
 
 ## Installed furniture resource path
 
-ABI 46 uses a two-MiB VROM reservation `02200000..02400000`. Its single DMA
+The runtime uses a two-MiB VROM reservation `02200000..02400000`. Its single DMA
 file contains the unchanged-size 49,152-byte resident prefix followed by the
 individual model, clothing, and secondary-code resources. Only the prefix and
 explicit secondary code load at startup; other resources retain on-demand
@@ -245,7 +248,7 @@ The expanded table's retired seed tail provides checked resident slots:
 | `80466F20..804670F7` | Complete 472-byte constructor/move/draw text |
 | `80467100..8046710F` | Positional sound tail-call adapter |
 | `80467110..80467123` | Constructor, move, draw, null destructor, null DMA |
-| `80467130..8046717F` | Disabled import row and complete native profile |
+| `80467130..8046717F` | Profile-bound import row and complete native profile |
 | `804672E0..804672FF` | Third 32-byte English item metadata record |
 
 The two live collection bridges at `80466F00..80466F1F` are retained. The
@@ -262,18 +265,21 @@ Metadata keeps the complete 16-byte English name, price field 2,990, and actual
 1×1 footprint. Public reader addresses remain fixed even when the compiler
 changes the private two-record search into a three-record loop.
 
-The default disabled row prevents acquisition and recognition as an enabled
-item; it is not included in the saved import profile. The
+The composer enables the row only with the complete installed catalogue,
+shop, scoring, score-letter, and selected-save dependencies. Component-only
+installation remains disabled. The
 [HRA adapter](V3_HRA.md#boxing-theme-storage) installs actual donor metadata
 `E8050000` and expands completion storage to 59 entries, retaining series 58
-and native loop termination. The boxing score-letter name remains required
-before ordinary gameplay is enabled. Its ordinary
+and native loop termination. The independent English score-letter lookup adds
+boxing without replacing an original name. Its ordinary
 shop membership is group A, catalogue preview mode is zero, generic action-sound
 class is zero, and feng shui metadata is `0000`. The animated callback supplies
 its separate actual hit sound.
 
 The [runtime checkpoint](../docs/checkpoints/V3_SPEED_BAG_RUNTIME.md) records the
 callback/model build and bounded native evidence. The
-[boxing checkpoint](../docs/checkpoints/V3_SPEED_BAG_HRA.md) records the current
-combined build and native room-scoring checks. Acquisition, score-letter name
-integration, ordinary interaction/persistence, and Punchy's house remain required.
+[boxing checkpoint](../docs/checkpoints/V3_SPEED_BAG_HRA.md) records native
+room-scoring checks. The [gameplay connections](../docs/checkpoints/V3_SPEED_BAG_GAMEPLAY.md)
+record the current enabled private build, native stock/ownership/letter/preview
+checks, and changed save-profile requirement. Ordinary purchase, interaction,
+persistence, and Punchy's house remain work.

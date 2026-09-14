@@ -7,6 +7,9 @@ the two selected static furniture pilots to native ordinary goods lists and
 the global shop-category reader. It retains native list priority, town rarity,
 random selection, duplicate filtering, and daily stock-generation code.
 Imports remain development-only; neither web patcher changes from V2.
+The animated variant adds speed bag `3350` to group A with its actual donor
+membership and shared item-category reader. It is enabled only with its full
+catalogue, scoring, English score-letter, and selected-save dependencies.
 
 The save format and required profile are unchanged. V3 imported saves require
 V3; do not load them in V2. Ordinary shop confirmation/payment, floor displays,
@@ -32,6 +35,14 @@ resource stays sixteen-byte-aligned.
 Both selected imports produce 976 bytes, table offset `390`, and descriptor
 `011E6000 011E63D0 06000390`. Ordinary list lengths are A: 102, B: 101, C: 102.
 Empty selection returns the complete original resource exactly.
+
+With speed bag, list A contains 103 entries, B 101, and C 102. Oil drum and
+speed bag both precede A's terminator; no duplicate terminator is introduced.
+The pointer table is at `394`, and the complete resource remains 976 bytes.
+The [combined checkpoint](../docs/checkpoints/V3_SPEED_BAG_GAMEPLAY.md) records
+actual native group-A stock selection, retained one-draw RNG behaviour,
+disabled-item category rejection, pocket acquisition, and saved ownership.
+Ordinary purchase/payment remains unverified.
 
 Town priorities remain authoritative. An import's donor list is an A/B/C group,
 not a fixed common/uncommon/rare assignment. Native `800C0490` membership and
