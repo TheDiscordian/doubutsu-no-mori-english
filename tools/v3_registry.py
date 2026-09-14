@@ -19,6 +19,17 @@ FURNITURE = {
     0x32B8: (1198, 0x32B8, 0x03F0A000),
 }
 
+# Additive clothing reservations, independent of donor furniture and native
+# clothing identities. These are not enabled items or saved-profile support.
+CLOTHING_REGISTRY_VERSION = 1
+CLOTHING = {0x24BF: (0x34BF, 0x10BF, 0x03F0F000)}
+
+
+def clothing_slot(donor_item):
+    if donor_item not in CLOTHING:
+        raise ValueError('Unassigned imported clothing identity')
+    return CLOTHING[donor_item]
+
 # Preserve the native sorted house-layer range 398..855. Each imported villager
 # owns two fixed layer slots, including unavailable villagers and subsets.
 HOUSE_LAYER_BASE, HOUSE_LAYER_CAPACITY = 856, 40

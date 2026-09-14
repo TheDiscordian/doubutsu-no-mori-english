@@ -133,3 +133,12 @@ Twenty-two recorded steps complete without a fault. The English follow-on
 message `02A9` retains `tralala`. This establishes completion of the greeting
 through the ordinary conversation menu; the next bounded continuation selects
 the chat option.
+
+`build/v3-cheri-chat-01` checks the actual menu strings/cursor, selects
+`Care to chat?`, and completes the ordinary multi-page fruit conversation
+`084B`. The full message expands from 598 to 608 encoded bytes as both live
+catchphrase references resolve to `tralala`; the town name appears normally.
+Nine A presses finish the conversation, with `loaded = 0`. All thirty-four
+recorded steps complete, the game thread remains unfaulted, and the translation
+guard remains intact. The conversation checkpoint is retained for later
+ordinary gameplay/persistence work; no further chat replay is queued.

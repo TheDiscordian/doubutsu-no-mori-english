@@ -58,6 +58,11 @@ with later e/e+ donor support investigated separately.
   Next: remaining native reader review and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.
+  The [clothing resource foundation](checkpoints/V3_CLOTHING.md) installs the
+  actual new shirt and shared indexed reader. Four focused checks and the
+  initial thirty-four-step native test pass. Next connect the NPC-specific
+  clothing loaders, wearing/item consumers, and clothing save registry before
+  enabling Punchy's outfit.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both

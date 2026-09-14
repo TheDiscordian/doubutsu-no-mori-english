@@ -161,7 +161,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
           save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
           shop_actors=False, shop_floor=False, hra=False, feng_shui=False, houses=False,
-          villager_readers=False, villager_selection=False, villager_rewards=False):
+          villager_readers=False, villager_selection=False, villager_rewards=False, clothing=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -190,6 +190,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_villager_readers
     import v3_villager_selection
     import v3_villager_rewards
+    import v3_clothing
+    if clothing and not villager_rewards:
+        raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
         raise ValueError('House rewards require the complete selection/house foundation')
     if villager_selection and not villager_readers:
@@ -260,7 +263,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_villager_houses.SOURCES if houses else ())
                     + (v3_villager_readers.SOURCES if villager_readers else ())
                     + (v3_villager_selection.SOURCES if villager_selection else ())
-                    + (v3_villager_rewards.SOURCES if villager_rewards else ()))
+                    + (v3_villager_rewards.SOURCES if villager_rewards else ())
+                    + (v3_clothing.SOURCES if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -312,6 +316,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_villager_rewards.ABI)
     if npc_draw:
         abi = max(abi, v3_npc_draw.STREAMING_ABI)
+    if clothing:
+        abi = max(abi, v3_clothing.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -336,6 +342,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     extra_sources = ('overlays/v3/npc_draw.c', 'overlays/v3/npc_voice.S') if npc_draw else ()
     if audio_donor is not None:
         extra_sources += ('overlays/v3/melody.c',)
+    if clothing:
+        extra_sources += ('overlays/v3/clothing.c',)
     helper, helper_report = compile_part('asset', out / 'asset', extra_sources=extra_sources)
     if len(startup) > CONFIG - STARTUP or len(helper) > TABLE_OFFSET - 0x100:
         raise ValueError('V3 code exceeds its owned reservation')
@@ -604,6 +612,13 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         reward_code, reward_compiled = compile_part('villager_rewards', out / 'villager_rewards')
         reward_report = v3_villager_rewards.install(code, blob, reward_code, reward_compiled['symbols'])
         reward_report['code'] = reward_compiled
+    clothing_report = None
+    if clothing:
+        clothing_resource, clothing_record, clothing_row = v3_clothing.convert(
+            native, text_donor[1], rel, symbols)
+        clothing_report = v3_clothing.install(code, blob, helper_report['symbols'],
+            clothing_resource, clothing_record)
+        clothing_report['imports'] = [clothing_row]
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -622,6 +637,12 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             blob_file.extend(bytes(offset - len(blob_file)))
             blob_file.extend(data)
             del additions[vrom]
+    if clothing:
+        offset = int(clothing_row['vrom'], 16)-BLOB
+        if offset < len(blob_file) or offset+len(clothing_resource) > TEXTURE_BASE-BLOB:
+            raise ValueError('Clothing ROM tail overlaps resident, furniture, or villager data')
+        blob_file.extend(bytes(offset-len(blob_file)))
+        blob_file.extend(clothing_resource)
     additions[BLOB] = bytes(blob_file)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
@@ -636,7 +657,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 villager house rewards integration 01' if villager_rewards else
+    label = ('V3 additive clothing resource foundation 01' if clothing else
+             'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else
              'V3 villager house development 01' if houses else
@@ -683,6 +705,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'villager_readers': reader_report,
         'villager_selection': selection_report,
         'villager_rewards': reward_report,
+        'clothing': clothing_report,
         'resized_resources': [f'{v:08X}' for v in resized],
         'relocated_resources': {f'{v:08X}': f'{target:08X}' for v, target in relocated.items()},
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
@@ -715,6 +738,7 @@ def main():
     p.add_argument('--villager-readers', action='store_true', help='Connect imported map, inventory, and mail names')
     p.add_argument('--villager-selection', action='store_true', help='Integrate subset-aware selection with imports disabled')
     p.add_argument('--villager-rewards', action='store_true', help='Include imported furniture in villager house gifts')
+    p.add_argument('--clothing', action='store_true', help='Add the cherry-shirt resource and shared reader; gameplay is not enabled')
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
@@ -736,6 +760,8 @@ def main():
     p.add_argument('--hra', action='store_true', help='Include imported furniture in native HRA scoring and recommendations')
     p.add_argument('--feng-shui', action='store_true', help='Include actual imported furniture colours in native feng shui scoring')
     args = p.parse_args()
+    if args.clothing:
+        args.villager_rewards = True
     if args.villager_rewards:
         args.villager_selection = True
     if args.villager_selection:
@@ -800,7 +826,8 @@ def main():
         collection=args.collection, catalogue=args.catalogue, shops=args.shops,
         shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra, feng_shui=args.feng_shui,
         houses=args.villager_houses, villager_readers=args.villager_readers,
-        villager_selection=args.villager_selection, villager_rewards=args.villager_rewards)
+        villager_selection=args.villager_selection, villager_rewards=args.villager_rewards,
+        clothing=args.clothing)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

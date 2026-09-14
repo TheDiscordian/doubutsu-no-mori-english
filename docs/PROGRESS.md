@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-npc-streaming-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`a9dd8d6ef851bf3141b32f84544d53058a0a8a5d41ab217b5992d518e1815b37`.
+`build/v3-clothing-resources-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`48140ace682f65c7bc9961dc0cf786075222e021e4d8cbba67af24170a4bce3b`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -163,6 +163,15 @@ and twenty-one-step gameplay run cross the acre normally, load Cheri, observe
 her movement, and reach her English introduction with the correct name, outfit,
 and catchphrase. Fault pointers remain zero and guards intact. The disposable
 town explicitly seeds Cheri; this is not natural move-in or save/restart evidence.
+The greeting reaches the normal three-option menu, and a thirty-four-step
+continuation completes a multi-page chat with both full catchphrase insertions.
+The [clothing resource foundation](checkpoints/V3_CLOTHING.md) installs Punchy's
+actual cherry-shirt texture/palette under a separate identity and connects the
+shared indexed reader. Four focused tests and the initial thirty-four-step
+native run pass, including complete native/imported garment transfers and
+rejection/guard checks. All original clothing is retained. The NPC-specific
+clothing, wearing/item, and clothing save-registry consumers remain work;
+Punchy's defaults stay disabled.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,
