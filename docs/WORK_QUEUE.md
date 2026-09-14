@@ -50,9 +50,11 @@ with later e/e+ donor support investigated separately.
   menus, held-item destinations, and room-placement dispatch; three focused
   checks and 77 native steps pass. The [inventory icon batch](checkpoints/V3_FURNITURE_ICON.md)
   connects the independent leaf reader; three focused checks and 59 native steps
-  pass, including full native drawing-command comparisons. Next: external field
-  consumers and catalogue/scoring
-  consumers, acquisition, and ordinary placement/persistence. No complete item is enabled yet.
+  pass, including full native drawing-command comparisons. The
+  [ground-item batch](checkpoints/V3_FURNITURE_GROUND.md) connects both drop-flag
+  paths and ground-descriptor selection; three focused checks and 57 native steps
+  pass. Next: inventory furniture-count/index queries, catalogue/scoring consumers,
+  acquisition, and ordinary placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

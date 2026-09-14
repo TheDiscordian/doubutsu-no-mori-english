@@ -62,8 +62,12 @@ contexts, wrapped/quest restrictions, and full-register checks. The
 [inventory icon batch](checkpoints/V3_FURNITURE_ICON.md) connects the independent
 leaf reader. Three focused checks and 59 native steps pass, including full-register
 preservation, actual parent relocation, six descriptor selections, and complete
-native drawing commands matching the original leaf for both imports. Remaining external
-caller integration, ordinary placement/persistence, and Punchy's animated speed
+native drawing commands matching the original leaf for both imports. The
+[ground-item batch](checkpoints/V3_FURNITURE_GROUND.md) connects both drop-flag
+paths and ground-descriptor selection. Three focused checks and 57 native steps
+pass, including full-register/branch cases, native furniture flags, and the
+complete descriptor function. Remaining inventory queries, catalogue/scoring
+consumers, ordinary acquisition/placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
