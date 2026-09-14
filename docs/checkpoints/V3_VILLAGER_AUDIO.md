@@ -101,3 +101,31 @@ Next work is the ordinary-villager name/default/house/selection and gameplay/sav
 paths, followed by the complete furniture pilot and broader import batches.
 The full goal, browser selections, and e/e+ adapters remain open. Stable V2,
 the public/local patchers, and the released trailer are unchanged.
+
+## Next-batch starting evidence
+
+The donor inventory identifies Cheri as peppy, with clothing `2498`, umbrella
+index 3, and catchphrase string `072B` (`tralala`, seven bytes). Punchy is lazy,
+with clothing `24BF`, umbrella 13, and string `072C` (`mrmpht`, six bytes).
+The donor strings are present in the extracted reference bank. Clothing IDs and
+house-layer IDs still need native identity/asset checks; shared numeric values
+are not sufficient evidence. Neither full catchphrase fits the native four-byte
+saved field, so its default/reset/borrowed-display handling needs an explicit
+V3 key/profile design, not silent truncation.
+
+Native defaults use six-byte rows at VROM `00E03000`. `mNpc_GetLooks` is
+`800AA1E0`, `mNpc_SetDefAnimalInfo` is `800AA218`, `mNpc_SetDefAnimal` is
+`800AA29C`, and `mNpc_SetAnimalInfoNpcIdx` is `800AD8C4`. The personality table
+is `8010AF58`. `mNpc_SetNpcList` loads the complete house resource at VROM
+`00E02000`, then directly indexes by actor low twelve bits. The donor
+`npc_house_list` is 1,904 bytes: 238 eight-byte records, including its test slots.
+Native initial selection and later move-ins remain bounded to 216.
+
+Existing V2 display APIs also enforce native capacity: `af_load_display_name`
+and `af_get_display_name` distinguish 216 villagers from special actors;
+`af_load_catchphrase` rejects imported actors. Additional explicit bounds occur
+in `overlays/text_names/names.c`, `overlays/letter_names/names.c`,
+`overlays/letter_ui/address.c`, and the villager-event, quest, departure,
+treasure, and NPC-capture creators under `overlays/mail_generation/`.
+Extending one shared name table does not connect these readers. Preserve their
+player/special-character distinctions and saved capacities while adding imports.
