@@ -37,6 +37,8 @@ with later e/e+ donor support investigated separately.
 - [ ] Add searchable per-entry/category/select-all controls to the web patcher;
   verify actual browser output and the unchanged import-free path.
 - [ ] Complete bounded combined checks and provide a V3 hardware-playtest build.
+- [ ] Obtain the user's V3 testing feedback and explicit approval before changing
+  the web patcher. Continue version-tracking V3 development on GitHub meanwhile.
 - [ ] Verify e/e+ editions, inputs, formats, additional identities, and capacity;
   implement donor adapters when their required source data is available.
 

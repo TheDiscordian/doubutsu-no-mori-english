@@ -14,6 +14,10 @@ The stable baseline is V2-11, SHA-256
 The import-free path reproduces the pinned translation baseline exactly.
 V3 development uses `v3/optional-imports`; the public V2 patcher, deployment
 recipe, local V2 service, and published trailer remain unchanged.
+V3 source and development work may be version-tracked on GitHub. Updating the
+web patcher to V3 requires the user's testing and subsequent explicit approval.
+Provide private playtest builds first; completed implementation or developer
+verification alone does not authorise the web-patcher switch.
 
 Japanese GameCube editions, including e/e+, are follow-on donor adapters, not
 assumed interchangeable inputs. Confirm exact editions, revisions, and source

@@ -15,6 +15,9 @@ Use `v3/optional-imports` for experimental implementation, preserving the stable
 V2 cartridge and public/local patchers. Imports need complete gameplay and
 persistence support; an extracted name or disabled web option is not completion.
 Do not repurpose existing villagers/items or assign IDs by checkbox order.
+V3 development source may be pushed to GitHub. Do not switch the web patcher to
+V3 until the user has tested the build and explicitly approved the switch.
+Developer verification and a private playtest handoff do not satisfy that approval.
 
 ## Workflow
 
