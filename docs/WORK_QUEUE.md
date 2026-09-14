@@ -292,6 +292,12 @@ with later e/e+ donor support investigated separately.
   without replaying the passing transform cases. Continue remaining voices,
   text/defaults, houses, town behaviour, ordinary appearance, and persistence
   before enabling new town inhabitants.
+  The [complete audio bundle](checkpoints/V3_COMPLETE_VILLAGER_AUDIO.md) supplies
+  all twenty melodies and four additional instruments, with all 83 native
+  instruments retained. Nine focused checks pass. Install the complete source
+  table/storage and expanded bank/wave resources, check actual audio allocation,
+  then continue text/defaults, houses, and town behaviour. Conversion alone does
+  not make the eighteen new audio paths playable.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile

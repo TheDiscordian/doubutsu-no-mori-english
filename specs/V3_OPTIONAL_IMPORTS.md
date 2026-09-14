@@ -173,6 +173,10 @@ native object-loading and population checks. The
 and all sixteen accessories in both NPC owners. Remaining voices, full text,
 defaults/houses, town behaviour, ordinary appearance, and persistence still
 require integration; move-in flags remain off.
+The [complete audio converter](V3_COMPLETE_VILLAGER_AUDIO.md) supplies all twenty
+melodies and four missing instruments while retaining all original instruments.
+Its extended audio resources still need runtime installation and allocation
+verification; the two pilots' installed audio remains unchanged.
 
 ### Items
 

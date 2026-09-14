@@ -396,6 +396,14 @@ failures; ordinary GPU appearance is not established. Remaining voices,
 text/defaults, houses, town behaviour, and persistence still require work.
 All move-in flags stay off; both V2 patchers are unchanged.
 
+The [complete audio bundle](checkpoints/V3_COMPLETE_VILLAGER_AUDIO.md) supplies
+all twenty additional villagers' full melody fragments and the four missing
+instruments, retaining all 83 original instruments. Nine focused checks pass
+after correcting one synthetic test's mutation indices. The 9,376-byte melody
+set retains every track and note; the font/wave grow by 656/7,584 bytes. These
+resources await runtime installation and audio-allocation verification. The
+current ABI-52 ROM and both V2 patchers remain unchanged by conversion.
+
 ## Stable V2 deliverable
 
 The current cartridge is **V2-11** at

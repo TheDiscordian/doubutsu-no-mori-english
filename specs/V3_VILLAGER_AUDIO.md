@@ -2,6 +2,11 @@
 
 ## Scope
 
+The [complete-roster converter](V3_COMPLETE_VILLAGER_AUDIO.md) supplies all twenty
+additional melody fragments and four required new instruments. Its extended
+bank/wave resources await installation; the pilot runtime described here remains
+the installed audio path.
+
 `tools/v3_asset_loader.py --villager-audio` installs the pilot NPC draw routes
 and Cheri/Punchy's donor melody programs. It widens the native voice paths to
 retain the full donor IDs, while keeping the original instruments, samples,
