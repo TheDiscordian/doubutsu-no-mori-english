@@ -59,6 +59,21 @@ conversion, not a playable islander release.
 
 ## Next integration
 
+Read-only comparison of the actual species vertex arrays identifies a separate
+Yodel requirement: the donor gorilla model has 429 vertices, with 313 position
+differences and 365 non-position-field differences after matrix-flag
+normalisation. It cannot use Pigleg's coordinates-only adaptation or be treated
+as a proven shared native model. The other newly reviewed islander species retain
+all vertex fields against their native species arrays. This is a vertex review,
+not complete model/rig conversion or topology proof.
+
+Penguin, bird, horse, chicken, and tiger rows have no mouth-frame pointers, like
+the wolf format. Their complete native texture objects are 4,128 bytes. Lion,
+penguin, bird, horse, chicken, koala, and tiger donor body arrays are larger than
+1,024 bytes; do not force these into the cat/cub body layout or discard the
+extra source data. Derive their individual body-piece mappings from the actual
+draw commands before claiming complete texture conversion.
+
 Finish the other sixteen islanders' body layouts and any required coordinate
 conversions, bind these exact accessory dependencies, and assign stable additive
 model storage. Implement joint attachment and its draw/lifetime rules without

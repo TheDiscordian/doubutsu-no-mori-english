@@ -274,6 +274,9 @@ with later e/e+ donor support investigated separately.
   focused checks pass. Continue the remaining species body conversions, bind
   these dependencies, and implement joint attachment/storage/cleanup. Do not
   remove accessories to force the existing body converter to accept them.
+  Yodel's gorilla geometry differs beyond positions and needs its actual model
+  conversion. Several additional species have null mouth frames or larger
+  donor body arrays; derive their layouts instead of assuming the cat format.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
   The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked
