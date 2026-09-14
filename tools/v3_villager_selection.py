@@ -6,7 +6,7 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 ABI, CODE, LIMIT = 25, 0x3400, 0x4000
 GROWTH, FLAGS, CANDIDATES, SHUFFLE = 0x1D80, 0x1E60, 0x4700, 0x4800
 SOURCES = ('tools/v3_villager_selection.py', 'overlays/v3/villager_selection.c',
-           'overlays/v3/villager_selection.ld')
+           'overlays/v3/villager_selection.ld', 'overlays/v3/villager_outfit.h')
 ENTRIES = (
     (0x800AA3A4, 0x800AA438, 'af_v3_unseen_personality'),
     (0x800AA49C, 0x800AA4FC, 'af_v3_reset_appeared'),
@@ -27,13 +27,13 @@ def install(native, code, blob, helper, symbols, text_report, house_report):
                        (SHUFFLE, SHUFFLE+238*4)):
         if any(blob[start:end]):
             raise ValueError('Selection code/data overlaps another resident component')
-    if not house_report or house_report['installed_villagers'] != ['E0EA']:
+    if not house_report or house_report['installed_villagers'] not in (['E0EA'], ['E0EA', 'E0ED']):
         raise ValueError('Selection integration requires complete Cheri house data')
     # Data readiness is separate from eligibility. No new identity reaches
     # ordinary gameplay until the remaining native readers/house checks close.
     capable = [row['actor_id'] for row in text_report['imports']
                if row['initial_defaults_applied'] and row['actor_id'] in house_report['installed_villagers']]
-    if capable != ['E0EA']:
+    if capable != house_report['installed_villagers']:
         raise ValueError('Changed reviewed ordinary-villager content dependencies')
     patches = []
     for start, end, name in ENTRIES:

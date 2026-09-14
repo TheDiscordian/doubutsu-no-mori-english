@@ -1,6 +1,7 @@
 /* Subset-aware town selection; saved IDs remain the fixed registry identities. */
 typedef unsigned char u8;
 typedef unsigned int u32;
+#include "villager_outfit.h"
 
 #ifdef __mips__
 #define flags ((const u8 *)0x80461E60u)
@@ -55,7 +56,7 @@ static int eligible(int index) {
     row = metadata+(index-218)*32;
     cloth = ((u32)row[30] << 8) | row[31];
     return row[0] == 0xE0 && row[1] == index && row[4] < 6 && row[6] == 0
-        && row[7] == 1 && cloth >= 0x2400 && cloth < 0x2500;
+        && row[7] == 1 && outfit_ready(cloth);
 }
 
 int af_v3_unseen_personality(u32 argument) {

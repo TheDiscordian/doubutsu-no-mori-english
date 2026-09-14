@@ -14,7 +14,7 @@ def exercise(debug, rom_path, record):
     rom = path.read_bytes(); report = json.loads((path.parent / 'build.json').read_text())
     if sha256(rom) != report['output_sha256'] or not report['villager_text']:
         raise ValueError('V3 defaults probe requires its exact current cartridge')
-    files = by_vrom(rom); blob = files[BLOB].extract(rom)
+    files = by_vrom(rom); blob = files[BLOB].extract(rom)[:0xC000]
     actor, animal = MODULE_RAM + 0x6500, MODULE_RAM + 0x6690
     output, default_table = MODULE_RAM + 0x6D00, MODULE_RAM + 0x7000
     cloth_tex, cloth_pal = MODULE_RAM + 0x6D30, MODULE_RAM + 0x6F50
@@ -57,25 +57,37 @@ def exercise(debug, rom_path, record):
     defaults = files[0xE03000].extract(rom)
     debug.write_memory(default_table, defaults)
     cheri, punchy = report['villager_text']['imports']
-    if not cheri['initial_defaults_applied'] or punchy['initial_defaults_applied']:
-        raise ValueError('Changed pilot default eligibility requires an updated fixture')
-    expected = expected_animal(0xE0EA, 1, 0x2498, bytes.fromhex(cheri['saved_default_key']))
-    for address, args in ((0x800AA29C, [animal, 0xE0EA, default_table]),
-                          (0x800AA218, [animal, 0xE0EA, 255, 0]),
-                          (0x800AD8C4, [animal, 234])):
-        debug.write_memory(animal, b'\xA5' * 0x540)
-        call(address, args)
-        check('Cheri complete initializer write set', animal, expected)
-    call(0x8019521C, [output, actor])
-    check('initialized full phrase reaches dialogue reader', output, b'tralala   ')
-    call(0x80195D20, [output, actor])
-    check('initialized identity reaches full-name reader', output, b'Cheri   ')
+    if not cheri['initial_defaults_applied']:
+        raise ValueError('Missing installed pilot defaults')
+    active = [cheri, punchy] if punchy['initial_defaults_applied'] else [cheri]
+    for row in active:
+        npc_id = int(row['actor_id'],16)
+        cloth = int(row.get('applied_clothing_id') or row['clothing_identity']['native_item_id'],16)
+        expected = expected_animal(npc_id, row['personality'], cloth, bytes.fromhex(row['saved_default_key']))
+        for address, args in ((0x800AA29C, [animal, npc_id, default_table]),
+                              (0x800AA218, [animal, npc_id, 255, 0]),
+                              (0x800AD8C4, [animal, npc_id & 255])):
+            debug.write_memory(animal, b'\xA5' * 0x540)
+            call(address, args)
+            check(row['name']+' complete initializer write set', animal, expected)
+        call(0x8019521C, [output, actor])
+        check('initialized full phrase reaches dialogue reader', output, row['catchphrase'].encode().ljust(10,b' '))
+        call(0x80195D20, [output, actor])
+        check('initialized identity reaches full-name reader', output, row['name'].encode().ljust(8,b' '))
+    if punchy['initial_defaults_applied']:
+        selected = debug.read_memory(0x8046282A,1)
+        try:
+            debug.write_memory(0x8046282A,bytes(1))
+            call(0x800AD8C4,[animal,237])
+            check('missing actual imported shirt is no-write',animal,expected)
+        finally:
+            debug.write_memory(0x8046282A,selected)
     for npc, looks in ((0xE0EA, 1), (0xE0ED, 2), (0xE0DA, 0), (0xEFFF, 0), (0xD008, 0)):
         call(0x800AA1E0, [npc], looks)
     native_code = files[CODE_VROM].extract(rom)
     for npc in (0xE000, 0xE0D9):
         call(0x800AA1E0, [npc], native_code[0x8010AF58 - CODE_RAM + (npc & 0xFFF)])
-    for npc in (0xE0DA, 0xE0ED):
+    for npc in ((0xE0DA,) if punchy['initial_defaults_applied'] else (0xE0DA,0xE0ED)):
         for address, args in ((0x800AA29C, [animal, npc, default_table]),
                               (0x800AA218, [animal, npc, 0, default_table]),
                               (0x800AD8C4, [animal, npc & 0xFFF])):
@@ -99,6 +111,25 @@ def exercise(debug, rom_path, record):
     call(0x800B1EDC, [cloth_tex, cloth_pal, 0x98])
     check('native complete yellow-bar texture DMA', cloth_tex, files[0xB68000].extract(rom)[0x13000:0x13200])
     check('native complete yellow-bar palette DMA', cloth_pal, files[0xB88000].extract(rom)[0x1300:0x1320])
+    if punchy['initial_defaults_applied']:
+        call(0x800B1EDC,[cloth_tex,cloth_pal,0x10BF])
+        garment = files[BLOB].extract(rom)[0xF000:0xF220]
+        check('complete imported cherry-shirt texture DMA',cloth_tex,garment[:512])
+        check('complete imported cherry-shirt palette DMA',cloth_pal,garment[512:])
+        saved = {at:debug.read_memory(at,n) for at,n in
+                 ((0x80461E60,20),(0x80464700,32),(0x8013670C,32),(0x80130DB8,15*0x528))}
+        try:
+            debug.write_memory(0x80130DB8,bytes(15*0x528))
+            history = bytearray(b'\xFF'*32);history[237//8] &= ~(1 << (237&7))
+            debug.write_memory(0x8013670C,history)
+            call(0x800AD6D4,[2],0xFFFFFFFF)
+            debug.write_memory(0x80461E73,b'\x01')
+            call(0x800AD6D4,[2],237)
+            debug.write_memory(0x8046282A,bytes(1))
+            call(0x800AD6D4,[2],0xFFFFFFFF)
+        finally:
+            debug.write_memory(0x8046282A,selected)
+            for at,data in saved.items():debug.write_memory(at,data)
     for address in guards: check('fixture guard', address, edge)
     check('source defaults table retained', default_table, defaults)
     check('land source retained', 0x80129E00, b'Forest!!\x12\x34')
@@ -106,7 +137,7 @@ def exercise(debug, rom_path, record):
     check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
     check('no faulted thread', 0x8003CE34, bytes(4))
     debug.write_memory(0x80129E00, land_before)
-    return {'native_initialization_routes': 3, 'imported_personalities': 2,
+    return {'native_initialization_routes': 3*len(active), 'imported_personalities': 2,
             'native_clothing_dma_tested': True, 'original_initialization_retained': True,
             'ordinary_move_in_tested': False, 'save_reload_tested': False,
             'requires_checkpoint_restore': True}

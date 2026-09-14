@@ -16,7 +16,7 @@ FIRST_SHA = '461d3d0e0293dac2d93ade9cf317487c92dc15a199da8f698b8f99cba1d812c0'
 SOURCES = ('tools/v3_villager_text.py', 'tools/v3_registry.py',
            'overlays/v3/villager.c', 'overlays/v3/villager.ld', 'tools/gc_text.py',
            'tools/gc_names.py', 'tools/gamecube.py', 'tools/textcodec.py', 'tools/textbanks.py',
-           'tools/v3_villager_defaults.py')
+           'tools/v3_villager_defaults.py', 'overlays/v3/villager_outfit.h')
 # No PC-relative instructions are copied into these return bridges.
 BRIDGES = (
     (0x80196044, 0x2F00, 'af_v3_load_name', (0x27BDFFA0, 0xAFB30054)),

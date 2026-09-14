@@ -7,10 +7,11 @@ for both pilots and Cheri's initial identity, personality, clothing, catchphrase
 reference, and hometown. It does not enable move-ins. House data, selection,
 remaining identity readers, and save/profile handling remain required.
 
-Punchy's starting cherry shirt requires a clothing import. His initializers
-therefore leave the destination untouched; they must not install the different
-native artwork at the same item number. His name, full phrase, draw record,
-audio, and personality lookup remain available for component development.
+The complete `--speed-bag` variant supplies Punchy's actual imported cherry
+shirt as `34BF` and connects all three starting-default routes. The shared
+clothing reader must confirm the exact enabled garment before initialization
+can write anything. Other variants leave his incomplete destination untouched;
+the different native shirt `24BF` is never substituted. Move-ins stay disabled.
 
 ## Clothing identity
 
@@ -57,7 +58,7 @@ Imported initialization writes exactly the original initializer's fields:
 - `+004..009`: six-byte current land name from `80129E00`.
 - `+00B`: personality; peppy is 1, lazy is 2 in both games.
 - `+4E5..4E8`: the full-phrase adapter's four-byte V3 default reference.
-- `+520..521`: verified native clothing ID.
+- `+520..521`: verified applied clothing ID, including imported `34BF`.
 
 Other fields, including name ID at `+00A`, follow their existing later
 initialization paths. This is not a replacement for full saved identity creation.
@@ -72,19 +73,25 @@ Present metadata and a verified outfit do not grant roster eligibility.
 
 ## Memory and compatibility
 
-The existing 32-byte metadata row now uses offsets 30–31 for a sixteen-bit
-verified native clothing ID. Zero means the outfit/initial-default dependency
-is pending. All other fields and the ABI-4 32-KiB reservation remain unchanged.
+The existing 32-byte metadata row uses offsets 30–31 for the sixteen-bit
+verified applied clothing ID. Zero means the outfit/default dependency is
+pending. The donor identity remains separately stored at offsets 2–3.
 Four additional return bridges use `80462F40..80462F7F`, before audio data at
 `80463000`. Text/default code occupies the existing region from `80464000`.
 Patch entries require exact displaced instructions; bridges contain no copied
-PC-relative instructions. Original/default table resources and ordinary heap
-allocations do not grow.
+PC-relative instructions. The complete variant puts its 188-byte default writer
+at `804632E0`, in the verified gap after the pilot melodies and before selection
+at `80463400`. Its 1,480-byte text program fits before the item bridges at
+`80464600`; the 1,504-byte selection program fits before rewards at `80463A00`.
+Both use the same checked outfit predicate. Original/default resources, native
+heap bounds, and the current 48-KiB permanent V3 prefix do not grow.
 
 V3 phrase references still require compatible V3 metadata. Save layouts do not
 grow, but these new saved values are not safe to load in V2. Imported ordinary
 save/reload and profile handling remain unverified. Use disposable saves only.
 The web patcher stays V2 until user testing and explicit approval.
 
-The [checkpoint](../docs/checkpoints/V3_VILLAGER_DEFAULTS.md) records the exact
-current build, focused checks, native results, and remaining work.
+The [Cheri checkpoint](../docs/checkpoints/V3_VILLAGER_DEFAULTS.md) retains its
+native results. The [Punchy checkpoint](../docs/checkpoints/V3_PUNCHY_HOUSE.md)
+records the combined implementation and focused checks. Its native default
+tail is unexecuted because the preceding house arithmetic check fails.

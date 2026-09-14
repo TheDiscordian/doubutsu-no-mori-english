@@ -140,4 +140,5 @@ int main(void) {
     af_v3_set_index(animal, 215);
     assert(calls == 3);
     puts("V3 names, borrowed/default phrases, initial defaults, personality, native fallback, and guards pass");
+    return 0;
 }

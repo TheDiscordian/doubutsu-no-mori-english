@@ -241,11 +241,17 @@ with later e/e+ donor support investigated separately.
   catalogue rows, and animated preview construction. The item is enabled in
   the private build; its seven host checks and 12-record cold-boot check pass.
   Neither web patcher exposes V3 options.
-  Next: ordinary speed-bag placement/interaction/save, and Punchy's house/defaults.
-  His two additional foreground layers exceed the current file's gap before
-  `011E2000`; move the complete foreground resource with checked loader/DMA
-  references instead of overwriting the next file. GPU/hardware acceptance,
-  ordinary purchase, and complete villager persistence remain open.
+  The [Punchy house/default batch](checkpoints/V3_PUNCHY_HOUSE.md) installs his
+  room and actual starting shirt, relocates the complete foreground without
+  overwriting adjacent files, and passes all seven focused checks. The two
+  native attempts stop at an unresolved size mismatch: 492 observed records
+  instead of 436. Full native layer/default execution is not accepted.
+  Next: classify this mismatch without repeating the exhausted debugger setup;
+  use ordinary scene execution or another independently justified check when
+  addressing the affected loader. Keep move-ins disabled. Continue unrelated
+  speed-bag ordinary placement/interaction/save and remaining donor conversion
+  work; do not waive the unresolved loader issue for a playable handoff.
+  GPU/hardware acceptance, ordinary purchase, and villager persistence remain open.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

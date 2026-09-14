@@ -2,6 +2,7 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+#include "villager_outfit.h"
 struct Villager {
     u16 actor, cloth;
     u8 personality, umbrella, growth, present;
@@ -139,8 +140,11 @@ u32 af_v3_get_looks(u32 argument) {
     return npc >= 0xE000u && npc < 0xE0DAu ? old_looks(npc) : 0;
 }
 
+#ifdef AF_V3_IMPORTED_OUTFIT_SOURCE
+__attribute__((section(".defaults")))
+#endif
 static void imported_defaults(u8 *animal, const struct Villager *row) {
-    if (!row || row->native_cloth < 0x2400u || row->native_cloth >= 0x2500u) return;
+    if (!row || !outfit_ready(row->native_cloth)) return;
     animal[0] = row->actor >> 8;
     animal[1] = row->actor;
     animal[0xB] = row->personality;

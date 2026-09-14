@@ -2,6 +2,9 @@ OUTPUT_ARCH(mips)
 ENTRY(af_v3_load_name)
 SECTIONS
 {
+    . = 0x804632E0;
+    .defaults : { *(.defaults) }
+    ASSERT(. <= 0x80463400, "V3 imported defaults exceed the gap after pilot melodies")
     . = 0x80464000;
     .text : { *(.text.af_v3_load_name) *(.text .text.*) }
     .rodata : { *(.rodata .rodata.*) }

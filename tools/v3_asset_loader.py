@@ -100,6 +100,11 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     report = {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
               'toolchain': IMAGE, 'flags': flags,
               'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
+    if part == 'villager':
+        run('objcopy', '-O', 'binary', '-j', '.defaults', 'code.elf', 'defaults.bin')
+        defaults = (out / 'defaults.bin').read_bytes()
+        report['default_extension'] = {'ram': 0x804632E0, 'bytes': len(defaults),
+                                       'sha256': sha256(defaults)}
     if part in ('catalogue', 'hra', 'feng_shui'):
         report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
     return code, report
@@ -115,7 +120,9 @@ def compose(native, base, changes, added, *, resized=(), relocated=None):
     scoring_moves = {0x0081D9D0: 0x03F40000, 0x00821740: 0x03F48000}
     all_moves = {**scoring_moves, 0x00827DE0: 0x03F50000, 0x00828C00: 0x03F54000}
     from v3_speed_bag_sound_runtime import RELOCATIONS as sound_moves
-    if (relocated not in ({}, scoring_moves, all_moves, {**all_moves, **sound_moves})
+    from v3_villager_houses import FOREGROUND, EXPANDED_FOREGROUND
+    if (relocated not in ({}, scoring_moves, all_moves, {**all_moves, **sound_moves},
+                         {**all_moves, **sound_moves, FOREGROUND: EXPANDED_FOREGROUND})
             or not set(relocated) <= set(resized) or set(relocated.values()) & (set(current) | set(added))):
         raise ValueError('Unreviewed V3 resource relocation')
     if not changes and not added and not relocated:
@@ -371,7 +378,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if speed_bag_sound:
         abi = max(abi, v3_speed_bag_sound_runtime.ABI)
     if speed_bag:
-        abi = max(abi, v3_speed_bag_runtime.ABI)
+        abi = max(abi, v3_speed_bag_runtime.ABI, v3_villager_houses.PUNCHY_ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -435,8 +442,10 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     audio_report = (v3_audio_runtime.install(native, code, blob, helper_report['symbols'], audio_donor)
                     if audio_donor is not None else None)
     text_report = None
+    outfit_defines = ((f'AF_V3_IMPORTED_OUTFIT_SOURCE=0x{helper_report["symbols"]["af_v3_clothing_source"]:08X}u',)
+                      if speed_bag else ())
     if text_donor is not None:
-        text_code, text_code_report = compile_part('villager', out / 'villager')
+        text_code, text_code_report = compile_part('villager', out / 'villager', defines=outfit_defines)
         text_limit = v3_furniture_runtime.CODE if furniture else blob_size - 16
         if furniture_items:
             text_limit = v3_furniture_items.BRIDGE
@@ -446,6 +455,12 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         text_report = v3_villager_text.install(native, code, module, blob,
             text_code_report['symbols'], *text_donor, symbols)
         text_report['code'] = text_code_report
+        if speed_bag:
+            defaults = (out / 'villager/defaults.bin').read_bytes()
+            if (not 0 < len(defaults) <= 0x120 or any(blob[0x32E0:0x3400])
+                    or len(text_code) > 0x600):
+                raise ValueError('Imported defaults overlap melody, selection, or item bridges')
+            blob[0x32E0:0x32E0+len(defaults)] = defaults
     furniture_changes, furniture_report = {}, None
     if furniture:
         furniture_code, furniture_code_report = compile_part('furniture', out / 'furniture',
@@ -682,7 +697,12 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     house_changes, house_report = {}, None
     if houses:
         house_changes, house_report = v3_villager_houses.install(native, base, code,
-            text_donor[0], symbols, furniture_report)
+            text_donor[0], symbols, {'imports': gameplay_imports}, punchy=speed_bag)
+        relocated.update({int(v, 16): int(t, 16) for v, t in house_report['relocations'].items()})
+    if speed_bag:
+        from v3_villager_defaults import imported_outfit
+        text_report['imported_outfit'] = imported_outfit(blob, text_report,
+            clothing_resource, clothing_record, clothing_row)
     reader_changes, reader_report = {}, None
     if villager_readers:
         reader_code, reader_compiled = compile_part('villager_readers', out / 'villager_readers')
@@ -693,7 +713,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         reader_report['code'] = reader_compiled
     selection_report = None
     if villager_selection:
-        selection_code, selection_compiled = compile_part('villager_selection', out / 'villager_selection')
+        selection_code, selection_compiled = compile_part('villager_selection', out / 'villager_selection',
+            defines=((f'AF_V3_OUTFIT_READY=0x{text_code_report["symbols"]["outfit_ready"]:08X}u',)
+                     if speed_bag else ()))
         selection_report = v3_villager_selection.install(native, code, blob,
             selection_code, selection_compiled['symbols'], text_report, house_report)
         selection_report['code'] = selection_compiled
@@ -707,6 +729,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if clothing:
         clothing_report = v3_clothing.install(code, blob, helper_report['symbols'],
             clothing_resource, clothing_record)
+        clothing_report['punchy_defaults_enabled'] = speed_bag
         clothing_report['imports'] = [clothing_row]
         draw_changes, clothing_owners = v3_npc_clothing.patch_owners(
             native, draw_changes, helper_report['symbols'])
@@ -812,6 +835,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         speed_bag_report.update({'saved_profile_included': True,
             'catalogue_row_installed': True, 'shop_stock_installed': True,
             'hra_score_letter_name_installed': True, 'feng_shui_installed': True})
+        speed_bag_report['punchy_house_installed'] = house_report['installed_villagers'] == ['E0EA', 'E0ED']
+        speed_bag_report['pending'] = ['ordinary acquisition/interaction and persistence',
+                                     'ordinary Punchy gameplay and house visits']
         furniture_added[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
         additions[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
     if len(blob) != blob_size:

@@ -282,4 +282,6 @@ callback/model build and bounded native evidence. The
 room-scoring checks. The [gameplay connections](../docs/checkpoints/V3_SPEED_BAG_GAMEPLAY.md)
 record the current enabled private build, native stock/ownership/letter/preview
 checks, and changed save-profile requirement. Ordinary purchase, interaction,
-persistence, and Punchy's house remain work.
+persistence, and ordinary Punchy house visits remain work. His house data and
+default outfit are installed in the complete private variant; the
+[combined native check](../docs/checkpoints/V3_PUNCHY_HOUSE.md) is unresolved.

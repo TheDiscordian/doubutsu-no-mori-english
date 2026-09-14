@@ -130,8 +130,10 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-speed-bag-gameplay-02/animal-forest-v3-asset-loader.z64`, ABI 49, SHA-256
-`7c0cbcf9a5f0b8c13d2aa7cbd38f253a2864bd30e2027a23e29ccc0a29972a2c`.
+`build/v3-punchy-house-02/animal-forest-v3-asset-loader.z64`, ABI 50, SHA-256
+`55cb90c0cc9eac32aa6e180051f1791072cfa6dd5ba1c6b8a72a413f6211e060`.
+This is an implementation artifact, not an accepted playtest handoff: its new
+native foreground-size check is unresolved, as detailed below.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -332,6 +334,21 @@ without that dependency reject its saves, although the format remains version 2.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
 the switch; publishing development source does not grant patcher approval.
+
+The [Punchy house/default batch](checkpoints/V3_PUNCHY_HOUSE.md) installs his
+complete mapped room, original furniture rotations, K.K. Love Song, matching
+native surfaces, and actual `34BF` starting shirt. The complete foreground
+moves to a checked reservation, retaining all original rows and DMA identities.
+Default/selection code fits existing resident gaps without permanent RAM growth.
+All seven focused checks pass, including sanitized default/clothing code,
+dependency rejection, full source conversion, and patch reconstruction.
+The two bounded native attempts both stop at a foreground-address arithmetic
+mismatch: 492 observed records instead of the assembled 436. Resident
+instructions match the ROM, but the cause is not established. Native layer,
+default, and gameplay verification remain incomplete; do not claim these paths
+passed or enable move-ins. Preserve the failed evidence instead of looping on
+the same debugger setup. Profile/format are unchanged from ABI 49; ordinary
+cross-build loading is not newly verified. Both patchers remain V2.
 
 ## Stable V2 deliverable
 

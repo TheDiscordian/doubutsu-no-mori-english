@@ -30,7 +30,10 @@ The new transient arrays do not overwrite the original 27-byte candidate array
 at `80142E58` or the original 216-entry shuffle at `80143028`. Native test indices
 216/217 and unavailable imports are excluded. An imported candidate additionally
 requires its exact installed metadata identity, ordinary growth role, valid
-personality, and implemented starting outfit. House availability is checked by
+personality, and implemented starting outfit. The complete variant accepts
+imported clothing only through the shared predicate that checks the actual
+clothing reader. Both pilot house/default dependencies are installed, but
+eligibility flags remain off. House availability is checked by
 the installer before any eligibility can be enabled in a later integration step.
 
 ## Selection behaviour

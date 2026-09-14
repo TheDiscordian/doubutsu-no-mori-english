@@ -19,6 +19,8 @@ from v3_registry import FURNITURE
 from v3_villager_art import native_palette, pack4, untile
 
 HOUSE, FOREGROUND, STRIDE = 0xE02000, 0x11AB000, 0x206
+EXPANDED_FOREGROUND, FOREGROUND_LIMIT = 0x03F60000, 0x03FA0000
+PUNCHY_ABI = 50
 NATIVE_START, NATIVE_COUNT, TARGET_COUNT = 398, 458, 498
 DONOR_FG_SHA = 'f443f2f451e3a579d183176ba97a81a6685be4746509a4c8a9979e7c900f6fa5'
 SHARED_HOUSE_ITEMS = (0x10B8, 0x1154, 0x11E4, 0x1358, 0x136C)
@@ -197,8 +199,10 @@ def metadata(native, donor, symbols):
             'donor_fg_sha256': sha256(fg), 'houses': houses}
 
 
-def install(native, base, code, donor, symbols, furniture):
-    """Install Cheri's complete mapped layers; move-in selection stays disabled."""
+def install(native, base, code, donor, symbols, furniture, *, punchy=False):
+    """Install complete mapped pilot houses; move-in selection stays disabled."""
+    if type(punchy) is not bool:
+        raise ValueError('Explicit Punchy house selection required')
     report = metadata(native, donor, symbols)
     files = by_vrom(base)
     original, fg_original = (files[v].extract(base) for v in (HOUSE, FOREGROUND))
@@ -208,58 +212,89 @@ def install(native, base, code, donor, symbols, furniture):
     for start, end in ((0x800AB134, 0x800AB3A0), (0x8008609C, 0x800862DC)):
         if bytes(code[start - CODE_RAM:end - CODE_RAM]) != native_code[start - CODE_RAM:end - CODE_RAM]:
             raise ValueError('House loader differs from its reviewed native function')
-    cheri = report['houses'][0]
-    if cheri['donor_house_hex'] != '00003f2102020203' or cheri['actor_id'] != 'E0EA':
+    cheri, second = report['houses']
+    if (cheri['donor_house_hex'] != '00003f2102020203' or cheri['actor_id'] != 'E0EA'
+            or second['donor_house_hex'] != '0201271401ea01eb' or second['actor_id'] != 'E0ED'):
         raise ValueError('Changed pilot house metadata')
-    active_items = {row['item_id'] for row in furniture['imports']}
-    mapping = {item: item for item in (0x4080, 0xFFFE, 0xFFFF)}
-    for row in cheri['dependencies']:
-        if len(row['reviewed_native_items']) == 1:
-            target = row['reviewed_native_items'][0]
-        elif row['status'] == 'import_dependency' and row['imported_item'] in active_items:
-            target = row['imported_item']
-        else:
-            raise ValueError('Cheri house dependency has no complete installed mapping')
-        mapping[int(row['donor_item'], 16)] = int(target, 16)
-    surface_indices = []
-    for name, bank in (('wall', 0x182A000), ('floor', 0x17A1000)):
-        matches = cheri[name]['native_matches']
-        if len(matches) != 1 or matches[0]['vrom'] != f'{bank:08X}':
-            raise ValueError('Cheri room surface lacks its exact native artwork')
-        surface_indices.append(matches[0]['index'])
+    active_items = set()
+    for row in furniture['imports']:
+        item = int(row['item_id'], 16)
+        if (item not in FURNITURE or FURNITURE[item][:2] != (row['runtime_index'], item)
+                or item in active_items):
+            raise ValueError('House furniture dependency has an invalid or duplicate identity')
+        active_items.add(item)
+    selected = report['houses'] if punchy else [cheri]
     houses = bytearray(original + bytes(20 * 8))
-    struct.pack_into('>4B2H', houses, 234 * 8, cheri['house_type'], cheri['house_palette'],
-                     *surface_indices, *villager_house_layers(232))
     donor_layers = layers(dict(rarc_files(donor['forest_2nd.arc']))['data/fgnpcdata.bin'])
     foreground = bytearray(fg_original)
     appended = []
-    for row in cheri['layers']:
-        raw = donor_layers[row['donor_layer']]
-        converted = (struct.pack('>H', row['target_layer']) +
-                     b''.join(struct.pack('>H', mapping[item])
-                              for (item,) in struct.iter_unpack('>H', raw[2:514])) + raw[514:])
-        if row['target_layer'] in layers(fg_original) or len(converted) != STRIDE:
-            raise ValueError('Imported house layer collides with native content')
-        foreground.extend(converted)
-        appended.append({'id': row['target_layer'], 'sha256': sha256(converted), 'bytes': len(converted)})
+    occupied = set(layers(fg_original))
+    for house in selected:
+        mapping = {item: item for item in (0x4080, 0xFFFE, 0xFFFF)}
+        for row in house['dependencies']:
+            if len(row['reviewed_native_items']) == 1:
+                target = row['reviewed_native_items'][0]
+            elif (row['status'] == 'import_dependency' and row['imported_item'] is not None
+                  and int(row['imported_item'], 16) & ~3 in active_items):
+                # Dependency checks use the canonical ID; preserve placed rotation.
+                target = row['imported_item']
+            else:
+                raise ValueError(house['name'] + ' house dependency has no complete installed mapping')
+            mapping[int(row['donor_item'], 16)] = int(target, 16)
+        surface_indices = []
+        for name, bank in (('wall', 0x182A000), ('floor', 0x17A1000)):
+            matches = house[name]['native_matches']
+            if len(matches) != 1 or matches[0]['vrom'] != f'{bank:08X}':
+                raise ValueError(house['name'] + ' room surface lacks its exact native artwork')
+            surface_indices.append(matches[0]['index'])
+        actor = int(house['actor_id'], 16)
+        struct.pack_into('>4B2H', houses, (actor & 0xFFF) * 8,
+                         house['house_type'], house['house_palette'], *surface_indices,
+                         *villager_house_layers(house['donor_index']))
+        for row in house['layers']:
+            raw = donor_layers[row['donor_layer']]
+            converted = (struct.pack('>H', row['target_layer']) +
+                         b''.join(struct.pack('>H', mapping[item])
+                                  for (item,) in struct.iter_unpack('>H', raw[2:514])) + raw[514:])
+            if row['target_layer'] in occupied or len(converted) != STRIDE:
+                raise ValueError('Imported house layer collides with installed content')
+            occupied.add(row['target_layer'])
+            foreground.extend(converted)
+            appended.append({'id': row['target_layer'], 'sha256': sha256(converted), 'bytes': len(converted)})
+        house['installed'] = True
     foreground.extend(bytes(-len(foreground) % 8))
-    if len(houses) != 0x770 or FOREGROUND + len(foreground) != 0x11E1E30:
+    target_fg = EXPANDED_FOREGROUND if punchy else FOREGROUND
+    limit = FOREGROUND_LIMIT if punchy else 0x011E2000
+    if (len(houses) != 0x770 or len(foreground) != (225848 if punchy else 224816)
+            or target_fg + len(foreground) > limit):
         raise ValueError('House resources differ from their reviewed loader bounds')
-    for address, expected, replacement in WINDOWS:
+    if punchy and any(e.vstart < limit and target_fg < e.vend for e in files.values()):
+        raise ValueError('Expanded foreground reservation overlaps an existing resource')
+    patches = list(WINDOWS)
+    if punchy:
+        # Native signed-low pairs: start v0/a1, end t3/t3, then subtract/divide.
+        end = target_fg + len(foreground)
+        patches[2:3] = [
+            (0x800860FC, 0x3C02011B, 0x3C020000 | (target_fg + 0x8000) >> 16),
+            (0x80086100, 0x3C0B011E, 0x3C0B0000 | (end + 0x8000) >> 16),
+            (0x80086104, 0x256B1A20, 0x256B0000 | end & 0xFFFF),
+            (0x80086108, 0x2445B000, 0x24450000 | target_fg & 0xFFFF)]
+    for address, expected, replacement in patches:
         if struct.unpack_from('>I', code, address - CODE_RAM)[0] != expected:
             raise ValueError('Changed house loader instruction')
         struct.pack_into('>I', code, address - CODE_RAM, replacement)
-    cheri['installed'] = True
-    report.update({'installed_villagers': ['E0EA'], 'new_villager_ids_enabled': False,
+    report.update({'installed_villagers': [h['actor_id'] for h in selected], 'new_villager_ids_enabled': False,
                    'house_bytes': len(houses), 'foreground_bytes': len(foreground),
-                   'foreground_records': 434, 'foreground_pointer_count': TARGET_COUNT,
+                   'foreground_records': len(occupied), 'foreground_pointer_count': TARGET_COUNT,
+                   'foreground_vrom': f'{target_fg:08X}', 'foreground_limit': f'{limit:08X}',
+                   'relocations': {f'{FOREGROUND:08X}': f'{target_fg:08X}'} if punchy else {},
                    'house_extra_allocation_bytes': len(houses) - len(original),
                    'foreground_extra_allocation_bytes': len(foreground) - len(fg_original),
                    'foreground_pointer_extra_allocation_bytes': (TARGET_COUNT - NATIVE_COUNT) * 4,
                    'appended_layers': appended,
                    'output_house_sha256': sha256(houses), 'output_fg_sha256': sha256(foreground),
                    'code_patches': [{'address': f'{at:08X}', 'expected': f'{before:08X}',
-                                     'replacement': f'{after:08X}'} for at, before, after in WINDOWS],
+                                     'replacement': f'{after:08X}'} for at, before, after in patches],
                    'house_visit_tested': False, 'saved_layout_changed': False})
     return {HOUSE: bytes(houses), FOREGROUND: bytes(foreground)}, report
 

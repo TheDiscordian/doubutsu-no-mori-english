@@ -116,14 +116,17 @@ and full-ID audio paths; focused native audio/draw checks pass. The
 native default reset, and four-byte borrowed/default references. Its focused
 and native reader/insertion checks pass. The
 [initial-default adapter](V3_VILLAGER_DEFAULTS.md) connects Cheri's verified
-starting shirt/defaults and both pilots' personality lookup. Punchy's actual
-cherry-shirt import, remaining native reader review, and
-ordinary gameplay/save integration remain pending.
+starting shirt/defaults and both pilots' personality lookup. The complete
+variant connects Punchy's actual imported cherry shirt to his initializers and
+the shared selection predicate. Native verification and ordinary gameplay/save
+integration remain pending.
 The [house adapter](V3_VILLAGER_HOUSES.md) installs Cheri's complete mapped
 furniture/music layers and verified native surfaces, preserving original houses.
 Focused native initialization and layer transfers pass; complete scene loading
-and ordinary visits remain unverified. Punchy's animated
-speed bag and actual cherry shirt are dependencies for his uninstalled house.
+and ordinary visits remain unverified. The complete variant installs Punchy's
+house with the animated speed bag and actual cherry-shirt dependencies. Its
+relocated foreground arithmetic has an unresolved native-test discrepancy;
+do not infer working house visits from the passing source conversion.
 The [secondary reader adapter](V3_VILLAGER_READERS.md) connects full names in
 map, inventory, letters, recipient selection, conversation identity fields,
 and generated-mail capture. Native names/aliases and saved field sizes remain.
@@ -203,7 +206,9 @@ actual donor metadata, theme groups, and missing-item recommendations, with
 focused checks and native execution. The [feng shui adapter](V3_FENG_SHUI.md)
 connects actual donor colours to native item/room evaluation and retains N64
 point weights, with focused checks and native execution.
-Punchy's speed bag needs its actual animation/interaction adapter.
+Punchy's speed bag has its actual animation/interaction adapter and connected
+stock, catalogue, scoring, and save profile. Ordinary gameplay/persistence and
+final appearance verification remain open.
 
 Then batch imports by shared conversion and behaviour needs. Interactive
 furniture, music, tools, living creatures, and other mechanics need their actual

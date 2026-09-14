@@ -3,10 +3,11 @@
 ## Installed scope
 
 `--villager-houses` installs Cheri's complete two-layer GAFE01-r0 house alongside
-the existing furniture, scoring, and save foundation. It does not enable move-ins
-or change the browser patchers. Punchy's room metadata and item dependencies are
-identified, but his house stays uninstalled until the speed bag's real behaviour
-and his default cherry shirt are available.
+the existing furniture, scoring, and save foundation. The complete `--speed-bag`
+variant also installs Punchy's two layers and imported cherry-shirt default.
+Neither variant enables move-ins or changes the browser patchers. The combined
+house/default build passes focused host checks; native foreground arithmetic
+verification remains unresolved, so ordinary house integration is not accepted.
 
 No original villager or house is repurposed. Shared furniture uses reviewed
 existing identities and native behaviour; the two new barrel items use their
@@ -62,34 +63,44 @@ markers (`FFFE`), and reserved spaces (`FFFF`) retain native semantics.
 ## Native installation
 
 The house table grows from 1,744 to 1,904 bytes within its existing ROM interval.
-All 218 original rows are retained. Cheri's new row is
-`00003F2103780379`; the other uninstalled import rows remain zero and unavailable
-to move-in selection. This table expansion is not an eligibility decision.
+All 218 original rows are retained. Cheri's row is `00003F2103780379`.
+The complete variant adds Punchy's row `02012714037E037F` at fixed index 237.
+All uninstalled import rows remain zero. This expansion is not an eligibility
+decision; move-in flags stay disabled.
 
-The foreground grows from 223,776 to 224,816 bytes: two appended 518-byte rows
-and four alignment bytes. Its end is `011E1E30`, below the next file at
-`011E2000`. Both DMA indices stay unchanged and no new DMA row is required.
+The Cheri-only foreground has 224,816 bytes: two appended 518-byte rows and
+four alignment bytes, ending at `011E1E30`. The complete variant needs 225,848
+bytes and cannot fit before the next native resource at `011E2000`. It moves
+the complete foreground to the checked `03F60000..03FA0000` reservation and
+ends at `03F97238`. All 432 original rows precede the four imported rows;
+the complete 436-row resource is eight-byte aligned without padding. The original DMA identity
+is retained, and adjacent native files stay unchanged.
 
-Five checked immediate instructions connect the new bounds:
+Checked instructions connect the new bounds:
 
 - `800AB194` and `800AB1B0`: both allocation routes of `mNpc_SetNpcList` use the
   house-table end `00E02770`. Native copying, placement, and cleanup remain.
 - `80086104`: the NPC foreground load ends at `011E1E30`; the native divide by
-  518 obtains 434 records and ignores the four alignment bytes.
+  518 obtains 434 records in the Cheri-only variant and ignores its padding.
+- The complete variant changes both signed-low address pairs at
+  `800860FC` / `80086108` and `80086100` / `80086104` to the relocated start/end.
+  The assembled arithmetic represents 436 complete records. The native test
+  instead reports 492; this discrepancy is unresolved, not a passing check.
 - `80086118` and `8008611C`: allocate 1,992 bytes for 498 sorted pointers,
   covering every fixed import layer reservation. Sparse slots remain null.
 
-The complete native functions are checked before these five words change.
-The house-table allocation grows by 160 bytes. The NPC foreground allocation
-grows by 1,040 bytes and its temporary pointer array by 160 bytes. Resident
-helpers, model banks, and ordinary heap bounds do not change.
+The complete native functions are checked before five words change in the
+Cheri-only variant or eight in the complete variant. The house-table allocation
+grows by 160 bytes. Foreground allocation grows by 1,040 or 2,072 bytes, and
+the temporary pointer array by 160 bytes. Native heap bounds do not change.
 
-The assembled startup uses ABI 23. Only the resident header's ABI word changes;
-all resident code, furniture metadata, model tails, and saved layouts remain.
-Experimental V3 saves still require their compatible V3 import profile and are
-not safe to load in V2. Ordinary imported-villager move-in, conversations,
-house visits, gifting, and saved identity need the remaining villager readers
-and selection/profile integration.
+The complete house/default build uses ABI 50. Its save profile and format are
+unchanged from the speed-bag gameplay build; cross-build reload is expected but
+not independently verified. V3 saves still require compatible V3 imports and
+must not be loaded in V2. Ordinary Punchy gameplay, house visits, gifting, and
+saved identity remain unverified.
 
-The [house checkpoint](../docs/checkpoints/V3_VILLAGER_HOUSES.md) records current
-cartridge hashes, focused checks, and native execution results.
+The [Cheri checkpoint](../docs/checkpoints/V3_VILLAGER_HOUSES.md) retains the
+accepted component evidence for that variant. The
+[combined checkpoint](../docs/checkpoints/V3_PUNCHY_HOUSE.md) records current
+artifacts, focused checks, and the unresolved native result.

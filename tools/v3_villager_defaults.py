@@ -45,3 +45,34 @@ def clothing(native, first):
             'compared_pixels': len(wanted), 'native_candidates_checked': len(native_pixels),
             'native_texture_bank_sha256': sha256(textures), 'native_palette_bank_sha256': sha256(palettes)}
     return result
+
+
+def imported_outfit(blob, text_report, resource, record, row):
+    """Bind Punchy's default to the verified additive garment and save profile."""
+    from v3_registry import clothing_slot
+    item, index, vrom = clothing_slot(0x24BF)
+    slots = [r for r in text_report['imports'] if r['actor_id'] == 'E0ED']
+    if len(slots) != 1 or len(blob) != 0xC000:
+        raise ValueError('Missing complete Punchy metadata')
+    target = slots[0]
+    at = 0x2C00 + 19 * 32
+    before = bytes(blob[at:at+32])
+    outfit = target['clothing_identity']
+    if (sha256(before) != target['record_sha256'] or before[30:] != bytes(2)
+            or before[:4] != bytes.fromhex('E0ED24BF') or target['initial_defaults_applied']
+            or len(resource) != 544 or len(record) != 32
+            or sha256(resource[:512]) != outfit['converted_texture_sha256']
+            or sha256(resource[512:]) != outfit['converted_palette_sha256']
+            or struct.unpack_from('>HHI', record) != (item, index, vrom)
+            or record[10:12] != b'\x01\x00' or record[28:] != bytes(4)
+            or row['resource_sha256'] != sha256(resource)
+            or row['metadata_sha256'] != sha256(record)
+            or not blob[0x20 + 160 + (item & 255)//8] & (1 << (item & 7))):
+        raise ValueError('Punchy default lacks its complete selected clothing dependency')
+    struct.pack_into('>H', blob, at+30, item)
+    target.update({'clothing_applied': True, 'initial_defaults_applied': True,
+                   'applied_clothing_id': f'{item:04X}', 'record_sha256': sha256(blob[at:at+32])})
+    return {'actor_id': 'E0ED', 'donor_clothing_id': '24BF', 'applied_clothing_id': f'{item:04X}',
+            'metadata_ram': f'{0x80460000+at:08X}', 'before_sha256': sha256(before),
+            'after_sha256': target['record_sha256'], 'resource_sha256': sha256(resource),
+            'move_in_enabled': False}
