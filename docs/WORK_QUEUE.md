@@ -137,15 +137,21 @@ with later e/e+ donor support investigated separately.
   focused checks and the initial 71-step native run pass: complete lists/names,
   selection, actual artwork/model loading, price/presentation, missing-dependency
   exclusion, restored state, and guards. The menu fits its existing reservation
-  with 384 bytes spare. Next: rotation, placed-item save/reload, and ordinary
-  catalogue payment/delivery, followed by remaining villager integration.
+  with 384 bytes spare. The
+  [placed-clothing persistence check](checkpoints/V3_DISPLAY_PERSISTENCE.md)
+  establishes ordinary Save & Quit, both complete independently validated save
+  banks, fresh-process room/ownership restoration, and B pickup with the correct
+  full identity and model-bank release. Its final scenario expectation is
+  corrected to the observed intact save guard; the subsequent unexecuted tail
+  is not claimed passed. Rotation remains unverified after the bounded two
+  approaches. Next: remaining villager integration and Punchy's animated speed
+  bag; retain ordinary rotation and transactions for the combined gameplay pass.
   The display profile bit means older profiles
   reject new saves; preserve backups and distinguish the passing codec check
   from untested ordinary cross-build loading.
-  Catalogue/home display and ordinary buy/sell remain.
-  Current copied-town change-back and outdoor Drop proceed;
-  pickup remains unverified after timed movement overshoots. Retain the Drop
-  checkpoint and move on from navigation retries to display implementation.
+  Ordinary catalogue ordering/payment and buy/sell remain. The separate outdoor
+  Drop checkpoint is retained with pickup unverified after movement overshoots;
+  do not confuse that pending outdoor case with the passing home pickup.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both

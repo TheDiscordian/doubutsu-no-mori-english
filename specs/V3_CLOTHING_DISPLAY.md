@@ -10,8 +10,11 @@ collection, and expanded scoring tables; the [global conversions](V3_DISPLAY_CON
 connect normal placement/pickup callers. Ordinary inventory Drop and B pickup
 pass inside the copied town's house. The [clothing catalogue](V3_CLOTHING_CATALOGUE.md)
 adds the collected row and complete native preview with passing focused/native
-checks. Remaining special readers, ordinary ordering/payment, rotation, and
-placed-save persistence still need integration/verification.
+checks. The [persistence check](../docs/checkpoints/V3_DISPLAY_PERSISTENCE.md)
+establishes ordinary same-build Save & Quit, both saved banks, fresh-process
+room/ownership restoration, and pickup with the correct identity and bank release.
+Remaining special readers, ordinary ordering/payment, and rotation still need
+integration/verification.
 
 Donor clothing `24BF` retains pocket item `34BF` and texture index `10BF`.
 Its display dependency is item `3AFC`, runtime index 1,727, with rotations
@@ -93,5 +96,5 @@ artifacts and the bounded test-setup correction. Both conversions at
 `800BEFCC` and `800BF10C` are installed. Shared metadata/collection and the
 2,051-row scoring tables and clothing catalogue preview pass native checks.
 Complete remaining special readers, ordinary catalogue ordering/payment, and
-placed-item persistence.
+rotation; same-build placed-shirt persistence has the scoped evidence above.
 Neither served web patcher changes without user testing and explicit approval.

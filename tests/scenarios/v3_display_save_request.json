@@ -1,0 +1,17 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.7},
+  {"wait": 10},
+  {"snapshot_player": true},
+  {"read": ["8012A4A6", 2], "expect": "3afc"},
+  {"key": "f", "duration": 0.5},
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 4},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

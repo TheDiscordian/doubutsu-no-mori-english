@@ -266,20 +266,27 @@ clothing presentation, price eligibility, and canonical ordering identity.
 Two focused tests and the initial 71-step native run pass: all 246 rows,
 selection, the complete 4,128-byte model/artwork transfer, original retention,
 disabled dependencies, restored state, and guards. The shared menu uses 274,176
-of its existing 274,560 bytes. Rotation, placed-item save/reload, and ordinary
-catalogue payment/delivery remain under integration.
-Its additional profile dependency accepts the preceding profile in the focused
+of its existing 274,560 bytes. The
+[placed-clothing persistence check](checkpoints/V3_DISPLAY_PERSISTENCE.md)
+establishes ordinary gyroid Save & Quit, independent validation of both complete
+FlashRAM banks, fresh-process restoration of the complete room and ownership,
+and B pickup returning `34BF` with its model bank released. Other inventory
+fields stay intact. The final scenario stops on a wrong expected guard constant;
+the observed save guard is correct, the expectation is fixed, and the remaining
+tail is not claimed passed. Ordinary rotation remains unverified after the two
+bounded approaches. Do not repeat that navigation batch.
+The mannequin's additional profile dependency accepts the preceding profile in the focused
 decoder check, but older profiles reject new saves. Keep save backups; this is
 not an ordinary cross-build reload result.
-Ordinary confirmation/player payment, catalogue/home display, and remaining
-buy/sell integration remain work. The current copied-
-town check changes back to the native shirt and drops the imported pocket item
-outdoors. Pickup remains unverified after the timed movement overshoots its
-tile; the checkpoint is retained without further movement retries in this batch.
+Ordinary confirmation/player payment, catalogue ordering/delivery, and remaining
+buy/sell integration remain work. The separate outdoor Drop checkpoint is
+retained; outdoor pickup remains unverified after timed movement overshoots.
+Home placement, same-build persistence, and pickup have the evidence above.
 The clothing variant writes format 2 and must not be loaded by older format-1
 V3 builds or V2. Back up existing saves. Ordinary acquisition/
-payment, placed-item rotation/persistence, remaining native readers,
-and the complete villager remain work.
+payment, rotation, other imported items' placed persistence, remaining native
+readers, and the complete villager remain work. Continue villager integration
+and Punchy's animated speed-bag dependency before another navigation batch.
 No import is enabled for players yet.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
