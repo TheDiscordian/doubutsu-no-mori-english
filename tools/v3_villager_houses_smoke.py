@@ -35,7 +35,8 @@ def exercise(debug, rom_path, record):
         record({'house_check': label, 'address': f'{address:08X}', 'bytes': len(expected),
                 'assertion': 'passed' if actual == expected else 'failed'})
         if actual != expected:
-            raise ValueError('Native house check failed: ' + label)
+            raise ValueError('Native house check failed: ' + label +
+                             f'; expected={expected.hex()} observed={actual.hex()}')
 
     def call(address, args):
         result = debug.call(f'{address:08X}', args, return_address=MODULE_RAM + 0x6480,
@@ -84,7 +85,8 @@ def exercise(debug, rom_path, record):
         at = i * 56
         struct.pack_into('>H', npc_data, at, actor)
         for position in (4, 16):
-            struct.pack_into('>3f', npc_data, at + position, 2140.0, 0.0, 2820.0)
+            # mFI_UtNum2PosXZInBk returns the unit origin, not its centre.
+            struct.pack_into('>3f', npc_data, at + position, 2120.0, 0.0, 2800.0)
         npc_data[at + 28] = 1
         npc_data[at + 44:at + 52] = table[(actor & 0xFFF) * 8:(actor & 0xFFF) * 8 + 8]
         struct.pack_into('>H', npc_data, at + 52, 0)

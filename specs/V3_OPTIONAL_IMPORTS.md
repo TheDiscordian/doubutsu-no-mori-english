@@ -116,15 +116,20 @@ native default reset, and four-byte borrowed/default references. Its focused
 and native reader/insertion checks pass. The
 [initial-default adapter](V3_VILLAGER_DEFAULTS.md) connects Cheri's verified
 starting shirt/defaults and both pilots' personality lookup. Punchy's actual
-cherry-shirt import, native selection/table expansion, and
+cherry-shirt import, remaining native reader review, and
 ordinary gameplay/save integration remain pending.
 The [house adapter](V3_VILLAGER_HOUSES.md) installs Cheri's complete mapped
 furniture/music layers and verified native surfaces, preserving original houses.
-Native house loading and ordinary visits remain unverified; Punchy's animated
+Focused native initialization and layer transfers pass; complete scene loading
+and ordinary visits remain unverified. Punchy's animated
 speed bag and actual cherry shirt are dependencies for his uninstalled house.
 The [secondary reader adapter](V3_VILLAGER_READERS.md) connects full names in
 map, inventory, letters, recipient selection, conversation identity fields,
 and generated-mail capture. Native names/aliases and saved field sizes remain.
+The [selection adapter](V3_VILLAGER_SELECTION.md) expands unseen counts, history
+reset, initial population, and normal move-in selection with independent
+transient arrays. Import eligibility remains disabled until ordinary gameplay
+integration is ready; temporary native test flags are not playable support.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

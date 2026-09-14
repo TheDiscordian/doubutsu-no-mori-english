@@ -47,12 +47,19 @@ boot-function proof. The exception occurs before that function executes.
 The checked DMA proof is added for the next useful combined integration check;
 no third attempt is made in this batch. No house consumer is marked passed.
 
-The prepared check targets full house-table initialization, DMA of the two new
-records, all 498 sparse pointer slots, and native layer selection/transfer.
-It does not exercise the ordinary scene's complete foreground allocation or
-establish a house visit. These remain explicit integration checks.
+The combined ABI-25 selection run at `build/v3-villager-selection-native-01`
+passes appended foreground DMA and all 498 sparse pointers. Its house-position
+assertion expects tile centres rather than the verified native tile origins.
+The single corrected house-only retry,
+`build/v3-villager-selection-house-tail-01`, passes all 42 recorded steps on
+`build/v3-villager-selection-01/animal-forest-v3-asset-loader.z64`.
+Complete native house-table initialization, both imported layer selections and
+transfers, restored globals, guards, checkpoint restoration, and clean shutdown
+pass. The installed house resources retain the hashes above. No source save is
+modified. These focused calls do not exercise the ordinary scene's complete
+foreground allocation or establish a house visit.
 
-Continue remaining ID-bounded villager readers, roster/move-in selection,
+Continue remaining ID-bounded villager readers,
 ordinary conversations/house visits, saved identity/profile handling, and
 Controller Pak transport. The native furniture reward-selection scans still
 need explicit imported-item consideration; building the correct room does not

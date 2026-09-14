@@ -29,13 +29,20 @@ with later e/e+ donor support investigated separately.
   six focused checks and native initialization/clothing-DMA checks pass.
   The [house batch](checkpoints/V3_VILLAGER_HOUSES.md) installs Cheri's complete
   mapped house layers, existing matching room surfaces, and K.K. Samba, retaining
-  every original house. Five focused tests pass. Native house calls remain
-  unverified after the two recorded setup failures; move-ins stay disabled.
+  every original house. Five focused tests and the corrected current 42-step
+  native house check pass, including complete initialization, appended DMA,
+  sparse pointers, both layer transfers, and guards. Ordinary house visits
+  remain unverified; move-ins stay disabled.
   The [secondary readers](checkpoints/V3_VILLAGER_READERS.md) connect map,
   inventory, letter/address, conversation identity, and generated-letter names.
   Six focused checks and the corrected 101-step native check pass, including
   both generated-name/alias entries, four complete display paths, and guards.
-  Next: native selection/table expansion and ordinary gameplay/
+  The [town-selection adapter](checkpoints/V3_VILLAGER_SELECTION.md) connects
+  unseen counts, history reset, initial population, and subsequent move-ins
+  with independent candidate/shuffle storage. Six focused checks and all four
+  native entries pass, including two complete starting populations and Cheri's
+  fixed ID under a temporary test flag. Default import eligibility remains off.
+  Next: remaining native reader review and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.
 - [ ] Review native/donor item identities and implement one complete simple
