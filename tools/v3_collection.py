@@ -4,7 +4,7 @@ import struct
 from aflib import CODE_RAM, sha256
 from v3_save_runtime import BLOB_SIZE
 
-ABI, CODE, LIMIT, BRIDGE = 15, 0x99C0, 0xA200, 0xBA80
+ABI, CLOTHING_ABI, CODE, LIMIT, BRIDGE = 15, 33, 0x99C0, 0x9C00, 0xBA80
 SOURCES = ('tools/v3_collection.py', 'overlays/v3/collection.c', 'overlays/v3/collection.ld')
 ENTRIES = ((0x800B88EC, 412, 'af_v3_catalogue_record', (0x27BDFFE8, 0xAFA40018),
             'f545d3a285b2c1797a5a92cb8029ab62c3bce494d63496ec772dc34a5f07b676'),
@@ -13,11 +13,13 @@ ENTRIES = ((0x800B88EC, 412, 'af_v3_catalogue_record', (0x27BDFFE8, 0xAFA40018),
 POSSESSION_SHA = '381dedb15e54d276176dc4691c7ed020b484ca87aa3b2df5604ba47193afb32a'
 
 
-def install(code, blob, helper, symbols, runtime, codec, furniture):
+def install(code, blob, helper, symbols, runtime, codec, furniture, item_readers=None):
     imports = {'af_v3_require_save_state': (runtime, 'require_state', 0x804692F4),
                'af_v3_save_halt': (runtime, 'af_v3_save_halt', 0x80469270),
                'af_v3_save_collect': (codec, 'af_v3_save_collect', 0x8046B9C4),
                'af_v3_furniture_import_profile': (furniture, 'af_v3_furniture_import_profile', 0x80465000)}
+    if item_readers is not None:
+        imports['af_v3_item_type'] = (item_readers, 'af_v3_item_type', 0x8046744C)
     if (len(blob) != BLOB_SIZE or not helper or len(helper) > LIMIT - CODE
             or any(blob[CODE:LIMIT]) or any(blob[BRIDGE:BRIDGE + 32])
             or 0x9200 + runtime['bytes'] > CODE):
@@ -44,4 +46,5 @@ def install(code, blob, helper, symbols, runtime, codec, furniture):
             'normal_collection_hook_enabled': True, 'player_clear_hook_enabled': True,
             'catalogue_menu_enabled': False, 'save_format_changed': False,
             'foreign_import_collection': 'stops before ownership is lost; Controller Pak transport pending',
-            'ordinary_acquisition_tested': False}
+            'ordinary_acquisition_tested': False,
+            'clothing_collection_enabled': item_readers is not None}

@@ -16,6 +16,9 @@ extern u8 af_collection_players[4 * 0xBD0], *af_collection_active;
 extern void af_v3_require_save_state(void);
 extern void af_v3_save_halt(int) __attribute__((noreturn));
 extern int af_v3_furniture_import_profile(u32);
+#ifdef AF_V3_CLOTHING_PROFILE
+extern int af_v3_item_type(u32);
+#endif
 extern void af_v3_original_collect(u32);
 extern void af_v3_original_private_clear(u8 *);
 
@@ -25,9 +28,19 @@ static u32 player_slot(const u8 *private) {
     return 4;
 }
 
+#ifdef AF_V3_CLOTHING_PROFILE
+/* Keep the public query/clear layout stable rather than duplicating this call. */
+static int selected(u32 item) __attribute__((noinline));
+#endif
 static int selected(u32 item) {
+#ifdef AF_V3_CLOTHING_PROFILE
+    /* The shared reader validates full garment identity, the selected profile,
+       and its artwork; furniture still uses its actual selected metadata. */
+    return (item >> 12) == 3 && af_v3_item_type(item);
+#else
     return (item >> 12) == 3 &&
         af_v3_furniture_import_profile(1024u + ((item & 0xFFFu) >> 2));
+#endif
 }
 
 void af_v3_catalogue_record(u32 argument) {

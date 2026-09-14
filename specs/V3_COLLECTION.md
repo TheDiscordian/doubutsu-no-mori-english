@@ -4,6 +4,8 @@
 
 `--collection` connects native item collection and live-player clearing to the
 four imported-furniture catalogues in [V3 save state](V3_FLASH_RUNTIME.md).
+The clothing variant also connects selected garments to their independent
+per-player ownership in [format 2](V3_CLOTHING_SAVE.md).
 It includes the existing FlashRAM runtime. The additional
 [catalogue adapter](V3_CATALOGUE.md) connects the screen's list, previews,
 completion, and prices. Ordinary ordering/delivery remain work; neither switch
@@ -28,6 +30,9 @@ wall, floor, music, clothing conversion, and excluded gift-category rules retain
 the native implementation. Imported `3xxx` IDs instead use their selected
 registry group, `(item & FFF) >> 2`, in the correct player's 128-byte V3 catalogue.
 All four rotations share a bit. Unknown or disabled imports are not credited.
+With clothing enabled, the checked shared item-category reader validates the
+selected full garment ID and artwork. `34BF` records clothing bit `BF` in that
+player's separate 32-byte catalogue, never the furniture rotation group.
 
 `mPr_SetPossessionItem` at `800B8B08` updates pockets/conditions and invokes
 collection only for condition zero. `mPr_SetFreePossessionItem` at `800B8B8C`
@@ -48,19 +53,25 @@ extended rows while retaining the original bit reader for native entries.
 
 ## Memory and guarded installation
 
-The collection helper occupies `804699C0..80469BB7` (504 bytes), within the
-existing loaded 48-KiB prefix. ABI 15 adds no resident allocation or saved bytes.
+The non-clothing collection helper occupies `804699C0..80469BB7` (504 bytes).
+The clothing variant occupies `804699C0..80469BDF` (544 bytes), within the
+existing loaded 48-KiB prefix. ABI 33 connects clothing without further
+allocation or save-format changes beyond the existing format-2 variant.
 Its entries are record at `804699C0`, query at `80469AD4`, and private clear at
 `80469B50`. Two original-function bridges occupy `8046BA80..8046BA9F`, after
 the FlashRAM bridges and before the existing end guard.
 
-The installer validates complete native collection/clear function hashes and
+The linker pins the public query address and keeps the selected-item check
+shared, preserving all three public entry addresses. It rejects overlap with
+shop code at `80469C00`. The installer validates complete native collection/clear function hashes and
 the unchanged acquisition pair. It binds the actual compiled save guard,
 warning, codec collection, and furniture-selection symbols. The save guard is
 the existing `require_state` function at `804692F4`; the linker alias is accepted
 only with that exact compiled symbol. The FlashRAM runtime code remains
 unchanged. Unknown function bodies, moved dependency entries, or overlapping
 resident bytes stop construction.
+The clothing variant additionally verifies the shared item-category entry at
+`8046744C`, whose installed jump reaches the selected garment implementation.
 
 ## Remaining player-lifecycle work
 

@@ -56,8 +56,8 @@ clothing ownership for four players, additions/removals, corruption rejection,
 bounds, startup code loading/cache handling, public-entry dispatch, expanded
 native save-state initialization, and the native player-clear hook.
 
-The clothing resource profile is installed, but normal garment collection and
-catalogue/menu consumers are not connected. Private-buffer encoding/decoding
+The clothing resource profile and normal garment collection are installed;
+the catalogue screen and garment menu consumers remain work. Private-buffer encoding/decoding
 does not establish ordinary clothing acquisition/save/reload or Controller Pak
 transport. Retain unchanged device-worker evidence instead of replaying old
 builds. Older format-1 test fixtures require format-aware adaptation before

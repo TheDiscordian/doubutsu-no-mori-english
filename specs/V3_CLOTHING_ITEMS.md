@@ -31,6 +31,7 @@ clothing selection/resource checks, native fallbacks, and guarded buffers.
 Native evidence and exact output hashes are recorded in the
 [checkpoint](../docs/checkpoints/V3_CLOTHING_ITEMS.md).
 
-Normal collection, menus/icons, wearing actions, acquisition/buy/sell,
+Normal [collection](V3_COLLECTION.md) records separate saved clothing ownership.
+Menus/icons, wearing actions, ordinary acquisition/buy/sell,
 mannequins, and ordinary gameplay/save integration remain required. Punchy's
 defaults and move-in eligibility stay disabled. Both patchers remain V2.

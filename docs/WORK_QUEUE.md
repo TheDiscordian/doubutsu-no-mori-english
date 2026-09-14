@@ -74,8 +74,12 @@ with later e/e+ donor support investigated separately.
   run pass. The [shared clothing item readers](checkpoints/V3_CLOTHING_ITEMS.md)
   connect the full English name, native category, and donor price. Current host/
   cartridge checks and the corrected 60-record native run pass, including
-  original/furniture retention and missing-profile rejection. Next connect
-  ordinary collection/menu consumers before enabling
+  original/furniture retention and missing-profile rejection. The
+  [clothing collection adapter](checkpoints/V3_CLOTHING_COLLECTION.md) connects
+  actual pocket acquisition to per-player saved ownership. Focused checks and
+  the initial 62-record native run pass, including present/quest timing,
+  separate clothing/furniture bits, player clearing, and guards. Next connect
+  menu, rendering, and ordinary gameplay consumers before enabling
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.

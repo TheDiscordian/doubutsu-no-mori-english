@@ -39,7 +39,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 32 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 33 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -109,7 +109,8 @@ Keep original garments and behaviour.
 
 The [format-2 save extension](V3_CLOTHING_SAVE.md) installs independent clothing
 profile/ownership bits while retaining the earlier furniture records. Native
-encoding/decoding and migration checks pass; normal collection, catalogue,
-and ordinary clothing save/reload remain unverified. Format-2 saves must not be
+encoding/decoding and migration checks pass. The normal collection adapter
+records per-player clothing ownership; catalogue presentation and ordinary
+clothing save/reload remain work. Format-2 saves must not be
 loaded in older format-1 V3 builds or V2. Keep existing saves backed up.
 Public and local patchers remain V2 pending user testing and explicit approval.
