@@ -4,6 +4,10 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed char s8;
 typedef signed short s16;
+#ifndef AF_V3_MELODY_BEGIN
+#define AF_V3_MELODY_BEGIN 0x80463000u
+#define AF_V3_MELODY_END 0x80463FF0u
+#endif
 struct Melody { u32 source, size; };
 struct AudioEntry { u32 source, size; u8 medium, cache; u16 params[3]; };
 _Static_assert(sizeof(struct AudioEntry) == 16, "Native audio header entry");
@@ -54,7 +58,7 @@ static int source_for(u32 voice, struct Melody *result) {
     if (voice >= 256) {
         *result = extra[voice - 256];
         if (!result->size || result->size > 0x600u || result->size % 16u
-                || result->source < 0x80463000u || result->source > 0x80463FF0u - result->size) return 0;
+                || result->source < AF_V3_MELODY_BEGIN || result->source > AF_V3_MELODY_END - result->size) return 0;
     } else {
         header = seq_header;
         if (!header) return 0;

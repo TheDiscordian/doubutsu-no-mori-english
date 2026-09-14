@@ -170,13 +170,15 @@ The [complete-asset loader](V3_COMPLETE_VILLAGER_ASSETS.md) installs all 38
 objects in fixed banks 410–447, safely relocates growth permissions, and passes
 native object-loading and population checks. The
 [attachment runtime](V3_ACCESSORY_RUNTIME.md) installs all twenty draw records
-and all sixteen accessories in both NPC owners. Remaining voices, full text,
+and all sixteen accessories in both NPC owners. Full text,
 defaults/houses, town behaviour, ordinary appearance, and persistence still
 require integration; move-in flags remain off.
 The [complete audio converter](V3_COMPLETE_VILLAGER_AUDIO.md) supplies all twenty
 melodies and four missing instruments while retaining all original instruments.
-Its extended audio resources still need runtime installation and allocation
-verification; the two pilots' installed audio remains unchanged.
+The [complete audio runtime](V3_COMPLETE_AUDIO_RUNTIME.md) installs all sources
+and expanded bank/wave resources, with native loading, font relocation, melody
+copying, and allocation checks passing. Playback of the four new instruments
+and the final post-audio guards remain unresolved; move-in flags stay off.
 
 ### Items
 

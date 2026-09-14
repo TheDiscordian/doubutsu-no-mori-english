@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-accessory-runtime-01/animal-forest-v3-asset-loader.z64`, ABI 52, SHA-256
-`18af2aad25285b9ab5bc01a9a47ed9a79e9b819fb9fa3c63e81699118043c4fc`.
+`build/v3-all-audio-runtime-01/animal-forest-v3-asset-loader.z64`, ABI 53, SHA-256
+`0e8335fa88c5da9800d6c38adf5c1d8fc08ebe86680bcaa88d2fbff5fbc3ff4f`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -302,8 +302,9 @@ poses, hit/retrigger/stop timing, native state-based sound dispatch, both matrix
 banks' drawing commands, and memory/save guards. The complete hit-sound program,
 instrument, envelopes, loop, predictor book, and 11,062-byte sample are converted;
 five audio checks pass. The [sound installer](checkpoints/V3_SPEED_BAG_SOUND.md)
-adds the real hit through the original native audio loader, preserves all original
-audio, and leaves 608 bytes of conservative permanent-heap spare capacity.
+adds the real hit through the original native audio loader and preserves all
+original audio. The complete villager audio installation below leaves 32 bytes
+of conservative permanent-heap spare capacity.
 Four focused checks and the corrected build's first 58-step native run pass,
 including actual trigger/retrigger, completed imported-sample transfers, and
 guards. Native testing found and fixed an unaligned envelope read. PCM/listening
@@ -391,18 +392,27 @@ draw records and attaches all sixteen accessories in both NPC owners, using
 49,152 additional resident bytes without actor/save or ordinary-heap growth.
 Seven focused tests pass. Partial native execution passes 28 assertions,
 including both joint transforms, actual drawing commands, native fallback, and
-buffer handling. The final guard tail remains open after bounded fixture
-failures; ordinary GPU appearance is not established. Remaining voices,
-text/defaults, houses, town behaviour, and persistence still require work.
+buffer handling. The complete audio batch closes the remaining accessory
+null/guard tail with 37 passing assertions; ordinary GPU appearance is not
+established. Text/defaults, houses, town behaviour, and persistence still require work.
 All move-in flags stay off; both V2 patchers are unchanged.
 
 The [complete audio bundle](checkpoints/V3_COMPLETE_VILLAGER_AUDIO.md) supplies
 all twenty additional villagers' full melody fragments and the four missing
-instruments, retaining all 83 original instruments. Nine focused checks pass
-after correcting one synthetic test's mutation indices. The 9,376-byte melody
-set retains every track and note; the font/wave grow by 656/7,584 bytes. These
-resources await runtime installation and audio-allocation verification. The
-current ABI-52 ROM and both V2 patchers remain unchanged by conversion.
+instruments, retaining all 83 original instruments. The 9,376-byte melody set
+retains every track and note. The compact font shares an identical original
+envelope, limiting font/wave growth to 592/7,584 bytes without dropping sound data.
+The [complete audio installation](checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md)
+installs all twenty sources and both expanded resources in ABI 53. Fourteen
+focused tests pass. Native checks pass startup, complete font relocation,
+physical sample addresses, melody copying, full-ID handling, and audio-heap
+bounds. The package grows by 12,288 resident bytes; ordinary heaps and saved
+formats remain unchanged. Both bounded playback attempts fail to observe a
+completed sample transfer for the four new instruments, so their playback and
+the final post-audio guards remain unresolved. This is not a confirmed fixture
+failure or a playable-import claim. Continue text/defaults, houses, and town
+behaviour; inspect note-layer progress and sample requests in the next meaningful
+combined native check. Both V2 patchers remain unchanged.
 
 ## Stable V2 deliverable
 

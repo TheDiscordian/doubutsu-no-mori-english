@@ -40,7 +40,7 @@ void af_v3_fastcopy(u32 source, void *dest, u32 size, int medium) {
     memcpy(dest, sample, size);
 }
 const u8 *af_v3_imported_data(u32 source) {
-    assert(events++ == 4 && (source == 0x80463000 || source == 0x80463100));
+    assert(events++ == 4 && (source == AF_V3_MELODY_BEGIN || source == AF_V3_MELODY_BEGIN+0x100));
     copied_source = source; copied_size = sizeof(sample); copied_medium = -1;
     ++ram_reads;
     return sample;
@@ -61,8 +61,8 @@ static void reset(void) {
     memset(sample, 0xCC, sizeof(sample));
     for (u32 i = 0; i < 19; ++i) { sample[4 + 2 * i] = 0; sample[5 + 2 * i] = 42 + 10 * i; }
     memset(af_v3_melodies, 0, sizeof(af_v3_melodies));
-    af_v3_melodies[29] = (struct Melody){0x80463000, 256};
-    af_v3_melodies[30] = (struct Melody){0x80463100, 256};
+    af_v3_melodies[29] = (struct Melody){AF_V3_MELODY_BEGIN, 256};
+    af_v3_melodies[30] = (struct Melody){AF_V3_MELODY_BEGIN+0x100, 256};
     for (u32 i = 0; i < 16; ++i) af_v3_melody_current[i] = 65535;
     memset(ports, 0, sizeof(ports)); events = copies = ram_reads = invalidate_during_wait = 0;
 }
@@ -96,7 +96,7 @@ int main(void) {
         assert(!af_v3_melody_start(invalid[i], 15, 0x80123450) && !events);
     assert(!af_v3_melody_start(285, 8, 0x80123450) && !events);
     assert(!af_v3_melody_start(285, 15, 0) && !events);
-    af_v3_melodies[29].source = 0x80463FE0;
+    af_v3_melodies[29].source = AF_V3_MELODY_END-16;
     assert(!af_v3_melody_start(285, 15, 0x80123450) && !events);
     reset(); active_track = 15; af_v3_melodies[29].size = 0x601;
     assert(!af_v3_melody_start(285, 15, 0x80123450) && !events);

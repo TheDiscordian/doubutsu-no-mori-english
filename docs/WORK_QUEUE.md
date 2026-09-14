@@ -288,16 +288,22 @@ with later e/e+ donor support investigated separately.
   draw records and attaches all sixteen accessories in both owners, with shared
   storage and frame-local matrices. Seven focused tests pass; partial native
   execution verifies head/torso transforms, commands, fallback, and buffer limits.
-  Carry the corrected final guard tail into the next combined native check
-  without replaying the passing transform cases. Continue remaining voices,
-  text/defaults, houses, town behaviour, ordinary appearance, and persistence
+  The complete audio batch closes the final accessory null/guard tail with
+  37 passing assertions, without replaying the passing transform cases.
+  Continue text/defaults, houses, town behaviour, ordinary appearance, and persistence
   before enabling new town inhabitants.
   The [complete audio bundle](checkpoints/V3_COMPLETE_VILLAGER_AUDIO.md) supplies
   all twenty melodies and four additional instruments, with all 83 native
-  instruments retained. Nine focused checks pass. Install the complete source
-  table/storage and expanded bank/wave resources, check actual audio allocation,
-  then continue text/defaults, houses, and town behaviour. Conversion alone does
-  not make the eighteen new audio paths playable.
+  instruments retained. The [complete audio runtime](checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md)
+  installs the source table/storage and expanded bank/wave resources in ABI 53.
+  Fourteen focused tests pass, as do native startup, complete font relocation,
+  physical headers, melody copies, full-ID handling, and allocation bounds.
+  New-instrument sample playback and final post-audio guards remain unresolved
+  after two bounded attempts. Do not start a third setup attempt in this batch
+  or classify the missing playback evidence as a proven fixture problem.
+  Continue full text/defaults, houses, and town behaviour. In the next meaningful
+  combined native check, inspect note-layer progress and actual sample requests
+  without replaying the passing font/attachment checks. Move-in flags stay off.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile

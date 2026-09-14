@@ -13,11 +13,14 @@ def exercise(debug, rom_path, record, *, tail_only=False):
     path = Path(rom_path)
     rom = path.read_bytes()
     report = json.loads((path.parent/'build.json').read_text())
-    if sha256(rom) != report['output_sha256'] or report.get('runtime_abi') != 52:
+    if sha256(rom) != report['output_sha256'] or report.get('runtime_abi') not in (52, 53):
         raise ValueError('Native accessory check needs its exact current cartridge')
     files = by_vrom(rom)
     blob = files[BLOB].extract(rom)
-    package = blob[PACKAGE_VROM-BLOB:PACKAGE_VROM-BLOB+PACKAGE_SIZE]
+    package_size = report['accessory_runtime']['package_bytes']
+    if package_size not in (PACKAGE_SIZE, 0xF000):
+        raise ValueError('Unexpected accessory/audio package size')
+    package = blob[PACKAGE_VROM-BLOB:PACKAGE_VROM-BLOB+package_size]
     proofs = boot_proofs(rom)
     edge = b'V3AC'*4
 
@@ -126,7 +129,7 @@ def exercise(debug, rom_path, record, *, tail_only=False):
         check('save/profile state unchanged', 0x8046C000, before_state)
         for address in guards: check('fixture and stack guard', address, edge)
         for address, marker in ((0x8019C8D0, 'AF32C0DE'), (0x80472850, 'AF46C0DE'),
-                                (PACKAGE_RAM+PACKAGE_SIZE-16, 'AFACC0DE')):
+                                (PACKAGE_RAM+package_size-16, 'AFACC0DE')):
             check('production memory guard', address, bytes.fromhex(marker)*4)
         check('no faulted thread', 0x8003CE34, bytes(4))
     finally:

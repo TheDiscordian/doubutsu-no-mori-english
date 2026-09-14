@@ -1566,6 +1566,13 @@ def main():
                     raise ValueError('V3 audio probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_complete_audio'):
+                from v3_complete_audio_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Complete audio probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record,
+                                        speech_tail=action['test_v3_complete_audio'] == 'speech-tail'))
             if action.get('test_v3_npc_draw'):
                 from v3_npc_draw_smoke import exercise
                 if not (out/'test.bs1').is_file():

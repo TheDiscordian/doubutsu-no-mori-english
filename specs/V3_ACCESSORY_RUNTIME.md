@@ -5,7 +5,7 @@
 `tools/v3_accessory_runtime.py` installs all twenty imported native draw records
 and attaches all sixteen required accessories through both NPC renderers. The
 ordinary native characters and the existing Cheri/Punchy records are retained.
-Remaining voices, text/defaults, houses, town behaviour, ordinary appearance,
+Text/defaults, houses, town behaviour, ordinary appearance,
 and persistence still require integration. All twenty move-in flags remain off.
 Neither served V2 patcher changes.
 
@@ -62,6 +62,11 @@ fits before the existing configuration. Systems without eight MiB do not touch
 the expansion reservation. The package follows the furniture reservation and
 does not overlap the font, title, save code, diagnostic area, or emergency stack.
 
+The [complete audio runtime](V3_COMPLETE_AUDIO_RUNTIME.md) extends this package
+to `F000` bytes for all twenty melody sources and their loader. The accessory
+helper, registry, objects, and original guard retain their addresses and contents.
+Its separate final guard covers the expanded package.
+
 ## Native hooks and cartridge
 
 | NPC owner VROM | Original link base | Replaced skeleton call |
@@ -87,7 +92,9 @@ Seven focused host/cartridge tests pass. Partial native execution verifies actua
 startup, both attachment joints, corrected transforms, emitted commands, native
 fallback, and nearly full graphics-buffer handling. These use a synthetic rig
 through the real skeleton engine, not ordinary NPC rendering or GPU acceptance.
-The final guard tail remains unexecuted after the bounded fixture failures.
-The [checkpoint](../docs/checkpoints/V3_ACCESSORY_RUNTIME.md) records exact
-outputs and limits. Carry the corrected tail into the next combined native
-test while continuing bulk voice/text/default/house integration.
+The [complete audio checkpoint](../docs/checkpoints/V3_COMPLETE_AUDIO_RUNTIME.md)
+closes the null/guard tail with 37 passing assertions on the expanded package,
+without replaying the head/torso checks. The
+[attachment checkpoint](../docs/checkpoints/V3_ACCESSORY_RUNTIME.md) retains the
+original transform evidence. Ordinary appearance and villager integration remain
+open; the accessory guard results do not establish complete audio playback.

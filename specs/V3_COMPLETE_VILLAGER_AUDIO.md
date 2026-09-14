@@ -8,10 +8,9 @@ The roster comes from the pinned complete-artwork manifest. The existing
 DOL/audio hashes and original N64 hash remain mandatory. Default invocation
 retains the two-pilot converter and its exact fragment output.
 
-This is a complete local audio bundle, not an installed runtime extension.
-The current cartridge still has only the two pilots' melody sources. New
-melody storage, expanded sound-font/wave headers, audio-allocation checks, and
-playback verification remain necessary before claiming all twenty voices work.
+The [runtime installer](V3_COMPLETE_AUDIO_RUNTIME.md) connects the complete
+bundle, expanded source storage, and font/wave headers. Native loading and
+melody handling pass; actual new-instrument sample playback remains unresolved.
 No move-in flag or web patcher changes.
 
 ## Melody preservation
@@ -67,21 +66,19 @@ shift. The four compiled additions are compared against the complete donor
 descriptions. Long envelopes retain every point through their actual terminator;
 unknown control flow is rejected. All new structures are 16-byte aligned.
 
-The font grows by 656 bytes, from 15,600 to 16,256. The waveform resource retains
+The four additions share a verified identical 52-byte envelope already present
+in the original font. The font grows by 592 bytes, from 15,600 to 16,192.
+The waveform resource retains
 the entire original prefix and appends the four ADPCM samples, with alignment:
 376,752 → 384,336 bytes, growth 7,584. These file sizes are not a claim about
 runtime audio heap usage. New samples keep codec flags, tuning, loop records,
 and predictor coefficients. Bank and wave IDs remain 2.
 
-## Runtime continuation
+## Runtime installation
 
-Install the complete fragments in checked memory, extend the existing source
-bounds, and preserve full-ID tags, native synchronization, nineteen-pointer
-relocation, and CPU copying. Install the larger bank/wave resources with checked
-physical addresses and updated counts/sizes; do not move directly addressed
-existing audio without updating its verified consumers. Measure the actual
-font/cache allocation and retain original instrument behaviour.
-
-Use a bounded combined native check for the changed audio path and the pending
-accessory guard tail. Do not replay the passing accessory transform prefix or
-old cartridges. Preserve all user saves and keep both served patchers on V2.
+The [installer](V3_COMPLETE_AUDIO_RUNTIME.md) preserves full-ID tags, native
+synchronization, nineteen-pointer relocation, and CPU copying. It installs
+larger bank/wave resources with checked physical addresses and updated counts,
+without moving the original audio files or growing the audio heap. Its
+checkpoint records the passing loading checks and unresolved sample-transfer
+observations. Preserve all user saves and keep both served patchers on V2.

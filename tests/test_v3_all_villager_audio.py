@@ -55,7 +55,7 @@ class ParserTests(unittest.TestCase):
             with self.assertRaises(ValueError): extended_envelope(changed, 0)
 
 
-@unittest.skipUnless((ROOT/'build/v3-all-villager-audio-01/audio.json').exists(), 'Local complete audio bundle required')
+@unittest.skipUnless((ROOT/'build/v3-all-villager-audio-02/audio.json').exists(), 'Local complete audio bundle required')
 class ActualDonorTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -67,7 +67,7 @@ class ActualDonorTests(unittest.TestCase):
         cls.native = (ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
         cls.donor = read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
         cls.assets, cls.report = build_audio(cls.native, *cls.donor, villagers=cls.roster, extended=True)
-        cls.out = ROOT/'build/v3-all-villager-audio-01'
+        cls.out = ROOT/'build/v3-all-villager-audio-02'
 
     def test_complete_twenty_voice_outputs_and_original_pilot_retention(self):
         self.assertEqual(len(self.report['villagers']), 20)
@@ -88,7 +88,8 @@ class ActualDonorTests(unittest.TestCase):
         extension = self.report['instrument_extension']
         self.assertEqual([r['instrument'] for r in extension['imports']], [84, 85, 86, 87])
         self.assertEqual(extension['instrument_count'], 88)
-        self.assertEqual(extension['font_growth_bytes'], 656)
+        self.assertEqual(extension['font_growth_bytes'], 592)
+        self.assertEqual(len(extension['reused_original_structures']), 4)
         self.assertEqual(extension['wave_growth_bytes'], 7584)
         self.assertEqual(u32(self.assets['villager.soundfont.bin'], 8+83*4), 0)
         self.assertEqual(sha256(self.assets['villager.soundfont.bin']), extension['font_sha256'])

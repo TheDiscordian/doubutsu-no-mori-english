@@ -329,7 +329,7 @@ def extend_voice_bank(native_bank, native_wave, donor_bank, donor_wave, missing)
     shift, first = 16, 0x160
     bank = bytearray(native_bank[:first]+bytes(shift)+native_bank[first:])
     waves = bytearray(native_wave)
-    pointers = {}
+    pointers, cache = {}, {}
 
     def relocate(at):
         value = u32(native_bank, at)
@@ -345,15 +345,20 @@ def extend_voice_bank(native_bank, native_wave, donor_bank, donor_wave, missing)
         inst = relocate(8+4*index)
         if not inst:
             raise ValueError('Unexpected empty original voice instrument')
-        relocate(inst+4)
+        envelope = relocate(inst+4)
+        cache.setdefault(('envelope', extended_envelope(native_bank, envelope)), envelope+shift)
         for field in (8, 16, 24):
             sample = relocate(inst+field)
             if sample:
-                relocate(sample+8)
-                relocate(sample+12)
+                loop = relocate(sample+8)
+                book = relocate(sample+12)
+                loop_data = span(native_bank, loop, 48 if u32(native_bank, loop+8) else 16)
+                order, count = struct.unpack('>2I', span(native_bank, book, 8))
+                cache.setdefault(('loop', loop_data), loop+shift)
+                cache.setdefault(('book', span(native_bank, book, 8+16*order*count)), book+shift)
     for at, target in pointers.items():
         struct.pack_into('>I', bank, at+(shift if at >= first else 0), target+shift)
-    cache, installed = {}, []
+    installed, reused = [], []
 
     def append(data, kind):
         key = kind, data
@@ -361,6 +366,8 @@ def extend_voice_bank(native_bank, native_wave, donor_bank, donor_wave, missing)
             at = (len(bank)+15) & ~15
             bank.extend(bytes(at-len(bank))+data)
             cache[key] = at
+        elif cache[key] < len(native_bank)+shift:
+            reused.append({'kind': kind, 'offset': cache[key], 'bytes': len(data), 'sha256': sha256(data)})
         return cache[key]
 
     for index in sorted(missing):
@@ -401,6 +408,7 @@ def extend_voice_bank(native_bank, native_wave, donor_bank, donor_wave, missing)
     return bytes(bank), bytes(waves), {'bank_id': 2, 'wave_id': 2,
         'native_instrument_count': 83, 'instrument_count': 88, 'empty_slots': [83],
         'imports': installed, 'original_data_shift': shift,
+        'reused_original_structures': reused,
         'font_bytes': len(bank), 'font_growth_bytes': len(bank)-len(native_bank),
         'wave_bytes': len(waves), 'wave_growth_bytes': len(waves)-len(native_wave),
         'font_sha256': sha256(bank), 'wave_sha256': sha256(waves),
