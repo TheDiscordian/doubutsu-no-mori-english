@@ -86,12 +86,17 @@ including native checksums, payload CRCs, and extension CRCs.
 The first fresh-process reload invocation uses a 65-second emulator lifetime
 for a controller sequence that explicitly waits over 87 seconds. The timeout
 terminates the emulator before the first snapshot; no reload result is claimed.
-The single corrected attempt uses a 160-second lifetime with the same source
-save, ROM, and controller sequence. Its result is pending.
+The single corrected attempt, `build/v3-clothing-reload-gameplay-02`, uses a
+160-second lifetime with the same source save, ROM, and controller sequence.
+It passes: ordinary town entry restores `10BF/34BF`, all fifteen expected
+pockets, imported ownership, and the complete 544-byte active garment artwork.
+The save-state guard, translation guard, and zero fault pointer pass; the
+process exits normally. This closes ordinary player clothing save/restart/load
+for this copied town, not Controller Pak transport or original hardware.
 
 ## Remaining work
 
 Complete dropped/displayed clothing, remaining renderer/shop/catalogue consumers,
-and gameplay persistence. Retain unresolved NPC queued
+and their gameplay persistence. Retain unresolved NPC queued
 and second-owner evidence for the combined clothing check. Punchy's defaults
 and move-in eligibility remain off; both patchers stay V2.

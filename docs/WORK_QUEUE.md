@@ -88,8 +88,9 @@ with later e/e+ donor support investigated separately.
   initial 33-record native instruction-window run pass. Ordinary copied-town
   cold boot, inventory, grab/wear, and outdoor rendering pass, retaining full
   imported clothing identity and returning the original shirt to its pocket.
-  Actual gyroid saving and fresh-process reload are the current check. Next
-  connect remaining renderer/shop consumers and drop/save gameplay before enabling
+  Actual gyroid Save & Quit and fresh-process reload pass, restoring clothing,
+  pockets, ownership, and complete active artwork. Next connect remaining
+  renderer/shop consumers and dropped/displayed garment gameplay before enabling
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.

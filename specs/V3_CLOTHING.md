@@ -107,14 +107,17 @@ non-furniture footprint result. The [menu routing](V3_CLOTHING_MENU.md) connects
 selected clothing classification and additional hand/cursor decisions without
 changing item identities. The [player animation adapter](V3_CLOTHING_WEAR.md)
 preserves the full imported texture index at the actual change-clothes frame.
-Connect remaining ordinary clothing actions and acquisition,
-buy/sell paths, display mannequins, mail/gifts, and ordinary saving/loading.
+Ordinary inventory-driven wearing, outdoor rendering, gyroid Save & Quit, and
+fresh-process reloading pass on a copied town. Both saved clothing fields,
+all expected pockets, ownership, and complete active artwork survive the cycle.
+Connect remaining clothing actions and acquisition, buy/sell paths, display
+mannequins, mail/gifts, and persistence for those representations.
 Keep original garments and behaviour.
 
 The [format-2 save extension](V3_CLOTHING_SAVE.md) installs independent clothing
 profile/ownership bits while retaining the earlier furniture records. Native
 encoding/decoding and migration checks pass. The normal collection adapter
-records per-player clothing ownership; catalogue presentation and ordinary
-clothing save/reload remain work. Format-2 saves must not be
+records per-player clothing ownership; catalogue presentation remains work.
+Format-2 saves must not be
 loaded in older format-1 V3 builds or V2. Keep existing saves backed up.
 Public and local patchers remain V2 pending user testing and explicit approval.

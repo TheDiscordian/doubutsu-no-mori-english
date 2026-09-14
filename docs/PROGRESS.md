@@ -208,8 +208,9 @@ cartridge checks and the initial 33-record native instruction-window check
 pass, retaining other registers, native/invalid fallbacks, classification,
 artwork, save code, and guards. Ordinary copied-town cold boot, inventory,
 grabbing, wearing, and outdoor rendering pass. The full imported identity is
-retained, and the original shirt returns to its pocket. Actual gyroid saving
-and fresh-process reloading are the current check.
+retained, and the original shirt returns to its pocket. Actual gyroid Save &
+Quit, return to title, and a fresh-process reload pass, restoring both clothing
+fields, all expected pockets, ownership, and complete active garment artwork.
 The clothing variant writes format 2 and must not be loaded by older format-1
 V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,
