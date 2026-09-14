@@ -10,8 +10,11 @@ the verified donor inventory and six passing focused tests. Twenty donor-only
 villager identities are identified. The [villager artwork batch](checkpoints/V3_VILLAGER_ART.md)
 converts Punchy and Cheri's complete body/palette and facial frames into native
 objects, verifies their shared models/skeletons, and passes nine focused checks.
+The [additive asset loader](checkpoints/V3_ASSET_LOADER.md) installs their texture
+banks alongside all 410 original banks without ordinary heap growth. Five focused
+checks, actual native object-DMA checks, and the no-Expansion-Pak path pass.
 The native draw lookup, voice mapping, and remaining villager gameplay/save paths
-are next; item identity/conversion work is pending. No V3 content is playable or
+are next; item identity/conversion work is pending. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
 

@@ -98,8 +98,10 @@ Keep source hashes and conversion revisions attached to each compiled import.
 ### Villagers
 
 The [cat/cub artwork converter](V3_VILLAGER_ART.md) produces Punchy/Cheri texture
-objects with verified model/skeleton correspondence. Runtime installation is
-pending; the artwork specification records the concrete draw/voice constraints.
+objects with verified model/skeleton correspondence. The
+[additive asset loader](V3_ASSET_LOADER.md) installs their texture banks and
+preserves all original object banks; draw/voice and gameplay integration remain
+pending. The artwork specification records the concrete draw/voice constraints.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

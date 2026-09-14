@@ -101,8 +101,9 @@ data. Keep original special identities intact with an explicit extended lookup.
 These are original link addresses, not assumed live addresses after relocation.
 The second NPC overlay also needs its equivalent path reviewed.
 
-The native object table has 410 entries. Added texture banks need a verified
-extension or lookup route, not an unchecked GC bank index. Punchy/Cheri's donor
+The native object table has 410 entries. The [V3 asset loader](V3_ASSET_LOADER.md)
+preserves those entries and installs additional texture banks for Cheri/Punchy.
+Use those assigned banks, not unchecked GC bank indices. Punchy/Cheri's donor
 voice IDs are 286/285, while the native draw record holds a one-byte voice ID.
 Investigate and port the appropriate voice mapping instead of truncating it.
 

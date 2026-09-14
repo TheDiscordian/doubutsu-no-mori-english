@@ -13,11 +13,15 @@ with later e/e+ donor support investigated separately.
 - [ ] Trace ordinary donor-only villager assets and implement one complete pilot
   through rendering, text, house/move-in, conversations, and saved identity.
   [Punchy/Cheri artwork conversion](checkpoints/V3_VILLAGER_ART.md) and shared
-  model/skeleton checks are complete. Next: extended native draw/asset lookup,
-  wider donor voice mapping, then remaining name/default/house/selection paths.
+  model/skeleton checks are complete. The [additive asset loader](checkpoints/V3_ASSET_LOADER.md)
+  and native object-DMA checks pass for both texture banks, with all original
+  banks preserved. Next: extended native draw lookup and wider donor voice mapping,
+  then remaining name/default/house/selection paths.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
+  Object-bank slots 410–429 are assigned by verified English-donor index;
+  actor/item/save IDs still require their own registry and reader work.
   Preserve special-character draw records; do not truncate the GC draw record
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
