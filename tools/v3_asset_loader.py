@@ -198,6 +198,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_save_clothing
     import v3_clothing_items
     import v3_clothing_menu
+    import v3_clothing_wear
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -273,6 +274,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_villager_rewards.SOURCES if villager_rewards else ())
                     + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES + v3_player_clothing.SOURCES
                        + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
+                       + v3_clothing_wear.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -327,7 +329,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_npc_draw.STREAMING_ABI)
     if clothing:
         abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI,
-                  v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI, v3_clothing_menu.ABI)
+                  v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
+                  v3_clothing_menu.ABI, v3_clothing_wear.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -628,7 +631,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         reward_code, reward_compiled = compile_part('villager_rewards', out / 'villager_rewards')
         reward_report = v3_villager_rewards.install(code, blob, reward_code, reward_compiled['symbols'])
         reward_report['code'] = reward_compiled
-    clothing_report = None
+    clothing_report, clothing_wear_changes = None, {}
     if clothing:
         clothing_report = v3_clothing.install(code, blob, helper_report['symbols'],
             clothing_resource, clothing_record)
@@ -655,7 +658,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_reloc = files[v3_furniture_menu.RELOC].extract(base)
         clothing_sites = v3_clothing_menu.inspect(clothing_tag, clothing_reloc, clothing_tag_owner)
         clothing_entries = out/'clothing-menu-hooks.S'
-        write_new(clothing_entries, v3_clothing_menu.assembly(clothing_sites).encode())
+        write_new(clothing_entries, (v3_clothing_menu.assembly(clothing_sites)+v3_clothing_wear.assembly()).encode())
         clothing_menu_code, clothing_menu_compiled = compile_part('clothing_menu', out/'clothing_menu',
             defines=('AF_V3_CLOTHING_PROFILE', 'af_v3_room_value=af_v3_room_value_clothing'),
             primary_source='overlays/v3/room.c', extra_sources=(str(clothing_entries.relative_to(ROOT)),))
@@ -667,6 +670,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         menu_report['before_villager_readers_sha256'] = menu_report['output_sha256']
         menu_report['before_clothing_sha256'] = sha256(clothing_tag)
         menu_report['output_sha256'] = clothing_tag_owner['output_sha256']
+        clothing_wear_changes, clothing_report['wearing'] = v3_clothing_wear.install(base, clothing_menu_compiled)
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,
@@ -707,7 +711,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
                **catalogue_changes, **shop_changes, **shop_actor_changes, **shop_floor_changes,
-               **hra_changes, **feng_changes, **house_changes, **reader_changes}
+               **hra_changes, **feng_changes, **house_changes, **reader_changes, **clothing_wear_changes}
     resized = (((v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ())
                + ((v3_shops.VROM,) if shops else ()) + tuple(relocated)
                + ((v3_villager_houses.HOUSE, v3_villager_houses.FOREGROUND) if houses else ()))
@@ -717,7 +721,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 clothing menu routing 01' if clothing else
+    label = ('V3 player clothing animation 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else

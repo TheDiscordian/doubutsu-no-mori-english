@@ -40,11 +40,14 @@ not declare every non-menu garment consumer finished.
 
 ## Memory and composition
 
-ABI 34 adds 492 bytes at `80463C30..80463E1B`, after the house-gift code and
+ABI 35 uses 672 bytes at `80463C30..80463ECF` for the combined menu and
+[player-wearing adapter](V3_CLOTHING_WEAR.md), after the house-gift code and
 before villager readers. The first function replaces the shared value query
 through an eight-byte entry jump at `80468000`. The existing full-register
 wrapper stays at `804680B8`, and all its callers remain at their fixed addresses.
-The new C query uses a 40-byte frame. No heap, DMA directory, save field, or
+The C query uses a 40-byte frame. Its mode 3 converts valid clothing items to
+full texture indices for player animation, with the original zero fallback.
+No heap, DMA directory, save field, or
 resource allocation grows.
 
 The builder validates the complete current room code, empty destination space,

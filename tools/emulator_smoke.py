@@ -1439,6 +1439,12 @@ def main():
                     raise ValueError('V3 defaults probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_clothing_wear'):
+                from v3_clothing_wear_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 clothing-wear probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_clothing_collection'):
                 from v3_clothing_collection_smoke import exercise
                 if not (out/'test.bs1').is_file():
@@ -1536,6 +1542,9 @@ def main():
                 for field, expected in action.get("expect_inventory", {}).items():
                     if snapshot.get(field) != expected:
                         raise ValueError(f"Inventory {field}: {snapshot.get(field)!r}, expected {expected!r}")
+            if action.get('snapshot_v3_player_clothing'):
+                from v3_clothing_gameplay_fixture import snapshot as clothing_snapshot
+                results.append(clothing_snapshot(debug, args.rom))
             if action.get("snapshot_villagers"):
                 results.append(villagers_snapshot(debug))
             if action.get("snapshot_npc_actors"):

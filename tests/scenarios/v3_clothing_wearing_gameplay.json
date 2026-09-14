@@ -1,0 +1,11 @@
+[
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 4},
+  {"capture": "wearing-cherry-shirt.png", "hide_cursor": true},
+  {"snapshot_inventory": true, "expect_inventory": {"cloth_id": "10BF", "cloth_item": "34BF"}},
+  {"snapshot_submenu": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

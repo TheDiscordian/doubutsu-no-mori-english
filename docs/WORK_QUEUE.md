@@ -82,8 +82,14 @@ with later e/e+ donor support investigated separately.
   [clothing menu routing](checkpoints/V3_CLOTHING_MENU.md) connects classification
   and three extra hand/cursor/animation decisions. Host/cartridge checks and the
   initial 62-record native run pass, covering six full-register windows and
-  complete eligibility/destination/action functions. Next connect remaining
-  renderer/shop consumers and ordinary wearing/drop/save gameplay before enabling
+  complete eligibility/destination/action functions. The
+  [player animation fix](checkpoints/V3_CLOTHING_WEAR.md) preserves full imported
+  shirt indices at the texture-change frame. Host/cartridge checks and the
+  initial 33-record native instruction-window run pass. Ordinary copied-town
+  cold boot, inventory, grab/wear, and outdoor rendering pass, retaining full
+  imported clothing identity and returning the original shirt to its pocket.
+  Actual gyroid saving and fresh-process reload are the current check. Next
+  connect remaining renderer/shop consumers and drop/save gameplay before enabling
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.

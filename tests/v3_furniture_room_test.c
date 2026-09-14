@@ -38,11 +38,21 @@ int main(void) {
     assert(af_v3_room_value(0x34BF, 0) == 0);
     assert(af_v3_room_value(0x34BF, 1) == 0x24BF);
     assert(af_v3_room_value(0x34BF, 2) == 2);
+    assert(af_v3_room_value(0x34BF, 3) == 0x10BF);
+    assert(af_v3_room_value(0x2400, 3) == 0);
+    assert(af_v3_room_value(0x24BF, 3) == 0xBF);
+    assert(af_v3_room_value(0x24FF, 3) == 0xFF);
+    assert(af_v3_room_value(0x23FF, 3) == 0);
+    assert(af_v3_room_value(0x2500, 3) == 0);
+    assert(af_v3_room_value(0x34BC, 3) == 0);
+    assert(af_v3_room_value(0x134BF, 3) == 0);
+    assert(af_v3_room_value(0xFFFFFFFF, 3) == 0);
     for (u32 item = 0x34BC; item < 0x34BF; ++item)
         assert(af_v3_room_value(item, 2) == 3);
     assert(af_v3_room_value(0x134BF, 2) == 3);
     disabled = 1;
     assert(af_v3_room_value(0x34BF, 2) == 3);
+    assert(af_v3_room_value(0x34BF, 3) == 0);
 #endif
     puts("Selected rotations, disabled profiles, and original room arithmetic pass");
     return 0;

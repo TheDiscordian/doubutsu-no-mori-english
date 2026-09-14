@@ -1,0 +1,14 @@
+[
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 1},
+  {"snapshot_choices": true, "expect_choices": {"choice_cursor": 0, "choice_count": 2}},
+  {"key": "a", "duration": 0.12},
+  {"wait": 25},
+  {"capture": "save-and-quit-result.png", "hide_cursor": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

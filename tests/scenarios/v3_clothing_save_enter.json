@@ -1,0 +1,14 @@
+[
+  {"wait": 1},
+  {"snapshot_v3_player_clothing": true},
+  {"key": "a", "duration": 0.12},
+  {"wait": 3},
+  {"key": "w", "duration": 0.8},
+  {"wait": 16},
+  {"capture": "ordinary-save-result.png", "hide_cursor": true},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

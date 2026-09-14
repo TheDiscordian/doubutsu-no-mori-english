@@ -1,0 +1,10 @@
+[
+  {"wait": 1},
+  {"key": "a", "duration": 0.12},
+  {"wait": 2},
+  {"capture": "clothing-actions.png", "hide_cursor": true},
+  {"snapshot_inventory": true},
+  {"snapshot_submenu": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

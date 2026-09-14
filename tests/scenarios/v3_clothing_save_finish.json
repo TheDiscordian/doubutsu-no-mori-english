@@ -1,0 +1,11 @@
+[
+  {"wait": 3},
+  {"key": "a", "duration": 0.12},
+  {"wait": 8},
+  {"capture": "save-complete.png", "hide_cursor": true},
+  {"key": "a", "duration": 0.12},
+  {"wait": 12},
+  {"capture": "returned-title.png", "hide_cursor": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"}
+]
