@@ -34,14 +34,17 @@ with later e/e+ donor support investigated separately.
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both
   haz-mat barrel and oil drum models/textures for Cheri's house and passes seven
-  focused checks. Next: native furniture profile/bank lifecycle, stable item IDs,
-  shared readers, and ordinary placement/persistence. The checkpoint records
-  the native table/loader entry points; no asset is enabled as an item yet.
+  focused checks. The [native loader batch](checkpoints/V3_FURNITURE_RUNTIME.md)
+  installs stable IDs, resident profiles, expanded readers, and native model-bank
+  selection/reuse/release. Five focused checks and 86 native steps pass, including
+  original furniture allocation/DMA and cleanup. Next: shared item readers and
+  ordinary acquisition/placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native
-  tests and special characters. Saved-identity readers and item IDs remain work.
+  tests and special characters. Furniture registry version 1 assigns the two
+  reviewed static pilots; saved-identity/shared item readers remain work.
   Preserve special-character draw records; do not truncate the GC draw record
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;

@@ -60,7 +60,8 @@ def compile_part(part, out, extra_sources=(), defines=()):
     code = (out / 'code.bin').read_bytes()
     entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
                        'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
-                       'villager': ('af_v3_load_name', BLOB_RAM + 0x4000)}[part]
+                       'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
+                       'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
@@ -117,26 +118,32 @@ def compose(native, base, changes, added):
     return image
 
 
-def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None):
+def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None, furniture=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
     import v3_npc_draw
     import v3_audio_runtime
     import v3_villager_text
+    import v3_furniture_runtime
+    if furniture and text_donor is None:
+        raise ValueError('Furniture variant requires the current villager/text baseline')
     if text_donor is not None and audio_donor is None:
         raise ValueError('Villager text variant requires installed pilot artwork and audio')
     if audio_donor is not None:
         npc_draw = True
     source_files = (SOURCE_FILES + (v3_npc_draw.SOURCE_FILES if npc_draw else ())
                     + (v3_audio_runtime.SOURCES if audio_donor is not None else ())
-                    + (v3_villager_text.SOURCES if text_donor is not None else ()))
+                    + (v3_villager_text.SOURCES if text_donor is not None else ())
+                    + (v3_furniture_runtime.SOURCE_FILES if furniture else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
         abi = v3_audio_runtime.ABI
     if text_donor is not None:
         blob_size, abi = v3_villager_text.BLOB_SIZE, v3_villager_text.ABI
+    if furniture:
+        blob_size, abi = v3_furniture_runtime.BLOB_SIZE, v3_furniture_runtime.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -192,33 +199,61 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     text_report = None
     if text_donor is not None:
         text_code, text_code_report = compile_part('villager', out / 'villager')
-        if len(text_code) > blob_size - v3_villager_text.CODE - 16:
+        text_limit = v3_furniture_runtime.CODE if furniture else blob_size - 16
+        if len(text_code) > text_limit - v3_villager_text.CODE:
             raise ValueError('Villager text code exceeds its reservation')
         blob[v3_villager_text.CODE:v3_villager_text.CODE + len(text_code)] = text_code
         text_report = v3_villager_text.install(native, code, module, blob,
             text_code_report['symbols'], *text_donor, symbols)
         text_report['code'] = text_code_report
+    furniture_changes, furniture_report = {}, None
+    if furniture:
+        furniture_code, furniture_code_report = compile_part('furniture', out / 'furniture',
+            extra_sources=('overlays/v3/furniture_entry.S',))
+        if len(furniture_code) > v3_furniture_runtime.PROFILES - v3_furniture_runtime.CODE:
+            raise ValueError('Furniture code exceeds its reservation')
+        blob[v3_furniture_runtime.CODE:v3_furniture_runtime.CODE + len(furniture_code)] = furniture_code
+        furniture_changes, furniture_added, furniture_report = v3_furniture_runtime.install(
+            native, base, blob, rel, symbols, furniture_code_report['symbols'], out / 'furniture-art')
+        furniture_report['code'] = furniture_code_report
+        if set(furniture_added) & set(additions) or set(furniture_changes) & set(draw_changes):
+            raise ValueError('Furniture composition collides with a villager resource')
+        additions.update(furniture_added)
     module[STARTUP:STARTUP + len(startup)] = startup
     struct.pack_into('>4I', module, CONFIG, BLOB, blob_size, zlib.crc32(blob), abi)
     struct.pack_into('>I', code, STARTUP_CALL - CODE_RAM,
                      0x0C000000 | ((MODULE_RAM + STARTUP) >> 2 & 0x3FFFFFF))
-    additions[BLOB] = bytes(blob)
-    changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes}
+    # The native DMA directory has no spare row after the two pilot texture
+    # banks. Furniture occupies ROM-only tail slots in the existing V3 file;
+    # startup still loads/checks exactly blob_size bytes into its RAM reservation.
+    blob_file = bytearray(blob)
+    if furniture:
+        for vrom, data in sorted(furniture_added.items()):
+            offset = vrom - BLOB
+            if offset < len(blob_file) or vrom + len(data) > TEXTURE_BASE:
+                raise ValueError('Furniture ROM tail overlaps resident or villager data')
+            blob_file.extend(bytes(offset - len(blob_file)))
+            blob_file.extend(data)
+            del additions[vrom]
+    additions[BLOB] = bytes(blob_file)
+    changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes, **furniture_changes}
     image = compose(native, base, changes, additions)
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 villager defaults development 01' if text_donor is not None else
+    label = ('V3 furniture loader development 01' if furniture else
+             'V3 villager defaults development 01' if text_donor is not None else
              'V3 villager audio development 02' if audio_donor is not None else
              'V3 NPC draw development 02' if npc_draw else 'V3 asset-loader development 02')
     return image, patch, {'build': label,
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
-        'villager_text': text_report,
+        'villager_text': text_report, 'furniture': furniture_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
-        'blob_sha256': sha256(blob), 'original_object_table_sha256': sha256(table),
+        'blob_sha256': sha256(blob), 'resident_blob_bytes': blob_size,
+        'blob_file_bytes': len(blob_file), 'original_object_table_sha256': sha256(table),
         'object_capacity': CAPACITY, 'imports': imports, 'rom_bytes': len(image),
         'resident_startup_range': ['8019A8E0', '8019ACE0'],
         'expansion_data_range': ['80460000', f'{BLOB_RAM + blob_size:08X}'], 'ordinary_heap_growth': 0,
@@ -239,7 +274,10 @@ def main():
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
+    p.add_argument('--furniture', action='store_true', help='Include the current baseline and experimental static furniture loading')
     args = p.parse_args()
+    if args.furniture:
+        args.villager_text = True
     out = args.output.resolve()
     if not out.is_relative_to(ROOT / 'build') or out.exists():
         raise ValueError('Choose a fresh output directory inside ignored build/')
@@ -254,7 +292,7 @@ def main():
     image, patch, report = build((ROOT / 'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
         (ROOT / 'build/v2-keyboard-fit-11/Animal Forest English V2.z64').read_bytes(), donor['rel'],
         (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out,
-        npc_draw=args.npc_draw, audio_donor=audio_donor, text_donor=text_donor)
+        npc_draw=args.npc_draw, audio_donor=audio_donor, text_donor=text_donor, furniture=args.furniture)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

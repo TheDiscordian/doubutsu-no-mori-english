@@ -75,7 +75,9 @@ roles/default dependencies, and furniture rotations.
 Donor identities use `GAFE01-r0/villager/00D8` or `GAFE01-r0/item/3000`.
 These are source identities, not N64 destination IDs. The raw inventory leaves
 destination IDs null; the separate [versioned villager registry](V3_NPC_DRAW.md)
-reserves new actor IDs without declaring them playable. Item rows remain unreviewed until
+reserves new actor IDs without declaring them playable. The
+[furniture registry](V3_FURNITURE_RUNTIME.md) reserves the two reviewed static
+pilot IDs independently of selection. Other item rows remain unreviewed until
 native identity and behaviour are established; a name match alone cannot approve
 them. The inventory deliberately does not call all 2,333 donor item-name records
 new or importable. No inventory row is currently selectable.
@@ -150,8 +152,11 @@ mail attachments, room scoring, and special readers where the item requires it.
 
 The [static furniture converter](V3_FURNITURE_ART.md) produces complete native
 haz-mat barrel and oil drum assets for Cheri's house, with verified donor profile
-bindings and seven passing focused tests. Furniture loading, item IDs, and the
-ordinary item lifecycle remain required; these assets are not playable imports.
+bindings and seven passing focused tests. The
+[native furniture loader](V3_FURNITURE_RUNTIME.md) installs stable item identities,
+resident profiles, expanded readers, and native model-bank selection/cleanup.
+Five focused checks and the bounded native check pass. Shared item readers and
+the ordinary item lifecycle remain required; these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

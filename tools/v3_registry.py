@@ -10,6 +10,21 @@ VILLAGERS = {
     231: 233, 232: 234, 233: 235, 234: 236, 235: 237,
 }
 
+# Reviewed static furniture reservations. Values are runtime index, saved item
+# ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay
+# untouched. Holes are not supported items; future additions must be explicit.
+FURNITURE_REGISTRY_VERSION = 1
+FURNITURE = {
+    0x3224: (1161, 0x3224, 0x03F08000),
+    0x32B8: (1198, 0x32B8, 0x03F0A000),
+}
+
+
+def furniture_slot(donor_item):
+    if donor_item not in FURNITURE:
+        raise ValueError('Unassigned imported furniture identity')
+    return FURNITURE[donor_item]
+
 
 def villager_actor(donor_index):
     if donor_index not in VILLAGERS:

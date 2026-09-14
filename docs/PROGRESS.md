@@ -38,8 +38,13 @@ enabled. Houses, selection, remaining ID-bounded readers, and gameplay/save/prof
 the [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts Cheri's
 haz-mat barrel and oil drum house dependencies into complete native objects.
 Seven focused checks pass, including every texel, vertex, and triangle in the
-actual donor conversion and compiled N64 lists. Furniture loader/ID/lifecycle
-integration and Punchy's animated speed bag remain work. No V3 villager is playable or
+actual donor conversion and compiled N64 lists. The
+[furniture loader](checkpoints/V3_FURNITURE_RUNTIME.md) adds stable item identities,
+resident profiles, expanded native table readers, and model-bank loading/cleanup.
+Five focused checks and 86 native steps pass, including both imported models,
+original furniture allocation/DMA, bank reuse/release, guards, and checkpoint
+restore. Shared item readers, ordinary placement/persistence, and Punchy's
+animated speed bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
 V3 development continues on GitHub. The web patcher stays V2 until the user

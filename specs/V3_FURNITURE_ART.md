@@ -8,9 +8,10 @@ are furniture dependencies of Cheri's donor house. Output remains in ignored
 local build directories; no game images, extracted assets, or executable donor
 code are committed or published.
 
-These are converted assets, **not playable or selectable imports**. Runtime item
-identity, profile loading, acquisition, placement, collision, prices, catalogue
-flags, rewards, scoring, and saved-item handling still need integration. Native
+These are converted assets, **not playable or selectable imports**. The
+[runtime adapter](V3_FURNITURE_RUNTIME.md) supplies stable identities, profile
+loading, model banks, and cleanup. Acquisition, placement, collision, prices,
+catalogue flags, rewards, scoring, and saved-item handling still need integration. Native
 profile construction preserves the donor scalar fields, but those fields do not
 by themselves verify ordinary collision or interaction behaviour.
 
@@ -30,7 +31,8 @@ not use unchecked asset caches or a different revision's exported C arrays.
 | `3224`–`3227` | haz-mat barrel | `iam_iku_hazardous_top` | Cheri main layer `0202` |
 | `32B8`–`32BB` | oil drum | `iam_iku_orange` | Cheri main layer `0202` |
 
-These are **donor** item IDs, not assigned N64 destination IDs. Both donor
+These are donor item IDs; the runtime registry separately assigns the two
+reviewed destination IDs. Both donor
 `furniture_quality` tables at `.data:00039FB4` and `.data:0007B5B0` must resolve
 the actual item index to its reviewed profile through the REL relocation stream.
 The second furniture-name table must contain the corresponding English name.
@@ -89,8 +91,9 @@ Compile native graphics macros in the existing pinned Docker MIPS toolchain:
 `native_profile` constructs the native 68-byte furniture profile for a supplied,
 checked VROM allocation: resource start/end, segment start/end, both model
 pointers, original scalar fields, and null unsupported callbacks. Bounds and
-alignment are mandatory. The future installer must additionally verify that
-the VROM allocation is unclaimed and present in the composed DMA table.
+alignment are mandatory. The installer additionally verifies that the VROM
+allocation is unclaimed and contained in a composed DMA resource. It may be an
+interior range of the existing V3 file's ROM-only tail.
 
 ## Verification and remaining integration
 
@@ -104,11 +107,11 @@ to compare every face, material load, texture extent, rendering state, and end.
 The [batch checkpoint](../docs/checkpoints/V3_FURNITURE_ART.md) records hashes and
 the exact local outputs. No native renderer, ordinary acquisition/placement,
 house visit, save cycle, or original-hardware test is claimed for these objects.
-The existing cartridge is unchanged, so unchanged V2/V3 code is not re-tested.
+Loader integration has its own focused checks; unchanged V2/V3 tests are not replayed.
 
 The native `ovl_My_Room` loader owns separate furniture profile/code allocations,
 resolved profile pointers, per-item bank indices, and per-bank addresses. It
-does not load furniture through the new villager texture-bank slots. Expand
-its table readers and initialization/cleanup paths together, retaining native
-ownership and safe rejection of absent imports. Shared item readers also need
-the selected stable registry before these assets can enter gameplay.
+does not load furniture through the new villager texture-bank slots. Its runtime
+adapter expands table readers and initialization/cleanup together, retaining
+native ownership and safe rejection of absent imports. Shared item readers still
+need the selected stable registry before these assets can enter gameplay.
