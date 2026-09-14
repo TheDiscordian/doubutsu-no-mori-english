@@ -5,7 +5,8 @@ from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from gc_names import symbol_data
 from v3_furniture_art import verify_sources
 
-ABI, CODE, LIMIT, BRIDGE = 16, 0x9C00, 0xA000, 0xBAA0
+ABI, CODE, LIMIT, BRIDGE = 16, 0x9C00, 0x9D00, 0xBAA0
+CLOTHING_ABI = 36
 VROM, TABLE, DESCRIPTOR = 0x011E6000, 0x38C, 0x8010DAA0
 SOURCE_SHA = 'ec1b8d3ed3ae8228ba9a16a5851f804659e53148517186aa5416a82de5b4d6a2'
 ENTRY, END = 0x800C05E0, 0x800C0684
@@ -60,7 +61,7 @@ def goods(base, rel, symbols, imports):
     return bytes(output), new_table, sorted(selected, key=lambda r: r['item_id'])
 
 
-def install(base, code, blob, helper, compiled, collection, furniture, rel, symbols, imports):
+def install(base, code, blob, helper, compiled, collection, furniture, rel, symbols, imports, *, clothing_items=None):
     if (len(blob) != 0xC000 or not helper or len(helper) > LIMIT - CODE
             or any(blob[CODE:LIMIT]) or any(blob[BRIDGE:BRIDGE + 16])
             or 0x99C0 + collection['bytes'] > CODE
@@ -69,6 +70,9 @@ def install(base, code, blob, helper, compiled, collection, furniture, rel, symb
             or compiled['symbols']['af_v3_furniture_import_profile'] != 0x80465000
             or furniture['symbols']['af_v3_furniture_import_profile'] != 0x80465000):
         raise ValueError('Shop helper overlaps live code or has changed dependencies')
+    if clothing_items is not None and (compiled['symbols'].get('af_v3_item_type') != 0x8046744C
+            or clothing_items['symbols']['af_v3_item_type'] != 0x8046744C):
+        raise ValueError('Clothing shop category has a changed shared item dependency')
     at = ENTRY - CODE_RAM
     if sha256(code[at:END - CODE_RAM]) != ENTRY_SHA or struct.unpack_from('>II', code, at) != (0xAFA40000, 0x3084FFFF):
         raise ValueError('Changed complete native shop category function')
@@ -96,4 +100,5 @@ def install(base, code, blob, helper, compiled, collection, furniture, rel, symb
         'output_sha256': sha256(data), 'bytes': len(data), 'table_offset': table,
         'descriptor': DESCRIPTOR, 'category_entry': ENTRY, 'category_source_sha256': ENTRY_SHA,
         'retained_owners': retained, 'native_rarity_and_rng_preserved': True,
+        'clothing_category_enabled': clothing_items is not None,
         'save_format_changed': False, 'ordinary_shop_gameplay_tested': False}

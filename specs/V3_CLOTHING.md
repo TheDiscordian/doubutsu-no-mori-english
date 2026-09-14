@@ -39,7 +39,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 35 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 36 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -110,7 +110,9 @@ preserves the full imported texture index at the actual change-clothes frame.
 Ordinary inventory-driven wearing, outdoor rendering, gyroid Save & Quit, and
 fresh-process reloading pass on a copied town. Both saved clothing fields,
 all expected pockets, ownership, and complete active artwork survive the cycle.
-Connect remaining clothing actions and acquisition, buy/sell paths, display
+The [shop category reader](V3_SHOPS.md) recognises selected imports as clothing
+without changing native categories or item IDs. Connect remaining clothing
+actions and acquisition, buy/sell paths, display
 mannequins, mail/gifts, and persistence for those representations.
 Keep original garments and behaviour.
 

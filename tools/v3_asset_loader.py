@@ -330,7 +330,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if clothing:
         abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI,
                   v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
-                  v3_clothing_menu.ABI, v3_clothing_wear.ABI)
+                  v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -530,9 +530,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         catalogue_report['code'] = catalogue_code_report
     shop_changes, shop_report = {}, None
     if shops:
-        shop_code, shop_code_report = compile_part('shops', out / 'shops')
+        shop_code, shop_code_report = compile_part('shops', out / 'shops',
+            defines=('AF_V3_CLOTHING_PROFILE',) if clothing else ())
         shop_changes, shop_report = v3_shops.install(base, code, blob, shop_code, shop_code_report,
-            collection_code_report, furniture_code_report, rel, symbols, furniture_report['imports'])
+            collection_code_report, furniture_code_report, rel, symbols, furniture_report['imports'],
+            clothing_items=item_code_report if clothing else None)
         shop_report['code'] = shop_code_report
     shop_actor_changes, shop_actor_report = {}, None
     if shop_actors:
@@ -721,7 +723,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 player clothing animation 01' if clothing else
+    label = ('V3 clothing shop category 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else
