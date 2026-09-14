@@ -13,6 +13,10 @@ Its 144-byte relocation resource is at `00849AC0`. Section sizes are 3,680 text
 and 112 data bytes, with 29 relocations. Its loaded-address field is `80101140`.
 All native allocation and relocation data remains unchanged.
 
+The clothing-enabled variant also includes three separate
+[clothing decisions](V3_CLOTHING_SHOP_FLOOR.md). Its 728-byte combined helper
+retains the complete 340-byte furniture helper and all its public entries.
+
 | Branch | Purpose | Native branch/delay |
 | --- | --- | --- |
 | `80953E54` | Reserve point | `BEQL`; `AT = 1F36` only when taken |

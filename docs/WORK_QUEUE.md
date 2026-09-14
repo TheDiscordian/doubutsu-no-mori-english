@@ -103,8 +103,12 @@ with later e/e+ donor support investigated separately.
   count/search decisions. Its cartridge check and corrected 56-record native
   run pass, including full original/imported/disabled/sold counting and search,
   both complete texture-loading loops, native relocation, and guards.
-  Next connect the three separate clothing shop-floor placement/selection/sale
-  decisions identified in that checkpoint, then ordinary shop interaction.
+  The [clothing shop-floor adapter](checkpoints/V3_CLOTHING_SHOP_FLOOR.md)
+  connects the three separate placement/selection/sale decisions. Its cartridge
+  check and initial 61-record native run pass, including full sale reporting,
+  actual bare-mannequin callback, foreground clearing, exact sales-total update,
+  retained other stock, and guards. Next check bounded ordinary acquisition
+  on the current build, then continue catalogue/home garment representation.
   Catalogue/home display and ordinary buy/sell remain.
   Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop

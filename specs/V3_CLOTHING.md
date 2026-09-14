@@ -40,7 +40,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 38 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 39 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -118,8 +118,11 @@ all-season stock, retaining native seasons, rarity, and single-draw RNG.
 Focused and native stock/acquisition checks pass. The
 [shop mannequin adapter](V3_SHOP_MANNEQUIN.md) connects native counting/search
 while retaining both full texture-loading loops; focused cartridge and native
-checks pass. Connect separate shop-floor decisions, remaining clothing actions
-and acquisition, ordinary buy/sell, home/catalogue display, mail/gifts, and
+checks pass. The [clothing shop-floor adapter](V3_CLOTHING_SHOP_FLOOR.md)
+connects reserve, selection, and native sale processing, including actual
+sold-stock updates, the bare-mannequin callback, and foreground clearing.
+Cartridge and native checks pass. Connect remaining clothing actions
+and ordinary acquisition/buy/sell, home/catalogue display, mail/gifts, and
 persistence for those representations.
 Keep original garments and behaviour.
 
