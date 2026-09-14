@@ -34,7 +34,7 @@ def texture_slot(donor_index):
     return OBJECT_COUNT + slot, TEXTURE_BASE + slot * TEXTURE_STRIDE
 
 
-def compile_part(part, out, extra_sources=(), defines=()):
+def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     out.mkdir(parents=True, exist_ok=False)
     docker = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}:/source:ro', '-v', f'{out.resolve()}:/out', '-w', '/out', '--entrypoint']
@@ -47,7 +47,7 @@ def compile_part(part, out, extra_sources=(), defines=()):
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
     objects = []
-    for i, source in enumerate((f'overlays/v3/{part}.c', *extra_sources)):
+    for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
@@ -64,7 +64,8 @@ def compile_part(part, out, extra_sources=(), defines=()):
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
-                       'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400)}[part]
+                       'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),
+                       'menu': ('af_v3_menu_type_80872bb0', BLOB_RAM + 0xA800)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
@@ -122,7 +123,8 @@ def compose(native, base, changes, added):
 
 
 def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None,
-          furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False):
+          furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False,
+          furniture_menu=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -133,6 +135,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_furniture_items
     import v3_furniture_room
     import v3_furniture_fields
+    import v3_furniture_menu
+    if furniture_menu and not furniture_fields:
+        raise ValueError('Menu variant requires installed shared grid integration')
     if furniture_fields and not furniture_room:
         raise ValueError('Field variant requires installed room integration')
     if furniture_room and not furniture_items:
@@ -151,7 +156,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_furniture_runtime.SOURCE_FILES if furniture else ())
                     + (v3_furniture_items.SOURCES if furniture_items else ())
                     + (v3_furniture_room.SOURCES if furniture_room else ())
-                    + (v3_furniture_fields.SOURCES if furniture_fields else ()))
+                    + (v3_furniture_fields.SOURCES if furniture_fields else ())
+                    + (v3_furniture_menu.SOURCES if furniture_menu else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -167,6 +173,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         blob_size, abi = v3_furniture_room.BLOB_SIZE, v3_furniture_room.ABI
     if furniture_fields:
         abi = v3_furniture_fields.ABI
+    if furniture_menu:
+        abi = v3_furniture_menu.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -277,6 +285,20 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             fields_code_report['symbols'], room_code_report['symbols'], rel, symbols)
         fields_report['code'] = fields_code_report
         fields_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+    menu_changes, menu_report = {}, None
+    if furniture_menu:
+        rows = v3_furniture_menu.inspect(code, files[v3_furniture_menu.ROOT_VROM].extract(base),
+            files[v3_furniture_menu.VROM].extract(base), files[v3_furniture_menu.RELOC].extract(base))
+        generated = out / 'menu-hooks.S'
+        write_new(generated, v3_furniture_menu.assembly(rows).encode())
+        menu_code, menu_code_report = compile_part('menu', out / 'menu',
+            primary_source=str(generated.relative_to(ROOT)))
+        menu_changes, menu_report = v3_furniture_menu.install(base, code, blob, rows, menu_code,
+            menu_code_report['symbols'], room_code_report['symbols'])
+        menu_report['code'] = menu_code_report
+        menu_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+        if set(menu_changes) & (set(draw_changes) | set(furniture_changes)):
+            raise ValueError('Menu composition overlaps another changed owner')
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -296,14 +318,15 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             blob_file.extend(data)
             del additions[vrom]
     additions[BLOB] = bytes(blob_file)
-    changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes, **furniture_changes}
+    changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes, **furniture_changes, **menu_changes}
     image = compose(native, base, changes, additions)
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 furniture field integration development 01' if furniture_fields else
+    label = ('V3 furniture menu integration development 01' if furniture_menu else
+             'V3 furniture field integration development 01' if furniture_fields else
              'V3 furniture room integration development 01' if furniture_room else
              'V3 furniture item readers development 01' if furniture_items else
              'V3 furniture loader development 01' if furniture else
@@ -315,6 +338,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'villager_text': text_report, 'furniture': furniture_report, 'furniture_items': items_report,
         'furniture_room': room_report,
         'furniture_fields': fields_report,
+        'furniture_menu': menu_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'resident_blob_bytes': blob_size,
@@ -343,7 +367,10 @@ def main():
     p.add_argument('--furniture-items', action='store_true', help='Include furniture loading and shared item metadata readers')
     p.add_argument('--furniture-room', action='store_true', help='Include selected furniture room range/index integration')
     p.add_argument('--furniture-fields', action='store_true', help='Include selected furniture shared grids and shop eligibility')
+    p.add_argument('--furniture-menu', action='store_true', help='Include selected furniture action, transfer, and placement menus')
     args = p.parse_args()
+    if args.furniture_menu:
+        args.furniture_fields = True
     if args.furniture_fields:
         args.furniture_room = True
     if args.furniture_room:
@@ -368,7 +395,7 @@ def main():
         (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out,
         npc_draw=args.npc_draw, audio_donor=audio_donor, text_donor=text_donor,
         furniture=args.furniture, furniture_items=args.furniture_items, furniture_room=args.furniture_room,
-        furniture_fields=args.furniture_fields)
+        furniture_fields=args.furniture_fields, furniture_menu=args.furniture_menu)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

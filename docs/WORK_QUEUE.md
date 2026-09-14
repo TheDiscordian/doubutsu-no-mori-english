@@ -46,7 +46,10 @@ with later e/e+ donor support investigated separately.
   and 151 native steps pass. The
   [shared field-grid batch](checkpoints/V3_FURNITURE_FIELDS.md) connects both native
   room-grid builders and shop eligibility; four focused checks and 56 native
-  steps pass. Next: external inventory/field and catalogue/scoring
+  steps pass. The [menu batch](checkpoints/V3_FURNITURE_MENU.md) connects action
+  menus, held-item destinations, and room-placement dispatch; three focused
+  checks and 77 native steps pass. Next: the independent inventory leaf-icon
+  reader, external field consumers, and catalogue/scoring
   consumers, acquisition, and ordinary placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.

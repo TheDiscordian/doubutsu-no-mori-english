@@ -54,7 +54,12 @@ branch-delay cases across the 27 installed detours. The
 [shared field-grid batch](checkpoints/V3_FURNITURE_FIELDS.md) connects both native
 room-grid builders and donor-backed shop eligibility. Four focused checks and
 56 native steps pass, including complete mixed-layer maps, cross-layer indices,
-retained rotations, disabled imports, original shop fallbacks, and guards. Remaining external
+retained rotations, disabled imports, original shop fallbacks, and guards. The
+[menu-dispatch batch](checkpoints/V3_FURNITURE_MENU.md) connects furniture action
+menus, held-item destinations, and room-placement dispatch. Three focused checks
+and 77 native steps pass, including complete action/hand decisions, all four field
+contexts, wrapped/quest restrictions, and full-register checks. The independent
+inventory leaf-icon reader remains pending. Remaining external
 caller integration, ordinary placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
