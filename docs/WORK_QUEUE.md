@@ -107,8 +107,10 @@ with later e/e+ donor support investigated separately.
   connects the three separate placement/selection/sale decisions. Its cartridge
   check and initial 61-record native run pass, including full sale reporting,
   actual bare-mannequin callback, foreground clearing, exact sales-total update,
-  retained other stock, and guards. Next check bounded ordinary acquisition
-  on the current build, then continue catalogue/home garment representation.
+  retained other stock, and guards. The [ordinary-shop check](checkpoints/V3_CLOTHING_SHOP_GAMEPLAY.md)
+  retains imported stock through cold boot without pre-awarding ownership.
+  Purchase remains unverified after two unsuccessful door approaches; stop
+  navigation retries for this batch and continue catalogue/home representation.
   Catalogue/home display and ordinary buy/sell remain.
   Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop

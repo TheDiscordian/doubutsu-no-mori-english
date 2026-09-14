@@ -230,6 +230,11 @@ separate reserve, selection, and sale decisions. Its cartridge check and
 initial 61-record native run pass, including twelve complete reserve/selection
 calls, full native sale reporting, the real bare-mannequin callback, foreground
 clearing, retained other stock, exact sales-total changes, and restored guards.
+The [bounded ordinary-shop check](checkpoints/V3_CLOTHING_SHOP_GAMEPLAY.md)
+confirms cold boot retains the seeded imported stock without pre-awarding a
+pocket item or ownership. Purchase remains unverified: both door approaches
+leave the player outside the shop, with guards and fault checks passing.
+Navigation retries stop for this batch; catalogue/home display is next.
 Ordinary confirmation/player payment, catalogue/home display, and remaining
 buy/sell integration remain work. The current copied-
 town check changes back to the native shirt and drops the imported pocket item

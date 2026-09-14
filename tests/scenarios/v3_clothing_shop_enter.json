@@ -1,0 +1,13 @@
+[
+  {"key_frames": "w", "frames": 65},
+  {"key_frames": "a", "frames": 4},
+  {"advance_frames": 180},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"snapshot_message": true},
+  {"capture": "shop-imported-stock.png", "hide_cursor": true},
+  {"read": ["80135BC2", 62]},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

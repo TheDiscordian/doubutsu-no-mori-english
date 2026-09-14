@@ -1,9 +1,11 @@
 """Create a copied-town clothing playtest fixture, never changing the source save."""
 import argparse
+from datetime import datetime
 import importlib.util
 import json
 from pathlib import Path
 import struct
+import time
 
 from aflib import sha256
 from apply_translation import write_new
@@ -49,7 +51,7 @@ def snapshot(debug, rom_path):
         'assertion': 'passed', 'read_only': True}}
 
 
-def create(source, rom, report):
+def create(source, rom, report, *, shop_stock=False):
     if len(source) != 2*BANK or sha256(source) != SOURCE_SHA:
         raise ValueError('Clothing fixture requires the preserved copied source town')
     if sha256(rom) != report['output_sha256'] or not report['clothing'].get('wearing'):
@@ -61,23 +63,41 @@ def create(source, rom, report):
     reference = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(reference)
     state = bytearray(profile+bytes(STATE-PROFILE))
-    state[PROFILE+512+23] = 0x80
+    if not shop_stock:
+        state[PROFILE+512+23] = 0x80
     output, records = bytearray(), []
     for number in range(2):
         bank = bytearray(source[number*BANK:(number+1)*BANK])
         if bank[4:8] != b'NAFJ' or sum(struct.unpack('>'+str(PAYLOAD//2)+'H', bank[:PAYLOAD])) & 0xFFFF:
             raise ValueError('Source town bank is invalid')
-        slot, conditions = 0x20+0x14, 0x20+0x34
-        before = bytes(bank[slot:slot+2])
-        condition_before = struct.unpack_from('>I', bank, conditions)[0]
-        bank[slot:slot+2] = bytes.fromhex('34BF')
-        struct.pack_into('>I', bank, conditions, condition_before & ~3)
-        records.append({'bank': number, 'pocket_offset': slot, 'before': before.hex(), 'after': '34bf',
-                        'condition_before': condition_before, 'condition_after': condition_before & ~3})
+        if shop_stock:
+            # Native shop goods start at saved ED22 / live 80135BC2. The
+            # preserved town's third entry is its clothing slot, not a pocket.
+            slot = 0xED26
+            before = bytes(bank[slot:slot+2])
+            if before != bytes.fromhex('2474'):
+                raise ValueError('Unexpected original shop clothing entry')
+            bank[slot:slot+2] = bytes.fromhex('34BF')
+            records.append({'bank': number, 'shop_goods_index': 2, 'saved_offset': slot,
+                            'before': before.hex(), 'after': '34bf'})
+            wallet = 0x20+0x38
+            balance = struct.unpack_from('>I', bank, wallet)[0]
+            struct.pack_into('>I', bank, wallet, 1000)
+            records.append({'bank': number, 'saved_offset': wallet,
+                            'wallet_before': balance, 'wallet_after': 1000})
+        else:
+            slot, conditions = 0x20+0x14, 0x20+0x34
+            before = bytes(bank[slot:slot+2])
+            condition_before = struct.unpack_from('>I', bank, conditions)[0]
+            bank[slot:slot+2] = bytes.fromhex('34BF')
+            struct.pack_into('>I', bank, conditions, condition_before & ~3)
+            records.append({'bank': number, 'pocket_offset': slot, 'before': before.hex(), 'after': '34bf',
+                            'condition_before': condition_before, 'condition_after': condition_before & ~3})
         output.extend(reference.reference_pack(bank, state))
     return bytes(output), {'source_save_sha256': SOURCE_SHA, 'rom_sha256': sha256(rom),
-        'fixture_save_sha256': sha256(output), 'player_slot': 0, 'pocket_slot': 0,
-        'item': '34BF', 'seeded_ownership': True, 'save_format': 2, 'field_changes': records,
+        'fixture_save_sha256': sha256(output), 'player_slot': 0,
+        'pocket_slot': None if shop_stock else 0, 'seeded_shop_stock': shop_stock,
+        'item': '34BF', 'seeded_ownership': not shop_stock, 'save_format': 2, 'field_changes': records,
         'villagers_and_other_items_retained': True, 'ordinary_acquisition_tested': False,
         'source_save_modified': False}
 
@@ -86,11 +106,24 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--rom', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--shop-stock', action='store_true',
+                        help='Seed shop clothing and 1,000 Bells; preserve pockets and zero imported ownership')
     args = parser.parse_args()
     source = ROOT/'local/rc2-save-report-g3O4lU/test.flash'
     image, receipt = create(source.read_bytes(), args.rom.read_bytes(),
-                            json.loads((args.rom.parent/'build.json').read_text()))
+                            json.loads((args.rom.parent/'build.json').read_text()), shop_stock=args.shop_stock)
     rtc = (ROOT/'build/v3-identity-arrival-01/test.rtc').read_bytes()
+    if args.shop_stock:
+        # Same calendar day as the source town's current stock timestamp.
+        # Ares's disposable RTC only; never change the host clock.
+        staged = datetime(2026, 9, 10, 12, 0, 0)
+        def bcd(value): return (value//10)*16+value%10
+        rtc = bytearray(b'\xff'*32)
+        rtc[16:24] = bytes([bcd(staged.second), bcd(staged.minute), bcd(staged.hour)|0x80,
+                           bcd(staged.day), bcd((staged.weekday()+1)%7), bcd(staged.month),
+                           bcd(staged.year%100), bcd(staged.year//100-19)])
+        rtc[24:32] = int(time.time()).to_bytes(8, 'big')
+        receipt['isolated_clock'] = staged.isoformat()
     if len(rtc) != 32: raise ValueError('Invalid retained daytime RTC')
     args.output.mkdir(parents=True, exist_ok=False)
     write_new(args.output/'test.flash', image)

@@ -1,0 +1,11 @@
+[
+  {"repeat": 3, "actions": [{"key_frames": "g", "frames": 120}]},
+  {"key_frames": "g", "frames": 76},
+  {"snapshot_player": true},
+  {"capture": "shop-east-acre.png", "hide_cursor": true},
+  {"key_frames": "w", "frames": 120},
+  {"snapshot_player": true},
+  {"capture": "shop-south-approach.png", "hide_cursor": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

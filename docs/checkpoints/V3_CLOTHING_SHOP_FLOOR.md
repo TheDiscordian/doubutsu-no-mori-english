@@ -50,18 +50,12 @@ audio or user-save modification occurs.
 
 ## Next work
 
-Perform a bounded current-build ordinary shop acquisition check, then continue
-the remaining clothing catalogue/home-display representation and mail/gift
-consumers. Do not repeat already-passing component checks or outdoor navigation
-attempts from older builds.
-
-The preserved original copied town contains one clothing stock entry, `2474`,
-at shop list index 2. The native 31-entry goods table is `80135BC2..80135BFF`,
-save offset `ED22`; its index-2 item is at `ED26`. The source player's pockets
-have four items and eleven empty slots. A future disposable shop fixture can
-replace that stock entry without seeding a purchased pocket item or ownership.
-Check whether normal arrival regenerates stock before claiming the fixture
-reaches the intended shop. Never edit the preserved source save.
+The [bounded ordinary-shop check](V3_CLOTHING_SHOP_GAMEPLAY.md) preserves imported
+stock through cold boot, with unchanged pockets and zero imported ownership.
+Purchase remains unverified after two door approaches leave the player outside;
+all observed guards and fault checks pass. Retain those checkpoints and stop
+navigation retries for this batch. Continue the remaining clothing catalogue/
+home-display representation and mail/gift consumers.
 
 Punchy's defaults and imported move-ins stay disabled. Full clothing display,
 villager lifecycle, remaining imports, browser selections, and profile transport

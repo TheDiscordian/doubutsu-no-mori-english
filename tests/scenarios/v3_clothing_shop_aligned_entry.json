@@ -1,0 +1,15 @@
+[
+  {"key_frames": "s", "frames": 52},
+  {"key_frames": "g", "frames": 40},
+  {"key_frames": "w", "frames": 65},
+  {"advance_frames": 180},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"snapshot_message": true},
+  {"capture": "shop-mannequin.png", "hide_cursor": true},
+  {"read": ["80136F0C", 4]},
+  {"read": ["80135BC2", 62]},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]
