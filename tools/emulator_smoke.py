@@ -452,7 +452,14 @@ def villagers_snapshot(debug):
         npc = struct.unpack_from(">H", animals, at)[0]
         if npc >> 12 != 0xE:
             continue
-        if npc & 0xFFF >= 216 or npc in seen:
+        index = npc & 0xFFF
+        if index >= 216:
+            if not 218 <= index < 238 or debug.read_memory(0x8019ACD0, 4) != bytes.fromhex('00000001'):
+                raise ValueError('Unavailable imported villager in snapshot')
+            metadata = debug.read_memory(0x80462C00+(index-218)*32, 32)
+            if int.from_bytes(metadata[:2], 'big') != npc or metadata[7] != 1:
+                raise ValueError('Uninstalled imported villager in snapshot')
+        if npc in seen:
             raise ValueError("Invalid or duplicate native villager ID")
         seen.add(npc)
         home = animals[at+0x4E0:at+0x4E5]

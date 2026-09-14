@@ -7,12 +7,34 @@ from v3_registry import REGISTRY_VERSION, villager_actor
 from v3_villager_art import (DRAW_STRIDE, NATIVE_DRAW_VROM, PILOTS, native_species)
 
 BLOB_SIZE, ABI, DRAW_OFFSET, STRIDE = 0x4000, 2, 0x2000, 104
+STREAMING_ABI = 27
 SOURCE_FILES = ('tools/v3_npc_draw.py', 'tools/v3_registry.py',
                 'overlays/v3/npc_draw.c', 'overlays/v3/npc_voice.S')
 OWNERS = (
     (0x8681F0, 0x878550, 0x809735B0, 0x809809FC, 0x8097F93C, 0xC0, 'af_v3_npc_voice_tail'),
     (0x8798C0, 0x886FA0, 0x80995BF0, 0x809A0AB8, 0x8099FCEC, 0xB8, 'af_v3_npc2_voice_tail'),
 )
+STREAMING = {
+    0x8681F0: (0x8097FDF0, 0x8097FE80, 0x8097FE24,
+               '5be948a9b7a89d663ada4e805973f703b2e8e6a3e4930fdef0ac9d707698e147'),
+    0x8798C0: (0x809A0378, 0x809A0408, 0x809A03AC,
+               '47e0ce2bab773d78d8792c4216e5710751059e6bff2ea8411125c868188b44ed'),
+}
+
+
+def patch_streaming(data, reloc_data, vrom, ram):
+    """Retain the native reserved model/texture slots and queued-DMA lifetime."""
+    start, end, address, digest = STREAMING[vrom]
+    at = address - ram
+    expected, replacement = bytes.fromhex('3c0f801125efddd0'), bytes.fromhex('3c0f804625ef1000')
+    if (sha256(data[start-ram:end-ram]) != digest or data[at:at+8] != expected
+            or {at, at+4} & relocation_offsets(reloc_data, len(data))):
+        raise ValueError('Changed native NPC streaming function, table pointer, or relocation')
+    data[at:at+8] = replacement
+    return {'entry': f'{start:08X}', 'end': f'{end:08X}', 'table_load': f'{address:08X}',
+            'native_function_sha256': digest, 'before': expected.hex(), 'after': replacement.hex(),
+            'object_table': '80461000', 'reserved_model_bytes': 0x2800,
+            'reserved_texture_bytes': 0x1620, 'allocation_and_dma_unchanged': True}
 
 
 def draw_records(native, rel, symbols, artwork):
@@ -85,9 +107,11 @@ def patch_owners(native, base, symbols):
         if (u32(data, tail - ram - 4) != 0x8FBF0024
                 or data[tail - ram + 8:tail - ram + 16] != struct.pack('>2I', 0x03E00008, 0)):
             raise ValueError('Changed NPC constructor epilogue')
+        streaming = patch_streaming(data, reloc_data, vrom, ram)
         changes[vrom] = bytes(data)
         report.append({'vrom': f'{vrom:08X}', 'link_address': f'{ram:08X}',
             'draw_hook': f'{draw:08X}', 'voice_tail_hook': f'{tail:08X}',
             'source_sha256': sha256(before), 'patched_sha256': sha256(data),
+            'streaming': streaming,
             'relocation_sha256': sha256(reloc_data), 'relocations_unchanged': True})
     return changes, report

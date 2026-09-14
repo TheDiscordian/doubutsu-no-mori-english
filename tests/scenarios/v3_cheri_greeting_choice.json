@@ -1,0 +1,8 @@
+[
+  {"advance_to_choice": {"max_presses": 12, "settle_seconds": 0.8}},
+  {"snapshot_message": true},
+  {"snapshot_choices": true},
+  {"capture": "cheri-greeting-choice.png", "hide_cursor": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

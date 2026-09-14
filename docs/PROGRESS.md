@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-villager-rewards-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`07ce3743aac471e6672d78b3fcb55bc02d76b88d0df4b3806e7e265e1ab63a03`.
+`build/v3-npc-streaming-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`a9dd8d6ef851bf3141b32f84544d53058a0a8a5d41ab217b5992d518e1815b37`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -155,6 +155,14 @@ The [umbrella review](../specs/V3_VILLAGER_UMBRELLAS.md) verifies both already
 installed defaults and their complete matching native artwork: 2,048 pixels,
 56 vertices, and 33 material-bound triangles per umbrella. Two focused checks
 pass. No ROM change is needed; ordinary rain animation remains a gameplay check.
+The [ordinary Cheri gameplay check](checkpoints/V3_CHERI_GAMEPLAY.md) identifies
+and fixes an acre-entry crash in both NPC-specific object streaming loaders.
+They now use the expanded object table while keeping native reserved buffers
+and DMA lifetimes. Three focused checks pass. The corrected current cold boot
+and twenty-one-step gameplay run cross the acre normally, load Cheri, observe
+her movement, and reach her English introduction with the correct name, outfit,
+and catchphrase. Fault pointers remain zero and guards intact. The disposable
+town explicitly seeds Cheri; this is not natural move-in or save/restart evidence.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

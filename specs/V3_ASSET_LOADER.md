@@ -59,9 +59,13 @@ startup failure path; no new object hook is installed after a failed DMA/CRC.
 
 ## Object lookup and allocation
 
-The original `func_800C5AA0_jp` consumes `gObjectTable` while preparing an object
-arena allocation. Both synchronous and queued object loading use that function.
+The original `func_800C5AA0_jp` consumes `gObjectTable` while preparing a shared
+scene object-arena allocation. Its synchronous and queued paths use that function.
 The installed entry jumps to `af_v3_object_status` in the checked V3 blob.
+NPCs also fill their own preallocated model/texture slots through separate
+[reserved-bank streaming functions](V3_NPC_DRAW.md#reserved-bank-streaming).
+The draw variant connects both of those direct table readers to the expanded
+table. Testing the shared scene allocator alone does not verify NPC streaming.
 
 Preserve the original low-sixteen-bit, signed bank conversion explicitly; do
 not rely on every caller to sign-extend its argument. Reject negative indices,

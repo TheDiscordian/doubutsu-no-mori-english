@@ -79,6 +79,27 @@ restore saved RA/S0 and SP, and return to the original caller. The first overlay
 uses frame size `C0`, row at `SP+58`; the second uses `B8`, row at `SP+50`.
 Both save RA/S0 at `+24`/`+20`. No actor layout grows.
 
+## Reserved-bank streaming
+
+Ordinary NPC construction has its own object-table lookup; it does not use
+the shared scene allocator at `800C5AA0`. The two streaming functions are
+`8097FDF0..8097FE7F` and `809A0378..809A0407`. Each finds a free preallocated
+status, uses the requested object bank's VROM bounds, and schedules the existing
+scene DMA. The callers provide `2800` bytes for models and `1620` for textures.
+Both imported texture resources fit the complete native texture reservation.
+
+The builder verifies each complete native function and changes only its
+two-instruction table address at `8097FE24` / `809A03AC`: `8010DDD0` becomes
+`80461000`. The original 410 table entries remain identical; banks 426 and 429
+are now available to these consumers. Neither changed word is relocated by the
+native overlay loader. Status selection, capacity limits, pending flags,
+asynchronous completion, reuse/release, and all arena allocations remain native.
+All newly built draw variants use at least configuration ABI 27 for this fix.
+This configuration revision does not change saved layouts or import profiles.
+
+The [gameplay checkpoint](../docs/checkpoints/V3_CHERI_GAMEPLAY.md) records the
+actual acre-entry failure and the targeted current-build verification.
+
 ## Audio integration
 
 Full voice transport is not full sound support. Native `Na_VoiceSe` at

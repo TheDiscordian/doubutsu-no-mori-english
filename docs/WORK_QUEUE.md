@@ -49,6 +49,12 @@ with later e/e+ donor support investigated separately.
   The [umbrella review](../specs/V3_VILLAGER_UMBRELLAS.md) confirms both installed
   defaults, native consumers, and full donor/native artwork correspondence.
   Two focused checks pass without changing the cartridge.
+  The [ordinary Cheri gameplay check](checkpoints/V3_CHERI_GAMEPLAY.md) fixes the
+  separate NPC streaming-table readers in both overlays. Three focused checks
+  and a twenty-one-step current cold-boot/gameplay run pass: acre crossing,
+  ordinary Cheri construction/movement, and her English introduction with the
+  correct name, outfit, and catchphrase. The town seeds Cheri explicitly;
+  natural move-in and ordinary save/restart remain unverified.
   Next: remaining native reader review and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.

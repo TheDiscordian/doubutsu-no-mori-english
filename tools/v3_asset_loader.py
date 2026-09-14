@@ -310,6 +310,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_villager_selection.ABI)
     if villager_rewards:
         abi = max(abi, v3_villager_rewards.ABI)
+    if npc_draw:
+        abi = max(abi, v3_npc_draw.STREAMING_ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))

@@ -1,0 +1,13 @@
+[
+  {"wait": 1},
+  {"key": "g", "duration": 1.3},
+  {"wait": 3},
+  {"read": ["8003CE34", 4]},
+  {"read": ["80145630", 432]},
+  {"read": ["8019C8D0", 16]},
+  {"read": ["80130DB8", 120]},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"capture": "acre-entry-fault.png", "hide_cursor": true},
+  {"save_state": true}
+]

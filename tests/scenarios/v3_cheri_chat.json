@@ -1,0 +1,17 @@
+[
+  {"snapshot_choices": true, "expect_choices": {"choice_state": 2, "choice_cursor": 0,
+    "choice_hex": ["43616e20492068656c7020796f753f", "4361726520746f20636861743f", "57686f6f70732c20736f72727921"]}},
+  {"key": "s", "duration": 0.06},
+  {"wait": 0.3},
+  {"snapshot_choices": true, "expect_choices": {"choice_cursor": 1}},
+  {"key": "a", "duration": 0.08},
+  {"wait": 2},
+  {"snapshot_message": true},
+  {"capture": "cheri-chat.png", "hide_cursor": true},
+  {"advance_dialogue": {"max_presses": 15, "settle_seconds": 0.8}},
+  {"snapshot_player": true},
+  {"snapshot_npc_actors": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]
