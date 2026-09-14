@@ -34,7 +34,7 @@ def texture_slot(donor_index):
     return OBJECT_COUNT + slot, TEXTURE_BASE + slot * TEXTURE_STRIDE
 
 
-def compile_part(part, out):
+def compile_part(part, out, extra_sources=(), defines=()):
     out.mkdir(parents=True, exist_ok=False)
     docker = ['docker', 'run', '--rm', '--network', 'none', '--user', f'{os.getuid()}:{os.getgid()}',
               '-v', f'{ROOT}:/source:ro', '-v', f'{out.resolve()}:/out', '-w', '/out', '--entrypoint']
@@ -45,8 +45,13 @@ def compile_part(part, out):
              '-mno-abicalls', '-fno-pic', '-ffreestanding', '-fno-builtin', '-fno-common',
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
-    run('gcc', *flags, f'/source/overlays/v3/{part}.c', '-o', 'code.o')
-    run('ld', '-EB', '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', 'code.o')
+    flags += ['-D' + define for define in defines]
+    objects = []
+    for i, source in enumerate((f'overlays/v3/{part}.c', *extra_sources)):
+        obj = 'code.o' if i == 0 else f'extra{i}.o'
+        run('gcc', *flags, f'/source/{source}', '-o', obj)
+        objects.append(obj)
+    run('ld', '-EB', '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
     symbols = {name: int(address, 16) for address, kind, name in
@@ -58,7 +63,8 @@ def compile_part(part, out):
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
     return code, {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
-                  'toolchain': IMAGE, 'flags': flags, 'stack_usage': (out / 'code.su').read_text()}
+                  'toolchain': IMAGE, 'flags': flags,
+                  'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
 
 
 def compose(native, base, changes, added):
@@ -109,11 +115,14 @@ def compose(native, base, changes, added):
     return image
 
 
-def build(native, base, rel, symbols, out):
+def build(native, base, rel, symbols, out, *, npc_draw=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
-    sources = {p: sha256((ROOT / p).read_bytes()) for p in SOURCE_FILES}
+    import v3_npc_draw
+    source_files = SOURCE_FILES + (v3_npc_draw.SOURCE_FILES if npc_draw else ())
+    sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
+    blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -131,15 +140,17 @@ def build(native, base, rel, symbols, out):
             continue
         if start not in files or end != files[start].vend:
             raise ValueError('Existing object bank does not match its current DMA resource')
-    startup, startup_report = compile_part('startup', out / 'startup')
-    helper, helper_report = compile_part('asset', out / 'asset')
+    startup, startup_report = compile_part('startup', out / 'startup',
+        defines=(f'AF_V3_BLOB_SIZE={blob_size}', f'AF_V3_ABI={abi}') if npc_draw else ())
+    helper, helper_report = compile_part('asset', out / 'asset',
+        extra_sources=('overlays/v3/npc_draw.c', 'overlays/v3/npc_voice.S') if npc_draw else ())
     if len(startup) > CONFIG - STARTUP or len(helper) > TABLE_OFFSET - 0x100:
         raise ValueError('V3 code exceeds its owned reservation')
-    blob = bytearray(BLOB_SIZE)
-    struct.pack_into('>5I', blob, 0, 0x41465633, 1, BLOB_SIZE, CAPACITY, OBJECT_COUNT)
+    blob = bytearray(blob_size)
+    struct.pack_into('>5I', blob, 0, 0x41465633, abi, blob_size, CAPACITY, OBJECT_COUNT)
     blob[0x100:0x100 + len(helper)] = helper
     blob[TABLE_OFFSET:TABLE_OFFSET + len(table)] = table
-    struct.pack_into('>4I', blob, BLOB_SIZE - 16, *([0xAF33C0DE] * 4))
+    struct.pack_into('>4I', blob, blob_size - 16, *([0xAF33C0DE] * 4))
     additions, imports = {}, []
     for row in art['villagers']:
         index = int(row['id'].rsplit('/', 1)[-1], 16)
@@ -149,26 +160,37 @@ def build(native, base, rel, symbols, out):
         additions[vrom] = texture
         imports.append({'id': row['id'], 'name': row['name'], 'object_bank': bank,
                         'texture_vrom': f'{vrom:08X}', 'texture_sha256': sha256(texture),
-                        'playable': False, 'draw_record_installed': False})
+                        'playable': False, 'draw_record_installed': npc_draw})
+    draw_changes, draw_report = {}, None
+    if npc_draw:
+        records, draw_imports = v3_npc_draw.draw_records(native, rel, symbols, art)
+        at = v3_npc_draw.DRAW_OFFSET
+        if at + len(records) > blob_size - 16:
+            raise ValueError('V3 draw records exceed their owned reservation')
+        blob[at:at + len(records)] = records
+        draw_changes, owner_report = v3_npc_draw.patch_owners(native, base, helper_report['symbols'])
+        draw_report = {'imports': draw_imports, 'owners': owner_report,
+                       'record_offset': at, 'record_stride': v3_npc_draw.STRIDE}
     module[STARTUP:STARTUP + len(startup)] = startup
-    struct.pack_into('>4I', module, CONFIG, BLOB, BLOB_SIZE, zlib.crc32(blob), 1)
+    struct.pack_into('>4I', module, CONFIG, BLOB, blob_size, zlib.crc32(blob), abi)
     struct.pack_into('>I', code, STARTUP_CALL - CODE_RAM,
                      0x0C000000 | ((MODULE_RAM + STARTUP) >> 2 & 0x3FFFFFF))
     additions[BLOB] = bytes(blob)
-    changes = {CODE_VROM: bytes(code), MODULE: bytes(module)}
+    changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes}
     image = compose(native, base, changes, additions)
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('V3 asset patch reconstruction failed')
-    if sources != {p: sha256((ROOT / p).read_bytes()) for p in SOURCE_FILES}:
+    if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    return image, patch, {'build': 'V3 asset-loader development 02', 'baseline_sha256': BASE_SHA,
+    return image, patch, {'build': 'V3 NPC draw development 02' if npc_draw else 'V3 asset-loader development 02',
+        'baseline_sha256': BASE_SHA, 'npc_draw': draw_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'original_object_table_sha256': sha256(table),
         'object_capacity': CAPACITY, 'imports': imports, 'rom_bytes': len(image),
         'resident_startup_range': ['8019A8E0', '8019ACE0'],
-        'expansion_data_range': ['80460000', '80462000'], 'ordinary_heap_growth': 0,
+        'expansion_data_range': ['80460000', f'{BLOB_RAM + blob_size:08X}'], 'ordinary_heap_growth': 0,
         'required_ram_bytes': 0x800000, 'saved_format_changed': False,
         'new_villager_ids_enabled': False, 'native_test': 'pending', 'hardware_test': 'not performed',
         'save_warning': 'Development loader only; use disposable saves. V3 import/profile compatibility is unverified.',
@@ -179,6 +201,7 @@ def build(native, base, rel, symbols, out):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     args = p.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT / 'build') or out.exists():
@@ -187,7 +210,8 @@ def main():
     out.mkdir(parents=True)
     image, patch, report = build((ROOT / 'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
         (ROOT / 'build/v2-keyboard-fit-11/Animal Forest English V2.z64').read_bytes(), donor['rel'],
-        (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out)
+        (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out,
+        npc_draw=args.npc_draw)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

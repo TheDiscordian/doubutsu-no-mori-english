@@ -99,13 +99,15 @@ index `218 + special_id`; the two native test records precede them. Merely
 inserting new ordinary villagers would redirect special characters to the wrong
 data. Keep original special identities intact with an explicit extended lookup.
 These are original link addresses, not assumed live addresses after relocation.
-The second NPC overlay also needs its equivalent path reviewed.
+The [V3 native draw adapter](V3_NPC_DRAW.md) implements equivalent routes in
+both NPC overlays and preserves the original special-character identities.
 
 The native object table has 410 entries. The [V3 asset loader](V3_ASSET_LOADER.md)
 preserves those entries and installs additional texture banks for Cheri/Punchy.
 Use those assigned banks, not unchecked GC bank indices. Punchy/Cheri's donor
 voice IDs are 286/285, while the native draw record holds a one-byte voice ID.
-Investigate and port the appropriate voice mapping instead of truncating it.
+The draw adapter transfers these full IDs into the existing actor word; the
+audio sequence engine still needs the corresponding wider lookup and sequences.
 
 Roster/default/name/catchphrase/house readers, selection bounds, moves, dialogue,
 mail, acquisition, and persistence remain part of the complete pilot. Verify

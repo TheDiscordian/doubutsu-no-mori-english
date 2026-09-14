@@ -69,8 +69,9 @@ import menu. The inventory preserves names, donor IDs, source hashes, villager
 roles/default dependencies, and furniture rotations.
 
 Donor identities use `GAFE01-r0/villager/00D8` or `GAFE01-r0/item/3000`.
-These are source identities, not N64 destination IDs. Every destination ID is
-null until explicitly assigned and validated. Item rows remain unreviewed until
+These are source identities, not N64 destination IDs. The raw inventory leaves
+destination IDs null; the separate [versioned villager registry](V3_NPC_DRAW.md)
+reserves new actor IDs without declaring them playable. Item rows remain unreviewed until
 native identity and behaviour are established; a name match alone cannot approve
 them. The inventory deliberately does not call all 2,333 donor item-name records
 new or importable. No inventory row is currently selectable.
@@ -100,8 +101,9 @@ Keep source hashes and conversion revisions attached to each compiled import.
 The [cat/cub artwork converter](V3_VILLAGER_ART.md) produces Punchy/Cheri texture
 objects with verified model/skeleton correspondence. The
 [additive asset loader](V3_ASSET_LOADER.md) installs their texture banks and
-preserves all original object banks; draw/voice and gameplay integration remain
-pending. The artwork specification records the concrete draw/voice constraints.
+preserves all original object banks. The [native draw routes](V3_NPC_DRAW.md)
+install pilot draw rows in both NPC overlays and preserve full donor voice IDs.
+Audio sequence playback and ordinary gameplay integration remain pending.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

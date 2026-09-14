@@ -8,8 +8,10 @@ banks and provides twenty additional, subset-independent villager texture slots.
 Cheri and Punchy's converted texture objects occupy their assigned slots.
 Other new slots are empty and rejected by the loader.
 
-This installs asset loading, not new villagers. No new actor identity, draw row,
-move-in candidate, house, dialogue, or voice is enabled. Villager construction,
+The asset-only variant installs loading, not new villagers. The optional
+[`--npc-draw` variant](V3_NPC_DRAW.md) adds pilot draw records, reserved actor
+identities, and full voice-ID transport in a 16-KiB ABI-2 blob. Neither variant
+enables move-ins, houses, dialogue, or imported audio playback. Villager construction,
 saved identity, item imports, and browser selection remain required. Do not
 present this development cartridge as a playable-import handoff.
 
@@ -82,8 +84,9 @@ range. The remaining twenty entries are reserved in English donor order:
 | Punchy, `GAFE01-r0/villager/00EB` | 429 | `03F36000` | 5,664 |
 
 These are object-bank assignments, not actor/name/save IDs. Do not compact or
-reassign the slots when selecting a different subset. Actor-ID allocation still
-needs to preserve the existing normal, test, and special-character distinctions.
+reassign the slots when selecting a different subset. The
+[separate actor registry](V3_NPC_DRAW.md) preserves existing normal, test, and
+special-character distinctions; bank IDs are not saved actor IDs.
 
 ## Cartridge composition and compatibility
 

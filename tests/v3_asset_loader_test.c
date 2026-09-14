@@ -6,8 +6,8 @@
 
 struct Object af_v3_objects[430];
 volatile u32 af_v3_object_entry[2], af_v3_config[4], af_v3_installed, af_v3_memsize;
-_Alignas(16) unsigned char af_v3_memory[0x2000];
-static _Alignas(16) unsigned char source[0x2000];
+_Alignas(16) unsigned char af_v3_memory[AF_V3_BLOB_SIZE];
+static _Alignas(16) unsigned char source[AF_V3_BLOB_SIZE];
 static int previous_ok, dma_bad, execute_bad, dma_calls, writes, invalidates, executions;
 
 int af_v3_previous(void) { return previous_ok; }
@@ -36,10 +36,10 @@ static void reset(void) {
     u32 *h = (u32 *)source;
     memset(source, 0, sizeof(source));
     memset(af_v3_memory, 0xA5, sizeof(af_v3_memory));
-    h[0] = 0x41465633; h[1] = 1; h[2] = 0x2000; h[3] = 430; h[4] = 410;
-    h[0x7FC] = 0xAF33C0DE;
-    af_v3_config[0] = 0x03F00000; af_v3_config[1] = 0x2000;
-    af_v3_config[2] = af_crc32(source, sizeof(source)); af_v3_config[3] = 1;
+    h[0] = 0x41465633; h[1] = AF_V3_ABI; h[2] = AF_V3_BLOB_SIZE; h[3] = 430; h[4] = 410;
+    h[AF_V3_GUARD] = 0xAF33C0DE;
+    af_v3_config[0] = 0x03F00000; af_v3_config[1] = AF_V3_BLOB_SIZE;
+    af_v3_config[2] = af_crc32(source, sizeof(source)); af_v3_config[3] = AF_V3_ABI;
     af_v3_installed = 0; af_v3_memsize = 0x800000;
     af_v3_object_entry[0] = 0xAFA60008; af_v3_object_entry[1] = 0x00063400;
     previous_ok = 1; dma_bad = execute_bad = dma_calls = writes = invalidates = executions = 0;
@@ -57,7 +57,7 @@ static void startup_tests(void) {
     reset(); dma_bad = 1;
     assert(!af_v3_startup() && !writes && !executions);
     for (int i = 0; i < 6; ++i) {
-        reset(); ((u32 *)source)[i < 5 ? i : 0x7FC] ^= 1;
+        reset(); ((u32 *)source)[i < 5 ? (u32)i : AF_V3_GUARD] ^= 1;
         af_v3_config[2] = af_crc32(source, sizeof(source));
         assert(!af_v3_startup() && !writes && !executions);
     }
@@ -70,7 +70,7 @@ static void startup_tests(void) {
     assert(af_v3_object_entry[0] == 0x08118050 && !af_v3_object_entry[1]);
     assert(af_v3_startup() && dma_calls == 1 && executions == 1);
     assert(af_v3_asset_init() && writes == 2);
-    ((u32 *)af_v3_memory)[0x7FC] = 0;
+    ((u32 *)af_v3_memory)[AF_V3_GUARD] = 0;
     assert(!af_v3_startup() && dma_calls == 1);
 }
 static void reject(struct Status *status, struct Arena *arena, s16 bank) {

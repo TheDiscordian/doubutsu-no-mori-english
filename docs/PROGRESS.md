@@ -13,8 +13,14 @@ objects, verifies their shared models/skeletons, and passes nine focused checks.
 The [additive asset loader](checkpoints/V3_ASSET_LOADER.md) installs their texture
 banks alongside all 410 original banks without ordinary heap growth. Five focused
 checks, actual native object-DMA checks, and the no-Expansion-Pak path pass.
-The native draw lookup, voice mapping, and remaining villager gameplay/save paths
-are next; item identity/conversion work is pending. No V3 villager is playable or
+The [native draw adapter](checkpoints/V3_NPC_DRAW.md) installs both pilot rows in
+both NPC overlays, reserves stable actor IDs, and preserves full donor voice IDs
+without enlarging actors. Seven focused host/cartridge checks pass. A native
+boot exposed a DMA alignment defect, now corrected; the corrected build reaches
+the game frame loop without a fault and loads its complete checked blob. The
+deeper native draw/tail fixture remains incomplete after bounded setup attempts.
+Audio sequences and remaining villager gameplay/save paths are next;
+item identity/conversion work is pending. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
 

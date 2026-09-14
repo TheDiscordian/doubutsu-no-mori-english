@@ -15,13 +15,17 @@ with later e/e+ donor support investigated separately.
   [Punchy/Cheri artwork conversion](checkpoints/V3_VILLAGER_ART.md) and shared
   model/skeleton checks are complete. The [additive asset loader](checkpoints/V3_ASSET_LOADER.md)
   and native object-DMA checks pass for both texture banks, with all original
-  banks preserved. Next: extended native draw lookup and wider donor voice mapping,
-  then remaining name/default/house/selection paths.
+  banks preserved. The [native draw adapter](checkpoints/V3_NPC_DRAW.md) installs
+  both overlay routes and full voice-ID transport. Seven host/cartridge checks
+  pass; cold boot passes after an alignment fix. Complete native draw/tail probing
+  remains unverified after bounded fixture attempts. Next: donor melody sequence
+  integration and wider audio lookup, then name/default/house/selection paths.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
-  actor/item/save IDs still require their own registry and reader work.
+  registry version 1 reserves villager actor indices 218–237, preserving native
+  tests and special characters. Saved-identity readers and item IDs remain work.
   Preserve special-character draw records; do not truncate the GC draw record
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
