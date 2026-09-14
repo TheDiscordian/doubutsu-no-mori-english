@@ -83,8 +83,14 @@ two-bank writer, and a 54-step fresh-process reader pass. Both native load entri
 restore the imported pocket IDs and catalogue/profile data without using the
 unnamed native RAM tail. A normal cold boot with missing imports displays the
 complete warning, stops without a CPU fault, and preserves both save banks.
-Native catalogue consumers, ordinary gameplay persistence, and Controller Pak
-profile transport remain work.
+The [collection adapter](checkpoints/V3_COLLECTION.md) connects native pocket
+acquisition/collection and resident clearing to the saved imported catalogues.
+Four focused tests and a 177-step native acquisition/two-bank save check pass,
+including present/quest conditions, original collection, rotation sharing,
+separate player ownership, and temporary/resident clearing. A 54-step fresh
+process restores the complete acquired payload and catalogue/profile. Catalogue menu
+lists/previews/ordering, ordinary gameplay routes, and Controller Pak profile
+transport remain work.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 

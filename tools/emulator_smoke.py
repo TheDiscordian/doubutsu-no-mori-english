@@ -1295,7 +1295,7 @@ def main():
             if 'test_v3_save_runtime' in action:
                 from v3_save_runtime_smoke import exercise
                 mode = action['test_v3_save_runtime']
-                if not (out/'test.bs1').is_file() or mode not in ('write', 'write-async', 'read'):
+                if not (out/'test.bs1').is_file() or mode not in ('write', 'write-async', 'write-collection', 'read'):
                     raise ValueError('V3 flash probes require a checkpoint and explicit mode')
                 if mode != 'read' and (not args.allow_test_flash_write or args.seed_save or args.seed_state):
                     raise ValueError('V3 flash writer requires opt-in and blank isolated storage')
@@ -1304,7 +1304,8 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                     export_directory=out/'native-flash-export' if mode != 'read' else None,
-                    seed_directory=args.seed_save if mode == 'read' else None, test_sync=mode == 'write'))
+                    seed_directory=args.seed_save if mode == 'read' else None, test_sync=mode == 'write',
+                    collect_items=mode == 'write-collection'))
             if action.get('test_v3_save_codec'):
                 from v3_save_codec_smoke import exercise
                 if not (out/'test.bs1').is_file():

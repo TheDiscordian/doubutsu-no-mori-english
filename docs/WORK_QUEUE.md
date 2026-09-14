@@ -55,8 +55,12 @@ with later e/e+ donor support investigated separately.
   paths and ground-descriptor selection; three focused checks and 57 native steps
   pass. The [pocket-search batch](checkpoints/V3_FURNITURE_POCKETS.md) connects both
   shared furniture queries; four focused checks and 51 native steps pass.
-  Next: catalogue/scoring consumers,
-  acquisition, and ordinary placement/persistence. No complete item is enabled yet.
+  The [collection adapter](checkpoints/V3_COLLECTION.md) connects native
+  acquisition/collection and resident clearing to saved imported ownership.
+  Four focused tests, a 177-step native collection/two-bank save check, and a
+  54-step fresh-process load pass.
+  Next: catalogue menu lists/previews/ordering, scoring, ordinary acquisition
+  routes, and placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
@@ -77,8 +81,9 @@ with later e/e+ donor support investigated separately.
   Six focused tests, synchronous writing, a 141-step two-bank writer, a
   54-step fresh-process reader, and the cold-boot warning pass. Both native
   load entries preserve imported IDs/catalogue state and the original RAM tail;
-  the warning preserves both stored banks. Catalogue consumers, ordinary
-  gameplay persistence, and Controller Pak profile transport remain work.
+  the warning preserves both stored banks. Native collection/clearing now
+  populates the saved ownership; catalogue menu consumers, ordinary gameplay
+  persistence, and Controller Pak profile transport remain work.
   Include imported default-phrase references borrowed by original villagers;
   checking imported actor IDs alone cannot detect every saved dependency.
 - [ ] Add searchable per-entry/category/select-all controls to the web patcher;

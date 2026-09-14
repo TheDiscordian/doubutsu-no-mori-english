@@ -9,7 +9,9 @@ state has a separate owned RAM allocation. Missing imports or an unsupported
 extension format produce an English instruction screen and stop the caller
 before it can continue loading or repairing the save.
 
-This installs persistence, not item acquisition or catalogue-menu integration.
+This variant installs persistence, not item acquisition or catalogue-menu integration.
+The [collection variant](V3_COLLECTION.md) additionally connects native item
+collection and live-player clearing; its catalogue-menu integration remains work.
 Controller Pak transport of imported identities/profile/catalogue data remains
 work. Do not describe the complete travel feature or an ordinary imported-item
 lifecycle as tested merely because its town FlashRAM calls are connected.
@@ -151,7 +153,8 @@ complete payload, catalogue/profile, native header, and unchanged live-tail chec
 The warning passes on a normal cold boot, with no fixture register or RAM edits.
 
 These are isolated storage fixtures, not an ordinary acquired-item/save-menu
-playthrough. Remaining work includes catalogue marking/query/order consumers,
+playthrough. The collection variant adds native marking/query/clearing checks;
+remaining work includes catalogue menu/list/preview/order consumers,
 ordinary import acquisition/placement/gameplay, actual V2-save migration testing,
 additional repair/device-error scenarios where warranted, Controller Pak profile
 transport, and original-hardware testing. No completed import or public handoff

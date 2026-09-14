@@ -10,9 +10,10 @@ from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK
 from v3_asset_loader import BLOB, BLOB_RAM
 from v3_save_codec import BANK, BLOB_SIZE, PROFILE, STATE
 from v3_save_runtime import STATE_RAM, STATE_BYTES
+from v3_npc_draw_smoke import boot_proofs
 
 
-def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=None, test_sync=True):
+def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=None, test_sync=True, collect_items=False):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())
     if sha256(rom) != report['output_sha256'] or not report.get('save_runtime'):
@@ -26,6 +27,7 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
     spec.loader.exec_module(reference)
     files = by_vrom(rom)
     blob, code = files[BLOB].extract(rom)[:BLOB_SIZE], files[CODE_VROM].extract(rom)
+    proofs = boot_proofs(rom) if collect_items else {}
     edge, calls = b'V3IO' * 4, 0
 
     def check(label, at, expected):
@@ -37,7 +39,8 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
 
     def call(address, args=(), expected=None):
         nonlocal calls
-        result = debug.call(f'{address:08X}', args, return_address=MODULE_RAM + 0x6480)
+        result = debug.call(f'{address:08X}', args, return_address=MODULE_RAM + 0x6480,
+                            verified_code=proofs.get(address))
         record(result)
         calls += 1
         if expected is not None and result['return_value'] != expected & 0xFFFFFFFF:
@@ -77,18 +80,22 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
             raise ValueError('Writer requires blank isolated FlashRAM and idle native pipeline')
         original = debug.read_memory(SAVE_RAM, SAVE_BYTES)
         old_runtime = debug.read_memory(STATE_RAM, STATE_BYTES)
-        modified = bytearray(original)
-        # Storage fixtures: preserve the rest of the cold-boot payload, install
-        # a valid synthetic town ID, and store the two actual imported IDs.
-        modified[0x2F68:0x2F6A] = bytes.fromhex('3012')
-        struct.pack_into('>H', modified, 0x34, 0x3225)
-        struct.pack_into('>H', modified, 0x20 + 0xBD0 + 0x14, 0x32BB)
-        debug.write_memory(SAVE_RAM, bytes(modified))
-        state = bytearray.fromhex(report['save_runtime']['profile_hex']) + bytearray(512)
-        state[PROFILE + (137 >> 3)] |= 1 << (137 & 7)
-        state[PROFILE + 128 + (174 >> 3)] |= 1 << (174 & 7)
-        state[PROFILE + 384 + (137 >> 3)] |= 1 << (137 & 7)
-        debug.write_memory(STATE_RAM + 16, bytes(state))
+        if collect_items:
+            from v3_collection_smoke import prepare
+            modified, state = prepare(debug, rom, report, call, check, record)
+        else:
+            modified = bytearray(original)
+            # Storage fixtures: preserve the rest of the cold-boot payload,
+            # install a synthetic town ID, and store the actual imported IDs.
+            modified[0x2F68:0x2F6A] = bytes.fromhex('3012')
+            struct.pack_into('>H', modified, 0x34, 0x3225)
+            struct.pack_into('>H', modified, 0x20 + 0xBD0 + 0x14, 0x32BB)
+            debug.write_memory(SAVE_RAM, bytes(modified))
+            state = bytearray.fromhex(report['save_runtime']['profile_hex']) + bytearray(512)
+            state[PROFILE + (137 >> 3)] |= 1 << (137 & 7)
+            state[PROFILE + 128 + (174 >> 3)] |= 1 << (174 & 7)
+            state[PROFILE + 384 + (137 >> 3)] |= 1 << (137 & 7)
+            debug.write_memory(STATE_RAM + 16, bytes(state))
         if test_sync:
             call(0x8008F7C8, expected=0)
             synchronous = read_chip()
@@ -139,6 +146,7 @@ def exercise(debug, rom_path, record, *, export_directory=None, seed_directory=N
         manifest = {'rom_sha256': sha256(rom), 'flash_sha256': sha256(saved),
             'bank_sha256': sha256(expected_bank), 'working_state_hex': state.hex(),
             'synchronous_single_bank_passed': test_sync, 'asynchronous_two_banks_passed': True,
+            'native_collection_populated_catalogue': collect_items,
             'ordinary_save_menu_tested': False, 'hardware_tested': False}
         (export_directory / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
         debug.write_memory(SAVE_RAM, original)
