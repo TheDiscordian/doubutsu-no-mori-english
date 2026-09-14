@@ -60,8 +60,8 @@ adding 2,784 or 4,352 bytes on demand. Both fit the 8-KiB image limit. Its
 relocation remains 80 bytes. It moves to `03F50000` / `03F54000` without changing
 DMA indices or consuming a directory slot. The scheduler's allocation-end and
 ROM-load operands are updated; its entry selection, allocator, free helper,
-and failure behaviour remain unchanged. The clothing variant uses ABI 43 and
-retains the same 48-KiB permanent prefix. HRA uses its separate expanded image.
+and failure behaviour remain unchanged. The clothing variant retains the same
+48-KiB permanent prefix. HRA uses its separate expanded image.
 
 Exact input hashes, symbol definitions, donor/native rule correspondence,
 table/code bounds, relocation ownership, scheduler words, and independent

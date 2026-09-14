@@ -9,6 +9,15 @@ af_v3_original_catalogue_program:
     j af_v3_catalogue_program_continue
     nop
 
+#ifdef AF_V3_CLOTHING_CATALOGUE
+.globl af_v3_original_catalogue_furniture_init
+af_v3_original_catalogue_furniture_init:
+    addiu $sp, $sp, -72
+    sw $s0, 32($sp)
+    j af_v3_catalogue_furniture_continue
+    nop
+#endif
+
 .globl af_v3_catalogue_type
 af_v3_catalogue_type:
     addiu $sp, $sp, -32

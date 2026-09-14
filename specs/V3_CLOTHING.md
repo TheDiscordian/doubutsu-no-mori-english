@@ -40,7 +40,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 43 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 44 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -130,14 +130,17 @@ commands. The [display readers](V3_DISPLAY_ITEM_READERS.md) connect canonical
 metadata/ownership and expanded scoring tables. Native item/collection and
 scoring checks pass. The [global conversions](V3_DISPLAY_CONVERSION.md) connect
 normal pocket/mannequin callers. Ordinary house placement and pickup pass,
-retaining full identity and other items. Remaining special readers, catalogue
-rows, rotation, and placed-save persistence still need integration/verification.
+retaining full identity and other items. The [clothing catalogue](V3_CLOTHING_CATALOGUE.md)
+installs the separate clothing row, full name, model preview, price, and ordering
+identity, with current focused/native checks passing. Remaining special readers,
+ordinary payment/delivery, rotation, and placed-save persistence still need
+integration/verification.
 Keep original garments and behaviour.
 
 The [format-2 save extension](V3_CLOTHING_SAVE.md) installs independent clothing
 profile/ownership bits while retaining the earlier furniture records. Native
 encoding/decoding and migration checks pass. The normal collection adapter
-records per-player clothing ownership; catalogue presentation remains work.
+records per-player clothing ownership; catalogue rows use that same ownership.
 Format-2 saves must not be
 loaded in older format-1 V3 builds or V2. Keep existing saves backed up.
 Public and local patchers remain V2 pending user testing and explicit approval.

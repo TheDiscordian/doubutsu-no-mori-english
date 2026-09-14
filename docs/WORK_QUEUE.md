@@ -131,8 +131,14 @@ with later e/e+ donor support investigated separately.
   The initial 22-record ordinary run passes copied-town cold boot, house entry,
   Drop, mannequin bank allocation, and B pickup retaining full `34BF` and
   releasing the bank. Other pockets, clothing, and guards stay intact; the
-  garment is fixture-seeded, not purchased. Next: actual clothing catalogue
-  rows/preview-specific readers, rotation, and placed-item save/reload.
+  garment is fixture-seeded, not purchased. The
+  [clothing catalogue](checkpoints/V3_CLOTHING_CATALOGUE.md) installs the owned
+  shirt after all 245 native entries, retaining their original order. Two
+  focused checks and the initial 71-step native run pass: complete lists/names,
+  selection, actual artwork/model loading, price/presentation, missing-dependency
+  exclusion, restored state, and guards. The menu fits its existing reservation
+  with 384 bytes spare. Next: rotation, placed-item save/reload, and ordinary
+  catalogue payment/delivery, followed by remaining villager integration.
   The display profile bit means older profiles
   reject new saves; preserve backups and distinguish the passing codec check
   from untested ordinary cross-build loading.

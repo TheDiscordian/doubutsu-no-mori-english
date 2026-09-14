@@ -9,6 +9,10 @@ and price display. It preserves all 436 native furniture rows in their original
 order and appends haz-mat barrel and oil drum in donor order: 438 rows total.
 The existing 444-slot category limit is enforced. Additional imports require
 reviewed capacity expansion; increasing a loop count alone is not sufficient.
+The clothing variant also appends cherry shirt to the separate clothing page,
+preserving all 245 native garment entries. Its [clothing adapter](V3_CLOTHING_CATALOGUE.md)
+connects canonical ownership, full names, the native mannequin preview, clothing
+presentation, and order identity. It does not add a third furniture-page row.
 
 This is development source, not an enabled browser option. Ordinary ordering,
 delivery, acquisition, scoring, placement, and complete player lifecycle still
@@ -56,17 +60,19 @@ items to the native shop's random stock or override town rarity distribution.
 
 The complete V2 catalogue is 53,680 bytes at VROM `03970000`, relocation
 `03980000`, linked RAM `808A6100`. Its translated names and Not for Sale adapter
-are retained. The new code/table suffix starts at `808B32B0` and is 2,144 bytes;
-the complete catalogue is 55,824 bytes, with a 688-byte relocation resource.
+are retained. The code/table suffix starts at `808B32B0`: 2,144 bytes without
+clothing and 2,880 with clothing. The complete images are 55,824 and 56,560
+bytes, with 688- and 720-byte relocation resources respectively.
 Both resources retain 16-byte alignment. The parent descriptor at VROM `7749C0`,
 offset `2C90`, receives only the new end addresses after preserving the installed
 V3 icon edits.
 
-The conservative current shared-menu requirement is 273,408 bytes within the
-existing 274,560-byte reservation. The installer binds the actual reservation
+The conservative shared-menu requirement is 273,408 bytes without clothing
+and 274,176 with clothing, within the existing 274,560-byte reservation.
+The installer binds the actual reservation
 instructions and refuses overflow. It does not reuse the smaller historical
 name-only allocation calculation. No additional pool or resident memory is
-allocated; the 48-KiB resident prefix and ABI 15 remain unchanged.
+allocated; the resident prefix remains 48 KiB. The clothing variant uses ABI 44.
 
 Whole-source hashes, donor resources, compiled dependencies, expected native
 instructions, ELF relocations, duplicate targets, virtual-ROM overlaps, and
@@ -85,6 +91,10 @@ completion, and original preview fallback. Guards, restored state, and graceful
 shutdown pass. It does not submit graphics to the GPU, use ordinary shop
 controls, deliver an order, or write a save. See the
 [checkpoint](../docs/checkpoints/V3_CATALOGUE.md) for exact artifacts and failures.
+The current clothing variant's two focused checks and initial 71-step native
+run also pass, including all 246 garment rows and their complete preview path.
+Its [checkpoint](../docs/checkpoints/V3_CLOTHING_CATALOGUE.md) separates that
+component evidence from unverified ordinary payment/delivery and GPU appearance.
 
 The catalogue ordering handoff retains original ID conversion at `800BF10C`;
 the native conversion returns these `3xxx` values unchanged. Review the actual

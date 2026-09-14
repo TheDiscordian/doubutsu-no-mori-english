@@ -212,6 +212,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_clothing_display
     import v3_display_items
     import v3_display_conversion
+    import v3_clothing_catalogue
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -290,6 +291,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_clothing_wear.SOURCES + v3_clothing_stock.SOURCES + v3_shop_mannequin.SOURCES
                        + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
                        + v3_clothing_display.SOURCES + v3_display_items.SOURCES + v3_display_conversion.SOURCES
+                       + v3_clothing_catalogue.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -348,7 +350,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI,
                   v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
                   v3_furniture_tables.ABI, v3_clothing_display.ABI, v3_display_items.ABI,
-                  v3_display_conversion.ABI)
+                  v3_display_conversion.ABI, v3_clothing_catalogue.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -542,15 +544,24 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         table_path = out / 'catalogue-order.bin'
         write_new(table_path, ordering)
         generated = out / 'catalogue-order.S'
-        write_new(generated, ('.section .rodata.catalogue_order\n.balign 4\n'
+        catalogue_assembly = ('.section .rodata.catalogue_order\n.balign 4\n'
             '.globl af_v3_catalogue_order\naf_v3_catalogue_order:\n'
-            f'.incbin "/source/{table_path.relative_to(ROOT)}"\n').encode())
+            f'.incbin "/source/{table_path.relative_to(ROOT)}"\n')
+        clothing_catalogue = v3_clothing_catalogue.table(base, rel, symbols) if clothing else None
+        if clothing_catalogue is not None:
+            clothing_path = out/'catalogue-clothing-order.bin'
+            write_new(clothing_path, clothing_catalogue[0])
+            catalogue_assembly += ('.section .rodata.catalogue_clothing\n.balign 4\n'
+                '.globl af_v3_catalogue_clothing_order\naf_v3_catalogue_clothing_order:\n'
+                f'.incbin "/source/{clothing_path.relative_to(ROOT)}"\n')
+        write_new(generated, catalogue_assembly.encode())
         catalogue_code, catalogue_code_report = compile_part('catalogue', out / 'catalogue',
             extra_sources=('overlays/v3/catalogue_bridge.S', str(generated.relative_to(ROOT))),
-            defines=table_defines)
+            defines=table_defines+(('AF_V3_CLOTHING_CATALOGUE=1',) if clothing else ()))
         catalogue_changes, catalogue_report = v3_catalogue.install(base,
             icon_changes[v3_catalogue.PARENT], catalogue_code, catalogue_code_report,
-            ordering, catalogue_records, collection_code_report, runtime_report, room_code_report)
+            ordering, catalogue_records, collection_code_report, runtime_report, room_code_report,
+            clothing=clothing_catalogue)
         catalogue_report['code'] = catalogue_code_report
     shop_changes, shop_report = {}, None
     if shops:

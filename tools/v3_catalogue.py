@@ -18,6 +18,7 @@ POINTERS = ((0x808A943C, 0x808A9450, 16), (0x808A6594, 0x808A65F4, 2))
 AVAILABLE = (0x808A667C, 0x808A6698, 0x808A66B0, 0x808A66C8, 0x808A66E0, 0x808A66F8)
 IMPORTS = {'af_v3_native_catalogue_bit': 0x808A931C,
            'af_v3_catalogue_program_continue': 0x808A6150,
+           'af_v3_catalogue_furniture_continue': 0x808A6284,
            'af_v3_catalogue_type_continue': 0x808A6B1C,
            'af_v3_room_query': 0x804680B8,
            'af_v3_native_catalogue_available': 0x800C0490,
@@ -72,7 +73,7 @@ def table(base, rel, donor_symbols, furniture):
     return b''.join(struct.pack('>HH', *row) for row in rows), records
 
 
-def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room):
+def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None):
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > 0xB50 or len(suffix) % 16
@@ -102,6 +103,34 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
 
     def jump(target, call=True):
         return (0x0C000000 if call else 0x08000000) | (target >> 2 & 0x3FFFFFF)
+
+    clothing_report = None
+    if clothing is not None:
+        from v3_clothing_catalogue import POINTER, COUNT, TABLE as CLOTH_TABLE, NATIVE_COUNT
+        from v3_npc_clothing import guard_incoming
+        clothing_table, clothing_report = clothing
+        cloth_address = symbols['af_v3_catalogue_clothing_order']
+        cloth_at = cloth_address-RAM
+        if ('-DAF_V3_CLOTHING_CATALOGUE=1' not in compiled['flags']
+                or len(clothing_table) != (NATIVE_COUNT+1)*2
+                or not SIZE <= cloth_at <= len(data)-len(clothing_table)
+                or data[cloth_at:cloth_at+len(clothing_table)] != clothing_table
+                or clothing_table[:-2] != old[CLOTH_TABLE-RAM:CLOTH_TABLE-RAM+NATIVE_COUNT*2]
+                or sha256(old[0x17C:0x630]) != '9011f6c34b7eba02f11fa2e2b87b18af33bc2569b7a17c8dded46fd44657c37d'
+                or slots.get(POINTER-RAM) != 2 or slots.get(0x342C) != 4
+                or any(at in slots for at in (0x17C, 0x180))):
+            raise ValueError('Changed clothing catalogue table, complete initializer, or relocations')
+        guard_incoming(old, 14048, RAM, [(0x17C, 8)])
+        word(POINTER, CLOTH_TABLE, cloth_address)
+        word(COUNT, NATIVE_COUNT, NATIVE_COUNT+1)
+        word(0x808A952C, jump(0x808A931C), jump(symbols['af_v3_catalogue_bit']))
+        word(0x808A627C, 0x27BDFFB8, jump(symbols['af_v3_catalogue_furniture_init'], False))
+        word(0x808A6280, 0xAFB00020, 0)
+        rows.append(0x4400017C)
+        clothing_report = {**clothing_report, 'table_address': cloth_address,
+            'table_sha256': sha256(clothing_table), 'initializer_entry': 0x808A627C,
+            'initializer_target': symbols['af_v3_catalogue_furniture_init'],
+            'initializer_bridge': symbols['af_v3_original_catalogue_furniture_init']}
 
     for address, name, original, kind in ((0x808A9470, 'af_v3_catalogue_bit', 0x808A931C, 4),
             *((address, 'af_v3_catalogue_available', 0x800C0490, None) for address in AVAILABLE)):
@@ -169,4 +198,5 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         'rounded_growth': growth, 'rounded_relocation_growth': relocation_growth,
         'conservative_pool_required': required, 'pool_reserved': reserved,
         'additional_pool_allocation': 0, 'save_format_changed': False,
-        'native_preview_tested': False, 'ordinary_order_delivery_tested': False}
+        'native_preview_tested': False, 'ordinary_order_delivery_tested': False,
+        **({'clothing': clothing_report} if clothing_report is not None else {})}

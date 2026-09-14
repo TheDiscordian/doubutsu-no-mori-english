@@ -25,8 +25,9 @@ in both directions, but unchanged formats do not prove an ordinary reload.
 
 ## Verification boundary
 
-Global conversion is installed for normal callers; catalogue clothing rows and
-remaining special readers still need integration. Focused host and current
+Global conversion is installed for normal callers and the
+[clothing catalogue](V3_CLOTHING_CATALOGUE.md). Remaining special readers and
+ordinary ordering/payment still need integration/verification. Focused host and current
 native conversion/scoring checks pass: two focused tests and the initial
 157-step native run. Full HRA grouping, recommendations, seven base-point
 evaluations, nine feng shui item evaluations, and three room evaluations pass.

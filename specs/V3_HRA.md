@@ -90,8 +90,8 @@ the 32-KiB image limit. The relocation resource is 1,184 bytes. The scheduler re
 the actual expanded image size and loads the moved pair. Its original allocator,
 free helper, evaluated-points return, and mail-success handling remain unchanged.
 The native overlay loader separately allocates/frees its relocation scratch.
-The fixed resident V3 prefix remains 48 KiB; the clothing variant uses ABI 43
-without additional permanent allocation or saved fields for scoring.
+The fixed resident V3 prefix remains 48 KiB, without additional permanent
+allocation or saved fields for scoring.
 
 The installer checks exact source identity, complete range/index inventories,
 incoming branch targets, relocation ownership, collisions, table bounds, every

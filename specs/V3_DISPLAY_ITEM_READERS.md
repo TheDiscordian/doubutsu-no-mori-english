@@ -75,6 +75,7 @@ display dependency still reject new saves; keep backups.
 
 The [global conversion](V3_DISPLAY_CONVERSION.md) connects normal pocket and
 display callers. Ordinary house placement and pickup pass on the copied town.
-Remaining special readers, actual catalogue rows, rotation, and placed-item
-persistence remain work. Component checks do not establish those gameplay routes. Both web patchers
+The [clothing catalogue](V3_CLOTHING_CATALOGUE.md) installs the collected row
+and complete preview. Remaining special readers, ordinary payment/delivery,
+rotation, and placed-item persistence remain work. Both web patchers
 stay V2 until user testing and explicit approval.

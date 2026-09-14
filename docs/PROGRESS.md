@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-display-conversion-01/animal-forest-v3-asset-loader.z64`, ABI 43, SHA-256
-`ba48944648a10baa0b8f36d6063af36c68bae9dba7a30b118bb2c0c166620436`.
+`build/v3-clothing-catalogue-01/animal-forest-v3-asset-loader.z64`, ABI 44, SHA-256
+`1f53456846a8f7f6ed9cd327ffc06e0e2f8d0253466a2bcdcb8e62b2cd1dab00`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -259,8 +259,15 @@ This closes the pending scoring tail. The initial 22-record ordinary copied-town
 run also passes house entry, inventory Drop, mannequin bank allocation, and
 B pickup returning the full `34BF` identity with the bank released. All other
 pockets, conditions, worn clothing, and guards remain intact. The pocket item
-is fixture-seeded, not purchased. Actual catalogue rows, rotation, and
-placed-item save/reload remain under integration.
+is fixture-seeded, not purchased. The
+[clothing catalogue](checkpoints/V3_CLOTHING_CATALOGUE.md) adds the owned shirt
+after all 245 native clothing rows, with its full English name, native mannequin,
+clothing presentation, price eligibility, and canonical ordering identity.
+Two focused tests and the initial 71-step native run pass: all 246 rows,
+selection, the complete 4,128-byte model/artwork transfer, original retention,
+disabled dependencies, restored state, and guards. The shared menu uses 274,176
+of its existing 274,560 bytes. Rotation, placed-item save/reload, and ordinary
+catalogue payment/delivery remain under integration.
 Its additional profile dependency accepts the preceding profile in the focused
 decoder check, but older profiles reject new saves. Keep save backups; this is
 not an ordinary cross-build reload result.

@@ -1475,6 +1475,12 @@ def main():
                     raise ValueError('V3 clothing-collection probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_clothing_catalogue'):
+                from v3_clothing_catalogue_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 clothing catalogue probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_display_conversion'):
                 from v3_display_conversion_smoke import exercise
                 if not (out/'test.bs1').is_file():

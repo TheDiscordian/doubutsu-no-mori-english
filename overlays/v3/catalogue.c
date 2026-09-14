@@ -8,8 +8,12 @@ typedef unsigned int u32;
 #define AF_V3_FURNITURE_CAPACITY 1267
 #define AF_V3_FURNITURE_PROFILES 0x80465800u
 #endif
-struct Preview { u16 index; u8 padding[0x746]; u32 profile; };
+struct Preview {
+    u16 index; u8 padding[10]; float model_y; u8 padding2[0x738];
+    u32 profile, unused74c; u16 type, timer; u32 price; float scale, height;
+};
 _Static_assert(__builtin_offsetof(struct Preview, profile) == 0x748, "Catalogue profile offset");
+_Static_assert(sizeof(struct Preview) == 0x760, "Complete catalogue preview size");
 #ifdef __mips__
 #define active (*(u8 *volatile *)0x80136FD8u)
 #define profiles ((const u32 *)AF_V3_FURNITURE_PROFILES)
@@ -25,6 +29,20 @@ extern void af_v3_save_halt(int) __attribute__((noreturn));
 extern int af_v3_native_catalogue_bit(const u32 *, int);
 extern void af_v3_original_catalogue_program(struct Preview *);
 extern int af_v3_native_catalogue_available(u32, int, int, void *);
+#ifdef AF_V3_CLOTHING_CATALOGUE
+extern void af_v3_original_catalogue_furniture_init(struct Preview *, u32);
+
+void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
+    af_v3_original_catalogue_furniture_init(preview, argument);
+    if (((u16)argument & 0xFFFCu) == 0x3AFCu && af_v3_furniture_import_profile(1727)) {
+        /* The native init already owns construction, geometry DMA, lighting,
+         * animation, and price. Match its original clothing presentation. */
+        preview->model_y = -4.0f;
+        preview->scale = 1.0f;
+        preview->height = 38.0f;
+    }
+}
+#endif
 
 int af_v3_catalogue_bit(const u32 *bits, int index) {
     if (index < 2048) return af_v3_native_catalogue_bit(bits, index);
@@ -49,6 +67,11 @@ void af_v3_catalogue_program(struct Preview *preview) {
 int af_v3_catalogue_available(u32 argument, int category, int list, void *game) {
     u32 item = (u16)argument;
     if ((item >> 12) != 3) return af_v3_native_catalogue_available(argument, category, list, game);
+#ifdef AF_V3_CLOTHING_CATALOGUE
+    if ((item & 0xFFFCu) == 0x3AFCu)
+        return category == 0 && (u32)list < 3 && af_v3_furniture_import_profile(1727) &&
+            af_v3_native_catalogue_available(0x34BFu, 2, list, game);
+#endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price
      * is shown; it does not replace the native town's rarity selection. */
