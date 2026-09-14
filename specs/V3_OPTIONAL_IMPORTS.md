@@ -15,7 +15,8 @@ The import-free path reproduces the pinned translation baseline exactly.
 V3 development uses `v3/optional-imports`; the public V2 patcher, deployment
 recipe, local V2 service, and published trailer remain unchanged.
 V3 source and development work may be version-tracked on GitHub. Updating the
-web patcher to V3 requires the user's testing and subsequent explicit approval.
+local or public web patcher to V3 requires the user's testing and subsequent
+explicit approval. GitHub source publication does not authorise either update.
 Provide private playtest builds first; completed implementation or developer
 verification alone does not authorise the web-patcher switch.
 
@@ -253,7 +254,8 @@ are disclosed, not silently enabled as unrelated additions.
 Changing a selection or input invalidates old results. Cancellation releases the
 worker and download URLs. Equivalent selection sets produce the same profile
 and cartridge regardless of click order. The source files remain untouched.
-Keep public deployment on stable V2 until a verified V3 handoff is ready.
+Keep both served patchers on stable V2 until the user has tested V3 and
+explicitly approved the switch. A verified playtest handoff alone is not approval.
 
 ## Delivery order and acceptance
 

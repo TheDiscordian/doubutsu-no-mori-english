@@ -251,8 +251,9 @@ V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,
 and the complete villager remain work.
 No import is enabled for players yet.
-V3 development continues on GitHub. The web patcher stays V2 until the user
-has tested V3 and explicitly approved the switch.
+V3 development continues on GitHub on `v3/optional-imports`. Both the local and
+public web patchers stay V2 until the user has tested V3 and explicitly approved
+the switch; publishing development source does not grant patcher approval.
 
 ## Stable V2 deliverable
 
