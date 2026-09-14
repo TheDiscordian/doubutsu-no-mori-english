@@ -2,6 +2,17 @@
 
 ## Active development
 
+**V3 optional content imports** are the active goal on `v3/optional-imports`.
+The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) covers individual villager
+and item selections, select all, the import-free option, and follow-on e/e+
+sources. The [foundation checkpoint](checkpoints/V3_IMPORT_FOUNDATION.md) records
+the verified donor inventory and six passing focused tests. Twenty donor-only
+villager identities are identified; item identity/conversion work is pending.
+No V3 content is playable or enabled in the patcher yet. The next implementation
+is one complete ordinary-villager import and one simple furniture import.
+
+## Stable V2 deliverable
+
 The current cartridge is **V2-11** at
 `build/v2-keyboard-fit-11/Animal Forest English V2.z64`.
 The [compact keyboard layout](../specs/KEYBOARD_V2_LAYOUT.md) uses a key-only

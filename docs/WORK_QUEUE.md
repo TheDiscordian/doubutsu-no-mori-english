@@ -1,5 +1,34 @@
 # Completion queue
 
+## Active: V3 optional GameCube imports
+
+The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) governs new work on
+`v3/optional-imports`. The goal is additive, optional villager/item content from
+GAFE01 revision 0, selected individually or together in the browser patcher,
+with later e/e+ donor support investigated separately.
+
+- [x] Establish source-verified donor inventory, identities, scope, and save policy.
+  [Foundation evidence](checkpoints/V3_IMPORT_FOUNDATION.md): six tests and actual
+  donor extraction pass; 20 donor-only villager identities are identified.
+- [ ] Trace ordinary donor-only villager assets and implement one complete pilot
+  through rendering, text, house/move-in, conversations, and saved identity.
+- [ ] Review native/donor item identities and implement one complete simple
+  furniture pilot through acquisition, inventory, placement, and persistence.
+- [ ] Expand native tables/readers safely and assign subset-independent IDs.
+- [ ] Batch remaining English-donor villagers/items and their actual behaviours;
+  adapt islanders explicitly instead of pretending the island engine is present.
+- [ ] Implement deterministic optional composition, dependencies, profile
+  receipts, and save/profile compatibility handling.
+- [ ] Add searchable per-entry/category/select-all controls to the web patcher;
+  verify actual browser output and the unchanged import-free path.
+- [ ] Complete bounded combined checks and provide a V3 hardware-playtest build.
+- [ ] Verify e/e+ editions, inputs, formats, additional identities, and capacity;
+  implement donor adapters when their required source data is available.
+
+Keep public/local V2 patchers and the trailer unchanged while V3 is experimental.
+Do not maintain the old translation-percentage tool or re-test old builds as
+part of this work. No import is complete merely because it has a name record.
+
 ## Compact N64 keyboard presentation
 
 The [key-only tray and attached N64-style sections](../specs/KEYBOARD_V2_LAYOUT.md)

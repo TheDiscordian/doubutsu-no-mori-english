@@ -9,6 +9,13 @@ An Expansion Pak requirement is acceptable if needed for the complete translatio
 Four-MiB compatibility is not a release requirement. Document and test the actual
 memory requirement; permission to use eight MiB does not itself change heap bounds.
 
+V3 adds optional GameCube villagers and items to the translated game. Read
+`specs/V3_OPTIONAL_IMPORTS.md` and the active V3 queue before import work.
+Use `v3/optional-imports` for experimental implementation, preserving the stable
+V2 cartridge and public/local patchers. Imports need complete gameplay and
+persistence support; an extracted name or disabled web option is not completion.
+Do not repurpose existing villagers/items or assign IDs by checkbox order.
+
 ## Workflow
 
 - Read `docs/PROGRESS.md`, `docs/V0_PLAN.md`, and the relevant specs before making
