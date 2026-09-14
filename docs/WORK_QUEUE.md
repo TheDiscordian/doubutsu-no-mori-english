@@ -17,9 +17,11 @@ with later e/e+ donor support investigated separately.
   and native object-DMA checks pass for both texture banks, with all original
   banks preserved. The [native draw adapter](checkpoints/V3_NPC_DRAW.md) installs
   both overlay routes and full voice-ID transport. Seven host/cartridge checks
-  pass; cold boot passes after an alignment fix. Complete native draw/tail probing
-  remains unverified after bounded fixture attempts. Next: donor melody sequence
-  integration and wider audio lookup, then name/default/house/selection paths.
+  pass; cold boot passes after an alignment fix. The
+  [audio batch](checkpoints/V3_VILLAGER_AUDIO.md) installs both donor melodies and
+  widened audio paths, verifies shared instrument/sample data, and passes five
+  focused checks plus combined native audio and both-overlay draw/tail probing.
+  Next: name/default/house/selection paths, then ordinary gameplay/save integration.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.

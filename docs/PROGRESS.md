@@ -18,8 +18,13 @@ both NPC overlays, reserves stable actor IDs, and preserves full donor voice IDs
 without enlarging actors. Seven focused host/cartridge checks pass. A native
 boot exposed a DMA alignment defect, now corrected; the corrected build reaches
 the game frame loop without a fault and loads its complete checked blob. The
-deeper native draw/tail fixture remains incomplete after bounded setup attempts.
-Audio sequences and remaining villager gameplay/save paths are next;
+deeper native draw/tail fixture passes in the combined
+[audio batch](checkpoints/V3_VILLAGER_AUDIO.md). That batch installs both donor
+melodies, verifies their complete shared instrument/sample dependencies, and
+widens the native audio paths without low-byte identity collisions. Five focused
+checks and actual native playback-entry/sequence/port checks pass, with no
+physical audio playback. Remaining villager name/default/house/selection and
+gameplay/save paths are next;
 item identity/conversion work is pending. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.

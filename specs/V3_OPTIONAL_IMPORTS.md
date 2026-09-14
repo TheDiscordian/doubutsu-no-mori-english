@@ -103,7 +103,9 @@ objects with verified model/skeleton correspondence. The
 [additive asset loader](V3_ASSET_LOADER.md) installs their texture banks and
 preserves all original object banks. The [native draw routes](V3_NPC_DRAW.md)
 install pilot draw rows in both NPC overlays and preserve full donor voice IDs.
-Audio sequence playback and ordinary gameplay integration remain pending.
+The [melody adapter](V3_VILLAGER_AUDIO.md) installs their verified donor programs
+and full-ID audio paths; focused native audio/draw checks pass. Ordinary gameplay
+integration remains pending.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

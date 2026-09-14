@@ -79,7 +79,7 @@ restore saved RA/S0 and SP, and return to the original caller. The first overlay
 uses frame size `C0`, row at `SP+58`; the second uses `B8`, row at `SP+50`.
 Both save RA/S0 at `+24`/`+20`. No actor layout grows.
 
-## Required audio continuation
+## Audio integration
 
 Full voice transport is not full sound support. Native `Na_VoiceSe` at
 `800F91FC` rejects IDs at or above 256. `Na_Inst` (`800FCE80`), melody start
@@ -99,9 +99,11 @@ another villager's instrument or strip padding by guesswork.
 
 The native combined melody is sequence 205, offset `A4ED0`, size `18D10`, within
 the audio-sequence resource at VROM `00027130`. Its original physical fragment
-base is `000CC000`. The donor interpreter's `EB` command selects bank and
-instrument; pilot tracks use bank 3, instruments `30`/`00`. Validate native
-bank/sample correspondence before claiming the sequences playable.
+base is `000CC000`. The donor interpreter's `EB` command selects a bank-map
+selector and instrument. Pilot selector 3 resolves to actual bank 2, not bank 3.
+The [audio variant](V3_VILLAGER_AUDIO.md) verifies all four used instruments
+and samples, installs the fragments, and connects the widened native paths.
+That variant uses ABI 3; the draw-only variant does not add audio support.
 
 ## Verification and compatibility
 
