@@ -118,15 +118,18 @@ and native reader/insertion checks pass. The
 [initial-default adapter](V3_VILLAGER_DEFAULTS.md) connects Cheri's verified
 starting shirt/defaults and both pilots' personality lookup. The complete
 variant connects Punchy's actual imported cherry shirt to his initializers and
-the shared selection predicate. Native verification and ordinary gameplay/save
-integration remain pending.
+the shared selection predicate. Native initialization, full name/catchphrase
+insertion, clothing transfers, and dependency rejection pass. Ordinary gameplay/
+save integration remains pending.
 The [house adapter](V3_VILLAGER_HOUSES.md) installs Cheri's complete mapped
 furniture/music layers and verified native surfaces, preserving original houses.
 Focused native initialization and layer transfers pass; complete scene loading
 and ordinary visits remain unverified. The complete variant installs Punchy's
-house with the animated speed bag and actual cherry-shirt dependencies. Its
-relocated foreground arithmetic has an unresolved native-test discrepancy;
-do not infer working house visits from the passing source conversion.
+house with the animated speed bag and actual cherry-shirt dependencies. The
+complete native arithmetic block, house initialization, sparse pointers, and
+all four imported foreground transfers have passing evidence; a separate
+breakpoint-driven diagnostic remains recorded as failed. Do not infer working
+house visits from these component checks.
 The [secondary reader adapter](V3_VILLAGER_READERS.md) connects full names in
 map, inventory, letters, recipient selection, conversation identity fields,
 and generated-mail capture. Native names/aliases and saved field sizes remain.

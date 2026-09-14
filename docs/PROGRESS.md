@@ -32,9 +32,9 @@ field widths. The [initial-default batch](checkpoints/V3_VILLAGER_DEFAULTS.md)
 connects Cheri's personality, verified yellow bar shirt, catchphrase reference,
 and hometown through all three native initialization entries. Both pilot
 personality lookups, native/test fallbacks, and actual clothing DMA pass native
-checks; six focused tests also pass. Punchy's cherry shirt has no exact native
-artwork match and needs a proper clothing import before his initialization is
-enabled. Selection, remaining ID-bounded readers, and gameplay/save/profile paths remain;
+checks; six focused tests also pass. The complete variant supplies Punchy's
+separate imported cherry shirt and passes his native initializers, as recorded
+in the combined house/default checkpoint. Ordinary gameplay/save paths remain;
 the [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts Cheri's
 haz-mat barrel and oil drum house dependencies into complete native objects.
 Seven focused checks pass, including every texel, vertex, and triangle in the
@@ -132,8 +132,9 @@ scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
 `build/v3-punchy-house-02/animal-forest-v3-asset-loader.z64`, ABI 50, SHA-256
 `55cb90c0cc9eac32aa6e180051f1791072cfa6dd5ba1c6b8a72a413f6211e060`.
-This is an implementation artifact, not an accepted playtest handoff: its new
-native foreground-size check is unresolved, as detailed below.
+This is an implementation artifact, not an accepted playtest handoff. Native
+default and house-layer checks pass; ordinary house/move-in and villager
+persistence checks remain open, as detailed below.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -187,7 +188,8 @@ clothing profile/ownership records and preserves format-1 furniture ownership
 during migration. Five focused checks, four current non-clothing codec host
 checks, and the corrected 52-step native run pass, including complete startup/
 encoding/decoding, ownership separation, player clearing, and guards. Remaining
-gameplay consumers need integration; Punchy's defaults stay disabled. The
+gameplay consumers need integration. Punchy's defaults are connected in the
+complete house/default variant; move-in eligibility stays disabled. The
 [shared clothing item readers](checkpoints/V3_CLOTHING_ITEMS.md) connect the
 complete English name, category, and donor price, preserving native garment
 footprint rejection. The current host/cartridge tests and corrected 60-record
@@ -342,12 +344,17 @@ moves to a checked reservation, retaining all original rows and DMA identities.
 Default/selection code fits existing resident gaps without permanent RAM growth.
 All seven focused checks pass, including sanitized default/clothing code,
 dependency rejection, full source conversion, and patch reconstruction.
-The two bounded native attempts both stop at a foreground-address arithmetic
-mismatch: 492 observed records instead of the assembled 436. Resident
-instructions match the ROM, but the cause is not established. Native layer,
-default, and gameplay verification remain incomplete; do not claim these paths
-passed or enable move-ins. Preserve the failed evidence instead of looping on
-the same debugger setup. Profile/format are unchanged from ABI 49; ordinary
+The full native arithmetic block produces the correct 436 records without the
+synthetic window's internal breakpoint. The failed window diagnostics remain
+recorded; their exact emulator entry/resume mechanism is not established.
+Native defaults pass 81 records / 44 assertions, including all six initializers,
+full names/catchphrases, actual garment transfers, and dependency rejection.
+The native house tail passes 48 records / 29 assertions, including all four
+imported layers and complete original/pilot house initialization.
+The [ordinary Punchy check](checkpoints/V3_PUNCHY_GAMEPLAY.md) cold-boots a
+disposable town, retains his full identity and imported outfit, and loads his
+actor while crossing the acre. House entry remains unverified after the bounded
+door approaches. Move-in eligibility stays disabled. Profile/format are unchanged from ABI 49; ordinary
 cross-build loading is not newly verified. Both patchers remain V2.
 
 ## Stable V2 deliverable

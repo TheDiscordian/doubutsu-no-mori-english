@@ -1,0 +1,19 @@
+[
+  {"wait": 10},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"read": ["800860FC", 16], "expect": "3c0203f63c0b03f9256b723824450000"},
+  {"command": "P25=ffffffff800860fc", "expect": "OK"},
+  {"command": "g", "expect_pc": "800860FC"},
+  {"command": "s"},
+  {"command": "g", "expect_pc": "80086100"},
+  {"command": "s"},
+  {"command": "g", "expect_pc": "80086104"},
+  {"command": "s"},
+  {"command": "g", "expect_pc": "80086108"},
+  {"command": "s"},
+  {"command": "g", "expect_pc": "8008610C"},
+  {"load_state": true},
+  {"wait": 1},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

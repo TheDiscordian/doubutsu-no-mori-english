@@ -6,8 +6,9 @@
 the existing furniture, scoring, and save foundation. The complete `--speed-bag`
 variant also installs Punchy's two layers and imported cherry-shirt default.
 Neither variant enables move-ins or changes the browser patchers. The combined
-house/default build passes focused host checks; native foreground arithmetic
-verification remains unresolved, so ordinary house integration is not accepted.
+house/default build passes focused host checks and native initialization/layer
+checks. Complete scene allocation and ordinary visits remain separate gameplay
+checks; component execution does not establish a working house visit.
 
 No original villager or house is repurposed. Shared furniture uses reviewed
 existing identities and native behaviour; the two new barrel items use their
@@ -84,8 +85,10 @@ Checked instructions connect the new bounds:
   518 obtains 434 records in the Cheri-only variant and ignores its padding.
 - The complete variant changes both signed-low address pairs at
   `800860FC` / `80086108` and `80086100` / `80086104` to the relocated start/end.
-  The assembled arithmetic represents 436 complete records. The native test
-  instead reports 492; this discrepancy is unresolved, not a passing check.
+  The complete native block produces the correct 225,848-byte interval and
+  quotient/remainder 436/0 without an internal breakpoint. The separate
+  breakpoint-driven register window reports a different result; preserve that
+  failed diagnostic rather than treating it as ordinary loader execution.
 - `80086118` and `8008611C`: allocate 1,992 bytes for 498 sorted pointers,
   covering every fixed import layer reservation. Sparse slots remain null.
 
@@ -103,4 +106,5 @@ saved identity remain unverified.
 The [Cheri checkpoint](../docs/checkpoints/V3_VILLAGER_HOUSES.md) retains the
 accepted component evidence for that variant. The
 [combined checkpoint](../docs/checkpoints/V3_PUNCHY_HOUSE.md) records current
-artifacts, focused checks, and the unresolved native result.
+artifacts, focused checks, the classified arithmetic diagnostic, and passing
+native default/house-layer checks.

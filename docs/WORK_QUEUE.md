@@ -56,8 +56,8 @@ with later e/e+ donor support investigated separately.
   correct name, outfit, and catchphrase. The town seeds Cheri explicitly;
   natural move-in and ordinary save/restart remain unverified.
   Next: remaining native reader review and ordinary gameplay/
-  save integration. Punchy's cherry shirt needs an additive clothing import;
-  do not substitute the different native shirt with the same item number.
+  save integration. Punchy's complete variant uses the additive cherry-shirt
+  import, never the different native shirt with the same item number.
   The [clothing resource foundation](checkpoints/V3_CLOTHING.md) installs the
   actual new shirt and shared indexed reader. Four focused checks and the
   initial thirty-four-step native test pass. The
@@ -90,8 +90,9 @@ with later e/e+ donor support investigated separately.
   imported clothing identity and returning the original shirt to its pocket.
   Actual gyroid Save & Quit and fresh-process reload pass, restoring clothing,
   pockets, ownership, and complete active artwork. Next connect remaining
-  renderer/shop consumers and dropped/displayed garment gameplay before enabling
-  Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
+  renderer/shop consumers and dropped/displayed garment gameplay; retain the
+  missing NPC queued evidence for combined gameplay. Punchy's complete variant
+  connects his actual outfit through the checked shared reader.
   The [shop category reader](checkpoints/V3_CLOTHING_SHOPS.md) recognises selected
   clothing with retained original/furniture handling. Two focused tests and the
   initial 23-record native run pass. The
@@ -243,14 +244,17 @@ with later e/e+ donor support investigated separately.
   Neither web patcher exposes V3 options.
   The [Punchy house/default batch](checkpoints/V3_PUNCHY_HOUSE.md) installs his
   room and actual starting shirt, relocates the complete foreground without
-  overwriting adjacent files, and passes all seven focused checks. The two
-  native attempts stop at an unresolved size mismatch: 492 observed records
-  instead of 436. Full native layer/default execution is not accepted.
-  Next: classify this mismatch without repeating the exhausted debugger setup;
-  use ordinary scene execution or another independently justified check when
-  addressing the affected loader. Keep move-ins disabled. Continue unrelated
-  speed-bag ordinary placement/interaction/save and remaining donor conversion
-  work; do not waive the unresolved loader issue for a playable handoff.
+  overwriting adjacent files, and passes all seven focused checks. The complete
+  native arithmetic block produces 436 records without the internal breakpoint;
+  preserve the separate failed window diagnostics and their recorded limits.
+  Native defaults pass 81 records / 44 assertions, and the native house tail
+  passes 48 records / 29 assertions across all four imported layers. The
+  [ordinary Punchy check](checkpoints/V3_PUNCHY_GAMEPLAY.md) loads his full
+  identity/outfit and actor through copied-town cold boot and acre crossing.
+  House entry remains unverified after bounded approaches; do not repeat that
+  navigation batch. Keep move-ins disabled. Continue remaining donor conversion
+  and speed-bag interaction/persistence work; complete ordinary house/move-in
+  and villager persistence remain required for a playable handoff.
   GPU/hardware acceptance, ordinary purchase, and villager persistence remain open.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

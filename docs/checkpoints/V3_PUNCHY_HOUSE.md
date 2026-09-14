@@ -48,8 +48,8 @@ are unchanged from the preceding ABI-49 speed-bag gameplay build; compatibility
 in either direction is expected but ordinary cross-build reload is unverified.
 Earlier builds missing speed-bag/clothing dependencies reject these saves;
 never use experimental V3 saves with V2. Source saves and earlier ROMs stay intact.
-This artifact is not an accepted gameplay handoff while the native result below
-is unresolved. Both web patchers remain on V2; only V3 development source is
+This artifact is not an accepted gameplay handoff; ordinary house/move-in and
+persistence checks remain open. Both web patchers remain on V2; only V3 development source is
 tracked on GitHub.
 
 ## Focused verification
@@ -75,7 +75,7 @@ tracked on GitHub.
 `build/v3-punchy-house-build-02.log` records successful current construction.
 The size guard is preserved, not weakened.
 
-## Unresolved native result
+## Retained arithmetic failures and classification
 
 Both `build/v3-punchy-house-native-01/` and `...-02/` stop at the foreground
 arithmetic window before layer/default checks. The encoded and resident words
@@ -88,16 +88,50 @@ The first attempt enters the actual native window through the debugger. The
 one setup retry verifies the installed instructions, copies the twelve
 PC-independent words to private scratch storage, flushes caches, and uses the
 existing isolated instruction-window method. It observes the same mismatch.
-Neither result establishes whether the cause is the emulator/debugger or an
-ordinary game path. Do not label this a proven harness defect, alter the
-expected count to pass, or treat the later unexecuted checks as successful.
+Neither window establishes ordinary loader execution. The failures remain
+failed records; neither expected count is changed to accept the observed value.
 The native runner uses `/usr/bin/ares`, SHA-256
 `347d5d352dc7d3a3aab1f9a5d6d2782ac0b23b84cb7ae85299a3c65cdd9b964b`.
 
-The setup retry allowance is exhausted. Preserve this evidence; the next
-useful classification is ordinary scene execution or independently justified
-inspection of instruction execution, not another identical debugger replay.
-Full foreground allocation/layer transfers, outlined native initialization,
-ordinary house visits, move-in, and persistence remain unverified. Treat the
-loader discrepancy as unresolved for any playable handoff. Unrelated donor
-conversion and item lifecycle work can continue. No physical audio is emitted.
+The independent `build/v3-house-bounds-trace-01/` diagnostic sets the actual
+native PC with `P25`, verifies the resident words, and executes without an
+internal breakpoint. One debugger `s` advances an entire compiled block to
+`80086184`, not one MIPS instruction. The diagnostic stops on its incorrect
+single-instruction PC expectation; it is not a passed complete scenario.
+The retained register packet nevertheless records the full correct result:
+
+- Start `03F60000`, end `03F97238`, and size `00037238` (225,848 bytes).
+- Divisor `206`, quotient/LO `1B4` (436), and remainder/HI zero.
+- Pointer count `1F2` (498), pointer allocation `7C8` (1,992 bytes).
+
+This classifies the earlier discrepancy as a debugger-entry/window observation,
+not incorrect installed address arithmetic. The exact emulator mechanism is not
+established: the diagnostic differs in PC entry and breakpoint placement.
+No ROM arithmetic is changed, and no emulator is patched. Do not repeat the
+exhausted synthetic window. Complete ordinary scene allocation still needs
+gameplay evidence.
+
+## Native defaults and house layers
+
+`build/v3-punchy-defaults-native-02/` passes 81 records / 44 assertions on the
+current ABI-50 ROM. All three actual initializers execute for each pilot. Full
+English names and catchphrases, original/test fallbacks, no-write missing-import
+cases, native yellow-bar artwork, and the complete imported cherry-shirt texture
+and palette pass. Disabling the real garment row prevents Punchy initialization
+and selection. The temporary eligibility flag permits index 237 through native
+grown-villager selection only while his garment is available. The flag, history,
+candidate array, animal records, and guards are restored. This is not an ordinary
+move-in. The `...defaults-native-01.log` attempt fails argument validation because
+its seed lacks `test.flash`; no emulator starts in that attempt.
+
+`build/v3-punchy-house-tail-01/` passes 48 records / 29 assertions. It resumes
+the matching current checkpoint and executes the previously unexecuted layer
+checks without the synthetic arithmetic window. Native house initialization
+handles an original villager and both pilots. Actual DMA loads all four appended
+layers; all 498 sparse pointers, both main-layer selections, both complete
+secondary layers including music, and both complete main transfers including
+rotations pass. Original animal records, complete resident code/data, and guards
+are restored. The small fixture does not duplicate a complete scene allocation.
+
+Ordinary house visits, move-in, and villager persistence remain open. No physical
+audio is emitted, no source save changes, and neither web patcher receives V3.

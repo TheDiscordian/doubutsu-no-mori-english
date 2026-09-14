@@ -93,5 +93,8 @@ The web patcher stays V2 until user testing and explicit approval.
 
 The [Cheri checkpoint](../docs/checkpoints/V3_VILLAGER_DEFAULTS.md) retains its
 native results. The [Punchy checkpoint](../docs/checkpoints/V3_PUNCHY_HOUSE.md)
-records the combined implementation and focused checks. Its native default
-tail is unexecuted because the preceding house arithmetic check fails.
+records the combined implementation and focused checks. The combined native
+default check passes all six imported initializer calls, full English names and
+catchphrases, original fallbacks, actual native/imported clothing transfers,
+and missing-garment rejection. Temporary selection flags are restored; this is
+not natural move-in or ordinary saved-identity persistence evidence.
