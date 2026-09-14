@@ -12,9 +12,14 @@ with later e/e+ donor support investigated separately.
   donor extraction pass; 20 donor-only villager identities are identified.
 - [ ] Trace ordinary donor-only villager assets and implement one complete pilot
   through rendering, text, house/move-in, conversations, and saved identity.
+  [Punchy/Cheri artwork conversion](checkpoints/V3_VILLAGER_ART.md) and shared
+  model/skeleton checks are complete. Next: extended native draw/asset lookup,
+  wider donor voice mapping, then remaining name/default/house/selection paths.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
+  Preserve special-character draw records; do not truncate the GC draw record
+  or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
 - [ ] Implement deterministic optional composition, dependencies, profile

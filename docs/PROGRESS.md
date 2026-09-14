@@ -7,9 +7,13 @@ The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) covers individual villag
 and item selections, select all, the import-free option, and follow-on e/e+
 sources. The [foundation checkpoint](checkpoints/V3_IMPORT_FOUNDATION.md) records
 the verified donor inventory and six passing focused tests. Twenty donor-only
-villager identities are identified; item identity/conversion work is pending.
-No V3 content is playable or enabled in the patcher yet. The next implementation
-is one complete ordinary-villager import and one simple furniture import.
+villager identities are identified. The [villager artwork batch](checkpoints/V3_VILLAGER_ART.md)
+converts Punchy and Cheri's complete body/palette and facial frames into native
+objects, verifies their shared models/skeletons, and passes nine focused checks.
+The native draw lookup, voice mapping, and remaining villager gameplay/save paths
+are next; item identity/conversion work is pending. No V3 content is playable or
+enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
+remain required.
 
 ## Stable V2 deliverable
 
