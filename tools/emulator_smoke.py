@@ -1324,6 +1324,12 @@ def main():
                     raise ValueError('V3 ground probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_villager_readers'):
+                from v3_villager_readers_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 name-reader probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_villager_houses'):
                 from v3_villager_houses_smoke import exercise
                 if not (out/'test.bs1').is_file():

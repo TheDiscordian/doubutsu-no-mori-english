@@ -31,7 +31,11 @@ with later e/e+ donor support investigated separately.
   mapped house layers, existing matching room surfaces, and K.K. Samba, retaining
   every original house. Five focused tests pass. Native house calls remain
   unverified after the two recorded setup failures; move-ins stay disabled.
-  Next: selection, remaining ID-bounded readers, and ordinary gameplay/
+  The [secondary readers](checkpoints/V3_VILLAGER_READERS.md) connect map,
+  inventory, letter/address, conversation identity, and generated-letter names.
+  Six focused checks and the corrected 101-step native check pass, including
+  both generated-name/alias entries, four complete display paths, and guards.
+  Next: native selection/table expansion and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.
 - [ ] Review native/donor item identities and implement one complete simple

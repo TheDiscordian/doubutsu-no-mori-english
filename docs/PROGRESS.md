@@ -128,11 +128,19 @@ flooring are exact existing native matches, and every original house is retained
 Five focused checks pass. The bounded native checks stop in fixture setup before
 house calls, so native loading and visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-house-layout-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`8c7dbf467319221f150735e35ed87a09fc219f5e4268e53a1ae9bac2b148b223`.
+`build/v3-villager-readers-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`bcdea083182abc071c2327401b803756a8f9edd52455c5d8c88d2cf1b11c041f`.
+The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
+inventory, address-list, letter-header, conversation-identity, and generated-mail
+names. Six focused checks pass, including full imported names, native alias
+retention, disabled/ambiguous-name rejection, both loading checksums, and the
+unchanged import-free cartridge. The corrected 101-step native check passes both
+generated-name/alias readers and four complete display paths with original and
+imported identities, current-owner relocation, disabled-name rejection, and guards.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
-payment, placed-item rotation/persistence, and the complete villager remain work.
+payment, placed-item rotation/persistence, native selection/table expansion,
+and the complete villager remain work.
 No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
