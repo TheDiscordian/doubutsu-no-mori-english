@@ -1,0 +1,21 @@
+[
+  {"wait": 2},
+  {"key": "b", "duration": 0.12},
+  {"wait": 0.5},
+  {"repeat": 4, "actions": [{"key": "g", "duration": 0.08}, {"wait": 0.25}]},
+  {"key": "a", "duration": 0.12},
+  {"wait": 2},
+  {"capture": "barrel-place-menu.png", "hide_cursor": true},
+  {"key": "s", "duration": 0.08},
+  {"wait": 0.4},
+  {"key": "a", "duration": 0.12},
+  {"wait": 4},
+  {"key": "b", "duration": 0.12},
+  {"wait": 3},
+  {"capture": "placed-barrel.png", "hide_cursor": true},
+  {"snapshot_inventory": true},
+  {"snapshot_player": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

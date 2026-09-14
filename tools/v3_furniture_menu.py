@@ -4,7 +4,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_furniture_room import BLOB_SIZE, branch_target, query
 
-ABI, CODE = 9, 0xA800
+ABI, CODE = 21, 0xA800
 VROM, RELOC, RAM, SIZE = 0x03950000, 0x03960000, 0x8086F310, 44384
 ROOT_VROM, ROOT_RAM, ROOT_SIZE = 0x7749C0, 0x8085BAC0, 0x13620
 SOURCE_SHA = '0462b689b147edced562fec29d8910b89fa47a0d27034db89c01f296d69d9613'
@@ -14,6 +14,9 @@ SOURCES = ('tools/v3_furniture_menu.py', 'overlays/v3/menu.ld')
 SITES = ((0x80872BB0, 0x3043F000, 0x00031B03, 'place-in-room dispatch'),
          (0x8087480C, 0x3058F000, 0x0018CB03, 'held-item target eligibility'),
          (0x80875688, 0x30EDF000, 0x000D7303, 'ordinary item action menu'))
+INDEX_START, INDEX_END = 0x80871B6C, 0x80871B84
+INDEX_WORDS = (0x30A50FFF, 0x04A10002, 0x00A00821, 0x24A10003, 0x00012883, 0x30A5FFFF)
+INDEX_SYMBOL = 'af_v3_menu_placement_index'
 
 
 def inspect(native_code, root, data, reloc):
@@ -29,7 +32,10 @@ def inspect(native_code, root, data, reloc):
         raise ValueError('Changed flattened tag relocation format')
     records = struct.unpack_from('>886I', reloc, 20)
     fixes = {w & 0xFFFFFF for w in records}
-    rows, interiors = [], set()
+    if (struct.unpack_from('>6I', data, INDEX_START - RAM) != INDEX_WORDS or
+            fixes & set(range(INDEX_START - RAM, INDEX_END - RAM, 4))):
+        raise ValueError('Changed or relocated furniture-drop index conversion')
+    rows, interiors = [], set(range(INDEX_START + 4, INDEX_END, 4))
     for start, first, second, purpose in SITES:
         at = start - RAM
         if struct.unpack_from('>2I', data, at) != (first, second) or fixes & {at, at + 4}:
@@ -42,6 +48,8 @@ def inspect(native_code, root, data, reloc):
                      'second': second, 'purpose': purpose, 'symbol': f'af_v3_menu_type_{start:08x}'})
         interiors.add(start + 4)
     for at in range(0, 0x9610, 4):
+        if INDEX_START <= RAM + at < INDEX_END:
+            continue  # The displaced signed-division branch is internal.
         word = u32(data, at)
         op = word >> 26
         if op in (1, 4, 5, 6, 7, 20, 21, 22, 23):
@@ -65,14 +73,29 @@ def assembly(rows):
         lines += query(row['source'], row['destination'], 2)
         # The parent loader updates its constructor pointer after tag init.
         # None of these three runtime menu paths runs during that constructor.
-        offset = row['end'] - 0x808787A0
-        if not -32768 <= offset < 32768:
-            raise ValueError('Menu continuation exceeds the checked constructor-relative offset')
-        lines += ['addiu $sp, $sp, -16', 'sd $ra, 8($sp)', 'lui $ra, 0x8011',
-                  'lw $ra, -0x2314($ra)', 'lw $ra, 0x2cc0($ra)',
-                  f'addiu $ra, $ra, {offset}', 'addiu $sp, $sp, 16',
-                  'jr $ra', 'ld $ra, -8($sp)']
+        lines += continuation(row['end'])
+    lines += [f'.globl {INDEX_SYMBOL}', f'{INDEX_SYMBOL}:']
+    lines += query(5, 1, 1)
+    # Native drop strips the type nibble before dividing by four. Imported
+    # furniture needs its expanded runtime index, not a low-bank alias. The
+    # query differs from item-0x1000 only for an enabled import; keep the old
+    # low-twelve-bit result for every other sixteen-bit input, including gaps.
+    lines += ['addiu $a1, $a1, -4096', f'beq $at, $a1, {INDEX_SYMBOL}_native',
+              'andi $a1, $a1, 4095', 'or $a1, $at, $zero',
+              f'{INDEX_SYMBOL}_native:', 'or $at, $a1, $zero',
+              'sra $a1, $at, 2', 'andi $a1, $a1, 65535']
+    lines += continuation(INDEX_END)
     return '\n'.join(lines) + '\n'
+
+
+def continuation(address):
+    offset = address - 0x808787A0
+    if not -32768 <= offset < 32768:
+        raise ValueError('Menu continuation exceeds the checked constructor-relative offset')
+    return ['addiu $sp, $sp, -16', 'sd $ra, 8($sp)', 'lui $ra, 0x8011',
+            'lw $ra, -0x2314($ra)', 'lw $ra, 0x2cc0($ra)',
+            f'addiu $ra, $ra, {offset}', 'addiu $sp, $sp, 16',
+            'jr $ra', 'ld $ra, -8($sp)']
 
 
 def install(base, native_code, blob, rows, helper, symbols, room_symbols):
@@ -89,7 +112,14 @@ def install(base, native_code, blob, rows, helper, symbols, room_symbols):
         if not 0x80460000 + CODE <= target < 0x80460000 + CODE + len(helper):
             raise ValueError('Menu detour target outside compiled code')
         struct.pack_into('>II', data, row['start'] - RAM, 0x08000000 | (target >> 2 & 0x3FFFFFF), 0)
+    target = symbols[INDEX_SYMBOL]
+    if not 0x80460000 + CODE <= target < 0x80460000 + CODE + len(helper):
+        raise ValueError('Furniture-drop index helper outside compiled code')
+    data[INDEX_START - RAM:INDEX_END - RAM] = struct.pack('>6I',
+        0x08000000 | (target >> 2 & 0x3FFFFFF), 0, 0, 0, 0, 0)
     blob[CODE:CODE + len(helper)] = helper
     return {VROM: bytes(data)}, {'source_sha256': SOURCE_SHA, 'output_sha256': sha256(data),
         'relocation_sha256': RELOC_SHA, 'parent_sha256': ROOT_SHA, 'sites': rows,
+        'placement_index': {'start': INDEX_START, 'end': INDEX_END,
+                            'symbol': INDEX_SYMBOL, 'original_words': list(INDEX_WORDS)},
         'ordinary_placement_tested': False, 'save_profile_support_ready': False}

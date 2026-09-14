@@ -1,0 +1,15 @@
+[
+  {"wait": 2},
+  {"key": "w", "duration": 0.17},
+  {"wait": 0.5},
+  {"key": "Return", "duration": 0.12},
+  {"wait": 3},
+  {"capture": "room-pocket.png", "hide_cursor": true},
+  {"key": "a", "duration": 0.12},
+  {"wait": 2},
+  {"capture": "room-actions.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

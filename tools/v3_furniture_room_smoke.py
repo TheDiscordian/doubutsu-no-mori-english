@@ -41,6 +41,15 @@ def delay_effect(word, registers, read_word):
 def expected_window(row, registers, selected, read_word):
     result = registers.copy()
     value = registers[row['source']] & 0xFFFFFFFF
+    if row['kind'] in ('collision', 'tile_lookup', 'model_dma'):
+        index = value >> 2 if row['kind'] == 'collision' else value
+        item = ({1161: 0x3224, 1198: 0x32B8}[index] if selected else index * 4 + 0x1000)
+        result[row['destination']] = extend(item)
+        if row['kind'] == 'collision':
+            result[5] = item & 65535
+        elif row['kind'] == 'model_dma':
+            result[4], result[5] = index & 65535, item & 65535
+        return row['end'], result
     if row['kind'] == 'transform':
         if row['mode'] == 1:
             offset = ((1024 + ((value & 4095) >> 2)) * 4 + (value & 3)
@@ -66,10 +75,10 @@ def expected_window(row, registers, selected, read_word):
     return row['fall'] + (4 if row['branch'] >> 26 in (20, 21) else 0), result
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, identity_only=False):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())
-    room = report.get('furniture_room')
+    room = report.get('furniture_identity' if identity_only else 'furniture_room')
     if sha256(rom) != report['output_sha256'] or not room or report['resident_blob_bytes'] != BLOB_SIZE:
         raise ValueError('Room probe requires its exact current cartridge')
     files, boot = by_vrom(rom), boot_proofs(rom)
@@ -99,7 +108,8 @@ def exercise(debug, rom_path, record):
         raise ValueError('Room probe allocation failed')
     live, stack = allocation + 16, allocation + 0x1C000
     data, reloc = (files[v].extract(rom) for v in (VROM, RELOC))
-    if sha256(data) != room['output_sha256'] or sha256(reloc) != room['relocation_sha256']:
+    final_room = report.get('furniture_identity') or room
+    if sha256(data) != final_room['output_sha256'] or sha256(reloc) != room['relocation_sha256']:
         raise ValueError('Changed room owner or relocation proof')
     sections = struct.unpack_from('>5I', reloc)
     expected = relocate_verified_data(SimpleNamespace(ram=RAM, resident_bytes=RESIDENT,
@@ -129,6 +139,9 @@ def exercise(debug, rom_path, record):
     for row in room['sites']:
         cases = [(0x1000, False, False), (0x3225, True, False), (0x3000, False, False),
                  (0x32B8, False, True)]
+        if identity_only:
+            cases = [(1, False, False), (947, False, False), (1161, True, False),
+                     (1198, True, False), (1198, False, True), (65535, False, False)]
         if row['kind'] == 'range' and row['paired']:
             cases.append((0xFFF, False, False))
         for value, selected, disabled in cases:
@@ -140,6 +153,10 @@ def exercise(debug, rom_path, record):
                 if i not in (26, 27):
                     registers[i] = (0x13579000 + i) << 32 | (0x2468A000 + i)
             registers[row['source']] = extend(value)
+            if identity_only and row['kind'] == 'collision':
+                registers[5] = extend(value * 4)
+            elif identity_only and row['kind'] == 'model_dma':
+                registers[18] = extend(value * 4 + 0x1000)
             registers[29] = extend(stack)
             registers[37] = extend(live + row['start'] - RAM)
             linked_target, wanted = expected_window(row, registers, selected, word)
@@ -179,6 +196,9 @@ def exercise(debug, rom_path, record):
     check('no faulted thread', 0x8003CE34, bytes(4))
     debug.write_memory(0x80100E00, saved_owner)
     call(0x8009C040, [allocation])
+    if identity_only:
+        return {'native_room_identity_windows': windows, 'sites': len(room['sites']),
+                'ordinary_pickup_tested': False, 'requires_checkpoint_restore': True}
     return {'native_room_windows': windows, 'range_sites': room['range_sites'],
             'index_sites': room['index_sites'], 'field_type_sites': room['field_type_sites'],
             'ordinary_placement_tested': False, 'save_reload_tested': False,

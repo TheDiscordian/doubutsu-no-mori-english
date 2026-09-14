@@ -1,0 +1,14 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.2},
+  {"wait": 0.3},
+  {"key": "f", "duration": 0.15},
+  {"wait": 0.3},
+  {"snapshot_player": true},
+  {"key": "w", "duration": 0.8},
+  {"wait": 7},
+  {"capture": "front-door-result.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

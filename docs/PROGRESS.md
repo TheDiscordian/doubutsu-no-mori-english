@@ -68,8 +68,8 @@ paths and ground-descriptor selection. Three focused checks and 57 native steps
 pass, including full-register/branch cases, native furniture flags, and the
 complete descriptor function. The [pocket-search batch](checkpoints/V3_FURNITURE_POCKETS.md)
 connects both shared furniture searches; four focused checks and 51 native steps
-pass, including 28 complete query calls and original-type fallbacks. Remaining catalogue/scoring
-consumers, ordinary acquisition/placement/persistence, and Punchy's animated speed
+pass, including 28 complete query calls and original-type fallbacks. Ordinary
+acquisition/persistence and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required. The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md)
@@ -93,7 +93,7 @@ process restores the complete acquired payload and catalogue/profile. The
 English names, model previews, selection, prices, and completion. Four focused
 tests and 70 native steps pass, including both complete model DMAs, all 438 rows,
 and original preview fallback within the existing menu allocation. Ordinary
-order/payment/delivery, scoring, placement, and Controller Pak profile transport
+order/payment, placement persistence, and Controller Pak profile transport
 remain work. The [shop adapter](checkpoints/V3_SHOPS.md) adds the pilots to native
 ordinary goods lists and category queries while preserving town rarity and RNG.
 Four focused tests pass; the native stock-selection and pocket-acquisition
@@ -104,7 +104,7 @@ complete imported-order deliveries/readbacks and pending-order clearing. The
 independent [shop-floor adapter](checkpoints/V3_SHOP_FLOOR.md) connects reserve
 points, floor-item selection, and sold-removal classification. Three focused
 tests and 63 native steps pass, including complete reserve/grid selections and
-all changed branch/delay semantics. Ordinary payment/model removal, scoring,
+all changed branch/delay semantics. Ordinary payment/model removal
 and the full item lifecycle remain work. The [HRA adapter](checkpoints/V3_HRA.md)
 connects all twenty range and twenty index decisions, expanded theme groups,
 actual donor scoring properties, and missing-item recommendations. Three focused
@@ -115,7 +115,18 @@ one-past-table marker. The [feng shui adapter](checkpoints/V3_FENG_SHUI.md) adds
 actual donor colours while retaining native point weights. Three focused checks
 and the first 45-step native run pass, including five complete item evaluations,
 three complete room evaluations, disabled/unknown exclusion, and guards.
-Ordinary acquisition/payment, placement/pickup, and persistence remain work.
+The [ordinary lifecycle batch](checkpoints/V3_ITEM_LIFECYCLE.md) fixes a room-drop
+index alias and three inlined inverse-ID conversions. The current barrel renders
+correctly when placed and returns to the pocket with its complete imported ID
+through normal B pickup; all original items stay intact. Both items are explicitly
+fixture-seeded for this check, not purchased. Seven focused host checks and 25
+native instruction windows pass across the fixes; the ordinary corrected
+interaction passes 24 recorded steps. Current experimental ROM:
+`build/v3-room-identity-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`129113cb34d44bab4c62395fd2eb3d51cdb6931f779fc5276d103138f06cf238`.
+The correction does not change the existing experimental V3 save format or
+profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
+payment, placed-item rotation/persistence, and the complete villager remain work.
 No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.

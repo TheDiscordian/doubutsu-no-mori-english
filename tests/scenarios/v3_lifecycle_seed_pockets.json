@@ -1,0 +1,20 @@
+[
+  {"wait": 2},
+  {"key": "b", "duration": 0.12},
+  {"wait": 2},
+  {"pause_game_thread": true},
+  {"read": ["80136FD8", 4], "expect": "80126ec0"},
+  {"read": ["80126EDC", 4], "expect": "00000000"},
+  {"read": ["80126EF4", 4], "expect": "00000000"},
+  {"write": ["80126EDC", "322432b8"]},
+  {"resume": true},
+  {"key": "f", "duration": 0.3},
+  {"key": "w", "duration": 1.5},
+  {"wait": 8},
+  {"capture": "home-approach.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

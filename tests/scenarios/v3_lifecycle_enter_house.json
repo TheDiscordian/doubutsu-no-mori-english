@@ -1,0 +1,12 @@
+[
+  {"wait": 2},
+  {"key": ["f", "w"], "duration": 0.18},
+  {"wait": 0.4},
+  {"key": "a", "duration": 0.12},
+  {"wait": 8},
+  {"capture": "entered-house.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_message": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

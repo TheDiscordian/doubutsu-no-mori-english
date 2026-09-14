@@ -67,6 +67,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
+                       'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),
                        'menu': ('af_v3_menu_type_80872bb0', BLOB_RAM + 0xA800),
                        'icon': ('af_v3_furniture_icon_type', BLOB_RAM + 0xAB00),
@@ -167,6 +168,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_furniture_room
     import v3_furniture_fields
     import v3_furniture_menu
+    import v3_furniture_identity
     import v3_furniture_icon
     import v3_furniture_ground
     import v3_furniture_pockets
@@ -225,6 +227,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_furniture_room.SOURCES if furniture_room else ())
                     + (v3_furniture_fields.SOURCES if furniture_fields else ())
                     + (v3_furniture_menu.SOURCES if furniture_menu else ())
+                    + (v3_furniture_identity.SOURCES if furniture_menu else ())
                     + (v3_furniture_icon.SOURCES if furniture_icon else ())
                     + (v3_furniture_ground.SOURCES if furniture_ground else ())
                     + (v3_furniture_pockets.SOURCES if furniture_pockets else ())
@@ -276,6 +279,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = v3_hra.ABI
     if feng_shui:
         abi = v3_feng_shui.ABI
+    if furniture_menu:
+        abi = max(abi, v3_furniture_menu.ABI, v3_furniture_identity.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -529,6 +534,22 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         feng_report['code'] = feng_compiled
         feng_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
         relocated.update({v3_feng_shui.VROM: v3_feng_shui.NEW_VROM, v3_feng_shui.RELOC: v3_feng_shui.NEW_RELOC})
+    identity_report = None
+    if furniture_menu:
+        rows = v3_furniture_identity.inspect(furniture_changes[v3_furniture_runtime.VROM],
+                                              furniture_changes[v3_furniture_runtime.RELOC])
+        generated, entry = out / 'identity-hooks.S', out / 'identity-entry.S'
+        write_new(generated, v3_furniture_identity.assembly(rows).encode())
+        write_new(entry, (ROOT / 'overlays/v3/room_entry.S').read_text().replace(
+            'af_v3_room_query', 'af_v3_identity_query').replace(
+            'af_v3_room_value', 'af_v3_identity_item').encode())
+        identity_code, identity_compiled = compile_part('identity', out / 'identity',
+            extra_sources=(str(entry.relative_to(ROOT)), str(generated.relative_to(ROOT))))
+        identity_report = v3_furniture_identity.install(furniture_changes, blob, rows,
+            identity_code, identity_compiled['symbols'], furniture_code_report['symbols'])
+        identity_report['code'] = identity_compiled
+        identity_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+        identity_report['generated_entry_sha256'] = sha256(entry.read_bytes())
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -584,6 +605,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
         'villager_text': text_report, 'furniture': furniture_report, 'furniture_items': items_report,
         'furniture_room': room_report,
+        'furniture_identity': identity_report,
         'furniture_fields': fields_report,
         'furniture_menu': menu_report,
         'furniture_icon': icon_report,

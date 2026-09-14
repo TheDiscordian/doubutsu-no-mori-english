@@ -1,0 +1,20 @@
+[
+  {"wait": 2},
+  {"key": "s", "duration": 0.3},
+  {"key": "f", "duration": 0.35},
+  {"key": "w", "duration": 1.2},
+  {"wait": 7},
+  {"capture": "home-interior.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"key": "Return", "duration": 0.12},
+  {"wait": 3},
+  {"repeat": 4, "actions": [{"key": "g", "duration": 0.08}, {"wait": 0.2}]},
+  {"wait": 1},
+  {"capture": "haz-mat-pocket.png", "hide_cursor": true},
+  {"key": "a", "duration": 0.12},
+  {"wait": 2},
+  {"capture": "haz-mat-actions.png", "hide_cursor": true},
+  {"snapshot_choices": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"save_state": true}
+]

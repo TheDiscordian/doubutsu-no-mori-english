@@ -81,8 +81,13 @@ with later e/e+ donor support investigated separately.
   The [feng shui adapter](checkpoints/V3_FENG_SHUI.md) connects actual donor
   colours and retains native balance. Three focused checks and the first
   45-step native run pass, including eight complete item/room evaluations.
-  Next: ordinary acquisition/payment/model removal and
-  placement/persistence. No complete item is enabled yet.
+  The [ordinary lifecycle batch](checkpoints/V3_ITEM_LIFECYCLE.md) fixes the
+  room-drop index and three inlined inverse-ID conversions. The current barrel
+  now places with its correct model and returns to its pocket with the correct
+  imported ID through normal B pickup. Seven host checks and 25 changed native
+  instruction windows pass across the two fixes; original items remain intact.
+  Next: ordinary acquisition/payment, rotation/persistence, and the remaining
+  villager-house implementation. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

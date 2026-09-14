@@ -1,0 +1,15 @@
+[
+  {"wait": 1},
+  {"snapshot_player": true},
+  {"key_frames": "g", "frames": 6},
+  {"key_frames": "w", "frames": 4},
+  {"snapshot_player": true},
+  {"key_frames": "b", "frames": 4},
+  {"advance_frames": 90},
+  {"capture": "pickup-result.png", "hide_cursor": true},
+  {"snapshot_player": true},
+  {"snapshot_inventory": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"save_state": true}
+]

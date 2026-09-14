@@ -2,12 +2,14 @@
 
 ## Implemented paths
 
-`tools/v3_furniture_menu.py` adapts three furniture-type checks in the current
-translated tag overlay. The checks classify selected imports as furniture without
-altering the item ID carried by the surrounding code.
+`tools/v3_furniture_menu.py` adapts three furniture-type checks and the room-drop
+index conversion in the current translated tag overlay. Classification retains
+the complete item ID; the separate index conversion passes the correct expanded
+runtime index to the native placement callbacks.
 
 | Native window | Purpose |
 | --- | --- |
+| `80871B6C` | Convert the complete selected item to its runtime placement index |
 | `80872BB0` | Route the room-placement action to the furniture drop function |
 | `8087480C` | Restrict held furniture to the ordinary inventory/letter destinations |
 | `80875688` | Choose furniture action menus for the current field/room context |
@@ -17,14 +19,24 @@ Its flattened relocation file at `03960000` contains 886 entries. The installer
 binds both complete files, their parent submenu owner, the native parent
 allocation descriptor, and the tag constructor record. It rejects changed
 instructions, displaced relocations, and incoming branches/pointers into a
-replaced window's interior. Only six original instruction words change.
+replaced window's interior. Twelve original instruction words change.
 
 Each detour reproduces the original `ANDI` temporary, calls the existing
 full-width query wrapper in classification mode, and writes only the intended
 type result. Selected imports produce type 1; original inputs retain their
 native type. An unavailable profile does not receive the furniture classification.
-Invalid saved imports still require the pending save/profile guard; this is not
-a substitute for that guard.
+The separate save/profile guard handles incompatible saved selections; menu
+classification is not a substitute for that guard.
+
+The room-drop function `80871B44` passes a furniture index to both its judge and
+reserve callbacks. Its native `(item & 0xFFF) / 4` calculation aliases imported
+`3224` to index 137, the original `1224`, instead of index 1161. Replace the whole
+six-word mask/signed-division sequence through `80871B80`, returning at
+`80871B84`. Enabled imports use the existing expanded-index query, retaining
+rotation until the final division. All other sixteen-bit inputs retain the
+native low-twelve-bit result, including disabled imports and unused IDs. Only
+`at` and `a1` have new outputs; all other registers, HI/LO, and the stack retain
+their original values. The callback interfaces and surrounding code are unchanged.
 
 Wrapped-present and quest conditions remain in their original earlier branches.
 Other tag type checks compare against ordinary item type 2, so original furniture
@@ -47,25 +59,28 @@ query wrapper preserves all other live GPRs, HI/LO, and the caller stack; the
 new code has no floating-point operations. The tag overlay and parent retain
 their allocation sizes, loader, constructors, destruction, and relocation files.
 
-V3 ABI 9 keeps the 48-KiB resident reservation and model layout. The three
-80-byte detours occupy `8046A800`–`8046A8EF`. The existing room and shared-field
-code remains unchanged. Guards, tables, saved identities, and heap bounds retain
-their positions. Both web patchers remain V2.
+V3 ABI 21 keeps the 48-KiB resident reservation and model layout. The three
+80-byte classification detours occupy `8046A800`–`8046A8EF`; the 104-byte index
+detour extends the helper through `8046A957`, below the next owner at `8046AB00`.
+The existing room and shared-field code remains unchanged. Guards, tables, saved
+identities, and heap bounds retain their positions. Both web patchers remain V2.
 
 ## Verification and remaining work
 
-Three focused tests check the exact complete overlay changes, retained parent
+Three focused placement tests check the exact complete overlay changes, retained parent
 and relocations, full-width save instructions, query binding, guards/CRC, UPS
 reconstruction, deterministic composition, and import-free V2 output.
 
-The [native checkpoint](../docs/checkpoints/V3_FURNITURE_MENU.md) checks all three
+The retained [classification checkpoint](../docs/checkpoints/V3_FURNITURE_MENU.md) checks all three
 windows with full-width registers and selected/disabled inputs. It also executes
 the complete held-item destination function and action-menu selector. The two
 imports match original furniture in all four field contexts, and wrapped/quest
 conditions remain intact. The fixture constructs the documented post-initializer
 parent state; it does not execute the complete parent initialization or ordinary
-menu flow. Normal placement/acquisition, saving/loading imports, and hardware
-compatibility remain unverified.
+menu flow. The [lifecycle work record](../docs/checkpoints/V3_ITEM_LIFECYCLE.md)
+owns the ordinary placement defect, corrected build, focused index execution,
+and normal-play results. Acquisition, ordinary save/reload, and original hardware
+remain separate acceptance work.
 
 The [inventory icon adapter](V3_FURNITURE_ICON.md) handles the separate native
 furniture check in the submenu parent. It leaves the tag detours unchanged and

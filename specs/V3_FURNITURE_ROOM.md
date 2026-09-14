@@ -7,6 +7,8 @@ index conversions for selected imports. It installs 21 upper-range detours,
 two item-to-runtime-index conversions, and four local field-type conversions.
 All native room code outside those exact instruction windows remains unchanged.
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_ROOM.md) records verification.
+The separate [room identity adapter](V3_FURNITURE_IDENTITY.md) connects the three
+inlined inverse conversions used by collision, pickup, and model re-DMA.
 
 The imported IDs remain `3224`–`3227` and `32B8`–`32BB`, with runtime indices
 1,161 and 1,198. Only their enabled, correctly bound resident profiles qualify.

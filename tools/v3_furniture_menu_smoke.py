@@ -8,12 +8,12 @@ from aflib import by_vrom, sha256
 from npc_mail_show import relocate_verified_data
 from runtime_layout import MODULE_RAM, RESERVATION, TEST_STACK
 from v3_asset_loader import BLOB, BLOB_RAM
-from v3_furniture_menu import BLOB_SIZE, RAM, RELOC, ROOT_VROM, SIZE, VROM
+from v3_furniture_menu import BLOB_SIZE, RAM, RELOC, ROOT_VROM, SIZE, VROM, INDEX_START, INDEX_END
 from v3_furniture_room_smoke import extend
 from v3_npc_draw_smoke import boot_proofs
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, index_only=False):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())
     menu = report.get('furniture_menu')
@@ -50,7 +50,9 @@ def exercise(debug, rom_path, record):
     hand, submenu, private = allocation + 0x20800, allocation + 0x20C00, allocation + 0x20D00
     debug.write_memory(allocation, bytes(size))
     root_data = files[ROOT_VROM].extract(rom)
-    if sha256(root_data) != menu['parent_sha256']:
+    parent_sha = (report['changed_resources'][f'{ROOT_VROM:08X}']
+                  if index_only else menu['parent_sha256'])
+    if sha256(root_data) != parent_sha:
         raise ValueError('Changed menu parent proof')
     debug.write_memory(root, root_data)
     data, reloc = (files[v].extract(rom) for v in (VROM, RELOC))
@@ -85,9 +87,14 @@ def exercise(debug, rom_path, record):
     original_regs = [int(before[i:i + 16], 16) for i in range(0, len(before), 16)]
     if len(original_regs) != 71 or original_regs[37] & 0xFFFFFFFF != 0x800D334C:
         raise ValueError('Menu windows require the paused game frame')
-    for row in menu['sites']:
-        for item, selected, disabled in ((0x1004, False, False), (0x3225, True, False),
-                                         (0x32BB, True, False), (0x32BB, False, True)):
+    rows = ([{'start': INDEX_START, 'end': INDEX_END, 'source': 5}]
+            if index_only else menu['sites'])
+    cases = ((0x1004, False, False), (0x3225, True, False),
+             (0x32BB, True, False), (0x32BB, False, True))
+    if index_only:
+        cases += ((0x3000, False, False), (0xFFFF, False, False), (0, False, False))
+    for row in rows:
+        for item, selected, disabled in cases:
             if disabled:
                 put(BLOB_RAM + 0x7254, 0)
             regs = original_regs.copy()
@@ -97,8 +104,13 @@ def exercise(debug, rom_path, record):
             regs[row['source']] = item
             regs[29], regs[37] = extend(TEST_STACK), extend(tag + row['start'] - RAM)
             wanted = regs.copy()
-            wanted[row['temporary']] = item & 0xF000
-            wanted[row['destination']] = 1 if selected else item >> 12
+            if index_only:
+                wanted[1] = ((1161 if item & 0xFFFC == 0x3224 else 1198) * 4 + (item & 3)
+                             if selected else item & 0xFFF)
+                wanted[5] = wanted[1] >> 2
+            else:
+                wanted[row['temporary']] = item & 0xF000
+                wanted[row['destination']] = 1 if selected else item >> 12
             target = tag + row['end'] - RAM
             breakpoint = f'0,{target:x},4'
             if debug.command('Z' + breakpoint) != 'OK':
@@ -122,18 +134,18 @@ def exercise(debug, rom_path, record):
                 debug.command('G' + before)
                 if disabled:
                     put(BLOB_RAM + 0x7254, 1)
-    for item in (0x1004, 0x3225, 0x32BB):
+    for item in (() if index_only else (0x1004, 0x3225, 0x32BB)):
         debug.write_memory(hand + 0x23C, struct.pack('>H', item))
         for destination in range(5):
             native(0x808747D0, [submenu, destination], int(destination < 2))
         check('hand keeps complete item identity', hand + 0x23C, struct.pack('>H', item))
-    for field in range(4):
+    for field in (() if index_only else range(4)):
         debug.write_memory(0x80136EA1, bytes((field,)))
         expected_type = native(0x80875610, [submenu, 0x1004, 0])
         for item in (0x3225, 0x32BB):
             native(0x80875610, [submenu, item, 0], expected_type)
         record({'native_menu_field': field, 'original_and_imported_tag_type': expected_type})
-    for condition, expected_type in ((1, 11), (2, 8)):
+    for condition, expected_type in (() if index_only else ((1, 11), (2, 8))):
         put(private + 0x34, condition)
         native(0x80875610, [submenu, 0x3225, 0], expected_type)
     check('complete resident prefix unchanged', BLOB_RAM, blob)
@@ -145,6 +157,10 @@ def exercise(debug, rom_path, record):
     for at, value in saved.items():
         debug.write_memory(at, value)
     call(0x8009C040, [allocation])
+    if index_only:
+        return {'placement_index_register_windows': len(cases),
+                'unchanged_menu_prefix_replayed': False, 'ordinary_placement_tested': False,
+                'save_reload_tested': False, 'requires_checkpoint_restore': True}
     return {'menu_register_windows': 12, 'complete_native_hand_destination_cases': 15,
             'native_action_menu_contexts': 4, 'wrapped_and_quest_conditions_retained': True,
             'parent_loader_executed': False, 'ordinary_placement_tested': False,

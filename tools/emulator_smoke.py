@@ -1368,24 +1368,26 @@ def main():
                     raise ValueError('V3 icon probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
-            if action.get('test_v3_furniture_menu'):
+            if action.get('test_v3_furniture_menu') or action.get('test_v3_furniture_menu_index'):
                 from v3_furniture_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 menu probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, args.rom, record))
+                results.append(exercise(debug, args.rom, record,
+                    index_only=bool(action.get('test_v3_furniture_menu_index'))))
             if action.get('test_v3_furniture_fields'):
                 from v3_furniture_fields_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 field probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
-            if action.get('test_v3_furniture_room'):
+            if action.get('test_v3_furniture_room') or action.get('test_v3_furniture_identity'):
                 from v3_furniture_room_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 room probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug, args.rom, record))
+                results.append(exercise(debug, args.rom, record,
+                                        identity_only=bool(action.get('test_v3_furniture_identity'))))
             if action.get('test_v3_furniture_items'):
                 from v3_furniture_items_smoke import exercise
                 if not (out/'test.bs1').is_file():
