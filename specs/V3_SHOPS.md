@@ -82,7 +82,7 @@ the already verified stock prefix without replaying it.
 
 See the [checkpoint](../docs/checkpoints/V3_SHOPS.md) for exact results and limits.
 
-## Clothing stock integration work
+## Clothing stock integration
 
 The actual donor puts cherry shirt (`24BF`) at position 27 in `cloth_listA`,
 inside its 32-item all-season prefix. The complete 144-byte donor list has
@@ -103,6 +103,9 @@ the actual list pointer in `s1`. Appending an all-season item only to A needs a
 list-aware index adapter; globally raising 32 to 33 would select the wrong
 seasonal entries in unchanged B/C lists. Preserve the native season mapping,
 single RNG draw, group-to-rarity mapping, special lists, and duplicate filtering.
-One bounded layout is to append the expanded A list and update only pointer A,
-retaining all original bytes including counts at `21C`. Verify the resource
-allocation and disabled-profile handling before installing that layout.
+The [clothing stock adapter](V3_CLOTHING_STOCK.md) appends the expanded A list
+and updates only pointer A, retaining the original lists and counts at `21C`.
+The resource grows to 720 bytes through the unchanged size-derived allocation
+and free paths. Focused seasonal/composition tests and the native stock,
+town-rarity, and acquisition check pass. Shop mannequin rendering, catalogue
+presentation, and ordinary payment remain work.

@@ -94,10 +94,15 @@ with later e/e+ donor support investigated separately.
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
   The [shop category reader](checkpoints/V3_CLOTHING_SHOPS.md) recognises selected
   clothing with retained original/furniture handling. Two focused tests and the
-  initial 23-record native run pass. Stock, catalogue/mannequins, and ordinary
-  buy/sell remain. Current copied-town change-back and outdoor Drop proceed;
+  initial 23-record native run pass. The
+  [stock adapter](checkpoints/V3_CLOTHING_STOCK.md) installs selected cherry shirt
+  in A's all-season list. Two focused tests and the initial 65-record native
+  run pass, including seven stock choices, six town-rarity queries, actual
+  full-ID acquisition, independent ownership, restored state, and guards.
+  Catalogue/mannequins and ordinary buy/sell remain.
+  Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop
-  checkpoint and move on from navigation retries to stock/display implementation.
+  checkpoint and move on from navigation retries to display implementation.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both

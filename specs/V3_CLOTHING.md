@@ -5,10 +5,11 @@
 `--clothing` includes the current villager/furniture foundation and installs
 Punchy's actual GameCube cherry-shirt artwork, name/price metadata, and the
 shared indexed texture/palette reader, both NPC clothing paths, and player
-startup/change-clothes readers, and selected shared item metadata. It does not
-enable the garment as an inventory item or enable Punchy's initial outfit.
-Ordinary clothing actions, acquisition routes, mannequins, and gameplay/persistence integration
-remain required before the garment is selectable.
+startup/change-clothes readers, selected shared item metadata, and native shop
+stock. Inventory wearing and ordinary save/reload work on the copied test town.
+It does not enable Punchy's initial outfit. Remaining clothing actions,
+ordinary acquisition, mannequins, and display persistence remain required before
+the garment is selectable in the patcher.
 
 All 256 original native clothing textures and palettes remain intact. Donor
 `24BF` is not native `24BF`: all 1,024 converted colour pixels are compared
@@ -39,7 +40,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 36 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 37 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -111,7 +112,10 @@ Ordinary inventory-driven wearing, outdoor rendering, gyroid Save & Quit, and
 fresh-process reloading pass on a copied town. Both saved clothing fields,
 all expected pockets, ownership, and complete active artwork survive the cycle.
 The [shop category reader](V3_SHOPS.md) recognises selected imports as clothing
-without changing native categories or item IDs. Connect remaining clothing
+without changing native categories or item IDs. The
+[stock adapter](V3_CLOTHING_STOCK.md) includes selected cherry shirt in A's
+all-season stock, retaining native seasons, rarity, and single-draw RNG.
+Focused and native stock/acquisition checks pass. Connect remaining clothing
 actions and acquisition, buy/sell paths, display
 mannequins, mail/gifts, and persistence for those representations.
 Keep original garments and behaviour.

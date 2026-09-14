@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-shop-category-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`958165c43bb59288d980a5c5a0ccf803baf5cfcb36b377078558e5ca1e64871c`.
+`build/v3-clothing-stock-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`04978d2f62d8ce70c2d5ce4c8e359a622501251669a59e0fb80ef692396cfa4f`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -214,8 +214,13 @@ fields, all expected pockets, ownership, and complete active garment artwork.
 The [clothing shop category](checkpoints/V3_CLOTHING_SHOPS.md) now recognises
 the selected garment through the checked shared item reader. Two focused tests
 and the initial 23-record native run pass, retaining original/furniture
-categories, complete resources, save code, profile, and guards. Actual stock,
-catalogue/mannequin presentation, and buy/sell remain work. The current copied-
+categories, complete resources, save code, profile, and guards. The
+[clothing stock adapter](checkpoints/V3_CLOTHING_STOCK.md) adds the selected
+shirt to A's all-season list with native B/C seasons, town rarity, and one RNG
+draw retained. Two focused tests and the initial 65-record native run pass:
+seven actual stock selections, six rarity queries, full-ID pocket acquisition,
+independent ownership, restored records, and guards. Catalogue/mannequin
+presentation and ordinary buy/sell remain work. The current copied-
 town check changes back to the native shirt and drops the imported pocket item
 outdoors. Pickup remains unverified after the timed movement overshoots its
 tile; the checkpoint is retained without further movement retries in this batch.
