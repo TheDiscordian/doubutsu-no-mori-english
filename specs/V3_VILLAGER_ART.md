@@ -12,14 +12,17 @@ Explicit `--villager` selections also convert Pigleg (`00E9`, `pig_11`) and
 Dobie (`00E0`, `wol_6`). These two islanders are artwork components only;
 the default two-pilot conversion and current development ROM do not change.
 Pigleg includes a separate converted model, not an overwrite of the native pig
-model. Town behaviour, dependencies, and runtime installation remain required.
+model. With a verified `--accessories` directory, `--all-supported` converts
+nineteen donor-only villagers: all except Yodel. The fifteen accessory-bearing
+entries include their actual separate accessory objects and attachment metadata.
+Town behaviour, dependencies, and runtime installation remain required.
 
 The donor disc/resources and symbol file use the pins in
 `V3_OPTIONAL_IMPORTS.md` and `v3_import_catalog.py`. Actual REL relocations bind
 the selected draw-table row to its skeleton, body, palette, all eight eye
 textures, and all six mouth textures. Asset filenames alone are not identity
 evidence. Unknown or missing pointer fields, external references, unsupported
-palette alpha, or accessories that need separate geometry fail construction.
+palette alpha, or missing/unverified accessory objects fail construction.
 
 ## Native object layout
 
@@ -84,6 +87,38 @@ Palette conversion preserves opaque RGB555 values. RGB5A3 entries with binary
 alpha convert to native RGBA5551; partial alpha requires another rendering path
 and is rejected, not silently flattened.
 
+## Additional species layouts
+
+The converter supplies duck, rabbit, squirrel, frog, lion, penguin, elephant,
+bird, mouse, horse, chicken, koala, and tiger layouts. Exact source offsets,
+native destinations, dimensions, and expression order are in `LAYOUTS` in
+`tools/v3_villager_art.py`, checked against both games' actual draw records and
+model commands. Duck and lion, like cub, store mouths before eyes. Penguin,
+bird, horse, chicken, and tiger, like wolf, have no mouth frames. Chicken has
+64 bytes of native zero padding at `07C0`; it is not another source tile.
+
+Some donor tiles include four extra rows for GX block alignment. These are
+explicit mirrored or clamped edge extensions, not unique image content to
+discard. `native_body_piece` regenerates every extension row from its visible
+rows and rejects any differing pixel. Only then does it store the native height,
+which is independently bound by the native tile commands. The full nineteen-body
+batch accounts for 704 such repeated source bytes. All other source pixels are
+stored directly; every native atlas byte remains assigned once.
+
+`tools/v3_villager_mesh.py` decodes each real joint's two display lists, including
+partial vertex-cache loads and matrix changes. It compares every face in order,
+allowing only a cyclic permutation of a triangle's corners, never reversed
+winding. Each corner retains its actual source vertex index and joint matrix.
+Every body-material reference must match the declared source offset, dimensions,
+native destination, and stride; mutable eye/mouth/shirt references are checked
+separately. This establishes shared topology and texture bindings, not hardware
+appearance or equivalence of every graphics-state command.
+
+The [body checkpoint](../docs/checkpoints/V3_ISLANDER_BODIES.md) records complete
+conversion and focused verification. Yodel remains unsupported because the
+gorilla geometry differs beyond positions. Do not weaken the pig-only coordinate
+adapter or reuse the unrelated native gorilla model to enable him.
+
 ## Shared model evidence
 
 The N64 model banks are `0085` (cat, VROM `00EC5000`) and `009D` (cub, VROM
@@ -123,11 +158,12 @@ this converted model from comparison against an unchanged native model.
 This coordinate adaptation does not globally resize existing N64 pigs. Its
 model-bank assignment, actual runtime drawing, and appearance verification are
 pending; texture conversion alone must not silently reuse the larger native
-head. Accessory-bearing villagers still fail conversion until their additional
-geometry has an explicit implementation. The separate
+head. Accessory-bearing villagers fail conversion without the verified separate
+geometry dependency. The separate
 [accessory converter](V3_VILLAGER_ACCESSORIES.md) supplies all sixteen actual
-accessory models, textures, and palettes. Body/attachment integration must bind
-those converted dependencies before accepting their villager rows.
+accessory models, textures, and palettes. The body bundle includes the fifteen
+dependencies for its supported bodies and records their exact consumer joints.
+Runtime attachment still needs implementation before those villagers are playable.
 
 ## Native integration still required
 

@@ -23,6 +23,26 @@ def source_texture():
     return palette, eyes, mouths, body
 
 
+def source_body(layout):
+    """Independent GX fixture with explicit clamped/mirrored extension rows."""
+    body = bytearray(layout.get('body_bytes', 1024))
+    for offset, _, width, height in layout['parts']:
+        native_height, mode = layout.get('edge_rows', {}).get(offset, (height, None))
+        pixels = []
+        for y in range(height):
+            row = y if y < native_height else native_height-1-(
+                y-native_height if mode == 'mirror' else 0)
+            pixels.extend((x+row*3) % 16 for x in range(width))
+        tiled = []
+        for by in range(0, height, 8):
+            for bx in range(0, width, 8):
+                for y in range(by, by+8):
+                    for x in range(bx, bx+8, 2):
+                        tiled.append(pixels[y*width+x]*16+pixels[y*width+x+1])
+        body[offset:offset+len(tiled)] = bytes(tiled)
+    return bytes(body)
+
+
 def fake_rel(records):
     data = bytearray(0x280)
     struct.pack_into('>I', data, 0, 1)
@@ -60,9 +80,10 @@ class V3VillagerArtTests(unittest.TestCase):
         palette, eyes, mouths, body = source_texture()
         for species, layout in LAYOUTS.items():
             with self.subTest(species=species):
+                body = source_body(layout)
                 selected_mouths = mouths[:layout.get('mouth_frames', 6)]
                 texture, parts = convert_texture(palette, eyes, selected_mouths,
-                                                  body[:layout.get('body_bytes', len(body))], layout)
+                                                  body, layout)
                 body_offset = texture_body_offset(layout)
                 self.assertEqual(len(texture), body_offset+2048)
                 first = mouths[0] if layout.get('mouth_first') else eyes[0]
@@ -78,9 +99,11 @@ class V3VillagerArtTests(unittest.TestCase):
                     self.assertEqual(atlas[at:at + 256], tmem_rows(frame, 32, 16))
                 for part in parts:
                     at, source, width, height = (part[key] for key in ('tmem_offset', 'source_offset', 'width', 'height'))
-                    count = width * height // 2
-                    row_major = tmem_rows(atlas[at:at + count], width, height)
-                    self.assertEqual(row_major, pack4(untile(body[source:source + count], width, height, 4)))
+                    native_height = part.get('native_height', height)
+                    count = width * native_height // 2
+                    row_major = tmem_rows(atlas[at:at + count], width, native_height)
+                    expected = pack4(untile(body[source:source + width*height//2], width, height, 4))
+                    self.assertEqual(row_major, expected[:count])
 
     def test_refuse_missing_frames_and_unaccounted_or_overlapping_pieces(self):
         source = list(source_texture())

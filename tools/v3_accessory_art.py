@@ -19,6 +19,31 @@ ACCESSORIES = ('anrium1', 'bag1', 'bag2', 'biscus1', 'biscus2', 'biscus3', 'bisc
                'hasu1', 'hat1', 'hat2', 'hat3', 'rei1', 'rei2', 'zinnia1', 'zinnia2', 'cobra1')
 PROFILE_TABLE = 'profile_table$395'
 PROFILE_TABLE_SHA = '0a54d36b4eda12e5c0c22c2ede016dbcc082060c63e6a0d96c0a9e31f23e9c98'
+VERIFIED_ART_SHA = 'a721b129f98959916d0d7cd6c73c9d60d8e2db9f815fcd832f4dfe3b3cac808c'
+
+
+def load_objects(directory, rel, symbols):
+    """Reuse the source-bound, compiled batch without trusting an edited receipt."""
+    verify_sources(rel, symbols)
+    receipt = (directory/'art.json').read_bytes()
+    if sha256(receipt) != VERIFIED_ART_SHA:
+        raise ValueError('Accessory dependency manifest is not the verified conversion')
+    report, artifacts, bindings = json.loads(receipt), {}, {}
+    for row in report['objects']:
+        data = (directory/row['object_file']).read_bytes()
+        if len(data) != row['object_bytes'] or sha256(data) != row['object_sha256']:
+            raise ValueError('Accessory dependency object differs from its verified conversion')
+        file = 'accessory-'+row['object_file']
+        artifacts[file] = data
+        for consumer in row['consumers']:
+            index = consumer['donor_villager_index']
+            if index in bindings:
+                raise ValueError('Duplicate villager accessory dependency')
+            bindings[index] = {**consumer, 'key': row['key'], 'tool': row['tool'],
+                'object_file': file, 'object_bytes': len(data), 'object_sha256': sha256(data),
+                'native_model_offset': row['native_model_offset'],
+                'source_manifest_sha256': VERIFIED_ART_SHA, 'runtime_attached': False}
+    return artifacts, bindings
 
 
 def text_data_relocations(rel):

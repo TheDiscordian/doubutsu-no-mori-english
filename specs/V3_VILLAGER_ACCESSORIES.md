@@ -7,9 +7,13 @@ the supplied GAFE01-r0 islanders. Every output includes its actual model,
 palette, and textures in native N64 format. These are components awaiting
 runtime attachment, not playable villagers or browser selections.
 
-Do not remove an accessory to make a villager pass the existing body converter.
-The body converter keeps rejecting accessory-bearing rows until a complete
-accessory dependency is connected. Preserve the original N64 villagers, their
+Do not remove an accessory to make a villager pass the body converter.
+Accessory-bearing rows require the verified compiled dependency, which is
+included in the resulting body bundle with its actual attachment joint.
+`load_objects` pins the complete verified manifest and validates every object's
+size and SHA-256; an edited receipt, missing object, or corrupted object fails.
+This dependency binding does not implement runtime attachment.
+Preserve the original N64 villagers, their
 model banks, the translation-only path, and both stable V2 patchers.
 
 ## Verified bindings
@@ -88,8 +92,9 @@ when adapting attachment; a texture alone does not supply the accessory.
 N64 integration needs explicit storage/lifetime management, joint attachment,
 scale handling, renderer-state preservation, and cleanup. Do not enlarge the
 native reserved NPC model buffer by assumption or overwrite another model.
-Verify ordinary animation and appearance after connecting the complete body
-and accessory. Town schedules, dialogue, houses, moves, and saved identity are
+Nineteen villager body conversions are available, with Yodel's actual gorilla
+model still required. Verify ordinary animation and appearance after connecting
+the complete body and accessory. Town schedules, dialogue, houses, moves, and saved identity are
 separate remaining islander work. Neither web patcher changes before user
 testing and explicit approval.
 

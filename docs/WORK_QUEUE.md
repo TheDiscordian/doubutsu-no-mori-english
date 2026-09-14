@@ -271,12 +271,14 @@ with later e/e+ donor support investigated separately.
   voices, text/defaults/houses, and town behaviour before move-in eligibility.
   The [accessory batch](checkpoints/V3_ACCESSORY_ART.md) supplies all sixteen
   complete accessory models with actual consumer/joint bindings; fifteen
-  focused checks pass. Continue the remaining species body conversions, bind
-  these dependencies, and implement joint attachment/storage/cleanup. Do not
+  focused checks pass. The [body bundle](checkpoints/V3_ISLANDER_BODIES.md)
+  converts nineteen villagers with all fifteen required accessory objects,
+  complete expressions, verified edge extensions, and matching native topology.
+  Nineteen focused checks pass. Implement joint attachment/storage/cleanup. Do not
   remove accessories to force the existing body converter to accept them.
   Yodel's gorilla geometry differs beyond positions and needs its actual model
-  conversion. Several additional species have null mouth frames or larger
-  donor body arrays; derive their layouts instead of assuming the cat format.
+  conversion. The other species' mouthless, reordered-expression, larger-body,
+  and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
   The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked

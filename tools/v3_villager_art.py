@@ -51,10 +51,110 @@ LAYOUTS = {
                   (0x280, 0x380, 16, 16), (0x300, 0x400, 16, 16),
                   (0x380, 0x480, 16, 16)),
     },
+    'duk': {
+        'template_index': 70, 'skeleton': 'cKF_bs_r_duk_1', 'mouth_first': True,
+        'eye': 0x380, 'mouth': 0x240, 'cloth': 0x500,
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 32, 32), (0x240, 0x340, 16, 8),
+                  (0x280, 0x480, 16, 16), (0x300, 0x700, 32, 8), (0x380, 0x780, 16, 16)),
+    },
+    'rbt': {
+        'template_index': 161, 'skeleton': 'cKF_bs_r_rbt_1',
+        'eye': 0x280, 'mouth': 0x380, 'cloth': 0x580,
+        'parts': ((0, 0, 16, 16), (0x80, 0x80, 32, 32), (0x280, 0x480, 16, 16),
+                  (0x300, 0x500, 16, 16), (0x380, 0x780, 16, 16)),
+    },
+    'squ': {
+        'template_index': 174, 'skeleton': 'cKF_bs_r_squ_1',
+        'eye': 0x240, 'mouth': 0x340, 'cloth': 0x500,
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 32, 32), (0x240, 0x440, 16, 8),
+                  (0x280, 0x480, 16, 16), (0x300, 0x700, 16, 32)),
+    },
+    'flg': {
+        'template_index': 79, 'skeleton': 'cKF_bs_r_flg_1',
+        'eye': 0, 'mouth': 0x100, 'cloth': 0x580,
+        'parts': ((0, 0x200, 32, 8), (0x80, 0x280, 32, 40),
+                  (0x300, 0x500, 16, 16), (0x380, 0x780, 16, 16)),
+    },
+    'lon': {
+        'template_index': 122, 'skeleton': 'cKF_bs_r_lon_1', 'mouth_first': True,
+        'eye': 0x400, 'mouth': 0x300, 'cloth': 0x5C0, 'body_bytes': 1216,
+        'edge_rows': {0x300: (4, 'mirror'), 0x380: (4, 'mirror'), 0x440: (4, 'clamp')},
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 16, 8), (0x80, 0x80, 32, 40),
+                  (0x300, 0x500, 32, 8), (0x380, 0x540, 32, 8),
+                  (0x400, 0x580, 16, 8), (0x440, 0x7C0, 32, 8)),
+    },
+    'pgn': {
+        'template_index': 144, 'skeleton': 'cKF_bs_r_pgn_1', 'mouth_frames': 0,
+        'eye': 0x180, 'mouth': 0, 'cloth': 0x480, 'body_bytes': 1408,
+        'edge_rows': {0x180: (4, 'mirror'), 0x200: (4, 'clamp')},
+        'parts': ((0, 0, 32, 8), (0x80, 0x80, 32, 16), (0x180, 0x280, 32, 8),
+                  (0x200, 0x2C0, 32, 8), (0x280, 0x300, 32, 16), (0x380, 0x400, 16, 16),
+                  (0x400, 0x680, 32, 8), (0x480, 0x700, 16, 16), (0x500, 0x780, 32, 8)),
+    },
+    'elp': {
+        'template_index': 76, 'skeleton': 'cKF_bs_r_elp_1',
+        'eye': 0x180, 'mouth': 0x580, 'cloth': 0x280,
+        'parts': ((0, 0, 16, 32), (0x100, 0x100, 16, 16), (0x180, 0x480, 16, 32),
+                  (0x280, 0x680, 16, 16), (0x300, 0x700, 16, 16), (0x380, 0x780, 16, 16)),
+    },
+    'brd': {
+        'template_index': 27, 'skeleton': 'cKF_bs_r_brd_1', 'mouth_frames': 0,
+        'eye': 0x40, 'mouth': 0, 'cloth': 0x480, 'body_bytes': 1280,
+        'parts': ((0, 0, 16, 8), (0x40, 0x140, 32, 32), (0x240, 0x340, 32, 16),
+                  (0x340, 0x440, 16, 8), (0x380, 0x680, 16, 24),
+                  (0x440, 0x740, 16, 8), (0x480, 0x780, 32, 8)),
+    },
+    'mus': {
+        'template_index': 125, 'skeleton': 'cKF_bs_r_mus_1',
+        'eye': 0x300, 'mouth': 0x400, 'cloth': 0x5C0,
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 16, 8), (0x80, 0x80, 16, 16),
+                  (0x100, 0x100, 32, 32), (0x300, 0x500, 16, 16),
+                  (0x380, 0x580, 16, 8), (0x3C0, 0x7C0, 16, 8)),
+    },
+    'hrs': {
+        'template_index': 104, 'skeleton': 'cKF_bs_r_hrs_1', 'mouth_frames': 0,
+        'eye': 0x140, 'mouth': 0, 'cloth': 0x5C0, 'body_bytes': 1408,
+        'edge_rows': {0x1C0: (4, 'mirror'), 0x240: (28, 'clamp')},
+        'parts': ((0, 0, 16, 16), (0x80, 0x80, 16, 24), (0x140, 0x240, 32, 8),
+                  (0x1C0, 0x2C0, 32, 8), (0x240, 0x300, 32, 32),
+                  (0x440, 0x4C0, 16, 8), (0x480, 0x500, 16, 16),
+                  (0x500, 0x580, 16, 8), (0x540, 0x7C0, 16, 8)),
+    },
+    'chn': {
+        'template_index': 39, 'skeleton': 'cKF_bs_r_chn_1', 'mouth_frames': 0,
+        'eye': 0x80, 'mouth': 0, 'cloth': 0x4C0, 'body_bytes': 1216,
+        'zero_padding': ((0x7C0, 64),),
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 16, 8), (0x80, 0x180, 32, 32),
+                  (0x280, 0x380, 32, 16), (0x380, 0x480, 16, 8),
+                  (0x3C0, 0x6C0, 16, 24), (0x480, 0x780, 16, 8)),
+    },
+    'kal': {
+        'template_index': 117, 'skeleton': 'cKF_bs_r_kal_1',
+        'eye': 0, 'mouth': 0x100, 'cloth': 0x600, 'body_bytes': 1152,
+        'edge_rows': {0: (4, 'mirror'), 0x80: (36, 'clamp')},
+        'parts': ((0, 0x200, 32, 8), (0x80, 0x240, 32, 40),
+                  (0x300, 0x480, 32, 16), (0x400, 0x580, 16, 16)),
+    },
+    'tig': {
+        'template_index': 182, 'skeleton': 'cKF_bs_r_tig_1', 'mouth_frames': 0,
+        'eye': 0x40, 'mouth': 0, 'cloth': 0x580, 'body_bytes': 1408,
+        'edge_rows': {0x140: (4, 'mirror'), 0x1C0: (36, 'clamp')},
+        'parts': ((0, 0, 16, 8), (0x40, 0x140, 32, 16), (0x140, 0x240, 32, 8),
+                  (0x1C0, 0x280, 32, 40), (0x440, 0x4C0, 16, 8),
+                  (0x480, 0x500, 16, 16), (0x500, 0x780, 16, 16)),
+    },
 }
 PILOTS = {'punchy': (235, 'cat', 'cat_15'), 'cheri': (232, 'cbr', 'cbr_11')}
 ARTWORK_VILLAGERS = {**PILOTS, 'pigleg': (233, 'pig', 'pig_11'),
-                    'dobie': (224, 'wol', 'wol_6')}
+                    'dobie': (224, 'wol', 'wol_6'),
+    'maelle': (216, 'duk', 'duk_11'), 'ohare': (217, 'rbt', 'rbt_11'),
+    'bliss': (218, 'squ', 'squ_11'), 'drift': (219, 'flg', 'flg_13'),
+    'bud': (220, 'lon', 'lon_4'), 'boomer': (221, 'pgn', 'pgn_8'),
+    'elina': (222, 'elp', 'elp_7'), 'flash': (223, 'brd', 'brd_11'),
+    'flossie': (225, 'mus', 'mus_10'), 'annalise': (226, 'hrs', 'hrs_8'),
+    'plucky': (227, 'chn', 'chn_9'), 'faith': (228, 'kal', 'kal_6'),
+    'rowan': (230, 'tig', 'tig_4'), 'june': (231, 'cbr', 'cbr_10'),
+    'ankha': (234, 'cat', 'cat_14')}
 
 
 def texture_body_offset(layout):
@@ -134,6 +234,24 @@ def tmem_rows(data, width, height):
                  for y in range(height) for x in range(stride))
 
 
+def native_body_piece(body, source, width, height, layout):
+    """Remove only fully verified donor edge extensions, never unique pixels."""
+    piece = pack4(untile(body[source:source+width*height//2], width, height, 4))
+    native_height, mode = layout.get('edge_rows', {}).get(source, (height, None))
+    if mode is not None:
+        if (mode not in ('mirror', 'clamp') or not 0 < native_height < height
+                or native_height % 4 or height-native_height > native_height):
+            raise ValueError('Unsupported donor edge extension')
+        stride = width//2
+        extension = b''.join(piece[y*stride:(y+1)*stride] for y in (
+            native_height-1-(i if mode == 'mirror' else 0)
+            for i in range(height-native_height)))
+        if piece[native_height*stride:] != extension:
+            raise ValueError('Donor edge extension contains unique pixels')
+        piece = piece[:native_height*stride]
+    return tmem_rows(piece, width, native_height), native_height
+
+
 def convert_texture(palette, eyes, mouths, body, layout):
     """Store all expressions separately and initialise the native body atlas."""
     mouth_frames = layout.get('mouth_frames', 6)
@@ -157,10 +275,14 @@ def convert_texture(palette, eyes, mouths, body, layout):
         count = width * height // 2
         if source < 0 or source + count > len(body) or any(source_used[source:source + count]):
             raise ValueError('Overlapping or out-of-bounds donor texture piece')
-        piece = pack4(untile(body[source:source + count], width, height, 4))
-        install(target, tmem_rows(piece, width, height))
+        piece, native_height = native_body_piece(body, source, width, height, layout)
+        install(target, piece)
         source_used[source:source + count] = b'\x01' * count
         parts.append({'source_offset': source, 'tmem_offset': target, 'width': width, 'height': height})
+        if native_height != height:
+            parts[-1].update(native_height=native_height,
+                verified_edge_mode=layout['edge_rows'][source][1],
+                verified_edge_bytes=width*(height-native_height)//2)
     install(layout['eye'], tmem_rows(converted_eyes[0], 32, 16))
     if converted_mouths:
         install(layout['mouth'], tmem_rows(converted_mouths[0], 32, 16))
@@ -179,7 +301,7 @@ def convert_texture(palette, eyes, mouths, body, layout):
     return texture, parts
 
 
-def bind_donor(rel, symbols, pointers, index, species, prefix):
+def bind_donor(rel, symbols, pointers, index, species, prefix, *, accessory=None):
     layout = LAYOUTS[species]
     if symbol_span(symbols, 'npc_draw_data_tbl') != (DRAW_BASE, DRAW_SIZE):
         raise ValueError('Changed donor draw table')
@@ -201,7 +323,12 @@ def bind_donor(rel, symbols, pointers, index, species, prefix):
             raise ValueError(f'Donor identity does not bind {name}')
     if struct.unpack_from('>3I', row, 0x48) != (layout['eye'] // 8, layout['mouth'] // 8, layout['cloth'] // 8):
         raise ValueError('Donor TMEM placement differs from the native species layout')
-    if struct.unpack_from('>2h', row, 0x68) != (-1, -1):
+    attachment = struct.unpack_from('>2h', row, 0x68)
+    if accessory is not None:
+        if (attachment != (accessory['tool'], accessory['joint'])
+                or accessory['donor_villager_index'] != index):
+            raise ValueError('Converted accessory does not bind this villager and joint')
+    elif attachment != (-1, -1):
         raise ValueError('Villager accessory needs a separate geometry import')
     texture, parts = convert_texture(
         symbol_data(rel, symbols, prefix + '_pal'),
@@ -329,7 +456,7 @@ def import_species_positions(rom, rel, symbols, species, metadata):
         'native_model_sha256': sha256(model), 'converted_model_sha256': sha256(result)}
 
 
-def build_art(rom, rel, symbols, *, villagers=None):
+def build_art(rom, rel, symbols, *, villagers=None, accessory_directory=None):
     rom = verified_rom(rom)
     if sha256(rel) != REL_SHA or sha256(symbols) != SYMBOLS_SHA:
         raise ValueError('Changed verified donor artwork source')
@@ -349,6 +476,10 @@ def build_art(rom, rel, symbols, *, villagers=None):
     if (not selected or len(set(selected)) != len(selected)
             or any(name not in ARTWORK_VILLAGERS for name in selected)):
         raise ValueError('Select distinct supported villager artwork identities')
+    accessory_artifacts, accessories = {}, {}
+    if accessory_directory is not None:
+        from v3_accessory_art import load_objects
+        accessory_artifacts, accessories = load_objects(Path(accessory_directory), rel, symbols.encode())
     for species, index, prefix in (('pig', 151, 'pig_1'), ('wol', 185, 'wol_1')):
         if not any(ARTWORK_VILLAGERS[name][1] == species for name in selected):
             continue
@@ -365,7 +496,9 @@ def build_art(rom, rel, symbols, *, villagers=None):
     for name, (index, species, prefix) in ARTWORK_VILLAGERS.items():
         if name not in selected:
             continue
-        texture, row, parts = bind_donor(rel, symbols, pointers, index, species, prefix)
+        accessory = accessories.get(index)
+        texture, row, parts = bind_donor(rel, symbols, pointers, index, species, prefix,
+                                         accessory=accessory)
         native_row, _, metadata = native_species(rom, species)
         # Confirm the shared species' scale, talk type, and collision dimensions.
         # GC's expanded voice ID and accessory fields are deliberately not cast
@@ -382,10 +515,15 @@ def build_art(rom, rel, symbols, *, villagers=None):
                             target_model_bank=None)
         metadata['shared_rig'] = verify_shared_rig(rom, rel, symbols, species, native_row, metadata,
                                                    model=converted_model)
+        if accessory is not None:
+            from v3_villager_mesh import verify_body_mesh
+            metadata['shared_mesh'] = verify_body_mesh(rom, rel, symbols, species, native_row, metadata)
+            metadata['accessory'] = accessory
+            artifacts[accessory['object_file']] = accessory_artifacts[accessory['object_file']]
         file = f'{name}.n64tex.bin'
         artifacts[file] = texture
         report['villagers'].append({
-            'id': f'{DONOR}/villager/{index:04X}', 'name': name.capitalize(),
+            'id': f'{DONOR}/villager/{index:04X}', 'name': "O'Hare" if name == 'ohare' else name.capitalize(),
             'donor_texture_prefix': prefix, 'donor_draw_record_sha256': sha256(row),
             'donor_voice_id': struct.unpack_from('>H', row, 0x62)[0],
             'native_texture_bytes': len(texture), 'texture_file': file,
@@ -405,14 +543,21 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--accessories', type=Path,
+                        help='Verified v3_accessory_art output; required for accessory-bearing bodies')
+    parser.add_argument('--all-supported', action='store_true',
+                        help='Convert all implemented body components; Yodel remains unsupported')
     parser.add_argument('--villager', action='append', choices=tuple(ARTWORK_VILLAGERS),
                         help='Convert selected artwork components; default: existing two pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh artwork output directory')
+    if args.all_supported and args.villager:
+        parser.error('Use --all-supported or individual --villager selections')
     donor = read_donor(args.disc)
     artifacts, report = build_art(args.n64.read_bytes(), donor['rel'], args.symbols.read_bytes(),
-                                  villagers=args.villager)
+        villagers=tuple(ARTWORK_VILLAGERS) if args.all_supported else args.villager,
+        accessory_directory=args.accessories)
     args.output.mkdir(parents=True)
     for file, data in artifacts.items():
         (args.output / file).write_bytes(data)

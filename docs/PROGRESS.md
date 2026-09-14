@@ -362,15 +362,24 @@ Pigleg's complete pig textures and separate donor-coordinate model, plus Dobie's
 complete mouthless wolf textures with a matching native rig. Thirteen focused
 tests pass, retaining exact Punchy/Cheri outputs and all original game assets.
 These components are not installed or selectable. Fixed model-bank assignment,
-islander town behaviour, dependencies, and the other sixteen islanders remain
+islander town behaviour and runtime dependencies remain
 work; the current ABI-50 ROM and both V2 patchers are unchanged.
 
 The [accessory batch](checkpoints/V3_ACCESSORY_ART.md) converts all sixteen
 islander accessories into complete native objects: actual hats, flowers, bags,
 leis, and cobra, with their verified consumer/joint bindings. Fifteen focused
 checks pass, including every source pixel, vertex, and compiled triangle plus
-retained furniture/speed-bag behaviour. Runtime attachment and remaining body
-conversion are pending; no accessory or islander is enabled by this asset batch.
+retained furniture/speed-bag behaviour. Runtime attachment is pending; no
+accessory or islander is enabled by this asset batch.
+
+The [complete body-component bundle](checkpoints/V3_ISLANDER_BODIES.md) converts
+nineteen of the twenty donor-only villagers, with all fifteen required accessory
+objects included. Thirteen additional species layouts preserve complete facial
+frames and source pixels, including verified mirrored/clamped edge extensions.
+Shared meshes retain every ordered face, vertex binding, and joint matrix.
+Nineteen focused checks pass. Yodel requires a genuine gorilla-model conversion. Stable bank assignment,
+attachment, town behaviour/defaults/houses, and persistence remain required;
+the current cartridge and both V2 patchers are unchanged.
 
 ## Stable V2 deliverable
 
