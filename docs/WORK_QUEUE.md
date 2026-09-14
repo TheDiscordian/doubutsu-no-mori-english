@@ -32,6 +32,12 @@ with later e/e+ donor support investigated separately.
   do not substitute the different native shirt with the same item number.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
+  The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both
+  haz-mat barrel and oil drum models/textures for Cheri's house and passes seven
+  focused checks. Next: native furniture profile/bank lifecycle, stable item IDs,
+  shared readers, and ordinary placement/persistence. The checkpoint records
+  the native table/loader entry points; no asset is enabled as an item yet.
+  Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

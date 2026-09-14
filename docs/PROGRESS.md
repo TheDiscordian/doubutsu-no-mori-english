@@ -35,7 +35,11 @@ personality lookups, native/test fallbacks, and actual clothing DMA pass native
 checks; six focused tests also pass. Punchy's cherry shirt has no exact native
 artwork match and needs a proper clothing import before his initialization is
 enabled. Houses, selection, remaining ID-bounded readers, and gameplay/save/profile paths are next;
-item identity/conversion work is pending. No V3 villager is playable or
+the [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts Cheri's
+haz-mat barrel and oil drum house dependencies into complete native objects.
+Seven focused checks pass, including every texel, vertex, and triangle in the
+actual donor conversion and compiled N64 lists. Furniture loader/ID/lifecycle
+integration and Punchy's animated speed bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
 V3 development continues on GitHub. The web patcher stays V2 until the user

@@ -148,6 +148,12 @@ price, appear through an ordinary acquisition route, place/pick up correctly,
 and survive saving/loading. Extend catalogue flags, shops/rewards, inventory,
 mail attachments, room scoring, and special readers where the item requires it.
 
+The [static furniture converter](V3_FURNITURE_ART.md) produces complete native
+haz-mat barrel and oil drum assets for Cheri's house, with verified donor profile
+bindings and seven passing focused tests. Furniture loading, item IDs, and the
+ordinary item lifecycle remain required; these assets are not playable imports.
+Punchy's speed bag needs its actual animation/interaction adapter.
+
 Then batch imports by shared conversion and behaviour needs. Interactive
 furniture, music, tools, living creatures, and other mechanics need their actual
 behaviour, not a generic decorative placeholder labelled as complete. Missing
