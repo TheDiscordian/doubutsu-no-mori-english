@@ -5,7 +5,8 @@
 The [clothing specification](../../specs/V3_CLOTHING.md) describes the additive
 cherry-shirt resource and shared reader. The new item reservation is `34BF`,
 render index `10BF`, VROM `03F0F000`. The [NPC adapter](V3_NPC_CLOTHING.md)
-connects the separate clothing loaders. Player wearing/items, acquisition,
+connects the separate clothing loaders; the [player adapter](V3_PLAYER_CLOTHING.md)
+connects startup/change-clothes resources. Ordinary items, acquisition,
 mannequins, and a reviewed clothing save registry remain work.
 Punchy's defaults and import eligibility remain disabled.
 

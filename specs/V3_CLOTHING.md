@@ -4,9 +4,10 @@
 
 `--clothing` includes the current villager/furniture foundation and installs
 Punchy's actual GameCube cherry-shirt artwork, name/price metadata, and the
-shared indexed texture/palette reader and both NPC clothing paths. It does not
+shared indexed texture/palette reader, both NPC clothing paths, and player
+startup/change-clothes readers. It does not
 enable the garment as an inventory item or enable Punchy's initial outfit.
-Wearing, menus, acquisition, mannequins, and profile/persistence integration
+Item menus, acquisition, mannequins, and profile/persistence integration
 remain required before the garment is selectable.
 
 All 256 original native clothing textures and palettes remain intact. Donor
@@ -38,7 +39,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 29 identifies this variant.
+The loaded prefix remains 48 KiB. Configuration ABI 30 identifies this variant.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
 ## Shared indexed reader
@@ -73,12 +74,33 @@ reader and adding 40 bytes to foreground calls. The checked index uses 24 bytes.
 Focused checks pass. Native evidence confirms the first owner's complete
 foreground loop with original, imported, and invalid clothing. Queued completion
 and the second owner's execution remain unverified; the bounded test checkpoint
-records the allocation/timing setup limits. Player startup/change-clothes paths
-still calculate their own source addresses and remain pending.
+records the allocation/timing setup limits.
+
+## Player startup and clothing changes
+
+The complete native functions at `800B1960..800B19C3`,
+`800B19C4..800B1A27`, and `800B1BE8..800B1C83` are hash-checked and redirected
+at their entries. Startup registers the same texture/palette banks 14/15 through
+native `800B1838`, retaining both buffer indices, their native offset convention,
+and 512/32-byte sizes. It reads the existing private clothing index at `A76`.
+Missing artwork uses native index zero without modifying the saved clothing;
+profile compatibility remains the save guard's responsibility.
+
+Clothes changes retain native buffer toggling and texture lookup. An unknown
+resource returns without toggling or writing. An unavailable inactive bank
+restores the preceding active index. Valid changes load the texture and adjacent
+palette through the installed shared reader. No bank, buffer, or saved field
+grows. Startup/change helpers use 40-byte frames.
+
+Three focused tests and the initial 47-step native run pass. Native evidence
+includes complete original/imported startup artwork, all four registered bank
+records, both buffer changes, unchanged inactive contents, unknown/missing
+handling, private-field retention, restored globals, and guards. This is resource
+integration, not an ordinary inventory-driven clothing change or save/reload.
 
 ## Remaining item and save integration
 
-Connect full clothing identities to player startup/change-clothes, full names, item classification,
+Connect full clothing identities to full names, item classification,
 menus/icons, normal acquisition, price/buy/sell paths, display mannequins,
 mail/gifts, and ordinary saving/loading. Keep original garments and behaviour.
 

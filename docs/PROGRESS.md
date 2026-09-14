@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-npc-clothing-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`2406a6dee1bc07bf3edeceb8125bbded2e12c30fc508e0018aaac81fa1042372`.
+`build/v3-player-clothing-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`6f376337d1f104fd9893d6d38a8cabcf879601592c9af19b76bee2f8b73a3ae2`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -175,8 +175,12 @@ foreground/queued resource readers and full shirt-ID checks. Four focused tests
 pass, and native execution confirms the first complete foreground loop with
 original, imported, and invalid clothing. Queued completion and the second
 owner remain unverified after the bounded allocation/timing setup attempts.
-Player wearing/item and clothing save-registry consumers remain work;
-Punchy's defaults stay disabled.
+The [player clothing adapter](checkpoints/V3_PLAYER_CLOTHING.md) connects both
+startup readers and clothes changes while retaining native double buffering.
+Three focused tests and the initial 47-step native run pass: complete original/
+imported artwork, four registered banks, both buffer changes, unknown/missing
+handling, restored globals, and guards. Ordinary item consumers and the clothing
+save registry remain work; Punchy's defaults stay disabled.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

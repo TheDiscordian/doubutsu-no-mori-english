@@ -192,6 +192,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_villager_rewards
     import v3_clothing
     import v3_npc_clothing
+    import v3_player_clothing
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -265,7 +266,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_villager_readers.SOURCES if villager_readers else ())
                     + (v3_villager_selection.SOURCES if villager_selection else ())
                     + (v3_villager_rewards.SOURCES if villager_rewards else ())
-                    + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES if clothing else ()))
+                    + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES + v3_player_clothing.SOURCES
+                       if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -318,7 +320,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if npc_draw:
         abi = max(abi, v3_npc_draw.STREAMING_ABI)
     if clothing:
-        abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI)
+        abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -344,7 +346,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if audio_donor is not None:
         extra_sources += ('overlays/v3/melody.c',)
     if clothing:
-        extra_sources += ('overlays/v3/clothing.c', 'overlays/v3/npc_clothing.c')
+        extra_sources += ('overlays/v3/clothing.c', 'overlays/v3/npc_clothing.c', 'overlays/v3/player_clothing.c')
     helper, helper_report = compile_part('asset', out / 'asset', extra_sources=extra_sources)
     if len(startup) > CONFIG - STARTUP or len(helper) > TABLE_OFFSET - 0x100:
         raise ValueError('V3 code exceeds its owned reservation')
@@ -624,6 +626,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             native, draw_changes, helper_report['symbols'])
         clothing_report['owners'] = clothing_owners
         clothing_report['npc_streaming_clothes_installed'] = True
+        clothing_report['player_readers'] = v3_player_clothing.install(code, helper_report['symbols'])
         for owner in draw_report['owners']:
             owner['before_clothing_sha256'] = owner['patched_sha256']
             owner['patched_sha256'] = sha256(draw_changes[int(owner['vrom'], 16)])
@@ -665,7 +668,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 NPC clothing integration 01' if clothing else
+    label = ('V3 player clothing integration 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else

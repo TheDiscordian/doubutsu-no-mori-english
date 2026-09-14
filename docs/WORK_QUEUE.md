@@ -64,9 +64,12 @@ with later e/e+ donor support investigated separately.
   [NPC clothing adapter](checkpoints/V3_NPC_CLOTHING.md) connects both owners'
   full shirt-ID checks and foreground/queued loaders. Four focused checks and
   the first native foreground loop pass; queued completion and the second
-  owner remain unverified after bounded setup attempts. Next connect player
-  wearing/item consumers and the clothing save registry before enabling
-  Punchy's outfit; retain the missing native evidence for combined gameplay.
+  owner remain unverified after bounded setup attempts. The
+  [player clothing adapter](checkpoints/V3_PLAYER_CLOTHING.md) connects startup
+  and clothes-changing resources. Three focused tests and the initial 47-step
+  native double-buffer/registration/guard run pass. Next connect ordinary item
+  consumers and the clothing save registry before enabling Punchy's outfit;
+  retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both
