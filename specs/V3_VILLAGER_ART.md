@@ -124,7 +124,10 @@ This coordinate adaptation does not globally resize existing N64 pigs. Its
 model-bank assignment, actual runtime drawing, and appearance verification are
 pending; texture conversion alone must not silently reuse the larger native
 head. Accessory-bearing villagers still fail conversion until their additional
-geometry has an explicit implementation.
+geometry has an explicit implementation. The separate
+[accessory converter](V3_VILLAGER_ACCESSORIES.md) supplies all sixteen actual
+accessory models, textures, and palettes. Body/attachment integration must bind
+those converted dependencies before accepting their villager rows.
 
 ## Native integration still required
 

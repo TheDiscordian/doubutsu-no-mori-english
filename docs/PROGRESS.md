@@ -365,6 +365,13 @@ These components are not installed or selectable. Fixed model-bank assignment,
 islander town behaviour, dependencies, and the other sixteen islanders remain
 work; the current ABI-50 ROM and both V2 patchers are unchanged.
 
+The [accessory batch](checkpoints/V3_ACCESSORY_ART.md) converts all sixteen
+islander accessories into complete native objects: actual hats, flowers, bags,
+leis, and cobra, with their verified consumer/joint bindings. Fifteen focused
+checks pass, including every source pixel, vertex, and compiled triangle plus
+retained furniture/speed-bag behaviour. Runtime attachment and remaining body
+conversion are pending; no accessory or islander is enabled by this asset batch.
+
 ## Stable V2 deliverable
 
 The current cartridge is **V2-11** at

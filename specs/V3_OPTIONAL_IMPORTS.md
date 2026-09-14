@@ -158,6 +158,11 @@ adaptation. This is not an implicit commitment to port the GBA island subsystem;
 if an import needs a materially different player-facing behaviour, identify the
 choice before claiming faithful support.
 
+The [islander accessory converter](V3_VILLAGER_ACCESSORIES.md) supplies all
+sixteen separate donor accessories with actual consumer/joint bindings and
+complete native graphics conversion. Runtime attachment and the remaining
+species bodies are required; do not omit accessories to enable their imports.
+
 ### Items
 
 Establish canonical identity using native/donor item definitions, object/profile

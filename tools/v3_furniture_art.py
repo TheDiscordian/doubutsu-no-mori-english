@@ -53,9 +53,10 @@ def scalar_profile(pilot):
     return struct.pack('>ff6BH', 18.0, 0.01, 4, 0, 0, pilot.lighting_map, 0, 0, 0)
 
 
-def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False):
+def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
+                accessory=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
-    if not raw or len(raw) % 8:
+    if not raw or len(raw) % 8 or speed_bag and accessory:
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -87,7 +88,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # Consume the paired Dolphin tile command. These two models clamp
             # every material in both directions, with no coordinate shifts.
             tile = raw[at + 8:at + 16]
-            if speed_bag and tile == struct.pack('>II', 0xD2F0F522, 0) and shape[:2] == (16, 16):
+            if accessory and tile in (struct.pack('>II', word, 0)
+                                      for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F900)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif speed_bag and tile == struct.pack('>II', 0xD2F0F522, 0) and shape[:2] == (16, 16):
                 row['repeat_shift'] = 2
             elif at + 16 > len(raw) or tile != struct.pack('>II', 0xD2F0F000, 0):
                 raise ValueError('Unsupported furniture wrap mode')
@@ -117,11 +122,17 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if (a, b) not in ((0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)):
                 raise ValueError('Unsupported furniture colour combiner')
         elif op == 0xE2:
-            if a != 0xE200001C or b not in (0xC8113078, 0xC8104DD8):
+            modes = (0xC8112078, 0xC8113078) if accessory else (0xC8113078, 0xC8104DD8)
+            if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
-            if a not in (0xFA000080, 0xFA0000FF) or b != 0xFFFFFFFF:
+            colours = (0xFFFFFFFF, 0xB2B2B2FF) if accessory else (0xFFFFFFFF,)
+            if a not in (0xFA000080, 0xFA0000FF) or b not in colours:
                 raise ValueError('Unsupported furniture primitive colour')
+        elif op == 0xF2:
+            if (not accessory or material is None or a != 0xF2000000
+                    or b not in (0x0007C07C, 0x000FC07C)):
+                raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
             modes = (0x230405, 0x230005, 0x270405) if speed_bag else (0x230405, 0x230005)
             if a != 0xD9000000 or b not in modes:
@@ -241,13 +252,18 @@ def command_source(models, offsets):
                 if w * h // 2 > 2048:
                     raise ValueError('Furniture texture exceeds CI4 TMEM capacity')
                 emit('gsDPPipeSync()')
-                wrap, shift = 'G_TX_CLAMP', 0
+                wrap_s, wrap_t, shift = 'G_TX_CLAMP', 'G_TX_CLAMP', 0
+                if 'wrap_modes' in row:
+                    modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
+                    if tuple(row['wrap_modes']) not in ((0, 0), (2, 0), (2, 1)):
+                        raise ValueError('Unsupported accessory tile wrapping')
+                    wrap_s, wrap_t = (modes[value] for value in row['wrap_modes'])
                 if 'repeat_shift' in row:
                     if row['repeat_shift'] != 2 or (w, h) != (16, 16):
                         raise ValueError('Unsupported furniture environment-map tile')
-                    wrap, shift = 'G_TX_WRAP', 2
+                    wrap_s, wrap_t, shift = 'G_TX_WRAP', 'G_TX_WRAP', 2
                 emit(f"gsDPLoadTextureBlock_4b(0x{SEGMENT + offsets[row['target']]:08X}, "
-                     f'G_IM_FMT_CI, {w}, {h}, 15, {wrap}, {wrap}, '
+                     f'G_IM_FMT_CI, {w}, {h}, 15, {wrap_s}, {wrap_t}, '
                      f'{w.bit_length() - 1}, {h.bit_length() - 1}, {shift}, {shift})', 7)
             elif op == 0x01:
                 # The donor pointer can address the middle of the vertex array.
@@ -262,7 +278,7 @@ def command_source(models, offsets):
                         emit('gsSP2Triangles(' + ', '.join(map(str, args)) + ')')
                     else:
                         emit('gsSP1Triangle(' + ', '.join(map(str, (*triangles[i], 0))) + ')')
-            elif op in (0xFC, 0xE2, 0xFA, 0xD9, 0xDF):
+            elif op in (0xFC, 0xE2, 0xFA, 0xD9, 0xDF, 0xF2):
                 # Only the explicitly decoded compatible F3DEX2 state/end
                 # commands reach here; Dolphin loads and packed triangles do not.
                 a, b = row['words']
