@@ -78,6 +78,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200),
                        'save_codec': ('af_v3_save_check', BLOB_RAM + 0xB400),
                        'save_clothing': ('af_v3_save_check_extended', BLOB_RAM + 0xD000),
+                       'clothing_menu': ('af_v3_room_value_clothing', BLOB_RAM + 0x3C30),
                        'save_runtime': ('af_v3_save_reset', BLOB_RAM + 0x9200),
                        'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0),
                        'catalogue': ('af_v3_catalogue_bit', 0x808B32B0),
@@ -196,6 +197,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_player_clothing
     import v3_save_clothing
     import v3_clothing_items
+    import v3_clothing_menu
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -270,7 +272,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_villager_selection.SOURCES if villager_selection else ())
                     + (v3_villager_rewards.SOURCES if villager_rewards else ())
                     + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES + v3_player_clothing.SOURCES
-                       + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES
+                       + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -325,7 +327,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_npc_draw.STREAMING_ABI)
     if clothing:
         abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI,
-                  v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI)
+                  v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI, v3_clothing_menu.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -645,6 +647,26 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_report['save_extension'] = extended_report
         clothing_report['item_readers'] = v3_clothing_items.install(
             blob, extended_compiled, item_code_report, helper_report)
+        # The name-reader pass also edits tag. Compose on that final owner,
+        # otherwise its later merge would silently discard clothing hooks.
+        clothing_tag = reader_changes[v3_furniture_menu.VROM]
+        clothing_tag_owner = next(row for row in reader_report['owners']
+                                  if row['vrom'] == f'{v3_furniture_menu.VROM:08X}')
+        clothing_reloc = files[v3_furniture_menu.RELOC].extract(base)
+        clothing_sites = v3_clothing_menu.inspect(clothing_tag, clothing_reloc, clothing_tag_owner)
+        clothing_entries = out/'clothing-menu-hooks.S'
+        write_new(clothing_entries, v3_clothing_menu.assembly(clothing_sites).encode())
+        clothing_menu_code, clothing_menu_compiled = compile_part('clothing_menu', out/'clothing_menu',
+            defines=('AF_V3_CLOTHING_PROFILE', 'af_v3_room_value=af_v3_room_value_clothing'),
+            primary_source='overlays/v3/room.c', extra_sources=(str(clothing_entries.relative_to(ROOT)),))
+        reader_changes[v3_furniture_menu.VROM], clothing_report['menu'] = v3_clothing_menu.install(
+            blob, clothing_menu_code, clothing_menu_compiled, clothing_tag, clothing_reloc,
+            clothing_tag_owner, room_code_report, item_code_report, reward_compiled)
+        clothing_tag_owner['before_clothing_sha256'] = clothing_tag_owner['output_sha256']
+        clothing_tag_owner['output_sha256'] = sha256(reader_changes[v3_furniture_menu.VROM])
+        menu_report['before_villager_readers_sha256'] = menu_report['output_sha256']
+        menu_report['before_clothing_sha256'] = sha256(clothing_tag)
+        menu_report['output_sha256'] = clothing_tag_owner['output_sha256']
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,
@@ -695,7 +717,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 clothing collection 01' if clothing else
+    label = ('V3 clothing menu routing 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else

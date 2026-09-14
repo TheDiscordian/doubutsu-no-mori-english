@@ -7,7 +7,7 @@ Punchy's actual GameCube cherry-shirt artwork, name/price metadata, and the
 shared indexed texture/palette reader, both NPC clothing paths, and player
 startup/change-clothes readers, and selected shared item metadata. It does not
 enable the garment as an inventory item or enable Punchy's initial outfit.
-Item menus, acquisition, mannequins, and ordinary gameplay/persistence integration
+Ordinary clothing actions, acquisition routes, mannequins, and gameplay/persistence integration
 remain required before the garment is selectable.
 
 All 256 original native clothing textures and palettes remain intact. Donor
@@ -39,7 +39,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 33 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 34 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -103,7 +103,9 @@ integration, not an ordinary inventory-driven clothing change or save/reload.
 
 The [shared item readers](V3_CLOTHING_ITEMS.md) connect the complete English
 name, clothing category, and donor price, while preserving the native
-non-furniture footprint result. Connect menus/icons, normal acquisition,
+non-furniture footprint result. The [menu routing](V3_CLOTHING_MENU.md) connects
+selected clothing classification and additional hand/cursor decisions without
+changing item identities. Connect ordinary clothing actions and acquisition,
 buy/sell paths, display mannequins, mail/gifts, and ordinary saving/loading.
 Keep original garments and behaviour.
 

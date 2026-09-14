@@ -13,12 +13,14 @@ from v3_furniture_room_smoke import extend
 from v3_npc_draw_smoke import boot_proofs
 
 
-def exercise(debug, rom_path, record, *, index_only=False):
+def exercise(debug, rom_path, record, *, index_only=False, clothing=False):
     path = Path(rom_path)
     rom, report = path.read_bytes(), json.loads((path.parent / 'build.json').read_text())
     menu = report.get('furniture_menu')
     if sha256(rom) != report['output_sha256'] or not menu:
         raise ValueError('Menu probe requires its exact current cartridge')
+    if clothing and (index_only or not report['clothing'].get('menu')):
+        raise ValueError('Clothing menu probe requires its installed current readers')
     files, boot = by_vrom(rom), boot_proofs(rom)
     blob = files[BLOB].extract(rom)[:BLOB_SIZE]
     edge = b'V3MN' * 4
@@ -42,16 +44,21 @@ def exercise(debug, rom_path, record, *, index_only=False):
         debug.write_memory(at, struct.pack('>I', value))
 
     check('complete current startup prefix', BLOB_RAM, blob)
-    size = 0x24000
+    size = 0x1F000 if clothing else 0x24000
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - size:
         raise ValueError('Menu fixture allocation failed')
     root, tag, overlay = allocation + 16, allocation + 0x3200, allocation + 0x10000
     hand, submenu, private = allocation + 0x20800, allocation + 0x20C00, allocation + 0x20D00
+    if clothing:
+        # The modeled parent already has enough BSS for its inventory pointer;
+        # reuse that area instead of allocating a second 64-KiB dummy overlay.
+        tag, overlay = allocation+0x12000, root
+        hand, submenu, private = allocation+0x1DC00, allocation+0x1E000, allocation+0x1E200
     debug.write_memory(allocation, bytes(size))
     root_data = files[ROOT_VROM].extract(rom)
     parent_sha = (report['changed_resources'][f'{ROOT_VROM:08X}']
-                  if index_only else menu['parent_sha256'])
+                  if index_only or clothing else menu['parent_sha256'])
     if sha256(root_data) != parent_sha:
         raise ValueError('Changed menu parent proof')
     debug.write_memory(root, root_data)
@@ -91,6 +98,9 @@ def exercise(debug, rom_path, record, *, index_only=False):
             if index_only else menu['sites'])
     cases = ((0x1004, False, False), (0x3225, True, False),
              (0x32BB, True, False), (0x32BB, False, True))
+    if clothing:
+        rows = rows+report['clothing']['menu']['sites']
+        cases = ((0x34BF, False, False),)
     if index_only:
         cases += ((0x3000, False, False), (0xFFFF, False, False), (0, False, False))
     for row in rows:
@@ -110,7 +120,7 @@ def exercise(debug, rom_path, record, *, index_only=False):
                 wanted[5] = wanted[1] >> 2
             else:
                 wanted[row['temporary']] = item & 0xF000
-                wanted[row['destination']] = 1 if selected else item >> 12
+                wanted[row['destination']] = 2 if clothing else 1 if selected else item >> 12
             target = tag + row['end'] - RAM
             breakpoint = f'0,{target:x},4'
             if debug.command('Z' + breakpoint) != 'OK':
@@ -134,20 +144,36 @@ def exercise(debug, rom_path, record, *, index_only=False):
                 debug.command('G' + before)
                 if disabled:
                     put(BLOB_RAM + 0x7254, 1)
-    for item in (() if index_only else (0x1004, 0x3225, 0x32BB)):
+    if clothing:
+        native(0x80874770, [0x24BF], 1)
+        native(0x80874770, [0x34BF], 1)
+        native(0x80874770, [0x34BC], 0)
+        selected = debug.read_memory(BLOB_RAM+0xD7, 1)
+        try:
+            debug.write_memory(BLOB_RAM+0xD7, bytes([selected[0] & 0x7F]))
+            native(0x80874770, [0x34BF], 0)
+        finally:
+            debug.write_memory(BLOB_RAM+0xD7, selected)
+        for destination in range(5):
+            debug.write_memory(hand+0x23C, bytes.fromhex('24BF'))
+            expected = native(0x808747D0, [submenu, destination])
+            debug.write_memory(hand+0x23C, bytes.fromhex('34BF'))
+            native(0x808747D0, [submenu, destination], expected)
+        check('hand retains full imported garment identity', hand+0x23C, bytes.fromhex('34BF'))
+    for item in (() if index_only or clothing else (0x1004, 0x3225, 0x32BB)):
         debug.write_memory(hand + 0x23C, struct.pack('>H', item))
         for destination in range(5):
             native(0x808747D0, [submenu, destination], int(destination < 2))
         check('hand keeps complete item identity', hand + 0x23C, struct.pack('>H', item))
     for field in (() if index_only else range(4)):
         debug.write_memory(0x80136EA1, bytes((field,)))
-        expected_type = native(0x80875610, [submenu, 0x1004, 0])
-        for item in (0x3225, 0x32BB):
+        expected_type = native(0x80875610, [submenu, 0x24BF if clothing else 0x1004, 0])
+        for item in ((0x34BF,) if clothing else (0x3225, 0x32BB)):
             native(0x80875610, [submenu, item, 0], expected_type)
         record({'native_menu_field': field, 'original_and_imported_tag_type': expected_type})
     for condition, expected_type in (() if index_only else ((1, 11), (2, 8))):
         put(private + 0x34, condition)
-        native(0x80875610, [submenu, 0x3225, 0], expected_type)
+        native(0x80875610, [submenu, 0x34BF if clothing else 0x3225, 0], expected_type)
     check('complete resident prefix unchanged', BLOB_RAM, blob)
     check('complete current tag unchanged by queries', tag, loaded)
     for at in guards:
@@ -157,6 +183,12 @@ def exercise(debug, rom_path, record, *, index_only=False):
     for at, value in saved.items():
         debug.write_memory(at, value)
     call(0x8009C040, [allocation])
+    if clothing:
+        return {'clothing_register_windows': len(rows), 'complete_hand_destination_cases': 10,
+                'native_clothing_eligibility_and_disabled_rejection': True,
+                'native_action_menu_contexts': 4, 'wrapped_and_quest_conditions_retained': True,
+                'parent_loader_executed': False, 'ordinary_wearing_or_drop_tested': False,
+                'requires_checkpoint_restore': True}
     if index_only:
         return {'placement_index_register_windows': len(cases),
                 'unchanged_menu_prefix_replayed': False, 'ordinary_placement_tested': False,

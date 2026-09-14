@@ -1399,13 +1399,15 @@ def main():
                     raise ValueError('V3 icon probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
-            if action.get('test_v3_furniture_menu') or action.get('test_v3_furniture_menu_index'):
+            if (action.get('test_v3_furniture_menu') or action.get('test_v3_furniture_menu_index')
+                    or action.get('test_v3_clothing_menu')):
                 from v3_furniture_menu_smoke import exercise
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 menu probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
-                    index_only=bool(action.get('test_v3_furniture_menu_index'))))
+                    index_only=bool(action.get('test_v3_furniture_menu_index')),
+                    clothing=bool(action.get('test_v3_clothing_menu'))))
             if action.get('test_v3_furniture_fields'):
                 from v3_furniture_fields_smoke import exercise
                 if not (out/'test.bs1').is_file():

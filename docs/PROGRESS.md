@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-collection-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`ebf12225974351bf4afa74392bf533afaff4c2e085e8091cb97007cd0ae0995a`.
+`build/v3-clothing-menu-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`72b8fa29f4c852373546b6e9cd15ed876a5f5e3d6f7a7b7453510179739cd3bd`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -185,7 +185,7 @@ clothing profile/ownership records and preserves format-1 furniture ownership
 during migration. Five focused checks, four current non-clothing codec host
 checks, and the corrected 52-step native run pass, including complete startup/
 encoding/decoding, ownership separation, player clearing, and guards. Ordinary
-menu consumers remain work; Punchy's defaults stay disabled. The
+ordinary gameplay consumers remain work; Punchy's defaults stay disabled. The
 [shared clothing item readers](checkpoints/V3_CLOTHING_ITEMS.md) connect the
 complete English name, category, and donor price, preserving native garment
 footprint rejection. The current host/cartridge tests and corrected 60-record
@@ -196,6 +196,12 @@ native pocket acquisition to independent per-player saved ownership. Current
 host/cartridge checks and the initial 62-record native run pass, including all
 four residents, present/quest timing, full IDs, original/furniture retention,
 disabled/adjacent-item rejection, player clearing, restored records, and guards.
+The [clothing menu routing](checkpoints/V3_CLOTHING_MENU.md) adds checked clothing
+classification and three hand/cursor/animation decisions. The host/cartridge
+checks and initial 62-record native run pass, including six full-register
+windows, complete eligibility/destination/action functions, retained present/
+quest menus, full identities, code retention, and guards. Ordinary wearing,
+drop/display, shop/catalogue, and gameplay persistence remain work.
 The clothing variant writes format 2 and must not be loaded by older format-1
 V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

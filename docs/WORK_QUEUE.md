@@ -78,8 +78,12 @@ with later e/e+ donor support investigated separately.
   [clothing collection adapter](checkpoints/V3_CLOTHING_COLLECTION.md) connects
   actual pocket acquisition to per-player saved ownership. Focused checks and
   the initial 62-record native run pass, including present/quest timing,
-  separate clothing/furniture bits, player clearing, and guards. Next connect
-  menu, rendering, and ordinary gameplay consumers before enabling
+  separate clothing/furniture bits, player clearing, and guards. The
+  [clothing menu routing](checkpoints/V3_CLOTHING_MENU.md) connects classification
+  and three extra hand/cursor/animation decisions. Host/cartridge checks and the
+  initial 62-record native run pass, covering six full-register windows and
+  complete eligibility/destination/action functions. Next connect remaining
+  renderer/shop consumers and ordinary wearing/drop/save gameplay before enabling
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
