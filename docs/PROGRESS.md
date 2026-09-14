@@ -23,11 +23,18 @@ deeper native draw/tail fixture passes in the combined
 melodies, verifies their complete shared instrument/sample dependencies, and
 widens the native audio paths without low-byte identity collisions. Five focused
 checks and actual native playback-entry/sequence/port checks pass, with no
-physical audio playback. Remaining villager name/default/house/selection and
-gameplay/save paths are next;
+physical audio playback. The [villager text batch](checkpoints/V3_VILLAGER_TEXT.md)
+installs shared full-name/phrase readers, native six-byte compatibility names,
+default reset, and borrowable four-byte V3 phrase references. Five focused checks
+and actual native name/phrase insertion, reset, setter, original/special fallback,
+and guard checks pass. The new references require V3 despite unchanged saved
+field widths. Initial clothing/defaults, houses, selection, remaining ID-bounded
+readers, and gameplay/save/profile paths are next;
 item identity/conversion work is pending. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
+V3 development continues on GitHub. The web patcher stays V2 until the user
+has tested V3 and explicitly approved the switch.
 
 ## Stable V2 deliverable
 

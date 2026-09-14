@@ -108,8 +108,11 @@ objects with verified model/skeleton correspondence. The
 preserves all original object banks. The [native draw routes](V3_NPC_DRAW.md)
 install pilot draw rows in both NPC overlays and preserve full donor voice IDs.
 The [melody adapter](V3_VILLAGER_AUDIO.md) installs their verified donor programs
-and full-ID audio paths; focused native audio/draw checks pass. Ordinary gameplay
-integration remains pending.
+and full-ID audio paths; focused native audio/draw checks pass. The
+[text adapter](V3_VILLAGER_TEXT.md) connects shared names, full catchphrases,
+native default reset, and four-byte borrowed/default references. Its focused
+and native reader/insertion checks pass. Initial defaults, houses, selection,
+secondary ID-bounded readers, and ordinary gameplay/save integration remain pending.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

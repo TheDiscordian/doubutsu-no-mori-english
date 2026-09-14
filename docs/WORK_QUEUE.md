@@ -21,7 +21,11 @@ with later e/e+ donor support investigated separately.
   [audio batch](checkpoints/V3_VILLAGER_AUDIO.md) installs both donor melodies and
   widened audio paths, verifies shared instrument/sample data, and passes five
   focused checks plus combined native audio and both-overlay draw/tail probing.
-  Next: name/default/house/selection paths, then ordinary gameplay/save integration.
+  The [text batch](checkpoints/V3_VILLAGER_TEXT.md) adds shared full-name/phrase
+  readers, six-byte compatibility names, default reset, and borrowable V3 phrase
+  references. Five focused tests and the combined native reader/insertion/reset
+  check pass. Next: initial defaults/clothing, houses, selection, remaining
+  ID-bounded readers, and ordinary gameplay/save integration.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
@@ -34,6 +38,8 @@ with later e/e+ donor support investigated separately.
   adapt islanders explicitly instead of pretending the island engine is present.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
+  Include imported default-phrase references borrowed by original villagers;
+  checking imported actor IDs alone cannot detect every saved dependency.
 - [ ] Add searchable per-entry/category/select-all controls to the web patcher;
   verify actual browser output and the unchanged import-free path.
 - [ ] Complete bounded combined checks and provide a V3 hardware-playtest build.

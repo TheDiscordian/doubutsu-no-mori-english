@@ -22,13 +22,13 @@ def install(native, code, blob, symbols, donor):
     for start, end in ((0x800F91FC, 0x800F9C24), (0x800FCE80, 0x800FD2C8)):
         if code[start - CODE_RAM:end - CODE_RAM] != original[start - CODE_RAM:end - CODE_RAM]:
             raise ValueError('Native voice or melody code is no longer the reviewed implementation')
-    if len(blob) != 0x4000 or any(blob[TABLE:0x3FF0]):
+    if len(blob) not in (0x4000, 0x8000) or any(blob[TABLE:0x3FF0]):
         raise ValueError('V3 audio metadata/state/data reservation is occupied')
     at = DATA
     installed = []
     for row in sorted(audio['villagers'], key=lambda r: r['voice']):
         data = assets[row['file']]
-        if at + len(data) > len(blob) - 16:
+        if at + len(data) > 0x3FF0:
             raise ValueError('Imported melodies exceed the V3 resident reservation')
         blob[at:at + len(data)] = data
         struct.pack_into('>II', blob, TABLE + (row['voice'] - 256) * 8, 0x80460000 + at, len(data))

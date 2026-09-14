@@ -46,7 +46,7 @@ int af_v3_startup(void) {
     if (header[0] != 0x41465633u || header[1] != AF_V3_ABI || header[2] != AF_V3_BLOB_SIZE
             || header[3] != 430 || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
     writeback(memory, AF_V3_BLOB_SIZE);
-    invalidate(memory + 0x100, 0xF00u);
+    invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);
     if (execute() != 1) return 0;
     installed = 1;
     return 1;

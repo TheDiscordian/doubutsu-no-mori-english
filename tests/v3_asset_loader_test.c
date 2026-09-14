@@ -24,7 +24,7 @@ void af_v3_writeback(void *dst, u32 size) {
     ++writes;
 }
 void af_v3_invalidate(void *dst, u32 size) {
-    assert((dst == af_v3_memory + 0x100 && size == 0xF00) ||
+    assert((dst == af_v3_memory + 0x100 && size == (AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u)) ||
            (dst == (void *)af_v3_object_entry && size == 8));
     ++invalidates;
 }

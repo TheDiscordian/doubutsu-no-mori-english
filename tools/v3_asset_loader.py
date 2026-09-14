@@ -58,8 +58,10 @@ def compile_part(part, out, extra_sources=(), defines=()):
                (line.split() for line in run('nm', '--defined-only', 'code.elf').splitlines())}
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata', 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
-    expected = MODULE_RAM + STARTUP if part == 'startup' else BLOB_RAM + 0x100
-    if symbols[f'af_v3_{part if part == "startup" else "asset_init"}'] != expected:
+    entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
+                       'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
+                       'villager': ('af_v3_load_name', BLOB_RAM + 0x4000)}[part]
+    if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
     return code, {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
@@ -115,20 +117,26 @@ def compose(native, base, changes, added):
     return image
 
 
-def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None):
+def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
     import v3_npc_draw
     import v3_audio_runtime
+    import v3_villager_text
+    if text_donor is not None and audio_donor is None:
+        raise ValueError('Villager text variant requires installed pilot artwork and audio')
     if audio_donor is not None:
         npc_draw = True
     source_files = (SOURCE_FILES + (v3_npc_draw.SOURCE_FILES if npc_draw else ())
-                    + (v3_audio_runtime.SOURCES if audio_donor is not None else ()))
+                    + (v3_audio_runtime.SOURCES if audio_donor is not None else ())
+                    + (v3_villager_text.SOURCES if text_donor is not None else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
         abi = v3_audio_runtime.ABI
+    if text_donor is not None:
+        blob_size, abi = v3_villager_text.BLOB_SIZE, v3_villager_text.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -181,6 +189,15 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None):
                        'record_offset': at, 'record_stride': v3_npc_draw.STRIDE}
     audio_report = (v3_audio_runtime.install(native, code, blob, helper_report['symbols'], audio_donor)
                     if audio_donor is not None else None)
+    text_report = None
+    if text_donor is not None:
+        text_code, text_code_report = compile_part('villager', out / 'villager')
+        if len(text_code) > blob_size - v3_villager_text.CODE - 16:
+            raise ValueError('Villager text code exceeds its reservation')
+        blob[v3_villager_text.CODE:v3_villager_text.CODE + len(text_code)] = text_code
+        text_report = v3_villager_text.install(native, code, module, blob,
+            text_code_report['symbols'], *text_donor, symbols)
+        text_report['code'] = text_code_report
     module[STARTUP:STARTUP + len(startup)] = startup
     struct.pack_into('>4I', module, CONFIG, BLOB, blob_size, zlib.crc32(blob), abi)
     struct.pack_into('>I', code, STARTUP_CALL - CODE_RAM,
@@ -193,19 +210,25 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None):
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 villager audio development 02' if audio_donor is not None else
+    label = ('V3 villager text development 02' if text_donor is not None else
+             'V3 villager audio development 02' if audio_donor is not None else
              'V3 NPC draw development 02' if npc_draw else 'V3 asset-loader development 02')
     return image, patch, {'build': label,
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
+        'villager_text': text_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'original_object_table_sha256': sha256(table),
         'object_capacity': CAPACITY, 'imports': imports, 'rom_bytes': len(image),
         'resident_startup_range': ['8019A8E0', '8019ACE0'],
         'expansion_data_range': ['80460000', f'{BLOB_RAM + blob_size:08X}'], 'ordinary_heap_growth': 0,
-        'required_ram_bytes': 0x800000, 'saved_format_changed': False,
+        'required_ram_bytes': 0x800000, 'saved_layout_changed': False,
+        'saved_format_changed': text_report is not None,
+        'imported_default_key_format': 'V3-only four-byte reference' if text_report else None,
         'new_villager_ids_enabled': False, 'native_test': 'pending', 'hardware_test': 'not performed',
-        'save_warning': 'Development loader only; use disposable saves. V3 import/profile compatibility is unverified.',
+        'save_warning': ('Development only; use disposable saves. Imported default references require V3 '
+                         'and compatible profile metadata; do not load those saves in V2.' if text_report else
+                         'Development loader only; use disposable saves. V3 import/profile compatibility is unverified.'),
         'added_resources': {f'{v:08X}': sha256(data) for v, data in additions.items()},
         'changed_resources': {f'{v:08X}': sha256(data) for v, data in changes.items()}}
 
@@ -215,6 +238,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
+    p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, and default-phrase references')
     args = p.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT / 'build') or out.exists():
@@ -222,12 +246,15 @@ def main():
     donor = read_donor(ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     from v3_villager_audio import read_audio_donor
     audio_donor = (read_audio_donor(ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
-                   if args.villager_audio else None)
+                   if args.villager_audio or args.villager_text else None)
+    from v3_villager_text import read_text_donor
+    text_donor = ((donor, read_text_donor(ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso'))
+                  if args.villager_text else None)
     out.mkdir(parents=True)
     image, patch, report = build((ROOT / 'local/rom/Doubutsu no Mori (Japan).z64').read_bytes(),
         (ROOT / 'build/v2-keyboard-fit-11/Animal Forest English V2.z64').read_bytes(), donor['rel'],
         (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out,
-        npc_draw=args.npc_draw, audio_donor=audio_donor)
+        npc_draw=args.npc_draw, audio_donor=audio_donor, text_donor=text_donor)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

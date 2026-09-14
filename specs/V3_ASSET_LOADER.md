@@ -14,6 +14,11 @@ identities, and full voice-ID transport in a 16-KiB ABI-2 blob. Neither variant
 enables move-ins, houses, dialogue, or imported audio playback. Villager construction,
 saved identity, item imports, and browser selection remain required. Do not
 present this development cartridge as a playable-import handoff.
+The [audio variant](V3_VILLAGER_AUDIO.md) and
+[villager text variant](V3_VILLAGER_TEXT.md) add their separately documented
+runtime paths. The text variant uses a 32-KiB ABI-4 blob and patches shared
+translation readers; the asset-only memory/code preservation statements below
+do not describe those additional text hooks.
 
 ## Memory ownership and startup
 
