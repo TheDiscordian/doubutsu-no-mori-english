@@ -9,7 +9,13 @@ af_v3_original_item_price = 0x80464640;
 SECTIONS
 {
     . = 0x80467300;
-    .text : { *(.text.af_v3_item_name) *(.text .text.*) }
+    .text : {
+        *(.text.af_v3_item_name) *(.text.find)
+        /* Public calls retain their addresses when the private table search
+           changes from the compiler's two-row unroll to a bounded loop. */
+        . = 0x14C;
+        *(.text.af_v3_item_type) *(.text .text.*)
+    }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }

@@ -1,6 +1,6 @@
 # V3 animated speed bag
 
-## Converted asset and remaining runtime work
+## Installed components and remaining gameplay work
 
 `tools/v3_speed_bag_art.py` converts the complete GAFE01-r0 speed-bag asset:
 both model parts, all textures/palettes/vertices, all animation tracks, the
@@ -8,17 +8,18 @@ two-joint hierarchy, and the native keyframe headers. The output is a local
 3,728-byte segment-six object, within the existing 5,120-byte room model bank.
 
 The native constructor, hit/retrigger callback, and draw callback are implemented
-in `overlays/v3/speed_bag.c`; their actual N64 execution passes in private test
-storage. The complete donor hit sound is extracted and assembled into bounded
-native-compatible resources by `tools/v3_speed_bag_audio.py`.
+in `overlays/v3/speed_bag.c`. `tools/v3_speed_bag_runtime.py` installs their
+production text, positional sound adapter, callback table, complete profile,
+model, and English metadata. The complete donor hit sound is extracted and
+assembled into bounded native-compatible resources by `tools/v3_speed_bag_audio.py`.
 
 `tools/v3_speed_bag_sound_runtime.py` installs the real sound through the native
 audio loader, without increasing its heap or replacing existing sounds.
 
-This is not a playable import. Callback/profile installation, item registration/
-readers, and Punchy's house placement remain uninstalled. Do not enable Punchy
-or substitute a static decoration for this
-item. Both served patchers remain V2 until the user tests and approves V3.
+This is not a playable import. The new row is disabled until its scoring,
+acquisition/catalogue, saved-profile, and house dependencies are complete.
+Do not enable Punchy or substitute a static decoration for this item.
+Both served patchers remain V2 until the user tests and approves V3.
 
 ## Verified source identity
 
@@ -28,6 +29,9 @@ and pinned symbols through the existing donor reader. Source identity is
 different import. Both donor furniture-quality tables resolve index 1,236 to
 `iam_ike_prores_punch01`, and the corresponding English name is “speed bag”.
 No destination ID is assigned by this asset-only converter.
+The runtime installer reserves native item `3350`, including four rotations,
+and runtime index 1,236. These are additive type-three identities; no original
+native item is replaced.
 
 The 52-byte donor profile is at `.data:000928F4`; its sole pointer targets the
 20-byte `fIPPnch_func` table at `.data:000928E0`. The callback table resolves
@@ -213,6 +217,60 @@ heap. Total audio heap, temporary cache sizes, and cache policies remain
 unchanged. Exceeding capacity fails the build.
 
 The [sound checkpoint](../docs/checkpoints/V3_SPEED_BAG_SOUND.md) records native
-loading/playback evidence and its limits. Callback installation and ordinary
-furniture interaction are separate unfinished work. No physical audio is emitted
-by tests.
+loading/playback evidence and its limits. Production callback binding is installed
+by the runtime adapter. Ordinary furniture interaction remains unfinished work.
+No physical audio is emitted by tests.
+
+## Installed furniture resource path
+
+ABI 46 uses a two-MiB VROM reservation `02200000..02400000`. Its single DMA
+file contains the unchanged-size 49,152-byte resident prefix followed by the
+individual model, clothing, and secondary-code resources. Only the prefix and
+explicit secondary code load at startup; other resources retain on-demand
+loading. The ROM allocation does not add two MiB of resident RAM.
+
+`tools/v3_storage.py` checks the complete reserved interval against existing
+files and packs all resource types in address order, rejecting overlap. The
+composer preserves every existing directory index before assigning new rows;
+putting the lower-VROM file first in the directory would renumber existing V2
+resources. Explicit addition ordering retains those original identities.
+The two original imported model offsets, clothing offset `F000`, and codec
+offset `F400` remain relative to this file. The speed bag occupies `10000..10E90`.
+Villager texture VROMs and all existing saved item/villager numbers are unchanged.
+
+The expanded table's retired seed tail provides checked resident slots:
+
+| RAM | Contents |
+| --- | --- |
+| `80466F20..804670F7` | Complete 472-byte constructor/move/draw text |
+| `80467100..8046710F` | Positional sound tail-call adapter |
+| `80467110..80467123` | Constructor, move, draw, null destructor, null DMA |
+| `80467130..8046717F` | Disabled import row and complete native profile |
+| `804672E0..804672FF` | Third 32-byte English item metadata record |
+
+The two live collection bridges at `80466F00..80466F1F` are retained. The
+installer checks the exact retired `FF` seed and unused zero suffix before
+reclaiming their successor region. Startup copies profile seed 1,236 into the
+expanded profile table. The furniture helper requires the fixed row, item,
+enabled flag, profile pointer, and reviewed vtable before loading the complete
+object. Other non-null custom vtables remain rejected.
+
+The sound adapter moves the position pointer into argument two, supplies sound
+`0169` in argument one, and tail-calls the real `sAdo_OngenTrgStart` at
+`800D1D58`. It does not bypass positional attenuation or scene suppression.
+Metadata keeps the complete 16-byte English name, price field 2,990, and actual
+1×1 footprint. Public reader addresses remain fixed even when the compiler
+changes the private two-record search into a three-record loop.
+
+The default disabled row prevents acquisition and recognition as an enabled
+item; it is not included in the saved import profile. Scoring must be completed
+before enabling it: donor HRA metadata `E8050000` names series 58, beyond the
+native 55-entry completion storage. Preserve that actual donor grouping through
+an explicit native adaptation, not a generic replacement series. Its ordinary
+shop membership is group A, catalogue preview mode is zero, generic action-sound
+class is zero, and feng shui metadata is `0000`. The animated callback supplies
+its separate actual hit sound.
+
+The [runtime checkpoint](../docs/checkpoints/V3_SPEED_BAG_RUNTIME.md) records the
+current build and bounded native evidence. Acquisition, scoring, ordinary
+interaction/persistence, and Punchy's house remain required.

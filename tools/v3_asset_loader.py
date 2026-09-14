@@ -13,17 +13,18 @@ from apply_translation import write_new
 from toolchain import IMAGE
 from v3_import_catalog import ROOT, read_donor
 from v3_villager_art import build_art
+import v3_storage
 
 BASE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 MODULE, MODULE_RAM = 0x02800000, 0x801948E0
 STARTUP, CONFIG, STATE, STARTUP_END = 0x6000, 0x63E0, 0x63F0, 0x6400
-BLOB, BLOB_RAM, BLOB_SIZE, TABLE_OFFSET = 0x03F00000, 0x80460000, 0x2000, 0x1000
+BLOB, BLOB_RAM, BLOB_SIZE, TABLE_OFFSET = v3_storage.START, 0x80460000, 0x2000, 0x1000
 OBJECT_TABLE, OBJECT_COUNT, CAPACITY = 0x8010DDD0, 410, 430
 STARTUP_CALL, ORIGINAL_CALL = 0x800D65D0, 0x0C0275B4
 TEXTURE_BASE, TEXTURE_STRIDE = 0x03F10000, 0x2000
 SOURCE_FILES = ('tools/v3_asset_loader.py', 'overlays/v3/startup.c', 'overlays/v3/startup.ld',
                 'overlays/v3/asset.c', 'overlays/v3/asset.ld', 'tools/v3_villager_art.py',
-                'tools/v3_import_catalog.py')
+                'tools/v3_import_catalog.py', 'tools/aflib.py') + v3_storage.SOURCES
 
 
 def texture_slot(donor_index):
@@ -142,7 +143,12 @@ def compose(native, base, changes, added, *, resized=(), relocated=None):
                 moves[old.vstart] = target
             if data != old.extract(native) or old.vstart in moves:
                 replacements[old.vstart] = data
-    image = bytearray(replace_dma(native, replacements, moves, additions))
+    # VROM addresses need not be sorted in the native directory. Preserve all
+    # existing appended row identities before allocating the new V3 rows.
+    addition_order = [v for v, entry in sorted(current.items(), key=lambda pair: pair[1].index)
+                      if entry.index not in original_by_index] + sorted(added)
+    image = bytearray(replace_dma(native, replacements, moves, additions,
+                                  addition_order=addition_order))
     boot = original[0x1060]
     boot_data = current[0x1060].extract(base)
     if base[boot.pstart:boot.pstart + boot.size] != boot_data:
@@ -171,7 +177,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
           save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
           shop_actors=False, shop_floor=False, hra=False, feng_shui=False, houses=False,
           villager_readers=False, villager_selection=False, villager_rewards=False, clothing=False,
-          speed_bag_sound=False):
+          speed_bag_sound=False, speed_bag=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -216,6 +222,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_display_conversion
     import v3_clothing_catalogue
     import v3_speed_bag_sound_runtime
+    import v3_speed_bag_runtime
+    if speed_bag and not speed_bag_sound:
+        raise ValueError('Speed-bag callbacks require their complete installed sound')
     if speed_bag_sound and not clothing:
         raise ValueError('Speed-bag sound requires the current complete V3 foundation')
     if clothing and not villager_rewards:
@@ -298,7 +307,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_clothing_display.SOURCES + v3_display_items.SOURCES + v3_display_conversion.SOURCES
                        + v3_clothing_catalogue.SOURCES
                        if clothing else ())
-                    + (v3_speed_bag_sound_runtime.SOURCES if speed_bag_sound else ()))
+                    + (v3_speed_bag_sound_runtime.SOURCES if speed_bag_sound else ())
+                    + (v3_speed_bag_runtime.SOURCES if speed_bag else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -359,6 +369,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_display_conversion.ABI, v3_clothing_catalogue.ABI)
     if speed_bag_sound:
         abi = max(abi, v3_speed_bag_sound_runtime.ABI)
+    if speed_bag:
+        abi = max(abi, v3_speed_bag_runtime.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -380,6 +392,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if save_runtime:
         startup_defines += ('AF_V3_SAVE_RUNTIME=1',)
     clothing_defines = ('AF_V3_CLOTHING_PROFILE=1',) if clothing else ()
+    speed_bag_defines = ('AF_V3_SPEED_BAG=1',) if speed_bag else ()
     startup_defines += clothing_defines
     table_defines = ('AF_V3_FURNITURE_TABLES=1',) if clothing else ()
     startup_defines += table_defines
@@ -448,7 +461,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         additions.update(furniture_added)
     items_report = None
     if furniture_items:
-        item_code, item_code_report = compile_part('items', out / 'items')
+        item_code, item_code_report = compile_part('items', out / 'items', defines=speed_bag_defines)
         if len(item_code) > staging_size - 16 - v3_furniture_items.CODE:
             raise ValueError('Furniture item helpers exceed their reservation')
         blob[v3_furniture_items.CODE:v3_furniture_items.CODE + len(item_code)] = item_code
@@ -696,7 +709,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_report['npc_streaming_clothes_installed'] = True
         clothing_report['player_readers'] = v3_player_clothing.install(code, helper_report['symbols'])
         extended_code, extended_compiled = compile_part('save_clothing', out/'save_clothing',
-            defines=v3_save_clothing.DEFINES+v3_clothing_items.DEFINES,
+            defines=v3_save_clothing.DEFINES+v3_clothing_items.DEFINES+speed_bag_defines,
             primary_source='overlays/v3/save_codec.c', extra_sources=('overlays/v3/items.c',))
         extended_resource, extended_report = v3_save_clothing.install(
             blob, extended_code, extended_compiled, save_code_report, save_runtime_report)
@@ -741,7 +754,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         expanded_code, expanded_compiled = compile_part('furniture_expanded', out/'furniture-expanded',
             primary_source='overlays/v3/furniture.c',
             extra_sources=('overlays/v3/furniture_entry.S',),
-            defines=table_defines+('AF_V3_CLOTHING_DISPLAY=1',))
+            defines=table_defines+('AF_V3_CLOTHING_DISPLAY=1',)+speed_bag_defines)
         table_entries = v3_furniture_tables.install_helper(blob, expanded_code, expanded_compiled,
                                                           furniture_code_report)
         table_code, table_compiled = compile_part('furniture_tables', out/'furniture_tables',
@@ -779,6 +792,12 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         for owner in draw_report['owners']:
             owner['before_clothing_sha256'] = owner['patched_sha256']
             owner['patched_sha256'] = sha256(draw_changes[int(owner['vrom'], 16)])
+    speed_bag_report = None
+    if speed_bag:
+        speed_bag_asset, speed_bag_report = v3_speed_bag_runtime.install(
+            native, code, blob, rel, symbols, out/'speed-bag')
+        furniture_added[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
+        additions[int(speed_bag_report['object_vrom'], 16)] = speed_bag_asset
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -788,33 +807,26 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     # The native DMA directory has no spare row after the two pilot texture
     # banks. Furniture occupies ROM-only tail slots in the existing V3 file;
     # startup still loads/checks exactly blob_size bytes into its RAM reservation.
-    blob_file = bytearray(blob)
+    resources = {}
     if furniture:
         for vrom, data in sorted(furniture_added.items()):
-            offset = vrom - BLOB
-            if offset < len(blob_file) or vrom + len(data) > TEXTURE_BASE:
-                raise ValueError('Furniture ROM tail overlaps resident or villager data')
-            blob_file.extend(bytes(offset - len(blob_file)))
-            blob_file.extend(data)
+            resources[vrom] = data
             del additions[vrom]
     if clothing:
-        offset = int(clothing_row['vrom'], 16)-BLOB
-        if offset < len(blob_file) or offset+len(clothing_resource) > TEXTURE_BASE-BLOB:
-            raise ValueError('Clothing ROM tail overlaps resident, furniture, or villager data')
-        blob_file.extend(bytes(offset-len(blob_file)))
-        blob_file.extend(clothing_resource)
-        offset = v3_save_clothing.VROM-BLOB
-        if offset < len(blob_file) or offset+len(extended_resource) > TEXTURE_BASE-BLOB:
-            raise ValueError('Extended clothing codec overlaps another ROM resource')
-        blob_file.extend(bytes(offset-len(blob_file)))
-        blob_file.extend(extended_resource)
-    additions[BLOB] = bytes(blob_file)
+        for vrom, data in ((int(clothing_row['vrom'], 16), clothing_resource),
+                           (v3_save_clothing.VROM, extended_resource)):
+            if vrom in resources:
+                raise ValueError('Duplicate V3 storage resource')
+            resources[vrom] = data
+    blob_file = v3_storage.pack(blob, resources, files)
+    additions[BLOB] = blob_file
     sound_changes, sound_report = {}, None
     if speed_bag_sound:
         for vrom in v3_speed_bag_sound_runtime.RELOCATIONS:
             if files[vrom].extract(base) != originals[vrom].extract(native):
                 raise ValueError('Stable audio resources changed before the V3 append')
         sound_changes, sound_report = v3_speed_bag_sound_runtime.prepare(native, code, audio_donor)
+        sound_report['furniture_callback_installed'] = speed_bag
         relocated.update(v3_speed_bag_sound_runtime.RELOCATIONS)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
@@ -840,7 +852,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 speed-bag native sound 01' if speed_bag_sound else
+    label = ('V3 speed-bag furniture integration 01' if speed_bag else
+             'V3 speed-bag native sound 01' if speed_bag_sound else
              'V3 expanded furniture tables 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
@@ -869,6 +882,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     return image, patch, {'build': label,
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
         'speed_bag_sound': sound_report,
+        'speed_bag': speed_bag_report,
+        'storage': {'vrom': BLOB, 'limit': v3_storage.END, 'bytes': len(blob_file)},
         'villager_text': text_report, 'furniture': furniture_report, 'furniture_items': items_report,
         'furniture_room': room_report,
         'furniture_identity': identity_report,
@@ -925,6 +940,7 @@ def main():
     p.add_argument('--villager-rewards', action='store_true', help='Include imported furniture in villager house gifts')
     p.add_argument('--clothing', action='store_true', help='Add the cherry-shirt resource and shared reader; gameplay is not enabled')
     p.add_argument('--speed-bag-sound', action='store_true', help='Install the actual speed-bag sound; furniture installation remains pending')
+    p.add_argument('--speed-bag', action='store_true', help='Install the animated item for private integration testing; acquisition remains disabled')
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
@@ -946,6 +962,8 @@ def main():
     p.add_argument('--hra', action='store_true', help='Include imported furniture in native HRA scoring and recommendations')
     p.add_argument('--feng-shui', action='store_true', help='Include actual imported furniture colours in native feng shui scoring')
     args = p.parse_args()
+    if args.speed_bag:
+        args.speed_bag_sound = True
     if args.speed_bag_sound:
         args.clothing = True
     if args.clothing:
@@ -1015,7 +1033,7 @@ def main():
         shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra, feng_shui=args.feng_shui,
         houses=args.villager_houses, villager_readers=args.villager_readers,
         villager_selection=args.villager_selection, villager_rewards=args.villager_rewards,
-        clothing=args.clothing, speed_bag_sound=args.speed_bag_sound)
+        clothing=args.clothing, speed_bag_sound=args.speed_bag_sound, speed_bag=args.speed_bag)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

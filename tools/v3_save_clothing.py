@@ -4,7 +4,8 @@ import zlib
 
 from aflib import sha256
 
-ABI, VROM, RAM, LIMIT, DESCRIPTOR = 31, 0x03F0F400, 0x8046D000, 0xC00, 0xE0
+from v3_storage import START as STORAGE
+ABI, VROM, RAM, LIMIT, DESCRIPTOR = 31, STORAGE+0xF400, 0x8046D000, 0xC00, 0xE0
 PROFILE, STATE, RUNTIME_BYTES = 192, 832, 864
 SOURCES = ('tools/v3_save_clothing.py', 'overlays/v3/save_clothing.ld')
 DEFINES = ('AF_V3_CLOTHING_PROFILE=1',

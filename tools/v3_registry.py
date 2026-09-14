@@ -1,4 +1,5 @@
 """Persistent destination reservations, not a declaration of playable content."""
+from v3_storage import START as STORAGE
 
 REGISTRY_VERSION = 1
 # Keep native ordinary IDs 0..215 and the original two test IDs 216/217.
@@ -15,14 +16,15 @@ VILLAGERS = {
 # untouched. Holes are not supported items; future additions must be explicit.
 FURNITURE_REGISTRY_VERSION = 1
 FURNITURE = {
-    0x3224: (1161, 0x3224, 0x03F08000),
-    0x32B8: (1198, 0x32B8, 0x03F0A000),
+    0x3224: (1161, 0x3224, STORAGE+0x8000),
+    0x32B8: (1198, 0x32B8, STORAGE+0xA000),
+    0x3350: (1236, 0x3350, STORAGE+0x10000),
 }
 
 # Additive clothing reservations, independent of donor furniture and native
 # clothing identities. These are not enabled items or saved-profile support.
 CLOTHING_REGISTRY_VERSION = 1
-CLOTHING = {0x24BF: (0x34BF, 0x10BF, 0x03F0F000)}
+CLOTHING = {0x24BF: (0x34BF, 0x10BF, STORAGE+0xF000)}
 
 # A placed garment uses a mannequin identity, not its pocket clothing identity.
 # These dependencies are never independently selectable or assigned by order.

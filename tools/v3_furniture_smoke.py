@@ -1,5 +1,6 @@
 """Current native furniture loading/lifetime checks; no placement or save writes."""
 import json
+import math
 from pathlib import Path
 import struct
 from types import SimpleNamespace
@@ -20,8 +21,9 @@ def exercise(debug, rom_path, record):
     if sha256(rom) != report['output_sha256'] or not report['furniture']:
         raise ValueError('Furniture probe requires its exact current cartridge')
     files = by_vrom(rom)
-    blob = files[BLOB].extract(rom)[:BLOB_SIZE]
+    blob = files[BLOB].extract(rom)[:report['resident_blob_bytes']]
     furniture = report['furniture']
+    animated = [report['speed_bag']] if report.get('speed_bag') else []
     displays = furniture.get('display_imports', [])
     expanded = furniture.get('expanded_tables')
     profile_ram = int(furniture['profile_table_ram'], 16)
@@ -66,7 +68,7 @@ def exercise(debug, rom_path, record):
         check('expanded leading guard', START, struct.pack('>I', EDGE)*4)
         check('expanded trailing guard', END-16, struct.pack('>I', EDGE)*4)
         expected_profiles = bytearray(capacity*4)
-        for row in furniture['imports'] + displays:
+        for row in furniture['imports'] + displays + animated:
             struct.pack_into('>I', expected_profiles, row['runtime_index']*4, int(row['profile_ram'], 16))
         check('complete expanded startup profiles', profile_ram, bytes(expected_profiles))
         check('complete expanded startup banks', index_ram, b'\xFF'*capacity)
@@ -152,6 +154,86 @@ def exercise(debug, rom_path, record):
     native(0x80937578, [], 1)
     native(0x809375E8, [], 0)
 
+    for row in animated:
+        index, item = row['runtime_index'], int(row['item_id'], 16)
+        row_ram = int(row['row_ram'], 16)
+        if row['enabled'] or row['selectable'] or row['saved_profile_included']:
+            raise ValueError('Animated fixture requires the explicitly disabled integration item')
+        check('animated item starts unavailable', row_ram+4, bytes(4))
+        native(0x8093678C, [index], 0)
+        call(0x800A5630, [item], 0)
+        start = int(row['object_vrom'], 16)
+        asset = object_bytes(start, start+row['object_bytes'])
+        if sha256(asset) != row['object_sha256']:
+            raise ValueError('Changed installed animated model')
+        expected = asset+b'\xA5'*(BANK_BYTES-len(asset))
+        saved_state = debug.read_memory(0x8046C000, 864)
+        write_word(row_ram+4, 1)
+        native(0x8093678C, [index], 1)
+        debug.write_memory(bank0, b'\xA5'*BANK_BYTES)
+        native(0x809389AC, [index, 0, item], 1)
+        check('complete animated model, rig, and untouched bank padding', bank0, expected)
+        for rotation in range(4):
+            native(0x80942688, [index, rotation], item | rotation)
+            call(0x800A5630, [item | rotation], 10)
+            call(0x800C0194, [item | rotation], row['price'])
+        text_at, actor, bridge = allocation+0x1DF00, allocation+0x1D000, allocation+0x1D800
+        call(0x801969C8, [text_at, 16, item], 1)
+        check('complete installed animated English name', text_at, b'speed bag       ')
+        table_at = int(row['vtable_ram'], 16)
+        expected_table = struct.pack('>5I', *row['callback_entries'], 0, 0)
+        check('complete production callback table', table_at, expected_table)
+        for kind, target in zip(('ct', 'mv'), row['callback_entries'][:2]):
+            wrapper = struct.pack('>2I', 0x08000000 | (target >> 2 & 0x3FFFFFF), 0)
+            debug.write_memory(bridge, wrapper)
+            call(0x8002FE00, [bridge, len(wrapper)])
+            call(0x80034CE0, [bridge, len(wrapper)])
+            if kind == 'ct':
+                saved_segment = debug.read_memory(0x801458B8, 4)
+                saved_audio_scene = debug.read_memory(0x80113844, 1)[0]
+                # Positional sounds are intentionally disabled in scene zero
+                # (the title checkpoint). Enter the native outdoor audio mode,
+                # and use its real listener position rather than assuming zero.
+                call(0x800FB3E8, [1])
+                check('native positional audio scene enabled', 0x80113844, b'\x01')
+                listener = call(0x80060D6C, [word(0x8010EF90)])
+                if listener & 3 or not 0x80000400 <= listener <= 0x80400000-12:
+                    raise ValueError('Native microphone pointer escapes checked RAM')
+                position = list(struct.unpack('>3f', debug.read_memory(listener, 12)))
+                if not all(math.isfinite(value) for value in position):
+                    raise ValueError('Native microphone is not initialised for this fixture')
+                position[0] += 12
+                write_word(0x801458B8, bank0-0x80000000)
+                debug.write_memory(actor, bytes(0x740))
+                debug.write_memory(actor+8, struct.pack('>3f', *position))
+            else:
+                debug.write_memory(actor+0x12D, b'\x01')
+            call(bridge, [actor, 0, 0, bank0], proof=(bridge, wrapper))
+            if kind == 'ct':
+                check('installed constructor resolves both loaded rig headers', actor+0x14C,
+                      struct.pack('>2I', bank0+0xE84, bank0+0xE58))
+                check('installed constructor evaluates the initial pose', actor+0x1A4,
+                      struct.pack('>9h', 800, 6508, 800, 0, 0, -16384, 0, 0, 0))
+                check('installed constructor keeps idle speed', actor+0x140, bytes(4))
+            else:
+                check('installed hit starts the donor animation', actor+0x140,
+                      struct.pack('>2f', .5, 1))
+                slots = debug.read_memory(0x80113C34, 6*32)
+                hits = [i for i in range(6) if struct.unpack_from('>H', slots, i*32)[0] == 0x169]
+                if len(hits) != 1 or slots[hits[0]*32+28] != 70:
+                    raise ValueError('Installed positional callback did not dispatch the actual donor sound')
+                record({'installed_animated_positional_sound': '0169', 'track': hits[0], 'priority': 70,
+                        'pcm_or_listening_verified': False})
+        debug.write_memory(0x801458B8, saved_segment)
+        call(0x800FB3E8, [saved_audio_scene])
+        check('native audio scene restored', 0x80113844, bytes((saved_audio_scene,)))
+        check('animated callbacks retain complete loaded model', bank0, expected)
+        native(0x80937C84, [index])
+        native(0x809374C4, [index], 0xFFFFFFFF)
+        write_word(row_ram+4, 0)
+        call(0x800A5630, [item], 0)
+        check('animated component retains the complete save runtime', 0x8046C000, saved_state)
+
     if displays:
         from v3_clothing_display import MODEL, MODEL_BYTES, PROGRAM, SIZE as DISPLAY_BYTES
         if len(displays) != 1 or not report.get('clothing', {}).get('display'):
@@ -223,7 +305,7 @@ def exercise(debug, rom_path, record):
     native(0x8093690C)
     check('original heap profile allocation released', live + 0x8094D320 - RAM, bytes(4))
     check('original resolved profile cleared', profile_ram, bytes(4))
-    for row in rows + displays:
+    for row in rows + displays + animated:
         check('resident imported profile survives native cleanup',
               profile_ram + row['runtime_index'] * 4,
               struct.pack('>I', int(row['profile_ram'], 16)))
@@ -239,6 +321,7 @@ def exercise(debug, rom_path, record):
     write_word(0x80136ECC, saved_limit)
     call(0x8009C040, [allocation])
     return {'imported_models_native_dma': 2, 'native_profile_and_model_fallback': True,
+            'installed_animated_model_constructor_hit_sound': len(animated),
             'clothing_display_native_model_and_commands': len(displays),
             'native_bank_selection_release_and_cleanup': True,
             'ordinary_placement_tested': False, 'rendering_tested': False,

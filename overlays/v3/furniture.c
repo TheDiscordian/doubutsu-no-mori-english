@@ -45,9 +45,25 @@ extern void af_v3_display_test_dma(u32, u32);
 #endif
 #endif
 
+#ifdef AF_V3_SPEED_BAG
+#include "speed_bag.h"
+#ifdef __mips__
+#define speed_bag ((const struct Import *)AF_V3_SPEED_BAG_ROW)
+#else
+extern struct Import af_v3_speed_bag_import;
+#define speed_bag (&af_v3_speed_bag_import)
+#endif
+#endif
+
 static const struct Import *find(u32 argument) {
     u32 n = (u16)argument, i;
     if (n < NATIVE || n >= CAPACITY) return 0;
+#ifdef AF_V3_SPEED_BAG
+    if (n == AF_V3_SPEED_BAG_INDEX && speed_bag->enabled == 1 &&
+            speed_bag->index == n && speed_bag->item == AF_V3_SPEED_BAG_ITEM &&
+            profiles[n] == AF_V3_SPEED_BAG_PROFILE &&
+            speed_bag->profile[16] == AF_V3_SPEED_BAG_VTABLE) return speed_bag;
+#endif
 #ifdef AF_V3_CLOTHING_DISPLAY
     if (n == AF_V3_CLOTHING_DISPLAY_INDEX && display_import->enabled == 1 &&
             display_import->index == n && display_import->item == AF_V3_CLOTHING_DISPLAY_ITEM &&
@@ -116,7 +132,16 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
     size = row->profile[3] - row->profile[2];
     if (size > BANK_BYTES || !row->profile[0] ||
             row->profile[0] > 0x04000000u - size ||
-            row->profile[1] != row->profile[0] + size || row->profile[16]) return 0;
+            row->profile[1] != row->profile[0] + size) return 0;
+    if (row->profile[16]) {
+#ifdef AF_V3_SPEED_BAG
+        /* Its constructor/move/draw callbacks consume the complete object;
+           there is no separate item-dependent DMA callback. */
+        if (row != speed_bag || row->profile[16] != AF_V3_SPEED_BAG_VTABLE) return 0;
+#else
+        return 0;
+#endif
+    }
     if (dma((void *)(uptr)bank, row->profile[0], size)) return 0;
     indices[(u16)argument] = (u8)active;
     return 1;

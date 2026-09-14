@@ -1,5 +1,6 @@
 /* V3 owns 0x6000..0x63FF of the existing resident reservation. */
 typedef unsigned int u32;
+#include "storage.h"
 extern u32 af_crc32(const void *, u32);
 #ifndef AF_V3_BLOB_SIZE
 #define AF_V3_BLOB_SIZE 0x2000u
@@ -48,14 +49,14 @@ int af_v3_startup(void) {
     /* Retain the low-memory English Expansion Pak warning path. */
     if (memsize != 0x800000u) return 1;
     if (installed) return header[0] == 0x41465633u && header[AF_V3_GUARD] == 0xAF33C0DEu;
-    if (config[0] != 0x03F00000u || config[1] != AF_V3_BLOB_SIZE || config[3] != AF_V3_ABI) return 0;
+    if (config[0] != AF_V3_STORAGE_VROM || config[1] != AF_V3_BLOB_SIZE || config[3] != AF_V3_ABI) return 0;
     if (dma(memory, config[0], config[1])) return 0;
     if (af_crc32(memory, config[1]) != config[2]) return 0;
     if (header[0] != 0x41465633u || header[1] != AF_V3_ABI || header[2] != AF_V3_BLOB_SIZE
             || header[3] != 430 || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
 #ifdef AF_V3_CLOTHING_PROFILE
     const u32 *extra = (const u32 *)(memory+0xE0);
-    if (extra[0] != 0x03F0F400u || !extra[1] || extra[1] > 0xC00u || (extra[1] & 15)
+    if (extra[0] != AF_V3_SAVE_CODE_VROM || !extra[1] || extra[1] > 0xC00u || (extra[1] & 15)
             || extra[3] != 0x8046D000u) return 0;
     if (dma(extra_code, extra[0], extra[1]) || af_crc32(extra_code, extra[1]) != extra[2]) return 0;
     writeback(extra_code, extra[1]);

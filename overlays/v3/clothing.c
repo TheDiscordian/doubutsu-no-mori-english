@@ -1,5 +1,6 @@
 /* Additive clothing resource lookup. Item/gameplay consumers remain separate. */
 #include "clothing.h"
+#include "storage.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -18,7 +19,7 @@ u32 af_v3_clothing_source(int index, u32 palette) {
     if (index >= 0 && index < 256)
         return palette ? 0x00B88000u + (u32)index * 32u : 0x00B68000u + (u32)index * 512u;
     if (index != 0x10BF || clothing->enabled != 1 || clothing->item != 0x34BF
-            || clothing->index != (u32)index || clothing->vrom != 0x03F0F000u
+            || clothing->index != (u32)index || clothing->vrom != AF_V3_CLOTHING_VROM
             || clothing->reserved || clothing->padding) return 0;
     return clothing->vrom + (palette ? 512u : 0u);
 }

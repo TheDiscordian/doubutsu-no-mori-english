@@ -4,12 +4,17 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 struct Item { u16 index, item, price; u8 size, enabled; u8 name[16], reserved[8]; };
 struct Place { int exists, x, z; };
+#ifdef AF_V3_SPEED_BAG
+#define ITEM_COUNT 3
+#else
+#define ITEM_COUNT 2
+#endif
 _Static_assert(sizeof(struct Item) == 32, "Imported item metadata width");
 _Static_assert(sizeof(struct Place) == 12, "Native placement cell width");
 #ifdef __mips__
 #define items ((const struct Item *)0x804672A0u)
 #else
-extern struct Item af_v3_test_items[2];
+extern struct Item af_v3_test_items[ITEM_COUNT];
 #define items af_v3_test_items
 #endif
 extern int af_v3_furniture_import_profile(u32);
@@ -36,7 +41,7 @@ static const struct Clothing *find_clothing(u32 item) {
 
 static const struct Item *find(u32 value) {
     u32 i, item = (u16)value & 0xFFFCu;
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < ITEM_COUNT; ++i) {
         const struct Item *row = items + i;
         if (row->enabled == 1 && row->item == item && row->size == 0 &&
                 af_v3_furniture_import_profile(row->index)) return row;

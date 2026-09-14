@@ -303,9 +303,18 @@ audio, and leaves 608 bytes of conservative permanent-heap spare capacity.
 Four focused checks and the corrected build's first 58-step native run pass,
 including actual trigger/retrigger, completed imported-sample transfers, and
 guards. Native testing found and fixed an unaligned envelope read. PCM/listening
-verification, callback/profile installation, stable item readers, ordinary gameplay, and GPU
-appearance remain work. These components do not enable Punchy's house or declare
-the item playable.
+verification, ordinary gameplay, and GPU appearance remain work.
+The [animated runtime installation](checkpoints/V3_SPEED_BAG_RUNTIME.md) adds the
+production callbacks and positional sound adapter, complete native profile/model
+loader, fixed item `3350`, and full English metadata. A two-MiB virtual-ROM
+reservation supplies room for further imports without increasing resident RAM;
+all original directory indices and public item-reader entries remain fixed.
+Four focused checks and the corrected 204-step native run pass, including actual
+installed construction, hit animation, positional sound, full model loading,
+English metadata, original/clothing retention, and cleanup/guards.
+The new item stays disabled while its actual donor
+scoring group, acquisition/catalogue, selected save dependency, and Punchy's
+house are completed. These components do not declare the item playable.
 No import is enabled for players yet.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved

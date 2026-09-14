@@ -242,7 +242,7 @@ def fix_checksum(rom):
     struct.pack_into(">2I", rom, 0x10, *n64_checksum(rom))
 
 
-def replace_dma(rom, replacements, relocations=None, additions=None):
+def replace_dma(rom, replacements, relocations=None, additions=None, *, addition_order=None):
     """Append replacement files; keep VROM identity and all original file ranges."""
     entries = by_vrom(rom)
     relocations = relocations or {}
@@ -260,7 +260,11 @@ def replace_dma(rom, replacements, relocations=None, additions=None):
             new_vrom = relocations[vrom]
             struct.pack_into(">2I", out, DMA_START+entry.index*16, new_vrom, new_vrom+len(data))
     next_index = len(entries)
-    for vrom, data in sorted(additions.items()):
+    order = sorted(additions) if addition_order is None else list(addition_order)
+    if len(order) != len(additions) or set(order) != set(additions):
+        raise ValueError('Explicit DMA addition order must include every resource exactly once')
+    for vrom in order:
+        data = additions[vrom]
         row = DMA_START+next_index*16
         if (vrom in entries or not data or vrom % 16 or len(data) % 16
                 or vrom < 0 or vrom+len(data) > MAX_ROM):

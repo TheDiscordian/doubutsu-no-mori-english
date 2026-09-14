@@ -223,9 +223,16 @@ with later e/e+ donor support investigated separately.
   audio heap. Four focused checks and the corrected build's first 58-step native
   run pass, including real trigger/retrigger and completed sample transfers.
   The native envelope-alignment defect is fixed; PCM/listening remains unverified.
-  Next bind the real sound callback, register the profile and stable item readers,
-  and connect Punchy's house. Ordinary gameplay and GPU appearance remain open;
-  the component checks do not enable the item or villager.
+  The [animated runtime installation](checkpoints/V3_SPEED_BAG_RUNTIME.md) adds
+  the production callbacks, positional sound, profile/model loading, fixed
+  item/index, and English metadata. Four focused checks and the corrected
+  204-step native run pass, including installed construction/hit/positional
+  sound, model loading, English metadata, retention, and cleanup. Storage now uses
+  a checked two-MiB VROM interval without RAM growth or directory-index changes.
+  Next adapt donor HRA series 58 beyond the native 55-entry storage, connect
+  catalogue/group-A acquisition and the selected save dependency, and install
+  Punchy's house. The new row stays disabled; ordinary gameplay, persistence,
+  and GPU appearance remain open. Component checks do not enable the item or villager.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

@@ -10,7 +10,15 @@ af_v3_original_item_price = 0x80464640;
 SECTIONS
 {
     . = 0x8046D000;
-    .text : { *(.text.af_v3_save_check_extended) *(.text .text.*) }
+    .text : {
+        *(.text.af_v3_save_check_extended)
+        code.o(.text .text.*)
+        *(.text.find_clothing) *(.text.find)
+        /* Keep the installed display-reader calls stable; reject growth past
+           this fixed public entry instead of silently moving every consumer. */
+        . = 0x8DC;
+        *(.text.af_v3_item_name_extended) *(.text .text.*)
+    }
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
