@@ -99,7 +99,13 @@ with later e/e+ donor support investigated separately.
   in A's all-season list. Two focused tests and the initial 65-record native
   run pass, including seven stock choices, six town-rarity queries, actual
   full-ID acquisition, independent ownership, restored state, and guards.
-  Catalogue/mannequins and ordinary buy/sell remain.
+  The [shop mannequin adapter](checkpoints/V3_SHOP_MANNEQUIN.md) connects all six
+  count/search decisions. Its cartridge check and corrected 56-record native
+  run pass, including full original/imported/disabled/sold counting and search,
+  both complete texture-loading loops, native relocation, and guards.
+  Next connect the three separate clothing shop-floor placement/selection/sale
+  decisions identified in that checkpoint, then ordinary shop interaction.
+  Catalogue/home display and ordinary buy/sell remain.
   Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop
   checkpoint and move on from navigation retries to display implementation.

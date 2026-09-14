@@ -6,7 +6,7 @@
 
 - ROM SHA-256: `04978d2f62d8ce70c2d5ce4c8e359a622501251669a59e0fb80ef692396cfa4f`.
 - UPS SHA-256: `d665e9266f8c2be10780d4f8d476c036ea22abb646c48de943e3f768f6713d30`.
-- Complete V3 blob SHA-256: `ebb99cc172d6a57a6959059e28aab43cedf5cef0557772ef3c61cd166f737dc5`.
+- Resident prefix SHA-256: `ebb99cc172d6a57a6959059e28aab43cedf5cef0557772ef3c61cd166f737dc5`.
 
 The [stock adapter](../../specs/V3_CLOTHING_STOCK.md) installs actual donor-backed
 cherry shirt in the native A all-season list without changing original garments,
