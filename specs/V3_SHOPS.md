@@ -10,7 +10,7 @@ Imports remain development-only; neither web patcher changes from V2.
 
 The save format and required profile are unchanged. V3 imported saves require
 V3; do not load them in V2. Ordinary shop confirmation/payment, floor displays,
-placement, scoring, complete delivery/read verification, and player lifecycle
+placement, scoring, and player lifecycle
 still need work before an import is enabled for playtesting.
 
 ## Verified goods lists
@@ -60,15 +60,14 @@ which already supports the imported complete English names. No second postal
 name patch is needed. The native pending-order loop at `800B6C88` retains its
 mailbox receipt gate and packed translated-letter creation.
 
-The current isolated check executes that loop with two imported pending orders
-and confirms the complete first 164-byte delivered oil-drum letter, including
-the full captured name and correct attachment. The second letter, final pending
-state, and restored reader text remain unverified after the fixture's reader
-owner check stops execution. This is partial evidence, not completed ordering.
+The combined [shop interaction check](V3_SHOP_INTERACTIONS.md) executes that loop
+with two imported pending orders and confirms both complete 164-byte delivered
+letters, full captured names, correct attachments, pending-order clearing, and
+complete restored English text. Ordinary confirmation/payment remains untested.
 
 The accent-aware reader is installed at startup from the persistent font image.
 Its owner is `80450010`, not ordinary heap storage; the exact V2 font/creator
-resources remain unchanged. Future focused delivery verification must bind
-that real owner and must not replay the already verified stock prefix.
+resources remain unchanged. Verification binds that actual owner and reuses
+the already verified stock prefix without replaying it.
 
 See the [checkpoint](../docs/checkpoints/V3_SHOPS.md) for exact results and limits.

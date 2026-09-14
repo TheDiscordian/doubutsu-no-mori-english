@@ -96,10 +96,13 @@ and original preview fallback within the existing menu allocation. Ordinary
 order/payment/delivery, scoring, placement, and Controller Pak profile transport
 remain work. The [shop adapter](checkpoints/V3_SHOPS.md) adds the pilots to native
 ordinary goods lists and category queries while preserving town rarity and RNG.
-Four focused tests pass. A partial native check verifies actual stock selection,
-pocket acquisition, and the first complete imported-order letter; the delivery
-reader tail remains unverified after the fixture's setup retry. No import is
-enabled for players yet.
+Four focused tests pass; the native stock-selection and pocket-acquisition
+prefix passes. The [shop interaction adapter](checkpoints/V3_SHOP_INTERACTIONS.md)
+connects twenty furniture decisions across all five shopkeepers without actor
+or save growth. Three focused tests and 148 native steps pass, including both
+complete imported-order deliveries/readbacks and pending-order clearing. The
+independent shop-floor selection/removal checks, ordinary payment, scoring,
+and the full item lifecycle remain work. No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 

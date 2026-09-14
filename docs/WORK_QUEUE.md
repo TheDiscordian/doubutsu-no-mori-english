@@ -65,12 +65,14 @@ with later e/e+ donor support investigated separately.
   within the existing menu allocation.
   The [shop adapter](checkpoints/V3_SHOPS.md) adds native ordinary-stock lists
   and category queries without changing town rarity/RNG. Four focused tests
-  pass; native stock selection, pocket acquisition, and the first complete
-  imported-order letter pass within an incomplete combined check. The delivery
-  reader tail remains unverified after a fixture ownership error and its retry;
-  resume only that tail in a later relevant check, not the stock prefix.
-  Next: actual shop confirmation/payment and floor handling, scoring, complete
-  delivery, and ordinary placement/persistence. No complete item is enabled yet.
+  pass, along with native stock selection and pocket acquisition. The
+  [shop interaction adapter](checkpoints/V3_SHOP_INTERACTIONS.md) connects twenty
+  furniture decisions across all five actors. Three focused tests and 148 native
+  steps pass, including complete deliveries/readbacks for both imports and
+  pending-order clearing; the earlier delivery-tail uncertainty is closed.
+  Next: the independent shop-floor reserve/selection/removal checks, ordinary
+  confirmation/payment, scoring, and placement/persistence. No complete item is
+  enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

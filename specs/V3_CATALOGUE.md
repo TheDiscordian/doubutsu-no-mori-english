@@ -91,6 +91,7 @@ the native conversion returns these `3xxx` values unchanged. Review the actual
 shop confirmation/payment and saved pending-order paths before claiming orders.
 The translated post-office creator calls the shared imported-name reader; no
 separate postal name patch is needed. The [shop adapter](V3_SHOPS.md) connects
-native ordinary stock and records partial native pending-order delivery evidence.
-Confirmation/payment, full delivery/read verification, scoring, and complete
+native ordinary stock. The [interaction adapter](V3_SHOP_INTERACTIONS.md) records
+complete native pending-order delivery/readback for both imports.
+Confirmation/payment, independent shop-floor handling, scoring, and complete
 gameplay remain work.
