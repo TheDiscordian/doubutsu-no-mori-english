@@ -4,9 +4,10 @@
 
 `--collection` connects native item collection and live-player clearing to the
 four imported-furniture catalogues in [V3 save state](V3_FLASH_RUNTIME.md).
-It includes the existing FlashRAM runtime. The catalogue screen's list,
-preview, completion, and ordering paths remain separate implementation work;
-this switch does not claim a complete playable item or expose web selections.
+It includes the existing FlashRAM runtime. The additional
+[catalogue adapter](V3_CATALOGUE.md) connects the screen's list, previews,
+completion, and prices. Ordinary ordering/delivery remain work; neither switch
+claims a complete playable item or exposes web selections.
 
 Both web patchers remain V2. The saved format, required imports, memory bounds,
 and compatibility warning are unchanged from the FlashRAM runtime. V3 saves
@@ -42,8 +43,8 @@ The save-state guard is checked before clearing a resident's data.
 
 `af_v3_catalogue_owned(private, item)` queries imported ownership without writes.
 It returns zero for unknown/disabled IDs, an invalid private pointer, or an item
-outside the supported range. It is an internal API for the upcoming menu work;
-the current catalogue screen does not call it yet.
+outside the supported range. The catalogue adapter calls this internal API for
+extended rows while retaining the original bit reader for native entries.
 
 ## Memory and guarded installation
 
@@ -75,7 +76,7 @@ passport record must be handled together with the complete Pak format and
 profile policy, not by copying a resident's unrelated catalogue. Broader player
 transfer/deletion paths remain subject to that implementation review.
 
-## Next catalogue integration
+## Catalogue integration contract
 
 The current translated catalogue is VROM `03970000`, relocation `03980000`,
 linked at `808A6100`; the complete-name adapter and its 63 cached names stay
@@ -94,8 +95,12 @@ the room renderer alone does not connect this second preview loader. Preserve
 model allocation, scale, lighting, order eligibility, and the complete-name
 adapter when adding the imported paths.
 
-Focused verification is recorded in
+The catalogue adapter implements this contract with separate catalogue-local
+index encoding, static resident profiles, retained native DMA, and a relocated
+ordering table. Its specification records the actual hooks and pool bound.
+
+Focused collection verification is recorded in
 [the collection checkpoint](../docs/checkpoints/V3_COLLECTION.md). Acquisition
 function fixtures do not establish an ordinary shop/reward route or hardware
-acceptance. Complete catalogue menus, item scoring, ordinary acquisition and
+acceptance. Ordinary catalogue ordering/delivery, item scoring, acquisition and
 placement, houses/move-in, and Controller Pak support remain required.

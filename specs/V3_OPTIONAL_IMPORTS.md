@@ -170,9 +170,11 @@ The [ground adapter](V3_FURNITURE_GROUND.md) connects drop flags and ground-desc
 selection, with focused/native checks. The [pocket adapter](V3_FURNITURE_POCKETS.md)
 connects both shared furniture count/index queries, with focused/native checks.
 The [collection adapter](V3_COLLECTION.md) connects native acquisition/collection
-and live-player clearing to saved imported ownership. Catalogue menu/scoring
-consumers and the ordinary item lifecycle are required; these are not playable
-imports.
+and live-player clearing to saved imported ownership. The
+[catalogue adapter](V3_CATALOGUE.md) connects collected rows, full names,
+selection, model previews, prices, and completion. Four focused tests and a
+70-step native check pass. Ordinary order/delivery, stock/acquisition, scoring,
+and the complete item lifecycle are required; these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

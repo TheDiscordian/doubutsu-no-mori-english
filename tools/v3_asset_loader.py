@@ -46,12 +46,15 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
+    if part == 'catalogue':
+        flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
     for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
-    run('ld', '-EB', '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
+    run('ld', '-EB', *(['--emit-relocs'] if part == 'catalogue' else []),
+        '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
     symbols = {name: int(address, 16) for address, kind, name in
@@ -71,16 +74,20 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200),
                        'save_codec': ('af_v3_save_check', BLOB_RAM + 0xB400),
                        'save_runtime': ('af_v3_save_reset', BLOB_RAM + 0x9200),
-                       'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0)}[part]
+                       'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0),
+                       'catalogue': ('af_v3_catalogue_bit', 0x808B32B0)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
-    return code, {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
-                  'toolchain': IMAGE, 'flags': flags,
-                  'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
+    report = {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
+              'toolchain': IMAGE, 'flags': flags,
+              'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
+    if part == 'catalogue':
+        report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
+    return code, report
 
 
-def compose(native, base, changes, added):
+def compose(native, base, changes, added, *, resized=()):
     """Preserve current DMA identities and startup copies while adding new files."""
     verified_rom(native)
     if sha256(base) != BASE_SHA:
@@ -90,7 +97,10 @@ def compose(native, base, changes, added):
         return base
     if not set(changes) <= set(current) or set(added) & set(current):
         raise ValueError('Unknown change or colliding V3 addition')
-    if any(len(data) != current[v].size or v in (0x1060, 0x19D40) for v, data in changes.items()):
+    if not set(resized) <= set(changes) or not set(resized) <= {0x03970000, 0x03980000}:
+        raise ValueError('Unreviewed V3 resource resize')
+    if any((len(data) != current[v].size and v not in resized) or v in (0x1060, 0x19D40)
+           for v, data in changes.items()):
         raise ValueError('Unexpected resize or boot change in V3 asset batch')
     original_by_index = {e.index: e for e in original.values()}
     if not set(original_by_index) <= {e.index for e in current.values()}:
@@ -131,7 +141,7 @@ def compose(native, base, changes, added):
 def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None,
           furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False,
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
-          save_codec=False, save_runtime=False, collection=False):
+          save_codec=False, save_runtime=False, collection=False, catalogue=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -149,6 +159,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_save_codec
     import v3_save_runtime
     import v3_collection
+    import v3_catalogue
+    if catalogue and not collection:
+        raise ValueError('Catalogue imports require persistent native collection')
     if collection and not save_runtime:
         raise ValueError('Collection requires actual save/profile state')
     if save_runtime and not save_codec:
@@ -188,7 +201,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_furniture_pockets.SOURCES if furniture_pockets else ())
                     + (v3_save_codec.SOURCES if save_codec else ())
                     + (v3_save_runtime.SOURCES if save_runtime else ())
-                    + (v3_collection.SOURCES if collection else ()))
+                    + (v3_collection.SOURCES if collection else ())
+                    + (v3_catalogue.SOURCES if catalogue else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -392,6 +406,21 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         collection_report = v3_collection.install(code, blob, collection_code,
             collection_code_report['symbols'], runtime_report, save_code_report, furniture_code_report)
         collection_report['code'] = collection_code_report
+    catalogue_changes, catalogue_report = {}, None
+    if catalogue:
+        ordering, catalogue_records = v3_catalogue.table(base, rel, symbols, furniture_report['imports'])
+        table_path = out / 'catalogue-order.bin'
+        write_new(table_path, ordering)
+        generated = out / 'catalogue-order.S'
+        write_new(generated, ('.section .rodata.catalogue_order\n.balign 4\n'
+            '.globl af_v3_catalogue_order\naf_v3_catalogue_order:\n'
+            f'.incbin "/source/{table_path.relative_to(ROOT)}"\n').encode())
+        catalogue_code, catalogue_code_report = compile_part('catalogue', out / 'catalogue',
+            extra_sources=('overlays/v3/catalogue_bridge.S', str(generated.relative_to(ROOT))))
+        catalogue_changes, catalogue_report = v3_catalogue.install(base,
+            icon_changes[v3_catalogue.PARENT], catalogue_code, catalogue_code_report,
+            ordering, catalogue_records, collection_code_report, runtime_report, room_code_report)
+        catalogue_report['code'] = catalogue_code_report
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -412,14 +441,16 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             del additions[vrom]
     additions[BLOB] = bytes(blob_file)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
-               **furniture_changes, **menu_changes, **icon_changes, **ground_changes}
-    image = compose(native, base, changes, additions)
+               **furniture_changes, **menu_changes, **icon_changes, **ground_changes, **catalogue_changes}
+    resized = (v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ()
+    image = compose(native, base, changes, additions, resized=resized)
     patch = make_ups(native, image)
     if apply_ups(native, patch) != image:
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 item collection integration development 01' if collection else
+    label = ('V3 imported catalogue development 01' if catalogue else
+             'V3 item collection integration development 01' if collection else
              'V3 FlashRAM integration development 01' if save_runtime else
              'V3 save-codec foundation development 01' if save_codec else
              'V3 furniture pocket integration development 01' if furniture_pockets else
@@ -445,6 +476,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'save_codec': save_report,
         'save_runtime': save_runtime_report,
         'collection': collection_report,
+        'catalogue': catalogue_report,
+        'resized_resources': [f'{v:08X}' for v in resized],
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'resident_blob_bytes': blob_size,
@@ -485,7 +518,10 @@ def main():
     p.add_argument('--save-codec', action='store_true', help='Include checked save/profile codec; native saving is not changed')
     p.add_argument('--save-runtime', action='store_true', help='Enable V3 FlashRAM profiles and save/load integration; saves require V3')
     p.add_argument('--collection', action='store_true', help='Connect native item collection and player clearing to V3 catalogue state')
+    p.add_argument('--catalogue', action='store_true', help='Include imported catalogue rows, model previews, and orderable prices')
     args = p.parse_args()
+    if args.catalogue:
+        args.collection = True
     if args.collection:
         args.save_runtime = True
     if args.save_runtime:
@@ -527,7 +563,7 @@ def main():
         furniture_fields=args.furniture_fields, furniture_menu=args.furniture_menu,
         furniture_icon=args.furniture_icon, furniture_ground=args.furniture_ground,
         furniture_pockets=args.furniture_pockets, save_codec=args.save_codec, save_runtime=args.save_runtime,
-        collection=args.collection)
+        collection=args.collection, catalogue=args.catalogue)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

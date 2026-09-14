@@ -88,9 +88,13 @@ acquisition/collection and resident clearing to the saved imported catalogues.
 Four focused tests and a 177-step native acquisition/two-bank save check pass,
 including present/quest conditions, original collection, rotation sharing,
 separate player ownership, and temporary/resident clearing. A 54-step fresh
-process restores the complete acquired payload and catalogue/profile. Catalogue menu
-lists/previews/ordering, ordinary gameplay routes, and Controller Pak profile
-transport remain work.
+process restores the complete acquired payload and catalogue/profile. The
+[catalogue adapter](checkpoints/V3_CATALOGUE.md) adds collected-item rows, complete
+English names, model previews, selection, prices, and completion. Four focused
+tests and 70 native steps pass, including both complete model DMAs, all 438 rows,
+and original preview fallback within the existing menu allocation. Ordinary
+order/payment/delivery, stock/acquisition, scoring, placement, and Controller Pak
+profile transport remain work; no import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 
