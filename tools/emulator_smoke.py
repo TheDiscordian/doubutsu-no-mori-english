@@ -1433,6 +1433,12 @@ def main():
                     raise ValueError('V3 speed-bag probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_speed_bag_callbacks'):
+                from v3_speed_bag_callback_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 callback probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture'):
                 from v3_furniture_smoke import exercise
                 if not (out/'test.bs1').is_file():

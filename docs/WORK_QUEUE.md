@@ -213,10 +213,15 @@ with later e/e+ donor support investigated separately.
   The [speed-bag asset converter](checkpoints/V3_SPEED_BAG_ART.md) supplies the
   complete two-part model, all eight textures, and the two-joint/three-track
   animation in 3,728 bytes. Six focused checks and five retained static-parser
-  host checks pass. Native evaluation remains unexecuted after two bounded setup
-  failures; do not repeat those attempts. Next implement the actual constructor,
-  hit/retrigger callback, verified sound, and native skeleton drawing, then
-  connect stable item identity/readers and Punchy's house.
+  host checks pass. The [callback batch](checkpoints/V3_SPEED_BAG_CALLBACKS.md)
+  implements all three native callbacks, with five focused checks and the
+  corrected 103-record native run passing actual interpolation, first hit,
+  retrigger/stop timing, sound eligibility, and drawing in both matrix banks.
+  The full donor hit sound is converted with five passing audio checks.
+  Next install its sequence/font/wave resources within verified audio capacity,
+  bind the real sound callback, register the profile and stable item readers,
+  and connect Punchy's house. Ordinary gameplay and GPU appearance remain open;
+  the component checks do not enable the item or villager.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

@@ -291,10 +291,16 @@ The [speed-bag converter](checkpoints/V3_SPEED_BAG_ART.md) supplies Punchy's
 complete two-part animated model: all textures, geometry, three animation tracks,
 and native two-joint headers fit in 3,728 bytes of a 5,120-byte bank. Six focused
 conversion checks and the five retained static-parser host checks pass. The
-native animation fixture remains unexecuted after its bounded setup failures;
-no gameplay or rendering result is claimed. Next implement the actual hit/
-retrigger callbacks, sound, drawing, and stable item registration. The asset
-alone does not enable Punchy's house or declare the item playable.
+separate [callback batch](checkpoints/V3_SPEED_BAG_CALLBACKS.md) implements the
+constructor, hit/retrigger logic, and native skeleton drawing in 472 bytes.
+Five focused checks and the corrected 103-record native run pass: complete
+poses, hit/retrigger/stop timing, native state-based sound dispatch, both matrix
+banks' drawing commands, and memory/save guards. The complete hit-sound program,
+instrument, envelopes, loop, predictor book, and 11,062-byte sample are converted;
+five audio checks pass. Native sound registration/allocation and synthesis,
+callback/profile installation, stable item readers, ordinary gameplay, and GPU
+appearance remain work. These components do not enable Punchy's house or declare
+the item playable.
 No import is enabled for players yet.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
