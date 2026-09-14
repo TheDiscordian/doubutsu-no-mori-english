@@ -57,6 +57,33 @@ native module and worker hashes in `FLASH_MAIL.md`, not isolated constants.
   These are review sites, not approved replacements. Travel must not drop V3
   identities/profile dependencies without safe handling and a clear warning.
 
+The main-code call audit also identifies `8008F530` as the bank-repair rereader:
+it rereads a selected source bank at `8008F56C` before repairing the other bank.
+The shared asynchronous bank writer at `8008F1BC` also reaches 512 pages; the
+travel-related preparation paths use that writer. Their allocations at
+`80095498` and `80096030` are framebuffer requests through `800D97A0`, not heap
+allocations. Their payload copies at `8009581C`/`800961F4`, header preparation at
+`80095874`/`80096260`, and verification reads at `80095A54`/`80096468` must stay
+coherent with the normal save path.
+
+The two load entries both return the native success boolean. The direct entry
+`8008F938` reads the selected bank into live RAM without a temporary allocation.
+The allocated entry `8008F968` already retries failed reads, validates the header,
+copies only `F980` bytes into live RAM, and frees its buffer. A candidate
+integration can route direct loads through the allocated path, grow only that
+private allocation to `10000`, and decode V3 state before committing the original
+payload copy. This avoids assuming ownership of the unnamed live-RAM tail;
+caller/overlay verification remains required before installing that change.
+
+Do not merely replace the header-writer call with packing and ignore its result.
+Native preparation callers continue into writing without testing that call's
+return. Packing/profile failures must stop the write before device I/O. The
+synchronous path must likewise validate its complete private prepared bank
+before its existing whole-chip erase operation. An incompatible otherwise-valid
+bank must not be silently replaced using an older compatible bank during repair.
+Preserve a distinct profile error and gate load/repair/save until the explicit
+incompatibility path is handled.
+
 V3 already owns RAM `80460000..8046FFFF`; the current loaded prefix ends at
 `8046BFFF`. A future explicitly initialised state at `8046C000` can avoid
 repurposing unnamed native save RAM. ROM-only model data beginning at VROM
