@@ -164,7 +164,9 @@ verification. The [shared field adapter](V3_FURNITURE_FIELDS.md) connects both
 complete native room-grid builders and donor-backed shop eligibility, with
 focused/native checks. The [menu adapter](V3_FURNITURE_MENU.md) connects action
 menus, hand destinations, and room-placement dispatch, with focused/native checks.
-The inventory leaf-icon reader, remaining external consumers, and the ordinary item lifecycle are required;
+The [inventory icon adapter](V3_FURNITURE_ICON.md) connects the separate leaf reader,
+with focused checks and actual native selection/drawing-command verification.
+Remaining external consumers and the ordinary item lifecycle are required;
 these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 

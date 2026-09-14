@@ -67,12 +67,11 @@ parent state; it does not execute the complete parent initialization or ordinary
 menu flow. Normal placement/acquisition, saving/loading imports, and hardware
 compatibility remain unverified.
 
-The inventory icon has a separate native furniture check in `mSM_draw_item` in
-the submenu parent. The type shift/constant pair at `8085C880`–`8085C884` is a
-candidate entry; its mask at `8085C864` is a branch delay instruction and must
-remain in place. The normal furniture path selects the leaf texture descriptor
-at linked `8085DCF8`, then reaches `8085C980` before drawing. This icon reader
-is not patched by the three tag detours and remains required work.
+The [inventory icon adapter](V3_FURNITURE_ICON.md) handles the separate native
+furniture check in the submenu parent. It leaves the tag detours unchanged and
+retains the parent mask at `8085C864`, which is a branch delay instruction. The
+native furniture path selects the leaf descriptor at linked `8085DCF8` and reaches
+`8085C980` before drawing. Its focused/native evidence is recorded separately.
 
 Catalogue flags, shop generation/order lists, outside-field item consumers,
 scoring, acquisition, and complete save/profile support also remain required.

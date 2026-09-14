@@ -58,8 +58,11 @@ retained rotations, disabled imports, original shop fallbacks, and guards. The
 [menu-dispatch batch](checkpoints/V3_FURNITURE_MENU.md) connects furniture action
 menus, held-item destinations, and room-placement dispatch. Three focused checks
 and 77 native steps pass, including complete action/hand decisions, all four field
-contexts, wrapped/quest restrictions, and full-register checks. The independent
-inventory leaf-icon reader remains pending. Remaining external
+contexts, wrapped/quest restrictions, and full-register checks. The
+[inventory icon batch](checkpoints/V3_FURNITURE_ICON.md) connects the independent
+leaf reader. Three focused checks and 59 native steps pass, including full-register
+preservation, actual parent relocation, six descriptor selections, and complete
+native drawing commands matching the original leaf for both imports. Remaining external
 caller integration, ordinary placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
