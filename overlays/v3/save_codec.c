@@ -34,10 +34,17 @@ static int town_valid(const u8 *bank) {
     return bank[8] == 0x30 && read16(bank + 8) == read16(bank + 0x2F68);
 }
 static int catalogue_valid(const u8 *profile, const u8 *catalogue) {
-    for (u32 i = 0; i < AF_SAVE_CATALOGUE; ++i)
+    for (u32 i = 0; i < AF_SAVE_FURNITURE_CATALOGUE; ++i)
         if (catalogue[i] & ~profile[32 + (i & 127)]) return 0;
     return 1;
 }
+#ifdef AF_V3_CLOTHING_PROFILE
+static int clothing_valid(const u8 *profile, const u8 *catalogue) {
+    for (u32 i = 0; i < 128; ++i)
+        if (catalogue[i] & ~profile[i & 31]) return 0;
+    return 1;
+}
+#endif
 
 int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
     if (!bank || size != AF_SAVE_BANK || !current || (state &&
@@ -48,23 +55,49 @@ int af_v3_save_check(const u8 *bank, u32 size, const u8 *current, u8 *state) {
     if (sum(bank)) return AF_SAVE_CHECKSUM;
     const u8 *ext = bank + AF_SAVE_PAYLOAD;
     int result = AF_SAVE_LEGACY;
+#ifdef AF_V3_CLOTHING_PROFILE
+    int clothing_format = 0;
+#endif
     if (magic == 0x4E414633u) {
+#ifdef AF_V3_CLOTHING_PROFILE
+        clothing_format = read32(ext+4) == 0x00020680u && read32(ext+8) == 2;
+        if (read32(ext) != 0x41465333u || (!clothing_format &&
+                (read32(ext+4) != 0x00010680u || read32(ext+8) != 1))) return AF_SAVE_FORMAT;
+#else
         if (read32(ext) != 0x41465333u || read32(ext + 4) != 0x00010680u ||
                 read32(ext + 8) != 1) return AF_SAVE_FORMAT;
+#endif
         for (u32 i = 0x14; i < AF_SAVE_CAPSULE; ++i)
-            if ((i < 0x18 || (i >= 0xB8 && i < 0xC0) || i >= 0x2C0) && ext[i])
+            if ((i < 0x18 || (i >= 0xB8 && i < 0xC0) ||
+#ifdef AF_V3_CLOTHING_PROFILE
+                    i >= (clothing_format ? 0x360u : 0x2C0u)
+#else
+                    i >= 0x2C0
+#endif
+                    ) && ext[i])
                 return AF_SAVE_FORMAT;
         if (crc(ext, AF_SAVE_CAPSULE, 0x10, 4) != read32(ext + 0x10)) return AF_SAVE_CRC;
         if (crc(bank, AF_SAVE_PAYLOAD, 0x12, 2) != read32(ext + 0xC)) return AF_SAVE_BINDING;
-        for (u32 i = 0; i < AF_SAVE_PROFILE; ++i)
+        for (u32 i = 0; i < AF_SAVE_BASE_PROFILE; ++i)
             if (ext[0x18 + i] & ~current[i]) return AF_SAVE_PROFILE_MISSING;
         if (!catalogue_valid(ext + 0x18, ext + 0xC0)) return AF_SAVE_CATALOGUE_INVALID;
+#ifdef AF_V3_CLOTHING_PROFILE
+        if (clothing_format) {
+            for (u32 i = 0; i < 32; ++i)
+                if (ext[0x2C0+i] & ~current[160+i]) return AF_SAVE_PROFILE_MISSING;
+            if (!clothing_valid(ext+0x2C0, ext+0x2E0)) return AF_SAVE_CATALOGUE_INVALID;
+        }
+#endif
         result = AF_SAVE_OK;
     }
     if (state) {
         copy(state, current, AF_SAVE_PROFILE);
-        for (u32 i = 0; i < AF_SAVE_CATALOGUE; ++i)
+        for (u32 i = 0; i < AF_SAVE_FURNITURE_CATALOGUE; ++i)
             state[AF_SAVE_PROFILE + i] = result == AF_SAVE_OK ? ext[0xC0 + i] : 0;
+#ifdef AF_V3_CLOTHING_PROFILE
+        for (u32 i = 0; i < 128; ++i)
+            state[AF_SAVE_PROFILE+512+i] = clothing_format ? ext[0x2E0+i] : 0;
+#endif
     }
     return result;
 }
@@ -74,14 +107,24 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
         return AF_SAVE_ARGUMENT;
     if (!town_valid(bank)) return AF_SAVE_HEADER;
     if (!catalogue_valid(state, state + AF_SAVE_PROFILE)) return AF_SAVE_CATALOGUE_INVALID;
+#ifdef AF_V3_CLOTHING_PROFILE
+    if (!clothing_valid(state+160, state+AF_SAVE_PROFILE+512)) return AF_SAVE_CATALOGUE_INVALID;
+#endif
     u8 *ext = bank + AF_SAVE_PAYLOAD;
     write32(bank + 4, 0x4E414633u);
     for (u32 i = 0; i < AF_SAVE_CAPSULE; ++i) ext[i] = 0;
     write32(ext, 0x41465333u);
+#ifdef AF_V3_CLOTHING_PROFILE
+    write32(ext + 4, 0x00020680u);
+    write32(ext + 8, 2);
+    copy(ext+0x2C0, state+160, 32);
+    copy(ext+0x2E0, state+AF_SAVE_PROFILE+512, 128);
+#else
     write32(ext + 4, 0x00010680u);
     write32(ext + 8, 1);
-    copy(ext + 0x18, state, AF_SAVE_PROFILE);
-    copy(ext + 0xC0, state + AF_SAVE_PROFILE, AF_SAVE_CATALOGUE);
+#endif
+    copy(ext + 0x18, state, AF_SAVE_BASE_PROFILE);
+    copy(ext + 0xC0, state + AF_SAVE_PROFILE, AF_SAVE_FURNITURE_CATALOGUE);
     write32(ext + 0xC, crc(bank, AF_SAVE_PAYLOAD, 0x12, 2));
     write32(ext + 0x10, crc(ext, AF_SAVE_CAPSULE, 0x10, 4));
     u32 checksum = (read16(bank + 0x12) - sum(bank)) & 0xFFFFu;
@@ -91,6 +134,15 @@ int af_v3_save_pack(u8 *bank, u32 size, const u8 *state) {
 
 int af_v3_save_collect(u8 *state, u32 player, u32 item, u32 mark) {
     if (!state || player >= 4 || item < 0x3000 || item > 0x3FFF || mark > 1) return AF_SAVE_ARGUMENT;
+#ifdef AF_V3_CLOTHING_PROFILE
+    if ((item & 0xFF00) == 0x3400) {
+        u32 index = item & 255, byte = index >> 3, bit = 1u << (index & 7);
+        if (!(state[160+byte] & bit)) return AF_SAVE_PROFILE_MISSING;
+        u8 *collected = state+AF_SAVE_PROFILE+512+player*32+byte;
+        if (mark) *collected |= bit;
+        return (*collected & bit) != 0;
+    }
+#endif
     u32 index = (item & 0xFFF) >> 2, byte = index >> 3, bit = 1u << (index & 7);
     if (!(state[32 + byte] & bit)) return AF_SAVE_PROFILE_MISSING;
     u8 *collected = state + AF_SAVE_PROFILE + player * 128 + byte;

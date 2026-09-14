@@ -2,6 +2,11 @@
 
 ## Implemented boundary
 
+The clothing-enabled variant uses the independently versioned
+[format-2 clothing extension](V3_CLOTHING_SAVE.md). It retains the format-1
+villager/furniture records, adds separate garment records, and migrates valid
+format-1 saves. The following format-1 layout remains the non-clothing variant.
+
 `overlays/v3/save_codec.c` implements a bounded bank encoder, validator/decoder,
 and four-player imported-furniture catalogue. `--save-codec` installs this code
 in the combined development cartridge, but **does not change native saving,
@@ -129,8 +134,9 @@ the stable actor index, without the `E000` prefix. A furniture bit is
 share ownership. The two pilots use bits 137 and 174; Cheri/Punchy use actor
 indices 234 and 237. The current registry builder remains responsible for
 assigning real supported identities; bit capacity does not enable unsupported
-imports. Clothing and other future imported item classes require a reviewed
-registry/format extension, not reuse of furniture bits.
+imports. The clothing variant uses its separate reviewed format-2 records;
+other future item classes also need an explicit extension, not reuse of
+furniture bits.
 
 The 672-byte working state is the 160-byte selection profile followed by the
 512-byte catalogue. Packing checks that every owned imported item is in the

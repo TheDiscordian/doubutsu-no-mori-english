@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-player-clothing-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`6f376337d1f104fd9893d6d38a8cabcf879601592c9af19b76bee2f8b73a3ae2`.
+`build/v3-clothing-save-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`dc0de52bab863e601c5ba174d5a70a649baa72ba00828aeff550fc8c967609b3`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -179,10 +179,15 @@ The [player clothing adapter](checkpoints/V3_PLAYER_CLOTHING.md) connects both
 startup readers and clothes changes while retaining native double buffering.
 Three focused tests and the initial 47-step native run pass: complete original/
 imported artwork, four registered banks, both buffer changes, unknown/missing
-handling, restored globals, and guards. Ordinary item consumers and the clothing
-save registry remain work; Punchy's defaults stay disabled.
-These changes do not change the existing experimental V3 save format or
-profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
+handling, restored globals, and guards. The
+[clothing save extension](checkpoints/V3_CLOTHING_SAVE.md) adds independent
+clothing profile/ownership records and preserves format-1 furniture ownership
+during migration. Five focused checks, four current non-clothing codec host
+checks, and the corrected 52-step native run pass, including complete startup/
+encoding/decoding, ownership separation, player clearing, and guards. Ordinary
+item consumers remain work; Punchy's defaults stay disabled.
+The clothing variant writes format 2 and must not be loaded by older format-1
+V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,
 and the complete villager remain work.
 No import is enabled for players yet.

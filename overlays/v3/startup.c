@@ -33,6 +33,14 @@ extern void af_v3_writeback(void *, u32), af_v3_invalidate(void *, u32);
 #define invalidate af_v3_invalidate
 #define execute af_v3_execute
 #endif
+#ifdef AF_V3_CLOTHING_PROFILE
+#ifdef __mips__
+#define extra_code (memory+0xD000)
+#else
+extern unsigned char af_v3_save_extra[0xC00];
+#define extra_code af_v3_save_extra
+#endif
+#endif
 
 int af_v3_startup(void) {
     const u32 *header = (const u32 *)memory;
@@ -45,6 +53,14 @@ int af_v3_startup(void) {
     if (af_crc32(memory, config[1]) != config[2]) return 0;
     if (header[0] != 0x41465633u || header[1] != AF_V3_ABI || header[2] != AF_V3_BLOB_SIZE
             || header[3] != 430 || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
+#ifdef AF_V3_CLOTHING_PROFILE
+    const u32 *extra = (const u32 *)(memory+0xE0);
+    if (extra[0] != 0x03F0F400u || !extra[1] || extra[1] > 0xC00u || (extra[1] & 15)
+            || extra[3] != 0x8046D000u) return 0;
+    if (dma(extra_code, extra[0], extra[1]) || af_crc32(extra_code, extra[1]) != extra[2]) return 0;
+    writeback(extra_code, extra[1]);
+    invalidate(extra_code, extra[1]);
+#endif
     writeback(memory, AF_V3_BLOB_SIZE);
     invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);
     if (execute() != 1) return 0;

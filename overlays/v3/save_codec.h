@@ -7,8 +7,15 @@ typedef unsigned int af_save_u32;
 #define AF_SAVE_PAYLOAD 0xF980u
 #define AF_SAVE_BANK 0x10000u
 #define AF_SAVE_CAPSULE (AF_SAVE_BANK - AF_SAVE_PAYLOAD)
-#define AF_SAVE_PROFILE 160u
-#define AF_SAVE_CATALOGUE 512u
+#define AF_SAVE_BASE_PROFILE 160u
+#define AF_SAVE_FURNITURE_CATALOGUE 512u
+#ifdef AF_V3_CLOTHING_PROFILE
+#define AF_SAVE_PROFILE 192u
+#define AF_SAVE_CATALOGUE 640u
+#else
+#define AF_SAVE_PROFILE AF_SAVE_BASE_PROFILE
+#define AF_SAVE_CATALOGUE AF_SAVE_FURNITURE_CATALOGUE
+#endif
 #define AF_SAVE_STATE (AF_SAVE_PROFILE + AF_SAVE_CATALOGUE)
 
 enum {
@@ -22,7 +29,7 @@ enum {
  * or current profile. Errors leave every caller buffer unchanged. */
 int af_v3_save_check(const af_save_u8 *bank, af_save_u32 size,
                      const af_save_u8 *current, af_save_u8 *state);
-/* State = 32 villager bytes, 128 furniture bytes, four 128-byte catalogues.
+/* State = current profile followed by furniture and optional clothing ownership.
  * State and bank must be disjoint. Preparation only; this does no device I/O. */
 int af_v3_save_pack(af_save_u8 *bank, af_save_u32 size, const af_save_u8 *state);
 /* Registry 1 uses bits (actor index) and ((item & 0xFFF) >> 2), LSB first.

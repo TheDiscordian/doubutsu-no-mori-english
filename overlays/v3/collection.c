@@ -61,6 +61,10 @@ void af_v3_catalogue_clear(u8 *private) {
         af_v3_require_save_state();
         u8 *catalogue = state->working + AF_SAVE_PROFILE + player * 128u;
         for (u32 i = 0; i < 128; ++i) catalogue[i] = 0;
+#ifdef AF_V3_CLOTHING_PROFILE
+        catalogue = state->working + AF_SAVE_PROFILE + 512 + player*32;
+        for (u32 i = 0; i < 32; ++i) catalogue[i] = 0;
+#endif
     }
     af_v3_original_private_clear(private);
 }

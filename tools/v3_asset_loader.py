@@ -77,6 +77,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'ground': ('af_v3_ground_type_8090f888', BLOB_RAM + 0xAE00),
                        'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200),
                        'save_codec': ('af_v3_save_check', BLOB_RAM + 0xB400),
+                       'save_clothing': ('af_v3_save_check_extended', BLOB_RAM + 0xD000),
                        'save_runtime': ('af_v3_save_reset', BLOB_RAM + 0x9200),
                        'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0),
                        'catalogue': ('af_v3_catalogue_bit', 0x808B32B0),
@@ -193,6 +194,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_clothing
     import v3_npc_clothing
     import v3_player_clothing
+    import v3_save_clothing
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -267,6 +269,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_villager_selection.SOURCES if villager_selection else ())
                     + (v3_villager_rewards.SOURCES if villager_rewards else ())
                     + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES + v3_player_clothing.SOURCES
+                       + v3_save_clothing.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -320,7 +323,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     if npc_draw:
         abi = max(abi, v3_npc_draw.STREAMING_ABI)
     if clothing:
-        abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI)
+        abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI, v3_save_clothing.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -341,6 +344,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     startup_defines = (f'AF_V3_BLOB_SIZE={blob_size}', f'AF_V3_ABI={abi}') if npc_draw else ()
     if save_runtime:
         startup_defines += ('AF_V3_SAVE_RUNTIME=1',)
+    clothing_defines = ('AF_V3_CLOTHING_PROFILE=1',) if clothing else ()
+    startup_defines += clothing_defines
     startup, startup_report = compile_part('startup', out / 'startup', defines=startup_defines)
     extra_sources = ('overlays/v3/npc_draw.c', 'overlays/v3/npc_voice.S') if npc_draw else ()
     if audio_donor is not None:
@@ -480,20 +485,23 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             pockets_code_report['symbols'], room_code_report['symbols'])
         pockets_report['code'] = pockets_code_report
     save_report = None
+    if clothing:
+        clothing_resource, clothing_record, clothing_row = v3_clothing.convert(
+            native, text_donor[1], rel, symbols)
     if save_codec:
         save_code, save_code_report = compile_part('save_codec', out / 'save_codec')
         save_report = v3_save_codec.install(blob, save_code, save_code_report['symbols'], pockets_code_report)
         save_report['code'] = save_code_report
     save_runtime_report = None
     if save_runtime:
-        runtime_code, runtime_report = compile_part('save_runtime', out / 'save_runtime')
+        runtime_code, runtime_report = compile_part('save_runtime', out / 'save_runtime', defines=clothing_defines)
         save_runtime_report = v3_save_runtime.install(native, base, code, blob, runtime_code,
             runtime_report['symbols'], save_code_report, room_code_report,
-            draw_report['imports'], furniture_report['imports'])
+            draw_report['imports'], furniture_report['imports'], [clothing_row] if clothing else None)
         save_runtime_report['code'] = runtime_report
     collection_report = None
     if collection:
-        collection_code, collection_code_report = compile_part('collection', out / 'collection')
+        collection_code, collection_code_report = compile_part('collection', out / 'collection', defines=clothing_defines)
         collection_report = v3_collection.install(code, blob, collection_code,
             collection_code_report['symbols'], runtime_report, save_code_report, furniture_code_report)
         collection_report['code'] = collection_code_report
@@ -617,8 +625,6 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         reward_report['code'] = reward_compiled
     clothing_report = None
     if clothing:
-        clothing_resource, clothing_record, clothing_row = v3_clothing.convert(
-            native, text_donor[1], rel, symbols)
         clothing_report = v3_clothing.install(code, blob, helper_report['symbols'],
             clothing_resource, clothing_record)
         clothing_report['imports'] = [clothing_row]
@@ -627,6 +633,16 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_report['owners'] = clothing_owners
         clothing_report['npc_streaming_clothes_installed'] = True
         clothing_report['player_readers'] = v3_player_clothing.install(code, helper_report['symbols'])
+        extended_code, extended_compiled = compile_part('save_clothing', out/'save_clothing',
+            defines=v3_save_clothing.DEFINES, primary_source='overlays/v3/save_codec.c')
+        extended_resource, extended_report = v3_save_clothing.install(
+            blob, extended_code, extended_compiled, save_code_report, save_runtime_report)
+        extended_report['code'] = extended_compiled
+        clothing_report['save_extension'] = extended_report
+        clothing_report['imports'][0]['save_profile_installed'] = True
+        save_report.update({'base_codec_format_version': 1, 'format_version': 2,
+            'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,
+            'extended_entry_dispatch': 'clothing.save_extension.public_entries'})
         for owner in draw_report['owners']:
             owner['before_clothing_sha256'] = owner['patched_sha256']
             owner['patched_sha256'] = sha256(draw_changes[int(owner['vrom'], 16)])
@@ -654,6 +670,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             raise ValueError('Clothing ROM tail overlaps resident, furniture, or villager data')
         blob_file.extend(bytes(offset-len(blob_file)))
         blob_file.extend(clothing_resource)
+        offset = v3_save_clothing.VROM-BLOB
+        if offset < len(blob_file) or offset+len(extended_resource) > TEXTURE_BASE-BLOB:
+            raise ValueError('Extended clothing codec overlaps another ROM resource')
+        blob_file.extend(bytes(offset-len(blob_file)))
+        blob_file.extend(extended_resource)
     additions[BLOB] = bytes(blob_file)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
@@ -668,7 +689,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 player clothing integration 01' if clothing else
+    label = ('V3 clothing save integration 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else
@@ -726,7 +747,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'object_capacity': CAPACITY, 'imports': imports, 'rom_bytes': len(image),
         'resident_startup_range': ['8019A8E0', '8019ACE0'],
         'expansion_data_range': ['80460000', f'{BLOB_RAM + blob_size:08X}'], 'ordinary_heap_growth': 0,
-        'expansion_state_range': ['8046C000', '8046C2C0'] if save_runtime else None,
+        'expansion_state_range': ['8046C000', f'{v3_save_runtime.STATE_RAM+save_runtime_report["state_bytes"]:08X}'] if save_runtime else None,
         'save_temporary_buffer_bytes': 0x10000 if save_runtime else None,
         'required_ram_bytes': 0x800000, 'saved_layout_changed': save_runtime,
         'saved_format_changed': text_report is not None,

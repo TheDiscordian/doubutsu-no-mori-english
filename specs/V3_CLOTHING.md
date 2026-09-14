@@ -7,7 +7,7 @@ Punchy's actual GameCube cherry-shirt artwork, name/price metadata, and the
 shared indexed texture/palette reader, both NPC clothing paths, and player
 startup/change-clothes readers. It does not
 enable the garment as an inventory item or enable Punchy's initial outfit.
-Item menus, acquisition, mannequins, and profile/persistence integration
+Item menus, acquisition, mannequins, and ordinary gameplay/persistence integration
 remain required before the garment is selectable.
 
 All 256 original native clothing textures and palettes remain intact. Donor
@@ -39,7 +39,8 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 30 identifies this variant.
+The loaded prefix remains 48 KiB. Configuration ABI 31 identifies this variant;
+its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
 ## Shared indexed reader
@@ -104,9 +105,9 @@ Connect full clothing identities to full names, item classification,
 menus/icons, normal acquisition, price/buy/sell paths, display mannequins,
 mail/gifts, and ordinary saving/loading. Keep original garments and behaviour.
 
-The existing [V3 save registry](V3_SAVE_PROFILE.md) allocates its item bits to
-furniture rotation groups. Do not reuse a furniture bit for this clothing ID:
-the clothing class needs a reviewed registry/format extension before player use.
-This resource-only build leaves the profile unchanged and does not claim
-imported-clothing persistence. V3 saves still must not be loaded in V2.
+The [format-2 save extension](V3_CLOTHING_SAVE.md) installs independent clothing
+profile/ownership bits while retaining the earlier furniture records. Native
+encoding/decoding and migration checks pass; normal collection, catalogue,
+and ordinary clothing save/reload remain unverified. Format-2 saves must not be
+loaded in older format-1 V3 builds or V2. Keep existing saves backed up.
 Public and local patchers remain V2 pending user testing and explicit approval.

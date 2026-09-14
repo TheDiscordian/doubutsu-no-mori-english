@@ -67,9 +67,12 @@ with later e/e+ donor support investigated separately.
   owner remain unverified after bounded setup attempts. The
   [player clothing adapter](checkpoints/V3_PLAYER_CLOTHING.md) connects startup
   and clothes-changing resources. Three focused tests and the initial 47-step
-  native double-buffer/registration/guard run pass. Next connect ordinary item
-  consumers and the clothing save registry before enabling Punchy's outfit;
-  retain the missing NPC queued evidence for combined gameplay.
+  native double-buffer/registration/guard run pass. The
+  [clothing save extension](checkpoints/V3_CLOTHING_SAVE.md) installs independent
+  selected/owned clothing records and format-1 migration. Five focused checks,
+  four current non-clothing codec host checks, and the corrected 52-step native
+  run pass. Next connect ordinary item/collection/menu consumers before enabling
+  Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both

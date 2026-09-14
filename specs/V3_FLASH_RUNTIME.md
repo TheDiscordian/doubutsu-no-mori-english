@@ -2,6 +2,11 @@
 
 ## Implemented scope
 
+The [clothing variant](V3_CLOTHING_SAVE.md) uses format 2, a 192-byte immutable
+profile, and 864-byte runtime state. Its separate checked codec keeps the public
+save-entry addresses stable. The format-1 sizes below describe the non-clothing
+variant; do not use those working-buffer sizes with the clothing variant.
+
 `--save-runtime` connects the [checked save codec](V3_SAVE_PROFILE.md) to native
 town loading, normal two-bank saving, synchronous save-menu writing, bank repair,
 and the town FlashRAM portions of travel-related saving. Imported catalogue

@@ -18,8 +18,8 @@ PREPARE_CALLS = (0x8008FBA0, 0x80095874, 0x80096260)
 ALLOCATIONS = (0x8008F98C, 0x8008FAFC, 0x80095498, 0x80096030)
 
 
-def profile_bytes(villagers, furniture):
-    result = bytearray(PROFILE)
+def profile_bytes(villagers, furniture, clothing=None):
+    result = bytearray(PROFILE + (32 if clothing is not None else 0))
     seen = set()
     for row in villagers:
         actor = int(row['actor_id'], 16)
@@ -32,18 +32,32 @@ def profile_bytes(villagers, furniture):
         item = int(row['item_id'], 16)
         if not 0x3000 <= item <= 0x3FFC or item & 3 or item in seen:
             raise ValueError('Invalid stable furniture profile identity')
+        if clothing is not None and 0x3400 <= item <= 0x34FF:
+            raise ValueError('Furniture identity collides with the clothing class')
         if row['runtime_index'] != 1024 + ((item & 0xFFF) >> 2):
             raise ValueError('Furniture profile differs from its installed identity')
         seen.add(item)
         index = (item & 0xFFF) >> 2
         result[32 + (index >> 3)] |= 1 << (index & 7)
+    if clothing is not None:
+        from v3_registry import CLOTHING_REGISTRY_VERSION, clothing_slot
+        for row in clothing:
+            item, index, vrom = clothing_slot(int(row['donor_item_id'], 16))
+            if (row['registry_version'] != CLOTHING_REGISTRY_VERSION
+                    or row['item_id'] != f'{item:04X}' or row['resource_index'] != index
+                    or row['vrom'] != f'{vrom:08X}' or item in seen):
+                raise ValueError('Changed clothing profile identity or duplicate')
+            seen.add(item)
+            bit = item & 255
+            result[160+(bit >> 3)] |= 1 << (bit & 7)
     return bytes(result)
 
 
-def install(native, base, code, blob, helper, symbols, codec, room, villagers, furniture):
+def install(native, base, code, blob, helper, symbols, codec, room, villagers, furniture, clothing=None):
     evidence(base)
+    profile = profile_bytes(villagers, furniture, clothing)
     if (len(blob) != BLOB_SIZE or not helper or len(helper) > LIMIT - CODE or any(blob[CODE:LIMIT])
-            or any(blob[BRIDGE:BRIDGE + 32]) or any(blob[PROFILE_OFFSET:PROFILE_OFFSET + PROFILE])
+            or any(blob[BRIDGE:BRIDGE + 32]) or any(blob[PROFILE_OFFSET:PROFILE_OFFSET + len(profile)])
             or 0x8000 + room['bytes'] > CODE or 0xB400 + codec['bytes'] > BRIDGE
             or codec['symbols']['af_v3_save_check'] != 0x8046B400
             or codec['symbols']['af_v3_save_pack'] != 0x8046B7A0):
@@ -101,12 +115,12 @@ def install(native, base, code, blob, helper, symbols, codec, room, villagers, f
     for address in PREPARE_CALLS:
         word(address, jal(0x8008EFDC), jal(target('af_v3_save_prepare')))
     word(0x8008F9EC, jal(0x800360E0), jal(target('af_v3_save_commit')))
-    profile = profile_bytes(villagers, furniture)
-    blob[PROFILE_OFFSET:PROFILE_OFFSET + PROFILE] = profile
+    blob[PROFILE_OFFSET:PROFILE_OFFSET + len(profile)] = profile
     blob[CODE:CODE + len(helper)] = helper
     return {'patches': patches, 'native_save_hooks_enabled': True,
             'native_catalogue_hooks_enabled': False, 'bank_bytes': BANK,
-            'native_live_payload_bytes': 0xF980, 'state_ram': STATE_RAM, 'state_bytes': STATE_BYTES,
+            'native_live_payload_bytes': 0xF980, 'state_ram': STATE_RAM,
+            'state_bytes': STATE_BYTES+(160 if clothing is not None else 0),
             'current_profile_ram': 0x80460000 + PROFILE_OFFSET, 'profile_hex': profile.hex(),
             'profile_sha256': sha256(profile), 'native_reader_calls_audited': len(READ_CALLS),
             'legacy_padding_normalised': True, 'incompatible_profile': 'English instruction screen; stop caller without writing',
