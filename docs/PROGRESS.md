@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-resources-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`48140ace682f65c7bc9961dc0cf786075222e021e4d8cbba67af24170a4bce3b`.
+`build/v3-npc-clothing-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`2406a6dee1bc07bf3edeceb8125bbded2e12c30fc508e0018aaac81fa1042372`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -169,8 +169,13 @@ The [clothing resource foundation](checkpoints/V3_CLOTHING.md) installs Punchy's
 actual cherry-shirt texture/palette under a separate identity and connects the
 shared indexed reader. Four focused tests and the initial thirty-four-step
 native run pass, including complete native/imported garment transfers and
-rejection/guard checks. All original clothing is retained. The NPC-specific
-clothing, wearing/item, and clothing save-registry consumers remain work;
+rejection/guard checks. All original clothing is retained. The
+[NPC clothing adapter](checkpoints/V3_NPC_CLOTHING.md) connects both owners'
+foreground/queued resource readers and full shirt-ID checks. Four focused tests
+pass, and native execution confirms the first complete foreground loop with
+original, imported, and invalid clothing. Queued completion and the second
+owner remain unverified after the bounded allocation/timing setup attempts.
+Player wearing/item and clothing save-registry consumers remain work;
 Punchy's defaults stay disabled.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/

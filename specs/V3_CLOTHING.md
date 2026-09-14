@@ -4,9 +4,9 @@
 
 `--clothing` includes the current villager/furniture foundation and installs
 Punchy's actual GameCube cherry-shirt artwork, name/price metadata, and the
-shared indexed texture/palette reader. It does not enable the garment as an
-inventory item or enable Punchy's initial outfit. NPC-specific streaming,
-wearing, menus, acquisition, mannequins, and profile/persistence integration
+shared indexed texture/palette reader and both NPC clothing paths. It does not
+enable the garment as an inventory item or enable Punchy's initial outfit.
+Wearing, menus, acquisition, mannequins, and profile/persistence integration
 remain required before the garment is selectable.
 
 All 256 original native clothing textures and palettes remain intact. Donor
@@ -36,9 +36,9 @@ It contains item/index, resource VROM, base price, resource-enabled flag,
 sixteen-byte name, and checked zero padding. Resource availability is distinct
 from completed item support and move-in eligibility.
 
-The two clothing helpers are linked after the existing asset/draw/audio code,
+The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 28 identifies this variant.
+The loaded prefix remains 48 KiB. Configuration ABI 29 identifies this variant.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
 ## Shared indexed reader
@@ -51,16 +51,34 @@ otherwise unknown imported indices return no resource and do not write buffers.
 Both destination pointers must be present. Transfers remain synchronous through
 the native DMA manager, using the original 512/32-byte sizes.
 
-NPCs have additional asynchronous and foreground clothing paths in both NPC
-overlays. Their category checks currently accept only `24xx`, and they calculate
-their own source addresses. Player startup/change-clothes paths also calculate
-addresses directly. Patching the shared indexed reader alone does not connect
-those paths; do not enable the imported default on that evidence.
+## NPC-specific loaders
+
+Both NPC owners retain ten `B0`-byte clothing slots at controller offset `174`.
+The four resource entries per owner jump to resident helpers. Two 32-byte
+category-decision windows per owner call a checked index reader: native `24xx`
+keeps its index, installed `34BF` gives `10BF`, and invalid clothing retains the
+native `2400` fallback. Full item IDs and the other slot flags remain intact.
+The remaining controller loops, reset/reuse logic, and native relocation tables
+are unchanged. Complete source-function hashes, incoming control-flow checks,
+and relocation exclusions guard every edit.
+
+Texture/palette banks stay at slot offsets `8`/`5C`, destination pointers at
+bank offset `4`, requests at `14`, queues at `34`, and message storage at `4C`.
+Foreground reads use native synchronous DMA. Queued reads preserve the native
+single-submission marker, one-message queues, and nonblocking completion poll.
+Transfers remain 512/32 bytes; no extra live slots or garment buffers are added.
+The shared transfer helper uses a 72-byte frame, matching the original queued
+reader and adding 40 bytes to foreground calls. The checked index uses 24 bytes.
+
+Focused checks pass. Native evidence confirms the first owner's complete
+foreground loop with original, imported, and invalid clothing. Queued completion
+and the second owner's execution remain unverified; the bounded test checkpoint
+records the allocation/timing setup limits. Player startup/change-clothes paths
+still calculate their own source addresses and remain pending.
 
 ## Remaining item and save integration
 
-Connect full clothing identities to the NPC category checks and their texture/
-palette sources, player startup/change-clothes, full names, item classification,
+Connect full clothing identities to player startup/change-clothes, full names, item classification,
 menus/icons, normal acquisition, price/buy/sell paths, display mannequins,
 mail/gifts, and ordinary saving/loading. Keep original garments and behaviour.
 

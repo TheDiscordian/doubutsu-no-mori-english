@@ -1,0 +1,9 @@
+[
+  {"wait": 10},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_v3_npc_clothing": true},
+  {"load_state": true},
+  {"wait": 1},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

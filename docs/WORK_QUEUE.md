@@ -60,9 +60,13 @@ with later e/e+ donor support investigated separately.
   do not substitute the different native shirt with the same item number.
   The [clothing resource foundation](checkpoints/V3_CLOTHING.md) installs the
   actual new shirt and shared indexed reader. Four focused checks and the
-  initial thirty-four-step native test pass. Next connect the NPC-specific
-  clothing loaders, wearing/item consumers, and clothing save registry before
-  enabling Punchy's outfit.
+  initial thirty-four-step native test pass. The
+  [NPC clothing adapter](checkpoints/V3_NPC_CLOTHING.md) connects both owners'
+  full shirt-ID checks and foreground/queued loaders. Four focused checks and
+  the first native foreground loop pass; queued completion and the second
+  owner remain unverified after bounded setup attempts. Next connect player
+  wearing/item consumers and the clothing save registry before enabling
+  Punchy's outfit; retain the missing native evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
   The [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts both
