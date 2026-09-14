@@ -1287,6 +1287,12 @@ def main():
                     raise ValueError('Dialogue date probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_dialogue_dates'],record))
+            if action.get('test_v3_furniture_pockets'):
+                from v3_furniture_pockets_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 pocket probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture_ground'):
                 from v3_furniture_ground_smoke import exercise
                 if not (out/'test.bs1').is_file():

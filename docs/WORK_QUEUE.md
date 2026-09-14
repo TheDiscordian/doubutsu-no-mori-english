@@ -53,7 +53,9 @@ with later e/e+ donor support investigated separately.
   pass, including full native drawing-command comparisons. The
   [ground-item batch](checkpoints/V3_FURNITURE_GROUND.md) connects both drop-flag
   paths and ground-descriptor selection; three focused checks and 57 native steps
-  pass. Next: inventory furniture-count/index queries, catalogue/scoring consumers,
+  pass. The [pocket-search batch](checkpoints/V3_FURNITURE_POCKETS.md) connects both
+  shared furniture queries; four focused checks and 51 native steps pass.
+  Next: catalogue/scoring consumers,
   acquisition, and ordinary placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.

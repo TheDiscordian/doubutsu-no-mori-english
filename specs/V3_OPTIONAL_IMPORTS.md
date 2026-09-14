@@ -167,8 +167,9 @@ menus, hand destinations, and room-placement dispatch, with focused/native check
 The [inventory icon adapter](V3_FURNITURE_ICON.md) connects the separate leaf reader,
 with focused checks and actual native selection/drawing-command verification.
 The [ground adapter](V3_FURNITURE_GROUND.md) connects drop flags and ground-descriptor
-selection, with focused/native checks. Inventory count/index queries, catalogue/
-scoring consumers, and the ordinary item lifecycle are required;
+selection, with focused/native checks. The [pocket adapter](V3_FURNITURE_POCKETS.md)
+connects both shared furniture count/index queries, with focused/native checks.
+Catalogue/scoring consumers and the ordinary item lifecycle are required;
 these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
