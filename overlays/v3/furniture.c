@@ -32,10 +32,28 @@ extern int af_v3_furniture_test_dma(void *, u32, u32);
 #define owner af_v3_furniture_owner
 #define dma af_v3_furniture_test_dma
 #endif
+#ifdef AF_V3_CLOTHING_DISPLAY
+#include "clothing_display.h"
+#ifdef __mips__
+#define display_import ((const struct Import *)AF_V3_CLOTHING_DISPLAY_ROW)
+#define display_dma ((void (*)(u32, u32))AF_V3_CLOTHING_DISPLAY_DMA)
+#else
+extern struct Import af_v3_display_import;
+extern void af_v3_display_test_dma(u32, u32);
+#define display_import (&af_v3_display_import)
+#define display_dma af_v3_display_test_dma
+#endif
+#endif
 
 static const struct Import *find(u32 argument) {
     u32 n = (u16)argument, i;
     if (n < NATIVE || n >= CAPACITY) return 0;
+#ifdef AF_V3_CLOTHING_DISPLAY
+    if (n == AF_V3_CLOTHING_DISPLAY_INDEX && display_import->enabled == 1 &&
+            display_import->index == n && display_import->item == AF_V3_CLOTHING_DISPLAY_ITEM &&
+            profiles[n] == AF_V3_CLOTHING_DISPLAY_PROFILE &&
+            af_v3_display_clothing_index(display_import->item) == 0x10BFu) return display_import;
+#endif
     for (i = 0; i < 2; ++i) {
         const struct Import *row = imports + i;
         if (row->enabled == 1 && row->index == n &&
@@ -86,6 +104,14 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
         active = (u32)bank_index;
     }
     if (af_v3_furniture_bank_address((int)active) != bank) return 0;
+#ifdef AF_V3_CLOTHING_DISPLAY
+    if (row == display_import) {
+        if (row->profile[16] != AF_V3_CLOTHING_DISPLAY_VTABLE) return 0;
+        display_dma(row->item | (item & 3u), bank);
+        indices[(u16)argument] = (u8)active;
+        return 1;
+    }
+#endif
     if (row->profile[2] != 0x06000000u || row->profile[3] <= row->profile[2]) return 0;
     size = row->profile[3] - row->profile[2];
     if (size > BANK_BYTES || !row->profile[0] ||

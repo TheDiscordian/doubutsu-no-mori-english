@@ -15,7 +15,11 @@ int main(void) {
     memset(af_v3_table_indices, 0xA5, sizeof af_v3_table_indices);
     assert(af_v3_furniture_tables_init() == 1);
     for (u32 i = 0; i < AF_V3_FURNITURE_CAPACITY; ++i) {
-        assert(af_v3_table_profiles[i] == (i == 1161 ? 0x80467208u : i == 1198 ? 0x80467258u : 0));
+        u32 expected = i == 1161 ? 0x80467208u : i == 1198 ? 0x80467258u : 0;
+#ifdef AF_V3_CLOTHING_DISPLAY
+        if (i == AF_V3_CLOTHING_DISPLAY_INDEX) expected = AF_V3_CLOTHING_DISPLAY_PROFILE;
+#endif
+        assert(af_v3_table_profiles[i] == expected);
         assert(af_v3_table_indices[i] == 255);
     }
     for (u32 i = 0; i < 4; ++i) {

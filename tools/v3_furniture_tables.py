@@ -14,7 +14,7 @@ SOURCE_SHA = 'ce4e0ebfb38f5118bb94f9347ddc771e04331562ed9decd91482689751578b19'
 
 
 def install_helper(blob, helper, compiled, previous):
-    if (not helper or len(helper) != compiled['bytes'] or len(helper) > 947*4
+    if (not helper or len(helper) != compiled['bytes'] or len(helper) > 0x800
             or any(blob[0x5800:0x5800+len(helper)])
             or compiled['symbols']['af_v3_furniture_import_profile'] != 0x80465800):
         raise ValueError('Expanded furniture code exceeds the retired native table prefix')

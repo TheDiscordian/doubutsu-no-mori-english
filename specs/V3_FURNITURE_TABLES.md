@@ -8,11 +8,11 @@ mannequins alongside donor furniture. The new capacity covers the complete
 runtime-index range for `3xxx` furniture, with three unused padding entries
 to preserve the native unrolled loops' three-plus-four structure.
 
-This does not assign or enable new items. Unknown indices still fail the checked
-profile lookup. Existing furniture, pocket clothing, saved identities, registry
-versions, and all original item IDs remain unchanged. Clothing display aliases,
-their actual model callbacks, catalogue rows, and acquisition readers remain
-separate implementation work.
+Unknown indices fail the checked profile lookup. The
+[clothing display adapter](V3_CLOTHING_DISPLAY.md) uses index 1,727 for its
+stable mannequin dependency; original furniture and pocket identities remain
+unchanged. Ordinary catalogue rows and acquisition readers remain integration
+work, separate from transient-table capacity.
 
 ## Memory ownership
 
@@ -27,14 +27,15 @@ requirement remains; the four-MiB warning path does not initialise this region.
 | `80472040` | 2,051 bank indices; `FF` means no bank |
 | `80472850` | Four `AF46C0DE` guard words |
 
-The 132-byte initializer is inside the existing resident prefix at
-`8046A000..8046A083`. The field bridge at `8046A200` is retained. Startup calls
+The 144-byte initializer is inside the existing resident prefix at
+`8046A000..8046A08F`. The field bridge at `8046A200` is retained. Startup calls
 the initializer after checking and loading the resident code and before setting
 the installed flag or returning to gameplay.
 
 All native profile entries initialise to zero. The reviewed imported seed range
 is copied from the existing immutable prefix, retaining the two static pilot
-profiles and leaving every other entry zero. Bank indices initialise to `FF`.
+profiles. The clothing variant also installs its mannequin profile at index
+1,727; other entries remain zero. Bank indices initialise to `FF`.
 The original 947-entry heap-allocation table, native profile cleanup, and all
 100 ordinary model-bank buffers keep their owners and sizes.
 
@@ -46,9 +47,9 @@ remain 947. Existing fixed-address references have no remaining relocation
 entries; the installer rejects a relocation at any changed word. The full room
 owner and its unchanged relocation resource are checked before patching.
 
-The expanded furniture helper is 964 bytes at `80465800..80465BC3`. It occupies
+The expanded furniture helper is 1,184 bytes at `80465800..80465C9F`. It occupies
 the retired native profile-table prefix, not the villager reader at
-`80465400..8046578F` or the imported seed rows starting at `804666CC`.
+`80465400..8046578F`, mannequin at `80466000`, or imported seed rows at `804666CC`.
 The initializer never copies this code into the new profile table.
 
 All eight existing public helper addresses remain fixed, including profile
@@ -66,11 +67,11 @@ The original unexpanded variants retain their existing table addresses.
 
 ## Compatibility and verification
 
-Save format 2, the 192-byte selected profile, and acquired-item state remain
-unchanged. This transient-table move introduces no new saved representation.
-Same-profile ABI-39 saves retain their representation; older format-1 V3 builds
-and V2 still cannot load format-2 saves. A fresh same-profile ordinary reload
-is not claimed by this component batch.
+Transient-table addresses do not change save format 2, the 192-byte profile
+layout, or acquired-item state. The clothing display dependency adds a selected
+bit, so its compatibility restriction applies independently of the table move:
+older profiles reject new saves. Older format-1 V3 builds and V2 cannot load
+format-2 saves. Ordinary cross-build reloads remain distinct from codec checks.
 
 Two focused tests and a 91-record current-cartridge native run pass. The native
 check executes real owner relocation, complete table reset, both imported model

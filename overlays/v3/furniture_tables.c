@@ -1,4 +1,7 @@
 #include "furniture_tables.h"
+#ifdef AF_V3_CLOTHING_DISPLAY
+#include "clothing_display.h"
+#endif
 typedef unsigned char u8;
 typedef unsigned int u32;
 #ifdef __mips__
@@ -25,6 +28,9 @@ int af_v3_furniture_tables_init(void) {
         profiles[i] = i >= 947 && i < 1267 ? seed[i] : 0;
         indices[i] = 255;
     }
+#ifdef AF_V3_CLOTHING_DISPLAY
+    profiles[AF_V3_CLOTHING_DISPLAY_INDEX] = AF_V3_CLOTHING_DISPLAY_PROFILE;
+#endif
     for (u32 i = 0; i < 4; ++i) first[i] = last[i] = AF_V3_FURNITURE_EDGE;
     return 1;
 }

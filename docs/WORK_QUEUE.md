@@ -114,8 +114,16 @@ with later e/e+ donor support investigated separately.
   The [expanded furniture tables](checkpoints/V3_FURNITURE_TABLES.md) raise
   transient capacity to 2,051 without native heap or save growth. Two focused
   tests and the initial 91-record native run pass, including both imported
-  models, original allocation/loading, full cleanup, and new guards. Next
-  implement actual clothing display IDs and shared mannequin callbacks/readers.
+  models, original allocation/loading, full cleanup, and new guards. The
+  [clothing display adapter](checkpoints/V3_CLOTHING_DISPLAY.md) installs stable
+  mannequin identity `3AFC`, the original native callbacks/model, and selected
+  full-index clothing loading within existing buffers. Three focused checks
+  and the corrected 116-record native run pass, including all four rotations,
+  complete transfers, draw commands, cleanup, and guards. Next connect shared
+  alias metadata, collection, scoring, and global pocket/display conversions
+  before enabling ordinary placement. Its new profile bit means older profiles
+  reject new saves; preserve backups and distinguish the passing codec check
+  from untested ordinary cross-build loading.
   Catalogue/home display and ordinary buy/sell remain.
   Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop

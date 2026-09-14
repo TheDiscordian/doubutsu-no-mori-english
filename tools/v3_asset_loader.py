@@ -70,6 +70,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
                        'furniture_tables': ('af_v3_furniture_tables_init', BLOB_RAM + 0xA000),
                        'furniture_expanded': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5800),
+                       'clothing_display': ('af_v3_display_clothing_index', BLOB_RAM + 0x6200),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
@@ -206,6 +207,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_shop_mannequin
     import v3_clothing_shop_floor
     import v3_furniture_tables
+    import v3_clothing_display
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -283,6 +285,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
                        + v3_clothing_wear.SOURCES + v3_clothing_stock.SOURCES + v3_shop_mannequin.SOURCES
                        + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
+                       + v3_clothing_display.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -340,7 +343,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
                   v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI,
                   v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
-                  v3_furniture_tables.ABI)
+                  v3_furniture_tables.ABI, v3_clothing_display.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -517,7 +520,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         runtime_code, runtime_report = compile_part('save_runtime', out / 'save_runtime', defines=clothing_defines)
         save_runtime_report = v3_save_runtime.install(native, base, code, blob, runtime_code,
             runtime_report['symbols'], save_code_report, room_code_report,
-            draw_report['imports'], furniture_report['imports'], [clothing_row] if clothing else None)
+            draw_report['imports'], furniture_report['imports'] +
+            ([v3_clothing_display.profile_dependency()] if clothing else []),
+            [clothing_row] if clothing else None)
         save_runtime_report['code'] = runtime_report
     collection_report = None
     if collection:
@@ -709,10 +714,12 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             base, blob, mannequin_code, mannequin_compiled, room_report['code'], selection_report)
         expanded_code, expanded_compiled = compile_part('furniture_expanded', out/'furniture-expanded',
             primary_source='overlays/v3/furniture.c',
-            extra_sources=('overlays/v3/furniture_entry.S',), defines=table_defines)
+            extra_sources=('overlays/v3/furniture_entry.S',),
+            defines=table_defines+('AF_V3_CLOTHING_DISPLAY=1',))
         table_entries = v3_furniture_tables.install_helper(blob, expanded_code, expanded_compiled,
                                                           furniture_code_report)
-        table_code, table_compiled = compile_part('furniture_tables', out/'furniture_tables')
+        table_code, table_compiled = compile_part('furniture_tables', out/'furniture_tables',
+            defines=('AF_V3_CLOTHING_DISPLAY=1',))
         furniture_changes[v3_furniture_runtime.VROM], table_report = v3_furniture_tables.install(
             furniture_changes[v3_furniture_runtime.VROM], furniture_changes[v3_furniture_runtime.RELOC],
             blob, table_code, table_compiled,
@@ -726,6 +733,10 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         furniture_report['external_mutable_ranges'] = [
             [v3_furniture_tables.PROFILES, v3_furniture_tables.PROFILES+v3_furniture_tables.CAPACITY*4],
             [v3_furniture_tables.INDICES, v3_furniture_tables.INDICES+v3_furniture_tables.CAPACITY]]
+        display_code, display_compiled = compile_part('clothing_display', out/'clothing_display')
+        clothing_report['display'] = v3_clothing_display.install(native, base, blob,
+            display_code, display_compiled, item_code_report, save_runtime_report)
+        furniture_report['display_imports'] = clothing_report['display']['imports']
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,

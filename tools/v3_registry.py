@@ -24,6 +24,11 @@ FURNITURE = {
 CLOTHING_REGISTRY_VERSION = 1
 CLOTHING = {0x24BF: (0x34BF, 0x10BF, 0x03F0F000)}
 
+# A placed garment uses a mannequin identity, not its pocket clothing identity.
+# These dependencies are never independently selectable or assigned by order.
+CLOTHING_DISPLAY_REGISTRY_VERSION = 1
+CLOTHING_DISPLAYS = {0x24BF: (1727, 0x3AFC)}
+
 
 def clothing_slot(donor_item):
     if donor_item not in CLOTHING:
