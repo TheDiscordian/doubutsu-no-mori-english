@@ -8,7 +8,7 @@ from v3_speed_bag import SOURCE_FILES as CALLBACK_SOURCES, build as build_callba
 from v3_speed_bag_art import build as build_art
 from v3_speed_bag_sound_runtime import SOUND_ID
 
-ABI, PROGRAM, SOUND, VTABLE, ROW, END = 46, 0x6F20, 0x7100, 0x7110, 0x7130, 0x7180
+ABI, PROGRAM, SOUND, VTABLE, ROW, END = 47, 0x6F20, 0x7100, 0x7110, 0x7130, 0x7180
 SOURCES = CALLBACK_SOURCES + ('tools/v3_speed_bag_runtime.py', 'tools/v3_speed_bag_art.py',
                              'overlays/v3/speed_bag.h')
 
@@ -79,5 +79,5 @@ def install(native, code, blob, rel, symbols, out):
         'metadata_ram': '804672E0', 'metadata_sha256': sha256(metadata), 'price': 2990,
         'runtime_installed': True, 'enabled': False, 'selectable': False,
         'saved_profile_included': False, 'ordinary_gameplay_tested': False,
-        'pending': ['native scoring group for donor series 58', 'acquisition/catalogue',
+        'pending': ['boxing score-letter name', 'acquisition/catalogue',
                     'saved-profile inclusion and ordinary persistence', 'Punchy house integration']}

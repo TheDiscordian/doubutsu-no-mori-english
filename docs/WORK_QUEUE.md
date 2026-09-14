@@ -229,9 +229,14 @@ with later e/e+ donor support investigated separately.
   204-step native run pass, including installed construction/hit/positional
   sound, model loading, English metadata, retention, and cleanup. Storage now uses
   a checked two-MiB VROM interval without RAM growth or directory-index changes.
-  Next adapt donor HRA series 58 beyond the native 55-entry storage, connect
-  catalogue/group-A acquisition and the selected save dependency, and install
-  Punchy's house. The new row stays disabled; ordinary gameplay, persistence,
+  The [boxing HRA adapter](checkpoints/V3_SPEED_BAG_HRA.md) expands native series
+  storage to 59 entries with the actual donor series 58 and unchanged scoring
+  formulas. Four focused checks and the first 68-record native run pass,
+  including all four scoring loops, real group/point data, disabled-item
+  rejection, original storage retention, and guards. Next extend the separate
+  English score-letter series-name reader, connect catalogue/group-A acquisition
+  and the selected save dependency, and install Punchy's house.
+  The new row stays disabled; ordinary gameplay, persistence,
   and GPU appearance remain open. Component checks do not enable the item or villager.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

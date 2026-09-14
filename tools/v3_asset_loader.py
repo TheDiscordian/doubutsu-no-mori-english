@@ -630,16 +630,18 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     hra_changes, hra_report, relocated = {}, None, {}
     if hra:
         metadata, records = v3_hra.table(base, rel, symbols, furniture_report['imports'],
-            v3_clothing_display.profile_dependency() if clothing else None)
+            v3_clothing_display.profile_dependency() if clothing else None, speed_bag=speed_bag)
+        series_resources = v3_hra.v3_hra_series.prepare(base, rel, symbols) if speed_bag else None
         metadata_path, generated = out / 'hra-metadata.bin', out / 'hra-hooks.S'
         write_new(metadata_path, metadata)
         rows = v3_hra.inspect(base)
         write_new(generated, (v3_hra.assembly(rows) + '.section .rodata.hra_table\n.balign 4\n'
             '.globl af_v3_hra_table\naf_v3_hra_table:\n'
-            f'.incbin "/source/{metadata_path.relative_to(ROOT)}"\n').encode())
+            f'.incbin "/source/{metadata_path.relative_to(ROOT)}"\n'
+            + (v3_hra.v3_hra_series.assembly(series_resources) if series_resources else '')).encode())
         hra_code, hra_compiled = compile_part('hra', out / 'hra',
-            extra_sources=(str(generated.relative_to(ROOT)),), defines=table_defines)
-        hra_changes, hra_report = v3_hra.install(base, code, hra_code, hra_compiled, metadata, records, rows)
+            extra_sources=(str(generated.relative_to(ROOT)),), defines=table_defines+speed_bag_defines)
+        hra_changes, hra_report = v3_hra.install(base, code, hra_code, hra_compiled, metadata, records, rows, series_resources)
         hra_report['code'] = hra_compiled
         hra_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
         relocated = {v3_hra.VROM: v3_hra.NEW_VROM, v3_hra.RELOC: v3_hra.NEW_RELOC}

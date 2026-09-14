@@ -21,6 +21,9 @@ def exercise(debug, rom_path, record, *, windows=True):
         raise ValueError('HRA probe requires its exact current cartridge')
     files, boot = by_vrom(rom), boot_proofs(rom)
     blob = files[BLOB].extract(rom)[:0xC000]
+    series_report = hr.get('series')
+    series_count = series_report['count'] if series_report else 55
+    speed_bag_flag = int(report['speed_bag']['row_ram'], 16)+4 if series_report else None
 
     def check(label, at, expected):
         actual = debug.read_memory(at, len(expected))
@@ -41,6 +44,7 @@ def exercise(debug, rom_path, record, *, windows=True):
         debug.write_memory(at, struct.pack('>I', value))
 
     check('complete current resident prefix', BLOB_RAM, blob)
+    saved_speed_bag_flag = debug.read_memory(speed_bag_flag, 4) if speed_bag_flag else None
     capacity = hr['metadata_rows']
     extra = 0xA00 if capacity > hra.COUNT else 0
     size = 0x8400+extra
@@ -75,6 +79,8 @@ def exercise(debug, rom_path, record, *, windows=True):
         raise ValueError('HRA windows require the paused native game frame')
     run_windows, windows = windows, 0
     try:
+        if speed_bag_flag:
+            put(speed_bag_flag, 1)
         for row in hr['sites'] if run_windows else []:
             cases = [(0x1005, False), (0x3225 if windows % 4 == 0 else 0x32BB, False)]
             if row['kind'] == 'range' and row['start'] in (0x80926208, 0x809275BC):
@@ -142,9 +148,10 @@ def exercise(debug, rom_path, record, *, windows=True):
         # and the full expanded metadata, including all unchanged native rows.
         table_at = hr['metadata_address'] - hra.RAM
         metadata = bytearray(expected[table_at:table_at + capacity * 4])
-        series_at = 0x809283B0 - hra.RAM
-        series = bytearray(expected[series_at:series_at + 55 * 3])
-        for s in range(55):
+        series_at = (series_report['info_address'] if series_report else 0x809283B0) - hra.RAM
+        search_at = linked(series_report['search_address'] if series_report else 0x80929750)
+        series = bytearray(expected[series_at:series_at + series_count * 3])
+        for s in range(series_count):
             group, count = (5 if series[s * 3] == 1 else 0), 0
             for i in range(capacity):
                 word = u32(metadata, i * 4)
@@ -156,11 +163,13 @@ def exercise(debug, rom_path, record, *, windows=True):
             series[s * 3 + 1] = count & 255
         put(layers, first); put(layers + 4, second)
         grid1, grid2 = bytearray(512), bytearray(512)
-        items = ((grid1, 17, 0x3225), (grid1, 18, 0x32BB), (grid2, 34, 0x1414))
-        search = bytearray(55 * 4)
+        items = [(grid1, 17, 0x3225), (grid1, 18, 0x32BB), (grid2, 34, 0x1414)]
+        if series_report:
+            items.append((grid1, 20, 0x3353))
+        search = bytearray(series_count * 4)
         for grid, cell, item in items:
             struct.pack_into('>H', grid, cell * 2, item)
-            index = (item - 0x1000) >> 2 if item < 0x2000 else (1161 if item & 0xFFFC == 0x3224 else 1198)
+            index = (item - 0x1000) >> 2 if item < 0x2000 else 1024 + ((item - 0x3000) >> 2)
             word = u32(metadata, index * 4)
             s, group = word >> 26, word >> 16 & 1023
             put_mask = u32(search, s * 4) | 1 << group
@@ -169,7 +178,29 @@ def exercise(debug, rom_path, record, *, windows=True):
         call(linked(0x8092817C), [layers, 5], proof=proof)
         check(f'all {capacity} assigned native/imported metadata rows', owner + table_at, metadata)
         check('all native series counts including construction 21', owner + series_at, series)
-        check('complete mixed-layer construction completion masks', linked(0x80929750), search)
+        check('complete mixed-layer series completion masks', search_at, search)
+        if series_report:
+            call(linked(0x80925A5C), [0, 58], 0x3350, proof)
+            put(speed_bag_flag, 0)
+            call(linked(0x80925A5C), [0, 58], 0, proof)
+            put(speed_bag_flag, 1)
+            # Exercise all expanded scoring loops, including both unrolled
+            # termination paths. Boxing has no installed matching surfaces.
+            recommendation, theme, name = layers+0x30, layers+0x34, layers+0x40
+            put(points, 0); put(theme, 0xFFFFFFFF); put(recommendation, 0)
+            for address, args in ((0x8092726C, [points]),
+                    (0x80926FA0, [points, recommendation, 0, 0]),
+                    (0x80926B34, [points, theme, recommendation, name, 0, 0]),
+                    (0x80926A08, [points])):
+                call(linked(address), args, proof=proof)
+                check('complete expanded scoring loop without spurious bonus', points, bytes(4))
+            check('boxing name from the native ten-byte reader', name, b'boxing    ')
+            check('unavailable boxing wall/floor cannot complete a native theme', theme, b'\xFF'*4)
+            check('no recommendation for uninstalled boxing surfaces', recommendation, bytes(4))
+            check('original series storage remains unchanged', linked(0x809283B0),
+                  expected[0x809283B0-hra.RAM:0x809283B0-hra.RAM+55*3])
+            check('original search storage and adjacent data remain unchanged', linked(0x80929750),
+                  expected[0x80929750-hra.RAM:0x80929750-hra.RAM+55*4+4])
         for group, item in ((19, 0x3224), (20, 0x32B8), (0, 0x1414), (21, 0)):
             call(linked(0x80925A5C), [group, 16], item, proof)
         put(BLOB_RAM + 0x7254, 0)
@@ -185,14 +216,15 @@ def exercise(debug, rom_path, record, *, windows=True):
         put(points, 0)
         call(linked(0x809274F8), [points, layers, 5, 0, 0], proof=proof)
         weights = expected[0x80928680 - hra.RAM:hra.TABLE - hra.RAM]
-        increment = sum(u32(weights, (u32(metadata, index * 4) >> 9 & 31) * 4) for index in (1161, 1198, 261))
+        increment = sum(u32(weights, (u32(metadata, index * 4) >> 9 & 31) * 4)
+                        for index in ((1161, 1198, 261, 1236) if series_report else (1161, 1198, 261)))
         check('complete mixed-layer base points use actual donor birth properties', points, struct.pack('>I', baseline + increment))
         # Native range checks admit the one-past-table marker. It must not
         # become an out-of-range series-mask write in the expanded table.
         struct.pack_into('>H', grid1, 19 * 2, 0x1ECC)
         debug.write_memory(first, grid1)
         call(linked(0x8092817C), [layers, 5], proof=proof)
-        check('one-past-native marker does not add a collection group', linked(0x80929750), search)
+        check('one-past-native marker does not add a collection group', search_at, search)
         put(points, 0)
         call(linked(0x809274F8), [points, layers, 5, 0, 0], proof=proof)
         check('one-past-native marker has zero point weight', points, struct.pack('>I', baseline + increment))
@@ -211,17 +243,23 @@ def exercise(debug, rom_path, record, *, windows=True):
                       struct.pack('>I', baseline+clothing_points))
         check('unchanged translated HRA code prefix', owner, expected[:hra.SECTIONS[0]])
         check('compiled suffix code retained', owner + hra.START, expected[hra.START:table_at])
+        if speed_bag_flag:
+            debug.write_memory(speed_bag_flag, saved_speed_bag_flag)
         check('complete resident prefix retained', BLOB_RAM, blob)
         for at in guards:
             check('fixture guard', at, edge)
         check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
         check('no faulted thread', 0x8003CE34, bytes(4))
     finally:
+        if speed_bag_flag:
+            debug.write_memory(speed_bag_flag, saved_speed_bag_flag)
         put(BLOB_RAM + 0x7254, 1)
         debug.write_memory(0x80107B50, old_pointer)
     call(0x8009C040, [allocation])
     return {'native_hra_register_windows': windows, 'native_group_initialization': True,
-            'native_mixed_layer_completion_masks': True, 'native_missing_item_selections': 5,
+            'series_count': series_count, 'native_boxing_theme_tested': bool(series_report),
+            'native_expanded_scoring_loops': 4 if series_report else 0,
+            'native_mixed_layer_completion_masks': True, 'native_missing_item_selections': 7 if series_report else 5,
             'native_base_point_evaluations': 3+(4 if capacity > hra.COUNT else 0), 'one_past_native_marker_safe': True,
             'ordinary_house_evaluation_tested': False,
             'saved_data_written': False, 'requires_checkpoint_restore': True}

@@ -10,10 +10,15 @@ typedef unsigned int u32;
 #endif
 extern u32 af_v3_hra_table[HRA_COUNT];
 extern int af_v3_furniture_import_profile(unsigned int runtime_index);
+#ifdef AF_V3_SPEED_BAG
+#define SERIES_COUNT 59
+#else
+#define SERIES_COUNT 55
+#endif
 
 unsigned int af_v3_hra_remaining(int group, int series) {
     unsigned int i;
-    if (series < 0 || series >= 55 || group < 0 || group >= 1024)
+    if (series < 0 || series >= SERIES_COUNT || group < 0 || group >= 1024)
         return 0;
     for (i = 0; i < HRA_COUNT; ++i) {
         u32 metadata = af_v3_hra_table[i];

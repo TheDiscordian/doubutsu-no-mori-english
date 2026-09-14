@@ -263,14 +263,17 @@ Metadata keeps the complete 16-byte English name, price field 2,990, and actual
 changes the private two-record search into a three-record loop.
 
 The default disabled row prevents acquisition and recognition as an enabled
-item; it is not included in the saved import profile. Scoring must be completed
-before enabling it: donor HRA metadata `E8050000` names series 58, beyond the
-native 55-entry completion storage. Preserve that actual donor grouping through
-an explicit native adaptation, not a generic replacement series. Its ordinary
+item; it is not included in the saved import profile. The
+[HRA adapter](V3_HRA.md#boxing-theme-storage) installs actual donor metadata
+`E8050000` and expands completion storage to 59 entries, retaining series 58
+and native loop termination. The boxing score-letter name remains required
+before ordinary gameplay is enabled. Its ordinary
 shop membership is group A, catalogue preview mode is zero, generic action-sound
 class is zero, and feng shui metadata is `0000`. The animated callback supplies
 its separate actual hit sound.
 
 The [runtime checkpoint](../docs/checkpoints/V3_SPEED_BAG_RUNTIME.md) records the
-current build and bounded native evidence. Acquisition, scoring, ordinary
-interaction/persistence, and Punchy's house remain required.
+callback/model build and bounded native evidence. The
+[boxing checkpoint](../docs/checkpoints/V3_SPEED_BAG_HRA.md) records the current
+combined build and native room-scoring checks. Acquisition, score-letter name
+integration, ordinary interaction/persistence, and Punchy's house remain required.

@@ -7,6 +7,7 @@ from gc_names import rel_sections
 from npc_mail_show import relocate_verified_data
 from v3_furniture_art import verify_sources
 from v3_furniture_room import assembly as room_assembly, branch_target, query
+import v3_hra_series
 
 ABI = 19
 VROM, RELOC, RAM = 0x81D9D0, 0x821740, 0x809259E0
@@ -16,7 +17,7 @@ SECTIONS = (10704, 5024, 0, 1248, 245)
 SOURCE_SHA = 'bb2d983ca0751681838d02dd96d5e7fdf63402d2acdc8410cfd3c0f1d89712a1'
 RELOC_SHA = 'a53d04cb5992a96bff77aa8cb9f022aff02764821f659c5578763b61fc6e39a5'
 DONOR_SHA = '231d23625c126b048d95be99f397e2f05f564af23423c1f911d706acaec37f0e'
-SOURCES = ('tools/v3_hra.py', 'overlays/v3/hra.c', 'overlays/v3/hra.ld')
+SOURCES = ('tools/v3_hra.py', 'overlays/v3/hra.c', 'overlays/v3/hra.ld') + v3_hra_series.SOURCES
 RANGES = (0x80926178, 0x809261C4, 0x80926210, 0x80926370, 0x809263C4,
           0x809263FC, 0x80926434, 0x8092646C, 0x809266CC, 0x80926888,
           0x809268DC, 0x80926914, 0x8092694C, 0x80926984, 0x809275C4,
@@ -33,7 +34,7 @@ def sources(base):
     return data, reloc
 
 
-def table(base, rel, symbols, furniture, display=None):
+def table(base, rel, symbols, furniture, display=None, *, speed_bag=False):
     data, _ = sources(base)
     verify_sources(rel, symbols)
     # Two private symbols share this name. Select the pinned HRA definition,
@@ -54,13 +55,19 @@ def table(base, rel, symbols, furniture, display=None):
     # into the 55-entry search buffer. It is not an imported or orderable item.
     output[947 * 4:948 * 4] = bytes.fromhex('D4002000')
     records, seen = [], set()
-    for row in furniture:
+    imports = list(furniture)
+    if speed_bag:
+        imports.append({'item_id': '3350', 'runtime_index': 1236})
+    approved = {(0x3224, 1161): '40050200', (0x32B8, 1198): '40050000'}
+    if speed_bag:
+        approved[0x3350, 1236] = 'E8050000'
+    for row in imports:
         item, index = int(row['item_id'], 16), row['runtime_index']
-        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198)) or index in seen:
+        if (item, index) not in approved or index in seen:
             raise ValueError('Unreviewed or duplicate HRA import')
         seen.add(index)
         donor_metadata = donor[index * 4:index * 4 + 4]
-        if donor_metadata != bytes.fromhex('40050200' if item == 0x3224 else '40050000'):
+        if donor_metadata != bytes.fromhex(approved[item, index]):
             raise ValueError('Changed imported HRA properties')
         # Native birth categories occupy five bits [13:9], followed by surface
         # [8:7]. GC adds a birth bit, moving birth/surface down by one. Face and
@@ -73,7 +80,7 @@ def table(base, rel, symbols, furniture, display=None):
         output[index * 4:index * 4 + 4] = metadata
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
                         'metadata': metadata.hex(), 'donor_metadata': donor_metadata.hex(),
-                        'series': 16, 'birth_category': birth, 'surface': surface})
+                        'series': value >> 26, 'birth_category': birth, 'surface': surface})
     if display is not None:
         from v3_display_items import scoring_identity
         donor_index = scoring_identity(rel, symbols, display)
@@ -181,11 +188,13 @@ def assembly(rows):
     return result
 
 
-def install(base, code, suffix, compiled, metadata, records, rows):
+def install(base, code, suffix, compiled, metadata, records, rows, series_resources=None):
     old, reloc = sources(base)
     symbols = compiled['symbols']
     count = len(metadata)//4
     extended = '-DAF_V3_FURNITURE_TABLES=1' in compiled['flags']
+    if bool(series_resources) != ('-DAF_V3_SPEED_BAG=1' in compiled['flags']):
+        raise ValueError('Expanded HRA series do not match the compiled bound')
     if (len(metadata) != count*4 or count != (2051 if extended else COUNT)
             or rows != inspect(base) or len(suffix) != compiled['bytes'] or len(suffix) % 16
             or not 0 < len(suffix) <= 0x8000 - START
@@ -206,7 +215,7 @@ def install(base, code, suffix, compiled, metadata, records, rows):
         changes[pos] = after
         struct.pack_into('>I', data, pos, after)
 
-    high, pointer_changes = {}, []
+    high, pointer_changes, series_pointers = {}, [], []
     for pos, kind in slots:
         original = u32(old, pos)
         if kind == 5:
@@ -215,13 +224,22 @@ def install(base, code, suffix, compiled, metadata, records, rows):
             hi_at, hi = high[original >> 21 & 31]
             target = (hi & 65535) * 65536 + (original & 65535) - (65536 if original & 32768 else 0)
             is_end = target == TABLE + 947 * 4 and original >> 26 == 9
+            new_series = v3_hra_series.replacement(target, symbols) if series_resources else None
             if TABLE <= target < TABLE + 947 * 4 or is_end:
                 new = table_address + (count * 4 if is_end else target - TABLE)
+                inventory = pointer_changes
+            elif new_series is not None:
+                new, inventory = new_series, series_pointers
+            else:
+                continue
+            if new is not None:
                 word(RAM + hi_at, hi, hi & 0xFFFF0000 | (new + 0x8000) >> 16 & 65535)
                 word(RAM + pos, original, original & 0xFFFF0000 | new & 65535)
-                pointer_changes.append({'high': RAM + hi_at, 'low': RAM + pos, 'before': target, 'after': new})
+                inventory.append({'high': RAM + hi_at, 'low': RAM + pos, 'before': target, 'after': new})
     if len(pointer_changes) != 48:
         raise ValueError('Changed complete HRA metadata pointer inventory')
+    series_report = (v3_hra_series.install(old, data, symbols, series_resources, series_pointers, word)
+                     if series_resources else None)
     for row in rows:
         for address in range(row['start'], row['end'], 4):
             target = symbols[row['symbol']]
@@ -279,7 +297,7 @@ def install(base, code, suffix, compiled, metadata, records, rows):
         'metadata_sha256': sha256(metadata), 'source_resident_bytes': START, 'bytes': len(data),
         'relocation_bytes': size, 'on_demand_growth': len(data) - START,
         'output_sha256': sha256(data), 'relocation_sha256': sha256(new_rel),
-        'sites': rows, 'pointer_changes': pointer_changes, 'scheduler': scheduler,
+        'sites': rows, 'pointer_changes': pointer_changes, 'scheduler': scheduler, 'series': series_report,
         'patches': [{'address': RAM + at, 'before': u32(old, at), 'after': word} for at, word in sorted(changes.items())],
         'save_format_changed': False, 'native_scoring_tested': False,
         'ordinary_scoring_tested': False, 'feng_shui_implemented': False}

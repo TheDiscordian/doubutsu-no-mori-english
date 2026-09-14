@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-catalogue-01/animal-forest-v3-asset-loader.z64`, ABI 44, SHA-256
-`1f53456846a8f7f6ed9cd327ffc06e0e2f8d0253466a2bcdcb8e62b2cd1dab00`.
+`build/v3-speed-bag-hra-01/animal-forest-v3-asset-loader.z64`, ABI 47, SHA-256
+`e98ffd4b040a0fc664d7dff80f68ef46ecbcc9f35faeeb47793fc678343e442f`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -312,9 +312,15 @@ all original directory indices and public item-reader entries remain fixed.
 Four focused checks and the corrected 204-step native run pass, including actual
 installed construction, hit animation, positional sound, full model loading,
 English metadata, original/clothing retention, and cleanup/guards.
-The new item stays disabled while its actual donor
-scoring group, acquisition/catalogue, selected save dependency, and Punchy's
-house are completed. These components do not declare the item playable.
+The [boxing HRA adapter](checkpoints/V3_SPEED_BAG_HRA.md) installs actual series
+58 and safely expands native definitions, names, and completion masks to 59
+entries. Four focused checks and the first 68-record native run pass, including
+complete grouping, all four scoring loops, points, disabled-item rejection,
+no false matching-surface bonus, and preserved storage/guards. The HRA image
+uses 31,296 of its 32,768-byte bound without permanent RAM growth.
+The new item stays disabled while the separate English score-letter name,
+acquisition/catalogue, selected save dependency, and Punchy's house are
+completed. These components do not declare the item playable.
 No import is enabled for players yet.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
