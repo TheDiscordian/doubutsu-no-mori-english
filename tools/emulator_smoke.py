@@ -1437,6 +1437,12 @@ def main():
                     raise ValueError('V3 defaults probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_clothing_items'):
+                from v3_clothing_items_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 clothing-item probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_save_clothing'):
                 from v3_save_clothing_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-save-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`dc0de52bab863e601c5ba174d5a70a649baa72ba00828aeff550fc8c967609b3`.
+`build/v3-clothing-items-03/animal-forest-v3-asset-loader.z64`, SHA-256
+`54e4a88d853f25c073e3d0c4f13aa86c970b8bb90ad39865da248935450041a4`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -185,7 +185,12 @@ clothing profile/ownership records and preserves format-1 furniture ownership
 during migration. Five focused checks, four current non-clothing codec host
 checks, and the corrected 52-step native run pass, including complete startup/
 encoding/decoding, ownership separation, player clearing, and guards. Ordinary
-item consumers remain work; Punchy's defaults stay disabled.
+collection/menu consumers remain work; Punchy's defaults stay disabled. The
+[shared clothing item readers](checkpoints/V3_CLOTHING_ITEMS.md) connect the
+complete English name, category, and donor price, preserving native garment
+footprint rejection. The current host/cartridge tests and corrected 60-record
+native run pass, including selected-profile rejection, retained original clothes
+and furniture, complete code retention, and guards.
 The clothing variant writes format 2 and must not be loaded by older format-1
 V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

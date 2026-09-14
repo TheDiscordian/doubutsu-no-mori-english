@@ -13,7 +13,7 @@ from v3_villager_text import FIRST_SHA
 ABI, DATA, LIMIT = 28, 0x2820, 0x2900
 ENTRY, END = 0x800B1EDC, 0x800B1F74
 SOURCE_SHA = 'bc35c64e7d10f51813c50f8523f1aa31a2ac54f5a3481bc5ef59b21cfd38f736'
-SOURCES = ('tools/v3_clothing.py', 'tools/v3_registry.py', 'overlays/v3/clothing.c')
+SOURCES = ('tools/v3_clothing.py', 'tools/v3_registry.py', 'overlays/v3/clothing.c', 'overlays/v3/clothing.h')
 
 
 def convert(native, first, rel, symbols):

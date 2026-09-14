@@ -1,16 +1,8 @@
 /* Additive clothing resource lookup. Item/gameplay consumers remain separate. */
+#include "clothing.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
-struct Clothing {
-    u16 item, index;
-    u32 vrom;
-    u16 price;
-    u8 enabled, reserved;
-    u8 name[16];
-    u32 padding;
-};
-_Static_assert(sizeof(struct Clothing) == 32, "Clothing metadata layout");
 #ifdef __mips__
 #define clothing ((const struct Clothing *)0x80462820u)
 #define dma ((int (*)(void *, u32, u32))0x80026B44u)

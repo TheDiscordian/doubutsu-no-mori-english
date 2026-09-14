@@ -71,7 +71,11 @@ with later e/e+ donor support investigated separately.
   [clothing save extension](checkpoints/V3_CLOTHING_SAVE.md) installs independent
   selected/owned clothing records and format-1 migration. Five focused checks,
   four current non-clothing codec host checks, and the corrected 52-step native
-  run pass. Next connect ordinary item/collection/menu consumers before enabling
+  run pass. The [shared clothing item readers](checkpoints/V3_CLOTHING_ITEMS.md)
+  connect the full English name, native category, and donor price. Current host/
+  cartridge checks and the corrected 60-record native run pass, including
+  original/furniture retention and missing-profile rejection. Next connect
+  ordinary collection/menu consumers before enabling
   Punchy's outfit; retain the missing NPC queued evidence for combined gameplay.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
