@@ -2,6 +2,14 @@
 
 ## Implemented boundary
 
+The current [complete-villager asset variant](V3_COMPLETE_VILLAGER_ASSETS.md)
+extends capacity to 448 banks, installs all twenty textures, two custom models,
+and sixteen accessories, and relocates native growth permissions to `80461E80`.
+Its 49,152-byte resident prefix and separate demand-loaded artwork supersede the
+asset-only memory sizes below. Do not use the asset-only `80463000` test scratch
+on the complete cartridge: that address contains production data/code.
+The following details describe the original asset-only stage.
+
 `tools/v3_asset_loader.py` constructs a local development cartridge from exact
 V2-11 and verified donor artwork. The new loader retains all 410 existing object
 banks and provides twenty additional, subset-independent villager texture slots.

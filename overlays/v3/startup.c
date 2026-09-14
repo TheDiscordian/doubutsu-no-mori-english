@@ -1,6 +1,9 @@
 /* V3 owns 0x6000..0x63FF of the existing resident reservation. */
 typedef unsigned int u32;
 #include "storage.h"
+#ifndef AF_V3_OBJECT_CAPACITY
+#define AF_V3_OBJECT_CAPACITY 430
+#endif
 extern u32 af_crc32(const void *, u32);
 #ifndef AF_V3_BLOB_SIZE
 #define AF_V3_BLOB_SIZE 0x2000u
@@ -53,7 +56,7 @@ int af_v3_startup(void) {
     if (dma(memory, config[0], config[1])) return 0;
     if (af_crc32(memory, config[1]) != config[2]) return 0;
     if (header[0] != 0x41465633u || header[1] != AF_V3_ABI || header[2] != AF_V3_BLOB_SIZE
-            || header[3] != 430 || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
+            || header[3] != AF_V3_OBJECT_CAPACITY || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
 #ifdef AF_V3_CLOTHING_PROFILE
     const u32 *extra = (const u32 *)(memory+0xE0);
     if (extra[0] != AF_V3_SAVE_CODE_VROM || !extra[1] || extra[1] > 0xC00u || (extra[1] & 15)

@@ -278,8 +278,13 @@ with later e/e+ donor support investigated separately.
   26 focused checks pass. Implement joint attachment/storage/cleanup. Do not
   remove accessories to force the existing body converter to accept them.
   Use Yodel's converted skeleton at `06002770`, not the native gorilla pointer.
-  Object-table expansion beyond 432 entries overlaps the growth-permission copy
-  at `80461D80`; resolve that storage before adding accessory banks.
+  The [complete-asset loader](checkpoints/V3_COMPLETE_VILLAGER_ASSETS.md) assigns
+  all 38 objects to fixed banks 410–447 and moves growth permissions to
+  `80461E80`. Seven focused tests and the 93-record / 59-assertion native run
+  pass, including real object DMA, both custom models, accessories, bank bounds,
+  and both starting populations. All original banks/audio locations remain;
+  move-in flags stay off. Next implement attachment/lifetime management and
+  remaining draw rows before enabling new town inhabitants.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile

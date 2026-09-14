@@ -3,6 +3,9 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef signed short s16;
+#ifndef AF_V3_OBJECT_CAPACITY
+#define AF_V3_OBJECT_CAPACITY 430
+#endif
 struct Object { u32 start, end; };
 struct Status {
     s16 id; u16 pad;
@@ -21,7 +24,7 @@ _Static_assert(__builtin_offsetof(struct Arena, next) == 0x1800, "Native arena l
 #define writeback ((void (*)(void *, u32))0x8002FE00u)
 #define invalidate ((void (*)(void *, u32))0x80034CE0u)
 #else
-extern struct Object af_v3_objects[430];
+extern struct Object af_v3_objects[AF_V3_OBJECT_CAPACITY];
 extern volatile u32 af_v3_object_entry[2];
 extern void af_v3_writeback(void *, u32), af_v3_invalidate(void *, u32);
 #define objects af_v3_objects
@@ -33,7 +36,7 @@ extern void af_v3_writeback(void *, u32), af_v3_invalidate(void *, u32);
 int af_v3_object_status(struct Status *status, struct Arena *arena, u32 bank_argument) {
     int bank = (s16)bank_argument;
     u32 start, end, size, next;
-    if (bank < 0 || bank >= 430) return 0;
+    if (bank < 0 || bank >= AF_V3_OBJECT_CAPACITY) return 0;
     start = objects[bank].start;
     end = objects[bank].end;
     if (end < start || (bank >= 410 && (!start || end == start))) return 0;

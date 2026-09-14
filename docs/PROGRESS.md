@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-punchy-house-02/animal-forest-v3-asset-loader.z64`, ABI 50, SHA-256
-`55cb90c0cc9eac32aa6e180051f1791072cfa6dd5ba1c6b8a72a413f6211e060`.
+`build/v3-complete-villager-assets-01/animal-forest-v3-asset-loader.z64`, ABI 51, SHA-256
+`ac0f03c94b94a7eea434a0a112c745205cc76f4006f3a7383dc13c7669cad57f`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -379,9 +379,15 @@ frames and source pixels, including verified mirrored/clamped edge extensions.
 Shared meshes retain every ordered face, vertex binding, and joint matrix.
 Yodel's separate complete model preserves all 429 donor vertices and 284
 triangles, fitting the native NPC model buffer with 128 bytes spare.
-Twenty-six focused checks pass. Stable bank assignment,
-attachment, town behaviour/defaults/houses, and persistence remain required;
-the current cartridge and both V2 patchers are unchanged.
+Twenty-six focused conversion checks pass. The
+[complete-asset loader](checkpoints/V3_COMPLETE_VILLAGER_ASSETS.md) installs all
+38 objects in fixed banks, relocates growth permissions safely, and preserves
+every original bank and audio DMA location. Seven focused checks and the
+93-record / 59-assertion native run pass, including actual model/texture/accessory
+loads and both initial populations. Startup memory and cartridge size remain
+unchanged. Attachment, remaining draw rows, town behaviour/defaults/houses,
+and persistence remain required. All move-in flags stay off; both V2 patchers
+are unchanged.
 
 ## Stable V2 deliverable
 

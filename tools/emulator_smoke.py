@@ -1332,6 +1332,12 @@ def main():
                     raise ValueError('V3 ground probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_villager_assets'):
+                from v3_villager_assets_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 asset probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_villager_selection'):
                 from v3_villager_selection_smoke import exercise
                 if not (out/'test.bs1').is_file():

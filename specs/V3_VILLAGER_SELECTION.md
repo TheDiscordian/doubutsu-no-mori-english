@@ -19,8 +19,11 @@ personal identities, and town capacity remain unchanged.
 
 - Selection code: `80463400..80463FFF`, after the two installed melodies and
   before the shared villager reader. The builder rejects overlap.
-- Native initial-growth permissions: `80461D80..80461E5F`, an exact copy of the
-  verified 224-byte `00E0D000` resource.
+- Native initial-growth permissions: `80461E80..80461F5F` in the
+  [complete-asset variant](V3_COMPLETE_VILLAGER_ASSETS.md), an exact copy of the
+  verified 224-byte `00E0D000` resource. Earlier build stages use `80461D80`;
+  the complete variant explicitly recompiles this reader before extending
+  object capacity to 448. Both initial populations pass native verification.
 - Import-eligibility flags: twenty bytes at `80461E60`, indexed by fixed actor
   index minus 218. All are zero in the integration build.
 - Transient candidate bits: 32 bytes at `80464700`.

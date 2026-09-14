@@ -2,11 +2,14 @@
 typedef unsigned char u8;
 typedef unsigned int u32;
 #include "villager_outfit.h"
+#ifndef AF_V3_GROWTH_ADDRESS
+#define AF_V3_GROWTH_ADDRESS 0x80461D80u
+#endif
 
 #ifdef __mips__
 #define flags ((const u8 *)0x80461E60u)
 #define metadata ((const u8 *)0x80462C00u)
-#define growth ((const signed char *)0x80461D80u)
+#define growth ((const signed char *)AF_V3_GROWTH_ADDRESS)
 #define candidates ((u8 *)0x80464700u)
 #define shuffle ((int *)0x80464800u)
 #define ready (*(volatile const u32 *)0x8019ACD0u == 1u)

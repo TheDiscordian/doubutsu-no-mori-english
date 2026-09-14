@@ -166,6 +166,10 @@ The [twenty-body bundle](../docs/checkpoints/V3_GORILLA_ART.md) includes
 all sixteen required accessories and Yodel's separate full model. Complete expressions,
 species layouts, and real shared face/matrix/material bindings are verified;
 town/runtime integration is not implied by these converted components.
+The [complete-asset loader](V3_COMPLETE_VILLAGER_ASSETS.md) installs all 38
+objects in fixed banks 410–447, safely relocates growth permissions, and passes
+native object-loading and population checks. Accessory attachment and remaining
+draw/default/behaviour integration are still required; move-in flags remain off.
 
 ### Items
 
