@@ -101,7 +101,10 @@ prefix passes. The [shop interaction adapter](checkpoints/V3_SHOP_INTERACTIONS.m
 connects twenty furniture decisions across all five shopkeepers without actor
 or save growth. Three focused tests and 148 native steps pass, including both
 complete imported-order deliveries/readbacks and pending-order clearing. The
-independent shop-floor selection/removal checks, ordinary payment, scoring,
+independent [shop-floor adapter](checkpoints/V3_SHOP_FLOOR.md) connects reserve
+points, floor-item selection, and sold-removal classification. Three focused
+tests and 63 native steps pass, including complete reserve/grid selections and
+all changed branch/delay semantics. Ordinary payment/model removal, scoring,
 and the full item lifecycle remain work. No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.

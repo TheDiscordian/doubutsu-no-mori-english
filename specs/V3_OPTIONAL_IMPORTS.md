@@ -178,9 +178,11 @@ goods lists and category queries, with four focused tests and partial native
 stock/acquisition evidence. The [shop interaction adapter](V3_SHOP_INTERACTIONS.md)
 connects twenty decisions across all five shopkeepers, with focused tests and
 native interaction-window/ticket checks. Both complete imported-order letters,
-readback, and pending clearing pass. Independent shop-floor handling, ordinary
-confirmation/payment, scoring, and the full item lifecycle are required; these
-are not playable imports.
+readback, and pending clearing pass. The [shop-floor adapter](V3_SHOP_FLOOR.md)
+connects reserve points, floor selection, and sold-removal classification, with
+focused tests and native selection/branch checks. Ordinary acquisition/payment,
+model removal, scoring, and the full item lifecycle are required; these are not
+playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

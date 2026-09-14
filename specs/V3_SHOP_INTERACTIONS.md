@@ -13,10 +13,10 @@ unchanged. Unknown/disabled imports and original item categories keep their
 native classification. Existing purchase/sale prices, payment logic, names,
 messages, ticket accounting, and translated counter fields are retained.
 
-The independent shop-floor owner still needs its reserve-point, item selection,
-and sold-item removal checks connected. This adapter does not claim ordinary
-shop transactions, rendered furniture, or a complete playable item. Both web
-patchers remain V2 pending user testing and approval.
+The [shop-floor adapter](V3_SHOP_FLOOR.md) connects the independent reserve-point,
+item selection, and sold-item removal checks. These adapters do not claim
+ordinary shop transactions, rendered furniture, or a complete playable item.
+Both web patchers remain V2 pending user testing and approval.
 
 ## Installation and memory
 

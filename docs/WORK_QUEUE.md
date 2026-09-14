@@ -70,9 +70,12 @@ with later e/e+ donor support investigated separately.
   furniture decisions across all five actors. Three focused tests and 148 native
   steps pass, including complete deliveries/readbacks for both imports and
   pending-order clearing; the earlier delivery-tail uncertainty is closed.
-  Next: the independent shop-floor reserve/selection/removal checks, ordinary
-  confirmation/payment, scoring, and placement/persistence. No complete item is
-  enabled yet.
+  The [shop-floor adapter](checkpoints/V3_SHOP_FLOOR.md) connects reserve points,
+  item selection, and sold-removal classification. Three focused tests and 63
+  native steps pass, including native complete reserve/grid selection and
+  retained branch-delay entry paths.
+  Next: scoring, then ordinary acquisition/payment/model removal and
+  placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

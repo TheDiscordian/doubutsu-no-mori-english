@@ -77,7 +77,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'collection': ('af_v3_catalogue_record', BLOB_RAM + 0x99C0),
                        'catalogue': ('af_v3_catalogue_bit', 0x808B32B0),
                        'shops': ('af_v3_shop_category', BLOB_RAM + 0x9C00),
-                       'shop_actors': ('af_v3_shop_type_809cacbc', BLOB_RAM + 0x7600)}[part]
+                       'shop_actors': ('af_v3_shop_type_809cacbc', BLOB_RAM + 0x7600),
+                       'shop_floor': ('af_v3_shop_floor_80953e54', BLOB_RAM + 0x7C00)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
@@ -143,7 +144,8 @@ def compose(native, base, changes, added, *, resized=()):
 def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None,
           furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False,
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
-          save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False, shop_actors=False):
+          save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
+          shop_actors=False, shop_floor=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -164,6 +166,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_catalogue
     import v3_shops
     import v3_shop_actors
+    import v3_shop_floor
+    if shop_floor and not shop_actors:
+        raise ValueError('Shop floor imports require shop interaction support')
     if shop_actors and not shops:
         raise ValueError('Shop interaction imports require native stock and catalogue support')
     if shops and not catalogue:
@@ -212,7 +217,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_collection.SOURCES if collection else ())
                     + (v3_catalogue.SOURCES if catalogue else ())
                     + (v3_shops.SOURCES if shops else ())
-                    + (v3_shop_actors.SOURCES if shop_actors else ()))
+                    + (v3_shop_actors.SOURCES if shop_actors else ())
+                    + (v3_shop_floor.SOURCES if shop_floor else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -246,6 +252,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = v3_shops.ABI
     if shop_actors:
         abi = v3_shop_actors.ABI
+    if shop_floor:
+        abi = v3_shop_floor.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -455,6 +463,21 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         if set(shop_actor_changes) & (set(draw_changes) | set(furniture_changes) | set(menu_changes)
                 | set(icon_changes) | set(ground_changes) | set(catalogue_changes) | set(shop_changes)):
             raise ValueError('Shop actor composition overlaps another changed owner')
+    shop_floor_changes, shop_floor_report = {}, None
+    if shop_floor:
+        rows = v3_shop_floor.inspect(base, code)
+        generated = out / 'shop-floor-hooks.S'
+        write_new(generated, v3_shop_floor.assembly(rows).encode())
+        floor_code, floor_code_report = compile_part('shop_floor', out / 'shop_floor',
+            primary_source=str(generated.relative_to(ROOT)))
+        shop_floor_changes, shop_floor_report = v3_shop_floor.install(base, code, blob, rows,
+            floor_code, floor_code_report['symbols'], actor_code_report, room_code_report)
+        shop_floor_report['code'] = floor_code_report
+        shop_floor_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+        if set(shop_floor_changes) & (set(draw_changes) | set(furniture_changes) | set(menu_changes)
+                | set(icon_changes) | set(ground_changes) | set(catalogue_changes)
+                | set(shop_changes) | set(shop_actor_changes)):
+            raise ValueError('Shop floor composition overlaps another changed owner')
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -476,7 +499,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     additions[BLOB] = bytes(blob_file)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
-               **catalogue_changes, **shop_changes, **shop_actor_changes}
+               **catalogue_changes, **shop_changes, **shop_actor_changes, **shop_floor_changes}
     resized = ((v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ()) + ((v3_shops.VROM,) if shops else ())
     image = compose(native, base, changes, additions, resized=resized)
     patch = make_ups(native, image)
@@ -484,7 +507,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 imported shop interactions development 01' if shop_actors else
+    label = ('V3 imported shop floor development 01' if shop_floor else
+             'V3 imported shop interactions development 01' if shop_actors else
              'V3 imported shop stock development 01' if shops else
              'V3 imported catalogue development 01' if catalogue else
              'V3 item collection integration development 01' if collection else
@@ -516,6 +540,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'catalogue': catalogue_report,
         'shops': shop_report,
         'shop_actors': shop_actor_report,
+        'shop_floor': shop_floor_report,
         'resized_resources': [f'{v:08X}' for v in resized],
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
@@ -560,7 +585,10 @@ def main():
     p.add_argument('--catalogue', action='store_true', help='Include imported catalogue rows, model previews, and orderable prices')
     p.add_argument('--shops', action='store_true', help='Include selected furniture in native ordinary-stock tables and category queries')
     p.add_argument('--shop-actors', action='store_true', help='Connect imported furniture to all five native shop interaction actors')
+    p.add_argument('--shop-floor', action='store_true', help='Connect imported stock to shop floor selection and sold-item removal')
     args = p.parse_args()
+    if args.shop_floor:
+        args.shop_actors = True
     if args.shop_actors:
         args.shops = True
     if args.shops:
@@ -608,7 +636,8 @@ def main():
         furniture_fields=args.furniture_fields, furniture_menu=args.furniture_menu,
         furniture_icon=args.furniture_icon, furniture_ground=args.furniture_ground,
         furniture_pockets=args.furniture_pockets, save_codec=args.save_codec, save_runtime=args.save_runtime,
-        collection=args.collection, catalogue=args.catalogue, shops=args.shops, shop_actors=args.shop_actors)
+        collection=args.collection, catalogue=args.catalogue, shops=args.shops,
+        shop_actors=args.shop_actors, shop_floor=args.shop_floor)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)
