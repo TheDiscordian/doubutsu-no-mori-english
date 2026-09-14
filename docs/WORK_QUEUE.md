@@ -265,6 +265,12 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
+  texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
+  tests pass with unchanged pilot outputs. Connect stable model/texture banks,
+  voices, text/defaults/houses, and town behaviour before move-in eligibility.
+  Continue the other sixteen islanders' species/accessory conversion; do not
+  remove their accessories to force the existing converter to accept them.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
   The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked

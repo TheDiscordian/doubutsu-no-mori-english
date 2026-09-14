@@ -1,4 +1,4 @@
-"""Convert verified GC cat/cub villager artwork to native N64 texture objects."""
+"""Convert verified GC villager artwork to matching native N64 texture objects."""
 
 import argparse
 import json
@@ -35,8 +35,30 @@ LAYOUTS = {
                   (0xC0, 0x1C0, 32, 32), (0x2C0, 0x3C0, 16, 8),
                   (0x300, 0x500, 16, 16), (0x380, 0x780, 16, 8), (0x3C0, 0x7C0, 16, 8)),
     },
+    'pig': {
+        'template_index': 151, 'skeleton': 'cKF_bs_r_pig_1',
+        'eye': 0x200, 'mouth': 0x380, 'cloth': 0x500,
+        'body_bytes': 896, 'zero_padding': ((0x780, 128),),
+        'position_import_vertices': 67,
+        'parts': ((0, 0, 32, 32), (0x200, 0x300, 16, 16),
+                  (0x280, 0x480, 16, 16), (0x300, 0x700, 32, 8)),
+    },
+    'wol': {
+        'template_index': 185, 'skeleton': 'cKF_bs_r_wol_1',
+        'eye': 0x280, 'mouth': 0, 'cloth': 0x500, 'mouth_frames': 0,
+        'zero_padding': ((0x700, 256),),
+        'parts': ((0, 0, 16, 16), (0x80, 0x80, 32, 32),
+                  (0x280, 0x380, 16, 16), (0x300, 0x400, 16, 16),
+                  (0x380, 0x480, 16, 16)),
+    },
 }
 PILOTS = {'punchy': (235, 'cat', 'cat_15'), 'cheri': (232, 'cbr', 'cbr_11')}
+ARTWORK_VILLAGERS = {**PILOTS, 'pigleg': (233, 'pig', 'pig_11'),
+                    'dobie': (224, 'wol', 'wol_6')}
+
+
+def texture_body_offset(layout):
+    return 32 + (8 + layout.get('mouth_frames', 6))*256
 
 
 def symbol_span(symbols, name):
@@ -114,13 +136,15 @@ def tmem_rows(data, width, height):
 
 def convert_texture(palette, eyes, mouths, body, layout):
     """Store all expressions separately and initialise the native body atlas."""
-    if len(eyes) != 8 or len(mouths) != 6 or any(len(t) != 256 for t in [*eyes, *mouths]):
-        raise ValueError('Villager needs all eight eyes and six mouths at 32 by 16 CI4')
-    if len(body) != 1024:
+    mouth_frames = layout.get('mouth_frames', 6)
+    if (mouth_frames not in (0, 6) or len(eyes) != 8 or len(mouths) != mouth_frames
+            or any(len(t) != 256 for t in [*eyes, *mouths])):
+        raise ValueError('Villager needs all eight eyes and its complete native mouth frames')
+    if len(body) != layout.get('body_bytes', 1024):
         raise ValueError('Unsupported donor body texture size')
     converted_eyes = [pack4(untile(t, 32, 16, 4)) for t in eyes]
     converted_mouths = [pack4(untile(t, 32, 16, 4)) for t in mouths]
-    atlas, used, source_used = bytearray(2048), bytearray(2048), bytearray(1024)
+    atlas, used, source_used = bytearray(2048), bytearray(2048), bytearray(len(body))
     parts = []
 
     def install(at, data):
@@ -138,16 +162,19 @@ def convert_texture(palette, eyes, mouths, body, layout):
         source_used[source:source + count] = b'\x01' * count
         parts.append({'source_offset': source, 'tmem_offset': target, 'width': width, 'height': height})
     install(layout['eye'], tmem_rows(converted_eyes[0], 32, 16))
-    install(layout['mouth'], tmem_rows(converted_mouths[0], 32, 16))
+    if converted_mouths:
+        install(layout['mouth'], tmem_rows(converted_mouths[0], 32, 16))
     # The native NPC constructor/draw path fills this from the villager's current
     # shirt. No unrelated character's shirt is copied into the new texture.
     install(layout['cloth'], bytes(512))
+    for at, count in layout.get('zero_padding', ()):
+        install(at, bytes(count))
     if not all(used) or not all(source_used):
         raise ValueError('Unaccounted native atlas or donor body bytes')
     expressions = (converted_mouths + converted_eyes if layout.get('mouth_first')
                    else converted_eyes + converted_mouths)
     texture = native_palette(palette) + b''.join(expressions) + bytes(atlas)
-    if len(texture) != NATIVE_TEXTURE_SIZE:
+    if len(texture) != texture_body_offset(layout) + 2048:
         raise ValueError('Wrong complete native villager texture size')
     return texture, parts
 
@@ -163,7 +190,10 @@ def bind_donor(rel, symbols, pointers, index, species, prefix):
     row = table[index * DRAW_STRIDE:(index + 1) * DRAW_STRIDE]
     expected = {4: layout['skeleton'], 8: prefix + '_tmem_txt', 12: prefix + '_pal'}
     expected.update({16 + i * 4: f'{prefix}_eye{i + 1}_TA_tex_txt' for i in range(8)})
-    expected.update({48 + i * 4: f'{prefix}_mouth{i + 1}_TA_tex_txt' for i in range(6)})
+    mouth_frames = layout.get('mouth_frames', 6)
+    expected.update({48 + i * 4: f'{prefix}_mouth{i + 1}_TA_tex_txt' for i in range(mouth_frames)})
+    if mouth_frames == 0 and row[48:72] != bytes(24):
+        raise ValueError('Mouthless species has unexpected mouth pointers')
     if {at - row_at for at in pointers if row_at <= at < row_at + DRAW_STRIDE} != set(expected):
         raise ValueError('Unexpected or missing villager draw pointer fields')
     for offset, name in expected.items():
@@ -176,7 +206,7 @@ def bind_donor(rel, symbols, pointers, index, species, prefix):
     texture, parts = convert_texture(
         symbol_data(rel, symbols, prefix + '_pal'),
         [symbol_data(rel, symbols, f'{prefix}_eye{i}_TA_tex_txt') for i in range(1, 9)],
-        [symbol_data(rel, symbols, f'{prefix}_mouth{i}_TA_tex_txt') for i in range(1, 7)],
+        [symbol_data(rel, symbols, f'{prefix}_mouth{i}_TA_tex_txt') for i in range(1, mouth_frames+1)],
         symbol_data(rel, symbols, prefix + '_tmem_txt'), layout)
     return texture, row, parts
 
@@ -199,9 +229,12 @@ def native_species(rom, species):
 
     model_vrom, model = object_file(model_bank)
     texture_vrom, texture = object_file(texture_bank)
-    order = (*range(6, 14), *range(6)) if layout.get('mouth_first') else tuple(range(14))
-    expected = (0x06000E20, 0x06000000, *(0x06000020 + i * 256 for i in order))
-    if struct.unpack_from('>16I', row, 8) != expected or len(texture) != NATIVE_TEXTURE_SIZE:
+    mouth_frames = layout.get('mouth_frames', 6)
+    order = (*range(6, 14), *range(6)) if layout.get('mouth_first') else tuple(range(8+mouth_frames))
+    body_offset = texture_body_offset(layout)
+    expressions = tuple(0x06000020 + i * 256 for i in order) + (0,)*(6-mouth_frames)
+    expected = (0x06000000+body_offset, 0x06000000, *expressions)
+    if struct.unpack_from('>16I', row, 8) != expected or len(texture) != body_offset+2048:
         raise ValueError('Native expression pointers or texture dimensions differ')
     skeleton = u32(row, 4)
     if skeleton >> 24 != 6 or (skeleton & 0xFFFFFF) + 8 > len(model):
@@ -230,8 +263,10 @@ def normalise_vertex_flags(vertices):
     return bytes(result), changed
 
 
-def verify_shared_rig(rom, rel, symbols, species, native_row, metadata):
-    model = by_vrom(rom)[int(metadata['native_model_vrom'], 16)].extract(rom)
+def verify_shared_rig(rom, rel, symbols, species, native_row, metadata, *, model=None):
+    native_model = by_vrom(rom)[int(metadata['native_model_vrom'], 16)].extract(rom)
+    if model is None:
+        model = native_model
     vertices = symbol_data(rel, symbols, f'{species}_1_v')
     normalised, flags_changed = normalise_vertex_flags(vertices)
     if model[:len(vertices)] != normalised:
@@ -266,10 +301,35 @@ def verify_shared_rig(rom, rel, symbols, species, native_row, metadata):
     return {'matched_vertices': len(vertices) // 16, 'matched_joints': skeleton[0],
             'shown_joints': skeleton[1], 'vertices_sha256': sha256(vertices),
             'native_vertices_sha256': sha256(normalised),
+            **({'comparison_model': 'converted_native_model',
+                'original_native_vertices_sha256': sha256(native_model[:len(vertices)])}
+               if model != native_model else {}),
             'vertex_transport_flags_normalised': flags_changed}
 
 
-def build_art(rom, rel, symbols):
+def import_species_positions(rom, rel, symbols, species, metadata):
+    """Retain native draw commands/rig while importing verified donor coordinates."""
+    model = by_vrom(rom)[int(metadata['native_model_vrom'], 16)].extract(rom)
+    vertices, _ = normalise_vertex_flags(symbol_data(rel, symbols, f'{species}_1_v'))
+    count = LAYOUTS[species]['position_import_vertices']
+    if len(vertices) > len(model):
+        raise ValueError('Donor vertex array exceeds the native model')
+    changed = []
+    for at in range(0, len(vertices), 16):
+        if model[at+6:at+16] != vertices[at+6:at+16]:
+            raise ValueError('Position import changes UVs, normals, alpha, or vertex layout')
+        if model[at:at+6] != vertices[at:at+6]:
+            changed.append(at//16)
+    if changed != list(range(count)):
+        raise ValueError('Changed donor coordinate-import range')
+    result = vertices + model[len(vertices):]
+    return result, {'imported_position_vertices': count,
+        'unchanged_position_vertices': len(vertices)//16-count,
+        'native_commands_skeleton_and_uvs_retained': True,
+        'native_model_sha256': sha256(model), 'converted_model_sha256': sha256(result)}
+
+
+def build_art(rom, rel, symbols, *, villagers=None):
     rom = verified_rom(rom)
     if sha256(rel) != REL_SHA or sha256(symbols) != SYMBOLS_SHA:
         raise ValueError('Changed verified donor artwork source')
@@ -285,7 +345,26 @@ def build_art(rom, rel, symbols):
         raise ValueError('Shared Bob artwork does not reproduce the native object')
     report['shared_bob_roundtrip'] = {'matched_bytes': NATIVE_TEXTURE_SIZE - 512,
                                       'excluded_mutable_clothing_bytes': 512}
-    for name, (index, species, prefix) in PILOTS.items():
+    selected = tuple(PILOTS) if villagers is None else tuple(villagers)
+    if (not selected or len(set(selected)) != len(selected)
+            or any(name not in ARTWORK_VILLAGERS for name in selected)):
+        raise ValueError('Select distinct supported villager artwork identities')
+    for species, index, prefix in (('pig', 151, 'pig_1'), ('wol', 185, 'wol_1')):
+        if not any(ARTWORK_VILLAGERS[name][1] == species for name in selected):
+            continue
+        layout = LAYOUTS[species]
+        reference, _, _ = bind_donor(rel, symbols, pointers, index, species, prefix)
+        _, native_reference, _ = native_species(rom, species)
+        cloth = texture_body_offset(layout) + layout['cloth']
+        if (reference[:cloth] + reference[cloth+512:]
+                != native_reference[:cloth] + native_reference[cloth+512:]):
+            raise ValueError(f'Shared {species} artwork does not reproduce the native object')
+        report[f'shared_{species}_roundtrip'] = {'donor_index': index, 'matched_bytes': len(reference)-512,
+            'excluded_mutable_clothing_bytes': 512,
+            'verified_zero_padding_bytes': sum(count for _, count in layout.get('zero_padding', ()))}
+    for name, (index, species, prefix) in ARTWORK_VILLAGERS.items():
+        if name not in selected:
+            continue
         texture, row, parts = bind_donor(rel, symbols, pointers, index, species, prefix)
         native_row, _, metadata = native_species(rom, species)
         # Confirm the shared species' scale, talk type, and collision dimensions.
@@ -293,7 +372,16 @@ def build_art(rom, rel, symbols):
         # into the smaller native record.
         if row[0x54:0x5C] != native_row[0x54:0x5C] or row[0x64:0x68] != native_row[0x60:0x64]:
             raise ValueError('Imported villager requires changed species geometry or collision')
-        metadata['shared_rig'] = verify_shared_rig(rom, rel, symbols, species, native_row, metadata)
+        converted_model = None
+        if 'position_import_vertices' in LAYOUTS[species]:
+            converted_model, geometry = import_species_positions(rom, rel, symbols, species, metadata)
+            model_file = f'{name}.n64model.bin'
+            artifacts[model_file] = converted_model
+            metadata.update(model_file=model_file, model_sha256=sha256(converted_model),
+                            model_bytes=len(converted_model), geometry_conversion=geometry,
+                            target_model_bank=None)
+        metadata['shared_rig'] = verify_shared_rig(rom, rel, symbols, species, native_row, metadata,
+                                                   model=converted_model)
         file = f'{name}.n64tex.bin'
         artifacts[file] = texture
         report['villagers'].append({
@@ -302,7 +390,7 @@ def build_art(rom, rel, symbols):
             'donor_voice_id': struct.unpack_from('>H', row, 0x62)[0],
             'native_texture_bytes': len(texture), 'texture_file': file,
             'texture_sha256': sha256(texture), 'body_parts': parts,
-            'expression_frames': {'eye': 8, 'mouth': 6}, **metadata,
+            'expression_frames': {'eye': 8, 'mouth': LAYOUTS[species].get('mouth_frames', 6)}, **metadata,
             'status': 'artwork_converted_runtime_pending', 'selectable': False,
             'target_texture_bank': None,
         })
@@ -317,16 +405,20 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--villager', action='append', choices=tuple(ARTWORK_VILLAGERS),
+                        help='Convert selected artwork components; default: existing two pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh artwork output directory')
     donor = read_donor(args.disc)
-    artifacts, report = build_art(args.n64.read_bytes(), donor['rel'], args.symbols.read_bytes())
+    artifacts, report = build_art(args.n64.read_bytes(), donor['rel'], args.symbols.read_bytes(),
+                                  villagers=args.villager)
     args.output.mkdir(parents=True)
     for file, data in artifacts.items():
         (args.output / file).write_bytes(data)
     (args.output / 'art.json').write_text(json.dumps(report, indent=2) + '\n')
-    print(json.dumps({'output': str(args.output), 'converted_artworks': len(artifacts),
+    print(json.dumps({'output': str(args.output), 'converted_artworks': len(report['villagers']),
+                      'asset_files': len(artifacts),
                       'bytes': sum(map(len, artifacts.values())),
                       'shared_bob_roundtrip': report['shared_bob_roundtrip'], 'installed': False}, indent=2))
 

@@ -357,6 +357,14 @@ actor while crossing the acre. House entry remains unverified after the bounded
 door approaches. Move-in eligibility stays disabled. Profile/format are unchanged from ABI 49; ordinary
 cross-build loading is not newly verified. Both patchers remain V2.
 
+The [additional islander artwork](checkpoints/V3_ISLANDER_ART.md) converts
+Pigleg's complete pig textures and separate donor-coordinate model, plus Dobie's
+complete mouthless wolf textures with a matching native rig. Thirteen focused
+tests pass, retaining exact Punchy/Cheri outputs and all original game assets.
+These components are not installed or selectable. Fixed model-bank assignment,
+islander town behaviour, dependencies, and the other sixteen islanders remain
+work; the current ABI-50 ROM and both V2 patchers are unchanged.
+
 ## Stable V2 deliverable
 
 The current cartridge is **V2-11** at

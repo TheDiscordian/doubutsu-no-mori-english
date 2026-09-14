@@ -8,6 +8,12 @@ It retains the native cat/cub geometry and animation skeleton after verifying
 their correspondence with the donor. This is an artwork component, not a
 complete playable villager or an enabled browser option.
 
+Explicit `--villager` selections also convert Pigleg (`00E9`, `pig_11`) and
+Dobie (`00E0`, `wol_6`). These two islanders are artwork components only;
+the default two-pilot conversion and current development ROM do not change.
+Pigleg includes a separate converted model, not an overwrite of the native pig
+model. Town behaviour, dependencies, and runtime installation remain required.
+
 The donor disc/resources and symbol file use the pins in
 `V3_OPTIONAL_IMPORTS.md` and `v3_import_catalog.py`. Actual REL relocations bind
 the selected draw-table row to its skeleton, body, palette, all eight eye
@@ -17,7 +23,7 @@ palette alpha, or accessories that need separate geometry fail construction.
 
 ## Native object layout
 
-Each output is 5,664 bytes (`0x1620`):
+Cat, cub, and pig texture outputs are 5,664 bytes (`0x1620`):
 
 - `0000–001F`: sixteen N64 RGBA5551 palette entries.
 - `0020–0E1F`: fourteen 256-byte, row-major CI4 expression frames.
@@ -26,6 +32,9 @@ Each output is 5,664 bytes (`0x1620`):
 Cats store eight eyes followed by six mouths. Cubs store six mouths followed by
 eight eyes. The existing native draw-record pointers determine that ordering;
 changing it without matching pointers would animate the wrong facial features.
+Wolves have eight eye frames and six null mouth pointers in both actual games.
+Their complete object is 4,128 bytes (`0x1020`), with body data at `0820`.
+Do not invent mouth frames or retain cat-sized expression offsets for wolves.
 
 The GameCube CI4 data uses 8×8 tiled blocks. Expression frames untile to 32×16
 row-major CI4. Body parts also untile, then swap the two 32-bit words in every
@@ -57,6 +66,20 @@ Cat eye/mouth/shirt offsets are `000`/`100`/`400`. Cub offsets are
 for exactly once, including the mutable areas. Bounds and overlap checks are
 mandatory.
 
+Pigs use 896 donor body bytes, not 1,024. Their source/native placements are
+`000→000` (32×32), `200→300` (16×16), `280→480` (16×16), and `300→700` (32×8).
+Eye/mouth/shirt offsets are `200`/`380`/`500`; native `780..7FF` is verified zero
+padding. Wolves use all 1,024 body bytes: `000→000` (16×16), `080→080` (32×32),
+`280→380`, `300→400`, and `380→480` (each 16×16). Their eye/shirt offsets are
+`280`/`500`, and `700..7FF` is verified zero padding. The unused mouth offset
+is zero, not a request to overwrite the first body tile.
+
+Complete shared-pig and shared-wolf texture conversions reproduce their actual
+native objects outside the mutable shirt: 5,152 and 3,616 bytes respectively.
+These comparisons include every expression, palette entry, body placement, and
+padding byte. Native model tile commands independently identify the listed body
+dimensions and texture-memory destinations.
+
 Palette conversion preserves opaque RGB555 values. RGB5A3 entries with binary
 alpha convert to native RGBA5551; partial alpha requires another rendering path
 and is rejected, not silently flattened.
@@ -85,6 +108,23 @@ Converting shared Bob artwork reproduces all 5,152 non-shirt bytes of his native
 texture object, including the palette, every expression, and body placements.
 The 512 mutable shirt bytes are deliberately excluded. Cheri's GC artwork is
 not required to match another cub's differently coloured N64 textures.
+
+Dobie's model retains all 374 native wolf vertices and 26 joints, with fourteen
+visible joints; donor matrix flags are the only vertex representation change.
+Pigleg needs different head coordinates: donor vertices 0–66 differ from the
+native pig, while vertices 67–318 retain their coordinates. All 319 UVs,
+normals/colours, alpha values, and vertex order agree after matrix-flag
+normalisation. The converter imports those 67 coordinate triples into a
+separate 7,360-byte copy of the native model. Every command, pointer, skeleton
+byte, and non-position vertex field stays native. All 26 joints and twelve
+visible-joint records match. The output report distinguishes comparison against
+this converted model from comparison against an unchanged native model.
+
+This coordinate adaptation does not globally resize existing N64 pigs. Its
+model-bank assignment, actual runtime drawing, and appearance verification are
+pending; texture conversion alone must not silently reuse the larger native
+head. Accessory-bearing villagers still fail conversion until their additional
+geometry has an explicit implementation.
 
 ## Native integration still required
 

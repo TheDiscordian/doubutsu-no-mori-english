@@ -12,7 +12,7 @@ from aflib import sha256
 from title_assets import pack4, untile
 from v3_villager_art import (LAYOUTS, NATIVE_BODY_OFFSET, NATIVE_TEXTURE_SIZE,
                              build_art, convert_texture, data_pointers, native_palette,
-                             normalise_vertex_flags, symbol_span, tmem_rows)
+                             normalise_vertex_flags, symbol_span, texture_body_offset, tmem_rows)
 
 
 def source_texture():
@@ -56,17 +56,25 @@ class V3VillagerArtTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 tmem_rows(data, width, height)
 
-    def test_complete_cat_and_cub_objects_keep_frame_order_and_all_pixels(self):
+    def test_complete_species_objects_keep_frame_order_and_all_pixels(self):
         palette, eyes, mouths, body = source_texture()
         for species, layout in LAYOUTS.items():
             with self.subTest(species=species):
-                texture, parts = convert_texture(palette, eyes, mouths, body, layout)
-                self.assertEqual(len(texture), NATIVE_TEXTURE_SIZE)
+                selected_mouths = mouths[:layout.get('mouth_frames', 6)]
+                texture, parts = convert_texture(palette, eyes, selected_mouths,
+                                                  body[:layout.get('body_bytes', len(body))], layout)
+                body_offset = texture_body_offset(layout)
+                self.assertEqual(len(texture), body_offset+2048)
                 first = mouths[0] if layout.get('mouth_first') else eyes[0]
                 self.assertEqual(texture[32:288], first)
-                atlas = texture[NATIVE_BODY_OFFSET:]
+                atlas = texture[body_offset:]
                 self.assertEqual(atlas[layout['cloth']:layout['cloth'] + 512], bytes(512))
-                for frame, at in ((eyes[0], layout['eye']), (mouths[0], layout['mouth'])):
+                for at, count in layout.get('zero_padding', ()):
+                    self.assertEqual(atlas[at:at+count], bytes(count))
+                frames = [(eyes[0], layout['eye'])]
+                if selected_mouths:
+                    frames.append((mouths[0], layout['mouth']))
+                for frame, at in frames:
                     self.assertEqual(atlas[at:at + 256], tmem_rows(frame, 32, 16))
                 for part in parts:
                     at, source, width, height = (part[key] for key in ('tmem_offset', 'source_offset', 'width', 'height'))
