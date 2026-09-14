@@ -46,6 +46,9 @@ with later e/e+ donor support investigated separately.
   furniture in native reward selection. Four focused tests and the initial
   45-step native run pass, including both actual-room barrel gifts through
   complete selection, list storage, and identity-based retrieval.
+  The [umbrella review](../specs/V3_VILLAGER_UMBRELLAS.md) confirms both installed
+  defaults, native consumers, and full donor/native artwork correspondence.
+  Two focused checks pass without changing the cartridge.
   Next: remaining native reader review and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.

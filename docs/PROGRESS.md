@@ -151,6 +151,10 @@ Four focused tests and the initial 45-step native run pass, including both
 actual Cheri-room imported gifts through complete list storage and retrieval,
 rotations, disabled imports, room boundaries, and guards. Ordinary gifting
 conversations remain part of gameplay integration.
+The [umbrella review](../specs/V3_VILLAGER_UMBRELLAS.md) verifies both already
+installed defaults and their complete matching native artwork: 2,048 pixels,
+56 vertices, and 33 material-bound triangles per umbrella. Two focused checks
+pass. No ROM change is needed; ordinary rain animation remains a gameplay check.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

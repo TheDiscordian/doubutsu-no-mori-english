@@ -62,8 +62,9 @@ Imported initialization writes exactly the original initializer's fields:
 Other fields, including name ID at `+00A`, follow their existing later
 initialization paths. This is not a replacement for full saved identity creation.
 N64 `Animal` has no GameCube-style saved umbrella byte. Do not write the donor's
-umbrella into native padding. Draw-record umbrella routing is a separate reader;
-its asset correspondence and ordinary rain behaviour remain to be verified.
+umbrella into native padding. The [draw-record umbrella review](V3_VILLAGER_UMBRELLAS.md)
+verifies both already-installed defaults and their complete native artwork
+correspondence. Ordinary rain behaviour remains a gameplay check.
 
 Null destinations, missing imports, incomplete outfits, and invalid indices are
 no-write. Original defaults/record pointers are used only for bounded native IDs.
