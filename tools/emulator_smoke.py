@@ -1287,6 +1287,24 @@ def main():
                     raise ValueError('Dialogue date probes require a saved emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug,action['test_dialogue_dates'],record))
+            if action.get('test_v3_save_warning'):
+                from v3_save_warning_smoke import verify
+                if not args.seed_save or args.seed_state or args.allow_test_flash_write:
+                    raise ValueError('V3 warning probe requires only a disposable cartridge seed')
+                results.append(verify(debug, args.rom, args.seed_save))
+            if 'test_v3_save_runtime' in action:
+                from v3_save_runtime_smoke import exercise
+                mode = action['test_v3_save_runtime']
+                if not (out/'test.bs1').is_file() or mode not in ('write', 'write-async', 'read'):
+                    raise ValueError('V3 flash probes require a checkpoint and explicit mode')
+                if mode != 'read' and (not args.allow_test_flash_write or args.seed_save or args.seed_state):
+                    raise ValueError('V3 flash writer requires opt-in and blank isolated storage')
+                if mode == 'read' and (not args.seed_save or args.seed_state or args.allow_test_flash_write):
+                    raise ValueError('V3 flash reader requires only the exported cartridge seed')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record,
+                    export_directory=out/'native-flash-export' if mode != 'read' else None,
+                    seed_directory=args.seed_save if mode == 'read' else None, test_sync=mode == 'write'))
             if action.get('test_v3_save_codec'):
                 from v3_save_codec_smoke import exercise
                 if not (out/'test.bs1').is_file():
@@ -1472,6 +1490,12 @@ def main():
         results.append({"graceful_shutdown": True, "save_files": [
             {"file": p.name, "bytes": p.stat().st_size, "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
             for p in (out/"test.flash", out/"test.rtc", out/"test.pak") if p.is_file()]})
+        for result in tuple(results):
+            if result.get('v3_save_warning') == 'passed':
+                observed = hashlib.sha256((out/'test.flash').read_bytes()).hexdigest()
+                if observed != result['expected_unchanged_flash_sha256']:
+                    raise ValueError('V3 incompatibility warning changed the cartridge save')
+                results.append({'v3_warning_preserves_complete_flash': True, 'sha256': observed})
         write_results(out, results)
         print(json.dumps({"output": str(out), "steps": len(results)}, indent=2))
     finally:

@@ -71,9 +71,14 @@ with later e/e+ donor support investigated separately.
   receipts, and save/profile compatibility handling.
   The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked
   profiles, payload/extension binding, legacy decoding, and four imported-item
-  catalogues. Six focused tests and 76 native steps pass. Native saving/loading,
-  catalogue calls, runtime state, and the incompatibility warning are not wired
-  yet; private-buffer checks do not establish persistence.
+  catalogues. Six focused tests and 76 native steps pass. The
+  [FlashRAM runtime](checkpoints/V3_FLASH_RUNTIME.md) now connects actual
+  saving/loading, separate state, and an English incompatibility warning.
+  Six focused tests, synchronous writing, a 141-step two-bank writer, a
+  54-step fresh-process reader, and the cold-boot warning pass. Both native
+  load entries preserve imported IDs/catalogue state and the original RAM tail;
+  the warning preserves both stored banks. Catalogue consumers, ordinary
+  gameplay persistence, and Controller Pak profile transport remain work.
   Include imported default-phrase references borrowed by original villagers;
   checking imported actor IDs alone cannot detect every saved dependency.
 - [ ] Add searchable per-entry/category/select-all controls to the web patcher;

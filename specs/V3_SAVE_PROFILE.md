@@ -6,8 +6,10 @@
 and four-player imported-furniture catalogue. `--save-codec` installs this code
 in the combined development cartridge, but **does not change native saving,
 loading, or catalogue calls**. All codec execution uses private test buffers.
-The actual FlashRAM hooks, player-facing incompatibility warning, fresh-process
-round trip, and ordinary gameplay persistence remain required.
+The [native runtime variant](V3_FLASH_RUNTIME.md) connects the FlashRAM hooks,
+separate state, and player-facing incompatibility warning, with an isolated
+fresh-process round trip. Ordinary gameplay persistence and catalogue consumers
+remain required. The codec-only variant retains its original isolated boundary.
 
 The existing [FlashRAM layout](FLASH_MAIL.md) supplies two 64-KiB banks on the
 128-KiB chip. The original logical payload is `F980` bytes. The codec uses the
@@ -16,6 +18,8 @@ puts additional bits beyond an original catalogue array.
 
 ## Native audit and integration constraints
 
+This audit describes the original routines; installed V3 changes are detailed
+in [the runtime specification](V3_FLASH_RUNTIME.md).
 Addresses and offsets below are hexadecimal. Bind changes to the complete
 native module and worker hashes in `FLASH_MAIL.md`, not isolated constants.
 
@@ -69,11 +73,10 @@ coherent with the normal save path.
 The two load entries both return the native success boolean. The direct entry
 `8008F938` reads the selected bank into live RAM without a temporary allocation.
 The allocated entry `8008F968` already retries failed reads, validates the header,
-copies only `F980` bytes into live RAM, and frees its buffer. A candidate
-integration can route direct loads through the allocated path, grow only that
-private allocation to `10000`, and decode V3 state before committing the original
-payload copy. This avoids assuming ownership of the unnamed live-RAM tail;
-caller/overlay verification remains required before installing that change.
+copies only `F980` bytes into live RAM, and frees its buffer. The runtime variant
+routes direct loads through this path, grows the private allocation to `10000`,
+and decodes V3 state before committing the original payload copy. Both entries
+pass the fresh-process check without changing the unnamed live-RAM tail.
 
 Do not merely replace the header-writer call with packing and ignore its result.
 Native preparation callers continue into writing without testing that call's
@@ -85,8 +88,8 @@ Preserve a distinct profile error and gate load/repair/save until the explicit
 incompatibility path is handled.
 
 V3 already owns RAM `80460000..8046FFFF`; the current loaded prefix ends at
-`8046BFFF`. A future explicitly initialised state at `8046C000` can avoid
-repurposing unnamed native save RAM. ROM-only model data beginning at VROM
+`8046BFFF`. The runtime variant explicitly initialises its separate state at
+`8046C000`, without repurposing unnamed native save RAM. ROM-only model data beginning at VROM
 `03F0C000` is not resident at RAM `8046C000`. No persistent state is assigned or
 initialised there by the codec-only build.
 

@@ -198,8 +198,10 @@ converter versions, selected identities, dependencies, and output hash. Design
 any runtime save/profile guard only after the save layout audit; no reserved
 storage is assumed free. The [save/profile codec](V3_SAVE_PROFILE.md) defines
 the reviewed two-bank extension and records the native read/write integration
-constraints. It is tested on private buffers; actual persistence/profile hooks
-remain required. The web patcher does not upload or edit saves.
+constraints. The [FlashRAM runtime](V3_FLASH_RUNTIME.md) connects actual save/load
+hooks and the incompatibility warning, with isolated fresh-process persistence
+and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
+integration remain required. The web patcher does not upload or edit saves.
 
 ## Browser implementation
 

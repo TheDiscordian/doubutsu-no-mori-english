@@ -76,9 +76,15 @@ remain required. The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md)
 implements checked import profiles, payload/extension CRC binding, legacy
 decoding, and four imported-item catalogues. Six focused checks and 76 native
 steps pass, including complete encoding against an independent reference and
-profile/corruption rejection. The codec is installed but disconnected from
-native saving/loading and catalogue calls; actual persistence and the
-incompatibility warning remain work.
+profile/corruption rejection. The [FlashRAM runtime](checkpoints/V3_FLASH_RUNTIME.md)
+connects actual saving/loading, separate runtime state, and the English
+incompatibility warning. Six focused checks, synchronous writing, a 141-step
+two-bank writer, and a 54-step fresh-process reader pass. Both native load entries
+restore the imported pocket IDs and catalogue/profile data without using the
+unnamed native RAM tail. A normal cold boot with missing imports displays the
+complete warning, stops without a CPU fault, and preserves both save banks.
+Native catalogue consumers, ordinary gameplay persistence, and Controller Pak
+profile transport remain work.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 
