@@ -16,7 +16,7 @@ from v3_villager_text import ABI, BLOB_SIZE, DATA, STRIDE, CODE, BRIDGES, jump
 
 
 class HostTests(unittest.TestCase):
-    def test_text_and_borrowed_reference_contract(self):
+    def test_text_initial_defaults_and_borrowed_reference_contract(self):
         self.sanitized('v3_villager_text_test.c', [], 'guards pass')
 
     def test_abi_four_startup_and_complete_code_cache_range(self):
@@ -33,11 +33,11 @@ class HostTests(unittest.TestCase):
             self.assertIn(message, result.stdout)
 
 
-@unittest.skipUnless((ROOT / 'build/v3-villager-text-02/build.json').exists(), 'Current local V3 text build required')
+@unittest.skipUnless((ROOT / 'build/v3-villager-defaults-01/build.json').exists(), 'Current local V3 defaults build required')
 class CartridgeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.out = ROOT / 'build/v3-villager-text-02'
+        cls.out = ROOT / 'build/v3-villager-defaults-01'
         cls.report = json.loads((cls.out / 'build.json').read_text())
         cls.rom = (cls.out / 'animal-forest-v3-asset-loader.z64').read_bytes()
         cls.files = by_vrom(cls.rom)
@@ -63,7 +63,8 @@ class CartridgeTests(unittest.TestCase):
             self.assertEqual(data[8:16], row['name'].encode().ljust(8, b' '))
             self.assertEqual(data[16:26], row['catchphrase'].encode().ljust(10, b' '))
             self.assertEqual(data[26:30], bytes.fromhex(row['saved_default_key']))
-            self.assertEqual(data[30:], bytes(2))
+            cloth = row['clothing_identity']['native_item_id']
+            self.assertEqual(data[30:], struct.pack('>H', int(cloth, 16) if cloth else 0))
         self.assertEqual(slots, {16, 19})
         for slot in set(range(20)) - slots:
             self.assertEqual(self.blob[DATA + slot * STRIDE:DATA + (slot + 1) * STRIDE], bytes(STRIDE))
@@ -79,8 +80,22 @@ class CartridgeTests(unittest.TestCase):
                          (jump(syms['af_v3_actor_name']), 0))
         # Original name and catchphrase resources retain their native ownership.
         before = by_vrom(self.base)
-        for vrom in (0xE04000, 0xE03000, 0xE02000, 0x2C00000, 0x2E00000):
+        for vrom in (0xE04000, 0xE03000, 0xE02000, 0x2C00000, 0x2E00000, 0xB68000, 0xB88000):
             self.assertEqual(self.files[vrom].extract(self.rom), before[vrom].extract(self.base))
+
+    def test_clothing_identity_gates_initial_defaults(self):
+        rows = self.report['villager_text']['imports']
+        self.assertEqual([r['initial_defaults_applied'] for r in rows], [True, False])
+        for row in rows:
+            proof = row['clothing_identity']
+            self.assertEqual(proof['compared_pixels'], 1024)
+            self.assertEqual(proof['native_candidates_checked'], 256)
+            for key, vrom in (('native_texture_bank_sha256', 0xB68000), ('native_palette_bank_sha256', 0xB88000)):
+                self.assertEqual(proof[key], sha256(self.files[vrom].extract(self.rom)))
+            self.assertFalse(row['move_in_enabled'])
+        self.assertEqual(rows[0]['clothing_identity']['native_item_id'], '2498')
+        self.assertIsNone(rows[1]['clothing_identity']['native_item_id'])
+        self.assertEqual(rows[1]['clothing_identity']['status'], 'new_clothing_import_required')
 
     def test_sources_reconstruction_and_translation_only_retention(self):
         self.assertTrue(self.report['saved_format_changed'])

@@ -210,7 +210,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 villager text development 02' if text_donor is not None else
+    label = ('V3 villager defaults development 01' if text_donor is not None else
              'V3 villager audio development 02' if audio_donor is not None else
              'V3 NPC draw development 02' if npc_draw else 'V3 asset-loader development 02')
     return image, patch, {'build': label,
@@ -238,7 +238,7 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
-    p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, and default-phrase references')
+    p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
     args = p.parse_args()
     out = args.output.resolve()
     if not out.is_relative_to(ROOT / 'build') or out.exists():

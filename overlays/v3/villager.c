@@ -1,11 +1,12 @@
-/* Imported display names and default catchphrases; no roster activation. */
+/* Imported text and verified starting defaults; no roster activation. */
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 struct Villager {
     u16 actor, cloth;
     u8 personality, umbrella, growth, present;
-    u8 name[8], phrase[10], key[4], reserved[2];
+    u8 name[8], phrase[10], key[4];
+    u16 native_cloth; /* Zero means the complete starting outfit is pending. */
 };
 _Static_assert(sizeof(struct Villager) == 32, "V3 villager metadata row");
 #ifdef __mips__
@@ -17,6 +18,11 @@ _Static_assert(sizeof(struct Villager) == 32, "V3 villager metadata row");
 #define old_phrase ((int (*)(u8 *, u32, u32, const u8 *))0x80462F10u)
 #define old_short_name ((void (*)(u8 *, u32))0x80462F20u)
 #define old_reset ((void (*)(const u8 *))0x80462F30u)
+#define old_looks ((u32 (*)(u32))0x80462F40u)
+#define old_defaults ((void (*)(u8 *, u32, const u8 *))0x80462F50u)
+#define old_info ((void (*)(u8 *, u32, u32, const u8 *))0x80462F60u)
+#define old_index ((void (*)(u8 *, int))0x80462F70u)
+#define land_info ((const u8 *)0x80129E00u)
 /* The original first branch is the null-destination return. Our wrapper guards
  * that itself, then enters the unchanged complete original prologue at +8. */
 #define old_actor_name ((void (*)(u8 *, const u8 *))0x80195D28u)
@@ -27,6 +33,10 @@ extern int af_v3_ready, af_v3_name_enabled, af_v3_phrase_enabled;
 extern int af_v3_old_name(u8 *, u32, u32), af_v3_old_phrase(u8 *, u32, u32, const u8 *);
 extern void af_v3_old_short_name(u8 *, u32), af_v3_old_reset(const u8 *), af_v3_old_actor_name(u8 *, const u8 *);
 extern u8 *af_v3_animal_at(const u8 *);
+extern u32 af_v3_old_looks(u32);
+extern void af_v3_old_defaults(u8 *, u32, const u8 *), af_v3_old_info(u8 *, u32, u32, const u8 *);
+extern void af_v3_old_index(u8 *, int);
+extern u8 af_v3_land_info[10];
 #define records af_v3_villagers
 #define ready af_v3_ready
 #define name_enabled af_v3_name_enabled
@@ -37,6 +47,11 @@ extern u8 *af_v3_animal_at(const u8 *);
 #define old_reset af_v3_old_reset
 #define old_actor_name af_v3_old_actor_name
 #define animal_at af_v3_animal_at
+#define old_looks af_v3_old_looks
+#define old_defaults af_v3_old_defaults
+#define old_info af_v3_old_info
+#define old_index af_v3_old_index
+#define land_info af_v3_land_info
 #endif
 
 static u32 actor_id(const u8 *data) { return (u32)data[0] * 256u + data[1]; }
@@ -113,4 +128,52 @@ void af_v3_reset_phrase(const u8 *actor) {
         return;
     }
     old_reset(actor);
+}
+
+u32 af_v3_get_looks(u32 argument) {
+    u32 npc = (u16)argument;
+    const struct Villager *row = lookup(npc);
+    if (row) return row->personality;
+    /* Native ordinary and test rows exist through E0D9. Other Exxx values
+     * must not read past the original personality table. */
+    return npc >= 0xE000u && npc < 0xE0DAu ? old_looks(npc) : 0;
+}
+
+static void imported_defaults(u8 *animal, const struct Villager *row) {
+    if (!row || row->native_cloth < 0x2400u || row->native_cloth >= 0x2500u) return;
+    animal[0] = row->actor >> 8;
+    animal[1] = row->actor;
+    animal[0xB] = row->personality;
+    animal[0x520] = row->native_cloth >> 8;
+    animal[0x521] = row->native_cloth;
+    copy(animal + 0x4E5, row->key, 4);
+    copy(animal + 2, land_info + 8, 2);
+    copy(animal + 4, land_info, 6);
+}
+
+void af_v3_set_defaults(u8 *animal, u32 argument, const u8 *defaults) {
+    u32 npc = (u16)argument;
+    if (!animal) return;
+    if (npc >= 0xE000u && npc < 0xE0DAu) {
+        if (defaults) old_defaults(animal, npc, defaults);
+        return;
+    }
+    imported_defaults(animal, lookup(npc));
+}
+
+void af_v3_set_info(u8 *animal, u32 argument, u32 looks, const u8 *defaults) {
+    u32 npc = (u16)argument;
+    if (!animal) return;
+    if (npc >= 0xE000u && npc < 0xE0DAu) {
+        if (defaults) old_info(animal, npc, (u8)looks, defaults);
+        return;
+    }
+    imported_defaults(animal, lookup(npc));
+}
+
+void af_v3_set_index(u8 *animal, int index) {
+    if (!animal || index < 0) return;
+    /* Preserve the native indexed initializer's exclusion of test rows. */
+    if (index < 216) { old_index(animal, index); return; }
+    if (index < 238) imported_defaults(animal, lookup(0xE000u + (u32)index));
 }

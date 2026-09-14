@@ -111,8 +111,11 @@ The [melody adapter](V3_VILLAGER_AUDIO.md) installs their verified donor program
 and full-ID audio paths; focused native audio/draw checks pass. The
 [text adapter](V3_VILLAGER_TEXT.md) connects shared names, full catchphrases,
 native default reset, and four-byte borrowed/default references. Its focused
-and native reader/insertion checks pass. Initial defaults, houses, selection,
-secondary ID-bounded readers, and ordinary gameplay/save integration remain pending.
+and native reader/insertion checks pass. The
+[initial-default adapter](V3_VILLAGER_DEFAULTS.md) connects Cheri's verified
+starting shirt/defaults and both pilots' personality lookup. Punchy's actual
+cherry-shirt import, houses, selection, secondary ID-bounded readers, and
+ordinary gameplay/save integration remain pending.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

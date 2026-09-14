@@ -9,6 +9,15 @@ static u8 actor[0x180], animal[0x540];
 static u8 *actor_animal = animal;
 static u32 old_npc;
 static int calls;
+u8 af_v3_land_info[10];
+u32 af_v3_old_looks(u32 npc) { assert(npc >= 0xE000 && npc < 0xE0DA); return 3; }
+void af_v3_old_defaults(u8 *out, u32 npc, const u8 *data) {
+    assert(out && data && npc >= 0xE000 && npc < 0xE0DA); ++calls;
+}
+void af_v3_old_info(u8 *out, u32 npc, u32 looks, const u8 *data) {
+    assert(out && data && npc >= 0xE000 && npc < 0xE0DA && looks < 256); ++calls;
+}
+void af_v3_old_index(u8 *out, int index) { assert(out && index >= 0 && index < 216); ++calls; }
 u8 *af_v3_animal_at(const u8 *value) { assert(value == actor); return actor_animal; }
 int af_v3_old_name(u8 *out, u32 capacity, u32 npc) {
     assert(out && capacity >= 8); ++calls;
@@ -89,5 +98,46 @@ int main(void) {
     assert(!calls && !memcmp(before, animal, sizeof(before)));
     animal[1] = 0; af_v3_reset_phrase(actor); assert(calls == 1);
     actor[2] = 2; af_v3_reset_phrase(actor); af_v3_reset_phrase(0); assert(calls == 1);
-    puts("V3 names, original delegation, default references, borrowing, reset, and guards pass");
+    reset(); calls = 0;
+    af_v3_villagers[16].personality = 1; af_v3_villagers[19].personality = 2;
+    af_v3_villagers[16].native_cloth = 0x2498;
+    memcpy(af_v3_land_info, "Forest!!\x12\x34", 10);
+    memcpy(before, animal, sizeof(before));
+    before[0] = 0xE0; before[1] = 0xEA; before[0xB] = 1;
+    memcpy(before + 2, "\x12\x34" "Forest", 8);
+    memcpy(before + 0x4E5, "\xFE\xF3\xEA ", 4);
+    before[0x520] = 0x24; before[0x521] = 0x98;
+    for (int route = 0; route < 3; ++route) {
+        memset(animal, 0xA5, sizeof(animal));
+        if (route == 0) af_v3_set_defaults(animal, 0x1234E0EA, NULL);
+        if (route == 1) af_v3_set_info(animal, 0xE0EA, 255, NULL);
+        if (route == 2) af_v3_set_index(animal, 234);
+        assert(!memcmp(before, animal, sizeof(before)) && !calls);
+    }
+    assert(af_v3_get_looks(0x1234E0EA) == 1 && af_v3_get_looks(0xE0ED) == 2);
+    assert(af_v3_get_looks(0xE0D9) == 3 && af_v3_get_looks(0xD008) == 0);
+    assert(af_v3_get_looks(0xE0DA) == 0 && af_v3_get_looks(0xEFFF) == 0);
+    for (u32 i = 0; i < 2; ++i) {
+        u32 npc = i ? 0xE0ED : 0xE0DA;
+        af_v3_set_defaults(animal, npc, animal);
+        af_v3_set_info(animal, npc, 0, animal);
+        af_v3_set_index(animal, npc & 255);
+        assert(!memcmp(before, animal, sizeof(before)) && !calls);
+    }
+    af_v3_ready = 0;
+    af_v3_set_info(animal, 0xE0EA, 1, animal);
+    assert(!memcmp(before, animal, sizeof(before)) && !calls && af_v3_get_looks(0xE0EA) == 0);
+    af_v3_ready = 1;
+    af_v3_set_defaults(NULL, 0xE0EA, animal);
+    af_v3_set_info(NULL, 0xE0EA, 1, animal);
+    af_v3_set_index(NULL, 234);
+    af_v3_set_defaults(animal, 0xE000, NULL);
+    af_v3_set_info(animal, 0xE000, 0, NULL);
+    af_v3_set_index(animal, -1); af_v3_set_index(animal, 216); af_v3_set_index(animal, 238);
+    assert(!calls && !memcmp(before, animal, sizeof(before)));
+    af_v3_set_defaults(animal, 0xE0D9, animal);
+    af_v3_set_info(animal, 0xE000, 0x123401, animal);
+    af_v3_set_index(animal, 215);
+    assert(calls == 3);
+    puts("V3 names, borrowed/default phrases, initial defaults, personality, native fallback, and guards pass");
 }

@@ -28,8 +28,13 @@ installs shared full-name/phrase readers, native six-byte compatibility names,
 default reset, and borrowable four-byte V3 phrase references. Five focused checks
 and actual native name/phrase insertion, reset, setter, original/special fallback,
 and guard checks pass. The new references require V3 despite unchanged saved
-field widths. Initial clothing/defaults, houses, selection, remaining ID-bounded
-readers, and gameplay/save/profile paths are next;
+field widths. The [initial-default batch](checkpoints/V3_VILLAGER_DEFAULTS.md)
+connects Cheri's personality, verified yellow bar shirt, catchphrase reference,
+and hometown through all three native initialization entries. Both pilot
+personality lookups, native/test fallbacks, and actual clothing DMA pass native
+checks; six focused tests also pass. Punchy's cherry shirt has no exact native
+artwork match and needs a proper clothing import before his initialization is
+enabled. Houses, selection, remaining ID-bounded readers, and gameplay/save/profile paths are next;
 item identity/conversion work is pending. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.

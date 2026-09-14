@@ -5,9 +5,11 @@
 `tools/v3_asset_loader.py --villager-text` includes the pilot artwork, draw,
 and audio paths, then installs Cheri/Punchy's shared full-name and catchphrase
 readers, six-byte compatibility-name reader, and native catchphrase-reset hook.
-Main dialogue name/phrase insertions use those readers. Initial defaults,
-clothes, umbrellas, houses, roster selection, ID-bounded secondary readers,
-and imported save/profile handling remain required before move-ins are enabled.
+Main dialogue name/phrase insertions use those readers. The
+[initial-default adapter](V3_VILLAGER_DEFAULTS.md) also connects Cheri's verified
+starting outfit/defaults and both pilots' personality lookup. Punchy's outfit,
+umbrella identity, houses, roster selection, ID-bounded secondary readers, and
+imported save/profile handling remain required before move-ins are enabled.
 
 ## Donor binding and metadata
 
@@ -16,8 +18,9 @@ the pinned donor REL. Full phrases use `forest_1st.arc`'s actual string bank
 and offset table. That archive is 852,896 bytes, SHA-256
 `461d3d0e0293dac2d93ade9cf317487c92dc15a199da8f698b8f99cba1d812c0`.
 Verify edition/revision, archives, REL, symbols, decoder, and native ROM.
-Encode complete supported Latin text. Clothing/umbrella values remain donor
-references, not established native asset mappings.
+Encode complete supported Latin text. The first clothing/umbrella values remain
+donor references. A separately verified native clothing mapping occupies the
+row's final two bytes; zero means the starting outfit is pending.
 
 Twenty fixed 32-byte rows start at `80462C00`. Registry version 1 determines
 the slot: N64 actor minus `E0DA`. Missing imports contain zero rows.
@@ -29,7 +32,7 @@ the slot: N64 actor minus `E0DA`. Missing imports contain zero rows.
 | 8…15 | Eight-byte padded English name |
 | 16…25 | Ten-byte padded full catchphrase |
 | 26…29 | Four-byte saved default reference |
-| 30…31 | Zero reserves |
+| 30…31 | Verified native clothing ID, or zero if pending |
 
 Only the two ordinary pilots have present rows. Cheri (`E0EA`) has `tralala`;
 Punchy (`E0ED`) has `mrmpht`. Present metadata is not move-in eligibility.
@@ -72,6 +75,7 @@ Every hook requires exact preceding instructions. Four return bridges at
 `80462F00..80462F3F` execute the displaced, non-PC-relative instructions and
 jump back to unchanged original code. The actor-name wrapper handles the null
 destination itself and enters the original prologue at `80195D28` for fallback.
+Initial-default adapters add four bridges at `80462F40..80462F7F`.
 No special/player actor becomes an imported villager because its `fgName`
 resembles an imported ID.
 
@@ -95,8 +99,10 @@ and writes back all data. ABI-4 code-cache invalidation covers
 `80460100..80467FEF`, including return bridges and text code. Earlier variants
 retain their cache range. No ordinary heap or saved structure grows.
 
-The [checkpoint](../docs/checkpoints/V3_VILLAGER_TEXT.md) binds exact output,
-five focused tests, and the combined native reader/insertion/reset pass.
+The [text checkpoint](../docs/checkpoints/V3_VILLAGER_TEXT.md) binds its exact
+output, five focused tests, and the combined native reader/insertion/reset pass.
+The [defaults checkpoint](../docs/checkpoints/V3_VILLAGER_DEFAULTS.md) records
+the current cartridge's six focused tests and native initial-default checks.
 These do not establish ordinary gameplay, imported save/reload, or hardware
 compatibility. GitHub development continues; the web patcher stays V2 until
 the user tests V3 and explicitly approves the switch.

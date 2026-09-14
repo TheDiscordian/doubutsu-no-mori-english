@@ -24,8 +24,12 @@ with later e/e+ donor support investigated separately.
   The [text batch](checkpoints/V3_VILLAGER_TEXT.md) adds shared full-name/phrase
   readers, six-byte compatibility names, default reset, and borrowable V3 phrase
   references. Five focused tests and the combined native reader/insertion/reset
-  check pass. Next: initial defaults/clothing, houses, selection, remaining
-  ID-bounded readers, and ordinary gameplay/save integration.
+  check pass. The [initial-default batch](checkpoints/V3_VILLAGER_DEFAULTS.md)
+  connects Cheri's verified starting outfit/defaults and both personalities;
+  six focused checks and native initialization/clothing-DMA checks pass.
+  Next: houses, selection, remaining ID-bounded readers, and ordinary gameplay/
+  save integration. Punchy's cherry shirt needs an additive clothing import;
+  do not substitute the different native shirt with the same item number.
 - [ ] Review native/donor item identities and implement one complete simple
   furniture pilot through acquisition, inventory, placement, and persistence.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
