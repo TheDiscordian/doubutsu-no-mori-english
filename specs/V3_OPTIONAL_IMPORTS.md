@@ -130,6 +130,9 @@ The [selection adapter](V3_VILLAGER_SELECTION.md) expands unseen counts, history
 reset, initial population, and normal move-in selection with independent
 transient arrays. Import eligibility remains disabled until ordinary gameplay
 integration is ready; temporary native test flags are not playable support.
+The [house-gift adapter](V3_VILLAGER_REWARDS.md) includes enabled imported
+furniture in native room rewards while retaining exclusions, random selection,
+full identities, and the existing stored reward field.
 
 Start with one ordinary donor-only villager, then the second. Integrate model,
 textures, expressions, the compatible species animation rig, English name and

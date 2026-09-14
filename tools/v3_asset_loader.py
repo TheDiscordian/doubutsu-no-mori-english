@@ -66,6 +66,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
                        'villager_readers': ('af_v3_mail_source_name', BLOB_RAM + 0x5400),
                        'villager_selection': ('af_v3_unseen_personality', BLOB_RAM + 0x3400),
+                       'villager_rewards': ('af_v3_house_reward', BLOB_RAM + 0x3A00),
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
@@ -160,7 +161,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
           save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
           shop_actors=False, shop_floor=False, hra=False, feng_shui=False, houses=False,
-          villager_readers=False, villager_selection=False):
+          villager_readers=False, villager_selection=False, villager_rewards=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -188,6 +189,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_villager_houses
     import v3_villager_readers
     import v3_villager_selection
+    import v3_villager_rewards
+    if villager_rewards and not villager_selection:
+        raise ValueError('House rewards require the complete selection/house foundation')
     if villager_selection and not villager_readers:
         raise ValueError('Villager selection requires the complete secondary name readers')
     if villager_readers and not houses:
@@ -255,7 +259,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_feng_shui.SOURCES if feng_shui else ())
                     + (v3_villager_houses.SOURCES if houses else ())
                     + (v3_villager_readers.SOURCES if villager_readers else ())
-                    + (v3_villager_selection.SOURCES if villager_selection else ()))
+                    + (v3_villager_selection.SOURCES if villager_selection else ())
+                    + (v3_villager_rewards.SOURCES if villager_rewards else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -303,6 +308,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_villager_readers.ABI)
     if villager_selection:
         abi = max(abi, v3_villager_selection.ABI)
+    if villager_rewards:
+        abi = max(abi, v3_villager_rewards.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -590,6 +597,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         selection_report = v3_villager_selection.install(native, code, blob,
             selection_code, selection_compiled['symbols'], text_report, house_report)
         selection_report['code'] = selection_compiled
+    reward_report = None
+    if villager_rewards:
+        reward_code, reward_compiled = compile_part('villager_rewards', out / 'villager_rewards')
+        reward_report = v3_villager_rewards.install(code, blob, reward_code, reward_compiled['symbols'])
+        reward_report['code'] = reward_compiled
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -622,7 +634,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 villager selection integration 01' if villager_selection else
+    label = ('V3 villager house rewards integration 01' if villager_rewards else
+             'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else
              'V3 villager house development 01' if houses else
              'V3 imported room scoring development 01' if feng_shui else
@@ -667,6 +680,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'villager_houses': house_report,
         'villager_readers': reader_report,
         'villager_selection': selection_report,
+        'villager_rewards': reward_report,
         'resized_resources': [f'{v:08X}' for v in resized],
         'relocated_resources': {f'{v:08X}': f'{target:08X}' for v, target in relocated.items()},
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
@@ -698,6 +712,7 @@ def main():
     p.add_argument('--villager-houses', action='store_true', help='Include Cheri house data; move-ins remain disabled')
     p.add_argument('--villager-readers', action='store_true', help='Connect imported map, inventory, and mail names')
     p.add_argument('--villager-selection', action='store_true', help='Integrate subset-aware selection with imports disabled')
+    p.add_argument('--villager-rewards', action='store_true', help='Include imported furniture in villager house gifts')
     p.add_argument('--npc-draw', action='store_true', help='Install experimental draw rows and voice-ID transport')
     p.add_argument('--villager-audio', action='store_true', help='Include pilot draw records and full-ID melody support')
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
@@ -719,6 +734,8 @@ def main():
     p.add_argument('--hra', action='store_true', help='Include imported furniture in native HRA scoring and recommendations')
     p.add_argument('--feng-shui', action='store_true', help='Include actual imported furniture colours in native feng shui scoring')
     args = p.parse_args()
+    if args.villager_rewards:
+        args.villager_selection = True
     if args.villager_selection:
         args.villager_readers = True
     if args.villager_readers:
@@ -781,7 +798,7 @@ def main():
         collection=args.collection, catalogue=args.catalogue, shops=args.shops,
         shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra, feng_shui=args.feng_shui,
         houses=args.villager_houses, villager_readers=args.villager_readers,
-        villager_selection=args.villager_selection)
+        villager_selection=args.villager_selection, villager_rewards=args.villager_rewards)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

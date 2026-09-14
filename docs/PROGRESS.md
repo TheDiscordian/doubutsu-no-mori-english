@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-villager-selection-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`ef6b82232e0d8a134e46f04cd176ec8fc47d25c407ee442776b975f1a5e33f32`.
+`build/v3-villager-rewards-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`07ce3743aac471e6672d78b3fcb55bc02d76b88d0df4b3806e7e265e1ab63a03`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -145,6 +145,12 @@ focused checks pass. Native execution passes all four entries, including two
 complete six-villager populations, original RNG/shuffle correspondence, Cheri's
 fixed identity, disabled/resident exclusion, history preservation, and guards.
 Import move-in flags remain off until ordinary gameplay integration is ready.
+The [house-gift adapter](checkpoints/V3_VILLAGER_REWARDS.md) connects imported
+furniture to the native reward selector, retaining original exclusions and RNG.
+Four focused tests and the initial 45-step native run pass, including both
+actual Cheri-room imported gifts through complete list storage and retrieval,
+rotations, disabled imports, room boundaries, and guards. Ordinary gifting
+conversations remain part of gameplay integration.
 These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, remaining native readers,

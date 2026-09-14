@@ -42,6 +42,10 @@ with later e/e+ donor support investigated separately.
   with independent candidate/shuffle storage. Six focused checks and all four
   native entries pass, including two complete starting populations and Cheri's
   fixed ID under a temporary test flag. Default import eligibility remains off.
+  The [house-gift adapter](checkpoints/V3_VILLAGER_REWARDS.md) includes imported
+  furniture in native reward selection. Four focused tests and the initial
+  45-step native run pass, including both actual-room barrel gifts through
+  complete selection, list storage, and identity-based retrieval.
   Next: remaining native reader review and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.
