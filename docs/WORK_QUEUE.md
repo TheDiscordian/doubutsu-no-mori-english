@@ -27,7 +27,11 @@ with later e/e+ donor support investigated separately.
   check pass. The [initial-default batch](checkpoints/V3_VILLAGER_DEFAULTS.md)
   connects Cheri's verified starting outfit/defaults and both personalities;
   six focused checks and native initialization/clothing-DMA checks pass.
-  Next: houses, selection, remaining ID-bounded readers, and ordinary gameplay/
+  The [house batch](checkpoints/V3_VILLAGER_HOUSES.md) installs Cheri's complete
+  mapped house layers, existing matching room surfaces, and K.K. Samba, retaining
+  every original house. Five focused tests pass. Native house calls remain
+  unverified after the two recorded setup failures; move-ins stay disabled.
+  Next: selection, remaining ID-bounded readers, and ordinary gameplay/
   save integration. Punchy's cherry shirt needs an additive clothing import;
   do not substitute the different native shirt with the same item number.
 - [ ] Review native/donor item identities and implement one complete simple
@@ -87,7 +91,7 @@ with later e/e+ donor support investigated separately.
   imported ID through normal B pickup. Seven host checks and 25 changed native
   instruction windows pass across the two fixes; original items remain intact.
   Next: ordinary acquisition/payment, rotation/persistence, and the remaining
-  villager-house implementation. No complete item is enabled yet.
+  villager integration. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

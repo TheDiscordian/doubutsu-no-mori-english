@@ -34,7 +34,7 @@ and hometown through all three native initialization entries. Both pilot
 personality lookups, native/test fallbacks, and actual clothing DMA pass native
 checks; six focused tests also pass. Punchy's cherry shirt has no exact native
 artwork match and needs a proper clothing import before his initialization is
-enabled. Houses, selection, remaining ID-bounded readers, and gameplay/save/profile paths are next;
+enabled. Selection, remaining ID-bounded readers, and gameplay/save/profile paths remain;
 the [static furniture batch](checkpoints/V3_FURNITURE_ART.md) converts Cheri's
 haz-mat barrel and oil drum house dependencies into complete native objects.
 Seven focused checks pass, including every texel, vertex, and triangle in the
@@ -121,10 +121,16 @@ correctly when placed and returns to the pocket with its complete imported ID
 through normal B pickup; all original items stay intact. Both items are explicitly
 fixture-seeded for this check, not purchased. Seven focused host checks and 25
 native instruction windows pass across the fixes; the ordinary corrected
-interaction passes 24 recorded steps. Current experimental ROM:
-`build/v3-room-identity-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`129113cb34d44bab4c62395fd2eb3d51cdb6931f779fc5276d103138f06cf238`.
-The correction does not change the existing experimental V3 save format or
+interaction passes 24 recorded steps.
+The [house batch](checkpoints/V3_VILLAGER_HOUSES.md) installs Cheri's complete
+mapped house, including both imported barrels and K.K. Samba. Her wallpaper and
+flooring are exact existing native matches, and every original house is retained.
+Five focused checks pass. The bounded native checks stop in fixture setup before
+house calls, so native loading and visits remain unverified. Move-ins stay disabled.
+Current experimental ROM:
+`build/v3-house-layout-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`8c7dbf467319221f150735e35ed87a09fc219f5e4268e53a1ae9bac2b148b223`.
+These changes do not change the existing experimental V3 save format or
 profile rules; V3 saves still must not be loaded by V2. Ordinary acquisition/
 payment, placed-item rotation/persistence, and the complete villager remain work.
 No import is enabled for players yet.

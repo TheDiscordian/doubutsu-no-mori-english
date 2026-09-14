@@ -19,6 +19,15 @@ FURNITURE = {
     0x32B8: (1198, 0x32B8, 0x03F0A000),
 }
 
+# Preserve the native sorted house-layer range 398..855. Each imported villager
+# owns two fixed layer slots, including unavailable villagers and subsets.
+HOUSE_LAYER_BASE, HOUSE_LAYER_CAPACITY = 856, 40
+
+
+def villager_house_layers(donor_index):
+    slot = villager_actor(donor_index) - 0xE0DA
+    return HOUSE_LAYER_BASE + slot * 2, HOUSE_LAYER_BASE + slot * 2 + 1
+
 
 def furniture_slot(donor_item):
     if donor_item not in FURNITURE:
