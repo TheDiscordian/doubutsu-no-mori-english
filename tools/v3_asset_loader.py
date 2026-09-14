@@ -46,14 +46,14 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
-    if part in ('catalogue', 'hra'):
+    if part in ('catalogue', 'hra', 'feng_shui'):
         flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
     for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
-    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra') else []),
+    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -79,14 +79,15 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'shops': ('af_v3_shop_category', BLOB_RAM + 0x9C00),
                        'shop_actors': ('af_v3_shop_type_809cacbc', BLOB_RAM + 0x7600),
                        'shop_floor': ('af_v3_shop_floor_80953e54', BLOB_RAM + 0x7C00),
-                       'hra': ('af_v3_hra_remaining', 0x80929C30)}[part]
+                       'hra': ('af_v3_hra_remaining', 0x80929C30),
+                       'feng_shui': ('af_v3_feng_range', 0x80931780)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
     report = {'bytes': len(code), 'sha256': sha256(code), 'symbols': symbols,
               'toolchain': IMAGE, 'flags': flags,
               'stack_usage': ''.join(p.read_text() for p in sorted(out.glob('*.su')))}
-    if part in ('catalogue', 'hra'):
+    if part in ('catalogue', 'hra', 'feng_shui'):
         report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
     return code, report
 
@@ -98,7 +99,9 @@ def compose(native, base, changes, added, *, resized=(), relocated=None):
         raise ValueError('V3 composition requires exact stable V2-11')
     current, original = by_vrom(base), by_vrom(native)
     relocated = relocated or {}
-    if (relocated and relocated != {0x0081D9D0: 0x03F40000, 0x00821740: 0x03F48000}
+    scoring_moves = {0x0081D9D0: 0x03F40000, 0x00821740: 0x03F48000}
+    all_moves = {**scoring_moves, 0x00827DE0: 0x03F50000, 0x00828C00: 0x03F54000}
+    if (relocated not in ({}, scoring_moves, all_moves)
             or not set(relocated) <= set(resized) or set(relocated.values()) & (set(current) | set(added))):
         raise ValueError('Unreviewed V3 resource relocation')
     if not changes and not added and not relocated:
@@ -152,7 +155,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
           furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False,
           furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
           save_codec=False, save_runtime=False, collection=False, catalogue=False, shops=False,
-          shop_actors=False, shop_floor=False, hra=False):
+          shop_actors=False, shop_floor=False, hra=False, feng_shui=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -175,6 +178,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_shop_actors
     import v3_shop_floor
     import v3_hra
+    import v3_feng_shui
+    if feng_shui and not hra:
+        raise ValueError('Feng shui imports require the current HRA foundation')
     if hra and not shop_floor:
         raise ValueError('HRA imports require the current shop-floor foundation')
     if shop_floor and not shop_actors:
@@ -229,7 +235,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_shops.SOURCES if shops else ())
                     + (v3_shop_actors.SOURCES if shop_actors else ())
                     + (v3_shop_floor.SOURCES if shop_floor else ())
-                    + (v3_hra.SOURCES if hra else ()))
+                    + (v3_hra.SOURCES if hra else ())
+                    + (v3_feng_shui.SOURCES if feng_shui else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -267,6 +274,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = v3_shop_floor.ABI
     if hra:
         abi = v3_hra.ABI
+    if feng_shui:
+        abi = v3_feng_shui.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -506,6 +515,20 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         hra_report['code'] = hra_compiled
         hra_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
         relocated = {v3_hra.VROM: v3_hra.NEW_VROM, v3_hra.RELOC: v3_hra.NEW_RELOC}
+    feng_changes, feng_report = {}, None
+    if feng_shui:
+        metadata, records = v3_feng_shui.table(base, rel, symbols, furniture_report['imports'])
+        metadata_path, generated = out / 'feng-metadata.bin', out / 'feng-hooks.S'
+        write_new(metadata_path, metadata)
+        write_new(generated, (v3_feng_shui.assembly() + '.section .rodata.feng_table\n.balign 4\n'
+            '.globl af_v3_feng_table\naf_v3_feng_table:\n'
+            f'.incbin "/source/{metadata_path.relative_to(ROOT)}"\n').encode())
+        feng_code, feng_compiled = compile_part('feng_shui', out / 'feng_shui',
+            primary_source=str(generated.relative_to(ROOT)))
+        feng_changes, feng_report = v3_feng_shui.install(base, code, feng_code, feng_compiled, metadata, records)
+        feng_report['code'] = feng_compiled
+        feng_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+        relocated.update({v3_feng_shui.VROM: v3_feng_shui.NEW_VROM, v3_feng_shui.RELOC: v3_feng_shui.NEW_RELOC})
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -527,7 +550,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     additions[BLOB] = bytes(blob_file)
     changes = {CODE_VROM: bytes(code), MODULE: bytes(module), **draw_changes,
                **furniture_changes, **menu_changes, **icon_changes, **ground_changes,
-               **catalogue_changes, **shop_changes, **shop_actor_changes, **shop_floor_changes, **hra_changes}
+               **catalogue_changes, **shop_changes, **shop_actor_changes, **shop_floor_changes,
+               **hra_changes, **feng_changes}
     resized = (((v3_catalogue.VROM, v3_catalogue.RELOC) if catalogue else ())
                + ((v3_shops.VROM,) if shops else ()) + tuple(relocated))
     image = compose(native, base, changes, additions, resized=resized, relocated=relocated)
@@ -536,7 +560,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 imported HRA scoring development 01' if hra else
+    label = ('V3 imported room scoring development 01' if feng_shui else
+             'V3 imported HRA scoring development 01' if hra else
              'V3 imported shop floor development 01' if shop_floor else
              'V3 imported shop interactions development 01' if shop_actors else
              'V3 imported shop stock development 01' if shops else
@@ -572,6 +597,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'shop_actors': shop_actor_report,
         'shop_floor': shop_floor_report,
         'hra': hra_report,
+        'feng_shui': feng_report,
         'resized_resources': [f'{v:08X}' for v in resized],
         'relocated_resources': {f'{v:08X}': f'{target:08X}' for v, target in relocated.items()},
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
@@ -619,7 +645,10 @@ def main():
     p.add_argument('--shop-actors', action='store_true', help='Connect imported furniture to all five native shop interaction actors')
     p.add_argument('--shop-floor', action='store_true', help='Connect imported stock to shop floor selection and sold-item removal')
     p.add_argument('--hra', action='store_true', help='Include imported furniture in native HRA scoring and recommendations')
+    p.add_argument('--feng-shui', action='store_true', help='Include actual imported furniture colours in native feng shui scoring')
     args = p.parse_args()
+    if args.feng_shui:
+        args.hra = True
     if args.hra:
         args.shop_floor = True
     if args.shop_floor:
@@ -672,7 +701,7 @@ def main():
         furniture_icon=args.furniture_icon, furniture_ground=args.furniture_ground,
         furniture_pockets=args.furniture_pockets, save_codec=args.save_codec, save_runtime=args.save_runtime,
         collection=args.collection, catalogue=args.catalogue, shops=args.shops,
-        shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra)
+        shop_actors=args.shop_actors, shop_floor=args.shop_floor, hra=args.hra, feng_shui=args.feng_shui)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

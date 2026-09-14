@@ -111,7 +111,11 @@ actual donor scoring properties, and missing-item recommendations. Three focused
 tests pass. Eighty-six native register windows pass on the retained detour code;
 the corrected current scoring tail passes 46 steps, including complete group
 initialization, five recommendations, three point calculations, and a safe
-one-past-table marker. Feng shui and ordinary item lifecycle remain work.
+one-past-table marker. The [feng shui adapter](checkpoints/V3_FENG_SHUI.md) adds
+actual donor colours while retaining native point weights. Three focused checks
+and the first 45-step native run pass, including five complete item evaluations,
+three complete room evaluations, disabled/unknown exclusion, and guards.
+Ordinary acquisition/payment, placement/pickup, and persistence remain work.
 No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.

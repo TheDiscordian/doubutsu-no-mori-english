@@ -8,8 +8,8 @@ wall/floor rules, mail selection, complete English score-letter creator, and
 delivery-success handling remain intact. This is not a port of GameCube's
 additional rooms or house-model rewards.
 
-The [checkpoint](../docs/checkpoints/V3_HRA.md) owns executed evidence. Feng shui
-uses a separate evaluator and remains the next integration step. No import is
+The [checkpoint](../docs/checkpoints/V3_HRA.md) owns executed evidence. The
+[feng shui adapter](V3_FENG_SHUI.md) connects its separate native evaluator. No import is
 enabled in either web patcher; V3 testing and explicit user approval are required.
 
 ## Sources and metadata conversion

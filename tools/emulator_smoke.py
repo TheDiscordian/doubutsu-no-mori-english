@@ -1324,6 +1324,12 @@ def main():
                     raise ValueError('V3 ground probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_feng_shui'):
+                from v3_feng_shui_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 feng shui probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_hra'):
                 from v3_hra_smoke import exercise
                 if not (out/'test.bs1').is_file():

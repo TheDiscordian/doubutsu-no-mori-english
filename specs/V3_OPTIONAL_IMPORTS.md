@@ -184,7 +184,9 @@ focused tests and native selection/branch checks. Ordinary acquisition/payment,
 model removal, and the full item lifecycle are required; these are not
 playable imports. The [HRA adapter](V3_HRA.md) connects native evaluation,
 actual donor metadata, theme groups, and missing-item recommendations, with
-focused checks and native execution. The separate feng shui evaluator remains work.
+focused checks and native execution. The [feng shui adapter](V3_FENG_SHUI.md)
+connects actual donor colours to native item/room evaluation and retains N64
+point weights, with focused checks and native execution.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive
