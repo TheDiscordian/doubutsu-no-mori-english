@@ -155,8 +155,11 @@ haz-mat barrel and oil drum assets for Cheri's house, with verified donor profil
 bindings and seven passing focused tests. The
 [native furniture loader](V3_FURNITURE_RUNTIME.md) installs stable item identities,
 resident profiles, expanded readers, and native model-bank selection/cleanup.
-Five focused checks and the bounded native check pass. Shared item readers and
-the ordinary item lifecycle remain required; these are not playable imports.
+Five focused checks and the bounded native check pass. The
+[shared item readers](V3_FURNITURE_ITEMS.md) add full names, category, donor price
+values, and placement footprints, with four focused checks and native verification.
+Remaining caller/index conversions and the ordinary item lifecycle are required;
+these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

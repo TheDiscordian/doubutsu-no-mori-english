@@ -10,8 +10,10 @@ code are committed or published.
 
 These are converted assets, **not playable or selectable imports**. The
 [runtime adapter](V3_FURNITURE_RUNTIME.md) supplies stable identities, profile
-loading, model banks, and cleanup. Acquisition, placement, collision, prices,
-catalogue flags, rewards, scoring, and saved-item handling still need integration. Native
+loading, model banks, and cleanup. The [shared item adapter](V3_FURNITURE_ITEMS.md)
+adds full names, classification, donor price values, and placement footprints.
+Remaining callers, acquisition, placement, collision, catalogue flags, rewards,
+scoring, and saved-item handling still need integration. Native
 profile construction preserves the donor scalar fields, but those fields do not
 by themselves verify ordinary collision or interaction behaviour.
 
@@ -113,5 +115,6 @@ The native `ovl_My_Room` loader owns separate furniture profile/code allocations
 resolved profile pointers, per-item bank indices, and per-bank addresses. It
 does not load furniture through the new villager texture-bank slots. Its runtime
 adapter expands table readers and initialization/cleanup together, retaining
-native ownership and safe rejection of absent imports. Shared item readers still
-need the selected stable registry before these assets can enter gameplay.
+native ownership and safe rejection of absent imports. Shared item readers use
+the selected stable registry; remaining caller/index conversions and the
+ordinary lifecycle are still required before these assets can enter gameplay.

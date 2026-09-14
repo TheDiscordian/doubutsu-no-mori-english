@@ -109,7 +109,7 @@ def exercise(debug, rom_path, record):
         native(0x8093678C, [index], 1)
         debug.write_memory(bank, b'\xA5' * BANK_BYTES)
         # The actual native bank selector calls the imported DMA bridge.
-        native(0x809389AC, [index, item, 0], 1)
+        native(0x809389AC, [index, 0, item], 1)
         check(row['name'] + ' full model DMA and untouched bank padding', bank, payload)
         native(0x80937490, [index], 1)
         native(0x809374C4, [index], slot)

@@ -7,10 +7,12 @@ profiles and models into the combined V3 development cartridge. The native room
 overlay selects, loads, reuses, and releases their model banks. Original furniture
 keeps its own profile-overlay allocations, model loader, and cleanup path.
 
-This is loader integration, not a complete furniture import. Shared item
-classification, English names, inventory, prices, acquisition, placement,
-collision/rendered appearance, catalogue/scoring, houses, and saved-item/profile
-handling remain required. Neither object is selectable in a web patcher.
+This is loader integration, not a complete furniture import. The
+[shared item adapter](V3_FURNITURE_ITEMS.md) provides full English names,
+classification, donor price values, and placement footprints. Remaining caller
+conversions, inventory, acquisition, placement, collision/rendered appearance,
+catalogue/scoring, houses, and saved-item/profile handling remain required.
+Neither object is selectable in a web patcher.
 The [native checkpoint](../docs/checkpoints/V3_FURNITURE_RUNTIME.md) records the
 exact current cartridge and tests. Public/local patchers remain V2.
 

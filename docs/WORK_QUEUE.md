@@ -37,7 +37,10 @@ with later e/e+ donor support investigated separately.
   focused checks. The [native loader batch](checkpoints/V3_FURNITURE_RUNTIME.md)
   installs stable IDs, resident profiles, expanded readers, and native model-bank
   selection/reuse/release. Five focused checks and 86 native steps pass, including
-  original furniture allocation/DMA and cleanup. Next: shared item readers and
+  original furniture allocation/DMA and cleanup. The
+  [shared item readers](checkpoints/V3_FURNITURE_ITEMS.md) add complete names,
+  item category, donor price values, and placement footprints; four focused
+  tests and 73 native steps pass. Next: remaining caller/index conversions and
   ordinary acquisition/placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.

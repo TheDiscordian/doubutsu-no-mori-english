@@ -43,8 +43,12 @@ actual donor conversion and compiled N64 lists. The
 resident profiles, expanded native table readers, and model-bank loading/cleanup.
 Five focused checks and 86 native steps pass, including both imported models,
 original furniture allocation/DMA, bank reuse/release, guards, and checkpoint
-restore. Shared item readers, ordinary placement/persistence, and Punchy's
-animated speed bag remain work. No V3 villager is playable or
+restore. The [shared item-reader batch](checkpoints/V3_FURNITURE_ITEMS.md) installs
+both complete English names, leaf classification, donor price values, and 1×1
+footprint readers. Four focused checks and 73 native steps pass, including
+disabled-profile rejection and all five original-item fallbacks. Remaining
+caller integration, ordinary placement/persistence, and Punchy's animated speed
+bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
 remain required.
 V3 development continues on GitHub. The web patcher stays V2 until the user
