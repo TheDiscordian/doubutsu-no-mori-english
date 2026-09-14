@@ -105,7 +105,14 @@ independent [shop-floor adapter](checkpoints/V3_SHOP_FLOOR.md) connects reserve
 points, floor-item selection, and sold-removal classification. Three focused
 tests and 63 native steps pass, including complete reserve/grid selections and
 all changed branch/delay semantics. Ordinary payment/model removal, scoring,
-and the full item lifecycle remain work. No import is enabled for players yet.
+and the full item lifecycle remain work. The [HRA adapter](checkpoints/V3_HRA.md)
+connects all twenty range and twenty index decisions, expanded theme groups,
+actual donor scoring properties, and missing-item recommendations. Three focused
+tests pass. Eighty-six native register windows pass on the retained detour code;
+the corrected current scoring tail passes 46 steps, including complete group
+initialization, five recommendations, three point calculations, and a safe
+one-past-table marker. Feng shui and ordinary item lifecycle remain work.
+No import is enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 

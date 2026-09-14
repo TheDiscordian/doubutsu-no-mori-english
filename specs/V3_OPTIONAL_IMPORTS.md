@@ -181,8 +181,10 @@ native interaction-window/ticket checks. Both complete imported-order letters,
 readback, and pending clearing pass. The [shop-floor adapter](V3_SHOP_FLOOR.md)
 connects reserve points, floor selection, and sold-removal classification, with
 focused tests and native selection/branch checks. Ordinary acquisition/payment,
-model removal, scoring, and the full item lifecycle are required; these are not
-playable imports.
+model removal, and the full item lifecycle are required; these are not
+playable imports. The [HRA adapter](V3_HRA.md) connects native evaluation,
+actual donor metadata, theme groups, and missing-item recommendations, with
+focused checks and native execution. The separate feng shui evaluator remains work.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

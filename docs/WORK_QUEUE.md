@@ -74,7 +74,11 @@ with later e/e+ donor support investigated separately.
   item selection, and sold-removal classification. Three focused tests and 63
   native steps pass, including native complete reserve/grid selection and
   retained branch-delay entry paths.
-  Next: scoring, then ordinary acquisition/payment/model removal and
+  The [HRA adapter](checkpoints/V3_HRA.md) adds actual donor properties, all range/
+  index consumers, native theme grouping, and correct missing-item IDs. Three
+  focused checks pass, with 86 native register windows and a corrected 46-step
+  scoring tail covering groups, recommendations, points, and boundary safety.
+  Next: feng shui, then ordinary acquisition/payment/model removal and
   placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
