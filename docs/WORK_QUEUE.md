@@ -40,8 +40,11 @@ with later e/e+ donor support investigated separately.
   original furniture allocation/DMA and cleanup. The
   [shared item readers](checkpoints/V3_FURNITURE_ITEMS.md) add complete names,
   item category, donor price values, and placement footprints; four focused
-  tests and 73 native steps pass. Next: remaining caller/index conversions and
-  ordinary acquisition/placement/persistence. No complete item is enabled yet.
+  tests and 73 native steps pass. The
+  [room integration](checkpoints/V3_FURNITURE_ROOM.md) connects 21 upper bounds,
+  two index conversions, and four local field-type scans; four focused checks
+  and 151 native steps pass. Next: external inventory/field and catalogue/scoring
+  consumers, acquisition, and ordinary placement/persistence. No complete item is enabled yet.
   Punchy's speed bag needs its actual animation/interaction code.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;

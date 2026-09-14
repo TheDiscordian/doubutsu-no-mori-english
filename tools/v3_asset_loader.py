@@ -62,7 +62,8 @@ def compile_part(part, out, extra_sources=(), defines=()):
                        'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
                        'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
-                       'items': ('af_v3_item_name', BLOB_RAM + 0x7300)}[part]
+                       'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
+                       'room': ('af_v3_room_value', BLOB_RAM + 0x8000)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
@@ -120,7 +121,7 @@ def compose(native, base, changes, added):
 
 
 def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None,
-          furniture=False, furniture_items=False):
+          furniture=False, furniture_items=False, furniture_room=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -129,6 +130,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_villager_text
     import v3_furniture_runtime
     import v3_furniture_items
+    import v3_furniture_room
+    if furniture_room and not furniture_items:
+        raise ValueError('Room variant requires installed shared item metadata readers')
     if furniture_items and not furniture:
         raise ValueError('Item metadata variant requires installed furniture models/profiles')
     if furniture and text_donor is None:
@@ -141,7 +145,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_audio_runtime.SOURCES if audio_donor is not None else ())
                     + (v3_villager_text.SOURCES if text_donor is not None else ())
                     + (v3_furniture_runtime.SOURCE_FILES if furniture else ())
-                    + (v3_furniture_items.SOURCES if furniture_items else ()))
+                    + (v3_furniture_items.SOURCES if furniture_items else ())
+                    + (v3_furniture_room.SOURCES if furniture_room else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -152,6 +157,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         blob_size, abi = v3_furniture_runtime.BLOB_SIZE, v3_furniture_runtime.ABI
     if furniture_items:
         abi = v3_furniture_items.ABI
+    staging_size = blob_size
+    if furniture_room:
+        blob_size, abi = v3_furniture_room.BLOB_SIZE, v3_furniture_room.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -177,11 +185,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     helper, helper_report = compile_part('asset', out / 'asset', extra_sources=extra_sources)
     if len(startup) > CONFIG - STARTUP or len(helper) > TABLE_OFFSET - 0x100:
         raise ValueError('V3 code exceeds its owned reservation')
-    blob = bytearray(blob_size)
+    blob = bytearray(staging_size)
     struct.pack_into('>5I', blob, 0, 0x41465633, abi, blob_size, CAPACITY, OBJECT_COUNT)
     blob[0x100:0x100 + len(helper)] = helper
     blob[TABLE_OFFSET:TABLE_OFFSET + len(table)] = table
-    struct.pack_into('>4I', blob, blob_size - 16, *([0xAF33C0DE] * 4))
+    struct.pack_into('>4I', blob, staging_size - 16, *([0xAF33C0DE] * 4))
     additions, imports = {}, []
     for row in art['villagers']:
         index = int(row['id'].rsplit('/', 1)[-1], 16)
@@ -224,7 +232,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             raise ValueError('Furniture code exceeds its reservation')
         blob[v3_furniture_runtime.CODE:v3_furniture_runtime.CODE + len(furniture_code)] = furniture_code
         furniture_changes, furniture_added, furniture_report = v3_furniture_runtime.install(
-            native, base, blob, rel, symbols, furniture_code_report['symbols'], out / 'furniture-art')
+            native, base, blob, rel, symbols, furniture_code_report['symbols'], out / 'furniture-art',
+            object_vrom_offset=v3_furniture_room.MODEL_SHIFT if furniture_room else 0)
         furniture_report['code'] = furniture_code_report
         if set(furniture_added) & set(additions) or set(furniture_changes) & set(draw_changes):
             raise ValueError('Furniture composition collides with a villager resource')
@@ -232,12 +241,26 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     items_report = None
     if furniture_items:
         item_code, item_code_report = compile_part('items', out / 'items')
-        if len(item_code) > blob_size - 16 - v3_furniture_items.CODE:
+        if len(item_code) > staging_size - 16 - v3_furniture_items.CODE:
             raise ValueError('Furniture item helpers exceed their reservation')
         blob[v3_furniture_items.CODE:v3_furniture_items.CODE + len(item_code)] = item_code
         items_report = v3_furniture_items.install(code, module, blob,
             item_code_report['symbols'], rel, symbols)
         items_report['code'] = item_code_report
+    room_report = None
+    if furniture_room:
+        rows = v3_furniture_room.inspect(furniture_changes[v3_furniture_runtime.VROM],
+                                        furniture_changes[v3_furniture_runtime.RELOC])
+        generated = out / 'room-hooks.S'
+        write_new(generated, v3_furniture_room.assembly(rows).encode())
+        room_code, room_code_report = compile_part('room', out / 'room',
+            extra_sources=('overlays/v3/room_entry.S', str(generated.relative_to(ROOT))))
+        room_report = v3_furniture_room.install(furniture_changes, blob, rows,
+                                               room_code, room_code_report['symbols'])
+        room_report['code'] = room_code_report
+        room_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
+    if len(blob) != blob_size:
+        raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
     struct.pack_into('>4I', module, CONFIG, BLOB, blob_size, zlib.crc32(blob), abi)
     struct.pack_into('>I', code, STARTUP_CALL - CODE_RAM,
@@ -262,7 +285,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 furniture item readers development 01' if furniture_items else
+    label = ('V3 furniture room integration development 01' if furniture_room else
+             'V3 furniture item readers development 01' if furniture_items else
              'V3 furniture loader development 01' if furniture else
              'V3 villager defaults development 01' if text_donor is not None else
              'V3 villager audio development 02' if audio_donor is not None else
@@ -270,6 +294,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     return image, patch, {'build': label,
         'baseline_sha256': BASE_SHA, 'npc_draw': draw_report, 'villager_audio': audio_report,
         'villager_text': text_report, 'furniture': furniture_report, 'furniture_items': items_report,
+        'furniture_room': room_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'resident_blob_bytes': blob_size,
@@ -296,7 +321,10 @@ def main():
     p.add_argument('--villager-text', action='store_true', help='Include pilot audio, names, phrases, and verified initial defaults')
     p.add_argument('--furniture', action='store_true', help='Include the current baseline and experimental static furniture loading')
     p.add_argument('--furniture-items', action='store_true', help='Include furniture loading and shared item metadata readers')
+    p.add_argument('--furniture-room', action='store_true', help='Include selected furniture room range/index integration')
     args = p.parse_args()
+    if args.furniture_room:
+        args.furniture_items = True
     if args.furniture_items:
         args.furniture = True
     if args.furniture:
@@ -316,7 +344,7 @@ def main():
         (ROOT / 'build/v2-keyboard-fit-11/Animal Forest English V2.z64').read_bytes(), donor['rel'],
         (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes(), out,
         npc_draw=args.npc_draw, audio_donor=audio_donor, text_donor=text_donor,
-        furniture=args.furniture, furniture_items=args.furniture_items)
+        furniture=args.furniture, furniture_items=args.furniture_items, furniture_room=args.furniture_room)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

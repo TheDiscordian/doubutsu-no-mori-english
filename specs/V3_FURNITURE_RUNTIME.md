@@ -24,8 +24,12 @@ unchanged. Other unused indices do not become enabled merely by extending tables
 
 | Donor base item | Runtime index | Destination item/rotations | Model VROM |
 | --- | --- | --- | --- |
-| `3224` | 1,161 | `3224`–`3227` | `03F08000` |
-| `32B8` | 1,198 | `32B8`–`32BB` | `03F0A000` |
+| `3224` | 1,161 | `3224`–`3227` | `03F0C000` |
+| `32B8` | 1,198 | `32B8`–`32BB` | `03F0E000` |
+
+These are the combined [room variant's](V3_FURNITURE_ROOM.md) model addresses.
+The 32-KiB loader-only variant uses `03F08000` and `03F0A000`; this is a ROM
+packing choice, not a change to saved item identity or registry version.
 
 The native DMA directory has 3,390 rows, including its terminator. The stable V2
 uses 3,386 files; the existing V3 resident file and two villager texture files
@@ -33,11 +37,12 @@ use the remaining three. Furniture models therefore occupy the ROM-only tail
 of the existing uncompressed V3 file at `03F00000`, not additional directory
 rows. Interior VROM reads use the ordinary synchronous DMA service.
 
-That ROM file contains 44,176 bytes. Only its first 32,768 bytes are loaded at
-startup and included in the resident CRC. Each model is 3,216 bytes, read on
+The loader-only ROM file contains 44,176 bytes, with its first 32,768 bytes
+loaded at startup and included in the resident CRC. The combined room variant
+contains 60,560 bytes, with a 49,152-byte resident prefix. Each model is 3,216 bytes, read on
 demand into an existing 5,120-byte native furniture bank. The next villager
 texture reservation at `03F10000` remains untouched. Bounds reject overlap;
-neither the native DMA-directory capacity nor resident RAM allocation grows.
+the native DMA-directory capacity and ordinary heap bounds remain unchanged.
 
 ## Resident layout and ownership
 

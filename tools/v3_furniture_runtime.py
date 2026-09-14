@@ -125,7 +125,9 @@ def patch_owner(data, relocation, symbols):
         'output_relocation_sha256': sha256(fixed), 'original_heap_profile_cleanup_retained': True}
 
 
-def install(native, base, blob, rel, donor_symbols, helper_symbols, out):
+def install(native, base, blob, rel, donor_symbols, helper_symbols, out, *, object_vrom_offset=0):
+    if object_vrom_offset not in (0, 0x4000):
+        raise ValueError('Unsupported furniture model-tail layout')
     if len(blob) != BLOB_SIZE or any(blob[PROFILES:0x7FF0]):
         raise ValueError('Furniture tables overlap an existing V3 resource')
     files = by_vrom(base)
@@ -142,6 +144,7 @@ def install(native, base, blob, rel, donor_symbols, helper_symbols, out):
     blob[INDICES:INDICES + CAPACITY] = b'\xFF' * CAPACITY
     for slot, (pilot, row) in enumerate(zip(PILOTS, art['objects'])):
         index, item, vrom = furniture_slot(pilot.item)
+        vrom += object_vrom_offset
         asset = (out / row['object_file']).read_bytes()
         if (len(asset) > BANK_BYTES or len(asset) != row['object_bytes'] or sha256(asset) != row['object_sha256'] or
                 any(e.vstart < vrom + len(asset) and vrom < e.vend for e in files.values())):

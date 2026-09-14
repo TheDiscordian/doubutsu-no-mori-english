@@ -46,7 +46,11 @@ original furniture allocation/DMA, bank reuse/release, guards, and checkpoint
 restore. The [shared item-reader batch](checkpoints/V3_FURNITURE_ITEMS.md) installs
 both complete English names, leaf classification, donor price values, and 1×1
 footprint readers. Four focused checks and 73 native steps pass, including
-disabled-profile rejection and all five original-item fallbacks. Remaining
+disabled-profile rejection and all five original-item fallbacks. The
+[room-integration batch](checkpoints/V3_FURNITURE_ROOM.md) connects all 21 reviewed
+room range checks, both index conversions, and four field-type scans. Four
+focused checks and 151 native steps pass, including 125 full-register and
+branch-delay cases across the 27 installed detours. Remaining external
 caller integration, ordinary placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots

@@ -158,7 +158,9 @@ resident profiles, expanded readers, and native model-bank selection/cleanup.
 Five focused checks and the bounded native check pass. The
 [shared item readers](V3_FURNITURE_ITEMS.md) add full names, category, donor price
 values, and placement footprints, with four focused checks and native verification.
-Remaining caller/index conversions and the ordinary item lifecycle are required;
+The [room adapter](V3_FURNITURE_ROOM.md) connects 21 range checks, two index
+conversions, and four field-type scans, with focused and native register/delay
+verification. Remaining external consumers and the ordinary item lifecycle are required;
 these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 

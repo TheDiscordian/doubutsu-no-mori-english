@@ -8,8 +8,9 @@ for the two reviewed static pilots. The readers require the selected furniture
 profile; unused `3xxx` IDs are not automatically accepted.
 
 This is shared-reader integration, not ordinary inventory or placement support.
-The room constructor and several item consumers still have native-range checks
-and inline index conversions. Acquisition, catalogue/scoring flags, pickup,
+The [room adapter](V3_FURNITURE_ROOM.md) connects its checked native-range and
+inline index sites. Other item consumers still need integration. Acquisition,
+catalogue/scoring flags, pickup,
 rendered placement/collision, and saved-item/profile handling remain required.
 The [checkpoint](../docs/checkpoints/V3_FURNITURE_ITEMS.md) owns test evidence.
 Both public and local patchers stay V2.
@@ -81,11 +82,10 @@ Native checks call the actual installed five entries for both pilots, rejected
 inputs, and an original furniture item. They do not insert objects into a town,
 write a save, or establish ordinary menu/rendering behaviour.
 
-Next integration points include the `My_Room` constructor at `80938A18`, its
-native-range test at `80938A34`, and inline item-index conversion at `80938AA0`.
-The actual constructor at `80938650` has its own initialization/index readers.
-Do not enable just the first branch and allow later readers to use an unchecked
-`(item - 1000) / 4` index. The shared placement functions likewise have callers
-that reject extended IDs before reaching them. Inventory dispatch, field lists,
+The room adapter covers the `My_Room` constructor range at `80938A34`, its index
+conversion at `80938AA0`, and the actual constructor's index reader at `809386B0`,
+along with the other reviewed room range/type sites. The shared placement
+functions also have callers outside that owner that reject extended IDs before
+reaching them. Inventory dispatch, field lists,
 catalogue/scoring, mail articles/attachments, and saved dependencies still need
 their complete selected-item paths.
