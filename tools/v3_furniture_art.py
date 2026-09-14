@@ -53,7 +53,7 @@ def scalar_profile(pilot):
     return struct.pack('>ff6BH', 18.0, 0.01, 4, 0, 0, pilot.lighting_map, 0, 0, 0)
 
 
-def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size):
+def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
     if not raw or len(raw) % 8:
         raise ValueError('Incomplete furniture display list')
@@ -70,7 +70,9 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size):
             row['target'] = pointers[fixup]
             used.add(fixup)
         if op == 0xD7:
-            if (a, b) != (0xD7000002, 0):
+            if speed_bag and (a, b) == (0xD7000002, 0x0FA00FA0):
+                row['texture_scale'] = (4000, 4000)
+            elif (a, b) != (0xD7000002, 0):
                 raise ValueError('Unsupported furniture texture scale')
         elif op == 0xF0:
             if a != 0xF08F4010 or row['target'] != palette:
@@ -84,7 +86,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size):
                 raise ValueError('Unsupported furniture CI4 texture or palette')
             # Consume the paired Dolphin tile command. These two models clamp
             # every material in both directions, with no coordinate shifts.
-            if at + 16 > len(raw) or raw[at + 8:at + 16] != struct.pack('>II', 0xD2F0F000, 0):
+            tile = raw[at + 8:at + 16]
+            if speed_bag and tile == struct.pack('>II', 0xD2F0F522, 0) and shape[:2] == (16, 16):
+                row['repeat_shift'] = 2
+            elif at + 16 > len(raw) or tile != struct.pack('>II', 0xD2F0F000, 0):
                 raise ValueError('Unsupported furniture wrap mode')
             row['shape'] = shape[:2]
             material = target
@@ -118,7 +123,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size):
             if a not in (0xFA000080, 0xFA0000FF) or b != 0xFFFFFFFF:
                 raise ValueError('Unsupported furniture primitive colour')
         elif op == 0xD9:
-            if a != 0xD9000000 or b not in (0x230405, 0x230005):
+            modes = (0x230405, 0x230005, 0x270405) if speed_bag else (0x230405, 0x230005)
+            if a != 0xD9000000 or b not in modes:
                 raise ValueError('Unsupported furniture geometry mode')
         elif op == 0xDF:
             if (a, b) != (0xDF000000, 0) or at + 8 != len(raw):
@@ -221,7 +227,12 @@ def command_source(models, offsets):
             op = row['opcode']
             if op == 0xD7:
                 # GX zero means its normal scale; native zero collapses UVs.
-                emit('gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON)')
+                if 'texture_scale' in row:
+                    if row['texture_scale'] != (4000, 4000):
+                        raise ValueError('Unsupported furniture environment-map scale')
+                    emit('gsSPTexture(4000, 4000, 0, G_TX_RENDERTILE, G_ON)')
+                else:
+                    emit('gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON)')
             elif op == 0xF0:
                 emit('gsDPPipeSync()')
                 emit(f"gsDPLoadTLUT_pal16(15, 0x{SEGMENT + offsets[row['target']]:08X})", 6)
@@ -230,9 +241,14 @@ def command_source(models, offsets):
                 if w * h // 2 > 2048:
                     raise ValueError('Furniture texture exceeds CI4 TMEM capacity')
                 emit('gsDPPipeSync()')
+                wrap, shift = 'G_TX_CLAMP', 0
+                if 'repeat_shift' in row:
+                    if row['repeat_shift'] != 2 or (w, h) != (16, 16):
+                        raise ValueError('Unsupported furniture environment-map tile')
+                    wrap, shift = 'G_TX_WRAP', 2
                 emit(f"gsDPLoadTextureBlock_4b(0x{SEGMENT + offsets[row['target']]:08X}, "
-                     f'G_IM_FMT_CI, {w}, {h}, 15, G_TX_CLAMP, G_TX_CLAMP, '
-                     f'{w.bit_length() - 1}, {h.bit_length() - 1}, 0, 0)', 7)
+                     f'G_IM_FMT_CI, {w}, {h}, 15, {wrap}, {wrap}, '
+                     f'{w.bit_length() - 1}, {h.bit_length() - 1}, {shift}, {shift})', 7)
             elif op == 0x01:
                 # The donor pointer can address the middle of the vertex array.
                 first = row['first_vertex']

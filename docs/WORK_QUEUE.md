@@ -210,7 +210,13 @@ with later e/e+ donor support investigated separately.
   instruction windows pass across the two fixes; original items remain intact.
   Next: ordinary acquisition/payment, rotation/persistence, and the remaining
   villager integration. No complete item is enabled yet.
-  Punchy's speed bag needs its actual animation/interaction code.
+  The [speed-bag asset converter](checkpoints/V3_SPEED_BAG_ART.md) supplies the
+  complete two-part model, all eight textures, and the two-joint/three-track
+  animation in 3,728 bytes. Six focused checks and five retained static-parser
+  host checks pass. Native evaluation remains unexecuted after two bounded setup
+  failures; do not repeat those attempts. Next implement the actual constructor,
+  hit/retrigger callback, verified sound, and native skeleton drawing, then
+  connect stable item identity/readers and Punchy's house.
 - [ ] Expand native tables/readers safely and assign subset-independent IDs.
   Object-bank slots 410–429 are assigned by verified English-donor index;
   registry version 1 reserves villager actor indices 218–237, preserving native

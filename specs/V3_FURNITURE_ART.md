@@ -50,8 +50,11 @@ vertices must have no relocations. A changed profile does not become a generic
 decorative item by dropping its callbacks.
 
 Punchy's main layer `01EA` contains a speed bag (`3352`, a rotation of `3350`).
-`iam_ike_prores_punch01` uses a custom animation/interaction table. It is outside
-this static converter and remains an explicit behaviour-port dependency.
+`iam_ike_prores_punch01` uses a custom animation/interaction table. Its separate
+[animated converter](V3_SPEED_BAG.md) supplies the complete model and rig;
+the custom runtime behaviour remains an explicit port dependency. The shared
+graphics parser requires an explicit speed-bag mode for its additional material
+settings; the default static conversion remains strict and unchanged.
 
 ## Native asset layout
 

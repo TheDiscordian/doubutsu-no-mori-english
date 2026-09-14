@@ -47,10 +47,11 @@ def symbol_span(symbols, name):
     return tuple(int(value, 16) for value in rows[0])
 
 
-def data_pointers(rel, start, size):
-    """Bind real same-module REL pointers only within the requested data span."""
+def data_pointers(rel, start, size, *, expected_section=5):
+    """Bind same-module data pointers, or explicitly requested text callbacks."""
     sections = rel_sections(rel)
-    if len(sections) <= 5 or start < 0 or size <= 0 or start + size > sections[5][1]:
+    if (expected_section not in (1, 5) or len(sections) <= 5 or start < 0 or
+            size <= 0 or start + size > sections[5][1]):
         raise ValueError('Requested donor pointer span exceeds the data section')
     module, table, table_size = u32(rel, 0), u32(rel, 0x28), u32(rel, 0x2C)
     if not table_size or table_size % 8 or table + table_size > len(rel):
@@ -80,8 +81,8 @@ def data_pointers(rel, start, size):
                 raise ValueError('Donor relocation exceeds its source section')
             if kind in (0, 201, 204) or section != 5 or not start <= address < start + size:
                 continue
-            if (kind != 1 or imported_module != module or target_section != 5
-                    or address % 4 or address + 4 > start + size or target >= sections[5][1]
+            if (kind != 1 or imported_module != module or target_section != expected_section
+                    or address % 4 or address + 4 > start + size or target >= sections[expected_section][1]
                     or address in result or u32(rel, sections[5][0] + address) != 0):
                 raise ValueError('Unsupported, external, or duplicate donor data pointer')
             result[address] = target

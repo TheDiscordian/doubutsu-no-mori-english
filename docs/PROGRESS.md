@@ -287,6 +287,14 @@ V3 builds or V2. Back up existing saves. Ordinary acquisition/
 payment, rotation, other imported items' placed persistence, remaining native
 readers, and the complete villager remain work. Continue villager integration
 and Punchy's animated speed-bag dependency before another navigation batch.
+The [speed-bag converter](checkpoints/V3_SPEED_BAG_ART.md) supplies Punchy's
+complete two-part animated model: all textures, geometry, three animation tracks,
+and native two-joint headers fit in 3,728 bytes of a 5,120-byte bank. Six focused
+conversion checks and the five retained static-parser host checks pass. The
+native animation fixture remains unexecuted after its bounded setup failures;
+no gameplay or rendering result is claimed. Next implement the actual hit/
+retrigger callbacks, sound, drawing, and stable item registration. The asset
+alone does not enable Punchy's house or declare the item playable.
 No import is enabled for players yet.
 V3 development continues on GitHub on `v3/optional-imports`. Both the local and
 public web patchers stay V2 until the user has tested V3 and explicitly approved
