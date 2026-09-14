@@ -89,6 +89,8 @@ controls, deliver an order, or write a save. See the
 The catalogue ordering handoff retains original ID conversion at `800BF10C`;
 the native conversion returns these `3xxx` values unchanged. Review the actual
 shop confirmation/payment and saved pending-order paths before claiming orders.
-The translated post-office creator captures item names through its own resource
-contract; the shared menu-name hook alone does not prove imported order letters.
-Those consumers, ordinary stock, scoring, and complete gameplay remain work.
+The translated post-office creator calls the shared imported-name reader; no
+separate postal name patch is needed. The [shop adapter](V3_SHOPS.md) connects
+native ordinary stock and records partial native pending-order delivery evidence.
+Confirmation/payment, full delivery/read verification, scoring, and complete
+gameplay remain work.

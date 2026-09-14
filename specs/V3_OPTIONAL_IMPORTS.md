@@ -173,8 +173,11 @@ The [collection adapter](V3_COLLECTION.md) connects native acquisition/collectio
 and live-player clearing to saved imported ownership. The
 [catalogue adapter](V3_CATALOGUE.md) connects collected rows, full names,
 selection, model previews, prices, and completion. Four focused tests and a
-70-step native check pass. Ordinary order/delivery, stock/acquisition, scoring,
-and the complete item lifecycle are required; these are not playable imports.
+70-step native check pass. The [shop adapter](V3_SHOPS.md) connects actual native
+goods lists and category queries, with four focused tests and partial native
+stock/acquisition/delivery evidence. Ordinary confirmation/payment, complete
+delivery, scoring, and the full item lifecycle are required; these are not
+playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 
 Then batch imports by shared conversion and behaviour needs. Interactive

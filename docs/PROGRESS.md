@@ -93,8 +93,13 @@ process restores the complete acquired payload and catalogue/profile. The
 English names, model previews, selection, prices, and completion. Four focused
 tests and 70 native steps pass, including both complete model DMAs, all 438 rows,
 and original preview fallback within the existing menu allocation. Ordinary
-order/payment/delivery, stock/acquisition, scoring, placement, and Controller Pak
-profile transport remain work; no import is enabled for players yet.
+order/payment/delivery, scoring, placement, and Controller Pak profile transport
+remain work. The [shop adapter](checkpoints/V3_SHOPS.md) adds the pilots to native
+ordinary goods lists and category queries while preserving town rarity and RNG.
+Four focused tests pass. A partial native check verifies actual stock selection,
+pocket acquisition, and the first complete imported-order letter; the delivery
+reader tail remains unverified after the fixture's setup retry. No import is
+enabled for players yet.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 
