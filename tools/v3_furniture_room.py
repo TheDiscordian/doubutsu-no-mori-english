@@ -126,7 +126,7 @@ def query(source, destination, mode):
             f'lw ${destination}, 8($sp)', 'ld $ra, 24($sp)', 'addiu $sp, $sp, 32']
 
 
-def assembly(rows):
+def assembly(rows, *, return_builder=return_to):
     result = ['/* Generated checked detours; no donor assets. */', '.set noreorder',
               '.set noat', '.set gp=64', '.text']
     for row in rows:
@@ -136,7 +136,7 @@ def assembly(rows):
             result += query(row['source'], row['destination'], row['mode'])
             if row['after']:
                 result.append(f'.word 0x{row["after"]:08x}')
-            result += return_to(row['end'])
+            result += return_builder(row['end'])
             continue
         if row['paired']:
             result += [f'.word 0x{row["lower_word"]:08x}', f'bnez $at, {name}_lower',
@@ -148,11 +148,11 @@ def assembly(rows):
         result += query(row['source'], 1, 0)
         condition = 'beqz' if row['branch'] >> 26 in (4, 20) else 'bnez'
         result += [f'{name}_branch:', f'{condition} $at, {name}_taken', 'nop']
-        result += return_to(row['fall'] + (4 if row['branch'] >> 26 in (20, 21) else 0))
+        result += return_builder(row['fall'] + (4 if row['branch'] >> 26 in (20, 21) else 0))
         result += [f'{name}_taken:', f'.word 0x{row["delay"]:08x}']
-        result += return_to(row['taken'])
+        result += return_builder(row['taken'])
         if row['paired']:
-            result += [f'{name}_lower:'] + return_to(row['lower_target'])
+            result += [f'{name}_lower:'] + return_builder(row['lower_target'])
     return '\n'.join(result) + '\n'
 
 

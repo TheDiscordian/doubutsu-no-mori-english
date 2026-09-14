@@ -160,7 +160,9 @@ Five focused checks and the bounded native check pass. The
 values, and placement footprints, with four focused checks and native verification.
 The [room adapter](V3_FURNITURE_ROOM.md) connects 21 range checks, two index
 conversions, and four field-type scans, with focused and native register/delay
-verification. Remaining external consumers and the ordinary item lifecycle are required;
+verification. The [shared field adapter](V3_FURNITURE_FIELDS.md) connects both
+complete native room-grid builders and donor-backed shop eligibility, with
+focused/native checks. Remaining external consumers and the ordinary item lifecycle are required;
 these are not playable imports.
 Punchy's speed bag needs its actual animation/interaction adapter.
 

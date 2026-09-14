@@ -50,7 +50,11 @@ disabled-profile rejection and all five original-item fallbacks. The
 [room-integration batch](checkpoints/V3_FURNITURE_ROOM.md) connects all 21 reviewed
 room range checks, both index conversions, and four field-type scans. Four
 focused checks and 151 native steps pass, including 125 full-register and
-branch-delay cases across the 27 installed detours. Remaining external
+branch-delay cases across the 27 installed detours. The
+[shared field-grid batch](checkpoints/V3_FURNITURE_FIELDS.md) connects both native
+room-grid builders and donor-backed shop eligibility. Four focused checks and
+56 native steps pass, including complete mixed-layer maps, cross-layer indices,
+retained rotations, disabled imports, original shop fallbacks, and guards. Remaining external
 caller integration, ordinary placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots

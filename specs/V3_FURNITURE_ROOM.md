@@ -15,7 +15,9 @@ do not replace the saved item number with a native alias.
 
 This component does not establish ordinary acquisition, inventory dispatch,
 placed rendering/collision, pickup, catalogue/scoring, or save/profile safety.
-Those consumers still need integration and an ordinary gameplay check before
+The [shared field adapter](V3_FURNITURE_FIELDS.md) connects the two native
+room-grid builders and donor-backed shop eligibility. Other consumers still
+need integration and an ordinary gameplay check before
 either import can be advertised as playable. Both web patchers remain V2.
 
 ## Checked source and control flow
