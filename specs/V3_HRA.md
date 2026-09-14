@@ -46,7 +46,7 @@ The expanded table has 1,267 rows without clothing and 2,051 with clothing;
 both preserve all 947 real native rows. The clothing display uses series 53,
 group 5, and birth category 8, from verified donor mannequin index 682.
 Its [reader specification](V3_DISPLAY_ITEM_READERS.md) records conversion and
-pending native scoring evidence. Selected
+passing current native scoring evidence. Selected
 imports occupy their stable room indices, not their larger catalogue bit
 indices. Unselected gaps use inactive series 63 and are rejected by the selected
 profile range helpers. The one-past-native marker `1ECC` is admitted by the
@@ -90,7 +90,7 @@ the 32-KiB image limit. The relocation resource is 1,184 bytes. The scheduler re
 the actual expanded image size and loads the moved pair. Its original allocator,
 free helper, evaluated-points return, and mail-success handling remain unchanged.
 The native overlay loader separately allocates/frees its relocation scratch.
-The fixed resident V3 prefix remains 48 KiB; the clothing variant uses ABI 42
+The fixed resident V3 prefix remains 48 KiB; the clothing variant uses ABI 43
 without additional permanent allocation or saved fields for scoring.
 
 The installer checks exact source identity, complete range/index inventories,

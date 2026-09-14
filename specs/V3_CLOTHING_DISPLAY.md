@@ -4,12 +4,12 @@
 
 The clothing-enabled build gives cherry shirt a stable mannequin identity and
 uses the original N64 clothing model, draw callback, and model-bank lifetime.
-This supplies the renderer needed for house and catalogue display. It does not
-yet enable ordinary placement or add a catalogue row. The
+This supplies the renderer needed for house and catalogue display. The
 [display readers](V3_DISPLAY_ITEM_READERS.md) connect metadata, canonical
-collection, and expanded scoring tables. Global pocket/display conversion,
-remaining special readers, and the pending scoring execution tail must be
-addressed before those routes are enabled.
+collection, and expanded scoring tables; the [global conversions](V3_DISPLAY_CONVERSION.md)
+connect normal placement/pickup callers. Ordinary inventory Drop and B pickup
+pass inside the copied town's house. Catalogue rows, remaining special readers,
+rotation, and placed-save persistence still need integration/verification.
 
 Donor clothing `24BF` retains pocket item `34BF` and texture index `10BF`.
 Its display dependency is item `3AFC`, runtime index 1,727, with rotations
@@ -87,9 +87,8 @@ and memory guards. The draw check writes private CPU-side command buffers;
 it is not an ordinary GPU-rendered house or catalogue scene.
 
 The [checkpoint](../docs/checkpoints/V3_CLOTHING_DISPLAY.md) records exact
-artifacts and the bounded test-setup correction. Before enabling ordinary
-placement, connect both conversions at `800BEFCC` and `800BF10C` and remaining
-special readers. Shared metadata/collection are installed and pass native
-checks; both scoring tables have 2,051 rows, with the native scoring tail still
-pending. Complete actual catalogue ordering/preview and placed-item persistence.
+artifacts and the bounded test-setup correction. Both conversions at
+`800BEFCC` and `800BF10C` are installed. Shared metadata/collection and the
+2,051-row scoring tables pass native checks. Complete remaining special readers,
+actual catalogue ordering/preview, and ordinary placed-item persistence.
 Neither served web patcher changes without user testing and explicit approval.

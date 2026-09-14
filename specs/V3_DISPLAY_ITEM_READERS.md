@@ -63,16 +63,18 @@ search uses the expanded count and rejects padding indices 2,048 and above.
 
 Two focused host/cartridge checks pass. Complete native item-reader and
 collection exercises pass, covering four rotations and canonical ownership.
-Native loading/relocation of the expanded HRA owner passes. Its group/points
-assertions and feng shui execution remain pending after bounded test-driver
-corrections, as recorded in the [checkpoint](../docs/checkpoints/V3_DISPLAY_ITEM_READERS.md).
+Native loading/relocation, full HRA group/points assertions, and feng shui item/
+room execution pass in the current [conversion batch](../docs/checkpoints/V3_DISPLAY_CONVERSION.md).
+The [reader checkpoint](../docs/checkpoints/V3_DISPLAY_ITEM_READERS.md) preserves
+the initial bounded test-driver failures without relabelling them passed.
 
 ABI 42 retains ABI 41's complete save runtime, codec, selected profile, and
 working-state layout. Same-profile compatibility is expected in both directions,
 but no new ordinary save/reload cycle is claimed. Older profiles without the
 display dependency still reject new saves; keep backups.
 
-Global pocket/display conversion, remaining special readers, actual catalogue
-rows, ordinary placement, and placed-item persistence remain work. Native
-component checks do not establish those gameplay routes. Both web patchers
+The [global conversion](V3_DISPLAY_CONVERSION.md) connects normal pocket and
+display callers. Ordinary house placement and pickup pass on the copied town.
+Remaining special readers, actual catalogue rows, rotation, and placed-item
+persistence remain work. Component checks do not establish those gameplay routes. Both web patchers
 stay V2 until user testing and explicit approval.

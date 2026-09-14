@@ -72,6 +72,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'furniture_expanded': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5800),
                        'clothing_display': ('af_v3_display_clothing_index', BLOB_RAM + 0x6200),
                        'display_items': ('af_v3_display_pocket_item', BLOB_RAM + 0x6C00),
+                       'display_conversion': ('af_v3_room_display_item', BLOB_RAM + 0x6270),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
@@ -210,6 +211,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_furniture_tables
     import v3_clothing_display
     import v3_display_items
+    import v3_display_conversion
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -287,7 +289,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
                        + v3_clothing_wear.SOURCES + v3_clothing_stock.SOURCES + v3_shop_mannequin.SOURCES
                        + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
-                       + v3_clothing_display.SOURCES + v3_display_items.SOURCES
+                       + v3_clothing_display.SOURCES + v3_display_items.SOURCES + v3_display_conversion.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -345,7 +347,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
                   v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI,
                   v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
-                  v3_furniture_tables.ABI, v3_clothing_display.ABI, v3_display_items.ABI)
+                  v3_furniture_tables.ABI, v3_clothing_display.ABI, v3_display_items.ABI,
+                  v3_display_conversion.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -745,6 +748,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_report['display']['readers'] = v3_display_items.install(blob,
             display_item_code, display_item_compiled, clothing_report['item_readers'],
             extended_compiled, collection_report)
+        conversion_code, conversion_compiled = compile_part('display_conversion', out/'display_conversion')
+        clothing_report['display']['conversion'] = v3_display_conversion.install(code, blob,
+            conversion_code, conversion_compiled, clothing_report['display'],
+            clothing_report['display']['readers'])
+        clothing_report['display']['global_placement_enabled'] = True
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,

@@ -13,7 +13,9 @@ function is specifically `mRmTp_GetFurnitureData`, not a general one-tile item
 query. Clothes retain its native non-furniture result: return 3 and clear all
 four twelve-byte cells. The separate [display readers](V3_DISPLAY_ITEM_READERS.md)
 support placed alias metadata, category, footprint, and canonical ownership.
-Global pocket/display conversion and ordinary mannequin placement remain work.
+The [global conversion](V3_DISPLAY_CONVERSION.md) connects pocket/mannequin
+identities. Ordinary placement/pickup pass on the copied town; rotation and
+placed-save persistence remain under verification.
 
 ## Installation and memory
 

@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-display-readers-02/animal-forest-v3-asset-loader.z64`, ABI 42, SHA-256
-`d8caeb04d9a2c8cfcac605e45cf9826cd82fb33b8014c0d9f4efcd4706fae09c`.
+`build/v3-display-conversion-01/animal-forest-v3-asset-loader.z64`, ABI 43, SHA-256
+`ba48944648a10baa0b8f36d6063af36c68bae9dba7a30b118bb2c0c166620436`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -249,10 +249,18 @@ The [display readers](checkpoints/V3_DISPLAY_ITEM_READERS.md) connect the full
 English name, price, placed category, native mannequin footprint, and canonical
 clothing ownership for all four rotations. Both scoring tables contain 2,051
 source-verified rows within existing allocation limits. Two focused checks and
-complete native item-reader/collection exercises pass. Native HRA relocation
-passes; scoring assertions and feng shui execution remain pending after bounded
-test-driver corrections. Global pocket/display conversion and actual catalogue/
-home integration remain; ordinary placement stays disabled.
+complete native item-reader/collection exercises pass. The
+[global conversion batch](checkpoints/V3_DISPLAY_CONVERSION.md) connects
+`34BF` to mannequin `3AFC` and all rotations back to the pocket garment,
+preserving every native conversion body. Two focused checks and the initial
+157-step native run pass, including complete conversions, full HRA grouping/
+points, feng shui item/room scoring, guards, and checkpoint restoration.
+This closes the pending scoring tail. The initial 22-record ordinary copied-town
+run also passes house entry, inventory Drop, mannequin bank allocation, and
+B pickup returning the full `34BF` identity with the bank released. All other
+pockets, conditions, worn clothing, and guards remain intact. The pocket item
+is fixture-seeded, not purchased. Actual catalogue rows, rotation, and
+placed-item save/reload remain under integration.
 Its additional profile dependency accepts the preceding profile in the focused
 decoder check, but older profiles reject new saves. Keep save backups; this is
 not an ordinary cross-build reload result.

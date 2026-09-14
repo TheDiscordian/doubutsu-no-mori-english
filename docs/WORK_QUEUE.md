@@ -123,11 +123,17 @@ with later e/e+ donor support investigated separately.
   [display readers](checkpoints/V3_DISPLAY_ITEM_READERS.md) connect canonical
   names/prices, placed category, native footprint, and clothing ownership.
   Both scoring tables contain 2,051 verified rows within existing limits.
-  Two focused checks and complete native item-reader/collection exercises pass;
-  native HRA relocation passes. Carry the corrected HRA scoring/feng shui tail
-  into the next meaningful integration, without another native setup retry in
-  this batch. Next connect global pocket/display conversions and remaining
-  special readers before ordinary placement. The display profile bit means older profiles
+  Two focused checks and complete native item-reader/collection exercises pass.
+  The [global conversion batch](checkpoints/V3_DISPLAY_CONVERSION.md) connects
+  the pocket/mannequin identities and preserves all native conversion bodies.
+  Two focused checks and the initial 157-step native run pass, including the
+  full HRA/feng shui scoring tail, four orientations, and guards.
+  The initial 22-record ordinary run passes copied-town cold boot, house entry,
+  Drop, mannequin bank allocation, and B pickup retaining full `34BF` and
+  releasing the bank. Other pockets, clothing, and guards stay intact; the
+  garment is fixture-seeded, not purchased. Next: actual clothing catalogue
+  rows/preview-specific readers, rotation, and placed-item save/reload.
+  The display profile bit means older profiles
   reject new saves; preserve backups and distinguish the passing codec check
   from untested ordinary cross-build loading.
   Catalogue/home display and ordinary buy/sell remain.
