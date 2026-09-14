@@ -35,7 +35,7 @@ def sources(base):
     return data, reloc
 
 
-def table(base, rel, symbols, furniture):
+def table(base, rel, symbols, furniture, display=None):
     data, _ = sources(base)
     verify_sources(rel, symbols)
     source = symbols.decode()
@@ -54,7 +54,9 @@ def table(base, rel, symbols, furniture):
             raise ValueError('Unreviewed donor feng shui type/point relationship')
         # GC multiplies item-luck weights by four. Keep N64 game balance and
         # its final room clamp/rounding rather than importing those point values.
-    output = bytearray(data[TABLE - RAM:TABLE - RAM + 947 * 2] + bytes((COUNT - 947) * 2))
+    from v3_furniture_tables import CAPACITY
+    count = CAPACITY if display is not None else COUNT
+    output = bytearray(data[TABLE - RAM:TABLE - RAM + 947 * 2] + bytes((count - 947) * 2))
     records, seen = [], set()
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
@@ -67,6 +69,16 @@ def table(base, rel, symbols, furniture):
         output[index * 2:index * 2 + 2] = metadata
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
                         'metadata': metadata.hex(), 'colour': 'red' if item == 0x3224 else 'orange'})
+    if display is not None:
+        from v3_display_items import scoring_identity
+        donor_index = scoring_identity(rel, symbols, display)
+        metadata = donor[donor_index*2:donor_index*2+2]
+        if metadata != bytes(2):
+            raise ValueError('Changed imported clothing feng shui properties')
+        index = display['runtime_index']
+        output[index*2:index*2+2] = metadata
+        records.append({**display, 'donor_runtime_index': donor_index,
+                        'metadata': metadata.hex(), 'colour': 'none'})
     return bytes(output), records
 
 
@@ -83,7 +95,8 @@ def assembly():
 def install(base, code, suffix, compiled, metadata, records):
     old, reloc = sources(base)
     symbols = compiled['symbols']
-    if (len(suffix) != compiled['bytes'] or not 0 < len(suffix) <= 0x2000 - SIZE
+    if (len(metadata) not in (COUNT*2, 2051*2)
+            or len(suffix) != compiled['bytes'] or not 0 < len(suffix) <= 0x2000 - SIZE
             or len(suffix) % 16 or symbols['af_v3_room_query'] != 0x804680B8):
         raise ValueError('Changed compiled feng shui image or dependency')
     data = bytearray(old + suffix)
@@ -153,7 +166,8 @@ def install(base, code, suffix, compiled, metadata, records):
     return {VROM: bytes(data), RELOC: new_rel}, {'imports': records,
         'source_sha256': SOURCE_SHA, 'source_relocation_sha256': RELOC_SHA,
         'donor_metadata_sha256': DONOR_SHA, 'metadata_sha256': sha256(metadata),
-        'metadata_address': table_address, 'bytes': len(data), 'relocation_bytes': size,
+        'metadata_address': table_address, 'metadata_rows': len(metadata)//2,
+        'bytes': len(data), 'relocation_bytes': size,
         'on_demand_growth': len(suffix), 'output_sha256': sha256(data),
         'relocation_sha256': sha256(new_rel), 'patches': patches, 'scheduler': scheduler,
         'sites': ROWS, 'donor_goods_weight_multiple': 4, 'native_point_rules_retained': True,

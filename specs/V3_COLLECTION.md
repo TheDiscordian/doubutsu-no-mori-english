@@ -11,9 +11,11 @@ It includes the existing FlashRAM runtime. The additional
 completion, and prices. Ordinary ordering/delivery remain work; neither switch
 claims a complete playable item or exposes web selections.
 
-Both web patchers remain V2. The saved format, required imports, memory bounds,
-and compatibility warning are unchanged from the FlashRAM runtime. V3 saves
-must not be loaded in V2 or earlier experimental formats.
+Both web patchers remain V2. Non-clothing builds retain the FlashRAM runtime's
+format and profile. Clothing uses format 2 and requires its selected garment
+and display dependencies. Its current display-reader integration retains the
+complete ABI-41 save runtime and profile. V3 saves must not be loaded in V2 or
+earlier incompatible experimental formats.
 
 ## Native contract
 
@@ -33,6 +35,9 @@ All four rotations share a bit. Unknown or disabled imports are not credited.
 With clothing enabled, the checked shared item-category reader validates the
 selected full garment ID and artwork. `34BF` records clothing bit `BF` in that
 player's separate 32-byte catalogue, never the furniture rotation group.
+The [display readers](V3_DISPLAY_ITEM_READERS.md) canonicalize selected
+`3AFC..3AFF` to `34BF` before recording or querying ownership. All rotations
+share that same clothing bit; a mannequin is not a separate collectible.
 
 `mPr_SetPossessionItem` at `800B8B08` updates pockets/conditions and invokes
 collection only for condition zero. `mPr_SetFreePossessionItem` at `800B8B8C`
@@ -60,6 +65,12 @@ allocation or save-format changes beyond the existing format-2 variant.
 Its entries are record at `804699C0`, query at `80469AD4`, and private clear at
 `80469B50`. Two original-function bridges occupy `8046BA80..8046BA9F`, after
 the FlashRAM bridges and before the existing end guard.
+
+The current clothing display variant redirects only the record/query prologues
+to `80466D94`/`80466DD4`. Two additional sixteen-byte bridges at `80466F00` and
+`80466F10` retain the displaced instructions and rejoin those original bodies.
+The installer verifies the full 544-byte dependency before editing; the clear
+entry, remaining collection code, and FlashRAM bridges are unchanged.
 
 The linker pins the public query address and keeps the selected-item check
 shared, preserving all three public entry addresses. It rejects overlap with

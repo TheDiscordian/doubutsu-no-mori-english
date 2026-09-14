@@ -31,6 +31,7 @@ Name-only lookup would select the earlier, unrelated feng shui definition.
 | --- | ---: | --- | --- |
 | haz-mat barrel `3224` | 1161 | `40050200` | `40050400` |
 | oil drum `32B8` | 1198 | `40050000` | `40050000` |
+| cherry shirt display `3AFC` (clothing variant) | 1727 | `D4050800` | `D4051000` |
 
 The metadata is not directly interchangeable. Series/group occupy the high
 six/ten bits in both games, followed by face and lucky flags at bits 15/14.
@@ -41,7 +42,11 @@ The pilots are construction-series furniture with no face, lucky, or surface
 flag. Haz-mat barrel uses group-C acquisition category 2; oil drum uses group-A
 category 0. Both use the native ordinary-acquisition point weight.
 
-The expanded 1,267-row table preserves all 947 real native rows. Selected
+The expanded table has 1,267 rows without clothing and 2,051 with clothing;
+both preserve all 947 real native rows. The clothing display uses series 53,
+group 5, and birth category 8, from verified donor mannequin index 682.
+Its [reader specification](V3_DISPLAY_ITEM_READERS.md) records conversion and
+pending native scoring evidence. Selected
 imports occupy their stable room indices, not their larger catalogue bit
 indices. Unselected gaps use inactive series 63 and are rejected by the selected
 profile range helpers. The one-past-native marker `1ECC` is admitted by the
@@ -79,13 +84,14 @@ indices. No additional DMA-directory slot is consumed. All original linked
 text/data/BSS addresses remain unchanged; original BSS is included as zeroed
 space before the appended code/table at `80929C30`.
 
-The expanded image is 27,152 bytes, adding 10,176 bytes to its native 16,976-byte
-resident size. The relocation resource is 1,184 bytes. The scheduler requests
+The expanded image is 27,152 bytes without clothing and 30,288 with clothing,
+adding 10,176 or 13,312 bytes to its native 16,976-byte resident size. Both fit
+the 32-KiB image limit. The relocation resource is 1,184 bytes. The scheduler requests
 the actual expanded image size and loads the moved pair. Its original allocator,
 free helper, evaluated-points return, and mail-success handling remain unchanged.
 The native overlay loader separately allocates/frees its relocation scratch.
-The fixed resident V3 prefix remains 48 KiB; this component uses ABI 19 and adds
-no permanent allocation or saved field.
+The fixed resident V3 prefix remains 48 KiB; the clothing variant uses ABI 42
+without additional permanent allocation or saved fields for scoring.
 
 The installer checks exact source identity, complete range/index inventories,
 incoming branch targets, relocation ownership, collisions, table bounds, every

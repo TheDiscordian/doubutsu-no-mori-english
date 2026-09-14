@@ -40,7 +40,7 @@ from completed item support and move-in eligibility.
 
 The clothing helpers are linked after the existing asset/draw/audio code,
 inside `80460100..80460FFF`; the linker forbids overlap with the object table.
-The loaded prefix remains 48 KiB. Configuration ABI 41 identifies this variant;
+The loaded prefix remains 48 KiB. Configuration ABI 42 identifies this variant;
 its separate [format-2 save codec](V3_CLOTHING_SAVE.md) is loaded independently.
 The native ordinary arenas, actors, and saved clothing field sizes do not grow.
 
@@ -126,7 +126,10 @@ and ordinary acquisition/buy/sell, home/catalogue display, mail/gifts, and
 persistence for those representations. The
 [display adapter](V3_CLOTHING_DISPLAY.md) installs the actual native mannequin
 under stable identity `3AFC`, with checked complete native loading and drawing
-commands. Global placement and remaining alias readers are not yet installed.
+commands. The [display readers](V3_DISPLAY_ITEM_READERS.md) connect canonical
+metadata/ownership and expanded scoring tables. Native item/collection checks
+pass; scoring execution remains pending. Global placement and remaining special
+readers are not yet installed.
 Keep original garments and behaviour.
 
 The [format-2 save extension](V3_CLOTHING_SAVE.md) installs independent clothing

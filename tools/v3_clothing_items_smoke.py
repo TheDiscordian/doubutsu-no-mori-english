@@ -78,6 +78,30 @@ def exercise(debug, rom_path, record):
     call(0x800A5630, [0x24BF], 12)
     call(0x800BE72C, [0x24BF, 0xFFFFFFFC, 7, place], 3)
     check('original garment rejects furniture-only footprint', place, bytes(48))
+    if report['clothing'].get('display', {}).get('readers'):
+        for rotation in range(4):
+            item = 0x3AFC | rotation
+            call(0x800BE72C, [0x17AC | rotation, 0xFFFFFFFC, 7, place], 0)
+            footprint = debug.read_memory(place, 48)
+            call(0x801969C8, [text, 16, item], 1)
+            check('mannequin uses the full canonical garment name', text, name)
+            call(0x800A5630, [item], 10)
+            call(0x800C0194, [item], 380)
+            call(0x800BE72C, [item, 0xFFFFFFFC, 7, place], 0)
+            check('mannequin retains all original footprint cells', place, footprint)
+        display_profile = BLOB_RAM+0x20+119
+        saved = debug.read_memory(display_profile, 1)
+        try:
+            debug.write_memory(display_profile, bytes(1))
+            call(0x801969C8, [text, 16, 0x3AFC], 0)
+            check('missing display leaves text unchanged', text, name)
+            call(0x800A5630, [0x3AFC], 0)
+            call(0x800C0194, [0x3AFC], 0)
+            call(0x800BE72C, [0x3AFC, 0xFFFFFFFC, 7, place], 3)
+            check('missing display clears and rejects footprint', place, bytes(48))
+            call(0x800A5630, [0x34BF], 12)
+        finally:
+            debug.write_memory(display_profile, saved)
     for address in guards: check('fixture guard', address, edge)
     check('unaligned name leading byte retained', text-1, b'\xA5')
     check('complete current prefix restored', BLOB_RAM, blob[:0xC000])

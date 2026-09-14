@@ -119,9 +119,15 @@ with later e/e+ donor support investigated separately.
   mannequin identity `3AFC`, the original native callbacks/model, and selected
   full-index clothing loading within existing buffers. Three focused checks
   and the corrected 116-record native run pass, including all four rotations,
-  complete transfers, draw commands, cleanup, and guards. Next connect shared
-  alias metadata, collection, scoring, and global pocket/display conversions
-  before enabling ordinary placement. Its new profile bit means older profiles
+  complete transfers, draw commands, cleanup, and guards. The
+  [display readers](checkpoints/V3_DISPLAY_ITEM_READERS.md) connect canonical
+  names/prices, placed category, native footprint, and clothing ownership.
+  Both scoring tables contain 2,051 verified rows within existing limits.
+  Two focused checks and complete native item-reader/collection exercises pass;
+  native HRA relocation passes. Carry the corrected HRA scoring/feng shui tail
+  into the next meaningful integration, without another native setup retry in
+  this batch. Next connect global pocket/display conversions and remaining
+  special readers before ordinary placement. The display profile bit means older profiles
   reject new saves; preserve backups and distinguish the passing codec check
   from untested ordinary cross-build loading.
   Catalogue/home display and ordinary buy/sell remain.

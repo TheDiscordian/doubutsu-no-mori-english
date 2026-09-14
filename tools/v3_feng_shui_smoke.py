@@ -38,11 +38,13 @@ def exercise(debug, rom_path, record):
         debug.write_memory(at, struct.pack('>I', value))
 
     check('complete current resident prefix', BLOB_RAM, blob)
-    size = 0x2800
+    extra = 0x800 if result.get('metadata_rows', feng.COUNT) > feng.COUNT else 0
+    size = 0x2800+extra
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - size:
         raise ValueError('Feng shui fixture allocation failed')
-    owner, layers, points, first, second = (allocation + n for n in (16, 0x1C00, 0x1C40, 0x1E00, 0x2100))
+    owner = allocation+16
+    layers, points, first, second = (allocation + extra + n for n in (0x1C00, 0x1C40, 0x1E00, 0x2100))
     data, reloc = (files[v].extract(rom) for v in (feng.NEW_VROM, feng.NEW_RELOC))
     if (sha256(data), sha256(reloc)) != (result['output_sha256'], result['relocation_sha256']):
         raise ValueError('Changed complete feng shui image')
@@ -68,6 +70,11 @@ def exercise(debug, rom_path, record):
             debug.write_memory(points, bytes.fromhex('FFFFFFFFFFFFFFFF'))
             call(owner, [item, x, z, 6, points, points + 4], proof)
             check(f'complete item {item:04X} at ({x},{z})', points, struct.pack('>II', money, goods))
+        if extra:
+            for rotation in range(4):
+                debug.write_memory(points, b'\xFF'*8)
+                call(owner, [0x3AFC | rotation, 4, 3, 6, points, points+4], proof)
+                check('complete native clothing feng shui retains donor neutral colour', points, bytes(8))
         put(layers, first); put(layers + 4, second)
         grid1, grid2 = bytearray(512), bytearray(512)
         for grid, x, z, item in ((grid1, 4, 3, 0x3227), (grid2, 3, 1, 0x32B9),
@@ -94,7 +101,7 @@ def exercise(debug, rom_path, record):
         for at, value in globals_before.items():
             debug.write_memory(at, value)
     call(0x8009C040, [allocation])
-    return {'complete_native_item_evaluations': 5, 'complete_native_room_evaluations': 3,
+    return {'complete_native_item_evaluations': 5+(4 if extra else 0), 'complete_native_room_evaluations': 3,
             'actual_donor_feng_shui_properties_tested': True,
             'ordinary_house_evaluation_tested': False, 'saved_data_written': False,
             'requires_checkpoint_restore': True}

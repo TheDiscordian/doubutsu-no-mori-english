@@ -83,6 +83,28 @@ def exercise(debug, rom_path, record):
         owned(3, 0x32B8, 1)
         call(0x800B88EC, [0x24BF])
         check('original garment does not enter imported ownership', runtime_address+16, bytes(expected))
+        if report['clothing'].get('display', {}).get('readers'):
+            at = PROFILE+512+3*32+23
+            for rotation in range(4):
+                expected[at] = 0
+                debug.write_memory(runtime_address+16+at, bytes(1))
+                owned(3, 0x3AFC | rotation, 0)
+                call(0x800B88EC, [0x3AFC | rotation])
+                mark(3)
+                owned(3, 0x3AFC | rotation, 1)
+                owned(3, 0x34BF, 1)
+            display_profile = BLOB_RAM+0x20+119
+            saved_display = debug.read_memory(display_profile, 1)
+            try:
+                debug.write_memory(display_profile, bytes(1))
+                owned(3, 0x3AFC, 0)
+                call(0x800B88EC, [0x3AFC])
+                check('missing display does not create furniture ownership', runtime_address+16, bytes(expected))
+            finally:
+                debug.write_memory(display_profile, saved_display)
+            # A valid ownership query runs require_state, which correctly
+            # rejects a current profile differing from its initialized state.
+            owned(3, 0x34BF, 1)
         debug.write_memory(profile_address, bytes([selected[0] & 0x7F]))
         call(0x800B88EC, [0x34BF])
         owned(3, 0x34BF, 0)

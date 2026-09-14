@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-display-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`8de718f1531e8d5d3652d74664deb7ff3a7ca9352839dc49db7522dc8432ab69`.
+`build/v3-display-readers-02/animal-forest-v3-asset-loader.z64`, ABI 42, SHA-256
+`d8caeb04d9a2c8cfcac605e45cf9826cd82fb33b8014c0d9f4efcd4706fae09c`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -245,8 +245,14 @@ installs stable mannequin identity `3AFC`, the original N64 model/draw callbacks
 and checked full-index garment loading without larger buffers. Three focused
 tests and the corrected 116-record native run pass, including all four rotations,
 complete artwork/model transfers, native draw commands, cleanup, and guards.
-Shared alias metadata, collection, scoring, global pocket/display conversion,
-and actual catalogue/home integration remain; ordinary placement stays disabled.
+The [display readers](checkpoints/V3_DISPLAY_ITEM_READERS.md) connect the full
+English name, price, placed category, native mannequin footprint, and canonical
+clothing ownership for all four rotations. Both scoring tables contain 2,051
+source-verified rows within existing allocation limits. Two focused checks and
+complete native item-reader/collection exercises pass. Native HRA relocation
+passes; scoring assertions and feng shui execution remain pending after bounded
+test-driver corrections. Global pocket/display conversion and actual catalogue/
+home integration remain; ordinary placement stays disabled.
 Its additional profile dependency accepts the preceding profile in the focused
 decoder check, but older profiles reject new saves. Keep save backups; this is
 not an ordinary cross-build reload result.

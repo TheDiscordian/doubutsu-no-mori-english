@@ -71,6 +71,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'furniture_tables': ('af_v3_furniture_tables_init', BLOB_RAM + 0xA000),
                        'furniture_expanded': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5800),
                        'clothing_display': ('af_v3_display_clothing_index', BLOB_RAM + 0x6200),
+                       'display_items': ('af_v3_display_pocket_item', BLOB_RAM + 0x6C00),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
@@ -208,6 +209,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_clothing_shop_floor
     import v3_furniture_tables
     import v3_clothing_display
+    import v3_display_items
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -285,7 +287,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                        + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
                        + v3_clothing_wear.SOURCES + v3_clothing_stock.SOURCES + v3_shop_mannequin.SOURCES
                        + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
-                       + v3_clothing_display.SOURCES
+                       + v3_clothing_display.SOURCES + v3_display_items.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -343,7 +345,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                   v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
                   v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI,
                   v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
-                  v3_furniture_tables.ABI, v3_clothing_display.ABI)
+                  v3_furniture_tables.ABI, v3_clothing_display.ABI, v3_display_items.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -592,7 +594,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             raise ValueError('Shop floor composition overlaps another changed owner')
     hra_changes, hra_report, relocated = {}, None, {}
     if hra:
-        metadata, records = v3_hra.table(base, rel, symbols, furniture_report['imports'])
+        metadata, records = v3_hra.table(base, rel, symbols, furniture_report['imports'],
+            v3_clothing_display.profile_dependency() if clothing else None)
         metadata_path, generated = out / 'hra-metadata.bin', out / 'hra-hooks.S'
         write_new(metadata_path, metadata)
         rows = v3_hra.inspect(base)
@@ -600,14 +603,15 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             '.globl af_v3_hra_table\naf_v3_hra_table:\n'
             f'.incbin "/source/{metadata_path.relative_to(ROOT)}"\n').encode())
         hra_code, hra_compiled = compile_part('hra', out / 'hra',
-            extra_sources=(str(generated.relative_to(ROOT)),))
+            extra_sources=(str(generated.relative_to(ROOT)),), defines=table_defines)
         hra_changes, hra_report = v3_hra.install(base, code, hra_code, hra_compiled, metadata, records, rows)
         hra_report['code'] = hra_compiled
         hra_report['generated_hooks_sha256'] = sha256(generated.read_bytes())
         relocated = {v3_hra.VROM: v3_hra.NEW_VROM, v3_hra.RELOC: v3_hra.NEW_RELOC}
     feng_changes, feng_report = {}, None
     if feng_shui:
-        metadata, records = v3_feng_shui.table(base, rel, symbols, furniture_report['imports'])
+        metadata, records = v3_feng_shui.table(base, rel, symbols, furniture_report['imports'],
+            v3_clothing_display.profile_dependency() if clothing else None)
         metadata_path, generated = out / 'feng-metadata.bin', out / 'feng-hooks.S'
         write_new(metadata_path, metadata)
         write_new(generated, (v3_feng_shui.assembly() + '.section .rodata.feng_table\n.balign 4\n'
@@ -737,6 +741,10 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         clothing_report['display'] = v3_clothing_display.install(native, base, blob,
             display_code, display_compiled, item_code_report, save_runtime_report)
         furniture_report['display_imports'] = clothing_report['display']['imports']
+        display_item_code, display_item_compiled = compile_part('display_items', out/'display_items')
+        clothing_report['display']['readers'] = v3_display_items.install(blob,
+            display_item_code, display_item_compiled, clothing_report['item_readers'],
+            extended_compiled, collection_report)
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,

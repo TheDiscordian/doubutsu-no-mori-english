@@ -33,7 +33,7 @@ def sources(base):
     return data, reloc
 
 
-def table(base, rel, symbols, furniture):
+def table(base, rel, symbols, furniture, display=None):
     data, _ = sources(base)
     verify_sources(rel, symbols)
     # Two private symbols share this name. Select the pinned HRA definition,
@@ -46,7 +46,9 @@ def table(base, rel, symbols, furniture):
     if sha256(donor) != DONOR_SHA:
         raise ValueError('Changed actual donor HRA table')
     native = data[TABLE - RAM:TABLE - RAM + 947 * 4]
-    output = bytearray(native + bytes.fromhex('FC000000') * (COUNT - 947))
+    from v3_furniture_tables import CAPACITY
+    count = CAPACITY if display is not None else COUNT
+    output = bytearray(native + bytes.fromhex('FC000000') * (count - 947))
     # The original upper bound includes the one-past-table marker 1ECC. Give
     # that marker an inert OTHER/unobtainable row so it cannot index series 63
     # into the 55-entry search buffer. It is not an imported or orderable item.
@@ -72,8 +74,21 @@ def table(base, rel, symbols, furniture):
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
                         'metadata': metadata.hex(), 'donor_metadata': donor_metadata.hex(),
                         'series': 16, 'birth_category': birth, 'surface': surface})
+    if display is not None:
+        from v3_display_items import scoring_identity
+        donor_index = scoring_identity(rel, symbols, display)
+        donor_metadata = donor[donor_index*4:donor_index*4+4]
+        if donor_metadata != bytes.fromhex('d4050800'):
+            raise ValueError('Changed clothing HRA series/group/birth properties')
+        # Clothing has birth category 8 in both engines; retain native bit layout.
+        metadata = bytes.fromhex('d4051000')
+        index = display['runtime_index']
+        output[index*4:index*4+4] = metadata
+        records.append({**display, 'donor_runtime_index': donor_index,
+            'metadata': metadata.hex(), 'donor_metadata': donor_metadata.hex(),
+            'series': 53, 'birth_category': 8, 'surface': 0})
     # Construction uses a native 32-bit completion mask, not an arbitrary list.
-    construction = sum(output[i * 4] >> 2 == 16 for i in range(COUNT))
+    construction = sum(output[i * 4] >> 2 == 16 for i in range(count))
     if data[0x809283B0 - RAM + 16 * 3] != 2 or not 19 <= construction <= 32:
         raise ValueError('Imported construction group exceeds native completion capacity')
     return bytes(output), records
@@ -169,7 +184,10 @@ def assembly(rows):
 def install(base, code, suffix, compiled, metadata, records, rows):
     old, reloc = sources(base)
     symbols = compiled['symbols']
-    if (rows != inspect(base) or len(suffix) != compiled['bytes'] or len(suffix) % 16
+    count = len(metadata)//4
+    extended = '-DAF_V3_FURNITURE_TABLES=1' in compiled['flags']
+    if (len(metadata) != count*4 or count != (2051 if extended else COUNT)
+            or rows != inspect(base) or len(suffix) != compiled['bytes'] or len(suffix) % 16
             or not 0 < len(suffix) <= 0x8000 - START
             or any(symbols[name] != target for name, target in IMPORTS.items())):
         raise ValueError('Changed HRA compiled image or dependencies')
@@ -198,7 +216,7 @@ def install(base, code, suffix, compiled, metadata, records, rows):
             target = (hi & 65535) * 65536 + (original & 65535) - (65536 if original & 32768 else 0)
             is_end = target == TABLE + 947 * 4 and original >> 26 == 9
             if TABLE <= target < TABLE + 947 * 4 or is_end:
-                new = table_address + (COUNT * 4 if is_end else target - TABLE)
+                new = table_address + (count * 4 if is_end else target - TABLE)
                 word(RAM + hi_at, hi, hi & 0xFFFF0000 | (new + 0x8000) >> 16 & 65535)
                 word(RAM + pos, original, original & 0xFFFF0000 | new & 65535)
                 pointer_changes.append({'high': RAM + hi_at, 'low': RAM + pos, 'before': target, 'after': new})
@@ -257,7 +275,7 @@ def install(base, code, suffix, compiled, metadata, records, rows):
                        0x24000000 | register << 21 | register << 16 | value & 65535)
     return {VROM: bytes(data), RELOC: new_rel}, {
         'imports': records, 'source_sha256': SOURCE_SHA, 'source_relocation_sha256': RELOC_SHA,
-        'donor_table_sha256': DONOR_SHA, 'metadata_rows': COUNT, 'metadata_address': table_address,
+        'donor_table_sha256': DONOR_SHA, 'metadata_rows': count, 'metadata_address': table_address,
         'metadata_sha256': sha256(metadata), 'source_resident_bytes': START, 'bytes': len(data),
         'relocation_bytes': size, 'on_demand_growth': len(data) - START,
         'output_sha256': sha256(data), 'relocation_sha256': sha256(new_rel),

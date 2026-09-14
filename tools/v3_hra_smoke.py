@@ -41,12 +41,14 @@ def exercise(debug, rom_path, record, *, windows=True):
         debug.write_memory(at, struct.pack('>I', value))
 
     check('complete current resident prefix', BLOB_RAM, blob)
-    size = 0x8400
+    capacity = hr['metadata_rows']
+    extra = 0xA00 if capacity > hra.COUNT else 0
+    size = 0x8400+extra
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - size:
         raise ValueError('HRA fixture allocation failed')
     owner = allocation + 16
-    layers, points, first, second = (allocation + n for n in (0x7600, 0x7620, 0x7800, 0x7B00))
+    layers, points, first, second = (allocation + extra + n for n in (0x7600, 0x7620, 0x7800, 0x7B00))
     data, reloc = (files[v].extract(rom) for v in (hra.NEW_VROM, hra.NEW_RELOC))
     if (sha256(data), sha256(reloc)) != (hr['output_sha256'], hr['relocation_sha256']):
         raise ValueError('Changed current HRA image')
@@ -139,12 +141,12 @@ def exercise(debug, rom_path, record, *, windows=True):
         # Predict native group assignment independently from the original types
         # and the full expanded metadata, including all unchanged native rows.
         table_at = hr['metadata_address'] - hra.RAM
-        metadata = bytearray(expected[table_at:table_at + hra.COUNT * 4])
+        metadata = bytearray(expected[table_at:table_at + capacity * 4])
         series_at = 0x809283B0 - hra.RAM
         series = bytearray(expected[series_at:series_at + 55 * 3])
         for s in range(55):
             group, count = (5 if series[s * 3] == 1 else 0), 0
-            for i in range(hra.COUNT):
+            for i in range(capacity):
                 word = u32(metadata, i * 4)
                 if word >> 26 == s:
                     if series[s * 3] != 1 or word >> 16 & 1023 >= 5:
@@ -165,7 +167,7 @@ def exercise(debug, rom_path, record, *, windows=True):
             struct.pack_into('>I', search, s * 4, put_mask)
         debug.write_memory(first, grid1); debug.write_memory(second, grid2)
         call(linked(0x8092817C), [layers, 5], proof=proof)
-        check('all 1267 assigned native/imported metadata rows', owner + table_at, metadata)
+        check(f'all {capacity} assigned native/imported metadata rows', owner + table_at, metadata)
         check('all native series counts including construction 21', owner + series_at, series)
         check('complete mixed-layer construction completion masks', linked(0x80929750), search)
         for group, item in ((19, 0x3224), (20, 0x32B8), (0, 0x1414), (21, 0)):
@@ -194,6 +196,19 @@ def exercise(debug, rom_path, record, *, windows=True):
         put(points, 0)
         call(linked(0x809274F8), [points, layers, 5, 0, 0], proof=proof)
         check('one-past-native marker has zero point weight', points, struct.pack('>I', baseline + increment))
+        if report['clothing'].get('display', {}).get('readers'):
+            # Evaluate each placed orientation through the full native point
+            # function; clothing is not added to construction completion masks.
+            debug.write_memory(second, bytes(512))
+            for rotation in range(4):
+                grid = bytearray(512)
+                struct.pack_into('>H', grid, 17*2, 0x3AFC | rotation)
+                debug.write_memory(first, grid)
+                put(points, 0)
+                call(linked(0x809274F8), [points, layers, 5, 0, 0], proof=proof)
+                clothing_points = u32(weights, 8*4)
+                check('clothing mannequin uses its actual native birth weight', points,
+                      struct.pack('>I', baseline+clothing_points))
         check('unchanged translated HRA code prefix', owner, expected[:hra.SECTIONS[0]])
         check('compiled suffix code retained', owner + hra.START, expected[hra.START:table_at])
         check('complete resident prefix retained', BLOB_RAM, blob)
@@ -207,6 +222,6 @@ def exercise(debug, rom_path, record, *, windows=True):
     call(0x8009C040, [allocation])
     return {'native_hra_register_windows': windows, 'native_group_initialization': True,
             'native_mixed_layer_completion_masks': True, 'native_missing_item_selections': 5,
-            'native_base_point_evaluations': 3, 'one_past_native_marker_safe': True,
+            'native_base_point_evaluations': 3+(4 if capacity > hra.COUNT else 0), 'one_past_native_marker_safe': True,
             'ordinary_house_evaluation_tested': False,
             'saved_data_written': False, 'requires_checkpoint_restore': True}

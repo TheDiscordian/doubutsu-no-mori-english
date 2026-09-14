@@ -11,8 +11,9 @@ shirt. All original item paths and both furniture imports remain active.
 The shared size function retains the native fallback zero. The footprint
 function is specifically `mRmTp_GetFurnitureData`, not a general one-tile item
 query. Clothes retain its native non-furniture result: return 3 and clear all
-four twelve-byte cells. This does not implement garment display, mannequin
-placement, or inventory actions.
+four twelve-byte cells. The separate [display readers](V3_DISPLAY_ITEM_READERS.md)
+support placed alias metadata, category, footprint, and canonical ownership.
+Global pocket/display conversion and ordinary mannequin placement remain work.
 
 ## Installation and memory
 

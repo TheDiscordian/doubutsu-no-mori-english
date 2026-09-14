@@ -31,8 +31,13 @@ the feng shui table at section-five offset `4EBF0`, with 2,532 bytes and SHA-256
 `5700370581b13dd85eb1102656f858c9c4dbb4752c646c3ad563893937a2517a`.
 The other symbol belongs to HRA and has a different record format.
 
-The expanded 1,267-row two-byte table preserves all 947 original records and
-places selected imports at stable runtime indices 1,161 and 1,198. Unselected
+The expanded two-byte table has 1,267 rows without clothing and 2,051 with
+clothing. Both preserve all 947 original records and place selected decorative
+imports at stable runtime indices 1,161 and 1,198. Clothing display index 1,727
+uses verified donor row 682, `0000`, with no colour bonus or facing penalty.
+Original garment rows retain their native `0001` values. The
+[display reader specification](V3_DISPLAY_ITEM_READERS.md) records its pending
+native execution evidence. Unselected
 rows and the original one-past marker have neutral metadata. Only selected,
 valid imported profiles pass the room scan's extended range check.
 
@@ -50,12 +55,13 @@ through the actual loaded owner pointer at `80107010`. No new resident helper
 or saved field is allocated. Original native instructions outside the declared
 windows/table-pointer pair remain intact, including all scoring arithmetic.
 
-The expanded owner occupies 6,400 bytes, adding 2,784 bytes on demand. Its
+The expanded owner occupies 6,400 bytes without clothing and 7,968 with clothing,
+adding 2,784 or 4,352 bytes on demand. Both fit the 8-KiB image limit. Its
 relocation remains 80 bytes. It moves to `03F50000` / `03F54000` without changing
 DMA indices or consuming a directory slot. The scheduler's allocation-end and
 ROM-load operands are updated; its entry selection, allocator, free helper,
-and failure behaviour remain unchanged. V3 ABI 20 retains the same 48-KiB
-permanent prefix. HRA's separately loaded image does not change.
+and failure behaviour remain unchanged. The clothing variant uses ABI 42 and
+retains the same 48-KiB permanent prefix. HRA uses its separate expanded image.
 
 Exact input hashes, symbol definitions, donor/native rule correspondence,
 table/code bounds, relocation ownership, scheduler words, and independent

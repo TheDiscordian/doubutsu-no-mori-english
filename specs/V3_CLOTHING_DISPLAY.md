@@ -5,9 +5,11 @@
 The clothing-enabled build gives cherry shirt a stable mannequin identity and
 uses the original N64 clothing model, draw callback, and model-bank lifetime.
 This supplies the renderer needed for house and catalogue display. It does not
-yet enable ordinary placement or add a catalogue row: shared item metadata,
-pocket/display conversion, collection, scoring, and remaining special readers
-must accept the new representation before those routes are enabled.
+yet enable ordinary placement or add a catalogue row. The
+[display readers](V3_DISPLAY_ITEM_READERS.md) connect metadata, canonical
+collection, and expanded scoring tables. Global pocket/display conversion,
+remaining special readers, and the pending scoring execution tail must be
+addressed before those routes are enabled.
 
 Donor clothing `24BF` retains pocket item `34BF` and texture index `10BF`.
 Its display dependency is item `3AFC`, runtime index 1,727, with rotations
@@ -86,8 +88,8 @@ it is not an ordinary GPU-rendered house or catalogue scene.
 
 The [checkpoint](../docs/checkpoints/V3_CLOTHING_DISPLAY.md) records exact
 artifacts and the bounded test-setup correction. Before enabling ordinary
-placement, connect full-name/price/footprint readers and both conversions at
-`800BEFCC` and `800BF10C`, route collection back to `34BF`, and cover the HRA
-and feng shui tables whose current 1,267-entry capacity cannot accept index
-1,727. Complete actual catalogue ordering/preview and placed-item persistence.
+placement, connect both conversions at `800BEFCC` and `800BF10C` and remaining
+special readers. Shared metadata/collection are installed and pass native
+checks; both scoring tables have 2,051 rows, with the native scoring tail still
+pending. Complete actual catalogue ordering/preview and placed-item persistence.
 Neither served web patcher changes without user testing and explicit approval.
