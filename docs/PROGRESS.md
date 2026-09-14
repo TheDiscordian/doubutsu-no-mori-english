@@ -372,12 +372,14 @@ checks pass, including every source pixel, vertex, and compiled triangle plus
 retained furniture/speed-bag behaviour. Runtime attachment is pending; no
 accessory or islander is enabled by this asset batch.
 
-The [complete body-component bundle](checkpoints/V3_ISLANDER_BODIES.md) converts
-nineteen of the twenty donor-only villagers, with all fifteen required accessory
+The [complete body-component bundle](checkpoints/V3_GORILLA_ART.md) converts
+all twenty donor-only villagers, with all sixteen required accessory
 objects included. Thirteen additional species layouts preserve complete facial
 frames and source pixels, including verified mirrored/clamped edge extensions.
 Shared meshes retain every ordered face, vertex binding, and joint matrix.
-Nineteen focused checks pass. Yodel requires a genuine gorilla-model conversion. Stable bank assignment,
+Yodel's separate complete model preserves all 429 donor vertices and 284
+triangles, fitting the native NPC model buffer with 128 bytes spare.
+Twenty-six focused checks pass. Stable bank assignment,
 attachment, town behaviour/defaults/houses, and persistence remain required;
 the current cartridge and both V2 patchers are unchanged.
 

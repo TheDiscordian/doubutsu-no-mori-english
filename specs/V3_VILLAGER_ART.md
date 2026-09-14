@@ -12,8 +12,8 @@ Explicit `--villager` selections also convert Pigleg (`00E9`, `pig_11`) and
 Dobie (`00E0`, `wol_6`). These two islanders are artwork components only;
 the default two-pilot conversion and current development ROM do not change.
 Pigleg includes a separate converted model, not an overwrite of the native pig
-model. With a verified `--accessories` directory, `--all-supported` converts
-nineteen donor-only villagers: all except Yodel. The fifteen accessory-bearing
+model. With verified `--accessories` and `--models` directories, `--all-supported`
+converts all twenty donor-only villagers. The sixteen accessory-bearing
 entries include their actual separate accessory objects and attachment metadata.
 Town behaviour, dependencies, and runtime installation remain required.
 
@@ -115,9 +115,11 @@ separately. This establishes shared topology and texture bindings, not hardware
 appearance or equivalence of every graphics-state command.
 
 The [body checkpoint](../docs/checkpoints/V3_ISLANDER_BODIES.md) records complete
-conversion and focused verification. Yodel remains unsupported because the
-gorilla geometry differs beyond positions. Do not weaken the pig-only coordinate
-adapter or reuse the unrelated native gorilla model to enable him.
+conversion and focused verification for the shared species. Yodel uses a
+[separate complete gorilla conversion](V3_GORILLA_MODEL.md): all 429 donor
+vertices, 284 triangles, matrix assignments, and 26 joints fit in 10,112 bytes.
+Do not weaken the pig-only coordinate adapter or reuse the unrelated native
+gorilla model for Yodel. His converted skeleton pointer is `06002770`.
 
 ## Shared model evidence
 
@@ -161,7 +163,7 @@ pending; texture conversion alone must not silently reuse the larger native
 head. Accessory-bearing villagers fail conversion without the verified separate
 geometry dependency. The separate
 [accessory converter](V3_VILLAGER_ACCESSORIES.md) supplies all sixteen actual
-accessory models, textures, and palettes. The body bundle includes the fifteen
+accessory models, textures, and palettes. The body bundle includes all sixteen
 dependencies for its supported bodies and records their exact consumer joints.
 Runtime attachment still needs implementation before those villagers are playable.
 

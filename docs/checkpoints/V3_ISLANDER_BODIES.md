@@ -68,7 +68,8 @@ patchers, and the trailer stay unchanged.
 
 ## Next work
 
-Convert Yodel's actual gorilla geometry. Assign stable additive model/texture
+The [Yodel conversion and twenty-body bundle](V3_GORILLA_ART.md) supply his
+actual gorilla geometry. Assign stable additive model/texture
 storage, implement the verified accessory joint attachment and cleanup, and
 connect the remaining voices, English/default data, houses, town-compatible
 behaviour, and persistence. Do not enable a villager just because its body and

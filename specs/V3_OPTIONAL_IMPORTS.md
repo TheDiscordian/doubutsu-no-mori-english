@@ -160,10 +160,10 @@ choice before claiming faithful support.
 
 The [islander accessory converter](V3_VILLAGER_ACCESSORIES.md) supplies all
 sixteen separate donor accessories with actual consumer/joint bindings and
-complete native graphics conversion. Runtime attachment and the remaining
-Yodel body/model are required; do not omit accessories to enable their imports.
-The [nineteen-body bundle](../docs/checkpoints/V3_ISLANDER_BODIES.md) includes
-the fifteen required accessories for its supported bodies. Complete expressions,
+complete native graphics conversion. Runtime attachment is required; do not
+omit accessories to enable their imports.
+The [twenty-body bundle](../docs/checkpoints/V3_GORILLA_ART.md) includes
+all sixteen required accessories and Yodel's separate full model. Complete expressions,
 species layouts, and real shared face/matrix/material bindings are verified;
 town/runtime integration is not implied by these converted components.
 

@@ -143,6 +143,13 @@ LAYOUTS = {
                   (0x1C0, 0x280, 32, 40), (0x440, 0x4C0, 16, 8),
                   (0x480, 0x500, 16, 16), (0x500, 0x780, 16, 16)),
     },
+    'gor': {
+        'template_index': 97, 'skeleton': 'cKF_bs_r_gor_1',
+        'eye': 0x280, 'mouth': 0x380, 'cloth': 0x4C0,
+        'parts': ((0, 0, 16, 8), (0x40, 0x40, 16, 8), (0x80, 0x80, 32, 32),
+                  (0x280, 0x480, 16, 8), (0x2C0, 0x6C0, 16, 16),
+                  (0x340, 0x740, 16, 16), (0x3C0, 0x7C0, 16, 8)),
+    },
 }
 PILOTS = {'punchy': (235, 'cat', 'cat_15'), 'cheri': (232, 'cbr', 'cbr_11')}
 ARTWORK_VILLAGERS = {**PILOTS, 'pigleg': (233, 'pig', 'pig_11'),
@@ -154,7 +161,7 @@ ARTWORK_VILLAGERS = {**PILOTS, 'pigleg': (233, 'pig', 'pig_11'),
     'flossie': (225, 'mus', 'mus_10'), 'annalise': (226, 'hrs', 'hrs_8'),
     'plucky': (227, 'chn', 'chn_9'), 'faith': (228, 'kal', 'kal_6'),
     'rowan': (230, 'tig', 'tig_4'), 'june': (231, 'cbr', 'cbr_10'),
-    'ankha': (234, 'cat', 'cat_14')}
+    'ankha': (234, 'cat', 'cat_14'), 'yodel': (229, 'gor', 'gor_5')}
 
 
 def texture_body_offset(layout):
@@ -456,7 +463,7 @@ def import_species_positions(rom, rel, symbols, species, metadata):
         'native_model_sha256': sha256(model), 'converted_model_sha256': sha256(result)}
 
 
-def build_art(rom, rel, symbols, *, villagers=None, accessory_directory=None):
+def build_art(rom, rel, symbols, *, villagers=None, accessory_directory=None, model_directory=None):
     rom = verified_rom(rom)
     if sha256(rel) != REL_SHA or sha256(symbols) != SYMBOLS_SHA:
         raise ValueError('Changed verified donor artwork source')
@@ -505,7 +512,7 @@ def build_art(rom, rel, symbols, *, villagers=None, accessory_directory=None):
         # into the smaller native record.
         if row[0x54:0x5C] != native_row[0x54:0x5C] or row[0x64:0x68] != native_row[0x60:0x64]:
             raise ValueError('Imported villager requires changed species geometry or collision')
-        converted_model = None
+        converted_model, mesh_row = None, native_row
         if 'position_import_vertices' in LAYOUTS[species]:
             converted_model, geometry = import_species_positions(rom, rel, symbols, species, metadata)
             model_file = f'{name}.n64model.bin'
@@ -513,11 +520,28 @@ def build_art(rom, rel, symbols, *, villagers=None, accessory_directory=None):
             metadata.update(model_file=model_file, model_sha256=sha256(converted_model),
                             model_bytes=len(converted_model), geometry_conversion=geometry,
                             target_model_bank=None)
-        metadata['shared_rig'] = verify_shared_rig(rom, rel, symbols, species, native_row, metadata,
+        elif species == 'gor':
+            if model_directory is None:
+                raise ValueError('Yodel requires his complete converted gorilla model')
+            from v3_gorilla_art import VERIFIED_ART_SHA, load_object
+            converted_model, geometry = load_object(Path(model_directory), rom, rel, symbols.encode())
+            model_file = geometry['model_file']
+            artifacts[model_file] = converted_model
+            mesh_row = bytearray(native_row)
+            struct.pack_into('>I', mesh_row, 4, int(geometry['skeleton'], 16))
+            metadata.update(model_file=model_file, model_sha256=sha256(converted_model),
+                model_bytes=len(converted_model), converted_skeleton=geometry['skeleton'],
+                target_model_bank=None, geometry_conversion={
+                    'complete_donor_mesh_converted': True, 'source_manifest_sha256': VERIFIED_ART_SHA,
+                    'source_vertices': geometry['vertices'], 'source_triangles': geometry['triangles'],
+                    'model_buffer_bytes': geometry['model_buffer_bytes'],
+                    'spare_model_bytes': geometry['spare_model_bytes']})
+        metadata['shared_rig'] = verify_shared_rig(rom, rel, symbols, species, mesh_row, metadata,
                                                    model=converted_model)
         if accessory is not None:
             from v3_villager_mesh import verify_body_mesh
-            metadata['shared_mesh'] = verify_body_mesh(rom, rel, symbols, species, native_row, metadata)
+            metadata['shared_mesh'] = verify_body_mesh(rom, rel, symbols, species, mesh_row, metadata,
+                                                       model=converted_model)
             metadata['accessory'] = accessory
             artifacts[accessory['object_file']] = accessory_artifacts[accessory['object_file']]
         file = f'{name}.n64tex.bin'
@@ -545,8 +569,10 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--accessories', type=Path,
                         help='Verified v3_accessory_art output; required for accessory-bearing bodies')
+    parser.add_argument('--models', type=Path,
+                        help='Verified v3_gorilla_art output; required for Yodel')
     parser.add_argument('--all-supported', action='store_true',
-                        help='Convert all implemented body components; Yodel remains unsupported')
+                        help='Convert all twenty body components with their required dependencies')
     parser.add_argument('--villager', action='append', choices=tuple(ARTWORK_VILLAGERS),
                         help='Convert selected artwork components; default: existing two pilots')
     args = parser.parse_args()
@@ -557,7 +583,7 @@ def main():
     donor = read_donor(args.disc)
     artifacts, report = build_art(args.n64.read_bytes(), donor['rel'], args.symbols.read_bytes(),
         villagers=tuple(ARTWORK_VILLAGERS) if args.all_supported else args.villager,
-        accessory_directory=args.accessories)
+        accessory_directory=args.accessories, model_directory=args.models)
     args.output.mkdir(parents=True)
     for file, data in artifacts.items():
         (args.output / file).write_bytes(data)

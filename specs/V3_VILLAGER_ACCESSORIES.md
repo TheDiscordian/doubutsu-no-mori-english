@@ -92,8 +92,8 @@ when adapting attachment; a texture alone does not supply the accessory.
 N64 integration needs explicit storage/lifetime management, joint attachment,
 scale handling, renderer-state preservation, and cleanup. Do not enlarge the
 native reserved NPC model buffer by assumption or overwrite another model.
-Nineteen villager body conversions are available, with Yodel's actual gorilla
-model still required. Verify ordinary animation and appearance after connecting
+All twenty villager body conversions are available, including Yodel's separate
+complete gorilla model. Verify ordinary animation and appearance after connecting
 the complete body and accessory. Town schedules, dialogue, houses, moves, and saved identity are
 separate remaining islander work. Neither web patcher changes before user
 testing and explicit approval.

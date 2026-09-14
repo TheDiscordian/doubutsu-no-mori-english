@@ -271,13 +271,16 @@ with later e/e+ donor support investigated separately.
   voices, text/defaults/houses, and town behaviour before move-in eligibility.
   The [accessory batch](checkpoints/V3_ACCESSORY_ART.md) supplies all sixteen
   complete accessory models with actual consumer/joint bindings; fifteen
-  focused checks pass. The [body bundle](checkpoints/V3_ISLANDER_BODIES.md)
-  converts nineteen villagers with all fifteen required accessory objects,
-  complete expressions, verified edge extensions, and matching native topology.
-  Nineteen focused checks pass. Implement joint attachment/storage/cleanup. Do not
+  focused checks pass. The [complete body bundle](checkpoints/V3_GORILLA_ART.md)
+  converts twenty villagers with all sixteen required accessory objects,
+  complete expressions, verified edge extensions, and verified mesh/joint bindings.
+  Yodel's complete donor model fits the native buffer with 128 bytes spare;
+  26 focused checks pass. Implement joint attachment/storage/cleanup. Do not
   remove accessories to force the existing body converter to accept them.
-  Yodel's gorilla geometry differs beyond positions and needs its actual model
-  conversion. The other species' mouthless, reordered-expression, larger-body,
+  Use Yodel's converted skeleton at `06002770`, not the native gorilla pointer.
+  Object-table expansion beyond 432 entries overlaps the growth-permission copy
+  at `80461D80`; resolve that storage before adding accessory banks.
+  The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.

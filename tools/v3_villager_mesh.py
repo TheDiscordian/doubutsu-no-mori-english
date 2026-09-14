@@ -91,9 +91,11 @@ def faces(raw, *, donor, vertex_start=0, vertex_bytes, pointers=None, start=0):
     raise ValueError('Unterminated species display list')
 
 
-def verify_body_mesh(rom, rel, symbols, species, row, metadata):
+def verify_body_mesh(rom, rel, symbols, species, row, metadata, *, model=None):
     """Compare complete ordered faces and their native/GC texture bindings."""
-    model = by_vrom(rom)[int(metadata['native_model_vrom'], 16)].extract(rom)
+    converted = model is not None
+    if model is None:
+        model = by_vrom(rom)[int(metadata['native_model_vrom'], 16)].extract(rom)
     vertex_at, vertex_bytes = symbol_span(symbols, f'{species}_1_v')
     joint_at, joint_size = symbol_span(symbols, f'cKF_je_r_{species}_1_tbl')
     joint_pointers = data_pointers(rel, joint_at, joint_size)
@@ -157,4 +159,5 @@ def verify_body_mesh(rom, rel, symbols, species, row, metadata):
             'body_tile_bindings': [dict(zip(('source', 'target', 'width', 'donor_height',
                 'native_extent_width', 'native_extent_height', 'tile_word', 'tile_mode',
                 'donor_tile_word'), values)) for values in sorted(bindings)],
-            'native_model_sha256': sha256(model)}
+            'native_model_sha256': sha256(model),
+            **({'comparison_model': 'converted_native_model'} if converted else {})}

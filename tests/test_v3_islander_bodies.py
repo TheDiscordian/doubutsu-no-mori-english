@@ -69,7 +69,7 @@ class ActualIslanderBodies(unittest.TestCase):
         cls.rel = (ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
         cls.symbols = (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes()
         cls.art, cls.report = build_art(cls.rom, cls.rel, cls.symbols,
-            villagers=tuple(ARTWORK_VILLAGERS), accessory_directory=ACCESSORIES)
+            villagers=tuple(k for k in ARTWORK_VILLAGERS if k != 'yodel'), accessory_directory=ACCESSORIES)
 
     def test_nineteen_bodies_keep_fifteen_required_accessories_and_existing_pilots(self):
         self.assertEqual(len(self.report['villagers']), 19)
