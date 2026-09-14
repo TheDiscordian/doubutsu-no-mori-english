@@ -1,6 +1,9 @@
 /* V3 owns 0x6000..0x63FF of the existing resident reservation. */
 typedef unsigned int u32;
 #include "storage.h"
+#ifdef AF_V3_ACCESSORIES
+#include "accessory.h"
+#endif
 #ifndef AF_V3_OBJECT_CAPACITY
 #define AF_V3_OBJECT_CAPACITY 430
 #endif
@@ -46,6 +49,15 @@ extern unsigned char af_v3_save_extra[0xC00];
 #endif
 #endif
 
+#ifdef AF_V3_ACCESSORIES
+#ifdef __mips__
+#define accessory_memory ((unsigned char *)AF_V3_ACCESSORY_RAM)
+#else
+extern unsigned char af_v3_accessory_memory[AF_V3_ACCESSORY_BYTES];
+#define accessory_memory af_v3_accessory_memory
+#endif
+#endif
+
 int af_v3_startup(void) {
     const u32 *header = (const u32 *)memory;
     if (!previous()) return 0;
@@ -64,6 +76,19 @@ int af_v3_startup(void) {
     if (dma(extra_code, extra[0], extra[1]) || af_crc32(extra_code, extra[1]) != extra[2]) return 0;
     writeback(extra_code, extra[1]);
     invalidate(extra_code, extra[1]);
+#endif
+#ifdef AF_V3_ACCESSORIES
+    const u32 *accessory = (const u32 *)(memory+0xF0);
+    if (accessory[0] != AF_V3_ACCESSORY_VROM || accessory[1] != AF_V3_ACCESSORY_BYTES
+            || accessory[3] != AF_V3_ACCESSORY_RAM) return 0;
+    if (dma(accessory_memory, accessory[0], accessory[1])
+            || af_crc32(accessory_memory, accessory[1]) != accessory[2]) return 0;
+    const u32 *accessory_header = (const u32 *)accessory_memory;
+    if (accessory_header[0] != AF_V3_ACCESSORY_MAGIC || accessory_header[1] != 1
+            || accessory_header[2] != AF_V3_ACCESSORY_BYTES || accessory_header[3] != 20
+            || accessory_header[(AF_V3_ACCESSORY_BYTES-16)/4] != AF_V3_ACCESSORY_GUARD) return 0;
+    writeback(accessory_memory, AF_V3_ACCESSORY_BYTES);
+    invalidate(accessory_memory+0x100, 0xF00);
 #endif
     writeback(memory, AF_V3_BLOB_SIZE);
     invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);

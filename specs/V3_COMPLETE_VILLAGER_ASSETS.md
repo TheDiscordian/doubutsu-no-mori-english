@@ -94,7 +94,9 @@ invalid indices, signed arguments, and resident/save/furniture guards pass.
 Both native initial populations and all four selection entries pass after the
 growth relocation, with temporary flags and state restored.
 
-Next implement accessory allocation, joint transforms, draw state, and cleanup;
-then complete new draw rows, voices, text/defaults/houses, town behaviour, and
-persistence. Neither converted artwork nor loading evidence is a playable
-islander. Do not enable move-ins or switch a web patcher on that basis.
+The [attachment variant](V3_ACCESSORY_RUNTIME.md) supplies all twenty draw rows
+and all sixteen runtime attachments, with shared storage and frame-local
+transforms. Remaining voices, text/defaults/houses, town behaviour, ordinary
+appearance, and persistence still require integration. Neither converted
+artwork nor loading evidence is a playable islander. Do not enable move-ins
+or switch a web patcher on that basis.

@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-complete-villager-assets-01/animal-forest-v3-asset-loader.z64`, ABI 51, SHA-256
-`ac0f03c94b94a7eea434a0a112c745205cc76f4006f3a7383dc13c7669cad57f`.
+`build/v3-accessory-runtime-01/animal-forest-v3-asset-loader.z64`, ABI 52, SHA-256
+`18af2aad25285b9ab5bc01a9a47ed9a79e9b819fb9fa3c63e81699118043c4fc`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -384,10 +384,17 @@ Twenty-six focused conversion checks pass. The
 38 objects in fixed banks, relocates growth permissions safely, and preserves
 every original bank and audio DMA location. Seven focused checks and the
 93-record / 59-assertion native run pass, including actual model/texture/accessory
-loads and both initial populations. Startup memory and cartridge size remain
-unchanged. Attachment, remaining draw rows, town behaviour/defaults/houses,
-and persistence remain required. All move-in flags stay off; both V2 patchers
-are unchanged.
+loads and both initial populations. That loader retains the original startup
+reservation and cartridge size. The
+[attachment runtime](checkpoints/V3_ACCESSORY_RUNTIME.md) installs all twenty
+draw records and attaches all sixteen accessories in both NPC owners, using
+49,152 additional resident bytes without actor/save or ordinary-heap growth.
+Seven focused tests pass. Partial native execution passes 28 assertions,
+including both joint transforms, actual drawing commands, native fallback, and
+buffer handling. The final guard tail remains open after bounded fixture
+failures; ordinary GPU appearance is not established. Remaining voices,
+text/defaults, houses, town behaviour, and persistence still require work.
+All move-in flags stay off; both V2 patchers are unchanged.
 
 ## Stable V2 deliverable
 

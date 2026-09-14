@@ -4,8 +4,9 @@
 
 `tools/v3_accessory_art.py` converts all sixteen separate accessories used by
 the supplied GAFE01-r0 islanders. Every output includes its actual model,
-palette, and textures in native N64 format. These are components awaiting
-runtime attachment, not playable villagers or browser selections.
+palette, and textures in native N64 format. The separate
+[runtime adapter](V3_ACCESSORY_RUNTIME.md) attaches these components; conversion
+alone does not supply playable villagers or browser selections.
 
 Do not remove an accessory to make a villager pass the body converter.
 Accessory-bearing rows require the verified compiled dependency, which is
@@ -80,7 +81,7 @@ primitive colour. It retains the two explicit native tile extents, 32×32 and
 dimensions, not the mirrored display extent. Ordinary static and speed-bag
 parsing stay separate and keep their original accepted settings.
 
-## Attachment still required
+## Runtime attachment
 
 In the donor, NPC construction creates a separate tool actor using the declared
 type. The NPC joint callback copies the selected joint matrix after applying
@@ -89,9 +90,10 @@ accessory draws only when that flag is set, consumes it, and uses the ordinary
 NPC lighting/fog setup and opaque display stream. Preserve this relationship
 when adapting attachment; a texture alone does not supply the accessory.
 
-N64 integration needs explicit storage/lifetime management, joint attachment,
-scale handling, renderer-state preservation, and cleanup. Do not enlarge the
-native reserved NPC model buffer by assumption or overwrite another model.
+The [runtime adapter](V3_ACCESSORY_RUNTIME.md) implements shared immutable
+storage, frame-local joint transforms, donor scale correction, and renderer-state
+preservation. It needs no persistent extra actor or deletion cleanup and leaves
+the native reserved NPC model buffer unchanged.
 All twenty villager body conversions are available, including Yodel's separate
 complete gorilla model. Verify ordinary animation and appearance after connecting
 the complete body and accessory. Town schedules, dialogue, houses, moves, and saved identity are

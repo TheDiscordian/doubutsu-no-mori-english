@@ -275,16 +275,23 @@ with later e/e+ donor support investigated separately.
   converts twenty villagers with all sixteen required accessory objects,
   complete expressions, verified edge extensions, and verified mesh/joint bindings.
   Yodel's complete donor model fits the native buffer with 128 bytes spare;
-  26 focused checks pass. Implement joint attachment/storage/cleanup. Do not
-  remove accessories to force the existing body converter to accept them.
+  26 focused checks pass. Retain all complete accessory objects and source-bound
+  conversion checks.
   Use Yodel's converted skeleton at `06002770`, not the native gorilla pointer.
   The [complete-asset loader](checkpoints/V3_COMPLETE_VILLAGER_ASSETS.md) assigns
   all 38 objects to fixed banks 410–447 and moves growth permissions to
   `80461E80`. Seven focused tests and the 93-record / 59-assertion native run
   pass, including real object DMA, both custom models, accessories, bank bounds,
   and both starting populations. All original banks/audio locations remain;
-  move-in flags stay off. Next implement attachment/lifetime management and
-  remaining draw rows before enabling new town inhabitants.
+  move-in flags stay off. The
+  [attachment runtime](checkpoints/V3_ACCESSORY_RUNTIME.md) installs all twenty
+  draw records and attaches all sixteen accessories in both owners, with shared
+  storage and frame-local matrices. Seven focused tests pass; partial native
+  execution verifies head/torso transforms, commands, fallback, and buffer limits.
+  Carry the corrected final guard tail into the next combined native check
+  without replaying the passing transform cases. Continue remaining voices,
+  text/defaults, houses, town behaviour, ordinary appearance, and persistence
+  before enabling new town inhabitants.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile

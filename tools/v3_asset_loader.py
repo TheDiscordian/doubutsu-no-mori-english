@@ -63,6 +63,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     run('objcopy', '-O', 'binary', '-j', '.text', '-j', '.rodata', 'code.elf', 'code.bin')
     code = (out / 'code.bin').read_bytes()
     entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
+                       'accessory': ('af_v3_accessory_draw', 0x80473100),
                        'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
                        'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
                        'villager_readers': ('af_v3_mail_source_name', BLOB_RAM + 0x5400),
