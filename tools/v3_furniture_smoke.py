@@ -22,6 +22,12 @@ def exercise(debug, rom_path, record):
     files = by_vrom(rom)
     blob = files[BLOB].extract(rom)[:BLOB_SIZE]
     furniture = report['furniture']
+    expanded = furniture.get('expanded_tables')
+    profile_ram = int(furniture['profile_table_ram'], 16)
+    index_ram = int(furniture['bank_index_ram'], 16)
+    capacity = furniture['capacity']
+    expanded_initial = debug.read_memory(int(expanded['reservation_start'], 16),
+                                       expanded['reservation_bytes']) if expanded else None
     boot = boot_proofs(rom)
     edge = b'V3FU' * 4
 
@@ -54,6 +60,15 @@ def exercise(debug, rom_path, record):
 
     check('complete startup resident prefix', BLOB_RAM, blob)
     check('installed', 0x8019ACD0, struct.pack('>I', 1))
+    if expanded:
+        from v3_furniture_tables import START, END, EDGE
+        check('expanded leading guard', START, struct.pack('>I', EDGE)*4)
+        check('expanded trailing guard', END-16, struct.pack('>I', EDGE)*4)
+        expected_profiles = bytearray(capacity*4)
+        for row in furniture['imports']:
+            struct.pack_into('>I', expected_profiles, row['runtime_index']*4, int(row['profile_ram'], 16))
+        check('complete expanded startup profiles', profile_ram, bytes(expected_profiles))
+        check('complete expanded startup banks', index_ram, b'\xFF'*capacity)
     allocation_size = 0x1E000
     allocation = call(0x8009BFC0, [allocation_size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - allocation_size:
@@ -61,7 +76,7 @@ def exercise(debug, rom_path, record):
     live = allocation + 16
     data, reloc = (files[v].extract(rom) for v in (VROM, RELOC))
     owner = furniture['owner']
-    if (sha256(data) != owner['output_sha256'] or
+    if (sha256(data) != (expanded['output_sha256'] if expanded else owner['output_sha256']) or
             sha256(reloc) != owner['output_relocation_sha256']):
         raise ValueError('Changed furniture owner or relocations')
     sections = struct.unpack_from('>5I', reloc)
@@ -90,8 +105,8 @@ def exercise(debug, rom_path, record):
     write_word(0x80136ECC, 2)
     native(0x80936710)
     native(0x80938C24)
-    check('complete expanded bank reset', BLOB_RAM + INDICES, b'\xFF' * CAPACITY)
-    check('original profile prefix cleared', BLOB_RAM + PROFILES, bytes(NATIVE_COUNT * 4))
+    check('complete expanded bank reset', index_ram, b'\xFF' * capacity)
+    check('original profile prefix cleared', profile_ram, bytes(NATIVE_COUNT * 4))
     write_word(live + 0x18D68, bank0)
     write_word(live + 0x18D6C, bank1)
     rows = furniture['imports']
@@ -122,7 +137,7 @@ def exercise(debug, rom_path, record):
     debug.write_memory(bank0, b'\xA5' * BANK_BYTES)
     native(0x8093885C, [first['runtime_index'], int(first['item_id'], 16), bank0, 0xFFFFFFFF], 1)
     check('imported existing-bank reload', bank0, payloads[0])
-    for index in (947, 1024, CAPACITY, 65535):
+    for index in (947, 1024, capacity, 65535):
         native(0x8093678C, [index], 0)
         native(0x809374C4, [index], 0xFFFFFFFF)
         native(0x80942688, [index, 0], 0x1ECC if index == 947 else 0x1088)
@@ -140,7 +155,7 @@ def exercise(debug, rom_path, record):
     # and execute the retained native model-DMA body through both bridges.
     native(0x8093678C, [0], 1)
     original_allocation = word(live + 0x8094D320 - RAM)
-    original_profile = word(BLOB_RAM + PROFILES)
+    original_profile = word(profile_ram)
     if not original_allocation or original_profile != original_allocation + 0x314:
         raise ValueError('Original furniture profile allocation/symbol mapping changed')
     start, end, segment, limit = struct.unpack('>4I', debug.read_memory(original_profile, 16))
@@ -154,13 +169,15 @@ def exercise(debug, rom_path, record):
     native(0x809374C4, [0], 0)
     native(0x8093690C)
     check('original heap profile allocation released', live + 0x8094D320 - RAM, bytes(4))
-    check('original resolved profile cleared', BLOB_RAM + PROFILES, bytes(4))
+    check('original resolved profile cleared', profile_ram, bytes(4))
     for row in rows:
         check('resident imported profile survives native cleanup',
-              BLOB_RAM + PROFILES + row['runtime_index'] * 4,
+              profile_ram + row['runtime_index'] * 4,
               struct.pack('>I', int(row['profile_ram'], 16)))
     native(0x80938C24)
     check('complete resident prefix restored after bank/profile cleanup', BLOB_RAM, blob)
+    if expanded:
+        check('complete expanded reservation restored after native cleanup', START, expanded_initial)
     for at in guards:
         check('fixture guard', at, edge)
     check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)

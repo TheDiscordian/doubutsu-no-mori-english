@@ -64,6 +64,14 @@ int af_v3_startup(void) {
     writeback(memory, AF_V3_BLOB_SIZE);
     invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);
     if (execute() != 1) return 0;
+#ifdef AF_V3_FURNITURE_TABLES
+#ifdef __mips__
+    if (((int (*)(void))0x8046A000u)() != 1) return 0;
+#else
+    extern int af_v3_furniture_tables_init(void);
+    if (af_v3_furniture_tables_init() != 1) return 0;
+#endif
+#endif
 #ifdef AF_V3_SAVE_RUNTIME
 #ifdef __mips__
     if (((int (*)(void))0x80469200u)() != 1) return 0;

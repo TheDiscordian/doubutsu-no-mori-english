@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-clothing-shop-floor-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`e112c96e3016d9fd4645565b2c3235d46ae6b123db10953b0c8a4a3cdd135059`.
+`build/v3-furniture-tables-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`5be3318a84a7655a1334465bfb83fffa6818bb85e5770d22f18a5a5afcd81826`.
 The [secondary reader batch](checkpoints/V3_VILLAGER_READERS.md) connects map,
 inventory, address-list, letter-header, conversation-identity, and generated-mail
 names. Six focused checks pass, including full imported names, native alias
@@ -235,6 +235,12 @@ confirms cold boot retains the seeded imported stock without pre-awarding a
 pocket item or ownership. Purchase remains unverified: both door approaches
 leave the player outside the shop, with guards and fault checks passing.
 Navigation retries stop for this batch; catalogue/home display is next.
+The [expanded furniture tables](checkpoints/V3_FURNITURE_TABLES.md) provide 2,051
+profile/bank entries in guarded Expansion Pak memory, retaining all eight public
+helper addresses, existing items, native heaps, and saved formats. Two focused
+tests and the initial 91-record current native run pass: both imported models,
+original profile/model allocation, bank reuse/release, complete cleanup, and
+new guards. Clothing display aliases and actual mannequin integration are next.
 Ordinary confirmation/player payment, catalogue/home display, and remaining
 buy/sell integration remain work. The current copied-
 town check changes back to the native shirt and drops the imported pocket item

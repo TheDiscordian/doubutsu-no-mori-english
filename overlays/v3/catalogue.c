@@ -2,14 +2,20 @@
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
+#ifdef AF_V3_FURNITURE_TABLES
+#include "furniture_tables.h"
+#else
+#define AF_V3_FURNITURE_CAPACITY 1267
+#define AF_V3_FURNITURE_PROFILES 0x80465800u
+#endif
 struct Preview { u16 index; u8 padding[0x746]; u32 profile; };
 _Static_assert(__builtin_offsetof(struct Preview, profile) == 0x748, "Catalogue profile offset");
 #ifdef __mips__
 #define active (*(u8 *volatile *)0x80136FD8u)
-#define profiles ((const u32 *)0x80465800u)
+#define profiles ((const u32 *)AF_V3_FURNITURE_PROFILES)
 #else
 extern u8 *af_catalogue_active;
-extern u32 af_catalogue_profiles[1267];
+extern u32 af_catalogue_profiles[AF_V3_FURNITURE_CAPACITY];
 #define active af_catalogue_active
 #define profiles af_catalogue_profiles
 #endif

@@ -13,6 +13,9 @@ classification, donor price values, and placement footprints. Remaining caller
 conversions, inventory, acquisition, placement, collision/rendered appearance,
 catalogue/scoring, houses, and saved-item/profile handling remain required.
 Neither object is selectable in a web patcher.
+The clothing-enabled build uses the [expanded transient tables](V3_FURNITURE_TABLES.md)
+and stable forwarding entries. The loader-only variant below retains its
+1,267-entry layout.
 The [native checkpoint](../docs/checkpoints/V3_FURNITURE_RUNTIME.md) records the
 exact current cartridge and tests. Public/local patchers remain V2.
 

@@ -3,13 +3,20 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef __UINTPTR_TYPE__ uptr;
-enum { NATIVE = 947, CAPACITY = 1267, BANKS = 100, BANK_BYTES = 0x1400 };
+#ifdef AF_V3_FURNITURE_TABLES
+#include "furniture_tables.h"
+#else
+#define AF_V3_FURNITURE_CAPACITY 1267
+#define AF_V3_FURNITURE_PROFILES 0x80465800u
+#define AF_V3_FURNITURE_INDICES 0x80466C00u
+#endif
+enum { NATIVE = 947, CAPACITY = AF_V3_FURNITURE_CAPACITY, BANKS = 100, BANK_BYTES = 0x1400 };
 struct Import { u16 index, item; u32 enabled; u32 profile[17]; u32 pad; };
 _Static_assert(sizeof(struct Import) == 80, "Furniture import row");
 #ifdef __mips__
 #define imports ((const struct Import *)0x80467200u)
-#define profiles ((const u32 *)0x80465800u)
-#define indices ((u8 *)0x80466C00u)
+#define profiles ((const u32 *)AF_V3_FURNITURE_PROFILES)
+#define indices ((u8 *)AF_V3_FURNITURE_INDICES)
 #define owner ((volatile const u32 *)0x80100DF0u)
 #define dma ((int (*)(void *, u32, u32))0x80026B44u)
 #else

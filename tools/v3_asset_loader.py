@@ -68,6 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'villager_selection': ('af_v3_unseen_personality', BLOB_RAM + 0x3400),
                        'villager_rewards': ('af_v3_house_reward', BLOB_RAM + 0x3A00),
                        'furniture': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5000),
+                       'furniture_tables': ('af_v3_furniture_tables_init', BLOB_RAM + 0xA000),
+                       'furniture_expanded': ('af_v3_furniture_import_profile', BLOB_RAM + 0x5800),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
@@ -203,6 +205,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_clothing_stock
     import v3_shop_mannequin
     import v3_clothing_shop_floor
+    import v3_furniture_tables
     if clothing and not villager_rewards:
         raise ValueError('Clothing resources require the current complete villager foundation')
     if villager_rewards and not villager_selection:
@@ -279,7 +282,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_clothing.SOURCES + v3_npc_clothing.SOURCES + v3_player_clothing.SOURCES
                        + v3_save_clothing.SOURCES + v3_clothing_items.SOURCES + v3_clothing_menu.SOURCES
                        + v3_clothing_wear.SOURCES + v3_clothing_stock.SOURCES + v3_shop_mannequin.SOURCES
-                       + v3_clothing_shop_floor.SOURCES
+                       + v3_clothing_shop_floor.SOURCES + v3_furniture_tables.SOURCES
                        if clothing else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
@@ -336,7 +339,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = max(abi, v3_clothing.ABI, v3_npc_clothing.ABI, v3_player_clothing.ABI,
                   v3_save_clothing.ABI, v3_clothing_items.ABI, v3_collection.CLOTHING_ABI,
                   v3_clothing_menu.ABI, v3_clothing_wear.ABI, v3_shops.CLOTHING_ABI,
-                  v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI)
+                  v3_clothing_stock.ABI, v3_shop_mannequin.ABI, v3_clothing_shop_floor.ABI,
+                  v3_furniture_tables.ABI)
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -359,6 +363,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         startup_defines += ('AF_V3_SAVE_RUNTIME=1',)
     clothing_defines = ('AF_V3_CLOTHING_PROFILE=1',) if clothing else ()
     startup_defines += clothing_defines
+    table_defines = ('AF_V3_FURNITURE_TABLES=1',) if clothing else ()
+    startup_defines += table_defines
     startup, startup_report = compile_part('startup', out / 'startup', defines=startup_defines)
     extra_sources = ('overlays/v3/npc_draw.c', 'overlays/v3/npc_voice.S') if npc_draw else ()
     if audio_donor is not None:
@@ -530,7 +536,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             '.globl af_v3_catalogue_order\naf_v3_catalogue_order:\n'
             f'.incbin "/source/{table_path.relative_to(ROOT)}"\n').encode())
         catalogue_code, catalogue_code_report = compile_part('catalogue', out / 'catalogue',
-            extra_sources=('overlays/v3/catalogue_bridge.S', str(generated.relative_to(ROOT))))
+            extra_sources=('overlays/v3/catalogue_bridge.S', str(generated.relative_to(ROOT))),
+            defines=table_defines)
         catalogue_changes, catalogue_report = v3_catalogue.install(base,
             icon_changes[v3_catalogue.PARENT], catalogue_code, catalogue_code_report,
             ordering, catalogue_records, collection_code_report, runtime_report, room_code_report)
@@ -700,6 +707,25 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
             primary_source=str(mannequin_source.relative_to(ROOT)))
         mannequin_changes, clothing_report['mannequin'] = v3_shop_mannequin.install(
             base, blob, mannequin_code, mannequin_compiled, room_report['code'], selection_report)
+        expanded_code, expanded_compiled = compile_part('furniture_expanded', out/'furniture-expanded',
+            primary_source='overlays/v3/furniture.c',
+            extra_sources=('overlays/v3/furniture_entry.S',), defines=table_defines)
+        table_entries = v3_furniture_tables.install_helper(blob, expanded_code, expanded_compiled,
+                                                          furniture_code_report)
+        table_code, table_compiled = compile_part('furniture_tables', out/'furniture_tables')
+        furniture_changes[v3_furniture_runtime.VROM], table_report = v3_furniture_tables.install(
+            furniture_changes[v3_furniture_runtime.VROM], furniture_changes[v3_furniture_runtime.RELOC],
+            blob, table_code, table_compiled,
+            {**furniture_report['owner'], 'room_relocation_sha256': room_report['relocation_sha256']})
+        table_report['expanded_code'] = expanded_compiled
+        table_report['public_entries'] = table_entries
+        furniture_report['expanded_tables'] = table_report
+        furniture_report.update({key: table_report[key] for key in
+            ('capacity', 'profile_table_ram', 'bank_index_ram')})
+        furniture_report['mutable_ranges'] = []
+        furniture_report['external_mutable_ranges'] = [
+            [v3_furniture_tables.PROFILES, v3_furniture_tables.PROFILES+v3_furniture_tables.CAPACITY*4],
+            [v3_furniture_tables.INDICES, v3_furniture_tables.INDICES+v3_furniture_tables.CAPACITY]]
         clothing_report['imports'][0]['save_profile_installed'] = True
         save_report.update({'base_codec_format_version': 1, 'format_version': 2,
             'registry_version': 2, 'work_state_bytes': v3_save_clothing.STATE,
@@ -751,7 +777,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 clothing shop floor 01' if clothing else
+    label = ('V3 expanded furniture tables 01' if clothing else
              'V3 villager house rewards integration 01' if villager_rewards else
              'V3 villager selection integration 01' if villager_selection else
              'V3 villager secondary readers development 01' if villager_readers else

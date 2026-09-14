@@ -111,6 +111,11 @@ with later e/e+ donor support investigated separately.
   retains imported stock through cold boot without pre-awarding ownership.
   Purchase remains unverified after two unsuccessful door approaches; stop
   navigation retries for this batch and continue catalogue/home representation.
+  The [expanded furniture tables](checkpoints/V3_FURNITURE_TABLES.md) raise
+  transient capacity to 2,051 without native heap or save growth. Two focused
+  tests and the initial 91-record native run pass, including both imported
+  models, original allocation/loading, full cleanup, and new guards. Next
+  implement actual clothing display IDs and shared mannequin callbacks/readers.
   Catalogue/home display and ordinary buy/sell remain.
   Current copied-town change-back and outdoor Drop proceed;
   pickup remains unverified after timed movement overshoots. Retain the Drop
