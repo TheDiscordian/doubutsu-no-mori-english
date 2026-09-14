@@ -72,7 +72,13 @@ pass, including 28 complete query calls and original-type fallbacks. Remaining c
 consumers, ordinary acquisition/placement/persistence, and Punchy's animated speed
 bag remain work. No V3 villager is playable or
 enabled in the patcher yet. Both complete ordinary-villager and furniture pilots
-remain required.
+remain required. The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md)
+implements checked import profiles, payload/extension CRC binding, legacy
+decoding, and four imported-item catalogues. Six focused checks and 76 native
+steps pass, including complete encoding against an independent reference and
+profile/corruption rejection. The codec is installed but disconnected from
+native saving/loading and catalogue calls; actual persistence and the
+incompatibility warning remain work.
 V3 development continues on GitHub. The web patcher stays V2 until the user
 has tested V3 and explicitly approved the switch.
 

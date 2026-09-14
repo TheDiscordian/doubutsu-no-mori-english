@@ -196,7 +196,10 @@ an explicit incompatibility warning; it must not silently load an unrelated ID.
 Export a deterministic profile alongside each ROM: base build/hash, registry and
 converter versions, selected identities, dependencies, and output hash. Design
 any runtime save/profile guard only after the save layout audit; no reserved
-storage is assumed free. The web patcher does not upload or edit saves.
+storage is assumed free. The [save/profile codec](V3_SAVE_PROFILE.md) defines
+the reviewed two-bank extension and records the native read/write integration
+constraints. It is tested on private buffers; actual persistence/profile hooks
+remain required. The web patcher does not upload or edit saves.
 
 ## Browser implementation
 

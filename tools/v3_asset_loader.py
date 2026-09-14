@@ -68,7 +68,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'menu': ('af_v3_menu_type_80872bb0', BLOB_RAM + 0xA800),
                        'icon': ('af_v3_furniture_icon_type', BLOB_RAM + 0xAB00),
                        'ground': ('af_v3_ground_type_8090f888', BLOB_RAM + 0xAE00),
-                       'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200)}[part]
+                       'pockets': ('af_v3_pocket_index', BLOB_RAM + 0xB200),
+                       'save_codec': ('af_v3_save_check', BLOB_RAM + 0xB400)}[part]
     if symbols[entry] != expected:
         raise ValueError('V3 linker moved the public entry')
     write_new(out / 'code.asm', run('objdump', '-d', 'code.elf').encode())
@@ -127,7 +128,8 @@ def compose(native, base, changes, added):
 
 def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, text_donor=None,
           furniture=False, furniture_items=False, furniture_room=False, furniture_fields=False,
-          furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False):
+          furniture_menu=False, furniture_icon=False, furniture_ground=False, furniture_pockets=False,
+          save_codec=False):
     verified_rom(native)
     if sha256(base) != BASE_SHA:
         raise ValueError('Asset loader requires exact stable V2-11')
@@ -142,6 +144,9 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
     import v3_furniture_icon
     import v3_furniture_ground
     import v3_furniture_pockets
+    import v3_save_codec
+    if save_codec and not furniture_pockets:
+        raise ValueError('Save-codec variant requires the current pocket integration baseline')
     if furniture_pockets and not furniture_ground:
         raise ValueError('Pocket variant requires installed furniture ground integration')
     if furniture_ground and not furniture_icon:
@@ -172,7 +177,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
                     + (v3_furniture_menu.SOURCES if furniture_menu else ())
                     + (v3_furniture_icon.SOURCES if furniture_icon else ())
                     + (v3_furniture_ground.SOURCES if furniture_ground else ())
-                    + (v3_furniture_pockets.SOURCES if furniture_pockets else ()))
+                    + (v3_furniture_pockets.SOURCES if furniture_pockets else ())
+                    + (v3_save_codec.SOURCES if save_codec else ()))
     sources = {p: sha256((ROOT / p).read_bytes()) for p in source_files}
     blob_size, abi = (v3_npc_draw.BLOB_SIZE, v3_npc_draw.ABI) if npc_draw else (BLOB_SIZE, 1)
     if audio_donor is not None:
@@ -196,6 +202,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         abi = v3_furniture_ground.ABI
     if furniture_pockets:
         abi = v3_furniture_pockets.ABI
+    if save_codec:
+        abi = v3_save_codec.ABI
     artifacts, art = build_art(native, rel, symbols)
     files, originals = by_vrom(base), by_vrom(native)
     code = bytearray(files[CODE_VROM].extract(base))
@@ -350,6 +358,11 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         pockets_report = v3_furniture_pockets.install(code, blob, pockets_code,
             pockets_code_report['symbols'], room_code_report['symbols'])
         pockets_report['code'] = pockets_code_report
+    save_report = None
+    if save_codec:
+        save_code, save_code_report = compile_part('save_codec', out / 'save_codec')
+        save_report = v3_save_codec.install(blob, save_code, save_code_report['symbols'], pockets_code_report)
+        save_report['code'] = save_code_report
     if len(blob) != blob_size:
         raise ValueError('V3 resident payload differs from startup reservation')
     module[STARTUP:STARTUP + len(startup)] = startup
@@ -377,7 +390,8 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         raise ValueError('V3 asset patch reconstruction failed')
     if sources != {p: sha256((ROOT / p).read_bytes()) for p in source_files}:
         raise ValueError('V3 sources changed during construction')
-    label = ('V3 furniture pocket integration development 01' if furniture_pockets else
+    label = ('V3 save-codec foundation development 01' if save_codec else
+             'V3 furniture pocket integration development 01' if furniture_pockets else
              'V3 furniture ground integration development 01' if furniture_ground else
              'V3 furniture icon integration development 01' if furniture_icon else
              'V3 furniture menu integration development 01' if furniture_menu else
@@ -397,6 +411,7 @@ def build(native, base, rel, symbols, out, *, npc_draw=False, audio_donor=None, 
         'furniture_icon': icon_report,
         'furniture_ground': ground_report,
         'furniture_pockets': pockets_report,
+        'save_codec': save_report,
         'source_sha256': sha256(native), 'output_sha256': sha256(image), 'patch_sha256': sha256(patch),
         'sources': sources, 'startup': startup_report, 'asset': helper_report,
         'blob_sha256': sha256(blob), 'resident_blob_bytes': blob_size,
@@ -429,7 +444,10 @@ def main():
     p.add_argument('--furniture-icon', action='store_true', help='Include selected furniture inventory leaf icons')
     p.add_argument('--furniture-ground', action='store_true', help='Include selected furniture ground drawing and drop flags')
     p.add_argument('--furniture-pockets', action='store_true', help='Include imported furniture in inventory searches and counts')
+    p.add_argument('--save-codec', action='store_true', help='Include checked save/profile codec; native saving is not changed')
     args = p.parse_args()
+    if args.save_codec:
+        args.furniture_pockets = True
     if args.furniture_pockets:
         args.furniture_ground = True
     if args.furniture_ground:
@@ -464,7 +482,7 @@ def main():
         furniture=args.furniture, furniture_items=args.furniture_items, furniture_room=args.furniture_room,
         furniture_fields=args.furniture_fields, furniture_menu=args.furniture_menu,
         furniture_icon=args.furniture_icon, furniture_ground=args.furniture_ground,
-        furniture_pockets=args.furniture_pockets)
+        furniture_pockets=args.furniture_pockets, save_codec=args.save_codec)
     for name, data in {'animal-forest-v3-asset-loader.z64': image, 'asset-loader.ups': patch,
                       'build.json': (json.dumps(report, indent=2) + '\n').encode()}.items():
         write_new(out / name, data)

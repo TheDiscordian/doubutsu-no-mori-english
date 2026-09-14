@@ -69,6 +69,11 @@ with later e/e+ donor support investigated separately.
   adapt islanders explicitly instead of pretending the island engine is present.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
+  The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked
+  profiles, payload/extension binding, legacy decoding, and four imported-item
+  catalogues. Six focused tests and 76 native steps pass. Native saving/loading,
+  catalogue calls, runtime state, and the incompatibility warning are not wired
+  yet; private-buffer checks do not establish persistence.
   Include imported default-phrase references borrowed by original villagers;
   checking imported actor IDs alone cannot detect every saved dependency.
 - [ ] Add searchable per-entry/category/select-all controls to the web patcher;
