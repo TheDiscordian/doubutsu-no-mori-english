@@ -9,7 +9,7 @@ browser's data-only selection plan from those same checked records. Neither
 selector maintains another item list. A newly installed supported item therefore
 needs no browser item definition, checkbox-order identity, or bespoke patch path.
 
-The current installed development catalogue contains 101 choices: 78 furniture
+The current installed development catalogue contains 102 choices: 79 furniture
 items, three shirts, and twenty villagers. A shirt's mannequin is a required
 representation, not another selectable choice. This catalogue describes installed
 development content, not completed gameplay acceptance. Select-all means the

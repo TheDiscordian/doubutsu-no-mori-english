@@ -228,9 +228,20 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
             (row->index == 1240 && row->item == 0x3360u && row->profile[16] == 0x80483FD8u))
             complete_object_callback = 1;
 #endif
+#ifdef AF_V3_SHARED_PALETTE_FADE
+        /* Generated object headers describe this shared callback category.
+         * No item identity or theme determines its DMA behaviour. */
+        if (row->profile[16] == 0x80483720u) complete_object_callback = 1;
+#endif
         if (!complete_object_callback) return 0;
     }
     if (dma((void *)(uptr)bank, row->profile[0], size)) return 0;
+#ifdef AF_V3_SHARED_PALETTE_FADE
+    if (row->profile[16] == 0x80483720u) {
+        const u32 *layout = (const u32 *)(uptr)bank;
+        if (size < 96 || layout[0] != 0x41465031u || layout[1] != (size << 16 | 3u)) return 0;
+    }
+#endif
     indices[(u16)argument] = (u8)active;
     return 1;
 }

@@ -22,12 +22,13 @@ import v3_furniture_behaviours as behaviours
 import v3_furniture_placement as placement
 import v3_furniture_rewards as rewards
 import v3_camper_trade as camper_trade
+import v3_furniture_palette as palette_fade
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 5
+VERSION = 6
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -36,7 +37,7 @@ SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
     'overlays/v3/startup.c', 'translations/provenance.json',
     'tools/v3_camper_trade.py','tools/v3_camping_items.py','overlays/v3/camper_trade.c',
-    'overlays/v3/camper_trade.h','overlays/v3/camper_trade.ld','overlays/v3/camper_trade_tail.S') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES
+    'overlays/v3/camper_trade.h','overlays/v3/camper_trade.ld','overlays/v3/camper_trade_tail.S') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES + palette_fade.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -56,12 +57,15 @@ def inputs(lock=LOCK):
 def profile(row, vrom):
     n, offsets = row['object_bytes'], row['model_offsets']
     scalar = bytes.fromhex(row['native_profile_scalar_hex'])
+    fading = row.get('profile',{}).get('callback_adapter',{}).get('category') == 'switch-palette-fade'
+    layers = ('part0','part1','part2') if fading else LAYERS
     if (not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > END or len(scalar) != 16
-            or not offsets or set(offsets)-set(LAYERS)
+            or not offsets or set(offsets)-set(layers) or fading and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
         raise ValueError('Invalid complete native object/profile bounds')
     pointers = [0x06000000+offsets[k] if k in offsets else 0 for k in LAYERS]
-    return struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+bytes(4)
+    return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
+            struct.pack('>I',palette_fade.VTABLE if fading else 0))
 
 
 def catalogue_record(row):
@@ -279,6 +283,8 @@ def build(output, art_path, lock=LOCK):
         blob[at+24] = order_mask(row)
     preview_report=catalogue.install_preview_records(blob,prior,source,cat_rows)
     output.mkdir(parents=True)
+    palette_report, expanded = palette_fade.install(original,base,prior,blob,source,output,imports)
+    all_furniture['expanded_tables'] = expanded
     text_patch=provenance_patch([r for r,_ in prepared])
     if text_patch: write_new(output/'provenance.patch',text_patch.encode())
     cat_changes, cat_report = install_catalogue(base,stable,prior,imports,output,source.rel,
@@ -366,6 +372,14 @@ def build(output, art_path, lock=LOCK):
         furniture_placement=placement_report,camper_trade=trade_report,**score_reports,
         native_test='pending representative automatic-import execution')
     if reward_report: report['furniture_rewards']=reward_report
+    if palette_report:
+        report['furniture_palette_fade']=palette_report
+        linked=palette_report['code'];at=PACKAGE+palette_report['ram']-PACKAGE_RAM
+        report['tent_model'].update(shared_palette_runtime=True,
+            runtime_code_receipt='furniture_palette_fade',legacy_asset_unchanged=True,
+            code={**linked,'linked_sha256':linked['sha256'],
+                  'sha256':sha256(blob[at:at+linked['bytes']])},
+            vtable_hex=palette_report['vtables']['80483700'],native_contract=palette_report['native_contract'])
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))
     report['furniture_items']['imports'].extend(installed)
     report['furniture_items']['active_metadata_rows']=len(imports)

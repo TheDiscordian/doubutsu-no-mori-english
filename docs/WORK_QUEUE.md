@@ -4,8 +4,9 @@
 
 Use the [generated browser plan](../specs/V3_OPTIONAL_COMPOSITION.md), not a second
 maintained item list, for browser selection. The independent JS composer and
-real worker match the offline outputs; generated choices cover all 101 installed
-records. The [private interface](checkpoints/V3_BROWSER_INTERFACE.md) implements
+real worker match the recorded offline outputs; current plan generation consumes
+all 102 installed records. The private interface export retains its tested
+101-choice snapshot. The [private interface](checkpoints/V3_BROWSER_INTERFACE.md) implements
 search, individual/category/all/clear, disclosed dependencies, save warnings,
 input/selection invalidation, cancellation, and download cleanup. Actual subset
 ROM/profile downloads match the offline hash. Initial selection and cancellation
@@ -16,7 +17,7 @@ failures; their corrections are in the shared check. Do not repeat this browser
 batch now. Continue shared content/runtime work; include those remaining checks
 with the next meaningful interface integration change.
 
-The review list is generated from a fresh donor scan: 164 unavailable furniture
+The private export's review list comes from its donor scan: 164 unavailable furniture
 entries have actual reasons and no selection controls. It does not classify every
 GameCube item or establish completed gameplay. Current recipes reconstruct
 prepared changes, not browser-native artwork conversion. Keep that distinction
@@ -24,18 +25,22 @@ when extending donor conversion/packaging. Both served patchers remain V2 until
 testing and explicit approval. No V3 service or public deployment is authorised.
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Thirty-nine additional complete assets and their shared runtime
-records are installed. ABI 93 adds snowy tree model, snow bunny, and sleigh
-through shared winter-camping rewards. Winter and summer use source-derived
+new furniture. Forty additional complete assets and their shared runtime
+records are installed. ABI 94 adds the igloo through shared palette-fade callbacks
+and winter-camping rewards. The category converts all eight building models in
+one batch; seven retain their actual missing acquisition routes. The shared
+callback retains the existing tent artwork, interpolates both complete palettes,
+and draws every model layer within the existing memory reservation. Winter and summer use source-derived
 reward records instead of a maintained runtime item array. The donor's seasonal
 thresholds, house roll, exclusions, and small-list duplicates remain; winter with
 no selected imports retains its original native body. All camping and Gulliver
 rewards stay non-orderable. No per-item converter, installer, or native scenario
-is added. This batch retains 13,728 artwork bytes, 322 vertices, and 275 triangles.
-Fifty-one focused checks and the first 162-record, 118-assertion native run pass;
-the optional prepared-only artifact check is
-skipped. The complete source/native verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 101
+is added. The eight prepared models retain 29,664 artwork bytes, 555 vertices, and
+346 triangles. Fifty-seven focused checks pass across the combined run and
+targeted correction. The corrected native run passes 190 records and 114
+assertions, including both actual callback layouts and seasonal rewards.
+The complete source/native verification record is in
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 102
 installed development options; neither patcher changes. Saved format 2 and
 permanent RAM reservations remain unchanged.
 
@@ -63,19 +68,21 @@ Founder's Day, Cherry Blossom Festival, and Nature Day gifts. The N64 lacks that
 actor; the shared event/calendar/conversation and per-player trophy route needs
 implementation. Prepared-only output cannot pass the installer. Keep that shared
 dependency explicit and continue graphics/contact/callback categories instead of
-blocking bulk imports on it. Useful callback groups include fifteen clocked
-station models, eight palette-animated
-buildings, and tool/fan/pinwheel selectors; preserve their actual effects.
+blocking bulk imports on it. Continue the fifteen clocked station models,
+roof-colour selectors, or tool/fan/pinwheel selectors; preserve their actual
+effects. The eight palette-animated buildings share one implemented category.
+Their prepared assets are in `build/v3-furniture-palette-fade-prepared-02/`;
+seven need acquisition integration, not another artwork converter.
 Beach chair and harvest bed pass shared bed/model discovery, but retain
 their island and harvest acquisition dependencies instead of substitute shop stock.
 Sixteen diary display models still need diary identity/gameplay/acquisition.
 Complete model conversion without required behaviour is not a completed import.
 Full catalogue construction, ordinary GPU appearance, interactions, and
 save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
-using the ABI-93 additions must not be loaded in older builds or V2.
+using the ABI-94 addition must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-camping-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-palette-fade-runtime-02/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

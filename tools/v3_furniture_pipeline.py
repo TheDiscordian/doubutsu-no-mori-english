@@ -23,7 +23,7 @@ from v3_furniture_art import SEGMENT, command_source, parse_model, verify_source
 from v3_registry import FURNITURE
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 5
+VERSION = 6
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -38,6 +38,18 @@ SCORING_ALIASES = {33: 3, 37: 3}
 # Reviewed complete GAFE01-r0 draw implementation, not an item allowlist.
 # It selects two opaque models and a palette using (actor index - base) * 12.
 INDEXED_STATIC_DRAW_SHA = '612998bdab7cb941114e08d66db7100ded74894f8c1ccfdbdffe4bb9fbb44917'
+# Complete callback implementations with only verified address fields removed.
+# These identify behaviour, not a list of item names or IDs.
+PALETTE_FADE_CODE = {
+    'create': (84, '9b0ac9f43f6ff69e3b4a75e7ae02cff615c9fd2050a9d8a940c224a5990c9879',
+               {0x1C: (311912, 'zelda_malloc_align'), 0x3C: (2877692, 'fFTR_MorphHousepaletteCt')}),
+    'move': (56, '74cb4ff1e7fcd0df934156e4ef7f85e9d14fd7182b96e31d2a3fc0eecdac080d',
+             {0x24: (2877124, 'fFTR_MorphHousePalette')}),
+    'draw': (204, 'cd20a081d7b57fb39579fb0092c5c9da35956c712ccc057f2c1a66b7c8b5b01f',
+             {0x38: (643604, '_Matrix_to_Mtx_new')}),
+    'destroy': (44, '93027b93411e9383050c763e5b19a0123d44f51d044e0bab85623c4022c9cce7',
+                {0x18: (312052, 'zelda_free')}),
+}
 
 
 class ReviewRequired(ValueError):
@@ -151,6 +163,10 @@ class Source:
         functions = {}
         for slot, role in enumerate(('create','move','draw','destroy')):
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
+        if functions['create']['bytes'] == PALETTE_FADE_CODE['create'][0]:
+            return self.palette_fade_models(name, at, functions)
+        for role, receipt in functions.items():
+            raw, _ = self.function(receipt['offset'])
             if role != 'draw' and (raw != bytes.fromhex('4e800020') or receipt['relocations']):
                 reject('lifecycle effects need an adapter')
         draw = functions['draw']
@@ -184,6 +200,67 @@ class Source:
             table_sha256=sha256(table_raw), table_pointers=dependencies,
             first_runtime_index=first, selected_index=selected, entries=size//stride,
             palette_symbol=palette[0], palette_offset=palette[1])
+
+    def palette_fade_models(self, name, at, functions):
+        """Resolve the shared three-model, two-endpoint light-switch behaviour."""
+        def reject(reason): raise ReviewRequired('custom callbacks: palette fade ' + reason)
+        module = u32(self.rel, 0)
+        def address(role, location):
+            fix = functions[role]['relocations'].get(location)
+            if fix is None or fix[:3] != (6, module, 5): reject('missing data dependency')
+            return fix[3]
+        off, on = address('create', 0x26), address('create', 0x2A)
+        model_addresses = [address('draw', loc) for loc in (0x46, 0x4A, 0x52)]
+        def pair(high, low, target): return {high: (6,module,5,target), low: (4,module,5,target)}
+        expected = {
+            'create': pair(0x26,0x32,off) | pair(0x2A,0x3A,on),
+            'move': pair(0x0A,0x1A,off) | pair(0x0E,0x1E,on),
+            'draw': {0x10:(10,0,4,0x8009AED4), 0xB8:(10,0,4,0x8009AF20)} |
+                    pair(0x46,0x62,model_addresses[0]) | pair(0x4A,0x6A,model_addresses[1]) |
+                    pair(0x52,0x6E,model_addresses[2]),
+            'destroy': {},
+        }
+        helpers = {}
+        for role, receipt in functions.items():
+            size, digest, calls = PALETTE_FADE_CODE[role]
+            if receipt['bytes'] != size or receipt['relocations'] != expected[role]:
+                reject('changed ' + role + ' dependencies')
+            raw, _ = self.function(receipt['offset']); normalized = bytearray(raw)
+            for loc, (kind, _, _, _) in expected[role].items():
+                if kind in (4,6): normalized[loc:loc+2] = bytes(2)
+                else: struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
+            found = {}
+            for loc in range(0, size, 4):
+                word = u32(raw,loc)
+                if word>>26 != 18 or loc in expected[role]: continue
+                if word & 0xFC000003 != 0x48000001 or loc not in calls:
+                    reject('unexpected local branch')
+                displacement = word & 0x3FFFFFC
+                if displacement & 0x2000000: displacement -= 0x4000000
+                target = receipt['offset'] + loc + displacement
+                if target != calls[loc][0]: reject('changed shared helper target')
+                _, helper = self.function(target)
+                if helper['symbol'] != calls[loc][1]: reject('changed shared helper identity')
+                found[loc] = target; helpers[helper['symbol']] = helper
+                struct.pack_into('>I',normalized,loc,word&0xFC000003)
+            if set(found) != set(calls) or sha256(normalized) != digest:
+                reject('unrecognised complete ' + role + ' implementation')
+            receipt.update(normalized_sha256=digest, local_calls=found)
+        endpoints = {}
+        for role, target in (('off',off), ('on',on)):
+            symbol, start, size = self.containing(target,exact=True)
+            if size != 32 or self.pointers(start,size): reject('invalid endpoint palette')
+            raw = self.data[start:start+size]
+            native_palette(raw)  # Reject partial alpha, even in unchanged entries.
+            endpoints[role] = dict(symbol=symbol, donor_offset=start, bytes=size, sha256=sha256(raw))
+        off_words = struct.unpack_from('>16H', self.data, off)
+        on_words = struct.unpack_from('>16H', self.data, on)
+        if any(a != b and not (a & b & 0x8000) for a,b in zip(off_words,on_words)):
+            reject('changing colours must both be opaque RGB5A3')
+        models = {f'part{i}': self.containing(target,exact=True) for i,target in enumerate(model_addresses)}
+        return models, {}, dict(category='switch-palette-fade', vtable_symbol=name, vtable_offset=at,
+            functions=functions, helpers=helpers, endpoints=endpoints, dynamic_palette_segment=0x08000000,
+            model_order=list(models), draw_arena='opaque', fade_step_hex='3dcccccd')
 
     def pointers(self, at, n):
         if at < 0 or n <= 0 or at+n > self.size: raise ValueError('Out-of-range dependency')
@@ -243,7 +320,7 @@ class Source:
                 or shape not in (3, 4, 5) or collision not in (0, 1, 2, 5)
                 or rotation not in (0, 1) or lighting not in (0, 1, 2) or pad):
             raise ReviewRequired('unsupported scalar profile category')
-        if contact not in BEHAVIOURS or interaction not in (0, 0x10):
+        if contact not in BEHAVIOURS or interaction not in (0, 0x10, 0x8000):
             raise ReviewRequired(f'contact/interaction behaviour {contact:02X}/{interaction:04X}')
         extra = {}
         if 48 in locations:
@@ -255,6 +332,9 @@ class Source:
             if not pointers or any(p-at not in (0, 4, 8, 12) for p in pointers):
                 raise ReviewRequired('unsupported static model slots')
             models = {LAYERS[(p-at)//4]: self.containing(target, exact=True) for p, target in pointers.items()}
+        fading = extra.get('callback_adapter', {}).get('category') == 'switch-palette-fade'
+        if fading and (interaction != 0x8000 or contact) or interaction == 0x8000 and not fading:
+            raise ReviewRequired('contact/interaction requires a checked palette-fade callback')
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=BEHAVIOURS[contact], contact_action=contact,
             interaction_flags=interaction,
@@ -265,6 +345,12 @@ def prepare(source, item):
     """Discover every model, texture, palette, and vertex dependency from the ROM."""
     descriptor = source.profile(item)
     palettes, textures, vertex_arrays, raw_models = {}, {}, {}, {}
+    adapter = descriptor.get('callback_adapter', {})
+    fading = adapter.get('category') == 'switch-palette-fade'
+    dynamic_used = False
+    if fading:
+        for endpoint in adapter['endpoints'].values():
+            palettes[endpoint['donor_offset']] = endpoint['symbol'], endpoint['bytes']
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
     for label, (name, at, n) in descriptor['models'].items():
         if n%8: raise ReviewRequired('unaligned display list')
@@ -275,7 +361,10 @@ def prepare(source, item):
             op = a >> 24
             if op in (0xF0, 0xFD, 0x01):
                 target = pointers.get(at+position+4)
-                if op == 0xF0 and b in bindings:
+                if fading and op == 0xF0 and b == 0x08000000:
+                    if target is not None: raise ReviewRequired('relocated dynamic palette binding')
+                    dynamic_used = True; position += 8; continue
+                elif op == 0xF0 and b in bindings:
                     if target is not None: raise ReviewRequired('relocated constant palette binding')
                     target = bindings[b]; used_bindings.add(b)
                 elif target is None or b: raise ReviewRequired('missing model dependency relocation')
@@ -302,9 +391,10 @@ def prepare(source, item):
             if position > n: raise ReviewRequired('truncated packed model')
         raw_models[label] = name, at, raw, pointers
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
+    if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
     if (any(r[4]==2 for r in textures.values()) and not palettes) or len(vertex_arrays) != 1:
         raise ReviewRequired('static materials need CI4 palettes and one complete vertex array')
-    body, resources, offsets = bytearray(), [], {}
+    body, resources, offsets = bytearray(32 if fading else 0), [], {}
     def add(at, name, n, convert, **details):
         raw = source.data[at:at+n]
         converted = convert(raw)
@@ -324,9 +414,19 @@ def prepare(source, item):
         models[label] = dict(symbol=name, donor_offset=at, source_sha256=sha256(raw),
             rows=parse_model(raw, at, pointers, tuple(palettes),
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
-                palette_bindings=bindings))
+                palette_bindings=bindings, palette_fade=fading))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
+    if fading:
+        cursor = len(body); destinations = []
+        for _, size in sections:
+            cursor = (cursor+7)&~7; destinations.append(SEGMENT+cursor); cursor += size
+        if len(destinations) != 3: raise ReviewRequired('changed palette-fade model count')
+        # Self-describing immutable object header; palettes/models remain in
+        # this complete DMA object. This does not imply runtime installation.
+        body[:32] = struct.pack('>IHH6I',0x41465031,(cursor+15)&~15,3,
+            offsets[adapter['endpoints']['on']['donor_offset']],
+            offsets[adapter['endpoints']['off']['donor_offset']],*destinations,0)
     return descriptor, bytes(body), resources, offsets, models, commands, sections
 
 

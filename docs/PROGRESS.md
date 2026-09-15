@@ -2,6 +2,27 @@
 
 ## Active development
 
+The [shared palette-fade category](checkpoints/V3_FURNITURE_PIPELINE.md)
+discovers and converts eight complete building models in one batch: 29,664
+artwork bytes, 555 vertices, and 346 triangles. Complete callback-code and
+dependency checks identify the shared behaviour without an item allowlist.
+Generated layouts retain every model layer, both palettes, and the light fade.
+One native implementation also handles the existing tent's unchanged artwork
+within its existing memory reservation. The igloo installs automatically through
+the supported winter-camping reward route; the other seven retain actual missing
+acquisition routes. Automatic additions total 40.
+
+The complete ABI-94 development cartridge is
+`build/v3-furniture-palette-fade-runtime-02/animal-forest-v3-asset-loader.z64`,
+pinned by `config/v3-import-build.json`. Fifty-seven focused checks pass across
+the combined run and targeted correction. Sanitizers cover all eight prepared
+objects and the retained tent. The corrected eight-MiB native run passes 190
+records with 114 assertions, including both callback layouts, full model DMA,
+palette lifetime, seasonal rewards, acquisition/ownership, and guards.
+Ordinary model appearance, interactions, full catalogue construction, and
+save/restart remain unverified. Saved format 2 is unchanged, but saves containing
+the new identity must not load older builds or V2. Both served patchers stay V2.
+
 The [private browser interface](checkpoints/V3_BROWSER_INTERFACE.md) supplies
 search, individual/category/all/clear choices, disclosed villager requirements,
 save warnings, and ROM/profile downloads. Its 101 choices come from installed
@@ -19,17 +40,16 @@ The [underlying composer](checkpoints/V3_BROWSER_COMPOSITION.md) retains its
 recorded no-import/all/subset worker results. The page binds the worker to the
 exact displayed plan hash. Exports remain unserved; both V2 sites are unchanged.
 Browser-native graphics conversion, full donor classification, and gameplay
-acceptance remain unfinished. No runtime ABI or saved format changes.
+acceptance remain unfinished. The interface work itself changes no runtime or save format.
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplies
-thirty-nine additional items through source-discovered records and shared graphics,
+forty additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
 installer, graphics description, or native scenario is needed. Converter/installer
-revision 5 adds winter-camping rewards and unifies winter/summer selection. One
-unrestricted conversion discovers snowy tree model, snow bunny, and sleigh,
-retaining all 13,728 artwork bytes, 322 vertices, and 275 triangles.
+revision 6 includes winter-camping rewards, shared winter/summer selection,
+and data-driven palette callbacks. No item-specific browser entry is required.
 
-The ABI-93 development cartridge uses source-derived canonical reward records
+The development cartridge uses source-derived canonical reward records
 for camping and Gulliver. No summer-item array is maintained in the runtime.
 The 948-byte shared reader preserves exclusions, small-list duplicate allowance,
 and safe exhausted-profile fallback. Winter retains the donor's 10% special-list
@@ -41,20 +61,10 @@ credited in the single text-source catalogue. Scoring-only category aliases keep
 the donor's 412-point weights without changing actual acquisition. No permanent
 RAM reservation or saved format grows; existing models and identities remain unchanged.
 
-Fifty-one focused pipeline/composition checks pass; the optional prepared-only
-artifact check is skipped for this installed batch. The first native run passes
-162 records with 118 assertions, including complete winter/summer trade preparation,
-selected-only rewards, winter's no-selection native body, sparse category fallbacks,
-model DMA, preview, acquisition, ownership, restoration, and guards.
-The checkpoint records the source evidence and verification limits.
-Full catalogue construction, ordinary appearance/gameplay, and save/restart remain
-unverified. Saved format 2 is unchanged, but saves using new items must not load
-older builds or V2. Neither served patcher changes.
-
-The offline composer contains 101 installed development options: 78 furniture,
-three shirts, and twenty villagers. The acquisition build is
-`build/v3-furniture-camping-runtime-01/animal-forest-v3-asset-loader.z64`.
-`config/v3-import-build.json` is the checked current complete-build lock.
+The offline composer contains 102 installed development options: 79 furniture,
+three shirts, and twenty villagers. The generated browser plan consumes that same
+lock. The recorded private interface export above remains the 101-choice export;
+it is not a served V3 site or a claim of fresh interface testing on ABI 94.
 
 The shared CI4/I4/RGBA16 and constant indexed-palette converters retain every
 supported material/model layer and reject unsupported effects rather than dropping

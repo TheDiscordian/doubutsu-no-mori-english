@@ -32,10 +32,10 @@ BLOCKS = (
 SOURCES = ('tools/v3_tent_model.py', 'overlays/v3/tent_model.c', 'overlays/v3/tent_model.ld')
 
 
-def native_contract(original, current):
+def native_contract(original, current, *, expected_sha=BASE_SHA):
     verified_rom(original)
-    if sha256(current) != BASE_SHA:
-        raise ValueError('Tent callbacks require the current checked ABI 68 cartridge')
+    if sha256(current) != expected_sha:
+        raise ValueError('Palette callbacks require the checked source cartridge')
     old, new = by_vrom(original), by_vrom(current)
     room = old[0x82D7F0].extract(original)
     room_now = new[0x82D7F0].extract(current)
@@ -62,7 +62,7 @@ def native_contract(original, current):
     if (sha256(cache) != '5306341d7122fdbbae63d48917c76f7f6c2ee0321e490862302581561bf0474c'
             or boot_now[at:at + 116] != cache):
         raise ValueError('Changed native cache-writeback function')
-    return {'current_source_sha256': BASE_SHA, 'blocks': blocks,
+    return {'current_source_sha256': expected_sha, 'blocks': blocks,
         'actor_bytes': 0x740, 'switch_offset': 0x12C, 'private_fade_offset': 0x1A4,
         'private_fade_bytes': 4, 'requires_null_generic_rig': True,
         'requires_null_texture_animation': True, 'opaque_head_offset': 0x298,

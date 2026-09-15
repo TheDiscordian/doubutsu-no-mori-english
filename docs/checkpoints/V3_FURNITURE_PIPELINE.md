@@ -1,5 +1,85 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared switchable-palette category
+
+Converter/installer revision 6 discovers eight complete building-model callback
+sets without an item allowlist. Normalised complete PowerPC implementations,
+exact local call targets, all relocation pairs, both endpoint palettes, and
+actual draw order identify one reusable behaviour. All three layers remain on
+the donor's opaque command stream, retaining each list's own material mode.
+Constant transparent colours survive; changing colours require opaque endpoints.
+Roof-colour selection and clocked station models are not silently flattened.
+
+One category conversion produces all eight objects at
+`build/v3-furniture-palette-fade-prepared-02/`: 29,664 bytes, 555 vertices, and
+346 triangles. Each generated 32-byte header describes its complete size,
+palettes, and ordered model pointers. Source callbacks and dependencies are
+recorded in each descriptor. Post model requires `ftr_listPostoffice`; police,
+museum, market, Katrina's tent, shop, and tailor models have no identified
+acquisition list. Those seven remain prepared-only, not selectable gameplay.
+
+The ordinary converter/installer discovers igloo model `31A4` and installs its
+complete 2,944-byte object, official name, price, preview, scoring, canonical
+profile, and winter-camping reward metadata. There is no dedicated item script,
+browser entry, or native scenario. The installed name is credited in the single
+provenance catalogue. Automatic additions total 40; the offline composer supplies
+102 installed choices: 79 furniture, three shirts, and twenty villagers.
+
+The shared callback compiles to 988 bytes, including reserved table/layout holes,
+inside the existing 1,024-byte tent allocation. `80483700` retains the legacy
+tent table; `80483720` is the generated-layout table. Creation, float-0.1 movement,
+destruction, and drawing are shared; an immutable compatibility layout preserves
+the installed tent object unchanged. The current item loader is 1,920 of 2,048
+reserved bytes. It accepts the category by callback contract, not by a new item
+ID case, and validates the complete loaded header before bank registration.
+Startup already invalidates this complete code range; no new startup range,
+heap, saved format, or permanent reservation is needed.
+
+ABI 94 is pinned at
+`build/v3-furniture-palette-fade-runtime-02/animal-forest-v3-asset-loader.z64`.
+The `runtime-01` and `runtime-02` ROMs have the same SHA-256; the second receipt
+also binds the legacy tent's current shared code/table correctly. No second
+emulator replay is needed for that receipt-only correction.
+
+- ROM SHA-256: `8dcb481ce08eb7bacbc4661cb06ec910bf3ec41d3eb6d3bb753ab0ebcfb6e358`.
+- UPS SHA-256: `65d3bda763c7949146fb08d71a0dad11f6bdc73f8d6a51a2bd4c461d0cd5f972`.
+- Build receipt SHA-256: `cfc62b59db3b27343a4bba5ce768cd878b6b0c7d09bb439c79176888b8a4ca0d`.
+- Complete callback reservation SHA-256: `d9d7f05fe744e0e74ae712e1f53e09bd8372dc69af08001de9c9e40e2b189d5c`.
+
+Blob size is 3,396,336 bytes, leaving 732,432 before English choices. Catalogue
+memory is 280,384 of 280,704 reserved bytes. Every previously installed model
+retains its VROM and data; only the declared helper/code tables change.
+
+The combined focused suite executes 56 tests. Fifty-five pass; one old blanket
+assertion incorrectly disallows the intentional furniture-loader change. Its
+targeted correction verifies the exact declared helper/public jumps and proves
+the rest of the resident prefix unchanged. That corrected test and a new complete
+code/layout/vtable-binding test both pass: 57 distinct checks covered. Sanitizers
+execute the shared C with all eight converted objects and the legacy tent,
+covering independent instances, mid-fade reversals, submitted-frame lifetime,
+all model commands, every palette colour, malformed headers, crowded graphics
+arenas, and actor/arena guards. Complete texel/vertex/triangle/material checks,
+source rejection, official credit, catalogue/scoring, optional subsets, full
+profile, exact no-import V2 output, and saved-profile rules also pass.
+
+The initial native invocation mistakenly omits the required Expansion Pak and
+uses the short default timeout; the emulator disconnects before the startup
+assertion. It supplies no gameplay result. The one corrected invocation uses
+the explicit eight-MiB setting, 180-second bound, and existing Xvfb executable.
+`build/v3-furniture-palette-fade-native-02/results.json` completes 190 records with
+114 passing assertions, SHA-256
+`5ed7848e5a353f5e0fff69f47d85106a8463c32eeb68d18192de1a87b8d474c8`.
+The shared representative scenario verifies actual new/legacy model DMA,
+all four callbacks, both draw layouts, full interpolated colours, surviving
+submitted palettes, actor preservation, full seasonal trade preparation,
+acquisition/ownership, restoration, and guards. The emulator exits cleanly.
+
+Ordinary appearance, interaction, full catalogue construction, save/restart,
+and original-hardware acceptance remain unverified. Saved format 2 is unchanged,
+but saves using the new item must not load earlier builds or V2. Both served
+patchers remain V2; the recorded private UI export stays at its earlier snapshot.
+Continue remaining shared acquisition/callback categories, not per-item scripts.
+
 ## Shared seasonal reward records
 
 Converter/installer revision 5 installs snowy tree model `31A8`, snow bunny

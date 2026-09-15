@@ -22,6 +22,15 @@ typedef struct {
     u8 *tail;
 } TentGfx;
 typedef struct { TentGfx *gfx; } TentGame;
+typedef struct {
+    u32 magic;
+    u16 bytes, count;
+    u32 on, off, models[4];
+} PaletteLayout;
+_Static_assert(sizeof(PaletteLayout) == 32, "Complete immutable palette-fade layout");
+#ifdef AF_V3_SHARED_PALETTE_FADE
+extern const PaletteLayout af_v3_legacy_tent_layout;
+#endif
 _Static_assert(sizeof(Tent) == 0x740, "Native furniture stride");
 _Static_assert(__builtin_offsetof(Tent, switch_bit) == 0x12C, "Native switch state");
 _Static_assert(__builtin_offsetof(Tent, fade) == 0x1A4, "Tent-owned unused joint storage");
@@ -61,24 +70,45 @@ void af_v3_tent_model_dt(Tent *actor, u8 *data) {
      * their palettes after the actor is destroyed or reused. */
 }
 
+#ifdef AF_V3_SHARED_PALETTE_FADE
+static void draw(Tent *actor, TentGame *game, u8 *data, const PaletteLayout *layout) {
+#else
 void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
+#endif
     TentGfx *gfx = game->gfx;
     uptr head = (uptr)gfx->head, tail = (uptr)gfx->tail, allocation;
     Command *commands = gfx->head;
     const u16 *on, *off;
     u16 *palette;
+#ifdef AF_V3_SHARED_PALETTE_FADE
+    u32 count = layout->count;
+    if (layout->magic != 0x41465031u || count < 1 || count > 4 ||
+            layout->bytes < 96 || layout->bytes > 9216 ||
+            (layout->on & 31) || (layout->off & 31) ||
+            layout->on > (u32)layout->bytes - 32 || layout->off > (u32)layout->bytes - 32) return;
+    for (u32 i = 0; i < count; ++i)
+        if ((layout->models[i] & 7) || layout->models[i] < 0x06000000u ||
+                layout->models[i] > 0x06000000u + layout->bytes - 8) return;
+#else
     (void)room;
+    const u32 count = 4;
+#endif
     /* Six commands, a 64-byte matrix, and a 32-byte palette. Round the shared
      * allocation down to 32 bytes, keeping both resources properly aligned.
      * Do not modify either arena end or issue a draw if there is no room. */
-    if (!data || (head & 7) || (tail & 15) || tail < head || tail - head < 144) return;
+    if (!data || (head & 7) || (tail & 15) || tail < head || tail - head < 96+(count+2)*8) return;
     allocation = (tail - 96) & ~(uptr)31;
-    if (allocation < head + 48) return;
+    if (allocation < head + (count+2)*8) return;
     gfx->tail = (u8 *)allocation;
-    gfx->head = commands + 6;
+    gfx->head = commands + count+2;
     palette = (u16 *)(allocation + 64);
+#ifdef AF_V3_SHARED_PALETTE_FADE
+    on = (const u16 *)(data + layout->on);
+    off = (const u16 *)(data + layout->off);
+#else
     on = (const u16 *)(data + 0x20);
     off = (const u16 *)(data + 0x40);
+#endif
     for (u32 i = 0; i < 16; ++i) {
         u32 result = off[i] & 1u;
         for (u32 shift = 1; shift <= 11; shift += 5) {
@@ -92,8 +122,26 @@ void af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
     osWritebackDCache((void *)allocation, 96);
     commands[0] = (Command){0xDA380003, (u32)allocation};
     commands[1] = (Command){0xDB060020, (u32)(allocation + 64)};
+#ifdef AF_V3_SHARED_PALETTE_FADE
+    for (u32 i = 0; i < count; ++i) commands[i+2] = (Command){0xDE000000, layout->models[i]};
+#else
     commands[2] = (Command){0xDE000000, 0x06000C50};
     commands[3] = (Command){0xDE000000, 0x06000D18};
     commands[4] = (Command){0xDE000000, 0x06000E00};
     commands[5] = (Command){0xDE000000, 0x06000FF0};
+#endif
 }
+
+#ifdef AF_V3_SHARED_PALETTE_FADE
+void __attribute__((section(".text.layout_entry")))
+af_v3_tent_model_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
+    (void)room;
+    if (data) draw(actor, game, data, &af_v3_legacy_tent_layout);
+}
+
+void __attribute__((section(".text.layout_entry")))
+af_v3_palette_fade_dw(Tent *actor, void *room, TentGame *game, u8 *data) {
+    (void)room;
+    if (data) draw(actor, game, data, (const PaletteLayout *)data);
+}
+#endif

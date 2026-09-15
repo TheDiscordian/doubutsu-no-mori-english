@@ -154,7 +154,45 @@ The shared static-material category supports:
   relocations, the selector row, and palette binding. This removes only a
   constant draw selector, never animation or gameplay behaviour.
 
-Dynamic texture/palette pointers, animation rigs, other custom callbacks, unsupported
+The `switch-palette-fade` category discovers the complete shared building-model
+callbacks. It checks all four compiled functions, normalising only verified
+address relocations and local call displacements. Every call target, paired
+palette/model relocation, and remaining instruction must match the shared
+behaviour. Item names and model-name suffixes do not select the category.
+Three display lists stay in their actual opaque-arena submission order;
+the material commands inside each list retain their original rendering modes.
+The exact two endpoint palettes and segment-eight loads remain dynamic.
+Changing entries must use opaque RGB5A3 at both endpoints. Unchanged transparent
+entries retain their colour and alpha; partial alpha is rejected.
+
+Each converted object starts with a 32-byte immutable `AFP1` layout: magic,
+16-bit complete object length, 16-bit model count, two 32-bit palette offsets
+(on, off), and four segmented display-list pointers. Three pointers are used;
+the fourth is zero. The converter derives these fields from the complete
+compiled object. The installer regenerates and checks the header with all
+other resource bytes. Generic profile model/rig/animation pointers stay null;
+the native toggle flag and shared callback table supply the behaviour.
+
+`tools/v3_furniture_palette.py` installs the shared callback in the existing
+`80483400..804837FF` reservation. The legacy tent table remains at `80483700`;
+generated-layout profiles use `80483720`. An immutable compatibility layout at
+`80483740` describes the unchanged installed tent artwork. Both tables share
+creation, movement, destruction, and drawing code; only the layout entry differs.
+The N64 code approaches the switch target by the donor's float `0.1`, draws all
+model layers, and allocates a 32-byte interpolated palette with a 64-byte matrix
+in the current graphics frame. Submitted palettes survive actor changes and
+destruction. No heap or permanent reservation grows. Invalid layouts or crowded
+graphics arenas produce no draw or arena writes. The complete-object DMA reader
+checks the generated header's magic, actual length, and three-model count before
+recording a loaded bank. There is no per-item DMA case for this category.
+
+Acquisition remains independent: an eligible winter-camping model can install
+through the existing reward category; models needing other source routes remain
+prepared-only. Model conversion never substitutes shop stock for an unknown
+reward. Roof-colour selectors, clocked station rigs, and additional effects
+remain separate unsupported categories, not static substitutions.
+
+Other dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized
 or different-format artwork, and framing outside the checked source table remain explicit review
 categories. Unsupported does not mean unused or unimportant. A successfully
@@ -187,7 +225,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 5 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 6 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -359,6 +397,14 @@ same complete texture/vertex/triangle/material checks on that batch. The shared
 test also checks source identities, retained pending reasons, and refusal by the
 installer. No new test scenario is needed for another prepared category. A
 converter-only change does not call for another native run of an unchanged ROM.
+
+Palette-category batches also run the actual shared C callbacks under address/
+undefined-behaviour sanitizers with every prepared object's source-derived
+palettes. Checks cover complete draw order, independent fade state, mid-fade
+reversal, frame lifetime, malformed layouts, crowded arenas, and actor guards.
+The existing representative native batch probe checks one new category record
+and the changed legacy-tent compatibility path together, including actual model
+DMA and callback execution. It does not create a separate scenario per building.
 
 See [the implementation checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md)
 for actual outputs, counts, and verification results.

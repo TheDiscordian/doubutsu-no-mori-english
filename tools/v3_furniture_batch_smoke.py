@@ -108,6 +108,53 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     debug.write_memory(bridge, stub)
     call(0x8002FE00, [bridge, 8]); call(0x80034CE0, [bridge, 8])
     tested_beds=set()
+    tested_palettes=[]
+    def palette_callbacks(row, asset, *, legacy=False):
+        """One actual callback-category check, plus its unchanged-asset compatibility path."""
+        receipt=report['furniture_palette_fade'];symbols=receipt['code']['symbols']
+        at=runtime.PACKAGE+receipt['ram']-runtime.PACKAGE_RAM
+        check('complete shared palette code, tables, and layout',receipt['ram'],blob[at:at+receipt['bytes']])
+        layout=bytes.fromhex(receipt['legacy_layout_hex']) if legacy else asset[:32]
+        _,n,count,on,off,*models=struct.unpack('>IHH6I',layout)
+        if n!=len(asset):raise ValueError('Palette test layout differs from complete object')
+        actor,gfx,game,arena=(scratch+x for x in (0x120,0x900,0xC00,0xC80))
+        actor_data=bytearray(b'\xA5'*0x740);actor_data[0x12C]=0
+        debug.write_memory(actor,actor_data);debug.write_memory(game,struct.pack('>I',gfx))
+        debug.write_memory(gfx+0x298,struct.pack('>II',arena,arena+0x200))
+        debug.write_memory(arena-16,edge);debug.write_memory(arena+0x200,edge)
+        def callback(role):
+            name='af_v3_palette_fade_dw' if role=='dw' and not legacy else 'af_v3_tent_model_'+role
+            entry=symbols[name];jump=struct.pack('>II',0x08000000|(entry>>2&0x3FFFFFF),0)
+            debug.write_memory(bridge,jump)
+            call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            call(bridge,[actor,bank] if role in ('ct','dt') else [actor,0,game,bank],proof=(bridge,jump))
+        callback('ct');actor_data[0x1A4:0x1A8]=bytes(4)
+        check('palette constructor preserves complete actor',actor,actor_data)
+        palettes=[]
+        for step in (0,1):
+            if step:
+                debug.write_memory(actor+0x12C,b'\x01');actor_data[0x12C]=1
+                callback('mv');actor_data[0x1A4:0x1A8]=struct.pack('>f',.1)
+            check('palette movement preserves complete actor',actor,actor_data)
+            head,tail=struct.unpack('>II',debug.read_memory(gfx+0x298,8));allocation=(tail-96)&~31
+            callback('dw')
+            expected=[0xDA380003,allocation,0xDB060020,allocation+64]
+            for model in models[:count]:expected.extend((0xDE000000,model))
+            check('every palette model in actual draw order',head,struct.pack('>'+str(len(expected))+'I',*expected))
+            check('bounded palette arena endpoints',gfx+0x298,struct.pack('>II',head+(count+2)*8,allocation))
+            fade=struct.unpack('>f',actor_data[0x1A4:0x1A8])[0]
+            ons,offs=struct.unpack_from('>16H',asset,on),struct.unpack_from('>16H',asset,off)
+            values=[(a&1)|sum(int((a>>s&31)+fade*((b>>s&31)-(a>>s&31)))<<s for s in (1,6,11))
+                    for a,b in zip(offs,ons)]
+            palette=struct.pack('>16H',*values);check('all interpolated native colours',allocation+64,palette)
+            palettes.append((allocation+64,palette))
+        callback('dt');actor_data[0x1A4:0x1A8]=bytes(4)
+        check('palette destructor preserves complete actor',actor,actor_data)
+        for address,palette in palettes:check('submitted palette survives movement and destruction',address,palette)
+        check('palette draw retains complete source asset',bank,asset)
+        check('palette arena leading guard',arena-16,edge);check('palette arena trailing guard',arena+0x200,edge)
+        tested_palettes.append(row['item_id'])
+        debug.write_memory(bridge,stub);call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
     try:
         if 'furniture_behaviours' in report:
             from v3_furniture_behaviours import RAM as SOUND_RAM,ENTRY as SOUND_ENTRY,NATIVE_CATEGORIES
@@ -202,6 +249,17 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             check(row['name'] + ' complete DMA and untouched bank tail', bank,
                   asset+b'\xA5'*(bank_size-len(asset)))
             check(row['name'] + ' bank assignment', index_ram+index, b'\x00')
+            if (not tested_palettes and
+                    row.get('profile',{}).get('callback_adapter',{}).get('category')=='switch-palette-fade'):
+                palette_callbacks(row,asset)
+                previous=next(r for r in report['tent_model']['imports'] if r['item_id']=='336C')
+                old_index=previous['runtime_index'];address=index_ram+old_index
+                saved.setdefault(address,debug.read_memory(address,1));debug.write_memory(address,b'\xFF')
+                call(bridge,[old_index,int(previous['item_id'],16),bank,0],1,(bridge,stub))
+                at=int(previous['object_vrom'],16)-runtime.BLOB
+                old_asset=blob[at:at+previous['object_bytes']]
+                check('legacy palette model complete DMA',bank,old_asset)
+                palette_callbacks(previous,old_asset,legacy=True)
         loaded, proof = load(catalogue.VROM, catalogue.RELOC, catalogue.RAM, files[catalogue.VROM].size)
         available = owner + report['catalogue']['code']['symbols']['af_v3_catalogue_available'] - catalogue.RAM
         if 'catalogue_preview_records' in report:
@@ -349,5 +407,6 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 ordinary_npc_gift_handover_tested=False,
                 native_shared_camping_trade_tested=bool(report['camper_trade'].get('shared_reward_categories')) and any(r.get('reward_route') in (19,23) for r in rows),
                 native_bed_geometry_tested=bool(tested_beds),native_bed_contact_actions=sorted(tested_beds),
+                native_palette_callbacks=tested_palettes,
                 ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)

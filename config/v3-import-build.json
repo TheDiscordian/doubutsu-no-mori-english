@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-camping-runtime-01",
-  "runtime_abi": 93,
-  "rom_sha256": "fe9b175801c5b1d7eb00b7ddf23d01d4fd164643cd01d9f2f6270d7e89f8598e",
-  "report_sha256": "4973f7d2705be2c280c321d29b7c51daddfa2e708b949db5c6cfd6153a5ec1c3"
+  "directory": "build/v3-furniture-palette-fade-runtime-02",
+  "runtime_abi": 94,
+  "rom_sha256": "8dcb481ce08eb7bacbc4661cb06ec910bf3ec41d3eb6d3bb753ab0ebcfb6e358",
+  "report_sha256": "cfc62b59db3b27343a4bba5ce768cd878b6b0c7d09bb439c79176888b8a4ca0d"
 }

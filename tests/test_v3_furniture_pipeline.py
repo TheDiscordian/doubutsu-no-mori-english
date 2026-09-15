@@ -26,6 +26,20 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_dynamic_palette_keeps_segment_and_refuses_constant_or_relocated_binding(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        struct.pack_into('>I',raw,0x1C,0x08000000);pointers.pop(0x11C)
+        def parse(**kwargs):
+            return parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,
+                               static_materials=True,palette_fade=True,**kwargs)
+        rows=parse();palette=next(r for r in rows if r['opcode']==0xF0)
+        self.assertEqual(palette['dynamic_palette'],0x08000000)
+        source,_=command_source({'part0':{'rows':rows}},{0x500:32,0x600:64,0x1000:576})
+        self.assertIn('gsDPLoadTLUT_pal16(15, 0x08000000)',source)
+        with self.assertRaisesRegex(ValueError,'no constant binding'):parse(palette_bindings={0x08000000:0x500})
+        pointers[0x11C]=0x500
+        with self.assertRaisesRegex(ValueError,'also has a relocation'):parse()
+
     def test_shared_camping_trade_categories_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-shared-camping-') as temporary:
             binary=Path(temporary)/'test'
@@ -208,6 +222,51 @@ class DonorTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('>H',table,2*4*2)[0],8)  # CI/4 -> GX_C4
         self.assertEqual(struct.unpack_from('>H',table,4*4*2)[0],0)  # I/4 -> GX_I4
 
+    def test_palette_fade_category_discovers_all_shared_code_and_complete_layouts(self):
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        rows=[r for r in inventory['rows'] if 'switch-palette-fade' in r.get('categories',[])]
+        self.assertEqual(len(rows),8)
+        self.assertEqual(sum(r['status']=='supported' for r in rows),1)
+        self.assertEqual({r['reason'].split(':')[0] for r in rows if r['status']=='review'},
+                         {'acquisition needs an adapter'})
+        for row in rows:
+            p,body,resources,offsets,models,_,sections=pipeline.prepare(self.source,int(row['item_id'],16))
+            adapter=p['callback_adapter'];self.assertEqual(p['interaction_flags'],0x8000)
+            self.assertEqual(list(models),adapter['model_order']);self.assertEqual(len(models),3)
+            self.assertEqual(struct.unpack_from('>IHH',body),(0x41465031,row['object_bytes'],3))
+            self.assertEqual(struct.unpack_from('>2I',body,8),tuple(
+                offsets[adapter['endpoints'][role]['donor_offset']] for role in ('on','off')))
+            cursor=len(body)
+            for i,(label,n) in enumerate(sections):
+                self.assertEqual(struct.unpack_from('>I',body,16+i*4)[0],0x06000000+cursor)
+                cursor+=n
+            self.assertEqual(body[28:32],bytes(4))
+            for role,f in adapter['functions'].items():
+                self.assertEqual(f['normalized_sha256'],pipeline.PALETTE_FADE_CODE[role][1])
+                self.assertEqual(set(f['local_calls']),set(pipeline.PALETTE_FADE_CODE[role][2]))
+        # The roof-colour selector is a different effect, not a static alias.
+        with self.assertRaises(pipeline.ReviewRequired):self.source.profile(0x3024)
+
+    def test_palette_category_rejects_changed_code_calls_palettes_and_effects(self):
+        p=self.source.profile(0x31A4);adapter=p['callback_adapter']
+        f=adapter['functions']['move'];text=self.source.sections[1][0]
+        for loc in (0,0x24):
+            changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+            changed.rel[text+f['offset']+loc+3]^=4
+            with self.assertRaisesRegex(ValueError,'palette fade'):changed.profile(0x31A4)
+        changed=copy.copy(self.source);changed.code_relocations=dict(self.source.code_relocations)
+        changed.code_relocations[f['offset']+0x0A]=(6,1,5,0)
+        with self.assertRaisesRegex(ValueError,'dependencies'):changed.profile(0x31A4)
+        off=adapter['endpoints']['off']['donor_offset'];on=adapter['endpoints']['on']['donor_offset']
+        changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+        struct.pack_into('>H',changed.data,on+6,0x09AD)
+        with self.assertRaisesRegex(ValueError,'changing colours'):changed.profile(0x31A4)
+        struct.pack_into('>H',changed.data,on+6,0x19AC)
+        with self.assertRaisesRegex(ValueError,'Partial-alpha'):changed.profile(0x31A4)
+        changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+        changed.data[p['profile_offset']+44]=1
+        with self.assertRaisesRegex(ValueError,'contact/interaction'):changed.profile(0x31A4)
+
     def test_indexed_dependencies_match_independent_relocation_reader(self):
         for row in self.report['objects'][:3]:
             for model in row['models']:
@@ -361,6 +420,21 @@ class DonorTests(unittest.TestCase):
                 self.assertEqual(str(error.exception),row['pending_reason'])
         self.check_complete_artwork(art,report)
 
+    def test_shared_palette_runtime_with_prepared_source_objects_under_sanitizers(self):
+        path=os.environ.get('V3_FURNITURE_PREPARED_ART')
+        if not path:self.skipTest('No optional prepared-asset batch supplied')
+        art=Path(path);report=json.loads((art/'art.json').read_bytes())
+        rows=[r for r in report['objects'] if r['profile'].get('callback_adapter',{}).get('category')=='switch-palette-fade']
+        if not rows:self.skipTest('No palette-fade category in prepared batch')
+        with tempfile.TemporaryDirectory(prefix='v3-shared-palette-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_furniture_palette_test.c'),'-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary),str(ROOT/'build/v3-camping-actor-art-01/tent-model.n64obj.bin'),
+                *(str(art/r['object_file']) for r in rows)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('retained frames, bounds, and actor guards pass',result.stdout)
+
     def test_complete_texels_vertices_and_compiled_triangles_for_entire_batch(self):
         self.check_complete_artwork(self.art,self.report)
 
@@ -405,7 +479,7 @@ class DonorTests(unittest.TestCase):
                     self.assertNotIn(op,(0x0A,0xD2,0xDE))
                     if op in (0xFC,0xE2,0xFA,0xFB,0xD9):state.append((a,b))
                     if op==0xFD:
-                        self.assertEqual(b>>24,6);loads.append(b-0x06000000)
+                        self.assertIn(b>>24,(6,8));loads.append(b)
                     if op==1:
                         self.assertEqual(b>>24,6);count=a>>12&255
                         first=(b-0x06000000-vertex['native_offset'])//16
@@ -418,7 +492,8 @@ class DonorTests(unittest.TestCase):
                 donor=models[model['layer']]['rows']
                 self.assertEqual(faces,[t for r in donor for t in r.get('global_triangles',[])])
                 self.assertEqual(state,[r['words'] for r in donor if r['opcode'] in (0xFC,0xE2,0xFA,0xFB,0xD9)])
-                self.assertEqual(loads,[offsets[r['target']] for r in donor if r['opcode'] in (0xF0,0xFD)])
+                self.assertEqual(loads,[r['dynamic_palette'] if 'dynamic_palette' in r else 0x06000000+offsets[r['target']]
+                                       for r in donor if r['opcode'] in (0xF0,0xFD)])
                 self.assertEqual(asset[start+n-8:start+n],struct.pack('>II',0xDF000000,0))
 
     def test_automatic_text_credits_are_in_the_single_catalogue(self):
@@ -488,7 +563,17 @@ class CurrentCartridgeTests(unittest.TestCase):
             self.assertEqual(record[25],row['action_sound'])
             self.assertEqual(record[27],row.get('reward_route',0))
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
-        self.assertEqual(self.report['furniture']['expanded_tables'],self.prior['furniture']['expanded_tables'])
+        expanded=self.report['furniture']['expanded_tables'];prior=self.prior['furniture']['expanded_tables']
+        if 'furniture_palette_fade' not in self.report:
+            self.assertEqual(expanded,prior)
+        else:
+            self.assertEqual({k:v for k,v in expanded.items() if k not in ('expanded_code','public_entries')},
+                             {k:v for k,v in prior.items() if k not in ('expanded_code','public_entries')})
+            code=expanded['expanded_code']
+            self.assertEqual(sha256(self.blob[0x5800:0x5800+code['bytes']]),code['sha256'])
+            for row in expanded['public_entries']:
+                at=row['entry']-0x80460000
+                self.assertEqual(self.blob[at:at+8],bytes.fromhex(row['after']))
         self.assertEqual(self.report['save_runtime']['code'],self.prior['save_runtime']['code'])
 
     def test_reused_terminal_resources_and_retained_objects(self):
@@ -662,13 +747,45 @@ class CurrentCartridgeTests(unittest.TestCase):
             (install.BLOB+install.PACKAGE,install.PACKAGE_SIZE,
              zlib.crc32(self.blob[install.PACKAGE:install.PACKAGE+install.PACKAGE_SIZE]),install.PACKAGE_RAM))
         before=self.old[install.BLOB].extract(self.base)
-        self.assertEqual(self.blob[0x100:0xC000],before[0x100:0xC000])
+        expected=bytearray(before)
+        if 'furniture_palette_fade' in self.report:
+            helper=self.report['furniture']['expanded_tables']['expanded_code']
+            self.assertEqual(sha256(self.blob[0x5800:0x5800+helper['bytes']]),helper['sha256'])
+            self.assertEqual(self.blob[0x5800+helper['bytes']:0x6000],bytes(0x800-helper['bytes']))
+            expected[0x5800:0x6000]=self.blob[0x5800:0x6000]
+            for row in self.report['furniture']['expanded_tables']['public_entries']:
+                at=row['entry']-0x80460000
+                self.assertEqual(expected[at:at+8],bytes.fromhex(row['before']))
+                expected[at:at+8]=bytes.fromhex(row['after'])
+        self.assertEqual(self.blob[0x100:0xC000],expected[0x100:0xC000])
         self.assertEqual(self.blob[0xE0:0xF0],before[0xE0:0xF0])
         code=bytearray(self.files[CODE_VROM].extract(self.image));native=self.old[CODE_VROM].extract(self.base)
         at=shops.DESCRIPTOR-CODE_RAM;code[at:at+12]=native[at:at+12]
         hook=self.report['furniture_behaviours']['hook'];at=hook['address']-CODE_RAM
         self.assertEqual(code[at:at+8].hex(),hook['after']);code[at:at+8]=native[at:at+8]
         self.assertEqual(code,native)
+
+    def test_shared_palette_code_layout_and_both_complete_callback_tables(self):
+        current=self.report.get('furniture_palette_fade')
+        if not current:self.skipTest('Current build has no shared palette category')
+        from v3_furniture_palette import RAM,LIMIT,VTABLE,LEGACY_VTABLE,LEGACY_LAYOUT
+        at=install.PACKAGE+RAM-install.PACKAGE_RAM;resident=self.blob[at:at+LIMIT-RAM]
+        self.assertEqual(sha256(resident),current['resident_sha256'])
+        linked=bytearray(resident);symbols=current['code']['symbols']
+        for address in (VTABLE,LEGACY_VTABLE):
+            table=resident[address-RAM:address-RAM+20]
+            self.assertEqual(table.hex(),current['vtables'][f'{address:08X}'])
+            entries=[symbols['af_v3_tent_model_'+r] for r in ('ct','mv','dw','dt')]+[0]
+            if address==VTABLE:entries[2]=symbols['af_v3_palette_fade_dw']
+            self.assertEqual(struct.unpack('>5I',table),tuple(entries))
+            linked[address-RAM:address-RAM+20]=bytes(20)
+        self.assertEqual(resident[LEGACY_LAYOUT-RAM:LEGACY_LAYOUT-RAM+32].hex(),current['legacy_layout_hex'])
+        linked[LEGACY_LAYOUT-RAM:LEGACY_LAYOUT-RAM+32]=bytes(32)
+        self.assertEqual(sha256(linked[:current['code']['bytes']]),current['code']['sha256'])
+        self.assertEqual(linked[current['code']['bytes']:],bytes(LIMIT-RAM-current['code']['bytes']))
+        self.assertEqual(self.report['tent_model']['code']['sha256'],sha256(resident[:current['code']['bytes']]))
+        self.assertEqual(current['additional_resident_bytes'],0)
+        self.assertEqual(current['heap_bytes'],0)
 
     def test_shared_sound_code_metadata_original_body_and_fire_remain_intact(self):
         from v3_furniture_behaviours import RAM,LIMIT,ENTRY,END,audio_contract

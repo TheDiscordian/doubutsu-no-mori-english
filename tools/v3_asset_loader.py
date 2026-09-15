@@ -83,6 +83,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
                        'items_large': ('af_v3_item_name_extended', 0x80483000),
                        'tent_model': ('af_v3_tent_model_ct', 0x80483400),
+                       'palette_fade': ('af_v3_tent_model_ct', 0x80483400),
                        'fire': ('af_v3_campfire_ct', 0x80483800),
                        'furniture_behaviours': ('af_v3_furniture_action_sound', 0x80483D00),
                        'furniture_rewards': ('af_v3_furniture_reward_goods', 0x80474BC0),

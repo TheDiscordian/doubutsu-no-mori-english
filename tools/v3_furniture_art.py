@@ -213,13 +213,15 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
                 campfire_body=False, fire_effect=0, school=False, static_materials=False,
-                palette_bindings=None):
+                palette_bindings=None, palette_fade=False):
     """Decode supported static materials and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
                                               tent, campfire_body, fire_effect, school, static_materials))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     palette_bindings = {} if palette_bindings is None else palette_bindings
+    if palette_fade and (not static_materials or palette_bindings):
+        raise ValueError('Palette fade requires the shared materials and no constant binding')
     if palette_bindings and (not static_materials or set(palette_bindings) != {0x08000000}
                              or any(p not in palette for p in palette_bindings.values())):
         raise ValueError('Unsupported constant furniture palette binding')
@@ -231,8 +233,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         a, b = struct.unpack_from('>II', raw, at)
         op = a >> 24
         row = {'words': (a, b), 'opcode': op}
-        dynamic_palette = tent and op == 0xF0 and b == 0x08000000
+        dynamic_palette = (tent or palette_fade) and op == 0xF0 and b == 0x08000000
         if dynamic_palette:
+            if start+at+4 in pointers:
+                raise ValueError('Dynamic furniture palette also has a relocation')
             row['dynamic_palette'] = b
         elif op == 0xF0 and b in palette_bindings:
             if start+at+4 in pointers:
