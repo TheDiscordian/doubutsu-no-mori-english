@@ -7,13 +7,12 @@ These complete the assets for the ten-entry `ftr_listTent` family alongside
 the seven static objects in [Camping items](V3_CAMPING_ITEMS.md).
 They are additive imports, not substitutions for native furniture.
 
-Complete converted objects and the native four-cell item-reader extension are
-available. Tent model is installed in ABI 69 with its light callbacks, English
-metadata, catalogue/scoring, and optional saved dependency. The two fires are
-**not installed or selectable**. Their complete sounds are installed with
-passing native allocation, font, and sample-transfer checks. Fire animation/
-positional sound callbacks and item integration,
-summer-camper acquisition, and ordinary gameplay/persistence remain required.
+ABI 70 installs all three complete actors: the tent model with its light
+callbacks, and both fires with full rigs, billboard flames, two-tile scrolling,
+and actual positional sound refresh. English metadata, catalogue/scoring,
+selected dependencies, complete-object DMA, and the bonfire's four-cell readers
+are installed. Individual selections are available in the offline composer.
+Summer-camper acquisition and ordinary gameplay/persistence remain required.
 Source on the V3 development branch is permitted; neither served web patcher
 changes before user testing and explicit approval.
 
@@ -96,9 +95,9 @@ The donor selects the gameplay frame counter or generic game counter using
 the translucent head receives segment 9. A failed scroll-list allocation must
 not lead to a draw with an unbound segment.
 
-The donor loop-sound numbers are `005D` (campfire) and `005C` (bonfire). They are
-source identities, **not verified native sound IDs**. The runtime must map the
-actual sound resource and keep position/lifetime behaviour. Existing furniture
+The donor loop-sound numbers are `005D` (campfire) and `005C` (bonfire). The
+installed audio adapter explicitly supplies those two native IDs with their
+complete mapped resources; numerical equality alone is not the mapping. Furniture
 transition-state exclusions use different native and donor enum values.
 
 ### Native implementation bindings
@@ -106,9 +105,10 @@ transition-state exclusions use different native and donor enum values.
 Native actor scale is at `714/718/71C`, the rig at `134`, joints/morph at
 `1A4/1DA`, and the two ten-matrix banks at `210`. Native gameplay frame and
 billboard matrix are at `1EA0` and `1E5C`; generic frame is at `A0`.
-The GC `ctr_type` at offset 2 is not an established native field: its explicit
-GC constructor assignment has no corresponding native assignment. Resolve
-ordinary-room versus catalogue context before selecting the frame source.
+The GC `ctr_type` at offset 2 is not a native field and is never read. The checked
+catalogue wrapper at `808A7814` passes a null room argument; the native room
+wrapper at `80946F40` passes the room owner. The callbacks use that distinction
+to select the appropriate frame counter without borrowing uninitialised padding.
 
 The native repeat initializer is `80052408`, full rig draw `800530D8`, and
 positional level-sound entry `800D1D08`. The complete rig draw emits segment D
@@ -121,7 +121,11 @@ Donor `two_tex_scroll_dolphin` doubles its input coordinates. The donor's
 standard N64 SetTileSize decoder multiplies those coordinates by four to reach
 the same representation. Thus the donor callback velocities correspond to
 half those values in native quarter-texel coordinates, not an unchanged copy.
-The bonfire's odd negative steps require explicit fractional/rounding treatment.
+The callbacks mask the doubled donor coordinates to 14 bits, then shift to the
+native quarter-texel representation. Bonfire's odd frames use explicit floor:
+the maximum instantaneous difference is 1/8 texel, with no accumulated drift.
+Even frames, campfire scrolling, and bonfire's horizontal scrolling are exact
+at the native tile-origin precision. Textures and vertex UVs are unchanged.
 The source bindings are `src/game/m_rcp.c`, `include/libforest/gbi_extensions.h`,
 and `src/static/libforest/emu64/emu64.c` in the pinned GC checkout.
 
@@ -161,8 +165,33 @@ Actual native allocation, complete font/header relocation, both sample transfers
 and start/stop pass. The installed pool has 256 conservative bytes spare.
 The full wave file moves to physical `03800000`, retaining external wave 2's
 physical location through the checked native unsigned header-base addition.
-Fire item callbacks still need ordinary per-actor positional refresh/stop through
-`sAdo_OngenPos`; repeated one-shot playback is not equivalent.
+Fire move callbacks refresh their actual IDs through `sAdo_OngenPos`, using the
+actor address as the source identity and the actual actor position. Native
+transition states 5, 6, 13, and 15 suppress refresh; the positional manager owns
+expiry. No repeated one-shot substitute is used.
+
+### Installed native callbacks
+
+`overlays/v3/fire.c` occupies 1,240 bytes at `80483800`. Its two callback tables
+are at `80483FC0` and `80483FD8`; both retain null destroy/DMA entries. The guard
+at `80483FF0` remains intact. Full objects occupy VROM `02468000` and `0246A000`.
+The checked complete-object DMA gate accepts only each exact index/item/vtable
+combination. Neither fire can borrow the other fire's callback permission.
+
+Every draw checks both display heads before writing. It reserves 176 bytes plus
+at most 15 alignment bytes from the opaque arena, with five commands per head.
+The identical opaque/translucent base transform shares one immutable matrix;
+a second frame-owned matrix contains the billboard transform. Five immutable
+scroll commands follow. Arbitrarily aligned allocation tails are accepted when
+the aligned resources and command heads fit; insufficient capacity changes
+nothing. Native cache writeback covers both frame resources and the two used
+actor matrices. No new normal heap, resident package, or model-bank allocation
+is required. Full native rig traversal retains all three joint transforms.
+
+The bonfire catalogue uses native mode 0 with its verified `0.86/−3` final
+framing, not GC mode 19 as a native index. Both fires remain non-orderable, and
+ordinary shop lists stay unchanged. HRA uses the same safe camping weight
+mapping as the other rewards, while feng shui preserves the zero-colour data.
 
 ## Tent light contract
 
@@ -243,24 +272,19 @@ missing, misidentified, or unsupported records reject placement with result 3
 and four zeroed records. Native-item fallbacks remain unchanged.
 
 The compiled extension occupies 1,020 bytes at `80483000`, inside the existing
-4 KiB resident item-code reservation. Integration must replace the checked code,
-rebind all five public bridges to their compiled entry points, and refresh the
-resident package and prefix checksums. Compiling it alone does not modify ABI 69
-or create a new playable bonfire. Save structures do not change.
+4 KiB resident item-code reservation. ABI 70 replaces the checked reader code,
+rebinds all five public bridges, and refreshes the saved-resource, package, and
+prefix checksums. The code ends before the tent callbacks at `80483400`.
+Save structures do not change; selected dependencies include enabled fires.
 
 ## Remaining integration
 
-1. Port the fires' complete rig,
-   billboard, dual-tile scrolling, and mapped loop sounds to native callbacks.
-2. Install complete profiles and item rows, four-cell readers, true catalogue
-   framing (`0.86/−3` for bonfire), non-orderability, HRA/feng data, and selected
-   dependencies. Use the current ABI 69 source, not an older cartridge chain.
-3. Add individual and combined offline options only when their dependencies are
-   actually installed; retain exact V2 composition for an empty selection.
-4. Connect the actual summer-camper reward route for all ten items. Do not
+1. Connect the actual summer-camper reward route for all ten items. Do not
    substitute ordinary shop stock or an unrelated generic gift source.
-5. Verify affected native calls and ordinary interaction/persistence in a bounded
+2. Complete the lantern and sleeping-bag behaviours beyond their static models.
+3. Verify ordinary appearance, interaction, and persistence in a bounded gameplay
    batch. Original-hardware acceptance and the remaining donor content stay open.
 
 Executed checks and artifact hashes live in the
-[camping actor checkpoint](../docs/checkpoints/V3_CAMPING_ACTORS.md).
+[camping actor checkpoint](../docs/checkpoints/V3_CAMPING_ACTORS.md) and the
+[complete fire runtime checkpoint](../docs/checkpoints/V3_FIRE_RUNTIME.md).

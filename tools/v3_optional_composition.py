@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-fire-sound-runtime-01'
-BASE_SHA = 'f3d055a74c2172029755b6be39e84b29658a17e83ef599a4f2fe6453570cb48f'
-REPORT_SHA = '75894b4b5a77b31ffcc34e32766d38abc6a65c899326b0aaa8e66413a246e7ce'
+BASE = ROOT/'build/v3-fire-runtime-02'
+BASE_SHA = 'e2a8ddfb41b7ad7d111cf666dc4b4706046d6edff1fe88968e925603a9345ad5'
+REPORT_SHA = 'ecf0b223d51609e004a369ad2b4a2d817c9e192edff4fe2213ac9092c2e3aa7c'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 69
+PREFIX_SIZE, ABI = 0xC000, 70
 from v3_import_storage import PACKAGE, PACKAGE_RAM, PACKAGE_SIZE, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -392,7 +392,7 @@ def build(output, selected=(), *, select_all=False):
         current['accessory_runtime']['package_sha256'] = package_sha
         current['import_storage'].update(package_sha256=package_sha,
             profile_rows_sha256=sha256(blob[ROWS:ITEMS]), item_rows_sha256=sha256(blob[ITEMS:TABLE_END]))
-        for section in ('camping', 'tent_model'):
+        for section in ('camping', 'tent_model', 'fire'):
             current[section].update(package_sha256=package_sha, optional_composition_updated=True)
             for row in current[section]['imports']:
                 row['enabled'] = row['id'] in selection['enabled']

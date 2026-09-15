@@ -39,7 +39,7 @@ def sources(base):
 
 
 def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False,
-          western_large=False, camping=False, tent_model=False):
+          western_large=False, camping=False, tent_model=False, fire=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -86,6 +86,14 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
         row = source_metadata(rel, donor_symbols, ACTORS[2])
         row.update(runtime_index=row['donor_runtime_index'], ordinary_stock=False)
         garden_rows[0x336C] = large_rows[0x336C] = reviewed[0x336C] = row
+    if fire:
+        from v3_camping_actor_art import ACTORS, source_metadata
+        if not camping:
+            raise ValueError('Fire catalogue needs the camping integration')
+        for actor in ACTORS[:2]:
+            row = source_metadata(rel, donor_symbols, actor)
+            row.update(runtime_index=row['donor_runtime_index'], ordinary_stock=False)
+            garden_rows[actor.item] = large_rows[actor.item] = reviewed[actor.item] = row
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (

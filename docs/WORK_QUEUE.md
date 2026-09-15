@@ -291,12 +291,20 @@ with later e/e+ donor support investigated separately.
   Five cartridge checks, twelve current composition checks, and the initial
   74-record native run pass actual allocation, complete font/header relocation,
   both new samples, start/stop, restoration, and guards. Permanent capacity has
-  256 bytes spare; session/cache capacity is unchanged. Continue fire
-  rig/billboard/scroll and positional sound callbacks,
-  and summer-camper acquisition, then other donor content and
-  ordinary gameplay/persistence. The eight installed Tent rewards do not enter normal
-  shop stock. Neither served patcher changes. Current catalogue suffix headroom
-  is 256 bytes; the menu pool has 448 bytes spare.
+  256 bytes spare; session/cache capacity is unchanged. The
+  [complete fire runtime](checkpoints/V3_FIRE_RUNTIME.md) installs both full
+  rig/billboard/scroll and positional sound callbacks, item profiles/readers,
+  English metadata, four-cell bonfire, catalogue/scoring, and saved dependencies
+  in ABI 70. Twenty-one focused checks pass; the current initial native run
+  passes 110 records, 24 calls, and 90 assertions, including real model DMA,
+  actual rig/draw execution, unaligned arenas, item readers, and guards.
+  Fifty-nine options compose offline; all/empty retain exact full/V2 output.
+  Continue lantern/sleeping-bag behaviour and summer-camper acquisition, then
+  other donor content and ordinary gameplay/persistence. The ten installed Tent
+  rewards do not enter normal shop stock. Neither served patcher changes.
+  Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes
+  spare. The furniture helper has 220 bytes spare. Further content must respect
+  those bounds or expand the relevant allocation before installation.
   The [expanded import storage](checkpoints/V3_IMPORT_STORAGE.md) preserves the
   full 3,389-entry DMA directory and relocates the unchanged English choice bank.
   ABI 67 provides 1,847,280 bytes of free import storage and fixed

@@ -72,6 +72,12 @@ void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
         preview->scale = 0.85f;
     }
 #endif
+#ifdef AF_V3_FIRE
+    if (((u16)argument & 0xFFFCu) == 0x3360u && af_v3_furniture_import_profile(1240)) {
+        preview->model_y = -3.0f;
+        preview->scale = 0.86f;
+    }
+#endif
 }
 #endif
 
@@ -134,6 +140,9 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
 #endif
 #ifdef AF_V3_TENT_MODEL
     if ((item & 0xFFFCu) == 0x336Cu) return 0;
+#endif
+#ifdef AF_V3_FIRE
+    if ((item & 0xFFFCu) == 0x335Cu || (item & 0xFFFCu) == 0x3360u) return 0;
 #endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price

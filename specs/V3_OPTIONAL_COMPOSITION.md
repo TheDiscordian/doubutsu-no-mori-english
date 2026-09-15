@@ -2,10 +2,9 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-69 integration cartridge,
-including the complete tent model, its checked DMA loader, and the installed
-fire-sound resources/allocation. Fire item profiles are not yet implemented
-and do not appear as selectable options. Shared audio resource/header changes
+Compose experimental selections from the pinned ABI-70 integration cartridge,
+including the complete tent model, both fires, their checked DMA/callback
+loaders, four-cell item readers, and complete sound resources. Shared audio changes
 remain in every nonempty profile; the empty profile still returns exact V2.
 The pinned source includes [expanded import storage](V3_IMPORT_STORAGE.md),
 the [full-sized Western runtime](V3_WESTERN_LARGE_ITEMS.md), dedicated
@@ -13,14 +12,14 @@ model banks, garden imports, expanded reward counters, and corrected aloha scori
 This is an offline development step, not a served web option or a declaration
 that all imported gameplay is complete. Neither V2 patcher changes.
 
-The selectable development catalogue contains twenty villagers and thirty-seven
-installed logical items: thirty-four furniture items and three shirts. A shirt's
+The selectable development catalogue contains twenty villagers and thirty-nine
+installed logical items: thirty-six furniture items and three shirts. A shirt's
 mannequin is a required representation, not another selectable item. Unconverted
 donor items are rejected. Select-all means these installed development entries,
 not every item on the donor disc.
 
 An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-69 engine and all compiled resources, but enables only the
+retains the shared ABI-70 engine and all compiled resources, but enables only the
 chosen identities and their declared dependencies. IDs, object slots, house
 layers, and allocations never depend on order or subset. Resource compaction is
 not part of this step.
@@ -42,18 +41,18 @@ again from the original selection, not by editing an earlier dependency result.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-69 cartridge and its source report. Validate each
+Pin both the complete ABI-70 cartridge and its source report. Validate each
 installed registry binding before generating writes. Resident changes cover the profile
 at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
 metadata's `present` bytes, and the installed furniture/clothing/mannequin
 `enabled` fields. Furniture's existing selector reads the `enabled` field;
 changing the save profile alone would not disable ordinary furniture stock.
 
-Thirty-three furniture rows occupy fixed canonical slots in the expanded
+Thirty-five furniture rows occupy fixed canonical slots in the expanded
 accessory/audio package at RAM `80484000`, backed by blob offset `211000`.
 The slot is `(item - 3000) / 4`; absent slots stay zero. Validate the package descriptor
 and CRC before resolving that mapping; subtracting the main prefix RAM base
-would target the wrong resource. Only the thirty-three reviewed four-byte enable words
+would target the wrong resource. Only the thirty-five reviewed four-byte enable words
 are writable in that package. The animated speed bag retains its prefix row.
 The shared item metadata is at `80498000`; composed reports retain the correct
 address and logical row count for each installed batch. The dedicated model pool
@@ -66,6 +65,8 @@ Its item-code extension and the fixed save-resource forwarding entries remain
 unchanged across profiles. Watering trough, covered wagon, and storefront retain
 size 1/two-cell metadata. The selected profile gates their compiled catalogue
 framing; raw GameCube preview-mode numbers are never written into native rows.
+The bonfire retains size 2/four-cell metadata and its complete fire callbacks;
+both fires keep their native loop programs, samples, and per-actor sound IDs.
 
 Pack selected appended catalogue rows after all unchanged native rows, preserving
 donor order and every item ID. Clear unused appended table slots in their existing

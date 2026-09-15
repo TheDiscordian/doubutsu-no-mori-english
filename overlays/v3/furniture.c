@@ -222,6 +222,12 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
         if (row->index == 1243 && row->item == 0x336Cu && row->profile[16] == 0x80483700u)
             complete_object_callback = 1;
 #endif
+#ifdef AF_V3_FIRE
+        /* Both reviewed fire tables have only create/move/draw callbacks. */
+        if ((row->index == 1239 && row->item == 0x335Cu && row->profile[16] == 0x80483FC0u) ||
+            (row->index == 1240 && row->item == 0x3360u && row->profile[16] == 0x80483FD8u))
+            complete_object_callback = 1;
+#endif
         if (!complete_object_callback) return 0;
     }
     if (dma((void *)(uptr)bank, row->profile[0], size)) return 0;

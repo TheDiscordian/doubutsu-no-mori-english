@@ -77,5 +77,25 @@ int main(void) {
     af_v3_furniture_profiles[AF_V3_SPEED_BAG_INDEX] = AF_V3_SPEED_BAG_PROFILE;
     assert(af_v3_furniture_import_dma(AF_V3_SPEED_BAG_INDEX, AF_V3_SPEED_BAG_ITEM, AF_V3_BANK_POOL_DATA, 0));
     assert(requests == 8);
+#ifdef AF_V3_FIRE
+    for (u32 n = 0; n < 2; ++n) {
+        u32 index = 1239 + n, item = 0x335C + n * 4;
+        struct Import *fire = &af_v3_furniture_imports[index - 1024];
+        *fire = *row; fire->index = index; fire->item = item;
+        fire->profile[0] = expected_vrom = 0x2468000 + n * 0x2000;
+        expected_bytes = n ? 6032 : 8000;
+        fire->profile[1] = expected_vrom + expected_bytes;
+        fire->profile[3] = 0x06000000 + expected_bytes;
+        fire->profile[16] = 0x80483FC0 + n * 24;
+        profiles[index] = AF_V3_STATIC_IMPORT_RAM + (index - 1024) * 80 + 8;
+        for (u32 rotation = 0; rotation < 4; ++rotation)
+            assert(af_v3_furniture_import_dma(index, item | rotation, AF_V3_BANK_POOL_DATA, 0));
+        u32 previous = requests;
+        fire->profile[16] = 0x80483FC0 + (1 - n) * 24;
+        assert(!af_v3_furniture_import_dma(index, item, AF_V3_BANK_POOL_DATA, 0));
+        assert(requests == previous);
+    }
+    puts("Both complete fire DMAs, rotations, and mismatched callback rejection pass");
+#endif
     puts("tent complete-object DMA, reload, static/speed-bag retention, rejection, and failure handling pass");
 }

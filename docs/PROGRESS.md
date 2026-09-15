@@ -2,15 +2,35 @@
 
 ## Active development
 
-The [fire-sound runtime](checkpoints/V3_FIRE_SOUND_RUNTIME.md) installs both
+The [complete fire runtime](checkpoints/V3_FIRE_RUNTIME.md) installs campfire and
+bonfire with full rigs, camera-facing flames, two scrolling textures, positional
+sound, English metadata, catalogue/scoring, and selected dependencies in ABI 70.
+The bonfire has its true four-cell footprint. Twenty-one focused checks pass;
+the current silent native run passes 110 records, 24 calls, and 90 assertions,
+including actual full model DMA, native rig/draw execution, unaligned graphics
+arenas, placement readers, restoration, and guards. The offline composer has
+59 experimental options with exact all/empty full/V2 output. No additional
+resident, model-bank, normal heap, or menu allocation is required.
+
+Current full integration:
+`build/v3-fire-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`e2a8ddfb41b7ad7d111cf666dc4b4706046d6edff1fe88968e925603a9345ad5`.
+The two-fire subset is `build/v3-optional-fires-02/`.
+Continue the remaining camping behaviours and summer-camper acquisition, then
+other donor content and ordinary gameplay/persistence. GPU appearance and
+original-hardware acceptance remain unverified. Both served patchers remain V2;
+this is not a complete-import playtest handoff. Saves using either fire require
+a matching/superset import profile; no save-structure change is introduced.
+
+The retained [fire-sound runtime](checkpoints/V3_FIRE_SOUND_RUNTIME.md) installs both
 complete two-layer sounds and their missing samples, retaining all current
 sounds. Its five cartridge checks, twelve composition checks, and initial
 74-record native run pass. Actual allocation, all six waveform headers,
 complete 74-instrument font relocation, both new sample transfers, native level
 start/stop, and final guards pass. Audio reserves 1 KiB more; session/cache
 capacity stays intact, and the permanent pool has 256 bytes spare. The fires'
-graphics/interaction callbacks and item installation remain work; they are not
-selectable yet. Both served patchers remain V2.
+graphics/interaction callbacks and item installation are supplied by the current
+integration above. Both served patchers remain V2.
 
 The [tent-model loader repair](checkpoints/V3_TENT_MODEL_LOADER.md) enables actual
 ROM DMA for the complete callback-owned tent. Fifteen focused tests pass; the
@@ -29,10 +49,10 @@ and checkpoint restoration. No extra resident RAM, model banks, or normal heap
 allocation is needed. The offline composer has 57 experimental options, with
 exact all/empty full/V2 output and deterministic individual selection.
 
-Current full integration:
+Sound-only integration checkpoint:
 `build/v3-fire-sound-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
 `f3d055a74c2172029755b6be39e84b29658a17e83ef599a4f2fe6453570cb48f`.
-The tent-only subset retaining the new sound runtime is `build/v3-optional-fire-audio-01/`.
+Its tent-only subset is `build/v3-optional-fire-audio-01/`.
 Ordinary light interaction, rendering, acquisition, and persistence are not yet
 verified. Both served patchers remain V2; this is not a complete-import playtest
 handoff. The selected-import dependency set changes, not the save format; a town
@@ -44,10 +64,9 @@ fire rigs, and both tent-light palettes. All 18,320 native asset bytes fit the
 existing model banks. The bonfire's true four-cell item reader is implemented
 and compiles to 1,020 bytes within the existing code reservation. Twenty-one
 focused checks pass, including sanitised shared readers and full source/asset
-checks. Both fires still need native callbacks and item/cartridge/composer
-installation; their complete mapped sounds are installed. Summer-camper acquisition for all ten rewards
-remains work. The two fires are not selectable; tent is available only through
-the experimental offline composer, and both served patchers remain V2.
+checks. Both complete fire actors and their individual offline options are
+installed by the current runtime above. Summer-camper acquisition for all ten
+rewards remains work. Both served patchers remain V2.
 
 The [camping integration](checkpoints/V3_CAMPING_ITEMS.md) installs seven complete
 objects: kayak, backpack, lantern, cooler, mountain bike, sleeping bag, and propane
@@ -59,7 +78,7 @@ calls and 37 memory assertions, including complete loaded rows and intact guards
 These seven entries retain deterministic individual selection in the current
 offline composer.
 
-Summer-camper acquisition, two remaining camping callback integrations, ordinary
+Summer-camper acquisition, remaining lantern/sleeping-bag behaviour, ordinary
 placement/rendering/persistence, and the remaining donor content are unfinished.
 The seven rewards are not substituted into ordinary shop stock. Both served
 patchers remain V2; this is not a complete-import playtest handoff.

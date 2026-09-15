@@ -14,6 +14,9 @@ static u32 last_item; static int last_category, last_list; static void *last_gam
 static jmp_buf halted;
 void af_v3_save_halt(int reason) { (void)reason; longjmp(halted, 1); }
 int af_v3_furniture_import_profile(u32 index) {
+#ifdef AF_V3_FIRE
+    if (index == 1238 || index == 1239) return selected;
+#endif
 #ifdef AF_V3_CAMPING_ITEMS
     /* Deliberately allow neighbouring fixture IDs as well: the seven-item
      * catalogue exclusion must not spread into adjacent identities. */
@@ -105,16 +108,28 @@ int main(void) {
 #ifdef AF_V3_CAMPING_ITEMS
     for (int enabled = 0; enabled < 2; ++enabled) {
         selected = enabled;
-        for (u32 item = 0x3360; item <= 0x33B4; item += 4) {
+        for (u32 item =
+#ifdef AF_V3_FIRE
+                0x3358;
+#else
+                0x3360;
+#endif
+                item <= 0x33B4; item += 4) {
             int reward = item == 0x3364 || item == 0x3370 || item == 0x339C ||
                 item == 0x33A4 || item == 0x33A8 || item == 0x33AC || item == 0x33B0;
 #ifdef AF_V3_TENT_MODEL
             reward |= item == 0x336C;
 #endif
+#ifdef AF_V3_FIRE
+            reward |= item == 0x335C || item == 0x3360;
+#endif
             for (u32 rotation = 0; rotation < 4; ++rotation) {
                 u32 argument = 0xABCD0000u | item | rotation;
                 af_v3_original_catalogue_furniture_init(&expected, argument);
                 if (enabled && item == 0x33A8) expected.scale = 0.85f;
+#ifdef AF_V3_FIRE
+                if (enabled && item == 0x3360) expected.scale = 0.86f;
+#endif
                 int calls = init_calls;
                 af_v3_catalogue_furniture_init(&preview, argument);
                 assert(init_calls == calls + 1 && last_item == argument);
