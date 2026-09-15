@@ -14,14 +14,15 @@ materials, and dynamic references. `tools/v3_campsite_scene.py` converts the
 scene/field packet, and `tools/v3_campsite_runtime.py` installs its loader and
 all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
 callbacks and native structure-loader binding. ABI 73 adds the native calendar
-and expanded event index. Event-manager activation, the complete visitor,
-conversations/rewards, and special scene lighting remain unfinished. Neither
+and expanded event index. ABI 74 supplies an independently owned visitor Animal,
+registration/defaults, and native NPC-info attachment. Event-manager activation,
+remaining masked readers/conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes.
 
 `overlays/v3/campsite_event.c` supplies the calendar, selection, and start/stop
 module. `campsite_calendar.c` binds its calendar to the native directory and
 date operations. Selection and lifecycle entries still require the event-manager
-and visitor adapters. The [native calendar checkpoint](../docs/checkpoints/V3_CAMPSITE_CALENDAR.md)
+and greeting/placement adapters. The [native calendar checkpoint](../docs/checkpoints/V3_CAMPSITE_CALENDAR.md)
 records fifteen focused/composition checks and passing native calendar/save-area
 execution; these do not establish an active tent visitor or ordinary acquisition.
 
@@ -249,10 +250,10 @@ RAM checks, not save/restart persistence or completed tent gameplay.
 ## Integration and verification still required
 
 The five native event-save areas offer forty payload bytes each, with two
-needed for the camper. Native masked NPC aliases lack the donor's full Animal
-record, so separate visitor ownership and all masked readers must be connected
-before tent activation. Preserve allocation-failure handling and do not register
-an unsupported masked identity against bounded original actor tables.
+needed for the camper. The independent visitor owner below supplies the full
+Animal without using a town slot. Connect the event-manager and remaining masked
+readers before tent activation. Preserve allocation-failure handling and do not
+register an unsupported masked identity against bounded original actor tables.
 
 Finish event-manager activation and saved camper
 identity, NPC/conversation readers, scene lighting/floor sounds, and enabled
@@ -269,3 +270,50 @@ open, including other donor content and browser composition.
 Executed conversion checks and artifact hashes are recorded in the
 [art checkpoint](../docs/checkpoints/V3_CAMPSITE_ART.md). Current installed-scene
 checks are recorded in the [runtime checkpoint](../docs/checkpoints/V3_CAMPSITE_SCENE.md).
+
+## Independent camper ownership
+
+`camper.c` and `camper_reader.c` install the native counterpart of GC's
+`mNpc_RegistMaskNpc_summercamp` and masked `mNpc_SetNpcinfo` branch. All five
+original twelve-byte aliases and fifteen town Animal/NpcList slots remain.
+An existing matching alias retains its Animal and memories; a conflicting alias,
+full table, disabled import, test ID, or incomplete outfit fails registration.
+Registration never clears an Animal referenced by an existing alias.
+
+| Owner | Address | Bytes |
+| --- | --- | ---: |
+| Checked visitor header/state/Animal/guard | `804A1A00` | 1,376 |
+| Complete native Animal inside owner | `804A1A20` | 1,320 |
+| Preserved native NPC-info prologue/trampoline | `804A1F60` | 16 |
+| Native NPC-info attachment adapter | `804A29A0` | 200 |
+| Complete registration/default/memory adapter | `804A2D00` | 448 |
+
+These reservations are verified unused before writing. The scene packet's
+existing exterior descriptor, scene guard, event index/calendar packet, and
+final package guard remain. Package size stays `30000` and neither the normal
+heap nor furniture pool grows. Startup verifies the whole package and invalidates
+`804A0100..804A2FFF`, covering both adapters and the original-function trampoline.
+Its native NPC-info detour preserves the full original path for unrelated actors.
+
+Registration uses the installed optional-town predicate and full indexed-default
+initializer. Both ordinary imports and selected islanders receive their actual
+personality, outfit, catchphrase reference, and town identity. Zero outfit means
+the animal's default; valid native/additive or reserved `FE20` overrides remain,
+and invalid explicit overrides use `2400`. The registered texture and identity
+are both the full actual `E0xx`, not a table index or replacement resident.
+
+The session greeting flag is owner byte `10`. The caller resets it for a newly
+selected camper and sets it after the actual first greeting. Re-registration
+with the flag set recreates the current player's first memory via the native
+memory setter. **Native Animal memories start at `+10`, not `+0C`**; the original
+initializer at `800A7A28` accounts for alignment. Personal IDs are sixteen bytes,
+the timestamp starts at memory `+10`, and friendship is at memory `+28`.
+The registration caller must supply the actual current private-player pointer.
+Greeting state transitions are still an event-manager/conversation task.
+
+The NPC-info adapter gives `D08F` the dedicated Animal and a null town NpcList,
+as in GC. A cleared or mismatching alias gives null pointers even if the caller
+supplies a valid resident index. Existing English actor-name and draw-record
+readers then resolve through the actual animal/alias. This does not by itself
+establish a complete NPC constructor, conversation, GPU draw, or save/restart.
+The [camper checkpoint](../docs/checkpoints/V3_CAMPER.md) records current evidence.

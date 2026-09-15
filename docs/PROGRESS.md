@@ -2,23 +2,29 @@
 
 ## Active development
 
-The [native summer calendar](checkpoints/V3_CAMPSITE_CALENDAR.md) installs
-the calendar, independent expanded event index, and native reader/cleanup hooks
-in ABI 73. All original event types/schedules remain. Fifteen focused/composition
-tests pass. The corrected native run passes 112 records, 63 calls, and 55
-assertions, including actual weekly/date/scene handling, shared status readers,
-and camper event-save allocation/readback in emulated RAM. A real weekly-date
-encoding mismatch found by the first run is fixed. Actual save/restart is not
-claimed from these RAM checks.
+The [independent camper](checkpoints/V3_CAMPER.md) installs complete visitor
+Animal ownership, optional-roster/default/outfit registration, current-player
+memory reconstruction, and native NPC-info attachment in ABI 74. No town slot,
+heap growth, or model bank is used. Fifteen current focused/composition checks
+pass. The corrected native run passes 144 records with no failed assertions,
+including actual native/imported defaults, English names, masked draw records,
+alias capacity/selection checks, greeting memory, and complete native save/town
+list preservation. The native greeting-memory alignment is explicitly handled.
+These are native RAM/reader checks, not full NPC construction or persistence.
 
 Current full integration:
-`build/v3-campsite-calendar-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`90279325c2c9c0b316e9705e741d4e1f7313c80b88df93e18736d0d84be35b6d`.
-The ten-item subset is `build/v3-optional-campsite-calendar-01/`. The offline
+`build/v3-camper-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`bd2fd28f02f1b667c1038e4ffc1121026d4660d94847afa53eaa03d53c35849f`.
+The ten-item subset is `build/v3-optional-camper-01/`. The offline
 composer retains 59 experimental choices and exact all/empty full/V2 output.
-Continue event-manager tent activation and full visitor Animal/identity/default/
-greeting readers, then English conversations, selected rewards, and lighting.
+Continue event-manager tent activation, remaining masked readers and greeting
+state transitions, English conversations, selected rewards, and lighting.
 Neither served patcher changes. This is not a complete-import playtest handoff.
+
+The installed [native summer calendar](checkpoints/V3_CAMPSITE_CALENDAR.md)
+retains its independent expanded index and all original event types/schedules.
+Its unchanged code retains passing native calendar/status/event-save-area
+evidence; that earlier RAM check is not re-labelled as save/restart persistence.
 
 The [additive tent exterior](checkpoints/V3_CAMPSITE_EXTERIOR.md) installs its
 complete actor callbacks, independent identity, native loader binding, full

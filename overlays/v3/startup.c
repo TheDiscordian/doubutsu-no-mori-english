@@ -95,7 +95,9 @@ int af_v3_startup(void) {
 #endif
 #ifdef AF_V3_CAMPSITE
     /* Additive scene callbacks follow the unchanged sparse-table guard. */
-#ifdef AF_V3_CAMPER_CALENDAR
+#ifdef AF_V3_CAMPER
+    invalidate(accessory_memory+0x2D100, 0x2F00);
+#elif defined(AF_V3_CAMPER_CALENDAR)
     invalidate(accessory_memory+0x2D100, 0x2A00);
 #else
     invalidate(accessory_memory+0x2D100, 0xF00);

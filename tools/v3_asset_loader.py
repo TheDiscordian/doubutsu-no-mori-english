@@ -88,6 +88,8 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'campsite_exterior': ('af_v3_campsite_actor_descriptor', 0x804A0360),
                        'campsite_event': ('af_v3_campsite_schedule', 0x804A2100),
                        'campsite_calendar': ('af_v3_campsite_today_init', 0x804A2740),
+                       'camper': ('af_v3_camper_register', 0x804A2D00),
+                       'camper_reader': ('af_v3_camper_npc_info', 0x804A29A0),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

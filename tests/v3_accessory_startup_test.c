@@ -40,7 +40,9 @@ void af_v3_invalidate(void *p, u32 size) {
 #endif
 #ifdef AF_V3_CAMPSITE
     if (p == af_v3_accessory_memory + 0x2D100) {
-#ifdef AF_V3_CAMPER_CALENDAR
+#ifdef AF_V3_CAMPER
+        assert(size == 0x2F00 && size <= sizeof(art) - 0x2D100);
+#elif defined(AF_V3_CAMPER_CALENDAR)
         assert(size == 0x2A00 && size <= sizeof(art) - 0x2D100);
 #else
         assert(size == 0xF00 && size <= sizeof(art) - 0x2D100);

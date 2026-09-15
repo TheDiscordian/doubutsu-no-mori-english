@@ -332,9 +332,18 @@ with later e/e+ donor support investigated separately.
   capacity. Fifteen current focused/composition tests and the corrected native
   112-record/63-call/55-assertion check pass. Native weekly-date encoding is
   adapted explicitly. Event-save-area checks use RAM, not FlashRAM persistence.
-  Current full build: `build/v3-campsite-calendar-runtime-02/`; camping subset:
-  `build/v3-optional-campsite-calendar-01/`. Both patchers remain V2.
-  Continue event-manager activation, full visitor registration, and English conversations,
+  The [independent camper](checkpoints/V3_CAMPER.md) supplies the complete visitor
+  Animal, optional-roster/default/outfit registration, current-player memory
+  reconstruction, and native NPC-info attachment in ABI 74. It uses no town
+  slot, extra heap, or model bank. Fifteen current focused/composition checks
+  and the corrected 144-record native run pass. Real native/imported defaults,
+  English names, masked draw records, alias limits, greeting memory, and complete
+  native save/town-list preservation are checked. Full NPC construction and
+  ordinary persistence remain unverified. The native memory array is at Animal
+  offset `10`, not the inaccurate source comment's `0C`.
+  Current full build: `build/v3-camper-runtime-02/`; camping subset:
+  `build/v3-optional-camper-01/`. Both patchers remain V2.
+  Continue event-manager activation, remaining masked readers/greeting state, and English conversations,
   selected rewards, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.
