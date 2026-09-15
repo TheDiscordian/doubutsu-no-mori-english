@@ -2,13 +2,23 @@
 
 ## Active development
 
-The [summer-camper event module](checkpoints/V3_CAMPSITE_EVENT.md) implements
-the calendar adjustments, inside/exit scene continuation, subset-aware visitor
-selection, and event start/stop flow. Its 1,600-byte N64 compilation and three
-focused checks pass. It is not installed: native event-directory expansion,
-manager binding, and a complete visitor Animal/identity adapter remain required.
-The current cartridge and composer remain ABI 72, and neither served patcher
-changes. The date adapter handles day-zero subtraction as the donor does.
+The [native summer calendar](checkpoints/V3_CAMPSITE_CALENDAR.md) installs
+the calendar, independent expanded event index, and native reader/cleanup hooks
+in ABI 73. All original event types/schedules remain. Fifteen focused/composition
+tests pass. The corrected native run passes 112 records, 63 calls, and 55
+assertions, including actual weekly/date/scene handling, shared status readers,
+and camper event-save allocation/readback in emulated RAM. A real weekly-date
+encoding mismatch found by the first run is fixed. Actual save/restart is not
+claimed from these RAM checks.
+
+Current full integration:
+`build/v3-campsite-calendar-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`90279325c2c9c0b316e9705e741d4e1f7313c80b88df93e18736d0d84be35b6d`.
+The ten-item subset is `build/v3-optional-campsite-calendar-01/`. The offline
+composer retains 59 experimental choices and exact all/empty full/V2 output.
+Continue event-manager tent activation and full visitor Animal/identity/default/
+greeting readers, then English conversations, selected rewards, and lighting.
+Neither served patcher changes. This is not a complete-import playtest handoff.
 
 The [additive tent exterior](checkpoints/V3_CAMPSITE_EXTERIOR.md) installs its
 complete actor callbacks, independent identity, native loader binding, full
@@ -20,12 +30,12 @@ controller relocation, setup registration, descriptor selection, and pool
 initialization. The combined probe stops at a field-background allocation bound
 before constructing the tent; that unresolved result is not a gameplay pass.
 
-Current full integration:
+Exterior checkpoint:
 `build/v3-campsite-exterior-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
 `61d9bec4ac698420f20df7a062b13d8bf3619989fc78b357245d6ade4589abdf`.
 The ten-item subset is `build/v3-optional-campsite-exterior-01/`. The offline
 composer retains all 59 experimental options and exact all/empty full/V2 output.
-Continue the summer event, saved camper identity, English conversations,
+Continue the event-manager binding, saved camper identity, English conversations,
 selected rewards, and scene lighting/floor sounds. Native actor construction,
 ordinary entry/exit, GPU appearance, and persistence still need verification.
 Neither web patcher changes; this is not a complete-import playtest handoff.

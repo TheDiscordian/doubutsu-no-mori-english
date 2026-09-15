@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-campsite-exterior-runtime-01'
-BASE_SHA = '61d9bec4ac698420f20df7a062b13d8bf3619989fc78b357245d6ade4589abdf'
-REPORT_SHA = '24fa37a4cd3bb5b5ace06cc10bfedf001b29a0ac2c0e905618f1a60c741fbc8b'
+BASE = ROOT/'build/v3-campsite-calendar-runtime-02'
+BASE_SHA = '90279325c2c9c0b316e9705e741d4e1f7313c80b88df93e18736d0d84be35b6d'
+REPORT_SHA = 'b687603059f655afe7293887d265a66cbc8e868c91c8dddc68378ec5c2c4fedd'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 72, 0x2F010
+PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 73, 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -391,6 +391,7 @@ def build(output, selected=(), *, select_all=False):
         current['construction_catalogue']['optional_composition_updated'] = True
         current['accessory_runtime']['package_sha256'] = package_sha
         current['campsite'].update(package_sha256=package_sha, optional_composition_updated=True)
+        current['campsite_calendar'].update(package_sha256=package_sha, optional_composition_updated=True)
         current['import_storage'].update(package_sha256=package_sha,
             profile_rows_sha256=sha256(blob[ROWS:ITEMS]), item_rows_sha256=sha256(blob[ITEMS:TABLE_END]))
         for section in ('camping', 'tent_model', 'fire'):

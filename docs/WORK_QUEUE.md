@@ -324,14 +324,17 @@ with later e/e+ donor support investigated separately.
   relocation, setup registration, descriptor selection, and pool initialization
   pass; native construction/drawing/cleanup remain unverified after the combined
   probe's field-background allocation bound fails. The failure is unresolved,
-  not waived as a fixture problem. The current full build is
+  not waived as a fixture problem. The exterior checkpoint build is
   `build/v3-campsite-exterior-runtime-01/`; its camping subset is
   `build/v3-optional-campsite-exterior-01/`. Neither patcher changes.
-  The [event module](checkpoints/V3_CAMPSITE_EVENT.md) implements calendar,
-  selection, and start/stop logic with three passing focused checks. It is
-  compiled but not installed; native directory/manager and complete visitor
-  bindings remain required. The current cartridge stays ABI 72.
-  Continue event activation, camper registration and English conversations,
+  The [native calendar](checkpoints/V3_CAMPSITE_CALENDAR.md) installs the event
+  index/readers and calendar hooks in ABI 73, preserving native holidays and
+  capacity. Fifteen current focused/composition tests and the corrected native
+  112-record/63-call/55-assertion check pass. Native weekly-date encoding is
+  adapted explicitly. Event-save-area checks use RAM, not FlashRAM persistence.
+  Current full build: `build/v3-campsite-calendar-runtime-02/`; camping subset:
+  `build/v3-optional-campsite-calendar-01/`. Both patchers remain V2.
+  Continue event-manager activation, full visitor registration, and English conversations,
   selected rewards, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.

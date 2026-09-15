@@ -13,15 +13,17 @@ verifies the actual decoded REL and symbols, full arrays, model relocations,
 materials, and dynamic references. `tools/v3_campsite_scene.py` converts the
 scene/field packet, and `tools/v3_campsite_runtime.py` installs its loader and
 all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
-callbacks and native structure-loader binding in ABI 72. Event, conversations,
-rewards, and special scene lighting remain unfinished. Neither served patcher changes.
+callbacks and native structure-loader binding. ABI 73 adds the native calendar
+and expanded event index. Event-manager activation, the complete visitor,
+conversations/rewards, and special scene lighting remain unfinished. Neither
+served patcher changes.
 
-`overlays/v3/campsite_event.c` supplies the compiled but uninstalled calendar,
-selection, and start/stop module. Its explicit operation tables require actual
-native directory and visitor adapters. The
-[event checkpoint](../docs/checkpoints/V3_CAMPSITE_EVENT.md) records three
-passing focused checks and the verified native constraints; it does not claim
-an active campsite event or another cartridge version.
+`overlays/v3/campsite_event.c` supplies the calendar, selection, and start/stop
+module. `campsite_calendar.c` binds its calendar to the native directory and
+date operations. Selection and lifecycle entries still require the event-manager
+and visitor adapters. The [native calendar checkpoint](../docs/checkpoints/V3_CAMPSITE_CALENDAR.md)
+records fifteen focused/composition checks and passing native calendar/save-area
+execution; these do not establish an active tent visitor or ordinary acquisition.
 
 ## Complete native scenery
 
@@ -89,8 +91,9 @@ required behaviour:
   selects/registers the masked camper, and places/removes the tent on a vacant
   housing lot. Its entry/exit handlers also participate in the event lifecycle.
   `src/game/m_event.c` supplies the calendar adjustments and inside-scene event
-  handling. Preserve the actual schedule and lifecycle; the complete native
-  event layout and capacity still need binding.
+  handling. The native calendar uses an independently allocated type index,
+  retaining the original sixteen daily-event slots. Manager callbacks and full
+  visitor binding still require integration.
 - `src/game/m_npc.c` selects a non-appeared personality/candidate and records
   appearance history. Mask registration uses the actual animal's defaults,
   clothing, and the current player's remembered greeting state. Camper selection
@@ -153,14 +156,16 @@ The edited overlay and relocation resource use new physical storage but retain
 their original VROMs and DMA directory slots. The directory still has 3,389 files
 and its original terminator.
 
-The checked resident package expands from `2D010` to `2F010` bytes, adding 8 KiB.
-Its original guard at `804A0000` remains, the packet has its own tail guard,
-and the final package guard moves to `804A2000`. Package end `804A2010` stays
-below the furniture pool at `80500000`. Startup verifies the larger CRC and
-invalidates the new code reservation. Saved format 2 and selected identities
-remain unchanged. The offline composer uses this current cartridge, retains
-shared scene data in nonempty profiles, and reproduces exact V2 when empty.
-Event activation must be conditional on selected camping content when installed.
+The checked resident package is `30000` bytes. Its original guards at
+`804A0000` and `804A2000` remain, the scene and calendar packets have their own
+guards, and the final package guard is `804A2FF0`. Package end `804A3000` stays
+below the furniture pool at `80500000`; its VROM end `02430000` meets the next
+existing resource. Further growth needs separately checked storage, not an
+in-place increase. Startup verifies the complete CRC and invalidates the new
+code reservation. Saved format 2 and selected identities remain unchanged.
+The offline composer retains shared scene data in nonempty profiles and exact
+V2 when empty. The calendar requires selected camping content; event-manager
+activation must preserve that condition when installed.
 
 ## Installed exterior actor
 
@@ -212,25 +217,44 @@ pass. The combined native probe stops at a field-background allocation bound
 before actor construction; the cause is unresolved. Do not claim native tent
 construction, drawing, cleanup, natural entry, or persistence from that run.
 
-## Integration and verification still required
+## Installed native calendar
 
 The event module preserves the supplied donor's twelve-byte calendar row,
 seasonal month substitution, Sunday adjustment, and separately ordered exit-frame
 and inside-tent rows. It retains the inclusive ending hour 14. Date subtraction
-handles day zero like the donor; the native helper does not. Calendar decoding
-continues to be an adapter operation so existing date rules remain authoritative.
+handles day zero like the donor; the native helper does not. The native calendar
+adapter also translates the weekly encoding: GameCube uses week 7/current and
+6/last, whereas N64 uses 9/current and 15/last. It retains GameCube's month-end
+clamp and uses native first/last Saturday decoding where required. The original
+date functions and schedules for other events remain unchanged.
 Visitor selection uses six personalities and the donor's 236 shuffle operations,
 with full fixed IDs and an explicit installed-selection predicate.
 
-Native event types occupy only seventy index bytes, and native initialization
-and cleanup still cover those seventy types. Proposed type 70 is not usable
-until that directory is extended. Existing named BSS next to the index is not
-an assumed reservation. The five native event-save areas offer forty payload
-bytes each; using two for the camper does not by itself make a new event safe.
-Native masked NPC aliases lack the donor's full Animal record, so separate
-visitor ownership and all masked readers must be connected before activation.
+Event type 70 uses the independently allocated 128-byte index at `804A2B00`.
+All eighteen native index readers/writers move, including the direct event-16
+consumer. Native initialization still owns its original BSS, then initializes
+the new index. Both cleanup loops cover types 0–70. End pointers for the
+unchanged daily-event array retain their original addresses, even where those
+addresses equal the old index start. Forty checked instruction writes install
+these changes and the initialization/pre-cleanup calls. The calendar runs inside
+the original job gate and preserves the native first-entry result.
 
-Finish event schedule and saved camper
+The 1,600-byte event module at `804A2100`, 588-byte native adapter at `804A2740`,
+index, and checked packet at `804A2C00` add 4,080 resident bytes. Normal heaps,
+model banks, and the sixteen daily-event slots remain unchanged. Native shared
+readers, actual calendar insertion, saved-event allocation/readback/release,
+neighbouring BSS, and guards have passing current evidence. These are emulated
+RAM checks, not save/restart persistence or completed tent gameplay.
+
+## Integration and verification still required
+
+The five native event-save areas offer forty payload bytes each, with two
+needed for the camper. Native masked NPC aliases lack the donor's full Animal
+record, so separate visitor ownership and all masked readers must be connected
+before tent activation. Preserve allocation-failure handling and do not register
+an unsupported masked identity against bounded original actor tables.
+
+Finish event-manager activation and saved camper
 identity, NPC/conversation readers, scene lighting/floor sounds, and enabled
 reward filtering. Assign stable additive identities without replacing existing
 scenes, events, or furniture. Only selected rewards may be awarded.
