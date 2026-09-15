@@ -65,6 +65,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
     entry, expected = {'startup': ('af_v3_startup', MODULE_RAM + STARTUP),
                        'accessory': ('af_v3_accessory_draw', 0x80473100),
                        'melody_expanded': ('af_v3_melody_start', 0x80473500),
+                       'clothing_roster': ('af_v3_roster_clothing_record', 0x80473A00),
                        'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
                        'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
                        'villager_readers': ('af_v3_mail_source_name', BLOB_RAM + 0x5400),

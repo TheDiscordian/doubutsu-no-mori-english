@@ -182,8 +182,10 @@ and the final post-audio guards remain unresolved; move-in flags stay off.
 The [complete text installation](V3_COMPLETE_VILLAGER_TEXT.md) supplies all
 twenty names and full phrases, preserving personality and donor growth values.
 Full-name aliases, actual dialogue insertions, borrowed phrases, and profile
-handling have focused/native evidence. The eighteen islanders need their actual
-two aloha shirts, houses, and explicit town behaviour before move-ins can be enabled.
+handling have focused/native evidence. The [aloha outfit runtime](V3_ALOHA_OUTFITS.md)
+installs both actual shirts and all eighteen islander defaults, with complete
+native resource/name/price/default checks. Their mannequin/catalogue/acquisition
+consumers, houses, and explicit town behaviour remain work before move-ins can be enabled.
 
 ### Items
 

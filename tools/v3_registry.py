@@ -24,7 +24,11 @@ FURNITURE = {
 # Additive clothing reservations, independent of donor furniture and native
 # clothing identities. These are not enabled items or saved-profile support.
 CLOTHING_REGISTRY_VERSION = 1
-CLOTHING = {0x24BF: (0x34BF, 0x10BF, STORAGE+0xF000)}
+CLOTHING = {
+    0x24BF: (0x34BF, 0x10BF, STORAGE+0xF000),
+    0x241A: (0x341A, 0x101A, STORAGE+0xE2000),
+    0x241B: (0x341B, 0x101B, STORAGE+0xE2400),
+}
 
 # A placed garment uses a mannequin identity, not its pocket clothing identity.
 # These dependencies are never independently selectable or assigned by order.

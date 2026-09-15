@@ -309,12 +309,16 @@ with later e/e+ donor support investigated separately.
   references in ABI 54. Six focused checks and the initial 168-record /
   90-assertion native run pass, including full-length dialogue insertion,
   borrowed phrases, aliases, profile loading, retained save state, and guards.
-  Next import the actual two aloha shirts `241A`/`241B`: all eighteen islanders
-  need one of these, and neither matches a native garment. Their applied outfit
-  remains zero and donor islander permission stays 2 until explicit town adaptation.
-  Complete those defaults, houses, ordinary move-ins, and persistence; do not
-  replay the passing text checks. Earlier pilot-only builds reject saves written
-  with the expanded text profile; retain separate test saves and compatibility warnings.
+  The [aloha outfit runtime](checkpoints/V3_ALOHA_OUTFITS.md) installs both actual
+  garments, all eighteen applied outfits, checked shared readers, and independent
+  saved clothing dependencies. Seven focused checks and the corrected native
+  run's 109 records / 55 assertions pass. Register-preserving bridges fix the
+  confirmed native boot defect; actual selected records supply names and prices.
+  Next connect the new garments' display/catalogue/acquisition consumers, islander
+  houses, explicit town behaviour, ordinary move-ins, and persistence. Donor growth
+  permission stays 2, and every move-in flag stays off. Do not replay passing
+  text/default checks. Older builds lacking the new dependencies reject new saves;
+  retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile

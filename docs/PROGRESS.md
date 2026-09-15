@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-all-villager-text-01/animal-forest-v3-asset-loader.z64`, ABI 54, SHA-256
-`eb611e2bade707270d8c72cd11349b344fecb3cd262918c31a4ffc1303ac8101`.
+`build/v3-aloha-outfits-03/animal-forest-v3-asset-loader.z64`, ABI 55, SHA-256
+`53e94b2cfdc960854bb2520e9bc381886e57fb8051f1bf10e34ef8514b76208c`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -422,12 +422,17 @@ readers and actual save-codec subset acceptance and missing-profile rejection.
 The initial native run passes 168 records / 90 assertions: O'Hare, Flossie,
 Annalise, and Plucky's complete text, real dialogue insertions, phrase reset and
 borrowing, unchanged save state, guards, and checkpoint restoration.
-The eighteen islanders still require two actual aloha shirts (`241A`, `241B`),
-neither of which matches any original N64 garment. Their default initialization
-and move-ins remain disabled. The saved dependency profile includes all twenty
-text identities; earlier pilot-only builds reject its saves, although the format
-is unchanged. Ordinary cross-build loading remains unverified. Continue the two
-shirt imports, houses, and explicit islander town behaviour. The audio playback
+The [aloha outfit runtime](checkpoints/V3_ALOHA_OUTFITS.md) supplies both actual
+shirts (`341A`, `341B`), shared resource/name/type/price readers, independent
+clothing profile bits, and all eighteen islander outfit initialisers. Seven
+focused checks and the corrected 109-record / 55-assertion native run pass.
+The native boot defect caused by a compiled caller's live register is fixed
+with checked preserving bridges; single-record name/price assumptions are fixed
+as well. All original garments and unrelated data remain intact. Houses, explicit
+town behaviour, and ordinary move-ins/persistence remain work; move-in flags stay
+off. Aloha mannequin/display and catalogue/acquisition consumers remain work.
+Earlier builds missing these garments reject new saves; the saved format is
+unchanged, but ordinary cross-build loading remains unverified. The audio playback
 issue remains recorded, and both web patchers stay V2.
 
 ## Stable V2 deliverable

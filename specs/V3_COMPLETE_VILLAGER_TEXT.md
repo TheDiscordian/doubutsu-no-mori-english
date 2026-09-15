@@ -49,10 +49,12 @@ The donor clothing names identify `241A` as red aloha shirt and `241B` as blue
 aloha shirt. All eighteen islanders retain donor growth permission 2. No row is silently
 changed to ordinary-villager permission 0. Both aloha-shirt images, `241A` and
 `241B`, are compared against all 256 original N64 garments, including every
-pixel's converted colour. Neither matches. Their applied outfit fields stay
-zero, so the existing default initializer refuses to write partial defaults.
+pixel's converted colour. Neither matches. The text-only stage keeps their
+applied outfit fields zero and refuses to write partial defaults.
 The two complete pilots retain native `2498` and additive `34BF` respectively.
-Import the actual aloha shirts before enabling islander initialization.
+The [aloha outfit runtime](V3_ALOHA_OUTFITS.md) supplies the actual garments and
+connects all eighteen initialisers without changing names, phrases, personality,
+donor growth permission, or the disabled move-in flags.
 
 ## Complete names and saved aliases
 
