@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-town-residents-03/animal-forest-v3-asset-loader.z64`, ABI 57, SHA-256
-`8ea1dd5de03a2d03db7e8bcafc58099a963a9ff2d5bdb8057e538e0100d92b58`.
+`build/v3-aloha-display-03/animal-forest-v3-asset-loader.z64`, ABI 58, SHA-256
+`0f1c532c281ba3dce1bbc32b1085b0207a6617b95090b98d97de2ff1ad2deb0e`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -436,7 +436,7 @@ The native boot defect caused by a compiled caller's live register is fixed
 with checked preserving bridges; single-record name/price assumptions are fixed
 as well. All original garments and unrelated data remain intact. The explicit
 town policy enables selection in the experimental cartridge; ordinary move-ins
-and persistence remain work. Aloha display/catalogue/acquisition remain work.
+and persistence remain work. Aloha ordinary acquisition remains work.
 Earlier builds missing these garments reject new saves; the saved format is
 unchanged, but ordinary cross-build loading remains unverified. The audio playback
 issue remains recorded, and both web patchers stay V2.
@@ -452,9 +452,23 @@ house initialization, complete layer transfers, guards, and checkpoint restorati
 The cartridge stays 32 MiB, original audio/file positions remain intact, and the
 scene foreground allocation grows by 18,648 bytes. Ordinary house entry and the
 complete scene's larger allocation remain unverified. Ordinary move-ins,
-villager persistence, aloha display/catalogue/acquisition, and new-instrument
+villager persistence, aloha ordinary acquisition, and new-instrument
 playback remain work. ABI 56 retains ABI 55's exact save profile and formats;
 ordinary cross-build reload is not newly verified. Both patchers remain V2.
+
+The [complete garment displays](checkpoints/V3_ALOHA_DISPLAY.md) connect all three
+imported shirts to fixed mannequins, full canonical readers, four-rotation
+conversion, ownership, catalogue selection, and complete preview loading. All 245
+native clothing rows remain in order, with three imports appended. Six focused
+tests pass across two invocations. The first native run passes 120 records /
+67 assertions, including full transfers, independent dependency removal, retained
+originals, state restoration, and guards. The catalogue uses 64 additional bytes
+of its existing menu reservation, leaving 320 bytes; no allocation grows. Both
+aloha shirts retain zero donor prices and stay out of general shop stock.
+The profile adds their two display dependencies: the actual codec accepts ABI 57
+saves in ABI 58 and rejects the reverse without source/output writes. Ordinary
+cross-build reload remains unverified. Ordinary acquisition, placement/persistence,
+the house/debugger failure, and new-instrument playback remain open.
 
 ## Stable V2 deliverable
 

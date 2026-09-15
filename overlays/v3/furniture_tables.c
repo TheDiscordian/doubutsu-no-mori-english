@@ -30,6 +30,10 @@ int af_v3_furniture_tables_init(void) {
     }
 #ifdef AF_V3_CLOTHING_DISPLAY
     profiles[AF_V3_CLOTHING_DISPLAY_INDEX] = AF_V3_CLOTHING_DISPLAY_PROFILE;
+#ifdef AF_V3_ALOHA_DISPLAY
+    profiles[AF_V3_RED_DISPLAY_INDEX] = AF_V3_RED_DISPLAY_ROW+8u;
+    profiles[AF_V3_BLUE_DISPLAY_INDEX] = AF_V3_BLUE_DISPLAY_ROW+8u;
+#endif
 #endif
     for (u32 i = 0; i < 4; ++i) first[i] = last[i] = AF_V3_FURNITURE_EDGE;
     return 1;

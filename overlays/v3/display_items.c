@@ -12,8 +12,16 @@ extern void af_v3_prior_catalogue_record(u32);
 extern int af_v3_prior_catalogue_owned(const u8 *, u32);
 
 u32 af_v3_display_pocket_item(u32 item) {
+#ifdef AF_V3_ALOHA_DISPLAY
+    u32 base=item&0xFFFCu;
+    if (item<=65535u && (base==AF_V3_CLOTHING_DISPLAY_ITEM ||
+            base==AF_V3_RED_DISPLAY_ITEM || base==AF_V3_BLUE_DISPLAY_ITEM) &&
+            af_v3_furniture_import_profile(1024u+((base&0xFFFu)>>2)))
+        return 0x3400u+((base-0x3800u)>>2);
+#else
     if (item <= 65535u && (item & 0xFFFCu) == AF_V3_CLOTHING_DISPLAY_ITEM &&
             af_v3_furniture_import_profile(AF_V3_CLOTHING_DISPLAY_INDEX)) return 0x34BFu;
+#endif
     return item;
 }
 

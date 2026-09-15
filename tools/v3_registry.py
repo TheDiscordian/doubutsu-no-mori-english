@@ -33,7 +33,11 @@ CLOTHING = {
 # A placed garment uses a mannequin identity, not its pocket clothing identity.
 # These dependencies are never independently selectable or assigned by order.
 CLOTHING_DISPLAY_REGISTRY_VERSION = 1
-CLOTHING_DISPLAYS = {0x24BF: (1727, 0x3AFC)}
+CLOTHING_DISPLAYS = {
+    0x24BF: (1727, 0x3AFC),
+    0x241A: (1562, 0x3868),
+    0x241B: (1563, 0x386C),
+}
 
 
 def clothing_slot(donor_item):

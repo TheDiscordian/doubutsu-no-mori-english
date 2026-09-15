@@ -326,8 +326,17 @@ with later e/e+ donor support investigated separately.
   90-record / 56-assertion resident/schedule tail. Maelle's full native creation,
   both starting populations, six personality schedules, event overrides, and
   guards pass. This is not ordinary elapsed-day arrival or save/restart evidence.
-  Next connect the new garments' display/catalogue/acquisition consumers and
-  finish ordinary move-ins, house visits, conversations, and persistence.
+  The [complete garment displays](checkpoints/V3_ALOHA_DISPLAY.md) connect all
+  three shirts to fixed display identities, canonical readers, full conversion,
+  ownership, and the 248-row clothing catalogue. Six focused tests pass, and the
+  first native run passes 120 records / 67 assertions covering complete transfers,
+  names/prices, selection, independent dependencies, original retention, and guards.
+  No memory allocation grows; the existing menu reservation has 320 bytes spare.
+  Actual codec tests accept the preceding profile and reject new-profile saves in
+  older builds without writes. Ordinary cross-build reload is not newly verified.
+  Next connect faithful aloha acquisition and finish ordinary move-ins, house
+  visits, conversations, and persistence. Retain the unresolved house/debugger
+  result and new-instrument playback issue; do not replay passing catalogue tests.
   Do not replay passing text/default checks. Older builds lacking dependencies reject new saves;
   retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,

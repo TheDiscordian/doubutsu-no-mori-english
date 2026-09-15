@@ -76,7 +76,7 @@ def table(base, rel, donor_symbols, furniture):
 def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None):
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
-    if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > 0xB50 or len(suffix) % 16
+    if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > 0xC50 or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']
             or runtime['symbols']['af_v3_save_halt'] != IMPORTS['af_v3_save_halt']
             or room['symbols']['af_v3_room_query'] != IMPORTS['af_v3_room_query']
@@ -109,20 +109,21 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         from v3_clothing_catalogue import POINTER, COUNT, TABLE as CLOTH_TABLE, NATIVE_COUNT
         from v3_npc_clothing import guard_incoming
         clothing_table, clothing_report = clothing
+        extra_clothes=3 if '-DAF_V3_ALOHA_DISPLAY=1' in compiled['flags'] else 1
         cloth_address = symbols['af_v3_catalogue_clothing_order']
         cloth_at = cloth_address-RAM
         if ('-DAF_V3_CLOTHING_CATALOGUE=1' not in compiled['flags']
-                or len(clothing_table) != (NATIVE_COUNT+1)*2
+                or len(clothing_table) != (NATIVE_COUNT+extra_clothes)*2
                 or not SIZE <= cloth_at <= len(data)-len(clothing_table)
                 or data[cloth_at:cloth_at+len(clothing_table)] != clothing_table
-                or clothing_table[:-2] != old[CLOTH_TABLE-RAM:CLOTH_TABLE-RAM+NATIVE_COUNT*2]
+                or clothing_table[:NATIVE_COUNT*2] != old[CLOTH_TABLE-RAM:CLOTH_TABLE-RAM+NATIVE_COUNT*2]
                 or sha256(old[0x17C:0x630]) != '9011f6c34b7eba02f11fa2e2b87b18af33bc2569b7a17c8dded46fd44657c37d'
                 or slots.get(POINTER-RAM) != 2 or slots.get(0x342C) != 4
                 or any(at in slots for at in (0x17C, 0x180))):
             raise ValueError('Changed clothing catalogue table, complete initializer, or relocations')
         guard_incoming(old, 14048, RAM, [(0x17C, 8)])
         word(POINTER, CLOTH_TABLE, cloth_address)
-        word(COUNT, NATIVE_COUNT, NATIVE_COUNT+1)
+        word(COUNT, NATIVE_COUNT, NATIVE_COUNT+extra_clothes)
         word(0x808A952C, jump(0x808A931C), jump(symbols['af_v3_catalogue_bit']))
         word(0x808A627C, 0x27BDFFB8, jump(symbols['af_v3_catalogue_furniture_init'], False))
         word(0x808A6280, 0xAFB00020, 0)

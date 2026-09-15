@@ -43,6 +43,16 @@ extern void af_v3_display_test_dma(u32, u32);
 #define display_import (&af_v3_display_import)
 #define display_dma af_v3_display_test_dma
 #endif
+#ifdef AF_V3_ALOHA_DISPLAY
+#ifdef __mips__
+#define red_display ((const struct Import *)AF_V3_RED_DISPLAY_ROW)
+#define blue_display ((const struct Import *)AF_V3_BLUE_DISPLAY_ROW)
+#else
+extern struct Import af_v3_red_display_import,af_v3_blue_display_import;
+#define red_display (&af_v3_red_display_import)
+#define blue_display (&af_v3_blue_display_import)
+#endif
+#endif
 #endif
 
 #ifdef AF_V3_SPEED_BAG
@@ -65,10 +75,21 @@ static const struct Import *find(u32 argument) {
             speed_bag->profile[16] == AF_V3_SPEED_BAG_VTABLE) return speed_bag;
 #endif
 #ifdef AF_V3_CLOTHING_DISPLAY
+#ifdef AF_V3_ALOHA_DISPLAY
+    const struct Import *display = n==AF_V3_CLOTHING_DISPLAY_INDEX ? display_import :
+        n==AF_V3_RED_DISPLAY_INDEX ? red_display : n==AF_V3_BLUE_DISPLAY_INDEX ? blue_display : 0;
+    if (display && display->enabled==1 && display->index==n &&
+            display->item==0x3000u+(n-1024u)*4u &&
+            profiles[n]==(u32)(uptr)display+8u &&
+            display->profile[16]==AF_V3_CLOTHING_DISPLAY_VTABLE &&
+            af_v3_display_clothing_index(display->item)==0x1000u+((display->item-0x3800u)>>2))
+        return display;
+#else
     if (n == AF_V3_CLOTHING_DISPLAY_INDEX && display_import->enabled == 1 &&
             display_import->index == n && display_import->item == AF_V3_CLOTHING_DISPLAY_ITEM &&
             profiles[n] == AF_V3_CLOTHING_DISPLAY_PROFILE &&
             af_v3_display_clothing_index(display_import->item) == 0x10BFu) return display_import;
+#endif
 #endif
     for (i = 0; i < 2; ++i) {
         const struct Import *row = imports + i;
@@ -121,7 +142,11 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
     }
     if (af_v3_furniture_bank_address((int)active) != bank) return 0;
 #ifdef AF_V3_CLOTHING_DISPLAY
-    if (row == display_import) {
+    if (row == display_import
+#ifdef AF_V3_ALOHA_DISPLAY
+            || row==red_display || row==blue_display
+#endif
+            ) {
         if (row->profile[16] != AF_V3_CLOTHING_DISPLAY_VTABLE) return 0;
         display_dma(row->item | (item & 3u), bank);
         indices[(u16)argument] = (u8)active;

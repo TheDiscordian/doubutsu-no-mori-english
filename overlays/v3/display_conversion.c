@@ -8,9 +8,16 @@ extern u16 af_v3_prior_display_item(u32);
 extern u16 af_v3_prior_pocket_item(u32);
 
 u16 af_v3_room_display_item(u32 argument) {
+#ifdef AF_V3_ALOHA_DISPLAY
+    u32 item=(u16)argument;
+    if ((item==0x34BFu || item==0x341Au || item==0x341Bu) &&
+            af_v3_furniture_import_profile(1536u+item-0x3400u))
+        return (u16)(0x3800u+(item-0x3400u)*4u);
+#else
     if ((u16)argument == 0x34BFu &&
             af_v3_furniture_import_profile(AF_V3_CLOTHING_DISPLAY_INDEX))
         return AF_V3_CLOTHING_DISPLAY_ITEM;
+#endif
     return af_v3_prior_display_item(argument);
 }
 

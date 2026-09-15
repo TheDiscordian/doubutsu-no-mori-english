@@ -23,6 +23,9 @@ def exercise(debug, rom_path, record):
         raise ValueError('Clothing catalogue needs its exact current cartridge')
     files, boot = by_vrom(rom), boot_proofs(rom)
     blob = files[BLOB].extract(rom)
+    display_rows=cat['clothing'].get('imports') or [cat['clothing']]
+    garments={row['item_id']:row for row in report['clothing']['imports']}
+    complete=bool(report.get('aloha_display'))
 
     def check(label, at, expected):
         actual = debug.read_memory(at, len(expected))
@@ -40,6 +43,17 @@ def exercise(debug, rom_path, record):
     def put(at, *values): debug.write_memory(at, struct.pack('>'+'I'*len(values), *values))
 
     check('complete current resident prefix', BLOB_RAM, blob[:0xC000])
+    if complete:
+        for row in display_rows:
+            pocket,display=int(row['pocket_item_id'],16),int(row['item_id'],16)
+            if call(0x800BEFCC,[pocket])!=display:
+                raise ValueError('Complete garment forward conversion failed')
+            for rotation in range(4):
+                if call(0x800BF10C,[display|rotation])!=pocket:
+                    raise ValueError('Complete garment inverse conversion failed')
+        for item,wanted in ((0x2400,0x17AC),(0x24BF,0x1AA8)):
+            if call(0x800BEFCC,[item])!=wanted:
+                raise ValueError('Original clothing conversion changed')
     size = 0x1C000
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM+RESERVATION <= allocation <= 0x80400000-size:
@@ -85,48 +99,63 @@ def exercise(debug, rom_path, record):
         debug.write_memory(runtime_at+16+PROFILE, bytes(640))
         initialize()
         check('uncollected clothing absent', page, bytes(2))
-        call(0x800B88EC, [0x2400]); call(0x800B88EC, [0x34BF]); call(0x800B88EC, [0x3224])
+        call(0x800B88EC, [0x2400])
+        for row in display_rows:call(0x800B88EC,[int(row['pocket_item_id'],16)])
+        call(0x800B88EC, [0x3224])
         initialize()
-        check('native and imported garments collected', page, bytes.fromhex('0002'))
-        check('complete display IDs preserve original order', page+8, bytes.fromhex('17AC3AFC'))
+        check('native and imported garments collected', page, struct.pack('>H',1+len(display_rows)))
+        imported_ids=b''.join(bytes.fromhex(r['item_id']) for r in display_rows)
+        check('complete display IDs preserve original order', page+8, bytes.fromhex('17AC')+imported_ids)
         check('partial clothing collection indicator', page+6, bytes(1))
         check('static furniture remains on its own page', furniture_page+8, bytes.fromhex('3224'))
         check('static preview presentation retained', state+8+0x758, struct.pack('>ff', 0.9, 42.0))
-        name = call(root+name_at, [page+0x380+10], (root+name_at, loaded[name_at:name_at+92]))
-        if not root+0x9910 <= name <= root+len(data)-16: raise ValueError('Name escaped owned cache')
-        check('complete English clothing name', name, b'cherry shirt'.ljust(16, b' '))
-        debug.write_memory(page+4, bytes.fromhex('0001'))
-        call(root+0x98C, [submenu, 3], proof)
-        check('selection switches preview buffers', state, bytes([1]))
-        preview = state+8+0x760
-        check('selected preview identity', preview, bytes.fromhex('0ABF'))
-        check('real resident mannequin profile', preview+0x748, bytes.fromhex('80466608'))
-        check('native type and animation timer', preview+0x750, struct.pack('>HH', 0, 15))
-        check('native clothing price', preview+0x754, struct.pack('>I', 380))
-        check('native clothing scale and viewing height', preview+0x758, struct.pack('>ff', 1.0, 38.0))
-        check('native clothing model height', preview+12, struct.pack('>f', -4.0))
-        model = blob[0xF000:0xF220]+files[MODEL].extract(rom)
-        check('complete actual garment and mannequin model DMA', banks[1], model)
-        check('preview buffer tail retained', banks[1]+len(model), b'\xA5'*(0x2400-len(model)))
-        if call(0x800BF10C, [0x3AFC]) != 0x34BF: raise ValueError('Catalogue order lost pocket identity')
+        for n,row in enumerate(display_rows,1):
+            garment=garments[row['pocket_item_id']]
+            name = call(root+name_at, [page+0x380+n*10], (root+name_at, loaded[name_at:name_at+92]))
+            if not root+0x9910 <= name <= root+len(data)-16: raise ValueError('Name escaped owned cache')
+            check('complete English clothing name', name, garment['name'].encode().ljust(16,b' '))
+            debug.write_memory(page+4,struct.pack('>H',n))
+            call(root+0x98C, [submenu, 3], proof)
+            selected=n&1
+            check('selection switches preview buffers', state,bytes((selected,)))
+            preview=state+8+0x760*selected
+            check('selected preview identity', preview,struct.pack('>H',row['catalogue_index']))
+            check('real resident mannequin profile', preview+0x748,bytes.fromhex(row['profile_ram']))
+            check('native type and animation timer', preview+0x750, struct.pack('>HH',0,15))
+            check('native clothing price', preview+0x754,struct.pack('>I',garment['price']))
+            check('native clothing scale and viewing height', preview+0x758,struct.pack('>ff',1.0,38.0))
+            check('native clothing model height', preview+12,struct.pack('>f',-4.0))
+            offset=int(garment['vrom'],16)-BLOB
+            model=blob[offset:offset+544]+files[MODEL].extract(rom)
+            check('complete actual garment and mannequin model DMA',banks[selected],model)
+            check('preview buffer tail retained',banks[selected]+len(model),b'\xA5'*(0x2400-len(model)))
+            if call(0x800BF10C,[int(row['item_id'],16)])!=int(row['pocket_item_id'],16):
+                raise ValueError('Catalogue order lost pocket identity')
         debug.write_memory(player+0xAF0, b'\xFF'*120)
         initialize()
-        check('all 246 clothing rows fit original capacity', page, struct.pack('>H', 246))
+        total=245+len(display_rows)
+        check('all clothing rows fit original capacity',page,struct.pack('>H',total))
         check('complete clothing collection indicator', page+6, bytes([1]))
         native_indices = struct.unpack_from('>245H', data, TABLE-RAM)
-        expected = b''.join(struct.pack('>H', 0x1000+i*4) for i in native_indices)+bytes.fromhex('3AFC')
+        expected=b''.join(struct.pack('>H',0x1000+i*4) for i in native_indices)+imported_ids
         check('entire original plus imported clothing list', page+8, expected)
         # Keep current and working profiles consistent while disabling the
         # dependency; never manufacture a save-state mismatch to test a list.
-        for offset in (119, 183):
+        for offset in ((99,163) if complete else (119,183)):
             current, working = BLOB_RAM+0x20+offset, runtime_at+16+offset
             original = debug.read_memory(current, 1)
             try:
-                debug.write_memory(current, bytes([original[0] & 0x7F]))
-                debug.write_memory(working, bytes([original[0] & 0x7F]))
+                mask=4 if complete else 128
+                debug.write_memory(current, bytes([original[0] & ~mask]))
+                debug.write_memory(working, bytes([original[0] & ~mask]))
                 initialize()
-                check('missing dependency removes only imported clothing', page, struct.pack('>H', 245))
-                check('every original catalogue garment retained', page+8, expected[:-2])
+                retained=expected[:490]+b''.join(bytes.fromhex(r['item_id']) for r in display_rows
+                    if r['pocket_item_id']!=('341A' if complete else '34BF'))
+                check('missing dependency removes only its garment',page,struct.pack('>H',total-1))
+                check('all other catalogue garments retained',page+8,retained)
+                if complete:
+                    if call(0x800BEFCC,[0x341A])!=0x341A or call(0x800BF10C,[0x3868])!=0x3868:
+                        raise ValueError('Disabled display conversion failed')
             finally:
                 debug.write_memory(current, original); debug.write_memory(working, original)
         check('catalogue executable prefix retained', root, loaded[:14048])
@@ -140,7 +169,8 @@ def exercise(debug, rom_path, record):
     check('complete runtime restored', runtime_at, saved[runtime_at])
     check('complete private record restored', player, saved[player])
     call(0x8009C040, [allocation])
-    return {'native_clothing_catalogue': True, 'complete_rows': 246,
-            'real_clothing_preview_and_full_name': True, 'order_identity': '34BF',
+    return {'native_clothing_catalogue': True, 'complete_rows':245+len(display_rows),
+            'real_clothing_preview_and_full_name':True,
+            'order_identities':[row['pocket_item_id'] for row in display_rows],
             'ordinary_payment_delivery_tested': False, 'gpu_rendered': False,
             'requires_checkpoint_restore': True}

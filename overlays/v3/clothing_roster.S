@@ -51,6 +51,8 @@
 .endm
 #ifdef AF_V3_TOWN_ELIGIBLE_BRIDGE
 bridge af_v3_town_eligible_bridge, af_v3_town_eligible
+#elif defined(AF_V3_DISPLAY_ROSTER_BRIDGE)
+bridge af_v3_all_display_clothing_index_bridge, af_v3_all_display_clothing_index
 #else
 bridge af_v3_roster_clothing_source_bridge, af_v3_roster_clothing_source
 bridge af_v3_roster_clothing_index_bridge, af_v3_roster_clothing_index

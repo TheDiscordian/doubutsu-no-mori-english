@@ -23,8 +23,9 @@ textures, palettes, and resource mapping.
 The existing eighteen islander records receive the appropriate `341A` or `341B`
 at their applied-outfit field. Names, phrases, personalities, donor clothing
 references, umbrellas, and donor growth permission 2 remain unchanged. Cheri
-and Punchy's complete initial defaults remain intact. All twenty move-in flags
-remain zero: complete outfits do not supply houses or town-compatible behaviour.
+and Punchy's complete initial defaults remain intact. The complete experimental
+cartridge uses the [explicit town policy](V3_TOWN_RESIDENTS.md) for eligibility;
+outfits alone do not supply houses or town-compatible behaviour.
 
 ## Shared runtime and compiled callers
 
@@ -70,6 +71,7 @@ newly verified; preserve existing saves and use disposable copies for testing.
 The [checkpoint](../docs/checkpoints/V3_ALOHA_OUTFITS.md) records the corrected
 cartridge, confirmed boot defect and fix, host checks, and combined native run.
 The [islander arrival houses](V3_ISLANDER_HOUSES.md) supply the eighteen source
-rooms. Mannequin/display identities, catalogue listing, ordinary acquisition/
-persistence, house visits, town behaviour, and enabled move-ins remain work.
+rooms. The [complete display adapter](V3_ALOHA_DISPLAY.md) supplies mannequin
+identities, catalogue listing, and all shared display consumers. Ordinary
+acquisition/persistence, house visits, and ordinary move-ins remain work.
 Both served patchers remain V2 pending user testing and explicit approval.

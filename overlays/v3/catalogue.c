@@ -31,10 +31,24 @@ extern void af_v3_original_catalogue_program(struct Preview *);
 extern int af_v3_native_catalogue_available(u32, int, int, void *);
 #ifdef AF_V3_CLOTHING_CATALOGUE
 extern void af_v3_original_catalogue_furniture_init(struct Preview *, u32);
+#ifdef AF_V3_ALOHA_DISPLAY
+static u32 display_pocket(u32 item) {
+    item&=0xFFFCu;
+    if (item==0x3AFCu || item==0x3868u || item==0x386Cu)
+        return 0x3400u+((item-0x3800u)>>2);
+    return 0;
+}
+#endif
 
 void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
     af_v3_original_catalogue_furniture_init(preview, argument);
-    if (((u16)argument & 0xFFFCu) == 0x3AFCu && af_v3_furniture_import_profile(1727)) {
+    if (
+#ifdef AF_V3_ALOHA_DISPLAY
+            display_pocket((u16)argument) && af_v3_furniture_import_profile(1024u+((argument&0xFFFu)>>2))
+#else
+            ((u16)argument & 0xFFFCu) == 0x3AFCu && af_v3_furniture_import_profile(1727)
+#endif
+            ) {
         /* The native init already owns construction, geometry DMA, lighting,
          * animation, and price. Match its original clothing presentation. */
         preview->model_y = -4.0f;
@@ -68,9 +82,16 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
     u32 item = (u16)argument;
     if ((item >> 12) != 3) return af_v3_native_catalogue_available(argument, category, list, game);
 #ifdef AF_V3_CLOTHING_CATALOGUE
+#ifdef AF_V3_ALOHA_DISPLAY
+    u32 garment=display_pocket(item);
+    if (garment)
+        return category==0 && (u32)list<3 && af_v3_furniture_import_profile(1024u+((item&0xFFFu)>>2)) &&
+            af_v3_native_catalogue_available(garment,2,list,game);
+#else
     if ((item & 0xFFFCu) == 0x3AFCu)
         return category == 0 && (u32)list < 3 && af_v3_furniture_import_profile(1727) &&
             af_v3_native_catalogue_available(0x34BFu, 2, list, game);
+#endif
 #endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price

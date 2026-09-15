@@ -18,7 +18,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) . = ALIGN(16); }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x808B3E00, "V3 catalogue suffix exceeds its bounded pool allowance")
+    ASSERT(. <= 0x808B3F00, "V3 catalogue suffix exceeds its bounded pool allowance")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected V3 catalogue state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }
