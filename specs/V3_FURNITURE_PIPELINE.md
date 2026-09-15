@@ -91,6 +91,13 @@ The shared static-CI4 category supports:
   remain; this is not a substitute for a diary's separate gameplay system.
 - Source-derived placement layers: ordinary floor items, surfaces that hold
   other items, and objects that may be placed on those surfaces.
+- Single-bed contact action `08`. Complete models and profile scalars feed the
+  existing native bed positioning, contact, entry, and exit routines through
+  the expanded profile table. No new bed callback, per-item behaviour switch,
+  or animation replacement is needed. The build checks the current room engine
+  and its four bed-profile bindings before accepting this category. Separate
+  island/holiday acquisition requirements still prevent installation; bed
+  support never substitutes ordinary shop stock for the actual donor route.
 - Constant identity-indexed model/palette selection. A reviewed complete draw
   implementation selects two opaque models and one sixteen-colour palette from
   a complete relocated table. The converter derives the index base, row stride,
@@ -195,7 +202,7 @@ sanitizer checks.
 `tools/v3_furniture_batch_smoke.py` and
 `tests/scenarios/v3_furniture_batch.json` are reusable across future batches.
 The manifest selects representatives by stock group, footprint, model layers,
-action sound, placement/interaction flags, preview mode, and lighting category,
+action sound, placement/interaction flags, contact behaviour, preview mode, and lighting category,
 preferring larger assets. The check exercises actual
 native owner loading,
 model DMA, item readers, placement, catalogue eligibility, acquisition, ownership,
@@ -209,6 +216,10 @@ Framing checks compare every preview field after the actual native helper runs,
 including source floats, unchanged surrounding fields, disabled imports, invalid
 selectors, native fallbacks, and the complete resident table/guards. Calling this
 helper does not establish complete catalogue construction or GPU appearance.
+The bed category exercises the actual native head-direction and both side-position
+functions with a representative imported profile in all four rotations, checks
+inactive-bed rejection, and preserves the complete temporary actor. This does
+not establish an ordinary player climbing onto or leaving the bed.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.
 

@@ -2,7 +2,7 @@
 import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from v3_asset_loader import ROOT, BLOB, compile_part
-from v3_import_storage import PACKAGE, PACKAGE_RAM, ITEMS, slot
+from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ITEMS, slot
 from v3_catalogue import PREVIEW_COUNT
 from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, NATIVE_FILES,
     read_audio_donor, header_entry, resource, span, instrument)
@@ -12,9 +12,37 @@ ENTRY, END = 0x800BED5C, 0x800BEE50
 SOURCE_SHA = 'ec58cd8da4eaf4a51e8913f75023a704995ef7f98a00a77ad08bd7a4c4e20339'
 NATIVE_CATEGORIES, NATIVE_SOUNDS = 0x8010D314, 0x8010D6C8
 CATEGORY_SHA = '6e88fc4da791a5e31e72b21c59876c4f2f5adf0d721dcb8d4b8d268c56dc0a73'
+# Existing native bed geometry, entry, and exit use the expanded profile table.
+# This is a shared engine contract, not a list of approved bed identities.
+BED_OWNER_SHA = 'ca540a6f48fa15fb8bfad4d36abf77bb3d318799732d965f278063207f64b74a'
+BED_HEAD, BED_FOOT_SIDES, BED_PILLOW_SIDES = 0x80940304, 0x80940498, 0x80940784
 SOURCES = ('tools/v3_furniture_behaviours.py','tools/v3_asset_loader.py','overlays/v3/furniture_behaviours.c',
            'overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
            'overlays/v3/fire.ld','overlays/v3/items_large.ld')
+
+
+def contact_contract(base, prior, blob, imports):
+    beds = [row for row in imports
+            if blob[ROWS+slot(int(row['item_id'],16))*80+8+60] == 8]
+    if not beds: return None
+    from v3_furniture_runtime import VROM, RAM as OWNER_RAM
+    owner = by_vrom(base)[VROM].extract(base)
+    if sha256(owner) != BED_OWNER_SHA:
+        raise ValueError('Changed native bed/contact engine requires category review')
+    tables = prior['furniture']['expanded_tables']
+    if tables['profile_table_ram'] != '80470010' or tables['capacity'] != 2051:
+        raise ValueError('Bed contact readers require the complete expanded profile table')
+    # The reviewed bed-profile readers retain the same checked table base.
+    for high,low in ((0x809404D0,0x809404DC),(0x809407BC,0x809407C8),
+                     (0x80940FA8,0x80940FB8),(0x809419D0,0x809419E0)):
+        hi,lo=struct.unpack_from('>I',owner,high-OWNER_RAM)[0],struct.unpack_from('>I',owner,low-OWNER_RAM)[0]
+        address=((hi&65535)<<16)+(lo&65535)-(65536 if lo&32768 else 0)
+        if address != int(tables['profile_table_ram'],16):
+            raise ValueError('Bed contact profile binding is not expanded')
+    return dict(contact_action=8,category='single-bed',native_owner_sha256=BED_OWNER_SHA,
+        profile_table_ram=tables['profile_table_ram'],imports=[r['item_id'] for r in beds],
+        head_direction_entry=BED_HEAD,foot_sides_entry=BED_FOOT_SIDES,pillow_sides_entry=BED_PILLOW_SIDES,
+        added_runtime_bytes=0,ordinary_bed_gameplay_tested=False)
 
 
 def audio_contract(original, base, prior, source):
@@ -91,6 +119,7 @@ def audio_contract(original, base, prior, source):
 
 def install(original, base, prior, blob, code, imports, source, output):
     contract=audio_contract(original,base,prior,source)
+    contacts=contact_contract(base,prior,blob,imports)
     original_code=by_vrom(original)[CODE_VROM].extract(original)
     original_body=original_code[ENTRY-CODE_RAM:END-CODE_RAM]
     if sha256(original_body)!=SOURCE_SHA: raise ValueError('Changed complete native sound reader')
@@ -128,5 +157,5 @@ def install(original, base, prior, blob, code, imports, source, output):
         row['action_sound']=category
         records.append(dict(item_id=row['item_id'],runtime_index=index,action_sound=category))
     return dict(code=compiled,hook=dict(address=ENTRY,before=original_body[:8].hex(),after=after.hex()),
-        native_function_sha256=SOURCE_SHA,imports=records,donor=contract,
+        native_function_sha256=SOURCE_SHA,imports=records,donor=contract,contacts=contacts,
         additional_resident_bytes=0,saved_format_changed=False,ordinary_seating_tested=False)

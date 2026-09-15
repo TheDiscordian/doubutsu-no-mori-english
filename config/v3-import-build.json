@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-material-preview-runtime-02",
-  "runtime_abi": 88,
-  "rom_sha256": "5644a08760b63a396747adf2d5926340255667309152c7d9d0e4290263945319",
-  "report_sha256": "c8181c0ccb92625fb8d031317f8b83df5be29d9a09a5e5bddff64340105f5cfe"
+  "directory": "build/v3-furniture-bed-runtime-02",
+  "runtime_abi": 89,
+  "rom_sha256": "e460ec11ba2eb2abebcc7aa15c8060728a5c986ddfb0c3f67078689c1a0d9dff",
+  "report_sha256": "ad8cc4af55fae0da16115b5d251ff6a07372b84abcbb70bdf734278b3d2ffb16"
 }

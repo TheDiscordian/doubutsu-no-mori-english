@@ -25,7 +25,8 @@ from v3_villager_art import native_palette, normalise_vertex_flags
 
 VERSION = 1
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
-BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa'}
+BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
+              8: 'single-bed'}
 STOCK = {'ftr_listA': 0, 'ftr_listB': 1, 'ftr_listC': 2,
          'ftr_listEvent': 3, 'ftr_listLottery': 5}
 # Reviewed complete GAFE01-r0 draw implementation, not an item allowlist.

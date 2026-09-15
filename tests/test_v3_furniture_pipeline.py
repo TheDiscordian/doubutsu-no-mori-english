@@ -128,6 +128,22 @@ class DonorTests(unittest.TestCase):
             pipeline.metadata(changed,0x324C,p,identities[0x324C])
         with self.assertRaises(ValueError): self.source.pointers(self.source.size-2,4)
 
+    def test_single_bed_category_discovers_models_without_waiving_acquisition(self):
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        beds=[r for r in inventory['rows'] if r.get('profile',{}).get('contact_action')==8]
+        self.assertEqual(len(beds),4)
+        self.assertEqual(sum(r['status']=='supported' for r in beds),2)
+        for row in beds:
+            self.assertTrue(row['asset_ready'])
+            self.assertIn('single-bed',row['categories'])
+            self.assertEqual(row['profile']['size_code'],1)
+            if row['status']=='review': self.assertIn('acquisition needs an adapter',row['reason'])
+        p=beds[0]['profile'];changed=copy.copy(self.source);changed.data=bytearray(changed.data)
+        for contact in (3,16,32,255):
+            changed.data[p['profile_offset']+44]=contact
+            with self.assertRaisesRegex(ValueError,'contact/interaction'):
+                changed.profile(int(beds[0]['item_id'],16))
+
     def test_shared_collision_flag_and_placement_categories_preserve_unknowns_for_review(self):
         identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
         profile=self.source.profile(0x30E8)
@@ -298,6 +314,22 @@ class CurrentCartridgeTests(unittest.TestCase):
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
         self.assertEqual(self.report['furniture']['expanded_tables'],self.prior['furniture']['expanded_tables'])
         self.assertEqual(self.report['save_runtime']['code'],self.prior['save_runtime']['code'])
+
+    def test_bed_category_uses_checked_existing_engine_and_rejects_changed_bindings(self):
+        from v3_furniture_behaviours import contact_contract
+        rows=self.report['furniture']['imports']+[self.report['speed_bag']]
+        current=contact_contract(self.image,self.report,self.blob,rows)
+        self.assertEqual(current,self.report['furniture_behaviours'].get('contacts'))
+        if current:
+            self.assertEqual(current['added_runtime_bytes'],0)
+            changed=copy.deepcopy(self.report)
+            changed['furniture']['expanded_tables']['profile_table_ram']='80465800'
+            with self.assertRaisesRegex(ValueError,'complete expanded profile table'):
+                contact_contract(self.image,changed,self.blob,rows)
+            image=bytearray(self.image)
+            image[self.files[0x82D7F0].pstart+0x80940518-0x80936710]^=1
+            with self.assertRaisesRegex(ValueError,'native bed/contact engine'):
+                contact_contract(bytes(image),self.report,self.blob,rows)
 
     def test_catalogue_and_stock_keep_prior_members_and_all_new_category_records(self):
         def lists(image,files,report):

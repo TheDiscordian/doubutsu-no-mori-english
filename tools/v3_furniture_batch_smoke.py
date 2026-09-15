@@ -20,6 +20,7 @@ def representatives(rows):
                   ('placement',row.get('layer_type',0)),('interaction',row.get('interaction_flags',0)),
                   ('preview',row.get('preview_mode',0)),
                   ('lighting',bytes.fromhex(row['native_profile_scalar_hex'])[11]),
+                  ('contact',bytes.fromhex(row['native_profile_scalar_hex'])[12]),
                   ('layers',tuple(sorted(row.get('model_offsets',{}))))}
         if features-covered: result.append(row); covered.update(features)
     if len(result)>12: raise ValueError('Split new behaviour categories into bounded smoke passes')
@@ -35,7 +36,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     rows = representatives(report[section]['imports'])
     record(dict(representative_furniture=[r['item_id'] for r in rows],
                 categories=['stock','footprint','display-list layers','action sounds','placement layers',
-                            'interaction flags','preview framing','lighting']))
+                            'interaction flags','preview framing','lighting','contact behaviour']))
     files, boot = by_vrom(image), boot_proofs(image)
     blob = files[runtime.BLOB].extract(image)
 
@@ -130,6 +131,32 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             for index in (947,1023,2048,0xFFFFFFFF):call(SOUND_ENTRY,[index,0],0xFFFFFFFF)
         for row in rows:
             item, index = int(row['item_id'], 16), row['runtime_index']
+            if bytes.fromhex(row['native_profile_scalar_hex'])[12] == 8:
+                from v3_furniture_behaviours import BED_HEAD,BED_FOOT_SIDES,BED_PILLOW_SIDES
+                actor=scratch+0x200;actor_data=bytearray(0x740)
+                struct.pack_into('>H',actor_data,0,index)
+                struct.pack_into('>fff',actor_data,8,100,7,200)
+                # One representative per contact category: actual native
+                # geometry consumes its imported profile and all rotations.
+                for rotation,(cosine,sine) in enumerate(((1,0),(0,1),(-1,0),(0,-1))):
+                    struct.pack_into('>H',actor_data,0x124,rotation*0x4000)
+                    debug.write_memory(actor,actor_data)
+                    call(owner+BED_HEAD-furniture.RAM,[actor],(1,2,3,0)[rotation],furniture_proof)
+                    for entry,x in ((BED_FOOT_SIDES,40),(BED_PILLOW_SIDES,0)):
+                        debug.write_memory(scratch,b'\xA5'*24)
+                        call(owner+entry-furniture.RAM,[scratch,scratch+12,actor,1],1,furniture_proof)
+                        expected=[v for z in (-40,40) for v in
+                                  (100+x*cosine+z*sine,7,200-x*sine+z*cosine)]
+                        actual=struct.unpack('>6f',debug.read_memory(scratch,24))
+                        passed=all(abs(a-b)<.02 for a,b in zip(actual,expected))
+                        record(dict(furniture_batch_check='native bed sides',item=row['item_id'],
+                            rotation=rotation,entry=f'{entry:08X}',expected=expected,observed=actual,
+                            assertion='passed' if passed else 'failed'))
+                        if not passed: raise ValueError('Native imported bed positioning differs')
+                for entry in (BED_FOOT_SIDES,BED_PILLOW_SIDES):
+                    call(owner+entry-furniture.RAM,[scratch,scratch+12,actor,0],0,furniture_proof)
+                    check('inactive bed has no entry/exit positions',scratch,bytes(24))
+                check('native bed helpers preserve complete actor',actor,actor_data)
             if row.get('interaction_flags',0)&0x10:
                 from v3_furniture_placement import REGISTER
                 # The actual native registration routine must skip collision in
@@ -220,4 +247,6 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 full_catalogue_initialization_tested=False,
                 rotated_two_cell_placement=True, native_stock_membership=True,
                 native_acquisition_and_ownership=True, ordinary_seating_tested=False,
+                native_bed_geometry_tested=any(bytes.fromhex(r['native_profile_scalar_hex'])[12]==8 for r in rows),
+                ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)

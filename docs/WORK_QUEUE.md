@@ -3,13 +3,15 @@
 ## Active: V3 optional GameCube imports
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Twenty-three additional complete assets and their shared runtime
-records are installed. ABI 88 adds bug zapper, coffee machine, candy machine, and
-steam roller through the common unlit-material category. Catalogue framing uses
+new furniture. Twenty-five additional complete assets and their shared runtime
+records are installed. ABI 89 adds hammock and weight bench through one
+single-bed category and the existing native controls, without new gameplay code.
+Catalogue framing uses
 donor-table records for all installed furniture, replacing per-item overrides.
-Thirty-four focused pipeline/composition tests and the first current native run
-(146 records, 124 assertions) pass. The full source/verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 85
+Thirty-five focused pipeline/composition checks pass; one optional prepared-assets
+check is not requested. The first current native run passes, including bed
+positioning in all four rotations. The full source/verification record is in
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 87
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
@@ -25,14 +27,16 @@ dependency explicit and continue graphics/contact/callback categories instead of
 blocking bulk imports on it. Useful callback groups include fifteen clocked
 station models, eight palette-animated
 buildings, and tool/fan/pinwheel selectors; preserve their actual effects.
+Beach chair and harvest bed pass shared bed/model discovery, but retain
+their island and harvest acquisition dependencies instead of substitute shop stock.
 Sixteen diary display models still need diary identity/gameplay/acquisition.
 Complete model conversion without required behaviour is not a completed import.
 Full catalogue construction, ordinary GPU appearance, interactions, and
 save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
-using the four ABI-88 additions must not be loaded in older builds or V2.
+using the two ABI-89 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-material-preview-runtime-02/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-bed-runtime-02/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

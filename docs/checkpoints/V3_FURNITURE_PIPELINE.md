@@ -1,6 +1,73 @@
 # Automatic furniture pipeline checkpoint
 
-## Current material and catalogue-framing categories
+## Current single-bed category
+
+The complete development cartridge is ABI 89:
+`build/v3-furniture-bed-runtime-02/animal-forest-v3-asset-loader.z64`.
+The shared `single-bed` category discovers and installs hammock `329C` and
+weight bench `3358` without per-item model definitions, installers, gameplay
+code, or native scenarios. Both retain stock C, their complete two-layer
+models, two-cell footprints, donor profile scalars, official names, prices,
+scoring, and preview framing. Total new art is 8,416 bytes, 196 vertices, and
+108 triangles. The automatic pipeline has installed twenty-five additions;
+the offline composer contains 87 development options: 64 furniture, three
+shirts, and twenty villagers.
+
+The category uses native contact action `08`, not a decorative approximation.
+The checked native room engine already handles bed positioning, contact, entry,
+and exit through the expanded profile table. The build verifies the complete
+owner SHA-256 `ca540a6f48fa15fb8bfad4d36abf77bb3d318799732d965f278063207f64b74a`
+and the four reviewed profile bindings at `809404D0/809404DC`,
+`809407BC/809407C8`, `80940FA8/80940FB8`, and `809419D0/809419E0`, all addressing
+`80470010`. No gameplay code or permanent memory is added. Native timing and
+player animations remain unchanged.
+
+Beach chair and harvest bed pass this category's model/dependency discovery
+but are not installed. Their actual `ftr_listIsland` and `ftr_listHarvest`
+acquisition routes still need shared adapters. Their presence in a supported
+bed category does not waive those requirements or replace them with shop stock.
+
+The catalogue contains 500 furniture rows and retains all 248 clothing rows.
+Conservative menu memory is 280,320 of 280,704 reserved bytes. The import blob
+is 3,268,832 bytes, leaving 859,936 bytes before English choices. Model-bank
+allocations and saved format 2 are unchanged. Saves containing the new items
+must not load in older cartridges or V2. Ordinary cross-version reload is not
+newly claimed; both served patchers remain V2.
+
+- ROM SHA-256: `e460ec11ba2eb2abebcc7aa15c8060728a5c986ddfb0c3f67078689c1a0d9dff`.
+- UPS SHA-256: `7020d093e96bb510a36e46383bb715d7a8b4e5757f4eda476bfc65636a478232`.
+- Build receipt SHA-256: `ad8cc4af55fae0da16115b5d251ff6a07372b84abcbb70bdf734278b3d2ffb16`.
+- Art receipt SHA-256: `56d48e0b812717e4368abb986813d89223920e896ac9b4152fc96d52a8b9205a`.
+- Import blob SHA-256: `0dbf4c68f6f5bc46c105887be5d268816cbcff90ecc26c1b5d3af832cc5d489b`.
+
+Thirty-five focused pipeline/composition checks pass; the optional prepared-
+assets check is not requested in this batch. They include complete conversion,
+source credits, shared category discovery with acquisition rejection, changed
+native-engine/table-binding rejection, complete installation, retained native
+code, stock, scoring, and selected-profile composition.
+
+The first silent native run passes 112 records with 93 assertions:
+`build/v3-furniture-bed-native-01/results.json`, SHA-256
+`6fc9749bd4f071050ee9f506c3347f13c88c7a4ead97f6c7dce110f00804fe9f`.
+The shared selector chooses the larger weight-bench model to represent the
+same stock, footprint, material layers, preview, sound, and bed category.
+Actual head-direction (`80940304`), foot-side (`80940498`), and pillow-side
+(`80940784`) functions pass all four rotations through the installed imported
+profile. Inactive beds return no positions; the complete temporary actor stays
+unchanged. Complete owner loading, model DMA, shared item/catalogue/stock
+readers, acquisition, ownership, restoration, and guards also pass. No retry
+is needed. The final recipe receipt refreshes a source comment and reproduces
+the exact native-tested cartridge; no emulator rerun follows that comment edit.
+
+These checks do not establish ordinary climbing onto/leaving a bed, full
+catalogue construction, GPU appearance, save/restart, or original-hardware
+behaviour. Continue shared callback, graphics, and acquisition categories;
+use the same representative batch scenario rather than adding an item scenario.
+The post-scan at `build/v3-furniture-bed-post-scan-01/inventory.json` has 51
+supported entries, all installed, and 191 review entries. Those entries include
+aliases and special imports; these counts are not a completion percentage.
+
+## Material and catalogue-framing batch
 
 The complete development cartridge is ABI 88:
 `build/v3-furniture-material-preview-runtime-02/animal-forest-v3-asset-loader.z64`.
