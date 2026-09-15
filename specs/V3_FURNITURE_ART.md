@@ -8,6 +8,12 @@ are furniture dependencies of Cheri's donor house. Output remains in ignored
 local build directories; no game images, extracted assets, or executable donor
 code are committed or published.
 
+The same checked converter supports the
+[seven camping furnishings](V3_CAMPING_ITEMS.md) in version 6, including their
+two-part opaque kayak, mirrored bike materials, backpack tile reset/tint, and
+unlit lantern. Complete assets and scalar profiles are preserved; runtime and
+acquisition status are tracked separately in that specification.
+
 Converter version 2 also supports the explicit
 [seven-item construction batch](V3_CONSTRUCTION_ITEMS.md). It retains the default
 two-object batch and verifies each additional profile's exact opaque-only layer

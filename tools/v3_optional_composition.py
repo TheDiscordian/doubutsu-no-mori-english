@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-import-storage-02'
-BASE_SHA = 'f12da1a8575403ab74ded685e916bf082b5c1d53e6b73c0ae74c0fe87d282ade'
-REPORT_SHA = 'a3534ac6e88f07bca7c476ed44914278cfbb063ccadfab8891e3bf2183681dfb'
+BASE = ROOT/'build/v3-camping-runtime-01'
+BASE_SHA = '3967dedabca6e65a97f57273028aaa19b0b24ed72b405f2498d5a4fce6a1cd29'
+REPORT_SHA = '7267629efe169d8f12a0a7cd58df65a28051d27eaab8d77f9d7322f22f26ac5a'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 67
+PREFIX_SIZE, ABI = 0xC000, 68
 from v3_import_storage import PACKAGE, PACKAGE_RAM, PACKAGE_SIZE, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -390,6 +390,9 @@ def build(output, selected=(), *, select_all=False):
         current['accessory_runtime']['package_sha256'] = package_sha
         current['import_storage'].update(package_sha256=package_sha,
             profile_rows_sha256=sha256(blob[ROWS:ITEMS]), item_rows_sha256=sha256(blob[ITEMS:TABLE_END]))
+        current['camping'].update(package_sha256=package_sha, optional_composition_updated=True)
+        for row in current['camping']['imports']:
+            row['enabled'] = row['id'] in selection['enabled']
         import v3_hra as hra
         _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
         hr = current['hra']
@@ -409,7 +412,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All 49 installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All installed experimental entries, not the whole donor disc')
     args = parser.parse_args()
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))

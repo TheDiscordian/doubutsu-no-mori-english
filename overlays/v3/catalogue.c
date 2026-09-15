@@ -65,6 +65,13 @@ void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
         preview->scale = item == 0x32D4u ? 0.87f : 0.82f;
     }
 #endif
+#ifdef AF_V3_CAMPING_ITEMS
+    if (((u16)argument & 0xFFFCu) == 0x33A8u && af_v3_furniture_import_profile(1258)) {
+        /* GC mode 24: the complete bike retains its donor preview framing. */
+        preview->model_y = -3.0f;
+        preview->scale = 0.85f;
+    }
+#endif
 }
 #endif
 
@@ -118,6 +125,12 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
 #ifdef AF_V3_WESTERN_LARGE
     if ((item & 0xFFFCu) == 0x32D4u)
         return category == 0 && list == 5 && af_v3_furniture_import_profile(1205);
+#endif
+#ifdef AF_V3_CAMPING_ITEMS
+    /* These seven summer-camper rewards are never catalogue-orderable.
+     * Bound the shift before testing canonical IDs 3364,3370,339C,A4,A8,AC,B0. */
+    u32 camping = (item & 0xFFFCu) - 0x3364u;
+    if (camping <= 0x4Cu && ((0xF4009u >> (camping >> 2)) & 1u)) return 0;
 #endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price

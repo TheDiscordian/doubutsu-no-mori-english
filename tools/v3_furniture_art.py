@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 5
+CONVERTER_VERSION = 6
 
 
 @dataclass(frozen=True)
@@ -46,6 +46,7 @@ class Pilot:
     collision: int = 0
     large_western: bool = False
     water_layer: bool = False
+    camping: bool = False
 
 
 PILOTS = (
@@ -140,7 +141,45 @@ LARGE_WESTERN_PILOTS = (
            ('enshita', 16, 8)), 0, 112, (('opaque', '_obj_model', 0, 0x198),),
           height=42.43, shape=3, collision=1, large_western=True),
 )
-REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS + WESTERN_PILOTS + LARGE_WESTERN_PILOTS
+CAMPING_PILOTS = (
+    Pilot('kayak', 0x3364, 'kayak', 'int_ike_tent_kayak01', 'iam_ike_tent_kayak01',
+          (('topr', 48, 16), ('topf', 48, 16), ('under', 16, 16),
+           ('chair', 32, 16), ('pab', 64, 16)), 0, 46,
+          (('opaque', '_on_model', 0, 0x100), ('opaque1', '_onT_model', 4, 0x80)),
+          height=15.7, shape=3, collision=1, camping=True,
+          texture_symbols=tuple((n, 'int_ike_tent_kayak_' + n) for n in
+                                ('topr', 'topf', 'under', 'chair', 'pab'))),
+    Pilot('backpack', 0x3370, 'backpack', 'int_ike_tent_knap01', 'iam_ike_tent_knap01',
+          (('frontside', 32, 8), ('top', 32, 16), ('base', 16, 32), ('topback', 32, 16),
+           ('side', 32, 8), ('back', 16, 32), ('front', 16, 32), ('topside', 16, 16)),
+          0, 100, (('opaque', '_model', 0, 0x1F8),), height=15.7, camping=True,
+          texture_symbols=tuple((n, 'int_ike_tent_knap_' + n + '_txt') for n in
+              ('frontside', 'top', 'base', 'topback', 'side', 'back', 'front', 'topside'))),
+    Pilot('lantern', 0x339C, 'lantern', 'int_tak_tent_lamp', 'iam_tak_tent_lamp',
+          (('', 16, 64),), 0, 70, (('opaque', '_offT_model', 0, 0xD8),), camping=True,
+          texture_symbols=(('', 'int_tak_tent_lamp_tex'),),
+          model_symbols=(('opaque', 'obj_tent_lamp_offT_model'),)),
+    Pilot('cooler', 0x33A4, 'cooler', 'int_tak_tent_box', 'iam_tak_tent_box',
+          (('1', 32, 64), ('2', 16, 16)), 0, 65, (('opaque', '_on_model', 0, 0xD8),), camping=True,
+          texture_symbols=(('1', 'int_tak_tent_box_1_tex'), ('2', 'int_tak_tent_box_2_tex'))),
+    Pilot('mountain-bike', 0x33A8, 'mountain bike', 'int_ike_tent_bike01', 'iam_ike_tent_bike01',
+          (('tire1', 32, 32), ('tire2', 32, 8), ('pedal1', 16, 8), ('tire3', 32, 16),
+           ('handle2', 32, 8), ('frame2', 32, 8), ('handle1', 32, 8), ('chiar1', 16, 8),
+           ('chiar2', 16, 8), ('frame1', 64, 32)), 0, 105,
+          (('opaque', '_model', 0, 0x268),), height=15.7, shape=3, collision=1, camping=True,
+          texture_symbols=tuple((n, 'int_ike_tent_bike_' + n + '_tex_txt') for n in
+              ('tire1', 'tire2', 'pedal1', 'tire3', 'handle2', 'frame2', 'handle1', 'chiar1', 'chiar2', 'frame1'))),
+    Pilot('sleeping-bag', 0x33AC, 'sleeping bag', 'int_ike_tent_sleepbag01', 'iam_ike_tent_sleepbag01',
+          (('side1', 64, 32), ('in1', 16, 16)), 0, 27, (('opaque', '_model', 0, 0xB0),),
+          height=15.7, shape=3, collision=1, camping=True,
+          texture_symbols=(('side1', 'int_ike_tent_sleepbag_side1_tex_txt'),
+                           ('in1', 'int_ike_tent_sleepbag_in1_tex_txt'))),
+    Pilot('propane-stove', 0x33B0, 'propane stove', 'int_nog_burner', 'iam_nog_burner',
+          (('top', 16, 64), ('side', 32, 64), ('gas', 16, 32)), 0, 111,
+          (('opaque', '_model', 0, 0x150),), height=15.7, camping=True,
+          texture_symbols=tuple((n, 'int_nog_burner_' + n + '_tex') for n in ('top', 'side', 'gas'))),
+)
+REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS + WESTERN_PILOTS + LARGE_WESTERN_PILOTS + CAMPING_PILOTS
 
 
 def verify_sources(rel, symbols):
@@ -157,10 +196,10 @@ def scalar_profile(pilot):
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
-                large_western=False, water=False):
+                large_western=False, water=False, camping=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
-                                              garden, western, large_western, water))) > 1:
+                                              garden, western, large_western, water, camping))) > 1:
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -202,6 +241,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 if tile != struct.pack('>II', 0xD2F0F511, 0):
                     raise ValueError('Unsupported water texture wrapping or shifts')
                 row.update(wrap_modes=(1, 1), water_shift=1)
+            elif camping and tile in (struct.pack('>II', word, 0) for word in
+                                      (0xD2F0F000, 0xD2F0F800, 0xD2F0FA00, 0xD2F0F200)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
             elif large_western and tile in (struct.pack('>II', word, 0)
                                            for word in (0xD2F0F000, 0xD2F0F400)):
                 word = struct.unpack_from('>I', tile)[0]
@@ -237,6 +280,9 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             elif (large_western and (a, b) == (0xD280F900, 0)
                     and textures.get(material) == (32, 32) and material_wrap == (0, 0)):
                 material_wrap = (2, 1)
+            elif (camping and (a, b) == (0xD280F000, 0)
+                    and textures.get(material) == (16, 32) and material_wrap == (2, 0)):
+                material_wrap = (0, 0)
             else:
                 raise ValueError('Unsupported standalone furniture tile update')
             row.update(shape=textures[material], wrap_modes=material_wrap)
@@ -270,7 +316,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
-            colours = (0xFFFFFFFF, 0xB2B2B2FF) if accessory else (0xFFFFFFFF,)
+            colours = ((0xFFFFFFFF, 0xB2B2B2FF) if accessory else
+                       (0xFFFFFFFF, 0xFFFDFFFF) if camping else (0xFFFFFFFF,))
             if ((a, b) != (0xFA00001E, 0x9B9BC864) if water else
                     (a not in (0xFA000080, 0xFA0000FF) or b not in colours)):
                 raise ValueError('Unsupported furniture primitive colour')
@@ -300,12 +347,21 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 ((16, 8), (1, 0)): (0x001BC01C, 0x000BC01C),
                 ((32, 32), (2, 1)): (0x000FC0FC,),
             }.get((textures.get(material), material_wrap), ())
+            camping_extent = camping and b == {
+                ((32, 16), (2, 0)): 0x000FC03C,
+                ((16, 32), (2, 0)): 0x0007C07C,
+                ((16, 32), (0, 0)): 0x0003C07C,
+                ((32, 32), (2, 2)): 0x000FC0FC,
+                ((32, 8), (2, 0)): 0x000FC01C,
+                ((16, 8), (0, 2)): 0x0003C03C,
+            }.get((textures.get(material), material_wrap))
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or garden_extent or western_extent or large_extent
+                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent
                      or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
-            modes = (0x270405,) if water else ((0x230405, 0x230005, 0x270405)
+            modes = (0x270405,) if water else ((0x230405, 0x230005, 0x210405, 0x210005)
+                if camping else (0x230405, 0x230005, 0x270405)
                 if speed_bag else (0x230405, 0x230005))
             if a != 0xD9000000 or b not in modes:
                 raise ValueError('Unsupported furniture geometry mode')
@@ -390,7 +446,8 @@ def prepare(rel, symbols_bytes, pilot):
                                              vertex_size, mirrored_s=pilot.mirrored_s,
                                              garden=pilot.garden, western=pilot.western,
                                              large_western=pilot.large_western,
-                                             water=pilot.water_layer and label == 'translucent')}
+                                             water=pilot.water_layer and label == 'translucent',
+                                             camping=pilot.camping)}
         profile_pointers[profile_at + slot] = at
     if data_pointers(rel, profile_at, profile_size) != profile_pointers:
         raise ValueError('Furniture profile has missing, extra, or unported dependencies')
@@ -407,7 +464,7 @@ def command_source(models, offsets):
 
     def tile_fields(shape, wraps):
         modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
-        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1), (2, 2), (1, 0), (1, 1)):
+        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1), (2, 2), (1, 0), (1, 1), (0, 2)):
             raise ValueError('Unsupported furniture tile wrapping')
         masks = []
         for size, wrap in zip(shape, wraps, strict=True):
@@ -468,7 +525,8 @@ def command_source(models, offsets):
                 macro = 'gsDPLoadTextureTile_4b' if w % 16 else 'gsDPLoadTextureBlock_4b'
                 emit(f"{macro}(0x{SEGMENT + offsets[row['target']]:08X}, {args})", 7)
             elif op == 0xD2:
-                if (row['shape'], row['wrap_modes']) not in (((32, 40), (2, 0)), ((32, 32), (2, 1))):
+                if (row['shape'], row['wrap_modes']) not in (((32, 40), (2, 0)), ((32, 32), (2, 1)),
+                                                           ((16, 32), (0, 0))):
                     raise ValueError('Unreviewed furniture tile update in compiler input')
                 w, h = row['shape']
                 wrap_s, wrap_t, mask_s, mask_t = tile_fields((w, h), row['wrap_modes'])
@@ -568,13 +626,13 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden', 'western', 'western-large'), default='pilots')
+    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden', 'western', 'western-large', 'camping'), default='pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh output directory; existing builds are preserved')
     pilots = {'pilots': PILOTS, 'construction': CONSTRUCTION_PILOTS,
               'garden': GARDEN_PILOTS, 'western': WESTERN_PILOTS,
-              'western-large': LARGE_WESTERN_PILOTS}[args.batch]
+              'western-large': LARGE_WESTERN_PILOTS, 'camping': CAMPING_PILOTS}[args.batch]
     report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve(), pilots)
     print(json.dumps({'output': str(args.output), 'objects': [
         {'name': r['name'], 'bytes': r['object_bytes'], 'sha256': r['object_sha256']} for r in report['objects']],

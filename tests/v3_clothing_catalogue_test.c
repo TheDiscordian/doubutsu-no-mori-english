@@ -14,6 +14,11 @@ static u32 last_item; static int last_category, last_list; static void *last_gam
 static jmp_buf halted;
 void af_v3_save_halt(int reason) { (void)reason; longjmp(halted, 1); }
 int af_v3_furniture_import_profile(u32 index) {
+#ifdef AF_V3_CAMPING_ITEMS
+    /* Deliberately allow neighbouring fixture IDs as well: the seven-item
+     * catalogue exclusion must not spread into adjacent identities. */
+    if (index >= 1240 && index <= 1261) return selected;
+#endif
 #ifdef AF_V3_WESTERN_LARGE
     if (index == 1201 || index == 1205 || index == 1206) return selected;
 #endif
@@ -96,6 +101,30 @@ int main(void) {
         }
     }
     puts("Large Western exact previews, four rotations, selection, and lottery rules pass");
+#endif
+#ifdef AF_V3_CAMPING_ITEMS
+    for (int enabled = 0; enabled < 2; ++enabled) {
+        selected = enabled;
+        for (u32 item = 0x3360; item <= 0x33B4; item += 4) {
+            int reward = item == 0x3364 || item == 0x3370 || item == 0x339C ||
+                item == 0x33A4 || item == 0x33A8 || item == 0x33AC || item == 0x33B0;
+            for (u32 rotation = 0; rotation < 4; ++rotation) {
+                u32 argument = 0xABCD0000u | item | rotation;
+                af_v3_original_catalogue_furniture_init(&expected, argument);
+                if (enabled && item == 0x33A8) expected.scale = 0.85f;
+                int calls = init_calls;
+                af_v3_catalogue_furniture_init(&preview, argument);
+                assert(init_calls == calls + 1 && last_item == argument);
+                assert(!memcmp(&preview, &expected, sizeof(preview)));
+                for (int list = -1; list < 7; ++list) {
+                    assert(af_v3_catalogue_available(argument, 0, list, other) ==
+                           (enabled && !reward && list >= 0 && list < 3));
+                    assert(!af_v3_catalogue_available(argument, 2, list, other));
+                }
+            }
+        }
+    }
+    puts("Camping exact bike preview, non-orderable rewards, neighbouring IDs, and rotations pass");
 #endif
     puts("clothing ownership, exact presentation, original previews, and native availability pass");
     return 0;

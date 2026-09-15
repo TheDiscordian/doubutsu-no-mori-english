@@ -2,6 +2,25 @@
 
 ## Active development
 
+The [camping integration](checkpoints/V3_CAMPING_ITEMS.md) installs seven complete
+objects: kayak, backpack, lantern, cooler, mountain bike, sleeping bag, and propane
+stove. English names/prices, one/two-cell profiles, catalogue framing and
+non-orderability, safe HRA points, feng shui, and selected dependencies are in
+ABI 68. No further resident RAM, heap, model-bank, or menu allocation is needed.
+Twenty-nine focused checks pass. The first native run passes all 28 item-reader
+calls and 37 memory assertions, including complete loaded rows and intact guards.
+The offline composer has 56 experimental options, deterministic subsets, exact
+select-all output, and exact V2 output when nothing is selected.
+
+Current full integration:
+`build/v3-camping-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`3967dedabca6e65a97f57273028aaa19b0b24ed72b405f2498d5a4fce6a1cd29`.
+The kayak/bike/blue-aloha subset is `build/v3-optional-camping-01/`.
+Summer-camper acquisition, three remaining animated camping objects, ordinary
+placement/rendering/persistence, and the remaining donor content are unfinished.
+The seven rewards are not substituted into ordinary shop stock. Both served
+patchers remain V2; this is not a complete-import playtest handoff.
+
 The [import-storage expansion](checkpoints/V3_IMPORT_STORAGE.md) supplies
 1,847,280 bytes of free import storage without adding to the full DMA directory.
 English choices retain their contents and IDs at a new virtual address. Fixed
@@ -11,12 +30,12 @@ pool. Seventeen focused checks and the first actual native run pass: 23 calls,
 48 memory assertions, all installed static pointers, relocated English choices,
 and intact guards. The offline composer retains all 49 experimental options,
 exact all/empty outputs, and deterministic individual selections.
-Current full integration:
+Storage checkpoint:
 `build/v3-import-storage-02/animal-forest-v3-asset-loader.z64`, SHA-256
 `f12da1a8575403ab74ded685e916bf082b5c1d53e6b73c0ae74c0fe87d282ade`.
 The subset is `build/v3-optional-storage-01/`. Both served patchers remain V2.
-Next are the camping models and their actual reward/scoring category, followed
-by remaining content and gameplay/persistence integration. This is not a
+Camping uses these fixed slots and a scoring-only category mapping; acquisition,
+remaining content, and gameplay/persistence integration continue. This is not a
 complete-import handoff; spare slots are not implemented items.
 
 The [full-sized Western batch](checkpoints/V3_WESTERN_LARGE_ITEMS.md) installs
@@ -27,7 +46,7 @@ The checked package adds 8 KiB; the existing menu and model-bank allocations sta
 Twenty-eight focused checks and the initial 88-record native run pass, including
 all three items' four rotations and retained three-shirt readers. Ordinary
 placement, rendering, acquisition, and persistence remain unverified.
-Current full integration:
+Full-sized Western checkpoint:
 `build/v3-western-large-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
 `5c51f80525a253e889a38b4ed4730df7e21b9a5e63a80917f0406b512faaebfe`.
 The offline composer has 49 experimental options, exact all/empty outputs, and
@@ -44,7 +63,7 @@ pass. Native item readers, event acquisition, catalogue rules, and Western
 scoring pass; bank verification is partial after two permitted setup attempts.
 Actual 100-bank allocation and dummy DMA are established. Paired upper-memory
 model DMA and executed teardown remain unverified; no complete bank-lifetime
-pass is claimed. Current full integration:
+pass is claimed. Western checkpoint:
 `build/v3-western-runtime-02/animal-forest-v3-asset-loader.z64`, ABI 65, SHA-256
 `e9285a7d301b466b32eb4af022b5dc7ffaa555b3f1de93cffdb86bc838daa858`.
 The offline composer has 46 experimental options and exact all/empty outputs.

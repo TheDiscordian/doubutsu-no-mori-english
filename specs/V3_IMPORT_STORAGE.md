@@ -56,18 +56,19 @@ both extended English choice IDs, long odd/even choices, and final guards.
 The [checkpoint](../docs/checkpoints/V3_IMPORT_STORAGE.md) records exact artifacts,
 the corrected preflight, source report, and ordinary-gameplay limits.
 
-## Next content batch
+## Camping content
 
 The actual English donor identifies seven static camping models: kayak `3364`,
 backpack `3370`, lantern `339C`, cooler `33A4`, mountain bike `33A8`, sleeping bag
 `33AC`, and propane stove `33B0`. They occur in `ftr_listTent`, not ordinary
 shop stock. The source profiles have no animation/callback pointers; kayak,
-mountain bike, and sleeping bag use the two-cell shape. Model conversion and
-runtime installation remain work.
+mountain bike, and sleeping bag use the two-cell shape. Their
+[complete conversion and runtime](V3_CAMPING_ITEMS.md) use fixed sparse slots
+without further resident growth. Summer-camper acquisition remains work.
 
 Their donor HRA birth category is 37, beyond the current native 23-counter
-adapter. Preserve the real camping acquisition route and implement a safe
-category mapping/counter adaptation before enabling these imports. Do not copy
-the six-bit donor category into the native five-bit field or silently give the
-items ordinary shop stock. The other Tent entries require separate behaviour
+adapter. The scoring-only mapping uses the verified equivalent 412-point native
+weight while preserving the real camping acquisition route. Do not copy the
+six-bit donor category into the native five-bit field or give these items
+ordinary shop stock. The other Tent entries require separate behaviour
 review; the seven static profiles do not define the entire family.

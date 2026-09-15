@@ -110,6 +110,12 @@ larger checked reservation. Fixed canonical profile/item slots cover the existin
 supported ID range without repeated metadata-table moves. This does not claim
 that all slots contain converted items or completed gameplay.
 
+The [camping batch](V3_CAMPING_ITEMS.md) installs seven complete static objects,
+their English/item readers, catalogue framing and non-orderability, safe HRA
+weight mapping, and selected dependencies without more resident memory.
+Summer-camper acquisition remains an explicit engine dependency. The offline
+composer supports these experimental choices without updating either patcher.
+
 ### Villagers
 
 The [cat/cub artwork converter](V3_VILLAGER_ART.md) produces Punchy/Cheri texture

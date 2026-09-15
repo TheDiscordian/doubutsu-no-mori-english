@@ -39,7 +39,7 @@ def sources(base):
 
 
 def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False,
-          western_large=False):
+          western_large=False, camping=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -72,6 +72,13 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
             raise ValueError('Large Western catalogue requires the Western integration')
         large_rows = {int(r['item_id'], 16): r for r in metadata(rel, donor_symbols, large=True)[1]}
         garden_rows.update(large_rows)
+    if camping:
+        from v3_camping_items import metadata
+        if not expanded:
+            raise ValueError('Camping catalogue requires expanded native pages')
+        reviewed = {int(r['item_id'], 16): r for r in metadata(rel, donor_symbols)[1]}
+        garden_rows.update(reviewed)
+        large_rows.update(reviewed)
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (
@@ -88,14 +95,14 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
         goods = symbol_data(rel, symbol_text, group)
         ids = struct.unpack('>' + str(len(goods) // 2) + 'H', goods)
         if ids[-1] != 0 or ids.count(item) != 1 or 0 in ids[:-1]:
-            raise ValueError('Donor item lacks verified ordinary-shop list membership')
+            raise ValueError('Donor item lacks verified acquisition-list membership')
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
             'catalogue_index': (item - 0x1000) >> 2, 'donor_position': found[0][0], 'mode': 0,
             'ordinary_shop_list': group, 'shop_list_sha256': sha256(goods)})
         if item in garden_rows:
             records[-1].update(donor_acquisition_list=group,
                 ordinary_shop_list=group if garden_rows[item]['ordinary_stock'] else None,
-                catalogue_orderable=item != 0x3294)
+                catalogue_orderable=garden_rows[item].get('catalogue_orderable', item != 0x3294))
         if item in large_rows:
             record = large_rows[item]
             scalar = draw[expected_mode * 8:(expected_mode + 1) * 8]
@@ -104,6 +111,7 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
             records[-1].update(donor_preview_mode=expected_mode,
                 donor_preview_scalar_hex=scalar.hex(),
                 preview_override=expected_mode != 0,
+                preview_define='AF_V3_CAMPING_ITEMS' if camping and item in reviewed else 'AF_V3_WESTERN_LARGE',
                 preview_mapping='native mode 0; guarded final scale/Y override' if expected_mode else 'native mode 0')
     records.sort(key=lambda row: row['donor_position'])
     if len({row['item_id'] for row in records}) != len(records) or len(rows) + len(records) > (CAPACITY if expanded else 444):
@@ -119,6 +127,9 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
             '-DAF_V3_WESTERN_LARGE=1' not in compiled['flags'] or clothing is None
             or '-DAF_V3_CLOTHING_CATALOGUE=1' not in compiled['flags']):
         raise ValueError('Large Western previews require the installed initializer override')
+    if any(row.get('preview_override') and '-D' + row.get('preview_define', 'AF_V3_WESTERN_LARGE') + '=1'
+           not in compiled['flags'] for row in records):
+        raise ValueError('Catalogue preview lacks its reviewed item-family override')
     limit = 0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > limit or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']

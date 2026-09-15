@@ -222,14 +222,14 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
-                      western_large=False):
+                      western_large=False, camping=False):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
     if sha256(old) != prior['catalogue']['output_sha256']:
         raise ValueError('Changed current complete catalogue')
     ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True,
-        western=western, western_large=western_large)
+        western=western, western_large=western_large, camping=camping)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
     cloth = old[at:at + 496]
@@ -244,7 +244,8 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
         defines=('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
                  'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1') + (('AF_V3_WESTERN_ITEMS=1',) if western else ())
-                 + (('AF_V3_WESTERN_LARGE=1',) if western_large else ()))
+                 + (('AF_V3_WESTERN_LARGE=1',) if western_large else ())
+                 + (('AF_V3_CAMPING_ITEMS=1',) if camping else ()))
     parent = bytearray(files[catalogue.PARENT].extract(base))
     _, _, native_parent = catalogue.sources(stable)
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])

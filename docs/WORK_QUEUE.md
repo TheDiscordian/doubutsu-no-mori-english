@@ -265,14 +265,25 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  The [camping integration](checkpoints/V3_CAMPING_ITEMS.md) installs seven complete
+  static models and their English names/prices, one/two-cell profiles, catalogue
+  framing and non-orderability, HRA/feng shui, and selected dependencies in ABI 68.
+  Twenty-nine focused checks pass. The initial native run passes 28 calls and
+  37 memory assertions, including all seven loaded profiles and item readers.
+  Fifty-six options compose offline; all/empty retain exact full/V2 outputs.
+  No additional resident RAM is needed. Continue the three callback/animated
+  camping objects and summer-camper acquisition, then other donor content and
+  ordinary gameplay/persistence. The seven Tent rewards do not enter normal
+  shop stock. Neither served patcher changes. Current catalogue suffix headroom
+  is 256 bytes; the menu pool has 448 bytes spare.
   The [expanded import storage](checkpoints/V3_IMPORT_STORAGE.md) preserves the
   full 3,389-entry DMA directory and relocates the unchanged English choice bank.
   ABI 67 provides 1,847,280 bytes of free import storage and fixed
   metadata slots, with 114,704 more resident bytes and no ordinary heap growth.
   The corrected preflight and first actual native run pass 84 records, including
   all installed static pointers, shared readers, relocated choices, and guards.
-  Continue camping models and their actual reward/scoring category; do not assign
-  donor category 37 to the current 23-counter native adapter without adaptation.
+  Camping uses a checked scoring-only mapping from category 37 to the native
+  equivalent 412-point weight; its actual reward route remains a separate task.
   The [full-sized Western integration](checkpoints/V3_WESTERN_LARGE_ITEMS.md)
   installs the remaining three Western furnishings, bringing the theme to ten
   complete models with true two-cell footprints and explicit catalogue framing.
@@ -293,8 +304,7 @@ with later e/e+ donor support investigated separately.
   corrected; paired model DMA, executed teardown, and the final restore tail remain
   unverified. Do not repeat that setup batch. Continue donor families and ordinary
   gameplay; retain the bank tail for a later meaningful integration check.
-  Current catalogue code has 384 bytes and the menu pool has 576 bytes spare;
-  retain full allocation checks before further additions. Both event rewards
+  Retain full catalogue/menu allocation checks before further additions. Both event rewards
   keep their actual route. No web update.
   The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) converts seven
   complete static models and verifies names/prices, 1×1 profiles, ordinary B/C

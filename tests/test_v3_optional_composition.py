@@ -39,7 +39,7 @@ class OptionalCompositionTests(unittest.TestCase):
         return composer.resolve(self.catalog, list(selected))
 
     def test_actual_house_and_outfit_dependencies_not_just_names(self):
-        self.assertEqual(len(self.catalog),49)
+        self.assertEqual(len(self.catalog),56)
         self.assertEqual(self.select(PUNCHY)['required'],
                          ['GAFE01-r0/item/24BF','GAFE01-r0/item/3350'])
         self.assertEqual(self.select(CHERI)['required'],
@@ -125,7 +125,8 @@ class OptionalCompositionTests(unittest.TestCase):
         data = by_vrom(image)[VROM].extract(image)
         table = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
         self.assertEqual(struct.unpack_from('>4H', data, table + 436 * 4), (2174, 0, 2187, 0))
-        self.assertEqual(data[table + 438 * 4:table + 462 * 4], bytes(24 * 4))
+        total = self.report['catalogue']['total_rows']
+        self.assertEqual(data[table + 438 * 4:table + total * 4], bytes((total - 438) * 4))
         for address, opcode in ((0x808A6600, 0x24050000), (0x808A9460, 0x24140000), (0x808AF7A8, 0)):
             self.assertEqual(struct.unpack_from('>I', data, address - RAM)[0], opcode | 438)
         table = cat['code']['symbols']['af_v3_catalogue_clothing_order'] - RAM
@@ -187,7 +188,8 @@ class OptionalCompositionTests(unittest.TestCase):
         at = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
         self.assertEqual(data[at + 436 * 4:at + 438 * 4], struct.pack('>4H',
             (0x32A4 - 0x1000) // 4, 0, (0x3294 - 0x1000) // 4, 0))
-        self.assertEqual(data[at + 438 * 4:at + 462 * 4], bytes(24 * 4))
+        total = self.report['catalogue']['total_rows']
+        self.assertEqual(data[at + 438 * 4:at + total * 4], bytes((total - 438) * 4))
         # Same codec, actual newly assigned profile bits: an older selection
         # must reject the new saved dependencies without touching any buffer.
         source = (ROOT / 'local/rc2-save-report-g3O4lU/test.flash').read_bytes()[:65536]
@@ -237,7 +239,8 @@ class OptionalCompositionTests(unittest.TestCase):
         data = files[cat_tool.VROM].extract(image)
         at = self.report['catalogue']['code']['symbols']['af_v3_catalogue_order'] - cat_tool.RAM
         self.assertEqual(struct.unpack_from('>4H', data, at + 436 * 4), (2223, 0, 2253, 0))
-        self.assertEqual(data[at + 438 * 4:at + 462 * 4], bytes(24 * 4))
+        total = self.report['catalogue']['total_rows']
+        self.assertEqual(data[at + 438 * 4:at + total * 4], bytes((total - 438) * 4))
         data = files[hra.NEW_VROM].extract(image)
         table = self.report['hra']['metadata_address'] - hra.RAM
         self.assertEqual(sum(data[table + i * 4] >> 2 == 55 for i in range(2051)), 2)
@@ -255,6 +258,44 @@ class OptionalCompositionTests(unittest.TestCase):
             self.assertEqual(self.codec.af_v3_save_check(bank, len(packed), current, out), expected)
             self.assertEqual(bytes(bank), packed)
             self.assertEqual(bytes(current), wanted)
+            self.assertEqual(bytes(out), wanted + bytes(STATE - PROFILE) if expected == 1 else b'\xA5' * STATE)
+
+    def test_camping_subset_keeps_fixed_slots_and_unorderable_donor_preview(self):
+        import v3_catalogue as cat_tool
+        import v3_hra as hra
+        chosen = ['GAFE01-r0/item/3364', 'GAFE01-r0/item/33A8']
+        selected = self.select(*chosen)
+        self.assertEqual(selected['required'], [])
+        image, _, blob = composer.compose(self.base, self.report, self.catalog, selected)
+        self.assertEqual(image, composer.compose(self.base, self.report, self.catalog,
+                         self.select(*reversed(chosen)))[0])
+        for key in chosen:
+            row = self.catalog[key]
+            item = int(row['item_id'], 16)
+            self.assertEqual(row['enable_offset'], composer.STATIC_ROWS + (item - 0x3000) // 4 * 80 + 4)
+            self.assertEqual(blob[row['enable_offset']:row['enable_offset'] + 4], b'\0\0\0\1')
+        data = by_vrom(image)[cat_tool.VROM].extract(image)
+        cat = self.report['catalogue']
+        at = cat['code']['symbols']['af_v3_catalogue_order'] - cat_tool.RAM
+        self.assertEqual(struct.unpack_from('>4H', data, at + 436 * 4), (2265, 0, 2282, 0))
+        self.assertEqual(data[at + 438 * 4:at + cat['total_rows'] * 4], bytes((cat['total_rows'] - 438) * 4))
+        rows = [r for r in cat['imports'] if composer.item_key(int(r['item_id'], 16)) in chosen]
+        self.assertTrue(all(not r['catalogue_orderable'] for r in rows))
+        self.assertEqual(rows[-1]['donor_preview_mode'], 24)
+        data = by_vrom(image)[hra.NEW_VROM].extract(image)
+        table = self.report['hra']['metadata_address'] - hra.RAM
+        for row in self.report['camping']['imports']:
+            at = table + row['runtime_index'] * 4
+            self.assertEqual(data[at:at + 4], bytes.fromhex(row['native_hra_hex'] if row['id'] in chosen else 'fc000000'))
+        source = (ROOT / 'local/rc2-save-report-g3O4lU/test.flash').read_bytes()[:65536]
+        profile = bytes.fromhex(selected['profile_hex'])
+        packed = bytes(reference_pack(source, profile + bytes(STATE - PROFILE)))
+        for wanted, expected in ((profile, 1), (bytes.fromhex(self.select(*self.catalog)['profile_hex']), 1),
+                                 (bytes.fromhex(self.select(chosen[0])['profile_hex']), -7)):
+            buffer = lambda b: (c.c_ubyte * len(b)).from_buffer_copy(b)
+            bank, current, out = buffer(packed), buffer(wanted), buffer(b'\xA5' * STATE)
+            self.assertEqual(self.codec.af_v3_save_check(bank, len(packed), current, out), expected)
+            self.assertEqual(bytes(bank), packed)
             self.assertEqual(bytes(out), wanted + bytes(STATE - PROFILE) if expected == 1 else b'\xA5' * STATE)
 
     def test_full_sized_western_subset_retains_two_cell_records_and_preview_mapping(self):
@@ -277,7 +318,8 @@ class OptionalCompositionTests(unittest.TestCase):
         data = by_vrom(image)[cat_tool.VROM].extract(image)
         at = self.report['catalogue']['code']['symbols']['af_v3_catalogue_order'] - cat_tool.RAM
         self.assertEqual(struct.unpack_from('>4H', data, at + 436 * 4), (2229, 0, 2225, 0))
-        self.assertEqual(data[at + 438 * 4:at + 462 * 4], bytes(24 * 4))
+        total = self.report['catalogue']['total_rows']
+        self.assertEqual(data[at + 438 * 4:at + total * 4], bytes((total - 438) * 4))
         # New compiled framing stays intact; the selected profile gates it.
         start = self.report['catalogue']['code']['symbols']['af_v3_catalogue_furniture_init'] - cat_tool.RAM
         previous = by_vrom(self.base)[cat_tool.VROM].extract(self.base)
