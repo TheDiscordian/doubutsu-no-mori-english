@@ -265,6 +265,13 @@ furniture, music, tools, living creatures, and other mechanics need their actual
 behaviour, not a generic decorative placeholder labelled as complete. Missing
 engine features stay explicit work rather than silently dropped scope.
 
+The [construction batch](V3_CONSTRUCTION_ITEMS.md) adds complete conversion for
+seven opaque-only furnishings, retaining all models, textures, material states,
+names/prices, stock groups, and scoring properties. Combined table generation
+retains current imports and native data. Runtime profiles/readers, registry,
+saved ownership, and optional-composer installation remain required before
+these seven become selectable or playable.
+
 ### Limits and saves
 
 Target an Expansion Pak-equipped N64 with 128-KiB FlashRAM and RTC, retaining

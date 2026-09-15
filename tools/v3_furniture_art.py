@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 1
+CONVERTER_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -32,6 +32,10 @@ class Pilot:
     profile: str
     textures: tuple
     lighting_map: int
+    vertex_count: int = 36
+    models: tuple = (('opaque', '_model_b_model', 0, 0x98),
+                     ('translucent', '_model_a_model', 8, 0x68))
+    mirrored_s: bool = False
 
 
 PILOTS = (
@@ -40,6 +44,28 @@ PILOTS = (
     Pilot('oil-drum', 0x32B8, 'oil drum', 'int_iku_orange', 'iam_iku_orange',
           (('b', 32, 32), ('a', 32, 32), ('c', 64, 32)), 0),
 )
+
+# Keep the original loader's default two-object batch unchanged. These reviewed
+# opaque-only profiles form a separate batch until their item runtime is installed.
+CONSTRUCTION_PILOTS = (
+    Pilot('wet-roadway-sign', 0x31F4, 'wet roadway sign', 'int_iku_slip', 'iam_iku_slip',
+          (('all', 32, 64),), 0, 94, (('opaque', '_model_model', 0, 0xC0),)),
+    Pilot('detour-sign', 0x31F8, 'detour sign', 'int_iku_ukai', 'iam_iku_ukai',
+          (('all', 64, 32),), 1, 94, (('opaque', '_mode_a_model', 0, 0xC0),)),
+    Pilot('men-at-work-sign', 0x31FC, 'men at work sign', 'int_iku_work', 'iam_iku_work',
+          (('all', 32, 64),), 0, 94, (('opaque', '_model_model', 0, 0xC0),)),
+    Pilot('flagman-sign', 0x320C, 'flagman sign', 'int_iku_flagman', 'iam_iku_flagman',
+          (('all', 32, 64),), 0, 94, (('opaque', '_model_model', 0, 0xC0),)),
+    Pilot('jersey-barrier', 0x3214, 'jersey barrier', 'int_iku_jersey', 'iam_iku_jersey',
+          (('mae', 32, 32), ('yoko', 16, 32)), 0, 44,
+          (('opaque', '_model_model', 0, 0xB0),), True),
+    Pilot('speed-sign', 0x3218, 'speed sign', 'int_iku_reducespeed', 'iam_iku_reducespeed',
+          (('all', 32, 64),), 0, 77, (('opaque', '_model_model', 0, 0xC0),)),
+    Pilot('saw-horse', 0x322C, 'saw horse', 'int_iku_sawhorsev', 'iam_iku_sawhousev',
+          (('a', 32, 32), ('b', 32, 32), ('c', 16, 32), ('d', 16, 32)), 0, 103,
+          (('opaque', '_model_model', 0, 0x138),), True),
+)
+REVIEWED = PILOTS + CONSTRUCTION_PILOTS
 
 
 def verify_sources(rel, symbols):
@@ -54,12 +80,13 @@ def scalar_profile(pilot):
 
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
-                accessory=False):
+                accessory=False, mirrored_s=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
-    if not raw or len(raw) % 8 or speed_bag and accessory:
+    if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s))) > 1:
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
+    material_wrap = None
     while at < len(raw):
         a, b = struct.unpack_from('>II', raw, at)
         op = a >> 24
@@ -85,19 +112,22 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if (not have_palette or target not in textures or
                     shape != (*textures[target], 2, 0)):
                 raise ValueError('Unsupported furniture CI4 texture or palette')
-            # Consume the paired Dolphin tile command. These two models clamp
-            # every material in both directions, with no coordinate shifts.
+            # Consume the paired Dolphin tile command. Additional wrap modes
+            # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
             if accessory and tile in (struct.pack('>II', word, 0)
                                       for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F900)):
                 word = struct.unpack_from('>I', tile)[0]
                 row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif mirrored_s and tile == struct.pack('>II', 0xD2F0F800, 0):
+                row['wrap_modes'] = (2, 0)
             elif speed_bag and tile == struct.pack('>II', 0xD2F0F522, 0) and shape[:2] == (16, 16):
                 row['repeat_shift'] = 2
             elif at + 16 > len(raw) or tile != struct.pack('>II', 0xD2F0F000, 0):
                 raise ValueError('Unsupported furniture wrap mode')
             row['shape'] = shape[:2]
             material = target
+            material_wrap = row.get('wrap_modes')
             at += 8
         elif op == 0x01:
             count = a >> 12 & 255
@@ -130,8 +160,13 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if a not in (0xFA000080, 0xFA0000FF) or b not in colours:
                 raise ValueError('Unsupported furniture primitive colour')
         elif op == 0xF2:
-            if (not accessory or material is None or a != 0xF2000000
-                    or b not in (0x0007C07C, 0x000FC07C)):
+            # The two construction models extend a mirrored 16x32 material
+            # across a 32x32 tile. Retain the explicit extent after loading it.
+            construction_extent = (mirrored_s and material_wrap == (2, 0)
+                                   and textures.get(material) == (16, 32)
+                                   and b == 0x0007C07C)
+            if (material is None or a != 0xF2000000 or not
+                    (construction_extent or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
             modes = (0x230405, 0x230005, 0x270405) if speed_bag else (0x230405, 0x230005)
@@ -153,7 +188,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
 
 def prepare(rel, symbols_bytes, pilot):
     verify_sources(rel, symbols_bytes)
-    if pilot not in PILOTS:
+    if pilot not in REVIEWED:
         raise ValueError('Unreviewed furniture pilot')
     symbols = symbols_bytes.decode()
     base = rel_sections(rel)[5][0]
@@ -195,22 +230,24 @@ def prepare(rel, symbols_bytes, pilot):
         at = add(pilot.stem + '_' + suffix + '_tex_txt', w * h // 2,
                  lambda data, w=w, h=h: pack4(untile(data, w, h, 4)))
         texture_shapes[at] = (w, h)
-    vertex = add(pilot.stem + '_v', 36 * 16, lambda data: normalise_vertex_flags(data)[0])
+    vertex_size = pilot.vertex_count * 16
+    vertex = add(pilot.stem + '_v', vertex_size, lambda data: normalise_vertex_flags(data)[0])
     # These are plain arrays, not containers of unconverted pointers.
     for resource in resources:
         if data_pointers(rel, resource['donor_offset'], resource['bytes']):
             raise ValueError('Unexpected relocation in furniture texels or vertices')
     models = {}
     profile_pointers = {}
-    for label, suffix, slot, size in (('opaque', 'b', 0, 0x98), ('translucent', 'a', 8, 0x68)):
-        name = pilot.stem + '_model_' + suffix + '_model'
+    for label, suffix, slot, size in pilot.models:
+        name = pilot.stem + suffix
         at, actual_size = symbol_span(symbols, name)
         if actual_size != size:
             raise ValueError('Changed furniture model size')
         raw = rel[base + at:base + at + size]
         pointers = data_pointers(rel, at, size)
         models[label] = {'symbol': name, 'donor_offset': at, 'source_sha256': sha256(raw),
-                         'rows': parse_model(raw, at, pointers, pal, texture_shapes, vertex, 36 * 16)}
+                         'rows': parse_model(raw, at, pointers, pal, texture_shapes, vertex,
+                                             vertex_size, mirrored_s=pilot.mirrored_s)}
         profile_pointers[profile_at + slot] = at
     if data_pointers(rel, profile_at, profile_size) != profile_pointers:
         raise ValueError('Furniture profile has missing, extra, or unported dependencies')
@@ -294,25 +331,29 @@ def command_source(models, offsets):
 
 def native_profile(pilot, object_size, model_offsets, vrom_start):
     """Bind an installed object's verified VROM; this does not register an item."""
-    if (pilot not in PILOTS or type(object_size) is not int or
+    if (pilot not in REVIEWED or type(object_size) is not int or
             not 0 < object_size < 0x1000000 or object_size % 16 or
             type(vrom_start) is not int or not 0 < vrom_start <= 0x4000000 - object_size or
-            vrom_start % 16 or set(model_offsets) != {'opaque', 'translucent'} or
+            vrom_start % 16 or set(model_offsets) != {row[0] for row in pilot.models} or
             any(type(at) is not int or at < 0 or at % 8 or at + 8 > object_size for at in model_offsets.values())):
         raise ValueError('Furniture profile exceeds its native object bounds')
+    opaque = SEGMENT + model_offsets['opaque'] if 'opaque' in model_offsets else 0
+    translucent = SEGMENT + model_offsets['translucent'] if 'translucent' in model_offsets else 0
     words = (vrom_start, vrom_start + object_size, SEGMENT, SEGMENT + object_size,
-             SEGMENT + model_offsets['opaque'], 0, SEGMENT + model_offsets['translucent'], 0, 0, 0, 0, 0)
+             opaque, 0, translucent, 0, 0, 0, 0, 0)
     return struct.pack('>12I', *words) + scalar_profile(pilot) + bytes(4)
 
 
-def build_objects(rel, symbols, out):
+def build_objects(rel, symbols, out, pilots=PILOTS):
     verify_sources(rel, symbols)
+    if not pilots or len(set(pilots)) != len(pilots) or any(p not in REVIEWED for p in pilots):
+        raise ValueError('Choose a nonempty, unique batch of reviewed furniture')
     out.mkdir(parents=True, exist_ok=False)
     report = {'format': 'AFV3-FURNITURE-ART-1', 'converter_version': CONVERTER_VERSION,
               'donor': DONOR, 'source_rel_sha256': REL_SHA, 'source_symbols_sha256': SYMBOLS_SHA,
               'compiler_image': IMAGE, 'objects': [], 'runtime_installed': False,
               'status': 'converted_static_assets_not_playable_imports'}
-    for pilot in PILOTS:
+    for pilot in pilots:
         body, resources, offsets, models = prepare(rel, symbols, pilot)
         source, sections = command_source(models, offsets)
         directory = out / pilot.key
@@ -349,10 +390,12 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--batch', choices=('pilots', 'construction'), default='pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh output directory; existing builds are preserved')
-    report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve())
+    pilots = PILOTS if args.batch == 'pilots' else CONSTRUCTION_PILOTS
+    report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve(), pilots)
     print(json.dumps({'output': str(args.output), 'objects': [
         {'name': r['name'], 'bytes': r['object_bytes'], 'sha256': r['object_sha256']} for r in report['objects']],
         'runtime_installed': False}, indent=2))

@@ -94,24 +94,32 @@ class FurnitureArtTests(unittest.TestCase):
             verify_sources(b'not the supplied donor', b'not the pinned symbols')
 
 
-@unittest.skipUnless((OUTPUT / 'art.json').exists(), 'Local furniture asset conversion is not built')
 class FurnitureArtLocalTests(unittest.TestCase):
+    output = OUTPUT
+    pilots = PILOTS
+    expected_hashes = ('27693e1512114e3091a7675b228e0e60643ec6114ceb55e59cb5a09c8316a42a',
+                       '0c5e51be4d6bda888fd52b5f5c25ca1dc5e5b93e9b2ada16b3aef2198845d2f2')
+    expected_sizes = (3216, 3216)
+
     @classmethod
     def setUpClass(cls):
+        if not (cls.output / 'art.json').exists():
+            raise unittest.SkipTest('Local furniture asset conversion is not built')
         cls.rel = (ROOT / 'build/gamecube/files/foresta.rel.szs.decoded').read_bytes()
         cls.symbols = (ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes()
-        cls.report = json.loads((OUTPUT / 'art.json').read_text())
-        cls.prepared = [prepare(cls.rel, cls.symbols, pilot) for pilot in PILOTS]
+        cls.report = json.loads((cls.output / 'art.json').read_text())
+        cls.prepared = [prepare(cls.rel, cls.symbols, pilot) for pilot in cls.pilots]
 
     def test_complete_assets_preserve_texels_palette_and_geometry(self):
         base = rel_sections(self.rel)[5][0]
-        expected_hashes = ('27693e1512114e3091a7675b228e0e60643ec6114ceb55e59cb5a09c8316a42a',
-                           '0c5e51be4d6bda888fd52b5f5c25ca1dc5e5b93e9b2ada16b3aef2198845d2f2')
-        for pilot, prepared, report, digest in zip(PILOTS, self.prepared, self.report['objects'], expected_hashes):
+        self.assertEqual(len(self.report['objects']), len(self.pilots))
+        for pilot, prepared, report, digest, size in zip(
+                self.pilots, self.prepared, self.report['objects'], self.expected_hashes,
+                self.expected_sizes, strict=True):
             body, resources, offsets, models = prepared
-            asset = (OUTPUT / report['object_file']).read_bytes()
+            asset = (self.output / report['object_file']).read_bytes()
             self.assertEqual(asset[:len(body)], body)
-            self.assertEqual(len(asset), 3216)
+            self.assertEqual(len(asset), size)
             self.assertEqual(sha256(asset), digest)
             self.assertEqual(report['object_sha256'], digest)
             self.assertFalse(report['selectable'])
@@ -149,7 +157,7 @@ class FurnitureArtLocalTests(unittest.TestCase):
     def test_actual_compiled_lists_keep_faces_materials_and_native_load_bounds(self):
         for prepared, report in zip(self.prepared, self.report['objects']):
             body, resources, offsets, models = prepared
-            asset = (OUTPUT / report['object_file']).read_bytes()
+            asset = (self.output / report['object_file']).read_bytes()
             source, sections = command_source(models, offsets)
             self.assertEqual(sha256(source.encode()), report['command_source_sha256'])
             for model_report in report['models']:
@@ -192,7 +200,14 @@ class FurnitureArtLocalTests(unittest.TestCase):
                 self.assertEqual(faces, expected)
                 self.assertEqual(len(faces), model_report['triangles'])
                 self.assertEqual(loads, [offsets[r['target']] for r in donor if r['opcode'] in (0xF0, 0xFD)])
-                self.assertEqual(shapes, [r['shape'] for r in donor if r['opcode'] == 0xFD])
+                expected_shapes = []
+                for row in donor:
+                    if row['opcode'] == 0xFD:
+                        expected_shapes.append(row['shape'])
+                    elif row['opcode'] == 0xF2:
+                        b = row['words'][1]
+                        expected_shapes.append(((b >> 12 & 4095) // 4 + 1, (b & 4095) // 4 + 1))
+                self.assertEqual(shapes, expected_shapes)
                 self.assertEqual(state, [r['words'] for r in donor if r['opcode'] in (0xFC, 0xE2, 0xFA, 0xD9)])
                 self.assertEqual(code[-8:], struct.pack('>II', 0xDF000000, 0))
         self.assertFalse(self.report['runtime_installed'])

@@ -4,6 +4,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from gc_names import symbol_data
 from v3_furniture_art import verify_sources
+from v3_construction_items import STOCK as CONSTRUCTION_STOCK
 
 ABI, CODE, LIMIT, BRIDGE = 16, 0x9C00, 0x9D00, 0xBAA0
 CLOTHING_ABI = 36
@@ -11,7 +12,8 @@ VROM, TABLE, DESCRIPTOR = 0x011E6000, 0x38C, 0x8010DAA0
 SOURCE_SHA = 'ec1b8d3ed3ae8228ba9a16a5851f804659e53148517186aa5416a82de5b4d6a2'
 ENTRY, END = 0x800C05E0, 0x800C0684
 ENTRY_SHA = 'd1870d741a325ea9a0f6247f84daca6fb9aa96b9c0960f09df1733e1ccb97703'
-SOURCES = ('tools/v3_shops.py', 'overlays/v3/shops.c', 'overlays/v3/shops.ld')
+SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
+           'overlays/v3/shops.c', 'overlays/v3/shops.ld')
 
 
 def goods(base, rel, symbols, imports):
@@ -30,7 +32,7 @@ def goods(base, rel, symbols, imports):
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),
                  0x32B8: (1198, 'ftr_listA', 0, 0xCA),
-                 0x3350: (1236, 'ftr_listA', 0, 0xCA)}
+                 0x3350: (1236, 'ftr_listA', 0, 0xCA), **CONSTRUCTION_STOCK}
         if item not in rules or row['runtime_index'] != rules[item][0]:
             raise ValueError('Unreviewed ordinary-stock item')
         _, name, group, at = rules[item]

@@ -8,6 +8,13 @@ are furniture dependencies of Cheri's donor house. Output remains in ignored
 local build directories; no game images, extracted assets, or executable donor
 code are committed or published.
 
+Converter version 2 also supports the explicit
+[seven-item construction batch](V3_CONSTRUCTION_ITEMS.md). It retains the default
+two-object batch and verifies each additional profile's exact opaque-only layer
+set, vertex span, and material states. Two construction models have narrowly
+reviewed mirrored-texture and explicit-tile support; the default parser remains
+strict. Their complete item runtime is still pending.
+
 These are converted assets, **not playable or selectable imports**. The
 [runtime adapter](V3_FURNITURE_RUNTIME.md) supplies stable identities, profile
 loading, model banks, and cleanup. The [shared item adapter](V3_FURNITURE_ITEMS.md)

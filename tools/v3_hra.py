@@ -6,6 +6,7 @@ from catalogue_names import Image, elf_inventory
 from gc_names import rel_sections
 from npc_mail_show import relocate_verified_data
 from v3_furniture_art import verify_sources
+from v3_construction_items import HRA as CONSTRUCTION_HRA
 from v3_furniture_room import assembly as room_assembly, branch_target, query
 import v3_hra_series
 
@@ -17,7 +18,8 @@ SECTIONS = (10704, 5024, 0, 1248, 245)
 SOURCE_SHA = 'bb2d983ca0751681838d02dd96d5e7fdf63402d2acdc8410cfd3c0f1d89712a1'
 RELOC_SHA = 'a53d04cb5992a96bff77aa8cb9f022aff02764821f659c5578763b61fc6e39a5'
 DONOR_SHA = '231d23625c126b048d95be99f397e2f05f564af23423c1f911d706acaec37f0e'
-SOURCES = ('tools/v3_hra.py', 'overlays/v3/hra.c', 'overlays/v3/hra.ld') + v3_hra_series.SOURCES
+SOURCES = ('tools/v3_hra.py', 'tools/v3_construction_items.py',
+           'overlays/v3/hra.c', 'overlays/v3/hra.ld') + v3_hra_series.SOURCES
 RANGES = (0x80926178, 0x809261C4, 0x80926210, 0x80926370, 0x809263C4,
           0x809263FC, 0x80926434, 0x8092646C, 0x809266CC, 0x80926888,
           0x809268DC, 0x80926914, 0x8092694C, 0x80926984, 0x809275C4,
@@ -58,7 +60,7 @@ def table(base, rel, symbols, furniture, display=None, *, speed_bag=False):
     imports = list(furniture)
     if speed_bag:
         imports.append({'item_id': '3350', 'runtime_index': 1236})
-    approved = {(0x3224, 1161): '40050200', (0x32B8, 1198): '40050000'}
+    approved = {(0x3224, 1161): '40050200', (0x32B8, 1198): '40050000', **CONSTRUCTION_HRA}
     if speed_bag:
         approved[0x3350, 1236] = 'E8050000'
     for row in imports:

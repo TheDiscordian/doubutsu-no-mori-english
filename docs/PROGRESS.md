@@ -2,6 +2,13 @@
 
 ## Active development
 
+The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) supplies seven
+more complete furniture models/textures and verified names, prices, shop groups,
+and scoring data. All 600 vertices and 277 triangles are retained; every object
+fits the current furniture model buffer. Focused conversion and combined
+shop/scoring checks pass. Installing their runtime records, saved selections,
+and optional-composer entries is next; these assets are not yet in a cartridge.
+
 The [local optional composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) now
 supports individual experimental selections across the twenty installed
 villagers and six logical items. It derives required house furnishings and

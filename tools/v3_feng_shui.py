@@ -6,6 +6,7 @@ from catalogue_names import Image, elf_inventory
 from gc_names import rel_sections, symbol_data
 from npc_mail_show import relocate_verified_data
 from v3_furniture_art import verify_sources
+from v3_construction_items import FENG as CONSTRUCTION_FENG
 from v3_furniture_room import assembly as room_assembly
 
 ABI = 20
@@ -16,7 +17,7 @@ SECTIONS = (1600, 1920, 96, 0, 12)
 SOURCE_SHA = '783bfaf1bf8fa58872ae2c3f9f55e686482f5434c2f42c49e3562de9ee284c47'
 RELOC_SHA = '326ba552f9fb152e9c0e174c5ed0f03d9b5f4adf40941e340209f05ee90f06dd'
 DONOR_SHA = '5700370581b13dd85eb1102656f858c9c4dbb4752c646c3ad563893937a2517a'
-SOURCES = ('tools/v3_feng_shui.py', 'overlays/v3/feng_shui.ld')
+SOURCES = ('tools/v3_feng_shui.py', 'tools/v3_construction_items.py', 'overlays/v3/feng_shui.ld')
 ROWS = [
     {'kind': 'range', 'start': 0x80930D90, 'end': 0x80930DA0, 'upper': 0x80930D98,
      'source': 4, 'upper_word': 0x28811ECD, 'branch': 0x1020000A, 'delay': 0x02002825,
@@ -61,7 +62,7 @@ def table(base, rel, symbols, furniture, display=None):
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         colours = {(0x3224, 1161): (2, 'red'), (0x32B8, 1198): (3, 'orange'),
-                   (0x3350, 1236): (0, 'none')}
+                   (0x3350, 1236): (0, 'none'), **CONSTRUCTION_FENG}
         if (item, index) not in colours or index in seen:
             raise ValueError('Unreviewed or duplicate feng shui import')
         seen.add(index)

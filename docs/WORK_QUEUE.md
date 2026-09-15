@@ -265,6 +265,14 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) converts seven
+  complete static models and verifies names/prices, 1×1 profiles, ordinary B/C
+  stock membership, and native scoring metadata. Five new asset checks, seven
+  shared converter checks, and four metadata/table checks pass. All seven models
+  fit existing banks; 28 construction-theme items fit the 32-bit completion mask.
+  Next install fixed registry/profile/metadata rows and connect the selected
+  shop, catalogue, ownership, and optional composition paths. Converted assets
+  alone do not enable the imports or change either web patcher.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
   texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
   tests pass with unchanged pilot outputs. Connect stable model/texture banks,
