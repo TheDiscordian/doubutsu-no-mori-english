@@ -2,6 +2,14 @@
 
 ## Active development
 
+The [garden batch](checkpoints/V3_GARDEN_ITEMS.md) converts six more complete
+decorations: birdhouse, bird feeder, both flamingos, mailbox, and garden gnome.
+Six new focused checks and ten shared parser/profile checks pass. Models retain
+all 406 vertices, 251 triangles, and 24,448 texels, including tall clamped textures
+and explicit mirrored materials. Acquisition metadata preserves lottery and
+post-office rewards. Runtime installation, backyard scoring, and post-office
+category support remain work; this source-only batch does not change the ROM.
+
 The [aloha scoring correction](checkpoints/V3_ALOHA_SCORING.md) supplies both
 imported displays' actual clothing properties instead of inactive HRA records.
 Three focused checks and a corrected 52-record native run pass, including full

@@ -202,7 +202,7 @@ class FurnitureArtLocalTests(unittest.TestCase):
                 self.assertEqual(loads, [offsets[r['target']] for r in donor if r['opcode'] in (0xF0, 0xFD)])
                 expected_shapes = []
                 for row in donor:
-                    if row['opcode'] == 0xFD:
+                    if row['opcode'] in (0xFD, 0xD2):
                         expected_shapes.append(row['shape'])
                     elif row['opcode'] == 0xF2:
                         b = row['words'][1]

@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 2
+CONVERTER_VERSION = 3
 
 
 @dataclass(frozen=True)
@@ -36,6 +36,9 @@ class Pilot:
     models: tuple = (('opaque', '_model_b_model', 0, 0x98),
                      ('translucent', '_model_a_model', 8, 0x68))
     mirrored_s: bool = False
+    height: float = 18.0
+    garden: bool = False
+    vertex_symbol: str | None = None
 
 
 PILOTS = (
@@ -65,7 +68,30 @@ CONSTRUCTION_PILOTS = (
           (('a', 32, 32), ('b', 32, 32), ('c', 16, 32), ('d', 16, 32)), 0, 103,
           (('opaque', '_model_model', 0, 0x138),), True),
 )
-REVIEWED = PILOTS + CONSTRUCTION_PILOTS
+GARDEN_PILOTS = (
+    Pilot('birdhouse', 0x3268, 'birdhouse', 'int_yaz_b_house', 'iam_yaz_b_house',
+          (('kabu', 16, 32), ('kabe01', 32, 40), ('kabe02', 32, 40),
+           ('ita', 32, 16), ('pole', 16, 32)), 1, 79,
+          (('opaque', '_body_model', 0, 0x158),), height=42.43, garden=True),
+    Pilot('bird-feeder', 0x3284, 'bird feeder', 'int_yaz_b_feeder', 'iam_yos_b_feeder',
+          (('pole', 16, 56), ('ana', 16, 48), ('ura', 16, 48), ('wood', 16, 16),
+           ('yane', 16, 16), ('wa', 32, 32)), 1, 65,
+          (('opaque', '_body_model', 0, 0x178),), height=42.43, garden=True,
+          vertex_symbol='int_yos_b_feeder_v'),
+    Pilot('mr-flamingo', 0x3290, 'Mr. Flamingo', 'int_yos_flamingo', 'iam_yos_flamingo',
+          (('kao', 64, 32), ('dou', 64, 32)), 1, 69,
+          (('opaque', '_body_model', 0, 0x110),), height=42.43, garden=True),
+    Pilot('mailbox', 0x3294, 'mailbox', 'int_yos_mailbox', 'iam_yos_mailbox',
+          (('mae', 32, 48), ('ana', 32, 16), ('sokumen', 32, 48), ('rabel', 32, 16)),
+          1, 52, (('opaque', '_body_model', 0, 0xF8),), height=42.43, garden=True),
+    Pilot('garden-gnome', 0x32A0, 'garden gnome', 'int_yos_gnome', 'iam_yos_gnome',
+          (('all', 64, 64),), 1, 72,
+          (('opaque', '_body_model', 0, 0x150),), height=42.43, garden=True),
+    Pilot('mrs-flamingo', 0x32A4, 'Mrs. Flamingo', 'int_yos_flamingo2', 'iam_yos_flamingo2',
+          (('kao', 64, 32), ('dou', 64, 32)), 1, 69,
+          (('opaque', '_body_model', 0, 0x110),), height=42.43, garden=True),
+)
+REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS
 
 
 def verify_sources(rel, symbols):
@@ -76,13 +102,13 @@ def verify_sources(rel, symbols):
 def scalar_profile(pilot):
     # Height, scale, 1x1 shape, collision kind, rotation, lighting, contact,
     # padding, and interaction. No rig, texture animation, or callback table.
-    return struct.pack('>ff6BH', 18.0, 0.01, 4, 0, 0, pilot.lighting_map, 0, 0, 0)
+    return struct.pack('>ff6BH', pilot.height, 0.01, 4, 0, 0, pilot.lighting_map, 0, 0, 0)
 
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
-                accessory=False, mirrored_s=False):
+                accessory=False, mirrored_s=False, garden=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
-    if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s))) > 1:
+    if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s, garden))) > 1:
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -115,7 +141,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
-            if accessory and tile in (struct.pack('>II', word, 0)
+            if garden and tile in (struct.pack('>II', word, 0)
+                                  for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F100)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif accessory and tile in (struct.pack('>II', word, 0)
                                       for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F900)):
                 word = struct.unpack_from('>I', tile)[0]
                 row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
@@ -129,6 +159,14 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             material = target
             material_wrap = row.get('wrap_modes')
             at += 8
+        elif op == 0xD2:
+            # Birdhouse reuses its current CI4 image with explicit GX C4 format
+            # and mirrored S. This is a material update, not a native command.
+            if (not garden or (a, b) != (0xD280F800, 0)
+                    or textures.get(material) != (32, 40) or material_wrap != (0, 0)):
+                raise ValueError('Unsupported standalone furniture tile update')
+            material_wrap = (2, 0)
+            row.update(shape=(32, 40), wrap_modes=material_wrap)
         elif op == 0x01:
             count = a >> 12 & 255
             offset = row['target'] - vertex
@@ -165,8 +203,15 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             construction_extent = (mirrored_s and material_wrap == (2, 0)
                                    and textures.get(material) == (16, 32)
                                    and b == 0x0007C07C)
+            garden_extent = garden and b == {
+                ((16, 32), (2, 0)): 0x0007C07C,
+                ((32, 40), (2, 0)): 0x000FC09C,
+                ((32, 16), (0, 1)): 0x0007C07C,
+                ((16, 48), (2, 0)): 0x0007C0BC,
+                ((16, 16), (2, 0)): 0x0007C03C,
+            }.get((textures.get(material), material_wrap))
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or accessory and b in (0x0007C07C, 0x000FC07C))):
+                    (construction_extent or garden_extent or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
             modes = (0x230405, 0x230005, 0x270405) if speed_bag else (0x230405, 0x230005)
@@ -231,7 +276,8 @@ def prepare(rel, symbols_bytes, pilot):
                  lambda data, w=w, h=h: pack4(untile(data, w, h, 4)))
         texture_shapes[at] = (w, h)
     vertex_size = pilot.vertex_count * 16
-    vertex = add(pilot.stem + '_v', vertex_size, lambda data: normalise_vertex_flags(data)[0])
+    vertex = add(pilot.vertex_symbol or pilot.stem + '_v', vertex_size,
+                 lambda data: normalise_vertex_flags(data)[0])
     # These are plain arrays, not containers of unconverted pointers.
     for resource in resources:
         if data_pointers(rel, resource['donor_offset'], resource['bytes']):
@@ -247,7 +293,7 @@ def prepare(rel, symbols_bytes, pilot):
         pointers = data_pointers(rel, at, size)
         models[label] = {'symbol': name, 'donor_offset': at, 'source_sha256': sha256(raw),
                          'rows': parse_model(raw, at, pointers, pal, texture_shapes, vertex,
-                                             vertex_size, mirrored_s=pilot.mirrored_s)}
+                                             vertex_size, mirrored_s=pilot.mirrored_s, garden=pilot.garden)}
         profile_pointers[profile_at + slot] = at
     if data_pointers(rel, profile_at, profile_size) != profile_pointers:
         raise ValueError('Furniture profile has missing, extra, or unported dependencies')
@@ -261,6 +307,22 @@ def prepare(rel, symbols_bytes, pilot):
 def command_source(models, offsets):
     output = ['/* Generated from local donor data; not a distribution asset. */', '#include <PR/mbi.h>']
     sections = []
+
+    def tile_fields(shape, wraps):
+        modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
+        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1)):
+            raise ValueError('Unsupported furniture tile wrapping')
+        masks = []
+        for size, wrap in zip(shape, wraps, strict=True):
+            if type(size) is not int or not 1 <= size <= 1024:
+                raise ValueError('Unsupported furniture texture dimension')
+            power_two = size & (size - 1) == 0
+            if wrap and not power_two:
+                raise ValueError('Repeated furniture texture needs a power-of-two axis')
+            # Masking a clamped 40/48/56-pixel axis to 32 would crop its tail.
+            masks.append(size.bit_length() - 1 if power_two else 0)
+        return *(modes[wrap] for wrap in wraps), *masks
+
     for label, model in models.items():
         values, count = [], 0
 
@@ -289,19 +351,24 @@ def command_source(models, offsets):
                 if w * h // 2 > 2048:
                     raise ValueError('Furniture texture exceeds CI4 TMEM capacity')
                 emit('gsDPPipeSync()')
-                wrap_s, wrap_t, shift = 'G_TX_CLAMP', 'G_TX_CLAMP', 0
-                if 'wrap_modes' in row:
-                    modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
-                    if tuple(row['wrap_modes']) not in ((0, 0), (2, 0), (2, 1)):
-                        raise ValueError('Unsupported accessory tile wrapping')
-                    wrap_s, wrap_t = (modes[value] for value in row['wrap_modes'])
+                wrap_s, wrap_t, mask_s, mask_t = tile_fields((w, h), row.get('wrap_modes', (0, 0)))
+                shift = 0
                 if 'repeat_shift' in row:
                     if row['repeat_shift'] != 2 or (w, h) != (16, 16):
                         raise ValueError('Unsupported furniture environment-map tile')
                     wrap_s, wrap_t, shift = 'G_TX_WRAP', 'G_TX_WRAP', 2
                 emit(f"gsDPLoadTextureBlock_4b(0x{SEGMENT + offsets[row['target']]:08X}, "
                      f'G_IM_FMT_CI, {w}, {h}, 15, {wrap_s}, {wrap_t}, '
-                     f'{w.bit_length() - 1}, {h.bit_length() - 1}, {shift}, {shift})', 7)
+                     f'{mask_s}, {mask_t}, {shift}, {shift})', 7)
+            elif op == 0xD2:
+                if row['shape'] != (32, 40) or row['wrap_modes'] != (2, 0):
+                    raise ValueError('Unreviewed furniture tile update in compiler input')
+                w, h = row['shape']
+                wrap_s, wrap_t, mask_s, mask_t = tile_fields((w, h), row['wrap_modes'])
+                emit('gsDPTileSync()')
+                emit(f'gsDPSetTile(G_IM_FMT_CI, G_IM_SIZ_4b, {w // 16}, 0, '
+                     f'G_TX_RENDERTILE, 15, {wrap_t}, {mask_t}, 0, {wrap_s}, {mask_s}, 0)')
+                emit(f'gsDPSetTileSize(G_TX_RENDERTILE, 0, 0, {(w - 1) * 4}, {(h - 1) * 4})')
             elif op == 0x01:
                 # The donor pointer can address the middle of the vertex array.
                 first = row['first_vertex']
@@ -390,11 +457,11 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--batch', choices=('pilots', 'construction'), default='pilots')
+    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden'), default='pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh output directory; existing builds are preserved')
-    pilots = PILOTS if args.batch == 'pilots' else CONSTRUCTION_PILOTS
+    pilots = {'pilots': PILOTS, 'construction': CONSTRUCTION_PILOTS, 'garden': GARDEN_PILOTS}[args.batch]
     report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve(), pilots)
     print(json.dumps({'output': str(args.output), 'objects': [
         {'name': r['name'], 'bytes': r['object_bytes'], 'sha256': r['object_sha256']} for r in report['objects']],

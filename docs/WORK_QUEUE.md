@@ -290,6 +290,13 @@ with later e/e+ donor support investigated separately.
   composer checks pass against that source without another menu replay.
   Ordinary acquisition/placement/persistence remain incomplete; neither web
   patcher changes.
+  The [six-item garden batch](checkpoints/V3_GARDEN_ITEMS.md) converts complete
+  artwork and verifies names, prices, real acquisition lists, and scoring flags.
+  Six new focused checks and ten shared parser/profile checks pass. Next install
+  fixed runtime profiles/item readers, backyard series 56, ordinary/lottery/
+  post-office acquisition, complete catalogue/scoring, saved dependencies, and
+  optional composition. Mailbox birth category 19 is not safe in the current
+  native point-table/counter path and stays explicitly uninstalled.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
   texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
   tests pass with unchanged pilot outputs. Connect stable model/texture banks,

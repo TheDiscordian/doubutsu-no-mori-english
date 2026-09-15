@@ -283,6 +283,11 @@ experimental options and their actual dependencies, including selected catalogue
 packing/completion. Focused and native subset checks pass. Ordinary gameplay/
 persistence and browser implementation remain required; neither patcher changes.
 
+The [garden batch](V3_GARDEN_ITEMS.md) converts six decorative models and their
+actual acquisition/scoring metadata. Complete runtime installation remains work;
+special lottery/post-office rewards must not become ordinary shop goods, and
+the new backyard series and post-office scoring category need explicit support.
+
 ### Limits and saves
 
 Target an Expansion Pak-equipped N64 with 128-KiB FlashRAM and RTC, retaining
