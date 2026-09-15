@@ -14,7 +14,7 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x80483FF0, "Multi-cell item code overlaps the checked package guard")
+    ASSERT(. <= 0x80483400, "Multi-cell item code overlaps the tent model callbacks")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected multi-cell item state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

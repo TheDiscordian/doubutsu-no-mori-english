@@ -3,16 +3,20 @@
 ## Active development
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) installs
-fourteen additional items in ABI 85 through source-discovered records and shared
-conversion, stock, catalogue, scoring, and profile installation. No per-item
-installer or graphics description is needed. Complete artwork retains 1,038
-vertices and 570 triangles. Twenty-four focused tests and the representative
-native run pass (148 records, 133 assertions). The offline composer has 76
-installed development options. Ordinary appearance/gameplay and save/restart
-remain unverified; both served patchers remain V2. Continue shared behaviour and
-graphics categories through this pipeline, starting with seating sounds.
+sixteen additional items through source-discovered records and shared conversion,
+stock, catalogue, scoring, and profile installation. No per-item installer or
+graphics description is needed. The current ABI-86 cartridge adds lawn chair
+and teacher's chair through the shared seating-sound category and corrects the
+existing lefty/righty desks' sound routing. Its 208-byte reader occupies existing
+reserved space; no audio data or permanent allocation grows. Twenty-six focused
+tests and the first current native run pass (88 records, 73 assertions), including
+all four imported sound routes and both complete chair model loads. The first
+fourteen items retain their passing 148-record native evidence. The offline
+composer has 78 installed development options. Ordinary appearance/gameplay and
+save/restart remain unverified; both served patchers remain V2. Continue shared
+contact/callback and graphics/acquisition categories through this pipeline.
 The current lock is `config/v3-import-build.json`; the cartridge is
-`build/v3-auto-furniture-final-01/animal-forest-v3-asset-loader.z64`.
+`build/v3-furniture-seats-runtime-02/animal-forest-v3-asset-loader.z64`.
 
 The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
 righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,
@@ -22,8 +26,9 @@ composition checks pass. The first native run passes 88 records with 74
 assertions, covering complete owner loading, names, prices, model DMA, rotated
 footprints, stock membership, catalogue eligibility, acquisition, saved ownership,
 restoration, and guards. Ordinary sitting, room appearance, and save/restart
-remain unverified. The shared seating-sound adapter remains required for the
-desks. Both served patchers remain V2. No permanent memory or saved format grows.
+remain unverified. Their shared seating-sound reader is installed and checked
+in the current cartridge above. Both served patchers remain V2. No permanent
+memory or saved format grows.
 
 The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) cold-boots
 ABI 83 with the current profile and unchanged copied-town content. The game

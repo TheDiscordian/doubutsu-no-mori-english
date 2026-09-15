@@ -1,8 +1,58 @@
 # Automatic furniture pipeline checkpoint
 
-## Delivered implementation
+## Current shared seating category
 
-The source-driven pipeline discovers and installs fourteen new items in one
+The current complete cartridge is ABI 86:
+`build/v3-furniture-seats-runtime-02/animal-forest-v3-asset-loader.z64`.
+The automatic pipeline adds lawn chair `324C` and teacher's chair `3288`
+without an item definition, dedicated installer, or separate native scenario.
+Their 7,872 bytes retain all 163 vertices and 81 triangles. This brings the
+automatic additions to sixteen and the offline composer to 78 installed options
+(55 furniture, three shirts, and twenty villagers).
+
+The category extension also supplies the donor's correct soft-chair sounds for
+lawn chair and hard-chair sounds for teacher's chair, lefty desk, and righty desk.
+Byte 25 of each existing item record stores its source-derived category. All
+installed furniture is populated from the actual donor table, including entries
+with no action sound. No per-item runtime branch or separate audio import is
+needed. Full sound programs, timing, complete instruments, envelopes, samples,
+loops, and predictors match native audio; matching sound numbers alone are not
+the verification. Original native items retain their original reader body.
+
+The helper is 208 bytes at `80483D00`, before the fire vtables at `80483FC0`.
+The installer verifies the existing fire code and empty intervening bytes;
+linker limits also prevent shared item/tent/fire/behaviour overlap. The helper
+uses a bounded 32-byte stack frame and no new permanent RAM or audio resources.
+The catalogue contains 491 furniture rows and 248 clothing rows. The resource is
+3,049,104 bytes, with 1,079,664 bytes remaining before the English-choice region.
+
+- ROM SHA-256: `e6f334027c352039fededafe8672d7ff480b5234bad914646b4beeffad00d1ab`.
+- UPS SHA-256: `b20ac5cf1f0bc6452a3ec38b76d15ab76d5e215e9112fd81d0c912af42ce6d40`.
+- Receipt SHA-256: `b3f9a540d3426a87dad66cc7eec0732fef38283b72de4fc312b87fd75eee4b54`.
+- Import-resource SHA-256: `2963fa39c0886ac784b3b6ed842e8dc6a8c88cef65c7b4909868a7debbeefff5`.
+- Native result: `build/v3-furniture-seats-native-01/results.json`, SHA-256
+  `33895a6070a9e352a7fc663f22c4fc5b1e45d84eaed84919005199c897733f4c`.
+
+All 26 focused pipeline/composition checks pass. The shared sound implementation
+passes address/undefined-behaviour sanitizers for original delegation, complete
+import index bounds, modes, categories, metadata identity, and disabled records.
+The first silent native run passes 88 records and 73 assertions: complete helper
+loading, original fallbacks, both modes for all four imported sound routes,
+disabled-profile rejection, invalid indices/modes, complete chair model DMA,
+names, prices, stock, catalogue eligibility, acquisition, ownership, restoration,
+and guards. No audio is played through the user's speakers/headphones.
+
+The initial installer attempt stops at a missing shared compiler-entry mapping;
+the mapping is added and the completed build passes. There is no native setup
+retry. Ordinary sitting, audible playback, GPU appearance, transactions, and
+save/restart are not established by these component checks. Saved format 2 is
+unchanged; the new profile is a superset of ABI 85, but ordinary cross-version
+reload is not newly tested. Saves containing the new chairs must not be loaded
+in an older cartridge or V2. Neither served patcher changes.
+
+## Initial automatic batch
+
+Source revision `7149f9c` discovers and installs fourteen new items in one
 batch, without an item-specific converter definition, stock/catalogue switch,
 installer, or test scenario. The complete command is:
 
@@ -45,7 +95,7 @@ and ringside table without other new furniture, ROM SHA-256
 Empty selection reproduces V2; all selection reproduces the complete cartridge.
 Neither served patcher changes, and this is not a public-release handoff.
 
-## Verified
+### Initial batch verification
 
 Seven shared format/donor tests, five current-cartridge tests, and twelve
 composition tests pass: **24 focused tests**. Checks cover every new texel,
@@ -87,24 +137,19 @@ new items in an older build or V2.
 ## Category queue
 
 The donor worksheet contains 242 canonical 3xxx entries. This converter supports
-36 under its present complete category rules; 22 were installed already and
-14 are the new batch. The post-install scan identifies no remaining supported,
+40 under its present complete category rules, all installed. The post-install
+scan identifies no remaining supported,
 uninstalled entries. This is **not** a whole-project completeness percentage.
-The other 206 entries include already-installed special adapters and explicit
+The other 202 entries include already-installed special adapters and explicit
 identity/unused cases as well as genuinely missing imports.
 
 Continue through shared feature categories, not individual item queues:
 
-1. Seating sounds: the scan identifies the donor action-sound table as an
-   additional reader requirement. Lawn chair and teacher's chair await the
-   shared sound adapter. Existing lefty/righty desk imports also need the donor
-   hard-chair sound route; their earlier geometry/seating-flag checks did not
-   cover sound. Preserve their passing unrelated checks.
-2. Shared contact flags and callback families: 20 entries have the same `0010`
+1. Shared contact flags and callback families: 20 entries have the same `0010`
    interaction flag; 106 have custom callback tables. Inspect actual behaviour
    and dependencies before enabling a family; never discard callbacks to make
    an item fit the static category.
-3. Acquisition categories, special preview framing, and graphics variants:
+2. Acquisition categories, special preview framing, and graphics variants:
    extend reusable adapters for the inventory's explicit reasons. Some items
    need combined features; clearing one reason need not make the item complete.
 

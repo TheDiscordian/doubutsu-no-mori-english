@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-auto-furniture-final-01",
-  "runtime_abi": 85,
-  "rom_sha256": "571e849108cf36983c7129a38d08bfc3b47dd71db5c4347cfe16b7425b1ed35c",
-  "report_sha256": "9f1df24e3e98f4972afc7c38720f91947afe6417082a79d13bdeee3959b80166"
+  "directory": "build/v3-furniture-seats-runtime-02",
+  "runtime_abi": 86,
+  "rom_sha256": "e6f334027c352039fededafe8672d7ff480b5234bad914646b4beeffad00d1ab",
+  "report_sha256": "b3f9a540d3426a87dad66cc7eec0732fef38283b72de4fc312b87fd75eee4b54"
 }

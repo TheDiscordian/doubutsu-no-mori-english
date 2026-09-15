@@ -21,7 +21,7 @@ SECTIONS {
     .rodata : { *(.rodata .rodata.*) }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x80483FC0, "Fire callbacks overlap their reserved vtables")
+    ASSERT(. <= 0x80483D00, "Fire callbacks overlap shared furniture behaviour code")
     ASSERT(SIZEOF(.rodata) <= 4, "Fire callbacks contain unexpected constant data")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Fire callbacks have shared writable state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }

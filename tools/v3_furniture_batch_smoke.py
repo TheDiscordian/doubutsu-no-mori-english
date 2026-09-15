@@ -16,7 +16,7 @@ def representatives(rows):
     """Cover each footprint, stock, and layer category, not each item identity."""
     result, covered = [], set()
     for row in sorted(rows,key=lambda r:(-r['object_bytes'],r['item_id'])):
-        features={('size',row['size_code']),('stock',row['stock_group']),
+        features={('size',row['size_code']),('stock',row['stock_group']),('sound',row.get('action_sound',0)),
                   ('layers',tuple(sorted(row.get('model_offsets',{}))))}
         if features-covered: result.append(row); covered.update(features)
     if len(result)>12: raise ValueError('Split new behaviour categories into bounded smoke passes')
@@ -31,7 +31,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         raise ValueError('Furniture probe requires its current checked cartridge')
     rows = representatives(report[section]['imports'])
     record(dict(representative_furniture=[r['item_id'] for r in rows],
-                categories=['stock','footprint','display-list layers']))
+                categories=['stock','footprint','display-list layers','action sounds']))
     files, boot = by_vrom(image), boot_proofs(image)
     blob = files[runtime.BLOB].extract(image)
 
@@ -94,6 +94,28 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     debug.write_memory(bridge, stub)
     call(0x8002FE00, [bridge, 8]); call(0x80034CE0, [bridge, 8])
     try:
+        if 'furniture_behaviours' in report:
+            from v3_furniture_behaviours import RAM as SOUND_RAM,ENTRY as SOUND_ENTRY,NATIVE_CATEGORIES
+            from aflib import CODE_RAM,CODE_VROM
+            behaviour=report['furniture_behaviours']
+            at=runtime.PACKAGE+SOUND_RAM-runtime.PACKAGE_RAM
+            check('complete shared behaviour code',SOUND_RAM,blob[at:at+behaviour['code']['bytes']])
+            original_types=files[CODE_VROM].extract(image)[NATIVE_CATEGORIES-CODE_RAM:NATIVE_CATEGORIES-CODE_RAM+947]
+            for category in (0,1,2):
+                index=original_types.index(category)
+                call(SOUND_ENTRY,[index,0],(0xFFFFFFFF,0x41F,0x420)[category])
+            audible=[r for r in behaviour['imports'] if r['action_sound']]
+            for row in audible:
+                for mode in (0,1):
+                    call(SOUND_ENTRY,[row['runtime_index'],mode],((0x41F,0x422),(0x420,0x423))[row['action_sound']-1][mode])
+            if audible:
+                row=audible[0]
+                profile=next(r for r in report['furniture']['imports'] if r['item_id']==row['item_id'])
+                enable=int(profile['profile_ram'],16)-4;saved[enable]=debug.read_memory(enable,4)
+                debug.write_memory(enable,bytes(4));call(SOUND_ENTRY,[row['runtime_index'],0],0xFFFFFFFF)
+                debug.write_memory(enable,saved[enable])
+                for mode in (0xFFFFFFFF,2):call(SOUND_ENTRY,[row['runtime_index'],mode],0xFFFFFFFF)
+            for index in (947,1023,2048,0xFFFFFFFF):call(SOUND_ENTRY,[index,0],0xFFFFFFFF)
         for row in rows:
             item, index = int(row['item_id'], 16), row['runtime_index']
             debug.write_memory(scratch, bytes(0x100))

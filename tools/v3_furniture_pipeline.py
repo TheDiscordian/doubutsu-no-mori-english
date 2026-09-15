@@ -235,7 +235,7 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('native identity/artwork correspondence needs review')
     index = 1024+(item-0x3000)//4
     action_sound = source.raw('mRmTp_ftr_se_type')[index]
-    if action_sound:
+    if action_sound not in (0,1,2):
         raise ReviewRequired(f'action-sound category {action_sound} needs the shared seating adapter')
     name_raw = source.raw('ftrName2_table')[(index-1024)*16:(index-1023)*16]
     try: name = name_raw.decode('ascii').rstrip(' ')

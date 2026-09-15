@@ -64,9 +64,13 @@ The shared static-CI4 category supports:
   collision: shape 4 is 1×1, shape 3 is 2×1, and shape 5 is 2×2.
 - Ordinary A/B/C, event, and lottery acquisition, existing scoring categories,
   and default catalogue framing. Names and prices come from actual donor tables.
+- Soft- and hard-chair action sounds, selected from the donor's actual category
+  table. Matching complete sound programs, timing, instruments, and samples use
+  the existing native audio; no replacement sample or new audio allocation is
+  needed. The shared reader also covers previously installed furniture.
 
 Dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
-contact/interaction flags, seating sounds, other acquisition routes, oversized
+contact/interaction flags, other action sounds or acquisition routes, oversized
 or different-format artwork, and special preview framing remain explicit review
 categories. Unsupported does not mean unused or unimportant. A successfully
 converted object is not automatically evidence of complete gameplay.
@@ -97,24 +101,40 @@ CRC updates, and full patch reconstruction. No new DMA-directory entry is needed
 Stock and catalogue builders accept verified records without family switches.
 Catalogue eligibility uses byte 24 of each existing 32-byte sparse item record:
 `7` for ordinary A/B/C, `8` for event, `32` for lottery, and `0` for non-orderable
-items. The other seven reserved bytes remain zero. The builder populates masks
-for **all** installed furniture, retaining existing non-orderable rewards and
+items. Byte 25 stores the donor action-sound category: `0` for none, `1` for
+soft chairs, and `2` for hard chairs. The other six reserved bytes remain zero.
+The builder populates masks for **all** installed furniture, retaining existing
+non-orderable rewards and
 the separate clothing-display route. Native gameplay IDs and saved formats do
 not change. Profile selection still rejects absent dependencies.
+
+`tools/v3_furniture_behaviours.py` installs the shared sound reader at `80483D00`
+within the existing package. Its reservation ends at `80483FC0`, before the fire
+vtables. The original sound-reader entry at `800BED5C` delegates native indices
+to its unchanged body; imported indices require complete, enabled item/profile
+records and a supported mode/category. Invalid imported requests return no sound.
+The build verifies complete source audio, current audio resources, original
+function bytes, existing fire code, and unclaimed helper padding. Linker limits
+separate the shared item, tent, fire, and behaviour code reservations.
 
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source
 relocations, independent complete texel/triangle comparisons, metadata/provenance,
 current cartridge installation, retained data/code, and subset composition.
-The catalogue mask reader has address/undefined-behaviour sanitizer checks.
+The catalogue mask and seating-sound readers have address/undefined-behaviour
+sanitizer checks.
 
 `tools/v3_furniture_batch_smoke.py` and
 `tests/scenarios/v3_furniture_batch.json` are reusable across future batches.
-The manifest selects representatives by stock group, footprint, and model layers,
-preferring larger assets. The check exercises actual native owner loading,
+The manifest selects representatives by stock group, footprint, model layers,
+and action-sound category, preferring larger assets. The check exercises actual
+native owner loading,
 model DMA, item readers, placement, catalogue eligibility, acquisition, ownership,
-state restoration, and guards. It does not create a new scenario per item.
+state restoration, and guards. The sound check executes the actual native entry,
+including original fallbacks, imported modes, disabled profiles, and invalid
+indices. It checks returned sound IDs without playing audio through hardware.
+It does not create a new scenario per item.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.
 

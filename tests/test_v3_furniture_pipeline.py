@@ -25,6 +25,15 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_shared_seating_categories_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-seating-sounds-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_furniture_behaviours_test.c'),'-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('original fallbacks, and bounds pass',result.stdout)
+
     def test_category_rules_preserve_colour_and_all_valid_wrap_combinations(self):
         raw,pointers=fixture()
         for s in range(3):
@@ -76,12 +85,16 @@ class DonorTests(unittest.TestCase):
         p=source.profile(0x3220);source.data[p['profile_offset']+41]=0
         self.assertEqual(source.profile(0x3220)['size_code'],1)
 
-    def test_review_does_not_drop_callbacks_or_action_sounds(self):
+    def test_review_does_not_drop_callbacks_or_unknown_action_sounds(self):
         with self.assertRaisesRegex(ValueError,'custom callbacks'): self.source.profile(0x3350)
         identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
         p=self.source.profile(0x324C)
+        row=pipeline.metadata(self.source,0x324C,p,identities[0x324C])
+        self.assertEqual(row['action_sound'],1)
+        changed=copy.copy(self.source);changed.data=bytearray(changed.data)
+        at,_=changed.symbol('mRmTp_ftr_se_type');changed.data[at+row['runtime_index']]=3
         with self.assertRaisesRegex(ValueError,'action-sound category'):
-            pipeline.metadata(self.source,0x324C,p,identities[0x324C])
+            pipeline.metadata(changed,0x324C,p,identities[0x324C])
         with self.assertRaises(ValueError): self.source.pointers(self.source.size-2,4)
 
     def test_complete_texels_vertices_and_compiled_triangles_for_entire_batch(self):
@@ -163,6 +176,7 @@ class CurrentCartridgeTests(unittest.TestCase):
             record=self.blob[install.ITEMS+i*32:install.ITEMS+(i+1)*32]
             self.assertEqual(record[8:24],row['name'].encode().ljust(16,b' '))
             self.assertEqual(record[24],install.order_mask(install.catalogue_record(row)))
+            self.assertEqual(record[25],row['action_sound'])
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
         self.assertEqual(self.report['furniture']['expanded_tables'],self.prior['furniture']['expanded_tables'])
         self.assertEqual(self.report['save_runtime']['code'],self.prior['save_runtime']['code'])
@@ -205,7 +219,28 @@ class CurrentCartridgeTests(unittest.TestCase):
         self.assertEqual(self.blob[0x100:0xC000],before[0x100:0xC000])
         self.assertEqual(self.blob[0xE0:0xF0],before[0xE0:0xF0])
         code=bytearray(self.files[CODE_VROM].extract(self.image));native=self.old[CODE_VROM].extract(self.base)
-        at=shops.DESCRIPTOR-CODE_RAM;code[at:at+12]=native[at:at+12];self.assertEqual(code,native)
+        at=shops.DESCRIPTOR-CODE_RAM;code[at:at+12]=native[at:at+12]
+        hook=self.report['furniture_behaviours']['hook'];at=hook['address']-CODE_RAM
+        self.assertEqual(code[at:at+8].hex(),hook['after']);code[at:at+8]=native[at:at+8]
+        self.assertEqual(code,native)
+
+    def test_shared_sound_code_metadata_original_body_and_fire_remain_intact(self):
+        from v3_furniture_behaviours import RAM,LIMIT,ENTRY,END,audio_contract
+        current=self.report['furniture_behaviours'];at=install.PACKAGE+RAM-install.PACKAGE_RAM
+        self.assertEqual(sha256(self.blob[at:at+current['code']['bytes']]),current['code']['sha256'])
+        self.assertEqual(self.blob[at+current['code']['bytes']:install.PACKAGE+LIMIT-install.PACKAGE_RAM],
+            bytes(LIMIT-RAM-current['code']['bytes']))
+        code=self.files[CODE_VROM].extract(self.image);before=self.old[CODE_VROM].extract(self.base)
+        self.assertEqual(code[ENTRY-CODE_RAM+8:END-CODE_RAM],before[ENTRY-CODE_RAM+8:END-CODE_RAM])
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        for row in current['imports']:
+            self.assertEqual(self.blob[install.ITEMS+install.slot(int(row['item_id'],16))*32+25],
+                source.raw('mRmTp_ftr_se_type')[row['runtime_index']])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(audio_contract(original,self.image,self.report,source),current['donor'])
+        fire=self.report['fire']['code'];at=install.PACKAGE+0x80483800-install.PACKAGE_RAM
+        self.assertEqual(sha256(self.blob[at:at+fire['bytes']]),fire['sha256'])
 
     def test_batch_selection_is_identity_based_and_removes_disabled_scores(self):
         cat=composer.catalogue(self.image,self.report);keys=[r['id'] for r in self.rows]

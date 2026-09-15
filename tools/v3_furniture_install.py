@@ -18,6 +18,7 @@ from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
+import v3_furniture_behaviours as behaviours
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
@@ -30,7 +31,7 @@ STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
-    'overlays/v3/startup.c', 'translations/provenance.json')
+    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -213,7 +214,7 @@ def build(output, art_path, lock=LOCK):
     for row in cat_rows:
         at = ITEMS+slot(int(row['item_id'],16))*32
         old = blob[at+24]
-        if old not in (0,order_mask(row)) or any(blob[at+25:at+32]):
+        if old not in (0,order_mask(row)) or any(blob[at+26:at+32]):
             raise ValueError('Catalogue mask overwrites reserved metadata')
         blob[at+24] = order_mask(row)
     output.mkdir(parents=True)
@@ -233,6 +234,7 @@ def build(output, art_path, lock=LOCK):
                 (shops.VROM,shops.VROM+stock['bytes'],0x06000000|stock['table_offset'])):
         raise ValueError('Changed goods owner/descriptor')
     struct.pack_into('>3I',code,shops.DESCRIPTOR-CODE_RAM,shops.VROM,shops.VROM+len(goods),0x06000000|table_at)
+    behaviour_report=behaviours.install(original,base,prior,blob,code,imports,source,output)
     changes[shops.VROM],changes[CODE_VROM] = goods,code
     stock_report = {**stock,'imports':stock_rows,'bytes':len(goods),'table_offset':table_at,'output_sha256':sha256(goods)}
     moves = []
@@ -276,7 +278,7 @@ def build(output, art_path, lock=LOCK):
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,
-        catalogue=cat_report,shops=stock_report,**score_reports,
+        catalogue=cat_report,shops=stock_report,furniture_behaviours=behaviour_report,**score_reports,
         native_test='pending representative automatic-import execution')
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))
     report['furniture_items']['imports'].extend(installed)
