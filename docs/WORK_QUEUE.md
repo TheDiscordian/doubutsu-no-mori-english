@@ -278,7 +278,12 @@ with later e/e+ donor support investigated separately.
   in ABI 69. Seventeen focused tests and the first native run pass, including
   17 calls, 48 assertions, independent fades, complete draw commands, palette
   lifetime, item readers, and guards. Fifty-seven options compose offline;
-  all/empty retain exact full/V2 outputs. Continue fire rig/billboard/scroll/sound callbacks,
+  all/empty retain exact full/V2 outputs. The
+  [tent DMA repair](checkpoints/V3_TENT_MODEL_LOADER.md) admits only the reviewed
+  tent identity/vtable through the complete-object loader. Fifteen focused tests
+  and the initial native 36-record run pass actual model DMA, rotated bank reuse,
+  rejection, and restoration. Content, ABI, saves, and allocations stay unchanged.
+  Continue fire rig/billboard/scroll/sound callbacks,
   and summer-camper acquisition, then other donor content and
   ordinary gameplay/persistence. The eight installed Tent rewards do not enter normal
   shop stock. Neither served patcher changes. Current catalogue suffix headroom

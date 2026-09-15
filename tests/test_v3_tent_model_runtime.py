@@ -22,7 +22,9 @@ import v3_feng_shui as feng
 class TentRuntimeTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.image, cls.report = composer.inputs()
+        output = ROOT / 'build/v3-tent-model-runtime-01'
+        cls.image = (output / 'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report = json.loads((output / 'build.json').read_bytes())
         cls.base = (r.BASE / 'animal-forest-v3-asset-loader.z64').read_bytes()
         cls.prior = json.loads((r.BASE / 'build.json').read_bytes())
         cls.files, cls.old = by_vrom(cls.image), by_vrom(cls.base)
@@ -105,11 +107,12 @@ class TentRuntimeTests(unittest.TestCase):
                 self.assertEqual(entry.extract(self.image), self.old[v].extract(self.base), f'{v:08X}')
 
     def test_tent_only_composition_keeps_complete_behaviour_and_removes_other_imports(self):
-        catalog = composer.catalogue(self.image, self.report)
+        current, report = composer.inputs()
+        catalog = composer.catalogue(current, report)
         key = 'GAFE01-r0/item/336C'
         selected = composer.resolve(catalog, [key])
         self.assertEqual(selected['required'], [])
-        image, _, blob = composer.compose(self.image, self.report, catalog, selected)
+        image, _, blob = composer.compose(current, report, catalog, selected)
         for k, row in catalog.items():
             self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset'] + row['enable_bytes']], 'big'), k == key)
         at = r.PACKAGE + tent.RAM - r.PACKAGE_RAM
@@ -118,7 +121,7 @@ class TentRuntimeTests(unittest.TestCase):
         at = self.report['catalogue']['code']['symbols']['af_v3_catalogue_order'] - catalogue.RAM
         self.assertEqual(data[at + 436 * 4:at + 437 * 4], struct.pack('>HH', 2267, 0))
         self.assertEqual(data[at + 437 * 4:at + 470 * 4], bytes(33 * 4))
-        self.assertEqual(image, composer.compose(self.image, self.report, catalog,
+        self.assertEqual(image, composer.compose(current, report, catalog,
                          composer.resolve(catalog, [key, key]))[0])
 
 

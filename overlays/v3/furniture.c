@@ -209,13 +209,20 @@ int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index)
             row->profile[0] > 0x04000000u - size ||
             row->profile[1] != row->profile[0] + size) return 0;
     if (row->profile[16]) {
+        int complete_object_callback = 0;
 #ifdef AF_V3_SPEED_BAG
         /* Its constructor/move/draw callbacks consume the complete object;
            there is no separate item-dependent DMA callback. */
-        if (row != speed_bag || row->profile[16] != AF_V3_SPEED_BAG_VTABLE) return 0;
-#else
-        return 0;
+        complete_object_callback = row == speed_bag && row->profile[16] == AF_V3_SPEED_BAG_VTABLE;
 #endif
+#ifdef AF_V3_TENT_MODEL
+        /* The checked tent vtable has create/move/draw/destroy only, and no
+         * item-dependent DMA entry. All four parts and palettes share its bank.
+         * Other callback-bearing profiles still require an explicit adapter. */
+        if (row->index == 1243 && row->item == 0x336Cu && row->profile[16] == 0x80483700u)
+            complete_object_callback = 1;
+#endif
+        if (!complete_object_callback) return 0;
     }
     if (dma((void *)(uptr)bank, row->profile[0], size)) return 0;
     indices[(u16)argument] = (u8)active;

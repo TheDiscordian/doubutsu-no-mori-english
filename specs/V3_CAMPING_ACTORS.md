@@ -99,6 +99,53 @@ source identities, **not verified native sound IDs**. The runtime must map the
 actual sound resource and keep position/lifetime behaviour. Existing furniture
 transition-state exclusions use different native and donor enum values.
 
+### Native implementation bindings
+
+Native actor scale is at `714/718/71C`, the rig at `134`, joints/morph at
+`1A4/1DA`, and the two ten-matrix banks at `210`. Native gameplay frame and
+billboard matrix are at `1EA0` and `1E5C`; generic frame is at `A0`.
+The GC `ctr_type` at offset 2 is not an established native field: its explicit
+GC constructor assignment has no corresponding native assignment. Resolve
+ordinary-room versus catalogue context before selecting the frame source.
+
+The native repeat initializer is `80052408`, full rig draw `800530D8`, and
+positional level-sound entry `800D1D08`. The complete rig draw emits segment D
+on both heads, transforms the suppressed flame joint, and calls the after-draw
+callback with that transformed matrix. Preserve that path rather than replacing
+the full actor with a static flame. Reserve/check both command heads and all
+frame-owned matrices/scroll data before any draw writes.
+
+Donor `two_tex_scroll_dolphin` doubles its input coordinates. The donor's
+standard N64 SetTileSize decoder multiplies those coordinates by four to reach
+the same representation. Thus the donor callback velocities correspond to
+half those values in native quarter-texel coordinates, not an unchanged copy.
+The bonfire's odd negative steps require explicit fractional/rounding treatment.
+The source bindings are `src/game/m_rcp.c`, `include/libforest/gbi_extensions.h`,
+and `src/static/libforest/emu64/emu64.c` in the pinned GC checkout.
+
+### Actual loop-sound dependencies
+
+Main SFX sequences are donor 242 and native 199. Their channels 8–13 start at
+`164`; C2 selects the level table at donor `2E02` or native `265C`. The donor
+table has 96 entries; native has 68. IDs `5C/5D` cannot index the native table.
+The six triggered-sound tables at `188` are not the looping-sound dispatch.
+
+Donor `5C` targets `2F08` and `5D` targets `2F5A`. Both programs contain two
+layers using instruments 12 and 14 from donor font 153, the default selector.
+Its native counterpart is font 139, but those instrument numbers refer to
+different waves/tuning. Import the actual programs and dependencies, not matching
+numeric IDs. The donor samples contain 18,514 and 2,826 ADPCM bytes in wave 5 at
+`23820` and `284D0`, with their complete loops, books, and envelope data.
+
+Current native font 140 (selector 1) contains 72 instruments, including speed
+bag at 71, and has room for these dependencies. Font 139 already has 126;
+appending there would reach reserved instrument values. A proposed installation
+uses new font-140 slots and an explicit selector in the imported programs,
+expands/rebinds the level dispatch, and preserves every original sound and the
+current speed-bag additions. This remains implementation work, not installed
+audio. Retain ordinary per-actor positional refresh/stop behaviour through
+`sAdo_OngenPos`; repeated one-shot playback is not equivalent.
+
 ## Tent light contract
 
 The donor constructor allocates a private 32-byte, 32-byte-aligned palette,
@@ -149,6 +196,10 @@ feng shui uses `0100`. Neither mapping changes the summer-camper reward route.
 
 The [runtime checkpoint](../docs/checkpoints/V3_TENT_MODEL_RUNTIME.md) records
 installed native callback/reader execution and deterministic offline selection.
+The [loader repair](../docs/checkpoints/V3_TENT_MODEL_LOADER.md) also verifies
+actual complete-object DMA and rotated bank reuse. The DMA gate accepts exactly
+tent index 1243, canonical item `336C`, and vtable `80483700`; its fifth DMA entry
+is zero. Other callback-owned objects need their own reviewed permission.
 GPU appearance, ordinary light interaction, acquisition, and persistence are
 not established by the callback probe. The
 [callback checkpoint](../docs/checkpoints/V3_TENT_MODEL_CALLBACKS.md) retains

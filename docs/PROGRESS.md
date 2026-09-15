@@ -2,6 +2,13 @@
 
 ## Active development
 
+The [tent-model loader repair](checkpoints/V3_TENT_MODEL_LOADER.md) enables actual
+ROM DMA for the complete callback-owned tent. Fifteen focused tests pass; the
+first native run passes 36 records, eight calls, and 24 assertions, including
+complete upper-memory model DMA, rotated bank reuse, invalid-profile rejection,
+and restoration. The expanded helper uses 1,760 of its reserved 2,048 bytes.
+ABI, saved format/profile, allocations, and all content remain unchanged.
+
 The [tent-model runtime](checkpoints/V3_TENT_MODEL_RUNTIME.md) installs its complete
 model and light callbacks, English name/price, one-cell profile, non-orderable
 catalogue entry, HRA/feng shui, and optional saved dependency in ABI 69. Seventeen
@@ -13,9 +20,9 @@ allocation is needed. The offline composer has 57 experimental options, with
 exact all/empty full/V2 output and deterministic individual selection.
 
 Current full integration:
-`build/v3-tent-model-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`29f5d1e6760dbfb4acc015f2a3482470fdbd43f1ce6ef03d156ecb1902ddab6a`.
-The tent-only subset is `build/v3-optional-tent-model-01/`.
+`build/v3-tent-model-loader-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`6655157c072b0b2e291224c1f22e5d4c45ed9a6299c5a6e478ecaaaf257c35de`.
+The tent-only subset is `build/v3-optional-tent-model-loader-01/`.
 Ordinary light interaction, rendering, acquisition, and persistence are not yet
 verified. Both served patchers remain V2; this is not a complete-import playtest
 handoff. The selected-import dependency set changes, not the save format; a town
