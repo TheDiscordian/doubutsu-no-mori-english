@@ -1,5 +1,77 @@
 # Automatic furniture pipeline checkpoint
 
+## Constant model-sequence imports
+
+Converter/installer revision 7 adds the shared `constant-model-sequence`
+category. Complete compiled draw functions, actual model-pointer relocations,
+and the one matrix-helper call establish fixed one-/three-model submission.
+Null lifecycle slots are supported, but present lifecycle callbacks must be
+complete no-ops. Extra code, calls, DMA callbacks, changed relocation pairs,
+and effects are rejected. The same checked-code normaliser serves the existing
+palette-fade category without changing its source receipts or runtime.
+
+The converter links complete native lists in donor order with a generated
+display list, recorded separately from the original model lists. The normal
+opaque profile slot points to that sequence; generic rigs, animations, and the
+callback pointer remain null. Lady Liberty retains all three material layers
+on the opaque command stream, including their original internal material modes.
+The tanabata palm retains its complete single list. Source scalars are unchanged.
+No per-item integration script, runtime callback, scenario, or allocation is added.
+
+The unrestricted category conversion at
+`build/v3-furniture-static-sequence-assets-01/` discovers both eligible records:
+Lady Liberty `3010` (6,736 bytes) and tanabata palm `3054` (4,416 bytes).
+Together they retain 11,152 bytes, 248 vertices, and 179 triangles. Generated
+links occupy 32 and 16 bytes respectively. The installer regenerates their
+exact order, target addresses, bounds, hash, and normal profile binding.
+Official names are credited in `translations/provenance.json`. Lady Liberty
+uses the existing selected Gulliver reward category and remains non-orderable;
+tanabata palm uses the donor event-stock list and actual catalogue policy.
+
+The ABI-95 cartridge is
+`build/v3-furniture-static-sequence-runtime-01/animal-forest-v3-asset-loader.z64`.
+Automatic additions total 42. The offline composer contains 104 installed
+choices: 81 furniture, three shirts, and twenty villagers. The model bank,
+item-rendering code, saved format, and existing assets remain unchanged. Blob size
+is 3,407,488 bytes, leaving 721,280 before English choices. The catalogue's
+conservative memory requirement remains 280,384 of 280,704 bytes.
+
+- ROM SHA-256: `01c7da7f945f02a4eebb1bafdc258b0485db5dd9240cf2254a51f3eefaccd68c`.
+- UPS SHA-256: `2d893591aa7f6b49f5e27f1749cfc8a19ae51d8f998eb232143e4428aebdbaf3`.
+- Build receipt SHA-256: `0f3991f6e27f59cd9698bbffe7dbe618b528e719773efd5906905b469bd75c9a`.
+- Art receipt SHA-256: `aaf6e06e8d3cec9cc705d016dbf86e932703aa8e70a5fb066c12b1f3bb4006a8`.
+
+The combined pipeline/composition suite runs 60 tests: 59 pass, and the
+scoring-alias test is skipped because these two records need no alias. The
+prepared palette batch is supplied to check that shared code normalisation
+retains that category. Complete texels, vertices, triangles, material state,
+ordered links, invalid source rejection, retained assets/code, names/credits,
+stock/rewards, scoring, catalogue, profile subsets, and exact V2/no-import output
+pass. The first silent current-build native run at
+`build/v3-furniture-static-sequence-native-01/results.json` passes 124 records
+and 85 assertions, SHA-256
+`82491eb4dda46a75c9e32bfda38a32bef6d70a7d93b6e8add3d4753b014d31f9`.
+It covers actual owner loading/relocation, both complete model transfers,
+source framing, selected Gulliver rewards, event stock, acquisition/ownership,
+restored state, and guards. Unchanged palette callback evidence is retained;
+that scenario is not replayed. The emulator exits cleanly.
+
+Ordinary appearance, interaction, complete catalogue construction, save/restart,
+and hardware acceptance remain open. Saved format 2 is unchanged, but saves
+containing these new identities must not load older builds or V2. Both served
+patchers remain V2, and the private interface export is not regenerated.
+
+The follow-up source review identifies the tools/fans/pinwheels/diaries as
+room-display aliases of parent items, not independently acquirable furniture.
+The donor forward function is `.text:0760E4`, 640 bytes, SHA-256
+`5228a779089eca94c3f751a814e169f74ff085a57626673c86d7d789fadd6c66`;
+the inverse is `.text:076364`, 664 bytes, SHA-256
+`a948f3ad02dcf0d9f967363bb22203091447edbb416345498564bb18efda353e`.
+Their source is `local/ac-decomp/src/game/m_room_type.c`. The native equivalents
+in `upstream/af/src/code/m_room_type.c` lack those extra categories. Parent
+identity classification and room-conversion implementation remain work; this
+finding does not declare those aliases supported or discard their dependencies.
+
 ## Shared switchable-palette category
 
 Converter/installer revision 6 discovers eight complete building-model callback

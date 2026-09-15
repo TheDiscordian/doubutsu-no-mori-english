@@ -15,7 +15,7 @@ from aflib import (CODE_RAM, CODE_VROM, DMA_START, DMA_END, by_vrom, fix_checksu
 from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, STARTUP, ROOT, compile_part
 from v3_campsite_calendar import PACKAGE_SIZE
-from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows
+from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_rows, draw_sequence
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
 import v3_furniture_behaviours as behaviours
@@ -28,7 +28,7 @@ import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 6
+VERSION = 7
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -57,13 +57,21 @@ def inputs(lock=LOCK):
 def profile(row, vrom):
     n, offsets = row['object_bytes'], row['model_offsets']
     scalar = bytes.fromhex(row['native_profile_scalar_hex'])
-    fading = row.get('profile',{}).get('callback_adapter',{}).get('category') == 'switch-palette-fade'
-    layers = ('part0','part1','part2') if fading else LAYERS
+    adapter=row.get('profile',{}).get('callback_adapter',{})
+    fading = adapter.get('category') == 'switch-palette-fade'
+    sequence = adapter.get('category') == 'constant-model-sequence'
+    layers = tuple(adapter['model_order']) if fading or sequence else LAYERS
     if (not 0 < n <= 9216 or n%16 or vrom%16 or vrom+n > END or len(scalar) != 16
-            or not offsets or set(offsets)-set(layers) or fading and set(offsets)!=set(layers)
+            or not offsets or set(offsets)-set(layers) or (fading or sequence) and set(offsets)!=set(layers)
             or any(type(at) is not int or at%8 or not 0 <= at <= n-8 for at in offsets.values())):
         raise ValueError('Invalid complete native object/profile bounds')
     pointers = [0x06000000+offsets[k] if k in offsets else 0 for k in LAYERS]
+    if sequence:
+        linked=row['draw_sequence'];at=linked['native_offset']
+        if (linked['model_offsets']!=offsets or linked['arena']!='opaque' or
+                at%8 or not 0<=at<=n-linked['bytes'] or linked['bytes']!=(len(offsets)+1)*8):
+            raise ValueError('Invalid static model sequence bounds')
+        pointers=[0x06000000+at,0,0,0]
     return (struct.pack('>12I', vrom, vrom+n, 0x06000000, 0x06000000+n, *pointers, 0,0,0,0)+scalar+
             struct.pack('>I',palette_fade.VTABLE if fading else 0))
 
@@ -166,6 +174,7 @@ def checked_assets(art_path, source, worksheet):
         if item in seen: raise ValueError('Duplicate batch identity')
         seen.add(item)
         descriptor, body, resources, _, models, commands, sections = prepare(source,item)
+        sequence_record,sequence=draw_sequence(descriptor,len(body),sections)
         meta = metadata(source,item,descriptor,identities[item])
         if any(row.get(k) != v for k,v in meta.items()) or row['profile'] != json.loads(json.dumps(descriptor)):
             raise ValueError('Import metadata differs from source discovery')
@@ -176,9 +185,15 @@ def checked_assets(art_path, source, worksheet):
                 or asset[:len(body)] != body or row['resources'] != resources
                 or row['native_profile_scalar_hex'] != descriptor['scalar_hex']
                 or set(row['model_offsets']) != set(models)
-                or len(asset) != (len(body)+sum(n for _,n in sections)+15)&~15
+                or len(asset) != (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
                 or (art_path/row['item_id']/'commands.c').read_text() != commands):
             raise ValueError('Changed complete converted asset or emitter input')
+        if row.get('draw_sequence')!=sequence_record:
+            raise ValueError('Changed generated static draw sequence record')
+        if sequence_record:
+            at=sequence_record['native_offset']
+            if asset[at:at+len(sequence)]!=sequence:
+                raise ValueError('Changed complete static draw order or targets')
         # Verify compiled display lists against the emitter's checked receipt.
         for model in row['models']:
             at,n = row['model_offsets'][model['layer']],model['bytes']

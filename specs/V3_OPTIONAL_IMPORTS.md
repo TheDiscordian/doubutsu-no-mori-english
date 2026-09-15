@@ -347,7 +347,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for twenty installed villagers and eighty-one installed logical items,
+selections for twenty installed villagers and eighty-four installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
 save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce

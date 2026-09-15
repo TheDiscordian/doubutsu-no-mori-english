@@ -2,6 +2,24 @@
 
 ## Active development
 
+The [constant model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
+installs Lady Liberty and the tanabata palm automatically, including all 11,152
+artwork bytes, 248 vertices, and 179 triangles. Complete draw-only callback
+verification supplies ordered model links to the normal native renderer;
+there is no new runtime callback, per-item installer, or memory reservation.
+Official names, Gulliver/event acquisition, catalogue, scoring, and optional
+selection use the shared pipeline. Automatic additions total 42.
+
+The complete ABI-95 development cartridge is
+`build/v3-furniture-static-sequence-runtime-01/animal-forest-v3-asset-loader.z64`,
+pinned by `config/v3-import-build.json`. The combined suite passes 59 checks;
+one scoring-alias test is inapplicable to this batch. The first silent native
+run passes 124 records and 85 assertions, including complete model DMA,
+source framing, selected-only rewards, event stock, ownership, restoration,
+and guards. Ordinary appearance, interaction, full catalogue construction,
+save/restart, and hardware acceptance remain open. Saved format 2 is unchanged;
+saves containing these identities must not load earlier builds or V2.
+
 The [shared palette-fade category](checkpoints/V3_FURNITURE_PIPELINE.md)
 discovers and converts eight complete building models in one batch: 29,664
 artwork bytes, 555 vertices, and 346 triangles. Complete callback-code and
@@ -10,12 +28,10 @@ Generated layouts retain every model layer, both palettes, and the light fade.
 One native implementation also handles the existing tent's unchanged artwork
 within its existing memory reservation. The igloo installs automatically through
 the supported winter-camping reward route; the other seven retain actual missing
-acquisition routes. Automatic additions total 40.
+acquisition routes.
 
-The complete ABI-94 development cartridge is
-`build/v3-furniture-palette-fade-runtime-02/animal-forest-v3-asset-loader.z64`,
-pinned by `config/v3-import-build.json`. Fifty-seven focused checks pass across
-the combined run and targeted correction. Sanitizers cover all eight prepared
+The palette-fade checkpoint preserves its passing native callback evidence;
+that installed code is unchanged in the current cartridge. Sanitizers cover all eight prepared
 objects and the retained tent. The corrected eight-MiB native run passes 190
 records with 114 assertions, including both callback layouts, full model DMA,
 palette lifetime, seasonal rewards, acquisition/ownership, and guards.
@@ -43,11 +59,11 @@ Browser-native graphics conversion, full donor classification, and gameplay
 acceptance remain unfinished. The interface work itself changes no runtime or save format.
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplies
-forty additional items through source-discovered records and shared graphics,
+forty-two additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
 installer, graphics description, or native scenario is needed. Converter/installer
-revision 6 includes winter-camping rewards, shared winter/summer selection,
-and data-driven palette callbacks. No item-specific browser entry is required.
+revision 7 includes winter-camping rewards, shared winter/summer selection,
+data-driven palette callbacks, and constant model sequences. No item-specific browser entry is required.
 
 The development cartridge uses source-derived canonical reward records
 for camping and Gulliver. No summer-item array is maintained in the runtime.
@@ -61,10 +77,10 @@ credited in the single text-source catalogue. Scoring-only category aliases keep
 the donor's 412-point weights without changing actual acquisition. No permanent
 RAM reservation or saved format grows; existing models and identities remain unchanged.
 
-The offline composer contains 102 installed development options: 79 furniture,
+The offline composer contains 104 installed development options: 81 furniture,
 three shirts, and twenty villagers. The generated browser plan consumes that same
 lock. The recorded private interface export above remains the 101-choice export;
-it is not a served V3 site or a claim of fresh interface testing on ABI 94.
+it is not a served V3 site or a claim of fresh interface testing on ABI 95.
 
 The shared CI4/I4/RGBA16 and constant indexed-palette converters retain every
 supported material/model layer and reject unsupported effects rather than dropping

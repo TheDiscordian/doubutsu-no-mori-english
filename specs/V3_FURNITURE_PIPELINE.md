@@ -154,6 +154,24 @@ The shared static-material category supports:
   relocations, the selector row, and palette binding. This removes only a
   constant draw selector, never animation or gameplay behaviour.
 
+The `constant-model-sequence` category recognises reviewed draw-only callbacks.
+Null lifecycle slots are allowed; any present create/move/destroy callback must
+be a complete no-op. DMA callbacks remain unsupported. The shared code verifier
+checks every instruction, model-address relocation pair, and matrix-helper call.
+It supports fixed one- and three-model opaque sequences without item definitions.
+Other draw operations, transformations, state changes, and lifecycle effects fail.
+
+The converter retains every complete source list and appends one small native
+display list that calls those lists in their original order. The sequence record
+contains every target, native offset, size, arena, and hash. All lists stay on the
+opaque stream; their own material modes remain unchanged. The profile uses the
+normal native opaque model slot and no callback. The installer regenerates and
+checks the complete sequence bytes, bounds, targets, and profile binding, alongside
+the ordinary graphics and acquisition checks. No runtime code or allocation grows.
+This linking method is independent of an item's identity or theme. A constant
+draw callback is removed only after its complete lack of additional effects is
+verified; this is not a mechanism for stripping animations.
+
 The `switch-palette-fade` category discovers the complete shared building-model
 callbacks. It checks all four compiled functions, normalising only verified
 address relocations and local call displacements. Every call target, paired
@@ -225,7 +243,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 6 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 7 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,

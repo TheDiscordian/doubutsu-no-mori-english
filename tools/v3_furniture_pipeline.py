@@ -23,7 +23,7 @@ from v3_furniture_art import SEGMENT, command_source, parse_model, verify_source
 from v3_registry import FURNITURE
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 6
+VERSION = 7
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -49,6 +49,12 @@ PALETTE_FADE_CODE = {
              {0x38: (643604, '_Matrix_to_Mtx_new')}),
     'destroy': (44, '93027b93411e9383050c763e5b19a0123d44f51d044e0bab85623c4022c9cce7',
                 {0x18: (312052, 'zelda_free')}),
+}
+# Reviewed pure opaque draw sequences: model addresses are data, never item IDs.
+STATIC_SEQUENCE_CODE = {
+    116: ('76825aad3256c4118369c78a4240d0264e2e3dc18516ad1d386edf10dfaad8d1', ((0x3E,0x4A),)),
+    172: ('d6dde5a8fad4d727364de9b717ef27562e128d4149e3e6da49846727ac9e7d2d',
+          ((0x3E,0x52),(0x42,0x56),(0x46,0x5E))),
 }
 
 
@@ -150,6 +156,35 @@ class Source:
         return raw, dict(symbol=name, offset=target, bytes=n, sha256=sha256(raw),
                         relocations=relocations)
 
+    def checked_callback_code(self, receipt, size, digest, expected, calls, category):
+        """Normalise only independently checked address fields and helper calls."""
+        def reject(reason): raise ReviewRequired('custom callbacks: '+category+' '+reason)
+        if receipt['bytes'] != size or receipt['relocations'] != expected:
+            reject('changed dependencies')
+        raw, _ = self.function(receipt['offset']); normalized = bytearray(raw)
+        for loc, (kind, _, _, _) in expected.items():
+            if kind in (4,6): normalized[loc:loc+2] = bytes(2)
+            elif kind == 10: struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
+            else: reject('unsupported code relocation')
+        found, helpers = {}, {}
+        for loc in range(0, size, 4):
+            word = u32(raw,loc)
+            if word>>26 != 18 or loc in expected: continue
+            if word & 0xFC000003 != 0x48000001 or loc not in calls:
+                reject('unexpected local branch')
+            displacement = word & 0x3FFFFFC
+            if displacement & 0x2000000: displacement -= 0x4000000
+            target = receipt['offset'] + loc + displacement
+            if target != calls[loc][0]: reject('changed shared helper target')
+            _, helper = self.function(target)
+            if helper['symbol'] != calls[loc][1]: reject('changed shared helper identity')
+            found[loc] = target; helpers[helper['symbol']] = helper
+            struct.pack_into('>I',normalized,loc,word&0xFC000003)
+        if set(found) != set(calls) or sha256(normalized) != digest:
+            reject('unrecognised complete implementation')
+        receipt.update(normalized_sha256=digest, local_calls=found)
+        return helpers
+
     def callback_models(self, profile_at, index):
         """Specialise a checked constant selector; unknown callback effects fail."""
         def reject(reason): raise ReviewRequired('custom callbacks: ' + reason)
@@ -158,18 +193,23 @@ class Source:
         name, at, n = self.containing(pointer[3], exact=True)
         if n != 20 or self.data[at:at+n] != bytes(n): reject('unsupported vtable')
         pointers = {p-at: r for p,r in self.relocations.items() if at <= p < at+n}
-        if set(pointers) != {0,4,8,12} or any(r[:3] != (1,True,1) for r in pointers.values()):
+        if (8 not in pointers or set(pointers)-{0,4,8,12} or
+                any(r[:3] != (1,True,1) for r in pointers.values())):
             reject('unsupported callback slots or DMA callback')
         functions = {}
         for slot, role in enumerate(('create','move','draw','destroy')):
+            if slot*4 not in pointers: continue
             raw, receipt = self.function(pointers[slot*4][3]); functions[role] = receipt
-        if functions['create']['bytes'] == PALETTE_FADE_CODE['create'][0]:
+        if functions.get('create',{}).get('bytes') == PALETTE_FADE_CODE['create'][0]:
+            if set(pointers) != {0,4,8,12}: reject('unsupported palette-fade callback slots')
             return self.palette_fade_models(name, at, functions)
         for role, receipt in functions.items():
             raw, _ = self.function(receipt['offset'])
             if role != 'draw' and (raw != bytes.fromhex('4e800020') or receipt['relocations']):
                 reject('lifecycle effects need an adapter')
         draw = functions['draw']
+        if draw['bytes'] in STATIC_SEQUENCE_CODE:
+            return self.static_sequence_models(name,at,functions)
         if draw['sha256'] != INDEXED_STATIC_DRAW_SHA: reject('unrecognised draw implementation')
         raw, _ = self.function(draw['offset'])
         table_pointer = draw['relocations'].get(0x1A)
@@ -201,6 +241,21 @@ class Source:
             first_runtime_index=first, selected_index=selected, entries=size//stride,
             palette_symbol=palette[0], palette_offset=palette[1])
 
+    def static_sequence_models(self, name, at, functions):
+        draw=functions['draw'];digest,pairs=STATIC_SEQUENCE_CODE[draw['bytes']]
+        module=u32(self.rel,0);expected={};models={}
+        for i,(hi,lo) in enumerate(pairs):
+            pointer=draw['relocations'].get(hi)
+            if pointer is None or pointer[:3]!=(6,module,5):
+                raise ReviewRequired('custom callbacks: fixed draw missing model dependency')
+            target=pointer[3];models[f'part{i}']=self.containing(target,exact=True)
+            expected.update({hi:(6,module,5,target),lo:(4,module,5,target)})
+        helpers=self.checked_callback_code(draw,draw['bytes'],digest,expected,
+            {0x34:(643604,'_Matrix_to_Mtx_new')},'fixed draw')
+        return models,{},dict(category='constant-model-sequence',vtable_symbol=name,vtable_offset=at,
+            functions=functions,helpers=helpers,model_order=list(models),draw_arena='opaque',
+            null_callbacks=[r for r in ('create','move','destroy') if r not in functions])
+
     def palette_fade_models(self, name, at, functions):
         """Resolve the shared three-model, two-endpoint light-switch behaviour."""
         def reject(reason): raise ReviewRequired('custom callbacks: palette fade ' + reason)
@@ -223,29 +278,7 @@ class Source:
         helpers = {}
         for role, receipt in functions.items():
             size, digest, calls = PALETTE_FADE_CODE[role]
-            if receipt['bytes'] != size or receipt['relocations'] != expected[role]:
-                reject('changed ' + role + ' dependencies')
-            raw, _ = self.function(receipt['offset']); normalized = bytearray(raw)
-            for loc, (kind, _, _, _) in expected[role].items():
-                if kind in (4,6): normalized[loc:loc+2] = bytes(2)
-                else: struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
-            found = {}
-            for loc in range(0, size, 4):
-                word = u32(raw,loc)
-                if word>>26 != 18 or loc in expected[role]: continue
-                if word & 0xFC000003 != 0x48000001 or loc not in calls:
-                    reject('unexpected local branch')
-                displacement = word & 0x3FFFFFC
-                if displacement & 0x2000000: displacement -= 0x4000000
-                target = receipt['offset'] + loc + displacement
-                if target != calls[loc][0]: reject('changed shared helper target')
-                _, helper = self.function(target)
-                if helper['symbol'] != calls[loc][1]: reject('changed shared helper identity')
-                found[loc] = target; helpers[helper['symbol']] = helper
-                struct.pack_into('>I',normalized,loc,word&0xFC000003)
-            if set(found) != set(calls) or sha256(normalized) != digest:
-                reject('unrecognised complete ' + role + ' implementation')
-            receipt.update(normalized_sha256=digest, local_calls=found)
+            helpers.update(self.checked_callback_code(receipt,size,digest,expected[role],calls,'palette fade '+role))
         endpoints = {}
         for role, target in (('off',off), ('on',on)):
             symbol, start, size = self.containing(target,exact=True)
@@ -430,6 +463,23 @@ def prepare(source, item):
     return descriptor, bytes(body), resources, offsets, models, commands, sections
 
 
+def draw_sequence(profile, body_bytes, sections):
+    """Link complete opaque lists in donor order, without a runtime callback."""
+    adapter=profile.get('callback_adapter',{})
+    if adapter.get('category')!='constant-model-sequence': return None,b''
+    if (adapter['draw_arena']!='opaque' or adapter['model_order']!=[label for label,_ in sections]
+            or not 1<=len(sections)<=4 or body_bytes%8):
+        raise ReviewRequired('invalid complete static draw sequence')
+    cursor=body_bytes;models={}
+    for label,size in sections:
+        if size<=0 or size%8: raise ReviewRequired('unaligned static sequence model')
+        models[label]=cursor;cursor+=size
+    raw=b''.join(struct.pack('>II',0xDE000000,SEGMENT+offset) for offset in models.values())
+    raw+=struct.pack('>II',0xDF000000,0)
+    return dict(native_offset=cursor,bytes=len(raw),model_offsets=models,
+                arena='opaque',output_sha256=sha256(raw)),raw
+
+
 def identity_rows(path):
     if sha256(path.read_bytes()) != SHEET_SHA: raise ValueError('Changed identity worksheet')
     rows = list(sheet_rows(path, 'Items'))
@@ -530,7 +580,8 @@ def scan(source, worksheet, installed=None):
             # Prepared batches also require a real, unambiguous donor identity.
             # Keep dummy/unknown names in review, not in the default bulk batch.
             name_metadata(source,item,identity)
-            estimated = (len(body)+sum(n for _,n in sections)+15)&~15
+            _,sequence=draw_sequence(profile,len(body),sections)
+            estimated = (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
             if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
             categories = [profile['behaviour'], 'static-materials', ('1x1','2x1','2x2')[profile['size_code']]]
@@ -579,12 +630,18 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
             records.append(dict(layer=label, symbol=model['symbol'], source_sha256=model['source_sha256'],
                 native_offset=destinations[label], bytes=len(compiled[label]), output_sha256=sha256(compiled[label]),
                 triangles=sum(len(r.get('triangles',[])) for r in model['rows'])))
+        sequence_record,sequence=draw_sequence(profile,len(body),sections)
+        if sequence_record:
+            if (sequence_record['model_offsets']!=destinations or sequence_record['native_offset']!=len(asset)):
+                raise ValueError('Static draw sequence differs from compiled layout')
+            asset.extend(sequence)
         asset.extend(bytes(-len(asset)%16))
         if len(asset) != row['object_bytes']: raise ValueError('Compiled object size differs from preflight')
         name = row['item_id']+'.n64obj.bin'; write_new(output/name, asset)
         objects.append(dict(**row.get('metadata',names[row['item_id']]), profile=profile, resources=resources, models=records,
             import_ready=row['status']=='supported', pending_reason=row.get('reason'),
             native_profile_scalar_hex=profile['scalar_hex'], model_offsets=destinations,
+            **({'draw_sequence':sequence_record} if sequence_record else {}),
             object_file=name, object_bytes=len(asset), object_sha256=sha256(asset)))
         print(json.dumps(dict(converted=row['item_id'], name=row['name'], bytes=len(asset))), flush=True)
     report = dict(format=('AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1' if assets_only else

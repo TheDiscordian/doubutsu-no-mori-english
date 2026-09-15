@@ -26,6 +26,20 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_static_model_linker_keeps_order_and_rejects_bad_layouts(self):
+        profile={'callback_adapter':{'category':'constant-model-sequence','draw_arena':'opaque',
+                                     'model_order':['part0','part1','part2']}}
+        sections=[('part0',16),('part1',24),('part2',8)]
+        record,raw=pipeline.draw_sequence(profile,64,sections)
+        self.assertEqual(record['native_offset'],112)
+        self.assertEqual(record['model_offsets'],{'part0':64,'part1':80,'part2':104})
+        self.assertEqual(list(struct.iter_unpack('>II',raw)),
+            [(0xDE000000,0x06000040),(0xDE000000,0x06000050),(0xDE000000,0x06000068),(0xDF000000,0)])
+        self.assertEqual(record['output_sha256'],sha256(raw))
+        for body,sections in ((65,sections),(64,sections[::-1]),(64,[('part0',7),*sections[1:]])):
+            with self.assertRaises(pipeline.ReviewRequired):pipeline.draw_sequence(profile,body,sections)
+        self.assertEqual(pipeline.draw_sequence({},64,[]),(None,b''))
+
     def test_dynamic_palette_keeps_segment_and_refuses_constant_or_relocated_binding(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>I',raw,0x1C,0x08000000);pointers.pop(0x11C)
@@ -247,6 +261,34 @@ class DonorTests(unittest.TestCase):
         # The roof-colour selector is a different effect, not a static alias.
         with self.assertRaises(pipeline.ReviewRequired):self.source.profile(0x3024)
 
+    def test_constant_draw_sequences_keep_all_models_and_reject_additional_effects(self):
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        rows=[r for r in inventory['rows'] if 'constant-model-sequence' in r.get('categories',[])]
+        self.assertEqual(sorted(len(r['profile']['models']) for r in rows),[1,3])
+        self.assertTrue(all(r['status']=='supported' for r in rows))
+        for row in rows:
+            item=int(row['item_id'],16);profile,body,_,_,models,_,sections=pipeline.prepare(self.source,item)
+            adapter=profile['callback_adapter'];draw=adapter['functions']['draw']
+            self.assertEqual(adapter['null_callbacks'],['create','move','destroy'])
+            self.assertEqual(list(models),adapter['model_order']);self.assertEqual(adapter['draw_arena'],'opaque')
+            record,linked=pipeline.draw_sequence(profile,len(body),sections)
+            self.assertEqual(record['bytes'],(len(models)+1)*8)
+            self.assertEqual(row['object_bytes'],(record['native_offset']+len(linked)+15)&~15)
+            raw=self.source.function(draw['offset'])[0]
+            for location in (0,0x34):
+                changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+                changed.rel[self.source.sections[1][0]+draw['offset']+location+3]^=4
+                with self.assertRaisesRegex(ValueError,'fixed draw'):changed.profile(item)
+            # Even a valid function pointer must not replace a null move with effects.
+            changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+            changed.relocations[adapter['vtable_offset']+4]=(1,True,1,draw['offset'])
+            with self.assertRaisesRegex(ValueError,'lifecycle effects'):changed.profile(item)
+            changed=copy.copy(self.source);changed.code_relocations=dict(self.source.code_relocations)
+            location=next(iter(draw['relocations']))
+            kind,module,section,target=draw['relocations'][location]
+            changed.code_relocations[draw['offset']+location]=(kind,module,section,target+8)
+            with self.assertRaises(ValueError):changed.profile(item)
+
     def test_palette_category_rejects_changed_code_calls_palettes_and_effects(self):
         p=self.source.profile(0x31A4);adapter=p['callback_adapter']
         f=adapter['functions']['move'];text=self.source.sections[1][0]
@@ -437,6 +479,23 @@ class DonorTests(unittest.TestCase):
 
     def test_complete_texels_vertices_and_compiled_triangles_for_entire_batch(self):
         self.check_complete_artwork(self.art,self.report)
+
+    def test_generated_sequence_targets_every_complete_compiled_model_in_order(self):
+        for row in self.report['objects']:
+            linked=row.get('draw_sequence')
+            if not linked:continue
+            asset=(self.art/row['object_file']).read_bytes()
+            order=row['profile']['callback_adapter']['model_order']
+            words=list(struct.iter_unpack('>II',asset[linked['native_offset']:linked['native_offset']+linked['bytes']]))
+            self.assertEqual(words,[(0xDE000000,0x06000000+row['model_offsets'][label]) for label in order]+[(0xDF000000,0)])
+            self.assertEqual(linked['model_offsets'],row['model_offsets'])
+            for label in order:
+                model=next(m for m in row['models'] if m['layer']==label)
+                self.assertEqual(model['native_offset'],row['model_offsets'][label])
+                self.assertLessEqual(model['native_offset']+model['bytes'],linked['native_offset'])
+            native=install.profile(row,0x02500000)
+            self.assertEqual(struct.unpack_from('>4I',native,16),(0x06000000+linked['native_offset'],0,0,0))
+            self.assertEqual(native[32:48],bytes(16));self.assertEqual(native[-4:],bytes(4))
 
     def check_complete_artwork(self,art,report):
         for row in report['objects']:

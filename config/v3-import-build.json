@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-palette-fade-runtime-02",
-  "runtime_abi": 94,
-  "rom_sha256": "8dcb481ce08eb7bacbc4661cb06ec910bf3ec41d3eb6d3bb753ab0ebcfb6e358",
-  "report_sha256": "cfc62b59db3b27343a4bba5ce768cd878b6b0c7d09bb439c79176888b8a4ca0d"
+  "directory": "build/v3-furniture-static-sequence-runtime-01",
+  "runtime_abi": 95,
+  "rom_sha256": "01c7da7f945f02a4eebb1bafdc258b0485db5dd9240cf2254a51f3eefaccd68c",
+  "report_sha256": "0f3991f6e27f59cd9698bbffe7dbe618b528e719773efd5906905b469bd75c9a"
 }
