@@ -2,15 +2,18 @@
 
 ## Active: V3 optional GameCube imports
 
-The [school desks](checkpoints/V3_SCHOOL_DESKS.md) have complete converted
-models and verified donor gameplay metadata. Integrate their fixed identities,
-model/name readers, stock/catalogue/scoring, profile bits, and text attribution.
-Verify directional seating and the teacher's two-cell surface. The converted
-assets are not installed options; preserve current ABI-83 pins until the new
-integration passes its focused checks.
+The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with
+complete artwork, native metadata/readers, stock, catalogue/scoring, profile
+bits, and official text attribution. Twenty cartridge/composition tests and the
+first 88-record native run pass, including all rotated footprints, actual model
+DMA, stock membership, catalogue eligibility, acquisition, and saved ownership.
+Ordinary sitting, appearance, and save/restart remain for the gameplay pass.
+Continue the next donor furniture group and remaining native readers; do not
+replay passed unchanged paths. The composer offers 62 installed development
+options, not the whole donor catalogue. Both patchers stay V2.
 
 The current integration image is
-`build/v3-tent-lamp-runtime-02/animal-forest-v3-asset-loader.z64`; the
+`build/v3-school-desks-runtime-01/animal-forest-v3-asset-loader.z64`; the
 [lamp checkpoint](checkpoints/V3_TENT_LAMP.md) records ABI-83 complete native
 creation, dawn/dusk movement, drawing, environment updates, and cleanup.
 Floor-sound routing, selected rewards, and full-ID pocket selection retain

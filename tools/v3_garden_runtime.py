@@ -222,14 +222,15 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
-                      western_large=False, camping=False, tent_model=False, fire=False):
+                      western_large=False, camping=False, tent_model=False, fire=False, school_desks=False):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
     if sha256(old) != prior['catalogue']['output_sha256']:
         raise ValueError('Changed current complete catalogue')
     ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True,
-        western=western, western_large=western_large, camping=camping, tent_model=tent_model, fire=fire)
+        western=western, western_large=western_large, camping=camping, tent_model=tent_model,
+        fire=fire, school_desks=school_desks)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
     cloth = old[at:at + 496]

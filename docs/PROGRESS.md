@@ -2,12 +2,16 @@
 
 ## Active development
 
-The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) converts complete lefty,
-righty, and teacher's desk assets with all 218 vertices and 96 triangles,
-directional seat flags, grey tint, and mirrored material extents retained.
-Official names, prices, stock lists, catalogue rows, and scoring are verified.
-Ten focused checks pass. These three items still need cartridge/selection
-integration and native seating/placement checks; the current ROM remains ABI 83.
+The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
+righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,
+catalogue entries, native scoring, and independent selection. All 218 vertices,
+96 triangles, seat flags, and material settings remain. Twenty cartridge/
+composition checks pass. The first native run passes 88 records with 74
+assertions, covering complete owner loading, names, prices, model DMA, rotated
+footprints, stock membership, catalogue eligibility, acquisition, saved ownership,
+restoration, and guards. Ordinary sitting, room appearance, and save/restart
+remain unverified. The composer has 62 installed development options; both
+served patchers remain V2. No permanent memory or saved format grows.
 
 The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) cold-boots
 ABI 83 with the current profile and unchanged copied-town content. The game

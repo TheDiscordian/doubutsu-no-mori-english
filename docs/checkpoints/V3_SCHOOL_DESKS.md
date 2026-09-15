@@ -1,4 +1,37 @@
-# V3 school-desk conversion
+# V3 school desks
+
+## Current integration image
+
+`build/v3-school-desks-runtime-01/animal-forest-v3-asset-loader.z64`, ABI 84.
+
+- ROM SHA-256: `179c19fb2b3846c77c2ca202dd15b96a268a7f172873b95f69d95da0635440f3`.
+- UPS SHA-256: `b60567d54e66fc91bf6f0d48f91e498c22762c6d4a7165acfdbfdd12bff6e0fb`.
+- Report SHA-256: `6344b8aa7a4a9c7305a688e4413f9ca9f5d8381e22465f63b10d55eaa353ddd4`.
+
+All three desks have complete model/profile/name/item readers, original prices,
+A/B stock, donor catalogue ordering, and native scoring. The full catalogue
+has 475 furniture rows; its 280,448-byte conservative requirement fits the
+existing 280,704-byte allocation. New artwork uses three fixed 4-KiB slots;
+total blob size is 2,862,144 bytes, ending at `024BAC40`, with 1,266,624 bytes
+remaining before the next reserved resource. Shared item, furniture, lamp,
+save, and environment code remains unchanged. Startup remains 912 bytes.
+
+The local composer now has 62 installed development options: twenty villagers,
+thirty-nine furniture items, and three shirts. Select-all reproduces the full
+current image; empty selection reproduces V2. These counts do not describe all
+donor content or imply completed gameplay. Both patchers remain V2.
+
+`build/v3-optional-school-desks-01/` selects only righty and teacher's desks.
+ROM SHA-256 `0f92d40d789957dbce7bf3d360366e4e568b7c1106c2131d4110247f1ae6603a`;
+UPS SHA-256 `f9740a04928a8d8639028b084d693c9b84e789040fb32a3b956f72ffaa410d7c`.
+Its receipt has correct independent enable fields, catalogue counts, and
+selected room-scoring members. The three English names have official source
+credits in the single provenance catalogue.
+
+Saved format 2 is unchanged, but the full profile gains three furniture bits.
+The decoder accepts equal/superset profiles and rejects missing dependencies;
+older full builds cannot accept saves requiring these desks. Do not load
+imported saves in V2. Ordinary cross-profile loading remains unverified.
 
 ## Complete local outputs
 
@@ -40,21 +73,35 @@ converter assertion is removed. Earlier incomplete conversion directories
 retain the failures that identified the nonzero contact field, grey tint,
 and teacher's extra mirrored extent; those source features are now preserved.
 
-## Next installation
+## Integration verification
 
-Keep ABI 83 and the current composer pinned until the complete new integration
-build is verified. Add fixed registry entries for donor `3200`, `3204`, and
-`3220`, checked model storage/profile rows, and all existing shared consumers.
-Connect actual A/B stock, packed selected catalogue rows, school-series counts,
-native scoring, and format-2 profile bits. Record source attribution for the
-three added item names in the single provenance catalogue.
+Eight current cartridge tests and twelve composer tests pass. They bind every
+changed asset/profile/item row, preserve the complete prior package except
+those six rows, preserve the full lamp resource and descriptor, verify all
+stock lists and native school members, bind native chair/contact functions and
+all rotated two-cell tables, check individual selection/report fields, and
+verify the exact limited ROM changes. Tests use the new current image; no
+historical emulator run is repeated.
 
-Verify the native directional-chair reader and teacher's two-cell placement;
-null custom callbacks are not evidence that contact behaviour needs no review.
-Then perform one combined changed-path check and retain ordinary acquisition/
-interaction/persistence for the broader gameplay pass. Do not replay the
-exhausted river-navigation batch merely to test unrelated desk assets.
+The initial builder catches stale inherited package-hash fields in the ABI-83
+report. Its actual ROM, installed CRC descriptor, and complete blob are correct.
+The new builder explicitly pins that actual package and refreshes all package
+receipt fields; no runtime validation is removed.
 
-No ROM, saved format, profile, or served patcher changes in this conversion
-batch. The three desks are not yet selectable or installed. GitHub development
-source may be pushed; patcher changes still require user testing and approval.
+The first silent native run, `build/v3-school-desks-native-01/results.json`,
+passes all 88 records, including 74 assertions. SHA-256:
+`c3274cd018f18f89dd60ef0968aa2ea71199b51e3b7bb8cd8960f03f4d8f495d`.
+The complete room and catalogue owners load and relocate through the real
+native loader. All three full names, prices, classifications, native footprint
+results, complete upper-memory model DMAs, untouched bank tails, and bank
+indices pass. The teacher's desk passes all four rotated placements. Actual
+native stock membership, catalogue eligibility, pocket acquisition, and per-item
+saved ownership pass for each desk. No callback is stubbed.
+
+Temporary owner/bank/player/save fixtures are restored, allocation and runtime
+guards pass, the matching checkpoint is restored, and ares exits cleanly.
+No FlashRAM write is requested during the fixture. Ordinary seating, GPU room
+appearance, transactions, and save/restart remain unverified. Continue bulk
+donor implementation; do not repeat the exhausted river-navigation batch or
+unchanged native prefixes. Patcher publication still requires user testing
+and explicit approval.

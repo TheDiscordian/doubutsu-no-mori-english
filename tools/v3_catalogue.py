@@ -39,7 +39,7 @@ def sources(base):
 
 
 def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False,
-          western_large=False, camping=False, tent_model=False, fire=False):
+          western_large=False, camping=False, tent_model=False, fire=False, school_desks=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -94,6 +94,13 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
             row = source_metadata(rel, donor_symbols, actor)
             row.update(runtime_index=row['donor_runtime_index'], ordinary_stock=False)
             garden_rows[actor.item] = large_rows[actor.item] = reviewed[actor.item] = row
+    if school_desks:
+        from v3_school_desks import metadata
+        from v3_asset_loader import ROOT
+        if not expanded:
+            raise ValueError('School desks require expanded catalogue pages')
+        school_rows = metadata(rel, donor_symbols, ROOT / 'build/item-identity-megasheet.xlsx')[1]
+        garden_rows.update({int(r['item_id'], 16): {**r, 'ordinary_stock': True} for r in school_rows})
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (

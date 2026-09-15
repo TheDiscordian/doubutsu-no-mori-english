@@ -16,7 +16,8 @@ SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
            'overlays/v3/shops.c', 'overlays/v3/shops.ld')
 
 
-def goods(base, rel, symbols, imports, *, garden=False, western=False, western_large=False):
+def goods(base, rel, symbols, imports, *, garden=False, western=False, western_large=False,
+          school_desks=False):
     verify_sources(rel, symbols)
     files = by_vrom(base)
     old = files[VROM].extract(base)
@@ -68,6 +69,13 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False, western_l
                 raise ValueError('Unreviewed large Western reward route')
             garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
                                                     {1: 0x196, 2: 0x262, 5: 0x334}[group])
+    if school_desks:
+        from v3_school_desks import metadata
+        from v3_asset_loader import ROOT
+        for row in metadata(rel, symbols, ROOT / 'build/item-identity-megasheet.xlsx')[1]:
+            group = row['stock_group']
+            garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
+                                                    (0xCA, 0x196, 0x262)[group])
     for row in imports:
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),

@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-tent-lamp-runtime-02'
-BASE_SHA = 'ff4e5ebafcb15d8ef777d569e0b2f4d29d848223d8e44ef15653c539796279d0'
-REPORT_SHA = '90a463751b63876534df9bcc0f1e49cdbf500f468dd175056155fcbda7a51413'
+BASE = ROOT/'build/v3-school-desks-runtime-01'
+BASE_SHA = '179c19fb2b3846c77c2ca202dd15b96a268a7f172873b95f69d95da0635440f3'
+REPORT_SHA = '6344b8aa7a4a9c7305a688e4413f9ca9f5d8381e22465f63b10d55eaa353ddd4'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 83, 0x30000
+PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 84, 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -397,10 +397,12 @@ def build(output, selected=(), *, select_all=False):
         current['campsite_placement'].update(package_sha256=package_sha, optional_composition_updated=True)
         current['import_storage'].update(package_sha256=package_sha,
             profile_rows_sha256=sha256(blob[ROWS:ITEMS]), item_rows_sha256=sha256(blob[ITEMS:TABLE_END]))
-        for section in ('camping', 'tent_model', 'fire'):
+        for section in ('camping', 'tent_model', 'fire', 'school_desks'):
             current[section].update(package_sha256=package_sha, optional_composition_updated=True)
             for row in current[section]['imports']:
                 row['enabled'] = row['id'] in selection['enabled']
+        current['school_desks']['pending'] = [p for p in current['school_desks']['pending']
+                                              if p != 'optional composition']
         import v3_hra as hra
         _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
         hr = current['hra']
