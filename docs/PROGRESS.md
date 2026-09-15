@@ -2,30 +2,45 @@
 
 ## Active development
 
+The [garden runtime and composer](checkpoints/V3_GARDEN_RUNTIME.md) install six
+complete models, English names/prices, catalogue entries, scoring, stock, and
+selected save dependencies. Four focused integration checks and the initial
+187-record native run pass. The gnome is acquired through native lottery
+selection; mailbox reward delivery remains unfinished. The 452-entry furniture
+catalogue and complete 248-entry clothing catalogue fit the existing menu RAM.
+Current full integration: `build/v3-garden-runtime-02/animal-forest-v3-asset-loader.z64`,
+ABI 64, SHA-256 `436c5cec2aeb1d9f34d1fb71217ec62a6ef232d91573e0112d7055c65345f1d0`.
+Nine composer checks pass across 39 experimental options. Unselected HRA records
+are excluded from theme requirements and recommendations; all/empty outputs
+retain the exact full/V2 cartridges. Current local subset: `build/v3-optional-garden-01/`.
+Its initial 35-record native scoring check passes, including selected-only theme
+counts/completion, actual reward points, saved-state restoration, and guards.
+Neither served patcher changes. Ordinary gameplay/persistence and remaining donor
+families continue; this is not a complete-import handoff.
+
 The [reward-category scoring adapter](checkpoints/V3_HRA_BIRTH.md) extends the
 actual HRA counter arrays to 23 categories, preventing post-office category 19
 from overwriting its output pointer. Three focused checks and the initial
 82-record native run pass, including complete counters/products, all four new
 categories, mixed/null layers, and guards. All native point values stay intact.
-Current full integration: `build/v3-hra-birth-01/animal-forest-v3-asset-loader.z64`,
-ABI 63, SHA-256 `ad8c7be6e3ec0918b0bcbc3df5028dbccbca4c2d29370f6ef9d726f3d41eedef`.
-It adds 96 on-demand bytes, with no permanent RAM or saved-format/profile change.
-Reward acquisition and the garden items' runtime installation remain work.
+This prerequisite remains in the current ABI-64 garden integration. It uses
+96 additional on-demand bytes without additional permanent RAM. Post-office
+reward delivery remains work.
 
 The [garden batch](checkpoints/V3_GARDEN_ITEMS.md) converts six more complete
 decorations: birdhouse, bird feeder, both flamingos, mailbox, and garden gnome.
 Six new focused checks and ten shared parser/profile checks pass. Models retain
 all 406 vertices, 251 triangles, and 24,448 texels, including tall clamped textures
 and explicit mirrored materials. Acquisition metadata preserves lottery and
-post-office rewards. Runtime installation and backyard scoring remain work;
-the separate reward-category adapter supplies its scoring prerequisite.
+post-office rewards. The runtime batch supplies installation and backyard scoring;
+the separate reward-category adapter supplies its safe counter prerequisite.
 
 The [aloha scoring correction](checkpoints/V3_ALOHA_SCORING.md) supplies both
 imported displays' actual clothing properties instead of inactive HRA records.
 Three focused checks and a corrected 52-record native run pass, including full
 grouping, native clothing points, disabled exclusion, and array-end guards.
 It changes two data words with no RAM, saved-profile/format, or ABI change.
-Its corrected metadata remains in the current ABI-63 integration above.
+Its corrected metadata remains in the current ABI-64 integration above.
 Neither served web patcher changes.
 
 The [construction catalogue integration](checkpoints/V3_CONSTRUCTION_CATALOGUE.md)
@@ -50,7 +65,7 @@ catalogue and stock/scoring tables. No complete-import handoff is claimed.
 
 The [local optional composer](checkpoints/V3_OPTIONAL_CONSTRUCTION.md) now
 supports individual experimental selections across the twenty installed
-villagers and thirteen logical items. It derives required house furnishings and
+villagers and nineteen logical items. It derives required house furnishings and
 outfits from installed content, preserves fixed IDs, and exports the selected
 save profile. Seven focused checks pass: reordered selections produce identical
 cartridges, select-all reproduces the full integration build, and an empty

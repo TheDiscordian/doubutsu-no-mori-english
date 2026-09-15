@@ -2,9 +2,10 @@
 
 ## Scope and identity
 
-Six GAFE01-r0 decorations have complete N64 graphics conversion and verified
-donor metadata. They are not installed or selectable yet. The current cartridge
-and both served web patchers remain unchanged by this source-conversion batch.
+Six GAFE01-r0 decorations have complete N64 graphics conversion, verified donor
+metadata, and experimental runtime installation. The offline composer supports
+individual selections. Post-office reward delivery and ordinary gameplay remain
+unfinished; neither served patcher changes.
 
 `tools/v3_furniture_art.py --batch garden` verifies the complete pinned REL and
 symbols, both actual furniture-quality tables, profiles, names, and all graphics
@@ -22,8 +23,8 @@ lack AF identity/name/model/texture entries; it is not executable game source.
 | `32A0` | 1192 | garden gnome | 3,380 | lottery | 3,728 |
 | `32A4` | 1193 | Mrs. Flamingo | 1,530 | ordinary A | 3,680 |
 
-The indices are donor furniture indices, not an assertion of installed native
-IDs. A future registry reservation must remain independent of checkbox order.
+The registry assigns these same indices and additive item IDs independently of
+checkbox order. Native identities and earlier imported identities remain intact.
 The mailbox is decorative furniture, not the player's operational mailbox.
 Neither the mailbox nor the gnome may be silently added to ordinary goods lists.
 
@@ -54,17 +55,17 @@ an N64 display list. Other parser modes keep their existing restrictions.
 
 ## Gameplay distinctions
 
-Five items belong to donor backyard series 56. The existing expanded HRA storage
-has a disabled placeholder there; supply its real theme definition and complete
-English score-letter name before enabling these items. Donor surface index 26
-is not automatically a native wall/floor match.
+Five items belong to donor backyard series 56. The installed HRA definition uses
+theme type 2 and its full English score-letter name. Native surface FF explicitly
+means no matching surface; donor surface index 26 is not an established native
+wall/floor match.
 
 | Item | Donor HRA | Native layout | Feng shui |
 | --- | --- | --- | --- |
 | birdhouse | `E0058100` | `E0058200` | `0000` |
 | bird feeder | `E0058200` | `E0058400` | `0000` |
 | Mr. Flamingo | `E0050100` | `E0050200` | `0001` |
-| mailbox | `D405D300` | requires ABI-63 installation | `0500` |
+| mailbox | `D405D300` | `D405E600`, checked ABI-63 prerequisite | `0500` |
 | garden gnome | `E0054780` | `E0054F00` | `0001` |
 | Mrs. Flamingo | `E0050000` | `E0050000` | `0001` |
 
@@ -75,13 +76,54 @@ points and expanded counters in ABI 63. The source-only metadata retains null
 native HRA until an installer verifies that prerequisite; older evaluators cannot
 safely accept category 19.
 
-## Integration work
+## Runtime storage and readers
 
-Install fixed registry entries, expanded static/item records, complete model
-resources, selected stock/event acquisition, catalogue/ownership, rewards,
-scoring, save dependencies, and optional composition. Preserve existing content
-and the import-free V2 result. Verify changed native readers and representative
-model/gameplay paths with bounded testing; do not replay unchanged old builds.
+`tools/v3_garden_runtime.py` installs ABI 64 on the complete ABI-63 source.
+The six fixed object VROMs are `0235D000`, `0235E000`, `0235F000`, `02360000`,
+`02361000`, and `02362000`, in the table's order. Each retains its own 4-KiB slot.
+The fifteen 80-byte static rows occupy RAM `80481500..804819AF`. Sixteen 32-byte
+item records occupy `80481A00..80481BFF`; copy all ten preceding records before
+reusing their old storage. The existing package guard at `80481FF0` remains.
+No permanent RAM or shared-menu allocation increases.
 
-The [checkpoint](../docs/checkpoints/V3_GARDEN_ITEMS.md) owns artifact hashes and
-executed evidence. Both patchers remain V2 until user testing and explicit approval.
+The actual clothing-aware item reader at `8046D000` retains every save-code
+instruction and public symbol. Only its two table start/end operands change.
+The static helper remains within its existing 2-KiB reservation. Both resource
+CRCs, the checked startup prefix, DMA bounds, and N64 checksums are verified.
+Every output must reconstruct completely through its UPS patch.
+
+The catalogue contains 452 furniture and 248 clothing entries in the existing
+753-slot pages. Its image occupies 62,288 bytes; conservative shared-menu use
+is 279,936 of 280,704 reserved bytes. All original ordering and complete clothing
+entries remain. The mailbox is visible but not orderable. The donor catalogue
+permits lottery furniture, so the gnome remains orderable through native list 5.
+
+Four garden items enter their true A/B/C lists. The gnome enters native lottery
+list 5, whose thirty original items all retain birth category 7. Its first
+terminator is at resource offset `334`, followed by two alignment bytes;
+inserting after the first terminator would make the new item unreachable.
+The mailbox is not added to a substitute stock list. Its reward delivery remains
+an explicit unfinished acquisition route.
+
+The HRA image keeps all ABI-63 counter instructions, weights, and relocations.
+Only six metadata records and backyard's definition/name change. The feng shui
+image changes only six records. The score-letter image grows by 32 bytes to
+62,688, with a 57th complete 26-byte name record, six padding bytes, and the
+unchanged 960-byte relocation format. Five counters and loader sizing/CRC change;
+all original keys, boxing, templates, and unrelated relocated code remain.
+
+Saved format 2 stays unchanged; the profile adds six furniture dependencies.
+An older profile must reject these saves safely. The offline composer excludes
+unselected HRA records from native grouping/recommendations as well as disabling
+their runtime profiles. Imports are not a backwards-compatible V2 save format.
+
+## Remaining work
+
+Finish post-office reward delivery and ordinary acquisition, placement,
+persistence, and player testing. Preserve the exact import-free V2 result.
+Source conversion and callable native checks do not certify ordinary gameplay
+or original-hardware appearance.
+
+The [source checkpoint](../docs/checkpoints/V3_GARDEN_ITEMS.md) and
+[runtime checkpoint](../docs/checkpoints/V3_GARDEN_RUNTIME.md) own artifact hashes
+and executed evidence. Both patchers remain V2 until user testing and explicit approval.

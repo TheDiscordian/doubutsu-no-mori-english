@@ -38,7 +38,7 @@ def sources(base):
     return data, reloc, parent
 
 
-def table(base, rel, donor_symbols, furniture, *, expanded=False):
+def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -53,15 +53,23 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False):
     if len({i for i, _ in rows}) != 436 or any(i >= 947 for i, _ in rows):
         raise ValueError('Invalid original catalogue index set')
     records = []
+    garden_rows = {}
+    if garden:
+        from v3_garden_items import metadata
+        if not expanded:
+            raise ValueError('Garden catalogue needs expanded native pages')
+        garden_rows = {int(r['item_id'], 16): r for r in metadata(rel, donor_symbols)[1]}
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (
-                expanded and item in STOCK and STOCK[item][0] == index):
+                expanded and item in STOCK and STOCK[item][0] == index) and not (
+                item in garden_rows and garden_rows[item]['runtime_index'] == index):
             raise ValueError('New catalogue import needs reviewed preview and shop rules')
         found = [(n, mode) for n, (i, mode) in enumerate(struct.iter_unpack('>HH', donor)) if i == index]
         if len(found) != 1 or found[0][1] != 0 or draw[:8] != data[0x808AF87C - RAM:0x808AF87C - RAM + 8]:
             raise ValueError('Donor catalogue preview mode is not the verified native mode')
-        group = STOCK[item][1] if item in STOCK else ('ftr_listC' if item == 0x3224 else 'ftr_listA')
+        group = (garden_rows[item]['donor_list'] if item in garden_rows else
+                 STOCK[item][1] if item in STOCK else ('ftr_listC' if item == 0x3224 else 'ftr_listA'))
         goods = symbol_data(rel, symbol_text, group)
         ids = struct.unpack('>' + str(len(goods) // 2) + 'H', goods)
         if ids[-1] != 0 or ids.count(item) != 1 or 0 in ids[:-1]:
@@ -69,6 +77,10 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False):
         records.append({'item_id': f'{item:04X}', 'runtime_index': index,
             'catalogue_index': (item - 0x1000) >> 2, 'donor_position': found[0][0], 'mode': 0,
             'ordinary_shop_list': group, 'shop_list_sha256': sha256(goods)})
+        if item in garden_rows:
+            records[-1].update(donor_acquisition_list=group,
+                ordinary_shop_list=group if garden_rows[item]['ordinary_stock'] else None,
+                catalogue_orderable=item != 0x3294)
     records.sort(key=lambda row: row['donor_position'])
     if len({row['item_id'] for row in records}) != len(records) or len(rows) + len(records) > (CAPACITY if expanded else 444):
         raise ValueError('Catalogue duplicates or exceeds the actual native item capacity')

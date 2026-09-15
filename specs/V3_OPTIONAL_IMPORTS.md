@@ -278,17 +278,19 @@ pass. The [catalogue integration](V3_CATALOGUE_CAPACITY.md) supplies actual
 753-slot pages, all 446 furniture rows, retained 248-row clothing, ordinary stock,
 and complete scoring metadata. Native catalogue selection, scrolling, names,
 model loading, B/C stock selection, and pocket ownership insertion pass.
-The [offline composer](V3_OPTIONAL_COMPOSITION.md) connects all 33 installed
+The [offline composer](V3_OPTIONAL_COMPOSITION.md) connects all 39 installed
 experimental options and their actual dependencies, including selected catalogue
 packing/completion. Focused and native subset checks pass. Ordinary gameplay/
 persistence and browser implementation remain required; neither patcher changes.
 
-The [garden batch](V3_GARDEN_ITEMS.md) converts six decorative models and their
-actual acquisition/scoring metadata. Complete runtime installation remains work;
-special lottery/post-office rewards must not become ordinary shop goods.
+The [garden batch](V3_GARDEN_ITEMS.md) installs six complete decorative models,
+shared readers, the 452-row furniture catalogue, scoring, saved dependencies,
+and individual offline selections. The gnome uses the native lottery list and
+can be reordered; the mailbox remains not for sale. Post-office reward delivery
+and ordinary gameplay/persistence remain work.
 The [reward-category adapter](V3_HRA_BIRTH.md) supplies expanded native counters
 and donor reward weights, with focused and native verification. Backyard-series
-installation and complete reward acquisition remain work.
+installation is complete; post-office reward acquisition remains work.
 
 ### Limits and saves
 
@@ -316,7 +318,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [local optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for the twenty installed villagers and thirteen installed logical items,
+selections for the twenty installed villagers and nineteen installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
 save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce

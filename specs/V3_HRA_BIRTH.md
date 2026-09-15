@@ -40,8 +40,8 @@ object/audio positions, and recalculate the checked startup/prefix configuration
 and N64 checksum. Validate complete UPS reconstruction. The saved format/profile
 stays unchanged; no new item is enabled by this prerequisite adapter.
 
-The offline composer retains its pinned ABI-62 input until the next integrated
-item batch updates it. Neither served web patcher changes.
+The garden integration retains this prerequisite in its ABI-64 cartridge and
+offline composer. Neither served web patcher changes.
 
 ## Verification and limits
 

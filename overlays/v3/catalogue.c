@@ -93,6 +93,13 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
             af_v3_native_catalogue_available(0x34BFu, 2, list, game);
 #endif
 #endif
+#ifdef AF_V3_GARDEN_ITEMS
+    /* The donor excludes the post-office mailbox from ordering, but permits
+     * the lottery gnome. Native furniture preview queries include list 5. */
+    if ((item & 0xFFFCu) == 0x3294u) return 0;
+    if ((item & 0xFFFCu) == 0x32A0u)
+        return category == 0 && list == 5 && af_v3_furniture_import_profile(1192);
+#endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price
      * is shown; it does not replace the native town's rarity selection. */

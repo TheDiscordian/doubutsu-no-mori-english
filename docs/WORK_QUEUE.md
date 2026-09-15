@@ -292,13 +292,22 @@ with later e/e+ donor support investigated separately.
   patcher changes.
   The [six-item garden batch](checkpoints/V3_GARDEN_ITEMS.md) converts complete
   artwork and verifies names, prices, real acquisition lists, and scoring flags.
-  Six new focused checks and ten shared parser/profile checks pass. Next install
-  fixed runtime profiles/item readers, backyard series 56, ordinary/lottery/
-  post-office acquisition, complete catalogue/scoring, saved dependencies, and
-  optional composition. The [reward-category adapter](checkpoints/V3_HRA_BIRTH.md)
+  Six new focused checks and ten shared parser/profile checks pass. The
+  [garden runtime](checkpoints/V3_GARDEN_RUNTIME.md) installs all six complete
+  profiles/models, shared readers, backyard series/name, ordinary/lottery stock,
+  complete catalogue/scoring, saved dependencies, and individual composition.
+  Four focused integration checks and the initial 187-record native run pass;
+  nine composer checks pass across 39 options. The gnome reaches actual native
+  lottery selection and pocket ownership. Unselected furniture is excluded from
+  HRA theme counts/recommendations. Next: faithful post-office reward delivery,
+  ordinary acquisition/placement/persistence, and the remaining donor families.
+  The local two-item subset's initial 35-record native scoring check passes:
+  one selected backyard member, no unselected boxing members, complete counters,
+  actual reward points, saved-state restoration, and guards.
+  The [reward-category adapter](checkpoints/V3_HRA_BIRTH.md)
   supplies safe counters and weights through category 22. Three focused checks
   and the initial 82-record native run pass. Require this ABI-63 prerequisite
-  before enabling the mailbox; its reward acquisition remains uninstalled.
+  before mailbox scoring; its reward acquisition remains uninstalled.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
   texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
   tests pass with unchanged pilot outputs. Connect stable model/texture banks,

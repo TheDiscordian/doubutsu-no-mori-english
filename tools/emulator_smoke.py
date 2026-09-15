@@ -1540,6 +1540,20 @@ def main():
                     raise ValueError('Construction item probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_garden_items'):
+                from v3_construction_smoke import exercise as readers
+                from v3_garden_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Garden probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(readers(debug, args.rom, record, garden=True))
+                results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_garden_scoring'):
+                from v3_garden_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Garden scoring probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record, scoring_only=True))
             if action.get('test_v3_villager_defaults'):
                 from v3_villager_defaults_smoke import exercise
                 if not (out/'test.bs1').is_file():

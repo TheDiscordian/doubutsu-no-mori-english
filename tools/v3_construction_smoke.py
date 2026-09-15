@@ -6,23 +6,28 @@ import struct
 from aflib import by_vrom, sha256
 from runtime_layout import MODULE_RAM
 from v3_asset_loader import BLOB
-from v3_construction_runtime import ABI, ITEMS, ITEMS_RAM, ROWS, ROWS_RAM, TABLE_END
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, garden=False):
+    if garden:
+        from v3_garden_runtime import ABI, ITEMS, ITEMS_RAM, ROWS, ROWS_RAM, TABLE_END
+        key, count, item_count = 'garden', 15, 16
+    else:
+        from v3_construction_runtime import ABI, ITEMS, ITEMS_RAM, ROWS, ROWS_RAM, TABLE_END
+        key, count, item_count = 'construction', 9, 10
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_text())
     if sha256(image) != report['output_sha256'] or report['runtime_abi'] != ABI:
         raise ValueError('Construction probe needs its exact current cartridge')
     blob = by_vrom(image)[BLOB].extract(image)
-    rows = report['construction']['imports']
+    rows = report[key]['imports']
     scratch = MODULE_RAM + 0x6500
     state = debug.read_memory(0x8046C000, 864)
 
     def check(label, address, expected):
         actual = debug.read_memory(address, len(expected))
-        record({'construction_check': label, 'address': f'{address:08X}', 'bytes': len(expected),
+        record({key + '_reader_check': label, 'address': f'{address:08X}', 'bytes': len(expected),
                 'assertion': 'passed' if actual == expected else 'failed'})
         if actual != expected:
             raise ValueError('Construction native memory mismatch: ' + label)
@@ -34,8 +39,8 @@ def exercise(debug, rom_path, record):
             raise ValueError(f'Construction native return {address:08X}: {value["return_value"]} != {expected}')
 
     check('startup ready', 0x8019ACD0, struct.pack('>I', 1))
-    check('nine complete static profiles', ROWS_RAM, blob[ROWS:ROWS + 9 * 80])
-    check('ten complete item records', ITEMS_RAM, blob[ITEMS:TABLE_END])
+    check(f'{count} complete static profiles', ROWS_RAM, blob[ROWS:ROWS + count * 80])
+    check(f'{item_count} complete item records', ITEMS_RAM, blob[ITEMS:TABLE_END])
     for row in rows:
         item = int(row['item_id'], 16)
         call(0x800A5630, [item | 3], 10)
@@ -65,12 +70,12 @@ def exercise(debug, rom_path, record):
         call(0x800C0194, [int(row['item_id'], 16)], 0)
     finally:
         debug.write_memory(enabled, struct.pack('>I', 1))
-    check('complete static profiles restored', ROWS_RAM, blob[ROWS:ROWS + 9 * 80])
+    check('complete static profiles restored', ROWS_RAM, blob[ROWS:ROWS + count * 80])
     check('runtime save state retained', 0x8046C000, state)
     for label, address, value in (('translation', 0x8019C8D0, 'AF32C0DE'),
             ('save', 0x8046C350, 'AF53C0DE'), ('resident', 0x8046BFF0, 'AF33C0DE'),
             ('package', 0x80481FF0, 'AFACC0DE')):
         check(label + ' guard', address, bytes.fromhex(value) * 4)
     check('no fault', 0x8003CE34, bytes(4))
-    return {'construction_readers': 7, 'retained_static_animated_and_clothing_readers': True,
+    return {key + '_readers': len(rows), 'retained_static_animated_and_clothing_readers': True,
             'ordinary_acquisition_or_persistence_tested': False, 'requires_checkpoint_restore': True}

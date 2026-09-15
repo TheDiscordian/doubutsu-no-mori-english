@@ -14,14 +14,14 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-aloha-scoring-01'
-BASE_SHA = 'e6a890c37e972422fe44cbbfb322dcccd17805186baa96ed7c20a45a2d4022f3'
-REPORT_SHA = '33959d0d3224ace91e14cedf5215eeffa3cd7e15c1f7d067fea0290a9b5c4c6b'
+BASE = ROOT/'build/v3-garden-runtime-02'
+BASE_SHA = '436c5cec2aeb1d9f34d1fb71217ec62a6ef232d91573e0112d7055c65345f1d0'
+REPORT_SHA = 'e931376f12e03eb3adbff213227c144c39d0debcff5cdf00f399f10ad4279cda'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 62
+PREFIX_SIZE, ABI = 0xC000, 64
 PACKAGE, PACKAGE_RAM, PACKAGE_SIZE = 0x70000, 0x80473000, 0xF000
-STATIC_ROWS = 0x7E500
+STATIC_ROWS, STATIC_COUNT = 0x7E500, 15
 
 
 def resident_offset(blob, address, size):
@@ -243,7 +243,7 @@ def compose(image, report, catalog, selection):
             writes.append({'offset':offset, 'before':before.hex(), 'after':value.hex(), 'purpose':label})
     def prefix(offset, value, label):
         if not (0x20 <= offset < offset+len(value) <= PREFIX_SIZE or
-                len(value) == 4 and offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(9))):
+                len(value) == 4 and offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(STATIC_COUNT))):
             raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
@@ -257,6 +257,8 @@ def compose(image, report, catalog, selection):
             prefix(row['display_enable_offset'], active.to_bytes(4, 'big'), key+' mannequin')
     catalogue_writes, _ = catalogue_selection(image, report, enabled)
     writes.extend(catalogue_writes)
+    scoring_writes, _ = scoring_selection(image, report, catalog, enabled)
+    writes.extend(scoring_writes)
     intermediate = apply_writes(image, writes)
     start = files[BLOB].pstart
     new_blob = intermediate[start:start+len(blob)]
@@ -276,6 +278,34 @@ def compose(image, report, catalog, selection):
     if apply_writes(image, writes) != result:
         raise ValueError('Unreported composition modification')
     return bytes(result), sorted(writes, key=lambda row:row['offset']), new_blob
+
+
+def scoring_selection(image, report, catalog, enabled):
+    """Exclude disabled imports from native group totals and recommendations.
+
+    The HRA grouping loops scan the entire metadata table, independently of
+    the placed-item enabled checks. Keeping disabled rows would make selected
+    themes require furniture the chosen cartridge cannot acquire.
+    """
+    import v3_hra as hra
+    entry, hr = by_vrom(image)[hra.NEW_VROM], report['hra']
+    data = entry.extract(image)
+    if entry.pend or sha256(data) != hr['output_sha256']:
+        raise ValueError('Changed complete source scoring image')
+    indices = {catalog[key]['runtime_index'] for key in enabled if catalog[key]['kind'] == 'furniture'}
+    indices |= {catalog[key]['display_runtime_index'] for key in enabled if catalog[key]['kind'] == 'clothing'}
+    writes, rows = [], []
+    for row in hr['imports']:
+        at = hr['metadata_address'] - hra.RAM + row['runtime_index'] * 4
+        before = bytes.fromhex(row['metadata'])
+        if data[at:at + 4] != before:
+            raise ValueError('Changed bound furniture scoring record')
+        if row['runtime_index'] in indices:
+            rows.append(row)
+        else:
+            writes.append({'offset': entry.pstart + at, 'before': before.hex(), 'after': 'fc000000',
+                           'purpose': 'disabled item excluded from HRA groups and recommendations'})
+    return writes, rows
 
 
 def build(output, selected=(), *, select_all=False):
@@ -331,7 +361,7 @@ def build(output, selected=(), *, select_all=False):
             row['metadata_sha256'] = sha256(blob[0x2820+slot*32:0x2840+slot*32])
         _, selected_cat = catalogue_selection(image, report, set(selection['enabled']))
         from v3_catalogue import VROM, RAM
-        from v3_construction_runtime import ROWS, ITEMS, TABLE_END
+        from v3_garden_runtime import ROWS, ITEMS, TABLE_END
         cat = current['catalogue']
         cat['installed_total_rows'] = cat['total_rows']
         cat.update(imports=selected_cat['imports'], total_rows=selected_cat['total_rows'])
@@ -345,10 +375,25 @@ def build(output, selected=(), *, select_all=False):
         cat['clothing']['table_sha256'] = sha256(data[at:at + cat['clothing']['total_rows'] * 2])
         current['construction'].update(optional_composition_updated=True,
             profile_rows_sha256=sha256(blob[ROWS:ROWS + 9 * 80]),
-            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            item_rows_ram=f'{0x80481A00:08X}',
+            item_rows_sha256=sha256(blob[ITEMS:ITEMS + 10 * 32]),
             package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
             pending=['ordinary acquisition, placement, and persistence'])
         current['construction_catalogue']['optional_composition_updated'] = True
+        current['garden'].update(optional_composition_updated=True,
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + STATIC_COUNT * 80]),
+            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
+            pending=['post-office reward delivery', 'ordinary acquisition, placement, and persistence'])
+        for row in current['garden']['imports']:
+            row['enabled'] = row['id'] in selection['enabled']
+        import v3_hra as hra
+        _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
+        hr = current['hra']
+        data = by_vrom(result)[hra.NEW_VROM].extract(result)
+        at = hr['metadata_address'] - hra.RAM
+        hr.update(imports=selected_hra, output_sha256=sha256(data),
+                  metadata_sha256=sha256(data[at:at + hr['metadata_rows'] * 4]))
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'animal-forest-v3-asset-loader.z64', result)
     write_new(output/'asset-loader.ups', patch)
@@ -361,7 +406,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All 33 installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All 39 installed experimental entries, not the whole donor disc')
     args = parser.parse_args()
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))

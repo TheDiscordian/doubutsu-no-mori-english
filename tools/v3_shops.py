@@ -16,7 +16,7 @@ SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
            'overlays/v3/shops.c', 'overlays/v3/shops.ld')
 
 
-def goods(base, rel, symbols, imports):
+def goods(base, rel, symbols, imports, *, garden=False):
     verify_sources(rel, symbols)
     files = by_vrom(base)
     old = files[VROM].extract(base)
@@ -28,11 +28,28 @@ def goods(base, rel, symbols, imports):
                     0x06000354, 0x0600036C, 0x06000384, 0):
         raise ValueError('Changed complete native list descriptor set')
     selected, insertions = [], []
+    garden_rules = {}
+    if garden:
+        from v3_garden_items import metadata
+        from v3_hra import sources, RAM, TABLE as HRA_TABLE
+        native_hra, _ = sources(base)
+        lottery = struct.unpack('>30H', old[0x2F8:0x334])
+        if old[0x334:0x338] != bytes(4) or any(not 0x1000 <= item < 0x1ECC or
+               (struct.unpack_from('>I', native_hra, HRA_TABLE - RAM + (item - 0x1000))[0] >> 9 & 31) != 7
+               for item in lottery):
+            raise ValueError('Native list 5 is not the complete lottery birth-category list')
+        for row in metadata(rel, symbols)[1]:
+            if row['ordinary_stock']:
+                group = row['stock_group']
+                garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
+                                                        (0xCA, 0x196, 0x262)[group])
+            elif row['donor_list'] == 'ftr_listLottery':
+                garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], 5, 0x334)
     for row in imports:
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),
                  0x32B8: (1198, 'ftr_listA', 0, 0xCA),
-                 0x3350: (1236, 'ftr_listA', 0, 0xCA), **CONSTRUCTION_STOCK}
+                 0x3350: (1236, 'ftr_listA', 0, 0xCA), **CONSTRUCTION_STOCK, **garden_rules}
         if item not in rules or row['runtime_index'] != rules[item][0]:
             raise ValueError('Unreviewed ordinary-stock item')
         _, name, group, at = rules[item]

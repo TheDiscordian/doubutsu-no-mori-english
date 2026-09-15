@@ -39,7 +39,7 @@ class OptionalCompositionTests(unittest.TestCase):
         return composer.resolve(self.catalog, list(selected))
 
     def test_actual_house_and_outfit_dependencies_not_just_names(self):
-        self.assertEqual(len(self.catalog),33)
+        self.assertEqual(len(self.catalog),39)
         self.assertEqual(self.select(PUNCHY)['required'],
                          ['GAFE01-r0/item/24BF','GAFE01-r0/item/3350'])
         self.assertEqual(self.select(CHERI)['required'],
@@ -81,7 +81,7 @@ class OptionalCompositionTests(unittest.TestCase):
         files = by_vrom(result)
         module = files[composer.MODULE].extract(result)
         self.assertEqual(struct.unpack_from('>4I',module,composer.CONFIG),
-                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),62))
+                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),64))
         self.assertEqual(struct.unpack_from('>4I', blob, 0xF0),
                          (composer.BLOB + composer.PACKAGE, composer.PACKAGE_SIZE,
                           zlib.crc32(blob[composer.PACKAGE:composer.PACKAGE + composer.PACKAGE_SIZE]),
@@ -92,7 +92,7 @@ class OptionalCompositionTests(unittest.TestCase):
         self.assertEqual(composer.apply_writes(result,reverse),self.base)
         base_files = by_vrom(self.base)
         self.assertEqual(files,base_files)  # No directory, allocation, or ID changes.
-        # Outside the prefix, only the nine profile enable words and the
+        # Outside the prefix, only the fifteen profile enable words and the
         # selected catalogue ordering/count fields may change. Assets stay put.
         restored_blob = bytearray(blob)
         original_blob = base_files[composer.BLOB].extract(self.base)
@@ -125,7 +125,7 @@ class OptionalCompositionTests(unittest.TestCase):
         data = by_vrom(image)[VROM].extract(image)
         table = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
         self.assertEqual(struct.unpack_from('>4H', data, table + 436 * 4), (2174, 0, 2187, 0))
-        self.assertEqual(data[table + 438 * 4:table + 446 * 4], bytes(8 * 4))
+        self.assertEqual(data[table + 438 * 4:table + 452 * 4], bytes(14 * 4))
         for address, opcode in ((0x808A6600, 0x24050000), (0x808A9460, 0x24140000), (0x808AF7A8, 0)):
             self.assertEqual(struct.unpack_from('>I', data, address - RAM)[0], opcode | 438)
         table = cat['code']['symbols']['af_v3_catalogue_clothing_order'] - RAM
@@ -133,7 +133,7 @@ class OptionalCompositionTests(unittest.TestCase):
         self.assertEqual(struct.unpack_from('>I', data, COUNT - RAM)[0], 246)
         for item in ('31F8', '322C'):
             row = self.catalog['GAFE01-r0/item/' + item]
-            self.assertTrue(composer.STATIC_ROWS <= row['enable_offset'] < composer.STATIC_ROWS + 9 * 80)
+            self.assertTrue(composer.STATIC_ROWS <= row['enable_offset'] < composer.STATIC_ROWS + composer.STATIC_COUNT * 80)
             self.assertEqual(row['enable_offset'] - composer.PACKAGE,
                              row['enable_ram'] - composer.PACKAGE_RAM)
             self.assertEqual(blob[row['enable_offset']:row['enable_offset'] + 4], b'\0\0\0\1')
@@ -169,3 +169,53 @@ class OptionalCompositionTests(unittest.TestCase):
             self.assertEqual(bytes(bank),packed)
             self.assertEqual(bytes(current),wanted)
             self.assertEqual(bytes(out),wanted+bytes(STATE-PROFILE) if expected==1 else b'\xA5'*STATE)
+
+    def test_individual_garden_subset_last_row_and_profile_requirement(self):
+        from v3_catalogue import VROM, RAM
+        keys = ['GAFE01-r0/item/3294', 'GAFE01-r0/item/32A4']
+        selected = self.select(*keys)
+        self.assertEqual(selected['required'], [])
+        image, _, blob = composer.compose(self.base, self.report, self.catalog, selected)
+        self.assertEqual(image, composer.compose(self.base, self.report, self.catalog, self.select(*reversed(keys)))[0])
+        for key, row in self.catalog.items():
+            if row['kind'] == 'furniture':
+                self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset'] + 4], 'big'), key in keys)
+        last = self.catalog[keys[-1]]
+        self.assertEqual(last['enable_offset'], composer.STATIC_ROWS + 14 * 80 + 4)
+        cat = self.report['catalogue']
+        data = by_vrom(image)[VROM].extract(image)
+        at = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
+        self.assertEqual(data[at + 436 * 4:at + 438 * 4], struct.pack('>4H',
+            (0x32A4 - 0x1000) // 4, 0, (0x3294 - 0x1000) // 4, 0))
+        self.assertEqual(data[at + 438 * 4:at + 452 * 4], bytes(14 * 4))
+        # Same codec, actual newly assigned profile bits: an older selection
+        # must reject the new saved dependencies without touching any buffer.
+        source = (ROOT / 'local/rc2-save-report-g3O4lU/test.flash').read_bytes()[:65536]
+        profile = bytes.fromhex(selected['profile_hex'])
+        packed = bytes(reference_pack(source, profile + bytes(STATE - PROFILE)))
+        for wanted, expected in ((profile, 1), (bytes.fromhex(self.select(*self.catalog)['profile_hex']), 1),
+                                 (bytes.fromhex(self.select(PUNCHY)['profile_hex']), -7)):
+            buffer = lambda b: (c.c_ubyte * len(b)).from_buffer_copy(b)
+            bank, current, out = buffer(packed), buffer(wanted), buffer(b'\xA5' * STATE)
+            self.assertEqual(self.codec.af_v3_save_check(bank, len(packed), current, out), expected)
+            self.assertEqual(bytes(bank), packed)
+            self.assertEqual(bytes(current), wanted)
+            self.assertEqual(bytes(out), wanted + bytes(STATE - PROFILE) if expected == 1 else b'\xA5' * STATE)
+
+    def test_unselected_furniture_cannot_inflate_group_totals_or_recommendations(self):
+        import v3_hra as hra
+        chosen = ['GAFE01-r0/item/3294', 'GAFE01-r0/item/32A4']
+        selection = self.select(*chosen)
+        result, _, _ = composer.compose(self.base, self.report, self.catalog, selection)
+        data = by_vrom(result)[hra.NEW_VROM].extract(result)
+        old = by_vrom(self.base)[hra.NEW_VROM].extract(self.base)
+        table = self.report['hra']['metadata_address'] - hra.RAM
+        restored = bytearray(data)
+        for row in self.report['hra']['imports']:
+            at = table + row['runtime_index'] * 4
+            key = 'GAFE01-r0/item/' + row['item_id']
+            self.assertEqual(data[at:at + 4], bytes.fromhex(row['metadata'] if key in chosen else 'fc000000'))
+            restored[at:at + 4] = old[at:at + 4]
+        self.assertEqual(restored, old)
+        self.assertEqual(sum(data[table + i * 4] >> 2 == 56 for i in range(2051)), 1)
+        self.assertEqual(sum(data[table + i * 4] >> 2 == 58 for i in range(2051)), 0)

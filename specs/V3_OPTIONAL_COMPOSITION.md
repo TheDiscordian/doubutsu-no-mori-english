@@ -2,19 +2,20 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-62 integration cartridge.
-The pinned source includes the [aloha scoring correction](V3_ALOHA_SCORING.md).
+Compose experimental selections from the pinned ABI-64 integration cartridge.
+The pinned source includes the complete [garden runtime](V3_GARDEN_ITEMS.md),
+expanded reward counters, and corrected aloha scoring.
 This is an offline development step, not a served web option or a declaration
 that all imported gameplay is complete. Neither V2 patcher changes.
 
-The selectable development catalogue contains twenty villagers and thirteen
-installed logical items: ten furniture items and three shirts. A shirt's
+The selectable development catalogue contains twenty villagers and nineteen
+installed logical items: sixteen furniture items and three shirts. A shirt's
 mannequin is a required representation, not another selectable item. Unconverted
 donor items are rejected. Select-all means these installed development entries,
 not every item on the donor disc.
 
 An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-62 engine and all compiled resources, but enables only the
+retains the shared ABI-64 engine and all compiled resources, but enables only the
 chosen identities and their declared dependencies. IDs, object slots, house
 layers, and allocations never depend on order or subset. Resource compaction is
 not part of this step.
@@ -36,18 +37,18 @@ again from the original selection, not by editing an earlier dependency result.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-62 cartridge and its source report. Validate each
-installed registry binding before generating writes. Change only the profile
+Pin both the complete ABI-64 cartridge and its source report. Validate each
+installed registry binding before generating writes. Resident changes cover the profile
 at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
 metadata's `present` bytes, and the installed furniture/clothing/mannequin
 `enabled` fields. Furniture's existing selector reads the `enabled` field;
 changing the save profile alone would not disable ordinary furniture stock.
 
-Nine static furniture rows live in the existing accessory/audio package at RAM
+Fifteen static furniture rows live in the existing accessory/audio package at RAM
 `80481500`, backed by blob offset `7E500`. Validate the actual package descriptor
 and CRC before resolving that mapping; subtracting the main prefix RAM base
-would target the wrong resource. Only the nine reviewed four-byte enable words
-are writable outside the prefix. The animated speed bag retains its prefix row.
+would target the wrong resource. Only the fifteen reviewed four-byte enable words
+are writable in that package. The animated speed bag retains its prefix row.
 
 Pack selected appended catalogue rows after all unchanged native rows, preserving
 donor order and every item ID. Clear unused appended table slots in their existing
@@ -56,11 +57,18 @@ and the clothing shared iteration/completion count. Reducing the latter without
 packing selected rows would lose a chosen later shirt. The actual allocated
 753-slot page capacity, native category order, pointers, and image size stay.
 
+Exclude unselected furniture and mannequin records from the HRA metadata table,
+using its existing inert `FC000000` entry. Native grouping scans this whole table
+independently of the placed-item selector: leaving disabled records would require
+unavailable furniture for theme completion and missing-item recommendations.
+Retain all original records, all selected properties, series definitions, names,
+code, and relocation. Empty series have zero members after native initialization.
+
 Every write includes its expected input and rejects overlap, unknown bytes, or
 out-of-range destinations. Recompute the package CRC first, then the prefix CRC
 which covers that descriptor, and the N64 header checksum. Apart from the two
 bounded furniture-count immediates, executable instructions remain unchanged.
-Source assets, physical and virtual file ranges, house contents, and save-codec
+Source artwork, physical and virtual file ranges, house contents, and save-codec
 code remain unchanged.
 All-selected composition must reproduce the pinned full integration ROM.
 

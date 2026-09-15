@@ -101,8 +101,8 @@ def metadata(rel, symbols):
         value = int(hra_hex, 16)
         birth, surface = value >> 8 & 63, value >> 6 & 3
         ordinary = list_name in ('ftr_listA', 'ftr_listB', 'ftr_listC')
-        # Source birth 19 has no native point-table row yet. Do not manufacture
-        # an ordinary-stock category or encode an unchecked out-of-bounds read.
+        # Source-only output cannot establish the installed counter layout.
+        # Require the separate ABI-63 adapter before encoding category 19.
         native_hra = (value & 0xFFFFC000 | birth << 9 | surface << 7) if birth <= 17 else None
         record = struct.pack('>HHHBB', index, item, price, 0, 1) + name + bytes(8)
         records.extend(record)
