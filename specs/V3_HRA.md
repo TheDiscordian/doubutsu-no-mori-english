@@ -65,6 +65,11 @@ is not a new collectible item.
 
 ## Native readers and bookkeeping
 
+The [acquisition-category adapter](V3_HRA_BIRTH.md) expands complete base-point
+counter/product arrays to 23 entries while preserving native weights. Donor
+post-office/HRA/mayor/Gulliver categories require that adapter before enabling
+their metadata; the original arrays cannot safely accept category 19.
+
 Forty checked detours cover twenty furniture range decisions and twenty index
 conversions. Lower/upper register aliases, branch-likely annulment, original
 branch-delay entry points, full-width integer registers, HI/LO, and floating

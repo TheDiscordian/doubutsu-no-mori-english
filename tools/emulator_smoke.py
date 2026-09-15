@@ -1469,6 +1469,12 @@ def main():
                     raise ValueError('Aloha scoring probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_hra_birth'):
+                from v3_hra_birth_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Acquisition-score probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture_icon'):
                 from v3_furniture_icon_smoke import exercise
                 if not (out/'test.bs1').is_file():

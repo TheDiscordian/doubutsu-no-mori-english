@@ -64,15 +64,16 @@ is not automatically a native wall/floor match.
 | birdhouse | `E0058100` | `E0058200` | `0000` |
 | bird feeder | `E0058200` | `E0058400` | `0000` |
 | Mr. Flamingo | `E0050100` | `E0050200` | `0001` |
-| mailbox | `D405D300` | pending category support | `0500` |
+| mailbox | `D405D300` | requires ABI-63 installation | `0500` |
 | garden gnome | `E0054780` | `E0054F00` | `0001` |
 | Mrs. Flamingo | `E0050000` | `E0050000` | `0001` |
 
 Keep face/lucky/surface bits and feng shui facing penalties, not just colours.
 The gnome is lucky and placeable on a surface. The mailbox uses post-office birth
-category 19, absent from the native point-table/counter contract. Its prepared
-metadata deliberately leaves native HRA null until the complete evaluator is
-adapted; writing index 19 into the existing path is not safe support.
+category 19. The [reward-category adapter](V3_HRA_BIRTH.md) supplies its actual
+points and expanded counters in ABI 63. The source-only metadata retains null
+native HRA until an installer verifies that prerequisite; older evaluators cannot
+safely accept category 19.
 
 ## Integration work
 

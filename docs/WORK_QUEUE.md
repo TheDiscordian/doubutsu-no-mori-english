@@ -295,8 +295,10 @@ with later e/e+ donor support investigated separately.
   Six new focused checks and ten shared parser/profile checks pass. Next install
   fixed runtime profiles/item readers, backyard series 56, ordinary/lottery/
   post-office acquisition, complete catalogue/scoring, saved dependencies, and
-  optional composition. Mailbox birth category 19 is not safe in the current
-  native point-table/counter path and stays explicitly uninstalled.
+  optional composition. The [reward-category adapter](checkpoints/V3_HRA_BIRTH.md)
+  supplies safe counters and weights through category 22. Three focused checks
+  and the initial 82-record native run pass. Require this ABI-63 prerequisite
+  before enabling the mailbox; its reward acquisition remains uninstalled.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
   texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
   tests pass with unchanged pilot outputs. Connect stable model/texture banks,

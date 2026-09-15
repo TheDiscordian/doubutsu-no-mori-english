@@ -2,21 +2,30 @@
 
 ## Active development
 
+The [reward-category scoring adapter](checkpoints/V3_HRA_BIRTH.md) extends the
+actual HRA counter arrays to 23 categories, preventing post-office category 19
+from overwriting its output pointer. Three focused checks and the initial
+82-record native run pass, including complete counters/products, all four new
+categories, mixed/null layers, and guards. All native point values stay intact.
+Current full integration: `build/v3-hra-birth-01/animal-forest-v3-asset-loader.z64`,
+ABI 63, SHA-256 `ad8c7be6e3ec0918b0bcbc3df5028dbccbca4c2d29370f6ef9d726f3d41eedef`.
+It adds 96 on-demand bytes, with no permanent RAM or saved-format/profile change.
+Reward acquisition and the garden items' runtime installation remain work.
+
 The [garden batch](checkpoints/V3_GARDEN_ITEMS.md) converts six more complete
 decorations: birdhouse, bird feeder, both flamingos, mailbox, and garden gnome.
 Six new focused checks and ten shared parser/profile checks pass. Models retain
 all 406 vertices, 251 triangles, and 24,448 texels, including tall clamped textures
 and explicit mirrored materials. Acquisition metadata preserves lottery and
-post-office rewards. Runtime installation, backyard scoring, and post-office
-category support remain work; this source-only batch does not change the ROM.
+post-office rewards. Runtime installation and backyard scoring remain work;
+the separate reward-category adapter supplies its scoring prerequisite.
 
 The [aloha scoring correction](checkpoints/V3_ALOHA_SCORING.md) supplies both
 imported displays' actual clothing properties instead of inactive HRA records.
 Three focused checks and a corrected 52-record native run pass, including full
 grouping, native clothing points, disabled exclusion, and array-end guards.
 It changes two data words with no RAM, saved-profile/format, or ABI change.
-Current full integration: `build/v3-aloha-scoring-01/animal-forest-v3-asset-loader.z64`,
-ABI 62, SHA-256 `e6a890c37e972422fe44cbbfb322dcccd17805186baa96ed7c20a45a2d4022f3`.
+Its corrected metadata remains in the current ABI-63 integration above.
 Neither served web patcher changes.
 
 The [construction catalogue integration](checkpoints/V3_CONSTRUCTION_CATALOGUE.md)
@@ -26,7 +35,7 @@ rows retain their full names and independent pages. The initial native catalogue
 run passes 103 records; the B/C stock and pocket-acquisition run passes 36.
 The shared menu reserves another 6,144 bytes; the cartridge remains 64 MiB with
 an Expansion Pak required. Its code and allocations remain in the current
-aloha-corrected integration above.
+integration above.
 The local optional composer connects the package-resident furniture rows/CRC.
 Ordinary acquisition/placement/persistence remain. Both web patchers remain V2.
 

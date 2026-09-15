@@ -285,8 +285,10 @@ persistence and browser implementation remain required; neither patcher changes.
 
 The [garden batch](V3_GARDEN_ITEMS.md) converts six decorative models and their
 actual acquisition/scoring metadata. Complete runtime installation remains work;
-special lottery/post-office rewards must not become ordinary shop goods, and
-the new backyard series and post-office scoring category need explicit support.
+special lottery/post-office rewards must not become ordinary shop goods.
+The [reward-category adapter](V3_HRA_BIRTH.md) supplies expanded native counters
+and donor reward weights, with focused and native verification. Backyard-series
+installation and complete reward acquisition remain work.
 
 ### Limits and saves
 
