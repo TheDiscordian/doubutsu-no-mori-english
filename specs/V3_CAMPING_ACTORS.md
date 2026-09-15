@@ -137,13 +137,24 @@ different waves/tuning. Import the actual programs and dependencies, not matchin
 numeric IDs. The donor samples contain 18,514 and 2,826 ADPCM bytes in wave 5 at
 `23820` and `284D0`, with their complete loops, books, and envelope data.
 
-Current native font 140 (selector 1) contains 72 instruments, including speed
-bag at 71, and has room for these dependencies. Font 139 already has 126;
-appending there would reach reserved instrument values. A proposed installation
-uses new font-140 slots and an explicit selector in the imported programs,
-expands/rebinds the level dispatch, and preserves every original sound and the
-current speed-bag additions. This remains implementation work, not installed
-audio. Retain ordinary per-actor positional refresh/stop behaviour through
+The [complete audio converter](../docs/checkpoints/V3_FIRE_AUDIO.md) uses the two
+spare native font-140 table words for instruments 72/73, without shifting original
+resources. Font 139 already has 126; appending there would reach reserved values.
+Each new program explicitly selects font selector 1 and large-note mode. All five
+program pointers relocate, both layer instruments map, and every other source
+byte remains, including the aligned envelope and original padding. The C2 table
+operand at sequence offset `179` points to 128 checked level entries: original
+IDs retain their targets, `5C/5D` select the imports, and unassigned IDs stop.
+
+The complete sustained layer uses a 32,000-tick continuous note; each crackling
+layer has ten notes, a one-time 100-tick rest, and a repeated 300-tick rest.
+Bonfire retains its five-semitone layer transposition. Its melody, timing,
+velocities, decay, loop state, predictors, and sample tuning are not approximated.
+The font grows by 352 bytes, the sequence by 432, and streamed wave data by
+21,360 including alignment. Conservative permanent usage grows by 800 to 109,312,
+exceeding the current 108,544-byte pool by 768. Installation must increase the
+actual allocation, not only the resource-size headers. Conversion is complete;
+these resources are not yet installed audio. Retain ordinary per-actor positional refresh/stop behaviour through
 `sAdo_OngenPos`; repeated one-shot playback is not equivalent.
 
 ## Tent light contract

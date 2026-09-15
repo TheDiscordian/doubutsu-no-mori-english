@@ -2,6 +2,13 @@
 
 ## Active development
 
+The [fire-audio conversion](checkpoints/V3_FIRE_AUDIO.md) supplies both complete
+two-layer fire sounds and their missing samples, retaining all 72 current
+sound-font instruments. Seven focused checks pass. The new resources need
+800 additional permanent-audio bytes; the current pool has 32 spare. Safe
+allocation and cartridge installation are next, alongside the fire callbacks.
+These local resources are not registered sounds or selectable fire items.
+
 The [tent-model loader repair](checkpoints/V3_TENT_MODEL_LOADER.md) enables actual
 ROM DMA for the complete callback-owned tent. Fifteen focused tests pass; the
 first native run passes 36 records, eight calls, and 24 assertions, including

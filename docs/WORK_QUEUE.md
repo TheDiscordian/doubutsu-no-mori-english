@@ -283,6 +283,11 @@ with later e/e+ donor support investigated separately.
   tent identity/vtable through the complete-object loader. Fifteen focused tests
   and the initial native 36-record run pass actual model DMA, rotated bank reuse,
   rejection, and restoration. Content, ABI, saves, and allocations stay unchanged.
+  The [fire-audio converter](checkpoints/V3_FIRE_AUDIO.md) retains both complete
+  two-layer programs, appends their actual samples/instruments, and preserves
+  current native/speed-bag resources. Seven checks pass. Install the sounds with
+  the measured 800-byte permanent-audio increase; the current pool has only
+  32 bytes spare. Fire sound data is not yet registered in the cartridge.
   Continue fire rig/billboard/scroll/sound callbacks,
   and summer-camper acquisition, then other donor content and
   ordinary gameplay/persistence. The eight installed Tent rewards do not enter normal
