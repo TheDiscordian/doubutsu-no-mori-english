@@ -64,7 +64,7 @@ def install_preview_records(blob, prior, source, records):
                 record.get('donor_preview_scalar_hex',scalar.hex())!=scalar.hex()):
             raise ValueError('Catalogue preview record differs from actual donor')
         pos=ITEMS+slot(item)*32
-        if blob[pos+26]!=previous_modes.get(record['item_id'],0) or any(blob[pos+27:pos+32]):
+        if blob[pos+26]!=previous_modes.get(record['item_id'],0) or any(blob[pos+28:pos+32]):
             raise ValueError('Preview selector overwrites reserved item metadata')
         blob[pos+26]=mode+1
         record.update(donor_preview_mode=mode,donor_preview_scalar_hex=scalar.hex(),

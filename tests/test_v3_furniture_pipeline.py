@@ -26,6 +26,15 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_shared_reward_categories_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-furniture-rewards-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_furniture_rewards_test.c'),'-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('Reward categories, sparse profiles, exclusions, bounds, and seven-argument fallbacks pass',result.stdout)
+
     def test_four_cell_item_readers_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-four-cell-items-') as temporary:
             binary=Path(temporary)/'test'
@@ -467,6 +476,7 @@ class CurrentCartridgeTests(unittest.TestCase):
             self.assertEqual(record[8:24],row['name'].encode().ljust(16,b' '))
             self.assertEqual(record[24],install.order_mask(install.catalogue_record(row)))
             self.assertEqual(record[25],row['action_sound'])
+            self.assertEqual(record[27],row.get('reward_route',0))
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
         self.assertEqual(self.report['furniture']['expanded_tables'],self.prior['furniture']['expanded_tables'])
         self.assertEqual(self.report['save_runtime']['code'],self.prior['save_runtime']['code'])
@@ -548,7 +558,11 @@ class CurrentCartridgeTests(unittest.TestCase):
         new=lists(self.image,self.files,self.report);old=lists(self.base,self.old,self.prior)
         ids={int(r['item_id'],16) for r in self.rows}
         self.assertEqual([[i for i in group if i not in ids] for group in new],old)
-        for row in self.rows:self.assertIn(int(row['item_id'],16),new[row['stock_group']])
+        for row in self.rows:
+            item=int(row['item_id'],16)
+            if row.get('reward_route'):
+                self.assertFalse(any(item in group for group in new))
+            else:self.assertIn(item,new[row['stock_group']])
         cat=self.report['catalogue']
         self.assertEqual(cat['total_rows'],self.prior['catalogue']['total_rows']+len(self.rows))
         self.assertLessEqual(cat['conservative_pool_required'],cat['pool_reserved'])
@@ -564,6 +578,39 @@ class CurrentCartridgeTests(unittest.TestCase):
                 at=table+row['runtime_index']*width
                 expected[at:at+width]=bytes.fromhex(row['native_hra_hex'] if width==4 else row['feng_hex'])
             self.assertEqual(self.files[tool.NEW_VROM].extract(self.image),expected)
+
+    def test_reward_binding_preserves_complete_owner_and_reuses_reservation(self):
+        import v3_furniture_rewards as rewards
+        current=self.report.get('furniture_rewards')
+        if not current:self.skipTest('Current batch has no optional NPC rewards')
+        begin=install.PACKAGE+rewards.FIRST-install.PACKAGE_RAM
+        end=install.PACKAGE+rewards.END-install.PACKAGE_RAM
+        self.assertEqual(self.blob[begin:begin+16],rewards.GUARD)
+        self.assertEqual(self.blob[end-16:end],rewards.GUARD)
+        self.assertEqual(sha256(self.blob[begin:end]),current['reservation_sha256'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes();native=by_vrom(original)
+        for route in current['routes']:
+            expected=bytearray(native[route['vrom']].extract(original))
+            for patch in route['patches']:
+                pos=patch['address']-route['ram']
+                self.assertEqual(struct.unpack_from('>I',expected,pos)[0],patch['before'])
+                struct.pack_into('>I',expected,pos,patch['after'])
+            self.assertEqual(self.files[route['vrom']].extract(self.image),expected)
+            self.assertFalse(self.files[route['vrom']].pend)
+            self.assertEqual(self.files[route['reloc']].extract(self.image),native[route['reloc']].extract(original))
+        for row in current['imports']:
+            at=install.ITEMS+install.slot(int(row['item_id'],16))*32
+            self.assertEqual(self.blob[at+24],0)
+            self.assertEqual(self.blob[at+27],row['route'])
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        blob=bytearray(self.blob)
+        with tempfile.TemporaryDirectory(prefix='reward-reuse-',dir=ROOT/'build') as temporary:
+            changes,again=rewards.install(original,self.image,self.report,blob,
+                self.report['furniture']['imports']+[self.report['speed_bag']],source,Path(temporary))
+        self.assertEqual(blob,self.blob)
+        self.assertEqual(again['reservation_sha256'],current['reservation_sha256'])
+        for vrom,data in changes.items():self.assertEqual(data,self.files[vrom].extract(self.image))
 
     def test_current_rom_checksums_directory_and_prior_runtime_preserved(self):
         self.assertEqual(set(self.files),set(self.old));self.assertEqual(self.image[DMA_END-16:DMA_END],bytes(16))
@@ -655,7 +702,7 @@ class CurrentCartridgeTests(unittest.TestCase):
         for r in row['imports']:
             pos=install.ITEMS+install.slot(int(r['item_id'],16))*32
             self.assertEqual(self.blob[pos+26],r['mode']+1)
-            self.assertEqual(self.blob[pos+27:pos+32],bytes(5))
+            self.assertEqual(self.blob[pos+28:pos+32],bytes(4))
             self.assertEqual(r['scalar_hex'],draw[r['mode']*8:r['mode']*8+8].hex())
         blob=bytearray(self.blob)
         again=catalogue.install_preview_records(blob,self.report,source,copy.deepcopy(self.report['catalogue']['imports']))

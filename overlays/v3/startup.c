@@ -89,6 +89,9 @@ int af_v3_startup(void) {
             || accessory_header[(AF_V3_ACCESSORY_BYTES-16)/4] != AF_V3_ACCESSORY_GUARD) return 0;
     writeback(accessory_memory, AF_V3_ACCESSORY_BYTES);
     invalidate(accessory_memory+0x100, 0xF00);
+#ifdef AF_V3_FURNITURE_REWARDS
+    invalidate(accessory_memory+0x1BC0, 0x420);
+#endif
 #ifdef AF_V3_WESTERN_LARGE
     /* The relocated checked package also owns the new shared item readers. */
     invalidate(accessory_memory+0x10000, 0x1000);

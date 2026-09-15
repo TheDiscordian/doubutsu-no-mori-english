@@ -166,7 +166,7 @@ def install(original, base, prior, blob, code, imports, source, output):
     for row in imports:
         index,item=row['runtime_index'],int(row['item_id'],16); at=ITEMS+slot(item)*32
         category=categories[index]
-        if (category not in (0,1,2) or blob[at+26]>PREVIEW_COUNT or any(blob[at+27:at+32])
+        if (category not in (0,1,2) or blob[at+26]>PREVIEW_COUNT or any(blob[at+28:at+32])
                 or blob[at+25] not in (0,category)
                 or struct.unpack_from('>HH',blob,at)!=(index,item)):
             raise ValueError('Unsupported furniture action sound or changed metadata slot')

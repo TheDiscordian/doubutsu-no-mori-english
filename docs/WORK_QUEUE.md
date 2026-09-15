@@ -3,29 +3,28 @@
 ## Active: V3 optional GameCube imports
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Thirty-one additional complete assets and their shared runtime
-records are installed. ABI 91 adds G logo and bird bath through shared CI4/I4
-materials, including independent texture scales/shifts and reflection/water state.
-There is no new item-specific converter, installer, runtime code, or allocation.
-The installer reuses its regenerated three-resource tail after complete mapping,
-content, padding, and retained-profile checks. The 6,880 bytes of new art increase
-storage by exactly 6,880 bytes, avoiding another 64,496-byte resource copy.
-Forty-seven focused checks pass across the current converter implementation,
-including prepared assets, actual donor format mapping, and placeholder discovery.
-The first current native run passes 88 records with 68 assertions. The full
-source/verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 93
-installed development options; neither patcher changes.
+new furniture. Thirty-six additional complete assets and their shared runtime
+records are installed. ABI 92 adds four Gulliver souvenirs and the festive flag
+through shared acquisition categories. The 700-byte optional reward reader uses
+selected canonical records; Gulliver's native handover remains, with original
+fallback when no eligible imports are selected. Train gifts use the existing list
+4. Souvenirs stay non-orderable. No per-item converter, installer, or native
+scenario is added. The complete batch retains 20,128 artwork bytes, 487 vertices,
+and 401 triangles. Forty-eight focused checks and the corrected 131-record,
+104-assertion native run pass; the optional prepared-only artifact check is
+skipped. The complete source/native verification record is in
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 98
+installed development options; neither patcher changes. Saved format 2 and
+permanent RAM reservations remain unchanged.
 
 Extend shared categories instead of writing another per-item/family installer.
-Converter revision 3 prepares all 62 eligible uninstalled, non-placeholder models
-in one command: `build/v3-furniture-all-static-prepared-02/`. Complete assets total
-211,136 bytes, 5,065 vertices, and 3,720 triangles. RGBA16 conversion retains
+The bulk-prepared collection at `build/v3-furniture-all-static-prepared-02/`
+contains 62 complete models; 57 remain uninstalled. RGBA16 conversion retains
 source-verified RGB5A3 colour and binary alpha, alongside CI4/I4 materials.
 Diver Dan's complete 5,120-byte model still requires island acquisition; the
 miniature car's actual acquisition remains unresolved. No ordinary stock is
-invented. The collection retains six harvest, five island, four Gulliver, three
-winter-camper, twelve Tortimer-gift, and one train-route dependencies; twenty-nine
+invented. Remaining models retain six harvest, five island, three
+winter-camper, and twelve Tortimer-gift dependencies; twenty-nine
 entries have no identified acquisition list, and two need native identity review.
 Some entries, including sixteen diary models, also need separate gameplay.
 The sixteen actual shared-dummy-profile entries remain excluded from preparation;
@@ -51,10 +50,10 @@ Sixteen diary display models still need diary identity/gameplay/acquisition.
 Complete model conversion without required behaviour is not a completed import.
 Full catalogue construction, ordinary GPU appearance, interactions, and
 save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
-using the two ABI-91 additions must not be loaded in older builds or V2.
+using the ABI-92 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-acquisition-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

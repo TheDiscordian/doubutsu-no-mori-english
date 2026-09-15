@@ -1,5 +1,89 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared acquisition categories
+
+Converter/installer revision 4 discovers, converts, and installs five further
+objects without an item list: Arc De Triomphe `3014`, mermaid statue `301C`,
+plate armor `3034`, Chinese lion `3050`, and festive flag `327C`. Complete artwork
+totals 20,128 bytes, 487 vertices, and 401 triangles. The four souvenirs use the
+actual `ftr_listJonason`; the flag uses `ftr_listTrain`. Every name has official
+source attribution in `translations/provenance.json`. Automatic additions total
+36, with 98 installed offline development options: 75 furniture, three shirts,
+and twenty villagers.
+
+The complete ABI-92 cartridge is
+`build/v3-furniture-acquisition-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+by `config/v3-import-build.json`. The artwork is in
+`build/v3-furniture-acquisition-assets-01/`. The shared catalogue has 511 furniture
+and 248 clothing rows, using a conservative 280,320 of 280,704 menu-pool bytes.
+The blob is 3,379,648 bytes, leaving 749,120 bytes before English choices.
+
+The train gift uses native list 4 and its catalogue-orderability mask. Gulliver
+already exists in the N64 game: actor `A8`, owner `00958220`, RAM `80A97FB0`.
+The original gift function at `80A983B4` selects native rare furniture; the donor
+selects souvenir list type 12. Only its list argument at `80A983BC` and selection
+call at `80A983D8` change. Native conversations, inventory checks, demo requests,
+pocket insertion, and event completion remain. The complete owner and unchanged
+304-byte relocation resource are checked. The 3,712-byte compressed owner moves
+once to uncompressed blob storage before the three regenerable terminal owners;
+future batches can update it in place without accumulating copies.
+
+One shared 700-byte reader at `80474BC0` uses canonical item metadata byte 27 and
+enabled profiles, not per-item switches. Encoded route `0C02` supplies donor
+category 12 with native fallback 2. Selected souvenirs retain the donor's random
+rare-item rejection; empty/all-excluded selections use the original native route.
+Souvenirs stay non-orderable and absent from ordinary shop lists. The code and
+guards fit the checked gap between preview data and accessory artwork. Startup
+is 924 bytes and explicitly invalidates the helper's code range. No permanent
+RAM reservation, item-record width, saved format, or original identity changes.
+Saved format 2 remains; saves containing these new IDs must not load older builds
+or V2. Ordinary cross-version save/restart compatibility is not newly claimed.
+
+- ROM SHA-256: `ffe996df066c4bfb85f8a438ffef852691e1e2ea4a58bda81d3816c2f3b92252`.
+- UPS SHA-256: `4bf6a6e7d039dc431f7e81b21198ad4f75cce98edf7c67f5e8ba0da7c797bb5d`.
+- Build receipt SHA-256: `5c99e5d37918f14f0af315eeaf77e6899300acf1acd922e9de2b0a023521db3d`.
+- Art receipt SHA-256: `d02e0c22a1badb5dd11afc4a76ad7613add19004499c4d713099a9b5557c6a77`.
+- Blob SHA-256: `066fefd4aba0bf5026b1866fb70b6c2a1dfab18d5954b7feb19b562513042679`.
+
+The combined focused suite runs 49 tests: 48 pass and the optional prepared-only
+artifact test is skipped. Complete conversion/material checks cover the new
+installed batch. Host sanitizers cover multiple reward categories, sparse and
+disabled records, canonical identity validation, random endpoints/rejection,
+rare-only fallback, and all seven native arguments. Cartridge checks verify the
+complete owner with exactly two instruction changes, retained relocations,
+non-orderability, repeated helper installation, safe terminal reuse, source text
+credits, scoring, subsets, select-all, and exact import-free V2 composition.
+
+The first native run passes 87 assertions in 104 records, then the harness rejects
+a direct upper-memory helper call before executing it. This is the debugger's
+explicit below-4-MiB proof restriction, not an observed game failure. Its evidence
+is retained at `build/v3-furniture-acquisition-native-01/results.json`, SHA-256
+`08637abdc036b6dc2ac34dd0f56be9bf40edd445c564232635eb4cec67c582d4`.
+The test reuses its existing checked low-memory jump bridge; no cartridge change
+or debugger-permission expansion is needed. The one corrected retry passes all
+131 records with 104 assertions at
+`build/v3-furniture-acquisition-native-02/results.json`, SHA-256
+`81bd7f935c9c901e334b3b54ac5cb5b85727df1d7dcc611566f63e6065838dc8`.
+Representatives are selected by category (`3034`, `301C`, `327C`), not separate
+scenarios. Actual owner loading/relocation, installed call instructions, complete
+model DMA, native readers/footprints, preview, stock/catalogue rules, acquisition,
+ownership, two isolated sparse souvenir selections, empty-selection native reward
+fallback, restored state, and all final guards pass.
+
+These checks do not establish ordinary NPC conversations/gift animation, train
+gift delivery, GPU appearance, full catalogue construction, save/restart, or
+hardware playtesting. Both served patchers remain V2. Source may be pushed;
+switching either patcher still requires the user's testing and explicit approval.
+
+The post-scan at `build/v3-furniture-acquisition-post-scan-01/inventory.json`
+contains 63 supported entries, all installed, and 179 review entries. Fifty-seven
+uninstalled real models pass artwork preparation: 29 unidentified acquisition
+routes, 12 Tortimer gifts, six harvest, five island, three winter-camper, and two
+identity reviews. Diary gameplay remains an additional dependency for sixteen.
+Continue shared acquisition and animated callback categories; do not restart
+per-item conversion, installers, or tests. Prepared assets remain distinct from
+completed playable imports.
+
 ## Direct-colour category and bulk prepared assets
 
 Converter/installer revision 3 adds shared RGBA16 materials and prepares every

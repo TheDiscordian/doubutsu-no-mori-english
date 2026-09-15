@@ -34,7 +34,7 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False, western_l
         if any((garden, western, western_large, school_desks)):
             raise ValueError('Choose record-driven or legacy shop rules, not both')
         names = {'ftr_listA':(0,0xCA), 'ftr_listB':(1,0x196), 'ftr_listC':(2,0x262),
-                 'ftr_listEvent':(3,0x2E4), 'ftr_listLottery':(5,0x334)}
+                 'ftr_listEvent':(3,0x2E4), 'ftr_listTrain':(4,0x2F4), 'ftr_listLottery':(5,0x334)}
         for row in reviewed_rows:
             item, name = int(row['item_id'],16), row['donor_list']
             if item in garden_rules or name not in names:

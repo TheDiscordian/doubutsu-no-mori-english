@@ -20,19 +20,20 @@ from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
 import v3_furniture_behaviours as behaviours
 import v3_furniture_placement as placement
+import v3_furniture_rewards as rewards
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 3
+VERSION = 4
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
-    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES + placement.SOURCES
+    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -73,7 +74,7 @@ def catalogue_record(row):
 def order_mask(row):
     if not row.get('catalogue_orderable', True): return 0
     group = row.get('donor_acquisition_list') or row['ordinary_shop_list']
-    masks = {'ftr_listA':7, 'ftr_listB':7, 'ftr_listC':7, 'ftr_listEvent':8, 'ftr_listLottery':32}
+    masks = {'ftr_listA':7, 'ftr_listB':7, 'ftr_listC':7, 'ftr_listEvent':8, 'ftr_listTrain':16, 'ftr_listLottery':32}
     if group not in masks: raise ValueError('Unsupported orderable acquisition category')
     return masks[group]
 
@@ -258,7 +259,7 @@ def build(output, art_path, lock=LOCK):
     for row in cat_rows:
         at = ITEMS+slot(int(row['item_id'],16))*32
         old = blob[at+24]
-        if old not in (0,order_mask(row)) or any(blob[at+27:at+32]):
+        if old not in (0,order_mask(row)) or any(blob[at+28:at+32]):
             raise ValueError('Catalogue mask overwrites reserved metadata')
         blob[at+24] = order_mask(row)
     preview_report=catalogue.install_preview_records(blob,prior,source,cat_rows)
@@ -269,7 +270,7 @@ def build(output, art_path, lock=LOCK):
         source.symbols.encode(),reviewed_rows=cat_rows)
     changes.update(cat_changes)
     stock_rows = prior['shops']['imports']+[dict(item_id=r['item_id'],group=r['stock_group'],
-        donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed]
+        donor_list=r['donor_list'],donor_list_sha256=r['donor_list_sha256']) for r in installed if not r['reward_route']]
     stock_ids = {r['item_id'] for r in stock_rows}
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)
@@ -282,8 +283,21 @@ def build(output, art_path, lock=LOCK):
     behaviour_report=behaviours.install(original,base,prior,blob,code,imports,source,output)
     placement_changes,placement_report=placement.install(original,base,prior,blob,imports,source)
     changes.update(placement_changes)
+    reward_changes,reward_report=rewards.install(original,base,prior,blob,imports,source,output)
+    changes.update(reward_changes)
     changes[shops.VROM],changes[CODE_VROM] = goods,code
     stock_report = {**stock,'imports':stock_rows,'bytes':len(goods),'table_offset':table_at,'output_sha256':sha256(goods)}
+    # Compressed NPC owners need one new uncompressed mapping, before the
+    # three regenerable terminal resources. Future batches update that owner
+    # in place. Its unchanged relocation resource remains at the original VROM.
+    owner_moves=[]
+    for vrom in sorted(reward_changes):
+        entry=files[vrom];data=changes[vrom]
+        if len(data)!=entry.size: raise ValueError('Reward owner allocation changes size')
+        if entry.pend:
+            blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(changes.pop(vrom))
+            owner_moves.append(dict(vrom=vrom,blob_offset=at,bytes=len(data),
+                physical=files[BLOB].pstart+at,sha256=sha256(data)))
     moves = []
     for vrom in (catalogue.VROM,catalogue.RELOC,shops.VROM):
         blob.extend(bytes(-len(blob)%16)); at=len(blob); data=changes.pop(vrom); blob.extend(data)
@@ -301,6 +315,8 @@ def build(output, art_path, lock=LOCK):
     module=bytearray(files[MODULE].extract(base))
     defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
                   for f in prior['startup']['flags'] if f.startswith('-D'))
+    if reward_report and 'AF_V3_FURNITURE_REWARDS=1' not in defines:
+        defines+=('AF_V3_FURNITURE_REWARDS=1',)
     startup,startup_report=compile_part('startup',output/'startup',defines=defines)
     old=prior['startup']
     if (sha256(module[STARTUP:STARTUP+old['bytes']]) != old['sha256']
@@ -317,7 +333,7 @@ def build(output, art_path, lock=LOCK):
     changes.update({BLOB:blob,MODULE:module}); result=bytearray(base)
     for vrom,data in changes.items(): result[files[vrom].pstart:files[vrom].pstart+len(data)]=data
     struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
-    for row in moves:
+    for row in owner_moves+moves:
         struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
             row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
     fix_checksum(result); result=bytes(result)
@@ -332,6 +348,7 @@ def build(output, art_path, lock=LOCK):
         catalogue_preview_records=preview_report,
         furniture_placement=placement_report,**score_reports,
         native_test='pending representative automatic-import execution')
+    if reward_report: report['furniture_rewards']=reward_report
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))
     report['furniture_items']['imports'].extend(installed)
     report['furniture_items']['active_metadata_rows']=len(imports)
@@ -347,7 +364,7 @@ def build(output, art_path, lock=LOCK):
             row['layer_type']=source.raw('aMR_layer_set_info')[row['runtime_index']]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),
-        resource_moves=moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,
+        resource_moves=moves,owner_moves=owner_moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,
         saved_profile_changed=True,older_builds_accept_new_saves=False,web_patcher_enabled=False,
         catalogue_masks_sha256=sha256(bytes(blob[ITEMS+i*32+24] for i in range(1024))),
         provenance_catalogue_complete=not bool(text_patch))

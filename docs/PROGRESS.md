@@ -2,44 +2,48 @@
 
 ## Active development
 
-The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) installs
-thirty-one additional items through source-discovered records and shared conversion,
-stock, catalogue, scoring, and profile installation. No per-item installer or
-graphics description is needed. The current ABI-91 cartridge adds G logo and
-bird bath through shared CI4/I4 material conversion, retaining their complete
-6,880 bytes of artwork, stock A, reflection/water state, and all model layers.
-Independent texture scales/shifts and material-specific palette modes come from
-source commands. Existing seating, bed, placement, and catalogue categories remain.
-The installer safely reuses its preceding regenerated catalogue/shop tail after
-validating every resource and retained profile. Cartridge storage grows only by
-the new artwork, avoiding another 64,496 bytes of superseded resource copies.
-No runtime code, permanent allocation, or saved format grows.
+The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplies
+thirty-six additional items through source-discovered records and shared graphics,
+metadata, acquisition, catalogue, scoring, and profile installation. No per-item
+installer, graphics description, or native scenario is needed. Converter/installer
+revision 4 adds train rewards and optional NPC souvenir categories. One unrestricted
+conversion discovers four Gulliver souvenirs and the festive flag, retaining all
+20,128 bytes of artwork, 487 vertices, and 401 triangles.
 
-Converter revision 3 also handles complete GX RGB5A3-to-native-RGBA16 textures,
-rejecting partial alpha that cannot be preserved. One unrestricted preparation
-command produces 62 non-placeholder models: 211,136 bytes, 5,065 vertices,
-and 3,720 triangles. These are prepared assets, not installed imports; actual
-acquisition, identity, and gameplay dependencies remain. Sixteen entries that
-share the donor's dummy profile are excluded automatically, regardless of their
-names. No per-item exclusion list is needed. The collection includes Diver Dan,
-miniature car, the flower models, island furnishings, and harvest furnishings.
+The ABI-92 development cartridge connects souvenirs to Gulliver's existing native
+gift handover. A shared 700-byte reader uses actual selected item/profile records,
+retains rare-item exclusion, and preserves the native reward fallback when no
+eligible souvenirs are selected. Dialogue, handover, and event completion remain
+native. Souvenirs stay non-orderable, not ordinary shop stock. Train gifts use the
+existing list 4 with no new gameplay code. Official names are credited in the
+single text-source catalogue. Existing models and native identities remain intact.
+No permanent RAM reservation or saved format grows. The compressed NPC owner is
+mapped uncompressed once; future batches update it in place while retaining safe
+reuse of the three regenerated terminal resources.
 
-Forty-seven focused checks pass across this implementation batch, including
-compiled material/texture checks, prepared-only assets, actual donor format
-mapping, and placeholder discovery. The first current
-silent native check passes 88 records with 68 assertions: complete model DMA,
-preview framing, stock, acquisition, ownership, restoration, and guards.
-The current cartridge remains ABI 91; the subsequent preparation work does not
-change it or justify another emulator run. The prepared flower-model variants
-retain their shared Tortimer event actor, calendar, conversations, and trophy
-persistence dependency. Prepared-only output is rejected by the installer.
+Forty-eight focused pipeline/composition checks pass; the optional prepared-only
+artifact check is skipped for this installed batch. The corrected native run
+passes 131 records with 104 assertions, including selected-only souvenirs,
+native fallback, train-list membership, acquisition, ownership, and guards.
+The checkpoint records the bounded harness correction and verification limits.
+Full catalogue construction, ordinary appearance/gameplay, and save/restart remain
+unverified. Saved format 2 is unchanged, but saves using new items must not load
+older builds or V2. Neither served patcher changes.
 
-The offline composer has 93 installed development options: 70 furniture,
-three shirts, and twenty villagers. Full catalogue construction, ordinary
-appearance/gameplay, and save/restart remain unverified; both served patchers
-remain V2. Continue shared callback, graphics, and acquisition categories.
-The current lock is `config/v3-import-build.json`; the cartridge is
-`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`.
+The offline composer contains 98 installed development options: 75 furniture,
+three shirts, and twenty villagers. The acquisition build is
+`build/v3-furniture-acquisition-runtime-01/animal-forest-v3-asset-loader.z64`.
+`config/v3-import-build.json` is the checked current complete-build lock.
+
+The shared CI4/I4/RGBA16 and constant indexed-palette converters retain every
+supported material/model layer and reject unsupported effects rather than dropping
+them. Fifty-seven additional non-placeholder models pass artwork preparation but
+retain acquisition, identity, or gameplay dependencies: 29 unidentified routes,
+12 Tortimer gifts, six harvest items, five island items, three winter-camper items,
+and two native-identity reviews. Sixteen diary display models also need diary
+gameplay. Prepared-only output cannot pass installation; donor dummy profiles
+remain explicit missing-artwork records. Continue shared acquisition and animated
+callback categories using the bulk-prepared assets.
 
 The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
 righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,

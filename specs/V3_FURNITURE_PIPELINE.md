@@ -106,8 +106,14 @@ The shared static-material category supports:
   four-cell placement in all rotations. The build verifies the complete installed
   four-cell item reader and actual original/donor footprint tables before
   accepting square records.
-- Ordinary A/B/C, event, and lottery acquisition, existing scoring categories,
+- Ordinary A/B/C, event, train, and lottery acquisition, existing scoring categories,
   and source-indexed catalogue framing. Names and prices come from actual donor tables.
+- Optional NPC souvenir categories use the shared selected-profile reward reader.
+  Gulliver uses his existing native conversation and handover, with selected
+  `ftr_listJonason` imports supplying his donor souvenir route. These items stay
+  non-orderable and never enter ordinary shop lists. Empty selections retain the
+  original native reward route. Other NPC/event categories still require their
+  own verified call contracts, not new per-item implementations.
 - Soft- and hard-chair action sounds, selected from the donor's actual category
   table. Matching complete sound programs, timing, instruments, and samples use
   the existing native audio; no replacement sample or new audio allocation is
@@ -165,7 +171,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 3 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 4 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -178,11 +184,12 @@ output changes; input ROMs, earlier builds, and saves remain untouched.
 
 Stock and catalogue builders accept verified records without family switches.
 Catalogue eligibility uses byte 24 of each existing 32-byte sparse item record:
-`7` for ordinary A/B/C, `8` for event, `32` for lottery, and `0` for non-orderable
+`7` for ordinary A/B/C, `8` for event, `16` for train, `32` for lottery, and `0` for non-orderable
 items. Byte 25 stores the donor action-sound category: `0` for none, `1` for
 soft chairs, and `2` for hard chairs. Byte 26 holds the donor catalogue framing
-index plus one; zero means no furniture-framing override. The other five
-reserved bytes remain zero.
+index plus one; zero means no furniture-framing override. Byte 27 holds an
+optional NPC reward route, using the actual donor list-type number; zero means
+no shared NPC reward. The other four reserved bytes remain zero.
 The builder populates masks for **all** installed furniture, retaining existing
 non-orderable rewards and
 the separate clothing-display route. Native gameplay IDs and saved formats do
@@ -228,6 +235,38 @@ The native catalogue still uses mode zero during construction, then receives
 the actual source floats; donor mode numbers are never mistaken for N64 indices.
 No item-record, saved-format, or permanent allocation grows.
 
+## Shared optional NPC rewards
+
+`tools/v3_furniture_rewards.py` verifies one call contract per acquisition
+category. Complete donor gift/selection implementations and source lists are
+checked. The native actor descriptor, complete owner, unchanged relocation
+resource, and exact argument/call instructions are verified before installation.
+The Gulliver category changes only the list argument and selection call in the
+native gift function at `80A983B4`. Conversation state, inventory capacity checks,
+gift animation requests, actual pocket insertion, and event completion remain
+native. The selector's encoded argument contains the donor route in its high
+byte and the original native fallback list in its low byte.
+
+The shared resident reader at `80474BC0` scans enabled, canonical item/profile
+records. It supports the checked single-furniture-gift call shape and delegates
+other requests to the original seven-argument selector. Random selection retains
+the donor's rare-item rejection; an empty or all-excluded optional set falls back
+instead of looping forever. There is no per-item selection switch or generated
+reward list to rebuild when checkboxes change. Sparse and non-prefix selections
+use the same record flags as the existing offline composer.
+
+The code and guards occupy `80474BB0..80474FEF`, between catalogue framing and
+accessory artwork. Startup explicitly invalidates this new code range after its
+existing checked package transfer. Permanent RAM reservations do not grow.
+An originally compressed NPC owner gets one uncompressed blob mapping before
+the three regenerable terminal resources. Its VROM and relocation identities
+remain unchanged; future batches update this verified owner in place. Separate
+`owner_moves` receipts keep the three-resource tail-reuse contract intact.
+
+The train category appends source-identified items to the already existing
+native list 4; it needs no new runtime adapter. Catalogue orderability follows
+that actual list, while Gulliver souvenirs remain non-orderable.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source
@@ -272,6 +311,15 @@ chairs; unchanged audio/code evidence stays in the checked build contract. This 
 not establish an ordinary player climbing onto or leaving the bed.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.
+
+Reward checks use the same representative batch probe: actual owner loading and
+relocation, installed hook instructions, isolated sparse selections, no-selection
+native fallback, and reservation guards. A checked low-RAM bridge reaches the
+actual upper-memory helper without widening the debugger's call permissions.
+Host sanitizer checks additionally cover multiple route values, malformed or
+disabled records, rare-only fallback, random rejection, and all seven fallback
+arguments. These checks do not claim an ordinary Gulliver conversation or gift
+animation has been played through.
 
 Set `V3_FURNITURE_PREPARED_ART` to a prepared-asset output directory to run the
 same complete texture/vertex/triangle/material checks on that batch. The shared

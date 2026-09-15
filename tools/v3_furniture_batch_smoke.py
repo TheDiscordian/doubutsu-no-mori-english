@@ -232,9 +232,10 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         ownership = bytearray(128)
         for n, row in enumerate(rows):
             item = int(row['item_id'], 16)
-            for group in sorted({0,row['stock_group']}):
-                call(0x800C0490, [item, 0, group, 0], int(group == row['stock_group']))
-            call(available, [item, 0, row['stock_group'], 0], 1, proof)
+            groups={0} if row.get('reward_route') else {0,row['stock_group']}
+            for group in sorted(groups):
+                call(0x800C0490, [item, 0, group, 0], int(not row.get('reward_route') and group == row['stock_group']))
+            call(available, [item, 0, row['stock_group'], 0], int(row['catalogue_orderable']), proof)
             call(available, [item, 1, row['stock_group'], 0], 0, proof)
             call(available, [item, 0, 6, 0], 0, proof)
             if row['stock_group']>=3: call(available,[item,0,0,0],0,proof)
@@ -242,6 +243,43 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             check(row['name'] + ' acquired full pocket identity', 0x80126ED4+n*2, struct.pack('>H', item))
             bit = runtime.slot(item); ownership[bit//8] |= 1 << (bit & 7)
             check(row['name'] + ' saved catalogue ownership', 0x8046C000+208, ownership)
+        if 'furniture_rewards' in report and any(r.get('reward_route') for r in rows):
+            reward=report['furniture_rewards'];entry=reward['entry']
+            first,last=reward['reservation_start'],reward['reservation_end']
+            offset=runtime.PACKAGE+first-runtime.PACKAGE_RAM
+            check('complete shared reward helper and guards',first,blob[offset:offset+last-first])
+            # The debugger's direct-call proof is deliberately limited to
+            # native low RAM. Reuse the checked low-RAM bridge, as model DMA
+            # already does, to execute the actual upper-memory helper.
+            reward_stub=struct.pack('>II',0x08000000|((entry>>2)&0x3FFFFFF),0)
+            debug.write_memory(bridge,reward_stub)
+            call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+            reward_proof=(bridge,reward_stub)
+            for route in reward['routes']:
+                loaded,_=load(route['vrom'],route['reloc'],route['ram'],route['resident'])
+                for patch in route['patches']:
+                    check('native reward call after actual relocation',owner+patch['address']-route['ram'],
+                          struct.pack('>I',patch['after']))
+                members=[r for r in reward['imports'] if r['route']==route['route']]
+                enables=[]
+                for member in members:
+                    address=runtime.ROWS_RAM+runtime.slot(int(member['item_id'],16))*80+4
+                    saved[address]=debug.read_memory(address,4);enables.append(address)
+                    debug.write_memory(address,bytes(4))
+                # One isolated candidate, then a different sparse candidate:
+                # neither can be selected by prefix count or list position.
+                for selected in sorted({0,len(members)-1}):
+                    debug.write_memory(enables[selected],struct.pack('>I',1))
+                    call(bridge,[0,scratch,1,0,0,0,route['encoded']],proof=reward_proof)
+                    check('selected-only native reward',scratch,bytes.fromhex(members[selected]['item_id']))
+                    debug.write_memory(enables[selected],bytes(4))
+                call(bridge,[0,scratch,1,0,0,0,route['encoded']],proof=reward_proof)
+                fallback=struct.unpack('>H',debug.read_memory(scratch,2))[0]
+                if fallback in {int(r['item_id'],16) for r in members}:
+                    raise ValueError('Empty reward profile returned a disabled import')
+                call(0x800C0490,[fallback,0,route['fallback'],0],1)
+                for address in enables:debug.write_memory(address,saved[address])
+            check('reward reservation unchanged',first,blob[offset:offset+last-first])
         check('no faulted CPU thread', 0x8003CE34, bytes(4))
         check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE')*4)
         check('resident package guard', 0x804A2FF0, bytes.fromhex('AFACC0DE')*4)
@@ -257,6 +295,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 full_catalogue_initialization_tested=False,
                 native_footprint_sizes=sorted({r['size_code'] for r in rows}), native_stock_membership=True,
                 native_acquisition_and_ownership=True, ordinary_seating_tested=False,
+                native_optional_rewards_tested='furniture_rewards' in report and any(r.get('reward_route') for r in rows),
+                ordinary_npc_gift_handover_tested=False,
                 native_bed_geometry_tested=bool(tested_beds),native_bed_contact_actions=sorted(tested_beds),
                 ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)

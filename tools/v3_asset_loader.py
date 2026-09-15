@@ -85,6 +85,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'tent_model': ('af_v3_tent_model_ct', 0x80483400),
                        'fire': ('af_v3_campfire_ct', 0x80483800),
                        'furniture_behaviours': ('af_v3_furniture_action_sound', 0x80483D00),
+                       'furniture_rewards': ('af_v3_furniture_reward_goods', 0x80474BC0),
                        'campsite_scene': ('af_v3_campsite_scene_status', 0x804A0100),
                        'campsite_exterior': ('af_v3_campsite_actor_descriptor', 0x804A0360),
                        'campsite_event': ('af_v3_campsite_schedule', 0x804A2100),
