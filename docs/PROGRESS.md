@@ -2,13 +2,21 @@
 
 ## Active development
 
-The [Western batch](checkpoints/V3_WESTERN_ITEMS.md) converts seven complete
-furnishings and their source-verified item/scoring/acquisition metadata. Twelve
-focused checks pass, retaining all 463 vertices, 295 triangles, and 23,808 texels.
-The saddle fence retains both opaque parts; the well retains double-mirrored
-materials. Runtime installation is next: the saddle fence needs 96 more bytes
-than the current model bank, and both event rewards must keep their real route.
-No cartridge, save profile, or served patcher changes in this source batch.
+The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete
+furnishings with English names/prices, catalogue entries, ordinary/event stock,
+scoring, and saved dependencies. Dedicated Expansion Pak banks hold 9,216 bytes
+each without ordinary heap growth. Fifteen focused integration/composer checks
+pass. Native item readers, event acquisition, catalogue rules, and Western
+scoring pass; bank verification is partial after two permitted setup attempts.
+Actual 100-bank allocation and dummy DMA are established. Paired upper-memory
+model DMA and executed teardown remain unverified; no complete bank-lifetime
+pass is claimed. Current full integration:
+`build/v3-western-runtime-02/animal-forest-v3-asset-loader.z64`, ABI 65, SHA-256
+`e9285a7d301b466b32eb4af022b5dc7ffaa555b3f1de93cffdb86bc838daa858`.
+The offline composer has 46 experimental options and exact all/empty outputs.
+The two-event-item subset is `build/v3-optional-western-01/`. Both web patchers
+remain V2. Ordinary gameplay/persistence, remaining donor families, and the
+bank tail continue; this is not a complete-import handoff.
 
 The [garden runtime and composer](checkpoints/V3_GARDEN_RUNTIME.md) install six
 complete models, English names/prices, catalogue entries, scoring, stock, and
@@ -16,11 +24,11 @@ selected save dependencies. Four focused integration checks and the initial
 187-record native run pass. The gnome is acquired through native lottery
 selection; mailbox reward delivery remains unfinished. The 452-entry furniture
 catalogue and complete 248-entry clothing catalogue fit the existing menu RAM.
-Current full integration: `build/v3-garden-runtime-02/animal-forest-v3-asset-loader.z64`,
+The garden artifact is `build/v3-garden-runtime-02/animal-forest-v3-asset-loader.z64`,
 ABI 64, SHA-256 `436c5cec2aeb1d9f34d1fb71217ec62a6ef232d91573e0112d7055c65345f1d0`.
 Nine composer checks pass across 39 experimental options. Unselected HRA records
 are excluded from theme requirements and recommendations; all/empty outputs
-retain the exact full/V2 cartridges. Current local subset: `build/v3-optional-garden-01/`.
+retain the exact full/V2 cartridges. Its subset is `build/v3-optional-garden-01/`.
 Its initial 35-record native scoring check passes, including selected-only theme
 counts/completion, actual reward points, saved-state restoration, and guards.
 Neither served patcher changes. Ordinary gameplay/persistence and remaining donor
@@ -31,7 +39,7 @@ actual HRA counter arrays to 23 categories, preventing post-office category 19
 from overwriting its output pointer. Three focused checks and the initial
 82-record native run pass, including complete counters/products, all four new
 categories, mixed/null layers, and guards. All native point values stay intact.
-This prerequisite remains in the current ABI-64 garden integration. It uses
+This prerequisite remains in the current Western integration. It uses
 96 additional on-demand bytes without additional permanent RAM. Post-office
 reward delivery remains work.
 

@@ -44,11 +44,11 @@ SOURCES = ('tools/v3_garden_runtime.py', 'tools/v3_garden_items.py',
     'overlays/v3/furniture.c', 'overlays/v3/items.c', 'overlays/v3/save_codec.c')
 
 
-def install_readers(blob, prior, output):
+def install_readers(blob, prior, output, *, extra_defines=()):
     expanded = copy.deepcopy(prior['furniture']['expanded_tables'])
     helper, compiled = compile_part('furniture_expanded', output / 'furniture_expanded',
         defines=('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_DISPLAY=1',
-            'AF_V3_SPEED_BAG=1', 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_CONSTRUCTION_ITEMS=1', 'AF_V3_GARDEN_ITEMS=1'),
+            'AF_V3_SPEED_BAG=1', 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_CONSTRUCTION_ITEMS=1', 'AF_V3_GARDEN_ITEMS=1') + extra_defines,
         extra_sources=('overlays/v3/furniture_entry.S',), primary_source='overlays/v3/furniture.c')
     old = expanded['expanded_code']
     if (sha256(blob[0x5800:0x5800 + old['bytes']]) != old['sha256']
@@ -66,7 +66,7 @@ def install_readers(blob, prior, output):
     expanded['expanded_code'] = compiled
     extra, code = compile_part('save_clothing', output / 'save_clothing',
         defines=SAVE_DEFINES + ITEM_DEFINES + ('AF_V3_SPEED_BAG=1',
-            'AF_V3_CONSTRUCTION_ITEMS=1', 'AF_V3_GARDEN_ITEMS=1'),
+            'AF_V3_CONSTRUCTION_ITEMS=1', 'AF_V3_GARDEN_ITEMS=1') + extra_defines,
         primary_source='overlays/v3/save_codec.c', extra_sources=('overlays/v3/items.c',))
     old_code = prior['clothing']['save_extension']['code']
     before = bytearray(blob[0xF400:0xF400 + old_code['bytes']])
@@ -100,7 +100,10 @@ def install_readers(blob, prior, output):
     return expanded, code, sha256(extra)
 
 
-def score_tables(base, prior, item_rows):
+def score_tables(base, prior, item_rows, *, theme=56):
+    if theme not in (55, 56):
+        raise ValueError('Unreviewed new furniture theme')
+    name, members, donor_surface = ('western', 7, 18) if theme == 55 else ('backyard', 5, 26)
     files = by_vrom(base)
     changes, reports = {}, {}
     for key, tool, width in (('hra', hra, 4), ('feng_shui', feng, 2)):
@@ -134,23 +137,23 @@ def score_tables(base, prior, item_rows):
             else:
                 payload = bytes.fromhex(row['feng_hex'])
                 record = {'item_id': item, 'runtime_index': index, 'metadata': payload.hex(),
-                    'colour': 'gold' if row['feng_colour'] == 5 else 'none',
+                    'colour': {0: 'none', 4: 'green', 5: 'gold'}[row['feng_colour']],
                     'facing_penalty': row['feng_facing_penalty']}
             data[at:at + width] = payload
             report['imports'].append(record)
         if key == 'hra':
             series = report['series']
             info, names = series['info_address'] - hra.RAM, series['names_address'] - hra.RAM
-            if data[info + 56 * 3:info + 57 * 3] != bytes.fromhex('FF00FF') or data[names + 560:names + 570] != b' ' * 10:
-                raise ValueError('Backyard series replaces an existing definition')
-            data[info + 56 * 3:info + 57 * 3] = bytes.fromhex('0200FF')
-            data[names + 560:names + 570] = b'backyard  '
-            if sum(data[table + i * 4] >> 2 == 56 for i in range(report['metadata_rows'])) != 5:
-                raise ValueError('Backyard series has an unexpected member count')
+            if data[info + theme * 3:info + (theme + 1) * 3] != bytes.fromhex('FF00FF') or data[names + theme * 10:names + (theme + 1) * 10] != b' ' * 10:
+                raise ValueError('New series replaces an existing definition')
+            data[info + theme * 3:info + (theme + 1) * 3] = bytes.fromhex('0200FF')
+            data[names + theme * 10:names + (theme + 1) * 10] = name.encode().ljust(10, b' ')
+            if sum(data[table + i * 4] >> 2 == theme for i in range(report['metadata_rows'])) != members:
+                raise ValueError('New series has an unexpected member count')
             series['resource_sha256'].update(af_v3_hra_series_info=sha256(data[info:info + 59 * 3]),
                 af_v3_hra_series_names=sha256(data[names:names + 590]))
-            series['backyard'] = {'series': 56, 'type': 2, 'name': 'backyard',
-                'donor_wall_floor_index': 26, 'native_wall_floor_index': 255,
+            series[name] = {'series': theme, 'type': 2, 'name': name,
+                'donor_wall_floor_index': donor_surface, 'native_wall_floor_index': 255,
                 'matching_surfaces_installed': False, 'score_letter_name_installed': True}
         report.update(output_sha256=sha256(data),
                       metadata_sha256=sha256(data[table:table + report['metadata_rows'] * width]))
@@ -158,27 +161,33 @@ def score_tables(base, prior, item_rows):
     return changes, reports
 
 
-def extend_letters(source, module, report, rel, symbols):
-    if (sha256(source) != report['output_sha256'] or report['image_bytes'] != 62656
-            or report['name_rows'] != 56 or len(source) != 63616
+def extend_letters(source, module, report, rel, symbols, *, theme=56):
+    if theme not in (55, 56):
+        raise ValueError('Unreviewed score-letter theme')
+    name, count, image = ('western', 57, 62688) if theme == 55 else ('backyard', 56, 62656)
+    if (sha256(source) != report['output_sha256'] or report['image_bytes'] != image
+            or report['name_rows'] != count or len(source) != image + 960
             or list(struct.unpack_from('>8I', module, 0x48)) != report['configuration']):
         raise ValueError('Changed complete English score-letter resource')
     image_size = report['image_bytes']
     at = report['name_table_address'] - mail.RAM
-    if at != 0xEF10 or sha256(source[at:image_size]) != report['name_table_sha256']:
+    table_end = at + count * 26
+    if (at != 0xEF10 or sha256(source[at:table_end]) != report['name_table_sha256']
+            or any(source[table_end:image_size]) or image_size - table_end != (-count * 26) % 16):
         raise ValueError('Changed full installed theme-name table')
-    donor = symbol_data(rel, symbols.decode(), 'mMkRm_series_name')[56 * 16:57 * 16]
-    if donor != b'backyard        ':
-        raise ValueError('Changed backyard English letter name')
-    table = source[at:image_size] + donor[:10] + donor
-    data = bytearray(source[:image_size] + donor[:10] + donor + bytes(6))
+    donor = symbol_data(rel, symbols.decode(), 'mMkRm_series_name')[theme * 16:(theme + 1) * 16]
+    if donor != name.encode().ljust(16, b' '):
+        raise ValueError('Changed new English letter name')
+    table = source[at:table_end] + donor[:10] + donor
+    padding = (-len(table)) % 16
+    data = bytearray(source[:at] + table + bytes(padding))
     relocation = bytearray(source[image_size:])
     if struct.unpack_from('>5I', relocation) != (image_size, 0, 0, 0, 233) or len(data) > 65536:
         raise ValueError('Changed letter relocation or exceeded loader capacity')
     patches = []
     for offset, original in mail.COUNTERS.items():
-        before = original & 0xFFFF0000 | (1456 if offset == 0x25F4 else 56)
-        after = original & 0xFFFF0000 | (1488 if offset == 0x25F4 else 57)
+        before = original & 0xFFFF0000 | ((count * 26 + 15) & ~15 if offset == 0x25F4 else count)
+        after = original & 0xFFFF0000 | (len(table) + padding if offset == 0x25F4 else count + 1)
         if u32(data, offset) != before:
             raise ValueError('Changed installed letter-name counter')
         struct.pack_into('>I', data, offset, after)
@@ -186,7 +195,7 @@ def extend_letters(source, module, report, rel, symbols):
     if u32(data, 0x2A04) != 0x24020037:
         raise ValueError('Letter-name extension changed an English template selector')
     struct.pack_into('>I', relocation, 0, len(data))
-    allowed = {i for p in patches for i in range(p['offset'], p['offset'] + 4)}
+    allowed = {i for p in patches for i in range(p['offset'], p['offset'] + 4)} | set(range(table_end, image_size))
     for loaded in (0x801A0010, 0x802F8010, 0x803D0010):
         before = relocate_verified_data(SimpleNamespace(ram=mail.RAM, resident_bytes=image_size,
             sections=(image_size, 0, 0, 0, 233)), source[:image_size], source[image_size:], loaded)
@@ -199,19 +208,19 @@ def extend_letters(source, module, report, rel, symbols):
     config[1], config[2], config[5], config[6] = len(result), len(data), len(data), zlib.crc32(result)
     struct.pack_into('>8I', module, 0x48, *config)
     return result, {**report, 'output_sha256': sha256(result), 'image_bytes': len(data),
-        'bytes': len(result), 'name_rows': 57, 'name_table_sha256': sha256(table),
-        'name_table_bytes': len(table), 'name_table_padding': 6, 'added_name': 'backyard',
-        'series': 56, 'patches': report['patches'] + patches, 'configuration': config,
+        'bytes': len(result), 'name_rows': count + 1, 'name_table_sha256': sha256(table),
+        'name_table_bytes': len(table), 'name_table_padding': padding, 'added_name': name,
+        'series': theme, 'patches': report['patches'] + patches, 'configuration': config,
         'native_letter_generation_tested': False}
 
 
-def install_catalogue(base, stable, prior, imports, output, rel, symbols):
+def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
     if sha256(old) != prior['catalogue']['output_sha256']:
         raise ValueError('Changed current complete catalogue')
-    ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True)
+    ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True, western=western)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
     cloth = old[at:at + 496]
@@ -225,7 +234,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols):
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
         defines=('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
-                 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1'))
+                 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1') + (('AF_V3_WESTERN_ITEMS=1',) if western else ()))
     parent = bytearray(files[catalogue.PARENT].extract(base))
     _, _, native_parent = catalogue.sources(stable)
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])

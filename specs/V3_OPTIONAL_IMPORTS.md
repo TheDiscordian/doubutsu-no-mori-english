@@ -292,11 +292,14 @@ The [reward-category adapter](V3_HRA_BIRTH.md) supplies expanded native counters
 and donor reward weights, with focused and native verification. Backyard-series
 installation is complete; post-office reward acquisition remains work.
 
-The [Western batch](V3_WESTERN_ITEMS.md) supplies seven more complete models and
-source-verified item/scoring/acquisition metadata. Runtime installation remains
-work, including the saddle fence's larger bank requirement, both opaque parts,
-the well's double mirrors, and faithful ordinary/event acquisition. No conversion
-result enables an import before its runtime capacity and consumers are safe.
+The [Western batch](V3_WESTERN_ITEMS.md) installs seven more complete models,
+English readers, true ordinary/event stock, catalogue/scoring, and optional
+saved dependencies. The [dedicated bank owner](V3_FURNITURE_BANKS.md) provides
+100 9,216-byte banks in reserved Expansion Pak memory without ordinary heap
+growth. Native reader, catalogue, event-selection, and scoring checks pass;
+bank allocation passes but paired upper-memory DMA and executed teardown remain
+unverified. Both opaque saddle-fence parts and the well's double mirrors are
+preserved. These are experimental imports, not certified complete gameplay.
 
 ### Limits and saves
 
@@ -324,7 +327,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [local optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for the twenty installed villagers and nineteen installed logical items,
+selections for the twenty installed villagers and twenty-six installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
 save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce

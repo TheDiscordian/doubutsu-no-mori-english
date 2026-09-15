@@ -38,7 +38,7 @@ def sources(base):
     return data, reloc, parent
 
 
-def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False):
+def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -59,6 +59,11 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False):
         if not expanded:
             raise ValueError('Garden catalogue needs expanded native pages')
         garden_rows = {int(r['item_id'], 16): r for r in metadata(rel, donor_symbols)[1]}
+    if western:
+        from v3_western_items import metadata
+        if not expanded:
+            raise ValueError('Western furniture requires expanded catalogue pages')
+        garden_rows.update({int(r['item_id'], 16): r for r in metadata(rel, donor_symbols)[1]})
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (

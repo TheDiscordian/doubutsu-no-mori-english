@@ -100,6 +100,11 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
     if ((item & 0xFFFCu) == 0x32A0u)
         return category == 0 && list == 5 && af_v3_furniture_import_profile(1192);
 #endif
+#ifdef AF_V3_WESTERN_ITEMS
+    if ((item & 0xFFFCu) == 0x32BCu || (item & 0xFFFCu) == 0x3334u)
+        return category == 0 && list == 3 &&
+            af_v3_furniture_import_profile(1024u + ((item & 0xFFFu) >> 2));
+#endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price
      * is shown; it does not replace the native town's rarity selection. */

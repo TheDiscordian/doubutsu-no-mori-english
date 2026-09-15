@@ -16,7 +16,7 @@ SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
            'overlays/v3/shops.c', 'overlays/v3/shops.ld')
 
 
-def goods(base, rel, symbols, imports, *, garden=False):
+def goods(base, rel, symbols, imports, *, garden=False, western=False):
     verify_sources(rel, symbols)
     files = by_vrom(base)
     old = files[VROM].extract(base)
@@ -45,6 +45,19 @@ def goods(base, rel, symbols, imports, *, garden=False):
                                                         (0xCA, 0x196, 0x262)[group])
             elif row['donor_list'] == 'ftr_listLottery':
                 garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], 5, 0x334)
+    if western:
+        from v3_western_items import metadata
+        from v3_hra import sources, RAM, TABLE as HRA_TABLE
+        native_hra, _ = sources(base)
+        event = struct.unpack('>64H', old[0x264:0x2E4])
+        if old[0x2E4:0x2E8] != bytes(4) or any(not 0x1000 <= item < 0x1ECC or
+               (struct.unpack_from('>I', native_hra, HRA_TABLE - RAM + (item - 0x1000))[0] >> 9 & 31) != 3
+               for item in event):
+            raise ValueError('Native list 3 is not the complete event birth-category list')
+        for row in metadata(rel, symbols)[1]:
+            group = row['stock_group'] if row['ordinary_stock'] else 3
+            garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
+                                                    (0xCA, 0x196, 0x262, 0x2E4)[group])
     for row in imports:
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),

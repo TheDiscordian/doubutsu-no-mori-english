@@ -14,14 +14,14 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-garden-runtime-02'
-BASE_SHA = '436c5cec2aeb1d9f34d1fb71217ec62a6ef232d91573e0112d7055c65345f1d0'
-REPORT_SHA = 'e931376f12e03eb3adbff213227c144c39d0debcff5cdf00f399f10ad4279cda'
+BASE = ROOT/'build/v3-western-runtime-02'
+BASE_SHA = 'e9285a7d301b466b32eb4af022b5dc7ffaa555b3f1de93cffdb86bc838daa858'
+REPORT_SHA = 'e6679d4b4faec83566d87d86ca7f942dd494de42405bca68752285325f4465f9'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 64
+PREFIX_SIZE, ABI = 0xC000, 65
 PACKAGE, PACKAGE_RAM, PACKAGE_SIZE = 0x70000, 0x80473000, 0xF000
-STATIC_ROWS, STATIC_COUNT = 0x7E500, 15
+STATIC_ROWS, STATIC_COUNT = 0x7E500, 22
 
 
 def resident_offset(blob, address, size):
@@ -361,7 +361,7 @@ def build(output, selected=(), *, select_all=False):
             row['metadata_sha256'] = sha256(blob[0x2820+slot*32:0x2840+slot*32])
         _, selected_cat = catalogue_selection(image, report, set(selection['enabled']))
         from v3_catalogue import VROM, RAM
-        from v3_garden_runtime import ROWS, ITEMS, TABLE_END
+        from v3_western_runtime import ROWS, ITEMS, ITEMS_RAM, TABLE_END
         cat = current['catalogue']
         cat['installed_total_rows'] = cat['total_rows']
         cat.update(imports=selected_cat['imports'], total_rows=selected_cat['total_rows'])
@@ -375,17 +375,25 @@ def build(output, selected=(), *, select_all=False):
         cat['clothing']['table_sha256'] = sha256(data[at:at + cat['clothing']['total_rows'] * 2])
         current['construction'].update(optional_composition_updated=True,
             profile_rows_sha256=sha256(blob[ROWS:ROWS + 9 * 80]),
-            item_rows_ram=f'{0x80481A00:08X}',
+            item_rows_ram=f'{ITEMS_RAM:08X}',
             item_rows_sha256=sha256(blob[ITEMS:ITEMS + 10 * 32]),
             package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
             pending=['ordinary acquisition, placement, and persistence'])
         current['construction_catalogue']['optional_composition_updated'] = True
         current['garden'].update(optional_composition_updated=True,
-            profile_rows_sha256=sha256(blob[ROWS:ROWS + STATIC_COUNT * 80]),
-            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + 15 * 80]),
+            item_rows_ram=f'{ITEMS_RAM:08X}',
+            item_rows_sha256=sha256(blob[ITEMS:ITEMS + 16 * 32]),
             package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
             pending=['post-office reward delivery', 'ordinary acquisition, placement, and persistence'])
         for row in current['garden']['imports']:
+            row['enabled'] = row['id'] in selection['enabled']
+        current['western'].update(optional_composition_updated=True,
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + STATIC_COUNT * 80]),
+            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
+            pending=['ordinary acquisition, placement, and persistence'])
+        for row in current['western']['imports']:
             row['enabled'] = row['id'] in selection['enabled']
         import v3_hra as hra
         _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
@@ -406,7 +414,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All 39 installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All 46 installed experimental entries, not the whole donor disc')
     args = parser.parse_args()
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))

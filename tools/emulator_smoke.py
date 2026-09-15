@@ -1548,6 +1548,14 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(readers(debug, args.rom, record, garden=True))
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_western_items'):
+                from v3_construction_smoke import exercise as readers
+                from v3_garden_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Western probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(readers(debug, args.rom, record, western=True))
+                results.append(exercise(debug, args.rom, record, western=True))
             if action.get('test_v3_garden_scoring'):
                 from v3_garden_smoke import exercise
                 if not (out/'test.bs1').is_file():

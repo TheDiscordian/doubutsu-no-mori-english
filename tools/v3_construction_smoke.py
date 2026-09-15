@@ -8,8 +8,11 @@ from runtime_layout import MODULE_RAM
 from v3_asset_loader import BLOB
 
 
-def exercise(debug, rom_path, record, *, garden=False):
-    if garden:
+def exercise(debug, rom_path, record, *, garden=False, western=False):
+    if western:
+        from v3_western_runtime import ABI, ITEMS, ITEMS_RAM, ROWS, ROWS_RAM, TABLE_END
+        key, count, item_count = 'western', 22, 23
+    elif garden:
         from v3_garden_runtime import ABI, ITEMS, ITEMS_RAM, ROWS, ROWS_RAM, TABLE_END
         key, count, item_count = 'garden', 15, 16
     else:

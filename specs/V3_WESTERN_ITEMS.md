@@ -2,9 +2,9 @@
 
 ## Scope and source identity
 
-Seven GAFE01-r0 furnishings have complete native graphics conversion and
-source-verified metadata. Runtime installation remains work. Neither served
-patcher changes; the import-free cartridge remains V2-11.
+Seven GAFE01-r0 furnishings have complete native graphics conversion,
+source-verified metadata, and experimental ABI-65 runtime installation. Neither
+served patcher changes; the import-free cartridge remains V2-11.
 
 `tools/v3_furniture_art.py --batch western` verifies both furniture-quality
 tables, exact profiles, names, model bindings, and every graphics relocation
@@ -24,8 +24,8 @@ tables, not worksheet names alone, establish profile identity.
 | `3330` | 1228 | wagon wheel | 1,230 | ordinary B | 2,720 |
 | `3334` | 1229 | well | 2,700 | event reward | 5,088 |
 
-These are proposed additive runtime identities until installed in the fixed
-registry. Selection order must never assign IDs or repurpose an existing item.
+These additive runtime identities are installed in the fixed registry.
+Selection order must never assign IDs or repurpose an existing item.
 The well is decorative furniture, not a replacement for the town's shrine.
 
 ## Complete graphics and exact model slots
@@ -74,31 +74,43 @@ index is not automatically a verified native wall/floor mapping.
 
 Cow skull retains surface type 2. Desert cactus retains green colour 4. The
 saddle fence and well belong only to `ftr_listEvent`, birth category 3; do not
-put either into an ordinary A/B/C stock list. Their native event-acquisition
-and catalogue-order routes require actual consumer review and installation.
-Selected-only theme counting must exclude unselected imports.
+put either into an ordinary A/B/C stock list. Both use native event list 3,
+whose 64 original entries all carry birth category 3. Its first terminator is
+at `2E4`, followed by two padding bytes; append before that first terminator.
+Catalogue availability admits the selected rewards in list 3, not ordinary
+stock. The native event selector and pocket-ownership path pass for the well.
+Selected-only theme counting excludes unselected imports. Ordinary event
+conversations and deliveries remain unverified.
 
-## Capacity and remaining installation
+## Dedicated model banks
 
-Saddle fence exceeds the current 5,120-byte bank by 96 bytes; it must not be
-installed with that limit. Well fits the bank with 32 bytes spare but also needs
-a ROM span larger than the preceding batches' 4-KiB slots. Preserve complete
-models, allocate non-overlapping storage, and resolve native capacity first.
+The [bank owner](V3_FURNITURE_BANKS.md) reserves 100 complete 9,216-byte banks
+in unused Expansion Pak RAM. The 5,216-byte saddle fence fits without truncation
+or overflowing the native 5,120-byte allocation. The shared DMA limit and actual
+constructor bank table use the same enlarged capacity. Native cleanup never
+passes these fixed banks to the ordinary heap allocator. Catalogue preview
+already owns independent `0x2400`-byte buffers and needs no increase.
 
-The native My_Room allocator at `80938D44` uses bank-count multiplication at
-`80938DA8..80938DB0`, contiguous-bank stride at `80938E78`, and separate heap
-allocation size at `80938EA8`. The shared DMA adapter independently checks
-`BANK_BYTES`. Altering only the adapter would permit an out-of-bounds transfer;
-altering only the allocator would leave the import rejected. Review every
-allocation/stride consumer, catalogue preview, and worst-case live memory before
-changing capacity. No capacity increase is implemented by source conversion.
+Each Western model has a fixed 8-KiB VROM slot, beginning at `0238C000` and
+ending with the well's slot at `02398000`. Complete converted models remain
+within their own slots. The 22 static 80-byte rows begin at RAM `80481500`;
+the 23 shared 32-byte item records begin at `80481C00`, ending at `80481EE0`.
+The package end guard at `80481FF0` is unchanged.
 
-Install fixed profiles, item records/readers, true stock routes, catalogue and
-scoring tables, English theme naming, and selected saved dependencies. Add the
-individual offline composer options after installation. Run one bounded combined
-check for the changed capacity, second opaque part, and native reward route;
-reuse existing evidence for unchanged systems. Ordinary placement, acquisition,
-persistence, and hardware appearance remain required playtest work.
+The actual furniture catalogue has 459 rows, with all 248 clothing rows retained.
+Its conservative complete allocation is 280,000 bytes within the existing
+280,704-byte menu pool. Catalogue code occupies 3,120 of its 3,152 reserved bytes;
+further additions require another capacity review. HRA installs all seven theme
+55 records, the English `western` name, and the donor properties. The score-letter
+table contains 58 logical 26-byte rows followed by 12 padding bytes. Appending
+a name must replace prior end padding, not insert padding between records.
 
-The [checkpoint](../docs/checkpoints/V3_WESTERN_ITEMS.md) records generated hashes
-and executed checks. No ROM or generated game asset is committed or published.
+All seven identities are optional in the offline composer. Shared saved format 2
+is unchanged, but selected dependencies change. An older/smaller profile rejects
+these saves; ordinary cross-profile gameplay reload is not established.
+
+The [source checkpoint](../docs/checkpoints/V3_WESTERN_ITEMS.md) and
+[runtime checkpoint](../docs/checkpoints/V3_WESTERN_RUNTIME.md) record generated
+hashes, executed checks, and incomplete native model/cleanup verification.
+Ordinary placement, acquisition, persistence, and hardware appearance remain
+required playtest work. No ROM or generated game asset is committed or published.

@@ -12,17 +12,18 @@ import v3_catalogue as catalogue
 import v3_hra as hra
 
 
-def exercise(debug, rom_path, record, *, scoring_only=False):
+def exercise(debug, rom_path, record, *, scoring_only=False, western=False):
+    key, theme, abi = ('western', 55, 65) if western else ('garden', 56, 64)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_text())
-    if sha256(image) != report['output_sha256'] or report['runtime_abi'] != 64:
-        raise ValueError('Garden probe requires its current installed cartridge')
+    if sha256(image) != report['output_sha256'] or report['runtime_abi'] != abi:
+        raise ValueError('Theme probe requires its current installed cartridge')
     files, boot = by_vrom(image), boot_proofs(image)
 
     def check(label, address, expected):
         actual = debug.read_memory(address, len(expected))
-        record({'garden_check': label, 'address': f'{address:08X}', 'bytes': len(expected),
+        record({key + '_check': label, 'address': f'{address:08X}', 'bytes': len(expected),
                 'assertion': 'passed' if actual == expected else 'failed'})
         if actual != expected:
             raise ValueError('Garden native mismatch: ' + label)
@@ -66,15 +67,18 @@ def exercise(debug, rom_path, record, *, scoring_only=False):
     def catalogue_and_stock():
         loaded, proof = load(catalogue, 'catalogue')
         available = owner + report['catalogue']['code']['symbols']['af_v3_catalogue_available'] - catalogue.RAM
-        for item in (0x3268, 0x3294, 0x32A0):
-            for group in (0, 2, 5):
-                expected = int(item == 0x3268 and group < 3 or item == 0x32A0 and group == 5)
+        reward, reward_group = (0x3334, 3) if western else (0x32A0, 5)
+        candidates = (0x32B0, 0x32BC, 0x3334) if western else (0x3268, 0x3294, 0x32A0)
+        for item in candidates:
+            for group in (0, 2, 3, 5):
+                expected = int((item == 0x32B0 and group < 3 or item in (0x32BC, 0x3334) and group == 3)
+                    if western else (item == 0x3268 and group < 3 or item == 0x32A0 and group == 5))
                 call(available, [item, 0, group, 0], expected, proof)
-        gnome = next(r for r in report['garden']['imports'] if r['item_id'] == '32A0')
-        enabled = int(gnome['profile_ram'], 16) - 4
+        reward_row = next(r for r in report[key]['imports'] if int(r['item_id'], 16) == reward)
+        enabled = int(reward_row['profile_ram'], 16) - 4
         try:
             put(enabled, 0)
-            call(available, [0x32A0, 0, 5, 0], 0, proof)
+            call(available, [reward, 0, reward_group, 0], 0, proof)
         finally:
             put(enabled, 1)
 
@@ -84,17 +88,17 @@ def exercise(debug, rom_path, record, *, scoring_only=False):
         put(0x80136FD8, 0x80126EC0)
         debug.write_memory(0x80126ED4, bytes(0x24))
         debug.write_memory(0x8046C000 + 208, bytes(640))
-        for group in (0, 1, 2, 5): call(0x800C0490, [0x32A0, 0, group, 0], int(group == 5))
+        for group in (0, 1, 2, 3, 5): call(0x800C0490, [reward, 0, group, 0], int(group == reward_group))
         random = 0xFF800000
         put(0x8003C590, ((random - 0x3C6EF35F) * pow(0x19660D, -1, 1 << 32)) & 0xFFFFFFFF)
-        call(0x800BFCF0, [0, points, 1, 0, 0, 0, 5])
-        check('native lottery selector chooses the gnome', points, struct.pack('>H', 0x32A0))
-        call(0x800B8B8C, [0x80126EC0, 0x32A0, 0], 1)
-        check('actual acquisition retains the gnome pocket ID', 0x80126ED4, struct.pack('>H', 0x32A0))
+        call(0x800BFCF0, [0, points, 1, 0, 0, 0, reward_group])
+        check('native reward selector chooses ' + reward_row['name'], points, struct.pack('>H', reward))
+        call(0x800B8B8C, [0x80126EC0, reward, 0], 1)
+        check('actual acquisition retains the reward pocket ID', 0x80126ED4, struct.pack('>H', reward))
         owned = bytearray(128)
-        bit = (0x32A0 - 0x3000) // 4
+        bit = (reward - 0x3000) // 4
         owned[bit // 8] |= 1 << (bit & 7)
-        check('gnome enters the saved ownership catalogue', 0x8046C000 + 208, owned)
+        check('reward enters the saved ownership catalogue', 0x8046C000 + 208, owned)
 
     try:
         if not scoring_only:
@@ -106,13 +110,13 @@ def exercise(debug, rom_path, record, *, scoring_only=False):
         linked = lambda address: owner + address - hra.RAM
         call(linked(0x8092817C), [layers, 16], proof=proof)
         info = linked(hr['series']['info_address'])
-        active = [r for r in report['garden']['imports'] if r['enabled']]
-        backyard_count = sum(r['series'] == 56 for r in active)
-        check('backyard counts only selected members', info + 56 * 3, bytes((2, backyard_count, 255)))
+        active = [r for r in report[key]['imports'] if r['enabled']]
+        member_count = sum(r['series'] == theme for r in active)
+        check('theme counts only selected members', info + theme * 3, bytes((2, member_count, 255)))
         if scoring_only:
             check('unselected boxing theme has no members', info + 58 * 3, bytes.fromhex('0200FF'))
         search = linked(hr['series']['search_address'])
-        check('empty backyard has no completion mask', search + 56 * 4, bytes(4))
+        check('empty theme has no completion mask', search + theme * 4, bytes(4))
         put(points, 17)
         call(linked(0x809274F8), [points, layers, 16, 0, 0], proof=proof)
         baseline = u32(debug.read_memory(points, 4), 0)
@@ -122,13 +126,13 @@ def exercise(debug, rom_path, record, *, scoring_only=False):
             counts[row['birth_category']] += 1
         debug.write_memory(first, grid)
         call(linked(0x8092817C), [layers, 16], proof=proof)
-        check('selected backyard items complete their real theme', search + 56 * 4,
-              struct.pack('>I', (1 << backyard_count) - 1))
+        check('selected items complete their real theme', search + theme * 4,
+              struct.pack('>I', (1 << member_count) - 1))
         weights = struct.unpack_from('>23I', loaded, hr['birth_extension']['points_address'] - hra.RAM)
         put(points, 17)
         call(linked(0x809274F8), [points, layers, 16, 0, 0], proof=proof)
-        check('real garden IDs reach their complete acquisition counters', TEST_STACK - 92, struct.pack('>23I', *counts))
-        check('native lottery and post-office weights retain their full values', points,
+        check('real imported IDs reach their complete acquisition counters', TEST_STACK - 92, struct.pack('>23I', *counts))
+        check('native acquisition weights retain their full values', points,
               struct.pack('>I', baseline + sum(n * w for n, w in zip(counts, weights, strict=True))))
         for at in guards: check('allocation guard', at, edge)
         check('no CPU fault', 0x8003CE34, bytes(4))
@@ -136,7 +140,8 @@ def exercise(debug, rom_path, record, *, scoring_only=False):
         for at, value in saved.items(): debug.write_memory(at, value)
     check('complete saved state restored', 0x8046C000, saved[0x8046C000])
     call(0x8009C040, [allocation])
-    return {'garden_catalogue_rules': not scoring_only, 'native_lottery_acquisition': not scoring_only,
-            'actual_backyard_group_and_birth_points': True, 'saved_data_written': False,
+    return {key + '_catalogue_rules': not scoring_only,
+            'native_event_acquisition' if western else 'native_lottery_acquisition': not scoring_only,
+            'actual_theme_group_and_birth_points': True, 'saved_data_written': False,
             'post_office_delivery_or_ordinary_gameplay_tested': False,
             'requires_checkpoint_restore': True}

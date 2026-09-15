@@ -265,14 +265,18 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
-  The [Western batch](checkpoints/V3_WESTERN_ITEMS.md) converts seven complete
-  models and verifies names/prices, source profiles, ordinary/event acquisition,
-  catalogue positions, and full scoring properties. Twelve focused checks pass,
-  including both saddle-fence opaque parts and the well's double mirrors. Next
-  resolve the 5,216-byte saddle model's 96-byte bank shortfall across actual
-  allocation/stride/DMA consumers and preview memory, then install the complete
-  batch, Western scoring/name, saved dependencies, and offline selections.
-  Do not truncate the model or substitute shop stock for the two event rewards.
+  The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete
+  models, English readers, true stock/catalogue/scoring, and saved dependencies
+  in ABI 65. Dedicated 9,216-byte Expansion Pak banks fit the saddle fence without
+  ordinary heap growth. Fifteen focused checks pass, and the offline composer
+  contains 46 options. Native readers, event selection/ownership, catalogue rules,
+  and Western scoring pass. Native 100-bank allocation is established, but two
+  fixture mistakes exhaust this batch's setup attempts. Both are classified and
+  corrected; paired model DMA, executed teardown, and the final restore tail remain
+  unverified. Do not repeat that setup batch. Continue donor families and ordinary
+  gameplay; retain the bank tail for a later meaningful integration check.
+  Review catalogue growth before more rows: code has 32 bytes and the menu pool
+  has 704 bytes spare. Both event rewards keep their actual route. No web update.
   The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) converts seven
   complete static models and verifies names/prices, 1×1 profiles, ordinary B/C
   stock membership, and native scoring metadata. Five new asset checks, seven

@@ -16,7 +16,12 @@ typedef __UINTPTR_TYPE__ uptr;
 #define AF_V3_FURNITURE_PROFILES 0x80465800u
 #define AF_V3_FURNITURE_INDICES 0x80466C00u
 #endif
-enum { NATIVE = 947, CAPACITY = AF_V3_FURNITURE_CAPACITY, BANKS = 100, BANK_BYTES = 0x1400 };
+#ifdef AF_V3_EXPANDED_BANKS
+#include "furniture_banks.h"
+#else
+#define AF_V3_BANK_BYTES 0x1400u
+#endif
+enum { NATIVE = 947, CAPACITY = AF_V3_FURNITURE_CAPACITY, BANKS = 100, BANK_BYTES = AF_V3_BANK_BYTES };
 struct Import { u16 index, item; u32 enabled; u32 profile[17]; u32 pad; };
 _Static_assert(sizeof(struct Import) == 80, "Furniture import row");
 #ifdef __mips__
@@ -132,11 +137,42 @@ u32 af_v3_furniture_bank_address(int bank) {
 #endif
 }
 
+#if defined(AF_V3_EXPANDED_BANKS) && defined(__mips__)
+extern void af_v3_save_halt(int) __attribute__((noreturn));
+
+void af_v3_furniture_secure_banks(u32 room) {
+    u32 live = owner[4], i, count;
+    if (*(volatile u32 *)0x80000318u != 0x800000u ||
+            owner[2] != 0x80936710u || owner[3] != 0x8094F610u ||
+            live < 0x8019C8E0u || live > 0x80400000u - 0x18F00u || (live & 7u) ||
+            room < 0x8019C8E0u || room > 0x80400000u - 0x4C8u || (room & 3u))
+        af_v3_save_halt(-1);
+    u32 *counts = (u32 *)(uptr)(room + 0x4C0u);
+    if (counts[0] > BANKS || counts[1] > BANKS - counts[0]) af_v3_save_halt(-1);
+    count = counts[0] + counts[1];
+    /* The native destructor frees only count1 heap banks. The dedicated pool
+     * has the lifetime of the single loaded My_Room owner, not a heap block. */
+    counts[0] = count;
+    counts[1] = 0;
+    u32 *table = (u32 *)(uptr)(live + 0x18D68u);
+    for (i = 0; i < BANKS; ++i)
+        table[i] = i < count ? AF_V3_BANK_POOL_DATA + i * BANK_BYTES : 0;
+    for (i = 0; i < 4; ++i) {
+        ((volatile u32 *)AF_V3_BANK_POOL_START)[i] = AF_V3_BANK_GUARD;
+        ((volatile u32 *)AF_V3_BANK_POOL_GUARD)[i] = AF_V3_BANK_GUARD;
+    }
+}
+#endif
+
 int af_v3_furniture_import_dma(u32 argument, u32 item, u32 bank, int bank_index) {
     const struct Import *row = find(argument);
     u32 size, active;
     (void)item; /* Static profiles have no item-dependent DMA callback. */
+#ifdef AF_V3_EXPANDED_BANKS
+    if (!row || bank < AF_V3_BANK_POOL_DATA || bank > AF_V3_BANK_POOL_GUARD - BANK_BYTES ||
+#else
     if (!row || !bank || bank < 0x80000000u || bank > 0x80400000u - BANK_BYTES ||
+#endif
             (bank & 7u)) return 0;
     if (bank_index == -1) {
         int existing = af_v3_furniture_bank(argument);

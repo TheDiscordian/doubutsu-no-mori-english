@@ -23,6 +23,8 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
     files = by_vrom(rom)
     blob = files[BLOB].extract(rom)[:report['resident_blob_bytes']]
     furniture = report['furniture']
+    pool = furniture.get('bank_pool')
+    bank_bytes = furniture.get('native_bank_bytes', BANK_BYTES)
     animated = [report['speed_bag']] if report.get('speed_bag') else []
     displays = furniture.get('display_imports', [])
     expanded = furniture.get('expanded_tables')
@@ -72,7 +74,7 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
             struct.pack_into('>I', expected_profiles, row['runtime_index']*4, int(row['profile_ram'], 16))
         check('complete expanded startup profiles', profile_ram, bytes(expected_profiles))
         check('complete expanded startup banks', index_ram, b'\xFF'*capacity)
-    allocation_size = 0x1E000
+    allocation_size = 0x24000 if pool else 0x1E000
     allocation = call(0x8009BFC0, [allocation_size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - allocation_size:
         raise ValueError('Furniture probe could not allocate its isolated fixture')
@@ -85,12 +87,13 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
     sections = struct.unpack_from('>5I', reloc)
     spec = SimpleNamespace(ram=RAM, resident_bytes=RESIDENT, sections=sections)
     loaded = relocate_verified_data(spec, data, reloc, live)
-    bank0 = live + RESIDENT + len(reloc) + 32
-    bank1 = bank0 + BANK_BYTES + 32
+    bank0 = pool['data'] if pool else live + RESIDENT + len(reloc) + 32
+    bank1 = bank0 + bank_bytes + (0 if pool else 32)
     guards = (allocation, allocation + allocation_size - 16,
-              bank0 - 16, bank0 + BANK_BYTES, bank1 - 16, bank1 + BANK_BYTES,
               TEST_STACK - 0x800, TEST_STACK + 0x40)
-    if bank1 + BANK_BYTES + 16 > allocation + allocation_size - 16:
+    if not pool:
+        guards += (bank0 - 16, bank0 + bank_bytes, bank1 - 16, bank1 + bank_bytes)
+    if not pool and bank1 + bank_bytes + 16 > allocation + allocation_size - 16:
         raise ValueError('Furniture fixture banks exceed allocation')
     for at in guards:
         debug.write_memory(at, edge)
@@ -110,8 +113,37 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
     native(0x80938C24)
     check('complete expanded bank reset', index_ram, b'\xFF' * capacity)
     check('original profile prefix cleared', profile_ram, bytes(NATIVE_COUNT * 4))
-    write_word(live + 0x18D68, bank0)
-    write_word(live + 0x18D6C, bank1)
+    if pool:
+        # Exercise the actual constructor allocator, including its retained
+        # dummy keyframe object, at both the full 100-bank cap and paired size.
+        game = (live + RESIDENT + len(reloc) + 47) & ~15
+        room, dummy = game + 0x4000, game + 0x4500
+        if dummy + 0x600 >= allocation + allocation_size - 16:
+            raise ValueError('Expanded furniture constructor fixture exceeds allocation')
+        # lui 0x013B + signed addiu 0xB000 resolves to 0x013AB000.
+        dummy_asset = object_bytes(0x013AB000, 0x013AB580)
+        for count in (100, 2):
+            debug.write_memory(game, bytes(0x4B00))
+            write_word(game + 0x1910, dummy)
+            write_word(game + 0x1914, dummy + 0x600)
+            write_word(0x80136ECC, count)
+            native(0x80938D44, [room, game])
+            check('actual allocator keeps all pool banks out of heap cleanup', room + 0x4C0,
+                  struct.pack('>2I', count, 0))
+            expected = [pool['data'] + i * bank_bytes if i < count else 0 for i in range(100)]
+            check('complete actual upper-memory bank table', live + 0x18D68, struct.pack('>100I', *expected))
+            check('only the dummy keyframe consumes scene-object memory', game + 0x1910,
+                  struct.pack('>2I', dummy + 0x580, dummy + 0x600))
+            check('one retained scene-object slot', game + 0x1904, struct.pack('>I', 1))
+            check('complete native dummy keyframe DMA', dummy, dummy_asset)
+            native(0x8093B6F4, [room])
+            check('native bank teardown retains the fixed pool table', live + 0x18D68, struct.pack('>100I', *expected))
+        for at in (pool['start'], pool['guard']):
+            check('upper-memory pool guard after actual allocator and teardown', at,
+                  struct.pack('>I', pool['guard_word']) * 4)
+    else:
+        write_word(live + 0x18D68, bank0)
+        write_word(live + 0x18D6C, bank1)
     rows = furniture['imports']
     if static_items is not None:
         if len(static_items) != 2 or len(set(static_items)) != 2:
@@ -130,10 +162,10 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
         asset = object_bytes(start, start + row['object_bytes'])
         if sha256(asset) != row['object_sha256']:
             raise ValueError('Furniture fixture asset hash changed')
-        payload = asset + b'\xA5' * (BANK_BYTES - len(asset))
+        payload = asset + b'\xA5' * (bank_bytes - len(asset))
         payloads.append(payload)
         native(0x8093678C, [index], 1)
-        debug.write_memory(bank, b'\xA5' * BANK_BYTES)
+        debug.write_memory(bank, b'\xA5' * bank_bytes)
         # The actual native bank selector calls the imported DMA bridge.
         native(0x809389AC, [index, 0, item], 1)
         check(row['name'] + ' full model DMA and untouched bank padding', bank, payload)
@@ -145,7 +177,7 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
     native(0x80937578, [], 0)
     native(0x809375E8, [], 0xFFFFFFFF)
     first = rows[0]
-    debug.write_memory(bank0, b'\xA5' * BANK_BYTES)
+    debug.write_memory(bank0, b'\xA5' * bank_bytes)
     native(0x8093885C, [first['runtime_index'], int(first['item_id'], 16), bank0, 0xFFFFFFFF], 1)
     check('imported existing-bank reload', bank0, payloads[0])
     for index in (947, 1024, capacity, 65535):
@@ -176,11 +208,11 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
         asset = object_bytes(start, start+row['object_bytes'])
         if sha256(asset) != row['object_sha256']:
             raise ValueError('Changed installed animated model')
-        expected = asset+b'\xA5'*(BANK_BYTES-len(asset))
+        expected = asset+b'\xA5'*(bank_bytes-len(asset))
         saved_state = debug.read_memory(0x8046C000, 864)
         write_word(row_ram+4, 1)
         native(0x8093678C, [index], 1)
-        debug.write_memory(bank0, b'\xA5'*BANK_BYTES)
+        debug.write_memory(bank0, b'\xA5'*bank_bytes)
         native(0x809389AC, [index, 0, item], 1)
         check('complete animated model, rig, and untouched bank padding', bank0, expected)
         for rotation in range(4):
@@ -258,10 +290,10 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
         model = object_bytes(MODEL, MODEL+MODEL_BYTES)
         if sha256(model) != info['model_sha256'] or info['bank_bytes_used'] != len(shirt+model):
             raise ValueError('Changed native clothing model layout')
-        expected = shirt+model+b'\xA5'*(BANK_BYTES-len(shirt+model))
+        expected = shirt+model+b'\xA5'*(bank_bytes-len(shirt+model))
         native(0x8093678C, [index], 1)
         for rotation in range(4):
-            debug.write_memory(bank0, b'\xA5'*BANK_BYTES)
+            debug.write_memory(bank0, b'\xA5'*bank_bytes)
             if rotation == 0:
                 native(0x809389AC, [index, 0, item], 1)
             else:
@@ -306,12 +338,12 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
         raise ValueError('Original furniture profile allocation/symbol mapping changed')
     start, end, segment, limit = struct.unpack('>4I', debug.read_memory(original_profile, 16))
     asset = object_bytes(start, end)
-    if segment != 0x06000000 or limit - segment != len(asset) or len(asset) > BANK_BYTES:
+    if segment != 0x06000000 or limit - segment != len(asset) or len(asset) > bank_bytes:
         raise ValueError('Original furniture model no longer fits the native bank')
-    debug.write_memory(bank0, b'\xA5' * BANK_BYTES)
+    debug.write_memory(bank0, b'\xA5' * bank_bytes)
     native(0x8093885C, [0, 0x1000, bank0, 0], 1)
     check('original native model DMA and padding retained', bank0,
-          asset + b'\xA5' * (BANK_BYTES - len(asset)))
+          asset + b'\xA5' * (bank_bytes - len(asset)))
     native(0x809374C4, [0], 0)
     native(0x8093690C)
     check('original heap profile allocation released', live + 0x8094D320 - RAM, bytes(4))
@@ -326,12 +358,18 @@ def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
         check('complete expanded reservation restored after native cleanup', START, expanded_initial)
     for at in guards:
         check('fixture guard', at, edge)
+    if pool:
+        for at in (pool['start'], pool['guard']):
+            check('upper-memory pool guard after model loading and cleanup', at,
+                  struct.pack('>I', pool['guard_word']) * 4)
     check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
     check('no faulted thread', 0x8003CE34, bytes(4))
     write_word(0x80100E00, saved_owner)
     write_word(0x80136ECC, saved_limit)
     call(0x8009C040, [allocation])
     return {'imported_models_native_dma': 2, 'native_profile_and_model_fallback': True,
+            'actual_expanded_pool_allocator_and_teardown': bool(pool),
+            'bank_bytes': bank_bytes,
             'installed_animated_model_constructor_hit_sound': len(animated),
             'clothing_display_native_model_and_commands': len(displays),
             'native_bank_selection_release_and_cleanup': True,
