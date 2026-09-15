@@ -2,6 +2,14 @@
 
 ## Active development
 
+The [summer-camper event module](checkpoints/V3_CAMPSITE_EVENT.md) implements
+the calendar adjustments, inside/exit scene continuation, subset-aware visitor
+selection, and event start/stop flow. Its 1,600-byte N64 compilation and three
+focused checks pass. It is not installed: native event-directory expansion,
+manager binding, and a complete visitor Animal/identity adapter remain required.
+The current cartridge and composer remain ABI 72, and neither served patcher
+changes. The date adapter handles day-zero subtraction as the donor does.
+
 The [additive tent exterior](checkpoints/V3_CAMPSITE_EXTERIOR.md) installs its
 complete actor callbacks, independent identity, native loader binding, full
 exterior/shadow assets, collision, doors, daylight fade, and cleanup in ABI 72.

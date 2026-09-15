@@ -327,6 +327,10 @@ with later e/e+ donor support investigated separately.
   not waived as a fixture problem. The current full build is
   `build/v3-campsite-exterior-runtime-01/`; its camping subset is
   `build/v3-optional-campsite-exterior-01/`. Neither patcher changes.
+  The [event module](checkpoints/V3_CAMPSITE_EVENT.md) implements calendar,
+  selection, and start/stop logic with three passing focused checks. It is
+  compiled but not installed; native directory/manager and complete visitor
+  bindings remain required. The current cartridge stays ABI 72.
   Continue event activation, camper registration and English conversations,
   selected rewards, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU

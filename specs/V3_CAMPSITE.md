@@ -16,6 +16,13 @@ all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
 callbacks and native structure-loader binding in ABI 72. Event, conversations,
 rewards, and special scene lighting remain unfinished. Neither served patcher changes.
 
+`overlays/v3/campsite_event.c` supplies the compiled but uninstalled calendar,
+selection, and start/stop module. Its explicit operation tables require actual
+native directory and visitor adapters. The
+[event checkpoint](../docs/checkpoints/V3_CAMPSITE_EVENT.md) records three
+passing focused checks and the verified native constraints; it does not claim
+an active campsite event or another cartridge version.
+
 ## Complete native scenery
 
 | Part | Vertices | Triangles | Native bytes | Model offset |
@@ -206,6 +213,22 @@ before actor construction; the cause is unresolved. Do not claim native tent
 construction, drawing, cleanup, natural entry, or persistence from that run.
 
 ## Integration and verification still required
+
+The event module preserves the supplied donor's twelve-byte calendar row,
+seasonal month substitution, Sunday adjustment, and separately ordered exit-frame
+and inside-tent rows. It retains the inclusive ending hour 14. Date subtraction
+handles day zero like the donor; the native helper does not. Calendar decoding
+continues to be an adapter operation so existing date rules remain authoritative.
+Visitor selection uses six personalities and the donor's 236 shuffle operations,
+with full fixed IDs and an explicit installed-selection predicate.
+
+Native event types occupy only seventy index bytes, and native initialization
+and cleanup still cover those seventy types. Proposed type 70 is not usable
+until that directory is extended. Existing named BSS next to the index is not
+an assumed reservation. The five native event-save areas offer forty payload
+bytes each; using two for the camper does not by itself make a new event safe.
+Native masked NPC aliases lack the donor's full Animal record, so separate
+visitor ownership and all masked readers must be connected before activation.
 
 Finish event schedule and saved camper
 identity, NPC/conversation readers, scene lighting/floor sounds, and enabled
