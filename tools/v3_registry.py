@@ -11,7 +11,7 @@ VILLAGERS = {
     231: 233, 232: 234, 233: 235, 234: 236, 235: 237,
 }
 
-# Reviewed static furniture reservations. Values are runtime index, saved item
+# Reviewed furniture reservations. Values are runtime index, saved item
 # ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay
 # untouched. Holes are not supported items; future additions must be explicit.
 FURNITURE_REGISTRY_VERSION = 1
@@ -49,6 +49,7 @@ FURNITURE = {
     0x33A8: (1258, 0x33A8, STORAGE+0x238000),
     0x33AC: (1259, 0x33AC, STORAGE+0x23A000),
     0x33B0: (1260, 0x33B0, STORAGE+0x23C000),
+    0x336C: (1243, 0x336C, STORAGE+0x24E000),
 }
 
 # Additive clothing reservations, independent of donor furniture and native

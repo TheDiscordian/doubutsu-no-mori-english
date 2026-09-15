@@ -39,7 +39,7 @@ class OptionalCompositionTests(unittest.TestCase):
         return composer.resolve(self.catalog, list(selected))
 
     def test_actual_house_and_outfit_dependencies_not_just_names(self):
-        self.assertEqual(len(self.catalog),56)
+        self.assertEqual(len(self.catalog),57)
         self.assertEqual(self.select(PUNCHY)['required'],
                          ['GAFE01-r0/item/24BF','GAFE01-r0/item/3350'])
         self.assertEqual(self.select(CHERI)['required'],

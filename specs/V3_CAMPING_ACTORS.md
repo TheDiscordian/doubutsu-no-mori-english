@@ -7,11 +7,11 @@ These complete the assets for the ten-entry `ftr_listTent` family alongside
 the seven static objects in [Camping items](V3_CAMPING_ITEMS.md).
 They are additive imports, not substitutions for native furniture.
 
-Complete converted objects, the native four-cell item-reader extension, and
-compiled tent-light callbacks are available. The three actors are **not installed
-in a cartridge or selectable**. Fire animation/sound callbacks, native execution,
-light-switch cartridge integration, scoring/catalogue integration,
-summer-camper acquisition, and ordinary persistence remain required.
+Complete converted objects and the native four-cell item-reader extension are
+available. Tent model is installed in ABI 69 with its light callbacks, English
+metadata, catalogue/scoring, and optional saved dependency. The two fires are
+**not installed or selectable**. Fire animation/sound callbacks and integration,
+summer-camper acquisition, and ordinary gameplay/persistence remain required.
 Source on the V3 development branch is permitted; neither served web patcher
 changes before user testing and explicit approval.
 
@@ -136,12 +136,23 @@ heap palette to release and no dangling palette reference when an actor is reuse
 The lifetime differs from the GC allocation strategy while retaining its visible
 fade and avoiding cross-frame mutation on N64.
 
-The callbacks compile to 580 bytes at `80483400`, with a proposed vtable at
+The callbacks occupy 580 installed bytes at `80483400`, with their vtable at
 `80483700`. The full 68-byte profile retains height 15.7, scale 0.01, shape 4,
 collision 0, and interaction `8000`, with no generic model/rig/texture pointers.
-These are compiled components, not an installed item or native/GPU execution
-claim. The [tent callback checkpoint](../docs/checkpoints/V3_TENT_MODEL_CALLBACKS.md)
-records the checked code, host execution, and remaining integration.
+The model occupies VROM `0244E000..0244F0BF`. Canonical sparse slots contain
+the complete callback-owned profile and English item record. The checked
+startup loads and invalidates the existing item-code reservation, including
+these callbacks; no separate loader or larger resident package is required.
+The catalogue retains native mode 0 and explicitly disallows ordering in all
+four orientations. Native HRA uses `D4050600` (412 points, scoring category 3);
+feng shui uses `0100`. Neither mapping changes the summer-camper reward route.
+
+The [runtime checkpoint](../docs/checkpoints/V3_TENT_MODEL_RUNTIME.md) records
+installed native callback/reader execution and deterministic offline selection.
+GPU appearance, ordinary light interaction, acquisition, and persistence are
+not established by the callback probe. The
+[callback checkpoint](../docs/checkpoints/V3_TENT_MODEL_CALLBACKS.md) retains
+the component's source/host evidence.
 
 ## Four-cell item readers
 
@@ -165,16 +176,16 @@ and four zeroed records. Native-item fallbacks remain unchanged.
 The compiled extension occupies 1,020 bytes at `80483000`, inside the existing
 4 KiB resident item-code reservation. Integration must replace the checked code,
 rebind all five public bridges to their compiled entry points, and refresh the
-resident package and prefix checksums. Compiling it alone does not modify ABI 68
+resident package and prefix checksums. Compiling it alone does not modify ABI 69
 or create a new playable bonfire. Save structures do not change.
 
 ## Remaining integration
 
-1. Install the compiled tent-light callbacks and port the fires' complete rig,
+1. Port the fires' complete rig,
    billboard, dual-tile scrolling, and mapped loop sounds to native callbacks.
 2. Install complete profiles and item rows, four-cell readers, true catalogue
    framing (`0.86/−3` for bonfire), non-orderability, HRA/feng data, and selected
-   dependencies. Use the current ABI 68 source, not an older cartridge chain.
+   dependencies. Use the current ABI 69 source, not an older cartridge chain.
 3. Add individual and combined offline options only when their dependencies are
    actually installed; retain exact V2 composition for an empty selection.
 4. Connect the actual summer-camper reward route for all ten items. Do not

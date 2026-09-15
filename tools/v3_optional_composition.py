@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-camping-runtime-01'
-BASE_SHA = '3967dedabca6e65a97f57273028aaa19b0b24ed72b405f2498d5a4fce6a1cd29'
-REPORT_SHA = '7267629efe169d8f12a0a7cd58df65a28051d27eaab8d77f9d7322f22f26ac5a'
+BASE = ROOT/'build/v3-tent-model-runtime-01'
+BASE_SHA = '29f5d1e6760dbfb4acc015f2a3482470fdbd43f1ce6ef03d156ecb1902ddab6a'
+REPORT_SHA = '7d177af03b8ad4a19796c7034fc3a097a705b8d3654ba050ec8f697c7915b693'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 68
+PREFIX_SIZE, ABI = 0xC000, 69
 from v3_import_storage import PACKAGE, PACKAGE_RAM, PACKAGE_SIZE, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -353,6 +353,8 @@ def build(output, selected=(), *, select_all=False):
             row['enabled_for_integration'] = row['actor_id'] in actors
         for row in current['furniture']['imports']+[current['speed_bag']]:
             row['enabled'] = row['id'] in selection['enabled']
+        for row in current['furniture_items']['imports']:
+            row['enabled'] = item_key(int(row['item_id'], 16)) in selection['enabled']
         current['speed_bag']['saved_profile_included'] = current['speed_bag']['enabled']
         current['clothing']['punchy_defaults_enabled'] = 'E0ED' in actors
         for slot,row in enumerate(current['clothing']['imports']):
@@ -390,9 +392,10 @@ def build(output, selected=(), *, select_all=False):
         current['accessory_runtime']['package_sha256'] = package_sha
         current['import_storage'].update(package_sha256=package_sha,
             profile_rows_sha256=sha256(blob[ROWS:ITEMS]), item_rows_sha256=sha256(blob[ITEMS:TABLE_END]))
-        current['camping'].update(package_sha256=package_sha, optional_composition_updated=True)
-        for row in current['camping']['imports']:
-            row['enabled'] = row['id'] in selection['enabled']
+        for section in ('camping', 'tent_model'):
+            current[section].update(package_sha256=package_sha, optional_composition_updated=True)
+            for row in current[section]['imports']:
+                row['enabled'] = row['id'] in selection['enabled']
         import v3_hra as hra
         _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
         hr = current['hra']

@@ -108,6 +108,9 @@ int main(void) {
         for (u32 item = 0x3360; item <= 0x33B4; item += 4) {
             int reward = item == 0x3364 || item == 0x3370 || item == 0x339C ||
                 item == 0x33A4 || item == 0x33A8 || item == 0x33AC || item == 0x33B0;
+#ifdef AF_V3_TENT_MODEL
+            reward |= item == 0x336C;
+#endif
             for (u32 rotation = 0; rotation < 4; ++rotation) {
                 u32 argument = 0xABCD0000u | item | rotation;
                 af_v3_original_catalogue_furniture_init(&expected, argument);

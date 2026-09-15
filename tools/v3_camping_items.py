@@ -51,10 +51,10 @@ def identity_evidence(path):
     return result
 
 
-def score_mapping(rel, symbols, cartridge, report):
+def score_mapping(rel, symbols, cartridge, report, *, source_sha256=BASE_SHA):
     """Bind the source weight and the actual installed native bitfield consumer."""
     verify_sources(rel, symbols)
-    if sha256(cartridge) != BASE_SHA or report['output_sha256'] != BASE_SHA:
+    if sha256(cartridge) != source_sha256 or report['output_sha256'] != source_sha256:
         raise ValueError('Camping scoring needs the checked expanded-storage cartridge')
     source = symbol_data(rel, symbols.decode(), 'mMkRm_birth_point_table')
     files = by_vrom(cartridge)

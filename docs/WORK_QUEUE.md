@@ -270,15 +270,17 @@ with later e/e+ donor support investigated separately.
   framing and non-orderability, HRA/feng shui, and selected dependencies in ABI 68.
   Twenty-nine focused checks pass. The initial native run passes 28 calls and
   37 memory assertions, including all seven loaded profiles and item readers.
-  Fifty-six options compose offline; all/empty retain exact full/V2 outputs.
   No additional resident RAM is needed. The [three callback-owned camping assets](checkpoints/V3_CAMPING_ACTORS.md)
   are converted completely, and the bonfire's true four-cell item reader compiles
-  within the existing reservation. Twenty-one focused checks pass. Continue
-  cartridge/composer integration for the [compiled tent-light callbacks](checkpoints/V3_TENT_MODEL_CALLBACKS.md),
-  which pass three focused source/host checks with complete palettes and private
-  frame lifetime. Continue native execution, fire rig/billboard/scroll/sound callbacks,
+  within the existing reservation. Twenty-one focused checks pass. The
+  [tent runtime](checkpoints/V3_TENT_MODEL_RUNTIME.md) installs complete callbacks,
+  English metadata, non-orderable catalogue entry, scoring, and saved dependency
+  in ABI 69. Seventeen focused tests and the first native run pass, including
+  17 calls, 48 assertions, independent fades, complete draw commands, palette
+  lifetime, item readers, and guards. Fifty-seven options compose offline;
+  all/empty retain exact full/V2 outputs. Continue fire rig/billboard/scroll/sound callbacks,
   and summer-camper acquisition, then other donor content and
-  ordinary gameplay/persistence. The seven Tent rewards do not enter normal
+  ordinary gameplay/persistence. The eight installed Tent rewards do not enter normal
   shop stock. Neither served patcher changes. Current catalogue suffix headroom
   is 256 bytes; the menu pool has 448 bytes spare.
   The [expanded import storage](checkpoints/V3_IMPORT_STORAGE.md) preserves the

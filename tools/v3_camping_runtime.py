@@ -35,8 +35,8 @@ SOURCES = ('tools/v3_camping_runtime.py', 'tools/v3_camping_items.py',
     'overlays/v3/catalogue.ld', 'overlays/v3/startup.c')
 
 
-def scoring(base, prior, item_rows, rel, symbols):
-    mapping = score_mapping(rel, symbols, base, prior)
+def scoring(base, prior, item_rows, rel, symbols, *, source_sha256=BASE_SHA):
+    mapping = score_mapping(rel, symbols, base, prior, source_sha256=source_sha256)
     changes, reports = {}, {}
     files = by_vrom(base)
     for key, tool, width in (('hra', hra, 4), ('feng_shui', feng, 2)):
