@@ -2,10 +2,11 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-72 integration cartridge,
+Compose experimental selections from the pinned ABI-75 integration cartridge,
 including the complete tent model, both fires, their checked DMA/callback
 loaders, four-cell item readers, complete sound resources, and the additive
-campsite scene/exterior runtime. The tent's setup predicate reads the actual
+campsite scene/exterior runtime, native calendar, independent camper, and native
+tent placement/removal adapter. The tent's setup predicate reads the actual
 selected camping-item rows. Event activation and acquisition remain unfinished.
 Shared audio changes
 remain in every nonempty profile; the empty profile still returns exact V2.
@@ -22,7 +23,7 @@ donor items are rejected. Select-all means these installed development entries,
 not every item on the donor disc.
 
 An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-72 engine and all compiled resources, but enables only the
+retains the shared ABI-75 engine and all compiled resources, but enables only the
 chosen identities and their declared dependencies. IDs, object slots, house
 layers, and allocations never depend on order or subset. Resource compaction is
 not part of this step.
@@ -44,7 +45,7 @@ again from the original selection, not by editing an earlier dependency result.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-72 cartridge and its source report. Validate each
+Pin both the complete ABI-75 cartridge and its source report. Validate each
 installed registry binding before generating writes. Resident changes cover the profile
 at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
 metadata's `present` bytes, and the installed furniture/clothing/mannequin
@@ -62,7 +63,7 @@ address and logical row count for each installed batch. The dedicated model pool
 is shared runtime capacity, not another selectable item or a profile-dependent
 allocation.
 
-The package is 192,528 bytes at VROM `02400000`, loaded at RAM `80473000`.
+The package is 196,608 bytes at VROM `02400000`, loaded at RAM `80473000`.
 English choices reside at `025F0000`; composition never changes their contents.
 Its item-code extension and the fixed save-resource forwarding entries remain
 unchanged across profiles. Watering trough, covered wagon, and storefront retain

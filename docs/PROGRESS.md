@@ -2,7 +2,26 @@
 
 ## Active development
 
-The [independent camper](checkpoints/V3_CAMPER.md) installs complete visitor
+The [tent placement adapter](checkpoints/V3_CAMPSITE_PLACEMENT.md) connects the
+new tent to native 3×3 placement, housing-lot restoration, and the expanded event
+cleanup list in ABI 75. Both native building-class consumers handle the added
+ID explicitly, avoiding an out-of-bounds read into function-pointer data.
+All original buildings and the complete English event-letter manager remain.
+Sixteen focused/composition checks pass. The silent current native test passes
+49 records, including all eight register/delay checks, actual nine-cell placement,
+invalid-edge rejection, and full foreground removal with lot restoration.
+No resident reservation, heap limit, DMA allocation, or saved format grows.
+
+Current full integration:
+`build/v3-campsite-placement-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`f3893696555b91f4852e87b7bce6d09b1213faf4defe75e3f3dc09ece2b02efe`.
+The ten-item subset is `build/v3-optional-placement-01/`. The offline composer
+retains 59 experimental choices and exact all/empty full/V2 output. Continue the
+English event-manager extension, remaining masked readers and greeting states,
+English conversations, selected rewards, and lighting. Neither served patcher
+changes. This is not a complete-import playtest handoff.
+
+The retained [independent camper](checkpoints/V3_CAMPER.md) installs complete visitor
 Animal ownership, optional-roster/default/outfit registration, current-player
 memory reconstruction, and native NPC-info attachment in ABI 74. No town slot,
 heap growth, or model bank is used. Fifteen current focused/composition checks
@@ -12,14 +31,8 @@ alias capacity/selection checks, greeting memory, and complete native save/town
 list preservation. The native greeting-memory alignment is explicitly handled.
 These are native RAM/reader checks, not full NPC construction or persistence.
 
-Current full integration:
-`build/v3-camper-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`bd2fd28f02f1b667c1038e4ffc1121026d4660d94847afa53eaa03d53c35849f`.
-The ten-item subset is `build/v3-optional-camper-01/`. The offline
-composer retains 59 experimental choices and exact all/empty full/V2 output.
-Continue event-manager tent activation, remaining masked readers and greeting
-state transitions, English conversations, selected rewards, and lighting.
-Neither served patcher changes. This is not a complete-import playtest handoff.
+Its unchanged ownership/default/name/attachment code retains that recorded native
+evidence; the placement batch does not re-test the older cartridge.
 
 The installed [native summer calendar](checkpoints/V3_CAMPSITE_CALENDAR.md)
 retains its independent expanded index and all original event types/schedules.

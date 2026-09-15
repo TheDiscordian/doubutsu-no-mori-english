@@ -15,7 +15,8 @@ scene/field packet, and `tools/v3_campsite_runtime.py` installs its loader and
 all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
 callbacks and native structure-loader binding. ABI 73 adds the native calendar
 and expanded event index. ABI 74 supplies an independently owned visitor Animal,
-registration/defaults, and native NPC-info attachment. Event-manager activation,
+registration/defaults, and native NPC-info attachment. ABI 75 supplies native
+tent foreground placement/removal classification and event cleanup. Event-manager activation,
 remaining masked readers/conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes.
 
@@ -317,3 +318,63 @@ supplies a valid resident index. Existing English actor-name and draw-record
 readers then resolve through the actual animal/alias. This does not by itself
 establish a complete NPC constructor, conversation, GPU draw, or save/restart.
 The [camper checkpoint](../docs/checkpoints/V3_CAMPER.md) records current evidence.
+
+## Native tent placement and cleanup
+
+The original building-class table at `8010699C` has 68 bytes for `5800..5843`.
+Its biased lookup at `8010119C + item` would read `5849` from the following
+function-pointer table, not a valid class. Both consumers (`8008D4A8` in
+`mFI_SetFGStructure_common` and `8008D5BC` in the structure-area reader) use
+explicit tent detours. Every other input executes its original byte lookup.
+Do not move the table base and thereby change undeclared original inputs.
+
+The eighty-byte adapter at `804A2A70` ends at `804A2AC0`, after the complete
+camper reader and before the event index. No new allocation is required. It
+preserves the displaced load/LUI and the native continuation; only the already
+dead `at` scratch register changes in addition to native outputs.
+
+GC's actual class byte for `5849` is 10. Its callback matches the donor's 3×3
+callback, and removal restores the reserved housing-lot sign. Native class 8
+provides those semantics through `8008D12C` and `800879B0`. Both games' area-query
+rows for this temporary lot type are origin-only, separately from the nine-cell
+foreground reservation; retain that distinction rather than assuming a larger
+query rectangle. The original igloo uses the same restoration class.
+
+The complete nineteen-entry event-structure cleanup list is retained and extended
+with `5849` at `804A2C80` (forty bytes). The native finish loop's base changes and
+its existing count word becomes twenty. This lets ordinary cleanup find and
+remove the tent without overwriting the padding before the original count word.
+The packet CRC, overall package CRC, and startup prefix CRC cover the changes.
+
+The [placement checkpoint](../docs/checkpoints/V3_CAMPSITE_PLACEMENT.md) records
+passing native nine-cell placement, invalid-edge rejection, lot restoration,
+area calls, and all eight full-register instruction windows. The test uses
+native saved-town foreground with a small indoor-field data fixture, not a
+constructed scene. It does not execute the full event-finish traversal, create
+an exterior actor, establish conversations, or write/reload FlashRAM.
+
+## Event-manager integration contract
+
+Extend the installed English manager at VROM `03800000`, linked RAM `8095B8B0`,
+not the absent original VROM `00850680`. The installed file is 38,128 bytes,
+ending at `80964DA0`, with 1,760 relocation bytes and 433 retained relocations.
+Its descriptor at `80101310`, profile `809622EC`, and 592-byte instance stay.
+Preserve the complete English suffix, original zero-initialized BSS addresses,
+save/destructor retry wrappers, and native control logic when appending camper
+callbacks. This manager extension is not installed yet.
+
+The original 28 controls occupy `80961F48..809622C8`, with a separate count at
+`809622C8`. Each control is 32 bytes. A complete relocated copy plus a 29th
+summer control fits the existing 32-pointer daily list at `809623D8`; its live
+count is `80962458`. The two control-base HI/LO pairs begin at `809612F4` and
+`809612F0`, with low instructions at `80961300` and `80961304` respectively.
+Retain their relocation handling. Native status dispatchers are `80961004` and
+`80961100`; zero callback results retain pending transitions for retry.
+
+Native lot placement is `8095D324(manager, control, foreground, area)`, with
+summer area `51`; removal is `8095D1E0(control, area)`. Placement uses saved
+location area ID `77`, twenty-byte place records, and the native vacant-lot
+picker. The independent two-byte camper identity uses event save area zero.
+Do not substitute the GC structure layout or mark start successful when visitor
+registration or placement fails. Complete the remaining masked NPC readers and
+conversation binding before presenting an active tent as playable.

@@ -1,0 +1,12 @@
+[
+  {"wait": 16},
+  {"read": ["8019ACD0", 4], "expect": "00000001"},
+  {"read": ["80460000", 16], "expect": "414656330000004b0000c000000001c0"},
+  {"save_state": true},
+  {"pause_game_thread": true},
+  {"test_v3_campsite_placement": true},
+  {"load_state": true},
+  {"wait": 1},
+  {"read": ["8003CE34", 4], "expect": "00000000"},
+  {"read": ["8019C8D0", 16], "expect": "af32c0deaf32c0deaf32c0deaf32c0de"}
+]
