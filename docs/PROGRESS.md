@@ -2,6 +2,18 @@
 
 ## Active development
 
+The [camper trade adapter](checkpoints/V3_CAMPER_TRADE.md) connects full-ID pocket
+selection, summer last-gift exclusion, and selected camping rewards in ABI 81.
+It preserves the donor's 20% tent-list roll, subsequent 10% house-gift roll,
+small-list duplicate rule, and carpet/wall list fallback. The 1,344-byte suffix
+uses the existing conversation allocation; saved formats and resident heaps do
+not grow. Eighteen focused/composition checks pass. The corrected silent native
+run passes 55 records and 37 assertions, including two selected-only rewards,
+three complete trade preparation calls, both gift hooks, constructor reset,
+the complete greeting initializer/return, restoration, and guards. Four pocket
+cases also pass in the initial run. Complete conversations and acquisition
+animations are not established by these checks.
+
 The [official credits correction](checkpoints/OFFICIAL_CREDITS_TITLE.md) uses
 the supplied English GameCube title, `Animal Crossing`, rather than the manual
 literal-title draft. The [single text-source catalogue](TEXT_PROVENANCE.md)
@@ -15,8 +27,9 @@ buffer; saved formats and permanent allocations do not grow. Seventeen current
 focused/composition checks pass. Actual native owner loading, all six personality
 introductions, English message reads, repeat bases, and thirteen eligibility
 cases pass. A later caller-dispatch breakpoint times out despite the expected
-message result. Its cause remains unresolved; native gift/reset execution,
-final guards, and complete conversations are not claimed as passed.
+message result. That intermediate stop remains unexplained; the current trade
+check passes the complete unchanged greeting initializer/return, native gift/reset
+execution, and final guards. Complete conversations still require verification.
 
 The unchanged [complete summer text adapter](checkpoints/V3_CAMPER_TEXT.md) appends all 253
 donor messages and 49 choices in ABI 79, retaining every existing English record.
@@ -61,15 +74,14 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`dfac082b4a900711aedf19b2e0cc869ee8622e1eb110e04be66591a448ea1d4e`.
-The ten-item subset is `build/v3-optional-camper-greeting-01/`. The offline composer
-retains 59 experimental choices and exact all/empty full/V2 output. Continue the
-actual trade picker and selected rewards, retaining the unresolved dispatch stop
-for focused caller tracing. Remaining masked readers and lighting/floor sounds
-need integration. Full construction, ordinary entry/exit, acquisition, and
-persistence remain unverified. GitHub
-development source is allowed; neither served patcher changes until the user
+`build/v3-camper-trade-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`d01afeb17c4c0a306e892037808268b675f8f02179dba7dd2261b397f03f55a9`.
+The two-item subset is `build/v3-optional-camper-trade-01/`. The offline composer
+retains 59 experimental choices and exact all/empty full/V2 output. Continue
+remaining masked readers and scene lighting/floor sounds, then combined ordinary
+construction, entry/exit, conversation handover, and persistence checks. Those
+gameplay paths remain unverified. GitHub development source is allowed; neither
+served patcher changes until the user
 tests V3 and explicitly approves the switch. This is not a complete-import
 playtest handoff. Imported saves require matching/superset profiles and must
 not be loaded in V2.

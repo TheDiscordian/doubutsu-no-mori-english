@@ -110,7 +110,10 @@ Continue actual trade selection and selected camping rewards. The donor's
 inside the tent; do not add ordinary shop stock or substitute an unrelated gift
 route. Its random furniture/carpet/wall picker also excludes `give_item`; that
 reader needs the new full-ID state as well as greeting eligibility. Preserve the
-native winter chance and other categories. Finish remaining masked readers and
+native winter behaviour and other categories. The actual native common body has
+no winter-special stock roll; its 10% branch selects house furniture. See the
+current [trade checkpoint](V3_CAMPER_TRADE.md) for implementation and executed
+full greeting return/gift/reset checks. Finish remaining masked readers and
 lighting/floor sounds, then combine ordinary construction, conversation/award,
 entry/exit, and persistence checks, retaining the dispatch failure above.
 

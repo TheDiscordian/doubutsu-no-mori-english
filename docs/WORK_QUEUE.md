@@ -3,10 +3,10 @@
 ## Active: V3 optional GameCube imports
 
 The current integration image is
-`build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`; the
-[credits/provenance checkpoint](checkpoints/OFFICIAL_CREDITS_TITLE.md) records
-its data-only correction and preserved ABI-80 behaviour. Resume camper trade
-selection and selected camping rewards from this image. Maintain text credits
+`build/v3-camper-trade-runtime-02/animal-forest-v3-asset-loader.z64`; the
+[trade checkpoint](checkpoints/V3_CAMPER_TRADE.md) records ABI-81 selected rewards
+and full-ID pocket selection. Continue remaining masked readers, scene lighting/
+floor sounds, and ordinary camper construction/conversations. Maintain text credits
 in the single `translations/provenance.json` catalogue; its own coverage queue
 tracks the remaining attribution work without a duplicate review list.
 
@@ -368,14 +368,20 @@ with later e/e+ donor support investigated separately.
   Seventeen current focused/composition checks pass; native full-owner loads,
   six personalities and nineteen repeat/eligibility cases pass. The later
   dispatch-window stop times out with the expected message in return registers.
-  Its cause remains unresolved; native gift/reset calls, final guards, and
-  complete conversations are not verified. Retain this issue for a focused
-  caller/return trace without replaying the successful component prefix.
-  Current full build: `build/v3-camper-greeting-runtime-02/`; camping subset:
-  `build/v3-optional-camper-greeting-01/`. Both patchers remain V2.
-  Continue actual trade picking, last-gift exclusion in that picker,
-  remaining masked readers, ordinary NPC construction,
-  selected rewards with the donor's 20% tent-list chance, and scene lighting/floor sounds as specified in
+  That intermediate stop remains unexplained. The [trade adapter](checkpoints/V3_CAMPER_TRADE.md)
+  passes the complete unchanged greeting initializer/return in the current ROM,
+  both native gift/reset hooks, restoration, and final guards. It installs actual
+  full-ID pocket selection, last-gift exclusion, and profile-filtered camping
+  rewards, preserving donor probabilities, small-list duplicate rules, and later
+  carpet/wall fallback. Eighteen focused/composition checks pass. The corrected
+  native run passes 55 records and 37 assertions, including three complete trade
+  preparation calls and two selected-only camping rewards. Four pocket cases
+  pass in the initial run; its bad fixture identity is corrected without a ROM
+  change or replaying those cases. Ordinary conversations remain unverified.
+  Current full build: `build/v3-camper-trade-runtime-02/`; camping subset:
+  `build/v3-optional-camper-trade-01/`. Both patchers remain V2.
+  Continue remaining masked readers, ordinary NPC construction, conversation
+  handover, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes

@@ -550,5 +550,65 @@ then performs the original `bzero`. No actor instance or reservation grows.
 The [greeting checkpoint](../docs/checkpoints/V3_CAMPER_GREETING.md) records
 passing focused checks and partial native selection/loading evidence, including
 the unresolved caller-dispatch stop. Do not treat it as full native conversation
-or award execution. The actual trade picker must also exclude this identity and
-filter the tent reward list to selected items before acquisition is complete.
+or award execution. The current trade adapter below supplies that same exclusion
+to actual pocket selection and filters rewards to selected items.
+
+## Summer trade selection and rewards
+
+`camper_trade.c` appends 1,344 bytes at linked address `80922370` to the existing
+English normal-conversation owner. VROM `03910000` contains 20,736 bytes;
+`03918000` contains its 2,272-byte relocation resource with 560 entries. Both
+retain their DMA identities/adjacency and original physical data. Total loaded
+size is 23,008 bytes within the existing `8800`-hex shared reservation. No
+resident allocation, actor instance, or saved structure grows. The quest
+descriptor's virtual/linked ends at offsets `2460` and `2468` change together.
+
+Only two original eight-byte entry windows change: the pocket picker at
+`8091ED64` and common trade preparation at `8091EFDC`. Existing English letter,
+name, date, choice, and gift helpers remain. All original owner bytes outside
+those windows retain their values under relocation at two independently checked
+addresses. The non-summer trampoline repeats the displaced prologue, then jumps
+to `8091EFE4`; non-summer trade preparation remains the actual native body.
+
+The pocket picker builds up to fifteen eligible slot indices using the shared
+selected-furniture classifier, original carpets/walls, and ordinary item
+conditions. It excludes `804A1A12` only in summer scene 35. Empty eligibility
+returns `-1` without writing the output or drawing randomness. This repairs the
+native mismatch between its expanded furniture count and raw-type-only search.
+
+Summer common preparation follows the supplied donor's **normal** owner:
+`.text:1228F4`/`174` bytes for pocket selection and `.text:122B8C`/`230` bytes
+for common preparation. Duplicate symbol names in the island owner are not
+equivalent sources. Categories are the actual tables at `.data:3E248`:
+`0,3,4` and `2,1,5`. The original native normal state, full-name insertion,
+fruit selection, clothes exclusions, final random candidate, and pitfall
+`2512` mode remain connected. No new player-facing wording is introduced.
+
+Furniture rolls `random(100) >= 80` for the tent list. The separate native/donor
+`random(10) == 0` house-gift chance follows that list roll and can override it.
+An empty house result falls through to the chosen list without another house
+roll. The native original common body has **no winter-special list roll**;
+its 10% chance is for house furniture. Preserve that actual native winter
+behaviour instead of inventing a pre-existing winter acquisition path.
+
+The actual ten-item `ftr_listTent` is filtered through enabled runtime metadata
+before selection. Existing candidates and the saved shop rare item at
+`80135C00` are excluded. Match the donor's small-list duplicate allowance when
+the selected list contains fewer than `1 + existing_count` items; disabled
+items never return through this allowance. A defensive empty/exhausted-profile
+case falls back to ordinary furniture rather than looping without a candidate.
+These are optional-profile adaptations, not changes to ordinary shop stock.
+
+The donor retains the chosen list across the whole category loop. Carpet and
+wall descriptors have no TENT pointer and fall back to their physical A lists.
+Obtain native priorities at `800C1BF0`, then pass `priorities[0]` to the original
+goods selector so the shorter native descriptor table selects that same A list.
+Do not treat this as an ABC roll or index a nonexistent native TENT descriptor.
+The saved rare-item check, native loading, and existing clothing-list adapter
+in `800BFCF0` remain unchanged.
+
+The [trade checkpoint](../docs/checkpoints/V3_CAMPER_TRADE.md) records passing
+current full-owner relocation, full-ID pocket cases, two selected-only reward
+preparations, an ordinary trade, gift/reset windows, complete greeting return,
+restoration, and guards. These are actual native routines on controlled fixtures,
+not ordinary conversation, acquisition-animation, or persistence acceptance.
