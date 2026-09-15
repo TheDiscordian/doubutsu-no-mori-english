@@ -19,6 +19,7 @@ from v3_furniture_pipeline import Source, LAYERS, prepare, metadata, identity_ro
 from v3_garden_runtime import install_catalogue
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE_END, END, slot
 import v3_furniture_behaviours as behaviours
+import v3_furniture_placement as placement
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
@@ -31,7 +32,7 @@ STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
-    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES
+    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES + placement.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -235,6 +236,8 @@ def build(output, art_path, lock=LOCK):
         raise ValueError('Changed goods owner/descriptor')
     struct.pack_into('>3I',code,shops.DESCRIPTOR-CODE_RAM,shops.VROM,shops.VROM+len(goods),0x06000000|table_at)
     behaviour_report=behaviours.install(original,base,prior,blob,code,imports,source,output)
+    placement_changes,placement_report=placement.install(original,base,prior,blob,imports,source)
+    changes.update(placement_changes)
     changes[shops.VROM],changes[CODE_VROM] = goods,code
     stock_report = {**stock,'imports':stock_rows,'bytes':len(goods),'table_offset':table_at,'output_sha256':sha256(goods)}
     moves = []
@@ -278,7 +281,8 @@ def build(output, art_path, lock=LOCK):
     report.update(build='v3-automatic-furniture',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,
-        catalogue=cat_report,shops=stock_report,furniture_behaviours=behaviour_report,**score_reports,
+        catalogue=cat_report,shops=stock_report,furniture_behaviours=behaviour_report,
+        furniture_placement=placement_report,**score_reports,
         native_test='pending representative automatic-import execution')
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))
     report['furniture_items']['imports'].extend(installed)
@@ -291,6 +295,8 @@ def build(output, art_path, lock=LOCK):
     for section in (report['furniture']['imports'],report['furniture_items']['imports']):
         for row in section:
             at=ITEMS+slot(int(row['item_id'],16))*32; row['record_sha256']=sha256(blob[at:at+32])
+            row['action_sound']=blob[at+25]
+            row['layer_type']=source.raw('aMR_layer_set_info')[row['runtime_index']]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),
         resource_moves=moves,additional_resident_bytes=0,saved_format_changed=False,

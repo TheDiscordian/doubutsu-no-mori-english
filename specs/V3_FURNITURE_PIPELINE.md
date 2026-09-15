@@ -68,6 +68,11 @@ The shared static-CI4 category supports:
   table. Matching complete sound programs, timing, instruments, and samples use
   the existing native audio; no replacement sample or new audio allocation is
   needed. The shared reader also covers previously installed furniture.
+- Native `NO_COLLISION` interaction flag `0010`, preserved in the complete
+  profile. The native registration/placement behaviour and shop exceptions
+  remain; this is not a substitute for a diary's separate gameplay system.
+- Source-derived placement layers: ordinary floor items, surfaces that hold
+  other items, and objects that may be placed on those surfaces.
 
 Dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized
@@ -117,6 +122,22 @@ The build verifies complete source audio, current audio resources, original
 function bytes, existing fire code, and unclaimed helper padding. Linker limits
 separate the shared item, tent, fire, and behaviour code reservations.
 
+`tools/v3_furniture_placement.py` provides a complete 2,051-entry placement-layer
+table at `80474200`. Native entries 0–946 remain unchanged; imported furniture
+uses its canonical donor entry, and clothing display aliases use their verified
+mannequin source. Uninstalled slots are zero. The immutable table and its two
+guards occupy `804741F0..80474A1F`, between the twenty accessory records ending
+at `80474140` and artwork starting at `80475000`. Nothing is taken from a live
+object or an unselected future item slot; no resident reservation grows.
+
+All five native table references are redirected together. The builder resolves
+the actual relocation pairs, rejects shared unrelated high halves, removes
+exactly ten obsolete relocations, and leaves all other owner bytes intact.
+The complete native collision-registration function is checked against the
+original after accounting for its changed table address. Future batches update
+the same table from their records, with the installed reservation and bindings
+verified first. Neither the existing item records nor saved formats grow.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source
@@ -134,6 +155,8 @@ model DMA, item readers, placement, catalogue eligibility, acquisition, ownershi
 state restoration, and guards. The sound check executes the actual native entry,
 including original fallbacks, imported modes, disabled profiles, and invalid
 indices. It checks returned sound IDs without playing audio through hardware.
+Placement checks cover the complete resident table/guards, all five bindings
+after relocation, and the actual native no-collision registration routine.
 It does not create a new scenario per item.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.

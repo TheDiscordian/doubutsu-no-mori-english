@@ -17,6 +17,7 @@ def representatives(rows):
     result, covered = [], set()
     for row in sorted(rows,key=lambda r:(-r['object_bytes'],r['item_id'])):
         features={('size',row['size_code']),('stock',row['stock_group']),('sound',row.get('action_sound',0)),
+                  ('placement',row.get('layer_type',0)),('interaction',row.get('interaction_flags',0)),
                   ('layers',tuple(sorted(row.get('model_offsets',{}))))}
         if features-covered: result.append(row); covered.update(features)
     if len(result)>12: raise ValueError('Split new behaviour categories into bounded smoke passes')
@@ -31,7 +32,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         raise ValueError('Furniture probe requires its current checked cartridge')
     rows = representatives(report[section]['imports'])
     record(dict(representative_furniture=[r['item_id'] for r in rows],
-                categories=['stock','footprint','display-list layers','action sounds']))
+                categories=['stock','footprint','display-list layers','action sounds','placement layers','interaction flags']))
     files, boot = by_vrom(image), boot_proofs(image)
     blob = files[runtime.BLOB].extract(image)
 
@@ -53,6 +54,10 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         return result['return_value']
 
     check('current startup and profile', 0x80460000, blob[:0x100])
+    if 'furniture_placement' in report:
+        placement=report['furniture_placement'];start=placement['reservation_start'];end=placement['reservation_end']
+        at=runtime.PACKAGE+start-runtime.PACKAGE_RAM
+        check('complete placement table and guards',start,blob[at:at+end-start])
     saved = {at: debug.read_memory(at, n) for at, n in (
         (0x80100DF0, 32), (0x8046C000, 864), (0x80126EC0, 0xBD0),
         (0x80136FD8, 4), (0x80135B1C, 1), (0x80135C00, 2), (0x801458B8, 4))}
@@ -82,7 +87,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         check('complete actual owner load and relocations', owner, expected)
         return expected, (owner, expected[:sections[0]])
 
-    loaded, _ = load(furniture.VROM, furniture.RELOC, furniture.RAM, furniture.RESIDENT)
+    loaded, furniture_proof = load(furniture.VROM, furniture.RELOC, furniture.RAM, furniture.RESIDENT)
     check('native directional chair table after relocation', owner+0x8094CFF8-furniture.RAM,
           loaded[0x8094CFF8-furniture.RAM:0x8094D028-furniture.RAM])
     debug.write_memory(0x80100E00, struct.pack('>I', owner))
@@ -118,6 +123,17 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             for index in (947,1023,2048,0xFFFFFFFF):call(SOUND_ENTRY,[index,0],0xFFFFFFFF)
         for row in rows:
             item, index = int(row['item_id'], 16), row['runtime_index']
+            if row.get('interaction_flags',0)&0x10:
+                from v3_furniture_placement import REGISTER
+                # The actual native registration routine must skip collision in
+                # an ordinary field, retaining its shop exceptions unchanged.
+                call(0x80087E14,[],0)
+                if call(0x80087C88)==0x3002: raise ValueError('Furniture fixture is in the broker shop')
+                actor=scratch+0x200;expected=bytearray(0x740)
+                struct.pack_into('>H',expected,0,index);debug.write_memory(actor,expected)
+                call(owner+REGISTER-furniture.RAM,[actor,int(row['profile_ram'],16)],1,furniture_proof)
+                struct.pack_into('>i',expected,0xD0,-1)
+                check(row['name']+' complete native no-collision registration',actor,expected)
             debug.write_memory(scratch, bytes(0x100))
             call(0x801969C8, [scratch, 16, item], 1)
             check(row['name'] + ' full English name', scratch, row['name'].encode().ljust(16, b' '))

@@ -1,8 +1,66 @@
 # Automatic furniture pipeline checkpoint
 
-## Current shared seating category
+## Current collision and placement categories
 
-The current complete cartridge is ABI 86:
+The current complete cartridge is ABI 87:
+`build/v3-furniture-placement-runtime-01/animal-forest-v3-asset-loader.z64`.
+The same importer installs grass model `30E8`, dirt model `30F0`, and boxing
+mat `3348`, retaining all 2,768 object bytes, 44 vertices, 24 triangles, textures,
+and the donor's `0010` no-collision flag. Official name credits are in the single
+provenance catalogue. Automatic additions total nineteen; the offline composer
+contains 81 installed options: 58 furniture, three shirts, and twenty villagers.
+
+Inspection identifies five native readers still indexing the original 947-entry
+placement-layer table with imported indices. This can read unrelated data and
+lose surface behaviour. The shared fix preserves the original prefix and adds
+source-derived rows for every installed furnishing and all three clothing display
+aliases. Four imported surfaces (teacher's desk, orange box, chess table, and
+ringside table) and five surface-placeable objects (garden gnome, cow skull,
+lantern, Luigi trophy, and Mario trophy) now have explicit correct categories.
+Other imported furniture has category zero. No item-specific runtime branch is
+added. The complete native collision-registration routine is unchanged except
+for its corrected table address, preserving its ordinary-room/shop distinction.
+
+The 2,051-entry table and guards occupy `804741F0..80474A1F` in the unused
+registry-to-artwork gap. The five actual HI/LO pairs are at
+`8093825C/80938268`, `80943878/8094387C`, `80943978/8094397C`,
+`80943A34/80943A40`, and `809462C8/809462D4`. Ten obsolete relocations are
+removed. All other native owner bytes and accessory records/artwork remain.
+There is no added executable code, resident allocation, or saved-format growth.
+
+- ROM SHA-256: `004a1173c51cdea009c3a5e291067469675d40809002bf8fd41d99f28f671c1d`.
+- UPS SHA-256: `df73ad1e2f7c8f010bd6016356a2d03b333d4295de4bb8d04c44cc286906c999`.
+- Receipt SHA-256: `64805f9215d264303347fc40842f5fa6b15d2c549453f3e6c5b7ac654b1e85ec`.
+- Import-resource SHA-256: `c328b130c6bb338de7582f24ceb6f3b741769427477e5c237a7a9b5c53665a58`.
+- Placement-table SHA-256: `9f6d51793f058d2b8ebe8952a4369fd4a7b5d48eb19c9998333b885aac89ef01`.
+- Native owner SHA-256: `ca540a6f48fa15fb8bfad4d36abf77bb3d318799732d965f278063207f64b74a`.
+- Relocation SHA-256: `c97bc9e48c97a6830145218f5fcdcaa664a7611167b2f013bc93d75f4e493bc5`.
+
+The blob contains 3,116,400 bytes, with 1,012,368 bytes remaining before English
+choices. The catalogue has 494 furniture rows and 248 clothing rows; conservative
+menu memory remains 280,384 of 280,704 reserved bytes. All 28 focused pipeline/
+composition tests pass. They include every converted texel/vertex/triangle,
+unknown interaction/placement rejection, source-derived table entries, all five
+retargeted references, complete relocation comparisons at two load addresses,
+unrelated-owner retention, repeat-batch reuse, and save-profile composition.
+The first silent native run passes 125 records and 107 assertions, including
+the complete placement table/guards, native owner loading/relocation, actual
+no-collision registration for all three new objects, complete model DMA,
+one-/two-cell rotated footprints, names, prices, stock, catalogue eligibility,
+acquisition, ownership, restored state, and guards. The existing four sound
+routes also pass. The emulator exits cleanly; no native setup retry is needed.
+Results are in `build/v3-furniture-placement-native-01/results.json`, SHA-256
+`5757a4b7580348303195455ae9c1b5b17e425a3bafa18cfc19c549673a7e733a`.
+
+Ordinary room appearance, table use, walking across the collision-less objects,
+and save/restart remain unverified. Saved format 2 is unchanged and the profile
+extends ABI 86; no ordinary cross-version reload is newly claimed. Saves using
+the three new objects must not be loaded in older builds or V2. Neither served
+patcher changes.
+
+## Shared seating category
+
+The seating-category cartridge is ABI 86:
 `build/v3-furniture-seats-runtime-02/animal-forest-v3-asset-loader.z64`.
 The automatic pipeline adds lawn chair `324C` and teacher's chair `3288`
 without an item definition, dedicated installer, or separate native scenario.
@@ -137,19 +195,21 @@ new items in an older build or V2.
 ## Category queue
 
 The donor worksheet contains 242 canonical 3xxx entries. This converter supports
-40 under its present complete category rules, all installed. The post-install
+43 under its present complete category rules, all installed. The post-install
 scan identifies no remaining supported,
 uninstalled entries. This is **not** a whole-project completeness percentage.
-The other 202 entries include already-installed special adapters and explicit
+The other 199 entries include already-installed special adapters and explicit
 identity/unused cases as well as genuinely missing imports.
 
 Continue through shared feature categories, not individual item queues:
 
-1. Shared contact flags and callback families: 20 entries have the same `0010`
-   interaction flag; 106 have custom callback tables. Inspect actual behaviour
-   and dependencies before enabling a family; never discard callbacks to make
-   an item fit the static category.
-2. Acquisition categories, special preview framing, and graphics variants:
+1. Shared callback families: 102 uninstalled entries stop on custom callback
+   tables. Classify the actual callback/dependency patterns and implement shared
+   behaviour adapters; never discard callbacks to fit the static category.
+2. The supported `0010` flag exposes further dependencies: sixteen diary display
+   models need diary identity/gameplay/acquisition; weed model needs the shared
+   `ftr_listEventPresentChumon` reward route. Neither is a completed static import.
+3. Acquisition categories, special preview framing, and graphics variants:
    extend reusable adapters for the inventory's explicit reasons. Some items
    need combined features; clearing one reason need not make the item complete.
 

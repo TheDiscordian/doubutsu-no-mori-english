@@ -48,6 +48,7 @@ at `80473000..8047EFFF`. This is additional resident memory; the original
 | `0000..000F` | `AFA3` header, package ABI 1, size `C000`, row count 20 |
 | `0100..04EB` | Accessory helper, entry `80473100` |
 | `1000..113F` | Twenty 16-byte identity/attachment rows |
+| `11F0..1A1F` | Shared furniture placement table and guards; see [automatic imports](V3_FURNITURE_PIPELINE.md) |
 | `2000` onward | Sixteen complete objects, individually aligned to 32 bytes |
 | `BFF0..BFFF` | Four `AFACC0DE` guard words |
 

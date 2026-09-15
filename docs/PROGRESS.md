@@ -3,20 +3,22 @@
 ## Active development
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) installs
-sixteen additional items through source-discovered records and shared conversion,
+nineteen additional items through source-discovered records and shared conversion,
 stock, catalogue, scoring, and profile installation. No per-item installer or
-graphics description is needed. The current ABI-86 cartridge adds lawn chair
-and teacher's chair through the shared seating-sound category and corrects the
-existing lefty/righty desks' sound routing. Its 208-byte reader occupies existing
-reserved space; no audio data or permanent allocation grows. Twenty-six focused
-tests and the first current native run pass (88 records, 73 assertions), including
-all four imported sound routes and both complete chair model loads. The first
-fourteen items retain their passing 148-record native evidence. The offline
-composer has 78 installed development options. Ordinary appearance/gameplay and
+graphics description is needed. The current ABI-87 cartridge adds grass model,
+dirt model, and boxing mat with the native no-collision flag. A shared placement
+table fixes five native readers that still used the original smaller table with
+imported indices. All installed furniture now has source-derived placement
+categories, including four surfaces and five surface-placeable objects. The
+table fits the existing accessory-package gap; no permanent allocation grows.
+Twenty-eight focused tests and the first current native run pass (125 records,
+107 assertions), including the complete table/guards, actual no-collision
+registration, model DMA, and acquisition. The offline composer has 81 installed
+development options. Ordinary appearance/gameplay and
 save/restart remain unverified; both served patchers remain V2. Continue shared
 contact/callback and graphics/acquisition categories through this pipeline.
 The current lock is `config/v3-import-build.json`; the cartridge is
-`build/v3-furniture-seats-runtime-02/animal-forest-v3-asset-loader.z64`.
+`build/v3-furniture-placement-runtime-01/animal-forest-v3-asset-loader.z64`.
 
 The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
 righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,

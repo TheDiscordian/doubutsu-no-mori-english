@@ -97,6 +97,24 @@ class DonorTests(unittest.TestCase):
             pipeline.metadata(changed,0x324C,p,identities[0x324C])
         with self.assertRaises(ValueError): self.source.pointers(self.source.size-2,4)
 
+    def test_shared_collision_flag_and_placement_categories_preserve_unknowns_for_review(self):
+        identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
+        profile=self.source.profile(0x30E8)
+        self.assertEqual(profile['interaction_flags'],0x10)
+        self.assertEqual(bytes.fromhex(profile['scalar_hex'])[-2:],bytes.fromhex('0010'))
+        changed=copy.copy(self.source);changed.data=bytearray(changed.data)
+        struct.pack_into('>H',changed.data,profile['profile_offset']+46,0x20)
+        with self.assertRaisesRegex(ValueError,'contact/interaction'):
+            changed.profile(0x30E8)
+        changed=copy.copy(self.source);changed.data=bytearray(changed.data)
+        at,_=changed.symbol('aMR_layer_set_info');changed.data[at+1082]=3
+        with self.assertRaisesRegex(ValueError,'placement-layer category'):
+            pipeline.metadata(changed,0x30E8,profile,identities[0x30E8])
+        # Diary display models are not ordinary furniture: recognising their
+        # collision flag must not bypass the missing gameplay/acquisition route.
+        with self.assertRaisesRegex(ValueError,'acquisition needs an adapter'):
+            pipeline.metadata(self.source,0x30FC,self.source.profile(0x30FC),identities[0x30FC])
+
     def test_complete_texels_vertices_and_compiled_triangles_for_entire_batch(self):
         for row in self.report['objects']:
             asset=(self.art/row['object_file']).read_bytes()
@@ -241,6 +259,48 @@ class CurrentCartridgeTests(unittest.TestCase):
         self.assertEqual(audio_contract(original,self.image,self.report,source),current['donor'])
         fire=self.report['fire']['code'];at=install.PACKAGE+0x80483800-install.PACKAGE_RAM
         self.assertEqual(sha256(self.blob[at:at+fire['bytes']]),fire['sha256'])
+
+    def test_complete_placement_table_bindings_and_unrelated_owner_bytes(self):
+        import v3_furniture_placement as placement
+        from npc_mail_show import relocate_verified_data
+        from types import SimpleNamespace
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        row=self.report['furniture_placement'];at=install.PACKAGE+placement.TABLE-install.PACKAGE_RAM
+        table=self.blob[at:at+placement.CAPACITY]
+        self.assertEqual(sha256(table),row['table_sha256'])
+        self.assertEqual(sha256(table[:947]),placement.NATIVE_SHA)
+        for item in row['imports']:
+            self.assertEqual(table[item['runtime_index']],source.raw('aMR_layer_set_info')[item['source_index']])
+        start=install.PACKAGE+placement.FIRST-install.PACKAGE_RAM
+        end=install.PACKAGE+placement.END-install.PACKAGE_RAM
+        self.assertEqual(self.blob[start:start+16],placement.GUARD)
+        self.assertEqual(self.blob[end-16:end],placement.GUARD)
+        self.assertEqual(self.blob[at+placement.CAPACITY:end-16],bytes(end-16-at-placement.CAPACITY))
+        before=self.old[placement.VROM].extract(self.base)
+        changed=self.files[placement.VROM].extract(self.image);expected=bytearray(before)
+        for patch in row['patches']:struct.pack_into('>I',expected,patch['address']-placement.RAM,patch['after'])
+        self.assertEqual(changed,expected)
+        relocation=self.files[placement.RELOC].extract(self.image)
+        pairs,_,locations=placement.references(changed,relocation,placement.NATIVE_TABLE)
+        self.assertEqual(pairs,());self.assertFalse(locations&{p['address']-placement.RAM for p in row['patches']})
+        old_reloc=self.old[placement.RELOC].extract(self.base)
+        new_spec=SimpleNamespace(ram=placement.RAM,resident_bytes=placement.RESIDENT,sections=struct.unpack_from('>5I',relocation))
+        old_spec=SimpleNamespace(ram=placement.RAM,resident_bytes=placement.RESIDENT,sections=struct.unpack_from('>5I',old_reloc))
+        # The sole effect after real owner relocation is the five table pointers.
+        for destination in (0x801A0010,0x803D0010):
+            old=bytearray(relocate_verified_data(old_spec,before,old_reloc,destination))
+            new=relocate_verified_data(new_spec,changed,relocation,destination)
+            for patch in row['patches']:
+                pos=patch['address']-placement.RAM;old[pos:pos+4]=new[pos:pos+4]
+            self.assertEqual(old,new)
+        # A later import batch reuses the same reservation without new patches.
+        blob=bytearray(self.blob)
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        changes,again=placement.install(original,self.image,self.report,blob,
+            self.report['furniture']['imports']+[self.report['speed_bag']],source)
+        self.assertEqual(blob,self.blob);self.assertEqual(again,row)
+        self.assertEqual(changes[placement.VROM],changed);self.assertEqual(changes[placement.RELOC],relocation)
 
     def test_batch_selection_is_identity_based_and_removes_disabled_scores(self):
         cat=composer.catalogue(self.image,self.report);keys=[r['id'] for r in self.rows]

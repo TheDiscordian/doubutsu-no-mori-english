@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-seats-runtime-02",
-  "runtime_abi": 86,
-  "rom_sha256": "e6f334027c352039fededafe8672d7ff480b5234bad914646b4beeffad00d1ab",
-  "report_sha256": "b3f9a540d3426a87dad66cc7eec0732fef38283b72de4fc312b87fd75eee4b54"
+  "directory": "build/v3-furniture-placement-runtime-01",
+  "runtime_abi": 87,
+  "rom_sha256": "004a1173c51cdea009c3a5e291067469675d40809002bf8fd41d99f28f671c1d",
+  "report_sha256": "64805f9215d264303347fc40842f5fa6b15d2c549453f3e6c5b7ac654b1e85ec"
 }

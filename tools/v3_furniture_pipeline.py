@@ -143,7 +143,7 @@ class Source:
                 or shape not in (3, 4, 5) or collision not in (0, 1, 2)
                 or rotation not in (0, 1) or lighting not in (0, 1, 2) or pad):
             raise ReviewRequired('unsupported scalar profile category')
-        if contact not in BEHAVIOURS or interaction:
+        if contact not in BEHAVIOURS or interaction not in (0, 0x10):
             raise ReviewRequired(f'contact/interaction behaviour {contact:02X}/{interaction:04X}')
         pointers = self.pointers(at, n)
         if not pointers or any(p-at not in (0, 4, 8, 12) for p in pointers):
@@ -151,6 +151,7 @@ class Source:
         models = {LAYERS[(p-at)//4]: self.containing(target, exact=True) for p, target in pointers.items()}
         return dict(profile_symbol=name, profile_offset=at, profile_sha256=sha256(raw),
             scalar_hex=raw[32:48].hex(), behaviour=BEHAVIOURS[contact], contact_action=contact,
+            interaction_flags=interaction,
             size_code={3:1, 4:0, 5:2}[shape], shape=shape, models=models)
 
 
@@ -237,6 +238,9 @@ def metadata(source, item, profile, identity):
     action_sound = source.raw('mRmTp_ftr_se_type')[index]
     if action_sound not in (0,1,2):
         raise ReviewRequired(f'action-sound category {action_sound} needs the shared seating adapter')
+    layer_type = source.raw('aMR_layer_set_info')[index]
+    if layer_type not in (0, 1, 2):
+        raise ReviewRequired(f'unsupported placement-layer category {layer_type}')
     name_raw = source.raw('ftrName2_table')[(index-1024)*16:(index-1023)*16]
     try: name = name_raw.decode('ascii').rstrip(' ')
     except UnicodeDecodeError: raise ReviewRequired('name needs supported encoding') from None
@@ -267,6 +271,7 @@ def metadata(source, item, profile, identity):
     native_hra = (hra&0xFFFFC000)|(birth<<9)|(surface<<7)
     return dict(id=f'GAFE01-r0/item/{item:04X}', item_id=f'{item:04X}', runtime_index=index,
         name=name, name_sha256=sha256(name_raw), name_source_index=index-1024, action_sound=action_sound,
+        layer_type=layer_type, interaction_flags=profile['interaction_flags'],
         price=price, size_code=profile['size_code'], footprint=('1x1','2x1','2x2')[profile['size_code']],
         donor_list=lists[0][0], donor_list_sha256=lists[0][1], stock_group=STOCK[lists[0][0]],
         ordinary_stock=STOCK[lists[0][0]] < 3, donor_catalogue_position=entries[0][0], preview_mode=0,

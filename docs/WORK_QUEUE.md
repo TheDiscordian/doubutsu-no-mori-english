@@ -3,26 +3,27 @@
 ## Active: V3 optional GameCube imports
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Sixteen additional complete assets and their shared runtime
-records are installed. ABI 86 adds lawn/teacher's chairs and the shared soft/hard
-seating-sound reader, including corrected lefty/righty desk sounds. Twenty-six
-focused tests and the first current native run (88 records, 73 assertions) pass;
-the first fourteen items retain their unchanged passing evidence. The full
+new furniture. Nineteen additional complete assets and their shared runtime
+records are installed. ABI 87 adds grass model, dirt model, and boxing mat with
+the native no-collision flag, plus a shared complete placement-layer table for
+all imports. Five native readers no longer index beyond their original table.
+Twenty-eight focused tests and the first current native run (125 records, 107
+assertions) pass. The full
 source/verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 78
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 81
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
-Next: shared contact/callback and graphics/acquisition categories from the
-generated inventory. Twenty entries share interaction flag `0010`, named
-`NO_COLLISION` in the donor. Verify the complete native consumers before allowing
-this category; preserving the flag is required, not clearing it to pass import.
-Complete model conversion without
+Next: classify shared callback/dependency patterns for the 102 uninstalled
+entries stopped by custom callbacks, and extend shared graphics/acquisition
+categories. The no-collision category is supported; sixteen diary display models
+still need diary identity/gameplay/acquisition, and weed model needs the shared
+`ftr_listEventPresentChumon` reward route. Complete model conversion without
 required behaviour is not a completed import. Ordinary GPU appearance,
 interactions, and save/restart remain for the gameplay pass.
 
 Current integration:
-`build/v3-furniture-seats-runtime-02/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-placement-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with
