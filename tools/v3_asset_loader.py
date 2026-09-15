@@ -92,6 +92,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'camper_reader': ('af_v3_camper_npc_info', 0x804A29A0),
                        'campsite_placement': ('af_v3_tent_set_class', 0x804A2A70),
                        'campsite_manager': ('af_v3_camper_event_start', 0x80964DA0),
+                       'camper_movein': ('af_v3_camper_movein_candidate', BLOB_RAM + 0x3EE0),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

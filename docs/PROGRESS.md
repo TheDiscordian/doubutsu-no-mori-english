@@ -2,26 +2,34 @@
 
 ## Active development
 
-The [summer event manager](checkpoints/V3_CAMPSITE_MANAGER.md) connects the
+The [camper move-in guard](checkpoints/V3_CAMPER_MOVEIN.md) prevents the saved
+summer visitor from simultaneously becoming a resident, through either normal
+growth or an inbound villager transfer. ABI 77 adds 252 bytes in checked unused
+resident space, preserving the native selection rules and all allocations.
+Fifteen focused/composition checks pass. The first silent native run passes
+48 records, 22 calls, and 25 assertions, including actual appearance-history
+reset, the complete candidate set, full native transfer refusal without town or
+incoming-Animal mutation, and restored eligibility after event-record release.
+
+The unchanged [summer event manager](checkpoints/V3_CAMPSITE_MANAGER.md) connects the
 calendar, saved camper selection, independent visitor registration, and native
 tent placement/removal in ABI 76. All 28 original event controls and the complete
 English letter manager remain. Failed placement/removal preserves the pending
 event state for retry; the engine's error flag would otherwise abort the event.
 Indoor starts register the same camper without requiring an outdoor field.
-Fifteen focused/composition checks pass. The corrected silent native test passes
+Its retained focused checks and corrected silent native test pass
 79 records, 42 calls, and 51 assertions, including real selection, registration,
 dispatcher retries, nine-cell placement, and removal with lot restoration.
 The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-campsite-manager-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`12715890318357a7150abeb8d29d59ed6e867ad00e247f9961be1febed62c195`.
-The ten-item subset is `build/v3-optional-manager-01/`. The offline composer
+`build/v3-camper-movein-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`31771d9e0fe23dba25fe1a8643f0124705ea40948b4c060853036fb4e150214f`.
+The ten-item subset is `build/v3-optional-camper-movein-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue the
 remaining masked NPC/quest readers, English first-greeting and conversation
-states, selected rewards, and lighting/floor sounds. Ordinary move-in must also
-exclude the active camper after an appearance-history reset. Full construction,
+states, selected rewards, and lighting/floor sounds. Full construction,
 ordinary entry/exit, acquisition, and persistence remain unverified. GitHub
 development source is allowed; neither served patcher changes until the user
 tests V3 and explicitly approves the switch. This is not a complete-import

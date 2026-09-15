@@ -5,10 +5,10 @@
 The selection adapter replaces the four native procedures that directly scan
 the 216-villager personality table or use native-only selection arrays:
 unseen personality counts, appearance-history reset, initial town population,
-and subsequent personality-balanced move-ins. The installed build keeps all
-twenty import-eligibility flags disabled until remaining native integration and
-house loading are checked. Content availability is not itself permission to
-put an unfinished villager into an ordinary town.
+and subsequent personality-balanced move-ins. The current experimental build
+uses the [explicit town policy](V3_TOWN_RESIDENTS.md) to enable selected complete
+metadata/house/outfit records. These development flags do not certify ordinary
+gameplay or authorise publishing the imports through either web patcher.
 
 Shared personality and default/indexed initialization already use the bounded
 V3 adapters. Saved appearance history is already 32 bytes at `8013670C`; no save
@@ -25,19 +25,19 @@ personal identities, and town capacity remain unchanged.
   the complete variant explicitly recompiles this reader before extending
   object capacity to 448. Both initial populations pass native verification.
 - Import-eligibility flags: twenty bytes at `80461E60`, indexed by fixed actor
-  index minus 218. All are zero in the integration build.
+  index minus 218. The offline composer sets only selected identities and their
+  dependencies; selection order never assigns a different identity.
 - Transient candidate bits: 32 bytes at `80464700`.
 - Transient shuffle array: 238 signed 32-bit entries at `80464800`.
 
 The new transient arrays do not overwrite the original 27-byte candidate array
 at `80142E58` or the original 216-entry shuffle at `80143028`. Native test indices
 216/217 and unavailable imports are excluded. An imported candidate additionally
-requires its exact installed metadata identity, ordinary growth role, valid
-personality, and implemented starting outfit. The complete variant accepts
+requires its exact installed metadata identity, explicit town-compatible role,
+valid personality, and implemented starting outfit. The complete variant accepts
 imported clothing only through the shared predicate that checks the actual
-clothing reader. Both pilot house/default dependencies are installed, but
-eligibility flags remain off. House availability is checked by
-the installer before any eligibility can be enabled in a later integration step.
+clothing reader. All twenty house/default dependencies are installed and checked
+before enabling the corresponding experimental eligibility flags.
 
 ## Selection behaviour
 
@@ -45,6 +45,10 @@ Unseen counts and history reset consider every eligible native/imported identity
 Normal move-in selection retains the native personality, already-resident, and
 appearance-history conditions. It forms the complete candidate bitset, consumes
 one native random float, and selects that ordinal in increasing fixed-ID order.
+The [saved-camper guard](V3_CAMPSITE.md#camper-and-resident-exclusion) additionally
+excludes the current summer visitor after appearance-history resets and from
+inbound transfers. It preserves the selection code's fixed entries and all
+native resident checks; releasing the event record restores eligibility.
 
 Initial population uses the original shuffle routine and swap count. With no
 imports enabled, both remain 216 and preserve the original random sequence.

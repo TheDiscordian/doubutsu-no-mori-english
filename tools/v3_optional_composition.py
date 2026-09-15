@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-campsite-manager-runtime-02'
-BASE_SHA = '12715890318357a7150abeb8d29d59ed6e867ad00e247f9961be1febed62c195'
-REPORT_SHA = 'f0c29e139ad55b84df92dd073ac60e71c928c287cc713d7fa98a3b73b2fb9f73'
+BASE = ROOT/'build/v3-camper-movein-runtime-02'
+BASE_SHA = '31771d9e0fe23dba25fe1a8643f0124705ea40948b4c060853036fb4e150214f'
+REPORT_SHA = 'd9e18c193d9a3955bc4069fea18913f7ccc083b07211d658918bb8d3de2464b1'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 76, 0x30000
+PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 77, 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 

@@ -18,7 +18,9 @@ and expanded event index. ABI 74 supplies an independently owned visitor Animal,
 registration/defaults, and native NPC-info attachment. ABI 75 supplies native
 tent foreground placement/removal classification and event cleanup. ABI 76
 extends the installed English manager with checked selection, registration,
-placement/removal, and retry handling. Remaining masked NPC/quest readers,
+placement/removal, and retry handling. ABI 77 prevents the saved camper from
+simultaneously entering town through natural growth or an inbound transfer.
+Remaining masked NPC/quest readers,
 conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
 
@@ -265,9 +267,9 @@ and do not register an unsupported masked identity against bounded original
 actor tables.
 
 Finish NPC/conversation readers and greeting transitions, scene lighting/floor
-sounds, and enabled reward filtering. Ordinary move-in selection must exclude
+sounds, and enabled reward filtering. The installed move-in guard excludes
 the saved active camper even after all-appeared history resets; marking the
-camper seen once does not establish that exclusion. Assign stable additive
+camper seen once is not the only protection. Assign stable additive
 identities without replacing existing scenes, events, or furniture. Only selected
 rewards may be awarded.
 
@@ -415,3 +417,31 @@ selection/registration, indoor starts, real failed-placement retry, nine-cell
 placement, removal retry, and lot restoration. The native test restores its RAM
 and checkpoint; it is not ordinary scene construction, conversations, rewards,
 event-finish traversal, save/restart, or original-hardware proof.
+
+## Camper and resident exclusion
+
+`camper_movein.c` occupies 252 checked bytes at `80463EE0..80463FDB`, after the
+complete clothing-menu/wearing helper and before the existing shared villager
+reader at `80464000`. Neither selection/reward code nor the clothing helper is
+overwritten. The native Animal search and free-state checks remain unchanged.
+
+Only the resident-search call at `804636B8` inside normal growth is redirected
+to the candidate wrapper. It retains actual resident results, and treats an
+otherwise available identity as occupied when event 70's save area zero holds
+that identity. This call uses the result only as a `-1`/not-`-1` check; the
+wrapper's conflict result must never be used as a real town Animal index.
+Personality, selected imports/outfits, candidate ordering, and random selection
+remain intact. The protection survives appearance-history reset and ends when
+the camper save record is released; it does not permanently remove a villager.
+
+The call at `800AC650` in native `mNpc_GetRemoveAnimal` uses the transfer wrapper.
+Its ordinary free-state result is retained; a matching saved camper rejects the
+incoming Animal before any resident replacement, housing change, mail, or copy.
+This implements the donor's explicit summer-camper transfer exclusion. Normal
+growth also uses the saved identity so clearing appearance history cannot allow
+simultaneous camping and residence. Neither hook changes its native delay slot.
+
+The [move-in checkpoint](../docs/checkpoints/V3_CAMPER_MOVEIN.md) records passing
+native candidate selection after actual history reset, full inbound transfer
+refusal without mutation, and re-eligibility after saved-area release. These
+checks do not establish ordinary arrival, house construction, or persistence.
