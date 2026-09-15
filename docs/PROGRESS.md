@@ -2,12 +2,15 @@
 
 ## Active development
 
-The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) supplies seven
-more complete furniture models/textures and verified names, prices, shop groups,
-and scoring data. All 600 vertices and 277 triangles are retained; every object
-fits the current furniture model buffer. Focused conversion and combined
-shop/scoring checks pass. Installing their runtime records, saved selections,
-and optional-composer entries is next; these assets are not yet in a cartridge.
+The [construction runtime](checkpoints/V3_CONSTRUCTION_RUNTIME.md) installs
+seven more complete furniture models, fixed profiles, English names/prices,
+placement readers, and selected save-profile bits in ABI 61 without more RAM.
+Four focused checks and the initial 145-record native run pass, including all
+seven item readers, paired detour-sign/saw-horse model loading, original-item
+fallbacks, cleanup, and guards. The actual C codec rejects new-profile saves in
+older profiles without writes. The catalogue needs 446 slots against its current
+444-slot bound; expanding that storage, then installing prepared stock/scoring
+data and optional composition, is next. No complete-import handoff is claimed.
 
 The [local optional composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) now
 supports individual experimental selections across the twenty installed

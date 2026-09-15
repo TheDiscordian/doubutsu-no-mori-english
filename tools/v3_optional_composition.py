@@ -104,7 +104,12 @@ def catalogue(image, report):
             'actor_id':f'{actor:04X}', 'registry_version':1,
             'dependencies':sorted(dependencies), 'house_layers':list(house_layers),
             'enable_offset':at+7, 'enable_bytes':1, 'town_flag_offset':0x1E60+actor-0xE0DA}
-    if len(result) != len(VILLAGERS)+len(FURNITURE)+len(CLOTHING):
+    # The fixed registry can reserve later imports before this pinned cartridge
+    # installs them. Its catalogue must cover its actual installed records only.
+    expected = ({row['id'] for row in report['villager_text']['imports']} |
+                {row['id'] for row in furniture_rows} |
+                {item_key(int(row['donor_item_id'], 16)) for row in report['clothing']['imports']})
+    if (set(result) != expected or len(result) != len(VILLAGERS)+len(furniture_rows)+len(CLOTHING)):
         raise ValueError('Incomplete or duplicated installed development catalogue')
     return dict(sorted(result.items()))
 

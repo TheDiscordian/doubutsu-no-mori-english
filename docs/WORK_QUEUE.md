@@ -270,9 +270,15 @@ with later e/e+ donor support investigated separately.
   stock membership, and native scoring metadata. Five new asset checks, seven
   shared converter checks, and four metadata/table checks pass. All seven models
   fit existing banks; 28 construction-theme items fit the 32-bit completion mask.
-  Next install fixed registry/profile/metadata rows and connect the selected
-  shop, catalogue, ownership, and optional composition paths. Converted assets
-  alone do not enable the imports or change either web patcher.
+  The [runtime batch](checkpoints/V3_CONSTRUCTION_RUNTIME.md) installs all seven
+  complete objects, fixed profiles, shared item readers, and saved-profile bits.
+  Four focused checks and the first 145-record native run pass, including all
+  seven names/prices, two model banks, original fallback, cleanup, and guards.
+  No additional RAM is allocated. Next expand actual furniture catalogue storage
+  from 444 to at least 446 slots, then install the prepared stock/scoring tables
+  and connect optional selection to the package-resident rows and its CRC.
+  Ordinary acquisition/placement/persistence remain incomplete; neither web
+  patcher changes.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
   texture formats and Pigleg's separate donor-coordinate model. Thirteen focused
   tests pass with unchanged pilot outputs. Connect stable model/texture banks,

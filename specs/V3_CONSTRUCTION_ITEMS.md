@@ -3,8 +3,10 @@
 ## Scope
 
 Seven additional GAFE01 revision 0 furnishings have complete native graphics
-conversion and source-verified item, shop, and scoring metadata. They are not
-installed in a cartridge or enabled by the optional composer yet. Neither the
+conversion and source-verified item, shop, and scoring metadata. The
+[runtime adapter](V3_CONSTRUCTION_RUNTIME.md) installs their models, profiles,
+names/prices, and placement readers in ABI 61. Complete catalogue/acquisition
+integration and optional composition remain required. Neither the
 local nor public web patcher changes. The user's testing and explicit approval
 remain required before either patcher receives V3.
 
@@ -25,9 +27,8 @@ indoor-image mapping. It is supporting identity evidence, not executable source
 or a substitute for verifying the donor models.
 
 The item/rotation mapping uses the original donor base ID and the existing
-type-3 formula `1024 + (base - 3000) / 4`. These are reviewed integration
-candidates, not registrations in the active runtime registry. Keep the seven
-identities fixed when installing them; selection order must not assign IDs.
+type-3 formula `1024 + (base - 3000) / 4`. The runtime registry assigns these
+fixed identities and separate model slots. Selection order must not assign IDs.
 
 | Base ID | Index | English name | Price | Ordinary stock | Native HRA | Feng shui |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -101,9 +102,8 @@ the remaining rows fit. The speed bag belongs to another theme.
 
 ## Required runtime integration
 
-- Add fixed registry records and safe ROM allocations for all seven objects.
-- Install profiles and names/prices/footprints in a larger static-item table;
-  connect the existing loader and item readers without disturbing current rows.
+- Retain the installed fixed registry records, complete models, expanded static
+  profiles, and names/prices/footprint readers.
 - Include selected items in shop stock, catalogue/ownership, rewards, scoring,
   saved profiles, and deterministic optional composition.
 - Preserve the native acquisition, placement, rotation, and persistence paths;
@@ -113,3 +113,5 @@ the remaining rows fit. The speed bag belongs to another theme.
 The [checkpoint](../docs/checkpoints/V3_CONSTRUCTION_ITEMS.md) contains the exact
 converted artifacts and focused results. No emulator, gameplay, save-format,
 cartridge, or original-hardware change is claimed by the conversion batch.
+The separate runtime checkpoint supplies the actual cartridge and native-loader
+evidence without treating unfinished acquisition or persistence as passed.

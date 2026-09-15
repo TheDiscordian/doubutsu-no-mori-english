@@ -1514,6 +1514,13 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('V3 furniture probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record,
+                    static_items=action.get('static_items'), core_only=bool(action.get('core_only'))))
+            if action.get('test_v3_construction_items'):
+                from v3_construction_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Construction item probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_villager_defaults'):
                 from v3_villager_defaults_smoke import exercise

@@ -14,7 +14,7 @@ from v3_furniture_runtime import (BANK_BYTES, BLOB_SIZE, CAPACITY, INDICES, NATI
 from v3_npc_draw_smoke import boot_proofs
 
 
-def exercise(debug, rom_path, record):
+def exercise(debug, rom_path, record, *, static_items=None, core_only=False):
     path = Path(rom_path)
     rom = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_text())
@@ -113,8 +113,16 @@ def exercise(debug, rom_path, record):
     write_word(live + 0x18D68, bank0)
     write_word(live + 0x18D6C, bank1)
     rows = furniture['imports']
+    if static_items is not None:
+        if len(static_items) != 2 or len(set(static_items)) != 2:
+            raise ValueError('Choose two distinct installed static models for the paired-bank check')
+        rows = [next(row for row in rows if int(row['item_id'], 16) == item) for item in static_items]
+    if core_only:
+        # Retain the complete startup-table check above, but do not replay
+        # unchanged instrument callbacks or mannequin rendering in a static batch.
+        animated, displays = [], []
     if len(rows) != 2:
-        raise ValueError('Furniture fixture requires the two reviewed static pilots')
+        raise ValueError('Furniture fixture requires two reviewed static models')
     payloads = []
     for slot, row in enumerate(rows):
         index, item, bank = row['runtime_index'], int(row['item_id'], 16), (bank0, bank1)[slot]

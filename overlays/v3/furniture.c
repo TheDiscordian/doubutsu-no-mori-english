@@ -3,6 +3,12 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef __UINTPTR_TYPE__ uptr;
+#ifdef AF_V3_CONSTRUCTION_ITEMS
+#include "construction.h"
+#else
+#define AF_V3_STATIC_IMPORT_COUNT 2
+#define AF_V3_STATIC_IMPORT_RAM 0x80467200u
+#endif
 #ifdef AF_V3_FURNITURE_TABLES
 #include "furniture_tables.h"
 #else
@@ -14,13 +20,13 @@ enum { NATIVE = 947, CAPACITY = AF_V3_FURNITURE_CAPACITY, BANKS = 100, BANK_BYTE
 struct Import { u16 index, item; u32 enabled; u32 profile[17]; u32 pad; };
 _Static_assert(sizeof(struct Import) == 80, "Furniture import row");
 #ifdef __mips__
-#define imports ((const struct Import *)0x80467200u)
+#define imports ((const struct Import *)AF_V3_STATIC_IMPORT_RAM)
 #define profiles ((const u32 *)AF_V3_FURNITURE_PROFILES)
 #define indices ((u8 *)AF_V3_FURNITURE_INDICES)
 #define owner ((volatile const u32 *)0x80100DF0u)
 #define dma ((int (*)(void *, u32, u32))0x80026B44u)
 #else
-extern struct Import af_v3_furniture_imports[2];
+extern struct Import af_v3_furniture_imports[AF_V3_STATIC_IMPORT_COUNT];
 extern u32 af_v3_furniture_profiles[CAPACITY];
 extern u8 af_v3_furniture_indices[CAPACITY];
 extern volatile u32 af_v3_furniture_owner[8];
@@ -91,10 +97,10 @@ static const struct Import *find(u32 argument) {
             af_v3_display_clothing_index(display_import->item) == 0x10BFu) return display_import;
 #endif
 #endif
-    for (i = 0; i < 2; ++i) {
+    for (i = 0; i < AF_V3_STATIC_IMPORT_COUNT; ++i) {
         const struct Import *row = imports + i;
         if (row->enabled == 1 && row->index == n &&
-                profiles[n] == 0x80467208u + i * 80u) return row;
+                profiles[n] == AF_V3_STATIC_IMPORT_RAM + 8u + i * 80u) return row;
     }
     return 0;
 }
