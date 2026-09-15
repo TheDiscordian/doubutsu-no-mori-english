@@ -198,6 +198,10 @@ matches. All twenty imported houses and forty fixed layers are present; actual
 native initialization and layer loading pass. Ordinary house entry, scene
 allocation, move-in progression, and persistence remain open. The explicit
 town policy supplies checked selection and the existing personality schedules.
+The [outdoor-house adapter](V3_HOUSE_EXTERIOR.md) connects the complete roster to
+actual structure selection, door/NPC checks, and daily-growth protection, fixing
+the invalid second-player construction. Separate temporary foreground markers
+and complete house interactions remain required; original building IDs stay fixed.
 
 ### Items
 

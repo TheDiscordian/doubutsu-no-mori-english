@@ -5,7 +5,7 @@ import sys
 import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"tools"))
-from emulator_smoke import RSP
+from emulator_smoke import RSP, DebuggerMemoryError
 
 
 class AlignedDebugger(RSP):
@@ -29,6 +29,17 @@ class AlignedDebugger(RSP):
 
 
 class DebuggerMemoryTests(unittest.TestCase):
+    def test_bad_reply_preserves_exact_command_and_raw_response(self):
+        from unittest.mock import Mock
+        debug = AlignedDebugger()
+        for response in ('T05thread:4;', 'E14', '', '0011', '00 '*8, 'g0'*8):
+            debug.command = Mock(return_value=response)
+            with self.assertRaises(DebuggerMemoryError) as caught:
+                debug.read_memory(0x8010EF94, 4)
+            self.assertEqual(caught.exception.command, 'm8010ef90,8')
+            self.assertEqual(caught.exception.response, response)
+            debug.command.assert_called_once_with('m8010ef90,8')
+
     def test_every_alignment_and_short_length_is_exact(self):
         for address in range(16, 24):
             for length in range(1, 34):

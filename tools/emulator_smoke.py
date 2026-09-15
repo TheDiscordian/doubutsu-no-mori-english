@@ -74,6 +74,14 @@ def require_program_counter(registers, expected):
     return f'{actual:08X}'
 
 
+class DebuggerMemoryError(ValueError):
+    """Retain the exact request/reply instead of losing it in bytes.fromhex."""
+
+    def __init__(self, command, response, reason):
+        self.command, self.response = command, response
+        super().__init__(f'{reason}: {command}, response={response!r}')
+
+
 class RSP:
     def __init__(self, port, timeout=5):
         self.sock = socket.create_connection(("127.0.0.1", port), timeout=timeout)
@@ -116,9 +124,13 @@ class RSP:
         # The eight-byte fast path also aligns down, including cached accesses.
         start = address & ~7
         size = (address-start+length+7) & ~7
-        data = bytes.fromhex(self.command(f"m{start:x},{size:x}"))
+        request = f"m{start:x},{size:x}"
+        response = self.command(request)
+        if len(response) != size*2 or any(c not in '0123456789abcdefABCDEF' for c in response):
+            raise DebuggerMemoryError(request, response, 'Invalid debugger memory response')
+        data = bytes.fromhex(response)
         if len(data) != size:
-            raise ValueError("Truncated debugger memory read")
+            raise DebuggerMemoryError(request, response, 'Truncated debugger memory read')
         return data[address-start:address-start+length]
 
     def write_memory(self, address, data):
@@ -776,7 +788,7 @@ def main():
         with reserve_x_display() as selected_display:
             xvfb = subprocess.Popen(["timeout", "-s", "KILL", str(args.seconds+30), args.xvfb,
                                       ":"+selected_display, "-displayfd", str(writefd),
-                                      "-screen", "0", "800x640x24", "-nolisten", "tcp"],
+                                      "-screen", "0", "800x640x24", "-nolisten", "tcp", "-noreset"],
                                      pass_fds=(writefd,), stdout=log, stderr=log, start_new_session=True)
             processes.append(xvfb)
             os.close(writefd)
@@ -1643,6 +1655,15 @@ def main():
                 results.append(villagers_snapshot(debug))
             if action.get("snapshot_npc_actors"):
                 results.append(npc_actors_snapshot(debug))
+            if action.get('snapshot_v3_house'):
+                from v3_house_gameplay import snapshot as house_snapshot
+                observed = house_snapshot(debug)
+                record({'house_snapshot': observed})
+                if observed['player_count'] != 1:
+                    raise ValueError('Outdoor-house construction created another player')
+                if 'expect_house' in action and not any(
+                        row['fg_name'] == action['expect_house'] for row in observed['houses']):
+                    raise ValueError('Expected native house actor is not loaded')
             if "approach_npc" in action:
                 results.append(approach_npc(debug, keyboard, action["approach_npc"], action.get("max_steps", 80)))
             if action.get("snapshot_keyboard"):
@@ -1711,6 +1732,42 @@ def main():
                 results.append({'v3_warning_preserves_complete_flash': True, 'sha256': observed})
         write_results(out, results)
         print(json.dumps({"output": str(out), "steps": len(results)}, indent=2))
+    except DebuggerMemoryError as error:
+        # Keep the failure and bounded read-only diagnostic replies. Do not
+        # consume a stray stop packet and silently relabel the scenario passed.
+        diagnostic = {'command': error.command, 'raw_response': error.response,
+                      'error': str(error), 'following_raw_replies': []}
+        if debug:
+            debug.sock.settimeout(2)
+            # A reported CPU signal precedes the already-requested memory reply.
+            # Retain that pending reply explicitly, then collect stopped-machine
+            # evidence. The failed scenario still raises its original exception.
+            if len(error.response) == 3 and error.response[0] == 'S':
+                try:
+                    diagnostic['pending_memory_reply'] = debug.receive()
+                except (OSError, RuntimeError, ValueError) as failure:
+                    diagnostic['pending_memory_error'] = str(failure)
+            for request in ('?', 'g', 'm8003ce30,20', 'm8010ef90,8',
+                            'm80137348,8', 'm80141fa0,28', 'm8013a248,8'):
+                try:
+                    response = debug.command(request)
+                    diagnostic['following_raw_replies'].append({'command': request, 'response': response})
+                except (OSError, RuntimeError, ValueError) as failure:
+                    diagnostic['following_raw_replies'].append({'command': request, 'error': str(failure)})
+                    break
+            replies = diagnostic['following_raw_replies']
+            if (len(replies) == 7 and replies[0].get('response') == 'T05'
+                    and len(replies[1].get('response', '')) == 71*16):
+                try:
+                    debug.sock.settimeout(5)
+                    ram = debug.read_memory(0x80000000, 0x800000 if args.expansion_pak else 0x400000)
+                    (out/'fault-ram.bin').write_bytes(ram)
+                    diagnostic['ram_dump'] = {'file': 'fault-ram.bin', 'bytes': len(ram),
+                                              'sha256': hashlib.sha256(ram).hexdigest()}
+                except (OSError, RuntimeError, ValueError) as failure:
+                    diagnostic['ram_dump_error'] = str(failure)
+        (out/'debugger-memory-failure.json').write_text(json.dumps(diagnostic, indent=2)+'\n')
+        raise
     finally:
         if debug:
             debug.sock.close()

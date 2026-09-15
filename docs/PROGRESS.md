@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-aloha-display-03/animal-forest-v3-asset-loader.z64`, ABI 58, SHA-256
-`0f1c532c281ba3dce1bbc32b1085b0207a6617b95090b98d97de2ff1ad2deb0e`.
+`build/v3-house-exterior-01/animal-forest-v3-asset-loader.z64`, ABI 59, SHA-256
+`ba188ffb7579a92418de4861f1b6daa92e6140f276ae4b17deaeb027cebed8df`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -468,7 +468,19 @@ aloha shirts retain zero donor prices and stay out of general shop stock.
 The profile adds their two display dependencies: the actual codec accepts ABI 57
 saves in ABI 58 and rejects the reverse without source/output writes. Ordinary
 cross-build reload remains unverified. Ordinary acquisition, placement/persistence,
-the house/debugger failure, and new-instrument playback remain open.
+temporary house-marker handling, house entry, and new-instrument playback remain open.
+
+The [outdoor-house fix](checkpoints/V3_HOUSE_EXTERIOR.md) corrects a confirmed
+animation fault: the old structure selector creates a second player for an
+unrecognised imported house. Six bounded instruction edits connect all twenty
+actual house IDs to structure, door, NPC, and daily-growth consumers. Two focused
+tests pass. The first corrected native run loads Punchy's real house, retains one
+player, passes the previous fault point, and passes nine fault/guard assertions.
+Its final house-entry assertion fails (`FFFF` owner), so complete entry is not
+claimed. A separate temporary-marker collision with existing buildings requires
+an additive mapping before house interactions are complete. Save profile/format
+and memory allocations are unchanged from ABI 58; ordinary reload is not newly
+verified. Both patchers remain V2.
 
 ## Stable V2 deliverable
 

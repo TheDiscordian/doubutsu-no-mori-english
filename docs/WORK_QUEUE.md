@@ -335,8 +335,15 @@ with later e/e+ donor support investigated separately.
   Actual codec tests accept the preceding profile and reject new-profile saves in
   older builds without writes. Ordinary cross-build reload is not newly verified.
   Next connect faithful aloha acquisition and finish ordinary move-ins, house
-  visits, conversations, and persistence. Retain the unresolved house/debugger
-  result and new-instrument playback issue; do not replay passing catalogue tests.
+  visits, conversations, and persistence. The
+  [outdoor-house diagnosis/fix](checkpoints/V3_HOUSE_EXTERIOR.md) identifies an
+  actual CPU address fault: unrecognised new houses construct a second player.
+  Six instruction changes cover all twenty actual house IDs. Two focused tests
+  pass; the corrected native run constructs a real house, retains one player,
+  and passes the prior fault point and nine fault/guard assertions. Final entry
+  remains incomplete. Implement separate temporary house markers next: the native
+  formula overlaps existing player houses. Keep the new-instrument playback issue
+  open, and do not replay passing catalogue tests.
   Do not replay passing text/default checks. Older builds lacking dependencies reject new saves;
   retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,
