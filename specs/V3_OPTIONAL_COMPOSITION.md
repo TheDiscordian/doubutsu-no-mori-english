@@ -3,7 +3,10 @@
 ## Scope
 
 Compose experimental selections from the pinned ABI-69 integration cartridge,
-including the complete tent model and its checked DMA-loader repair.
+including the complete tent model, its checked DMA loader, and the installed
+fire-sound resources/allocation. Fire item profiles are not yet implemented
+and do not appear as selectable options. Shared audio resource/header changes
+remain in every nonempty profile; the empty profile still returns exact V2.
 The pinned source includes [expanded import storage](V3_IMPORT_STORAGE.md),
 the [full-sized Western runtime](V3_WESTERN_LARGE_ITEMS.md), dedicated
 model banks, garden imports, expanded reward counters, and corrected aloha scoring.

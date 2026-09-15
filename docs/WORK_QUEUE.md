@@ -285,10 +285,14 @@ with later e/e+ donor support investigated separately.
   rejection, and restoration. Content, ABI, saves, and allocations stay unchanged.
   The [fire-audio converter](checkpoints/V3_FIRE_AUDIO.md) retains both complete
   two-layer programs, appends their actual samples/instruments, and preserves
-  current native/speed-bag resources. Seven checks pass. Install the sounds with
-  the measured 800-byte permanent-audio increase; the current pool has only
-  32 bytes spare. Fire sound data is not yet registered in the cartridge.
-  Continue fire rig/billboard/scroll/sound callbacks,
+  current native/speed-bag resources. Seven checks pass. The
+  [sound runtime](checkpoints/V3_FIRE_SOUND_RUNTIME.md) installs both loop IDs
+  with a coordinated 1-KiB allocation increase and safe whole-wave relocation.
+  Five cartridge checks, twelve current composition checks, and the initial
+  74-record native run pass actual allocation, complete font/header relocation,
+  both new samples, start/stop, restoration, and guards. Permanent capacity has
+  256 bytes spare; session/cache capacity is unchanged. Continue fire
+  rig/billboard/scroll and positional sound callbacks,
   and summer-camper acquisition, then other donor content and
   ordinary gameplay/persistence. The eight installed Tent rewards do not enter normal
   shop stock. Neither served patcher changes. Current catalogue suffix headroom

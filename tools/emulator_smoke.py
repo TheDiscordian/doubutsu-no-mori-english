@@ -1539,6 +1539,12 @@ def main():
                     raise ValueError('V3 sound probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_fire_sound'):
+                from v3_fire_sound_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 fire sound probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture'):
                 from v3_furniture_smoke import exercise
                 if not (out/'test.bs1').is_file():

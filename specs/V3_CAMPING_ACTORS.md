@@ -10,7 +10,9 @@ They are additive imports, not substitutions for native furniture.
 Complete converted objects and the native four-cell item-reader extension are
 available. Tent model is installed in ABI 69 with its light callbacks, English
 metadata, catalogue/scoring, and optional saved dependency. The two fires are
-**not installed or selectable**. Fire animation/sound callbacks and integration,
+**not installed or selectable**. Their complete sounds are installed with
+passing native allocation, font, and sample-transfer checks. Fire animation/
+positional sound callbacks and item integration,
 summer-camper acquisition, and ordinary gameplay/persistence remain required.
 Source on the V3 development branch is permitted; neither served web patcher
 changes before user testing and explicit approval.
@@ -152,9 +154,14 @@ Bonfire retains its five-semitone layer transposition. Its melody, timing,
 velocities, decay, loop state, predictors, and sample tuning are not approximated.
 The font grows by 352 bytes, the sequence by 432, and streamed wave data by
 21,360 including alignment. Conservative permanent usage grows by 800 to 109,312,
-exceeding the current 108,544-byte pool by 768. Installation must increase the
-actual allocation, not only the resource-size headers. Conversion is complete;
-these resources are not yet installed audio. Retain ordinary per-actor positional refresh/stop behaviour through
+requiring more than the native 108,544-byte pool. The
+[sound runtime](../docs/checkpoints/V3_FIRE_SOUND_RUNTIME.md) increases total,
+fixed, and permanent allocation by 1 KiB, preserving session/cache capacity.
+Actual native allocation, complete font/header relocation, both sample transfers,
+and start/stop pass. The installed pool has 256 conservative bytes spare.
+The full wave file moves to physical `03800000`, retaining external wave 2's
+physical location through the checked native unsigned header-base addition.
+Fire item callbacks still need ordinary per-actor positional refresh/stop through
 `sAdo_OngenPos`; repeated one-shot playback is not equivalent.
 
 ## Tent light contract

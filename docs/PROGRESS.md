@@ -2,12 +2,15 @@
 
 ## Active development
 
-The [fire-audio conversion](checkpoints/V3_FIRE_AUDIO.md) supplies both complete
-two-layer fire sounds and their missing samples, retaining all 72 current
-sound-font instruments. Seven focused checks pass. The new resources need
-800 additional permanent-audio bytes; the current pool has 32 spare. Safe
-allocation and cartridge installation are next, alongside the fire callbacks.
-These local resources are not registered sounds or selectable fire items.
+The [fire-sound runtime](checkpoints/V3_FIRE_SOUND_RUNTIME.md) installs both
+complete two-layer sounds and their missing samples, retaining all current
+sounds. Its five cartridge checks, twelve composition checks, and initial
+74-record native run pass. Actual allocation, all six waveform headers,
+complete 74-instrument font relocation, both new sample transfers, native level
+start/stop, and final guards pass. Audio reserves 1 KiB more; session/cache
+capacity stays intact, and the permanent pool has 256 bytes spare. The fires'
+graphics/interaction callbacks and item installation remain work; they are not
+selectable yet. Both served patchers remain V2.
 
 The [tent-model loader repair](checkpoints/V3_TENT_MODEL_LOADER.md) enables actual
 ROM DMA for the complete callback-owned tent. Fifteen focused tests pass; the
@@ -27,9 +30,9 @@ allocation is needed. The offline composer has 57 experimental options, with
 exact all/empty full/V2 output and deterministic individual selection.
 
 Current full integration:
-`build/v3-tent-model-loader-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`6655157c072b0b2e291224c1f22e5d4c45ed9a6299c5a6e478ecaaaf257c35de`.
-The tent-only subset is `build/v3-optional-tent-model-loader-01/`.
+`build/v3-fire-sound-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`f3d055a74c2172029755b6be39e84b29658a17e83ef599a4f2fe6453570cb48f`.
+The tent-only subset retaining the new sound runtime is `build/v3-optional-fire-audio-01/`.
 Ordinary light interaction, rendering, acquisition, and persistence are not yet
 verified. Both served patchers remain V2; this is not a complete-import playtest
 handoff. The selected-import dependency set changes, not the save format; a town
@@ -41,8 +44,8 @@ fire rigs, and both tent-light palettes. All 18,320 native asset bytes fit the
 existing model banks. The bonfire's true four-cell item reader is implemented
 and compiles to 1,020 bytes within the existing code reservation. Twenty-one
 focused checks pass, including sanitised shared readers and full source/asset
-checks. Both fires still need native callbacks, mapped fire sounds, and
-cartridge/composer installation. Summer-camper acquisition for all ten rewards
+checks. Both fires still need native callbacks and item/cartridge/composer
+installation; their complete mapped sounds are installed. Summer-camper acquisition for all ten rewards
 remains work. The two fires are not selectable; tent is available only through
 the experimental offline composer, and both served patchers remain V2.
 

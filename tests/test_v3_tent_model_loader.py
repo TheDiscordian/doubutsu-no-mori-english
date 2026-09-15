@@ -18,7 +18,9 @@ import v3_optional_composition as composer
 class TentLoader(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.image, cls.report = composer.inputs()
+        output = ROOT / 'build/v3-tent-model-loader-01'
+        cls.image = (output / 'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report = json.loads((output / 'build.json').read_bytes())
         cls.base = (repair.BASE / 'animal-forest-v3-asset-loader.z64').read_bytes()
         cls.prior = json.loads((repair.BASE / 'build.json').read_bytes())
         cls.files, cls.old = by_vrom(cls.image), by_vrom(cls.base)

@@ -14,9 +14,9 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-tent-model-loader-01'
-BASE_SHA = '6655157c072b0b2e291224c1f22e5d4c45ed9a6299c5a6e478ecaaaf257c35de'
-REPORT_SHA = '82c4ba4a5067d3debd19c5c459205efcba12c005bd371d627326f654b79950e0'
+BASE = ROOT/'build/v3-fire-sound-runtime-01'
+BASE_SHA = 'f3d055a74c2172029755b6be39e84b29658a17e83ef599a4f2fe6453570cb48f'
+REPORT_SHA = '75894b4b5a77b31ffcc34e32766d38abc6a65c899326b0aaa8e66413a246e7ce'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 PREFIX_SIZE, ABI = 0xC000, 69
