@@ -15,7 +15,7 @@ from v3_punchy_gameplay_fixture import ANIMAL, create
 from v3_save_codec import BANK, PAYLOAD
 from v3_save_clothing import PROFILE, STATE
 
-OUTPUT = ROOT/'build/v3-town-residents-03'
+OUTPUT = ROOT/'build/v3-house-markers-01'
 SOURCE = ROOT/'local/rc2-save-report-g3O4lU/test.flash'
 
 
@@ -82,6 +82,36 @@ class PunchyFixtureTests(unittest.TestCase):
                 report[key]['installed_villagers'].remove('E0ED')
             with self.assertRaises(ValueError):
                 create(self.source, self.rom, report)
+
+    def test_selected_maelle_fixture_keeps_every_unrelated_payload_byte(self):
+        result, receipt = create(self.source, self.rom, self.report, actor=0xE0DA)
+        self.assertEqual(receipt['actor_id'], 'E0DA')
+        self.assertEqual(receipt['matching_outdoor_house_identity'], '50DA')
+        self.assertFalse(receipt['natural_move_in_or_schedule_tested'])
+        for number in range(2):
+            original = self.source[number*BANK:(number+1)*BANK]
+            actual = result[number*BANK:(number+1)*BANK]
+            expected = bytearray(original[:PAYLOAD])
+            expected[4:8] = b'NAF3'
+            expected[0x12:0x14] = actual[0x12:0x14]
+            expected[0xF86C+218//8] |= 1<<(218&7)
+            for edit in receipt['field_changes']:
+                if edit['bank'] != number:
+                    continue
+                at, before, after = edit['offset'], bytes.fromhex(edit['before']), bytes.fromhex(edit['after'])
+                self.assertEqual(expected[at:at+len(before)], before)
+                expected[at:at+len(after)] = after
+            self.assertEqual(actual[:PAYLOAD], expected)
+            self.assertEqual(actual[ANIMAL:ANIMAL+2].hex(), 'e0da')
+            self.assertEqual(actual[ANIMAL+10:ANIMAL+12].hex(), 'da05')
+            self.assertEqual(actual[ANIMAL+0x4E5:ANIMAL+0x4E9].hex(), 'fef3da20')
+            self.assertEqual(actual[ANIMAL+0x520:ANIMAL+0x522].hex(), '341a')
+            self.assertEqual(actual[0x7D7E:0x7D80].hex(), '50da')
+            self.assertEqual(sum(struct.unpack('>'+str(PAYLOAD//2)+'H', actual[:PAYLOAD])) & 65535, 0)
+        self.assertEqual(SOURCE.read_bytes(), self.source)
+        for actor in (0xE0D9, 0xE0EE, 'E0DA'):
+            with self.assertRaises(ValueError):
+                create(self.source, self.rom, self.report, actor=actor)
 
 
 if __name__ == '__main__':

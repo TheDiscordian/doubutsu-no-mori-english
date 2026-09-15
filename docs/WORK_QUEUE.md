@@ -350,6 +350,12 @@ with later e/e+ donor support investigated separately.
   conversation and ordinary exit also pass, restoring the outdoor house/marker
   and a valid 69-node arena. Continue ordinary villager persistence; keep the
   new-instrument playback issue open, and do not replay passing catalogue tests.
+  The [islander gameplay check](checkpoints/V3_ISLANDER_GAMEPLAY.md) loads Maelle's
+  complete house and ordinary away schedule without a room-allocation defect.
+  Her outdoor conversation remains unverified after two bounded setup attempts;
+  preserve the matching checkpoint and continue independent implementation.
+  The no-dialogue sample observation passes final guards but proves no imported
+  instrument playback. Do not repeat its navigation prefix.
   Do not replay passing text/default checks. Older builds lacking dependencies reject new saves;
   retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,

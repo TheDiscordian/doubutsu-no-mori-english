@@ -1,0 +1,19 @@
+[
+  {"place_test_player_near_npc":"E0DA"},
+  {"resume":true},
+  {"key":"w","duration":0.03},
+  {"key":"a","duration":0.08},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"snapshot_message":true},
+  {"save_state":true},
+  {"observe_v3_voice":120},
+  {"resume":true},
+  {"advance_to_choice":{"max_presses":16,"settle_seconds":0.6}},
+  {"snapshot_message":true},
+  {"snapshot_choices":true},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"read":["8019C8D0",16],"expect":"af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"read":["8046C350",16],"expect":"af53c0deaf53c0deaf53c0deaf53c0de"},
+  {"save_state":true}
+]

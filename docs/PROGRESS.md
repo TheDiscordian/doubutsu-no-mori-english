@@ -145,6 +145,15 @@ the three live English choices. Ordinary exit returns outdoors, reconstructs the
 correct house/marker, and retains one player plus a valid arena with 40,608 bytes
 free. Natural arrivals and ordinary villager persistence remain distinct from
 those passing checks.
+The [islander gameplay check](checkpoints/V3_ISLANDER_GAMEPLAY.md) adds a
+profile-checked disposable fixture for any fixed imported villager. Maelle's
+current copied town loads her identity, outfit, house, and complete interior
+with 359,248 bytes free. Her ordinary schedule takes her outdoors; the native
+away-resident handling explains her inactive indoor position. Outdoor speech
+remains unverified after two bounded setup attempts, with exact checkpoints
+retained. The first read-only sample observation passes its final guards but
+does not start speech or validate any new instruments. Continue independent
+implementation instead of repeating that navigation setup.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.

@@ -1625,6 +1625,18 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                                         speech_tail=action['test_v3_complete_audio'] == 'speech-tail'))
+            if 'observe_v3_voice' in action:
+                from v3_voice_observation import observe
+                message = message_snapshot(debug)
+                record(message)
+                if message.get('loaded') != 1:
+                    raise ValueError('Voice observation requires an active ordinary conversation')
+                observe(debug, args.rom, record, frames=action['observe_v3_voice'])
+            if 'place_test_player_near_npc' in action:
+                from v3_voice_observation import place_player
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Test positioning requires a matching emulator checkpoint')
+                place_player(debug, action['place_test_player_near_npc'], record)
             if action.get('test_v3_npc_draw'):
                 from v3_npc_draw_smoke import exercise
                 if not (out/'test.bs1').is_file():
