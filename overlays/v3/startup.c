@@ -93,6 +93,10 @@ int af_v3_startup(void) {
     /* The relocated checked package also owns the new shared item readers. */
     invalidate(accessory_memory+0x10000, 0x1000);
 #endif
+#ifdef AF_V3_CAMPSITE
+    /* Additive scene callbacks follow the unchanged sparse-table guard. */
+    invalidate(accessory_memory+0x2D100, 0xF00);
+#endif
 #endif
     writeback(memory, AF_V3_BLOB_SIZE);
     invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);

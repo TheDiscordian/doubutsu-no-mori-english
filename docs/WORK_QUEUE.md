@@ -308,9 +308,19 @@ with later e/e+ donor support investigated separately.
   The [complete campsite scenery](checkpoints/V3_CAMPSITE_ART.md) supplies native
   exterior, projected shadow, interior, and scene-lantern assets with all source
   geometry/materials retained. Five focused checks pass. The 19,872-byte interior
-  requires scene storage, not a furniture bank. Connect the actual scene/event,
-  English camper conversation, and selected reward route described in
-  [V3_CAMPSITE](../specs/V3_CAMPSITE.md); the assets are not installed yet.
+  uses scene storage, not a furniture bank. The
+  [scene-loader integration](checkpoints/V3_CAMPSITE_SCENE.md) installs all four
+  assets, native scene 35, the complete 36-record field directory, collision,
+  exits, and camper placement in ABI 71. Fifteen focused/composition checks and
+  the corrected 57-record native run pass, including complete field construction,
+  actual interior DMA, relocated gameplay code, cleanup, and guards. Resident
+  RAM adds 8 KiB without normal heap or model-bank growth. Current full build is
+  `build/v3-campsite-runtime-03/`; its ten-item subset is
+  `build/v3-optional-campsite-01/`. Both served patchers remain V2.
+  Continue enterable exterior/event, camper registration and English conversations,
+  selected rewards, and scene lighting/floor sounds as specified in
+  [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
+  appearance, and persistence are not yet verified.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes
   spare. The furniture helper has 220 bytes spare. Further content must respect
   those bounds or expand the relevant allocation before installation.

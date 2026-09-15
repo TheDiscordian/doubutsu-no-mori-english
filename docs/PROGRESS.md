@@ -2,15 +2,34 @@
 
 ## Active development
 
-The [summer campsite scenery](checkpoints/V3_CAMPSITE_ART.md) is converted in
-`build/v3-campsite-art-01/`: complete tent exterior, projected shadow, interior,
-and separate scene lantern, retaining all 527 vertices and 369 triangles.
-Five focused checks pass, including the interior's mixed CI4/I4 materials and
-the lantern's two simultaneous textures/palette banks. These assets are not yet
-installed. Continue the actual campsite scene/event, English conversations, and
-enabled reward routing. The current full cartridge below and both V2 patchers
-remain unchanged. The collectible lantern and sleeping bag correctly have no
-extra interaction; the animated lantern belongs to this separate scene.
+The [campsite scene loader](checkpoints/V3_CAMPSITE_SCENE.md) installs native
+scene 35, a complete extended field directory, all four scenery objects, and
+checked resident callbacks in ABI 71. All 35 original scene/field records remain;
+the complete 19,872-byte room uses the existing background allocation. Fifteen
+focused/composition tests pass. The corrected silent native run passes 57
+records, 24 calls, and 30 assertions: full real field construction, collision,
+exits, camper placement, model DMA, gameplay-overlay relocation, and guards.
+The resident package adds 8 KiB; normal heaps and furniture banks do not grow.
+
+Current full integration:
+`build/v3-campsite-runtime-03/animal-forest-v3-asset-loader.z64`, SHA-256
+`fc8a8682c58f61841f23996bacccf2daa98eefda2c6f9e65aa4e472713834ea9`.
+The ten-camping-item subset is `build/v3-optional-campsite-01/`. All 59
+experimental options compose offline; all/empty output is exact full/V2.
+Neither served patcher changes. This is not a complete-import playtest handoff.
+Continue the enterable exterior, summer event, camper identity/English
+conversations, selected rewards, and special scene lighting/floor sounds.
+Ordinary scene entry, acquisition, GPU appearance, persistence, and hardware
+acceptance are not established by the field-constructor test. Saved format 2
+and selected identities are unchanged; imported saves require matching/superset
+profiles and must not be loaded in V2.
+
+The [summer campsite scenery](checkpoints/V3_CAMPSITE_ART.md) retains all 527
+vertices and 369 triangles across exterior, projected shadow, interior, and
+separate scene lantern. Its five conversion checks cover the interior's mixed
+CI4/I4 materials and the lantern's simultaneous textures/palette banks.
+The collectible lantern and sleeping bag correctly have no extra interaction;
+the animated lantern belongs to this separate scene.
 
 The [complete fire runtime](checkpoints/V3_FIRE_RUNTIME.md) installs campfire and
 bonfire with full rigs, camera-facing flames, two scrolling textures, positional
@@ -22,10 +41,10 @@ arenas, placement readers, restoration, and guards. The offline composer has
 59 experimental options with exact all/empty full/V2 output. No additional
 resident, model-bank, normal heap, or menu allocation is required.
 
-Current full integration:
+Fire runtime checkpoint:
 `build/v3-fire-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
 `e2a8ddfb41b7ad7d111cf666dc4b4706046d6edff1fe88968e925603a9345ad5`.
-The two-fire subset is `build/v3-optional-fires-02/`.
+Its two-fire subset is `build/v3-optional-fires-02/`.
 Continue summer-camper acquisition, then
 other donor content and ordinary gameplay/persistence. GPU appearance and
 original-hardware acceptance remain unverified. Both served patchers remain V2;

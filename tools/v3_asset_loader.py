@@ -84,6 +84,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'items_large': ('af_v3_item_name_extended', 0x80483000),
                        'tent_model': ('af_v3_tent_model_ct', 0x80483400),
                        'fire': ('af_v3_campfire_ct', 0x80483800),
+                       'campsite_scene': ('af_v3_campsite_scene_status', 0x804A0100),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),
