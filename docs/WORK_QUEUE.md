@@ -2,6 +2,18 @@
 
 ## Active: V3 optional GameCube imports
 
+Use the [generated browser plan](../specs/V3_OPTIONAL_COMPOSITION.md), not a second
+maintained item list, for browser selection. The independent JS composer and
+real worker match the offline outputs; generated choices cover all 101 installed
+records. Continue the unserved selection UI: search, individual/category/all/
+clear, disclosed dependencies, input/selection invalidation, cancellation, and
+download cleanup. Keep unsupported records distinct from installed development
+choices and completed gameplay acceptance. Current recipes reconstruct prepared
+changes; they do not run the Python artwork converters in the browser. Retain
+that distinction when extending donor conversion/packaging. Both served patchers
+remain V2 until testing and explicit approval. Evidence and exact scope are in
+[the browser checkpoint](checkpoints/V3_BROWSER_COMPOSITION.md).
+
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
 new furniture. Thirty-nine additional complete assets and their shared runtime
 records are installed. ABI 93 adds snowy tree model, snow bunny, and sleigh

@@ -1,135 +1,140 @@
-# Local optional import composition
+# Optional import composition
 
-## Scope
+## Scope and authority
 
-Compose experimental selections from the pinned ABI-84 integration cartridge
-with the [official localized credits title](../docs/checkpoints/OFFICIAL_CREDITS_TITLE.md),
-including the complete tent model, both fires, their checked DMA/callback
-loaders, four-cell item readers, complete sound resources, and the additive
-campsite scene/exterior runtime, native calendar, independent camper, and native
-tent placement/removal adapter, English event-manager extension, and saved-camper
-move-in exclusion, both camper NPC-profile routes, first/repeat quest state, and
-all 253 summer messages and 49 choices, summer greeting selection, and transient
-last-gift tracking, full-ID trade picking, selected summer rewards, and the
-tent's native floor sound, donor point-light parameters, and complete timed
-lamp lifecycle. Native creation, fade, drawing commands, environment updates,
-and cleanup pass; ordinary scene appearance remains unverified. The
-complete greeting initializer/return passes in the current native trade check;
-the earlier intermediate breakpoint remains unexplained. Both manager
-activation and tent setup require actual selected camping-item rows. Camper
-conversations and acquisition remain unfinished.
-Shared audio changes
-remain in every nonempty profile; the empty profile still returns exact V2.
-The pinned source includes [expanded import storage](V3_IMPORT_STORAGE.md),
-the [full-sized Western runtime](V3_WESTERN_LARGE_ITEMS.md), dedicated
-model banks, garden imports, expanded reward counters, and corrected aloha scoring.
-The [three school desks](V3_SCHOOL_DESKS.md) retain complete artwork,
-directional seat flags, native footprints, shop groups, and selected catalogue/
-room-scoring membership. Full native names, prices, model DMA, rotated footprints,
-stock membership, acquisition, and saved ownership pass their current check.
-Ordinary sitting, appearance, and save/restart remain unverified.
-This is an offline development step, not a served web option or a declaration
-that all imported gameplay is complete. Neither V2 patcher changes.
+`config/v3-import-build.json` pins the complete installed development cartridge,
+its report, and its runtime ABI. `tools/v3_optional_composition.py` is the
+authoritative offline selector. `tools/v3_browser_composition.py` generates the
+browser's data-only selection plan from those same checked records. Neither
+selector maintains another item list. A newly installed supported item therefore
+needs no browser item definition, checkbox-order identity, or bespoke patch path.
 
-The selectable development catalogue contains twenty villagers and forty-two
-installed logical items: thirty-nine furniture items and three shirts. A shirt's
-mannequin is a required representation, not another selectable item. Unconverted
-donor items are rejected. Select-all means these installed development entries,
-not every item on the donor disc.
+The current installed development catalogue contains 101 choices: 78 furniture
+items, three shirts, and twenty villagers. A shirt's mannequin is a required
+representation, not another selectable choice. This catalogue describes installed
+development content, not completed gameplay acceptance. Select-all means the
+installed catalogue, not every entry on the donor disc. Unimplemented identities
+are rejected rather than given substitutes.
 
-An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-84 engine and all compiled resources, but enables only the
-chosen identities and their declared dependencies. IDs, object slots, house
-layers, and allocations never depend on order or subset. Resource compaction is
-not part of this step.
+An empty selection returns the exact V2-11 cartridge, SHA-256
+`8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507`.
+A nonempty selection retains the shared import engine and compiled resources,
+but enables only the chosen identities and required dependencies. Object slots,
+saved identities, house layers, allocations, and audio resources do not depend
+on selection order. Resource compaction is not part of composition.
+
+The experimental browser modules live under `experimental/imports/`, outside
+the deployed `web/` tree. Exports go to a fresh ignored `build/` directory and
+remain unserved. Both V2 patchers, recipes, services, and the Pages allowlist
+stay unchanged until the user tests V3 and explicitly approves the switch.
 
 ## Dependency resolution
 
-Use fixed source identities from `v3_registry.py`. Derive required shirts from
-the installed villager metadata and required furnishings from the actual two
-installed house layers. Normalize furniture rotations to their canonical item.
-Reject unknown imported house furnishings or missing defaults. Selecting Punchy
-therefore requires the cherry shirt and speed bag; selecting Cheri requires
-both barrels. Islanders require their actual red or blue aloha shirt. Each shirt
-requires its fixed mannequin in the save profile and native item records.
+Use fixed source identities from `v3_registry.py` and the installed report.
+Derive required shirts from actual villager metadata and furnishings from both
+installed house layers. Normalize furniture rotations to canonical identities.
+Reject missing defaults, unknown imported furnishings, and missing dependencies.
+Punchy requires the cherry shirt and speed bag; Cheri requires both barrels.
+Imported islanders retain their reviewed starting outfits. Shirts require their
+fixed mannequin in both the saved profile and native item records.
 
-Canonicalize duplicate/order-varied selections into sorted sets. Record explicit
+Canonicalize duplicate/order-varied requests into sorted sets. Record explicit
 selections, automatically required identities, dependency reasons, destinations,
-and the complete 192-byte save profile. A cancelled selection must be resolved
-again from the original selection, not by editing an earlier dependency result.
+and the complete 192-byte saved profile. Re-resolve from the requested set after
+removal; do not mutate a previously expanded dependency result. Browser plans
+also reject cyclic dependencies and two options owning the same saved bit.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-84 cartridge and its source report. Validate each
-installed registry binding before generating writes. Resident changes cover the profile
-at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
-metadata's `present` bytes, and the installed furniture/clothing/mannequin
-`enabled` fields. Furniture's existing selector reads the `enabled` field;
-changing the save profile alone would not disable ordinary furniture stock.
+Validate the complete source ROM/report and every installed binding. Resident
+changes cover the profile at blob offset `20`, villager town-eligibility bytes,
+villager metadata's `present` bytes, and furniture/clothing/mannequin enable
+fields. Changing saved profile bits alone does not disable ordinary item stock.
 
-Thirty-eight furniture rows occupy fixed canonical slots in the expanded
-accessory/audio package at RAM `80484000`, backed by blob offset `211000`.
-The slot is `(item - 3000) / 4`; absent slots stay zero. Validate the package descriptor
-and CRC before resolving that mapping; subtracting the main prefix RAM base
-would target the wrong resource. Only the thirty-eight reviewed four-byte enable words
-are writable in that package. The animated speed bag retains its prefix row.
-The shared item metadata is at `80498000`; composed reports retain the correct
-address and logical row count for each installed batch. The dedicated model pool
-is shared runtime capacity, not another selectable item or a profile-dependent
-allocation.
+Static furniture profiles occupy canonical slots at blob offset `211000`,
+resident RAM `80484000`; each slot is 80 bytes and its four-byte enable field
+starts at offset four. The slot is `(item - 3000) / 4`. Only installed reviewed
+enable words are writable; absent slots stay zero. The animated speed bag and
+clothing mannequins retain their checked prefix rows. Validate the actual package
+descriptor before resolving a resident address. Source item metadata, model
+banks, artwork, callbacks, and resource allocations remain unchanged.
 
-The package is 196,608 bytes at VROM `02400000`, loaded at RAM `80473000`.
-English choices reside at `025F0000`; composition never changes their contents.
-Its item-code extension and the fixed save-resource forwarding entries remain
-unchanged across profiles. Watering trough, covered wagon, and storefront retain
-size 1/two-cell metadata. The selected profile gates their compiled catalogue
-framing; raw GameCube preview-mode numbers are never written into native rows.
-The bonfire retains size 2/four-cell metadata and its complete fire callbacks;
-both fires keep their native loop programs, samples, and per-actor sound IDs.
+Pack selected appended catalogue entries after the unchanged native prefix,
+retaining donor order and fixed catalogue identities. Clear unused appended
+slots in their existing allocation. Update all furniture initialization/search/
+completion counts and the clothing shared iteration/completion count together.
+The browser generator obtains row encodings, native addresses, and count bases
+from the offline composer's checked table writes, not another hard-coded layout.
 
-Pack selected appended catalogue rows after all unchanged native rows, preserving
-donor order and every item ID. Clear unused appended table slots in their existing
-storage. Update the furniture search/initialization/completion counts together,
-and the clothing shared iteration/completion count. Reducing the latter without
-packing selected rows would lose a chosen later shirt. The actual allocated
-753-slot page capacity, native category order, pointers, and image size stay.
+Exclude unselected furniture/mannequins from HRA groups and recommendations with
+the existing inert `FC000000` entry. Native grouping scans the complete metadata
+table independently of placed-item enable checks. Preserve native rows, selected
+properties, series definitions, names, code, and relocation. The browser plan
+assigns each scoring write to the option owning its fixed runtime identity.
 
-Exclude unselected furniture and mannequin records from the HRA metadata table,
-using its existing inert `FC000000` entry. Native grouping scans this whole table
-independently of the placed-item selector: leaving disabled records would require
-unavailable furniture for theme completion and missing-item recommendations.
-Retain all original records, all selected properties, series definitions, names,
-code, and relocation. Empty series have zero members after native initialization.
+Every field carries its expected source value. Reject unknown bytes, overlapping
+destinations, invalid sizes, and out-of-range offsets before applying changes.
+Update the package CRC first, then the prefix CRC that covers that descriptor,
+then the CIC 6102/7101 cartridge checksum. Checksum destinations cannot overlap
+their own covered range or invalidate a preceding checksum. Apart from the
+reviewed count immediates, executable instructions remain unchanged.
 
-Every write includes its expected input and rejects overlap, unknown bytes, or
-out-of-range destinations. Recompute the package CRC first, then the prefix CRC
-which covers that descriptor, and the N64 header checksum. Apart from the two
-bounded furniture-count immediates, executable instructions remain unchanged.
-Source artwork, physical and virtual file ranges, house contents, and save-codec
-code remain unchanged.
-All-selected composition must reproduce the pinned full integration ROM.
+All-selected output must reproduce the complete pinned integration ROM. The
+offline CLI produces a ROM, UPS patch, selection receipt, and matching report
+under a fresh ignored output; it reconstructs the result through the patch
+before writing. Browser composition produces an independent output buffer and
+a receipt listing selected identities, profile and output hashes, and changes.
+Neither path modifies an input cartridge or save.
 
-The offline CLI writes a new ROM, UPS patch, selection receipt, and matching
-build report only under ignored `build/`. Verify the original ROM and reconstruct
-the full result through the UPS patch before writing output. Never overwrite
-an existing output directory. Do not modify a source cartridge, save, web
-recipe, or running service.
+## Experimental browser plan and worker
+
+`AFV3-BROWSER-COMPOSITION-1` contains source/stable sizes and SHA-256 pins,
+runtime ABI, source-report hash, generated options, dependencies, disjoint
+profile masks, per-option disable writes, packed catalogue suffixes/counts,
+ordered resource CRC fields, and the cartridge checksum field. It is JSON,
+not executable conversion code. The bundle binds its exact size and SHA-256.
+
+The browser core validates the entire plan, resolves requests, snapshots inputs
+before asynchronous hashing, and checks every expected field even when that
+option remains enabled. Only a private copy receives changes. It reports the
+actual result hash; it does not pretend to have a precomputed expected hash for
+every possible subset. Representative complete-ROM equality with the offline
+composer supplies the independent implementation check.
+
+The module worker uses the existing V2 disc/recipe engine for source hash checks,
+cartridge byte-order normalization, bounded ISO/CISO reads, Yaz0 decoding, and
+two-input reconstruction. No-import requests reconstruct pinned V2 directly;
+nonempty requests reconstruct the pinned complete development cartridge, then
+apply generated selection rules. Manifest/plan/recipe reads are same-origin,
+bounded, redirect-free GETs. Input games remain File objects inside the browser.
+Terminating the worker cancels the build; no storage or upload API is used.
+
+`tools/v3_browser_composition.py --output build/NAME --recipes` exports modules,
+the generated plan, and checked reconstruction recipes to an unserved directory.
+Omitting `--recipes` exports the plan/modules for development checks only.
+The bundle reuses checked GameCube resource spans and prepared literal changes.
+Converted artwork embedded in those literals is prepared by the Python importer;
+this is not yet execution of its graphics converters in JavaScript. Exports are
+private development data, not approved redistribution artifacts.
+
+The user-facing selection UI, unsupported-item explanations, selection/input
+change invalidation, download/object-URL lifecycle, and public packaging remain
+separate implementation work. Worker cancellation tests do not establish those
+UI behaviours. The test server exposes only its explicit exported file list and
+synthetic file-input page, and shuts down after the check.
 
 ## Saves and verification
 
-Selected imports are saved dependencies even if not yet acquired. The existing
-format-2 codec accepts a saved profile in an equal or larger selection and
-rejects a missing dependency before modifying output state. A smaller selection
-is not a save migration. Never load imported saves in V2 or imply that stable
-field sizes establish gameplay compatibility.
+Selected imports are saved dependencies even before acquisition. The format-2
+codec accepts a saved profile in an equal or larger selection and rejects missing
+dependencies before modifying output state. Removing imports is not migration.
+Do not load imported saves in V2 or an older build lacking those identities.
+Ordinary cross-profile reload remains unverified; stable field sizes do not
+establish gameplay compatibility.
 
-Focused checks cover dependency closure, selection-order independence, every
-changed enable field, collision rejection, preserved code/resources, exact
-all/empty outputs, and actual codec subset/superset handling. One combined
-native check verifies selected versus excluded runtime entries and a non-prefix
-shirt/furniture subset's real catalogue selection and completion. Ordinary
-cross-profile save/reload and player acceptance remain separate evidence.
-
-Browser composition and input conversion remain later work. GitHub development
-source is allowed; both web patchers remain on V2 until testing and explicit
-approval from the user.
+Focused checks cover dependency closure, source/field corruption, overlap/bounds,
+selection-order independence, exact all/empty output, packed catalogue/HRA
+membership, checksums, input immutability, and current-cartridge equivalence.
+Silent browser-worker checks use the supplied original games and a temporary
+isolated export, not either live patcher. Runtime code does not change in browser
+composition, so unchanged native evidence is retained without replaying old builds.

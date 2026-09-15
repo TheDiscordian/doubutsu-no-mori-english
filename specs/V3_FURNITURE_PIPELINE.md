@@ -54,6 +54,13 @@ price, footprint, acquisition list, catalogue position, scoring, source hashes,
 and installed resource locations. The installer and tests consume those records.
 They do not restate the items in another maintained Python list.
 
+The [browser composition plan](V3_OPTIONAL_COMPOSITION.md) also comes from the
+installed records. A new eligible furniture record automatically supplies its
+choice, saved-profile bit, enable/scoring writes, and catalogue membership.
+Villager requirements come from actual installed outfit and house data. There
+is no separate per-item browser list or patch definition. Experimental exports
+remain unserved; neither V2 patcher changes without user testing and approval.
+
 New official name entries are generated as `provenance.patch` if missing from
 `translations/provenance.json`. Apply the generated patch through `apply_patch`
 and build with the updated catalogue before promoting a build. Existing human

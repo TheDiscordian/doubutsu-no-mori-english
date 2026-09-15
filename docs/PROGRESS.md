@@ -2,6 +2,18 @@
 
 ## Active development
 
+The [experimental browser composer](checkpoints/V3_BROWSER_COMPOSITION.md)
+generates all 101 installed choices and their selection rules from the same
+records as the offline importer. New supported items require no website-specific
+item definition. Eleven representative profiles produce exactly the offline
+composer's ROM hashes. The first silent browser-worker check with the supplied
+N64 ROM and GC CISO passes no-import, all-installed, and dependent-villager/
+seasonal-subset reconstruction, cancellation, and malformed-plan rejection.
+Nine synthetic browser checks and three current-build Python checks pass.
+Exports remain unserved; both V2 sites are unchanged. The selection UI and
+browser-side graphics conversion are unfinished, and this adds no gameplay
+acceptance claim or new runtime ABI.
+
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplies
 thirty-nine additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
