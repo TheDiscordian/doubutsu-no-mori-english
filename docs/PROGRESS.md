@@ -2,7 +2,17 @@
 
 ## Active development
 
-The [camper NPC/quest adapter](checkpoints/V3_CAMPER_QUEST.md) binds both native
+The [complete summer text adapter](checkpoints/V3_CAMPER_TEXT.md) appends all 253
+donor messages and 49 choices in ABI 79, retaining every existing English record.
+All branches, choices, wording, page breaks, timing, and expressions are preserved;
+eight duplicate donor trade requests map to their verified native handler.
+The largest expanded message bound is 827 of 1,024 bytes. Seventeen current
+focused/composition tests pass. The corrected native run passes 74 records,
+23 calls, and 54 assertions, including complete old/new reads and continuation.
+Its unchanged loader evidence applies to the final eight-byte command adaptation;
+ordinary conversations and reward execution remain unverified.
+
+The unchanged [camper NPC/quest adapter](checkpoints/V3_CAMPER_QUEST.md) binds both native
 NPC controllers to the donor's shared camper profile and installs first/repeat
 quest routing in ABI 78. The summer greeting-session flag changes at first talk
 start; winter and ordinary conversations leave it alone. The helper uses 112
@@ -34,9 +44,9 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-camper-quest-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`f0a34dfed22880ac012cae1ebc6be22d0c49cade56c9d4b08a2e24bfc3d0c001`.
-The ten-item subset is `build/v3-optional-camper-quest-01/`. The offline composer
+`build/v3-camper-text-runtime-03/animal-forest-v3-asset-loader.z64`, SHA-256
+`df8161549e9069ee68c34a4fae3cf3200739a40cb3adecef5e31f6a8aebd24e1`.
+The ten-item subset is `build/v3-optional-camper-text-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue the
 actual English summer greeting selector and conversation commands, remaining
 masked NPC/quest readers, selected rewards, and lighting/floor sounds. Full construction,

@@ -349,9 +349,14 @@ with later e/e+ donor support investigated separately.
   The [NPC/quest adapter](checkpoints/V3_CAMPER_QUEST.md) binds both camper-profile
   readers and first/repeat quest state. Seventeen focused/composition checks and
   the corrected 68-record/55-assertion native instruction-window check pass.
-  Full NPC construction and summer-specific English messages remain unfinished.
-  Current full build: `build/v3-camper-quest-runtime-02/`; camping subset:
-  `build/v3-optional-camper-quest-01/`. Both patchers remain V2.
+  Full NPC construction remains unverified. The [summer text adapter](checkpoints/V3_CAMPER_TEXT.md)
+  appends all 253 messages and 49 choices, retaining the original English banks,
+  complete wording/timing, stable branches, and equivalent native trade operations.
+  Seventeen focused/composition checks pass. Its corrected native loader and
+  continuation check passes 74 records, 23 calls, and 54 assertions; ordinary
+  conversation/reward execution is not established.
+  Current full build: `build/v3-camper-text-runtime-03/`; camping subset:
+  `build/v3-optional-camper-text-01/`. Both patchers remain V2.
   Continue actual English summer greeting selection and conversation commands,
   remaining masked readers, ordinary NPC construction,
   selected rewards, and scene lighting/floor sounds as specified in

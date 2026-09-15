@@ -1551,6 +1551,12 @@ def main():
                     raise ValueError('V3 fire probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_camper_text'):
+                from v3_camper_text_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 camper text probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_camper_quest'):
                 from v3_camper_quest_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -21,6 +21,8 @@ extends the installed English manager with checked selection, registration,
 placement/removal, and retry handling. ABI 77 prevents the saved camper from
 simultaneously entering town through natural growth or an inbound transfer.
 ABI 78 binds both NPC-profile readers and the first/repeat quest lifecycle.
+ABI 79 appends the complete summer message and choice groups with native links
+and equivalent trade commands, preserving all existing English records.
 Remaining masked NPC/quest readers,
 conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
@@ -490,3 +492,28 @@ relocation comparisons at two bases must show no changes outside the declared
 windows. The [quest checkpoint](../docs/checkpoints/V3_CAMPER_QUEST.md) records
 actual complete native loading and twelve profile/quest instruction windows;
 those checks do not establish a complete NPC construction or conversation.
+
+## Complete summer text
+
+`v3_camper_text.py` installs donor messages 15930–16182 as native IDs
+11754–12006 and their 49 choices as 462–510. All 238 message targets and 152
+choice references are mapped to fixed appended IDs, independent of selected
+items/villagers. Original English records, wording, line/page boundaries, timing,
+and expressions remain. Only 23 verified redundant article suppressions are
+removed. Eight donor trade-23 requests use native 13: both actual donor table
+entries point to the same handler, while the native dispatcher accepts 1–22.
+Do not leave unsupported actor requests silently ignored.
+
+Main text uses VROM `01FA0000`, size 2,107,696, after complete audio waves and
+before import storage. Both message bounds become 12007; both choice bounds
+become 511. The existing tables stay at `CF9000` and `D06000`; choice data stays
+at `025F0000`. All four complete resources use unused physical storage from
+`03000000`, retaining original physical data and DMA slots. Virtual addresses
+and physical ends must remain below the native `04000000` DMA ceiling. No
+resident or heap allocation grows; expanded messages are bounded by 1,024 bytes.
+
+The [text checkpoint](../docs/checkpoints/V3_CAMPER_TEXT.md) records all-record
+preservation, native loading/continuation, and the repaired virtual allocation.
+Summer greeting selection, complete conversation and trade execution, and
+selected rewards remain required. Text installation does not establish those
+gameplay routes or authorise switching either web patcher.
