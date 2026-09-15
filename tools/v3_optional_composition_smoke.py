@@ -21,7 +21,8 @@ def exercise(debug, rom_path, record):
     if any(receipt[key]!=value for key,value in selection.items()):
         raise ValueError('Changed optional-selection receipt')
     files = by_vrom(image)
-    prefix = files[BLOB].extract(image)[:0xC000]
+    blob = files[BLOB].extract(image)
+    prefix = blob[:0xC000]
     def check(label, address, expected):
         actual = debug.read_memory(address,len(expected))
         record({'optional_profile_check':label,'address':f'{address:08X}','bytes':len(expected),
@@ -36,6 +37,7 @@ def exercise(debug, rom_path, record):
     check('selected profile',0x80460020,bytes.fromhex(selection['profile_hex']))
     check('selected town flags',0x80461E60,prefix[0x1E60:0x1E74])
     check('complete selected text/default metadata',0x80462C00,prefix[0x2C00:0x2E80])
+    check('selected package-resident static rows', 0x80481500, blob[0x7E500:0x7E500 + 9 * 80])
     state = debug.read_memory(0x8046C000,864)
     history = debug.read_memory(0x8013670C,32)
     scratch = MODULE_RAM+0x6500

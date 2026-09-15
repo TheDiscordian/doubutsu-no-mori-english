@@ -127,10 +127,10 @@ class ConstructionRuntimeTests(unittest.TestCase):
                 self.assertEqual(bytes(out), wanted + bytes(STATE - PROFILE) if result == 1 else b'\xA5' * STATE)
 
     def test_later_registry_reservations_do_not_enable_missing_prior_cartridge_content(self):
-        catalog = composer.catalogue(self.base, self.prior)
-        self.assertEqual(len(catalog), 26)
-        with self.assertRaisesRegex(ValueError, 'unimplemented'):
-            composer.resolve(catalog, ['GAFE01-r0/item/31F4'])
+        # The current composer must reject the old cartridge entirely; its
+        # newer installed catalogue cannot authorise writes into an old build.
+        with self.assertRaisesRegex(ValueError, 'pinned installed cartridge'):
+            composer.catalogue(self.base, self.prior)
 
 
 if __name__ == '__main__':

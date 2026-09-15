@@ -11,10 +11,10 @@ garment displays retain their identities and readers.
 
 This runtime-only stage is not a playable handoff. The
 [catalogue integration](V3_CATALOGUE_CAPACITY.md) supplies expanded pages,
-ordinary stock, and scoring installation. Optional composition and ordinary
-placement/persistence still need completion. Both web patchers remain V2 until the user tests and explicitly
-approves V3. The local optional composer remains pinned to the preceding
-26-entry integration cartridge and rejects the seven uninstalled options there.
+ordinary stock, and scoring installation. The optional composer connects these
+installed items; ordinary placement/persistence still need completion.
+Both web patchers remain V2 until the user tests and explicitly approves V3.
+The local composer uses the 33-entry integration cartridge and rejects old inputs.
 Registry reservations do not themselves enable an option in an older cartridge.
 
 ## Fixed storage and ownership
@@ -85,8 +85,8 @@ is not established by the codec checks; preserve backups.
 
 Use the capacity-expanded integration cartridge for further work. Its 446-row
 furniture list, 248-row clothing list, stock, and scoring data are installed.
-Connect optional composition to the package-resident enabled words and package
-CRC, and complete ordinary acquisition/placement/persistence. Do not add these
+Optional composition connects the package-resident enabled words and package
+CRC. Complete ordinary acquisition/placement/persistence. Do not add these
 options to either served web patcher during experimental work.
 
 The [native checkpoint](../docs/checkpoints/V3_CONSTRUCTION_RUNTIME.md) records

@@ -39,7 +39,7 @@ class OptionalCompositionTests(unittest.TestCase):
         return composer.resolve(self.catalog, list(selected))
 
     def test_actual_house_and_outfit_dependencies_not_just_names(self):
-        self.assertEqual(len(self.catalog),26)
+        self.assertEqual(len(self.catalog),33)
         self.assertEqual(self.select(PUNCHY)['required'],
                          ['GAFE01-r0/item/24BF','GAFE01-r0/item/3350'])
         self.assertEqual(self.select(CHERI)['required'],
@@ -81,14 +81,25 @@ class OptionalCompositionTests(unittest.TestCase):
         files = by_vrom(result)
         module = files[composer.MODULE].extract(result)
         self.assertEqual(struct.unpack_from('>4I',module,composer.CONFIG),
-                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),60))
+                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),62))
+        self.assertEqual(struct.unpack_from('>4I', blob, 0xF0),
+                         (composer.BLOB + composer.PACKAGE, composer.PACKAGE_SIZE,
+                          zlib.crc32(blob[composer.PACKAGE:composer.PACKAGE + composer.PACKAGE_SIZE]),
+                          composer.PACKAGE_RAM))
         self.assertEqual(struct.unpack_from('>2I',result,0x10),n64_checksum(result))
         self.assertEqual(len(result),len(self.base))
         reverse = [{**row,'before':row['after'],'after':row['before']} for row in writes]
         self.assertEqual(composer.apply_writes(result,reverse),self.base)
         base_files = by_vrom(self.base)
         self.assertEqual(files,base_files)  # No directory, allocation, or ID changes.
-        self.assertEqual(blob[0xC000:],base_files[composer.BLOB].extract(self.base)[0xC000:])
+        # Outside the prefix, only the nine profile enable words and the
+        # selected catalogue ordering/count fields may change. Assets stay put.
+        restored_blob = bytearray(blob)
+        original_blob = base_files[composer.BLOB].extract(self.base)
+        for row in writes:
+            at = row['offset'] - files[composer.BLOB].pstart
+            if 0 <= at < len(blob): restored_blob[at:at + len(bytes.fromhex(row['before']))] = bytes.fromhex(row['before'])
+        self.assertEqual(restored_blob, original_blob)
         self.assertEqual(composer.compose(self.base,self.report,self.catalog,
                          self.select(PUNCHY,MAELLE))[0],result)
 
@@ -103,6 +114,30 @@ class OptionalCompositionTests(unittest.TestCase):
         self.assertEqual(writes,[])
         self.assertIsNone(blob)
 
+    def test_nonprefix_new_items_and_last_shirt_pack_counts_and_preserve_fixed_ids(self):
+        from v3_catalogue import VROM, RAM
+        from v3_clothing_catalogue import COUNT
+        chosen = ['GAFE01-r0/item/31F8', 'GAFE01-r0/item/322C', 'GAFE01-r0/item/241B']
+        selection = self.select(*chosen)
+        self.assertEqual(selection['required'], [])
+        image, _, blob = composer.compose(self.base, self.report, self.catalog, selection)
+        cat = self.report['catalogue']
+        data = by_vrom(image)[VROM].extract(image)
+        table = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
+        self.assertEqual(struct.unpack_from('>4H', data, table + 436 * 4), (2174, 0, 2187, 0))
+        self.assertEqual(data[table + 438 * 4:table + 446 * 4], bytes(8 * 4))
+        for address, opcode in ((0x808A6600, 0x24050000), (0x808A9460, 0x24140000), (0x808AF7A8, 0)):
+            self.assertEqual(struct.unpack_from('>I', data, address - RAM)[0], opcode | 438)
+        table = cat['code']['symbols']['af_v3_catalogue_clothing_order'] - RAM
+        self.assertEqual(data[table + 490:table + 496], struct.pack('>3H', (0x386C - 0x1000) // 4, 0, 0))
+        self.assertEqual(struct.unpack_from('>I', data, COUNT - RAM)[0], 246)
+        for item in ('31F8', '322C'):
+            row = self.catalog['GAFE01-r0/item/' + item]
+            self.assertTrue(composer.STATIC_ROWS <= row['enable_offset'] < composer.STATIC_ROWS + 9 * 80)
+            self.assertEqual(row['enable_offset'] - composer.PACKAGE,
+                             row['enable_ram'] - composer.PACKAGE_RAM)
+            self.assertEqual(blob[row['enable_offset']:row['enable_offset'] + 4], b'\0\0\0\1')
+
     def test_bad_overlapping_and_tampered_writes_fail_without_source_changes(self):
         source = b'12345678'
         row = {'offset':2,'before':b'34'.hex(),'after':b'AB'.hex()}
@@ -114,6 +149,10 @@ class OptionalCompositionTests(unittest.TestCase):
         tampered = self.select(PUNCHY);tampered['enabled'].remove('GAFE01-r0/item/3350')
         with self.assertRaises(ValueError):
             composer.compose(self.base,self.report,self.catalog,tampered)
+        altered = {key: dict(value) for key, value in self.catalog.items()}
+        altered['GAFE01-r0/item/31F8']['enable_offset'] += 4
+        with self.assertRaisesRegex(ValueError, 'actual installed bindings'):
+            composer.compose(self.base, self.report, altered, self.select('GAFE01-r0/item/31F8'))
 
     def test_actual_codec_equal_superset_and_missing_dependency_profiles(self):
         source = (ROOT/'local/rc2-save-report-g3O4lU/test.flash').read_bytes()[:65536]

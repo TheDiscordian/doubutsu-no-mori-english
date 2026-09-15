@@ -170,12 +170,13 @@ def exercise(debug, rom_path, record):
             for row in cat['clothing']['imports']: call(0x800B88EC, [int(row['pocket_item_id'], 16)])
             initialize()
             clothes = page + 3 * page_bytes
-            check('complete independent garment count', clothes, struct.pack('>H', 248))
+            clothing_count = cat['clothing']['total_rows']
+            check('complete independent garment count', clothes, struct.pack('>H', clothing_count))
             check('garment completion flag', clothes + 6, bytes([1]))
             expected = b''.join(struct.pack('>H', 0x1000 + i * 4) for (i,) in
-                struct.iter_unpack('>H', data[cat['clothing']['table_address'] - RAM:cat['clothing']['table_address'] - RAM + 496]))
+                struct.iter_unpack('>H', data[cat['clothing']['table_address'] - RAM:cat['clothing']['table_address'] - RAM + clothing_count * 2]))
             check('all native and imported garments retain their order', clothes + 8, expected)
-            debug.write_memory(clothes + 2, struct.pack('>HH', 241, 6))
+            debug.write_memory(clothes + 2, struct.pack('>HH', clothing_count - 7, 6))
             call(root + 0x808A6A8C - RAM, [submenu, 3], core_proof)
             selected = cat['clothing']['imports'][-1]
             check('last garment is selected from the resized page', state + 8 + 0x760,

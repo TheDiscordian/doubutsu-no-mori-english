@@ -11,8 +11,8 @@ The shared menu reserves another 6,144 bytes; the cartridge remains 64 MiB with
 an Expansion Pak required. Current integration artifact:
 `build/v3-construction-catalogue-03/animal-forest-v3-asset-loader.z64`, ABI 62,
 SHA-256 `5d6e3abdb2b67f33b99264dd2a4a0069c542c34c60b397fcf9df97121237fbc7`.
-Next connect optional selection to the package-resident furniture rows/CRC and
-complete ordinary acquisition/placement/persistence. Both web patchers remain V2.
+The local optional composer connects the package-resident furniture rows/CRC.
+Ordinary acquisition/placement/persistence remain. Both web patchers remain V2.
 
 The [construction runtime](checkpoints/V3_CONSTRUCTION_RUNTIME.md) installs
 seven more complete furniture models, fixed profiles, English names/prices,
@@ -23,16 +23,17 @@ fallbacks, cleanup, and guards. The actual C codec rejects new-profile saves in
 older profiles without writes. The capacity-expanded integration supplies its
 catalogue and stock/scoring tables. No complete-import handoff is claimed.
 
-The [local optional composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) now
+The [local optional composer](checkpoints/V3_OPTIONAL_CONSTRUCTION.md) now
 supports individual experimental selections across the twenty installed
-villagers and six logical items. It derives required house furnishings and
+villagers and thirteen logical items. It derives required house furnishings and
 outfits from installed content, preserves fixed IDs, and exports the selected
-save profile. Six focused checks pass: reordered selections produce identical
+save profile. Seven focused checks pass: reordered selections produce identical
 cartridges, select-all reproduces the full integration build, and an empty
-selection reproduces stable V2-11. The Maelle/Punchy subset also passes its
-42-record native run: nineteen selected/excluded reader/count/name returns,
-fifteen memory assertions, preserved save state, and final guards. Its complete
-local build is `build/v3-optional-profile-02/`. Neither served patcher changes.
+selection reproduces stable V2-11. The O'Hare/detour-sign/saw-horse subset passes
+its initial 122-record native run: selected/excluded readers, package CRC,
+438-row furniture and 246-row clothing catalogues, correct subset completion,
+model loading, names, saved-state retention, and final guards. Its local build
+is `build/v3-optional-construction-01/`. Neither served patcher changes.
 This does not certify unfinished gameplay or
 claim that all donor items are converted.
 

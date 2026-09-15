@@ -11,8 +11,10 @@ the construction theme has 28 members, within its 32-bit completion mask.
 
 `tools/v3_construction_catalogue.py` builds this ABI 62 integration cartridge
 from the pinned ABI 61 runtime. It preserves all original assets, fixed import
-identities, resident code, audio, and saved profiles. The optional composer still
-needs connection to this larger installed set. Neither served patcher changes.
+identities, resident code, audio, and saved profiles. The
+[optional composer](V3_OPTIONAL_COMPOSITION.md) connects this larger installed set,
+including selected catalogue rows/counts and package CRC handling.
+Neither served patcher changes.
 
 ## Actual N64 state
 

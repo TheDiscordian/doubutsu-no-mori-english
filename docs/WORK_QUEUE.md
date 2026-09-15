@@ -280,9 +280,10 @@ with later e/e+ donor support investigated separately.
   metadata. Four focused tests, 103 native catalogue records, and 36 native stock/
   pocket-acquisition records pass. Its menu reservation grows by 6,144 bytes;
   the Expansion Pak requirement and 64-MiB cartridge size remain unchanged.
-  Next connect optional selection to the package-resident rows and its CRC.
-  Keep subset catalogue row packing and iteration/completion counts consistent;
-  full-integration counts cannot represent completion in a smaller selection.
+  The [33-entry optional composer](checkpoints/V3_OPTIONAL_CONSTRUCTION.md)
+  connects package-resident enable words and both CRCs, with selected catalogue
+  packing and iteration/completion counts. Seven focused checks and the first
+  122-record native subset check pass, including non-prefix item/shirt choices.
   Review the red/blue aloha mannequin scoring rows, whose installation is not
   established by the existing cherry-mannequin scoring evidence.
   Ordinary acquisition/placement/persistence remain incomplete; neither web

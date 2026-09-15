@@ -14,12 +14,25 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-house-markers-01'
-BASE_SHA = '55a715831671c989aa465fbf6d04c49caa975a761105ffa1f3acecd10ac7b8cf'
-REPORT_SHA = 'adb6c52ed51b3606cf86f07febc459d31cc15bad6fc69459c612aec4130a53a3'
+BASE = ROOT/'build/v3-construction-catalogue-03'
+BASE_SHA = '5d6e3abdb2b67f33b99264dd2a4a0069c542c34c60b397fcf9df97121237fbc7'
+REPORT_SHA = '0f33275f8f62d65ef0f3de7e4e8da038d2ca630f58ffad4d83fb53954f6b11d6'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 60
+PREFIX_SIZE, ABI = 0xC000, 62
+PACKAGE, PACKAGE_RAM, PACKAGE_SIZE = 0x70000, 0x80473000, 0xF000
+STATIC_ROWS = 0x7E500
+
+
+def resident_offset(blob, address, size):
+    if 0x80460000 <= address <= 0x80460000 + PREFIX_SIZE - size:
+        return address - 0x80460000
+    if (struct.unpack_from('>4I', blob, 0xF0) !=
+            (BLOB + PACKAGE, PACKAGE_SIZE, zlib.crc32(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]), PACKAGE_RAM)):
+        raise ValueError('Changed package address or checksum descriptor')
+    if PACKAGE_RAM <= address <= PACKAGE_RAM + PACKAGE_SIZE - size:
+        return PACKAGE + address - PACKAGE_RAM
+    raise ValueError('Import row is outside checked resident resources')
 
 
 def canonical(value):
@@ -52,13 +65,14 @@ def catalogue(image, report):
     for row in furniture_rows:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
         index, item, _ = FURNITURE[donor]
-        at = int(row['profile_ram'], 16)-0x80460000-8
+        row_ram = int(row['profile_ram'], 16) - 8
+        at = resident_offset(blob, row_ram, 80)
         if (row['item_id'] != f'{item:04X}' or row['runtime_index'] != index
                 or struct.unpack_from('>HHI', blob, at) != (index, item, 1)):
             raise ValueError('Changed installed furniture binding')
         result[row['id']] = {'id':row['id'], 'name':row['name'], 'kind':'furniture',
             'item_id':row['item_id'], 'runtime_index':index, 'dependencies':[],
-            'enable_offset':at+4, 'enable_bytes':4}
+            'enable_offset':at+4, 'enable_bytes':4, 'enable_ram':row_ram+4}
     for slot, row in enumerate(report['clothing']['imports']):
         donor = int(row['donor_item_id'], 16)
         item, index, source = CLOTHING[donor]
@@ -164,6 +178,46 @@ def apply_writes(source, writes):
     return bytes(result)
 
 
+def catalogue_selection(image, report, enabled):
+    """Pack selected appended rows without changing native order or identities."""
+    from v3_catalogue import VROM, RAM
+    from v3_clothing_catalogue import COUNT
+    entry = by_vrom(image)[VROM]
+    data = entry.extract(image)
+    cat = report['catalogue']
+    if entry.pend or sha256(data) != cat['output_sha256']:
+        raise ValueError('Changed full source catalogue resource')
+    rows = [row for row in cat['imports'] if item_key(int(row['item_id'], 16)) in enabled]
+    clothes = [row for row in cat['clothing']['imports'] if item_key(int(row['donor_item_id'], 16)) in enabled]
+    writes = []
+
+    def change(address, before, after, purpose):
+        at = address - RAM
+        if len(before) != len(after) or not 0 <= at <= len(data) - len(before) or data[at:at + len(before)] != before:
+            raise ValueError('Changed optional catalogue table or count')
+        if before != after:
+            writes.append({'offset': entry.pstart + at, 'before': before.hex(), 'after': after.hex(), 'purpose': purpose})
+
+    for key, width, native_count, original, selected in (
+            ('af_v3_catalogue_order', 4, 436, cat['imports'], rows),
+            ('af_v3_catalogue_clothing_order', 2, 245, cat['clothing']['imports'], clothes)):
+        address = cat['code']['symbols'][key]
+        at = address - RAM
+        prefix = data[at:at + native_count * width]
+        encode = lambda row: struct.pack('>HH', row['catalogue_index'], row['mode']) if width == 4 else struct.pack('>H', row['catalogue_index'])
+        before = prefix + b''.join(encode(row) for row in original)
+        after = prefix + b''.join(encode(row) for row in selected) + bytes((len(original) - len(selected)) * width)
+        change(address, before, after, 'selected furniture ordering' if width == 4 else 'selected clothing ordering')
+    furniture_count, clothing_count = 436 + len(rows), 245 + len(clothes)
+    for address, opcode in ((0x808A6600, 0x24050000), (0x808A9460, 0x24140000), (0x808AF7A8, 0)):
+        change(address, struct.pack('>I', opcode | cat['total_rows']),
+               struct.pack('>I', opcode | furniture_count), 'selected furniture iteration/search/completion count')
+    change(COUNT, struct.pack('>I', cat['clothing']['total_rows']), struct.pack('>I', clothing_count),
+           'selected clothing iteration/completion count')
+    return writes, {'imports': rows, 'total_rows': furniture_count,
+                    'clothing_imports': clothes, 'clothing_total_rows': clothing_count}
+
+
 def compose(image, report, catalog, selection):
     # Re-resolve instead of trusting a caller-supplied enabled set or profile.
     if selection != resolve(catalog, selection['requested']):
@@ -175,6 +229,8 @@ def compose(image, report, catalog, selection):
         return stable, [], None
     if sha256(image)!=BASE_SHA:
         raise ValueError('Composition needs the pinned integration cartridge')
+    if catalog != catalogue(image, report):
+        raise ValueError('Selection catalogue differs from actual installed bindings')
     files = by_vrom(image)
     blob = files[BLOB].extract(image)
     if (len(blob)!=files[BLOB].size or files[BLOB].pend or files[MODULE].pend
@@ -186,8 +242,9 @@ def compose(image, report, catalog, selection):
         if before != value:
             writes.append({'offset':offset, 'before':before.hex(), 'after':value.hex(), 'purpose':label})
     def prefix(offset, value, label):
-        if not 0x20 <= offset < offset+len(value) <= PREFIX_SIZE:
-            raise ValueError('Selection field escapes the resident prefix')
+        if not (0x20 <= offset < offset+len(value) <= PREFIX_SIZE or
+                len(value) == 4 and offset in (STATIC_ROWS + slot * 80 + 4 for slot in range(9))):
+            raise ValueError('Selection field escapes reviewed resident enable words')
         change(files[BLOB].pstart+offset, value, label)
     prefix(0x20, bytes.fromhex(selection['profile_hex']), 'complete saved import profile')
     enabled = set(selection['enabled'])
@@ -198,8 +255,16 @@ def compose(image, report, catalog, selection):
             prefix(row['town_flag_offset'], bytes((active,)), key+' town eligibility')
         if row['kind']=='clothing':
             prefix(row['display_enable_offset'], active.to_bytes(4, 'big'), key+' mannequin')
+    catalogue_writes, _ = catalogue_selection(image, report, enabled)
+    writes.extend(catalogue_writes)
     intermediate = apply_writes(image, writes)
     start = files[BLOB].pstart
+    new_blob = intermediate[start:start+len(blob)]
+    resident_offset(blob, PACKAGE_RAM, PACKAGE_SIZE)  # Bind the actual package descriptor.
+    prefix(0xF8, struct.pack('>I', zlib.crc32(new_blob[PACKAGE:PACKAGE + PACKAGE_SIZE])), 'resident package CRC')
+    # The package checksum is inside the main prefix and must be included in
+    # its checksum, after all selected package enable words have been applied.
+    intermediate = apply_writes(image, writes)
     new_blob = intermediate[start:start+len(blob)]
     module = files[MODULE].extract(image)
     if struct.unpack_from('>4I', module, CONFIG) != (BLOB, PREFIX_SIZE, zlib.crc32(blob[:PREFIX_SIZE]), ABI):
@@ -264,6 +329,26 @@ def build(output, selected=(), *, select_all=False):
         for slot,row in enumerate(current['clothing']['imports']):
             row['selected_for_profile'] = item_key(int(row['donor_item_id'],16)) in selection['enabled']
             row['metadata_sha256'] = sha256(blob[0x2820+slot*32:0x2840+slot*32])
+        _, selected_cat = catalogue_selection(image, report, set(selection['enabled']))
+        from v3_catalogue import VROM, RAM
+        from v3_construction_runtime import ROWS, ITEMS, TABLE_END
+        cat = current['catalogue']
+        cat['installed_total_rows'] = cat['total_rows']
+        cat.update(imports=selected_cat['imports'], total_rows=selected_cat['total_rows'])
+        cat['clothing']['installed_total_rows'] = cat['clothing']['total_rows']
+        cat['clothing'].update(imports=selected_cat['clothing_imports'], total_rows=selected_cat['clothing_total_rows'])
+        data = by_vrom(result)[VROM].extract(result)
+        cat['output_sha256'] = sha256(data)
+        at = cat['code']['symbols']['af_v3_catalogue_bit'] - RAM
+        cat['code']['sha256'] = sha256(data[at:at + cat['code']['bytes']])
+        at = cat['clothing']['table_address'] - RAM
+        cat['clothing']['table_sha256'] = sha256(data[at:at + cat['clothing']['total_rows'] * 2])
+        current['construction'].update(optional_composition_updated=True,
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + 9 * 80]),
+            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
+            pending=['ordinary acquisition, placement, and persistence'])
+        current['construction_catalogue']['optional_composition_updated'] = True
     output.mkdir(parents=True, exist_ok=False)
     write_new(output/'animal-forest-v3-asset-loader.z64', result)
     write_new(output/'asset-loader.ups', patch)
@@ -276,7 +361,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All 26 installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All 33 installed experimental entries, not the whole donor disc')
     args = parser.parse_args()
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))
