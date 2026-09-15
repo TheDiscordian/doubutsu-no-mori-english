@@ -130,8 +130,21 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-house-exterior-01/animal-forest-v3-asset-loader.z64`, ABI 59, SHA-256
-`ba188ffb7579a92418de4861f1b6daa92e6140f276ae4b17deaeb027cebed8df`.
+`build/v3-house-markers-01/animal-forest-v3-asset-loader.z64`, ABI 60, SHA-256
+`55a715831671c989aa465fbf6d04c49caa975a761105ffa1f3acecd10ac7b8cf`.
+The [separate house markers](checkpoints/V3_HOUSE_MARKERS.md) prevent imported
+houses from sharing original player-house/building markers. Three focused tests
+pass, including compiled instructions over all 16-bit inputs and the complete
+cartridge/patch. The ROM is 64 MiB; RAM remains 8 MiB, with no extra allocation.
+The corrected native run enters Punchy's actual room, retains one player and
+intact guards, and draws Punchy inside. The matching-state continuation verifies
+the normal outdoor house ID is restored and all 65 scene-heap nodes are valid,
+with 358,528 bytes free. The corrected side approach and ordinary A presses
+advance Punchy's English home dialogue, insert his full catchphrase, and reach
+the three live English choices. Ordinary exit returns outdoors, reconstructs the
+correct house/marker, and retains one player plus a valid arena with 40,608 bytes
+free. Natural arrivals and ordinary villager persistence remain distinct from
+those passing checks.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.

@@ -1,0 +1,23 @@
+[
+  {"wait":2},
+  {"snapshot_choices":true,"expect_choices":{"choice_state":2,"choice_cursor":0}},
+  {"key":"s","duration":0.06},
+  {"wait":0.2},
+  {"key":"s","duration":0.06},
+  {"snapshot_choices":true,"expect_choices":{"choice_cursor":2}},
+  {"key":"a","duration":0.08},
+  {"advance_dialogue":{"max_presses":10,"settle_seconds":0.5}},
+  {"wait":1},
+  {"key":"g","duration":0.15},
+  {"key":"s","duration":2},
+  {"wait":10},
+  {"snapshot_player":true},
+  {"snapshot_npc_actors":true},
+  {"pause_game_thread":true},
+  {"snapshot_v3_house":true,"expect_house":"50ED","scene_heap":true},
+  {"read":["8012EC1E",2],"expect":"f213"},
+  {"read":["8003CE34",4],"expect":"00000000"},
+  {"read":["8019C8D0",16],"expect":"af32c0deaf32c0deaf32c0deaf32c0de"},
+  {"read":["8046C350",16],"expect":"af53c0deaf53c0deaf53c0deaf53c0de"},
+  {"save_state":true}
+]

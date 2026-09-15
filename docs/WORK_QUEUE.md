@@ -341,9 +341,15 @@ with later e/e+ donor support investigated separately.
   Six instruction changes cover all twenty actual house IDs. Two focused tests
   pass; the corrected native run constructs a real house, retains one player,
   and passes the prior fault point and nine fault/guard assertions. Final entry
-  remains incomplete. Implement separate temporary house markers next: the native
-  formula overlaps existing player houses. Keep the new-instrument playback issue
-  open, and do not replay passing catalogue tests.
+  remains incomplete. The [separate marker adapter](checkpoints/V3_HOUSE_MARKERS.md)
+  assigns `F200..F213` without moving original buildings, connects the three
+  native consumers, and passes three focused cartridge/compiled-code tests.
+  The cartridge grows to 64 MiB without additional RAM allocation. Native
+  Punchy-house entry, normal-marker restoration, and valid complete interior
+  arena allocation pass, with one player and intact guards. His normal English
+  conversation and ordinary exit also pass, restoring the outdoor house/marker
+  and a valid 69-node arena. Continue ordinary villager persistence; keep the
+  new-instrument playback issue open, and do not replay passing catalogue tests.
   Do not replay passing text/default checks. Older builds lacking dependencies reject new saves;
   retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,

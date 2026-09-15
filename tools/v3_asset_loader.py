@@ -68,6 +68,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'clothing_roster': ('af_v3_roster_clothing_record', 0x80473A00),
                        'town_eligible': ('af_v3_town_eligible', 0x80473E40),
                        'display_roster': ('af_v3_all_display_clothing_index', 0x80466380),
+                       'house_markers': ('af_v3_house_marker_v1', 0x80461F80),
                        'asset': ('af_v3_asset_init', BLOB_RAM + 0x100),
                        'villager': ('af_v3_load_name', BLOB_RAM + 0x4000),
                        'villager_readers': ('af_v3_mail_source_name', BLOB_RAM + 0x5400),

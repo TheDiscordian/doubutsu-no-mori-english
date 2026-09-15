@@ -48,6 +48,11 @@ def clothing_slot(donor_item):
 # Preserve the native sorted house-layer range 398..855. Each imported villager
 # owns two fixed layer slots, including unavailable villagers and subsets.
 HOUSE_LAYER_BASE, HOUSE_LAYER_CAPACITY = 856, 40
+HOUSE_MARKER_BASE, HOUSE_MARKER_CAPACITY = 0xF200, 20
+
+
+def villager_house_marker(donor_index):
+    return HOUSE_MARKER_BASE + villager_actor(donor_index) - 0xE0DA
 
 
 def villager_house_layers(donor_index):

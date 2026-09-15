@@ -10,6 +10,7 @@ import json
 import math
 import os
 from pathlib import Path
+import select
 import shutil
 import signal
 import socket
@@ -36,6 +37,29 @@ def reserve_x_display(tmp=Path("/tmp")):
             yield str(number)
             return
         raise RuntimeError("No unused test X display available between :200 and :999")
+
+
+def read_x_display(fd, timeout=10):
+    """Keep the readiness pipe open until Xvfb finishes its newline-terminated reply.
+
+    A pipe read can return just the digits. Closing its read end at that point
+    can make the server's final newline write fail and terminate the display.
+    """
+    deadline, data = time.monotonic()+timeout, b""
+    while len(data) < 32:
+        remaining = deadline-time.monotonic()
+        if remaining <= 0 or not select.select([fd], [], [], remaining)[0]:
+            raise RuntimeError('Xvfb readiness reply timed out')
+        chunk = os.read(fd, 32-len(data))
+        if not chunk:
+            raise RuntimeError('Xvfb closed its readiness pipe before the newline')
+        data += chunk
+        if data.endswith(b'\n'):
+            number = data[:-1]
+            if not number or not all(48 <= c <= 57 for c in number):
+                raise RuntimeError('Invalid Xvfb display number')
+            return number.decode('ascii')
+    raise RuntimeError('Oversized Xvfb readiness reply')
 
 
 def write_results(directory, results):
@@ -792,8 +816,10 @@ def main():
                                      pass_fds=(writefd,), stdout=log, stderr=log, start_new_session=True)
             processes.append(xvfb)
             os.close(writefd)
-            display_number = os.read(readfd, 32).decode().strip()
-            os.close(readfd)
+            try:
+                display_number = read_x_display(readfd)
+            finally:
+                os.close(readfd)
             if display_number != selected_display:
                 raise RuntimeError("Xvfb failed to start on the reserved display; see xvfb.log")
         display = ":"+display_number
@@ -1657,7 +1683,7 @@ def main():
                 results.append(npc_actors_snapshot(debug))
             if action.get('snapshot_v3_house'):
                 from v3_house_gameplay import snapshot as house_snapshot
-                observed = house_snapshot(debug)
+                observed = house_snapshot(debug, scene_heap=action.get('scene_heap', False))
                 record({'house_snapshot': observed})
                 if observed['player_count'] != 1:
                     raise ValueError('Outdoor-house construction created another player')

@@ -49,9 +49,9 @@ overlapping original player houses and other structures. The player-house actor
 uses `F0DF` as its own base, so widening all dummy ranges or shifting the original
 IDs is not an acceptable solution.
 
-Separate fixed imported marker IDs and their actual consumers remain required.
-The existing original-marker constants are deliberately unchanged by ABI 59.
-The completed actual-house selector fix does not establish safe final marker
+The [marker adapter](V3_HOUSE_MARKERS.md) supplies separate fixed imported marker
+IDs and their actual consumers while retaining the original-marker constants.
+The actual-house selector fix alone does not establish safe final marker
 handling or complete house interaction/persistence. The
 [checkpoint](../docs/checkpoints/V3_HOUSE_EXTERIOR.md) records the confirmed fault,
 corrected house construction, and incomplete entry result. Both patchers remain

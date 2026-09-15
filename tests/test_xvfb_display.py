@@ -6,12 +6,27 @@ import socket
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]/"tools"))
-from emulator_smoke import reserve_x_display
+from emulator_smoke import read_x_display, reserve_x_display
 
 
 class XvfbDisplayTests(unittest.TestCase):
+    def test_waits_for_the_complete_newline_terminated_readiness_reply(self):
+        with patch('emulator_smoke.select.select', return_value=([7], [], [])), \
+             patch('emulator_smoke.os.read', side_effect=[b'2', b'00', b'\n']) as read:
+            self.assertEqual(read_x_display(7), '200')
+            self.assertEqual(read.call_count, 3)
+
+    def test_rejects_incomplete_or_invalid_readiness(self):
+        for chunks in ([b'200', b''], [b'200\n201\n'], [b'\n'], [b'x\n'], [b'1'*32]):
+            with patch('emulator_smoke.select.select', return_value=([7], [], [])), \
+                 patch('emulator_smoke.os.read', side_effect=chunks), self.assertRaises(RuntimeError):
+                read_x_display(7)
+        with patch('emulator_smoke.select.select', return_value=([], [], [])), self.assertRaises(RuntimeError):
+            read_x_display(7)
+
     def test_skips_locks_sockets_and_broken_symlinks_without_replacing_them(self):
         with tempfile.TemporaryDirectory() as directory:
             tmp = Path(directory)

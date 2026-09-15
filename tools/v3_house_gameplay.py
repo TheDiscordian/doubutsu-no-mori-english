@@ -2,7 +2,7 @@
 import struct
 
 
-def snapshot(debug):
+def snapshot(debug, scene_heap=False):
     def read(address, length):
         if address & 3 or not 0x80000000 <= address <= 0x80400000-length:
             raise ValueError('Invalid house diagnostic pointer')
@@ -29,5 +29,20 @@ def snapshot(debug):
         actor = int.from_bytes(data[0x158:0x15C], 'big')
     if actor:
         raise ValueError('Structure actor chain exceeds declared count')
-    return {'player_count': players, 'player': f'{player:08X}', 'houses': houses,
-            'house_owner': debug.read_memory(0x80137348, 2).hex().upper(), 'read_only': True}
+    result = {'player_count': players, 'player': f'{player:08X}', 'houses': houses,
+              'house_owner': debug.read_memory(0x80137348, 2).hex().upper(), 'read_only': True}
+    if scene_heap:
+        node = int.from_bytes(read(0x80141FA0, 4), 'big')
+        seen, previous, free, allocated = set(), 0, [], []
+        while node:
+            if node in seen or node & 15 or len(seen) >= 256:
+                raise ValueError('Invalid house-scene arena chain')
+            seen.add(node)
+            magic, isfree, size, following, prev = struct.unpack('>2H3I', read(node, 16))
+            if magic != 0x7373 or isfree not in (0, 1) or prev != previous or node+16+size > 0x80400000:
+                raise ValueError('Invalid house-scene arena node')
+            (free if isfree else allocated).append(size)
+            previous, node = node, following
+        result['scene_heap'] = {'nodes': len(seen), 'allocated_bytes': sum(allocated),
+                                'free_bytes': sum(free), 'largest_free_bytes': max(free, default=0)}
+    return result
