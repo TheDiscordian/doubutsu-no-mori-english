@@ -1,5 +1,67 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared identity-indexed model and palette conversion
+
+The converter handles the complete nine-entry flower selector through one
+`indexed-static-model-palette` rule. No item list, separate graphics converter,
+installer, runtime helper, or native test scenario is added. The source's fixed
+actor identity selects two opaque models and a palette. Both models retain
+their full material/geometry commands, and their segment-eight palette loads
+become direct loads of the selected native palette.
+
+The checked donor has `fNFL_dw` at `.text:2D0768`, 192 bytes, SHA-256
+`612998bdab7cb941114e08d66db7100ded74894f8c1ccfdbdffe4bb9fbb44917`.
+Its four code relocations bind the save/restore helpers and the complete
+`fNFL_model_data` table at `.data:092BE0`, 108 bytes. The actual instructions
+subtract runtime index 1246 and multiply by a twelve-byte row stride. All three
+lifecycle callbacks are four-byte returns; the DMA slot is null. The verifier
+checks those facts and dependencies, not merely function names. The donor room
+renderer's `aMR_DrawRegistModel` uses the same current matrix and opaque0/opaque1
+order; the special callback adds only the constant palette selection. Catalogue
+rendering also retains that model order. Native execution of these new assets
+is not yet claimed.
+
+One command prepares all nine variants:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category indexed-static-model-palette \
+  --output build/v3-furniture-indexed-palette-art-01
+```
+
+The output contains 19,152 object bytes, 555 vertices, and 288 triangles across
+all three pansies, three cosmos, and three tulips (`3378..3398`). Each object has
+its actual official donor name/source index and its selected palette. The
+complete prepared receipt SHA-256 is
+`6e173ac1c9c1889389779d93b63fd7ac6589d5644bd6d0afa9387dfe72711e83`;
+the inventory SHA-256 is
+`20df1500755bc29f67ffcb923f84a34244430e79a758bc718eb6e89b4e61f522`.
+Individual object/resource hashes are in that receipt.
+
+All nine remain **prepared, not installed**. The donor's
+`ftr_listEventPresentChumon` contains these nine flowers, two tree models, and
+weed model. `mCL_furniture_init` and `mMpswd_check_present_user` treat this category as
+orderable/password-eligible, but that does not establish a working native initial
+acquisition route. The N64 has no matching stock-list slot. Do not put the objects
+in ordinary shop stock or claim acquisition is complete. Shared acquisition and
+catalogue handling must cover the twelve source records together.
+
+Thirty-two focused pipeline/composition checks pass with
+`V3_FURNITURE_PREPARED_ART=build/v3-furniture-indexed-palette-art-01`. The reused
+asset checks compare complete texels, vertices, triangles, materials, and palette
+load targets. New checks cover every actual selector row, independent relocation
+resolution, unknown/changed callback rejection, extra DMA effects, bad indices,
+ambiguous palette bindings, and refusal to install prepared-only output. No
+native emulator run is repeated: ABI 87, the ROM, import lock, saves, and both
+served V2 patchers are unchanged. The 81 installed options do not include these
+nine prepared objects.
+
+Callback inspection also identifies useful next shared categories: fifteen
+station models with one animated clock/skeleton implementation; eight building
+models using palette-fade callbacks; tool, fan, and pinwheel display selectors;
+and move-only sound callbacks. These are category candidates, not approved static
+substitutions. In particular, station clock hands and animated parts must remain.
+
 ## Current collision and placement categories
 
 The current complete cartridge is ABI 87:

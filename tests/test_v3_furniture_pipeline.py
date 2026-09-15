@@ -1,6 +1,7 @@
 """Shared format discovery, conversion integrity, and current batch installation."""
 import copy
 import json
+import os
 from pathlib import Path
 import struct
 import subprocess
@@ -25,6 +26,24 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_constant_palette_binding_preserves_commands_and_rejects_ambiguous_dependencies(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        struct.pack_into('>I',raw,0x1C,0x08000000)
+        pointers.pop(0x11C)
+        def parse(binding, fixups=pointers):
+            return parse_model(raw,0x100,fixups,(0x500,),{0x600:(32,32)},0x1000,48,
+                               static_ci4=True,palette_bindings=binding)
+        rows=parse({0x08000000:0x500})
+        palette=next(r for r in rows if r['opcode']==0xF0)
+        self.assertEqual(palette['target'],0x500)
+        self.assertEqual(palette['bound_segment'],0x08000000)
+        source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+        self.assertIn('gsDPLoadTLUT_pal16(15, 0x06000000)',source)
+        self.assertNotIn('0x08000000',source)
+        for bindings in ({},{0x09000000:0x500},{0x08000000:0x501}):
+            with self.assertRaises(ValueError): parse(bindings)
+        with self.assertRaises(ValueError): parse({0x08000000:0x500},{**pointers,0x11C:0x500})
+
     def test_shared_seating_categories_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-seating-sounds-') as temporary:
             binary=Path(temporary)/'test'
@@ -115,9 +134,78 @@ class DonorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'acquisition needs an adapter'):
             pipeline.metadata(self.source,0x30FC,self.source.profile(0x30FC),identities[0x30FC])
 
+    def test_indexed_static_callback_category_uses_every_actual_selector_row(self):
+        source=self.source
+        table,n=source.symbol('fNFL_model_data')
+        pointers=data_pointers(source.rel,table,n)
+        for selected in range(n//12):
+            item=0x3378+selected*4
+            descriptor,_,resources,_,models,_,_=pipeline.prepare(source,item)
+            adapter=descriptor['callback_adapter']
+            self.assertEqual(adapter['selected_index'],selected)
+            self.assertEqual(adapter['first_runtime_index'],1246)
+            self.assertEqual(adapter['table_pointers'],pointers)
+            self.assertEqual(adapter['entries'],9)
+            self.assertEqual(list(models),['opaque','opaque1'])
+            for slot,layer in enumerate(models):
+                self.assertEqual(models[layer]['donor_offset'],pointers[table+selected*12+slot*4])
+            palette=next(r for r in resources if r['kind']=='palette')
+            self.assertEqual(palette['donor_offset'],pointers[table+selected*12+8])
+            self.assertEqual(descriptor['palette_bindings'],{0x08000000:palette['donor_offset']})
+            self.assertEqual(descriptor['interaction_flags'],0x10)
+        vtable,n=source.symbol('fNFL_func')
+        self.assertEqual(data_pointers(source.rel,vtable,n,expected_section=1),
+            {vtable+i*4:adapter['functions'][role]['offset']
+             for i,role in enumerate(('create','move','draw','destroy'))})
+
+    def test_callback_specialisation_rejects_changed_effects_dependencies_and_indices(self):
+        source=self.source;profile=source.profile(0x3378);adapter=profile['callback_adapter']
+        for role in ('create','move','draw','destroy'):
+            changed=copy.copy(source);changed.rel=bytearray(source.rel)
+            changed.rel[source.sections[1][0]+adapter['functions'][role]['offset']]^=1
+            with self.subTest(role=role),self.assertRaisesRegex(ValueError,'custom callbacks'):
+                changed.profile(0x3378)
+        changed=copy.copy(source);changed.code_relocations=dict(source.code_relocations)
+        changed.code_relocations[adapter['functions']['draw']['offset']+0x10]=(10,2,4,0x8009AECC)
+        with self.assertRaisesRegex(ValueError,'changed draw dependencies'): changed.profile(0x3378)
+        changed=copy.copy(source);changed.relocations=dict(source.relocations)
+        at=adapter['vtable_offset']
+        changed.relocations[at+16]=changed.relocations[at]
+        with self.assertRaisesRegex(ValueError,'DMA callback'): changed.profile(0x3378)
+        changed=copy.copy(source);changed.data=bytearray(source.data)
+        changed.data[adapter['table_offset']]=1
+        with self.assertRaises(ValueError): changed.profile(0x3378)
+        for index in (1245,1255):
+            with self.assertRaisesRegex(ValueError,'selector index escapes'):
+                source.callback_models(profile['profile_offset'],index)
+
+    def test_prepared_artwork_cannot_bypass_missing_gameplay_or_acquisition(self):
+        path=os.environ.get('V3_FURNITURE_PREPARED_ART')
+        if not path: self.skipTest('No optional prepared-asset batch supplied')
+        art=Path(path).resolve();report=json.loads((art/'art.json').read_bytes())
+        self.assertEqual(report['format'],'AFV3-AUTO-FURNITURE-PREPARED-ASSETS-1')
+        self.assertFalse(report['runtime_installed'])
+        worksheet=ROOT/'build/item-identity-megasheet.xlsx'
+        with self.assertRaisesRegex(ValueError,'Unknown converter/source revision'):
+            install.checked_assets(art,self.source,worksheet)
+        identities=pipeline.identity_rows(worksheet)
+        for row in report['objects']:
+            item=int(row['item_id'],16)
+            self.assertEqual(row['profile'],json.loads(json.dumps(self.source.profile(item))))
+            names=pipeline.name_metadata(self.source,item,identities[item])
+            self.assertEqual({k:row[k] for k in names},names)
+            if not row['import_ready']:
+                with self.assertRaises(pipeline.ReviewRequired) as error:
+                    pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
+                self.assertEqual(str(error.exception),row['pending_reason'])
+        self.check_complete_artwork(art,report)
+
     def test_complete_texels_vertices_and_compiled_triangles_for_entire_batch(self):
-        for row in self.report['objects']:
-            asset=(self.art/row['object_file']).read_bytes()
+        self.check_complete_artwork(self.art,self.report)
+
+    def check_complete_artwork(self,art,report):
+        for row in report['objects']:
+            asset=(art/row['object_file']).read_bytes()
             descriptor,body,resources,offsets,models,_,sections=pipeline.prepare(self.source,int(row['item_id'],16))
             self.assertEqual(asset[:len(body)],body)
             self.assertEqual(sha256(asset),row['object_sha256'])

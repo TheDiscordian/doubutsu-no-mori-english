@@ -7,19 +7,25 @@ new furniture. Nineteen additional complete assets and their shared runtime
 records are installed. ABI 87 adds grass model, dirt model, and boxing mat with
 the native no-collision flag, plus a shared complete placement-layer table for
 all imports. Five native readers no longer index beyond their original table.
-Twenty-eight focused tests and the first current native run (125 records, 107
-assertions) pass. The full
+Thirty-two focused pipeline/composition tests pass, including prepared-asset
+conversion. The unchanged ABI-87 native evidence is 125 records and 107 passing
+assertions. The full
 source/verification record is in
 [the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 81
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
-Next: classify shared callback/dependency patterns for the 102 uninstalled
-entries stopped by custom callbacks, and extend shared graphics/acquisition
-categories. The no-collision category is supported; sixteen diary display models
-still need diary identity/gameplay/acquisition, and weed model needs the shared
-`ftr_listEventPresentChumon` reward route. Complete model conversion without
-required behaviour is not a completed import. Ordinary GPU appearance,
+The constant identity-indexed model/palette category prepares all nine flower
+variants in one command, retaining their full 19,152 bytes, 555 vertices, and 288
+triangles. They are not installed: the shared `ftr_listEventPresentChumon`
+acquisition/catalogue route must cover those flowers, two tree models, and weed
+model together. Prepared-only output cannot pass the installer. Next: implement
+that shared route and extend shared graphics/callback categories. Other useful
+callback groups include fifteen clocked station models, eight palette-animated
+buildings, and tool/fan/pinwheel selectors; preserve their actual effects.
+Sixteen diary display models still need diary identity/gameplay/acquisition.
+Complete model conversion without required behaviour is not a completed import.
+Ordinary GPU appearance,
 interactions, and save/restart remain for the gameplay pass.
 
 Current integration:

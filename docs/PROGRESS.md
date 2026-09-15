@@ -11,10 +11,14 @@ table fixes five native readers that still used the original smaller table with
 imported indices. All installed furniture now has source-derived placement
 categories, including four surfaces and five surface-placeable objects. The
 table fits the existing accessory-package gap; no permanent allocation grows.
-Twenty-eight focused tests and the first current native run pass (125 records,
-107 assertions), including the complete table/guards, actual no-collision
-registration, model DMA, and acquisition. The offline composer has 81 installed
-development options. Ordinary appearance/gameplay and
+Thirty-two focused pipeline/composition tests pass. The unchanged ABI-87 native
+evidence covers 125 records and 107 assertions, including the complete
+table/guards, actual no-collision registration, model DMA, and acquisition.
+A shared identity-indexed selector also prepares all nine complete flower-model
+variants automatically: 19,152 bytes, 555 vertices, and 288 triangles. These assets
+are not installed; their source's special acquisition/catalogue category remains
+unsupported. Prepared-only output is explicitly rejected by the installer.
+The offline composer still has 81 installed development options. Ordinary appearance/gameplay and
 save/restart remain unverified; both served patchers remain V2. Continue shared
 contact/callback and graphics/acquisition categories through this pipeline.
 The current lock is `config/v3-import-build.json`; the cartridge is

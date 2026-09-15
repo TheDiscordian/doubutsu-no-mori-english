@@ -212,12 +212,17 @@ def scalar_profile(pilot):
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
-                campfire_body=False, fire_effect=0, school=False, static_ci4=False):
+                campfire_body=False, fire_effect=0, school=False, static_ci4=False,
+                palette_bindings=None):
     """Decode reviewed CI4/I4 families and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
                                               tent, campfire_body, fire_effect, school, static_ci4))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
+    palette_bindings = {} if palette_bindings is None else palette_bindings
+    if palette_bindings and (not static_ci4 or set(palette_bindings) != {0x08000000}
+                             or any(p not in palette for p in palette_bindings.values())):
+        raise ValueError('Unsupported constant furniture palette binding')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
     material_wrap = None
@@ -229,6 +234,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         dynamic_palette = tent and op == 0xF0 and b == 0x08000000
         if dynamic_palette:
             row['dynamic_palette'] = b
+        elif op == 0xF0 and b in palette_bindings:
+            if start+at+4 in pointers:
+                raise ValueError('Constant furniture palette binding also has a relocation')
+            row.update(target=palette_bindings[b], bound_segment=b)
         elif op in (0xF0, 0xFD, 0x01):
             fixup = start + at + 4
             if b or fixup not in pointers:

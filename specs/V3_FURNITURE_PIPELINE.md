@@ -28,6 +28,20 @@ standalone installer accepts an existing conversion through `--art`; it performs
 the same source and base checks. Use fresh ignored output paths. No ROM, save,
 source artwork, served website, or existing generated build is overwritten.
 
+`--category` selects a discovered shared category without maintaining an item
+list. `convert --assets-only` prepares complete artwork while retaining missing
+metadata/gameplay/acquisition reasons. It produces a distinct **prepared-assets**
+format that the installer rejects. This mode cannot be used with `import`.
+The ordinary `convert` and `import` commands still require every eligibility
+check. Inventory `asset_ready` describes conversion only; `status: supported`
+also requires the supported metadata and acquisition route. Neither field is a
+claim of completed playtesting.
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --category indexed-static-model-palette --output build/indexed-palette-assets
+```
+
 Each item has one generated descriptor containing profile/model dependencies,
 textures, palettes, vertices, native display-list locations, official name,
 price, footprint, acquisition list, catalogue position, scoring, source hashes,
@@ -73,8 +87,19 @@ The shared static-CI4 category supports:
   remain; this is not a substitute for a diary's separate gameplay system.
 - Source-derived placement layers: ordinary floor items, surfaces that hold
   other items, and objects that may be placed on those surfaces.
+- Constant identity-indexed model/palette selection. A reviewed complete draw
+  implementation selects two opaque models and one sixteen-colour palette from
+  a complete relocated table. The converter derives the index base, row stride,
+  model pointers, and palette from the donor, not per-item definitions. The
+  selected palette replaces the fixed segment-eight reference in both models.
+  All create/move/destroy callbacks must be complete no-ops, DMA must be absent,
+  and every draw-code relocation must match the reviewed dependency pattern.
+  Changed code, additional effects, incomplete tables, ambiguous bindings, and
+  out-of-range indices fail. The descriptor retains function hashes, code/data
+  relocations, the selector row, and palette binding. This removes only a
+  constant draw selector, never animation or gameplay behaviour.
 
-Dynamic texture/palette pointers, animation rigs, custom callbacks, unsupported
+Dynamic texture/palette pointers, animation rigs, other custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized
 or different-format artwork, and special preview framing remain explicit review
 categories. Unsupported does not mean unused or unimportant. A successfully
@@ -160,6 +185,12 @@ after relocation, and the actual native no-collision registration routine.
 It does not create a new scenario per item.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.
+
+Set `V3_FURNITURE_PREPARED_ART` to a prepared-asset output directory to run the
+same complete texture/vertex/triangle/material checks on that batch. The shared
+test also checks source identities, retained pending reasons, and refusal by the
+installer. No new test scenario is needed for another prepared category. A
+converter-only change does not call for another native run of an unchanged ROM.
 
 See [the implementation checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md)
 for actual outputs, counts, and verification results.
