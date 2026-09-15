@@ -3,10 +3,12 @@
 ## Active: V3 optional GameCube imports
 
 The current integration image is
-`build/v3-camper-trade-runtime-02/animal-forest-v3-asset-loader.z64`; the
-[trade checkpoint](checkpoints/V3_CAMPER_TRADE.md) records ABI-81 selected rewards
-and full-ID pocket selection. Continue remaining masked readers, scene lighting/
-floor sounds, and ordinary camper construction/conversations. Maintain text credits
+`build/v3-campsite-environment-runtime-02/animal-forest-v3-asset-loader.z64`; the
+[environment checkpoint](checkpoints/V3_CAMPSITE_ENVIRONMENT.md) records ABI-82
+floor-sound routing and donor point-light parameters. Selected rewards and
+full-ID pocket selection retain their passing trade evidence. Continue the timed
+lamp effect, remaining masked readers, and ordinary camper construction/
+conversations. Maintain text credits
 in the single `translations/provenance.json` catalogue; its own coverage queue
 tracks the remaining attribution work without a duplicate review list.
 
@@ -378,10 +380,14 @@ with later e/e+ donor support investigated separately.
   preparation calls and two selected-only camping rewards. Four pocket cases
   pass in the initial run; its bad fixture identity is corrected without a ROM
   change or replaying those cases. Ordinary conversations remain unverified.
-  Current full build: `build/v3-camper-trade-runtime-02/`; camping subset:
-  `build/v3-optional-camper-trade-01/`. Both patchers remain V2.
+  The [environment adapter](checkpoints/V3_CAMPSITE_ENVIRONMENT.md) connects
+  actual native player/NPC floor-sound routing and donor room-light parameters.
+  Eighteen focused/composition checks pass; the corrected native run passes
+  39 records and 29 assertions. The timed scene lamp remains work.
+  Current full build: `build/v3-campsite-environment-runtime-02/`; camping subset:
+  `build/v3-optional-campsite-environment-01/`. Both patchers remain V2.
   Continue remaining masked readers, ordinary NPC construction, conversation
-  handover, and scene lighting/floor sounds as specified in
+  handover, and timed scene lighting as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes

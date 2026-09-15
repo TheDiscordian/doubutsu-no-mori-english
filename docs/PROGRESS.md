@@ -2,6 +2,17 @@
 
 ## Active development
 
+The [campsite environment adapter](checkpoints/V3_CAMPSITE_ENVIRONMENT.md)
+connects the donor's actual footstep sound and room-light parameters in ABI 82.
+Its complete sound program, instrument, and sample match existing native audio;
+the transient floor selector shares that sound without replacing any flooring.
+The 156-byte adapter fits existing reserved memory. Eighteen focused/composition
+checks pass. The corrected silent native run passes 39 records and 29 assertions,
+including the actual field store, player/NPC sound readers, full five-argument
+light getters, original-room fallbacks, restoration, and guards. The first run
+also passes the new floor getter. Timed lamp creation/fade/drawing and ordinary
+tent gameplay remain work. No saved formats, text resources, or patchers change.
+
 The [camper trade adapter](checkpoints/V3_CAMPER_TRADE.md) connects full-ID pocket
 selection, summer last-gift exclusion, and selected camping rewards in ABI 81.
 It preserves the donor's 20% tent-list roll, subsequent 10% house-gift roll,
@@ -74,11 +85,11 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-camper-trade-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`d01afeb17c4c0a306e892037808268b675f8f02179dba7dd2261b397f03f55a9`.
-The two-item subset is `build/v3-optional-camper-trade-01/`. The offline composer
+`build/v3-campsite-environment-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`6d2d533bbf85b961560417293626400222f7c2576c565adfa1b93465f41e21f6`.
+The two-item subset is `build/v3-optional-campsite-environment-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue
-remaining masked readers and scene lighting/floor sounds, then combined ordinary
+the timed scene lamp and remaining masked readers, then combined ordinary
 construction, entry/exit, conversation handover, and persistence checks. Those
 gameplay paths remain unverified. GitHub development source is allowed; neither
 served patcher changes until the user
@@ -126,7 +137,7 @@ Exterior checkpoint:
 The ten-item subset is `build/v3-optional-campsite-exterior-01/`. The offline
 composer retains all 59 experimental options and exact all/empty full/V2 output.
 The current manager supplies event binding and saved camper identity. Continue
-English conversations, selected rewards, and scene lighting/floor sounds. Native actor construction,
+ordinary English conversations, reward handovers, and timed scene lighting. Native actor construction,
 ordinary entry/exit, GPU appearance, and persistence still need verification.
 Neither web patcher changes; this is not a complete-import playtest handoff.
 Saved format 2 and selected identities are unchanged. Imported saves require
@@ -147,8 +158,8 @@ Scene-loader checkpoint:
 The ten-camping-item subset is `build/v3-optional-campsite-01/`. All 59
 experimental options compose offline; all/empty output is exact full/V2.
 Neither served patcher changes. This is not a complete-import playtest handoff.
-Continue the summer event, camper identity/English
-conversations, selected rewards, and special scene lighting/floor sounds.
+Continue ordinary summer-event integration, camper conversations,
+reward handovers, and timed scene lighting.
 Ordinary scene entry, acquisition, GPU appearance, persistence, and hardware
 acceptance are not established by the field-constructor test. Saved format 2
 and selected identities are unchanged; imported saves require matching/superset

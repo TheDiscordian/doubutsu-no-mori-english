@@ -24,8 +24,10 @@ ABI 78 binds both NPC-profile readers and the first/repeat quest lifecycle.
 ABI 79 appends the complete summer message and choice groups with native links
 and equivalent trade commands, preserving all existing English records.
 ABI 80 supplies summer greeting selection and transient last-gift tracking.
+ABI 81 connects selected rewards and full-ID trade picking. ABI 82 connects
+native floor-sound routing and the donor's room-light parameters.
 Remaining masked NPC/quest readers,
-conversations/rewards, and special scene lighting remain unfinished. Neither
+ordinary conversations/reward handovers, and timed scene lighting remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
 
 `overlays/v3/campsite_event.c` supplies the calendar, selection, and portable
@@ -270,8 +272,9 @@ quest readers before a playable handoff. Preserve allocation-failure handling
 and do not register an unsupported masked identity against bounded original
 actor tables.
 
-Finish NPC/conversation readers and greeting transitions, scene lighting/floor
-sounds, and enabled reward filtering. The installed move-in guard excludes
+Finish remaining NPC/conversation readers, ordinary conversation handovers,
+and the timed scene lamp. Floor sounds, greeting selection, and enabled reward
+filtering are installed below. The installed move-in guard excludes
 the saved active camper even after all-appeared history resets; marking the
 camper seen once is not the only protection. Assign stable additive
 identities without replacing existing scenes, events, or furniture. Only selected
@@ -612,3 +615,47 @@ current full-owner relocation, full-ID pocket cases, two selected-only reward
 preparations, an ordinary trade, gift/reset windows, complete greeting return,
 restoration, and guards. These are actual native routines on controlled fixtures,
 not ordinary conversation, acquisition-animation, or persistence acceptance.
+
+## Interior floor sound and point-light parameters
+
+`campsite_environment.S` supplies 156 bytes at `804A2F54..804A2FEF`, between
+the gift helper and the final package guard. It adds no allocation or mutable
+state. The checked package checksum and startup ABI change; its size, cache
+invalidation range, heap reservations, and DMA directory do not. The package's
+last code gap is occupied; further effect code needs separately checked space.
+
+Native `mRmTp_GetFloorIdx` at `800BEEC4` returns transient sound-table index 68
+for scene 35. All other scenes repeat the displaced prologue and execute the
+complete original body at `800BEECC`. This index does not select floor artwork
+or change any item identity. The native field constructor stores the result
+at `80137655`; the existing player and NPC consumers require indices below 73.
+Both sound readers and the native table remain unchanged.
+
+The donor's `FLOOR_TENT_SE` is index 85 of its 95-entry `SE_FLOOR_DATA` table at
+DOL address `800A9938`. Its value 32 matches native sound-table index 68 at
+`80113A64`; adding the native/donor base `02E6` gives sound `0306`. The complete
+eleven-byte sequence programs at donor `41BE` and native `34A0` differ only in
+the absolute layer pointer. Both use selector 2, instrument 24, and the same
+note/duration/velocity. The reverse font map binds donor bank 155 and native
+bank 141, both wave bank 5. Full range/decay, envelope, tuning, 2,512-byte ADPCM
+sample, loop, and predictor hashes match. No new audio is needed. This is an
+explicit shared sound mapping, not an assumed match from a common item name.
+
+The entry hook at `80096D60` supplies `(120,80,120)`, RGB `(235,190,185)`,
+power 6,000, and non-flame status when scene 35 has indoor field-draw type 1.
+It uses the original five-argument o32 interface, including the fifth pointer
+on the caller's stack. Other scenes/draw types repeat the original prologue
+and continue at `80096D68`. The native light owner still performs allocation,
+registration, and cleanup. These parameters alone do not supply the donor's
+separate timed scene-lamp owner or its diffuse-light adjustments.
+
+The donor turns the scene lamp off from 05:00 through 17:59 and on outside that
+interval. `ef_tent_lamp.c` also fades the two-texture model with primitive LOD,
+requests room-light transitions, and keeps the effect alive. Native creation,
+per-frame updates, complete drawing, and scene-exit cleanup remain required.
+Do not label the installed static parameters complete day/night lighting.
+
+The [environment checkpoint](../docs/checkpoints/V3_CAMPSITE_ENVIRONMENT.md)
+records current native getter, field-store, sound-dispatch, fallbacks, and guard
+evidence. Ordinary floor walking, timed lighting, and complete scene acceptance
+are not established by these controlled checks.

@@ -97,6 +97,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'camper_greeting': ('af_v3_camper_greeting', 0x8092DAE0),
                        'camper_trade': ('af_v3_camper_pocket', 0x80922370),
                        'camper_gift': ('af_v3_camper_gift', 0x804A2F30),
+                       'campsite_environment': ('af_v3_campsite_floor', 0x804A2F54),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

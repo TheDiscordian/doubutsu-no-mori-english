@@ -2,7 +2,7 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-81 integration cartridge
+Compose experimental selections from the pinned ABI-82 integration cartridge
 with the [official localized credits title](../docs/checkpoints/OFFICIAL_CREDITS_TITLE.md),
 including the complete tent model, both fires, their checked DMA/callback
 loaders, four-cell item readers, complete sound resources, and the additive
@@ -10,7 +10,9 @@ campsite scene/exterior runtime, native calendar, independent camper, and native
 tent placement/removal adapter, English event-manager extension, and saved-camper
 move-in exclusion, both camper NPC-profile routes, first/repeat quest state, and
 all 253 summer messages and 49 choices, summer greeting selection, and transient
-last-gift tracking, full-ID trade picking, and selected summer rewards. The
+last-gift tracking, full-ID trade picking, selected summer rewards, and the
+tent's native floor sound and donor point-light parameters. Timed lamp creation,
+fade, and drawing remain work. The
 complete greeting initializer/return passes in the current native trade check;
 the earlier intermediate breakpoint remains unexplained. Both manager
 activation and tent setup require actual selected camping-item rows. Camper
@@ -30,7 +32,7 @@ donor items are rejected. Select-all means these installed development entries,
 not every item on the donor disc.
 
 An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-81 engine and all compiled resources, but enables only the
+retains the shared ABI-82 engine and all compiled resources, but enables only the
 chosen identities and their declared dependencies. IDs, object slots, house
 layers, and allocations never depend on order or subset. Resource compaction is
 not part of this step.
@@ -52,7 +54,7 @@ again from the original selection, not by editing an earlier dependency result.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-81 cartridge and its source report. Validate each
+Pin both the complete ABI-82 cartridge and its source report. Validate each
 installed registry binding before generating writes. Resident changes cover the profile
 at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
 metadata's `present` bytes, and the installed furniture/clothing/mannequin
