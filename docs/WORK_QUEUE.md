@@ -304,6 +304,10 @@ with later e/e+ donor support investigated separately.
   The local two-item subset's initial 35-record native scoring check passes:
   one selected backyard member, no unselected boxing members, complete counters,
   actual reward points, saved-state restoration, and guards.
+  The [reward-source review](checkpoints/V3_POST_OFFICE_REWARD_REVIEW.md) binds
+  mailbox template `0248`, balance 100,000,000, flag `10`, and successful-mail-only
+  acknowledgement. Establish actual native account/save equivalents before
+  adapting this route; donor private-data offsets are not native fields.
   The [reward-category adapter](checkpoints/V3_HRA_BIRTH.md)
   supplies safe counters and weights through category 22. Three focused checks
   and the initial 82-record native run pass. Require this ABI-63 prerequisite
