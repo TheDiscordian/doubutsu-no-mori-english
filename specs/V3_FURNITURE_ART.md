@@ -14,6 +14,10 @@ two-part opaque kayak, mirrored bike materials, backpack tile reset/tint, and
 unlit lantern. Complete assets and scalar profiles are preserved; runtime and
 acquisition status are tracked separately in that specification.
 
+Version 8 adds the [three school desks](V3_SCHOOL_DESKS.md), retaining their
+complete models, front-only seating flags, grey materials, and explicit mirrored
+tile extents. Runtime integration remains separate from artwork conversion.
+
 Converter version 2 also supports the explicit
 [seven-item construction batch](V3_CONSTRUCTION_ITEMS.md). It retains the default
 two-object batch and verifies each additional profile's exact opaque-only layer

@@ -2,6 +2,13 @@
 
 ## Active development
 
+The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) converts complete lefty,
+righty, and teacher's desk assets with all 218 vertices and 96 triangles,
+directional seat flags, grey tint, and mirrored material extents retained.
+Official names, prices, stock lists, catalogue rows, and scoring are verified.
+Ten focused checks pass. These three items still need cartridge/selection
+integration and native seating/placement checks; the current ROM remains ABI 83.
+
 The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) cold-boots
 ABI 83 with the current profile and unchanged copied-town content. The game
 activates event 70 and places the tent on a vacant lot without fixture-seeded

@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 7
+CONVERTER_VERSION = 8
 
 
 @dataclass(frozen=True)
@@ -47,6 +47,8 @@ class Pilot:
     large_western: bool = False
     water_layer: bool = False
     camping: bool = False
+    contact_action: int = 0
+    school: bool = False
 
 
 PILOTS = (
@@ -179,7 +181,20 @@ CAMPING_PILOTS = (
           (('opaque', '_model', 0, 0x150),), height=15.7, camping=True,
           texture_symbols=tuple((n, 'int_nog_burner_' + n + '_tex') for n in ('top', 'side', 'gas'))),
 )
-REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS + WESTERN_PILOTS + LARGE_WESTERN_PILOTS + CAMPING_PILOTS
+SCHOOL_DESKS = (
+    Pilot('lefty-desk', 0x3200, 'lefty desk', 'int_hos_deskL', 'iam_hos_deskL',
+          (('', 64, 64),), 0, 89, (('opaque', '_model_model', 0, 0xF0),), contact_action=1, school=True),
+    Pilot('righty-desk', 0x3204, 'righty desk', 'int_hos_deskR', 'iam_hos_deskR',
+          (('', 64, 64),), 0, 97, (('opaque', '_model_model', 0, 0x100),), contact_action=1, school=True),
+    Pilot('teachers-desk', 0x3220, "teacher's desk", 'int_hos_Tdesk', 'iam_hos_Tdesk',
+          (('body', 32, 32), ('hiki', 32, 32), ('top', 32, 32), ('side', 16, 32)),
+          0, 32, (('opaque', '_base_model', 0, 0x110),), school=True,
+          height=30.5, shape=3, collision=1,
+          texture_symbols=tuple((n, 'int_hos_T_desk_' + n + '_tex_txt')
+                                for n in ('body', 'hiki', 'top', 'side'))),
+)
+REVIEWED = (PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS + WESTERN_PILOTS
+            + LARGE_WESTERN_PILOTS + CAMPING_PILOTS + SCHOOL_DESKS)
 
 
 def verify_sources(rel, symbols):
@@ -191,17 +206,17 @@ def scalar_profile(pilot):
     # Height, scale, exact shape/collision, rotation, lighting, contact,
     # padding, and interaction. No rig, texture animation, or callback table.
     return struct.pack('>ff6BH', pilot.height, 0.01, pilot.shape, pilot.collision,
-                       0, pilot.lighting_map, 0, 0, 0)
+                       0, pilot.lighting_map, pilot.contact_action, 0, 0)
 
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
-                campfire_body=False, fire_effect=0):
+                campfire_body=False, fire_effect=0, school=False):
     """Decode reviewed CI4/I4 families and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
-                                              tent, campfire_body, fire_effect))) > 1 or fire_effect not in (0, 1, 2):
+                                              tent, campfire_body, fire_effect, school))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -282,7 +297,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                                       for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F900)):
                 word = struct.unpack_from('>I', tile)[0]
                 row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
-            elif mirrored_s and tile == struct.pack('>II', 0xD2F0F800, 0):
+            elif (mirrored_s or school) and tile == struct.pack('>II', 0xD2F0F800, 0):
                 row['wrap_modes'] = (2, 0)
             elif speed_bag and tile == struct.pack('>II', 0xD2F0F522, 0) and shape[:2] == (16, 16):
                 row['repeat_shift'] = 2
@@ -339,7 +354,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
-            colours = ((0xFFFFFFFF, 0xB2B2B2FF) if accessory else
+            colours = ((0xFFFFFFFF, 0xB2B2B2FF) if accessory or school else
                        (0xFFFFFFFF, 0xFFFDFFFF) if camping else (0xFFFFFFFF,))
             if ((a, b) != ((0xFA000064, 0xFFD264FF) if fire_effect == 1 else (0xFA00008C, 0xFFF01EFF)) if fire_effect else
                     (a, b) != (0xFA00001E, 0x9B9BC864) if water else
@@ -350,6 +365,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if not (water or fire_effect) or (a, b) != expected:
                 raise ValueError('Unsupported furniture environment colour')
         elif op == 0xF2:
+            school_extent = school and b == {
+                ((32, 32), (2, 0)): 0x000FC07C,
+                ((16, 32), (2, 0)): 0x0007C07C,
+            }.get((textures.get(material), material_wrap))
             # The two construction models extend a mirrored 16x32 material
             # across a 32x32 tile. Retain the explicit extent after loading it.
             construction_extent = (mirrored_s and material_wrap == (2, 0)
@@ -383,7 +402,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             fire_extent = (campfire_body and textures.get(material) == (16, 16)
                            and material_wrap == (0, 1) and b == 0x0003C07C)
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent or fire_extent
+                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent or fire_extent or school_extent
                      or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
@@ -481,7 +500,7 @@ def prepare(rel, symbols_bytes, pilot):
                                              garden=pilot.garden, western=pilot.western,
                                              large_western=pilot.large_western,
                                              water=pilot.water_layer and label == 'translucent',
-                                             camping=pilot.camping)}
+                                             camping=pilot.camping, school=pilot.school)}
         profile_pointers[profile_at + slot] = at
     if data_pointers(rel, profile_at, profile_size) != profile_pointers:
         raise ValueError('Furniture profile has missing, extra, or unported dependencies')
@@ -679,13 +698,14 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden', 'western', 'western-large', 'camping'), default='pilots')
+    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden', 'western', 'western-large', 'camping', 'school-desks'), default='pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh output directory; existing builds are preserved')
     pilots = {'pilots': PILOTS, 'construction': CONSTRUCTION_PILOTS,
               'garden': GARDEN_PILOTS, 'western': WESTERN_PILOTS,
-              'western-large': LARGE_WESTERN_PILOTS, 'camping': CAMPING_PILOTS}[args.batch]
+              'western-large': LARGE_WESTERN_PILOTS, 'camping': CAMPING_PILOTS,
+              'school-desks': SCHOOL_DESKS}[args.batch]
     report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve(), pilots)
     print(json.dumps({'output': str(args.output), 'objects': [
         {'name': r['name'], 'bytes': r['object_bytes'], 'sha256': r['object_sha256']} for r in report['objects']],

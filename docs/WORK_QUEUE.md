@@ -2,6 +2,13 @@
 
 ## Active: V3 optional GameCube imports
 
+The [school desks](checkpoints/V3_SCHOOL_DESKS.md) have complete converted
+models and verified donor gameplay metadata. Integrate their fixed identities,
+model/name readers, stock/catalogue/scoring, profile bits, and text attribution.
+Verify directional seating and the teacher's two-cell surface. The converted
+assets are not installed options; preserve current ABI-83 pins until the new
+integration passes its focused checks.
+
 The current integration image is
 `build/v3-tent-lamp-runtime-02/animal-forest-v3-asset-loader.z64`; the
 [lamp checkpoint](checkpoints/V3_TENT_LAMP.md) records ABI-83 complete native
