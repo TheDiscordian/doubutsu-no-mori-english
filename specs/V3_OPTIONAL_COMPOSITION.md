@@ -2,7 +2,8 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-80 integration cartridge,
+Compose experimental selections from the pinned ABI-80 integration cartridge
+with the [official localized credits title](../docs/checkpoints/OFFICIAL_CREDITS_TITLE.md),
 including the complete tent model, both fires, their checked DMA/callback
 loaders, four-cell item readers, complete sound resources, and the additive
 campsite scene/exterior runtime, native calendar, independent camper, and native

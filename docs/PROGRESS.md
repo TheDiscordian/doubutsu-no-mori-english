@@ -2,6 +2,12 @@
 
 ## Active development
 
+The [official credits correction](checkpoints/OFFICIAL_CREDITS_TITLE.md) uses
+the supplied English GameCube title, `Animal Crossing`, rather than the manual
+literal-title draft. The [single text-source catalogue](TEXT_PROVENANCE.md)
+records per-text authorship and source evidence, including assistant-authored
+passages and explicit remaining provenance coverage. No served patcher changes.
+
 The [summer greeting adapter](checkpoints/V3_CAMPER_GREETING.md) connects first
 and repeat introductions, donor item/Bell eligibility, and transient last-gift
 tracking in ABI 80. Its 512-byte suffix fits the existing shared conversation
@@ -55,8 +61,8 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-camper-greeting-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`22293297ece2547c93f26d038fb74396163943ad548dab53b3b9ded9af9fdf39`.
+`build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`dfac082b4a900711aedf19b2e0cc869ee8622e1eb110e04be66591a448ea1d4e`.
 The ten-item subset is `build/v3-optional-camper-greeting-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue the
 actual trade picker and selected rewards, retaining the unresolved dispatch stop

@@ -79,6 +79,7 @@ edits, specifications, test records, and the complete browser patcher.
   the Pages workflow publishes only the verified website artifact.
 - [Formats and implementation specifications](specs/).
 - [Source provenance and acknowledgements](docs/SOURCES.md).
+- [Per-text credits, assistant translations, and human review](docs/TEXT_PROVENANCE.md).
 
 ROMs, disc images, saves, extracted working assets, and emulator recordings stay
 outside version control. The reviewed browser patch recipe, its manifest, and

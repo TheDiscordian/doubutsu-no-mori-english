@@ -9,7 +9,7 @@ import subprocess
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, verified_rom, make_ups, apply_ups
 from apply_translation import write_new
 from catalogue_names import Image
-from credits_strings import VROM, RAM, RELOCATION, FIRST, END, PAGES, VALUES_HASH, group_hash
+from credits_strings import VROM, RAM, RELOCATION, FIRST, END, PAGES, group_hash
 from letter_ui_fix import PARTS, compile_part
 from npc_mail_show import relocate_verified_data
 from textbanks import Bank
@@ -17,6 +17,8 @@ from title_start_fix import reconstruct
 from toolchain import IMAGE
 
 ROOT = Path(__file__).resolve().parents[1]
+# This historical data-preserving stage consumes the frozen V2-07 wording.
+VALUES_HASH = '1ab4a9d3d2d0c854cd2ae3d48fc3c40e6114e8867cd50446ee85710203ed5020'
 BASE_SHA = '400423ea152338df763192f95c159a037453f4ddbc8711e83ef38d0a34fc8c25'
 ACTOR_SHA = 'cbb0b08439b7289c3e22ff7332d953c31ad385dc2aff05983671c4a009569e12'
 REL_SHA = '5b347ca673af7e0487ee7ef1a5ab68e9647ae878bb0ee70d49cbbaf9068b2123'

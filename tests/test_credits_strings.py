@@ -52,6 +52,10 @@ class CreditsTests(unittest.TestCase):
         self.assertGreater(grown,50)
 
     def test_native_identities_not_legacy_substitutions(self):
+        self.assertEqual(self.edits['string:04EA']['translation'], 'Animal Crossing')
+        self.assertEqual(self.edits['string:04EA']['provenance']['reference_id'], 'string:077B')
+        for n in c.ADAPTED_REFERENCES:
+            self.assertNotIn(n, c.DRAFTS)
         for native,reference in c.REFERENCES.items():
             self.assertEqual(self.edits[f'string:{native:04X}']['translation'],
                              self.refs[f'string:{reference:04X}']['text'])
@@ -74,6 +78,7 @@ class CreditsTests(unittest.TestCase):
         for bad in (edits[:-1],edits+[edits[0]]):
             with self.assertRaises(ValueError):c.permits(self.rom,bad,self.info)
         for id,field,value in (('string:054A','translation','   Takao Sawano'),
+                              ('string:04EA','translation','Animal Forest'),
                               ('string:050B','translation','   Yumi Yoshimi'),
                               ('string:0552','translation',''),
                               ('string:04EA','source_sha256','0'*64),

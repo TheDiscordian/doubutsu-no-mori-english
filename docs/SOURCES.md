@@ -1,5 +1,11 @@
 # Sources and provenance
 
+Per-text authorship and source identities live in the single
+[`translations/provenance.json`](../translations/provenance.json) catalogue.
+The [catalogue guide](TEXT_PROVENANCE.md) explains assistant-authored entries,
+human review, coverage limits, and additional languages. This page credits the
+project's input resources; it is not a second per-text attribution list.
+
 | Source | Purpose | Distribution policy |
 | --- | --- | --- |
 | User-supplied Japanese N64 ROM | Build input and original text | Local only |

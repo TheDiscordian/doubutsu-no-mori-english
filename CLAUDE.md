@@ -29,6 +29,13 @@ Developer verification and a private playtest handoff do not satisfy that approv
 - Keep ROMs, extracted game assets, legacy distribution contents, saves, and
   generated patches in ignored directories. Commit original tools, translation
   edits, specifications, provenance records, and test fixtures made for testing.
+- Use existing official translations where the original identity matches;
+  otherwise use an identified human fan translation before writing new text.
+  Keep per-text authorship and source references in the single
+  `translations/provenance.json` catalogue, including assistant-written text
+  without a human translation source. Unknown provenance is unresolved, not
+  evidence of human authorship or an unavailable translation. Preserve actual
+  N64 identities and record necessary platform adaptations explicitly.
 - Never distribute a full ROM. Public releases contain patches and instructions.
 - The existing development repository is the public source and GitHub Pages
   repository; keep its name. The exact reviewed browser recipe, manifest, and

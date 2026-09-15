@@ -23,8 +23,20 @@ ACTOR_HASH = 'e34789965dda5548c380a87e7384b635931fe6d6826356332f3ba6aa8878757c'
 RELOCATION_HASH = '4eed1aaf28aacc093e4b6bf8c6d1fb773bdaeaba8b0228a05624b758ef6f8e31'
 PAGES = (0,3,9,18,27,36,44,52,56,64,69,77,85,91,98,105,107)
 ROLE_LINES = (6,12,16,21,25,34,39,42,47,50,59,62,67,88,89,95,102)
-VALUES_HASH = '1ab4a9d3d2d0c854cd2ae3d48fc3c40e6114e8867cd50446ee85710203ed5020'
-REFERENCE_HASH = 'a1e5e6183398737fa0fdd62854f845a6de1da63bea8c52589142c233c4aa7f09'
+VALUES_HASH = '9262e5a23f522e0ccf60e15fdfe1cd6e6375ffce49181602b3f0a302588af5b8'
+REFERENCE_HASH = '74d0c62ef0a5d6ca9b3f7ff5c259b8672b2f68c5663764c0c0b94cf9bdb4493a'
+
+# Use the active localized title, not the literal title in the donor's unused
+# earlier credits. Strip only the explicitly bound decorative prefix. Three
+# native-only contributor/role identities have official spellings in that
+# earlier group; retain those spellings with the native three-space indent.
+ADAPTED_REFERENCES = {
+    0x4EA: (0x77B, b'\xc6 Animal Crossing', b'Animal Crossing'),
+    0x4EC: (0x77C, b'\xd3\xd3 Staff Credits', b'Staff Credits'),
+    0x545: (0x542, b'Supervisor', b'Supervisor'),
+    0x546: (0x543, b'          Shigeru Miyamoto', b'   Shigeru Miyamoto'),
+    0x554: (0x54F, b'          Hiroshi Yamauchi', b'   Hiroshi Yamauchi'),
+}
 
 # Explicit identity mapping, not matching numeric IDs or the legacy order.
 # These are the active English credits at 077B..07FE, not the older unused
@@ -52,14 +64,12 @@ REFERENCES = {
 # Original translations/transliterations for native-only rows. Keep native
 # responsibilities instead of replacing them with the English release's roles.
 DRAFTS = {
-    0x4EA:'Animal Forest', 0x4EC:'Staff Credits',
     0x525:'Character Programming', 0x528:'Player Programming',
     0x52A:'Data Processing Program', 0x52D:'Field Programming',
     0x53F:'Famicom Emulator Program', 0x542:'Famicom Emulator',
-    0x543:'   Sound Programming', 0x545:'Supervisor',
-    0x546:'   Shigeru Miyamoto', 0x549:'Project Management',
+    0x543:'   Sound Programming', 0x549:'Project Management',
     0x54A:'   Keizo Kato', 0x54B:'   Minoru Narita',
-    0x552:'   Sarugakucho', 0x554:'   Hiroshi Yamauchi',
+    0x552:'   Sarugakucho',
     0x555:'Reserved', 0x556:'Reserved', 0x557:'Reserved',
 }
 
@@ -119,6 +129,20 @@ def reference_evidence():
             raise ValueError('Changed English credits function or row table')
 
 
+def adapted_reference_evidence():
+    from textbanks import Bank
+    root = Path(__file__).resolve().parents[1]/'build/gamecube/files/forest_1st.arc.unpacked/data'
+    data, table = (root/'string_data.bin').read_bytes(), (root/'string_data_table.bin').read_bytes()
+    if (sha256(data), sha256(table)) != (
+            '1ca41141a2265ddd0b3bee22868f27fe3cd980f2caeb948e1d00e7910e0533cf',
+            '1b61ef035cd276a575169a7473f62a8cd9b1b788abd713bbd972c016487079df'):
+        raise ValueError('Changed supplied credits string resources')
+    rows = Bank('string', 0, 0, data, table).entries()
+    for reference, original, value in ADAPTED_REFERENCES.values():
+        if rows[reference] != original or not value or len(value) > 25:
+            raise ValueError('Changed identity-bound official credit')
+
+
 def verify_native(rom,replacements=None):
     files = by_vrom(rom); replacements = replacements or {}
     for vrom,digest in ((VROM,ACTOR_HASH),(RELOCATION,RELOCATION_HASH),*DEPENDENCIES):
@@ -141,13 +165,28 @@ def verify_values(values,info):
 
 
 def candidates(rom,references,inventory,info):
-    verify_native(rom); reference_evidence()
+    verify_native(rom); reference_evidence(); adapted_reference_evidence()
     originals = source_entries(rom); result = {}; values = []; donor_values = []
     for n in range(FIRST,END):
         id = f'string:{n:04X}'; row = inventory.get(id); original = originals[n]
         if not row or row['id']!=id or row['source_sha256']!=sha256(original):
             raise ValueError('Stale native credits inventory')
-        if n in REFERENCES:
+        if n in ADAPTED_REFERENCES:
+            from gc_text import decode_gc, decoder_tables
+            reference, original_reference, value = ADAPTED_REFERENCES[n]
+            reference_id = f'string:{reference:04X}'
+            row_reference = references.get(reference_id, {})
+            tables = decoder_tables(Path(__file__).resolve().parents[1]/'local/ac-decomp/tools/msg_tool.py')
+            if (row_reference.get('sha256') != sha256(original_reference)
+                    or row_reference.get('text') != decode_gc(original_reference, tables)):
+                raise ValueError('Changed official credit reference wording')
+            text = value.decode('ascii'); donor_values.append(original_reference)
+            extra = {'status':'mechanically_validated_candidate_not_reviewed',
+                     'provenance':{'source':'user-supplied GAFE01 revision 0 disc',
+                         'reference_id':reference_id,'reference_sha256':sha256(original_reference),
+                         'match_basis':'native_title_heading_or_contributor_identity',
+                         'adaptation':'decoration or indentation only; English wording unchanged'}}
+        elif n in REFERENCES:
             reference_id = f'string:{REFERENCES[n]:04X}'
             reference = references.get(reference_id)
             if not reference or reference['id']!=reference_id:

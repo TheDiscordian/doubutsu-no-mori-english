@@ -42,11 +42,14 @@ The native direct-font wrapper at `80090E1C` forwards the same stack arguments;
 its implementation at `80090CC0` uses the requested width flag. The x origin is
 150, not an instruction to centre the row or strip its leading spaces.
 
-All 110 native IDs have explicit English replacements: 74 complete
-identity-matched references, nineteen original drafts/transliterations, and
-seventeen preserved native blank rows. The imported references use the active
-English credits at `077B..07FE`, not the older unused credit strings also in
-the disc. Every matched reference retains its full wording and leading spaces.
+All 110 native IDs have explicit English replacements: 79
+identity-matched references, fourteen original drafts/transliterations, and
+seventeen preserved native blank rows. The title and shared contributor rows
+use the active English credits at `077B..07FE`. Supervisor, Shigeru Miyamoto,
+and Hiroshi Yamauchi use official wording in the older unused group because
+their native roles/identities are absent from the active English group.
+The title/heading omit explicitly bound decorative prefixes; the two names
+retain native indentation. Every English word is preserved.
 Fifty-eight resulting rows exceed the old fifteen-byte destination.
 
 The native Japanese identities determine the mapping, not legacy position:
@@ -60,15 +63,17 @@ The native Japanese identities determine the mapping, not legacy position:
 - `0552` restores Sarugakucho; `0554` retains Hiroshi Yamauchi, not Satoru Iwata.
 - Native character/player/data/field and Famicom programming roles remain
   separate. The two-line Famicom sound role retains both lines and its scale.
-- The native title becomes Animal Forest; decorative non-Latin legacy marks
-  and the English release's title glyphs are not inserted as text bytes.
+- The native title uses the active English release's Animal Crossing wording,
+  not the literal Animal Forest title in its older unused group. Decorative
+  title glyphs are not inserted as native text bytes.
 - The three unused reserve rows say Reserved; they are not credited as
   translated Japanese gameplay text or shown as new pages.
 
 The complete English output group hashes to
-`1ab4a9d3d2d0c854cd2ae3d48fc3c40e6114e8867cd50446ee85710203ed5020`.
-The 74 complete donor rows in native order hash to
-`a1e5e6183398737fa0fdd62854f845a6de1da63bea8c52589142c233c4aa7f09`.
+`9262e5a23f522e0ccf60e15fdfe1cd6e6375ffce49181602b3f0a302588af5b8`.
+The 79 complete donor rows in native order, including their original decoration
+and indentation before adaptation, hash to
+`74d0c62ef0a5d6ca9b3f7ff5c259b8672b2f68c5663764c0c0b94cf9bdb4493a`.
 Both digests prefix each encoded row with its big-endian sixteen-bit length.
 Source bank hashes and native IDs bind every output identity. A shortened,
 reordered, substituted, partial, or stale group fails independently in the

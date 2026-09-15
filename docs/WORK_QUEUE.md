@@ -2,6 +2,14 @@
 
 ## Active: V3 optional GameCube imports
 
+The current integration image is
+`build/v3-official-credits-01/animal-forest-v3-asset-loader.z64`; the
+[credits/provenance checkpoint](checkpoints/OFFICIAL_CREDITS_TITLE.md) records
+its data-only correction and preserved ABI-80 behaviour. Resume camper trade
+selection and selected camping rewards from this image. Maintain text credits
+in the single `translations/provenance.json` catalogue; its own coverage queue
+tracks the remaining attribution work without a duplicate review list.
+
 The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) governs new work on
 `v3/optional-imports`. The goal is additive, optional villager/item content from
 GAFE01 revision 0, selected individually or together in the browser patcher,
