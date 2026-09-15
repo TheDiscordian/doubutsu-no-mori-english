@@ -2,6 +2,11 @@
 
 ## Implemented scope
 
+The [capacity-expanded construction variant](V3_CATALOGUE_CAPACITY.md) installs
+446 furniture rows and the complete 248-row clothing list in 753-slot pages.
+It updates actual state, name/tail readers, relocation, and menu reservation.
+The 444-slot checks below remain the contract for the unexpanded variant.
+
 `--catalogue` includes native collection and FlashRAM support, then connects
 the two selected static furniture pilots to the catalogue's ownership filter,
 ordering table, full names, completion indicator, preview loading, selection,

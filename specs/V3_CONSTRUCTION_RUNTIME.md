@@ -9,9 +9,10 @@ prices, 1×1 placement readers, and selected save-profile bits are present.
 The original barrel/drum, animated speed bag, three imported garments, and
 garment displays retain their identities and readers.
 
-This is not a playable handoff. Ordinary stock, catalogue entries, scoring-table
-installation, optional composition, and ordinary placement/persistence still
-need completion. Both web patchers remain V2 until the user tests and explicitly
+This runtime-only stage is not a playable handoff. The
+[catalogue integration](V3_CATALOGUE_CAPACITY.md) supplies expanded pages,
+ordinary stock, and scoring installation. Optional composition and ordinary
+placement/persistence still need completion. Both web patchers remain V2 until the user tests and explicitly
 approves V3. The local optional composer remains pinned to the preceding
 26-entry integration cartridge and rejects the seven uninstalled options there.
 Registry reservations do not themselves enable an option in an older cartridge.
@@ -82,15 +83,10 @@ is not established by the codec checks; preserve backups.
 
 ## Remaining integration
 
-The furniture catalogue has 439 installed rows and a verified 444-slot limit.
-Adding all seven needs 446 slots. Extend the actual category-list allocation and
-every affected stride/bound before installing that larger table; raising only
-the row-count constant is unsafe. Preserve the separate clothing list and the
-complete translated name cache, preview buffers, and menu allocation guards.
-
-Then install the prepared B/C shop lists and scoring rows, connect optional
-composition to the new package-resident enabled words and package CRC, and run
-the focused combined catalogue/acquisition/persistence checks. Do not add these
+Use the capacity-expanded integration cartridge for further work. Its 446-row
+furniture list, 248-row clothing list, stock, and scoring data are installed.
+Connect optional composition to the package-resident enabled words and package
+CRC, and complete ordinary acquisition/placement/persistence. Do not add these
 options to either served web patcher during experimental work.
 
 The [native checkpoint](../docs/checkpoints/V3_CONSTRUCTION_RUNTIME.md) records

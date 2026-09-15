@@ -2,15 +2,26 @@
 
 ## Active development
 
+The [construction catalogue integration](checkpoints/V3_CONSTRUCTION_CATALOGUE.md)
+installs all seven new items into ordinary stock, the catalogue, and room scoring.
+The actual category storage grows to 753 slots: 446 furniture and 248 clothing
+rows retain their full names and independent pages. The initial native catalogue
+run passes 103 records; the B/C stock and pocket-acquisition run passes 36.
+The shared menu reserves another 6,144 bytes; the cartridge remains 64 MiB with
+an Expansion Pak required. Current integration artifact:
+`build/v3-construction-catalogue-03/animal-forest-v3-asset-loader.z64`, ABI 62,
+SHA-256 `5d6e3abdb2b67f33b99264dd2a4a0069c542c34c60b397fcf9df97121237fbc7`.
+Next connect optional selection to the package-resident furniture rows/CRC and
+complete ordinary acquisition/placement/persistence. Both web patchers remain V2.
+
 The [construction runtime](checkpoints/V3_CONSTRUCTION_RUNTIME.md) installs
 seven more complete furniture models, fixed profiles, English names/prices,
 placement readers, and selected save-profile bits in ABI 61 without more RAM.
 Four focused checks and the initial 145-record native run pass, including all
 seven item readers, paired detour-sign/saw-horse model loading, original-item
 fallbacks, cleanup, and guards. The actual C codec rejects new-profile saves in
-older profiles without writes. The catalogue needs 446 slots against its current
-444-slot bound; expanding that storage, then installing prepared stock/scoring
-data and optional composition, is next. No complete-import handoff is claimed.
+older profiles without writes. The capacity-expanded integration supplies its
+catalogue and stock/scoring tables. No complete-import handoff is claimed.
 
 The [local optional composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) now
 supports individual experimental selections across the twenty installed

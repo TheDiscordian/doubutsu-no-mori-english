@@ -272,8 +272,11 @@ retains current imports and native data. The
 [construction runtime](V3_CONSTRUCTION_RUNTIME.md) installs all seven complete
 objects, fixed profiles, shared item readers, and saved-profile dependencies
 without another RAM allocation. Native readers and paired model-bank loading
-pass. Catalogue capacity, ordinary stock/scoring installation, optional
-composition, and gameplay/persistence remain required for complete imports.
+pass. The [catalogue integration](V3_CATALOGUE_CAPACITY.md) supplies actual
+753-slot pages, all 446 furniture rows, retained 248-row clothing, ordinary stock,
+and complete scoring metadata. Native catalogue selection, scrolling, names,
+model loading, B/C stock selection, and pocket ownership insertion pass.
+Optional composition and ordinary gameplay/persistence remain required.
 
 ### Limits and saves
 

@@ -274,9 +274,13 @@ with later e/e+ donor support investigated separately.
   complete objects, fixed profiles, shared item readers, and saved-profile bits.
   Four focused checks and the first 145-record native run pass, including all
   seven names/prices, two model banks, original fallback, cleanup, and guards.
-  No additional RAM is allocated. Next expand actual furniture catalogue storage
-  from 444 to at least 446 slots, then install the prepared stock/scoring tables
-  and connect optional selection to the package-resident rows and its CRC.
+  The [catalogue integration](checkpoints/V3_CONSTRUCTION_CATALOGUE.md) installs
+  the 446-row furniture table in actual 753-slot pages, retaining all 248 clothing
+  rows, full names, and preview buffers. It installs verified B/C stock and scoring
+  metadata. Four focused tests, 103 native catalogue records, and 36 native stock/
+  pocket-acquisition records pass. Its menu reservation grows by 6,144 bytes;
+  the Expansion Pak requirement and 64-MiB cartridge size remain unchanged.
+  Next connect optional selection to the package-resident rows and its CRC.
   Ordinary acquisition/placement/persistence remain incomplete; neither web
   patcher changes.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete

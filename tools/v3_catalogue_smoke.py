@@ -25,6 +25,10 @@ def exercise(debug, rom_path, record):
     models = {int(row['item_id'],16):row for row in report['furniture']['imports']}
     metadata = {int(row['item_id'],16):row for row in report['furniture_items']['imports']}
     speed_bag = report.get('speed_bag') if 0x3350 in item_ids else None
+    expanded = cat.get('capacity_expansion')
+    growth = expanded['insert_bytes'] if expanded else 0
+    name_offset = expanded['name_offset'] if expanded else 0x380
+    page_bytes = expanded['page_bytes'] if expanded else 966
     if speed_bag:
         models[0x3350] = metadata[0x3350] = speed_bag
     calls = 0
@@ -48,22 +52,24 @@ def exercise(debug, rom_path, record):
         debug.write_memory(at, struct.pack('>' + 'I' * len(values), *values))
 
     check('complete current resident prefix', BLOB_RAM, blob)
-    size = 0x1C000
+    size = 0x20000 if expanded else 0x1C000
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - size:
         raise ValueError('Catalogue fixture allocation failed')
-    root, submenu, stub, overlay = (allocation + n for n in (16, 0xF000, 0xF100, 0))
+    root, submenu, stub, overlay = (allocation + n for n in ((16, 0x11000, 0x11100, 0) if expanded else (16, 0xF000, 0xF100, 0)))
     # These entry points only use overlay + 10628..10723. Its earlier fields
     # are not accessed, so those addresses may share the owned code allocation;
     # do not reserve an otherwise unused second 64-KiB window at title boot.
-    banks = [allocation + 0x11000, allocation + 0x15C00]
-    programs = [allocation + 0x13800, allocation + 0x18400]
+    banks = [allocation + n for n in ((0x13000, 0x17C00) if expanded else (0x11000, 0x15C00))]
+    programs = [allocation + n for n in ((0x15800, 0x1A400) if expanded else (0x13800, 0x18400))]
     state = root + 0x9910
     page = state + 0xEC8
     debug.write_memory(allocation, bytes(size))
     data, reloc = (files[v].extract(rom) for v in (VROM, RELOC))
     if sha256(data) != cat['output_sha256'] or sha256(reloc) != cat['relocation_sha256']:
         raise ValueError('Changed catalogue proof')
+    if root + len(data) + len(reloc) >= overlay + 0x10628:
+        raise ValueError('Catalogue fixture overlaps owner callbacks')
     loaded = relocate_verified_data(Image(RAM, len(data), struct.unpack_from('>5I', reloc)),
                                      data, reloc, root)
     call(0x800262D0, [VROM, VROM + len(data), RAM, RAM + len(data),
@@ -92,11 +98,11 @@ def exercise(debug, rom_path, record):
     old_speed_bag_flag = debug.read_memory(0x80467134,4) if speed_bag else None
     old_segment = debug.read_memory(0x801458B8, 4)
     old_debug = debug.read_memory(0x8010FD60, 4)
-    init = APPROVED['symbols']['af_catalog_init']
-    name_at = APPROVED['symbols']['af_catalog_name']
+    init = APPROVED['symbols']['af_catalog_init'] + growth
+    name_at = APPROVED['symbols']['af_catalog_name'] + growth
 
     def initialize():
-        debug.write_memory(state, bytes(12576))
+        debug.write_memory(state, bytes(expanded['state_bytes'] if expanded else 12576))
         for n, (program, bank) in enumerate(zip(programs, banks)):
             put(state + 8 + n * 0x760 + 0x740, program, bank)
         call(root + init, [submenu], (root + init, loaded[init:init + 40]))
@@ -134,18 +140,20 @@ def exercise(debug, rom_path, record):
         order = struct.pack('>'+'H'*len(item_ids),*item_ids)
         check('stable real item IDs in donor catalogue order', page + 8, order)
         check('partial collection is not marked complete', page + 6, bytes(1))
-        for n, item in enumerate(item_ids):
-            address = call(root + name_at, [page + 0x380 + n * 10],
+        for n, item in enumerate(item_ids[:7]):
+            address = call(root + name_at, [page + name_offset + n * 10],
                            (root + name_at, loaded[name_at:name_at + 92]))
             if not root + 0x9910 <= address <= root + len(data) - 16:
                 raise ValueError('Catalogue full name escaped owned storage')
             check('complete displayed English catalogue name', address, metadata[item]['name'].encode().ljust(16, b' '))
-        preview(0,item_ids[0])
-        for n,item in enumerate(item_ids[1:],1):
+        selected_previews = ([(item_ids.index(item), item) for item in (0x31F8, 0x322C)] if expanded
+                             else list(enumerate(item_ids[1:], 1)))
+        if not expanded: preview(0,item_ids[0])
+        for turn, (n,item) in enumerate(selected_previews, 1):
             debug.write_memory(page+4,struct.pack('>H',n))
             call(root + 0x808A6A8C - RAM, [submenu, 0], core_proof)
-            check('native selection switches preview buffers', state, bytes([n & 1]))
-            preview(n & 1,item)
+            check('native selection switches preview buffers', state, bytes([turn & 1]))
+            preview(turn & 1,item)
         # Test the true maximum with all native furniture plus selected additions.
         # Native category construction and full-name storage retain their sizes.
         debug.write_memory(player + 0xAF0, b'\xFF' * 120)
@@ -153,6 +161,29 @@ def exercise(debug, rom_path, record):
         check('complete additive furniture list count', page, struct.pack('>H',436+len(item_ids)))
         check('complete collection indicator', page + 6, bytes([1]))
         check('last imported entries fit the native category', page + 8 + 436 * 2, order)
+        if expanded:
+            check('unused furniture slots do not spill into names', page + 8 + cat['total_rows'] * 2,
+                  bytes((cat['row_capacity'] - cat['total_rows']) * 2))
+            check('navigation tail initializes all nine pages', state + expanded['page_order_offset'], bytes(range(9)))
+            # A nonzero category exercises the changed stride in selection and
+            # name reload, while retaining the complete independent garment list.
+            for row in cat['clothing']['imports']: call(0x800B88EC, [int(row['pocket_item_id'], 16)])
+            initialize()
+            clothes = page + 3 * page_bytes
+            check('complete independent garment count', clothes, struct.pack('>H', 248))
+            check('garment completion flag', clothes + 6, bytes([1]))
+            expected = b''.join(struct.pack('>H', 0x1000 + i * 4) for (i,) in
+                struct.iter_unpack('>H', data[cat['clothing']['table_address'] - RAM:cat['clothing']['table_address'] - RAM + 496]))
+            check('all native and imported garments retain their order', clothes + 8, expected)
+            debug.write_memory(clothes + 2, struct.pack('>HH', 241, 6))
+            call(root + 0x808A6A8C - RAM, [submenu, 3], core_proof)
+            selected = cat['clothing']['imports'][-1]
+            check('last garment is selected from the resized page', state + 8 + 0x760,
+                  struct.pack('>H', selected['catalogue_index']))
+            address = call(root + name_at, [clothes + name_offset + 60],
+                           (root + name_at, loaded[name_at:name_at + 92]))
+            garment = next(r for r in report['clothing']['imports'] if r['item_id'] == selected['pocket_item_id'])
+            check('scrolled garment full name stays inside its cache', address, garment['name'].encode().ljust(16, b' '))
         # Original complete program and model loaders still run through fallback.
         call(root + 0x808A627C - RAM, [state + 8, 0x1004], core_proof)
         check('original preview keeps original index', state + 8, bytes.fromhex('0001'))
@@ -160,7 +191,7 @@ def exercise(debug, rom_path, record):
         if speed_bag: debug.write_memory(0x80467134,old_speed_bag_flag)
         check('complete resident prefix retained', BLOB_RAM, blob)
         check('catalogue executable prefix unchanged by menu work', root, loaded[:14048])
-        check('catalogue suffix retained', root + SIZE, loaded[SIZE:])
+        check('catalogue suffix retained', root + SIZE + growth, loaded[SIZE + growth:])
         for at in guards:
             check('fixture guard', at, edge)
         check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE') * 4)
@@ -172,7 +203,8 @@ def exercise(debug, rom_path, record):
         debug.write_memory(0x8010FD60, old_debug)
     call(0x8009C040, [allocation])
     return {'catalogue_native_calls': calls, 'native_list_and_full_name_cases': 3,
-            'imported_complete_previews': len(item_ids), 'native_selection_tested': True,
+            'imported_complete_previews': len(selected_previews) if expanded else len(item_ids), 'native_selection_tested': True,
+            'expanded_category_layout_tested': bool(expanded),
             'original_preview_fallback_tested': True, 'gpu_rendered': False,
             'ordinary_order_delivery_tested': False, 'saved_data_written': False,
             'requires_checkpoint_restore': True}

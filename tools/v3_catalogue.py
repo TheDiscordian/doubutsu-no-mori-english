@@ -38,7 +38,9 @@ def sources(base):
     return data, reloc, parent
 
 
-def table(base, rel, donor_symbols, furniture):
+def table(base, rel, donor_symbols, furniture, *, expanded=False):
+    from v3_construction_items import STOCK
+    from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
     verify_sources(rel, donor_symbols)
     symbol_text = donor_symbols.decode()
@@ -53,12 +55,13 @@ def table(base, rel, donor_symbols, furniture):
     records = []
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
-        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)):
+        if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (
+                expanded and item in STOCK and STOCK[item][0] == index):
             raise ValueError('New catalogue import needs reviewed preview and shop rules')
         found = [(n, mode) for n, (i, mode) in enumerate(struct.iter_unpack('>HH', donor)) if i == index]
         if len(found) != 1 or found[0][1] != 0 or draw[:8] != data[0x808AF87C - RAM:0x808AF87C - RAM + 8]:
             raise ValueError('Donor catalogue preview mode is not the verified native mode')
-        group = 'ftr_listC' if item == 0x3224 else 'ftr_listA'
+        group = STOCK[item][1] if item in STOCK else ('ftr_listC' if item == 0x3224 else 'ftr_listA')
         goods = symbol_data(rel, symbol_text, group)
         ids = struct.unpack('>' + str(len(goods) // 2) + 'H', goods)
         if ids[-1] != 0 or ids.count(item) != 1 or 0 in ids[:-1]:
@@ -67,13 +70,13 @@ def table(base, rel, donor_symbols, furniture):
             'catalogue_index': (item - 0x1000) >> 2, 'donor_position': found[0][0], 'mode': 0,
             'ordinary_shop_list': group, 'shop_list_sha256': sha256(goods)})
     records.sort(key=lambda row: row['donor_position'])
-    if len({row['item_id'] for row in records}) != len(records) or len(rows) + len(records) > 444:
+    if len({row['item_id'] for row in records}) != len(records) or len(rows) + len(records) > (CAPACITY if expanded else 444):
         raise ValueError('Catalogue duplicates or exceeds the actual native item capacity')
     rows += [(row['catalogue_index'], row['mode']) for row in records]
     return b''.join(struct.pack('>HH', *row) for row in rows), records
 
 
-def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None):
+def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False):
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
     if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > 0xC50 or len(suffix) % 16
@@ -85,6 +88,9 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
         raise ValueError('Changed catalogue helper dependencies or parent descriptor')
     data = bytearray(old + suffix)
     count = 436 + len(records)
+    from v3_catalogue_capacity import CAPACITY, POOL_EXTRA, expand, shifted
+    if count > (CAPACITY if expanded else 444):
+        raise ValueError('Ordering exceeds installed catalogue storage')
     table_address = symbols['af_v3_catalogue_order']
     table_at = table_address - RAM
     if (not SIZE <= table_at <= len(data) - len(ordering) or data[table_at:table_at + len(ordering)] != ordering
@@ -170,6 +176,13 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
             raise ValueError('Unbound catalogue external target')
     if len({row & 0xFFFFFF for row in rows}) != len(rows):
         raise ValueError('Duplicate catalogue relocation')
+    capacity_report = None
+    if expanded:
+        data, rows, capacity_report = expand(data, rows)
+        if clothing_report is not None:
+            clothing_report = {**clothing_report, 'table_address': shifted(clothing_report['table_address'])}
+            for key in ('initializer_target', 'initializer_bridge'):
+                clothing_report[key] = shifted(clothing_report[key])
     size = (24 + len(rows) * 4 + 15) & ~15
     new_rel = (struct.pack('>5I', len(data), 0, 0, 0, len(rows))
         + struct.pack('>' + str(len(rows)) + 'I', *rows)
@@ -179,25 +192,39 @@ def install(base, parent, suffix, compiled, ordering, records, collection, runti
     struct.pack_into('>I', changed_parent, OWNER + 12, RAM + len(data))
     align = lambda value: (value + 63) & ~63
     growth, relocation_growth = align(len(data)) - align(SIZE), align(len(new_rel)) - align(len(reloc))
-    required, reserved = 253696 + 0x4400 + 64 + growth + relocation_growth, 257152 + 0x4400
+    required, reserved = 253696 + 0x4400 + 64 + growth + relocation_growth, 257152 + 0x4400 + (POOL_EXTRA if expanded else 0)
     code = by_vrom(base)[CODE_VROM].extract(base)
     if (required > reserved or u32(code, 0x800C4AFC - CODE_RAM) != 0x3C0E8089
             or u32(code, 0x800C4B10 - CODE_RAM) != 0x25CE7620):
         raise ValueError('Extended catalogue exceeds the actual shared menu reservation')
     allowed = {i for p in patches for i in range(p['address'] - RAM, p['address'] - RAM + 4)}
+    if expanded:
+        allowed |= {i for p in capacity_report['patches'] for i in range(p['address'] - RAM, p['address'] - RAM + 4)}
     for address in (0x801A0010, 0x802F8010, 0x803D0010):
         before = relocate_verified_data(Image(RAM, SIZE, (SIZE, 0, 0, 0, 152)), old, reloc, address)
         after = relocate_verified_data(Image(RAM, len(data), (len(data), 0, 0, 0, len(rows))), bytes(data), new_rel, address)
+        if expanded:
+            after = after[:capacity_report['insert_at']] + after[capacity_report['insert_at'] + capacity_report['insert_bytes']:]
         if any(a != b and i not in allowed for i, (a, b) in enumerate(zip(before, after))):
             raise ValueError('Catalogue change alters an unrelated relocated word')
-    return {VROM: bytes(data), RELOC: new_rel, PARENT: bytes(changed_parent)}, {
-        'imports': records, 'native_rows': 436, 'total_rows': count, 'row_capacity': 444,
+    changes = {VROM: bytes(data), RELOC: new_rel, PARENT: bytes(changed_parent)}
+    if expanded:
+        # The native allocator takes this checked endpoint through a signed
+        # ADDIU: growing past 8000 also requires the matching LUI carry.
+        endpoint = 0x80897620 + POOL_EXTRA
+        code = bytearray(code)
+        struct.pack_into('>I', code, 0x800C4AFC - CODE_RAM, 0x3C0E0000 | ((endpoint + 32768) >> 16))
+        struct.pack_into('>I', code, 0x800C4B10 - CODE_RAM, 0x25CE0000 | (endpoint & 65535))
+        changes[CODE_VROM] = bytes(code)
+    return changes, {
+        'imports': records, 'native_rows': 436, 'total_rows': count, 'row_capacity': CAPACITY if expanded else 444,
         'catalogue_index_encoding': '(item - 0x1000) >> 2; separate from room runtime indices',
         'source_sha256': SOURCE_SHA, 'relocation_source_sha256': RELOC_SHA,
         'output_sha256': sha256(data), 'relocation_sha256': sha256(new_rel),
         'bytes': len(data), 'relocation_bytes': len(new_rel), 'patches': patches,
         'rounded_growth': growth, 'rounded_relocation_growth': relocation_growth,
         'conservative_pool_required': required, 'pool_reserved': reserved,
-        'additional_pool_allocation': 0, 'save_format_changed': False,
+        'additional_pool_allocation': POOL_EXTRA if expanded else 0, 'save_format_changed': False,
         'native_preview_tested': False, 'ordinary_order_delivery_tested': False,
-        **({'clothing': clothing_report} if clothing_report is not None else {})}
+        **({'clothing': clothing_report} if clothing_report is not None else {}),
+        **({'capacity_expansion': capacity_report} if capacity_report is not None else {})}
