@@ -1632,6 +1632,12 @@ def main():
                 if message.get('loaded') != 1:
                     raise ValueError('Voice observation requires an active ordinary conversation')
                 observe(debug, args.rom, record, frames=action['observe_v3_voice'])
+            if action.get('test_v3_optional_composition'):
+                from v3_optional_composition_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Optional selection checks require a matching checkpoint')
+                needs_checkpoint_restore = True
+                record(exercise(debug, args.rom, record))
             if 'place_test_player_near_npc' in action:
                 from v3_voice_observation import place_player
                 if not (out/'test.bs1').is_file():

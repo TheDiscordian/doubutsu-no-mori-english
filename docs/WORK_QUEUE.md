@@ -362,6 +362,15 @@ with later e/e+ donor support investigated separately.
   and repeated-edge layouts are implemented; retain their source-bound checks.
 - [ ] Implement deterministic optional composition, dependencies, profile
   receipts, and save/profile compatibility handling.
+  The [local composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) resolves the
+  twenty installed villagers and six logical items into fixed-ID selections,
+  required house/outfit dependencies, and complete save profiles. Six focused
+  checks pass, including native enable-field changes, exact all/empty outputs,
+  selection-order independence, and actual codec subset/superset handling.
+  The first 42-record native run passes all nineteen selected/excluded item,
+  name, and personality-count returns plus fifteen memory assertions, preserving
+  save state and final guards. Local artifact: `build/v3-optional-profile-02/`.
+  Browser conversion/composition remains separate and unserved.
   The [save-codec foundation](checkpoints/V3_SAVE_CODEC.md) implements checked
   profiles, payload/extension binding, legacy decoding, and four imported-item
   catalogues. Six focused tests and 76 native steps pass. The

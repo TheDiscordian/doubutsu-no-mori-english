@@ -2,6 +2,19 @@
 
 ## Active development
 
+The [local optional composer](checkpoints/V3_OPTIONAL_COMPOSITION.md) now
+supports individual experimental selections across the twenty installed
+villagers and six logical items. It derives required house furnishings and
+outfits from installed content, preserves fixed IDs, and exports the selected
+save profile. Six focused checks pass: reordered selections produce identical
+cartridges, select-all reproduces the full integration build, and an empty
+selection reproduces stable V2-11. The Maelle/Punchy subset also passes its
+42-record native run: nineteen selected/excluded reader/count/name returns,
+fifteen memory assertions, preserved save state, and final guards. Its complete
+local build is `build/v3-optional-profile-02/`. Neither served patcher changes.
+This does not certify unfinished gameplay or
+claim that all donor items are converted.
+
 **V3 optional content imports** are the active goal on `v3/optional-imports`.
 The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) covers individual villager
 and item selections, select all, the import-free option, and follow-on e/e+
