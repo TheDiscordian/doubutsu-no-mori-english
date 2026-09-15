@@ -355,11 +355,19 @@ with later e/e+ donor support investigated separately.
   Seventeen focused/composition checks pass. Its corrected native loader and
   continuation check passes 74 records, 23 calls, and 54 assertions; ordinary
   conversation/reward execution is not established.
-  Current full build: `build/v3-camper-text-runtime-03/`; camping subset:
-  `build/v3-optional-camper-text-01/`. Both patchers remain V2.
-  Continue actual English summer greeting selection and conversation commands,
+  The [summer greeting adapter](checkpoints/V3_CAMPER_GREETING.md) installs first/
+  repeat selection, donor item/Bell conditions, and transient last-gift tracking.
+  Seventeen current focused/composition checks pass; native full-owner loads,
+  six personalities and nineteen repeat/eligibility cases pass. The later
+  dispatch-window stop times out with the expected message in return registers.
+  Its cause remains unresolved; native gift/reset calls, final guards, and
+  complete conversations are not verified. Retain this issue for a focused
+  caller/return trace without replaying the successful component prefix.
+  Current full build: `build/v3-camper-greeting-runtime-02/`; camping subset:
+  `build/v3-optional-camper-greeting-01/`. Both patchers remain V2.
+  Continue actual trade picking, last-gift exclusion in that picker,
   remaining masked readers, ordinary NPC construction,
-  selected rewards, and scene lighting/floor sounds as specified in
+  selected rewards with the donor's 20% tent-list chance, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes

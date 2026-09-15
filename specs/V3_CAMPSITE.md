@@ -23,6 +23,7 @@ simultaneously entering town through natural growth or an inbound transfer.
 ABI 78 binds both NPC-profile readers and the first/repeat quest lifecycle.
 ABI 79 appends the complete summer message and choice groups with native links
 and equivalent trade commands, preserving all existing English records.
+ABI 80 supplies summer greeting selection and transient last-gift tracking.
 Remaining masked NPC/quest readers,
 conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
@@ -480,7 +481,8 @@ free strings and the available inventory slot. Share native modes 4/5 and steps
 first talk sets owner byte `804A1A10` to one at the same transition as donor
 `aQMgr_actor_talk_start`; repeat, winter, and ordinary talks leave it unchanged.
 This is common lifecycle reuse, not permission to substitute winter dialogue.
-Actual summer English greeting selection and conversation/reward commands remain
+The summer-specific selector below supplies English greeting selection.
+Complete conversation/reward commands and combined native execution remain
 required before the acquisition route is complete.
 
 Eight obsolete mode-window relocations are replaced by four new self-contained
@@ -514,6 +516,39 @@ resident or heap allocation grows; expanded messages are bounded by 1,024 bytes.
 
 The [text checkpoint](../docs/checkpoints/V3_CAMPER_TEXT.md) records all-record
 preservation, native loading/continuation, and the repaired virtual allocation.
-Summer greeting selection, complete conversation and trade execution, and
-selected rewards remain required. Text installation does not establish those
+The summer selector below supplies greeting selection; complete conversation
+and trade execution and selected rewards remain required. Text installation does not establish those
 gameplay routes or authorise switching either web patcher.
+
+## Summer greetings and last-given item
+
+The greeting owner is linked at `8092CD00`, not `8093CD00`; signed low halves
+matter when reconstructing its addresses. It is 4,064 bytes at VROM `03A10000`,
+with a 256-byte relocation resource at `03A14000`, using the original adjacent
+directory slots. The manager's existing `8800`-byte shared buffer is unchanged.
+Its loader at `80954E90` receives the new virtual interval and linked end.
+The initializer remains `8092D8F8`. A 512-byte suffix begins at `8092DAE0`;
+only the 48-byte original dispatch window at `8092D958` is replaced.
+Flatten original data-section relocation offsets explicitly rather than moving
+original data or leaving those offsets relative to a new section start.
+
+Summer first introductions use `11754 + looks*12 + time_kind*3 + random(3)`.
+Repeat bases are 11826, 11856, 11887, 11917, 11947, and 11977. An empty pocket
+and at least 3,000 Bells set offer bit one; an eligible ordinary-condition item
+other than the last gift sets bit two. Furniture uses the full selected-import
+classifier; native carpets/walls keep their original categories. Both bits
+choose `base + 1 + random(2)`; otherwise use `base + bits`. Original native
+winter and ordinary selectors remain unchanged.
+
+The halfword at `804A1A12` stores the full last-given item. It is transient
+quest-manager state in checked unused camper-header space, not a saved field.
+The 36-byte adapter at `804A2F30` wraps the two normal item callback calls
+`8091F56C` and `80920AB8`, preserving their full item stores in the delay slots
+and tail-calling `t9`. The constructor call at `80957040` resets the halfword,
+then performs the original `bzero`. No actor instance or reservation grows.
+
+The [greeting checkpoint](../docs/checkpoints/V3_CAMPER_GREETING.md) records
+passing focused checks and partial native selection/loading evidence, including
+the unresolved caller-dispatch stop. Do not treat it as full native conversation
+or award execution. The actual trade picker must also exclude this identity and
+filter the tent reward list to selected items before acquisition is complete.

@@ -14,12 +14,12 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-camper-text-runtime-03'
-BASE_SHA = 'df8161549e9069ee68c34a4fae3cf3200739a40cb3adecef5e31f6a8aebd24e1'
-REPORT_SHA = '778db38b13be2c71056ea2c50f25a1d7f73209a0e205e3f20bb4fad802984e97'
+BASE = ROOT/'build/v3-camper-greeting-runtime-02'
+BASE_SHA = '22293297ece2547c93f26d038fb74396163943ad548dab53b3b9ded9af9fdf39'
+REPORT_SHA = '31c5d19fcedfcf2852d9b584f07c130d336a007bdb61109fd983a6dee73602cc'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 79, 0x30000
+PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 80, 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 

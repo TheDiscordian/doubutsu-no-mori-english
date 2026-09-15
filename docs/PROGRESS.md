@@ -2,7 +2,17 @@
 
 ## Active development
 
-The [complete summer text adapter](checkpoints/V3_CAMPER_TEXT.md) appends all 253
+The [summer greeting adapter](checkpoints/V3_CAMPER_GREETING.md) connects first
+and repeat introductions, donor item/Bell eligibility, and transient last-gift
+tracking in ABI 80. Its 512-byte suffix fits the existing shared conversation
+buffer; saved formats and permanent allocations do not grow. Seventeen current
+focused/composition checks pass. Actual native owner loading, all six personality
+introductions, English message reads, repeat bases, and thirteen eligibility
+cases pass. A later caller-dispatch breakpoint times out despite the expected
+message result. Its cause remains unresolved; native gift/reset execution,
+final guards, and complete conversations are not claimed as passed.
+
+The unchanged [complete summer text adapter](checkpoints/V3_CAMPER_TEXT.md) appends all 253
 donor messages and 49 choices in ABI 79, retaining every existing English record.
 All branches, choices, wording, page breaks, timing, and expressions are preserved;
 eight duplicate donor trade requests map to their verified native handler.
@@ -20,7 +30,8 @@ checked unused resident bytes without growing any RAM allocation or saved format
 Seventeen focused/composition tests pass. The corrected silent native run passes
 68 records, five calls, and 55 assertions, including all three complete owner
 loads/relocations and twelve changed instruction windows. Full NPC construction,
-summer English message selection, complete conversations, and rewards remain work.
+complete conversations, and rewards remain work; the current greeting adapter
+supplies summer-specific selection with the native limits described above.
 
 The unchanged [camper move-in guard](checkpoints/V3_CAMPER_MOVEIN.md) prevents the saved
 summer visitor from simultaneously becoming a resident, through either normal
@@ -44,13 +55,14 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-camper-text-runtime-03/animal-forest-v3-asset-loader.z64`, SHA-256
-`df8161549e9069ee68c34a4fae3cf3200739a40cb3adecef5e31f6a8aebd24e1`.
-The ten-item subset is `build/v3-optional-camper-text-01/`. The offline composer
+`build/v3-camper-greeting-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`22293297ece2547c93f26d038fb74396163943ad548dab53b3b9ded9af9fdf39`.
+The ten-item subset is `build/v3-optional-camper-greeting-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue the
-actual English summer greeting selector and conversation commands, remaining
-masked NPC/quest readers, selected rewards, and lighting/floor sounds. Full construction,
-ordinary entry/exit, acquisition, and persistence remain unverified. GitHub
+actual trade picker and selected rewards, retaining the unresolved dispatch stop
+for focused caller tracing. Remaining masked readers and lighting/floor sounds
+need integration. Full construction, ordinary entry/exit, acquisition, and
+persistence remain unverified. GitHub
 development source is allowed; neither served patcher changes until the user
 tests V3 and explicitly approves the switch. This is not a complete-import
 playtest handoff. Imported saves require matching/superset profiles and must
