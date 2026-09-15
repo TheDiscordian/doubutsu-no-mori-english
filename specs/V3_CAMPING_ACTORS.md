@@ -281,7 +281,12 @@ Save structures do not change; selected dependencies include enabled fires.
 
 1. Connect the actual summer-camper reward route for all ten items. Do not
    substitute ordinary shop stock or an unrelated generic gift source.
-2. Complete the lantern and sleeping-bag behaviours beyond their static models.
+   [Complete campsite scenery and the scene/event bindings](V3_CAMPSITE.md)
+   supply the assets and define the remaining runtime adapter.
+2. Preserve the seven static furniture profiles as supplied. In particular,
+   the collectible lantern has no light callback and the sleeping bag has no
+   sleep/contact action bit. `ef_tent_lamp` is a separate campsite scene effect,
+   not an unimplemented collectible interaction.
 3. Verify ordinary appearance, interaction, and persistence in a bounded gameplay
    batch. Original-hardware acceptance and the remaining donor content stay open.
 

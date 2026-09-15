@@ -2,6 +2,16 @@
 
 ## Active development
 
+The [summer campsite scenery](checkpoints/V3_CAMPSITE_ART.md) is converted in
+`build/v3-campsite-art-01/`: complete tent exterior, projected shadow, interior,
+and separate scene lantern, retaining all 527 vertices and 369 triangles.
+Five focused checks pass, including the interior's mixed CI4/I4 materials and
+the lantern's two simultaneous textures/palette banks. These assets are not yet
+installed. Continue the actual campsite scene/event, English conversations, and
+enabled reward routing. The current full cartridge below and both V2 patchers
+remain unchanged. The collectible lantern and sleeping bag correctly have no
+extra interaction; the animated lantern belongs to this separate scene.
+
 The [complete fire runtime](checkpoints/V3_FIRE_RUNTIME.md) installs campfire and
 bonfire with full rigs, camera-facing flames, two scrolling textures, positional
 sound, English metadata, catalogue/scoring, and selected dependencies in ABI 70.
@@ -16,7 +26,7 @@ Current full integration:
 `build/v3-fire-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
 `e2a8ddfb41b7ad7d111cf666dc4b4706046d6edff1fe88968e925603a9345ad5`.
 The two-fire subset is `build/v3-optional-fires-02/`.
-Continue the remaining camping behaviours and summer-camper acquisition, then
+Continue summer-camper acquisition, then
 other donor content and ordinary gameplay/persistence. GPU appearance and
 original-hardware acceptance remain unverified. Both served patchers remain V2;
 this is not a complete-import playtest handoff. Saves using either fire require
@@ -78,7 +88,11 @@ calls and 37 memory assertions, including complete loaded rows and intact guards
 These seven entries retain deterministic individual selection in the current
 offline composer.
 
-Summer-camper acquisition, remaining lantern/sleeping-bag behaviour, ordinary
+The donor's collectible lantern and sleeping bag are correctly non-interactive:
+their profiles have no callbacks or contact/interaction flags. The separate
+`ef_tent_lamp` scene effect is not the collectible lantern. The complete pinned
+profiles and installed scalar fields agree; no extra furniture behaviour is
+required. Summer-camper acquisition, ordinary
 placement/rendering/persistence, and the remaining donor content are unfinished.
 The seven rewards are not substituted into ordinary shop stock. Both served
 patchers remain V2; this is not a complete-import playtest handoff.

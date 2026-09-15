@@ -119,8 +119,10 @@ unverified; this is not a complete-import playtest handoff.
 
 ## Continuation and saves
 
-Complete the lantern and sleeping-bag behaviours, then the real summer-camper
-reward route for all ten items. Continue the other requested donor content,
+Complete the real summer-camper reward route for all ten items. The collectible
+lantern and sleeping bag correctly retain their donor's null callbacks and
+contact/interaction flags; the separate scene lantern is not that furniture.
+Continue the other requested donor content,
 ordinary villager/item gameplay and persistence, browser composition, and later
 e/e+ donor assessment. None of that work is replaced by this actor milestone.
 

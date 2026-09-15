@@ -299,9 +299,18 @@ with later e/e+ donor support investigated separately.
   passes 110 records, 24 calls, and 90 assertions, including real model DMA,
   actual rig/draw execution, unaligned arenas, item readers, and guards.
   Fifty-nine options compose offline; all/empty retain exact full/V2 output.
-  Continue lantern/sleeping-bag behaviour and summer-camper acquisition, then
+  Continue summer-camper acquisition, then
   other donor content and ordinary gameplay/persistence. The ten installed Tent
   rewards do not enter normal shop stock. Neither served patcher changes.
+  The collectible lantern and sleeping bag retain the donor's null callbacks
+  and contact/interaction flags. The animated lantern is a separate scene
+  effect; do not invent lighting or sleep interactions for these furniture items.
+  The [complete campsite scenery](checkpoints/V3_CAMPSITE_ART.md) supplies native
+  exterior, projected shadow, interior, and scene-lantern assets with all source
+  geometry/materials retained. Five focused checks pass. The 19,872-byte interior
+  requires scene storage, not a furniture bank. Connect the actual scene/event,
+  English camper conversation, and selected reward route described in
+  [V3_CAMPSITE](../specs/V3_CAMPSITE.md); the assets are not installed yet.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes
   spare. The furniture helper has 220 bytes spare. Further content must respect
   those bounds or expand the relevant allocation before installation.
