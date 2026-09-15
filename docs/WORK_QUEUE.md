@@ -3,11 +3,11 @@
 ## Active: V3 optional GameCube imports
 
 The current integration image is
-`build/v3-campsite-environment-runtime-02/animal-forest-v3-asset-loader.z64`; the
-[environment checkpoint](checkpoints/V3_CAMPSITE_ENVIRONMENT.md) records ABI-82
-floor-sound routing and donor point-light parameters. Selected rewards and
-full-ID pocket selection retain their passing trade evidence. Continue the timed
-lamp effect, remaining masked readers, and ordinary camper construction/
+`build/v3-tent-lamp-runtime-02/animal-forest-v3-asset-loader.z64`; the
+[lamp checkpoint](checkpoints/V3_TENT_LAMP.md) records ABI-83 complete native
+creation, dawn/dusk movement, drawing, environment updates, and cleanup.
+Floor-sound routing, selected rewards, and full-ID pocket selection retain
+their passing evidence. Continue remaining masked readers and ordinary camper construction/
 conversations. Maintain text credits
 in the single `translations/provenance.json` catalogue; its own coverage queue
 tracks the remaining attribution work without a duplicate review list.
@@ -383,11 +383,15 @@ with later e/e+ donor support investigated separately.
   The [environment adapter](checkpoints/V3_CAMPSITE_ENVIRONMENT.md) connects
   actual native player/NPC floor-sound routing and donor room-light parameters.
   Eighteen focused/composition checks pass; the corrected native run passes
-  39 records and 29 assertions. The timed scene lamp remains work.
-  Current full build: `build/v3-campsite-environment-runtime-02/`; camping subset:
-  `build/v3-optional-campsite-environment-01/`. Both patchers remain V2.
+  39 records and 29 assertions. The [timed lamp](checkpoints/V3_TENT_LAMP.md)
+  installs the full lifecycle, donor model fade, point/diffuse/room colours,
+  and cleanup without permanent memory growth. Nineteen focused/composition
+  tests pass; the first native run completes 65 records and 36 assertions,
+  including all four callbacks and the complete native environment update.
+  Current full build: `build/v3-tent-lamp-runtime-02/`; camping subset:
+  `build/v3-optional-tent-lamp-01/`. Both patchers remain V2.
   Continue remaining masked readers, ordinary NPC construction, conversation
-  handover, and timed scene lighting as specified in
+  handover, and ordinary scene lighting as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.
   Current catalogue suffix headroom is 160 bytes; the menu pool has 256 bytes

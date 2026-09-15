@@ -44,7 +44,7 @@ extern void af_v3_writeback(void *, u32), af_v3_invalidate(void *, u32);
 #ifdef __mips__
 #define extra_code (memory+0xD000)
 #else
-extern unsigned char af_v3_save_extra[0xC00];
+extern unsigned char af_v3_save_extra[AF_V3_EXTRA_CODE_LIMIT];
 #define extra_code af_v3_save_extra
 #endif
 #endif
@@ -71,7 +71,7 @@ int af_v3_startup(void) {
             || header[3] != AF_V3_OBJECT_CAPACITY || header[4] != 410 || header[AF_V3_GUARD] != 0xAF33C0DEu) return 0;
 #ifdef AF_V3_CLOTHING_PROFILE
     const u32 *extra = (const u32 *)(memory+0xE0);
-    if (extra[0] != AF_V3_SAVE_CODE_VROM || !extra[1] || extra[1] > 0xC00u || (extra[1] & 15)
+    if (extra[0] != AF_V3_SAVE_CODE_VROM || !extra[1] || extra[1] > AF_V3_EXTRA_CODE_LIMIT || (extra[1] & 15)
             || extra[3] != 0x8046D000u) return 0;
     if (dma(extra_code, extra[0], extra[1]) || af_crc32(extra_code, extra[1]) != extra[2]) return 0;
     writeback(extra_code, extra[1]);

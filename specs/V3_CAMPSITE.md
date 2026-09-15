@@ -25,9 +25,10 @@ ABI 79 appends the complete summer message and choice groups with native links
 and equivalent trade commands, preserving all existing English records.
 ABI 80 supplies summer greeting selection and transient last-gift tracking.
 ABI 81 connects selected rewards and full-ID trade picking. ABI 82 connects
-native floor-sound routing and the donor's room-light parameters.
+native floor-sound routing and the donor's room-light parameters. ABI 83 connects
+the timed lamp lifecycle and point/diffuse/room-light transitions.
 Remaining masked NPC/quest readers,
-ordinary conversations/reward handovers, and timed scene lighting remain unfinished. Neither
+ordinary conversations/reward handovers, and combined scene acceptance remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
 
 `overlays/v3/campsite_event.c` supplies the calendar, selection, and portable
@@ -649,13 +650,58 @@ and continue at `80096D68`. The native light owner still performs allocation,
 registration, and cleanup. These parameters alone do not supply the donor's
 separate timed scene-lamp owner or its diffuse-light adjustments.
 
-The donor turns the scene lamp off from 05:00 through 17:59 and on outside that
-interval. `ef_tent_lamp.c` also fades the two-texture model with primitive LOD,
-requests room-light transitions, and keeps the effect alive. Native creation,
-per-frame updates, complete drawing, and scene-exit cleanup remain required.
-Do not label the installed static parameters complete day/night lighting.
-
 The [environment checkpoint](../docs/checkpoints/V3_CAMPSITE_ENVIRONMENT.md)
-records current native getter, field-store, sound-dispatch, fallbacks, and guard
-evidence. Ordinary floor walking, timed lighting, and complete scene acceptance
-are not established by these controlled checks.
+records native getter, field-store, sound-dispatch, fallbacks, and guard evidence.
+Ordinary floor walking and complete scene acceptance are not established by
+those controlled checks. Timed lighting is installed separately below.
+
+## Timed scene-lamp lifecycle
+
+`tent_lamp.c` connects the complete original Effect_Control actor (`21`) to the
+donor's tent-only lamp. Its original constructor, destructor, move, and draw
+bodies still execute in full. Four profile pointers at linked `80A1A840..84C`
+call resident wrappers; only their four `R_MIPS_32` relocations are removed.
+The remaining 321 relocations, original 14,144-byte owner, 7,632-byte BSS, and
+444-byte actor instance retain their native dimensions. The owner resolves
+its actual loaded address through descriptor `801010C0`; callbacks must not
+call its original linked address as resident code. Its VROM/DMA slots remain.
+
+The 2,436-byte lamp helper occupies `8046E000`; 36 bytes of explicit transient
+state occupy `8046FFC0` in a 48-byte reservation. Guards at `8046DFF0` and
+`8046FFF0` contain four `AF1AC0DE` words each. No implicit data/BSS is allowed.
+The extra-code descriptor at prefix `E0` loads 12,288 bytes from `024A1080`
+into `8046D000..8046FFFF`, retaining all 2,976 existing save-code bytes exactly.
+It ends immediately before the furniture tables at `80470000`. Startup pins
+the source, size limit, destination, and complete CRC, then flushes both caches.
+Its compiled size remains 912 of 992 bytes. No reservation or heap limit grows.
+
+The constructor initializes the state from the current clock: on before 05:00
+or from 18:00, off otherwise. Entry uses light strength 1 or 0.14 directly,
+without adding a saved tent-switch field. The donor's initial off-request
+transient is not persisted. Movement retains its visual chase coefficients
+`0.015, 0.1, 0.001`. Environment updates approach strength 1 with
+`0.01, 0.01, 0.01`, or subtract 0.01 down to 0.14. These are the donor's
+per-update coefficients, not an assumed frame-rate multiplier.
+
+The native `Global_kankyo_set` entry at `800984CC` runs its complete original
+body before tent-specific changes. The lamp scales point RGB `(235,190,185)`
+by strength, both celestial RGBs by `1 - 0.6*strength`, and blends shadow alpha
+towards 150. The complete native diffuse setters then refresh the light records.
+The room primitive entry at `800981B8` retains its full original path outside
+the active tent. Inside, both opaque and translucent arenas receive the donor
+formula `roomRGB*(1 - 0.3*strength) + pointRGB*(0.6*strength)`, clamped to bytes.
+Native initialization and destruction keep ownership of the room light nodes.
+
+A live lamp allocates 3,280 bytes: both 16-byte guards and the complete 3,248-byte
+model from `02489000`. Failed allocation/DMA releases partial ownership and
+retries after 30 moves. Draw retains the original controller's effects, checks
+model guards and arena capacity, allocates a frame-owned 64-byte scale-0.05
+matrix, binds the full model through segment 6, and sets primitive LOD to
+`255 - 255*visual`. All source textures, palettes, and geometry remain. The
+matching owner destructor clears every state field and frees the model before
+executing the complete native destructor. Other scenes add no lamp allocation.
+
+The [lamp checkpoint](../docs/checkpoints/V3_TENT_LAMP.md) records passing
+sanitized actual-C, cartridge, startup, composition, and native lifecycle checks.
+The native check uses a private game fixture and genuine native callbacks;
+it does not establish ordinary tent entry, GPU appearance, or hardware play.

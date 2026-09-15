@@ -2,6 +2,17 @@
 
 ## Active development
 
+The [timed tent lamp](checkpoints/V3_TENT_LAMP.md) installs the donor model,
+dawn/dusk fade, room-light transitions, drawing, and cleanup in ABI 83. The
+complete original native effect controller remains. Lamp code uses existing
+reserved memory; a live model needs 3,280 heap bytes, released by the destructor.
+Nineteen focused/composition tests pass. The first silent native run completes
+65 records with 36 passing assertions, including the full owner load/relocation,
+all four actual callbacks, model DMA, draw commands, complete native environment
+update, room colours, cleanup, restoration, and guards. Ordinary tent entry,
+GPU appearance, conversations, and persistence remain unverified. No saved
+formats, text resources, or patchers change.
+
 The [campsite environment adapter](checkpoints/V3_CAMPSITE_ENVIRONMENT.md)
 connects the donor's actual footstep sound and room-light parameters in ABI 82.
 Its complete sound program, instrument, and sample match existing native audio;
@@ -10,8 +21,8 @@ The 156-byte adapter fits existing reserved memory. Eighteen focused/composition
 checks pass. The corrected silent native run passes 39 records and 29 assertions,
 including the actual field store, player/NPC sound readers, full five-argument
 light getters, original-room fallbacks, restoration, and guards. The first run
-also passes the new floor getter. Timed lamp creation/fade/drawing and ordinary
-tent gameplay remain work. No saved formats, text resources, or patchers change.
+also passes the new floor getter. Ordinary walking and tent gameplay remain
+unverified; the timed lamp has the separate current evidence above.
 
 The [camper trade adapter](checkpoints/V3_CAMPER_TRADE.md) connects full-ID pocket
 selection, summer last-gift exclusion, and selected camping rewards in ABI 81.
@@ -85,11 +96,11 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-campsite-environment-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`6d2d533bbf85b961560417293626400222f7c2576c565adfa1b93465f41e21f6`.
-The two-item subset is `build/v3-optional-campsite-environment-01/`. The offline composer
+`build/v3-tent-lamp-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`ff4e5ebafcb15d8ef777d569e0b2f4d29d848223d8e44ef15653c539796279d0`.
+The two-item subset is `build/v3-optional-tent-lamp-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue
-the timed scene lamp and remaining masked readers, then combined ordinary
+remaining masked readers and combined ordinary
 construction, entry/exit, conversation handover, and persistence checks. Those
 gameplay paths remain unverified. GitHub development source is allowed; neither
 served patcher changes until the user

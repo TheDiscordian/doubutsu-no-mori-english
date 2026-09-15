@@ -1564,6 +1564,12 @@ def main():
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record,
                                         remaining=action.get('camper_trade_remaining_only',False)))
+            if action.get('test_v3_tent_lamp'):
+                from v3_tent_lamp_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 lamp probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_campsite_environment'):
                 from v3_campsite_environment_smoke import exercise
                 if not (out/'test.bs1').is_file():
