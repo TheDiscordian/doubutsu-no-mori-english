@@ -25,7 +25,7 @@ import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 1
+VERSION = 2
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -169,6 +169,46 @@ def checked_assets(art_path, source, worksheet):
     return rows, sha256(raw)
 
 
+def reuse_resource_tail(base, prior, old_blob):
+    """Retire only the three terminal resources this builder regenerates.
+
+    Input files remain untouched. Existing object VROMs never move. Receipts,
+    DMA mappings, padding, and every resident profile must agree before reuse.
+    """
+    previous=prior.get('automatic_furniture')
+    if not previous:
+        return bytearray(old_blob),dict(reused_bytes=0)
+    files=by_vrom(base);moves=previous['resource_moves']
+    owners={catalogue.VROM,catalogue.RELOC,shops.VROM}
+    if (len(moves)!=3 or {r['vrom'] for r in moves}!=owners
+            or sha256(old_blob)!=prior['blob_sha256'] or files[BLOB].pend):
+        raise ValueError('Changed regenerated resource tail inventory')
+    first=min(r['blob_offset'] for r in moves);cursor=first
+    if first%16 or not PACKAGE+PACKAGE_SIZE <= first < len(old_blob):
+        raise ValueError('Regenerated resource tail overlaps resident data')
+    for row in sorted(moves,key=lambda r:r['blob_offset']):
+        at,n=row['blob_offset'],row['bytes'];entry=files[row['vrom']]
+        if (at!=(cursor+15)&~15 or n<=0 or at+n>len(old_blob) or any(old_blob[cursor:at])
+                or entry.pend or entry.size!=n or entry.pstart!=files[BLOB].pstart+at
+                or row['physical']!=entry.pstart or sha256(old_blob[at:at+n])!=row['sha256']
+                or entry.extract(base)!=old_blob[at:at+n]):
+            raise ValueError('Changed regenerated resource extent, mapping, padding, or contents')
+        cursor=at+n
+    if cursor!=len(old_blob): raise ValueError('Regenerated resources are not the complete terminal tail')
+    physical=files[BLOB].pstart+first;end=files[BLOB].pstart+len(old_blob)
+    if any(e.pstart<end and physical<(e.pend or e.pstart+e.size)
+           for v,e in files.items() if v not in owners|{BLOB} and e.pstart!=0xFFFFFFFF):
+        raise ValueError('Regenerated resource tail overlaps another DMA resource')
+    for at in range(ROWS,ITEMS,80):
+        if any(old_blob[at:at+80]):
+            lo,hi=struct.unpack_from('>II',old_blob,at+8)
+            if lo<BLOB+len(old_blob) and BLOB+first<hi:
+                raise ValueError('Regenerated resource tail overlaps retained furniture')
+    return bytearray(old_blob[:first]),dict(reused_bytes=len(old_blob)-first,
+        blob_offset=first,source_blob_sha256=sha256(old_blob),
+        retained_prefix_sha256=sha256(old_blob[:first]),retired_resources=copy.deepcopy(moves))
+
+
 def build(output, art_path, lock=LOCK):
     output = output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build directory')
@@ -193,6 +233,7 @@ def build(output, art_path, lock=LOCK):
             or package[-16:] != bytes.fromhex('AFACC0DE')*4
             or DMA_START+(len(files)+1)*16 != DMA_END or base[DMA_END-16:DMA_END] != bytes(16)):
         raise ValueError('Changed complete shared storage prerequisite')
+    blob,reused=reuse_resource_tail(base,prior,old_blob)
     changes, score_reports = scoring(base,prior,[r for r,_ in prepared])
     installed = []
     for row,asset in prepared:
@@ -250,7 +291,10 @@ def build(output, art_path, lock=LOCK):
     for vrom,data in list(changes.items()):
         entry=files[vrom]; at=entry.pstart-files[BLOB].pstart
         if entry.pend or len(data)!=entry.size: raise ValueError('Unexpected fixed-owner allocation change')
-        if 0 <= at <= len(old_blob)-len(data): blob[at:at+len(data)]=data; changes.pop(vrom)
+        if 0 <= at <= len(old_blob)-len(data):
+            if at+len(data)>reused.get('blob_offset',len(old_blob)):
+                raise ValueError('Fixed owner update overlaps reused resource tail')
+            blob[at:at+len(data)]=data; changes.pop(vrom)
     abi=prior['runtime_abi']+1
     blob[0x20:0xE0]=profile_bits; package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]
     struct.pack_into('>I',blob,0xF8,zlib.crc32(package)); struct.pack_into('>I',blob,4,abi)
@@ -265,7 +309,7 @@ def build(output, art_path, lock=LOCK):
     module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
     struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
     start,end=files[BLOB].pstart+len(old_blob),files[BLOB].pstart+len(blob)
-    if (BLOB+len(blob)>END or end>len(base) or any(base[start:end])
+    if (len(blob)<len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
             or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                    for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)
             or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend for v,e in files.items() if v!=BLOB)):
@@ -303,7 +347,7 @@ def build(output, art_path, lock=LOCK):
             row['layer_type']=source.raw('aMR_layer_set_info')[row['runtime_index']]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),
-        resource_moves=moves,additional_resident_bytes=0,saved_format_changed=False,
+        resource_moves=moves,resource_tail_reuse=reused,additional_resident_bytes=0,saved_format_changed=False,
         saved_profile_changed=True,older_builds_accept_new_saves=False,web_patcher_enabled=False,
         catalogue_masks_sha256=sha256(bytes(blob[ITEMS+i*32+24] for i in range(1024))),
         provenance_catalogue_complete=not bool(text_patch))

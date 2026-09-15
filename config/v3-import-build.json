@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-square-runtime-01",
-  "runtime_abi": 90,
-  "rom_sha256": "91be4e2ccd1fc9bb3be77f16c11eff74a7b387582475deed575d3a316ea02277",
-  "report_sha256": "bdbeb14058d69b704de14865b5b2bb47048636345d34eccb76887265fcbffdfe"
+  "directory": "build/v3-furniture-intensity-runtime-01",
+  "runtime_abi": 91,
+  "rom_sha256": "ad194977b9083764c0efe8636614ba45d69b9370d6322514e2fd0b24aff2c1e3",
+  "report_sha256": "cbd63fe09ae8661bf4f9490e7f9ab3adcfb1e014c5d7932408322fce4203809b"
 }

@@ -3,32 +3,34 @@
 ## Active development
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) installs
-twenty-nine additional items through source-discovered records and shared conversion,
+thirty-one additional items through source-discovered records and shared conversion,
 stock, catalogue, scoring, and profile installation. No per-item installer or
-graphics description is needed. The current ABI-90 cartridge adds picnic table
-and all three wrestling-ring corners through square-furniture and double-bed
-categories, using existing native controls and four-cell readers without extra
-runtime code or allocations. Their original C/A/event/lottery stock routes remain.
-Single-bed support, shared unlit materials, and source-indexed catalogue framing
-remain installed. Thirty-eight focused
-pipeline/composition checks pass, with one optional prepared-assets check not
-requested. The first current silent native check passes 180 records with 158
-assertions, including all four footprint/bed rotations, inactive-bed rejection,
-complete model DMA, preview framing, stock, acquisition, ownership, restoration,
-and guards. Bed geometry is checked once per changed contact category; imported
-chair-sound checks use new records rather than every previous chair.
-A shared identity-indexed selector also prepares all nine complete flower-model
-variants automatically: 19,152 bytes, 555 vertices, and 288 triangles. These assets
-are not installed. Their initial acquisition is traced to Tortimer's holiday
-gifts, together with the two tree models and weed model; the shared event actor,
-calendar, conversations, and trophy persistence remain required. Prepared-only
-output is explicitly rejected by the installer. The offline composer has 91
-installed development options. Full catalogue construction, ordinary
+graphics description is needed. The current ABI-91 cartridge adds G logo and
+bird bath through shared CI4/I4 material conversion, retaining their complete
+6,880 bytes of artwork, stock A, reflection/water state, and all model layers.
+Independent texture scales/shifts and material-specific palette modes come from
+source commands. Existing seating, bed, placement, and catalogue categories remain.
+The installer safely reuses its preceding regenerated catalogue/shop tail after
+validating every resource and retained profile. Cartridge storage grows only by
+the new artwork, avoiding another 64,496 bytes of superseded resource copies.
+No runtime code, permanent allocation, or saved format grows.
+
+All forty-four focused pipeline/composition checks pass, including complete
+compiled material/texture checks and prepared-only assets. The first current
+silent native check passes 88 records with 68 assertions: complete model DMA,
+preview framing, stock, acquisition, ownership, restoration, and guards.
+The converter also prepares the complete miniature car automatically; its actual
+acquisition route remains unresolved, so it is not installed. All nine prepared
+flower-model variants retain the shared Tortimer holiday-gift dependency. Their
+event actor, calendar, conversations, and trophy persistence remain required.
+Prepared-only output is explicitly rejected by the installer.
+
+The offline composer has 93 installed development options: 70 furniture,
+three shirts, and twenty villagers. Full catalogue construction, ordinary
 appearance/gameplay, and save/restart remain unverified; both served patchers
-remain V2. Continue shared
-contact/callback and graphics/acquisition categories through this pipeline.
+remain V2. Continue shared callback, graphics, and acquisition categories.
 The current lock is `config/v3-import-build.json`; the cartridge is
-`build/v3-furniture-square-runtime-01/animal-forest-v3-asset-loader.z64`.
+`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`.
 
 The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
 righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,
@@ -145,10 +147,10 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-auto-furniture-final-01/animal-forest-v3-asset-loader.z64`, SHA-256
-`571e849108cf36983c7129a38d08bfc3b47dd71db5c4347cfe16b7425b1ed35c`.
-The new three-item subset is `build/v3-optional-auto-furniture-01/`. The offline composer
-retains 76 experimental choices and exact all/empty full/V2 output. Continue
+`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`ad194977b9083764c0efe8636614ba45d69b9370d6322514e2fd0b24aff2c1e3`.
+The offline composer retains 93 experimental choices and exact all/empty
+full/V2 output. Continue
 remaining masked readers and combined ordinary
 construction, entry/exit, conversation handover, and persistence checks. Those
 gameplay paths remain unverified. GitHub development source is allowed; neither

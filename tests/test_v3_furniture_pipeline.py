@@ -39,14 +39,14 @@ class FormatTests(unittest.TestCase):
     def test_unlit_material_uses_native_texture_primitive_expression_without_item_switches(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>II',raw,8,0xFCFFFE60,0xFFFCF3F8)
-        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
         self.assertTrue(rows[1]['unlit_texture_primitive'])
         source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
         self.assertIn('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
                       'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)',source)
         struct.pack_into('>I',raw,12,0xFFFCF3F9)
         with self.assertRaisesRegex(ValueError,'colour combiner'):
-            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
 
     def test_constant_palette_binding_preserves_commands_and_rejects_ambiguous_dependencies(self):
         raw,pointers=fixture();raw=bytearray(raw)
@@ -54,7 +54,7 @@ class FormatTests(unittest.TestCase):
         pointers.pop(0x11C)
         def parse(binding, fixups=pointers):
             return parse_model(raw,0x100,fixups,(0x500,),{0x600:(32,32)},0x1000,48,
-                               static_ci4=True,palette_bindings=binding)
+                               static_4bit=True,palette_bindings=binding)
         rows=parse({0x08000000:0x500})
         palette=next(r for r in rows if r['opcode']==0xF0)
         self.assertEqual(palette['target'],0x500)
@@ -82,14 +82,46 @@ class FormatTests(unittest.TestCase):
                 changed=bytearray(raw)
                 struct.pack_into('>I',changed,0x28,0xD2F0F000|s<<10|t<<8)
                 struct.pack_into('>I',changed,0x34,0x123456FF)
-                rows=parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+                rows=parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
                 self.assertIn((0xFA000080,0x123456FF),[r['words'] for r in rows])
                 source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
                 self.assertIn('gsSPVertex',source)
-        for value in (0xD2F0FC00,0xD2F0F300,0xD2F0F001):
+        for value in (0xD2F0FC00,0xD2F0F300,0xD2F1F000):
             changed=bytearray(raw);struct.pack_into('>I',changed,0x28,value)
             with self.assertRaises(ValueError):
-                parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+                parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
+
+    def test_palette_free_intensity_and_asymmetric_texture_scales_shifts(self):
+        original,_=fixture()
+        raw=bytearray(original[:0x18]+original[0x20:])
+        pointers={0x11C:0x600,0x13C:0x1000}
+        struct.pack_into('>I',raw,0x18,0xFD841C1F)
+        struct.pack_into('>I',raw,4,0x11940FA0)
+        for s,t in ((0,1),(2,1),(15,15)):
+            struct.pack_into('>I',raw,0x20,0xD2F0F500|s<<4|t)
+            rows=parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_4bit=True)
+            texture=next(r for r in rows if r['opcode']==0xFD)
+            self.assertTrue(texture['intensity']);self.assertEqual(texture['tile_shifts'],(s,t))
+            source,_=command_source({'translucent':{'rows':rows}},{0x600:0,0x1000:512})
+            self.assertIn('gsSPTexture(4500, 4000,',source)
+            self.assertIn('gsDPSetTextureLUT(G_TT_NONE)',source)
+            self.assertNotIn('gsDPLoadTLUT',source)
+            self.assertIn(f'G_IM_FMT_I, 32, 32, 0, G_TX_WRAP, G_TX_WRAP, 5, 5, {s}, {t}',source)
+        struct.pack_into('>I',raw,0x18,0xFD441C1F)
+        with self.assertRaisesRegex(ValueError,'texture or palette'):
+            parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_4bit=True)
+
+    def test_mixed_materials_switch_native_palette_mode_at_each_format_change(self):
+        raw,pointers=fixture();words=list(struct.iter_unpack('>II',raw));triangle=words[-2]
+        words=words[:-1]+[(0xFD841C1F,0),(0xD2F0F521,0),triangle,
+                          (0xFD441C1F,0),(0xD2F0F000,0),triangle,words[-1]]
+        pointers.update({0x154:0x700,0x16C:0x800})
+        rows=parse_model(b''.join(struct.pack('>II',*w) for w in words),0x100,pointers,(0x500,),
+            {a:(32,32) for a in (0x600,0x700,0x800)},0x1000,48,static_4bit=True)
+        source,_=command_source({'opaque':{'rows':rows}},
+            {0x500:0,0x600:32,0x700:544,0x800:1056,0x1000:1568})
+        self.assertEqual(source.count('gsDPSetTextureLUT(G_TT_RGBA16)'),2)
+        self.assertEqual(source.count('gsDPSetTextureLUT(G_TT_NONE)'),1)
 
     def test_record_driven_catalogue_under_address_and_undefined_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-catalogue-records-') as temporary:
@@ -313,6 +345,36 @@ class DonorTests(unittest.TestCase):
             self.assertEqual(entry['text'],row['name']);self.assertEqual(entry['credit'],'official')
             self.assertEqual(entry['source']['index'],row['name_source_index'])
 
+    def test_compiled_material_formats_scales_and_tile_shifts_match_the_source(self):
+        batches=[(self.art,self.report)]
+        if path:=os.environ.get('V3_FURNITURE_PREPARED_ART'):
+            art=Path(path).resolve();batches.append((art,json.loads((art/'art.json').read_bytes())))
+        for art,report in batches:
+            for row in report['objects']:
+                asset=(art/row['object_file']).read_bytes()
+                _,_,_,_,models,_,_=pipeline.prepare(self.source,int(row['item_id'],16))
+                for model in row['models']:
+                    at,n=model['native_offset'],model['bytes']
+                    words=list(struct.iter_unpack('>II',asset[at:at+n]))
+                    source=models[model['layer']]['rows']
+                    scales=[(0xD7000002,r['words'][1] or 0xFFFFFFFF) for r in source if r['opcode']==0xD7]
+                    self.assertEqual([w for w in words if w[0]>>24==0xD7],scales)
+                    expected=[];luts=[];last=None
+                    for r in source:
+                        if r['opcode'] not in (0xFD,0xD2):continue
+                        intensity=bool(r.get('intensity'));w,h=r['shape']
+                        wraps=tuple({0:2,1:0,2:1}[x] for x in r['wrap_modes'])
+                        shifts=r.get('tile_shifts',(0,0))
+                        expected.append((4 if intensity else 2,0,(w+15)//16,0,
+                                         0 if intensity else 15,*wraps,*shifts))
+                        if r['opcode']==0xFD and intensity!=last:
+                            luts.append((0xE3001001,0 if intensity else 0x8000));last=intensity
+                    actual=[(a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,
+                             b>>8&3,b>>18&3,b&15,b>>10&15)
+                            for a,b in words if a>>24==0xF5 and b>>24&7==0]
+                    self.assertEqual(actual,expected)
+                    self.assertEqual([w for w in words if w[0]==0xE3001001],luts)
+
 
 class CurrentCartridgeTests(unittest.TestCase):
     @classmethod
@@ -341,6 +403,43 @@ class CurrentCartridgeTests(unittest.TestCase):
         self.assertEqual(self.report['furniture']['bank_pool'],self.prior['furniture']['bank_pool'])
         self.assertEqual(self.report['furniture']['expanded_tables'],self.prior['furniture']['expanded_tables'])
         self.assertEqual(self.report['save_runtime']['code'],self.prior['save_runtime']['code'])
+
+    def test_reused_terminal_resources_and_retained_objects(self):
+        old_blob=self.old[install.BLOB].extract(self.base)
+        retained,receipt=install.reuse_resource_tail(self.base,self.prior,old_blob)
+        self.assertEqual(receipt,self.report['automatic_furniture']['resource_tail_reuse'])
+        self.assertGreater(receipt['reused_bytes'],0)
+        self.assertEqual(old_blob[:receipt['blob_offset']],retained)
+        self.assertEqual(int(self.rows[0]['object_vrom'],16)-install.BLOB,receipt['blob_offset'])
+        for row in self.prior['furniture']['imports']+[self.prior['speed_bag']]:
+            at=int(row['object_vrom'],16)-install.BLOB;n=row['object_bytes']
+            self.assertLessEqual(at+n,len(retained))
+            self.assertEqual(self.blob[at:at+n],old_blob[at:at+n])
+        # Reuse is repeatable from the newly built receipt; no growing stack
+        # of catalogue/shop copies is needed on the next import.
+        next_blob,next_receipt=install.reuse_resource_tail(self.image,self.report,self.blob)
+        self.assertEqual(next_receipt['blob_offset'],len(next_blob))
+        self.assertEqual(len(self.blob)-len(next_blob),next_receipt['reused_bytes'])
+
+    def test_resource_tail_rejects_bad_receipts_contents_and_retained_profile_overlap(self):
+        old_blob=self.old[install.BLOB].extract(self.base)
+        changed=copy.deepcopy(self.prior)
+        changed['automatic_furniture']['resource_moves'][0]['physical']+=16
+        with self.assertRaisesRegex(ValueError,'extent, mapping, padding, or contents'):
+            install.reuse_resource_tail(self.base,changed,old_blob)
+        changed=copy.deepcopy(self.prior)
+        changed['automatic_furniture']['resource_moves'].pop()
+        with self.assertRaisesRegex(ValueError,'tail inventory'):
+            install.reuse_resource_tail(self.base,changed,old_blob)
+        blob=bytearray(old_blob);blob[-1]^=1;changed=copy.deepcopy(self.prior)
+        changed['blob_sha256']=sha256(blob)
+        with self.assertRaisesRegex(ValueError,'extent, mapping, padding, or contents'):
+            install.reuse_resource_tail(self.base,changed,blob)
+        first=min(r['blob_offset'] for r in self.prior['automatic_furniture']['resource_moves'])
+        blob=bytearray(old_blob);struct.pack_into('>II',blob,install.ROWS+8,install.BLOB+first,install.BLOB+first+16)
+        changed=copy.deepcopy(self.prior);changed['blob_sha256']=sha256(blob)
+        with self.assertRaisesRegex(ValueError,'overlaps retained furniture'):
+            install.reuse_resource_tail(self.base,changed,blob)
 
     def test_bed_category_uses_checked_existing_engine_and_rejects_changed_bindings(self):
         from v3_furniture_behaviours import contact_contract

@@ -63,11 +63,15 @@ across the scan. Dependencies come from actual profile/model pointers, including
 interior vertex-array references. Missing, ambiguous, external, truncated, or
 unaccounted dependencies are rejected.
 
-The shared static-CI4 category supports:
+The shared static-four-bit category supports:
 
 - All four native opaque/translucent model slots, complete 16-colour palettes,
   one complete vertex array, and multiple textures/palettes.
-- Complete TMEM-sized CI4 textures, untiled from GX blocks without resizing.
+- Complete CI4 and I4 textures up to 2,048 bytes, untiled from GX blocks without
+  resizing. Pure I4 objects need no palette. Each resource records its format;
+  native texture-LUT mode follows each material, including mixed-format lists.
+  The shared `static-4bit` category covers both; `static-ci4` selects CI4-only
+  objects, and `intensity-materials` selects objects with I4 layers.
 - Native vertex conversion preserving position, UVs, and colours, clearing only
   donor flag fields; complete triangle conversion and bounded vertex loads.
 - Source primitive colours and the supported material/geometry commands.
@@ -75,14 +79,19 @@ The shared static-CI4 category supports:
   multiplies RGB by primitive colour in cycle two, and preserves texture alpha.
   Its symbolic native combiner compiles to the exact checked donor command;
   no theme/item switch or extra texture dependency is required.
-  Clamp, wrap, and mirror combinations are decoded by their actual bit fields;
-  repeated axes require power-of-two texture dimensions. Unknown state fails.
+  Primitive/environment interpolation, alpha, and texture-generated or linear
+  reflection coordinates retain their checked native commands. Positive S/T
+  scales and four-bit S/T tile shifts remain independent; zero/zero source scale
+  retains the established full-scale native conversion. Clamp, wrap, and mirror
+  combinations are decoded by their actual bit fields; repeated axes require
+  power-of-two texture dimensions. Unknown state fails.
 - Static profiles with supported shape, collision, lighting, and rotation
   fields. Footprint follows **shape**, as in donor `aMR_GetFurnitureUnit`, not
   collision: shape 4 is 1×1, shape 3 is 2×1, and shape 5 is 2×2.
   The square collision category `5` is supported. Shape `5` retains native
-  four-cell placement in all rotations. The build verifies the complete installed four-cell item reader
-  and actual original/donor footprint tables before accepting square records.
+  four-cell placement in all rotations. The build verifies the complete installed
+  four-cell item reader and actual original/donor footprint tables before
+  accepting square records.
 - Ordinary A/B/C, event, and lottery acquisition, existing scoring categories,
   and source-indexed catalogue framing. Names and prices come from actual donor tables.
 - Soft- and hard-chair action sounds, selected from the donor's actual category
@@ -95,9 +104,8 @@ The shared static-CI4 category supports:
 - Source-derived placement layers: ordinary floor items, surfaces that hold
   other items, and objects that may be placed on those surfaces.
 - Single- and double-bed contact actions `0x08` and `0x10`. Complete models and
-  profile scalars feed the
-  existing native bed positioning, contact, entry, and exit routines through
-  the expanded profile table. No new bed callback, per-item behaviour switch,
+  profile scalars feed the existing native bed positioning, contact, entry,
+  and exit routines through the expanded profile table. No new bed callback, per-item behaviour switch,
   or animation replacement is needed. The build checks the current room engine
   and its four bed-profile bindings before accepting this category. Separate
   island/holiday acquisition requirements still prevent installation; bed
@@ -142,6 +150,17 @@ The checked build manifest records each new object's VROM; it is not a saved
 identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
+
+Converter/installer revision 2 reuses the preceding automatic batch's terminal
+catalogue, relocation, and shop resources, because all three are regenerated.
+`reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
+DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
+resident-data boundary, other DMA resources, and every retained furniture profile.
+Changed receipts, live overlaps, and non-terminal resources fail rather than
+being discarded. New art starts at that checked boundary, followed by the rebuilt
+owners and updated DMA mappings. Existing model VROMs and saved identities do
+not move. The receipt records the reused range and source hashes. Only the fresh
+output changes; input ROMs, earlier builds, and saves remain untouched.
 
 Stock and catalogue builders accept verified records without family switches.
 Catalogue eligibility uses byte 24 of each existing 32-byte sparse item record:
@@ -202,6 +221,11 @@ relocations, independent complete texel/triangle comparisons, metadata/provenanc
 current cartridge installation, retained data/code, and subset composition.
 The catalogue mask and seating-sound readers have address/undefined-behaviour
 sanitizer checks.
+Material checks decode the compiled texture format, palette mode, line stride,
+S/T scale, wrapping, and independent shifts against the donor commands. Complete
+sample, vertex, triangle, and material checks also cover prepared-only objects.
+Storage tests reject changed tail receipts/data and live-profile overlaps, check
+every previous model unchanged, and verify reuse again from the newly built receipt.
 
 `tools/v3_furniture_batch_smoke.py` and
 `tests/scenarios/v3_furniture_batch.json` are reusable across future batches.

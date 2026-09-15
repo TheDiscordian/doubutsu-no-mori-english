@@ -3,29 +3,29 @@
 ## Active: V3 optional GameCube imports
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Twenty-nine additional complete assets and their shared runtime
-records are installed. ABI 90 adds picnic table and all three wrestling-ring
-corners through square-furniture and double-bed categories, using existing native
-controls/readers without extra runtime code or allocations. Catalogue framing uses
-donor-table records for all installed furniture, replacing per-item overrides.
-Thirty-eight focused pipeline/composition checks pass; one optional prepared-assets
-check is not requested. The first current native run passes 180 records with
-158 assertions, including four-cell placement and double-bed positioning in all
-rotations. The full source/verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 91
+new furniture. Thirty-one additional complete assets and their shared runtime
+records are installed. ABI 91 adds G logo and bird bath through shared CI4/I4
+materials, including independent texture scales/shifts and reflection/water state.
+There is no new item-specific converter, installer, runtime code, or allocation.
+The installer reuses its regenerated three-resource tail after complete mapping,
+content, padding, and retained-profile checks. The 6,880 bytes of new art increase
+storage by exactly 6,880 bytes, avoiding another 64,496-byte resource copy.
+All forty-four focused pipeline/composition checks pass, including prepared assets.
+The first current native run passes 88 records with 68 assertions. The full
+source/verification record is in
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 93
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
-Next, allow the installer to safely reuse the preceding batch's regenerated
-catalogue/relocation/shop tail instead of keeping those superseded copies on
-every import. The current three-resource tail occupies 64,496 bytes; validate
-the pinned resource receipts, exact terminal extents/padding, and all retained
-objects before reuse. Do not remove any input or previous build. Retain the
-source-derived item identities and fixed VROM owners; check new physical mappings.
-The next shared graphics extension is CI4/I4 material layers: miniature car,
-G logo, and bird bath use I4 rather than an oversized CI4 texture; Diver Dan
-also requires RGBA16. Preserve environment mapping, tile shifts, palettes, and
-every material layer. Do not erase those effects to make conversion pass.
+The shared CI4/I4 converter prepares the complete miniature car automatically:
+7,104 bytes, 170 vertices, and 98 triangles. It remains uninstalled because no
+actual acquisition route is identified; trace that route rather than inventing
+shop stock or classifying it as unused. Harvest mirror also passes shared
+material discovery, with its harvest acquisition dependency retained.
+The next texture format is RGBA16, used by Diver Dan alongside CI4/I4; verify
+actual GX/native colour and alpha representation before extending conversion.
+Preserve environment mapping, palettes, and every material layer. Do not erase
+effects to make conversion pass. Island acquisition remains a separate dependency.
 The constant identity-indexed model/palette category prepares all nine flower
 variants in one command, retaining their full 19,152 bytes, 555 vertices, and 288
 triangles. They are not installed: the shared `ftr_listEventPresentChumon`
@@ -44,10 +44,10 @@ Sixteen diary display models still need diary identity/gameplay/acquisition.
 Complete model conversion without required behaviour is not a completed import.
 Full catalogue construction, ordinary GPU appearance, interactions, and
 save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
-using the four ABI-90 additions must not be loaded in older builds or V2.
+using the two ABI-91 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-square-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

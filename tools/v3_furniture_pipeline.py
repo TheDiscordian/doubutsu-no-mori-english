@@ -23,7 +23,7 @@ from v3_furniture_art import SEGMENT, command_source, parse_model, verify_source
 from v3_registry import FURNITURE
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 1
+VERSION = 2
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -257,11 +257,11 @@ def prepare(source, item):
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
                     w, h, fmt, bits = model_texture_shape(raw[position:position+8])
-                    if fmt != 2 or bits != 0 or w*h//2 != size or w*h//2 > 2048:
-                        raise ReviewRequired('texture is not complete TMEM-sized CI4')
-                    if start in textures and textures[start][2:] != (w, h):
+                    if fmt not in (2,4) or bits != 0 or w*h//2 != size or w*h//2 > 2048:
+                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4')
+                    if start in textures and textures[start][2:] != (w, h, fmt):
                         raise ReviewRequired('texture has inconsistent dimensions')
-                    textures[start] = (symbol, size, w, h)
+                    textures[start] = (symbol, size, w, h, fmt)
                 else:
                     if size%16: raise ReviewRequired('invalid complete vertex array')
                     vertex_arrays[start] = (symbol, size)
@@ -272,8 +272,8 @@ def prepare(source, item):
             if position > n: raise ReviewRequired('truncated packed model')
         raw_models[label] = name, at, raw, pointers
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
-    if not palettes or len(vertex_arrays) != 1:
-        raise ReviewRequired('static CI4 needs palettes and one complete vertex array')
+    if (any(r[4]==2 for r in textures.values()) and not palettes) or len(vertex_arrays) != 1:
+        raise ReviewRequired('static materials need CI4 palettes and one complete vertex array')
     body, resources, offsets = bytearray(), [], {}
     def add(at, name, n, convert, **details):
         raw = source.data[at:at+n]
@@ -283,15 +283,16 @@ def prepare(source, item):
         resources.append(dict(symbol=name, donor_offset=at, native_offset=offsets[at], bytes=n,
             source_sha256=sha256(raw), output_sha256=sha256(converted), **details))
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
-    for at, (name, n, w, h) in sorted(textures.items()):
-        add(at, name, n, lambda data, w=w, h=h: pack4(untile(data, w, h, 4)), kind='texture', width=w, height=h)
+    for at, (name, n, w, h, fmt) in sorted(textures.items()):
+        add(at, name, n, lambda data, w=w, h=h: pack4(untile(data, w, h, 4)), kind='texture', width=w, height=h,
+            format='CI4' if fmt==2 else 'I4')
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
     for label, (name, at, raw, pointers) in raw_models.items():
         models[label] = dict(symbol=name, donor_offset=at, source_sha256=sha256(raw),
             rows=parse_model(raw, at, pointers, tuple(palettes),
-                {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_ci4=True,
+                {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_4bit=True,
                 palette_bindings=bindings))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
@@ -389,7 +390,9 @@ def scan(source, worksheet, installed=None):
             profile, body, resources, offsets, models, commands, sections = prepare(source, item)
             estimated = (len(body)+sum(n for _,n in sections)+15)&~15
             if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
-            categories = [profile['behaviour'], 'static-ci4', ('1x1','2x1','2x2')[profile['size_code']]]
+            formats={r['format'] for r in resources if r['kind']=='texture'}
+            categories = [profile['behaviour'], 'static-4bit', ('1x1','2x1','2x2')[profile['size_code']]]
+            categories += ['static-ci4'] if formats=={'CI4'} else ['intensity-materials']
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
             row.update(asset_ready=True, profile=profile,
                 object_bytes=estimated, textures=sum(r['kind']=='texture' for r in resources),

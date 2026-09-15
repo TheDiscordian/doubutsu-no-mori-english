@@ -1,6 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
-## Current square-furniture and double-bed categories
+## Current shared intensity materials and resource reuse
+
+The complete development cartridge is ABI 91:
+`build/v3-furniture-intensity-runtime-01/animal-forest-v3-asset-loader.z64`.
+The shared `intensity-materials` category discovers G logo `31E8` and bird bath
+`3240`, retaining complete CI4/I4 textures, all opaque/translucent model layers,
+reflection/water material state, and actual stock A acquisition. Their 6,880 bytes
+contain all 202 vertices and 126 triangles. No item-specific model definition,
+installer, runtime code, or native scenario is added. Automatic additions total
+thirty-one; the offline composer contains 93 installed development options:
+70 furniture, three shirts, and twenty villagers.
+
+Converter revision 2 supports complete four-bit CI and intensity textures without
+resizing. Pure I4 objects do not require a palette. Mixed lists select native
+TLUT state at every actual format transition. Independent positive S/T scales,
+four-bit shifts, wrapping, primitive/environment colours, and reviewed generated
+reflection coordinates retain their source values. Unknown formats/state still
+fail. The earlier CI4-only category remains available; `static-4bit` covers both.
+The same category prepares miniature car `3094`: 7,104 bytes, 170 vertices,
+and 98 triangles. Its acquisition is unresolved, so this prepared-only artifact
+cannot be installed. Harvest mirror passes graphics discovery but still needs
+the harvest acquisition adapter. No unsupported callback or acquisition is waived.
+
+The installer reuses exactly the preceding automatic batch's terminal catalogue,
+relocation, and shop resources. Complete hashes, DMA mappings, aligned contiguous
+extents, zero padding, terminal boundary, resident boundary, every other DMA
+resource, and all canonical profile extents are checked before reuse. Changed
+receipts or live overlaps fail. The 64,496-byte prior tail starts at blob offset
+3,284,400. Its retained prefix SHA-256 is
+`0bb5766df6d034e6fca7acbed4efe8b7213db38808110f5ccac0df1663d429ac`.
+New art precedes the regenerated owners; their fixed VROM identities and all
+previous model VROMs remain unchanged. Reuse affects only the fresh output, not
+input ROMs, previous builds, or saves. It prevents new redundant copies; it does
+not compact older superseded data elsewhere in the retained prefix.
+
+The catalogue has 506 furniture and 248 clothing rows. Conservative menu memory
+remains 280,320 of 280,704 bytes. The import blob is 3,355,776 bytes, leaving
+772,992 bytes before English choices. Growth is exactly the new 6,880 artwork
+bytes, rather than another catalogue/shop copy. No runtime code or permanent
+allocation grows. Saved format 2 remains; saves containing either new item must
+not be loaded by older builds or V2. Forward ordinary cross-version reload is
+not newly claimed. Both served patchers remain V2.
+
+- ROM SHA-256: `ad194977b9083764c0efe8636614ba45d69b9370d6322514e2fd0b24aff2c1e3`.
+- UPS SHA-256: `419588ce3dbf295f27ce96c8647f9042ed7111645fb84560f1d19f1aed89a2cd`.
+- Build receipt SHA-256: `cbd63fe09ae8661bf4f9490e7f9ab3adcfb1e014c5d7932408322fce4203809b`.
+- Art receipt SHA-256: `53659935e7ba271730ff1cb7b5cc5fe89ed290c9d40a3ab5af7975fa97c5e035`.
+- Import blob SHA-256: `1c125a28cb24537db05e4f81e5703050d910a4542291586e5acbb71d1959383d`.
+- Prepared car receipt SHA-256: `d9235377ce673ab0119b5cb025e5df3abc68d4f6cd06889b56b9ed3698966077`.
+
+All forty-four focused pipeline/composition checks pass, with no skips. Material
+tests independently decode compiled format, palette mode, stride, S/T scale,
+wrapping, and shifts against source commands. Complete sample/vertex/triangle
+checks also cover the prepared car. Palette-free I4, CI4 palette rejection,
+mixed LUT transitions, changed tail data/receipts, and retained-profile overlap
+are covered. Every previous complete model stays unchanged; tail reuse is
+verified again from the new receipt. Existing sanitizer, stock/scoring,
+official-text attribution, original-code, optional-subset, full, and exact V2
+composition checks pass. All twenty current build-source hashes match the receipt.
+
+The first silent native run passes 88 records with 68 assertions:
+`build/v3-furniture-intensity-native-01/results.json`, SHA-256
+`0153c9a523feb3316d5ce3d809f06e195e08c43a2149d0e0b4c7ad4dd51118cb`.
+Both items represent distinct model-layer configurations. Complete native owner
+loading/relocation, model DMA and bank tails, names/prices, footprint, catalogue
+framing/fallbacks, relocated owners, stock, acquisition, ownership, restoration,
+guards, and clean exit pass. No retry is needed. This is not GPU appearance,
+full catalogue construction, ordinary gameplay, save/restart, or hardware proof.
+No old cartridge is rerun.
+
+The post-scan at `build/v3-furniture-intensity-post-scan-01/inventory.json` has
+58 supported entries, all installed, and 184 review entries. These include
+aliases and special imports, not a completion percentage. Continue shared
+callback/acquisition categories and verified RGBA16 conversion; miniature car,
+holiday gifts, island items, harvest items, and diaries retain their actual
+unresolved dependencies.
+
+## Square-furniture and double-bed batch
 
 The complete development cartridge is ABI 90:
 `build/v3-furniture-square-runtime-01/animal-forest-v3-asset-loader.z64`.
