@@ -2,12 +2,13 @@
 
 ## Scope
 
-Compose experimental selections from the pinned ABI-75 integration cartridge,
+Compose experimental selections from the pinned ABI-76 integration cartridge,
 including the complete tent model, both fires, their checked DMA/callback
 loaders, four-cell item readers, complete sound resources, and the additive
 campsite scene/exterior runtime, native calendar, independent camper, and native
-tent placement/removal adapter. The tent's setup predicate reads the actual
-selected camping-item rows. Event activation and acquisition remain unfinished.
+tent placement/removal adapter and English event-manager extension. Both manager
+activation and tent setup require actual selected camping-item rows. Camper
+conversations and acquisition remain unfinished.
 Shared audio changes
 remain in every nonempty profile; the empty profile still returns exact V2.
 The pinned source includes [expanded import storage](V3_IMPORT_STORAGE.md),
@@ -23,7 +24,7 @@ donor items are rejected. Select-all means these installed development entries,
 not every item on the donor disc.
 
 An empty selection returns the exact pinned V2-11 cartridge. A nonempty selection
-retains the shared ABI-75 engine and all compiled resources, but enables only the
+retains the shared ABI-76 engine and all compiled resources, but enables only the
 chosen identities and their declared dependencies. IDs, object slots, house
 layers, and allocations never depend on order or subset. Resource compaction is
 not part of this step.
@@ -45,7 +46,7 @@ again from the original selection, not by editing an earlier dependency result.
 
 ## Checked cartridge writes
 
-Pin both the complete ABI-75 cartridge and its source report. Validate each
+Pin both the complete ABI-76 cartridge and its source report. Validate each
 installed registry binding before generating writes. Resident changes cover the profile
 at blob offset `20`, twenty eligibility bytes at `1E60`, selected villager
 metadata's `present` bytes, and the installed furniture/clothing/mannequin

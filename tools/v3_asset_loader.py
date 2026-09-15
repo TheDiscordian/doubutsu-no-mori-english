@@ -47,14 +47,14 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
              '-fno-stack-protector', '-ffunction-sections', '-fdata-sections', '-fstack-usage',
              '-Wall', '-Wextra', '-Werror']
     flags += ['-D' + define for define in defines]
-    if part in ('catalogue', 'hra', 'feng_shui'):
+    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager'):
         flags += ['-fno-merge-constants', '-mno-explicit-relocs', '-mno-split-addresses']
     objects = []
     for i, source in enumerate((primary_source or f'overlays/v3/{part}.c', *extra_sources)):
         obj = 'code.o' if i == 0 else f'extra{i}.o'
         run('gcc', *flags, f'/source/{source}', '-o', obj)
         objects.append(obj)
-    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui') else []),
+    run('ld', '-EB', *(['--emit-relocs'] if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager') else []),
         '-T', f'/source/overlays/v3/{part}.ld', '-o', 'code.elf', *objects)
     if run('nm', '--undefined-only', 'code.elf').strip():
         raise ValueError('Unresolved V3 loader symbol')
@@ -91,6 +91,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'camper': ('af_v3_camper_register', 0x804A2D00),
                        'camper_reader': ('af_v3_camper_npc_info', 0x804A29A0),
                        'campsite_placement': ('af_v3_tent_set_class', 0x804A2A70),
+                       'campsite_manager': ('af_v3_camper_event_start', 0x80964DA0),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),
@@ -121,7 +122,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
         defaults = (out / 'defaults.bin').read_bytes()
         report['default_extension'] = {'ram': 0x804632E0, 'bytes': len(defaults),
                                        'sha256': sha256(defaults)}
-    if part in ('catalogue', 'hra', 'feng_shui'):
+    if part in ('catalogue', 'hra', 'feng_shui', 'campsite_manager'):
         report['elf_relocations'] = run('readelf', '-rW', 'code.elf')
     return code, report
 

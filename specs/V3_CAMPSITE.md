@@ -16,14 +16,18 @@ all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
 callbacks and native structure-loader binding. ABI 73 adds the native calendar
 and expanded event index. ABI 74 supplies an independently owned visitor Animal,
 registration/defaults, and native NPC-info attachment. ABI 75 supplies native
-tent foreground placement/removal classification and event cleanup. Event-manager activation,
-remaining masked readers/conversations/rewards, and special scene lighting remain unfinished. Neither
-served patcher changes.
+tent foreground placement/removal classification and event cleanup. ABI 76
+extends the installed English manager with checked selection, registration,
+placement/removal, and retry handling. Remaining masked NPC/quest readers,
+conversations/rewards, and special scene lighting remain unfinished. Neither
+served patcher changes without user testing and explicit approval.
 
-`overlays/v3/campsite_event.c` supplies the calendar, selection, and start/stop
-module. `campsite_calendar.c` binds its calendar to the native directory and
-date operations. Selection and lifecycle entries still require the event-manager
-and greeting/placement adapters. The [native calendar checkpoint](../docs/checkpoints/V3_CAMPSITE_CALENDAR.md)
+`overlays/v3/campsite_event.c` supplies the calendar, selection, and portable
+lifecycle reference. `campsite_calendar.c` binds the calendar to the native
+directory and date operations. `campsite_manager.c` binds the installed chooser
+and visitor registrar to actual native start/stop and placement operations;
+the portable lifecycle reference is not the installed manager. The
+[native calendar checkpoint](../docs/checkpoints/V3_CAMPSITE_CALENDAR.md)
 records fifteen focused/composition checks and passing native calendar/save-area
 execution; these do not establish an active tent visitor or ordinary acquisition.
 
@@ -94,8 +98,9 @@ required behaviour:
   housing lot. Its entry/exit handlers also participate in the event lifecycle.
   `src/game/m_event.c` supplies the calendar adjustments and inside-scene event
   handling. The native calendar uses an independently allocated type index,
-  retaining the original sixteen daily-event slots. Manager callbacks and full
-  visitor binding still require integration.
+  retaining the original sixteen daily-event slots. The installed manager
+  performs saved selection, visitor registration, and checked placement/removal.
+  Complete masked actor construction and quest binding remain work.
 - `src/game/m_npc.c` selects a non-appeared personality/candidate and records
   appearance history. Mask registration uses the actual animal's defaults,
   clothing, and the current player's remembered greeting state. Camper selection
@@ -139,7 +144,8 @@ field `3012`, one block, and donor combination `05BC` (background `F3`, foregrou
 `199`, type `FF`). Native scene-control actors and door commands match the donor
 and retain native segment-2 addresses; the donor's player position is converted.
 The complete 24-byte-per-actor camper list retains masked identity `D08F` and its
-sentinel. Registration of that camper identity is still required before entry.
+sentinel. The manager registers that camper before entry; complete native actor
+construction and quest binding still need verification.
 
 The packet retains all 256 collision records and all 256 foreground cells,
 including exit markers `4080` at cells 98 and 99. Donor/native collision corner
@@ -166,8 +172,8 @@ existing resource. Further growth needs separately checked storage, not an
 in-place increase. Startup verifies the complete CRC and invalidates the new
 code reservation. Saved format 2 and selected identities remain unchanged.
 The offline composer retains shared scene data in nonempty profiles and exact
-V2 when empty. The calendar requires selected camping content; event-manager
-activation must preserve that condition when installed.
+V2 when empty. Both the calendar and installed event manager require selected
+camping content.
 
 ## Installed exterior actor
 
@@ -252,14 +258,18 @@ RAM checks, not save/restart persistence or completed tent gameplay.
 
 The five native event-save areas offer forty payload bytes each, with two
 needed for the camper. The independent visitor owner below supplies the full
-Animal without using a town slot. Connect the event-manager and remaining masked
-readers before tent activation. Preserve allocation-failure handling and do not
-register an unsupported masked identity against bounded original actor tables.
+Animal without using a town slot. The manager connects saved selection,
+registration, and tent placement/removal. Complete the remaining masked NPC and
+quest readers before a playable handoff. Preserve allocation-failure handling
+and do not register an unsupported masked identity against bounded original
+actor tables.
 
-Finish event-manager activation and saved camper
-identity, NPC/conversation readers, scene lighting/floor sounds, and enabled
-reward filtering. Assign stable additive identities without replacing existing
-scenes, events, or furniture. Only selected rewards may be awarded.
+Finish NPC/conversation readers and greeting transitions, scene lighting/floor
+sounds, and enabled reward filtering. Ordinary move-in selection must exclude
+the saved active camper even after all-appeared history resets; marking the
+camper seen once does not establish that exclusion. Assign stable additive
+identities without replacing existing scenes, events, or furniture. Only selected
+rewards may be awarded.
 
 After installation, use one bounded combined native/gameplay batch for entry,
 camper conversation and reward handover, exit, and persistence. Do not rerun old
@@ -303,14 +313,15 @@ the animal's default; valid native/additive or reserved `FE20` overrides remain,
 and invalid explicit overrides use `2400`. The registered texture and identity
 are both the full actual `E0xx`, not a table index or replacement resident.
 
-The session greeting flag is owner byte `10`. The caller resets it for a newly
-selected camper and sets it after the actual first greeting. Re-registration
+The session greeting flag is owner byte `10`. The manager resets it for a newly
+selected camper; the conversation owner must set it after the actual first
+greeting. Re-registration
 with the flag set recreates the current player's first memory via the native
 memory setter. **Native Animal memories start at `+10`, not `+0C`**; the original
 initializer at `800A7A28` accounts for alignment. Personal IDs are sixteen bytes,
 the timestamp starts at memory `+10`, and friendship is at memory `+28`.
 The registration caller must supply the actual current private-player pointer.
-Greeting state transitions are still an event-manager/conversation task.
+The actual first-greeting completion transition remains a conversation task.
 
 The NPC-info adapter gives `D08F` the dedicated Animal and a null town NpcList,
 as in GC. A cleared or mismatching alias gives null pointers even if the caller
@@ -353,28 +364,54 @@ native saved-town foreground with a small indoor-field data fixture, not a
 constructed scene. It does not execute the full event-finish traversal, create
 an exterior actor, establish conversations, or write/reload FlashRAM.
 
-## Event-manager integration contract
+## Installed English event manager
 
-Extend the installed English manager at VROM `03800000`, linked RAM `8095B8B0`,
-not the absent original VROM `00850680`. The installed file is 38,128 bytes,
-ending at `80964DA0`, with 1,760 relocation bytes and 433 retained relocations.
-Its descriptor at `80101310`, profile `809622EC`, and 592-byte instance stay.
-Preserve the complete English suffix, original zero-initialized BSS addresses,
-save/destructor retry wrappers, and native control logic when appending camper
-callbacks. This manager extension is not installed yet.
+The manager at VROM `03800000`, linked RAM `8095B8B0`, extends the complete
+38,128-byte English event-letter owner, not the absent original VROM `00850680`.
+Its complete English suffix, original zero-initialized BSS addresses,
+save/destructor retry wrappers, profile `809622EC`, and 592-byte actor instance
+remain. Only the two ends in descriptor `80101310` change. The installed owner
+is 40,048 bytes, ending at `80965520`; its 2,192-byte relocation resource keeps
+all 433 original records and adds 98 copied-table and eleven suffix records.
+Both resources retain their VROMs and adjacent DMA slots. Loaded owner growth
+is 1,920 bytes; no permanent reservation, normal heap limit, or save format grows.
 
 The original 28 controls occupy `80961F48..809622C8`, with a separate count at
-`809622C8`. Each control is 32 bytes. A complete relocated copy plus a 29th
-summer control fits the existing 32-pointer daily list at `809623D8`; its live
-count is `80962458`. The two control-base HI/LO pairs begin at `809612F4` and
+`809622C8`, now set to 29. Each control is 32 bytes. The complete relocated copy
+at `80965180` adds a 29th summer control without replacing an original event.
+Its 928 bytes end at `80965520`. The existing 32-pointer daily list at
+`809623D8` retains its allocation and live count at `80962458`.
+The two control-base HI/LO pairs begin at `809612F4` and
 `809612F0`, with low instructions at `80961300` and `80961304` respectively.
-Retain their relocation handling. Native status dispatchers are `80961004` and
+Their original relocation handling remains. Native status dispatchers are `80961004` and
 `80961100`; zero callback results retain pending transitions for retry.
 
 Native lot placement is `8095D324(manager, control, foreground, area)`, with
-summer area `51`; removal is `8095D1E0(control, area)`. Placement uses saved
-location area ID `77`, twenty-byte place records, and the native vacant-lot
-picker. The independent two-byte camper identity uses event save area zero.
-Do not substitute the GC structure layout or mark start successful when visitor
-registration or placement fails. Complete the remaining masked NPC readers and
-conversation binding before presenting an active tent as playable.
+summer area `51` hexadecimal; removal is `8095D1E0(control, area)`. Placement
+uses saved location area ID `77` hexadecimal (119 decimal), twenty-byte place
+records, and the native vacant-lot picker. The independent two-byte camper
+identity uses event save area zero. The native today row is sixteen bytes, with
+its status halfword at `+0C`; the manager validates type 70 and its index first.
+
+A missing field, unavailable save area, failed selection, or failed registration
+leaves start pending. Selection failure releases its newly reserved area;
+registration failure preserves the selected identity for retry. A live alias
+without its saved identity is not overwritten. Indoor starts register the same
+visitor without outdoor placement. Outdoor starts retain an existing tent or
+live `F127` marker; otherwise native placement must succeed before keep is set.
+Stop clears keep only after successful removal and never clears a live Animal.
+
+Native `mEv_set_status(type, 20)` uses hexadecimal `20` as an abort: it clears
+all other status bits, and status readers mask non-error queries while that bit
+is set. Native placement/removal can set this flag themselves. To preserve
+retries, the manager snapshots the actual today status and aggregate change
+word `80104F9C`, then restores both when a native helper fails. Returning zero
+alone is insufficient after the destructive error setter. Ordinary setup
+failures do not set that error flag. Successful operations clear it.
+
+The [manager checkpoint](../docs/checkpoints/V3_CAMPSITE_MANAGER.md) records
+passing full native load/relocation, original-plus-summer table dispatch,
+selection/registration, indoor starts, real failed-placement retry, nine-cell
+placement, removal retry, and lot restoration. The native test restores its RAM
+and checkpoint; it is not ordinary scene construction, conversations, rewards,
+event-finish traversal, save/restart, or original-hardware proof.
