@@ -26,7 +26,7 @@ from v3_villager_art import native_palette, normalise_vertex_flags
 VERSION = 1
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
-              8: 'single-bed'}
+              8: 'single-bed', 16: 'double-bed'}
 STOCK = {'ftr_listA': 0, 'ftr_listB': 1, 'ftr_listC': 2,
          'ftr_listEvent': 3, 'ftr_listLottery': 5}
 # Reviewed complete GAFE01-r0 draw implementation, not an item allowlist.
@@ -211,7 +211,7 @@ class Source:
             raise ReviewRequired('unrelocated profile pointers')
         h, scale, shape, collision, rotation, lighting, contact, pad, interaction = struct.unpack_from('>ff6BH', raw, 32)
         if (not math.isfinite(h) or not 0 < h <= 200 or raw[36:40] != struct.pack('>f', .01)
-                or shape not in (3, 4, 5) or collision not in (0, 1, 2)
+                or shape not in (3, 4, 5) or collision not in (0, 1, 2, 5)
                 or rotation not in (0, 1) or lighting not in (0, 1, 2) or pad):
             raise ReviewRequired('unsupported scalar profile category')
         if contact not in BEHAVIOURS or interaction not in (0, 0x10):

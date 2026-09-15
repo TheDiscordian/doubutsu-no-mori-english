@@ -80,6 +80,9 @@ The shared static-CI4 category supports:
 - Static profiles with supported shape, collision, lighting, and rotation
   fields. Footprint follows **shape**, as in donor `aMR_GetFurnitureUnit`, not
   collision: shape 4 is 1×1, shape 3 is 2×1, and shape 5 is 2×2.
+  The square collision category `5` is supported. Shape `5` retains native
+  four-cell placement in all rotations. The build verifies the complete installed four-cell item reader
+  and actual original/donor footprint tables before accepting square records.
 - Ordinary A/B/C, event, and lottery acquisition, existing scoring categories,
   and source-indexed catalogue framing. Names and prices come from actual donor tables.
 - Soft- and hard-chair action sounds, selected from the donor's actual category
@@ -91,7 +94,8 @@ The shared static-CI4 category supports:
   remain; this is not a substitute for a diary's separate gameplay system.
 - Source-derived placement layers: ordinary floor items, surfaces that hold
   other items, and objects that may be placed on those surfaces.
-- Single-bed contact action `08`. Complete models and profile scalars feed the
+- Single- and double-bed contact actions `0x08` and `0x10`. Complete models and
+  profile scalars feed the
   existing native bed positioning, contact, entry, and exit routines through
   the expanded profile table. No new bed callback, per-item behaviour switch,
   or animation replacement is needed. The build checks the current room engine
@@ -216,9 +220,13 @@ Framing checks compare every preview field after the actual native helper runs,
 including source floats, unchanged surrounding fields, disabled imports, invalid
 selectors, native fallbacks, and the complete resident table/guards. Calling this
 helper does not establish complete catalogue construction or GPU appearance.
-The bed category exercises the actual native head-direction and both side-position
-functions with a representative imported profile in all four rotations, checks
-inactive-bed rejection, and preserves the complete temporary actor. This does
+The bed categories exercise the actual native head-direction and both side-position
+functions with one representative per changed contact category in all four rotations,
+check inactive-bed rejection, and preserve the complete temporary actor. Double
+beds retain their wider side span and half-cell pillow offset. Four-cell footprint
+checks retain the same upper-left anchor and clockwise cells in every rotation.
+The shared sound check selects new batch records, not all previously installed
+chairs; unchanged audio/code evidence stays in the checked build contract. This does
 not establish an ordinary player climbing onto or leaving the bed.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.

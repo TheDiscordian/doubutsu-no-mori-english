@@ -1,6 +1,78 @@
 # Automatic furniture pipeline checkpoint
 
-## Current single-bed category
+## Current square-furniture and double-bed categories
+
+The complete development cartridge is ABI 90:
+`build/v3-furniture-square-runtime-01/animal-forest-v3-asset-loader.z64`.
+One `convert --category 2x2` batch discovers picnic table `32DC`, neutral corner
+`333C`, red corner `3340`, and blue corner `3344`. The shared installer supplies
+their complete models, profiles, names/prices, catalogue/scoring records, and
+stock C/A/event/lottery routes respectively. No item-specific converter,
+installer, gameplay code, or native scenario is added. The 15,568 bytes of
+new artwork retain all 330 vertices and 182 triangles. Automatic additions
+total twenty-nine; the offline composer has 91 installed development options:
+68 furniture, three shirts, and twenty villagers.
+
+Square collision category `5` and shape `5` remain distinct profile fields.
+The existing four-cell reader supplies the same clockwise, upper-left-anchored
+footprint in every rotation. The build rechecks the actual original/donor
+footprint tables and the complete installed 1,020-byte reader at `80483000`,
+SHA-256 `baf6957601fea4fc0829382bbc21604ade478479e9f0f6375c6e4d49e2f0317d`.
+The three ring corners keep contact action `0x10` and the existing native
+double-bed routines; they are not flattened into decorative furniture or
+single beds. The complete checked room engine and expanded profile bindings
+remain unchanged. No permanent allocation, saved structure, or native code
+reservation grows.
+
+The catalogue contains 504 furniture rows and retains 248 clothing rows.
+Conservative menu memory is 280,320 of 280,704 bytes. The import blob is
+3,348,896 bytes, leaving 779,872 bytes before English choices. Saved format 2
+remains, but saves containing the new four items require this build or a
+compatible profile superset; older builds and V2 must not load those saves.
+Ordinary cross-version save/reload is not newly claimed. Neither served patcher
+changes.
+
+- ROM SHA-256: `91be4e2ccd1fc9bb3be77f16c11eff74a7b387582475deed575d3a316ea02277`.
+- UPS SHA-256: `935651090a5a5b62ac99ddb37a9871951b8b3eaa9813bca90e3bfb06603bc0cd`.
+- Build receipt SHA-256: `bdbeb14058d69b704de14865b5b2bb47048636345d34eccb76887265fcbffdfe`.
+- Art receipt SHA-256: `bec4490afaca0b848c3d8fb4b4d5bd5e5a22a3773e1befb034ba2847f4291d74`.
+- Import blob SHA-256: `02b36fbc1e93a002ca5c3f9db66f46c260aae3853b24d8a7eb9b291562b0eaa5`.
+
+Thirty-eight focused pipeline/composition checks pass; one optional prepared-
+assets check is not requested. New checks cover shared square/double-bed
+discovery, intact donor scalars, unknown collision rejection, changed native
+reader rejection, and the existing four-cell host fixture under address and
+undefined-behaviour sanitizers. Complete texture/vertex/material conversion,
+installed records, official text credits, retained native code, stock/scoring,
+and optional-profile composition also pass.
+
+The first silent native run passes 180 records with 158 assertions:
+`build/v3-furniture-square-native-01/results.json`, SHA-256
+`208149336a2def36a3647f23eb8aa1bc3450527ef25c89e93824c020c297ba9e`.
+All four items are representatives because their stock categories differ.
+Their complete model DMA, names/prices, four-cell footprints in all rotations,
+catalogue framing/eligibility, stock, acquisition, ownership, restoration,
+and guards pass. One double-bed representative exercises the actual native
+head-direction and both side-position functions in every rotation, retaining
+the wider side span and half-cell pillow offset. Inactive-bed rejection and
+complete temporary-actor preservation also pass. No retry is needed.
+
+The shared probe checks bed geometry once per changed contact category and
+tests imported chair sounds for the new batch rather than every previous
+chair. Full source audio/code checks remain in the build contract; earlier
+passing native evidence remains recorded. No old candidate is rerun.
+These checks do not establish ordinary bed entry/rolling/exit, complete room
+appearance, catalogue construction, save/restart, or original-hardware play.
+
+The post-scan has 55 supported entries, all installed, and 187 review entries.
+It includes aliases and special imports and is not a completion percentage.
+The next shared storage improvement is safe reuse of the regenerated
+catalogue/relocation/shop tail (64,496 bytes in this build), preserving every
+retained resource and previous output. Shared mixed CI4/I4 material handling
+also remains: miniature car, G logo, and bird bath have I4 layers, while Diver
+Dan additionally has RGBA16. Keep acquisition/callback dependencies explicit.
+
+## Single-bed batch
 
 The complete development cartridge is ABI 89:
 `build/v3-furniture-bed-runtime-02/animal-forest-v3-asset-loader.z64`.

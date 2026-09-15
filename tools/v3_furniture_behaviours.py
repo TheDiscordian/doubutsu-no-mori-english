@@ -16,14 +16,15 @@ CATEGORY_SHA = '6e88fc4da791a5e31e72b21c59876c4f2f5adf0d721dcb8d4b8d268c56dc0a73
 # This is a shared engine contract, not a list of approved bed identities.
 BED_OWNER_SHA = 'ca540a6f48fa15fb8bfad4d36abf77bb3d318799732d965f278063207f64b74a'
 BED_HEAD, BED_FOOT_SIDES, BED_PILLOW_SIDES = 0x80940304, 0x80940498, 0x80940784
-SOURCES = ('tools/v3_furniture_behaviours.py','tools/v3_asset_loader.py','overlays/v3/furniture_behaviours.c',
+SOURCES = ('tools/v3_furniture_behaviours.py','tools/v3_four_cell_items.py','overlays/v3/items.c',
+           'tools/v3_asset_loader.py','overlays/v3/furniture_behaviours.c',
            'overlays/v3/furniture_behaviours.S','overlays/v3/furniture_behaviours.ld',
            'overlays/v3/fire.ld','overlays/v3/items_large.ld')
 
 
 def contact_contract(base, prior, blob, imports):
     beds = [row for row in imports
-            if blob[ROWS+slot(int(row['item_id'],16))*80+8+60] == 8]
+            if blob[ROWS+slot(int(row['item_id'],16))*80+8+60] in (8,16)]
     if not beds: return None
     from v3_furniture_runtime import VROM, RAM as OWNER_RAM
     owner = by_vrom(base)[VROM].extract(base)
@@ -39,10 +40,25 @@ def contact_contract(base, prior, blob, imports):
         address=((hi&65535)<<16)+(lo&65535)-(65536 if lo&32768 else 0)
         if address != int(tables['profile_table_ram'],16):
             raise ValueError('Bed contact profile binding is not expanded')
-    return dict(contact_action=8,category='single-bed',native_owner_sha256=BED_OWNER_SHA,
+    actions=sorted({blob[ROWS+slot(int(row['item_id'],16))*80+8+60] for row in beds})
+    return dict(contact_actions=actions,category='native-bed',native_owner_sha256=BED_OWNER_SHA,
         profile_table_ram=tables['profile_table_ram'],imports=[r['item_id'] for r in beds],
         head_direction_entry=BED_HEAD,foot_sides_entry=BED_FOOT_SIDES,pillow_sides_entry=BED_PILLOW_SIDES,
         added_runtime_bytes=0,ordinary_bed_gameplay_tested=False)
+
+
+def four_cell_contract(original, prior, blob, imports, source):
+    rows=[row for row in imports if blob[ITEMS+slot(int(row['item_id'],16))*32+6]==2]
+    if not rows: return None
+    from v3_four_cell_items import source_evidence
+    evidence=source_evidence(original,source.rel,source.symbols.encode())
+    reader=prior['import_storage']['item_code'];at=PACKAGE+0x80483000-PACKAGE_RAM
+    if (reader['sha256'] != 'baf6957601fea4fc0829382bbc21604ade478479e9f0f6375c6e4d49e2f0317d'
+            or reader['bytes'] != 1020 or sha256(blob[at:at+reader['bytes']])!=reader['sha256']
+            or '-DAF_V3_FOUR_CELL_ITEMS=1' not in reader['flags']):
+        raise ValueError('Four-cell imports require the checked complete native item readers')
+    return dict(imports=[r['item_id'] for r in rows],source=evidence,
+        reader_sha256=reader['sha256'],reader_ram='80483000',added_runtime_bytes=0)
 
 
 def audio_contract(original, base, prior, source):
@@ -120,6 +136,7 @@ def audio_contract(original, base, prior, source):
 def install(original, base, prior, blob, code, imports, source, output):
     contract=audio_contract(original,base,prior,source)
     contacts=contact_contract(base,prior,blob,imports)
+    four_cells=four_cell_contract(original,prior,blob,imports,source)
     original_code=by_vrom(original)[CODE_VROM].extract(original)
     original_body=original_code[ENTRY-CODE_RAM:END-CODE_RAM]
     if sha256(original_body)!=SOURCE_SHA: raise ValueError('Changed complete native sound reader')
@@ -158,4 +175,5 @@ def install(original, base, prior, blob, code, imports, source, output):
         records.append(dict(item_id=row['item_id'],runtime_index=index,action_sound=category))
     return dict(code=compiled,hook=dict(address=ENTRY,before=original_body[:8].hex(),after=after.hex()),
         native_function_sha256=SOURCE_SHA,imports=records,donor=contract,contacts=contacts,
+        four_cells=four_cells,
         additional_resident_bytes=0,saved_format_changed=False,ordinary_seating_tested=False)

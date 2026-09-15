@@ -26,6 +26,16 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_four_cell_item_readers_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-four-cell-items-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_four_cell_items_test.c'),'-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('Four-cell size, all rotations, sparse selection, signed boundaries, and original fallbacks pass',
+                          result.stdout)
+
     def test_unlit_material_uses_native_texture_primitive_expression_without_item_switches(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>II',raw,8,0xFCFFFE60,0xFFFCF3F8)
@@ -139,10 +149,27 @@ class DonorTests(unittest.TestCase):
             self.assertEqual(row['profile']['size_code'],1)
             if row['status']=='review': self.assertIn('acquisition needs an adapter',row['reason'])
         p=beds[0]['profile'];changed=copy.copy(self.source);changed.data=bytearray(changed.data)
-        for contact in (3,16,32,255):
+        for contact in (3,32,255):
             changed.data[p['profile_offset']+44]=contact
             with self.assertRaisesRegex(ValueError,'contact/interaction'):
                 changed.profile(int(beds[0]['item_id'],16))
+
+    def test_square_collision_and_double_bed_categories_keep_complete_scalars(self):
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        double=[r for r in inventory['rows'] if r.get('profile',{}).get('contact_action')==16]
+        self.assertEqual(len(double),3)
+        for row in double:
+            p=row['profile'];at=p['profile_offset']
+            self.assertEqual(p['scalar_hex'],self.source.data[at+32:at+48].hex())
+            self.assertEqual(p['size_code'],2)
+            self.assertEqual(self.source.data[at+41],5)
+            self.assertIn('double-bed',row['categories'])
+            self.assertEqual(row['status'],'supported')
+        p=double[0]['profile'];changed=copy.copy(self.source);changed.data=bytearray(changed.data)
+        for collision in (3,4,6,255):
+            changed.data[p['profile_offset']+41]=collision
+            with self.assertRaisesRegex(ValueError,'scalar profile category'):
+                changed.profile(int(double[0]['item_id'],16))
 
     def test_shared_collision_flag_and_placement_categories_preserve_unknowns_for_review(self):
         identities=pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')
@@ -330,6 +357,19 @@ class CurrentCartridgeTests(unittest.TestCase):
             image[self.files[0x82D7F0].pstart+0x80940518-0x80936710]^=1
             with self.assertRaisesRegex(ValueError,'native bed/contact engine'):
                 contact_contract(bytes(image),self.report,self.blob,rows)
+
+    def test_four_cell_category_requires_actual_extended_native_reader(self):
+        from v3_furniture_behaviours import four_cell_contract
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        rows=self.report['furniture']['imports']+[self.report['speed_bag']]
+        current=four_cell_contract(original,self.report,self.blob,rows,source)
+        self.assertEqual(current,self.report['furniture_behaviours']['four_cells'])
+        self.assertEqual(current['added_runtime_bytes'],0)
+        changed=bytearray(self.blob);changed[install.PACKAGE+0x80483000-install.PACKAGE_RAM]^=1
+        with self.assertRaisesRegex(ValueError,'complete native item readers'):
+            four_cell_contract(original,self.report,changed,rows,source)
 
     def test_catalogue_and_stock_keep_prior_members_and_all_new_category_records(self):
         def lists(image,files,report):

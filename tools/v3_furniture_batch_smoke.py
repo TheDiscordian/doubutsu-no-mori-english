@@ -106,6 +106,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     stub = struct.pack('>II', 0x08000000 | ((public['entry'] >> 2) & 0x3FFFFFF), 0)
     debug.write_memory(bridge, stub)
     call(0x8002FE00, [bridge, 8]); call(0x80034CE0, [bridge, 8])
+    tested_beds=set()
     try:
         if 'furniture_behaviours' in report:
             from v3_furniture_behaviours import RAM as SOUND_RAM,ENTRY as SOUND_ENTRY,NATIVE_CATEGORIES
@@ -117,7 +118,9 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             for category in (0,1,2):
                 index=original_types.index(category)
                 call(SOUND_ENTRY,[index,0],(0xFFFFFFFF,0x41F,0x420)[category])
-            audible=[r for r in behaviour['imports'] if r['action_sound']]
+            # Changed records, not every previously installed chair. Their
+            # unchanged code/audio evidence is retained by the build contract.
+            audible=[r for r in rows if r.get('action_sound',0)]
             for row in audible:
                 for mode in (0,1):
                     call(SOUND_ENTRY,[row['runtime_index'],mode],((0x41F,0x422),(0x420,0x423))[row['action_sound']-1][mode])
@@ -131,7 +134,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             for index in (947,1023,2048,0xFFFFFFFF):call(SOUND_ENTRY,[index,0],0xFFFFFFFF)
         for row in rows:
             item, index = int(row['item_id'], 16), row['runtime_index']
-            if bytes.fromhex(row['native_profile_scalar_hex'])[12] == 8:
+            contact=bytes.fromhex(row['native_profile_scalar_hex'])[12]
+            if contact in (8,16) and contact not in tested_beds:
                 from v3_furniture_behaviours import BED_HEAD,BED_FOOT_SIDES,BED_PILLOW_SIDES
                 actor=scratch+0x200;actor_data=bytearray(0x740)
                 struct.pack_into('>H',actor_data,0,index)
@@ -142,10 +146,13 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                     struct.pack_into('>H',actor_data,0x124,rotation*0x4000)
                     debug.write_memory(actor,actor_data)
                     call(owner+BED_HEAD-furniture.RAM,[actor],(1,2,3,0)[rotation],furniture_proof)
-                    for entry,x in ((BED_FOOT_SIDES,40),(BED_PILLOW_SIDES,0)):
+                    # Both native branches are profile-driven: a double bed
+                    # has a wider side span and a half-cell pillow offset.
+                    foot,pillow,side=(40,0,40) if contact==8 else (20,-20,60)
+                    for entry,x in ((BED_FOOT_SIDES,foot),(BED_PILLOW_SIDES,pillow)):
                         debug.write_memory(scratch,b'\xA5'*24)
                         call(owner+entry-furniture.RAM,[scratch,scratch+12,actor,1],1,furniture_proof)
-                        expected=[v for z in (-40,40) for v in
+                        expected=[v for z in (-side,side) for v in
                                   (100+x*cosine+z*sine,7,200-x*sine+z*cosine)]
                         actual=struct.unpack('>6f',debug.read_memory(scratch,24))
                         passed=all(abs(a-b)<.02 for a,b in zip(actual,expected))
@@ -157,6 +164,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                     call(owner+entry-furniture.RAM,[scratch,scratch+12,actor,0],0,furniture_proof)
                     check('inactive bed has no entry/exit positions',scratch,bytes(24))
                 check('native bed helpers preserve complete actor',actor,actor_data)
+                tested_beds.add(contact)
             if row.get('interaction_flags',0)&0x10:
                 from v3_furniture_placement import REGISTER
                 # The actual native registration routine must skip collision in
@@ -176,11 +184,13 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             call(0x800BE69C, [item | 3], row['size_code'])
             for rotation in (range(4) if row['size_code'] else (0,)):
                 call(0x800BE72C, [item | rotation, 5, 6, scratch+32], row['size_code'])
-                cells = [(1, 5, 6)]
-                dx, dz = ((1, 0), (0, -1), (-1, 0), (0, 1))[rotation]
-                if row['size_code']>1: raise ValueError('Add four-cell category to shared smoke expectations')
-                cells.append((1, 5+dx, 6+dz) if row['size_code'] else (0, 5, 6))
-                cells += [(0, 5, 6)] * 2
+                if row['size_code']==2:
+                    cells=[(1,5,6),(1,6,6),(1,6,7),(1,5,7)]
+                else:
+                    cells = [(1, 5, 6)]
+                    dx, dz = ((1, 0), (0, -1), (-1, 0), (0, 1))[rotation]
+                    cells.append((1, 5+dx, 6+dz) if row['size_code'] else (0, 5, 6))
+                    cells += [(0, 5, 6)] * 2
                 check(row['name'] + f' complete footprint rotation {rotation}', scratch+32,
                       b''.join(struct.pack('>iii', *c) for c in cells))
             at = int(row['object_vrom'], 16)-runtime.BLOB
@@ -245,8 +255,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     return dict(native_furniture_batch_readers=True, complete_native_model_dma=True,
                 native_preview_framing='catalogue_preview_records' in report,
                 full_catalogue_initialization_tested=False,
-                rotated_two_cell_placement=True, native_stock_membership=True,
+                native_footprint_sizes=sorted({r['size_code'] for r in rows}), native_stock_membership=True,
                 native_acquisition_and_ownership=True, ordinary_seating_tested=False,
-                native_bed_geometry_tested=any(bytes.fromhex(r['native_profile_scalar_hex'])[12]==8 for r in rows),
+                native_bed_geometry_tested=bool(tested_beds),native_bed_contact_actions=sorted(tested_beds),
                 ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)
