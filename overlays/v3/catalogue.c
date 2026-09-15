@@ -116,6 +116,19 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
             af_v3_native_catalogue_available(0x34BFu, 2, list, game);
 #endif
 #endif
+#ifdef AF_V3_CATALOGUE_RECORDS
+    /* One checked mask per canonical item: A/B/C, event, lottery, or none.
+     * The builder populates the existing metadata reservation for all imports. */
+    u32 index = (item & 0xFFFu) >> 2;
+#ifdef __mips__
+    const u8 *row = (const u8 *)(0x80498000u + index * 32u);
+#else
+    extern u8 af_catalogue_item_records[1024][32];
+    const u8 *row = af_catalogue_item_records[index];
+#endif
+    return category == 0 && (u32)list < 6u && row[7] == 1 &&
+        ((row[24] >> list) & 1u) && af_v3_furniture_import_profile(1024u + index);
+#else
 #ifdef AF_V3_GARDEN_ITEMS
     /* The donor excludes the post-office mailbox from ordering, but permits
      * the lottery gnome. Native furniture preview queries include list 5. */
@@ -149,4 +162,5 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
      * is shown; it does not replace the native town's rarity selection. */
     return category == 0 && (u32)list < 3 &&
         af_v3_furniture_import_profile(1024u + ((item & 0xFFFu) >> 2));
+#endif
 }

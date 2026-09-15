@@ -10,16 +10,17 @@ from aflib import apply_ups, by_vrom, fix_checksum, make_ups, sha256, verified_r
 from apply_translation import write_new
 from v3_asset_loader import BLOB, CONFIG, MODULE, ROOT
 from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
-                         villager_actor, villager_house_layers)
+                         villager_actor, villager_house_layers, furniture_identity)
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-school-desks-runtime-01'
-BASE_SHA = '179c19fb2b3846c77c2ca202dd15b96a268a7f172873b95f69d95da0635440f3'
-REPORT_SHA = '6344b8aa7a4a9c7305a688e4413f9ca9f5d8381e22465f63b10d55eaa353ddd4'
+BUILD_PIN = json.loads((ROOT/'config/v3-import-build.json').read_bytes())
+BASE = ROOT/BUILD_PIN['directory']
+BASE_SHA = BUILD_PIN['rom_sha256']
+REPORT_SHA = BUILD_PIN['report_sha256']
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, 84, 0x30000
+PREFIX_SIZE, ABI, PACKAGE_SIZE = 0xC000, BUILD_PIN['runtime_abi'], 0x30000
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS as STATIC_ROWS, SLOTS as STATIC_COUNT
 
 
@@ -63,7 +64,13 @@ def catalogue(image, report):
     furniture_rows = report['furniture']['imports']+[report['speed_bag']]
     for row in furniture_rows:
         donor = int(row['id'].rsplit('/', 1)[1], 16)
-        index, item, _ = FURNITURE[donor]
+        if row.get('registry_version') == 2:
+            index,item = furniture_identity(donor)
+            at=int(row['object_vrom'],16)-BLOB
+            if sha256(blob[at:at+row['object_bytes']]) != row['object_sha256']:
+                raise ValueError('Changed manifest-bound furniture artwork')
+        else:
+            index, item, _ = FURNITURE[donor]
         row_ram = int(row['profile_ram'], 16) - 8
         at = resident_offset(blob, row_ram, 80)
         if (row['item_id'] != f'{item:04X}' or row['runtime_index'] != index

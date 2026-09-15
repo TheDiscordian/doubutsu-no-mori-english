@@ -222,7 +222,8 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
 
 
 def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
-                      western_large=False, camping=False, tent_model=False, fire=False, school_desks=False):
+                      western_large=False, camping=False, tent_model=False, fire=False, school_desks=False,
+                      reviewed_rows=None):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
@@ -230,7 +231,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         raise ValueError('Changed current complete catalogue')
     ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True,
         western=western, western_large=western_large, camping=camping, tent_model=tent_model,
-        fire=fire, school_desks=school_desks)
+        fire=fire, school_desks=school_desks, reviewed_rows=reviewed_rows)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
     cloth = old[at:at + 496]
@@ -241,14 +242,18 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         '.balign 2\n.globl af_v3_catalogue_clothing_order\naf_v3_catalogue_clothing_order:\n.byte ' +
         ','.join(map(str, cloth)) + '\n')
     write_new(output / 'catalogue_tables.S', assembly.encode())
+    defines = (tuple(f[2:] for f in prior['catalogue']['linked_code']['flags'] if f.startswith('-D'))
+               + ('AF_V3_CATALOGUE_RECORDS=1',)) if reviewed_rows is not None else (
+        ('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
+         'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1')
+        + (('AF_V3_WESTERN_ITEMS=1',) if western else ())
+        + (('AF_V3_WESTERN_LARGE=1',) if western_large else ())
+        + (('AF_V3_CAMPING_ITEMS=1',) if camping else ())
+        + (('AF_V3_TENT_MODEL=1',) if tent_model else ())
+        + (('AF_V3_FIRE=1',) if fire else ()))
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
-        defines=('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
-                 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1') + (('AF_V3_WESTERN_ITEMS=1',) if western else ())
-                 + (('AF_V3_WESTERN_LARGE=1',) if western_large else ())
-                 + (('AF_V3_CAMPING_ITEMS=1',) if camping else ())
-                 + (('AF_V3_TENT_MODEL=1',) if tent_model else ())
-                 + (('AF_V3_FIRE=1',) if fire else ()))
+        defines=tuple(dict.fromkeys(defines)))
     parent = bytearray(files[catalogue.PARENT].extract(base))
     _, _, native_parent = catalogue.sources(stable)
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])

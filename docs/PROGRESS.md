@@ -2,6 +2,18 @@
 
 ## Active development
 
+The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) installs
+fourteen additional items in ABI 85 through source-discovered records and shared
+conversion, stock, catalogue, scoring, and profile installation. No per-item
+installer or graphics description is needed. Complete artwork retains 1,038
+vertices and 570 triangles. Twenty-four focused tests and the representative
+native run pass (148 records, 133 assertions). The offline composer has 76
+installed development options. Ordinary appearance/gameplay and save/restart
+remain unverified; both served patchers remain V2. Continue shared behaviour and
+graphics categories through this pipeline, starting with seating sounds.
+The current lock is `config/v3-import-build.json`; the cartridge is
+`build/v3-auto-furniture-final-01/animal-forest-v3-asset-loader.z64`.
+
 The [school-desk batch](checkpoints/V3_SCHOOL_DESKS.md) installs complete lefty,
 righty, and teacher's desks in ABI 84, with official names, prices, A/B stock,
 catalogue entries, native scoring, and independent selection. All 218 vertices,
@@ -10,8 +22,8 @@ composition checks pass. The first native run passes 88 records with 74
 assertions, covering complete owner loading, names, prices, model DMA, rotated
 footprints, stock membership, catalogue eligibility, acquisition, saved ownership,
 restoration, and guards. Ordinary sitting, room appearance, and save/restart
-remain unverified. The composer has 62 installed development options; both
-served patchers remain V2. No permanent memory or saved format grows.
+remain unverified. The shared seating-sound adapter remains required for the
+desks. Both served patchers remain V2. No permanent memory or saved format grows.
 
 The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) cold-boots
 ABI 83 with the current profile and unchanged copied-town content. The game
@@ -116,10 +128,10 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-tent-lamp-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`ff4e5ebafcb15d8ef777d569e0b2f4d29d848223d8e44ef15653c539796279d0`.
-The two-item subset is `build/v3-optional-tent-lamp-01/`. The offline composer
-retains 59 experimental choices and exact all/empty full/V2 output. Continue
+`build/v3-auto-furniture-final-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`571e849108cf36983c7129a38d08bfc3b47dd71db5c4347cfe16b7425b1ed35c`.
+The new three-item subset is `build/v3-optional-auto-furniture-01/`. The offline composer
+retains 76 experimental choices and exact all/empty full/V2 output. Continue
 remaining masked readers and combined ordinary
 construction, entry/exit, conversation handover, and persistence checks. Those
 gameplay paths remain unverified. GitHub development source is allowed; neither

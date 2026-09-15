@@ -15,6 +15,17 @@ VILLAGERS = {
 # ID, and object VROM. Native 0..946 and the index-947 conversion sentinel stay
 # untouched. Holes are not supported items; future additions must be explicit.
 FURNITURE_REGISTRY_VERSION = 1
+# Version 2 records use the canonical donor identity rule below. Object VROMs
+# belong to the checked build manifest, not saved identity or checkbox order.
+CANONICAL_FURNITURE_VERSION = 2
+
+
+def furniture_identity(donor_item):
+    if type(donor_item) is not int or not 0x3000 <= donor_item < 0x33C8 or donor_item & 3:
+        raise ValueError('Not a canonical English-donor furniture identity')
+    return 1024+(donor_item-0x3000)//4, donor_item
+
+
 FURNITURE = {
     0x3224: (1161, 0x3224, STORAGE+0x8000),
     0x32B8: (1198, 0x32B8, STORAGE+0xA000),

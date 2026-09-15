@@ -85,6 +85,14 @@ Developer verification and a private playtest handoff do not satisfy that approv
 - Prioritise complete English content and playable sections. Batch verification
   around meaningful changes; record difficult edge cases for the later bug pass
   instead of repeatedly attempting them while bulk implementation waits.
+- New V3 furniture uses `tools/v3_furniture_pipeline.py` and the checked current
+  build lock. Extend shared format/behaviour/acquisition categories rather than
+  adding per-item Python definitions, family switches, installers, or native
+  scenarios. Read `specs/V3_FURNITURE_PIPELINE.md`; keep unsupported dependencies
+  explicit. Use the shared representative batch probe and retain passing
+  unchanged evidence. The local Xvfb executable is
+  `/home/discordian/Games/OpenRSC/headless/vendor/usr/bin/Xvfb`; pass it explicitly
+  when it is absent from PATH.
 - Use existing focused checks once per meaningful change. Reuse passing native
   evidence for unchanged code/resources; do not add exhaustive per-record or
   all-combinations harnesses without a concrete uncovered risk. For a testing-

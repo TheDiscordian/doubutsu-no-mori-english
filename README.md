@@ -78,6 +78,9 @@ edits, specifications, test records, and the complete browser patcher.
 - [Run or deploy the website](docs/WEB_PORTAL.md): `web/` contains the site;
   the Pages workflow publishes only the verified website artifact.
 - [Formats and implementation specifications](specs/).
+- [V3 furniture import pipeline](specs/V3_FURNITURE_PIPELINE.md): source-driven
+  batch conversion and installation for experimental optional content. V3 is
+  under development and is not enabled in the browser patcher.
 - [Source provenance and acknowledgements](docs/SOURCES.md).
 - [Per-text credits, assistant translations, and human review](docs/TEXT_PROVENANCE.md).
 

@@ -38,8 +38,48 @@ def sources(base):
     return data, reloc, parent
 
 
+def table_from_records(base, rel, symbols, furniture, records):
+    """Consume source-checked import records without another item-family switch."""
+    from v3_catalogue_capacity import CAPACITY
+    verify_sources(rel, symbols)
+    data, _, _ = sources(base)
+    donor = list(struct.iter_unpack('>HH', symbol_data(rel, symbols.decode(), 'mCL_furniture_list')))
+    draw = symbol_data(rel, symbols.decode(), 'furniture_draw_data$436')
+    if draw[:8] != data[0x808AF87C-RAM:0x808AF884-RAM]:
+        raise ValueError('Changed default catalogue framing')
+    identities = {r['item_id']: r['runtime_index'] for r in furniture}
+    if (len(identities) != len(furniture) or len(records) != len(identities)
+            or {r['item_id'] for r in records} != set(identities)):
+        raise ValueError('Incomplete or duplicate catalogue records')
+    result = []
+    for record in records:
+        row = dict(record)
+        item, index = int(row['item_id'], 16), identities[row['item_id']]
+        mode = row.get('donor_preview_mode', 0)
+        found = [(n,m) for n,(i,m) in enumerate(donor) if i == index]
+        group = row.get('donor_acquisition_list') or row['ordinary_shop_list']
+        goods = symbol_data(rel, symbols.decode(), group)
+        ids = list(struct.unpack('>'+str(len(goods)//2)+'H', goods))
+        if (index != 1024+(item-0x3000)//4 or row['runtime_index'] != index
+                or row['catalogue_index'] != (item-0x1000)//4 or row['mode'] != 0
+                or found != [(row['donor_position'], mode)] or ids[-1] or 0 in ids[:-1]
+                or ids.count(item) != 1 or sha256(goods) != row['shop_list_sha256']
+                or mode and (not row.get('preview_override') or
+                    draw[mode*8:mode*8+8].hex() != row.get('donor_preview_scalar_hex'))):
+            raise ValueError('Catalogue record differs from the checked donor')
+        result.append(row)
+    result.sort(key=lambda r:r['donor_position'])
+    if 436+len(result) > CAPACITY: raise ValueError('Catalogue exceeds native storage')
+    native = data[TABLE-RAM:TABLE-RAM+436*4]
+    return native+b''.join(struct.pack('>HH', r['catalogue_index'], r['mode']) for r in result), result
+
+
 def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False,
-          western_large=False, camping=False, tent_model=False, fire=False, school_desks=False):
+          western_large=False, camping=False, tent_model=False, fire=False, school_desks=False,
+          reviewed_rows=None):
+    if reviewed_rows is not None:
+        if not expanded: raise ValueError('Record-driven catalogue requires expanded pages')
+        return table_from_records(base, rel, donor_symbols, furniture, reviewed_rows)
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)

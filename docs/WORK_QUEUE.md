@@ -2,17 +2,35 @@
 
 ## Active: V3 optional GameCube imports
 
+Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
+new furniture. Fourteen additional complete assets and their shared runtime
+records are installed in ABI 85; 24 focused tests and the representative native
+run (148 records, 133 assertions) pass. The full source/verification record is
+in [the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 76
+installed development options; neither patcher changes.
+
+Extend shared categories instead of writing another per-item/family installer.
+Next: the seating-sound reader for lawn/teacher's chairs and the existing
+lefty/righty desks, then shared contact/callback and graphics/acquisition
+categories from the generated inventory. Complete model conversion without
+required behaviour is not a completed import. Ordinary GPU appearance,
+interactions, and save/restart remain for the gameplay pass.
+
+Current integration:
+`build/v3-auto-furniture-final-01/animal-forest-v3-asset-loader.z64`, pinned
+by `config/v3-import-build.json` for both the pipeline and offline composer.
+
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with
 complete artwork, native metadata/readers, stock, catalogue/scoring, profile
 bits, and official text attribution. Twenty cartridge/composition tests and the
 first 88-record native run pass, including all rotated footprints, actual model
 DMA, stock membership, catalogue eligibility, acquisition, and saved ownership.
 Ordinary sitting, appearance, and save/restart remain for the gameplay pass.
-Continue the next donor furniture group and remaining native readers; do not
-replay passed unchanged paths. The composer offers 62 installed development
-options, not the whole donor catalogue. Both patchers stay V2.
+Continue shared import categories and remaining native readers; do not
+replay passed unchanged paths. The desks also need the shared seating-sound
+adapter identified by the automatic inventory. Both patchers stay V2.
 
-The current integration image is
+The desk prerequisite image is
 `build/v3-school-desks-runtime-01/animal-forest-v3-asset-loader.z64`; the
 [lamp checkpoint](checkpoints/V3_TENT_LAMP.md) records ABI-83 complete native
 creation, dawn/dusk movement, drawing, environment updates, and cleanup.

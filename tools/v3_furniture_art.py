@@ -212,11 +212,11 @@ def scalar_profile(pilot):
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
                 large_western=False, water=False, camping=False, tent=False,
-                campfire_body=False, fire_effect=0, school=False):
+                campfire_body=False, fire_effect=0, school=False, static_ci4=False):
     """Decode reviewed CI4/I4 families and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
                                               garden, western, large_western, water, camping,
-                                              tent, campfire_body, fire_effect, school))) > 1 or fire_effect not in (0, 1, 2):
+                                              tent, campfire_body, fire_effect, school, static_ci4))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -243,7 +243,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             elif (a, b) != (0xD7000002, 0):
                 raise ValueError('Unsupported furniture texture scale')
         elif op == 0xF0:
-            allowed_palettes = palette if campfire_body and isinstance(palette, tuple) else (palette,)
+            allowed_palettes = palette if (campfire_body or static_ci4) and isinstance(palette, tuple) else (palette,)
             if water or fire_effect or a != 0xF08F4010 or (not dynamic_palette and row['target'] not in allowed_palettes):
                 raise ValueError('Unsupported furniture palette load')
             have_palette = True
@@ -259,7 +259,15 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
-            if fire_effect:
+            if static_ci4:
+                if len(tile) != 8:
+                    raise ValueError('Truncated static CI4 tile')
+                word, reserved = struct.unpack('>II', tile)
+                wraps = (word >> 10 & 3, word >> 8 & 3)
+                if (word & 0xFFFFF0FF != 0xD2F0F000 or reserved or 3 in wraps):
+                    raise ValueError('Static CI4 needs tile 0, palette 15, and unshifted clamp/repeat/mirror')
+                row['wrap_modes'] = wraps
+            elif fire_effect:
                 shapes = ((32, 64), (32, 32) if fire_effect == 1 else (64, 32))
                 tiles = ((0xD2F0F500, 0xD2F1F500) if fire_effect == 1 else (0xD2F0F511, 0xD2F1F520))
                 shifts = ((0, 0), (0, 0)) if fire_effect == 1 else ((1, 1), (2, 0))
@@ -310,7 +318,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         elif op == 0xD2:
             # Birdhouse reuses its current CI4 image with explicit GX C4 format
             # and mirrored S. This is a material update, not a native command.
-            if (garden and (a, b) == (0xD280F800, 0)
+            if static_ci4 and material is not None:
+                if a & 0xFFFFF0FF != 0xD280F000 or b or 3 in (a >> 10 & 3, a >> 8 & 3):
+                    raise ValueError('Unsupported static CI4 material update')
+                material_wrap = (a >> 10 & 3, a >> 8 & 3)
+                row['static_ci4'] = True
+            elif (garden and (a, b) == (0xD280F800, 0)
                     and textures.get(material) == (32, 40) and material_wrap == (0, 0)):
                 material_wrap = (2, 0)
             elif (large_western and (a, b) == (0xD280F900, 0)
@@ -356,7 +369,10 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         elif op == 0xFA:
             colours = ((0xFFFFFFFF, 0xB2B2B2FF) if accessory or school else
                        (0xFFFFFFFF, 0xFFFDFFFF) if camping else (0xFFFFFFFF,))
-            if ((a, b) != ((0xFA000064, 0xFFD264FF) if fire_effect == 1 else (0xFA00008C, 0xFFF01EFF)) if fire_effect else
+            if static_ci4:
+                if a not in (0xFA000080, 0xFA0000FF):
+                    raise ValueError('Unsupported static primitive LOD state')
+            elif ((a, b) != ((0xFA000064, 0xFFD264FF) if fire_effect == 1 else (0xFA00008C, 0xFFF01EFF)) if fire_effect else
                     (a, b) != (0xFA00001E, 0x9B9BC864) if water else
                     (a not in (0xFA000080, 0xFA0000FF) or b not in colours)):
                 raise ValueError('Unsupported furniture primitive colour')
@@ -365,6 +381,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             if not (water or fire_effect) or (a, b) != expected:
                 raise ValueError('Unsupported furniture environment colour')
         elif op == 0xF2:
+            # Native F2 extents are already RDP coordinates, not texture DMA
+            # lengths. Preserve bounded tile-zero coordinates for all static
+            # materials; no object-specific texture-size exception is needed.
+            static_extent = (static_ci4 and material is not None and a == 0xF2000000
+                             and b & 0xFF000000 == 0 and b & 0x003003 == 0)
             school_extent = school and b == {
                 ((32, 32), (2, 0)): 0x000FC07C,
                 ((16, 32), (2, 0)): 0x0007C07C,
@@ -402,12 +423,12 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             fire_extent = (campfire_body and textures.get(material) == (16, 16)
                            and material_wrap == (0, 1) and b == 0x0003C07C)
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent or fire_extent or school_extent
+                    (static_extent or construction_extent or garden_extent or western_extent or large_extent or camping_extent or fire_extent or school_extent
                      or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
             modes = (0x210005,) if fire_effect else (0x270405,) if water else ((0x230405, 0x230005, 0x210405, 0x210005)
-                if camping or tent else (0x230405, 0x230005, 0x270405)
+                if camping or tent or static_ci4 else (0x230405, 0x230005, 0x270405)
                 if speed_bag else (0x230405, 0x230005))
             if a != 0xD9000000 or b not in modes:
                 raise ValueError('Unsupported furniture geometry mode')
@@ -517,7 +538,7 @@ def command_source(models, offsets):
 
     def tile_fields(shape, wraps):
         modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
-        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1), (2, 2), (1, 0), (1, 1), (0, 2)):
+        if len(wraps) != 2 or any(w not in modes for w in wraps):
             raise ValueError('Unsupported furniture tile wrapping')
         masks = []
         for size, wrap in zip(shape, wraps, strict=True):
@@ -593,7 +614,7 @@ def command_source(models, offsets):
                 macro = 'gsDPLoadTextureTile_4b' if w % 16 else 'gsDPLoadTextureBlock_4b'
                 emit(f"{macro}(0x{SEGMENT + offsets[row['target']]:08X}, {args})", 7)
             elif op == 0xD2:
-                if (row['shape'], row['wrap_modes']) not in (((32, 40), (2, 0)), ((32, 32), (2, 1)),
+                if not row.get('static_ci4') and (row['shape'], row['wrap_modes']) not in (((32, 40), (2, 0)), ((32, 32), (2, 1)),
                                                            ((16, 32), (0, 0))):
                     raise ValueError('Unreviewed furniture tile update in compiler input')
                 w, h = row['shape']

@@ -17,7 +17,7 @@ SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
 
 
 def goods(base, rel, symbols, imports, *, garden=False, western=False, western_large=False,
-          school_desks=False):
+          school_desks=False, reviewed_rows=None):
     verify_sources(rel, symbols)
     files = by_vrom(base)
     old = files[VROM].extract(base)
@@ -30,6 +30,21 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False, western_l
         raise ValueError('Changed complete native list descriptor set')
     selected, insertions = [], []
     garden_rules = {}
+    if reviewed_rows is not None:
+        if any((garden, western, western_large, school_desks)):
+            raise ValueError('Choose record-driven or legacy shop rules, not both')
+        names = {'ftr_listA':(0,0xCA), 'ftr_listB':(1,0x196), 'ftr_listC':(2,0x262),
+                 'ftr_listEvent':(3,0x2E4), 'ftr_listLottery':(5,0x334)}
+        for row in reviewed_rows:
+            item, name = int(row['item_id'],16), row['donor_list']
+            if item in garden_rules or name not in names:
+                raise ValueError('Duplicate identity or unsupported acquisition category')
+            group, at = names[name]
+            if row['group'] != group or row['donor_list_sha256'] != sha256(symbol_data(rel, symbols.decode(), name)):
+                raise ValueError('Stock record differs from donor source')
+            garden_rules[item] = (1024+(item-0x3000)//4, name, group, at)
+        if set(garden_rules) != {int(r['item_id'],16) for r in imports}:
+            raise ValueError('Incomplete record-driven stock batch')
     if garden:
         from v3_garden_items import metadata
         from v3_hra import sources, RAM, TABLE as HRA_TABLE
@@ -78,7 +93,7 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False, western_l
                                                     (0xCA, 0x196, 0x262)[group])
     for row in imports:
         item = int(row['item_id'], 16)
-        rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),
+        rules = garden_rules if reviewed_rows is not None else {0x3224: (1161, 'ftr_listC', 2, 0x262),
                  0x32B8: (1198, 'ftr_listA', 0, 0xCA),
                  0x3350: (1236, 'ftr_listA', 0, 0xCA), **CONSTRUCTION_STOCK, **garden_rules}
         if item not in rules or row['runtime_index'] != rules[item][0]:
