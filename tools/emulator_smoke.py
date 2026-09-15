@@ -1463,6 +1463,12 @@ def main():
                     raise ValueError('Construction stock probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_aloha_scoring'):
+                from v3_aloha_scoring_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('Aloha scoring probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record))
             if action.get('test_v3_furniture_icon'):
                 from v3_furniture_icon_smoke import exercise
                 if not (out/'test.bs1').is_file():

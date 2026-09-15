@@ -3,6 +3,7 @@
 ## Scope
 
 Compose experimental selections from the pinned ABI-62 integration cartridge.
+The pinned source includes the [aloha scoring correction](V3_ALOHA_SCORING.md).
 This is an offline development step, not a served web option or a declaration
 that all imported gameplay is complete. Neither V2 patcher changes.
 

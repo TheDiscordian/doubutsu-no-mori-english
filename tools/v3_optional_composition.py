@@ -14,9 +14,9 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-construction-catalogue-03'
-BASE_SHA = '5d6e3abdb2b67f33b99264dd2a4a0069c542c34c60b397fcf9df97121237fbc7'
-REPORT_SHA = '0f33275f8f62d65ef0f3de7e4e8da038d2ca630f58ffad4d83fb53954f6b11d6'
+BASE = ROOT/'build/v3-aloha-scoring-01'
+BASE_SHA = 'e6a890c37e972422fe44cbbfb322dcccd17805186baa96ed7c20a45a2d4022f3'
+REPORT_SHA = '33959d0d3224ace91e14cedf5215eeffa3cd7e15c1f7d067fea0290a9b5c4c6b'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 PREFIX_SIZE, ABI = 0xC000, 62

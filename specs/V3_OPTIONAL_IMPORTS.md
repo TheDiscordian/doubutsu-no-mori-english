@@ -192,6 +192,8 @@ native resource/name/price/default checks. The
 mannequins, canonical readers, ownership, conversion, and complete native preview
 loading without another allocation. Ordinary aloha acquisition and persistence
 remain work before the imports are ready for a complete handoff.
+The [aloha scoring adapter](V3_ALOHA_SCORING.md) supplies both real clothing
+records, with complete native grouping, point, and array-bound checks passing.
 The [islander arrival houses](V3_ISLANDER_HOUSES.md) install all eighteen authentic
 initial rooms with reviewed existing furnishings and complete native wall/floor
 matches. All twenty imported houses and forty fixed layers are present; actual
@@ -276,7 +278,10 @@ pass. The [catalogue integration](V3_CATALOGUE_CAPACITY.md) supplies actual
 753-slot pages, all 446 furniture rows, retained 248-row clothing, ordinary stock,
 and complete scoring metadata. Native catalogue selection, scrolling, names,
 model loading, B/C stock selection, and pocket ownership insertion pass.
-Optional composition and ordinary gameplay/persistence remain required.
+The [offline composer](V3_OPTIONAL_COMPOSITION.md) connects all 33 installed
+experimental options and their actual dependencies, including selected catalogue
+packing/completion. Focused and native subset checks pass. Ordinary gameplay/
+persistence and browser implementation remain required; neither patcher changes.
 
 ### Limits and saves
 

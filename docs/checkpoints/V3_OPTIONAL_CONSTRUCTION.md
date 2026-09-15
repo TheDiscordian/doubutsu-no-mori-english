@@ -67,8 +67,8 @@ guards, checkpoint reload, and graceful shutdown pass. Audio stays disabled.
 
 No ordinary arrival, shop payment, placed-item persistence, save/restart cycle,
 or GPU/hardware appearance is claimed. These checks do not assess the separate
-missing red/blue aloha room-scoring records; that concrete gap is next work,
-with donor rows verified as `D4050800` / neutral colour.
+red/blue aloha room-scoring records. The [aloha scoring checkpoint](V3_ALOHA_SCORING.md)
+records their correction, focused native verification, and corrected subset.
 
 ## Compatibility and remaining work
 
@@ -76,7 +76,7 @@ Smaller profiles reject saves requiring excluded imports; they do not migrate
 them. Codec acceptance does not establish ordinary cross-profile reload. Keep
 backups and never load imported saves in V2.
 
-Complete aloha scoring, remaining donor conversions, ordinary gameplay/
+Remaining donor conversions, ordinary gameplay/
 persistence, and unserved browser composition/UI remain required. GitHub
 development-branch source is authorised. Both web patchers remain V2 until the
 user tests V3 and explicitly approves a switch.

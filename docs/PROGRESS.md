@@ -2,15 +2,23 @@
 
 ## Active development
 
+The [aloha scoring correction](checkpoints/V3_ALOHA_SCORING.md) supplies both
+imported displays' actual clothing properties instead of inactive HRA records.
+Three focused checks and a corrected 52-record native run pass, including full
+grouping, native clothing points, disabled exclusion, and array-end guards.
+It changes two data words with no RAM, saved-profile/format, or ABI change.
+Current full integration: `build/v3-aloha-scoring-01/animal-forest-v3-asset-loader.z64`,
+ABI 62, SHA-256 `e6a890c37e972422fe44cbbfb322dcccd17805186baa96ed7c20a45a2d4022f3`.
+Neither served web patcher changes.
+
 The [construction catalogue integration](checkpoints/V3_CONSTRUCTION_CATALOGUE.md)
 installs all seven new items into ordinary stock, the catalogue, and room scoring.
 The actual category storage grows to 753 slots: 446 furniture and 248 clothing
 rows retain their full names and independent pages. The initial native catalogue
 run passes 103 records; the B/C stock and pocket-acquisition run passes 36.
 The shared menu reserves another 6,144 bytes; the cartridge remains 64 MiB with
-an Expansion Pak required. Current integration artifact:
-`build/v3-construction-catalogue-03/animal-forest-v3-asset-loader.z64`, ABI 62,
-SHA-256 `5d6e3abdb2b67f33b99264dd2a4a0069c542c34c60b397fcf9df97121237fbc7`.
+an Expansion Pak required. Its code and allocations remain in the current
+aloha-corrected integration above.
 The local optional composer connects the package-resident furniture rows/CRC.
 Ordinary acquisition/placement/persistence remain. Both web patchers remain V2.
 
@@ -33,7 +41,9 @@ selection reproduces stable V2-11. The O'Hare/detour-sign/saw-horse subset passe
 its initial 122-record native run: selected/excluded readers, package CRC,
 438-row furniture and 246-row clothing catalogues, correct subset completion,
 model loading, names, saved-state retention, and final guards. Its local build
-is `build/v3-optional-construction-01/`. Neither served patcher changes.
+is `build/v3-optional-construction-02/`, with the two corrected HRA words and
+unchanged catalogue/selector code. Seven composer checks pass on this source;
+the native subset evidence covers the unchanged consumers. Neither served patcher changes.
 This does not certify unfinished gameplay or
 claim that all donor items are converted.
 

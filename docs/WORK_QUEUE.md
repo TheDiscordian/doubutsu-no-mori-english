@@ -284,8 +284,10 @@ with later e/e+ donor support investigated separately.
   connects package-resident enable words and both CRCs, with selected catalogue
   packing and iteration/completion counts. Seven focused checks and the first
   122-record native subset check pass, including non-prefix item/shirt choices.
-  Review the red/blue aloha mannequin scoring rows, whose installation is not
-  established by the existing cherry-mannequin scoring evidence.
+  The [aloha scoring correction](checkpoints/V3_ALOHA_SCORING.md) installs both
+  actual clothing records. Three focused checks and the corrected 52-record
+  native run pass, including complete grouping/points and end guards. Seven
+  composer checks pass against that source without another menu replay.
   Ordinary acquisition/placement/persistence remain incomplete; neither web
   patcher changes.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete

@@ -2,7 +2,7 @@
 
 ## Scope
 
-The haz-mat barrel, oil drum, clothing display, and experimental speed bag
+The reviewed construction furniture, three clothing displays, and speed bag
 participate in the native HRA evaluator with their actual donor properties.
 The speed-bag variant includes expanded boxing-theme storage. Native scoring formulas, theme rewards,
 wall/floor rules, mail selection, complete English score-letter creator, and
@@ -33,7 +33,14 @@ Name-only lookup would select the earlier, unrelated feng shui definition.
 | haz-mat barrel `3224` | 1161 | `40050200` | `40050400` |
 | oil drum `32B8` | 1198 | `40050000` | `40050000` |
 | cherry shirt display `3AFC` (clothing variant) | 1727 | `D4050800` | `D4051000` |
+| red aloha display `3868` | 1562 | `D4050800` | `D4051000` |
+| blue aloha display `386C` | 1563 | `D4050800` | `D4051000` |
 | speed bag `3350` (animated variant) | 1236 | `E8050000` | `E8050000` |
+
+The [aloha correction](V3_ALOHA_SCORING.md) binds donor mannequin rows 517/518
+and supplies both installed displays' real clothing properties. Enabled records
+must never use the inactive series-63 placeholder. Their full native grouping,
+point evaluation, disabled exclusion, and completion-array bounds are checked.
 
 The metadata is not directly interchangeable. Series/group occupy the high
 six/ten bits in both games, followed by face and lucky flags at bits 15/14.

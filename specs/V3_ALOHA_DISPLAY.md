@@ -21,6 +21,8 @@ display rotations and inverse conversion, including catalogue order conversion.
 Both aloha garments retain their actual zero donor price and exclusive status.
 They are not inserted into ordinary shop lists. Catalogue visibility follows
 collection; visibility does not establish ordinary purchasability or acquisition.
+The [scoring adapter](V3_ALOHA_SCORING.md) supplies both displays' actual clothing
+properties and neutral feng shui metadata, retaining native point weights.
 
 ## Runtime and memory
 
