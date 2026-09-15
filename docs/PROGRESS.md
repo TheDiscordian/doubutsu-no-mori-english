@@ -3,44 +3,46 @@
 ## Active development
 
 The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplies
-thirty-six additional items through source-discovered records and shared graphics,
+thirty-nine additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
 installer, graphics description, or native scenario is needed. Converter/installer
-revision 4 adds train rewards and optional NPC souvenir categories. One unrestricted
-conversion discovers four Gulliver souvenirs and the festive flag, retaining all
-20,128 bytes of artwork, 487 vertices, and 401 triangles.
+revision 5 adds winter-camping rewards and unifies winter/summer selection. One
+unrestricted conversion discovers snowy tree model, snow bunny, and sleigh,
+retaining all 13,728 artwork bytes, 322 vertices, and 275 triangles.
 
-The ABI-92 development cartridge connects souvenirs to Gulliver's existing native
-gift handover. A shared 700-byte reader uses actual selected item/profile records,
-retains rare-item exclusion, and preserves the native reward fallback when no
-eligible souvenirs are selected. Dialogue, handover, and event completion remain
-native. Souvenirs stay non-orderable, not ordinary shop stock. Train gifts use the
-existing list 4 with no new gameplay code. Official names are credited in the
-single text-source catalogue. Existing models and native identities remain intact.
-No permanent RAM reservation or saved format grows. The compressed NPC owner is
-mapped uncompressed once; future batches update it in place while retaining safe
-reuse of the three regenerated terminal resources.
+The ABI-93 development cartridge uses source-derived canonical reward records
+for camping and Gulliver. No summer-item array is maintained in the runtime.
+The 948-byte shared reader preserves exclusions, small-list duplicate allowance,
+and safe exhausted-profile fallback. Winter retains the donor's 10% special-list
+roll, summer its 20% roll, and both the subsequent house-gift chance. Winter with
+no selected imports retains the unchanged original native trade body. Camping
+and Gulliver items stay non-orderable, not ordinary shop stock. The trade suffix
+uses 1,152 bytes within its existing 1,344-byte allocation. Official names remain
+credited in the single text-source catalogue. Scoring-only category aliases keep
+the donor's 412-point weights without changing actual acquisition. No permanent
+RAM reservation or saved format grows; existing models and identities remain unchanged.
 
-Forty-eight focused pipeline/composition checks pass; the optional prepared-only
-artifact check is skipped for this installed batch. The corrected native run
-passes 131 records with 104 assertions, including selected-only souvenirs,
-native fallback, train-list membership, acquisition, ownership, and guards.
-The checkpoint records the bounded harness correction and verification limits.
+Fifty-one focused pipeline/composition checks pass; the optional prepared-only
+artifact check is skipped for this installed batch. The first native run passes
+162 records with 118 assertions, including complete winter/summer trade preparation,
+selected-only rewards, winter's no-selection native body, sparse category fallbacks,
+model DMA, preview, acquisition, ownership, restoration, and guards.
+The checkpoint records the source evidence and verification limits.
 Full catalogue construction, ordinary appearance/gameplay, and save/restart remain
 unverified. Saved format 2 is unchanged, but saves using new items must not load
 older builds or V2. Neither served patcher changes.
 
-The offline composer contains 98 installed development options: 75 furniture,
+The offline composer contains 101 installed development options: 78 furniture,
 three shirts, and twenty villagers. The acquisition build is
-`build/v3-furniture-acquisition-runtime-01/animal-forest-v3-asset-loader.z64`.
+`build/v3-furniture-camping-runtime-01/animal-forest-v3-asset-loader.z64`.
 `config/v3-import-build.json` is the checked current complete-build lock.
 
 The shared CI4/I4/RGBA16 and constant indexed-palette converters retain every
 supported material/model layer and reject unsupported effects rather than dropping
-them. Fifty-seven additional non-placeholder models pass artwork preparation but
+them. Fifty-four additional non-placeholder models pass artwork preparation but
 retain acquisition, identity, or gameplay dependencies: 29 unidentified routes,
-12 Tortimer gifts, six harvest items, five island items, three winter-camper items,
-and two native-identity reviews. Sixteen diary display models also need diary
+12 Tortimer gifts, six harvest items, five island items, and two native-identity
+reviews. Sixteen diary display models also need diary
 gameplay. Prepared-only output cannot pass installation; donor dummy profiles
 remain explicit missing-artwork records. Continue shared acquisition and animated
 callback categories using the bulk-prepared assets.

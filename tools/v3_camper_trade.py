@@ -62,19 +62,90 @@ def donor_sources():
         result.append(dict(symbol=name, section=section, offset=offset, bytes=size, sha256=digest))
     tent = symbol_data(rel, symbols, 'ftr_listTent')
     cats = rel[sections[5][0]+0x3E248:sections[5][0]+0x3E260]
-    if (tent != struct.pack('>11H', *TENT) or cats != words(0,3,4,2,1,5)):
+    if (sha256(tent) != '3f73297331f0cb0867a0ac92d16a0f306eb35f729231d7df165ab4512d7d04d3'
+            or cats != words(0,3,4,2,1,5)):
         raise ValueError('Changed actual tent items or complete trade categories')
     for name, address, a in (('carpet',0x62B3A0,0x62B300), ('wall',0xAC8408,0xAC8368)):
         pointers = data_pointers(rel, address, 92)
-        if pointers.get(address) != a or address+22*4 in pointers:
-            raise ValueError('Changed donor carpet/wall TENT-to-A fallback')
+        if pointers.get(address) != a or any(address+i*4 in pointers for i in (18,22)):
+            raise ValueError('Changed donor carpet/wall camping-to-A fallback')
         result.append(dict(symbol='mSP_'+name+'_list', offset=address,
                            a_list=a, tent_pointer=None, bytes=92))
     for name in ('mQst_GetGoods_common', 'mSP_SelectRandomItem_New'):
         data = symbol_data(rel, symbols, name)
         result.append(dict(symbol=name, bytes=len(data), sha256=sha256(data)))
-    result.append(dict(symbol='ftr_listTent', bytes=len(tent), sha256=sha256(tent), items=list(TENT[:-1])))
+    result.append(dict(symbol='ftr_listTent', bytes=len(tent), sha256=sha256(tent),
+                       items=list(struct.unpack('>11H',tent)[:-1])))
     return result
+
+
+def install_shared(base, prior, reward_report, output):
+    """Replace the existing camping suffix with the shared reward-category reader.
+
+    The complete owner/relocation allocations remain unchanged. Rebuild only
+    suffix relocations; retain original code, state, descriptors, and callbacks.
+    """
+    current=copy.deepcopy(prior['camper_trade']);files=by_vrom(base)
+    data=files[VROM].extract(base);relocation=files[RELOC].extract(base)
+    donor=donor_sources()
+    if (sha256(data)!=current['sha256'] or sha256(relocation)!=current['relocation_sha256'] or
+            len(data)!=20736 or len(relocation)!=2272 or current['original_bytes']!=SIZE or
+            struct.unpack_from('>5I',relocation)!=tuple(current['sections'])):
+        raise ValueError('Changed complete camping owner or relocation allocation')
+    # The loader's existing allocation and descriptor are retained exactly.
+    quest=files[QUEST].extract(base)
+    if (struct.unpack_from('>I',quest,0x2460)[0]!=VROM+len(data) or
+            struct.unpack_from('>I',quest,0x2468)[0]!=RAM+len(data)):
+        raise ValueError('Changed current camping conversation descriptor')
+    helper=reward_report['code'];count=helper['symbols']['af_v3_furniture_reward_count']
+    if not reward_report['entry']<=count<reward_report['entry']+helper['bytes']:
+        raise ValueError('Missing complete resident reward count implementation')
+    suffix,compiled=compile_part('camper_trade',output/'camper_trade',
+        extra_sources=('overlays/v3/camper_trade_tail.S',),defines=(f'AF_V3_REWARD_COUNT_ADDRESS={count}',))
+    symbols=compiled['symbols'];n=len(suffix)
+    if (n>len(data)-SIZE or any(symbols.get(k)!=v for k,v in IMPORTS.items()) or
+            symbols['af_v3_camper_pocket']!=RAM+SIZE):
+        raise ValueError('Shared camping helper changes native bindings or allocation')
+    result=bytearray(data[:SIZE]+suffix+bytes(len(data)-SIZE-n));hooks=[]
+    for hook,name in zip(current['hooks'],('af_v3_camper_pocket','af_v3_camper_trade')):
+        address=hook['address'];at=address-RAM
+        if data[at:at+8].hex()!=hook['after']:
+            raise ValueError('Changed camping entry hook')
+        after=words(jump(symbols[name]),0);result[at:at+8]=after
+        hooks.append(dict(address=address,before=hook['before'],after=after.hex(),target=symbols[name]))
+    # The original prefix must stay identical after masking just its two hooks.
+    prefix=bytearray(result[:SIZE])
+    for hook in current['hooks']:
+        at=hook['address']-RAM;prefix[at:at+8]=bytes.fromhex(hook['after'])
+    if prefix!=data[:SIZE]: raise ValueError('Shared camping changes original owner bytes')
+    rows=[r for (r,) in struct.iter_unpack('>I',relocation[20:20+current['sections'][4]*4])
+          if r&0xFFFFFF<SIZE]
+    for pos,kind,target,name in elf_inventory(compiled['elf_relocations'],ram=RAM):
+        if not SIZE<=pos<=SIZE+n-4 or pos&3: raise ValueError('Camping relocation escapes new suffix')
+        if RAM<=target<RAM+len(data):rows.append(0x40000000|kind<<24|pos)
+        elif IMPORTS.get(name)!=target or kind not in (2,4,5,6):
+            raise ValueError('Unknown shared camping reference')
+    if len({r&0xFFFFFF for r in rows})!=len(rows) or 24+len(rows)*4>len(relocation):
+        raise ValueError('Shared camping relocations overlap or exceed allocation')
+    sections=(len(data),0,0,0,len(rows))
+    new_reloc=words(*sections,*rows)+bytes(len(relocation)-24-len(rows)*4)+words(len(relocation))
+    for target in (0x80204000,0x80308000):
+        old=relocate_verified_data(SimpleNamespace(ram=RAM,resident_bytes=len(data),sections=current['sections']),
+                                  data,relocation,target)
+        new=bytearray(relocate_verified_data(SimpleNamespace(ram=RAM,resident_bytes=len(data),sections=sections),
+                                            result,new_reloc,target))
+        for h in hooks:
+            at=h['address']-RAM;new[at:at+8]=old[at:at+8]
+        if new[:SIZE]!=old[:SIZE]: raise ValueError('Shared camping changes unrelated relocated owner data')
+    current.update(code=compiled,sha256=sha256(result),relocation_sha256=sha256(new_reloc),
+        sections=sections,hooks=hooks,donor=donor,shared_reward_categories=[19,23],
+        reward_count_entry=count,selected_reward_items=[int(r['item_id'],16) for r in reward_report['imports']
+                                                       if r['route'] in (19,23)],
+        winter_selection_installed=True,unused_suffix_bytes=len(data)-SIZE-n)
+    current['moves']=[dict(vrom=v,bytes=len(payload),physical=files[v].pstart,
+                          blob_offset=files[v].pstart-files[BLOB].pstart,sha256=sha256(payload))
+                      for v,payload in ((VROM,result),(RELOC,new_reloc))]
+    return {VROM:bytes(result),RELOC:new_reloc},current
 
 
 def source_owners(base):

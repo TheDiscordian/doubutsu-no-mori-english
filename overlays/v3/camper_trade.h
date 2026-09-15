@@ -31,6 +31,18 @@ extern void native_goods_priority(u8 *, int);
 extern void native_item_name(u16, int);
 extern u16 native_other_fruit(void);
 extern void native_trade_original(PocketPicker, const void *, const int *, int, int);
+#ifdef __mips__
+#ifndef AF_V3_REWARD_COUNT_ADDRESS
+#error Shared camper rewards require the checked resident count entry
+#endif
+#define reward_count ((u32 (*)(u32))AF_V3_REWARD_COUNT_ADDRESS)
+#define reward_goods ((void (*)(void *,u16 *,int,const u16 *,int,int,int))0x80474BC0u)
+#else
+extern u32 af_v3_furniture_reward_count(u32);
+extern void af_v3_furniture_reward_goods(void *,u16 *,int,const u16 *,int,int,int);
+#define reward_count af_v3_furniture_reward_count
+#define reward_goods af_v3_furniture_reward_goods
+#endif
 int af_v3_camper_pocket(u16 *);
 void af_v3_camper_trade(PocketPicker, const void *, const int *, int, int);
 #endif

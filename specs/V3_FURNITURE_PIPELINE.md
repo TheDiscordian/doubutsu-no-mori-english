@@ -114,6 +114,11 @@ The shared static-material category supports:
   non-orderable and never enter ordinary shop lists. Empty selections retain the
   original native reward route. Other NPC/event categories still require their
   own verified call contracts, not new per-item implementations.
+- Winter and summer camping use the same reward records, with donor categories
+  19 and 23. The shared camper adapter preserves the winter 10% and summer 20%
+  special-list rolls, subsequent 10% house-furniture chance, exclusions, and
+  carpet/wall fallbacks. Winter selections opt into the donor route; no selected
+  winter imports means the unchanged original native trade body.
 - Soft- and hard-chair action sounds, selected from the donor's actual category
   table. Matching complete sound programs, timing, instruments, and samples use
   the existing native audio; no replacement sample or new audio allocation is
@@ -156,6 +161,10 @@ assets. It installs full profiles and item records, names/prices/footprints,
 stock, catalogue entries, HRA/feng-shui rows, and selected-profile bits together.
 Missing native scoring-series definitions require a category adapter. Existing
 documented theme adapters retain their unavailable matching-surface policy.
+Donor HRA birth categories 33 and 37 map to native scoring category 3 only after
+checking their equal 412-point weights and all three actual native bitfield
+consumers. This is scoring metadata only: winter/summer acquisition remains
+independent in byte 27. Native weights, counters, and stack sizes do not change.
 
 Canonical furniture identity version 2 is independent of conversion order,
 checkbox selection, and resource placement:
@@ -171,7 +180,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 4 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 5 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -248,12 +257,22 @@ native. The selector's encoded argument contains the donor route in its high
 byte and the original native fallback list in its low byte.
 
 The shared resident reader at `80474BC0` scans enabled, canonical item/profile
-records. It supports the checked single-furniture-gift call shape and delegates
-other requests to the original seven-argument selector. Random selection retains
-the donor's rare-item rejection; an empty or all-excluded optional set falls back
-instead of looping forever. There is no per-item selection switch or generated
+records. It supports the checked single-furniture-gift call shape, including up
+to fifteen existing-item exclusions, and delegates other requests to the original
+seven-argument selector. Random selection retains rare/existing-item rejection
+and the donor's small-list duplicate allowance. Empty or exhausted optional sets
+fall back instead of looping forever. There is no per-item selection switch or generated
 reward list to rebuild when checkboxes change. Sparse and non-prefix selections
 use the same record flags as the existing offline composer.
+
+The exported reward-count entry lets winter camping retain the exact native
+trade body when its optional category is absent, without consuming randomness.
+`tools/v3_camper_trade.py:install_shared` recompiles the dependent camping suffix
+against that checked entry. It keeps the complete existing owner/relocation
+allocations, rebuilds only suffix relocations, and verifies that original code
+and state outside the two entry hooks remain unchanged at two relocation bases.
+The ten summer items come from source-derived records, not a runtime item array.
+Both camping categories stay non-orderable and outside ordinary shop stock.
 
 The code and guards occupy `80474BB0..80474FEF`, between catalogue framing and
 accessory artwork. Startup explicitly invalidates this new code range after its
@@ -320,6 +339,13 @@ Host sanitizer checks additionally cover multiple route values, malformed or
 disabled records, rare-only fallback, random rejection, and all seven fallback
 arguments. These checks do not claim an ordinary Gulliver conversation or gift
 animation has been played through.
+The same batch probe exercises complete native winter/summer trade preparation,
+using the real RNG with verified seeds, one selected reward, and winter's
+no-selection fallback. Input names/slots, carpet/wall candidates, and pitfall mode
+are retained. Host checks cover both seasonal thresholds, house override and
+empty-house fallthrough, all ten summer candidates, and duplicate/exclusion rules.
+Ordinary camper conversations, handover animation, and save/restart remain
+separate gameplay verification.
 
 Set `V3_FURNITURE_PREPARED_ART` to a prepared-asset output directory to run the
 same complete texture/vertex/triangle/material checks on that batch. The shared

@@ -1,5 +1,97 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared seasonal reward records
+
+Converter/installer revision 5 installs snowy tree model `31A8`, snow bunny
+`31D4`, and sleigh `31E0` through the unrestricted automatic conversion and shared
+installer. Their complete models contain 13,728 bytes, 322 vertices, and 275
+triangles. No item-specific converter, integration script, or native scenario is
+added. The three names use the official donor records in the single provenance
+catalogue. Automatic additions total 39. The offline composer contains 101
+installed development options: 78 furniture, three shirts, and twenty villagers.
+
+The complete ABI-93 cartridge is
+`build/v3-furniture-camping-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+by `config/v3-import-build.json`. Artwork is in
+`build/v3-furniture-camping-assets-01/`. The catalogue has 514 furniture and 248
+clothing rows. Conservative menu memory remains 280,320 of 280,704 bytes. Blob
+growth is exactly the 13,728 artwork bytes, to 3,393,376 bytes, leaving 735,392
+bytes before English choices. Existing owner allocations and model VROMs remain.
+
+Winter acquisition uses actual `ftr_listKamakura`, donor list type 19. The donor
+normal-trade function at `.text:122B8C` rolls `random(100) >= 90` in scene 31;
+the separate 10% house-gift roll follows it. The native body lacks this winter
+special-list roll. The shared trade adapter enables it only when winter imports
+are selected; otherwise the original native body runs without another RNG draw.
+Summer scene 35 retains its `>= 80` roll and list type 23. Carpet/wall donor
+descriptors have neither special-list pointer and retain physical-A fallback.
+
+Both seasons and Gulliver share the same source-derived item metadata. The ten
+summer items no longer live in a hand-maintained runtime array. All seventeen
+installed reward records carry their actual category in byte 27. The 948-byte
+resident reader preserves rare/existing-item exclusions, the donor's small-list
+duplicate allowance, and exhausted-profile fallback. It exports a checked count
+entry at `80474EFC`, used without randomness to select winter's original-body
+fallback. Code and guards fit the same `80474BB0..80474FEF` reservation.
+
+The dependent camper suffix compiles to 1,152 bytes, down from 1,344, with 192
+zero padding bytes. Its complete normal owner remains 20,736 bytes and its
+relocation file remains 2,272 bytes, with 558 entries. The original prefix outside
+the two entry hooks, native state, quest descriptors, callbacks, and shared
+conversation allocation remain unchanged. Both relocated bases are checked.
+Future automatic batches rebuild the suffix against the actual resident count
+entry rather than assuming a stale compiled address.
+
+HRA donor category 33 maps to native scoring category 3, using the same verified
+412-point equivalence as summer category 37. The actual donor point table,
+installed native weights, expanded evaluator patches, and all three native
+five-bit consumers are checked. This changes scoring metadata only, not the
+reward route. Native counters, point weights, and stack allocation stay intact.
+
+- ROM SHA-256: `fe9b175801c5b1d7eb00b7ddf23d01d4fd164643cd01d9f2f6270d7e89f8598e`.
+- UPS SHA-256: `e80813e4d538cfe5d117afbc07e6d2ca90d3dc1bd01704a092aa3e4c881669ad`.
+- Build receipt SHA-256: `4973f7d2705be2c280c321d29b7c51daddfa2e708b949db5c6cfd6153a5ec1c3`.
+- Art receipt SHA-256: `463e19c092235b63f907b12a8493e799e6d2561268c2b4c16a404f6a8ebb26cf`.
+- Blob SHA-256: `f4301306b6245a24b59d62225f34ded2d44545b615699f1224eaf2ad43d2e91c`.
+- Shared reward code SHA-256: `193943c60d253c8eacc76250d2960a902ff8e79d648efa10587a61b36fd430b1`.
+- Trade owner SHA-256: `1a6571128da3e3c8171a347af5a829eb8acaf3246362c0fcb5b7a5074056037e`.
+- Trade relocation SHA-256: `f4a0fffe3564208ccd2ec1e95d65c8703a7f5efc54c62bbfbccad237bb5246bd`.
+
+The combined suite runs 52 tests: 51 pass and the optional prepared-only artifact
+check is skipped. Sanitizers execute the actual shared selector and camper C,
+including all ten summer identities, sparse profiles, both seasonal thresholds,
+house override/empty-house fallthrough, duplicate/exclusion rules, and unchanged
+ordinary trades. Complete source texels/vertices/triangles, material commands,
+owner-prefix retention, fixed allocations, scoring equivalence/rejection,
+catalogue, source credits, profile composition, and exact V2/no-import output pass.
+
+The first silent native run completes all 162 records with 118 passing assertions
+at `build/v3-furniture-camping-native-01/results.json`, SHA-256
+`c2cff0b14ccb4f61b7b2e95c37715fbe4ac3cf52fee77a80c06c6c90c1cfc92d`.
+It covers actual current owner loading/relocation, complete model DMA, readers,
+preview, ownership, all three selected reward categories, sparse first/last
+choices, no-selection native stock fallback, and complete seasonal trade calls.
+Real RNG seed 7 produces the selected winter reward; disabling winter imports
+executes the original native trade body. Seed 6 checks the unchanged summer
+threshold through the shared reader. Input identity/slot, carpet/wall candidates,
+pitfall mode, state restoration, guards, and clean shutdown pass. No native retry
+is needed, and no old build is rerun.
+
+These results do not establish ordinary camper conversations, handover animation,
+GPU appearance, full catalogue construction, save/restart, or original-hardware
+playtesting. Saved format 2 and permanent allocations remain unchanged, but saves
+using the three new IDs must not load older builds or V2. Both served patchers
+remain V2 pending the user's testing and explicit approval.
+
+The post-scan at `build/v3-furniture-camping-post-scan-01/inventory.json` identifies
+73 supported entries, all installed, and 169 review entries. This includes seven
+already-installed summer models now recognised by the shared metadata path.
+Fifty-four additional real models pass artwork preparation but retain their
+actual requirements: 29 unidentified acquisition routes, twelve Tortimer gifts,
+six harvest, five island, and two identity reviews. Sixteen diary models also
+need diary gameplay. Continue shared acquisition/callback categories and the
+remaining V3 gameplay/browser integration; prepared assets are not playable imports.
+
 ## Shared acquisition categories
 
 Converter/installer revision 4 discovers, converts, and installs five further

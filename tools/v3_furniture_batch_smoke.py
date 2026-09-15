@@ -68,7 +68,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         check('complete catalogue framing table and guards',start,blob[at:at+end-start])
     saved = {at: debug.read_memory(at, n) for at, n in (
         (0x80100DF0, 32), (0x8046C000, 864), (0x80126EC0, 0xBD0),
-        (0x80136FD8, 4), (0x80135B1C, 1), (0x80135C00, 2), (0x801458B8, 4))}
+        (0x80136FD8, 4), (0x80135B1C, 1), (0x80135C00, 2), (0x801458B8, 4),
+        (0x8003C590,4),(0x80126EB4,4),(0x80137000,15*56))}
     pool = report['furniture']['bank_pool']
     bank, bank_size = pool['data'], pool['bank_bytes']
     bank_before = debug.read_memory(bank, bank_size)
@@ -255,11 +256,12 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             debug.write_memory(bridge,reward_stub)
             call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
             reward_proof=(bridge,reward_stub)
-            for route in reward['routes']:
-                loaded,_=load(route['vrom'],route['reloc'],route['ram'],route['resident'])
-                for patch in route['patches']:
-                    check('native reward call after actual relocation',owner+patch['address']-route['ram'],
-                          struct.pack('>I',patch['after']))
+            for route in reward['routes']+reward.get('trade_routes',[]):
+                if 'vrom' in route:
+                    loaded,_=load(route['vrom'],route['reloc'],route['ram'],route['resident'])
+                    for patch in route['patches']:
+                        check('native reward call after actual relocation',owner+patch['address']-route['ram'],
+                              struct.pack('>I',patch['after']))
                 members=[r for r in reward['imports'] if r['route']==route['route']]
                 enables=[]
                 for member in members:
@@ -277,9 +279,57 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 fallback=struct.unpack('>H',debug.read_memory(scratch,2))[0]
                 if fallback in {int(r['item_id'],16) for r in members}:
                     raise ValueError('Empty reward profile returned a disabled import')
-                call(0x800C0490,[fallback,0,route['fallback'],0],1)
+                groups=(0,1,2) if route['fallback']==8 else (route['fallback'],)
+                membership=[call(0x800C0490,[fallback,0,g,0]) for g in groups]
+                passed=any(membership)
+                record(dict(furniture_batch_check='native fallback stock membership',
+                            route=route['route'],item=f'{fallback:04X}',assertion='passed' if passed else 'failed'))
+                if not passed:raise ValueError('Optional reward fallback is outside native stock')
                 for address in enables:debug.write_memory(address,saved[address])
             check('reward reservation unchanged',first,blob[offset:offset+last-first])
+            if report['camper_trade'].get('shared_reward_categories') and any(r.get('reward_route') in (19,23) for r in rows):
+                from v3_villager_rewards_smoke import ordinal
+                trade=report['camper_trade'];loaded,proof=load(trade['vrom'],trade['relocation_vrom'],trade['ram'],trade['bytes'])
+                picker=owner+0x8091ED64-trade['ram'];common=owner+0x8091EFDC-trade['ram']
+                state=owner+0x80921DE8-trade['ram']
+                private,animal,categories=owner+0x7000,owner+0x7B00,scratch+0x40
+                debug.write_memory(animal,bytes.fromhex('E0EA')+bytes(0x526))
+                debug.write_memory(categories,struct.pack('>3I',0,3,4))
+                debug.write_memory(0x80136FD8,struct.pack('>I',private))
+                def wanted(seed,threshold):
+                    _,seed=ordinal(seed,1);r,seed=ordinal(seed,100);house,_=ordinal(seed,10)
+                    return r>=threshold and house>0
+                for route,scene,threshold in ((19,31,90),(23,35,80)):
+                    members=[r for r in reward['imports'] if r['route']==route]
+                    if not members:continue
+                    chosen=members[-1];item=int(chosen['item_id'],16);enables=[]
+                    for member in members:
+                        address=runtime.ROWS_RAM+runtime.slot(int(member['item_id'],16))*80+4
+                        saved.setdefault(address,debug.read_memory(address,4));enables.append(address)
+                        debug.write_memory(address,struct.pack('>I',member==chosen))
+                    seed=next(s for s in range(10000) if wanted(s,threshold))
+                    for disabled in ((False,True) if route==19 else (False,)):
+                        if disabled:
+                            for address in enables:debug.write_memory(address,bytes(4))
+                        data=bytearray(0xA80);struct.pack_into('>H',data,0x14,0x3224)
+                        struct.pack_into('>H',data,0xA78,0x34BF);debug.write_memory(private,data)
+                        debug.write_memory(state,bytes(0x30));debug.write_memory(0x8003C590,struct.pack('>I',seed))
+                        debug.write_memory(0x80126EB4,struct.pack('>I',scene))
+                        call(common,[picker,animal,categories,3,1],proof=proof)
+                        check('complete camping trade retains input slot',state+12,bytes(4))
+                        check('complete camping trade retains full input',state+0x14,bytes.fromhex('3224'))
+                        check('complete camping trade retains pitfall mode',state+0x1C,bytes.fromhex('2512'))
+                        if not disabled:check('source-category reward through full native trade',state+0x16,struct.pack('>H',item))
+                        else:
+                            actual=struct.unpack('>H',debug.read_memory(state+0x16,2))[0]
+                            if actual in {int(r['item_id'],16) for r in members}:
+                                raise ValueError('Unselected winter reward escaped native fallback')
+                        other=struct.unpack('>2H',debug.read_memory(state+0x18,4))
+                        passed=other[0]>>8==0x26 and other[1]>>8==0x27
+                        record(dict(furniture_batch_check='complete seasonal trade categories',route=route,
+                                    disabled=disabled,seed=seed,assertion='passed' if passed else 'failed'))
+                        if not passed:raise ValueError('Camping trade lost native carpet/wall categories')
+                    for address in enables:debug.write_memory(address,saved[address])
         check('no faulted CPU thread', 0x8003CE34, bytes(4))
         check('translation guard', 0x8019C8D0, bytes.fromhex('AF32C0DE')*4)
         check('resident package guard', 0x804A2FF0, bytes.fromhex('AFACC0DE')*4)
@@ -297,6 +347,7 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 native_acquisition_and_ownership=True, ordinary_seating_tested=False,
                 native_optional_rewards_tested='furniture_rewards' in report and any(r.get('reward_route') for r in rows),
                 ordinary_npc_gift_handover_tested=False,
+                native_shared_camping_trade_tested=bool(report['camper_trade'].get('shared_reward_categories')) and any(r.get('reward_route') in (19,23) for r in rows),
                 native_bed_geometry_tested=bool(tested_beds),native_bed_contact_actions=sorted(tested_beds),
                 ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)

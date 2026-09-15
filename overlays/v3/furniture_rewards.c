@@ -10,7 +10,7 @@ struct Item {
 _Static_assert(sizeof(struct Item) == 32, "Complete furniture metadata record");
 _Static_assert(__builtin_offsetof(struct Item, reward) == 27, "Reward category field");
 extern int af_v3_furniture_import_profile(u32);
-extern void af_v3_native_reward_goods(void *, u16 *, int, u16 *, int, int, int);
+extern void af_v3_native_reward_goods(void *, u16 *, int, const u16 *, int, int, int);
 extern float af_v3_reward_random(void);
 #ifdef __mips__
 #define items ((const struct Item *)0x80498000u)
@@ -29,30 +29,45 @@ static int selected(u32 slot, u32 route) {
         af_v3_furniture_import_profile(row->index);
 }
 
+u32 af_v3_furniture_reward_count(u32 route) {
+    u32 count=0;
+    if (route && route<=255u)
+        for (u32 slot=0;slot<1024u;++slot) count+=selected(slot,route)!=0;
+    return count;
+}
+
+static int excluded(u16 item, const u16 *existing, int count) {
+    if (item==rare) return 1;
+    for (int i=0;i<count;++i) if (existing[i]==item) return 1;
+    return 0;
+}
+
 /* High byte: optional donor category; low byte: unchanged native fallback.
  * Only the verified single-gift call shape uses this adapter. Other calls
  * retain the original seven arguments and the native implementation.
  */
 void af_v3_furniture_reward_goods(void *game, u16 *out, int count,
-        u16 *existing, int existing_count, int kind, int encoded) {
+        const u16 *existing, int existing_count, int kind, int encoded) {
     u32 route = (u32)encoded >> 8;
-    if (route && route <= 255u && out && count == 1 && !existing_count && !kind) {
+    if (route && route <= 255u && out && count == 1 && !kind &&
+            (u32)existing_count<=15u && (existing || !existing_count)) {
         u32 total = 0, eligible = 0;
         for (u32 slot = 0; slot < 1024u; ++slot) {
             if (selected(slot, route)) {
                 ++total;
-                eligible += items[slot].item != rare;
+                eligible += !excluded(items[slot].item,existing,existing_count);
             }
         }
         /* Avoid the source selector's infinite rejection when an optional
          * one-item profile consists entirely of the current rare item. */
-        if (eligible) {
+        int duplicates = total < (u32)existing_count+1u;
+        if (total && (eligible || duplicates)) {
             for (;;) {
                 u32 pick = (u32)(af_v3_reward_random() * (float)total);
                 if (pick >= total) pick = total - 1u;
                 for (u32 slot = 0; slot < 1024u; ++slot) {
                     if (selected(slot, route) && !pick--) {
-                        if (items[slot].item != rare) {
+                        if (duplicates || !excluded(items[slot].item,existing,existing_count)) {
                             *out = items[slot].item;
                             return;
                         }

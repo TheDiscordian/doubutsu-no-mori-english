@@ -21,19 +21,22 @@ from v3_import_storage import PACKAGE, PACKAGE_RAM, ROWS, ROWS_RAM, ITEMS, TABLE
 import v3_furniture_behaviours as behaviours
 import v3_furniture_placement as placement
 import v3_furniture_rewards as rewards
+import v3_camper_trade as camper_trade
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 4
+VERSION = 5
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
 SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
-    'overlays/v3/startup.c', 'translations/provenance.json') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES
+    'overlays/v3/startup.c', 'translations/provenance.json',
+    'tools/v3_camper_trade.py','tools/v3_camping_items.py','overlays/v3/camper_trade.c',
+    'overlays/v3/camper_trade.h','overlays/v3/camper_trade.ld','overlays/v3/camper_trade_tail.S') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -101,9 +104,20 @@ def provenance_patch(rows):
             '\n@@\n   "entries": [\n'+'\n'.join(additions)+'\n*** End Patch\n')
 
 
-def scoring(base, prior, rows):
+def scoring(base, prior, rows, source):
     changes, reports = {}, {}
     files = by_vrom(base)
+    aliases=[]
+    for row in rows:
+        if row['donor_birth_category']!=row['birth_category']:
+            from v3_camping_items import score_mapping
+            mapping=score_mapping(source.rel,source.symbols.encode(),base,prior,source_sha256=sha256(base))
+            points=source.raw('mMkRm_birth_point_table')
+            donor=row['donor_birth_category'];native=row['birth_category']
+            if (native!=mapping['native_scoring_category'] or
+                    struct.unpack_from('>I',points,donor*4)[0]!=mapping['points']):
+                raise ValueError('Changed source/native reward scoring equivalence')
+            aliases.append(dict(**{**mapping,'donor_category':donor},item_id=row['item_id']))
     for key, tool, width in (('hra',hra,4), ('feng_shui',feng,2)):
         report = copy.deepcopy(prior[key]); data = bytearray(files[tool.NEW_VROM].extract(base))
         if (sha256(data) != report['output_sha256'] or
@@ -131,6 +145,7 @@ def scoring(base, prior, rows):
             report['imports'].append(dict(item_id=row['item_id'], runtime_index=index, metadata=payload.hex(),
                 **({k:row[k] for k in ('series','birth_category','surface')} if width==4 else {})))
         report.update(output_sha256=sha256(data), metadata_sha256=sha256(data[table:table+report['metadata_rows']*width]))
+        if width==4:report['automatic_scoring_aliases']=report.get('automatic_scoring_aliases',[])+aliases
         changes[tool.NEW_VROM], reports[key] = bytes(data), report
     return changes, reports
 
@@ -235,7 +250,7 @@ def build(output, art_path, lock=LOCK):
             or DMA_START+(len(files)+1)*16 != DMA_END or base[DMA_END-16:DMA_END] != bytes(16)):
         raise ValueError('Changed complete shared storage prerequisite')
     blob,reused=reuse_resource_tail(base,prior,old_blob)
-    changes, score_reports = scoring(base,prior,[r for r,_ in prepared])
+    changes, score_reports = scoring(base,prior,[r for r,_ in prepared],source)
     installed = []
     for row,asset in prepared:
         item,index = int(row['item_id'],16),row['runtime_index']; i=slot(item)
@@ -285,6 +300,8 @@ def build(output, art_path, lock=LOCK):
     changes.update(placement_changes)
     reward_changes,reward_report=rewards.install(original,base,prior,blob,imports,source,output)
     changes.update(reward_changes)
+    trade_changes,trade_report=camper_trade.install_shared(base,prior,reward_report,output)
+    changes.update(trade_changes)
     changes[shops.VROM],changes[CODE_VROM] = goods,code
     stock_report = {**stock,'imports':stock_rows,'bytes':len(goods),'table_offset':table_at,'output_sha256':sha256(goods)}
     # Compressed NPC owners need one new uncompressed mapping, before the
@@ -346,7 +363,7 @@ def build(output, art_path, lock=LOCK):
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,
         catalogue=cat_report,shops=stock_report,furniture_behaviours=behaviour_report,
         catalogue_preview_records=preview_report,
-        furniture_placement=placement_report,**score_reports,
+        furniture_placement=placement_report,camper_trade=trade_report,**score_reports,
         native_test='pending representative automatic-import execution')
     if reward_report: report['furniture_rewards']=reward_report
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))
@@ -361,6 +378,7 @@ def build(output, art_path, lock=LOCK):
         for row in section:
             at=ITEMS+slot(int(row['item_id'],16))*32; row['record_sha256']=sha256(blob[at:at+32])
             row['action_sound']=blob[at+25]
+            row['reward_route']=blob[at+27]
             row['layer_type']=source.raw('aMR_layer_set_info')[row['runtime_index']]
     report['automatic_furniture']=dict(version=VERSION,imports=installed,art_report_sha256=art_sha,
         base=base_pin,art_directory=str(art_path.resolve().relative_to(ROOT)),

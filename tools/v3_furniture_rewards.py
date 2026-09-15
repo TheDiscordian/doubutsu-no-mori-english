@@ -32,9 +32,9 @@ def install(original, base, prior, blob, imports, source, output):
     active = {REWARDS[r['donor_list']] for r in imports if r.get('donor_list') in REWARDS}
     if not active and not previous:
         return {}, None
-    if not active <= ROUTES.keys() or not old_routes.keys() <= active:
+    if not active <= ROUTES.keys() | {19,23} or not old_routes.keys() <= active:
         raise ValueError('Missing reward category binding')
-    functions = {**DONOR_FUNCTIONS, **{ROUTES[r]['donor_gift']:ROUTES[r]['donor_gift_sha256'] for r in active}}
+    functions = {**DONOR_FUNCTIONS, **{ROUTES[r]['donor_gift']:ROUTES[r]['donor_gift_sha256'] for r in active & ROUTES.keys()}}
     donor_receipts = []
     for name, expected in functions.items():
         matches = [at for at, rows in source.functions.items() if any(n==name for n,_ in rows)]
@@ -63,16 +63,20 @@ def install(original, base, prior, blob, imports, source, output):
         if blob[at+27]!=old_items.get(row['item_id'],0) or any(blob[at+28:at+32]):
             raise ValueError('Changed reward metadata or reserved fields')
         if route:
-            if (row.get('catalogue_orderable') or row.get('reward_route')!=route or
-                    row['donor_list_sha256']!=sha256(source.raw(ROUTES[route]['donor_list']))):
+            raw=source.raw(row['donor_list']);digest=sha256(raw)
+            members=struct.unpack('>'+str(len(raw)//2)+'H',raw)
+            if (row.get('catalogue_orderable') or row.get('reward_route',route)!=route or
+                    row.get('donor_list_sha256',digest)!=digest or members.count(item)!=1 or
+                    members[-1] or 0 in members[:-1]):
                 raise ValueError('Reward descriptor differs from source category')
+            row.update(reward_route=route,donor_list_sha256=digest)
             records.append(dict(item_id=row['item_id'],runtime_index=row['runtime_index'],route=route))
         blob[at+27] = route
     native_files,files=by_vrom(original),by_vrom(base)
     native_code=native_files[CODE_VROM].extract(original)
     current_code=files[CODE_VROM].extract(base)
     changes, routes = {}, []
-    for route in sorted(active):
+    for route in sorted(active & ROUTES.keys()):
         rule=ROUTES[route];vrom=rule['vrom'];ram=rule['ram']
         native=native_files[vrom].extract(original);current=files[vrom].extract(base)
         relocation=files[rule['reloc']].extract(base)
@@ -101,7 +105,9 @@ def install(original, base, prior, blob, imports, source, output):
         routes.append(dict(**rule,route=route,encoded=(route<<8)|rule['fallback'],
             output_sha256=sha256(patched), patches=[dict(address=a,before=b,after=c) for a,b,c in patches],
             donor_list_sha256=sha256(source.raw(rule['donor_list']))))
-    return changes, dict(code=compiled,entry=RAM,imports=records,routes=routes,
+    trade_routes=[dict(route=route,donor_list=name,donor_list_sha256=sha256(source.raw(name)),
+                      encoded=(route<<8)|8,fallback=8) for name,route in REWARDS.items() if route in active & {19,23}]
+    return changes, dict(code=compiled,entry=RAM,imports=records,routes=routes,trade_routes=trade_routes,
         donor_functions=donor_receipts,reservation_start=FIRST,reservation_end=END,
         reservation_sha256=sha256(reservation),additional_resident_bytes=0,
         selected_profile_aware=True,ordinary_handover_tested=False)

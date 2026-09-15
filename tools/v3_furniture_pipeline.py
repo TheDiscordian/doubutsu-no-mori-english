@@ -23,14 +23,18 @@ from v3_furniture_art import SEGMENT, command_source, parse_model, verify_source
 from v3_registry import FURNITURE
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 4
+VERSION = 5
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
 STOCK = {'ftr_listA': 0, 'ftr_listB': 1, 'ftr_listC': 2,
          'ftr_listEvent': 3, 'ftr_listTrain': 4, 'ftr_listLottery': 5}
 # Source list types for shared optional NPC reward selection, not shop stock.
-REWARDS = {'ftr_listJonason': 12}
+REWARDS = {'ftr_listJonason': 12, 'ftr_listKamakura': 19, 'ftr_listTent': 23}
+# HRA-only equivalents for source categories exceeding the native bitfield.
+# Acquisition remains the separate actual donor list. The installer verifies
+# the equal source/native weights and the complete native scoring consumers.
+SCORING_ALIASES = {33: 3, 37: 3}
 # Reviewed complete GAFE01-r0 draw implementation, not an item allowlist.
 # It selects two opaque models and a palette using (actor index - base) * 12.
 INDEXED_STATIC_DRAW_SHA = '612998bdab7cb941114e08d66db7100ded74894f8c1ccfdbdffe4bb9fbb44917'
@@ -393,7 +397,12 @@ def metadata(source, item, profile, identity):
     price = struct.unpack_from('>H', source.raw('ftr_price_table'), index*2)[0]
     hra = u32(source.data, 0x4FAFC+index*4)
     feng = source.data[0x4EBF0+index*2:0x4EBF0+index*2+2]
-    birth, surface, series = hra>>8&63, hra>>6&3, hra>>26
+    donor_birth, surface, series = hra>>8&63, hra>>6&3, hra>>26
+    birth = SCORING_ALIASES.get(donor_birth, donor_birth)
+    if birth != donor_birth:
+        points=source.raw('mMkRm_birth_point_table')
+        if len(points)!=152 or u32(points,birth*4)!=412 or u32(points,donor_birth*4)!=412:
+            raise ReviewRequired('source scoring equivalence changed')
     if birth >= 23 or hra&63 or series >= 59:
         raise ReviewRequired('scoring needs an acquisition/category adapter')
     native_hra = (hra&0xFFFFC000)|(birth<<9)|(surface<<7)
@@ -405,7 +414,7 @@ def metadata(source, item, profile, identity):
         donor_catalogue_position=entries[0][0], preview_mode=preview,
         donor_preview_scalar_hex=framing.hex(),
         catalogue_orderable=not reward, donor_hra_hex=f'{hra:08x}', native_hra_hex=f'{native_hra:08x}',
-        feng_hex=feng.hex(), series=series, birth_category=birth, surface=surface,
+        feng_hex=feng.hex(), series=series, birth_category=birth, donor_birth_category=donor_birth, surface=surface,
         donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),
         identity_worksheet_row=number, behaviour=profile['behaviour'])
 

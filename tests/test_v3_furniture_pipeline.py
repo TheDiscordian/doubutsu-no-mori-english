@@ -26,6 +26,16 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_shared_camping_trade_categories_under_sanitizers(self):
+        with tempfile.TemporaryDirectory(prefix='v3-shared-camping-') as temporary:
+            binary=Path(temporary)/'test'
+            subprocess.run(['cc','-std=c11','-O1','-g','-Wall','-Wextra','-Werror',
+                '-fsanitize=address,undefined','-fno-omit-frame-pointer',
+                str(ROOT/'tests/v3_camper_trade_test.c'),str(ROOT/'overlays/v3/camper_trade.c'),
+                '-o',str(binary)],check=True,capture_output=True)
+            result=subprocess.run([str(binary)],check=True,capture_output=True,text=True,timeout=20)
+            self.assertIn('actual camping rewards, optional profiles, exclusions, donor rolls',result.stdout)
+
     def test_shared_reward_categories_under_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-furniture-rewards-') as temporary:
             binary=Path(temporary)/'test'
@@ -578,6 +588,39 @@ class CurrentCartridgeTests(unittest.TestCase):
                 at=table+row['runtime_index']*width
                 expected[at:at+width]=bytes.fromhex(row['native_hra_hex'] if width==4 else row['feng_hex'])
             self.assertEqual(self.files[tool.NEW_VROM].extract(self.image),expected)
+
+    def test_reward_scoring_aliases_keep_actual_weights_and_reject_changed_category(self):
+        aliases=[r for r in self.rows if r.get('donor_birth_category',r['birth_category'])!=r['birth_category']]
+        if not aliases:self.skipTest('Current batch needs no scoring aliases')
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        data=self.files[hra.NEW_VROM].extract(self.image);ext=self.report['hra']['birth_extension']
+        for row in aliases:
+            donor=struct.unpack_from('>I',source.raw('mMkRm_birth_point_table'),row['donor_birth_category']*4)[0]
+            native=struct.unpack_from('>I',data,ext['points_address']-hra.RAM+row['birth_category']*4)[0]
+            self.assertEqual(native,donor);self.assertEqual(native,412)
+            receipt=next(r for r in self.report['hra']['automatic_scoring_aliases'] if r['item_id']==row['item_id'])
+            self.assertEqual(receipt['donor_category'],row['donor_birth_category'])
+            self.assertFalse(receipt['acquisition_category_changed'])
+        changed=copy.deepcopy(aliases[0]);changed['donor_birth_category']=34
+        with self.assertRaisesRegex(ValueError,'scoring equivalence'):
+            install.scoring(self.base,self.prior,[changed],source)
+
+    def test_shared_camping_suffix_retains_native_prefix_and_fixed_allocations(self):
+        from v3_camper_trade import VROM,RELOC,RAM,SIZE,QUEST,QUEST_RELOC
+        current=self.report['camper_trade'];previous=self.prior['camper_trade']
+        if not current.get('shared_reward_categories'):self.skipTest('No shared camping suffix')
+        self.assertEqual(current['shared_reward_categories'],[19,23])
+        before=self.old[VROM].extract(self.base);after=bytearray(self.files[VROM].extract(self.image))
+        self.assertEqual(len(after),len(before));self.assertEqual(self.files[RELOC].size,self.old[RELOC].size)
+        for new,old in zip(current['hooks'],previous['hooks']):
+            at=new['address']-RAM;self.assertEqual(after[at:at+8].hex(),new['after'])
+            after[at:at+8]=bytes.fromhex(old['after'])
+        self.assertEqual(after[:SIZE],before[:SIZE])
+        self.assertEqual(self.files[QUEST].extract(self.image),self.old[QUEST].extract(self.base))
+        self.assertEqual(self.files[QUEST_RELOC].extract(self.image),self.old[QUEST_RELOC].extract(self.base))
+        self.assertEqual(after[SIZE+current['code']['bytes']:],bytes(current['unused_suffix_bytes']))
+        self.assertEqual(current['reward_count_entry'],self.report['furniture_rewards']['code']['symbols']['af_v3_furniture_reward_count'])
 
     def test_reward_binding_preserves_complete_owner_and_reuses_reservation(self):
         import v3_furniture_rewards as rewards

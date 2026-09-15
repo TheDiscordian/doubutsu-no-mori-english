@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-acquisition-runtime-01",
-  "runtime_abi": 92,
-  "rom_sha256": "ffe996df066c4bfb85f8a438ffef852691e1e2ea4a58bda81d3816c2f3b92252",
-  "report_sha256": "5c99e5d37918f14f0af315eeaf77e6899300acf1acd922e9de2b0a023521db3d"
+  "directory": "build/v3-furniture-camping-runtime-01",
+  "runtime_abi": 93,
+  "rom_sha256": "fe9b175801c5b1d7eb00b7ddf23d01d4fd164643cd01d9f2f6270d7e89f8598e",
+  "report_sha256": "4973f7d2705be2c280c321d29b7c51daddfa2e708b949db5c6cfd6153a5ec1c3"
 }

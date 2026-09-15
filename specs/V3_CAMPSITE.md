@@ -557,11 +557,12 @@ the unresolved caller-dispatch stop. Do not treat it as full native conversation
 or award execution. The current trade adapter below supplies that same exclusion
 to actual pocket selection and filters rewards to selected items.
 
-## Summer trade selection and rewards
+## Shared winter and summer trade selection
 
-`camper_trade.c` appends 1,344 bytes at linked address `80922370` to the existing
-English normal-conversation owner. VROM `03910000` contains 20,736 bytes;
-`03918000` contains its 2,272-byte relocation resource with 560 entries. Both
+`camper_trade.c` uses 1,152 bytes at linked address `80922370` in the existing
+1,344-byte suffix reservation, with 192 zero padding bytes. The shared category
+reader replaces a maintained summer-item array. VROM `03910000` contains 20,736
+bytes; `03918000` contains its 2,272-byte relocation resource with 558 entries. Both
 retain their DMA identities/adjacency and original physical data. Total loaded
 size is 23,008 bytes within the existing `8800`-hex shared reservation. No
 resident allocation, actor instance, or saved structure grows. The quest
@@ -572,7 +573,9 @@ Only two original eight-byte entry windows change: the pocket picker at
 name, date, choice, and gift helpers remain. All original owner bytes outside
 those windows retain their values under relocation at two independently checked
 addresses. The non-summer trampoline repeats the displaced prologue, then jumps
-to `8091EFE4`; non-summer trade preparation remains the actual native body.
+to `8091EFE4`; ordinary trades and winter trades without selected winter imports
+remain the actual native body. Neither the suffix reservation nor the loader's
+descriptors grow. Complete original bytes outside the two entry hooks remain.
 
 The pocket picker builds up to fifteen eligible slot indices using the shared
 selected-furniture classifier, original carpets/walls, and ordinary item
@@ -580,7 +583,7 @@ conditions. It excludes `804A1A12` only in summer scene 35. Empty eligibility
 returns `-1` without writing the output or drawing randomness. This repairs the
 native mismatch between its expanded furniture count and raw-type-only search.
 
-Summer common preparation follows the supplied donor's **normal** owner:
+Seasonal common preparation follows the supplied donor's **normal** owner:
 `.text:1228F4`/`174` bytes for pocket selection and `.text:122B8C`/`230` bytes
 for common preparation. Duplicate symbol names in the island owner are not
 equivalent sources. Categories are the actual tables at `.data:3E248`:
@@ -588,15 +591,20 @@ equivalent sources. Categories are the actual tables at `.data:3E248`:
 fruit selection, clothes exclusions, final random candidate, and pitfall
 `2512` mode remain connected. No new player-facing wording is introduced.
 
-Furniture rolls `random(100) >= 80` for the tent list. The separate native/donor
+Furniture rolls `random(100) >= 80` for the summer list and `>= 90` for the winter
+list. Native scenes are 35 and 31 respectively. The separate native/donor
 `random(10) == 0` house-gift chance follows that list roll and can override it.
 An empty house result falls through to the chosen list without another house
 roll. The native original common body has **no winter-special list roll**;
-its 10% chance is for house furniture. Preserve that actual native winter
-behaviour instead of inventing a pre-existing winter acquisition path.
+its 10% chance is for house furniture. Selected winter imports enable the donor
+special-list rule. If no winter imports are enabled, use the actual original
+body without drawing an additional random number.
 
-The actual ten-item `ftr_listTent` is filtered through enabled runtime metadata
-before selection. Existing candidates and the saved shop rare item at
+The actual `ftr_listTent` and `ftr_listKamakura` memberships generate canonical
+reward metadata (donor list types 23 and 19). The shared 948-byte reader at
+`80474BC0` filters enabled item/profile records; no item array is maintained in
+the camper code. Its reward-count entry is bound from the checked compiler receipt.
+Existing candidates and the saved shop rare item at
 `80135C00` are excluded. Match the donor's small-list duplicate allowance when
 the selected list contains fewer than `1 + existing_count` items; disabled
 items never return through this allowance. A defensive empty/exhausted-profile
@@ -604,10 +612,10 @@ case falls back to ordinary furniture rather than looping without a candidate.
 These are optional-profile adaptations, not changes to ordinary shop stock.
 
 The donor retains the chosen list across the whole category loop. Carpet and
-wall descriptors have no TENT pointer and fall back to their physical A lists.
+wall descriptors have neither camping pointer and fall back to physical A lists.
 Obtain native priorities at `800C1BF0`, then pass `priorities[0]` to the original
 goods selector so the shorter native descriptor table selects that same A list.
-Do not treat this as an ABC roll or index a nonexistent native TENT descriptor.
+Do not treat this as an ABC roll or index nonexistent native camping descriptors.
 The saved rare-item check, native loading, and existing clothing-list adapter
 in `800BFCF0` remain unchanged.
 
@@ -616,6 +624,9 @@ current full-owner relocation, full-ID pocket cases, two selected-only reward
 preparations, an ordinary trade, gift/reset windows, complete greeting return,
 restoration, and guards. These are actual native routines on controlled fixtures,
 not ordinary conversation, acquisition-animation, or persistence acceptance.
+The [automatic import checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md)
+records current complete native winter/summer preparation, optional-category
+fallback, shared reward selection, scoring equivalence, and retained allocations.
 
 ## Interior floor sound and point-light parameters
 

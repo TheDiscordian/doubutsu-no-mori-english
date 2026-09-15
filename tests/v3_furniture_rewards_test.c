@@ -9,14 +9,15 @@ static unsigned char enabled[1024];
 static float rolls[8];
 static unsigned roll, calls;
 static void *last_game;
-static u16 *last_out, *last_existing;
+static u16 *last_out;
+static const u16 *last_existing;
 static int last_count, last_existing_count, last_kind, last_list;
 int af_v3_furniture_import_profile(u32 index) {
     assert(index >= 1024 && index < 2048);
     return enabled[index - 1024];
 }
 float af_v3_reward_random(void) { assert(roll < 8); return rolls[roll++]; }
-void af_v3_native_reward_goods(void *game, u16 *out, int count, u16 *existing,
+void af_v3_native_reward_goods(void *game, u16 *out, int count, const u16 *existing,
         int existing_count, int kind, int list) {
     ++calls; last_game=game; last_out=out; last_existing=existing;
     last_count=count; last_existing_count=existing_count; last_kind=kind; last_list=list;
@@ -35,6 +36,8 @@ static u16 gift(int encoded) {
 int main(void) {
     assert(gift(0x0C02)==0x1234 && calls==1 && !roll && last_list==2);
     add(5,12);add(129,12);add(1023,12);add(70,13);
+    assert(af_v3_furniture_reward_count(12)==3 && af_v3_furniture_reward_count(13)==1);
+    assert(!af_v3_furniture_reward_count(0) && !af_v3_furniture_reward_count(256));
     assert(gift(0x0C02)==0x3014 && !calls && roll==1);
     rolls[0]=.5f;assert(gift(0x0C02)==0x3204);
     rolls[0]=.99999f;assert(gift(0x0C02)==0x3FFC);
@@ -57,5 +60,17 @@ int main(void) {
     assert(gift(-1)==0x1234 && last_list==-1);
     af_v3_furniture_reward_goods(&game,0,1,0,0,0,0x0C02);
     assert(last_out==0 && last_list==2);
+    /* Trade requests preserve donor small-list duplicate allowance. */
+    existing[0]=0x3014;existing[1]=0x3204;roll=0;rolls[0]=0.f;calls=0;
+    af_v3_furniture_reward_goods(0,out,1,existing,2,0,0x0C02);
+    assert(out[0]==0x3014 && !calls && roll==1);
+    items[1023].enabled=1;roll=0;rolls[0]=0.f;rolls[1]=.5f;rolls[2]=.99f;
+    af_v3_furniture_reward_goods(0,out,1,existing,2,0,0x0C02);
+    assert(out[0]==0x3FFC && !calls && roll==3);
+    af_test_reward_rare=0x3FFC;roll=0;
+    af_v3_furniture_reward_goods(0,out,1,existing,2,0,0x0C02);
+    assert(out[0]==0x1234 && calls==1 && !roll);
+    af_v3_furniture_reward_goods(0,out,1,0,2,0,0x0C02);
+    assert(last_existing==0 && last_existing_count==2 && last_list==2);
     puts("Reward categories, sparse profiles, exclusions, bounds, and seven-argument fallbacks pass");
 }
