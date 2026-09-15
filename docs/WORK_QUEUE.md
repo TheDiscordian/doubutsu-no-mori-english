@@ -5,14 +5,23 @@
 Use the [generated browser plan](../specs/V3_OPTIONAL_COMPOSITION.md), not a second
 maintained item list, for browser selection. The independent JS composer and
 real worker match the offline outputs; generated choices cover all 101 installed
-records. Continue the unserved selection UI: search, individual/category/all/
-clear, disclosed dependencies, input/selection invalidation, cancellation, and
-download cleanup. Keep unsupported records distinct from installed development
-choices and completed gameplay acceptance. Current recipes reconstruct prepared
-changes; they do not run the Python artwork converters in the browser. Retain
-that distinction when extending donor conversion/packaging. Both served patchers
-remain V2 until testing and explicit approval. Evidence and exact scope are in
-[the browser checkpoint](checkpoints/V3_BROWSER_COMPOSITION.md).
+records. The [private interface](checkpoints/V3_BROWSER_INTERFACE.md) implements
+search, individual/category/all/clear, disclosed dependencies, save warnings,
+input/selection invalidation, cancellation, and download cleanup. Actual subset
+ROM/profile downloads match the offline hash. Initial selection and cancellation
+checks pass; later URL invalidation, no-import UI download, input-error/stale-menu
+checks, and narrow layouts remain unexecuted after the allowed initial attempt
+and one retry. Both failures are independently classified test issues, not game
+failures; their corrections are in the shared check. Do not repeat this browser
+batch now. Continue shared content/runtime work; include those remaining checks
+with the next meaningful interface integration change.
+
+The review list is generated from a fresh donor scan: 164 unavailable furniture
+entries have actual reasons and no selection controls. It does not classify every
+GameCube item or establish completed gameplay. Current recipes reconstruct
+prepared changes, not browser-native artwork conversion. Keep that distinction
+when extending donor conversion/packaging. Both served patchers remain V2 until
+testing and explicit approval. No V3 service or public deployment is authorised.
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
 new furniture. Thirty-nine additional complete assets and their shared runtime

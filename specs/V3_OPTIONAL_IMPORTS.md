@@ -346,12 +346,14 @@ hooks and the incompatibility warning, with isolated fresh-process persistence
 and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
-The [local optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for the twenty installed villagers and thirty-nine installed logical items,
+The [optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
+selections for twenty installed villagers and eighty-one installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
 save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce
-the pinned complete integration cartridge. These are experimental local profiles,
+the pinned complete integration cartridge. The private browser interface uses
+generated records for the same choices, not a separate maintained item list.
+These are experimental development profiles,
 not complete donor coverage, playable-import certification, or served web options.
 
 ## Browser implementation

@@ -117,11 +117,40 @@ Converted artwork embedded in those literals is prepared by the Python importer;
 this is not yet execution of its graphics converters in JavaScript. Exports are
 private development data, not approved redistribution artifacts.
 
-The user-facing selection UI, unsupported-item explanations, selection/input
-change invalidation, download/object-URL lifecycle, and public packaging remain
-separate implementation work. Worker cancellation tests do not establish those
-UI behaviours. The test server exposes only its explicit exported file list and
-synthetic file-input page, and shuts down after the check.
+The private page provides name/identity search, category filtering, individual
+choices, select/clear visible, and select/clear all installed imports. Selections
+start empty. Required outfits/furnishings remain visibly checked, with the names
+of the villagers requiring them. Removing a parent re-resolves the original
+requested set. Explicitly choosing an already-required item keeps it selected
+when its parent is removed; clearing a category does not remove another selected
+villager's requirements.
+
+`data/review.json` is generated from a fresh checked furniture-pipeline scan.
+The bundle binds its hash and size, and the page rejects overlap with installed
+options. It lists unavailable 3xxx furniture with actual reasons, not a promise
+that all those records are distinct new content. Installed custom/animated items
+are not downgraded because the generic converter handles fewer categories.
+The review queue is explicitly not a complete inventory of every donor item.
+
+Both file fields are checked for rejected archive formats on every state change.
+Changing an input or requested selection terminates active work, invalidates its
+generation, revokes both download URLs, and resets save acknowledgement. Late
+worker messages cannot restore stale downloads. Search/filter changes alone do
+not alter a profile or cancel a build. The worker requires the exact plan hash
+shown by the page, rejecting an export changed between selection and build.
+
+Nonempty selections require acknowledgement of separate test saves and retained
+profiles. The resulting ROM filename includes the output hash prefix; the JSON
+profile download shares that prefix. Download URLs are revoked on replacement,
+cancellation, input/selection changes, and page exit. No download starts without
+a click. The page has no external embeds, media, uploads, storage, or autoplay.
+
+The temporary verification server exposes only its exact export file allowlist
+and test page, and shuts down after the check. Interface checks cover actual
+downloads and invalidation, not just worker termination. The page remains an
+unserved private development export, not the approved public patcher design.
+Public packaging, fuller donor classification, and browser-native artwork
+conversion remain separate work.
 
 ## Saves and verification
 

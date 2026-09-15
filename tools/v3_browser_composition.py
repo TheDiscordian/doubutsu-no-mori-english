@@ -16,7 +16,7 @@ import v3_optional_composition as composition
 from v3_save_runtime import profile_bytes
 
 ROOT = composition.ROOT
-FILES = ('composer.mjs', 'worker.mjs')
+FILES = ('composer.mjs', 'worker.mjs', 'bundle.mjs', 'app.mjs', 'style.css')
 
 
 def rules(image, report):
@@ -130,6 +130,37 @@ def rules(image, report):
             'crc32': crcs, 'header': field(0x10, 8)}
 
 
+def review_catalogue(plan, report):
+    """Generate unavailable furniture reasons from a fresh shared scan.
+
+    This is the 3xxx furniture queue, not a claim to classify every donor item.
+    Installed records take precedence over the static converter's narrower
+    coverage of legacy animated/custom imports.
+    """
+    import v3_furniture_pipeline as pipeline
+    source = pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                             (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    installed = {int(row['item_id'], 16) for row in report['furniture']['imports'] + [report['speed_bag']]}
+    scan = pipeline.scan(source, ROOT/'build/item-identity-megasheet.xlsx', installed)
+    options = {row['id'] for row in plan['options']}
+    unavailable = []
+    for row in scan['rows']:
+        key = composition.item_key(int(row['item_id'], 16))
+        if key in options:
+            continue
+        if row['installed']:
+            raise ValueError('Installed furniture is missing from the composition plan')
+        unavailable.append({'id': key, 'name': row['name'] or 'Unnamed donor furniture',
+            'kind': 'furniture', 'selectable': False,
+            'reason': row.get('reason') or 'Conversion supported; runtime installation is pending.'})
+    return {'format': 'AFV3-BROWSER-REVIEW-1', 'base_sha256': plan['base_sha256'],
+            'scope': 'GAFE01-r0 3xxx furniture import queue, not all donor items',
+            'pipeline_version': pipeline.VERSION,
+            'source_rel_sha256': scan['source_rel_sha256'],
+            'source_symbols_sha256': scan['source_symbols_sha256'],
+            'worksheet_sha256': scan['worksheet_sha256'], 'unavailable': unavailable}
+
+
 def build(output, *, recipes=False, disc=None):
     out = output.resolve()
     if not out.is_relative_to(ROOT/'build') or out.exists():
@@ -137,19 +168,23 @@ def build(output, *, recipes=False, disc=None):
     image, report = composition.inputs()
     plan = rules(image, report)
     raw = composition.canonical(plan)
+    review = composition.canonical(review_catalogue(plan, report))
     site = out/'site'
     data = site/'data'
     data.mkdir(parents=True)
     (data/'composition.json').write_bytes(raw)
+    (data/'review.json').write_bytes(review)
     for name in FILES:
         target = site/'experimental/imports'/name
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(ROOT/'experimental/imports'/name, target)
+    shutil.copyfile(ROOT/'experimental/imports/index.html', site/'index.html')
     (site/'web').mkdir()
     shutil.copyfile(ROOT/'web/core.mjs', site/'web/core.mjs')
     manifest = {'format': 'AFV3-BROWSER-BUNDLE-1', 'experimental': True,
                 'web_patcher_enabled': False, 'plan': {'file': 'composition.json',
-                'size': len(raw), 'sha256': sha256(raw)}}
+                'size': len(raw), 'sha256': sha256(raw)},
+                'review': {'file': 'review.json', 'size': len(review), 'sha256': sha256(review)}}
     if recipes:
         from build_portal import donor_resources, make_recipe, SAVE_NOTE
         native = verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())

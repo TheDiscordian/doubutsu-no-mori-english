@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <title>Animal Crossing N64 · Optional imports · Development</title>
+  <link rel="stylesheet" href="./experimental/imports/style.css">
+  <script type="module" src="./experimental/imports/app.mjs"></script>
+</head>
+<body>
+  <a class="skip" href="#search">Skip to import choices</a>
+  <header class="wrap">
+    <p class="eyebrow">Animal Crossing N64 <span>V3 development</span></p>
+    <h1>A few more neighbours.<br>A little more <em>you.</em></h1>
+    <p class="intro">Bring selected villagers and items from your English GameCube game into your N64 town—or keep the original English translation without imports.</p>
+    <p class="notice">Experimental build. These imports are installed for development, not fully playtested or approved for release. Use a separate test save.</p>
+  </header>
+  <main class="wrap layout">
+    <section class="card patcher" id="patcher" aria-labelledby="build-heading" aria-busy="false">
+      <p class="eyebrow">1 · Your game files</p>
+      <h2 id="build-heading">Build it locally</h2>
+      <p>Your files stay in this browser. Nothing is uploaded, and the patcher never reads or edits saves.</p>
+      <label class="file" for="n64"><strong>Doubutsu no Mori (Japan)</strong><span>Original N64 ROM · .z64, .v64, or .n64</span>
+        <input id="n64" type="file" accept=".z64,.v64,.n64" aria-describedby="file-help">
+      </label>
+      <label class="file" for="gamecube"><strong>Animal Crossing (USA, Canada)</strong><span>GameCube · GAFE01 revision 0 · .iso, .gcm, or .ciso</span>
+        <input id="gamecube" type="file" accept=".iso,.gcm,.ciso" aria-describedby="file-help">
+      </label>
+      <p class="muted small" id="file-help">Extract archives first. Both original games are required. Their contents are verified before a download is created.</p>
+      <div class="selection-summary" aria-live="polite" aria-atomic="true">
+        <h3 id="selection-heading">No imports selected</h3>
+        <p id="selection-summary">Loading the installed catalogue…</p>
+        <div id="dependencies" hidden><h4>Included requirements</h4><ul id="dependency-list"></ul></div>
+      </div>
+      <div class="warning" id="save-warning" hidden>
+        <h3>Keep your save and selections together</h3>
+        <p>Removing an import used by this profile is not a save migration. Do not load an imported save in V2 or an older build missing these imports. Ordinary reloads between different profiles remain unverified.</p>
+        <label class="ack"><input type="checkbox" id="save-ack"> <span>I’ll use a separate test save and keep its selection profile.</span></label>
+      </div>
+      <p class="small" id="baseline-note">No imports produces the unchanged V2 English translation. Do not load a V3 import save in V2.</p>
+      <button class="primary" id="build" type="button" disabled>Build translation only</button>
+      <div id="working" hidden><progress id="progress" max="100" value="0" aria-label="Build progress"></progress><button id="cancel" type="button">Cancel build</button></div>
+      <p class="status" id="status" role="status">Loading import data…</p>
+      <p class="error" id="error" role="alert" hidden></p>
+      <section id="success" hidden aria-labelledby="success-heading">
+        <h3 id="success-heading" tabindex="-1">Your build is ready</h3>
+        <a class="primary" id="download">Download ROM</a>
+        <a id="receipt" download="Animal Crossing N64 - Import profile.json">Download selection profile</a>
+        <details><summary>Output SHA-256</summary><code id="output-sha"></code></details>
+      </section>
+      <p class="hardware">Expansion Pak · 128-KiB FlashRAM · RTC</p>
+    </section>
+
+    <section class="choices" aria-labelledby="choices-heading">
+      <p class="eyebrow">2 · Make it your town</p>
+      <h2 id="choices-heading">Choose your additions</h2>
+      <p>All imports start off. Villagers bring their required outfits and house furnishings; those additions are listed before you build.</p>
+      <fieldset id="selection-controls" disabled>
+        <legend class="sr-only">Find and select installed development imports</legend>
+        <div class="filters">
+          <label for="search">Search by name or donor ID<input id="search" type="search" placeholder="Try Punchy, sleigh, or 31E0" autocomplete="off"></label>
+          <label for="kind">Category<select id="kind"><option value="all">All categories</option><option value="villager">Villagers</option><option value="furniture">Furniture</option><option value="clothing">Clothing</option></select></label>
+        </div>
+        <div class="actions"><button id="select-visible" type="button">Select visible</button><button id="clear-visible" type="button">Clear visible</button><button id="select-all" type="button">Select all installed</button><button id="clear-all" type="button">Clear all</button></div>
+      </fieldset>
+      <p class="small muted" id="visible-count" role="status"></p>
+      <div id="options" class="option-grid"></div>
+      <p id="no-results" hidden>No installed imports match this search.</p>
+      <details class="review" id="review">
+        <summary>Other donor furniture under review <span id="review-count"></span></summary>
+        <p>These entries cannot be selected yet. Their actual missing support is shown below. Some need identity checks against existing N64 items. This furniture queue is not an inventory of every GameCube item.</p>
+        <div id="unavailable" class="review-grid"></div>
+        <p id="no-review-results" hidden>No review entries match this search.</p>
+      </details>
+    </section>
+  </main>
+  <footer class="wrap"><p>Private development export · GAFE01 revision 0 · No public V3 patcher release</p><p>Changing a file or selection cancels the current build and clears its downloads.</p></footer>
+  <noscript><p class="wrap notice">JavaScript is required to verify your files and build the ROM locally.</p></noscript>
+</body>
+</html>

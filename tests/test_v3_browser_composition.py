@@ -44,6 +44,19 @@ class BrowserCompositionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'fresh ignored'):
             browser.build(composer.BASE)
 
+    def test_review_queue_is_source_generated_disjoint_and_never_selectable(self):
+        import v3_furniture_pipeline as pipeline
+        review = browser.review_catalogue(self.plan, self.report)
+        candidates = {composer.item_key(item) for item in pipeline.identity_rows(ROOT/'build/item-identity-megasheet.xlsx')}
+        unavailable = {row['id']: row for row in review['unavailable']}
+        self.assertEqual(set(unavailable), candidates - set(self.catalog))
+        self.assertEqual(len(unavailable), len(review['unavailable']))
+        self.assertEqual(review['base_sha256'], composer.BASE_SHA)
+        self.assertEqual(review['pipeline_version'], pipeline.VERSION)
+        self.assertTrue(all(row['selectable'] is False and row['reason'] for row in unavailable.values()))
+        self.assertIn('callbacks', unavailable['GAFE01-r0/item/3010']['reason'])
+        self.assertNotIn('GAFE01-r0/item/3350', unavailable)  # Installed animated import is not downgraded.
+
     def test_browser_output_matches_authoritative_composition_for_representative_profiles(self):
         keys = list(self.catalog)
         grouped = {kind: [key for key, row in self.catalog.items() if row['kind'] == kind]
