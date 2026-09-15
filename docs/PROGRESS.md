@@ -2,6 +2,14 @@
 
 ## Active development
 
+The [Western batch](checkpoints/V3_WESTERN_ITEMS.md) converts seven complete
+furnishings and their source-verified item/scoring/acquisition metadata. Twelve
+focused checks pass, retaining all 463 vertices, 295 triangles, and 23,808 texels.
+The saddle fence retains both opaque parts; the well retains double-mirrored
+materials. Runtime installation is next: the saddle fence needs 96 more bytes
+than the current model bank, and both event rewards must keep their real route.
+No cartridge, save profile, or served patcher changes in this source batch.
+
 The [garden runtime and composer](checkpoints/V3_GARDEN_RUNTIME.md) install six
 complete models, English names/prices, catalogue entries, scoring, stock, and
 selected save dependencies. Four focused integration checks and the initial

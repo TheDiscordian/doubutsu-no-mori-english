@@ -292,6 +292,12 @@ The [reward-category adapter](V3_HRA_BIRTH.md) supplies expanded native counters
 and donor reward weights, with focused and native verification. Backyard-series
 installation is complete; post-office reward acquisition remains work.
 
+The [Western batch](V3_WESTERN_ITEMS.md) supplies seven more complete models and
+source-verified item/scoring/acquisition metadata. Runtime installation remains
+work, including the saddle fence's larger bank requirement, both opaque parts,
+the well's double mirrors, and faithful ordinary/event acquisition. No conversion
+result enables an import before its runtime capacity and consumers are safe.
+
 ### Limits and saves
 
 Target an Expansion Pak-equipped N64 with 128-KiB FlashRAM and RTC, retaining

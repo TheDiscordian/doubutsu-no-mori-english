@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 3
+CONVERTER_VERSION = 4
 
 
 @dataclass(frozen=True)
@@ -39,6 +39,8 @@ class Pilot:
     height: float = 18.0
     garden: bool = False
     vertex_symbol: str | None = None
+    western: bool = False
+    texture_symbols: tuple = ()
 
 
 PILOTS = (
@@ -91,7 +93,32 @@ GARDEN_PILOTS = (
           (('kao', 64, 32), ('dou', 64, 32)), 1, 69,
           (('opaque', '_body_model', 0, 0x110),), height=42.43, garden=True),
 )
-REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS
+WESTERN_PILOTS = (
+    Pilot('tumbleweed', 0x32B0, 'tumbleweed', 'int_iku_tumble', 'iam_iku_tumble',
+          (('', 64, 64),), 0, 53, (('opaque', '_model', 0, 0xB8),)),
+    Pilot('cow-skull', 0x32B4, 'cow skull', 'int_iku_cow', 'iam_iku_cow',
+          (('5', 16, 32), ('1', 64, 32), ('4', 32, 16), ('3', 16, 32), ('2', 32, 16)),
+          0, 54, (('opaque', '_model', 0, 0x130),),
+          texture_symbols=(('1', 'int_iku_cow1_tex_txt'),)),
+    Pilot('saddle-fence', 0x32BC, 'saddle fence', 'int_iku_saku_a', 'iam_iku_saku_a',
+          (('b', 16, 16), ('a', 32, 32), ('c', 16, 16), ('h', 16, 32),
+           ('g', 64, 32), ('f', 16, 16), ('d', 16, 32), ('e', 16, 32)),
+          0, 90, (('opaque', '_model_b_model', 0, 0x128),
+                  ('opaque1', '_model_a_model', 4, 0xC8)), western=True),
+    Pilot('western-fence', 0x32C0, 'western fence', 'int_iku_saku_b', 'iam_iku_saku_b',
+          (('b', 16, 16), ('a', 32, 32), ('c', 16, 16)), 0, 42,
+          (('opaque', '_model_model', 0, 0xC8),)),
+    Pilot('desert-cactus', 0x3328, 'desert cactus', 'int_yos_cactus', 'iam_yos_cactus',
+          (('bou', 64, 32),), 0, 56, (('opaque', '_obj_model', 0, 0xB0),), height=42.43),
+    Pilot('wagon-wheel', 0x3330, 'wagon wheel', 'int_yos_wheel', 'iam_yos_wheel',
+          (('nakatyu', 32, 16), ('tyu', 16, 16), ('bo', 64, 8), ('sotowa', 32, 32)),
+          0, 56, (('opaque', '_obj_model', 0, 0x118),), height=42.43),
+    Pilot('well', 0x3334, 'well', 'int_iku_ido', 'iam_iku_ido',
+          (('ab', 32, 32), ('i', 16, 16), ('h', 16, 16), ('g', 16, 16), ('f', 32, 32),
+           ('e', 16, 16), ('c', 16, 16), ('b', 16, 32), ('j', 32, 8), ('d', 16, 16)),
+          0, 112, (('opaque', '_model', 0, 0x1D8),), western=True),
+)
+REVIEWED = PILOTS + CONSTRUCTION_PILOTS + GARDEN_PILOTS + WESTERN_PILOTS
 
 
 def verify_sources(rel, symbols):
@@ -106,9 +133,9 @@ def scalar_profile(pilot):
 
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
-                accessory=False, mirrored_s=False, garden=False):
+                accessory=False, mirrored_s=False, garden=False, western=False):
     """Decode only the reviewed static CI4 command subset; never copy GX loads."""
-    if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s, garden))) > 1:
+    if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s, garden, western))) > 1:
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
@@ -141,7 +168,11 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
-            if garden and tile in (struct.pack('>II', word, 0)
+            if western and tile in (struct.pack('>II', word, 0)
+                                    for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0FA00)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif garden and tile in (struct.pack('>II', word, 0)
                                   for word in (0xD2F0F000, 0xD2F0F800, 0xD2F0F100)):
                 word = struct.unpack_from('>I', tile)[0]
                 row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
@@ -210,8 +241,14 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 ((16, 48), (2, 0)): 0x0007C0BC,
                 ((16, 16), (2, 0)): 0x0007C03C,
             }.get((textures.get(material), material_wrap))
+            western_extent = western and b == {
+                ((16, 32), (2, 0)): 0x0007C07C,
+                ((16, 16), (2, 0)): 0x0007C03C,
+                ((16, 16), (2, 2)): 0x0007C07C,
+            }.get((textures.get(material), material_wrap))
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or garden_extent or accessory and b in (0x0007C07C, 0x000FC07C))):
+                    (construction_extent or garden_extent or western_extent
+                     or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
             modes = (0x230405, 0x230005, 0x270405) if speed_bag else (0x230405, 0x230005)
@@ -272,7 +309,9 @@ def prepare(rel, symbols_bytes, pilot):
 
     pal = add(pilot.stem + '_pal', 32, native_palette)
     for suffix, w, h in pilot.textures:
-        at = add(pilot.stem + '_' + suffix + '_tex_txt', w * h // 2,
+        name = dict(pilot.texture_symbols).get(suffix,
+            pilot.stem + ('_' + suffix if suffix else '') + '_tex_txt')
+        at = add(name, w * h // 2,
                  lambda data, w=w, h=h: pack4(untile(data, w, h, 4)))
         texture_shapes[at] = (w, h)
     vertex_size = pilot.vertex_count * 16
@@ -293,7 +332,8 @@ def prepare(rel, symbols_bytes, pilot):
         pointers = data_pointers(rel, at, size)
         models[label] = {'symbol': name, 'donor_offset': at, 'source_sha256': sha256(raw),
                          'rows': parse_model(raw, at, pointers, pal, texture_shapes, vertex,
-                                             vertex_size, mirrored_s=pilot.mirrored_s, garden=pilot.garden)}
+                                             vertex_size, mirrored_s=pilot.mirrored_s,
+                                             garden=pilot.garden, western=pilot.western)}
         profile_pointers[profile_at + slot] = at
     if data_pointers(rel, profile_at, profile_size) != profile_pointers:
         raise ValueError('Furniture profile has missing, extra, or unported dependencies')
@@ -310,7 +350,7 @@ def command_source(models, offsets):
 
     def tile_fields(shape, wraps):
         modes = {0: 'G_TX_CLAMP', 1: 'G_TX_WRAP', 2: 'G_TX_MIRROR | G_TX_WRAP'}
-        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1)):
+        if tuple(wraps) not in ((0, 0), (2, 0), (2, 1), (0, 1), (2, 2)):
             raise ValueError('Unsupported furniture tile wrapping')
         masks = []
         for size, wrap in zip(shape, wraps, strict=True):
@@ -404,10 +444,14 @@ def native_profile(pilot, object_size, model_offsets, vrom_start):
             vrom_start % 16 or set(model_offsets) != {row[0] for row in pilot.models} or
             any(type(at) is not int or at < 0 or at % 8 or at + 8 > object_size for at in model_offsets.values())):
         raise ValueError('Furniture profile exceeds its native object bounds')
-    opaque = SEGMENT + model_offsets['opaque'] if 'opaque' in model_offsets else 0
-    translucent = SEGMENT + model_offsets['translucent'] if 'translucent' in model_offsets else 0
+    slots = {0: 'opaque', 4: 'opaque1', 8: 'translucent', 12: 'translucent1'}
+    if (any(slots.get(slot) != label for label, _, slot, _ in pilot.models)
+            or len({row[2] for row in pilot.models}) != len(pilot.models)):
+        raise ValueError('Furniture model uses an unsupported or duplicated profile slot')
+    models = [SEGMENT + model_offsets[label] if label in model_offsets else 0
+              for label in slots.values()]
     words = (vrom_start, vrom_start + object_size, SEGMENT, SEGMENT + object_size,
-             opaque, 0, translucent, 0, 0, 0, 0, 0)
+             *models, 0, 0, 0, 0)
     return struct.pack('>12I', *words) + scalar_profile(pilot) + bytes(4)
 
 
@@ -457,11 +501,12 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden'), default='pilots')
+    parser.add_argument('--batch', choices=('pilots', 'construction', 'garden', 'western'), default='pilots')
     args = parser.parse_args()
     if args.output.exists():
         parser.error('Choose a fresh output directory; existing builds are preserved')
-    pilots = {'pilots': PILOTS, 'construction': CONSTRUCTION_PILOTS, 'garden': GARDEN_PILOTS}[args.batch]
+    pilots = {'pilots': PILOTS, 'construction': CONSTRUCTION_PILOTS,
+              'garden': GARDEN_PILOTS, 'western': WESTERN_PILOTS}[args.batch]
     report = build_objects(read_donor(args.disc)['rel'], args.symbols.read_bytes(), args.output.resolve(), pilots)
     print(json.dumps({'output': str(args.output), 'objects': [
         {'name': r['name'], 'bytes': r['object_bytes'], 'sha256': r['object_sha256']} for r in report['objects']],

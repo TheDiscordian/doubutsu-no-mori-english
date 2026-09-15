@@ -29,13 +29,32 @@ and its partially named definition does not establish corresponding fields.
 Do not copy donor offsets, assume unknown native bytes are free, reuse an
 unreviewed received flag, or substitute lifetime earnings for savings balance.
 
+## Native account route
+
+The original Pelly owner at VROM `008A6C10`, RAM `809C3420`, matches the
+7,680-byte cached disassembly input. Its 104-byte status function at
+`809C3708..809C376F` has SHA-256
+`69f4cd5494efd6f494ee3b322f24db809e8ef33e7c858dbc2727ddb0a3ebfd1c`.
+The ABI-64 garden cartridge retains these instructions unchanged. The function
+sets the mail-queue bit and, when the first-job check permits it, tests the loan
+at `Now_Private + 3C` before setting the repayment bit. It has no bank-account
+branch corresponding to the donor's `aPG_set_post_status`.
+
+The pinned native submenu enum ends at catalogue entry 20; the donor adds music
+at 21 and banking at 22. The donor Pelly constructor enables banking for a native
+resident whose loan is paid, whose house size is at least three, and whose house
+is not being renewed. The donor deposit path opens that added bank submenu.
+Native repayment is not an existing equivalent of this savings route. These
+facts establish a missing player-facing banking path, not that every unknown
+native save byte has been identified.
+
 ## Next implementation checks
 
-Trace the actual N64 post-office account/payment UI, persistence fields, and
-ordinary mail scheduling. Establish whether an existing savings mechanism and
-reviewed reward flag can support this milestone. An unnamed source field is
-not proof that the mechanism is absent. Bind the actual native instructions
-and saved ownership before changing them.
+Implement a real deposit/withdrawal route and reviewed per-player saved balance
+and reward acknowledgement before enabling the savings milestone. Preserve
+the loan-payment route and the donor's account eligibility. Bind actual native
+money transfers, save ownership, and ordinary mail scheduling before changing
+them. Unknown saved fields are not available storage without review.
 
 Extract and integrate the complete English `0248` reward template, preserving
 town/player fields, its genuine sender, paper mapping, and attached `3294` ID.

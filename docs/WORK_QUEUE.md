@@ -265,6 +265,14 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  The [Western batch](checkpoints/V3_WESTERN_ITEMS.md) converts seven complete
+  models and verifies names/prices, source profiles, ordinary/event acquisition,
+  catalogue positions, and full scoring properties. Twelve focused checks pass,
+  including both saddle-fence opaque parts and the well's double mirrors. Next
+  resolve the 5,216-byte saddle model's 96-byte bank shortfall across actual
+  allocation/stride/DMA consumers and preview memory, then install the complete
+  batch, Western scoring/name, saved dependencies, and offline selections.
+  Do not truncate the model or substitute shop stock for the two event rewards.
   The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) converts seven
   complete static models and verifies names/prices, 1×1 profiles, ordinary B/C
   stock membership, and native scoring metadata. Five new asset checks, seven
@@ -308,6 +316,10 @@ with later e/e+ donor support investigated separately.
   mailbox template `0248`, balance 100,000,000, flag `10`, and successful-mail-only
   acknowledgement. Establish actual native account/save equivalents before
   adapting this route; donor private-data offsets are not native fields.
+  The original/current Pelly status function and native submenu set lack the
+  donor banking route. Faithful delivery requires deposit/withdrawal, preserved
+  loan payment/account eligibility, and reviewed per-player balance/reward
+  persistence; do not substitute lifetime earnings or reuse unknown fields.
   The [reward-category adapter](checkpoints/V3_HRA_BIRTH.md)
   supplies safe counters and weights through category 22. Three focused checks
   and the initial 82-record native run pass. Require this ABI-63 prerequisite

@@ -143,8 +143,10 @@ class FurnitureArtLocalTests(unittest.TestCase):
                         self.assertEqual(native[start + 6:start + 8], bytes(2))
                         self.assertEqual(native[start + 8:start + 16], original[start + 8:start + 16])
                 else:
-                    suffix = resource['symbol'][len(pilot.stem) + 1:-len('_tex_txt')]
-                    w, h = next((w, h) for name, w, h in pilot.textures if name == suffix)
+                    symbols = dict(pilot.texture_symbols)
+                    w, h = next((w, h) for suffix, w, h in pilot.textures
+                        if resource['symbol'] == symbols.get(suffix,
+                            pilot.stem + ('_' + suffix if suffix else '') + '_tex_txt'))
                     # Independent GX 8x8 block addressing, compared to every
                     # native row-major nibble. No shared untile implementation.
                     for y in range(h):
