@@ -12,8 +12,9 @@ interior, and scene lantern from the pinned GAFE01-r0 donor. The converter
 verifies the actual decoded REL and symbols, full arrays, model relocations,
 materials, and dynamic references. `tools/v3_campsite_scene.py` converts the
 scene/field packet, and `tools/v3_campsite_runtime.py` installs its loader and
-all four assets in ABI 71. Event, exterior actor, conversations, rewards, and
-special scene lighting remain unfinished. Neither served patcher changes.
+all four assets. `tools/v3_campsite_exterior.py` adds the complete exterior
+callbacks and native structure-loader binding in ABI 72. Event, conversations,
+rewards, and special scene lighting remain unfinished. Neither served patcher changes.
 
 ## Complete native scenery
 
@@ -154,9 +155,59 @@ remain unchanged. The offline composer uses this current cartridge, retains
 shared scene data in nonempty profiles, and reproduces exact V2 when empty.
 Event activation must be conditional on selected camping content when installed.
 
+## Installed exterior actor
+
+The native structure loader gives foreground `5849` a separate resident actor
+`CA`; `C9` remains the original no-demo sentinel. All 201 original descriptors,
+the igloo actor, and its artwork remain unchanged. The native active-actor limit
+remains 201. Only the descriptor lookup in `Actor_info_make_actor` is extended;
+each live actor retains its exact descriptor pointer for later destruction.
+
+The controller's setup callback intercepts `5849` and forwards all other building
+IDs to the existing relocated controller. Its original two HI/LO relocations
+`45001528` and `46001530` are removed; the other 120 remain. The controller and
+relocation resources keep their VROMs and existing DMA directory slots. Tent setup
+requires at least one of the ten actual camping-item enable rows; no-selection
+profiles cannot create this actor.
+
+The native birth controller routes every `5xxx` foreground through the structure
+callback (`80936010..80936160`); it does not index a bounded building table first.
+It skips `Fxxx` temporary markers. Thus `5849` reaches the new selector and `F127`
+does not request another actor. This is verified against the original native
+instructions, not inferred from GameCube constants.
+
+`overlays/v3/campsite_exterior.c` uses 3,168 bytes at `804A0360`, leaving 64 bytes
+before the scene packet. Its separate `AFTE` actor packet occupies 496 bytes at
+`804A1800`, within the scene packet's unused gap. Startup CRC and instruction-cache
+coverage include both. There is no additional permanent RAM, model bank, or
+ordinary heap-limit increase. The actor remains exactly `2D8` bytes, the native
+structure pool's fixed stride; never enlarge it in place.
+
+Each live tent owns a checked 7,776-byte heap allocation containing the complete
+6,960-byte exterior, 800-byte shadow, and 16-byte guard. A failed allocation or
+DMA deletes the actor without changing foreground/collision. Destruction clears
+the entrance reservation and frees the assets. The native actor lifecycle restores
+foreground `5849` in place of temporary marker `F127` and returns the pool slot.
+This lifecycle is implemented; complete native execution remains unverified.
+
+The callbacks preserve buried-item recovery, all nine donor collision records,
+door request angle/distance, outside return coordinates, scene-35 entry, and
+window fading at 05:00/18:00. The door uses native wipe/BGM command `028A`, not the
+unrelated donor numeric encoding. GC's `0800` texture-adjust flag is not an N64
+actor flag. Window display-list and complete projected-shadow vertices use
+separate segment-8 bindings in checked frame-owned storage. Exhausted or
+misaligned opaque/shadow arenas cause no partial draw.
+
+The [exterior checkpoint](../docs/checkpoints/V3_CAMPSITE_EXTERIOR.md) records
+sixteen focused/composition checks and partial native evidence. Actual controller
+relocation, setup registration, descriptor selection, and pool initialization
+pass. The combined native probe stops at a field-background allocation bound
+before actor construction; the cause is unresolved. Do not claim native tent
+construction, drawing, cleanup, natural entry, or persistence from that run.
+
 ## Integration and verification still required
 
-Finish enterable exterior actor/collision, event schedule and saved camper
+Finish event schedule and saved camper
 identity, NPC/conversation readers, scene lighting/floor sounds, and enabled
 reward filtering. Assign stable additive identities without replacing existing
 scenes, events, or furniture. Only selected rewards may be awarded.

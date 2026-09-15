@@ -314,10 +314,20 @@ with later e/e+ donor support investigated separately.
   exits, and camper placement in ABI 71. Fifteen focused/composition checks and
   the corrected 57-record native run pass, including complete field construction,
   actual interior DMA, relocated gameplay code, cleanup, and guards. Resident
-  RAM adds 8 KiB without normal heap or model-bank growth. Current full build is
+  RAM adds 8 KiB without normal heap or model-bank growth. The scene checkpoint is
   `build/v3-campsite-runtime-03/`; its ten-item subset is
   `build/v3-optional-campsite-01/`. Both served patchers remain V2.
-  Continue enterable exterior/event, camper registration and English conversations,
+  The [additive exterior](checkpoints/V3_CAMPSITE_EXTERIOR.md) installs the complete
+  tent callbacks and loader binding in ABI 72 without more permanent RAM. The
+  actor retains the fixed native pool stride and owns 7,776 bytes of full artwork
+  and guard storage. Sixteen focused/composition tests pass. Actual controller
+  relocation, setup registration, descriptor selection, and pool initialization
+  pass; native construction/drawing/cleanup remain unverified after the combined
+  probe's field-background allocation bound fails. The failure is unresolved,
+  not waived as a fixture problem. The current full build is
+  `build/v3-campsite-exterior-runtime-01/`; its camping subset is
+  `build/v3-optional-campsite-exterior-01/`. Neither patcher changes.
+  Continue event activation, camper registration and English conversations,
   selected rewards, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.

@@ -2,6 +2,28 @@
 
 ## Active development
 
+The [additive tent exterior](checkpoints/V3_CAMPSITE_EXTERIOR.md) installs its
+complete actor callbacks, independent identity, native loader binding, full
+exterior/shadow assets, collision, doors, daylight fade, and cleanup in ABI 72.
+The original igloo and all native descriptors remain. Code and metadata fit the
+existing resident reservation; each live tent needs 7,776 heap bytes. Sixteen
+focused/composition checks pass. Partial native execution confirms complete
+controller relocation, setup registration, descriptor selection, and pool
+initialization. The combined probe stops at a field-background allocation bound
+before constructing the tent; that unresolved result is not a gameplay pass.
+
+Current full integration:
+`build/v3-campsite-exterior-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`61d9bec4ac698420f20df7a062b13d8bf3619989fc78b357245d6ade4589abdf`.
+The ten-item subset is `build/v3-optional-campsite-exterior-01/`. The offline
+composer retains all 59 experimental options and exact all/empty full/V2 output.
+Continue the summer event, saved camper identity, English conversations,
+selected rewards, and scene lighting/floor sounds. Native actor construction,
+ordinary entry/exit, GPU appearance, and persistence still need verification.
+Neither web patcher changes; this is not a complete-import playtest handoff.
+Saved format 2 and selected identities are unchanged. Imported saves require
+matching/superset profiles and must not be loaded in V2.
+
 The [campsite scene loader](checkpoints/V3_CAMPSITE_SCENE.md) installs native
 scene 35, a complete extended field directory, all four scenery objects, and
 checked resident callbacks in ABI 71. All 35 original scene/field records remain;
@@ -11,13 +33,13 @@ records, 24 calls, and 30 assertions: full real field construction, collision,
 exits, camper placement, model DMA, gameplay-overlay relocation, and guards.
 The resident package adds 8 KiB; normal heaps and furniture banks do not grow.
 
-Current full integration:
+Scene-loader checkpoint:
 `build/v3-campsite-runtime-03/animal-forest-v3-asset-loader.z64`, SHA-256
 `fc8a8682c58f61841f23996bacccf2daa98eefda2c6f9e65aa4e472713834ea9`.
 The ten-camping-item subset is `build/v3-optional-campsite-01/`. All 59
 experimental options compose offline; all/empty output is exact full/V2.
 Neither served patcher changes. This is not a complete-import playtest handoff.
-Continue the enterable exterior, summer event, camper identity/English
+Continue the summer event, camper identity/English
 conversations, selected rewards, and special scene lighting/floor sounds.
 Ordinary scene entry, acquisition, GPU appearance, persistence, and hardware
 acceptance are not established by the field-constructor test. Saved format 2
