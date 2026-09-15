@@ -137,3 +137,28 @@ establish ordinary villager saving/loading, natural arrivals, all other homes,
 or the unresolved new-instrument playback. Continue from the matching current
 checkpoint where possible. The preserved original town and stable V2 ROM hashes
 remain unchanged.
+
+## Save attempt boundary
+
+`tests/scenarios/v3_house_save.json` attempts the existing ordinary gyroid flow
+after a test-only position change to the player's home. The first run,
+`build/v3-house-save-native-01`, incorrectly expects the imported marker to have
+already restored: the field still contains `F213`. Nearby visible-acre actors
+can remain loaded; that observation alone is not a persisted-marker defect.
+The player also overshoots the gyroid.
+
+The single corrected attempt, `build/v3-house-save-native-02`, shortens movement
+and records the live marker without demanding restoration before saving. It
+reaches `2098.05,160,1493.90`, but no gyroid message is active. Its later expected
+choice cursor 2 is still 0, and the scenario stops before a save operation.
+Results SHA-256:
+`f0c6549d1c43d10afaedac55cdcbdd943ebf55ee20b1442fc17c1a811553605b`.
+The matching state retains the corrected home approach and full pre-save animal/
+profile observations. No save/restart success or fresh persistent marker handling
+is claimed. The exact navigation/streaming cause is not established.
+
+Stop gyroid setup attempts for this batch. Next use an actual loaded-actor/acre
+observation before choosing the approach, and inspect both stored banks for
+the permanent house identity once an ordinary save really occurs. Do not replay
+the completed house visit or replace normal saving with a direct packer call
+and label that ordinary persistence. Continue other unfinished import work.
