@@ -320,10 +320,15 @@ with later e/e+ donor support investigated separately.
   including all forty imported layer transfers into the pointer table and three
   representative full rooms. Ordinary visits and complete scene allocation remain
   unverified. The separate island gift layouts are not imported as initial rooms.
-  Next connect the new garments' display/catalogue/acquisition consumers, explicit
-  town behaviour, ordinary move-ins, house visits, and persistence. Donor growth
-  permission stays 2, and every move-in flag stays off. Do not replay passing
-  text/default checks. Older builds lacking the new dependencies reject new saves;
+  The [complete town policy](checkpoints/V3_TOWN_RESIDENTS.md) enables all twenty
+  fixed identities in the experimental cartridge while preserving donor roles.
+  Six focused checks pass, as do native roster counts/exclusions and the corrected
+  90-record / 56-assertion resident/schedule tail. Maelle's full native creation,
+  both starting populations, six personality schedules, event overrides, and
+  guards pass. This is not ordinary elapsed-day arrival or save/restart evidence.
+  Next connect the new garments' display/catalogue/acquisition consumers and
+  finish ordinary move-ins, house visits, conversations, and persistence.
+  Do not replay passing text/default checks. Older builds lacking dependencies reject new saves;
   retain separate test saves and compatibility warnings.
   The other species' mouthless, reordered-expression, larger-body,
   and repeated-edge layouts are implemented; retain their source-bound checks.

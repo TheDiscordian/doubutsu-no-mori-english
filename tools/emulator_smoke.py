@@ -1344,6 +1344,13 @@ def main():
                     raise ValueError('V3 asset probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
                 results.append(exercise(debug, args.rom, record))
+            if action.get('test_v3_town_residents'):
+                from v3_town_residents_smoke import exercise
+                if not (out/'test.bs1').is_file():
+                    raise ValueError('V3 town probes require an emulator checkpoint')
+                needs_checkpoint_restore = True
+                results.append(exercise(debug, args.rom, record,
+                    tail_only=action['test_v3_town_residents']=='tail'))
             if action.get('test_v3_villager_selection'):
                 from v3_villager_selection_smoke import exercise
                 if not (out/'test.bs1').is_file():

@@ -15,7 +15,7 @@ from v3_punchy_gameplay_fixture import ANIMAL, create
 from v3_save_codec import BANK, PAYLOAD
 from v3_save_clothing import PROFILE, STATE
 
-OUTPUT = ROOT/'build/v3-punchy-house-02'
+OUTPUT = ROOT/'build/v3-town-residents-03'
 SOURCE = ROOT/'local/rc2-save-report-g3O4lU/test.flash'
 
 
@@ -56,6 +56,12 @@ class PunchyFixtureTests(unittest.TestCase):
                 self.assertEqual(bank[ANIMAL+10:ANIMAL+12], bytes((237, 2)))
                 self.assertEqual(bank[ANIMAL+0x520:ANIMAL+0x522], bytes.fromhex('34BF'))
                 self.assertEqual(bank[ANIMAL+0x524], 1)
+                self.assertEqual(receipt['house_cell_offset'],0x7D7E)
+                self.assertEqual(bank[0x7D7E:0x7D80],bytes.fromhex('50ED'))
+                # No other foreground tile changes in this disposable fixture.
+                foreground=bytearray(original[0x62A8:0x9EA8])
+                foreground[0x7D7E-0x62A8:0x7D80-0x62A8]=bytes.fromhex('50ED')
+                self.assertEqual(bank[0x62A8:0x9EA8],foreground)
                 source = ctypes.create_string_buffer(bank)
                 selected = ctypes.create_string_buffer(profile)
                 state = ctypes.create_string_buffer(b'\xA5'*STATE)

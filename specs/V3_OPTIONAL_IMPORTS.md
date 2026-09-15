@@ -135,8 +135,11 @@ map, inventory, letters, recipient selection, conversation identity fields,
 and generated-mail capture. Native names/aliases and saved field sizes remain.
 The [selection adapter](V3_VILLAGER_SELECTION.md) expands unseen counts, history
 reset, initial population, and normal move-in selection with independent
-transient arrays. Import eligibility remains disabled until ordinary gameplay
-integration is ready; temporary native test flags are not playable support.
+transient arrays. The [explicit town policy](V3_TOWN_RESIDENTS.md) connects all
+twenty complete metadata/house/outfit records to selected town eligibility,
+preserving donor roles and the six native personality schedules. The experimental
+cartridge enables these identities for integration; native resident creation and
+schedule checks are not complete ordinary gameplay or playable-browser support.
 The [house-gift adapter](V3_VILLAGER_REWARDS.md) includes enabled imported
 furniture in native room rewards while retaining exclusions, random selection,
 full identities, and the existing stored reward field.
@@ -178,19 +181,20 @@ melodies and four missing instruments while retaining all original instruments.
 The [complete audio runtime](V3_COMPLETE_AUDIO_RUNTIME.md) installs all sources
 and expanded bank/wave resources, with native loading, font relocation, melody
 copying, and allocation checks passing. Playback of the four new instruments
-and the final post-audio guards remain unresolved; move-in flags stay off.
+and the final post-audio guards remain unresolved; this remains a handoff issue.
 The [complete text installation](V3_COMPLETE_VILLAGER_TEXT.md) supplies all
 twenty names and full phrases, preserving personality and donor growth values.
 Full-name aliases, actual dialogue insertions, borrowed phrases, and profile
 handling have focused/native evidence. The [aloha outfit runtime](V3_ALOHA_OUTFITS.md)
 installs both actual shirts and all eighteen islander defaults, with complete
 native resource/name/price/default checks. Their mannequin/catalogue/acquisition
-consumers and explicit town behaviour remain work before move-ins can be enabled.
+consumers remain work before the imports are ready for a complete handoff.
 The [islander arrival houses](V3_ISLANDER_HOUSES.md) install all eighteen authentic
 initial rooms with reviewed existing furnishings and complete native wall/floor
 matches. All twenty imported houses and forty fixed layers are present; actual
 native initialization and layer loading pass. Ordinary house entry, scene
-allocation, town behaviour, move-in progression, and persistence remain open.
+allocation, move-in progression, and persistence remain open. The explicit
+town policy supplies checked selection and the existing personality schedules.
 
 ### Items
 

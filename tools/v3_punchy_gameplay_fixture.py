@@ -40,11 +40,21 @@ def create(source, rom, report):
         if (bank[4:8]!=b'NAFJ' or sum(struct.unpack('>'+str(PAYLOAD//2)+'H',bank[:PAYLOAD]))&65535
                 or bank[ANIMAL:ANIMAL+2]!=bytes.fromhex('E004') or bank[ANIMAL+11]!=1):
             raise ValueError('Changed copied-town resident slot or checksum')
+        # An existing resident's outdoor house is stored independently of its
+        # identity record. Preserve the location and assign the same fixture ID.
+        home=bank[ANIMAL+0x4E0:ANIMAL+0x4E5]
+        if home!=bytes.fromhex('0004030B07'):
+            raise ValueError('Changed copied-town home coordinates')
+        _,bx,bz,x,z=home
+        house=0x62A8+((bz-1)*5+bx-1)*512+((z-1)*16+x)*2
+        if bank[house:house+2]!=bytes.fromhex('5004'):
+            raise ValueError('Changed copied-town outdoor house identity')
         # Fixture-only substitution at the existing, navigable acre-4/3 house.
         # The ROM remains additive. At-home state is seeded, not schedule proof.
         edits = ((ANIMAL,bytes.fromhex('E0ED')), (ANIMAL+10,bytes((237,2))),
                  (ANIMAL+0x4E5,bytes.fromhex(row['saved_default_key'])),
-                 (ANIMAL+0x520,bytes.fromhex('34BF')), (ANIMAL+0x524,b'\x01'))
+                 (ANIMAL+0x520,bytes.fromhex('34BF')), (ANIMAL+0x524,b'\x01'),
+                 (house,bytes.fromhex('50ED')))
         for at,value in edits:
             changes.append({'bank':number,'offset':at,'before':bank[at:at+len(value)].hex(),
                             'after':value.hex()})
@@ -54,6 +64,7 @@ def create(source, rom, report):
     return bytes(output), {'source_save_sha256':SOURCE_SHA,'fixture_save_sha256':sha256(output),
         'rom_sha256':sha256(rom),'actor_id':'E0ED','resident_slot':3,'save_format':2,
         'fixture_only_resident_substitution':True,'seeded_at_home':True,
+        'matching_outdoor_house_identity':'50ED','house_cell_offset':house,
         'natural_move_in_or_schedule_tested':False,'field_changes':changes,
         'player_pockets_and_other_residents_unchanged':True,'source_save_modified':False}
 

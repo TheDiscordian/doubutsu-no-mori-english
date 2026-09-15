@@ -49,7 +49,11 @@
     addiu $sp, $sp, 144
 .end \name
 .endm
+#ifdef AF_V3_TOWN_ELIGIBLE_BRIDGE
+bridge af_v3_town_eligible_bridge, af_v3_town_eligible
+#else
 bridge af_v3_roster_clothing_source_bridge, af_v3_roster_clothing_source
 bridge af_v3_roster_clothing_index_bridge, af_v3_roster_clothing_index
 bridge af_v3_roster_outfit_ready_bridge, af_v3_roster_outfit_ready
 bridge af_v3_roster_clothing_record_bridge, af_v3_roster_clothing_record
+#endif

@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-islander-houses-02/animal-forest-v3-asset-loader.z64`, ABI 56, SHA-256
-`e18e7ce0e52a745dbffc964b9c38122d11e0ac6a38433377ed9098c760c861b7`.
+`build/v3-town-residents-03/animal-forest-v3-asset-loader.z64`, ABI 57, SHA-256
+`8ea1dd5de03a2d03db7e8bcafc58099a963a9ff2d5bdb8057e538e0100d92b58`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -147,7 +147,13 @@ counts, history reset, and both initial/subsequent population selection. Six
 focused checks pass. Native execution passes all four entries, including two
 complete six-villager populations, original RNG/shuffle correspondence, Cheri's
 fixed identity, disabled/resident exclusion, history preservation, and guards.
-Import move-in flags remain off until ordinary gameplay integration is ready.
+The [complete town adaptation](checkpoints/V3_TOWN_RESIDENTS.md) enables all
+twenty fixed identities in the experimental integration cartridge, with separate
+town modes, selected-profile/outfit checks, and unchanged donor roles. Six
+focused tests pass. Native counts/exclusions pass, and the corrected 90-record /
+56-assertion tail verifies full Maelle resident creation, two complete starting
+populations, all six daily schedules, event overrides, and guards. Ordinary
+arrivals, visits, and persistence remain incomplete; neither patcher enables V3.
 The [house-gift adapter](checkpoints/V3_VILLAGER_REWARDS.md) connects imported
 furniture to the native reward selector, retaining original exclusions and RNG.
 Four focused tests and the initial 45-step native run pass, including both
@@ -428,9 +434,9 @@ clothing profile bits, and all eighteen islander outfit initialisers. Seven
 focused checks and the corrected 109-record / 55-assertion native run pass.
 The native boot defect caused by a compiled caller's live register is fixed
 with checked preserving bridges; single-record name/price assumptions are fixed
-as well. All original garments and unrelated data remain intact. Explicit
-town behaviour and ordinary move-ins/persistence remain work; move-in flags stay
-off. Aloha mannequin/display and catalogue/acquisition consumers remain work.
+as well. All original garments and unrelated data remain intact. The explicit
+town policy enables selection in the experimental cartridge; ordinary move-ins
+and persistence remain work. Aloha display/catalogue/acquisition remain work.
 Earlier builds missing these garments reject new saves; the saved format is
 unchanged, but ordinary cross-build loading remains unverified. The audio playback
 issue remains recorded, and both web patchers stay V2.
@@ -445,7 +451,7 @@ including complete appended DMA, all sparse pointers, native and representative
 house initialization, complete layer transfers, guards, and checkpoint restoration.
 The cartridge stays 32 MiB, original audio/file positions remain intact, and the
 scene foreground allocation grows by 18,648 bytes. Ordinary house entry and the
-complete scene's larger allocation remain unverified. Town behaviour, move-ins,
+complete scene's larger allocation remain unverified. Ordinary move-ins,
 villager persistence, aloha display/catalogue/acquisition, and new-instrument
 playback remain work. ABI 56 retains ABI 55's exact save profile and formats;
 ordinary cross-build reload is not newly verified. Both patchers remain V2.
