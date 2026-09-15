@@ -1,5 +1,80 @@
 # Automatic furniture pipeline checkpoint
 
+## Direct-colour category and bulk prepared assets
+
+Converter/installer revision 3 adds shared RGBA16 materials and prepares every
+eligible uninstalled static model in one command:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --assets-only \
+  --output build/v3-furniture-all-static-prepared-02
+```
+
+The resulting 62 non-placeholder objects contain 211,136 bytes, 5,065 vertices,
+and 3,720 triangles. The art receipt SHA-256 is
+`0cf956288f7c323d5d0571fd9b8426fd93105a070d4bcb205a3fb1b06d2dffad`.
+No individual item list or specialised graphics description is used. The shared
+RGBA16 category includes Diver Dan `31D0`, retaining all 5,120 bytes, 107 vertices,
+102 triangles, CI4 body materials, direct-colour helmet, and I4 reflection layer.
+Its actual island acquisition remains required.
+
+The supplied executable SHA-256 is
+`e3166b15b810ff20397784fc83b2eb053db5d0c2a9e22ac2ead63a645881d150`.
+Its complete 64-byte `fmtxtbl__5emu64` at `800AAFC0` has SHA-256
+`7ae4019ff69d72ee09dd42b8b1c5a4c7a3a236d07aa238e2acdb93c97302fe30`.
+The actual RGBA/16 entry is GX format 5, RGB5A3, not RGB565. The matching source
+is `src/static/libforest/emu64/emu64.c` in the pinned donor checkout. Conversion
+untile uses complete four-by-four blocks and native RGBA5551. Opaque and fully
+transparent alpha are retained exactly; partial alpha fails instead of being
+thresholded. Textures remain bounded to 2,048 bytes so switching back to CI4
+cannot lose palettes in upper TMEM. Native 16-bit loads retain source scales,
+wrapping, and shifts. No texture is resized or dropped.
+
+Bulk discovery identifies sixteen entries using the same `iam_dummy` profile at
+donor `.data:00092D6C`; fifteen have plausible item names. Both actual profile
+tables select that placeholder. The converter now excludes this category by
+its source pointer, not a maintained item-name/ID list. These entries retain
+`asset_ready: false` and an explicit missing-artwork reason. An initial prepared
+collection at `build/v3-furniture-all-static-prepared-01/` exposed the placeholders;
+it is retained but not the current prepared collection. Unknown/dummy names also
+remain excluded. A missing model in this English donor is not proof that the
+item is unused in other editions.
+
+The final collection retains actual missing dependencies:
+
+| Dependency | Prepared objects |
+| --- | ---: |
+| No identified acquisition list | 29 |
+| Tortimer holiday gifts | 12 |
+| Harvest rewards | 6 |
+| Island rewards | 5 |
+| Gulliver rewards | 4 |
+| Winter-camper rewards | 3 |
+| Native identity/artwork correspondence | 2 |
+| Train reward route | 1 |
+
+Acquisition is not the only possible requirement: the sixteen diary display
+models also need their actual diary gameplay. Prepared output is a separate
+format and cannot pass installation. No prepared object is added to the offline
+selection catalogue or counted as a completed playable import.
+
+Forty-six focused pipeline/composition checks pass with the new direct-colour
+artifact; the additional actual-executable format-table check and updated shared
+placeholder-discovery check also pass. The shared complete-artwork and compiled-
+material checks pass again against all 62 final prepared objects. Thus forty-seven
+distinct focused checks pass across this batch. Independent comparisons cover
+every source sample, vertex, triangle, model layer, material state, native load
+format, palette mode, stride, texture scale, wrap, and shift. Partial-alpha and
+incomplete-block rejection are covered without a new native scenario.
+
+The current cartridge, build pin, 93 installed development options, saves, and
+both served patchers remain unchanged. ABI-91 native results below are retained;
+no old cartridge or unchanged emulator path is rerun. The newer converter source
+does not relabel the ABI-91 build receipt as produced by revision 3. The scan still
+has 58 supported and 184 review records; placeholder classification improves the
+reason rather than hiding those records. Continue shared acquisition and animated
+callback implementation using these prepared assets.
+
 ## Current shared intensity materials and resource reuse
 
 The complete development cartridge is ABI 91:

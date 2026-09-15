@@ -17,13 +17,13 @@ from apply_translation import write_new
 from gc_names import rel_sections
 from item_identity_sheet import SHEET_SHA, sheet_rows
 from map_artwork import compile_commands
-from title_assets import model_texture_shape, pack4, untile
+from title_assets import model_texture_shape, pack4, rgb5a3, untile
 from v3_asset_loader import ROOT
 from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources
 from v3_registry import FURNITURE
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 2
+VERSION = 3
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -36,6 +36,27 @@ INDEXED_STATIC_DRAW_SHA = '612998bdab7cb941114e08d66db7100ded74894f8c1ccfdbdffe4
 
 class ReviewRequired(ValueError):
     """A valid donor feature lacks a supported conversion/runtime category."""
+
+
+def native_rgba16(data, width, height):
+    """Convert complete GX RGB5A3 blocks to native RGBA5551 without alpha loss.
+
+    The donor's emu64 format table maps RGBA/16 to GX_RGB5A3, not RGB565.
+    Partial alpha needs a wider renderer and is rejected, never thresholded.
+    """
+    if (type(width) is not int or type(height) is not int or width<=0 or height<=0
+            or width%4 or height%4 or len(data)!=width*height*2):
+        raise ReviewRequired('RGBA16 texture needs complete four-by-four GX blocks')
+    result=bytearray(len(data))
+    for y in range(height):
+        for x in range(width):
+            index=((y//4)*(width//4)+x//4)*16+(y%4)*4+x%4
+            value=struct.unpack_from('>H',data,index*2)[0]
+            r,g,b,a=rgb5a3(value)
+            if a not in (0,255):
+                raise ReviewRequired('Partial-alpha RGB5A3 texture needs a wider native renderer')
+            struct.pack_into('>H',result,(y*width+x)*2,(r>>3)<<11|(g>>3)<<6|(b>>3)<<1|(a==255))
+    return bytes(result)
 
 
 class Source:
@@ -197,6 +218,8 @@ class Source:
         targets = [table.get(at+index*4) for (at, _), table in zip(self.names['furniture_quality'], self.quality)]
         if targets[0] is None or targets[0] != targets[1]:
             raise ReviewRequired('profile tables disagree or lack the item')
+        if targets[0] == self.symbol('iam_dummy')[0]:
+            raise ReviewRequired('shared dummy profile: actual artwork absent in this donor')
         name, at, n = self.containing(targets[0], exact=True)
         if n != 52: raise ReviewRequired('unsupported furniture profile format')
         raw = self.data[at:at+n]
@@ -257,11 +280,12 @@ def prepare(source, item):
                     palettes[start] = (symbol, size)
                 elif op == 0xFD:
                     w, h, fmt, bits = model_texture_shape(raw[position:position+8])
-                    if fmt not in (2,4) or bits != 0 or w*h//2 != size or w*h//2 > 2048:
-                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4')
-                    if start in textures and textures[start][2:] != (w, h, fmt):
+                    if ((fmt,bits) not in ((2,0),(4,0),(0,2))
+                            or w*h*(4<<bits)//8 != size or size>2048):
+                        raise ReviewRequired('texture is not complete TMEM-sized CI4/I4/RGBA16')
+                    if start in textures and textures[start][2:] != (w, h, fmt, bits):
                         raise ReviewRequired('texture has inconsistent dimensions')
-                    textures[start] = (symbol, size, w, h, fmt)
+                    textures[start] = (symbol, size, w, h, fmt, bits)
                 else:
                     if size%16: raise ReviewRequired('invalid complete vertex array')
                     vertex_arrays[start] = (symbol, size)
@@ -283,16 +307,17 @@ def prepare(source, item):
         resources.append(dict(symbol=name, donor_offset=at, native_offset=offsets[at], bytes=n,
             source_sha256=sha256(raw), output_sha256=sha256(converted), **details))
     for at, (name, n) in sorted(palettes.items()): add(at, name, n, native_palette, kind='palette')
-    for at, (name, n, w, h, fmt) in sorted(textures.items()):
-        add(at, name, n, lambda data, w=w, h=h: pack4(untile(data, w, h, 4)), kind='texture', width=w, height=h,
-            format='CI4' if fmt==2 else 'I4')
+    for at, (name, n, w, h, fmt, bits) in sorted(textures.items()):
+        add(at, name, n, lambda data, w=w, h=h, bits=bits:
+            native_rgba16(data,w,h) if bits==2 else pack4(untile(data,w,h,4)),
+            kind='texture',width=w,height=h,format={2:'CI4',4:'I4',0:'RGBA16'}[fmt])
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
     for label, (name, at, raw, pointers) in raw_models.items():
         models[label] = dict(symbol=name, donor_offset=at, source_sha256=sha256(raw),
             rows=parse_model(raw, at, pointers, tuple(palettes),
-                {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_4bit=True,
+                {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
                 palette_bindings=bindings))
     # Validate all native emitter rules before creating output files.
     commands, sections = command_source(models, offsets)
@@ -388,11 +413,17 @@ def scan(source, worksheet, installed=None):
                    asset_ready=False)
         try:
             profile, body, resources, offsets, models, commands, sections = prepare(source, item)
+            # Prepared batches also require a real, unambiguous donor identity.
+            # Keep dummy/unknown names in review, not in the default bulk batch.
+            name_metadata(source,item,identity)
             estimated = (len(body)+sum(n for _,n in sections)+15)&~15
             if estimated > 9216: raise ReviewRequired('complete object exceeds native model-bank capacity')
             formats={r['format'] for r in resources if r['kind']=='texture'}
-            categories = [profile['behaviour'], 'static-4bit', ('1x1','2x1','2x2')[profile['size_code']]]
-            categories += ['static-ci4'] if formats=={'CI4'} else ['intensity-materials']
+            categories = [profile['behaviour'], 'static-materials', ('1x1','2x1','2x2')[profile['size_code']]]
+            if formats<={'CI4','I4'}: categories.append('static-4bit')
+            if formats=={'CI4'}: categories.append('static-ci4')
+            if 'I4' in formats: categories.append('intensity-materials')
+            if 'RGBA16' in formats: categories.append('rgba16-materials')
             if 'callback_adapter' in profile: categories.append(profile['callback_adapter']['category'])
             row.update(asset_ready=True, profile=profile,
                 object_bytes=estimated, textures=sum(r['kind']=='texture' for r in resources),

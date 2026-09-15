@@ -10,22 +10,29 @@ There is no new item-specific converter, installer, runtime code, or allocation.
 The installer reuses its regenerated three-resource tail after complete mapping,
 content, padding, and retained-profile checks. The 6,880 bytes of new art increase
 storage by exactly 6,880 bytes, avoiding another 64,496-byte resource copy.
-All forty-four focused pipeline/composition checks pass, including prepared assets.
+Forty-seven focused checks pass across the current converter implementation,
+including prepared assets, actual donor format mapping, and placeholder discovery.
 The first current native run passes 88 records with 68 assertions. The full
 source/verification record is in
 [the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 93
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
-The shared CI4/I4 converter prepares the complete miniature car automatically:
-7,104 bytes, 170 vertices, and 98 triangles. It remains uninstalled because no
-actual acquisition route is identified; trace that route rather than inventing
-shop stock or classifying it as unused. Harvest mirror also passes shared
-material discovery, with its harvest acquisition dependency retained.
-The next texture format is RGBA16, used by Diver Dan alongside CI4/I4; verify
-actual GX/native colour and alpha representation before extending conversion.
-Preserve environment mapping, palettes, and every material layer. Do not erase
-effects to make conversion pass. Island acquisition remains a separate dependency.
+Converter revision 3 prepares all 62 eligible uninstalled, non-placeholder models
+in one command: `build/v3-furniture-all-static-prepared-02/`. Complete assets total
+211,136 bytes, 5,065 vertices, and 3,720 triangles. RGBA16 conversion retains
+source-verified RGB5A3 colour and binary alpha, alongside CI4/I4 materials.
+Diver Dan's complete 5,120-byte model still requires island acquisition; the
+miniature car's actual acquisition remains unresolved. No ordinary stock is
+invented. The collection retains six harvest, five island, four Gulliver, three
+winter-camper, twelve Tortimer-gift, and one train-route dependencies; twenty-nine
+entries have no identified acquisition list, and two need native identity review.
+Some entries, including sixteen diary models, also need separate gameplay.
+The sixteen actual shared-dummy-profile entries remain excluded from preparation;
+their artwork is absent in this donor, not established unused in every edition.
+Continue shared acquisition and callback categories; do not repeat complete
+artwork conversion separately for each item. Preserve environment mapping,
+palettes, animation, and every material layer.
 The constant identity-indexed model/palette category prepares all nine flower
 variants in one command, retaining their full 19,152 bytes, 555 vertices, and 288
 triangles. They are not installed: the shared `ftr_listEventPresentChumon`

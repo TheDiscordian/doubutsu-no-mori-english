@@ -39,14 +39,14 @@ class FormatTests(unittest.TestCase):
     def test_unlit_material_uses_native_texture_primitive_expression_without_item_switches(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>II',raw,8,0xFCFFFE60,0xFFFCF3F8)
-        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
+        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
         self.assertTrue(rows[1]['unlit_texture_primitive'])
         source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
         self.assertIn('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
                       'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)',source)
         struct.pack_into('>I',raw,12,0xFFFCF3F9)
         with self.assertRaisesRegex(ValueError,'colour combiner'):
-            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
+            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
 
     def test_constant_palette_binding_preserves_commands_and_rejects_ambiguous_dependencies(self):
         raw,pointers=fixture();raw=bytearray(raw)
@@ -54,7 +54,7 @@ class FormatTests(unittest.TestCase):
         pointers.pop(0x11C)
         def parse(binding, fixups=pointers):
             return parse_model(raw,0x100,fixups,(0x500,),{0x600:(32,32)},0x1000,48,
-                               static_4bit=True,palette_bindings=binding)
+                               static_materials=True,palette_bindings=binding)
         rows=parse({0x08000000:0x500})
         palette=next(r for r in rows if r['opcode']==0xF0)
         self.assertEqual(palette['target'],0x500)
@@ -82,14 +82,14 @@ class FormatTests(unittest.TestCase):
                 changed=bytearray(raw)
                 struct.pack_into('>I',changed,0x28,0xD2F0F000|s<<10|t<<8)
                 struct.pack_into('>I',changed,0x34,0x123456FF)
-                rows=parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
+                rows=parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
                 self.assertIn((0xFA000080,0x123456FF),[r['words'] for r in rows])
                 source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
                 self.assertIn('gsSPVertex',source)
         for value in (0xD2F0FC00,0xD2F0F300,0xD2F1F000):
             changed=bytearray(raw);struct.pack_into('>I',changed,0x28,value)
             with self.assertRaises(ValueError):
-                parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_4bit=True)
+                parse_model(changed,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_materials=True)
 
     def test_palette_free_intensity_and_asymmetric_texture_scales_shifts(self):
         original,_=fixture()
@@ -99,7 +99,7 @@ class FormatTests(unittest.TestCase):
         struct.pack_into('>I',raw,4,0x11940FA0)
         for s,t in ((0,1),(2,1),(15,15)):
             struct.pack_into('>I',raw,0x20,0xD2F0F500|s<<4|t)
-            rows=parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_4bit=True)
+            rows=parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_materials=True)
             texture=next(r for r in rows if r['opcode']==0xFD)
             self.assertTrue(texture['intensity']);self.assertEqual(texture['tile_shifts'],(s,t))
             source,_=command_source({'translucent':{'rows':rows}},{0x600:0,0x1000:512})
@@ -109,7 +109,7 @@ class FormatTests(unittest.TestCase):
             self.assertIn(f'G_IM_FMT_I, 32, 32, 0, G_TX_WRAP, G_TX_WRAP, 5, 5, {s}, {t}',source)
         struct.pack_into('>I',raw,0x18,0xFD441C1F)
         with self.assertRaisesRegex(ValueError,'texture or palette'):
-            parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_4bit=True)
+            parse_model(raw,0x100,pointers,(),{0x600:(32,32)},0x1000,48,static_materials=True)
 
     def test_mixed_materials_switch_native_palette_mode_at_each_format_change(self):
         raw,pointers=fixture();words=list(struct.iter_unpack('>II',raw));triangle=words[-2]
@@ -117,11 +117,49 @@ class FormatTests(unittest.TestCase):
                           (0xFD441C1F,0),(0xD2F0F000,0),triangle,words[-1]]
         pointers.update({0x154:0x700,0x16C:0x800})
         rows=parse_model(b''.join(struct.pack('>II',*w) for w in words),0x100,pointers,(0x500,),
-            {a:(32,32) for a in (0x600,0x700,0x800)},0x1000,48,static_4bit=True)
+            {a:(32,32) for a in (0x600,0x700,0x800)},0x1000,48,static_materials=True)
         source,_=command_source({'opaque':{'rows':rows}},
             {0x500:0,0x600:32,0x700:544,0x800:1056,0x1000:1568})
         self.assertEqual(source.count('gsDPSetTextureLUT(G_TT_RGBA16)'),2)
         self.assertEqual(source.count('gsDPSetTextureLUT(G_TT_NONE)'),1)
+
+    def test_direct_colour_untile_preserves_all_opaque_and_transparent_samples(self):
+        for w,h in ((4,4),(8,12),(12,8)):
+            raw=bytearray(w*h*2);expected=bytearray(w*h*2)
+            for y in range(h):
+                for x in range(w):
+                    i=y*w+x
+                    pixel=(0x8000|(i*971)&0x7FFF) if i%3 else (i*337)&0xFFF
+                    gx=((y//4)*(w//4)+x//4)*16+y%4*4+x%4
+                    struct.pack_into('>H',raw,gx*2,pixel)
+                    if pixel&0x8000:
+                        native=((pixel&0x7FFF)<<1)|1
+                    else:
+                        r,g,b=((pixel>>s&15)*17>>3 for s in (8,4,0))
+                        native=r<<11|g<<6|b<<1
+                    struct.pack_into('>H',expected,i*2,native)
+            self.assertEqual(pipeline.native_rgba16(raw,w,h),expected)
+        for bad in (0x1000,0x6000):
+            with self.assertRaisesRegex(pipeline.ReviewRequired,'Partial-alpha'):
+                pipeline.native_rgba16(struct.pack('>16H',bad,*([0xFFFF]*15)),4,4)
+        for data,w,h in ((bytes(32),3,4),(bytes(30),4,4),(bytes(32),4,0)):
+            with self.assertRaises(pipeline.ReviewRequired):pipeline.native_rgba16(data,w,h)
+
+    def test_direct_colour_material_has_native_16bit_load_and_no_palette(self):
+        original,_=fixture();raw=bytearray(original[:0x18]+original[0x20:])
+        pointers={0x11C:0x600,0x13C:0x1000}
+        struct.pack_into('>I',raw,0x18,0xFD141C0F)
+        struct.pack_into('>I',raw,0x20,0xD2F00800)
+        rows=parse_model(raw,0x100,pointers,(),{0x600:(16,32)},0x1000,48,static_materials=True)
+        texture=next(r for r in rows if r['opcode']==0xFD)
+        self.assertTrue(texture['rgba16']);self.assertNotIn('intensity',texture)
+        source,_=command_source({'opaque':{'rows':rows}},{0x600:0,0x1000:1024})
+        self.assertIn('gsDPLoadTextureBlock(0x06000000, G_IM_FMT_RGBA, G_IM_SIZ_16b, 16, 32, 0,',source)
+        self.assertIn('gsDPSetTextureLUT(G_TT_NONE)',source)
+        self.assertNotIn('gsDPLoadTLUT',source)
+        for shape in ((32,64),(6,8)):
+            texture['shape']=shape
+            with self.assertRaises(ValueError):command_source({'opaque':{'rows':rows}},{0x600:0,0x1000:1024})
 
     def test_record_driven_catalogue_under_address_and_undefined_sanitizers(self):
         with tempfile.TemporaryDirectory(prefix='v3-catalogue-records-') as temporary:
@@ -141,6 +179,15 @@ class DonorTests(unittest.TestCase):
         _,current=composer.inputs()
         cls.art=ROOT/current['automatic_furniture']['art_directory']
         cls.report=json.loads((cls.art/'art.json').read_bytes())
+
+    def test_actual_donor_executable_maps_direct_colour_to_rgb5a3(self):
+        from v3_villager_audio import read_audio_donor
+        dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
+        table=dol.read(0x800AAFC0,64)
+        self.assertEqual(sha256(table),'7ae4019ff69d72ee09dd42b8b1c5a4c7a3a236d07aa238e2acdb93c97302fe30')
+        self.assertEqual(struct.unpack_from('>H',table,2*2)[0],5)  # RGBA/16 -> GX_RGB5A3
+        self.assertEqual(struct.unpack_from('>H',table,2*4*2)[0],8)  # CI/4 -> GX_C4
+        self.assertEqual(struct.unpack_from('>H',table,4*4*2)[0],0)  # I/4 -> GX_I4
 
     def test_indexed_dependencies_match_independent_relocation_reader(self):
         for row in self.report['objects'][:3]:
@@ -172,6 +219,14 @@ class DonorTests(unittest.TestCase):
 
     def test_single_bed_category_discovers_models_without_waiving_acquisition(self):
         inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx')
+        for row in inventory['rows']:
+            if row.get('reason')=='name/identity is ambiguous or unused':
+                self.assertFalse(row['asset_ready'])
+            if row.get('reason','').startswith('shared dummy profile:'):
+                self.assertFalse(row['asset_ready'])
+                index=1024+(int(row['item_id'],16)-0x3000)//4
+                for (at,_),table in zip(self.source.names['furniture_quality'],self.source.quality):
+                    self.assertEqual(table[at+index*4],self.source.symbol('iam_dummy')[0])
         beds=[r for r in inventory['rows'] if r.get('profile',{}).get('contact_action')==8]
         self.assertEqual(len(beds),4)
         self.assertEqual(sum(r['status']=='supported' for r in beds),2)
@@ -303,10 +358,20 @@ class DonorTests(unittest.TestCase):
                 if r['kind']=='texture':
                     for y in range(r['height']):
                         for x in range(r['width']):
-                            gx=((y//8)*(r['width']//8)+x//8)*64+y%8*8+x%8
                             flat=y*r['width']+x
-                            self.assertEqual(donor[gx//2]>>(4 if gx%2==0 else 0)&15,
-                                native[flat//2]>>(4 if flat%2==0 else 0)&15)
+                            if r['format']=='RGBA16':
+                                gx=((y//4)*(r['width']//4)+x//4)*16+y%4*4+x%4
+                                value=struct.unpack_from('>H',donor,gx*2)[0]
+                                if value&0x8000:expected=((value&0x7FFF)<<1)|1
+                                else:
+                                    alpha=value>>12;self.assertIn(alpha,(0,7))
+                                    red,green,blue=((value>>s&15)*17>>3 for s in (8,4,0))
+                                    expected=red<<11|green<<6|blue<<1|bool(alpha)
+                                self.assertEqual(struct.unpack_from('>H',native,flat*2)[0],expected)
+                            else:
+                                gx=((y//8)*(r['width']//8)+x//8)*64+y%8*8+x%8
+                                self.assertEqual(donor[gx//2]>>(4 if gx%2==0 else 0)&15,
+                                    native[flat//2]>>(4 if flat%2==0 else 0)&15)
                 elif r['kind']=='vertices':
                     for start in range(0,n,16):
                         self.assertEqual(native[start:start+6],donor[start:start+6])
@@ -362,13 +427,15 @@ class DonorTests(unittest.TestCase):
                     expected=[];luts=[];last=None
                     for r in source:
                         if r['opcode'] not in (0xFD,0xD2):continue
-                        intensity=bool(r.get('intensity'));w,h=r['shape']
+                        intensity=bool(r.get('intensity'));rgba16=bool(r.get('rgba16'));w,h=r['shape']
+                        direct=intensity or rgba16
                         wraps=tuple({0:2,1:0,2:1}[x] for x in r['wrap_modes'])
                         shifts=r.get('tile_shifts',(0,0))
-                        expected.append((4 if intensity else 2,0,(w+15)//16,0,
-                                         0 if intensity else 15,*wraps,*shifts))
-                        if r['opcode']==0xFD and intensity!=last:
-                            luts.append((0xE3001001,0 if intensity else 0x8000));last=intensity
+                        expected.append((0 if rgba16 else 4 if intensity else 2,2 if rgba16 else 0,
+                                         w//4 if rgba16 else (w+15)//16,0,
+                                         0 if direct else 15,*wraps,*shifts))
+                        if r['opcode']==0xFD and direct!=last:
+                            luts.append((0xE3001001,0 if direct else 0x8000));last=direct
                     actual=[(a>>21&7,a>>19&3,a>>9&511,a&511,b>>20&15,
                              b>>8&3,b>>18&3,b&15,b>>10&15)
                             for a,b in words if a>>24==0xF5 and b>>24&7==0]

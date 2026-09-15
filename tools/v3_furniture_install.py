@@ -25,7 +25,7 @@ import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 2
+VERSION = 3
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'

@@ -15,15 +15,24 @@ validating every resource and retained profile. Cartridge storage grows only by
 the new artwork, avoiding another 64,496 bytes of superseded resource copies.
 No runtime code, permanent allocation, or saved format grows.
 
-All forty-four focused pipeline/composition checks pass, including complete
-compiled material/texture checks and prepared-only assets. The first current
+Converter revision 3 also handles complete GX RGB5A3-to-native-RGBA16 textures,
+rejecting partial alpha that cannot be preserved. One unrestricted preparation
+command produces 62 non-placeholder models: 211,136 bytes, 5,065 vertices,
+and 3,720 triangles. These are prepared assets, not installed imports; actual
+acquisition, identity, and gameplay dependencies remain. Sixteen entries that
+share the donor's dummy profile are excluded automatically, regardless of their
+names. No per-item exclusion list is needed. The collection includes Diver Dan,
+miniature car, the flower models, island furnishings, and harvest furnishings.
+
+Forty-seven focused checks pass across this implementation batch, including
+compiled material/texture checks, prepared-only assets, actual donor format
+mapping, and placeholder discovery. The first current
 silent native check passes 88 records with 68 assertions: complete model DMA,
 preview framing, stock, acquisition, ownership, restoration, and guards.
-The converter also prepares the complete miniature car automatically; its actual
-acquisition route remains unresolved, so it is not installed. All nine prepared
-flower-model variants retain the shared Tortimer holiday-gift dependency. Their
-event actor, calendar, conversations, and trophy persistence remain required.
-Prepared-only output is explicitly rejected by the installer.
+The current cartridge remains ABI 91; the subsequent preparation work does not
+change it or justify another emulator run. The prepared flower-model variants
+retain their shared Tortimer event actor, calendar, conversations, and trophy
+persistence dependency. Prepared-only output is rejected by the installer.
 
 The offline composer has 93 installed development options: 70 furniture,
 three shirts, and twenty villagers. Full catalogue construction, ordinary

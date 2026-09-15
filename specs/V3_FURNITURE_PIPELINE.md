@@ -36,6 +36,12 @@ The ordinary `convert` and `import` commands still require every eligibility
 check. Inventory `asset_ready` describes conversion only; `status: supported`
 also requires the supported metadata and acquisition route. Neither field is a
 claim of completed playtesting.
+An unrestricted `convert --assets-only` prepares all eligible uninstalled
+artwork in one batch. Names must identify actual donor entries, and both donor
+profile tables must resolve to real models. Entries pointing to the shared
+`iam_dummy` profile remain explicit review records with `asset_ready: false`,
+even when the name table contains a plausible item name. The English donor's
+placeholder is not a substitute for artwork from another edition.
 
 ```sh
 python3 tools/v3_furniture_pipeline.py convert --assets-only \
@@ -63,7 +69,7 @@ across the scan. Dependencies come from actual profile/model pointers, including
 interior vertex-array references. Missing, ambiguous, external, truncated, or
 unaccounted dependencies are rejected.
 
-The shared static-four-bit category supports:
+The shared static-material category supports:
 
 - All four native opaque/translucent model slots, complete 16-colour palettes,
   one complete vertex array, and multiple textures/palettes.
@@ -72,6 +78,14 @@ The shared static-four-bit category supports:
   native texture-LUT mode follows each material, including mixed-format lists.
   The shared `static-4bit` category covers both; `static-ci4` selects CI4-only
   objects, and `intensity-materials` selects objects with I4 layers.
+- Complete RGBA16 textures up to 2,048 bytes, using source-verified GX RGB5A3
+  four-by-four blocks and native RGBA5551. Opaque and fully transparent alpha
+  survive exactly. Partial alpha is rejected, never thresholded; it requires
+  a wider native renderer. No resizing or texture reduction is used. Upper TMEM
+  stays available for CI palettes when materials switch. `rgba16-materials`
+  selects these objects; `static-materials` includes all supported formats.
+  The donor executable's `fmtxtbl__5emu64` at `800AAFC0` supplies the verified
+  RGBA/16-to-RGB5A3 mapping, not a guess from the texture's symbol name.
 - Native vertex conversion preserving position, UVs, and colours, clearing only
   donor flag fields; complete triangle conversion and bounded vertex loads.
 - Source primitive colours and the supported material/geometry commands.
@@ -151,7 +165,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 2 reuses the preceding automatic batch's terminal
+Converter/installer revision 3 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -224,6 +238,10 @@ sanitizer checks.
 Material checks decode the compiled texture format, palette mode, line stride,
 S/T scale, wrapping, and independent shifts against the donor commands. Complete
 sample, vertex, triangle, and material checks also cover prepared-only objects.
+Direct-colour checks independently compare every RGB/alpha sample after untile,
+reject partial alpha and incomplete blocks, and verify the actual donor
+executable's complete format table. Shared placeholder-profile discovery is
+checked against both actual profile tables, not a manually maintained item list.
 Storage tests reject changed tail receipts/data and live-profile overlaps, check
 every previous model unchanged, and verify reuse again from the newly built receipt.
 
