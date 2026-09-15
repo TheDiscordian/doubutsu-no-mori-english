@@ -20,6 +20,7 @@ tent foreground placement/removal classification and event cleanup. ABI 76
 extends the installed English manager with checked selection, registration,
 placement/removal, and retry handling. ABI 77 prevents the saved camper from
 simultaneously entering town through natural growth or an inbound transfer.
+ABI 78 binds both NPC-profile readers and the first/repeat quest lifecycle.
 Remaining masked NPC/quest readers,
 conversations/rewards, and special scene lighting remain unfinished. Neither
 served patcher changes without user testing and explicit approval.
@@ -316,14 +317,14 @@ and invalid explicit overrides use `2400`. The registered texture and identity
 are both the full actual `E0xx`, not a table index or replacement resident.
 
 The session greeting flag is owner byte `10`. The manager resets it for a newly
-selected camper; the conversation owner must set it after the actual first
-greeting. Re-registration
+selected camper; the quest owner sets it at the first summer talk start, matching
+the donor's `aQMgr_actor_talk_start`, not at conversation completion. Re-registration
 with the flag set recreates the current player's first memory via the native
 memory setter. **Native Animal memories start at `+10`, not `+0C`**; the original
 initializer at `800A7A28` accounts for alignment. Personal IDs are sixteen bytes,
 the timestamp starts at memory `+10`, and friendship is at memory `+28`.
 The registration caller must supply the actual current private-player pointer.
-The actual first-greeting completion transition remains a conversation task.
+The actual first-talk transition is installed by the quest adapter below.
 
 The NPC-info adapter gives `D08F` the dedicated Animal and a null town NpcList,
 as in GC. A cleared or mismatching alias gives null pointers even if the caller
@@ -445,3 +446,47 @@ The [move-in checkpoint](../docs/checkpoints/V3_CAMPER_MOVEIN.md) records passin
 native candidate selection after actual history reset, full inbound transfer
 refusal without mutation, and re-eligibility after saved-area release. These
 checks do not establish ordinary arrival, house construction, or persistence.
+
+## Native camper profiles and quest lifecycle
+
+`camper_quest.S` occupies 112 checked bytes at `804A2EC0..804A2F2F`. Both native
+NPC controllers' 110-entry special-profile tables require an explicit `D08F`
+path: index 143 exceeds their tables. The donor's `event_npc_profile_table$4912`
+and `$3781` each contain 144 entries and map both `D05E` and `D08F` to profile
+`23`, `Kamakura_Npc0`. Reuse that actual camper controller, retaining the full
+summer identity and every other profile lookup.
+
+The native hooks at `80980448` and `809A09D0` retain their existing HI/LO pairs.
+Convert the signed profile load into address construction, call the shared
+resident adapter, and write the selected profile into the original stack slot
+`56`. The native `addiu a0, sp, 44` remains the call's delay slot. The biased
+profile bases `80969690` and `80989060` must relocate with their owners; do not
+embed either original table address in resident code. The original complete
+NPC files, BSS allocations, relocation files, and table rows otherwise remain.
+
+The current English quest owner at VROM `849B50`, RAM `80954D80`, retains its
+11,600-byte extent, actor size, shared conversation buffers, and existing letter
+and choice changes. Replace only the 72-byte mode-selection window at `809550D8`.
+After the original demo/listen preconditions, read the actual first-meeting flag
+at owner address `809571B0`, select the mode, then write `809571A4`. The subsequent
+native memory-binding and melody calls remain unchanged.
+
+The donor's winter/summer normal-init functions are equivalent pairs: first
+talk clears normal state and enters demo-order wait; repeat talk also prepares
+free strings and the available inventory slot. Share native modes 4/5 and steps
+8/9 for this common lifecycle. Ordinary conversations retain mode 1. Summer's
+first talk sets owner byte `804A1A10` to one at the same transition as donor
+`aQMgr_actor_talk_start`; repeat, winter, and ordinary talks leave it unchanged.
+This is common lifecycle reuse, not permission to substitute winter dialogue.
+Actual summer English greeting selection and conversation/reward commands remain
+required before the acquisition route is complete.
+
+Eight obsolete mode-window relocations are replaced by four new self-contained
+HI/LO entries. The relocation file remains 800 bytes, with 187 entries and the
+original footer. Its raw ROM alias occupies 800 appended bytes in the existing
+trailing resource; virtual ID `84C8A0`, directory slot, and runtime allocation
+stay fixed. Preserve the original compressed physical bytes. Full-owner
+relocation comparisons at two bases must show no changes outside the declared
+windows. The [quest checkpoint](../docs/checkpoints/V3_CAMPER_QUEST.md) records
+actual complete native loading and twelve profile/quest instruction windows;
+those checks do not establish a complete NPC construction or conversation.

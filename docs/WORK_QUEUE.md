@@ -341,9 +341,19 @@ with later e/e+ donor support investigated separately.
   native save/town-list preservation are checked. Full NPC construction and
   ordinary persistence remain unverified. The native memory array is at Animal
   offset `10`, not the inaccurate source comment's `0C`.
-  Current full build: `build/v3-camper-runtime-02/`; camping subset:
-  `build/v3-optional-camper-01/`. Both patchers remain V2.
-  Continue event-manager activation, remaining masked readers/greeting state, and English conversations,
+  The [event manager](checkpoints/V3_CAMPSITE_MANAGER.md) binds real selection,
+  registration, placement/removal, and retries, retaining all original events
+  and the current English letter owner. Its 79-record native check passes.
+  The [move-in guard](checkpoints/V3_CAMPER_MOVEIN.md) excludes the saved camper
+  from both native growth and inbound transfers; its 48-record native check passes.
+  The [NPC/quest adapter](checkpoints/V3_CAMPER_QUEST.md) binds both camper-profile
+  readers and first/repeat quest state. Seventeen focused/composition checks and
+  the corrected 68-record/55-assertion native instruction-window check pass.
+  Full NPC construction and summer-specific English messages remain unfinished.
+  Current full build: `build/v3-camper-quest-runtime-02/`; camping subset:
+  `build/v3-optional-camper-quest-01/`. Both patchers remain V2.
+  Continue actual English summer greeting selection and conversation commands,
+  remaining masked readers, ordinary NPC construction,
   selected rewards, and scene lighting/floor sounds as specified in
   [V3_CAMPSITE](../specs/V3_CAMPSITE.md). Natural entry, reward handover, GPU
   appearance, and persistence are not yet verified.

@@ -2,7 +2,17 @@
 
 ## Active development
 
-The [camper move-in guard](checkpoints/V3_CAMPER_MOVEIN.md) prevents the saved
+The [camper NPC/quest adapter](checkpoints/V3_CAMPER_QUEST.md) binds both native
+NPC controllers to the donor's shared camper profile and installs first/repeat
+quest routing in ABI 78. The summer greeting-session flag changes at first talk
+start; winter and ordinary conversations leave it alone. The helper uses 112
+checked unused resident bytes without growing any RAM allocation or saved format.
+Seventeen focused/composition tests pass. The corrected silent native run passes
+68 records, five calls, and 55 assertions, including all three complete owner
+loads/relocations and twelve changed instruction windows. Full NPC construction,
+summer English message selection, complete conversations, and rewards remain work.
+
+The unchanged [camper move-in guard](checkpoints/V3_CAMPER_MOVEIN.md) prevents the saved
 summer visitor from simultaneously becoming a resident, through either normal
 growth or an inbound villager transfer. ABI 77 adds 252 bytes in checked unused
 resident space, preserving the native selection rules and all allocations.
@@ -24,12 +34,12 @@ The loaded manager grows by 1,920 bytes; permanent reservations, heap limits,
 actor instance size, DMA file count, and saved formats stay unchanged.
 
 Current full integration:
-`build/v3-camper-movein-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
-`31771d9e0fe23dba25fe1a8643f0124705ea40948b4c060853036fb4e150214f`.
-The ten-item subset is `build/v3-optional-camper-movein-01/`. The offline composer
+`build/v3-camper-quest-runtime-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`f0a34dfed22880ac012cae1ebc6be22d0c49cade56c9d4b08a2e24bfc3d0c001`.
+The ten-item subset is `build/v3-optional-camper-quest-01/`. The offline composer
 retains 59 experimental choices and exact all/empty full/V2 output. Continue the
-remaining masked NPC/quest readers, English first-greeting and conversation
-states, selected rewards, and lighting/floor sounds. Full construction,
+actual English summer greeting selector and conversation commands, remaining
+masked NPC/quest readers, selected rewards, and lighting/floor sounds. Full construction,
 ordinary entry/exit, acquisition, and persistence remain unverified. GitHub
 development source is allowed; neither served patcher changes until the user
 tests V3 and explicitly approves the switch. This is not a complete-import
