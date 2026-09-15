@@ -1,5 +1,78 @@
 # Automatic furniture pipeline checkpoint
 
+## Current material and catalogue-framing categories
+
+The complete development cartridge is ABI 88:
+`build/v3-furniture-material-preview-runtime-02/animal-forest-v3-asset-loader.z64`.
+Shared discovery installs bug zapper `3234`, coffee machine `323C`, candy machine
+`3254`, and steam roller `328C`, with 15,104 complete object bytes, 258 vertices,
+and 153 triangles. The first two retain stock A, candy machine retains stock C,
+and steam roller retains event acquisition and its two-cell footprint. All names
+have official-source credits in the single provenance catalogue. Automatic
+additions total twenty-three; the offline composer contains 85 installed
+development options: 62 furniture, three shirts, and twenty villagers.
+
+All four use the same unlit texture/primitive material command. Its two cycles
+pass texture RGBA through, then multiply RGB by primitive colour while retaining
+alpha. The symbolic native `gsDPSetCombineLERP` compiles to donor words
+`FCFFFE60 FFFCF3F8`; complete compiled material/geometry checks pass. The coffee
+machine's environment-lighting flag is also retained. There is no item-specific
+graphics description or installer.
+
+Catalogue framing is now source-indexed for all 62 installed furnishings. Byte
+26 of the existing 32-byte item record stores the donor framing index plus one.
+The complete 328-byte/41-entry table and its guards occupy
+`80474A30..80474B9F`, with table data at `80474A40`. It fits after the placement
+table and before accessory artwork, without increasing any permanent allocation.
+The general native helper changes only model Y and scale after native
+construction; clothing aliases keep their existing presentation. It replaces
+the installed per-item Western, bike, and campfire overrides. The steam roller
+and campfire both obtain the donor's mode 19 (`0.86`, `-3.0`) through records.
+Disabled, absent, invalid-selector, and original-native cases retain their input.
+
+The complete catalogue suffix is 3,408 bytes, and its 498 furniture rows retain
+all 248 clothing rows. Conservative menu memory is 280,256 of 280,704 reserved
+bytes. The import blob is 3,195,952 bytes, with 932,816 bytes before English
+choices. Model-bank allocation and saved format 2 are unchanged. The required
+saved profile is a superset of ABI 87. Saves using the four new items must not
+be loaded in older builds or V2; ordinary cross-version reload is not newly
+claimed. Both served patchers remain V2.
+
+- ROM SHA-256: `5644a08760b63a396747adf2d5926340255667309152c7d9d0e4290263945319`.
+- UPS SHA-256: `ed9c1c5b54e57d7414cc6b1f2b4dca39e9b5e284925222b999f54249e809c74e`.
+- Build receipt SHA-256: `c8181c0ccb92625fb8d031317f8b83df5be29d9a09a5e5bddff64340105f5cfe`.
+- Art receipt SHA-256: `e0e93177e8b011b6f73d571ce6e805317f4d13797adf03eefd2ee70ba4598a57`.
+- Import blob SHA-256: `76032e58970f9e296b3d8054b09220662ef571a20339b345034ca9e8a172521a`.
+- Preview table SHA-256: `fa6592f8af1ebb2ddb984e59b39649c36afeb85bdd4f9127dbcae26ba62a2a98`.
+- Preview reservation SHA-256: `44d06f4df2fca8da04bb6c6a4ee48f131d9a2e1d22dce012027f077cb32b71bb`.
+
+Thirty-four focused pipeline/composition checks pass against this candidate
+before promoting its lock. They include the shared native combiner expression,
+complete resource/geometry comparisons, all source-derived framing selectors,
+guarded repeat-batch reuse, source credits, installed metadata, and selected/save
+profile composition. The catalogue's host address/undefined-behaviour checks
+cover the complete framing-table range and invalid boundaries. The fixture
+preserves the distinct clothing-display stock route when enabling the full
+catalogue wrapper. An initial build catches the old seating helper's reserved-
+byte check; the corrected check recognises byte 26 as framing metadata while
+retaining zero checks on bytes 27–31. That partial build has no promoted ROM.
+
+The first silent native run passes 146 records with 124 assertions:
+`build/v3-furniture-material-preview-native-01/results.json`, SHA-256
+`3ae031b8643fbcd3a029b4387e2a7e5fde499f4b1157e4d687878e159a20b777`.
+The shared representative selector covers all four new records because their
+stock, footprint, preview, and lighting categories differ. Actual owner loads,
+complete model DMA, source framing with every other preview field unchanged,
+disabled/invalid/native framing fallbacks, names, prices, rotations, stock,
+acquisition, ownership, restoration, and guards pass. The emulator exits cleanly;
+no native retry is needed. This is not proof of full catalogue initialization,
+GPU appearance, ordinary gameplay/save-restart, or original-hardware execution.
+
+The post-scan in `build/v3-furniture-material-preview-post-scan-01/inventory.json`
+has 49 supported entries, all installed, and 193 entries needing review. That
+inventory includes aliases and unused records and is not a remaining-content
+percentage. Continue shared behaviour/format/acquisition categories.
+
 ## Shared identity-indexed model and palette conversion
 
 The converter handles the complete nine-entry flower selector through one
@@ -46,6 +119,33 @@ acquisition route. The N64 has no matching stock-list slot. Do not put the objec
 in ordinary shop stock or claim acquisition is complete. Shared acquisition and
 catalogue handling must cover the twelve source records together.
 
+The actual initial acquisition comes from `mSC_trophy_item`, not a random shop
+list. Its 244-byte donor function at `.text:07C31C` has SHA-256
+`48321dd6e22de9f11751b89f9557c5be837f142f70b36bbe5cbd8ff933ea8234`.
+The 56-byte `soncho_item_table$582` at `.data:010714` has SHA-256
+`2bf4a655de09672b8c202cad690e6595cae1859656b5f379e9b9347822ea2fd9`.
+
+| Donor event | Source reward rule |
+| --- | --- |
+| Founder's Day, index 1 | Weed model `3080` |
+| Cherry Blossom Festival, index 7 | Pink tree model `307C` |
+| Nature Day, index 9 | Tree model `3078` |
+| Groundhog Day, index 13 | Uniform random runtime index `1246 + RANDOM(9)` |
+
+The gift list at `.data:698630` is 26 bytes including its terminator, SHA-256
+`07391eb07d67a5f92dfcd3300ac0586bc3908bb470e8ff2257cd7e39e1a8040f`.
+`aES2_talk_before_give` checks pocket space; `aES2_talk_give` performs the normal
+handover, inserts the actual item, and records the event trophy. Their complete
+function hashes are respectively
+`a3129746c1e60b877ecd74ae82f6861db8ef00509f0f15bfebe097324683bacc`
+and `adb99cc52df75acb980d5f865c3c20f9778e223011b86d6f0b00d59aeec0d699`.
+This requires the donor Tortimer event actor, English conversations, calendar
+integration, selected-reward eligibility, and reviewed per-player trophy/calendar
+persistence; the N64 actor/profile inventory has no corresponding Tortimer
+implementation. Donor private-data offsets are not native saved fields. Implement
+the shared event route without turning these rewards into ordinary stock, and
+continue unrelated conversion categories while that larger dependency is open.
+
 Thirty-two focused pipeline/composition checks pass with
 `V3_FURNITURE_PREPARED_ART=build/v3-furniture-indexed-palette-art-01`. The reused
 asset checks compare complete texels, vertices, triangles, materials, and palette
@@ -62,9 +162,9 @@ models using palette-fade callbacks; tool, fan, and pinwheel display selectors;
 and move-only sound callbacks. These are category candidates, not approved static
 substitutions. In particular, station clock hands and animated parts must remain.
 
-## Current collision and placement categories
+## Collision and placement categories
 
-The current complete cartridge is ABI 87:
+The collision/placement cartridge is ABI 87:
 `build/v3-furniture-placement-runtime-01/animal-forest-v3-asset-loader.z64`.
 The same importer installs grass model `30E8`, dirt model `30F0`, and boxing
 mat `3348`, retaining all 2,768 object bytes, 44 vertices, 24 triangles, textures,

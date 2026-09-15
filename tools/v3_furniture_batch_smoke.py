@@ -18,6 +18,8 @@ def representatives(rows):
     for row in sorted(rows,key=lambda r:(-r['object_bytes'],r['item_id'])):
         features={('size',row['size_code']),('stock',row['stock_group']),('sound',row.get('action_sound',0)),
                   ('placement',row.get('layer_type',0)),('interaction',row.get('interaction_flags',0)),
+                  ('preview',row.get('preview_mode',0)),
+                  ('lighting',bytes.fromhex(row['native_profile_scalar_hex'])[11]),
                   ('layers',tuple(sorted(row.get('model_offsets',{}))))}
         if features-covered: result.append(row); covered.update(features)
     if len(result)>12: raise ValueError('Split new behaviour categories into bounded smoke passes')
@@ -32,7 +34,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         raise ValueError('Furniture probe requires its current checked cartridge')
     rows = representatives(report[section]['imports'])
     record(dict(representative_furniture=[r['item_id'] for r in rows],
-                categories=['stock','footprint','display-list layers','action sounds','placement layers','interaction flags']))
+                categories=['stock','footprint','display-list layers','action sounds','placement layers',
+                            'interaction flags','preview framing','lighting']))
     files, boot = by_vrom(image), boot_proofs(image)
     blob = files[runtime.BLOB].extract(image)
 
@@ -58,6 +61,10 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
         placement=report['furniture_placement'];start=placement['reservation_start'];end=placement['reservation_end']
         at=runtime.PACKAGE+start-runtime.PACKAGE_RAM
         check('complete placement table and guards',start,blob[at:at+end-start])
+    if 'catalogue_preview_records' in report:
+        preview=report['catalogue_preview_records'];start=preview['reservation_start'];end=preview['reservation_end']
+        at=runtime.PACKAGE+start-runtime.PACKAGE_RAM
+        check('complete catalogue framing table and guards',start,blob[at:at+end-start])
     saved = {at: debug.read_memory(at, n) for at, n in (
         (0x80100DF0, 32), (0x8046C000, 864), (0x80126EC0, 0xBD0),
         (0x80136FD8, 4), (0x80135B1C, 1), (0x80135C00, 2), (0x801458B8, 4))}
@@ -159,6 +166,25 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
             check(row['name'] + ' bank assignment', index_ram+index, b'\x00')
         loaded, proof = load(catalogue.VROM, catalogue.RELOC, catalogue.RAM, files[catalogue.VROM].size)
         available = owner + report['catalogue']['code']['symbols']['af_v3_catalogue_available'] - catalogue.RAM
+        if 'catalogue_preview_records' in report:
+            frame=owner+report['catalogue']['code']['symbols']['af_v3_catalogue_frame']-catalogue.RAM
+            preview=scratch+0x200; before=b'\xA5'*0x760
+            for row in rows:
+                expected=bytearray(before);scalar=bytes.fromhex(row['donor_preview_scalar_hex'])
+                expected[0xC:0x10]=scalar[4:];expected[0x758:0x75C]=scalar[:4]
+                debug.write_memory(preview,before)
+                call(frame,[preview,int(row['item_id'],16)|3],proof=proof)
+                check(row['name']+' source framing and untouched preview fields',preview,expected)
+            row=rows[0];item=int(row['item_id'],16)
+            enable=int(row['profile_ram'],16)-4;saved[enable]=debug.read_memory(enable,4)
+            debug.write_memory(enable,bytes(4));debug.write_memory(preview,before)
+            call(frame,[preview,item],proof=proof);check('disabled preview untouched',preview,before)
+            debug.write_memory(enable,saved[enable])
+            selector=0x80498000+runtime.slot(item)*32+26;saved[selector]=debug.read_memory(selector,1)
+            debug.write_memory(selector,b'\xFF')
+            call(frame,[preview,item],proof=proof);check('invalid preview selector untouched',preview,before)
+            debug.write_memory(selector,saved[selector])
+            call(frame,[preview,0x1000],proof=proof);check('native preview untouched',preview,before)
         # Existing native list membership, acquisition, and ownership functions
         # use temporary state restored below; no FlashRAM write is requested.
         debug.write_memory(0x80135B1C, b'\x18')
@@ -190,6 +216,8 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
     check('native owner descriptor restored', 0x80100DF0, saved[0x80100DF0])
     call(0x8009C040, [allocation])
     return dict(native_furniture_batch_readers=True, complete_native_model_dma=True,
+                native_preview_framing='catalogue_preview_records' in report,
+                full_catalogue_initialization_tested=False,
                 rotated_two_cell_placement=True, native_stock_membership=True,
                 native_acquisition_and_ownership=True, ordinary_seating_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)

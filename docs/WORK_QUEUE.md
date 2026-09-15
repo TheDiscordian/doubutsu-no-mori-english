@@ -3,15 +3,13 @@
 ## Active: V3 optional GameCube imports
 
 Use the [automatic furniture pipeline](../specs/V3_FURNITURE_PIPELINE.md) for
-new furniture. Nineteen additional complete assets and their shared runtime
-records are installed. ABI 87 adds grass model, dirt model, and boxing mat with
-the native no-collision flag, plus a shared complete placement-layer table for
-all imports. Five native readers no longer index beyond their original table.
-Thirty-two focused pipeline/composition tests pass, including prepared-asset
-conversion. The unchanged ABI-87 native evidence is 125 records and 107 passing
-assertions. The full
-source/verification record is in
-[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 81
+new furniture. Twenty-three additional complete assets and their shared runtime
+records are installed. ABI 88 adds bug zapper, coffee machine, candy machine, and
+steam roller through the common unlit-material category. Catalogue framing uses
+donor-table records for all installed furniture, replacing per-item overrides.
+Thirty-four focused pipeline/composition tests and the first current native run
+(146 records, 124 assertions) pass. The full source/verification record is in
+[the checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md). The composer has 85
 installed development options; neither patcher changes.
 
 Extend shared categories instead of writing another per-item/family installer.
@@ -19,17 +17,22 @@ The constant identity-indexed model/palette category prepares all nine flower
 variants in one command, retaining their full 19,152 bytes, 555 vertices, and 288
 triangles. They are not installed: the shared `ftr_listEventPresentChumon`
 acquisition/catalogue route must cover those flowers, two tree models, and weed
-model together. Prepared-only output cannot pass the installer. Next: implement
-that shared route and extend shared graphics/callback categories. Other useful
-callback groups include fifteen clocked station models, eight palette-animated
+model together. Actual source tracing identifies Tortimer's Groundhog Day,
+Founder's Day, Cherry Blossom Festival, and Nature Day gifts. The N64 lacks that
+actor; the shared event/calendar/conversation and per-player trophy route needs
+implementation. Prepared-only output cannot pass the installer. Keep that shared
+dependency explicit and continue graphics/contact/callback categories instead of
+blocking bulk imports on it. Useful callback groups include fifteen clocked
+station models, eight palette-animated
 buildings, and tool/fan/pinwheel selectors; preserve their actual effects.
 Sixteen diary display models still need diary identity/gameplay/acquisition.
 Complete model conversion without required behaviour is not a completed import.
-Ordinary GPU appearance,
-interactions, and save/restart remain for the gameplay pass.
+Full catalogue construction, ordinary GPU appearance, interactions, and
+save/restart remain for the gameplay pass. Saved format 2 is unchanged, but saves
+using the four ABI-88 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-placement-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-furniture-material-preview-runtime-02/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

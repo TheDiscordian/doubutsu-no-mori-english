@@ -364,11 +364,17 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             row['material'] = material
             at += size - 8
         elif op == 0xFC:
+            # Two-cycle unlit CI4: cycle one passes texture RGBA through;
+            # cycle two multiplies RGB by primitive colour and preserves alpha.
+            # The donor uses this for several material parts, independently of
+            # the furniture's name or theme. No extra texture/state is needed.
+            unlit = static_ci4 and (a, b) == (0xFCFFFE60, 0xFFFCF3F8)
             modes = (((0xFC30FE03, 0x5F1AF3E9 if fire_effect == 1 else 0x5F06F3FF),)
                 if fire_effect else ((0xFC309C04, 0x5FFEF7F8),) if water else (
                 (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
-            if (a, b) not in modes:
+            if not unlit and (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
+            if unlit: row['unlit_texture_primitive'] = True
         elif op == 0xE2:
             modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
                 (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
@@ -649,6 +655,13 @@ def command_source(models, offsets):
                 if row.get('dynamic_scroll') != 0x09000000 or row['words'] != (0xDE000000, 0x09000000):
                     raise ValueError('Unreviewed dynamic fire scroll list')
                 emit('gsSPDisplayList(0x09000000)')
+            elif op == 0xFC and row.get('unlit_texture_primitive'):
+                if row['words'] != (0xFCFFFE60, 0xFFFCF3F8):
+                    raise ValueError('Changed unlit texture/primitive combiner')
+                # Compile the actual native expression; shared asset checks
+                # compare its complete words with the donor command.
+                emit('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
+                     'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)')
             elif op in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9, 0xDF, 0xF2):
                 # Only the explicitly decoded compatible F3DEX2 state/end
                 # commands reach here; Dolphin loads and packed triangles do not.

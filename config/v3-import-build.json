@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-placement-runtime-01",
-  "runtime_abi": 87,
-  "rom_sha256": "004a1173c51cdea009c3a5e291067469675d40809002bf8fd41d99f28f671c1d",
-  "report_sha256": "64805f9215d264303347fc40842f5fa6b15d2c549453f3e6c5b7ac654b1e85ec"
+  "directory": "build/v3-furniture-material-preview-runtime-02",
+  "runtime_abi": 88,
+  "rom_sha256": "5644a08760b63a396747adf2d5926340255667309152c7d9d0e4290263945319",
+  "report_sha256": "c8181c0ccb92625fb8d031317f8b83df5be29d9a09a5e5bddff64340105f5cfe"
 }

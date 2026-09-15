@@ -64,6 +64,8 @@ def catalogue_record(row):
     return dict(item_id=row['item_id'], runtime_index=row['runtime_index'],
         catalogue_index=(int(row['item_id'],16)-0x1000)//4, mode=0,
         donor_position=row['donor_catalogue_position'], donor_acquisition_list=row['donor_list'],
+        donor_preview_mode=row['preview_mode'],donor_preview_scalar_hex=row['donor_preview_scalar_hex'],
+        preview_override=row['preview_mode']!=0,preview_define='AF_V3_CATALOGUE_PREVIEW_RECORDS',
         ordinary_shop_list=row['donor_list'] if row['ordinary_stock'] else None,
         shop_list_sha256=row['donor_list_sha256'], catalogue_orderable=row['catalogue_orderable'])
 
@@ -215,9 +217,10 @@ def build(output, art_path, lock=LOCK):
     for row in cat_rows:
         at = ITEMS+slot(int(row['item_id'],16))*32
         old = blob[at+24]
-        if old not in (0,order_mask(row)) or any(blob[at+26:at+32]):
+        if old not in (0,order_mask(row)) or any(blob[at+27:at+32]):
             raise ValueError('Catalogue mask overwrites reserved metadata')
         blob[at+24] = order_mask(row)
+    preview_report=catalogue.install_preview_records(blob,prior,source,cat_rows)
     output.mkdir(parents=True)
     text_patch=provenance_patch([r for r,_ in prepared])
     if text_patch: write_new(output/'provenance.patch',text_patch.encode())
@@ -282,6 +285,7 @@ def build(output, art_path, lock=LOCK):
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
         blob_bytes=len(blob),blob_file_bytes=len(blob),startup=startup_report,furniture=all_furniture,
         catalogue=cat_report,shops=stock_report,furniture_behaviours=behaviour_report,
+        catalogue_preview_records=preview_report,
         furniture_placement=placement_report,**score_reports,
         native_test='pending representative automatic-import execution')
     report['save_runtime'].update(profile_hex=profile_bits.hex(),profile_sha256=sha256(profile_bits))

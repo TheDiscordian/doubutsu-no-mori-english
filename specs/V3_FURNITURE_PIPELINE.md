@@ -71,13 +71,17 @@ The shared static-CI4 category supports:
 - Native vertex conversion preserving position, UVs, and colours, clearing only
   donor flag fields; complete triangle conversion and bounded vertex loads.
 - Source primitive colours and the supported material/geometry commands.
+  The unlit texture/primitive category preserves texture RGBA in cycle one,
+  multiplies RGB by primitive colour in cycle two, and preserves texture alpha.
+  Its symbolic native combiner compiles to the exact checked donor command;
+  no theme/item switch or extra texture dependency is required.
   Clamp, wrap, and mirror combinations are decoded by their actual bit fields;
   repeated axes require power-of-two texture dimensions. Unknown state fails.
 - Static profiles with supported shape, collision, lighting, and rotation
   fields. Footprint follows **shape**, as in donor `aMR_GetFurnitureUnit`, not
   collision: shape 4 is 1×1, shape 3 is 2×1, and shape 5 is 2×2.
 - Ordinary A/B/C, event, and lottery acquisition, existing scoring categories,
-  and default catalogue framing. Names and prices come from actual donor tables.
+  and source-indexed catalogue framing. Names and prices come from actual donor tables.
 - Soft- and hard-chair action sounds, selected from the donor's actual category
   table. Matching complete sound programs, timing, instruments, and samples use
   the existing native audio; no replacement sample or new audio allocation is
@@ -101,7 +105,7 @@ The shared static-CI4 category supports:
 
 Dynamic texture/palette pointers, animation rigs, other custom callbacks, unsupported
 contact/interaction flags, other action sounds or acquisition routes, oversized
-or different-format artwork, and special preview framing remain explicit review
+or different-format artwork, and framing outside the checked source table remain explicit review
 categories. Unsupported does not mean unused or unimportant. A successfully
 converted object is not automatically evidence of complete gameplay.
 
@@ -132,7 +136,9 @@ Stock and catalogue builders accept verified records without family switches.
 Catalogue eligibility uses byte 24 of each existing 32-byte sparse item record:
 `7` for ordinary A/B/C, `8` for event, `32` for lottery, and `0` for non-orderable
 items. Byte 25 stores the donor action-sound category: `0` for none, `1` for
-soft chairs, and `2` for hard chairs. The other six reserved bytes remain zero.
+soft chairs, and `2` for hard chairs. Byte 26 holds the donor catalogue framing
+index plus one; zero means no furniture-framing override. The other five
+reserved bytes remain zero.
 The builder populates masks for **all** installed furniture, retaining existing
 non-orderable rewards and
 the separate clothing-display route. Native gameplay IDs and saved formats do
@@ -163,6 +169,21 @@ original after accounting for its changed table address. Future batches update
 the same table from their records, with the installed reservation and bindings
 verified first. Neither the existing item records nor saved formats grow.
 
+The shared preview builder in `tools/v3_catalogue.py` installs the complete
+41-entry donor framing table at `80474A40`. Its table, padding, and two guards
+occupy `80474A30..80474B9F`, after the placement table and before accessory artwork
+at `80475000`. All installed furnishings use source-derived selectors; display
+aliases retain their separate native presentation. New batches reuse the same
+table and reject changed prior selectors or occupied reservations.
+
+`af_v3_catalogue_frame` keeps ordinary native construction and changes only scale
+and model Y for an enabled imported furniture record with a bounded selector.
+It replaces the installed item-specific Western/camping/fire preview cases.
+Native items, missing/disabled records, and invalid selectors are unchanged.
+The native catalogue still uses mode zero during construction, then receives
+the actual source floats; donor mode numbers are never mistaken for N64 indices.
+No item-record, saved-format, or permanent allocation grows.
+
 ## Verification policy
 
 `tests/test_v3_furniture_pipeline.py` checks shared parser rules, source
@@ -174,7 +195,8 @@ sanitizer checks.
 `tools/v3_furniture_batch_smoke.py` and
 `tests/scenarios/v3_furniture_batch.json` are reusable across future batches.
 The manifest selects representatives by stock group, footprint, model layers,
-and action-sound category, preferring larger assets. The check exercises actual
+action sound, placement/interaction flags, preview mode, and lighting category,
+preferring larger assets. The check exercises actual
 native owner loading,
 model DMA, item readers, placement, catalogue eligibility, acquisition, ownership,
 state restoration, and guards. The sound check executes the actual native entry,
@@ -183,6 +205,10 @@ indices. It checks returned sound IDs without playing audio through hardware.
 Placement checks cover the complete resident table/guards, all five bindings
 after relocation, and the actual native no-collision registration routine.
 It does not create a new scenario per item.
+Framing checks compare every preview field after the actual native helper runs,
+including source floats, unchanged surrounding fields, disabled imports, invalid
+selectors, native fallbacks, and the complete resident table/guards. Calling this
+helper does not establish complete catalogue construction or GPU appearance.
 GPU appearance, ordinary interactions, and save/restart require the gameplay pass;
 memory-reader checks do not claim them. Retain passing unchanged evidence.
 

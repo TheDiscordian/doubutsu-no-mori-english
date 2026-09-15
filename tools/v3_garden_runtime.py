@@ -243,7 +243,7 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
         ','.join(map(str, cloth)) + '\n')
     write_new(output / 'catalogue_tables.S', assembly.encode())
     defines = (tuple(f[2:] for f in prior['catalogue']['linked_code']['flags'] if f.startswith('-D'))
-               + ('AF_V3_CATALOGUE_RECORDS=1',)) if reviewed_rows is not None else (
+               + ('AF_V3_CATALOGUE_RECORDS=1','AF_V3_CATALOGUE_PREVIEW_RECORDS=1')) if reviewed_rows is not None else (
         ('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
          'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1')
         + (('AF_V3_WESTERN_ITEMS=1',) if western else ())

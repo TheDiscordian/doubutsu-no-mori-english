@@ -3,6 +3,7 @@ import struct
 from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256
 from v3_asset_loader import ROOT, BLOB, compile_part
 from v3_import_storage import PACKAGE, PACKAGE_RAM, ITEMS, slot
+from v3_catalogue import PREVIEW_COUNT
 from v3_villager_audio import (GC_SECTIONS, NATIVE_HEADERS, NATIVE_FILES,
     read_audio_donor, header_entry, resource, span, instrument)
 
@@ -119,7 +120,8 @@ def install(original, base, prior, blob, code, imports, source, output):
     for row in imports:
         index,item=row['runtime_index'],int(row['item_id'],16); at=ITEMS+slot(item)*32
         category=categories[index]
-        if (category not in (0,1,2) or any(blob[at+26:at+32]) or blob[at+25] not in (0,category)
+        if (category not in (0,1,2) or blob[at+26]>PREVIEW_COUNT or any(blob[at+27:at+32])
+                or blob[at+25] not in (0,category)
                 or struct.unpack_from('>HH',blob,at)!=(index,item)):
             raise ValueError('Unsupported furniture action sound or changed metadata slot')
         blob[at+25]=category

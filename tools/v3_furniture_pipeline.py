@@ -349,8 +349,16 @@ def metadata(source, item, profile, identity):
         raise ReviewRequired('acquisition needs an adapter: ' + ', '.join(r[0] for r in lists))
     catalogue = list(struct.iter_unpack('>HH', source.raw('mCL_furniture_list')))
     entries = [(position, mode) for position,(i,mode) in enumerate(catalogue) if i == index]
-    if len(entries) != 1 or entries[0][1] != 0:
+    if len(entries) != 1:
         raise ReviewRequired('catalogue preview needs a framing adapter')
+    preview = entries[0][1]
+    draw = source.raw('furniture_draw_data$436')
+    if len(draw) != 328 or not 0 <= preview < len(draw)//8:
+        raise ReviewRequired('catalogue preview exceeds the complete donor table')
+    framing = draw[preview*8:preview*8+8]
+    scale, y = struct.unpack('>ff',framing)
+    if not (math.isfinite(scale) and .1 <= scale <= 2 and math.isfinite(y) and -200 <= y <= 100):
+        raise ReviewRequired('unsupported catalogue preview framing')
     price = struct.unpack_from('>H', source.raw('ftr_price_table'), index*2)[0]
     hra = u32(source.data, 0x4FAFC+index*4)
     feng = source.data[0x4EBF0+index*2:0x4EBF0+index*2+2]
@@ -362,7 +370,8 @@ def metadata(source, item, profile, identity):
         layer_type=layer_type, interaction_flags=profile['interaction_flags'],
         price=price, size_code=profile['size_code'], footprint=('1x1','2x1','2x2')[profile['size_code']],
         donor_list=lists[0][0], donor_list_sha256=lists[0][1], stock_group=STOCK[lists[0][0]],
-        ordinary_stock=STOCK[lists[0][0]] < 3, donor_catalogue_position=entries[0][0], preview_mode=0,
+        ordinary_stock=STOCK[lists[0][0]] < 3, donor_catalogue_position=entries[0][0], preview_mode=preview,
+        donor_preview_scalar_hex=framing.hex(),
         catalogue_orderable=True, donor_hra_hex=f'{hra:08x}', native_hra_hex=f'{native_hra:08x}',
         feng_hex=feng.hex(), series=series, birth_category=birth, surface=surface,
         donor_series_hex=source.raw('mMkRm_series_info')[series*3:series*3+3].hex(),

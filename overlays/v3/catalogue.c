@@ -29,6 +29,33 @@ extern void af_v3_save_halt(int) __attribute__((noreturn));
 extern int af_v3_native_catalogue_bit(const u32 *, int);
 extern void af_v3_original_catalogue_program(struct Preview *);
 extern int af_v3_native_catalogue_available(u32, int, int, void *);
+#ifdef AF_V3_CATALOGUE_PREVIEW_RECORDS
+#define AF_V3_PREVIEW_COUNT 41u
+struct PreviewFraming { float scale, model_y; };
+_Static_assert(sizeof(struct PreviewFraming)==8, "Donor preview framing stride");
+#ifdef __mips__
+#define framing ((const struct PreviewFraming *)0x80474A40u)
+#else
+extern struct PreviewFraming af_catalogue_framing[AF_V3_PREVIEW_COUNT];
+#define framing af_catalogue_framing
+#endif
+
+void af_v3_catalogue_frame(struct Preview *preview, u32 argument) {
+    u32 item=(u16)argument, index=(item&0xFFFu)>>2;
+    if (!preview || item>>12!=3u) return;
+#ifdef __mips__
+    const u8 *row=(const u8 *)(0x80498000u+index*32u);
+#else
+    extern u8 af_catalogue_item_records[1024][32];
+    const u8 *row=af_catalogue_item_records[index];
+#endif
+    u32 selector=row[26];
+    if (row[7]!=1 || !selector || selector>AF_V3_PREVIEW_COUNT ||
+            !af_v3_furniture_import_profile(1024u+index)) return;
+    preview->scale=framing[selector-1].scale;
+    preview->model_y=framing[selector-1].model_y;
+}
+#endif
 #ifdef AF_V3_CLOTHING_CATALOGUE
 extern void af_v3_original_catalogue_furniture_init(struct Preview *, u32);
 #ifdef AF_V3_ALOHA_DISPLAY
@@ -55,6 +82,9 @@ void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
         preview->scale = 1.0f;
         preview->height = 38.0f;
     }
+#ifdef AF_V3_CATALOGUE_PREVIEW_RECORDS
+    af_v3_catalogue_frame(preview,argument);
+#else
 #ifdef AF_V3_WESTERN_LARGE
     u32 item = (u16)argument & 0xFFFCu;
     if ((item == 0x32D4u || item == 0x32D8u) &&
@@ -77,6 +107,7 @@ void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
         preview->model_y = -3.0f;
         preview->scale = 0.86f;
     }
+#endif
 #endif
 }
 #endif

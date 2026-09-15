@@ -25,6 +25,59 @@ IMPORTS = {'af_v3_native_catalogue_bit': 0x808A931C,
            'af_v3_catalogue_owned': 0x80469AD4,
            'af_v3_furniture_import_profile': 0x80465000,
            'af_v3_save_halt': 0x80469270}
+PREVIEW_TABLE, PREVIEW_FIRST, PREVIEW_END = 0x80474A40, 0x80474A30, 0x80474BA0
+PREVIEW_COUNT = 41
+PREVIEW_SHA = 'fa6592f8af1ebb2ddb984e59b39649c36afeb85bdd4f9127dbcae26ba62a2a98'
+PREVIEW_GUARD = bytes.fromhex('AFF9C0DE')*4
+
+
+def install_preview_records(blob, prior, source, records):
+    """Bind every imported preview to the donor's common framing table."""
+    from v3_import_storage import PACKAGE, PACKAGE_RAM, ITEMS, slot
+    from v3_furniture_placement import END as PLACEMENT_END
+    draw=source.raw('furniture_draw_data$436')
+    begin,end=(PACKAGE+a-PACKAGE_RAM for a in (PREVIEW_FIRST,PREVIEW_END))
+    at=PACKAGE+PREVIEW_TABLE-PACKAGE_RAM
+    if (len(draw)!=PREVIEW_COUNT*8 or sha256(draw)!=PREVIEW_SHA or
+            not PLACEMENT_END<=PREVIEW_FIRST<PREVIEW_TABLE<PREVIEW_END<=0x80475000 or
+            at+len(draw)>end-16):
+        raise ValueError('Preview table overlaps placement data or accessory artwork')
+    previous=prior.get('catalogue_preview_records')
+    if previous:
+        if (previous['table_ram']!=PREVIEW_TABLE or previous['count']!=PREVIEW_COUNT or
+                sha256(blob[begin:end])!=previous['reservation_sha256']):
+            raise ValueError('Changed installed catalogue preview table')
+    elif any(blob[begin:end]):
+        raise ValueError('Catalogue preview reservation is occupied')
+    ordering=list(struct.iter_unpack('>HH',source.raw('mCL_furniture_list')))
+    previous_modes={r['item_id']:r['mode']+1 for r in previous['imports']} if previous else {}
+    rows=[]; seen=set()
+    for record in records:
+        item=int(record['item_id'],16); index=1024+slot(item)
+        found=[(p,m) for p,(i,m) in enumerate(ordering) if i==index]
+        if len(found)!=1 or found[0][0]!=record['donor_position'] or item in seen:
+            raise ValueError('Ambiguous catalogue preview identity')
+        seen.add(item);mode=found[0][1]
+        if not 0<=mode<PREVIEW_COUNT: raise ValueError('Catalogue preview mode exceeds donor table')
+        scalar=draw[mode*8:mode*8+8]
+        if (mode!=record.get('donor_preview_mode',0) or
+                record.get('donor_preview_scalar_hex',scalar.hex())!=scalar.hex()):
+            raise ValueError('Catalogue preview record differs from actual donor')
+        pos=ITEMS+slot(item)*32
+        if blob[pos+26]!=previous_modes.get(record['item_id'],0) or any(blob[pos+27:pos+32]):
+            raise ValueError('Preview selector overwrites reserved item metadata')
+        blob[pos+26]=mode+1
+        record.update(donor_preview_mode=mode,donor_preview_scalar_hex=scalar.hex(),
+            preview_override=mode!=0,preview_define='AF_V3_CATALOGUE_PREVIEW_RECORDS',
+            preview_mapping='native construction; source-indexed final scale/Y')
+        rows.append(dict(item_id=record['item_id'],runtime_index=index,mode=mode,scalar_hex=scalar.hex()))
+    blob[begin:end]=bytes(end-begin)
+    blob[begin:begin+16]=PREVIEW_GUARD;blob[end-16:end]=PREVIEW_GUARD
+    blob[at:at+len(draw)]=draw
+    rows.sort(key=lambda r:r['runtime_index'])
+    return dict(table_ram=PREVIEW_TABLE,count=PREVIEW_COUNT,table_sha256=sha256(draw),
+        reservation_start=PREVIEW_FIRST,reservation_end=PREVIEW_END,
+        reservation_sha256=sha256(blob[begin:end]),selector_byte=26,imports=rows)
 
 
 def sources(base):

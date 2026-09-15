@@ -26,6 +26,18 @@ import v3_feng_shui as feng
 
 
 class FormatTests(unittest.TestCase):
+    def test_unlit_material_uses_native_texture_primitive_expression_without_item_switches(self):
+        raw,pointers=fixture();raw=bytearray(raw)
+        struct.pack_into('>II',raw,8,0xFCFFFE60,0xFFFCF3F8)
+        rows=parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+        self.assertTrue(rows[1]['unlit_texture_primitive'])
+        source,_=command_source({'opaque':{'rows':rows}},{0x500:0,0x600:32,0x1000:544})
+        self.assertIn('gsDPSetCombineLERP(0, 0, 0, TEXEL0, 0, 0, 0, TEXEL0, '
+                      'PRIMITIVE, 0, COMBINED, 0, 0, 0, 0, COMBINED)',source)
+        struct.pack_into('>I',raw,12,0xFFFCF3F9)
+        with self.assertRaisesRegex(ValueError,'colour combiner'):
+            parse_model(raw,0x100,pointers,(0x500,),{0x600:(32,32)},0x1000,48,static_ci4=True)
+
     def test_constant_palette_binding_preserves_commands_and_rejects_ambiguous_dependencies(self):
         raw,pointers=fixture();raw=bytearray(raw)
         struct.pack_into('>I',raw,0x1C,0x08000000)
@@ -389,6 +401,30 @@ class CurrentCartridgeTests(unittest.TestCase):
             self.report['furniture']['imports']+[self.report['speed_bag']],source)
         self.assertEqual(blob,self.blob);self.assertEqual(again,row)
         self.assertEqual(changes[placement.VROM],changed);self.assertEqual(changes[placement.RELOC],relocation)
+
+    def test_shared_preview_table_selectors_guards_and_repeat_batch(self):
+        source=pipeline.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        row=self.report['catalogue_preview_records']
+        start=install.PACKAGE+catalogue.PREVIEW_FIRST-install.PACKAGE_RAM
+        at=install.PACKAGE+catalogue.PREVIEW_TABLE-install.PACKAGE_RAM
+        end=install.PACKAGE+catalogue.PREVIEW_END-install.PACKAGE_RAM
+        draw=source.raw('furniture_draw_data$436')
+        self.assertEqual(self.blob[at:at+len(draw)],draw)
+        self.assertEqual(self.blob[start:start+16],catalogue.PREVIEW_GUARD)
+        self.assertEqual(self.blob[end-16:end],catalogue.PREVIEW_GUARD)
+        self.assertEqual(sha256(self.blob[start:end]),row['reservation_sha256'])
+        for r in row['imports']:
+            pos=install.ITEMS+install.slot(int(r['item_id'],16))*32
+            self.assertEqual(self.blob[pos+26],r['mode']+1)
+            self.assertEqual(self.blob[pos+27:pos+32],bytes(5))
+            self.assertEqual(r['scalar_hex'],draw[r['mode']*8:r['mode']*8+8].hex())
+        blob=bytearray(self.blob)
+        again=catalogue.install_preview_records(blob,self.report,source,copy.deepcopy(self.report['catalogue']['imports']))
+        self.assertEqual(blob,self.blob);self.assertEqual(again,row)
+        blob[start]^=1
+        with self.assertRaisesRegex(ValueError,'Changed installed'):
+            catalogue.install_preview_records(blob,self.report,source,copy.deepcopy(self.report['catalogue']['imports']))
 
     def test_batch_selection_is_identity_based_and_removes_disabled_scores(self):
         cat=composer.catalogue(self.image,self.report);keys=[r['id'] for r in self.rows]
