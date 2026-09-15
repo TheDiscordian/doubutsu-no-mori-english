@@ -1,0 +1,19 @@
+[
+  {"wait": 1},
+  {"key": "s", "duration": 0.8},
+  {"wait": 1},
+  {"snapshot_player": true},
+  {"key": "f", "duration": 2.5},
+  {"wait": 2},
+  {"snapshot_player": true},
+  {"snapshot_campsite": true},
+  {"key": "f", "duration": 2.5},
+  {"wait": 2},
+  {"read": ["8003CE34", 4]},
+  {"snapshot_player": true},
+  {"snapshot_campsite": true},
+  {"read": ["8019C8D0", 16]},
+  {"read": ["8046C350", 16]},
+  {"save_state": true},
+  {"read": ["8003CE34", 4], "expect": "00000000"}
+]

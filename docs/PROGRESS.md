@@ -2,6 +2,15 @@
 
 ## Active development
 
+The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) cold-boots
+ABI 83 with the current profile and unchanged copied-town content. The game
+activates event 70 and places the tent on a vacant lot without fixture-seeded
+camper, tent, or rewards. Arrival and two bounded approaches retain clean
+fault/save/translation guards. River navigation prevents reaching the tent;
+no further navigation retry is queued. Ordinary actor construction, entry,
+conversations, rewards, and persistence remain open. Continue remaining native
+readers and donor implementation; neither patcher changes.
+
 The [timed tent lamp](checkpoints/V3_TENT_LAMP.md) installs the donor model,
 dawn/dusk fade, room-light transitions, drawing, and cleanup in ABI 83. The
 complete original native effect controller remains. Lamp code uses existing

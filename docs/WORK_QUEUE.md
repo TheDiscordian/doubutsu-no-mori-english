@@ -12,6 +12,14 @@ conversations. Maintain text credits
 in the single `translations/provenance.json` catalogue; its own coverage queue
 tracks the remaining attribution work without a duplicate review list.
 
+The [ordinary summer-town check](checkpoints/V3_CAMPSITE_GAMEPLAY.md) passes
+cold boot and natural event/tent placement. Both bounded navigation approaches
+stop at the river without reaching the tent; do not repeat this navigation
+batch. Actor construction, scene entry, conversations, rewards, and persistence
+remain unverified. Continue native-reader and donor-content implementation.
+Private captures also show `0:05 pm` around noon; inspect the clock formatter
+in a later concrete rendering fix. No patcher update is authorised by that finding.
+
 The [V3 specification](../specs/V3_OPTIONAL_IMPORTS.md) governs new work on
 `v3/optional-imports`. The goal is additive, optional villager/item content from
 GAFE01 revision 0, selected individually or together in the browser patcher,

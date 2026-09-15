@@ -1838,6 +1838,9 @@ def main():
                     raise ValueError(f"Unexpected message: {snapshot.get('message_id')}")
             if action.get("snapshot_player"):
                 results.append(player_snapshot(debug))
+            if action.get('snapshot_campsite'):
+                from v3_campsite_gameplay import snapshot as campsite_snapshot
+                results.append({'campsite_snapshot':campsite_snapshot(debug)})
             if action.get("snapshot_inventory"):
                 snapshot = inventory_snapshot(debug)
                 results.append(snapshot)

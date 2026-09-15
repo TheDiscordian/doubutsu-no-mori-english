@@ -1,0 +1,7 @@
+[
+  {"wait": 1},
+  {"capture": "route.png", "hide_cursor": true},
+  {"key": "Return", "duration": 0.12},
+  {"wait": 2},
+  {"capture": "route-map.png", "hide_cursor": true}
+]
