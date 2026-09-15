@@ -47,27 +47,31 @@ def exercise(debug, rom_path, record):
     check('complete unchanged resident prefix', BLOB_RAM, blob)
     # Probe the appended records only. A full foreground fixture duplicates the
     # scene's large allocation while the title scene still owns its heap.
-    size = 0x4000
+    complete_roster=bool(report.get('islander_houses'))
+    size = 0x9000 if complete_roster else 0x4000
     allocation = call(0x8009BFC0, [size])
     if allocation & 15 or not MODULE_RAM + RESERVATION <= allocation <= 0x80400000 - size:
         raise ValueError('House fixture allocation failed')
     fg, pointers, animals, npc, output = (allocation + value for value in
-                                         (16, 0xA00, 0x1300, 0x2400, 0x2600))
+        ((16,0x5200,0x5A00,0x7000,0x7200) if complete_roster else
+         (16, 0xA00, 0x1300, 0x2400, 0x2600)))
     fg_vrom = int(houses.get('foreground_vrom', f'{FOREGROUND:08X}'), 16)
     data, table = (files[v].extract(rom) for v in (fg_vrom, HOUSE))
     if (sha256(data), sha256(table)) != (houses['output_fg_sha256'], houses['output_house_sha256']):
         raise ValueError('Changed installed house data')
     count = len(houses['appended_layers'])
-    actor_ids = [0xE000] + [int(value,16) for value in houses['installed_villagers']]
+    actor_ids = ([0xE000,0xE0DA,0xE0EC,0xE0ED] if complete_roster else
+                 [0xE000] + [int(value,16) for value in houses['installed_villagers']])
     animal_count = len(actor_ids)
     tail_offset = (houses['foreground_records'] - count) * STRIDE
     tail = data[tail_offset:]
     padding = tail[count*STRIDE:]
-    if count not in (2,4) or padding != bytes(len(padding)) or len(padding) >= 8:
+    if (count not in ((40,) if complete_roster else (2,4))
+            or padding != bytes(len(padding)) or len(padding) >= 8):
         raise ValueError('House probe requires complete appended layers and alignment padding')
-    # Address arithmetic is verified separately by execution of the complete
-    # original block. The breakpoint-driven window reports a different result;
-    # do not reintroduce that synthetic window as an ordinary loader check.
+    offsets={struct.unpack_from('>H',tail,at)[0]:at for at in range(0,count*STRIDE,STRIDE)}
+    # Exercise actual DMA, sorting, and selection entries. The full scene loader
+    # and its larger foreground allocation are not exercised by this fixture.
     edge = b'V3HS' * 4
     guards = (allocation, fg + len(tail), pointers - 16, pointers + TARGET_COUNT * 4,
               animals - 16, animals + animal_count * 0x528, npc - 16, npc + animal_count * 56,
@@ -107,7 +111,8 @@ def exercise(debug, rom_path, record):
              ((0x80130DB8, 2), (0x80137000, 56), (0x80137348, 2))}
     try:
         for n, actor in enumerate(actor_ids[1:]):
-            offset = n*2*STRIDE
+            main_layer,secondary_layer=struct.unpack_from('>2H',table,(actor&0xFFF)*8+4)
+            offset,second_offset=offsets[main_layer],offsets[secondary_layer]
             debug.write_memory(0x80130DB8, struct.pack('>H',actor))
             debug.write_memory(0x80137000, npc_data[(n+1)*56:(n+2)*56])
             debug.write_memory(0x80137348, struct.pack('>H',actor))
@@ -116,7 +121,7 @@ def exercise(debug, rom_path, record):
             check('native main-layer selection', output, tail[offset:offset+2])
             call(0x80085A84, [output, pointers, 0x4000, NATIVE_START])
             check('complete secondary layer including donor music', output,
-                  tail[offset+STRIDE+2:offset+STRIDE+514])
+                  tail[second_offset+2:second_offset+514])
             call(0x80085178, [output, fg+offset+2])
             check('complete main-layer transfer retains furniture IDs and rotations', output,
                   tail[offset+2:offset+514])
@@ -132,5 +137,5 @@ def exercise(debug, rom_path, record):
     call(0x8009C040, [allocation])
     return {'native_house_records': animal_count, 'native_layer_pointers': TARGET_COUNT,
             'foreground_records_loaded': count, 'complete_scene_foreground_allocation_tested': False,
-            'native_imported_layer_transfers': count, 'house_visit_tested': False,
+            'native_imported_layer_transfers': (animal_count-1)*2, 'house_visit_tested': False,
             'saved_data_written': False, 'requires_checkpoint_restore': True}

@@ -314,8 +314,14 @@ with later e/e+ donor support investigated separately.
   saved clothing dependencies. Seven focused checks and the corrected native
   run's 109 records / 55 assertions pass. Register-preserving bridges fix the
   confirmed native boot defect; actual selected records supply names and prices.
-  Next connect the new garments' display/catalogue/acquisition consumers, islander
-  houses, explicit town behaviour, ordinary move-ins, and persistence. Donor growth
+  The [arrival-house batch](checkpoints/V3_ISLANDER_HOUSES.md) installs all eighteen
+  authentic initial rooms, matching native surfaces, and reviewed furnishings.
+  Five focused checks and the initial 57-record / 35-assertion native run pass,
+  including all forty imported layer transfers into the pointer table and three
+  representative full rooms. Ordinary visits and complete scene allocation remain
+  unverified. The separate island gift layouts are not imported as initial rooms.
+  Next connect the new garments' display/catalogue/acquisition consumers, explicit
+  town behaviour, ordinary move-ins, house visits, and persistence. Donor growth
   permission stays 2, and every move-in flag stays off. Do not replay passing
   text/default checks. Older builds lacking the new dependencies reject new saves;
   retain separate test saves and compatibility warnings.

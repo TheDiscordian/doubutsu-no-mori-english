@@ -185,7 +185,12 @@ Full-name aliases, actual dialogue insertions, borrowed phrases, and profile
 handling have focused/native evidence. The [aloha outfit runtime](V3_ALOHA_OUTFITS.md)
 installs both actual shirts and all eighteen islander defaults, with complete
 native resource/name/price/default checks. Their mannequin/catalogue/acquisition
-consumers, houses, and explicit town behaviour remain work before move-ins can be enabled.
+consumers and explicit town behaviour remain work before move-ins can be enabled.
+The [islander arrival houses](V3_ISLANDER_HOUSES.md) install all eighteen authentic
+initial rooms with reviewed existing furnishings and complete native wall/floor
+matches. All twenty imported houses and forty fixed layers are present; actual
+native initialization and layer loading pass. Ordinary house entry, scene
+allocation, town behaviour, move-in progression, and persistence remain open.
 
 ### Items
 

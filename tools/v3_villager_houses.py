@@ -23,7 +23,7 @@ EXPANDED_FOREGROUND, FOREGROUND_LIMIT = 0x03F60000, 0x03FA0000
 PUNCHY_ABI = 50
 NATIVE_START, NATIVE_COUNT, TARGET_COUNT = 398, 458, 498
 DONOR_FG_SHA = 'f443f2f451e3a579d183176ba97a81a6685be4746509a4c8a9979e7c900f6fa5'
-SHARED_HOUSE_ITEMS = (0x10B8, 0x1154, 0x11E4, 0x1358, 0x136C)
+SHARED_HOUSE_ITEMS = (0x10B8, 0x1154, 0x11C0, 0x11E4, 0x12E8, 0x1358, 0x136C, 0x15A8)
 ABI = 23
 SOURCES = ('tools/v3_villager_houses.py', 'tools/v3_registry.py', 'tools/item_matches.py',
            'tools/item_identity_sheet.py', 'translations/item_reference_matches.json',

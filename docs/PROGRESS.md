@@ -130,8 +130,8 @@ Five focused checks pass. The current combined selection batch's corrected
 all 498 sparse pointers, both imported layer transfers, and guards. Complete
 scene allocation and ordinary visits remain unverified. Move-ins stay disabled.
 Current experimental ROM:
-`build/v3-aloha-outfits-03/animal-forest-v3-asset-loader.z64`, ABI 55, SHA-256
-`53e94b2cfdc960854bb2520e9bc381886e57fb8051f1bf10e34ef8514b76208c`.
+`build/v3-islander-houses-02/animal-forest-v3-asset-loader.z64`, ABI 56, SHA-256
+`e18e7ce0e52a745dbffc964b9c38122d11e0ac6a38433377ed9098c760c861b7`.
 This is an implementation artifact, not an accepted playtest handoff. Native
 default and house-layer checks pass; ordinary house/move-in and villager
 persistence checks remain open, as detailed below.
@@ -428,12 +428,27 @@ clothing profile bits, and all eighteen islander outfit initialisers. Seven
 focused checks and the corrected 109-record / 55-assertion native run pass.
 The native boot defect caused by a compiled caller's live register is fixed
 with checked preserving bridges; single-record name/price assumptions are fixed
-as well. All original garments and unrelated data remain intact. Houses, explicit
-town behaviour, and ordinary move-ins/persistence remain work; move-in flags stay
+as well. All original garments and unrelated data remain intact. Explicit
+town behaviour and ordinary move-ins/persistence remain work; move-in flags stay
 off. Aloha mannequin/display and catalogue/acquisition consumers remain work.
 Earlier builds missing these garments reject new saves; the saved format is
 unchanged, but ordinary cross-build loading remains unverified. The audio playback
 issue remains recorded, and both web patchers stay V2.
+
+The [islander arrival houses](checkpoints/V3_ISLANDER_HOUSES.md) supply all
+eighteen authentic sparse rooms, including each starting furnishing, its position,
+and exact matching native wall/floor artwork. The separate furnished island
+gift layouts are not substituted for arrival rooms. All twenty imported house
+records and forty fixed layers are installed, with original/pilot data retained.
+Five focused checks and the initial 57-record / 35-assertion native run pass,
+including complete appended DMA, all sparse pointers, native and representative
+house initialization, complete layer transfers, guards, and checkpoint restoration.
+The cartridge stays 32 MiB, original audio/file positions remain intact, and the
+scene foreground allocation grows by 18,648 bytes. Ordinary house entry and the
+complete scene's larger allocation remain unverified. Town behaviour, move-ins,
+villager persistence, aloha display/catalogue/acquisition, and new-instrument
+playback remain work. ABI 56 retains ABI 55's exact save profile and formats;
+ordinary cross-build reload is not newly verified. Both patchers remain V2.
 
 ## Stable V2 deliverable
 

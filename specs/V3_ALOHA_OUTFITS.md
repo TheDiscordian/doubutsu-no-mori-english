@@ -69,6 +69,7 @@ newly verified; preserve existing saves and use disposable copies for testing.
 
 The [checkpoint](../docs/checkpoints/V3_ALOHA_OUTFITS.md) records the corrected
 cartridge, confirmed boot defect and fix, host checks, and combined native run.
-Mannequin/display identities, catalogue listing, ordinary acquisition/persistence,
-islander houses, town behaviour, and enabled move-ins remain implementation work.
+The [islander arrival houses](V3_ISLANDER_HOUSES.md) supply the eighteen source
+rooms. Mannequin/display identities, catalogue listing, ordinary acquisition/
+persistence, house visits, town behaviour, and enabled move-ins remain work.
 Both served patchers remain V2 pending user testing and explicit approval.
