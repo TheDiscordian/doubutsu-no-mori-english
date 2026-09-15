@@ -108,6 +108,15 @@ Connect the local optional composer to this 33-entry installed set. Package RAM
 enable words and package CRC before calculating the prefix CRC. Keep empty
 selection identical to V2 and selected IDs independent of order.
 
+Also make each subset's catalogue iteration/search/completion counts match its
+selected rows. The current composer retains the full integration ordering/counts,
+so a subset cannot earn the complete-collection indicator. The clothing count
+is shared by iteration and completion: reducing that count without compacting
+selected appended rows would drop a selected later shirt. Preserve native order
+and fixed item IDs, pack only selected added rows into the existing table storage,
+and update the associated counts together. Cover a non-prefix shirt/furniture
+selection in the next composer check; this is not another capacity expansion.
+
 Continue ordinary acquisition/placement/persistence, village arrival/voice/travel
 work, and remaining donor-content conversions. The report also retains existing
 clothing scoring coverage: cherry's mannequin is present, but additional aloha

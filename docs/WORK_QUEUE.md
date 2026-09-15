@@ -281,6 +281,10 @@ with later e/e+ donor support investigated separately.
   pocket-acquisition records pass. Its menu reservation grows by 6,144 bytes;
   the Expansion Pak requirement and 64-MiB cartridge size remain unchanged.
   Next connect optional selection to the package-resident rows and its CRC.
+  Keep subset catalogue row packing and iteration/completion counts consistent;
+  full-integration counts cannot represent completion in a smaller selection.
+  Review the red/blue aloha mannequin scoring rows, whose installation is not
+  established by the existing cherry-mannequin scoring evidence.
   Ordinary acquisition/placement/persistence remain incomplete; neither web
   patcher changes.
   [Pigleg/Dobie artwork](checkpoints/V3_ISLANDER_ART.md) converts both complete
