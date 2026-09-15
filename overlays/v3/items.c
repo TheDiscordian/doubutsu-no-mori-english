@@ -4,6 +4,9 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 struct Item { u16 index, item, price; u8 size, enabled; u8 name[16], reserved[8]; };
 struct Place { int exists, x, z; };
+#if defined(AF_V3_FOUR_CELL_ITEMS) && !defined(AF_V3_MULTI_CELL_ITEMS)
+#error Four-cell furniture requires multi-cell item readers
+#endif
 #ifdef AF_V3_CONSTRUCTION_ITEMS
 #include "construction.h"
 #define ITEM_COUNT AF_V3_ITEM_TABLE_COUNT
@@ -65,7 +68,9 @@ static const struct Item *find(u32 value) {
 #ifdef AF_V3_SPARSE_FURNITURE
                 row->index == AF_V3_SPARSE_FIRST + i &&
 #endif
-#ifdef AF_V3_MULTI_CELL_ITEMS
+#ifdef AF_V3_FOUR_CELL_ITEMS
+                row->size <= 2 &&
+#elif defined(AF_V3_MULTI_CELL_ITEMS)
                 row->size <= 1 &&
 #else
                 row->size == 0 &&
@@ -134,7 +139,18 @@ int af_v3_item_place(u32 argument, int x, int z, struct Place *destination) {
             dx = direction == 0 ? 1 : direction == 2 ? -1 : 0;
             dz = direction == 1 ? -1 : direction == 3 ? 1 : 0;
         }
+#ifdef AF_V3_FOUR_CELL_ITEMS
+        /* Both games anchor 2x2 furniture at the upper-left cell for every
+         * rotation. Keep the native clockwise order; size 2 means four cells,
+         * not three. It is independent of the profile's shape/collision 5. */
+        if (row && row->size == 2) {
+            dx = i == 1 || i == 2;
+            dz = i >= 2;
+        }
+        destination[i].exists = row && (row->size == 2 || i <= row->size);
+#else
         destination[i].exists = row && i <= row->size;
+#endif
         destination[i].x = row ? (int)((u32)x + (u32)dx) : 0;
         destination[i].z = row ? (int)((u32)z + (u32)dz) : 0;
 #else

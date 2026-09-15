@@ -2,6 +2,16 @@
 
 ## Active development
 
+The [remaining camping assets](checkpoints/V3_CAMPING_ACTORS.md) are complete:
+campfire, bonfire, and tent model, including both moving flame textures, full
+fire rigs, and both tent-light palettes. All 18,320 native asset bytes fit the
+existing model banks. The bonfire's true four-cell item reader is implemented
+and compiles to 1,020 bytes within the existing code reservation. Twenty-one
+focused checks pass, including sanitised shared readers and full source/asset
+checks. Native callbacks, mapped fire sounds, cartridge/composer installation,
+and summer-camper acquisition remain work. These three are not selectable yet;
+the current cartridge remains ABI 68 and both served patchers remain V2.
+
 The [camping integration](checkpoints/V3_CAMPING_ITEMS.md) installs seven complete
 objects: kayak, backpack, lantern, cooler, mountain bike, sleeping bag, and propane
 stove. English names/prices, one/two-cell profiles, catalogue framing and
@@ -16,7 +26,7 @@ Current full integration:
 `build/v3-camping-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
 `3967dedabca6e65a97f57273028aaa19b0b24ed72b405f2498d5a4fce6a1cd29`.
 The kayak/bike/blue-aloha subset is `build/v3-optional-camping-01/`.
-Summer-camper acquisition, three remaining animated camping objects, ordinary
+Summer-camper acquisition, three remaining camping callback integrations, ordinary
 placement/rendering/persistence, and the remaining donor content are unfinished.
 The seven rewards are not substituted into ordinary shop stock. Both served
 patchers remain V2; this is not a complete-import playtest handoff.

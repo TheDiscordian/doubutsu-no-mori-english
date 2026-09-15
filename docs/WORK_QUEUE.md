@@ -271,8 +271,11 @@ with later e/e+ donor support investigated separately.
   Twenty-nine focused checks pass. The initial native run passes 28 calls and
   37 memory assertions, including all seven loaded profiles and item readers.
   Fifty-six options compose offline; all/empty retain exact full/V2 outputs.
-  No additional resident RAM is needed. Continue the three callback/animated
-  camping objects and summer-camper acquisition, then other donor content and
+  No additional resident RAM is needed. The [three callback-owned camping assets](checkpoints/V3_CAMPING_ACTORS.md)
+  are converted completely, and the bonfire's true four-cell item reader compiles
+  within the existing reservation. Twenty-one focused checks pass. Continue
+  native light/rig/billboard/scroll/sound callbacks, cartridge/composer integration,
+  and summer-camper acquisition, then other donor content and
   ordinary gameplay/persistence. The seven Tent rewards do not enter normal
   shop stock. Neither served patcher changes. Current catalogue suffix headroom
   is 256 bytes; the menu pool has 448 bytes spare.

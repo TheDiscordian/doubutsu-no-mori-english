@@ -20,7 +20,7 @@ from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, native_palette, normalise_vertex_flags, symbol_span
 
 SEGMENT = 0x06000000
-CONVERTER_VERSION = 6
+CONVERTER_VERSION = 7
 
 
 @dataclass(frozen=True)
@@ -196,19 +196,25 @@ def scalar_profile(pilot):
 
 def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *, speed_bag=False,
                 accessory=False, mirrored_s=False, garden=False, western=False,
-                large_western=False, water=False, camping=False):
-    """Decode only the reviewed static CI4 command subset; never copy GX loads."""
+                large_western=False, water=False, camping=False, tent=False,
+                campfire_body=False, fire_effect=0):
+    """Decode reviewed CI4/I4 families and explicit dynamic dependencies, never GX loads."""
     if not raw or len(raw) % 8 or sum(map(bool, (speed_bag, accessory, mirrored_s,
-                                              garden, western, large_western, water, camping))) > 1:
+                                              garden, western, large_western, water, camping,
+                                              tent, campfire_body, fire_effect))) > 1 or fire_effect not in (0, 1, 2):
         raise ValueError('Incomplete furniture display list')
     result, used = [], set()
     at, loaded, first_vertex, material, have_palette = 0, 0, 0, None, False
     material_wrap = None
+    fire_tiles, fire_scroll = 0, False
     while at < len(raw):
         a, b = struct.unpack_from('>II', raw, at)
         op = a >> 24
         row = {'words': (a, b), 'opcode': op}
-        if op in (0xF0, 0xFD, 0x01):
+        dynamic_palette = tent and op == 0xF0 and b == 0x08000000
+        if dynamic_palette:
+            row['dynamic_palette'] = b
+        elif op in (0xF0, 0xFD, 0x01):
             fixup = start + at + 4
             if b or fixup not in pointers:
                 raise ValueError('Missing or nonzero furniture data relocation')
@@ -222,27 +228,42 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             elif (a, b) != (0xD7000002, 0):
                 raise ValueError('Unsupported furniture texture scale')
         elif op == 0xF0:
-            if water or a != 0xF08F4010 or row['target'] != palette:
+            allowed_palettes = palette if campfire_body and isinstance(palette, tuple) else (palette,)
+            if water or fire_effect or a != 0xF08F4010 or (not dynamic_palette and row['target'] not in allowed_palettes):
                 raise ValueError('Unsupported furniture palette load')
             have_palette = True
         elif op == 0xFD:
             shape = model_texture_shape(raw[at:at + 8])
             target = row['target']
-            if (target not in textures or (not water and not have_palette) or
-                    shape != (*textures[target], 4 if water else 2, 0) or
+            if (target not in textures or (not (water or fire_effect) and not have_palette) or
+                    shape != (*textures[target], 4 if water or fire_effect else 2, 0) or
                     water and shape[:2] != (32, 16)):
                 raise ValueError('Unsupported furniture CI4 texture or palette')
-            if water:
+            if water or fire_effect:
                 row['intensity'] = True
             # Consume the paired Dolphin tile command. Additional wrap modes
             # require an explicit reviewed model mode; the default clamps both axes.
             tile = raw[at + 8:at + 16]
-            if water:
+            if fire_effect:
+                shapes = ((32, 64), (32, 32) if fire_effect == 1 else (64, 32))
+                tiles = ((0xD2F0F500, 0xD2F1F500) if fire_effect == 1 else (0xD2F0F511, 0xD2F1F520))
+                shifts = ((0, 0), (0, 0)) if fire_effect == 1 else ((1, 1), (2, 0))
+                if fire_tiles >= 2 or shape[:2] != shapes[fire_tiles] or tile != struct.pack('>II', tiles[fire_tiles], 0):
+                    raise ValueError('Unsupported paired fire texture or tile state')
+                row.update(wrap_modes=(1, 1), fire_tile=fire_tiles, fire_shifts=shifts[fire_tiles])
+                fire_tiles += 1
+            elif water:
                 if tile != struct.pack('>II', 0xD2F0F511, 0):
                     raise ValueError('Unsupported water texture wrapping or shifts')
                 row.update(wrap_modes=(1, 1), water_shift=1)
             elif camping and tile in (struct.pack('>II', word, 0) for word in
                                       (0xD2F0F000, 0xD2F0F800, 0xD2F0FA00, 0xD2F0F200)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif tent and tile in (struct.pack('>II', word, 0) for word in (0xD2F0F500, 0xD2F0F800)):
+                word = struct.unpack_from('>I', tile)[0]
+                row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
+            elif campfire_body and tile in (struct.pack('>II', word, 0) for word in (0xD2F0F000, 0xD2F0F100)):
                 word = struct.unpack_from('>I', tile)[0]
                 row['wrap_modes'] = (word >> 10 & 3, word >> 8 & 3)
             elif large_western and tile in (struct.pack('>II', word, 0)
@@ -295,7 +316,7 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             loaded, first_vertex = count, offset // 16
             row.update(count=count, first_vertex=first_vertex)
         elif op == 0x0A:
-            if not loaded or material is None:
+            if not loaded or material is None or fire_effect and not fire_scroll:
                 raise ValueError('Furniture triangles lack vertices or a material')
             count = (a >> 17 & 127) + 1
             size = (1 + (max(0, count - 3) + 3) // 4) * 8
@@ -306,23 +327,27 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
             row['material'] = material
             at += size - 8
         elif op == 0xFC:
-            modes = ((0xFC309C04, 0x5FFEF7F8),) if water else (
-                (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8))
+            modes = (((0xFC30FE03, 0x5F1AF3E9 if fire_effect == 1 else 0x5F06F3FF),)
+                if fire_effect else ((0xFC309C04, 0x5FFEF7F8),) if water else (
+                (0xFC127E60, 0xFFFFF3F8), (0xFC11FE04, 0xFFFFF3F8)))
             if (a, b) not in modes:
                 raise ValueError('Unsupported furniture colour combiner')
         elif op == 0xE2:
-            modes = (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
-                if accessory else (0xC8113078, 0xC8104DD8))
+            modes = ((0xC81049D8 if fire_effect == 1 else 0xC8104A50,) if fire_effect else
+                (0xC8104A50,) if water else ((0xC8112078, 0xC8113078)
+                if accessory else (0xC8113078, 0xC8104DD8)))
             if a != 0xE200001C or b not in modes:
                 raise ValueError('Unsupported furniture render mode')
         elif op == 0xFA:
             colours = ((0xFFFFFFFF, 0xB2B2B2FF) if accessory else
                        (0xFFFFFFFF, 0xFFFDFFFF) if camping else (0xFFFFFFFF,))
-            if ((a, b) != (0xFA00001E, 0x9B9BC864) if water else
+            if ((a, b) != ((0xFA000064, 0xFFD264FF) if fire_effect == 1 else (0xFA00008C, 0xFFF01EFF)) if fire_effect else
+                    (a, b) != (0xFA00001E, 0x9B9BC864) if water else
                     (a not in (0xFA000080, 0xFA0000FF) or b not in colours)):
                 raise ValueError('Unsupported furniture primitive colour')
         elif op == 0xFB:
-            if not water or (a, b) != (0xFB000000, 0x6464AFFF):
+            expected = (0xFB000000, 0xFF5000FF if fire_effect == 1 else 0xDC1E0078) if fire_effect else (0xFB000000, 0x6464AFFF)
+            if not (water or fire_effect) or (a, b) != expected:
                 raise ValueError('Unsupported furniture environment colour')
         elif op == 0xF2:
             # The two construction models extend a mirrored 16x32 material
@@ -355,16 +380,23 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
                 ((32, 8), (2, 0)): 0x000FC01C,
                 ((16, 8), (0, 2)): 0x0003C03C,
             }.get((textures.get(material), material_wrap))
+            fire_extent = (campfire_body and textures.get(material) == (16, 16)
+                           and material_wrap == (0, 1) and b == 0x0003C07C)
             if (material is None or a != 0xF2000000 or not
-                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent
+                    (construction_extent or garden_extent or western_extent or large_extent or camping_extent or fire_extent
                      or accessory and b in (0x0007C07C, 0x000FC07C))):
                 raise ValueError('Unsupported explicit native tile extent')
         elif op == 0xD9:
-            modes = (0x270405,) if water else ((0x230405, 0x230005, 0x210405, 0x210005)
-                if camping else (0x230405, 0x230005, 0x270405)
+            modes = (0x210005,) if fire_effect else (0x270405,) if water else ((0x230405, 0x230005, 0x210405, 0x210005)
+                if camping or tent else (0x230405, 0x230005, 0x270405)
                 if speed_bag else (0x230405, 0x230005))
             if a != 0xD9000000 or b not in modes:
                 raise ValueError('Unsupported furniture geometry mode')
+        elif op == 0xDE:
+            if not fire_effect or fire_tiles != 2 or fire_scroll or (a, b) != (0xDE000000, 0x09000000):
+                raise ValueError('Unsupported dynamic furniture display-list dependency')
+            fire_scroll = True
+            row['dynamic_scroll'] = 0x09000000
         elif op == 0xDF:
             if (a, b) != (0xDF000000, 0) or at + 8 != len(raw):
                 raise ValueError('Invalid furniture display-list terminator')
@@ -376,6 +408,8 @@ def parse_model(raw, start, pointers, palette, textures, vertex, vertex_size, *,
         raise ValueError('Furniture model lacks triangles or termination')
     if used != set(pointers):
         raise ValueError('Unaccounted furniture data relocation')
+    if fire_effect and (fire_tiles != 2 or not fire_scroll):
+        raise ValueError('Incomplete two-texture fire effect')
     return result
 
 
@@ -500,7 +534,10 @@ def command_source(models, offsets):
                     emit('gsSPTexture(0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_ON)')
             elif op == 0xF0:
                 emit('gsDPPipeSync()')
-                emit(f"gsDPLoadTLUT_pal16(15, 0x{SEGMENT + offsets[row['target']]:08X})", 6)
+                palette = row['dynamic_palette'] if 'dynamic_palette' in row else SEGMENT + offsets[row['target']]
+                if 'dynamic_palette' in row and palette != 0x08000000:
+                    raise ValueError('Unreviewed dynamic palette segment')
+                emit(f"gsDPLoadTLUT_pal16(15, 0x{palette:08X})", 6)
             elif op == 0xFD:
                 w, h = row['shape']
                 if w * h // 2 > 2048:
@@ -517,6 +554,18 @@ def command_source(models, offsets):
                         raise ValueError('Unsupported furniture water tile')
                     shift = 1
                 fmt, pal = ('G_IM_FMT_I', 0) if row.get('intensity') else ('G_IM_FMT_CI', 15)
+                if 'fire_tile' in row:
+                    tile = row['fire_tile']
+                    shifts = row['fire_shifts']
+                    if (not row.get('intensity') or tile not in (0, 1) or row['wrap_modes'] != (1, 1)
+                            or (tile == 0 and (w, h) != (32, 64))
+                            or (tile == 1 and (w, h) not in ((32, 32), (64, 32)))
+                            or shifts not in ((0, 0), (1, 1), (2, 0))):
+                        raise ValueError('Unreviewed fire multi-texture allocation')
+                    args = (f'{tile * 128}, {tile}, G_IM_FMT_I, {w}, {h}, 0, G_TX_WRAP, G_TX_WRAP, '
+                            f'{mask_s}, {mask_t}, {shifts[0]}, {shifts[1]}')
+                    emit(f"gsDPLoadMultiBlock_4b(0x{SEGMENT + offsets[row['target']]:08X}, {args})", 7)
+                    continue
                 args = (f'{fmt}, {w}, {h}, ' + (f'0, 0, {w - 1}, {h - 1}, ' if w % 16 else '') +
                         f'{pal}, {wrap_s}, {wrap_t}, {mask_s}, {mask_t}, {shift}, {shift}')
                 # A 24-pixel row has a 12-byte source pitch but occupies two
@@ -547,6 +596,10 @@ def command_source(models, offsets):
                         emit('gsSP2Triangles(' + ', '.join(map(str, args)) + ')')
                     else:
                         emit('gsSP1Triangle(' + ', '.join(map(str, (*triangles[i], 0))) + ')')
+            elif op == 0xDE:
+                if row.get('dynamic_scroll') != 0x09000000 or row['words'] != (0xDE000000, 0x09000000):
+                    raise ValueError('Unreviewed dynamic fire scroll list')
+                emit('gsSPDisplayList(0x09000000)')
             elif op in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9, 0xDF, 0xF2):
                 # Only the explicitly decoded compatible F3DEX2 state/end
                 # commands reach here; Dolphin loads and packed triangles do not.
