@@ -18,7 +18,9 @@ SECTIONS
     .rodata : { *(.rodata .rodata.*) . = ALIGN(16); }
     .data : { *(.data .data.*) }
     .bss (NOLOAD) : { *(.bss .bss.* COMMON) }
-    ASSERT(. <= 0x808B3F00, "V3 catalogue suffix exceeds its bounded pool allowance")
+    /* Another 512 bytes fit the existing expanded menu reservation. The
+       builder checks the full image, relocation DMA, and all menu owners. */
+    ASSERT(. <= 0x808B4100, "V3 catalogue suffix exceeds its bounded pool allowance")
     ASSERT(SIZEOF(.data) == 0 && SIZEOF(.bss) == 0, "Unexpected V3 catalogue state")
     /DISCARD/ : { *(.comment .note.* .reginfo .MIPS.abiflags .pdr .gnu.attributes) }
 }

@@ -100,10 +100,14 @@ def install_readers(blob, prior, output, *, extra_defines=()):
     return expanded, code, sha256(extra)
 
 
-def score_tables(base, prior, item_rows, *, theme=56):
+def score_tables(base, prior, item_rows, *, theme=56, extend_western=False):
     if theme not in (55, 56):
         raise ValueError('Unreviewed new furniture theme')
     name, members, donor_surface = ('western', 7, 18) if theme == 55 else ('backyard', 5, 26)
+    if extend_western:
+        if theme != 55 or [r['item_id'] for r in item_rows] != ['32C4', '32D4', '32D8']:
+            raise ValueError('Unreviewed Western theme extension')
+        members = 10
     files = by_vrom(base)
     changes, reports = {}, {}
     for key, tool, width in (('hra', hra, 4), ('feng_shui', feng, 2)):
@@ -144,7 +148,10 @@ def score_tables(base, prior, item_rows, *, theme=56):
         if key == 'hra':
             series = report['series']
             info, names = series['info_address'] - hra.RAM, series['names_address'] - hra.RAM
-            if data[info + theme * 3:info + (theme + 1) * 3] != bytes.fromhex('FF00FF') or data[names + theme * 10:names + (theme + 1) * 10] != b' ' * 10:
+            before_info = bytes.fromhex('0200FF' if extend_western else 'FF00FF')
+            before_name = name.encode().ljust(10, b' ') if extend_western else b' ' * 10
+            if (data[info + theme * 3:info + (theme + 1) * 3] != before_info
+                    or data[names + theme * 10:names + (theme + 1) * 10] != before_name):
                 raise ValueError('New series replaces an existing definition')
             data[info + theme * 3:info + (theme + 1) * 3] = bytes.fromhex('0200FF')
             data[names + theme * 10:names + (theme + 1) * 10] = name.encode().ljust(10, b' ')
@@ -214,13 +221,15 @@ def extend_letters(source, module, report, rel, symbols, *, theme=56):
         'native_letter_generation_tested': False}
 
 
-def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False):
+def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, western=False,
+                      western_large=False):
     from v3_catalogue_capacity import GROWTH, shifted
     files = by_vrom(base)
     old = files[catalogue.VROM].extract(base)
     if sha256(old) != prior['catalogue']['output_sha256']:
         raise ValueError('Changed current complete catalogue')
-    ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True, western=western)
+    ordering, rows = catalogue.table(stable, rel, symbols, imports, expanded=True, garden=True,
+        western=western, western_large=western_large)
     clothes = copy.deepcopy(prior['catalogue']['clothing'])
     at = clothes['table_address'] - catalogue.RAM
     cloth = old[at:at + 496]
@@ -234,7 +243,8 @@ def install_catalogue(base, stable, prior, imports, output, rel, symbols, *, wes
     suffix, compiled = compile_part('catalogue', output / 'catalogue',
         extra_sources=('overlays/v3/catalogue_bridge.S', str((output / 'catalogue_tables.S').relative_to(ROOT))),
         defines=('AF_V3_FURNITURE_TABLES=1', 'AF_V3_CLOTHING_CATALOGUE=1',
-                 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1') + (('AF_V3_WESTERN_ITEMS=1',) if western else ()))
+                 'AF_V3_ALOHA_DISPLAY=1', 'AF_V3_GARDEN_ITEMS=1') + (('AF_V3_WESTERN_ITEMS=1',) if western else ())
+                 + (('AF_V3_WESTERN_LARGE=1',) if western_large else ()))
     parent = bytearray(files[catalogue.PARENT].extract(base))
     _, _, native_parent = catalogue.sources(stable)
     expected = bytearray(native_parent[catalogue.OWNER:catalogue.OWNER + 32])

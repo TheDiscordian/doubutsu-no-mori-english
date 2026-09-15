@@ -81,6 +81,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'display_items': ('af_v3_display_pocket_item', BLOB_RAM + 0x6C00),
                        'display_conversion': ('af_v3_room_display_item', BLOB_RAM + 0x6270),
                        'items': ('af_v3_item_name', BLOB_RAM + 0x7300),
+                       'items_large': ('af_v3_item_name_extended', 0x80483000),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

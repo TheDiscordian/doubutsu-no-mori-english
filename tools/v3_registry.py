@@ -39,6 +39,9 @@ FURNITURE = {
     0x3328: (1226, 0x3328, STORAGE+0x194000),
     0x3330: (1228, 0x3330, STORAGE+0x196000),
     0x3334: (1229, 0x3334, STORAGE+0x198000),
+    0x32C4: (1201, 0x32C4, STORAGE+0x1C4000),
+    0x32D4: (1205, 0x32D4, STORAGE+0x1C6000),
+    0x32D8: (1206, 0x32D8, STORAGE+0x1C8000),
 }
 
 # Additive clothing reservations, independent of donor furniture and native

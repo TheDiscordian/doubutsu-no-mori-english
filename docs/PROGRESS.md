@@ -2,6 +2,23 @@
 
 ## Active development
 
+The [full-sized Western batch](checkpoints/V3_WESTERN_LARGE_ITEMS.md) installs
+watering trough, covered wagon, and storefront, completing the ten-item Western
+theme. Complete models, two-cell footprints, true stock routes, catalogue framing,
+English readers, scoring, and selected dependencies are installed in ABI 66.
+The checked package adds 8 KiB; the existing menu and model-bank allocations stay.
+Twenty-eight focused checks and the initial 88-record native run pass, including
+all three items' four rotations and retained three-shirt readers. Ordinary
+placement, rendering, acquisition, and persistence remain unverified.
+Current full integration:
+`build/v3-western-large-runtime-01/animal-forest-v3-asset-loader.z64`, SHA-256
+`5c51f80525a253e889a38b4ed4730df7e21b9a5e63a80917f0406b512faaebfe`.
+The offline composer has 49 experimental options, exact all/empty outputs, and
+a generated trough/wagon/red-aloha subset at `build/v3-optional-western-large-01/`.
+Further donor families need a reviewed storage expansion: the current import
+VROM file has 47,888 bytes free. Both served patchers remain V2. This is not a
+complete-import playtest handoff; remaining donor content and gameplay continue.
+
 The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete
 furnishings with English names/prices, catalogue entries, ordinary/event stock,
 scoring, and saved dependencies. Dedicated Expansion Pak banks hold 9,216 bytes

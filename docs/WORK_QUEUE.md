@@ -265,6 +265,16 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  The [full-sized Western integration](checkpoints/V3_WESTERN_LARGE_ITEMS.md)
+  installs the remaining three Western furnishings, bringing the theme to ten
+  complete models with true two-cell footprints and explicit catalogue framing.
+  ABI 66 relocates/expands the checked package by 8 KiB while preserving save
+  code, public item entries, and existing menu/model allocations. Twenty-eight
+  focused checks and the first 88-record native run pass. Forty-nine options
+  compose individually; all/empty retain exact full/V2 outputs. The next donor
+  family needs reviewed storage expansion, with only 47,888 VROM bytes left.
+  Continue ordinary placement/rendering/acquisition/persistence, mailbox
+  behaviours, and remaining villagers/items. Neither served patcher changes.
   The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete
   models, English readers, true stock/catalogue/scoring, and saved dependencies
   in ABI 65. Dedicated 9,216-byte Expansion Pak banks fit the saddle fence without
@@ -275,8 +285,9 @@ with later e/e+ donor support investigated separately.
   corrected; paired model DMA, executed teardown, and the final restore tail remain
   unverified. Do not repeat that setup batch. Continue donor families and ordinary
   gameplay; retain the bank tail for a later meaningful integration check.
-  Review catalogue growth before more rows: code has 32 bytes and the menu pool
-  has 704 bytes spare. Both event rewards keep their actual route. No web update.
+  Current catalogue code has 384 bytes and the menu pool has 576 bytes spare;
+  retain full allocation checks before further additions. Both event rewards
+  keep their actual route. No web update.
   The [construction batch](checkpoints/V3_CONSTRUCTION_ITEMS.md) converts seven
   complete static models and verifies names/prices, 1×1 profiles, ordinary B/C
   stock membership, and native scoring metadata. Five new asset checks, seven

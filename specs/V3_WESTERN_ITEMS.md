@@ -3,7 +3,9 @@
 ## Scope and source identity
 
 Seven GAFE01-r0 furnishings have complete native graphics conversion,
-source-verified metadata, and experimental ABI-65 runtime installation. Neither
+source-verified metadata, and experimental runtime installation. The
+[full-sized additions](V3_WESTERN_LARGE_ITEMS.md) complete the ten-item theme.
+Neither
 served patcher changes; the import-free cartridge remains V2-11.
 
 `tools/v3_furniture_art.py --batch western` verifies both furniture-quality
@@ -93,13 +95,13 @@ already owns independent `0x2400`-byte buffers and needs no increase.
 
 Each Western model has a fixed 8-KiB VROM slot, beginning at `0238C000` and
 ending with the well's slot at `02398000`. Complete converted models remain
-within their own slots. The 22 static 80-byte rows begin at RAM `80481500`;
-the 23 shared 32-byte item records begin at `80481C00`, ending at `80481EE0`.
-The package end guard at `80481FF0` is unchanged.
+within their own slots. The current shared 25 static 80-byte rows begin at RAM
+`80482000`; the 26 shared 32-byte item records begin at `80482800`, ending at
+`80482B40`. The expanded package end guard is at `80483FF0`.
 
-The actual furniture catalogue has 459 rows, with all 248 clothing rows retained.
-Its conservative complete allocation is 280,000 bytes within the existing
-280,704-byte menu pool. Catalogue code occupies 3,120 of its 3,152 reserved bytes;
+The actual furniture catalogue has 462 rows, with all 248 clothing rows retained.
+Its conservative complete allocation is 280,128 bytes within the existing
+280,704-byte menu pool. Catalogue code occupies 3,280 of its 3,664 reserved bytes;
 further additions require another capacity review. HRA installs all seven theme
 55 records, the English `western` name, and the donor properties. The score-letter
 table contains 58 logical 26-byte rows followed by 12 padding bytes. Appending

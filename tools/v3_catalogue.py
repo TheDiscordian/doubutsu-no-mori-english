@@ -38,7 +38,8 @@ def sources(base):
     return data, reloc, parent
 
 
-def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False):
+def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, western=False,
+          western_large=False):
     from v3_construction_items import STOCK
     from v3_catalogue_capacity import CAPACITY
     data, _, _ = sources(base)
@@ -64,6 +65,13 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
         if not expanded:
             raise ValueError('Western furniture requires expanded catalogue pages')
         garden_rows.update({int(r['item_id'], 16): r for r in metadata(rel, donor_symbols)[1]})
+    large_rows = {}
+    if western_large:
+        from v3_western_items import metadata
+        if not expanded or not western:
+            raise ValueError('Large Western catalogue requires the Western integration')
+        large_rows = {int(r['item_id'], 16): r for r in metadata(rel, donor_symbols, large=True)[1]}
+        garden_rows.update(large_rows)
     for row in furniture:
         item, index = int(row['item_id'], 16), row['runtime_index']
         if (item, index) not in ((0x3224, 1161), (0x32B8, 1198), (0x3350, 1236)) and not (
@@ -71,7 +79,9 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
                 item in garden_rows and garden_rows[item]['runtime_index'] == index):
             raise ValueError('New catalogue import needs reviewed preview and shop rules')
         found = [(n, mode) for n, (i, mode) in enumerate(struct.iter_unpack('>HH', donor)) if i == index]
-        if len(found) != 1 or found[0][1] != 0 or draw[:8] != data[0x808AF87C - RAM:0x808AF87C - RAM + 8]:
+        expected_mode = large_rows[item]['preview_mode'] if item in large_rows else 0
+        if (len(found) != 1 or found[0][1] != expected_mode
+                or draw[:8] != data[0x808AF87C - RAM:0x808AF87C - RAM + 8]):
             raise ValueError('Donor catalogue preview mode is not the verified native mode')
         group = (garden_rows[item]['donor_list'] if item in garden_rows else
                  STOCK[item][1] if item in STOCK else ('ftr_listC' if item == 0x3224 else 'ftr_listA'))
@@ -86,6 +96,15 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
             records[-1].update(donor_acquisition_list=group,
                 ordinary_shop_list=group if garden_rows[item]['ordinary_stock'] else None,
                 catalogue_orderable=item != 0x3294)
+        if item in large_rows:
+            record = large_rows[item]
+            scalar = draw[expected_mode * 8:(expected_mode + 1) * 8]
+            if scalar.hex() != record['donor_preview_scalar_hex']:
+                raise ValueError('Changed large Western catalogue framing')
+            records[-1].update(donor_preview_mode=expected_mode,
+                donor_preview_scalar_hex=scalar.hex(),
+                preview_override=expected_mode != 0,
+                preview_mapping='native mode 0; guarded final scale/Y override' if expected_mode else 'native mode 0')
     records.sort(key=lambda row: row['donor_position'])
     if len({row['item_id'] for row in records}) != len(records) or len(rows) + len(records) > (CAPACITY if expanded else 444):
         raise ValueError('Catalogue duplicates or exceeds the actual native item capacity')
@@ -96,7 +115,12 @@ def table(base, rel, donor_symbols, furniture, *, expanded=False, garden=False, 
 def install(base, parent, suffix, compiled, ordering, records, collection, runtime, room, *, clothing=None, expanded=False):
     old, reloc, source_parent = sources(base)
     symbols = compiled['symbols']
-    if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > 0xC50 or len(suffix) % 16
+    if any(row.get('preview_override') for row in records) and (
+            '-DAF_V3_WESTERN_LARGE=1' not in compiled['flags'] or clothing is None
+            or '-DAF_V3_CLOTHING_CATALOGUE=1' not in compiled['flags']):
+        raise ValueError('Large Western previews require the installed initializer override')
+    limit = 0xE50 if '-DAF_V3_WESTERN_LARGE=1' in compiled['flags'] else 0xC50
+    if (len(suffix) != compiled['bytes'] or not suffix or len(suffix) > limit or len(suffix) % 16
             or collection['symbols']['af_v3_catalogue_owned'] != IMPORTS['af_v3_catalogue_owned']
             or runtime['symbols']['af_v3_save_halt'] != IMPORTS['af_v3_save_halt']
             or room['symbols']['af_v3_room_query'] != IMPORTS['af_v3_room_query']

@@ -32,6 +32,10 @@ extern int af_v3_original_item_place(u32, int, int, struct Place *);
 extern u32 af_v3_original_item_price(u32);
 #ifdef AF_V3_CLOTHING_PROFILE
 #include "clothing.h"
+#ifdef AF_V3_ROSTER_CLOTHING
+extern const struct Clothing *af_v3_roster_clothing_record(u32);
+#define find_clothing af_v3_roster_clothing_record
+#else
 #ifdef __mips__
 #define clothing ((const struct Clothing *)0x80462820u)
 #define selected_clothing (((const u8 *)0x80460020u)[183] & 0x80)
@@ -45,12 +49,18 @@ static const struct Clothing *find_clothing(u32 item) {
     return item == 0x34BF && selected_clothing && af_v3_clothing_source(0x10BF, 0) ? clothing : 0;
 }
 #endif
+#endif
 
 static const struct Item *find(u32 value) {
     u32 i, item = (u16)value & 0xFFFCu;
     for (i = 0; i < ITEM_COUNT; ++i) {
         const struct Item *row = items + i;
-        if (row->enabled == 1 && row->item == item && row->size == 0 &&
+        if (row->enabled == 1 && row->item == item &&
+#ifdef AF_V3_MULTI_CELL_ITEMS
+                row->size <= 1 &&
+#else
+                row->size == 0 &&
+#endif
                 af_v3_furniture_import_profile(row->index)) return row;
     }
     return 0;
@@ -86,9 +96,14 @@ int af_v3_item_type(u32 argument) {
 int af_v3_item_size(u32 argument) {
     u32 item = (u16)argument;
     if ((item >> 12) != 3u) return af_v3_original_item_size(argument);
+#ifdef AF_V3_MULTI_CELL_ITEMS
+    const struct Item *row = find(item);
+    return row ? row->size : 0;
+#else
     /* Both selected profiles have the actual donor 1x1 shape. Missing items
      * retain the native size-query fallback; placement itself rejects them. */
     return 0;
+#endif
 }
 
 int af_v3_item_place(u32 argument, int x, int z, struct Place *destination) {
@@ -100,11 +115,30 @@ int af_v3_item_place(u32 argument, int x, int z, struct Place *destination) {
        native non-furniture result (3, cleared cells), not become furniture. */
     row = find(item);
     for (i = 0; i < 4; ++i) {
+#ifdef AF_V3_MULTI_CELL_ITEMS
+        /* Native 1x2 directions: south +x, east -z, north -x, west +z.
+         * Inactive cells retain the anchor coordinates, just like the native
+         * placement table. Unsigned addition preserves MIPS wrapping. */
+        int dx = 0, dz = 0;
+        if (row && row->size == 1 && i == 1) {
+            u32 direction = item & 3u;
+            dx = direction == 0 ? 1 : direction == 2 ? -1 : 0;
+            dz = direction == 1 ? -1 : direction == 3 ? 1 : 0;
+        }
+        destination[i].exists = row && i <= row->size;
+        destination[i].x = row ? (int)((u32)x + (u32)dx) : 0;
+        destination[i].z = row ? (int)((u32)z + (u32)dz) : 0;
+#else
         destination[i].exists = row && i == 0;
         destination[i].x = row ? x : 0;
         destination[i].z = row ? z : 0;
+#endif
     }
+#ifdef AF_V3_MULTI_CELL_ITEMS
+    return row ? row->size : 3;
+#else
     return row ? 0 : 3;
+#endif
 }
 
 u32 af_v3_item_price(u32 argument) {

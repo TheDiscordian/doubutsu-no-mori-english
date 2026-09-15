@@ -301,6 +301,13 @@ bank allocation passes but paired upper-memory DMA and executed teardown remain
 unverified. Both opaque saddle-fence parts and the well's double mirrors are
 preserved. These are experimental imports, not certified complete gameplay.
 
+The [full-sized Western batch](V3_WESTERN_LARGE_ITEMS.md) installs the remaining
+three theme furnishings with true two-cell footprints, translucent water,
+narrow texture rows, and explicit donor-to-native catalogue framing. A relocated
+checked package adds 8 KiB while retaining save-code entry points and the existing
+model/menu allocations. The offline composer contains 49 experimental options.
+Ordinary gameplay, appearance, and persistence remain required validation.
+
 ### Limits and saves
 
 Target an Expansion Pak-equipped N64 with 128-KiB FlashRAM and RTC, retaining
@@ -327,7 +334,7 @@ and cold-boot rejection checks. Ordinary gameplay/catalogue and Controller Pak
 integration remain required. The web patcher does not upload or edit saves.
 
 The [local optional composer](V3_OPTIONAL_COMPOSITION.md) resolves per-entry
-selections for the twenty installed villagers and twenty-six installed logical items,
+selections for the twenty installed villagers and twenty-nine installed logical items,
 including required outfits, house furnishings, and mannequin representations.
 It updates actual native enable fields, resource CRCs, catalogue rows/counts, and
 save profiles without new allocations. Empty selections reproduce V2-11; all installed selections reproduce

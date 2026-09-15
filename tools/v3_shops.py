@@ -16,7 +16,7 @@ SOURCES = ('tools/v3_shops.py', 'tools/v3_construction_items.py',
            'overlays/v3/shops.c', 'overlays/v3/shops.ld')
 
 
-def goods(base, rel, symbols, imports, *, garden=False, western=False):
+def goods(base, rel, symbols, imports, *, garden=False, western=False, western_large=False):
     verify_sources(rel, symbols)
     files = by_vrom(base)
     old = files[VROM].extract(base)
@@ -58,6 +58,16 @@ def goods(base, rel, symbols, imports, *, garden=False, western=False):
             group = row['stock_group'] if row['ordinary_stock'] else 3
             garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
                                                     (0xCA, 0x196, 0x262, 0x2E4)[group])
+    if western_large:
+        from v3_western_items import metadata
+        if not garden or not western:
+            raise ValueError('Large Western stock requires verified ordinary, event, and lottery lists')
+        for row in metadata(rel, symbols, large=True)[1]:
+            group = row['stock_group'] if row['ordinary_stock'] else 5
+            if group == 5 and row['donor_list'] != 'ftr_listLottery':
+                raise ValueError('Unreviewed large Western reward route')
+            garden_rules[int(row['item_id'], 16)] = (row['runtime_index'], row['donor_list'], group,
+                                                    {1: 0x196, 2: 0x262, 5: 0x334}[group])
     for row in imports:
         item = int(row['item_id'], 16)
         rules = {0x3224: (1161, 'ftr_listC', 2, 0x262),

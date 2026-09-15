@@ -55,6 +55,16 @@ void af_v3_catalogue_furniture_init(struct Preview *preview, u32 argument) {
         preview->scale = 1.0f;
         preview->height = 38.0f;
     }
+#ifdef AF_V3_WESTERN_LARGE
+    u32 item = (u16)argument & 0xFFFCu;
+    if ((item == 0x32D4u || item == 0x32D8u) &&
+            af_v3_furniture_import_profile(1024u + ((item & 0xFFFu) >> 2))) {
+        /* GC preview indices 29 and 6 are not native indices. Construction
+         * uses verified native mode 0; retain the donor's final framing. */
+        preview->model_y = -5.0f;
+        preview->scale = item == 0x32D4u ? 0.87f : 0.82f;
+    }
+#endif
 }
 #endif
 
@@ -74,7 +84,7 @@ void af_v3_catalogue_program(struct Preview *preview) {
     if (index < 2048 || index > 3071 || !af_v3_furniture_import_profile(index - 1024))
         af_v3_save_halt(-7);
     /* Resident static profiles use the same native bank DMA and drawing code.
-     * No copied program is needed; the original 2400-byte model buffer remains. */
+     * No copied program is needed; the original 0x2400-byte model buffer remains. */
     preview->profile = profiles[index - 1024];
 }
 
@@ -104,6 +114,10 @@ int af_v3_catalogue_available(u32 argument, int category, int list, void *game) 
     if ((item & 0xFFFCu) == 0x32BCu || (item & 0xFFFCu) == 0x3334u)
         return category == 0 && list == 3 &&
             af_v3_furniture_import_profile(1024u + ((item & 0xFFFu) >> 2));
+#endif
+#ifdef AF_V3_WESTERN_LARGE
+    if ((item & 0xFFFCu) == 0x32D4u)
+        return category == 0 && list == 5 && af_v3_furniture_import_profile(1205);
 #endif
     /* The builder proves these selected pilots belong to the donor's ordinary
      * A/C shop lists. This local query only decides whether a catalogue price

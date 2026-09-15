@@ -175,18 +175,20 @@ class FurnitureArtLocalTests(unittest.TestCase):
                 for a, b in struct.iter_unpack('>II', code):
                     op = a >> 24
                     self.assertIn(op, (0xE7, 0xE8, 0xE3, 0xD7, 0xFC, 0xE2, 0xFD, 0xF5,
-                                       0xE6, 0xF0, 0xF3, 0xF2, 0xFA, 0xD9, 0x01, 0x05, 0x06, 0xDF))
-                    if op in (0xFC, 0xE2, 0xFA, 0xD9):
+                                       0xE6, 0xF0, 0xF3, 0xF4, 0xF2, 0xFA, 0xFB, 0xD9, 0x01, 0x05, 0x06, 0xDF))
+                    if op in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9):
                         state.append((a, b))
                     if op == 0xF0:
                         self.assertEqual((a, b), (0xF0000000, 0x0703C000))
                     if op == 0xFD:
-                        self.assertIn(a, (0xFD100000, 0xFD500000))
+                        self.assertTrue(a in (0xFD100000, 0xFD500000, 0xFD900000)
+                            or a & 0xFFFFF000 == 0xFD480000)
                         self.assertEqual(b >> 24, 6)
                         self.assertIn(b - SEGMENT, offsets.values())
                         loads.append(b - SEGMENT)
                     if op == 0xD7:
-                        self.assertEqual((a, b), (0xD7000002, 0xFFFFFFFF))
+                        scale = next(r.get('texture_scale', (65535, 65535)) for r in donor if r['opcode'] == 0xD7)
+                        self.assertEqual((a, b), (0xD7000002, scale[0] << 16 | scale[1]))
                     if op == 0xF2:
                         shapes.append(((b >> 12 & 4095) // 4 + 1, (b & 4095) // 4 + 1))
                     if op == 0x01:
@@ -210,7 +212,7 @@ class FurnitureArtLocalTests(unittest.TestCase):
                         b = row['words'][1]
                         expected_shapes.append(((b >> 12 & 4095) // 4 + 1, (b & 4095) // 4 + 1))
                 self.assertEqual(shapes, expected_shapes)
-                self.assertEqual(state, [r['words'] for r in donor if r['opcode'] in (0xFC, 0xE2, 0xFA, 0xD9)])
+                self.assertEqual(state, [r['words'] for r in donor if r['opcode'] in (0xFC, 0xE2, 0xFA, 0xFB, 0xD9)])
                 self.assertEqual(code[-8:], struct.pack('>II', 0xDF000000, 0))
         self.assertFalse(self.report['runtime_installed'])
 

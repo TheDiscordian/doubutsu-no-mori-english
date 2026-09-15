@@ -12,7 +12,7 @@ import struct
 from aflib import sha256
 from gc_names import rel_sections, symbol_data
 from item_identity_sheet import SHEET_SHA, sheet_rows
-from v3_furniture_art import WESTERN_PILOTS, scalar_profile, verify_sources
+from v3_furniture_art import WESTERN_PILOTS, LARGE_WESTERN_PILOTS, scalar_profile, verify_sources
 from v3_import_catalog import DONOR, REL_SHA, ROOT, SYMBOLS_SHA, read_donor
 from v3_villager_art import data_pointers, symbol_span
 
@@ -26,9 +26,17 @@ PROPERTIES = {
     0x3330: (1230, 'ftr_listB', 'DC050100', '0000', 260),
     0x3334: (2700, 'ftr_listEvent', 'DC050300', '0000', 262),
 }
+LARGE_PROPERTIES = {
+    0x32C4: (1100, 'ftr_listB', 'DC050100', '0000', 261),
+    0x32D4: (3800, 'ftr_listLottery', 'DC050700', '0000', 254),
+    0x32D8: (3680, 'ftr_listC', 'DC050200', '0000', 258),
+}
+LARGE_PREVIEW = {0x32C4: (0, '3f666666c0400000'),
+                 0x32D4: (29, '3f5eb852c0a00000'),
+                 0x32D8: (6, '3f51eb85c0a00000')}
 
 
-def identity_evidence(path):
+def identity_evidence(path, *, large=False):
     if sha256(path.read_bytes()) != SHEET_SHA:
         raise ValueError('Changed Western identity worksheet')
     cells = list(sheet_rows(path, 'Items'))
@@ -36,7 +44,7 @@ def identity_evidence(path):
             'C': 'ID (AF)', 'E': 'ID (AC)', 'H': 'Name (AF)', 'J': 'Name (English)'}.items()):
         raise ValueError('Changed Western identity columns')
     result = []
-    for pilot in WESTERN_PILOTS:
+    for pilot in LARGE_WESTERN_PILOTS if large else WESTERN_PILOTS:
         matches = [(n, c) for n, c in cells[1:] if c.get('E') == f'{pilot.item:04X}']
         if (len(matches) != 1 or matches[0][1].get('J') != pilot.name
                 or any(matches[0][1].get(k) != '-' for k in ('C', 'H', 'CG', 'CJ'))):
@@ -46,7 +54,7 @@ def identity_evidence(path):
     return result
 
 
-def metadata(rel, symbols):
+def metadata(rel, symbols, *, large=False):
     verify_sources(rel, symbols)
     text = symbols.decode()
     base = rel_sections(rel)[5][0]
@@ -55,6 +63,7 @@ def metadata(rel, symbols):
     catalogue = symbol_data(rel, text, 'mCL_furniture_list')
     series = symbol_data(rel, text, 'mMkRm_series_info')
     series_names = symbol_data(rel, text, 'mMkRm_series_name')
+    draw = symbol_data(rel, text, 'furniture_draw_data$436')
     h = rel[base + 0x4FAFC:base + 0x4FAFC + 1266 * 4]
     f = rel[base + 0x4EBF0:base + 0x4EBF0 + 1266 * 2]
     if (len(prices) != 1267 * 2 or len(names) != 242 * 16
@@ -76,15 +85,16 @@ def metadata(rel, symbols):
         lists[name] = raw, struct.unpack('>' + str(len(raw) // 2) + 'H', raw)
     tables = [(at, data_pointers(rel, at, 1266 * 4)) for at in (0x39FB4, 0x7B5B0)]
     records, rows = bytearray(), []
-    for pilot in WESTERN_PILOTS:
+    for pilot in LARGE_WESTERN_PILOTS if large else WESTERN_PILOTS:
         item, index = pilot.item, 1024 + (pilot.item - 0x3000) // 4
-        price, list_name, hra_hex, feng_hex, position = PROPERTIES[item]
+        price, list_name, hra_hex, feng_hex, position = (LARGE_PROPERTIES if large else PROPERTIES)[item]
+        preview, draw_hex = LARGE_PREVIEW[item] if large else (0, '3f666666c0400000')
         name = names[(index - 1024) * 16:(index - 1023) * 16]
         profile_at, size = symbol_span(text, pilot.profile)
         profile = symbol_data(rel, text, pilot.profile)
         models = {}
-        for _, suffix, slot, expected_size in pilot.models:
-            address, model_size = symbol_span(text, pilot.stem + suffix)
+        for label, suffix, slot, expected_size in pilot.models:
+            address, model_size = symbol_span(text, dict(pilot.model_symbols).get(label, pilot.stem + suffix))
             if model_size != expected_size or profile_at + slot in models:
                 raise ValueError('Changed or duplicated Western model binding')
             models[profile_at + slot] = address
@@ -97,26 +107,31 @@ def metadata(rel, symbols):
                 or data_pointers(rel, profile_at, size) != models
                 or h[index * 4:index * 4 + 4] != bytes.fromhex(hra_hex)
                 or f[index * 2:index * 2 + 2] != bytes.fromhex(feng_hex)
-                or membership != [(list_name, 1)] or found != [(position, 0)]):
+                or membership != [(list_name, 1)] or found != [(position, preview)]
+                or draw[preview * 8:preview * 8 + 8] != bytes.fromhex(draw_hex)):
             raise ValueError('Changed Western model, item identity, or gameplay properties')
         raw, ids = lists[list_name]
         if ids[-1] != 0 or 0 in ids[:-1]:
             raise ValueError('Changed Western acquisition-list terminator')
         value = int(hra_hex, 16)
         birth, surface = value >> 8 & 63, value >> 6 & 3
-        if birth not in (0, 1, 2, 3) or value & 63:
+        if birth not in ((0, 1, 2, 3, 7) if large else (0, 1, 2, 3)) or value & 63:
             raise ValueError('Unreviewed Western scoring category')
         native_hra = value & 0xFFFFC000 | birth << 9 | surface << 7
         ordinary = list_name in ('ftr_listA', 'ftr_listB', 'ftr_listC')
-        record = struct.pack('>HHHBB', index, item, price, 0, 1) + name + bytes(8)
+        footprint = 1 if large else 0
+        if pilot.shape != (3 if large else 4) or pilot.collision != int(large):
+            raise ValueError('Unreviewed Western shape or collision mapping')
+        record = struct.pack('>HHHBB', index, item, price, footprint, 1) + name + bytes(8)
         records.extend(record)
         rows.append({'id': f'{DONOR}/item/{item:04X}', 'item_id': f'{item:04X}',
-            'runtime_index': index, 'name': pilot.name, 'price': price, 'footprint': '1x1',
+            'runtime_index': index, 'name': pilot.name, 'price': price, 'footprint': '1x2' if large else '1x1',
             'donor_name_sha256': sha256(name), 'donor_profile_sha256': sha256(profile),
             'record_sha256': sha256(record), 'donor_list': list_name,
             'donor_list_sha256': sha256(raw), 'ordinary_stock': ordinary,
             'stock_group': 'ABC'.index(list_name[-1]) if ordinary else None,
-            'donor_catalogue_position': position, 'preview_mode': 0,
+            'donor_catalogue_position': position, 'preview_mode': preview,
+            'donor_preview_scalar_hex': draw_hex,
             'donor_hra_hex': hra_hex.lower(), 'native_hra_hex': f'{native_hra:08x}',
             'series': 55, 'birth_category': birth, 'surface': surface,
             'face': bool(value & 0x8000), 'lucky': bool(value & 0x4000),
@@ -127,6 +142,10 @@ def metadata(rel, symbols):
                 'install Western series 55 and its English score-letter name',
                 'verify actual model-bank and catalogue-preview capacity'],
             'runtime_installed': False, 'selectable': False})
+        if large:
+            rows[-1]['runtime_requirements'] += [
+                'connect both two-cell placement and size readers for every rotation',
+                'map donor preview scale/height to native presets; mode numbers differ']
     return bytes(records), rows
 
 
@@ -135,12 +154,13 @@ def main():
     parser.add_argument('--disc', type=Path, default=ROOT / 'local/gamecube/Animal Crossing (USA, Canada).ciso')
     parser.add_argument('--symbols', type=Path, default=ROOT / 'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--large', action='store_true', help='The three full-sized Western furnishings')
     args = parser.parse_args()
     output = args.output.resolve()
     if output.exists() or not output.is_relative_to(ROOT / 'build'):
         parser.error('Choose a fresh ignored build/ directory')
-    evidence = identity_evidence(ROOT / 'build/item-identity-megasheet.xlsx')
-    records, rows = metadata(read_donor(args.disc)['rel'], args.symbols.read_bytes())
+    evidence = identity_evidence(ROOT / 'build/item-identity-megasheet.xlsx', large=args.large)
+    records, rows = metadata(read_donor(args.disc)['rel'], args.symbols.read_bytes(), large=args.large)
     report = {'format': 'AFV3-WESTERN-ITEMS-1', 'source_rel_sha256': REL_SHA,
         'source_symbols_sha256': SYMBOLS_SHA, 'identity_sheet_sha256': SHEET_SHA,
         'identity_evidence': evidence, 'records_sha256': sha256(records), 'record_bytes': 32,

@@ -14,14 +14,14 @@ from v3_registry import (CLOTHING, CLOTHING_DISPLAYS, FURNITURE, VILLAGERS,
 from v3_save_runtime import profile_bytes
 from v3_villager_houses import layers
 
-BASE = ROOT/'build/v3-western-runtime-02'
-BASE_SHA = 'e9285a7d301b466b32eb4af022b5dc7ffaa555b3f1de93cffdb86bc838daa858'
-REPORT_SHA = 'e6679d4b4faec83566d87d86ca7f942dd494de42405bca68752285325f4465f9'
+BASE = ROOT/'build/v3-western-large-runtime-01'
+BASE_SHA = '5c51f80525a253e889a38b4ed4730df7e21b9a5e63a80917f0406b512faaebfe'
+REPORT_SHA = 'ce78cdb3f8fe717679fd8b74bf92cadb11cec19fc0f6abbe8b6b26284946547e'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-PREFIX_SIZE, ABI = 0xC000, 65
-PACKAGE, PACKAGE_RAM, PACKAGE_SIZE = 0x70000, 0x80473000, 0xF000
-STATIC_ROWS, STATIC_COUNT = 0x7E500, 22
+PREFIX_SIZE, ABI = 0xC000, 66
+PACKAGE, PACKAGE_RAM, PACKAGE_SIZE = 0x1CA000, 0x80473000, 0x11000
+STATIC_ROWS, STATIC_COUNT = PACKAGE + 0xF000, 25
 
 
 def resident_offset(blob, address, size):
@@ -361,7 +361,7 @@ def build(output, selected=(), *, select_all=False):
             row['metadata_sha256'] = sha256(blob[0x2820+slot*32:0x2840+slot*32])
         _, selected_cat = catalogue_selection(image, report, set(selection['enabled']))
         from v3_catalogue import VROM, RAM
-        from v3_western_runtime import ROWS, ITEMS, ITEMS_RAM, TABLE_END
+        from v3_western_large_runtime import ROWS, ITEMS, ITEMS_RAM, TABLE_END
         cat = current['catalogue']
         cat['installed_total_rows'] = cat['total_rows']
         cat.update(imports=selected_cat['imports'], total_rows=selected_cat['total_rows'])
@@ -389,11 +389,18 @@ def build(output, selected=(), *, select_all=False):
         for row in current['garden']['imports']:
             row['enabled'] = row['id'] in selection['enabled']
         current['western'].update(optional_composition_updated=True,
-            profile_rows_sha256=sha256(blob[ROWS:ROWS + STATIC_COUNT * 80]),
-            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + 22 * 80]),
+            item_rows_sha256=sha256(blob[ITEMS:ITEMS + 23 * 32]),
             package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
             pending=['ordinary acquisition, placement, and persistence'])
         for row in current['western']['imports']:
+            row['enabled'] = row['id'] in selection['enabled']
+        current['western_large'].update(optional_composition_updated=True,
+            profile_rows_sha256=sha256(blob[ROWS:ROWS + STATIC_COUNT * 80]),
+            item_rows_sha256=sha256(blob[ITEMS:TABLE_END]),
+            package_sha256=sha256(blob[PACKAGE:PACKAGE + PACKAGE_SIZE]),
+            pending=['native two-cell/runtime verification', 'ordinary acquisition, placement, and persistence'])
+        for row in current['western_large']['imports']:
             row['enabled'] = row['id'] in selection['enabled']
         import v3_hra as hra
         _, selected_hra = scoring_selection(image, report, catalog, set(selection['enabled']))
@@ -414,7 +421,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Fixed GAFE01-r0 identity; repeat as needed')
-    parser.add_argument('--all', action='store_true', help='All 46 installed experimental entries, not the whole donor disc')
+    parser.add_argument('--all', action='store_true', help='All 49 installed experimental entries, not the whole donor disc')
     args = parser.parse_args()
     result = build(args.output, args.select, select_all=args.all)
     print(json.dumps({key:result[key] for key in ('requested','required','output_sha256','save_compatibility')}, indent=2))
