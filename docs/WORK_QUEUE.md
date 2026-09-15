@@ -274,7 +274,9 @@ with later e/e+ donor support investigated separately.
   No additional resident RAM is needed. The [three callback-owned camping assets](checkpoints/V3_CAMPING_ACTORS.md)
   are converted completely, and the bonfire's true four-cell item reader compiles
   within the existing reservation. Twenty-one focused checks pass. Continue
-  native light/rig/billboard/scroll/sound callbacks, cartridge/composer integration,
+  cartridge/composer integration for the [compiled tent-light callbacks](checkpoints/V3_TENT_MODEL_CALLBACKS.md),
+  which pass three focused source/host checks with complete palettes and private
+  frame lifetime. Continue native execution, fire rig/billboard/scroll/sound callbacks,
   and summer-camper acquisition, then other donor content and
   ordinary gameplay/persistence. The seven Tent rewards do not enter normal
   shop stock. Neither served patcher changes. Current catalogue suffix headroom

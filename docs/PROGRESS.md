@@ -2,6 +2,15 @@
 
 ## Active development
 
+The [tent-model light callbacks](checkpoints/V3_TENT_MODEL_CALLBACKS.md) compile
+to 580 native bytes. Three focused checks pass, including sanitised execution
+with the actual converted palettes, independent per-instance fades, complete
+four-part draws, actor/arena guards, and palette lifetime after removal. The
+checked native profile leaves generic animation off; no heap allocation is
+introduced. Cartridge/catalogue/scoring/composer integration and native gameplay
+execution are next. This component is not yet an installed or selectable item;
+ABI 68 and both V2 web-patcher deployments remain unchanged.
+
 The [remaining camping assets](checkpoints/V3_CAMPING_ACTORS.md) are complete:
 campfire, bonfire, and tent model, including both moving flame textures, full
 fire rigs, and both tent-light palettes. All 18,320 native asset bytes fit the

@@ -7,9 +7,10 @@ These complete the assets for the ten-entry `ftr_listTent` family alongside
 the seven static objects in [Camping items](V3_CAMPING_ITEMS.md).
 They are additive imports, not substitutions for native furniture.
 
-Complete converted objects and the native four-cell item-reader extension are
-available. The three actors are **not installed in a cartridge or selectable**.
-Animation, sound, light-switch callbacks, scoring/catalogue integration,
+Complete converted objects, the native four-cell item-reader extension, and
+compiled tent-light callbacks are available. The three actors are **not installed
+in a cartridge or selectable**. Fire animation/sound callbacks, native execution,
+light-switch cartridge integration, scoring/catalogue integration,
 summer-camper acquisition, and ordinary persistence remain required.
 Source on the V3 development branch is permitted; neither served web patcher
 changes before user testing and explicit approval.
@@ -113,9 +114,34 @@ must stay unchanged. Do not apply the donor RGB5A3 packing directly to RGBA16.
 
 The N64 actor stride is `740`, with switch state at `12C`, not the GC actor
 layout. GC `dynamic_work_f`/`pal_p` offsets cannot be copied into the N64 actor.
-Choose and verify per-instance native storage, allocation failure behaviour,
-render/cache lifetime, and destruction before enabling the item. Multiple
-instances must not share a changing palette or fade state.
+The native adapter stores the four-byte fade in unused joint storage at `1A4`.
+The tent's native profile has no generic rig or texture animation. Checked
+constructor, update, and draw branches in both the original and current ROMs
+skip the generic animation consumers when those profile pointers are null.
+No other item uses this tent-specific interpretation of joint storage.
+
+`overlays/v3/tent_model.c` supplies create, move, draw, and destroy callbacks.
+Create/move preserve the donor's boolean switch interpretation, float step,
+clamping, and interpolation. Draw creates an immutable palette for that submitted
+graphics frame. The existing opaque arena supplies a 32-byte-aligned 64-byte
+matrix followed by the complete 32-byte palette; both receive a native cache
+writeback. Six commands load the matrix, bind segment 8, and draw all four parts.
+Both arena ends are checked before writing. Insufficient space leaves the arena
+and commands unchanged rather than submitting an invalid pointer.
+
+Each draw uses 144 bytes plus at most 16 bytes of alignment padding. Fade updates
+remain per actor even when not drawn, and successive draws cannot mutate a
+previous frame's palette. Destruction resets only the private fade: there is no
+heap palette to release and no dangling palette reference when an actor is reused.
+The lifetime differs from the GC allocation strategy while retaining its visible
+fade and avoiding cross-frame mutation on N64.
+
+The callbacks compile to 580 bytes at `80483400`, with a proposed vtable at
+`80483700`. The full 68-byte profile retains height 15.7, scale 0.01, shape 4,
+collision 0, and interaction `8000`, with no generic model/rig/texture pointers.
+These are compiled components, not an installed item or native/GPU execution
+claim. The [tent callback checkpoint](../docs/checkpoints/V3_TENT_MODEL_CALLBACKS.md)
+records the checked code, host execution, and remaining integration.
 
 ## Four-cell item readers
 
@@ -144,8 +170,8 @@ or create a new playable bonfire. Save structures do not change.
 
 ## Remaining integration
 
-1. Port the tent's per-instance light fade and the fires' complete rig, billboard,
-   dual-tile scrolling, and mapped loop sounds to checked native callbacks.
+1. Install the compiled tent-light callbacks and port the fires' complete rig,
+   billboard, dual-tile scrolling, and mapped loop sounds to native callbacks.
 2. Install complete profiles and item rows, four-cell readers, true catalogue
    framing (`0.86/−3` for bonfire), non-orderability, HRA/feng data, and selected
    dependencies. Use the current ABI 68 source, not an older cartridge chain.
