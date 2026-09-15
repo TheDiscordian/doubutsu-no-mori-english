@@ -52,10 +52,19 @@ static const struct Clothing *find_clothing(u32 item) {
 #endif
 
 static const struct Item *find(u32 value) {
-    u32 i, item = (u16)value & 0xFFFCu;
-    for (i = 0; i < ITEM_COUNT; ++i) {
+    u32 item = (u16)value & 0xFFFCu;
+#ifdef AF_V3_SPARSE_FURNITURE
+    if ((item >> 12) != 3u) return 0;
+    u32 i = (item - 0x3000u) >> 2;
+    {
+#else
+    for (u32 i = 0; i < ITEM_COUNT; ++i) {
+#endif
         const struct Item *row = items + i;
         if (row->enabled == 1 && row->item == item &&
+#ifdef AF_V3_SPARSE_FURNITURE
+                row->index == AF_V3_SPARSE_FIRST + i &&
+#endif
 #ifdef AF_V3_MULTI_CELL_ITEMS
                 row->size <= 1 &&
 #else

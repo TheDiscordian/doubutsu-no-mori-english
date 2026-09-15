@@ -77,7 +77,7 @@ extern struct Import af_v3_speed_bag_import;
 #endif
 
 static const struct Import *find(u32 argument) {
-    u32 n = (u16)argument, i;
+    u32 n = (u16)argument;
     if (n < NATIVE || n >= CAPACITY) return 0;
 #ifdef AF_V3_SPEED_BAG
     if (n == AF_V3_SPEED_BAG_INDEX && speed_bag->enabled == 1 &&
@@ -102,11 +102,19 @@ static const struct Import *find(u32 argument) {
             af_v3_display_clothing_index(display_import->item) == 0x10BFu) return display_import;
 #endif
 #endif
-    for (i = 0; i < AF_V3_STATIC_IMPORT_COUNT; ++i) {
+#ifdef AF_V3_SPARSE_FURNITURE
+    if (n < AF_V3_SPARSE_FIRST || n >= AF_V3_SPARSE_END) return 0;
+    u32 i = n - AF_V3_SPARSE_FIRST;
+    const struct Import *row = imports + i;
+    if (row->enabled == 1 && row->index == n && row->item == 0x3000u + i * 4u &&
+            profiles[n] == AF_V3_STATIC_IMPORT_RAM + 8u + i * 80u) return row;
+#else
+    for (u32 i = 0; i < AF_V3_STATIC_IMPORT_COUNT; ++i) {
         const struct Import *row = imports + i;
         if (row->enabled == 1 && row->index == n &&
                 profiles[n] == AF_V3_STATIC_IMPORT_RAM + 8u + i * 80u) return row;
     }
+#endif
     return 0;
 }
 

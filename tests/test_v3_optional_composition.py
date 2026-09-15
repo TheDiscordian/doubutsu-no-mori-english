@@ -81,7 +81,7 @@ class OptionalCompositionTests(unittest.TestCase):
         files = by_vrom(result)
         module = files[composer.MODULE].extract(result)
         self.assertEqual(struct.unpack_from('>4I',module,composer.CONFIG),
-                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),66))
+                         (composer.BLOB,0xC000,zlib.crc32(blob[:0xC000]),composer.ABI))
         self.assertEqual(struct.unpack_from('>4I', blob, 0xF0),
                          (composer.BLOB + composer.PACKAGE, composer.PACKAGE_SIZE,
                           zlib.crc32(blob[composer.PACKAGE:composer.PACKAGE + composer.PACKAGE_SIZE]),
@@ -181,7 +181,7 @@ class OptionalCompositionTests(unittest.TestCase):
             if row['kind'] == 'furniture':
                 self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset'] + 4], 'big'), key in keys)
         last = self.catalog[keys[-1]]
-        self.assertEqual(last['enable_offset'], composer.STATIC_ROWS + 14 * 80 + 4)
+        self.assertEqual(last['enable_offset'], composer.STATIC_ROWS + (0x32A4 - 0x3000) // 4 * 80 + 4)
         cat = self.report['catalogue']
         data = by_vrom(image)[VROM].extract(image)
         at = cat['code']['symbols']['af_v3_catalogue_order'] - RAM
@@ -229,7 +229,7 @@ class OptionalCompositionTests(unittest.TestCase):
         image, _, blob = composer.compose(self.base, self.report, self.catalog, selected)
         self.assertEqual(image, composer.compose(self.base, self.report, self.catalog,
                          self.select(*reversed(chosen)))[0])
-        self.assertEqual(self.catalog[chosen[-1]]['enable_offset'], composer.STATIC_ROWS + 21 * 80 + 4)
+        self.assertEqual(self.catalog[chosen[-1]]['enable_offset'], composer.STATIC_ROWS + (0x3334 - 0x3000) // 4 * 80 + 4)
         for key, row in self.catalog.items():
             if row['kind'] == 'furniture':
                 self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset'] + 4], 'big'), key in chosen)
@@ -260,20 +260,20 @@ class OptionalCompositionTests(unittest.TestCase):
     def test_full_sized_western_subset_retains_two_cell_records_and_preview_mapping(self):
         import v3_catalogue as cat_tool
         import v3_hra as hra
-        from v3_western_large_runtime import ITEMS, TABLE_END
+        from v3_import_storage import ITEMS, TABLE_END
         chosen = ['GAFE01-r0/item/32C4', 'GAFE01-r0/item/32D4', 'GAFE01-r0/item/241A']
         selected = self.select(*chosen)
         self.assertEqual(selected['required'], [])
         image, _, blob = composer.compose(self.base, self.report, self.catalog, selected)
         self.assertEqual(image, composer.compose(self.base, self.report, self.catalog,
                          self.select(*reversed(chosen)))[0])
-        self.assertEqual(self.catalog['GAFE01-r0/item/32D8']['enable_offset'], composer.STATIC_ROWS + 24 * 80 + 4)
+        self.assertEqual(self.catalog['GAFE01-r0/item/32D8']['enable_offset'], composer.STATIC_ROWS + (0x32D8 - 0x3000) // 4 * 80 + 4)
         for key, row in self.catalog.items():
             if row['kind'] == 'furniture':
                 self.assertEqual(int.from_bytes(blob[row['enable_offset']:row['enable_offset'] + 4], 'big'), key in chosen)
         original_blob = by_vrom(self.base)[composer.BLOB].extract(self.base)
         self.assertEqual(blob[ITEMS:TABLE_END], original_blob[ITEMS:TABLE_END])
-        self.assertEqual([blob[ITEMS + slot * 32 + 6] for slot in (23, 24, 25)], [1, 1, 1])
+        self.assertEqual([blob[ITEMS + (item - 0x3000) // 4 * 32 + 6] for item in (0x32C4, 0x32D4, 0x32D8)], [1, 1, 1])
         data = by_vrom(image)[cat_tool.VROM].extract(image)
         at = self.report['catalogue']['code']['symbols']['af_v3_catalogue_order'] - cat_tool.RAM
         self.assertEqual(struct.unpack_from('>4H', data, at + 436 * 4), (2229, 0, 2225, 0))

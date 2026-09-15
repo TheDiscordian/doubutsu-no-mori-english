@@ -27,17 +27,18 @@ requirement remains; the four-MiB warning path does not initialise this region.
 | `80472040` | 2,051 bank indices; `FF` means no bank |
 | `80472850` | Four `AF46C0DE` guard words |
 
-The 144-byte initializer is inside the existing resident prefix at
-`8046A000..8046A08F`. The field bridge at `8046A200` is retained. Startup calls
+The 204-byte initializer is inside the existing resident prefix at
+`8046A000..8046A0CB`. The field bridge at `8046A200` is retained. Startup calls
 the initializer after checking and loading the resident code and before setting
 the installed flag or returning to gameplay.
 
-All native profile entries initialise to zero. The reviewed imported seed range
-is copied from the existing immutable prefix, retaining the two static pilot
-profiles. The clothing variant also installs its mannequin profile at index
-1,727; other entries remain zero. Bank indices initialise to `FF`.
-The original 947-entry heap-allocation table, native profile cleanup, and all
-100 ordinary model-bank buffers keep their owners and sizes.
+All native profile entries initialise to zero. Imported static profiles derive
+from the checked [canonical sparse rows](V3_IMPORT_STORAGE.md) at `80484000`,
+validating both identity and enable state. The speed bag and three clothing
+mannequins retain their separate callback profiles. Absent/malformed rows and the
+three final padding entries remain zero. Bank indices initialise to `FF`.
+The original 947-entry profile allocation and cleanup remain native-owned;
+the [100 dedicated model banks](V3_FURNITURE_BANKS.md) retain their fixed pool.
 
 ## Readers and stable entry points
 
@@ -47,10 +48,10 @@ remain 947. Existing fixed-address references have no remaining relocation
 entries; the installer rejects a relocation at any changed word. The full room
 owner and its unchanged relocation resource are checked before patching.
 
-The expanded furniture helper is 1,184 bytes at `80465800..80465C9F`. It occupies
+The expanded furniture helper is 1,720 bytes at `80465800..80465EB7`. It occupies
 the retired native profile-table prefix, not the villager reader at
-`80465400..8046578F`, mannequin at `80466000`, or imported seed rows at `804666CC`.
-The initializer never copies this code into the new profile table.
+`80465400..8046578F` or mannequin at `80466000`. The initializer does not read
+the retired seed table or copy code into the transient profile table.
 
 All eight existing public helper addresses remain fixed, including profile
 lookup at `80465000` and inverse item conversion at `804652E4`. Each forwards

@@ -1,7 +1,9 @@
 /* Fixed tables inside the already-loaded, CRC-checked resident package. */
 #ifndef AF_V3_CONSTRUCTION_H
 #define AF_V3_CONSTRUCTION_H
-#ifdef AF_V3_WESTERN_LARGE
+#ifdef AF_V3_SPARSE_FURNITURE
+#include "sparse_furniture.h"
+#elif defined(AF_V3_WESTERN_LARGE)
 #define AF_V3_STATIC_IMPORT_RAM 0x80482000u
 #define AF_V3_STATIC_IMPORT_COUNT 25
 #define AF_V3_ITEM_TABLE_COUNT 26

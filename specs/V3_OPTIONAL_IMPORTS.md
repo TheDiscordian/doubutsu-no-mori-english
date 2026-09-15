@@ -103,6 +103,13 @@ Keep source hashes and conversion revisions attached to each compiled import.
 
 ## Runtime work
 
+The [expanded import storage](V3_IMPORT_STORAGE.md) supports further batches
+without adding to the full DMA directory. English choice data retains its
+identity and contents at a new virtual address; the import resource gains a
+larger checked reservation. Fixed canonical profile/item slots cover the existing
+supported ID range without repeated metadata-table moves. This does not claim
+that all slots contain converted items or completed gameplay.
+
 ### Villagers
 
 The [cat/cub artwork converter](V3_VILLAGER_ART.md) produces Punchy/Cheri texture

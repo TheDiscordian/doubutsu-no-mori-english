@@ -265,14 +265,22 @@ with later e/e+ donor support investigated separately.
   or voice IDs into the smaller native fields.
 - [ ] Batch remaining English-donor villagers/items and their actual behaviours;
   adapt islanders explicitly instead of pretending the island engine is present.
+  The [expanded import storage](checkpoints/V3_IMPORT_STORAGE.md) preserves the
+  full 3,389-entry DMA directory and relocates the unchanged English choice bank.
+  ABI 67 provides 1,847,280 bytes of free import storage and fixed
+  metadata slots, with 114,704 more resident bytes and no ordinary heap growth.
+  The corrected preflight and first actual native run pass 84 records, including
+  all installed static pointers, shared readers, relocated choices, and guards.
+  Continue camping models and their actual reward/scoring category; do not assign
+  donor category 37 to the current 23-counter native adapter without adaptation.
   The [full-sized Western integration](checkpoints/V3_WESTERN_LARGE_ITEMS.md)
   installs the remaining three Western furnishings, bringing the theme to ten
   complete models with true two-cell footprints and explicit catalogue framing.
   ABI 66 relocates/expands the checked package by 8 KiB while preserving save
   code, public item entries, and existing menu/model allocations. Twenty-eight
   focused checks and the first 88-record native run pass. Forty-nine options
-  compose individually; all/empty retain exact full/V2 outputs. The next donor
-  family needs reviewed storage expansion, with only 47,888 VROM bytes left.
+  compose individually; all/empty retain exact full/V2 outputs. Expanded import
+  storage supplies the headroom and canonical metadata slots for further batches.
   Continue ordinary placement/rendering/acquisition/persistence, mailbox
   behaviours, and remaining villagers/items. Neither served patcher changes.
   The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete

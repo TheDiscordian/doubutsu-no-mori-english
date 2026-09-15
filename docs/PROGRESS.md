@@ -2,6 +2,23 @@
 
 ## Active development
 
+The [import-storage expansion](checkpoints/V3_IMPORT_STORAGE.md) supplies
+1,847,280 bytes of free import storage without adding to the full DMA directory.
+English choices retain their contents and IDs at a new virtual address. Fixed
+profile/item slots remove the need to relocate tables for every content batch.
+ABI 67 adds 114,704 resident bytes without increasing the normal heaps or model
+pool. Seventeen focused checks and the first actual native run pass: 23 calls,
+48 memory assertions, all installed static pointers, relocated English choices,
+and intact guards. The offline composer retains all 49 experimental options,
+exact all/empty outputs, and deterministic individual selections.
+Current full integration:
+`build/v3-import-storage-02/animal-forest-v3-asset-loader.z64`, SHA-256
+`f12da1a8575403ab74ded685e916bf082b5c1d53e6b73c0ae74c0fe87d282ade`.
+The subset is `build/v3-optional-storage-01/`. Both served patchers remain V2.
+Next are the camping models and their actual reward/scoring category, followed
+by remaining content and gameplay/persistence integration. This is not a
+complete-import handoff; spare slots are not implemented items.
+
 The [full-sized Western batch](checkpoints/V3_WESTERN_LARGE_ITEMS.md) installs
 watering trough, covered wagon, and storefront, completing the ten-item Western
 theme. Complete models, two-cell footprints, true stock routes, catalogue framing,
@@ -15,8 +32,8 @@ Current full integration:
 `5c51f80525a253e889a38b4ed4730df7e21b9a5e63a80917f0406b512faaebfe`.
 The offline composer has 49 experimental options, exact all/empty outputs, and
 a generated trough/wagon/red-aloha subset at `build/v3-optional-western-large-01/`.
-Further donor families need a reviewed storage expansion: the current import
-VROM file has 47,888 bytes free. Both served patchers remain V2. This is not a
+Expanded import storage supplies the headroom for further donor families.
+Both served patchers remain V2. This is not a
 complete-import playtest handoff; remaining donor content and gameplay continue.
 
 The [Western runtime](checkpoints/V3_WESTERN_RUNTIME.md) installs seven complete

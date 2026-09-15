@@ -13,7 +13,7 @@ The reservation contains 100 banks of `0x2400` bytes (9,216 decimal), with
 | `80500010..805E100F` | 100 consecutive model banks |
 | `805E1010..805E101F` | Four `AF42C0DE` trailing guard words |
 
-The current resident import package ends at `80484000`. Font memory remains
+The current resident import package ends at `804A0010`. Font memory remains
 `80450000..80457FFF`; title resources end below it. The emergency fault
 framebuffer starts at `807DA800`. Ordinary system/game heaps, framebuffer
 allocations, and scene-object arenas remain below `80400000` and do not grow.
