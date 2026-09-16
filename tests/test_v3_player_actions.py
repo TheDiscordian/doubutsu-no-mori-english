@@ -20,6 +20,90 @@ import v3_player_actions as actions
 OUTPUT=ROOT/os.environ.get('V3_PLAYER_ACTIONS_BUILD','build/v3-player-action-tables-03')
 CONTROLS=ROOT/os.environ.get('V3_PLAYER_CONTROLS_BUILD','build/v3-player-fan-controls-01')
 HELD=ROOT/os.environ.get('V3_HELD_DISPATCH_BUILD','build/v3-held-item-dispatch-02')
+ACTIVE=ROOT/os.environ.get('V3_FAN_ACTION_BUILD','build/v3-fan-action-dispatch-03')
+
+
+@unittest.skipUnless((ACTIVE/'build.json').is_file(),'Current activated-action cartridge required')
+class ActivationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom=(ACTIVE/'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report=json.loads((ACTIVE/'build.json').read_bytes())
+        cls.base,cls.prior=inputs(ACTIVE/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.a=cls.e['player_actions'];cls.activation=cls.a['fan_activation']
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.old_blob=cls.before[BLOB].extract(cls.base)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+
+    def test_only_complete_fan_callbacks_are_published(self):
+        old=self.prior['equipment_resources'];before=self.old_blob[old['blob_offset']:old['blob_offset']+old['bytes']]
+        restored=bytearray(self.module)
+        self.assertEqual(len(self.activation['callbacks']),3)
+        for row in self.activation['callbacks']:
+            self.assertEqual(struct.unpack_from('>I',self.module,row['offset'])[0],row['target'])
+            self.assertEqual(before[row['offset']:row['offset']+4],bytes(4))
+            restored[row['offset']:row['offset']+4]=bytes(4)
+        self.assertEqual(restored[actions.CODE_OFFSET:actions.CODE_OFFSET+80],before[actions.CODE_OFFSET:actions.CODE_OFFSET+80])
+        restored[actions.CODE_OFFSET:actions.TABLE_OFFSET]=before[actions.CODE_OFFSET:actions.TABLE_OFFSET]
+        draw=self.a['held_dispatch']['tables'][1]['offset']+23*4
+        restored[draw:draw+4]=before[draw:draw+4]
+        self.assertEqual(restored,before)
+        self.assertEqual(self.a['enabled_imported_actions'],[109]);self.assertTrue(self.a['fan_action_installed'])
+        self.assertFalse(self.activation['inventory_selection_installed']);self.assertEqual(self.activation['logical_imports_added'],0)
+        for row in self.a['tables']:
+            value=self.module[row['offset']:row['offset']+row['bytes']]
+            self.assertEqual(sha256(value),row['sha256'])
+            if row['width']==4:
+                for index in self.a['disabled_indices']:self.assertEqual(value[index*4:index*4+4],bytes(4))
+        code=self.a['code']
+        self.assertEqual(sha256(self.module[actions.CODE_OFFSET:actions.CODE_OFFSET+code['bytes']]),code['sha256'])
+        self.assertTrue(self.activation['crossed_release_events_preserved'])
+        self.assertTrue(self.activation['wrapped_end_event_preserved'])
+        self.assertEqual(self.e['sound_programs'],old['sound_programs'])
+        self.assertEqual(zlib.crc32(self.module),self.e['crc32'])
+
+    def test_poll_hooks_remove_only_their_native_call_relocations(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom);restored=bytearray(owner)
+        old=self.before[actions.PLAYER_VROM].extract(self.base)
+        count=len(self.prior['equipment_resources']['player_actions']['patches'])
+        patches=self.a['patches'][count:];self.assertEqual(len(patches),4)
+        self.assertEqual({r['offset']+actions.PLAYER_RAM for r in patches},{r[0] for r in actions.POLL_SITES})
+        for r in patches:
+            self.assertEqual(struct.unpack_from('>I',owner,r['offset'])[0],r['after'])
+            struct.pack_into('>I',restored,r['offset'],r['before'])
+        self.assertEqual(restored,old)
+        reloc=self.files[actions.PLAYER_RELOC].extract(self.rom)
+        prior=self.before[actions.PLAYER_RELOC].extract(self.base)
+        self.assertEqual(struct.unpack_from('>I',prior,16)[0]-struct.unpack_from('>I',reloc,16)[0],4)
+        spec=SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=struct.unpack_from('>5I',reloc))
+        for base in (0x80200000,0x80300000):
+            live=relocate_verified_data(spec,owner,reloc,base)
+            for r in patches:self.assertEqual(struct.unpack_from('>I',live,r['offset'])[0],r['after'])
+            self.assertEqual(struct.unpack_from('>I',live,0x808DCAA0-actions.PLAYER_RAM)[0],
+                actions.jump(base+0x808B7DD8-actions.PLAYER_RAM,link=True))
+        self.assertEqual(sha256(reloc),self.e['player_motion']['reloc_sha256'])
+
+    def test_remaining_core_limits_and_unchanged_inventory_profile(self):
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        core=self.files[CODE_VROM].extract(self.rom);owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        audit=actions.fan_action_audit(source,owner,core,original)
+        self.assertEqual(json.loads(json.dumps(audit)),self.activation['audit'])
+        self.assertFalse(audit['core_changes_required'])
+        self.assertEqual(audit['equipment_change_callback']['returns'],[-1,7,8,9,10])
+        damaged=bytearray(core);struct.pack_into('>I',damaged,0,0x28420069)
+        with self.assertRaisesRegex(ValueError,'inventory'):actions.fan_action_audit(source,owner,damaged,original)
+        bindings=actions.control_bindings(source,owner,core,original,self.e)
+        bindings.update(action_callbacks_installed=True,poll_hooks_installed=True)
+        self.assertEqual(json.loads(json.dumps(bindings)),self.a['fan_control_flow'])
+        self.assertEqual(sha256(self.blob),self.report['blob_sha256'])
+        for v in self.files.keys()-{BLOB,MODULE,actions.PLAYER_VROM,actions.PLAYER_RELOC,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),f'{v:08X}')
+        for key in ('save_runtime','furniture','catalogue','clothing_profile','hra','feng_shui'):
+            self.assertEqual(self.report.get(key),self.prior.get(key))
+        self.assertEqual(apply_ups(original,(ACTIVE/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,0x10),n64_checksum(self.rom))
 
 
 @unittest.skipUnless((HELD/'build.json').is_file(),'Current held-dispatch cartridge required')

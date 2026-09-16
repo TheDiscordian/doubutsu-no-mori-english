@@ -1,6 +1,6 @@
 /* The extended tables retain native linked pointers, not stale heap pointers.
    Resolve them against the actual loaded player owner at every dispatch. The
-   two call-register variants preserve arguments, stack, and the caller's RA.
+   call-register variants preserve arguments, stack, and the caller's RA.
    t0/t1/t9 are caller-saved. Imported callbacks already use resident addresses. */
 .set noreorder
 .set noat

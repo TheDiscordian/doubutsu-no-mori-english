@@ -1,5 +1,76 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared fan action activation
+
+The existing action adapter registers the complete source fan callback group:
+compiled setup and movement plus native net reset `808BE140`. Source submenu
+and settle callbacks remain null. Four ordinary umbrella polls call the shared
+umbrella-then-fan helper with unchanged priority and following input checks;
+the umbrella's own repeat call remains native. Four obsolete local JAL
+relocations are removed, bringing the total action/held removals to 64. All
+original actions remain intact, and fifteen unfinished extended actions reject.
+
+The outside-owner audit checks all three native comparisons against 105. One
+is a resource byte-length bound. Equipment-change dispatch only returns
+`-1, 7, 8, 9, 10`, so its bound needs no expansion. The native out-of-range
+event-position result equals the source fan's zero entry. Complete consumer
+bodies, callback registration, source dependencies, and the event table are
+bound in the receipt; no unrelated core table changes.
+
+The first full native action-cycle check exposed a real game bug: native speed
+one crosses source frames 7.5 and 8 together, and an `else` swallowed the release
+check. Repeat wrapping also skipped the idle threshold at 8.5. Independent ordered
+event checks now handle the first boundary; a virtual crossed-end coordinate
+handles the wrap without changing the rendered frame or advancing animation
+twice. This is an implementation correction, not a testing-setup retry.
+
+### Build and verification
+
+- ABI 104: `build/v3-fan-action-dispatch-03/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256: `b7a8964f6d8fa323c2c84712086cdb04949f07de230ac794ba3ae4a9d146d620`.
+- UPS SHA-256: `9f2342690162bbe8ecc016022a58c4ee8d74ba92e013246bf5b887c5c1928a25`.
+- Receipt SHA-256: `afa35cf9a6cba7f32ec8569ff239e7af3bf1835dd9bfe2a265df78287f74de4e`.
+- Action code is 1,944 bytes, retaining the 80-byte dispatch prefix. Module is
+  24,576 bytes; startup remains 952 of 992 bytes. Blob is 3,517,632 bytes, with
+  611,136 free. No allocation, source model/motion, or sound resource changes.
+- Saved format 2 and 104 choices remain unchanged. Same-profile ABI-103/104
+  compatibility is expected both ways; the current actual-codec checks pass.
+  No new ordinary save/restart or hardware result is claimed. V3 saves are not
+  for V2. Both served patchers remain V2.
+
+Four focused current-build checks pass in 5.692 seconds: host sanitizers,
+held-A repeat and released idle across the wrap, complete source/callback/audit
+contracts, owner relocation at two bases, resource retention, and UPS/CRC checks.
+Twelve current composition checks pass in 8.667 seconds, covering exact no-import
+V2, all-import ABI 104, sparse choices, dependencies, and the actual save codec.
+
+The initial native result `build/smoke-v3-fan-action-dispatch-01/results.json`
+contains 42 records and 24 passing assertions before the missing exit request;
+SHA-256 is `55ef474cedc8ba13b49f36162376b0b2256c568d2c75955566b52aaa8c95a213`.
+Raw requested-action and post-wrap frame values were not logged in that run;
+the diagnosis comes from the boundary logic and the corrected execution.
+
+The corrected result `build/smoke-v3-fan-action-dispatch-02/results.json`
+passes 60 records and 37 assertions, SHA-256
+`cd413a906a714b6ef08d901d87cc7f3d1d65bc6617884b6c32f7f57e0742f58d`.
+Probe SHA-256 is `ea04a39f5e58211f837429005b177374156d40488887d69fb43f98c3bf667f98`.
+Actual native setup selects animations 270/0, main dispatch advances the live
+actor, frame eight requests movement action eight, and the next dispatch exits
+the swing. Net reset, disabled-action rejection, full actor/animation-bank
+restoration, guards, checkpoint restoration, and no CPU fault pass. Native
+stationary idle and positive equipped-fan input are not claimed. FlashRAM stays
+all `FF`, SHA-256
+`b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+No audio or user save is used.
+
+That run used build `02`; build `03` only clarifies source comments/indentation
+and has exactly the same complete ROM and compiled code. The proof is retained
+without another native run. Build `01` is not promoted.
+
+Next connect profile-aware equipment selection, scene/special-action permissions,
+parent inventory/names/prices/acquisition, context-correct catalogue ownership,
+and persistence. No new logical item is enabled by callback activation alone.
+
 ## Shared held-item dispatch
 
 The callback converter handles the two complete donor held-item tables using the

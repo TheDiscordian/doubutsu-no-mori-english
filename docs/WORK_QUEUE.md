@@ -2,21 +2,22 @@
 
 ## Active: V3 optional GameCube imports
 
-Current ABI 103 is `build/v3-held-item-dispatch-02/`. The shared table converter
-handles both held-item dispatchers and all original tools. Fan category 23 has
-main/draw callbacks; balloon/pinwheel entries remain null. Static draw uses the
-actual held resource and existing native hand-matrix/scale/segment setup. The
-four focused checks and 58-record/40-assertion silent native run pass. Preserve
-those results and the unchanged audio evidence; do not replay either batch.
-All twelve current composition checks pass, including no-import V2 and ABI 103.
-See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch).
+Current ABI 104 is `build/v3-fan-action-dispatch-03/`. The shared importer
+registers fan action 109's complete setup/main/net-reset group and four ordinary
+input polls. The outside-owner audit preserves unrelated core limits. Native
+release/repeat handling retains crossed and wrapped end events, fixing the
+skipped-release defect from the initial native run. Four focused checks, the
+corrected 60-record/37-assertion native run, and twelve current composition checks
+pass. No allocation, saved format, or selectable identity changes. Preserve the
+unchanged held-draw and sound evidence instead of replaying those batches.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-action-activation).
 
-Next, finish the outside-owner action audit, register fan action 109's installed
-setup/main and equivalent native net reset, and connect the four ordinary input
-poll sites. Add profile-aware native equipment selection and parent inventory/
-acquisition/catalogue/persistence before offering fans as choices. The current
-native item selector still rejects their IDs. Keep full scene rendering and
-ordinary equipped-fan use explicit; direct callback execution is not that proof.
+Next, add profile-aware native equipment selection, scene/special-action
+permissions, and parent inventory/names/prices/acquisition/catalogue/persistence
+before offering fans as choices. The current native item selector still rejects
+their IDs. Use source-derived category records and context-specific collection
+representations. Keep full scene rendering and ordinary equipped-fan use explicit;
+direct callback execution is not that proof.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains
@@ -31,16 +32,16 @@ See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-
 
 The complete native held-item main/draw tables and source static fan drawing are
 installed above. The eight fans share code and source-derived records, not
-per-item installers. Fan action callbacks and input-poll hooks remain disabled.
+per-item installers. Fan action callbacks and input-poll hooks are installed;
+selected inventory and acquisition remain required.
 
 All 105 native actions retain their original
 metadata and callbacks; the complete donor metadata covers sixteen reserved
-indices `105..120`. Extra callbacks remain disabled and native setup rejects
-those requests. The fan retains donor action index 109. Continue its actual
-draw/net reset and installed per-frame/sound code through these shared
-tables, not another action installer. The source net-angle callback for the fan
-is a reset routine, not null; submenu and settle callbacks are null. Audit
-remaining core-library action checks before enabling equipment.
+indices `105..120`. The fifteen unfinished actions remain disabled and native
+setup rejects those requests. Fan action 109 has its source-derived callback
+group; submenu and settle remain null as in the donor. Continue through these
+shared tables, not another action installer. Core checks required for fan action
+109 are audited; new categories still require their own verified contracts.
 
 The module has checked code space at `804A5000..804A6FFF`, tables at
 `804A7000`, and an end guard at `804A8FF0`. Its complete 24-KiB transfer uses the

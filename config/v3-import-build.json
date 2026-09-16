@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-held-item-dispatch-02",
-  "runtime_abi": 103,
-  "rom_sha256": "d9c84c537a1565986de459667e4428d9d0dadcf79a1f1ea7a1904eb03fd99f0b",
-  "report_sha256": "de2265f41d8d0a54ab2db52452dc0e51e501e30d929eef907ff0a90eeb7f5842"
+  "directory": "build/v3-fan-action-dispatch-03",
+  "runtime_abi": 104,
+  "rom_sha256": "b7a8964f6d8fa323c2c84712086cdb04949f07de230ac794ba3ae4a9d146d620",
+  "report_sha256": "afa35cf9a6cba7f32ec8569ff239e7af3bf1835dd9bfe2a265df78287f74de4e"
 }

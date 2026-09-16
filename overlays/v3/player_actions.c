@@ -1,7 +1,7 @@
 /* Shared player-action extensions, using the currently loaded native owner.
  * Fan controls/setup/transitions retain GAFE01-r0 semantics. These entry points
- * are not published in action tables until drawing, sound, and item selection
- * are complete. No saved fields or player allocation are added.
+ * form complete callback groups registered by the importer. Inventory choices
+ * remain a separate requirement. No saved fields or player allocation are added.
  */
 typedef unsigned char u8;
 typedef unsigned int u32;
@@ -98,6 +98,7 @@ void af_v3_player_fan_setup(void *actor, void *game) {
 
 #ifdef AF_V3_FAN_SOUND
 void af_v3_player_fan_finish(void *actor, void *game);
+static void fan_finish_frame(void *actor, void *game, float current);
 void af_v3_player_fan_main(void *actor, void *game) {
     float last_frame;
     /* Use the corresponding native braking routine, not the donor's
@@ -112,29 +113,38 @@ void af_v3_player_fan_main(void *actor, void *game) {
     FN(0x808B4DACu, void, void *, void *)(actor, game);
     FN(0x808B5FB0u, void, void *)(actor);
     FN(0x808BF410u, void, void *, void *)(actor, game);
-    af_v3_player_fan_finish(actor, game);
+    float current = REAL(actor, 0x184);
+    /* Native steps can cross the donor's final half-frame and wrap before
+       the end request runs. Retain that crossed event without changing the
+       rendered frame or introducing a second animation/morph update. */
+    if (last_frame >= 8.0f && current < last_frame) current = REAL(actor, 0x178);
+    fan_finish_frame(actor, game, current);
 }
 #endif
 
-void af_v3_player_fan_finish(void *actor, void *game) {
+static void fan_finish_frame(void *actor, void *game, float current) {
     void *frame_control = (u8 *)actor + 0x174;
     if (FN(0x808B5844u, int, void *, float)(frame_control, 7.5f)) {
         FN(0x808B3648u, void, void *)(actor);
         FN(0x808B3AF0u, void, void *, int)(actor, 1);
-    } else {
-        float current = REAL(actor, 0x184);
-        if (current >= 8.0f && !af_v3_player_fan_check(game, 0, 0, 4)) {
-            if (FN(0x808B312Cu, float, void)() || FN(0x808B3170u, float, void)())
-                FN(0x808C13F0u, int, void *, void *, float, int, int)
-                    (game, (void *)0, -5.0f, 0, 1);
-            if (current >= REAL(actor, 0x178) - 0.5f) {
-                FN(0x808B3648u, void, void *)(actor);
-                /* GAFE01 stores a delay-frame argument but its WAIT setup
-                   never reads it. Both implementations ignore flag two.
-                   Native request signature is (game, morph, flags, priority),
-                   not the donor's five-argument signature. */
-                FN(0x808C1064u, int, void *, float, int, int)(game, -5.0f, 2, 1);
-            }
+    }
+    /* A native step can cross 7.5 and 8 together. Both source events must
+       execute in order; an else branch would permanently swallow release. */
+    if (current >= 8.0f && !af_v3_player_fan_check(game, 0, 0, 4)) {
+        if (FN(0x808B312Cu, float, void)() || FN(0x808B3170u, float, void)())
+            FN(0x808C13F0u, int, void *, void *, float, int, int)
+                (game, (void *)0, -5.0f, 0, 1);
+        if (current >= REAL(actor, 0x178) - 0.5f) {
+            FN(0x808B3648u, void, void *)(actor);
+            /* GAFE01 stores a delay-frame argument but its WAIT setup
+               never reads it. Both implementations ignore flag two.
+               Native request signature is (game, morph, flags, priority),
+               not the donor's five-argument signature. */
+            FN(0x808C1064u, int, void *, float, int, int)(game, -5.0f, 2, 1);
         }
     }
+}
+
+void af_v3_player_fan_finish(void *actor, void *game) {
+    fan_finish_frame(actor, game, REAL(actor, 0x184));
 }

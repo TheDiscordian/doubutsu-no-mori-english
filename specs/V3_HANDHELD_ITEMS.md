@@ -246,10 +246,11 @@ Their zero placeholders acquire function pointers from relocation records.
 The 105 native action indices and every original value/callback remain unchanged.
 Indices `105..120` reserve the donor's own identities, including fan action 109.
 Their permissions, priorities, movement, texture, weight, bee, menu, camera,
-footstep, pitfall, and draw metadata come from the actual source tables. All new
-callbacks remain null until their complete implementations are installed. A
-request for an unfinished action therefore fails at the native setup-table gate;
-metadata installation does not enable waving, equipment selection, or imports.
+footstep, pitfall, and draw metadata come from the actual source tables. Fan
+action 109 has its complete setup, movement, and net-reset callback group; its
+submenu and settle callbacks remain null as in the donor. The other fifteen
+extended actions remain null and reject at the native setup-table gate.
+Action availability does not enable equipment selection or import choices.
 
 The `AFPA` version-one header and complete 121-entry tables occupy 5,164 bytes
 from `804A7000`. Shared dispatch code starts at `804A5000` and is bounded below
@@ -275,11 +276,14 @@ addresses. Argument registers, stack arguments, and return addresses are retaine
 Ordinary scene changes can therefore relocate the player owner without leaving
 stale callback targets. These thunks do not implement any missing action.
 
-Complete source callback dependencies remain in the receipt. In particular, the
-fan's net-angle callback is the donor reset routine, not null; its eventual
-integration must retain that dependency alongside setup and movement. The fan
-submenu and settle callbacks are null in the donor. Core-library action checks
-outside the player owner still need their own audit before enabling actions.
+Complete source callback dependencies remain in the receipt. The fan's net-angle
+callback uses the equivalent native reset alongside its compiled setup and
+movement callbacks. The outside-owner audit retains all three native bounds of
+105: `80093954` limits a resource byte length, not an action; the equipment-change
+callback used by `800B3398` only returns `-1, 7, 8, 9, 10`; event-position checking
+at `800B5AF4` already returns the donor fan's zero value outside the native range.
+Complete consumer/callback bodies, callback registration, and the source event
+table are checked. No unrelated core table is extended for fan action 109.
 
 ### Player ownership and actions
 
@@ -288,8 +292,8 @@ module with source-derived fan controls, requests, setup, per-frame movement,
 sound, and end-of-swing transitions. `overlays/v3/player_actions.c` resolves each owner function against
 the currently loaded constructor; no heap address is captured at build time.
 The complete donor functions and every called native API are recorded and
-checked. The installed dispatch entries and all action tables stay unchanged.
-The code occupies 1,908 bytes of the existing 8-KiB code reservation. In-place
+checked. The installed dispatch entry addresses and all original actions stay
+unchanged. The code occupies 1,944 bytes of the existing 8-KiB code reservation. In-place
 code refresh preserves animation banks, actor size, and save profile. The sound
 adapter appends a relocated complete sequence, retaining existing banks/samples.
 It adds no selectable items.
@@ -297,9 +301,12 @@ It adds no selectable items.
 Press and hold are distinct, including title-demo controller bytes `38` and
 `39`. Fan kinds `107..114` use the normal scene/visibility-aware kind getter.
 Walking/running/dashing reject fan input at native animation speed `>= 1.0`;
-the original umbrella helper remains unchanged. The prepared shared poll
-calls umbrella then fan, matching the donor order. Its four ordinary caller
-hooks remain uninstalled, as do the fan action callbacks.
+the original umbrella helper remains unchanged. The shared poll calls umbrella
+then fan, matching the donor order. Four ordinary calls at `808C12EC`,
+`808C1CE4`, `808C2194`, and `808C2A38` reach this helper, retaining priority four
+and subsequent native input checks. Their four owner-local JAL relocations are
+removed so relocation cannot corrupt the resident targets. The umbrella's own
+repeat call at `808DCAA0` and its relocation remain unchanged.
 
 The request stores action 109 and the start flag in the existing request union
 at `D58`, only after the original priority/permission checks accept it. Setup
@@ -322,8 +329,12 @@ native common braking `808B3C74`, including its native `0.75` step, instead of
 copying the donor's per-update `0.32625001` constant into native physics.
 
 At frame `7.5`, the transition routine settles priority and sets the bee-attack
-state. From frame eight, holding A can request another swing. Otherwise movement
-can request walking, and reaching `end - 0.5` settles priority and requests idle.
+state. From frame eight, holding A can request another swing. Both events execute
+in order when one native step crosses both coordinates. Otherwise movement can
+request walking, and reaching `end - 0.5` settles priority and requests idle.
+When repeat animation wraps before that last half-frame is observed, transition
+checking uses the crossed end coordinate without changing the rendered frame
+or advancing animation/morph twice. Release cannot disappear at the wrap.
 Native idle request takes `(game, morph, flags, priority)`, unlike the donor's
 five-argument form. The donor stores its extra delay-frame argument but its idle
 setup does not consume it; flag two is also ignored by both idle initializers.
@@ -334,8 +345,7 @@ The complete per-frame callback preserves donor order: brake, forced-position
 input, animation, frame-event sound, lean recovery, standing-object correction,
 background collision, held-item update, and end-of-swing requests. Sound triggers
 at frame `1.5` only when animation advances; a frozen frame cannot retrigger it.
-These functions are installed dependencies, not an enabled main action.
-Net-angle reset registration, ordinary polling, native item selection, and
+These functions form the registered fan action. Native item selection and
 profile/acquisition integration remain required. The action tables still reject
 every unfinished imported action.
 
@@ -380,10 +390,10 @@ donor's separate balloon-start flag has no native storage and is not invented.
 Balloon and pinwheel indices 21 and 22 remain null pending their actual rigs.
 
 The donor fan net reset matches native `808BE140`: angles `(0, 182, -7281)`,
-fraction `0.2`, minimum `2730`, maximum `100`. The dependency is bound but not
-registered in action 109 yet. Main/draw availability is not item selection or
-fan-action activation. Ordinary polling, full scene rendering, profile-aware
-inventory, acquisition, and persistence still need integration.
+fraction `0.2`, and step arguments `2730` and `100`. The native callback is
+registered in action 109. Full scene rendering, profile-aware inventory and
+equipment selection, scene permissions, acquisition, and persistence still need
+integration. Ordinary equipped-fan use is not established by direct callbacks.
 
 The refresh updates an already resident player relocation resource in place
 inside the import blob. Its reported blob checksum includes that change; it
@@ -422,9 +432,9 @@ action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
 per-frame callback, drawing, and sound define the action's dependencies. The
 callback, sound, and held drawing are installed as described above. The complete
-wait/swing and tumble/get-up data is installed through the shared animation readers; it is not
-connected to dispatched player actions yet. Prepared controls and setup do not
-make the complete handheld item selectable or playable.
+wait/swing and tumble/get-up data is installed through the shared animation
+readers; action 109 reaches its setup/main through native dispatch. This does
+not make the complete handheld item selectable or playable.
 
 Inventory/ground readers, official names and prices, acquisition, context-correct
 catalogue/collection integration, optional selection, and save/profile handling

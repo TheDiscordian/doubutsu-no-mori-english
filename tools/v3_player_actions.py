@@ -55,6 +55,10 @@ DISPATCH = ((0x808BE658,2),(0x808DD8D0,2),(0x808DD9F4,2),
             (0x808DDAFC,25),(0x808DDBB0,2))
 HELD_CATEGORIES=((0x173B38,0x808BF410,0x808BF424,0x808DF7F8,4),
                  (0x173BCC,0x808BF494,0x808BF4AC,0x808DF84C,4))
+POLL_SITES=((0x808C12EC,0x808C1270,0x808C1370),
+            (0x808C1CE4,0x808C1C48,0x808C1DB8),
+            (0x808C2194,0x808C20F8,0x808C223C),
+            (0x808C2A38,0x808C2994,0x808C2B78))
 # This address is also the exclusive end of the PRECEDING eight-float array.
 # The spatial-search loop compares its incrementing pointer against this end;
 # moving that boundary to the new action table would overrun its stack buffer.
@@ -247,6 +251,126 @@ def refresh_held_dispatch(base,prior,blob,core,original,output):
     return report,{PLAYER_VROM:bytes(patched),PLAYER_RELOC:bytes(fixed)}
 
 
+def fan_action_audit(source,owner,core,original):
+    """Bind the remaining core limits without expanding unrelated native tables."""
+    files=by_vrom(original);native_core=files[CODE_VROM].extract(original)
+    native_owner=files[PLAYER_VROM].extract(original)
+    bounds=lambda data:{CODE_RAM+i for i in range(0,len(data)-3,4)
+        if u32(data,i)>>26 in (10,11) and u32(data,i)&65535==NATIVE_COUNT}
+    expected={0x80093954,0x800B3398,0x800B5AF4}
+    if bounds(core)!=expected or bounds(native_core)!=expected:
+        raise ValueError('Changed outside-owner native action-limit inventory')
+    receipts=[]
+    for start,end in ((0x80093878,0x800939B8),(0x800B3330,0x800B33AC),(0x800B5AB8,0x800B5B1C)):
+        data=core[start-CODE_RAM:end-CODE_RAM]
+        if data!=native_core[start-CODE_RAM:end-CODE_RAM]:
+            raise ValueError('Changed complete core action-limit consumer')
+        receipts.append(dict(entry=start,end=end,sha256=sha256(data)))
+    start,end=0x808B91CC,0x808B9248
+    callback=owner[start-PLAYER_RAM:end-PLAYER_RAM]
+    if (callback!=native_owner[start-PLAYER_RAM:end-PLAYER_RAM]
+            or [u32(owner,x-PLAYER_RAM)&65535 for x in (0x808B9208,0x808B9210,0x808B9218,0x808B9220)]!=[7,8,9,10]
+            or u32(owner,0x808DD640-PLAYER_RAM)!=0x273991CC
+            or u32(owner,0x808DD668-PLAYER_RAM)!=0xAE191278):
+        raise ValueError('Changed equipment-change callback or its complete return set')
+    gc_table=source.rel[source.sections[4][0]+7912:source.sections[4][0]+7912+COUNT]
+    if len(gc_table)!=COUNT or gc_table[109]!=0:
+        raise ValueError('Fan needs a non-default core event-position rule')
+    return dict(native_105_bounds=sorted(expected),native_functions=receipts,
+        source_functions=[source.function(x)[1] for x in (0x6B424,0x6DCDC,0x16AD54)],
+        resource_size_bound=0x80093954,resource_size_bound_is_action_limit=False,
+        equipment_change_callback=dict(entry=start,end=end,sha256=sha256(callback),
+            returns=[-1,7,8,9,10],actor_slot=0x1278),
+        event_position=dict(source_table_offset=7912,source_sha256=sha256(gc_table),
+            source_fan_value=0,native_out_of_range_value=0),core_changes_required=False)
+
+
+def activate_fan_action(base,prior,blob,core,original,output):
+    """Publish implemented callbacks and ordinary polling, not inventory choices."""
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']]);files=by_vrom(base)
+    owner=files[PLAYER_VROM].extract(base);reloc=files[PLAYER_RELOC].extract(base)
+    if (sha256(module)!=old['sha256'] or actions['enabled_imported_actions']
+            or not actions.get('held_dispatch') or actions.get('fan_activation')
+            or sha256(owner)!=actions['owner_sha256'] or sha256(reloc)!=actions['relocation_sha256']):
+        raise ValueError('Fan activation requires the complete tested held/action dependencies')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    audit=fan_action_audit(source,owner,core,original)
+    bindings=control_bindings(source,owner,core,original,old)
+    n=actions['code']['bytes']
+    if sha256(module[CODE_OFFSET:CODE_OFFSET+n])!=actions['code']['sha256'] or any(module[CODE_OFFSET+n:TABLE_OFFSET]):
+        raise ValueError('Changed action code before callback activation')
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',extra_sources=('overlays/v3/player_actions.c',),
+        defines=(f'AF_V3_FAN_SOUND=0x{actions["fan_frame_flow"]["native_sound_id"]:04X}',
+                 f'AF_V3_HELD_POINTER=0x{old["code"]["symbols"]["af_v3_equipment_pointer"]:08X}u'))
+    if len(code)>TABLE_OFFSET-CODE_OFFSET or code[:80]!=module[CODE_OFFSET:CODE_OFFSET+80]:
+        raise ValueError('Action rebuild changes an installed dispatcher')
+    module[CODE_OFFSET:TABLE_OFFSET]=code+bytes(TABLE_OFFSET-CODE_OFFSET-len(code))
+    symbols=compiled['symbols'];report=copy.deepcopy(old);tables=report['player_actions']['tables']
+    held_draw=report['player_actions']['held_dispatch']['tables'][1]
+    start=held_draw['offset'];n=held_draw['bytes']
+    if sha256(module[start:start+n])!=held_draw['sha256']:raise ValueError('Changed complete held draw table')
+    struct.pack_into('>I',module,start+23*4,symbols['af_v3_player_draw_static_item'])
+    held_draw['sha256']=sha256(module[start:start+n])
+    callbacks={'Player_actor_setup_main_Swing_fan':symbols['af_v3_player_fan_setup'],
+               'Player_actor_main_Swing_fan':symbols['af_v3_player_fan_main'],
+               'Player_actor_Item_net_CulcJointAngle_dummy_net_reset':0x808BE140}
+    installed=[]
+    for row in tables:
+        if row['width']!=4:continue
+        start=row['offset'];n=row['bytes']
+        if sha256(module[start:start+n])!=row['sha256'] or u32(module,start+109*4):
+            raise ValueError('Changed previously disabled fan callback slot')
+        callback=row['source_callbacks'].get('109')
+        if callback:
+            name=callback['symbol']
+            if name not in callbacks:raise ValueError('Unimplemented source fan callback')
+            struct.pack_into('>I',module,start+109*4,callbacks[name])
+            installed.append(dict(consumer=row['native_entry'],source=name,target=callbacks[name],
+                offset=start+109*4))
+            row['sha256']=sha256(module[start:start+n])
+    if len(installed)!=3:raise ValueError('Incomplete source fan callback set')
+    native=by_vrom(original)[PLAYER_VROM].extract(original)
+    umbrella=jump(0x808B7DD8,link=True)
+    original_calls={PLAYER_RAM+i for i in range(0,TEXT_SIZE,4) if u32(native,i)==umbrella}
+    expected={x[0] for x in POLL_SITES}|{0x808DCAA0}
+    if original_calls!=expected:raise ValueError('Changed complete umbrella polling inventory')
+    _,_,records,locations,_=native_references(owner,reloc)
+    patched=bytearray(owner);patches=[];removed=set();consumers=[]
+    for call,start,end in POLL_SITES:
+        value=owner[start-PLAYER_RAM:end-PLAYER_RAM]
+        offset=call-PLAYER_RAM;record=locations.get(offset)
+        if (value!=native[start-PLAYER_RAM:end-PLAYER_RAM] or u32(owner,offset)!=umbrella
+                or record is None or record>>24&63!=4
+                or u32(owner,offset+4)!=0x24050004
+                or u32(owner,offset+8)!=jump(0x808BA7BC,link=True)):
+            raise ValueError('Changed complete ordinary poll consumer or call relocation')
+        after=jump(symbols['af_v3_player_handheld_poll'],link=True)
+        struct.pack_into('>I',patched,offset,after)
+        patches.append(dict(offset=offset,before=umbrella,after=after));removed.add(record)
+        consumers.append(dict(entry=start,end=end,call=call,sha256=sha256(value)))
+    kept=[r for r in records if r not in removed]
+    fixed=bytearray(reloc);struct.pack_into('>I',fixed,16,len(kept))
+    fixed[20:-4]=struct.pack('>'+str(len(kept))+'I',*kept)+bytes(len(fixed)-24-len(kept)*4)
+    blob[at:at+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    report['player_motion'].update(owner_sha256=sha256(patched),reloc_sha256=sha256(fixed))
+    bindings.update(action_callbacks_installed=True,poll_hooks_installed=True)
+    report['player_actions'].update(code=compiled,owner_sha256=sha256(patched),relocation_sha256=sha256(fixed),
+        patches=actions['patches']+patches,removed_relocations=actions['removed_relocations']+len(removed),
+        fan_control_flow=bindings,enabled_imported_actions=[109],fan_action_installed=True,
+        disabled_indices=[i for i in range(NATIVE_COUNT,COUNT) if i!=109],
+        fan_activation=dict(audit=audit,callbacks=installed,poll_consumers=consumers,
+            retained_umbrella_repeat_call=0x808DCAA0,inventory_selection_installed=False,
+            crossed_release_events_preserved=True,wrapped_end_event_preserved=True,
+            logical_imports_added=0,ordinary_equipped_fan_tested=False))
+    report['player_actions']['fan_frame_flow'].update(action_callbacks_installed=True,poll_hooks_installed=True)
+    report['player_actions']['held_dispatch']['net_reset']['installed']=True
+    return report,{PLAYER_VROM:bytes(patched),PLAYER_RELOC:bytes(fixed)}
+
+
 def refresh_controls(base,prior,blob,core,original,output):
     """Extend the existing action code in place; keep incomplete actions off."""
     old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
@@ -402,6 +526,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old['player_actions'].get('held_dispatch'):
+            return activate_fan_action(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_frame_flow'):
             return refresh_held_dispatch(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_control_flow'):

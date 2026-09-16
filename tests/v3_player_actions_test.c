@@ -79,7 +79,11 @@ static int brake(void *a) { assert(a == actor); event(11); return 1; }
 static void reinput(void *a, void *g) { assert(a == actor && g == game); event(12); }
 static int calculate(void *a, float *last) {
     assert(a == actor); event(13); *last = REAL(actor, 0x184);
-    if (!stopped) REAL(actor, 0x184) += REAL(actor, 0x180);
+    if (!stopped) {
+        REAL(actor, 0x184) += REAL(actor, 0x180);
+        if (REAL(actor, 0x184) >= REAL(actor, 0x178))
+            REAL(actor, 0x184) += REAL(actor, 0x174) - REAL(actor, 0x178);
+    }
     return stopped;
 }
 static int equal_frame(void *a, float last) {
@@ -133,7 +137,7 @@ static void reset(void) {
     requests = settled = bee = walk_requests = wait_requests = polls = setup_calls = eye = 0;
     sound_calls = stopped = 0;
     move_x = move_y = 0; WORD(actor, 0xCF0) = 109;
-    REAL(actor, 0x178) = 9; REAL(actor, 0x180) = 1.0f;
+    REAL(actor, 0x174) = 1; REAL(actor, 0x178) = 9; REAL(actor, 0x180) = 1.0f;
 }
 int main(void) {
     reset(); trigger_a = 1;
@@ -200,6 +204,13 @@ int main(void) {
     assert(REAL(actor, 0x184) == 8 && bee == 1 && settled == 1 && !sound_calls);
     event_count = 0; af_v3_player_fan_main(actor, game);
     assert(wait_requests == 1 && WORD(actor, 0xD00) == 7);
+    assert(REAL(actor, 0x184) == 1 && !sound_calls);
+    reset(); REAL(actor, 0x184) = 7; WORD(actor, 0xD04) = 4; held_a = 1;
+    af_v3_player_fan_main(actor, game);
+    assert(bee == 1 && requests == 1 && WORD(actor, 0xD00) == 109 && !WORD(actor, 0xD58));
+    reset(); REAL(actor, 0x184) = 7; WORD(actor, 0xD04) = 4; move_x = 0.25f;
+    af_v3_player_fan_main(actor, game);
+    assert(bee == 1 && walk_requests == 1 && WORD(actor, 0xD00) == 8);
     struct { u8 padding[0x298]; u32 *cursor; } graph;
     struct { void *graph; } draw_game = { &graph };
     u32 display[6] = { 0x12345678, 0, 0, 0x87654321, 0, 0 };

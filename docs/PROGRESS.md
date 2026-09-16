@@ -2,59 +2,40 @@
 
 ## Active development
 
-ABI 103 extends the shared callback converter to the held-item main/draw tables.
-All 21 original entries remain intact; fan category 23 uses complete static
-held-model drawing, and balloon/pinwheel entries remain disabled. The existing
-module holds the 208-byte tables and 1,908-byte code without growing or moving
-allocations. Four focused checks pass, including sanitizer-covered draw bounds,
-source tables, owner relocation, complete blob checksums, and patch reconstruction.
-The silent native run passes 58 records with 40 passing assertions, including
-actual main dispatch, both draw banks, invalid-model/bank rejection, memory
-guards, saved-profile retention, and checkpoint restoration. Full scene rendering
-and ordinary equipped-fan gameplay remain untested. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch).
-Twelve current composition checks pass, including exact no-import V2 and
-all-import ABI 103, dependencies, sparse profiles, and the real save codec.
+ABI 104 registers fan action 109's complete setup/main/net-reset group and its
+four ordinary input polls through the shared importer. A complete core-bound
+audit preserves unrelated native limits and umbrella repeat behaviour. Native
+release/repeat handling retains events crossed in one update or at the animation
+wrap. Action code occupies 1,944 bytes without allocation growth.
 
-ABI 102 adds the complete fan per-frame callback and a reusable single-layer
-sound-program converter. Source pitch sweep, envelope, timing, and priority are
-retained; the complete instrument/sample already exists in N64. Registration
-adds 32 loaded bytes without enlarging the audio heap. Playback speed and braking
-use the native update interval. The action code occupies 1,772 bytes of its
-existing 8-KiB reservation; no actor, animation bank, or saved field grows.
+Four focused checks pass in 5.692 seconds, including host sanitizers, source/
+relocation guards, and patch reconstruction. The corrected silent native run
+passes 60 records with 37 passing assertions: real action dispatch, complete
+swing, release to movement, guards, and restored live actor/animation banks and
+checkpoint. It fixes an actual skipped-release bug found by the initial run,
+not a test-setup failure. Held-A repeat and idle-after-wrap have host evidence;
+ordinary equipped-fan use and full scene rendering remain unverified. Twelve
+current composition checks pass, including exact no-import V2, all-import ABI
+104, dependencies, sparse profiles, and the real save codec. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-action-activation).
 
-Six focused checks pass, including sanitizer coverage, complete resource
-retention, rejected unsupported sound forms, and patch reconstruction. The
-silent native check passes all 119 records with 70 passing assertions: actual
-sound loading/trigger/sample transfers, live-player per-frame animation and
-collision calls, native morph timing, guards, and checkpoint restoration.
-No speakers/headphones or user saves are used. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions).
-Twelve current optional-composition checks also pass, including exact no-import
-V2, all-import ABI 102, sparse profiles, dependencies, and the real save codec.
+The shared converter handles all 27 player action tables and both held-item
+main/draw tables. All 105 native actions and 21 native held categories remain
+intact. Fan category 23 draws complete static held models; balloon/pinwheel
+categories and fifteen unfinished actions remain disabled. The native dispatch
+resolves the currently loaded player owner. The
+[held-draw evidence](checkpoints/V3_FURNITURE_PIPELINE.md#shared-held-item-dispatch)
+and [sound evidence](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions)
+remain applicable to unchanged dependencies. The fan's complete source pitch
+sweep, envelope, and sample are retained without enlarging the audio heap.
 
-Fan action callbacks and polling hooks remain disabled until net-angle reset,
-selected inventory, and acquisition are connected. No new selectable items are
-added. Continue those shared dependencies and the outside-owner action audit;
-do not repeat passing component checks or create per-item scripts. Ordinary
-equipped-fan gameplay and hardware testing remain pending.
-
-The shared 121-entry player action tables contain 22 metadata categories
-and five callback categories, preserving all 105 native actions. The source
-reader follows real callback relocations, and the native dispatch resolves the
-currently loaded player owner. Sixteen new action slots retain their actual
-donor metadata but reject requests until their callbacks are implemented.
-This does not enable fans or add selectable items. One source-derived adapter
-covers the category; there is no per-item installer.
-
-The shared equipment/action module adds 16 KiB in Expansion Pak memory. Its
-complete 24-KiB startup transfer is checksum-bound; startup remains 952 of 992
-bytes. Existing models, motions, actor sizes, animation banks, saved format 2,
-and 104 choices remain unchanged. Fifteen focused source/art/cartridge/startup
-checks and twelve optional-composition checks pass. The corrected silent native
-run passes 173 records and 143 assertions, including live-owner dispatch,
-extended metadata, disabled-action rejection, guards, and checkpoint restoration. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-action-tables).
+The complete 24-KiB module transfer is checksum-bound; startup remains 952 of
+992 bytes. Models, motions, actor sizes, animation banks, saved format 2, and
+104 choices remain unchanged. No fan is offered as a selectable import yet.
+Next connect profile-aware equipment selection, scene permissions, parent
+inventory/readers/acquisition, and context-correct catalogue/persistence. Do not
+repeat passing component checks or create per-item scripts. Original-hardware
+testing and ordinary equipped-fan gameplay remain pending.
 
 All six equipment-kind lookups use one source-derived
 record format: holding pose, item routine, shape, equipment motion, tumble, and
@@ -123,10 +104,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 103 at
-`build/v3-held-item-dispatch-02/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 104 at
+`build/v3-fan-action-dispatch-03/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 102 is expected in both directions; this
+Same-profile compatibility with ABI 103 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

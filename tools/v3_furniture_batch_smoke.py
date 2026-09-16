@@ -585,6 +585,78 @@ def player_motion(debug,rom_path,record):
         check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
         record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
         actions=resources.get('player_actions')
+        if actions and actions.get('fan_activation'):
+            def owner_call(entry,args=(),want=None,end=None):
+                if end is None:end=next(t['native_end'] for t in actions['tables'] if t['native_entry']==entry)
+                address=owner+entry-equipment.PLAYER_RAM
+                return call(address,args,want,(address,expected[entry-equipment.PLAYER_RAM:end-equipment.PLAYER_RAM]))
+            for row in actions['tables']:
+                if row['width']==4:
+                    check('complete activated action callback table',row['ram'],
+                          blob[at+row['offset']:at+row['offset']+row['bytes']])
+            for index in (105,120,121,0xFFFFFFFF):
+                actor=bytearray(0x12D8);struct.pack_into('>I',actor,0xD00,index);struct.pack_into('>I',actor,0xD08,1)
+                debug.write_memory(target,actor)
+                owner_call(0x808DDA18,[target,0],0)
+                check('unfinished action remains rejected without actor writes',target,actor)
+            actor=bytearray(0x12D8);struct.pack_into('>I',actor,0xCF0,109)
+            debug.write_memory(target,actor)
+            owner_call(0x808BE140,[target],end=0x808BE184)
+            reset=debug.read_memory(target,len(actor));debug.write_memory(target,actor)
+            owner_call(0x808BE620,[target])
+            check('fan dispatch uses the complete original net reset',target,reset)
+            real_game=struct.unpack('>I',debug.read_memory(0x8010EF90,4))[0]
+            if real_game&3 or not 0x80000400<=real_game<=0x80400000-0x1E00:
+                raise ValueError('Fan action dispatch requires the live game')
+            real_actor=struct.unpack('>I',debug.read_memory(real_game+0x1C90,4))[0]
+            if real_actor&3 or not 0x80000400<=real_actor<=0x80400000-0x12D8:
+                raise ValueError('Fan action dispatch requires the initialized live player')
+            actor_before=debug.read_memory(real_actor,0x12D8);banks={}
+            for index in struct.unpack_from('>2h',actor_before,0xDA0):
+                if not 0<=index<8:raise ValueError('Unbounded live animation bank')
+                address=struct.unpack('>I',debug.read_memory(real_game+0x114+84*index,4))[0]
+                if address&15 or not 0x80000400<=address<=0x80400000-equipment.PLAYER_CAPACITY:
+                    raise ValueError('Live animation bank escapes native RAM')
+                banks[address]=debug.read_memory(address,equipment.PLAYER_CAPACITY)
+            try:
+                record(dict(fan_dispatch_original_action=struct.unpack_from('>I',actor_before,0xCF0)[0],
+                    original_equipment_kind=struct.unpack_from('>b',actor_before,0x1117)[0]))
+                debug.write_memory(real_actor+0xE64,b'\x01')
+                debug.write_memory(real_actor+0xD00,struct.pack('>3I',109,4,1))
+                debug.write_memory(real_actor+0xD58,struct.pack('>I',1))
+                owner_call(0x808DDA18,[real_actor,real_game],1)
+                check('native setup dispatcher accepts action 109',real_actor+0xCF0,struct.pack('>I',109))
+                check('dispatched fan uses the complete swing',real_actor+0xDAC,struct.pack('>2I',270,0))
+                owner_call(0x808DDB5C,[real_actor,real_game])
+                check('native main dispatcher advances the fan frame',real_actor+0x184,struct.pack('>f',2))
+                check('native main dispatcher advances native morph',real_actor+0x194,struct.pack('>f',-4))
+                for _ in range(6):owner_call(0x808DDB5C,[real_actor,real_game])
+                check('dispatched complete swing reaches its release frame',real_actor+0x184,struct.pack('>f',8))
+                check('dispatched complete swing changes bee state',real_actor+0x11B7,b'\x01')
+                next_action=struct.unpack('>I',debug.read_memory(real_actor+0xD00,4))[0]
+                if next_action not in (7,8):
+                    # With no stick input, the donor's idle event is the last
+                    # half-frame. Native playback crosses that event at wrap.
+                    owner_call(0x808DDB5C,[real_actor,real_game])
+                    next_action=struct.unpack('>I',debug.read_memory(real_actor+0xD00,4))[0]
+                record(dict(dispatched_fan_exit_request=next_action,
+                    frame=struct.unpack('>f',debug.read_memory(real_actor+0x184,4))[0]))
+                if next_action not in (7,8):raise ValueError('Released fan did not request normal movement/idle')
+                owner_call(0x808DDB5C,[real_actor,real_game])
+                check('native action cycle exits the fan',real_actor+0xCF0,struct.pack('>I',next_action))
+                check('native action cycle has no CPU fault',0x8003CE34,bytes(4))
+            finally:
+                for address,value in banks.items():debug.write_memory(address,value)
+                debug.write_memory(real_actor,actor_before)
+            check('live actor restored after dispatch cycle',real_actor,actor_before)
+            for address,value in banks.items():check('live motion bank restored after dispatch cycle',address,value)
+            for address in (allocation,end,allocation+size-16):check('fan dispatch private-memory guard',address,edge)
+            check('fan dispatch retains saved profile',0x8046C000,saved)
+            check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+            check('equipment module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+            return dict(native_fan_setup_main_net_and_exit_dispatch=True,assertions=assertions,
+                ordinary_equipment_selection_tested=False,hardware_tested=False,flash_written=False,
+                requires_checkpoint_restore=True)
         if actions and actions.get('held_dispatch'):
             held=actions['held_dispatch'];symbols=actions['code']['symbols']
             bridge=allocation+0x1400;game=allocation+0x2000;graph=allocation+0x2300;commands=allocation+0x2800

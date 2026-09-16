@@ -66,8 +66,15 @@ supports in-place code updates without growing or relocating unchanged ROM
 resources. The same adapter adds the per-frame callback and shared single-layer
 sound-program conversion, retaining the source pitch sweep/envelope and reusing
 an equivalent native instrument/sample. Native frame speed and braking use the
-corresponding N64 timing. Incomplete action callbacks and polling hooks remain
-disabled until their remaining gameplay dependencies are implemented.
+corresponding N64 timing. It registers complete implemented callback groups,
+including the fan's setup/main/native net reset, and redirects its four ordinary
+input polls through the shared umbrella-then-fan helper. The source/owner audit
+retains unrelated core limits and umbrella repeat behaviour; obsolete local JAL
+relocations are removed for resident calls. Crossed and wrapped frame events
+retain release/repeat transitions at the native update interval. Other incomplete
+action groups remain disabled. Profile-aware equipment selection, scene
+permissions, and parent inventory/acquisition are still required before choices
+are enabled.
 The table converter also extends the two held-item main/draw tables, preserving
 all original tools. Source static-held drawing uses the existing equipment
 resources and native outer draw setup. Unimplemented rig categories retain null
