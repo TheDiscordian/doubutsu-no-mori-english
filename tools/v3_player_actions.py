@@ -9,7 +9,7 @@ import re
 import struct
 import zlib
 
-from aflib import by_vrom, sha256, u32
+from aflib import CODE_RAM, CODE_VROM, by_vrom, sha256, u32
 from v3_asset_loader import BLOB, ROOT, compile_part
 from v3_equipment_runtime import RAM, SIZE, GUARD, PLAYER_RAM, PLAYER_VROM, PLAYER_RELOC
 from v3_furniture_pipeline import Source
@@ -58,7 +58,85 @@ DISPATCH = ((0x808BE658,2),(0x808DD8D0,2),(0x808DD9F4,2),
 RETAINED_BOUNDARY = (0x808B99D0,0x808B99D8,0x808DF2BC)
 SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'tools/v3_asset_loader.py','overlays/v3/startup.c',
-           'overlays/v3/player_actions.S','overlays/v3/player_actions.ld')
+           'overlays/v3/player_actions.S','overlays/v3/player_actions.c',
+           'overlays/v3/player_actions.ld')
+
+
+def control_bindings(source,owner,core,original,prior):
+    """Bind the complete donor flow and every native API used by its adapter."""
+    functions=(0x164628,0x169484,0x169544,0x19623C,0x1962B0,0x196468,
+               0x166460,0x166650,0x175A3C,0x175B0C,0x175E90,
+               0x175CDC,0x1767F8,0x176E6C,0x1777FC)
+    receipts=[source.function(at)[1] for at in functions]
+    if [r['symbol'] for r in receipts[:6]]!=[
+            'Player_actor_CheckController_forFan','Player_actor_CheckAbleSpeed_forItem',
+            'Player_actor_CheckAndRequest_main_fan_all','Player_actor_request_main_swing_fan_all',
+            'Player_actor_setup_main_Swing_fan','Player_actor_request_proc_index_fromSwing_fan']:
+        raise ValueError('Changed complete donor fan control functions')
+    # Action metadata consumers have already been redirected to the complete
+    # tables. Undo only their recorded instructions for original API comparison.
+    restored=bytearray(owner)
+    for row in prior['player_actions']['patches']:
+        at=row['offset']
+        if u32(restored,at)!=row['after']:raise ValueError('Changed installed player action patch')
+        struct.pack_into('>I',restored,at,row['before'])
+    files=by_vrom(original);native_owner=files[PLAYER_VROM].extract(original)
+    native_core=files[CODE_VROM].extract(original)
+    boundaries=[]
+    for name in ('symbol_addrs_code.txt','symbol_addrs_overlays.txt'):
+        boundaries.extend(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
+            (ROOT/'upstream/af/linker_scripts/jp'/name).read_text()))
+    code=(ROOT/'overlays/v3/player_actions.c').read_text()
+    entries=sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)})
+    native=[]
+    for entry in entries:
+        end=min(a for a in boundaries if a>entry)
+        data,expected,base=(restored,native_owner,PLAYER_RAM) if entry>=PLAYER_RAM else (core,native_core,CODE_RAM)
+        value=data[entry-base:end-base]
+        if not value or value!=expected[entry-base:end-base]:
+            raise ValueError(f'Changed native player control API {entry:08X}')
+        native.append(dict(entry=entry,end=end,bytes=len(value),sha256=sha256(value)))
+    return dict(source_functions=receipts,native_functions=native,
+        fan_action=109,fan_kind_first=107,fan_kind_count=8,
+        swing_animation=270,lower_animation=0,part_mask=4,frame_speed=0.5,
+        request_union_offset=0xD58,initializer=0x808B4A44,
+        wait_signature='game, morph, flags, priority',
+        donor_wait_delay_consumed=False,poll_hooks_installed=False,
+        action_callbacks_installed=False,ordinary_gameplay_tested=False)
+
+
+def refresh_controls(base,prior,blob,core,original,output):
+    """Extend the existing action code in place; keep incomplete actions off."""
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']])
+    if (old['bytes']!=MODULE_SIZE or sha256(module)!=old['sha256']
+            or old['ram']!=RAM or old['vrom']!=BLOB+at
+            or actions['enabled_imported_actions'] or actions.get('fan_control_flow')):
+        raise ValueError('Control integration requires the unchanged shared action tables')
+    files=by_vrom(base);owner=files[PLAYER_VROM].extract(base)
+    if (sha256(owner)!=actions['owner_sha256'] or
+            sha256(files[PLAYER_RELOC].extract(base))!=actions['relocation_sha256']):
+        raise ValueError('Changed player action owner or relocations')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=control_bindings(source,owner,core,original,old)
+    previous=actions['code'];n=previous['bytes']
+    if (sha256(module[CODE_OFFSET:CODE_OFFSET+n])!=previous['sha256']
+            or any(module[CODE_OFFSET+n:TABLE_OFFSET])):
+        raise ValueError('Changed player action code reservation')
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',extra_sources=('overlays/v3/player_actions.c',))
+    if len(code)>TABLE_OFFSET-CODE_OFFSET or code[:n]!=module[CODE_OFFSET:CODE_OFFSET+n]:
+        raise ValueError('Player control extension changed original dispatch code')
+    for name in ('af_v3_player_action_v0','af_v3_player_action_t9'):
+        if compiled['symbols'][name]!=previous['symbols'][name]:
+            raise ValueError('Player control extension moved installed dispatch')
+    module[CODE_OFFSET:TABLE_OFFSET]=code+bytes(TABLE_OFFSET-CODE_OFFSET-len(code))
+    blob[at:at+len(module)]=module
+    report=copy.deepcopy(old)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    report['player_actions'].update(code=compiled,fan_control_flow=bindings)
+    return report,{}
 
 
 def source_tables(source):
@@ -179,6 +257,8 @@ def expanded_tables(source,owner,reloc):
 
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
+    if old.get('player_actions'):
+        return refresh_controls(base,prior,blob,core,original,output)
     if not old.get('kind_readers') or old.get('player_actions') or old.get('bytes')!=SIZE:
         raise ValueError('Action tables require the complete, unextended equipment-kind module')
     at=old['blob_offset'];module=bytearray(blob[at:at+SIZE])

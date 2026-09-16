@@ -1,5 +1,104 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared fan control flow
+
+The existing `--refresh-runtime --player-actions` mode installs the donor fan's
+press/hold controller, priority-checked request, split-body setup, repeat setup,
+and end-of-swing transitions. The implementation resolves the actual loaded
+native owner on every call. Fifteen complete donor functions and nineteen
+native APIs bind the adapter. All eight fans share these functions. No extra
+item script, action table, actor allocation, animation bank, or saved field is
+added. Callback tables and ordinary input-poll hooks remain unchanged and off
+for imported actions. This is not a selectable/playable fan handoff.
+
+The native standard initializer is `808B4A44`, with ten arguments. The reverse
+initializer at `808B4B6C` has a different signature. The source fan uses upper
+animation 270, native lower WAIT1 zero, half-frame speed, repeat mode, and
+explicit mask four. Its start/repeat lower frames and morph values differ.
+The native idle request has four arguments, unlike the donor's five; the
+extra donor delay is stored but not consumed by its idle initializer. Flag two
+is unused by both. The adapter preserves the effective behaviour without
+passing the extra float into the native flags field.
+
+### Build and allocation
+
+- ABI 101: `build/v3-player-fan-controls-01/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256:
+  `1763e613b3f080a4cacc26cbfa9d244a742b6e34cff077bbc9e142ac4aeeaa38`.
+- UPS SHA-256:
+  `06fa46e6bba6721d01958b62f9d63386fd64f38b9cb5a3def9bbbf3bb07857ea`.
+- Receipt SHA-256:
+  `faa4db40813490033dd2ba7d538c9bcedd9b8eb4639689c8dc3fa25e7dde1abb`.
+- Shared action code: 1,436 bytes at `804A5000`, inside its existing 8-KiB span.
+  The original 68-byte dispatch prefix and both public entry addresses remain.
+- Module: unchanged 24,576-byte allocation at `804A3000`, VROM `0253BD00`.
+  Shared refresh updates code in place instead of allocating another copy.
+- Blob: unchanged 3,497,424 bytes, retaining 631,344 bytes of free storage.
+  All models, motions, tables, owners, relocations, and resource locations remain.
+- Startup: 952 of 992 bytes, with the updated complete-module checksum.
+  The 104 choices and saved format 2 remain unchanged. Same-profile ABI-100/101
+  compatibility is expected in both directions and the profile codec passes;
+  this is not a fresh ordinary save/restart or hardware test. Do not use V3 saves
+  with V2. Both served V2 patchers stay unchanged.
+
+### Focused verification and classified stopping points
+
+Two current host/cartridge tests pass in 5.622 seconds. Address/undefined-behaviour
+sanitizers cover all fan kinds, rejected kinds, title/ordinary press and hold,
+permission and priority rejection, unchanged actor bytes on rejection,
+walk/run/dash speed thresholds, umbrella/fan polling order, both setups, bee
+timing, repeat requests, and walk/idle arbitration. The host priority model
+retains the native pending-request and already-settled checks. Cartridge checks
+bind complete code, source/native functions, deliberate native API corruption
+rejection, unchanged tables/artwork/owners/profiles, unchanged allocations,
+checksums, and complete patch reconstruction. Twelve current optional-composition
+tests pass in 7.783 seconds, including exact no-import V2, exact all-import ABI
+101, dependencies, sparse selection, and the actual saved-profile codec.
+
+The silent native probe extends the existing shared player-motion scenario,
+using an isolated full-size actor, fake game context, and two native-sized
+animation banks. The first attempt stops at the debugger's low-RAM call guard,
+before invoking a new function. The single setup retry uses the established
+eight-byte low-RAM jump bridge to the cartridge-loaded Expansion Pak code.
+No replacement gameplay function is uploaded.
+
+`build/smoke-v3-player-fan-controls-02/results.json` contains 50 records and 22
+passing assertions before the final idle expectation fails. Its SHA-256 is
+`ec20b8b90916c5a5ef7f3270e209d8a7024a7102d7c841bc405457a4c8dbcecf`.
+Verified components include complete module/code relocation, hidden-item
+controller rejection, actual priority/request writes, equal-priority rejection,
+full setup, eye pattern, frame control/morph, complete swing DMA, explicit mask,
+restored segment-six binding, repeat lower-frame retention, zero repeat morph,
+and bee timing. The failing field's observed SHA-256 is
+`5be0a01e5257e4c08ac57e3d288893e9cc6f8d6fc2d9aff9eab81c0fbf00c384`,
+which independently decodes to `(requested action=8, priority=1, pending=1)`.
+That is the valid walk request. The original native priority-settling function
+does not clear an existing pending request, so an equal-priority idle request
+cannot replace walking. The fixture incorrectly assumed the title-demo stick
+was idle; this is an expectation failure, not evidence of a game defect.
+
+The corrected fixture reads actual title/ordinary controller movement and checks
+the resulting walk or idle branch. It is **not rerun** in this batch. Final
+guard checks, checkpoint restoration, native idle acceptance, and a positively
+equipped fan controller remain unverified here. Retain the passing prefix and
+include those checks with the next actual callback integration, not a third
+setup attempt. The isolated 131,072-byte FlashRAM stays all `FF`, SHA-256
+`b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+No user save or hardware is touched, and audio is disabled.
+
+### Next shared dependencies
+
+The donor's complete fan sound program is 32 bytes at main-sequence `0812`.
+Its bank-154 instrument 12 matches native bank-140 instrument 12, including
+all tuning/envelope/loop/predictor data and the 3,726-byte sample. Both priority
+entries are 60. Numeric ID `0167` is still outside the original 97-entry native
+group and is not a playable registered sound. Extend shared sequence-program
+binding with the complete custom envelope and playback operands; do not append
+another copy of the instrument/sample. The [specification](../../specs/V3_HANDHELD_ITEMS.md)
+records exact identities. Complete the per-frame action/draw/net reset, the four
+ordinary polling sites, native selected equipment, acquisition, and profiles.
+Keep all unfinished callback entries disabled until their dependencies exist.
+
 ## Shared player action tables
 
 The existing importer installs `--refresh-runtime --player-actions` through one

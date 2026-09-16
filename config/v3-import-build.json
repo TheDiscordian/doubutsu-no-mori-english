@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-player-action-tables-03",
-  "runtime_abi": 100,
-  "rom_sha256": "1cffa6906ac85234ee16e1e81b7b18f20fc92cc118ce477a002d5511c8648273",
-  "report_sha256": "f0b4b6d9b21a720f4004be590cd68170facdca3b6cc8e080288764904b8c098c"
+  "directory": "build/v3-player-fan-controls-01",
+  "runtime_abi": 101,
+  "rom_sha256": "1763e613b3f080a4cacc26cbfa9d244a742b6e34cff077bbc9e142ac4aeeaa38",
+  "report_sha256": "faa4db40813490033dd2ba7d538c9bcedd9b8eb4639689c8dc3fa25e7dde1abb"
 }

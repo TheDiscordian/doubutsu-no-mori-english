@@ -60,6 +60,11 @@ does not enable unimplemented callbacks; the shared dispatch resolves the live
 player owner instead of retaining stale relocated pointers. The same module's
 checked startup transfer covers its additional 16-KiB reservation. See
 [held equipment](V3_HANDHELD_ITEMS.md#extended-action-tables).
+On a cartridge with those tables, the same adapter installs the donor fan's
+controls/setup/transitions into unused action-code space. The shared refresh
+supports in-place code updates without growing or relocating unchanged ROM
+resources. Incomplete action callbacks and polling hooks remain disabled until
+their remaining gameplay dependencies are implemented.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

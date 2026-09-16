@@ -506,7 +506,7 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
     result=bytearray(base)
     if equipment_report:
         start=files[BLOB].pstart+len(old_blob);end=files[BLOB].pstart+len(blob)
-        if (len(blob)<=len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
+        if (len(blob)<len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
                 or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
                        for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)
                 or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend
@@ -552,9 +552,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         report['automatic_furniture']['resource_moves']=moved
         report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
         report['shared_runtime_refresh'].update(adapters=['display_aliases','equipment_resources'],
-            resource_allocations_changed=True,resource_tail_reuse=reused,
+            resource_allocations_changed=bool(owner_moves or len(blob)!=len(old_blob)
+                or any(row['physical']!=files[row['vrom']].pstart for row in moved)),resource_tail_reuse=reused,
             unchanged_owner_moves=moved,changed_owner_moves=owner_moves,
-            additional_resident_bytes=equipment_report['additional_resident_bytes'])
+            additional_resident_bytes=equipment_report['bytes']-prior.get('equipment_resources',{}).get('bytes',0))
         if player_motion:
             report['shared_runtime_refresh']['adapters'].append('player_motion')
         if equipment_kinds:

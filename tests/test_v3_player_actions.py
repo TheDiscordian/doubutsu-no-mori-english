@@ -18,6 +18,51 @@ import tests.test_v3_equipment_runtime as shared_tests
 import v3_player_actions as actions
 
 OUTPUT=ROOT/os.environ.get('V3_PLAYER_ACTIONS_BUILD','build/v3-player-action-tables-03')
+CONTROLS=ROOT/os.environ.get('V3_PLAYER_CONTROLS_BUILD','build/v3-player-fan-controls-01')
+
+
+class ControlTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+
+    def test_fan_controls_setup_and_end_transitions(self):
+        self.sanitized('v3_player_actions_test.c')
+
+    @unittest.skipUnless((CONTROLS/'build.json').is_file(),'Current control cartridge required')
+    def test_in_place_controls_preserve_tables_artwork_owners_and_profile(self):
+        rom=(CONTROLS/'animal-forest-v3-asset-loader.z64').read_bytes()
+        report=json.loads((CONTROLS/'build.json').read_bytes())
+        base,prior=inputs(CONTROLS/'base-lock.json');files,before=by_vrom(rom),by_vrom(base)
+        e=report['equipment_resources'];old=prior['equipment_resources'];a=e['player_actions']
+        blob=files[BLOB].extract(rom);old_blob=before[BLOB].extract(base)
+        self.assertEqual(e['vrom'],old['vrom']);self.assertEqual(e['bytes'],old['bytes'])
+        self.assertEqual(e['blob_offset'],old['blob_offset']);self.assertEqual(len(blob),len(old_blob))
+        at=e['blob_offset'];module=blob[at:at+e['bytes']]
+        self.assertEqual(sha256(module),e['sha256']);self.assertEqual(zlib.crc32(module),e['crc32'])
+        code=a['code'];self.assertEqual(sha256(module[actions.CODE_OFFSET:actions.CODE_OFFSET+code['bytes']]),code['sha256'])
+        self.assertLessEqual(code['bytes'],actions.TABLE_OFFSET-actions.CODE_OFFSET)
+        restored=bytearray(blob);start=at+actions.CODE_OFFSET;end=at+actions.TABLE_OFFSET
+        restored[start:end]=old_blob[start:end];restored[4:8]=old_blob[4:8]
+        self.assertEqual(restored,old_blob)
+        self.assertEqual(a['tables'],old['player_actions']['tables'])
+        self.assertEqual(a['disabled_indices'],list(range(105,121)))
+        self.assertFalse(a['fan_action_installed']);self.assertEqual(a['enabled_imported_actions'],[])
+        refresh=report['shared_runtime_refresh']
+        self.assertFalse(refresh['resource_allocations_changed']);self.assertEqual(refresh['additional_resident_bytes'],0)
+        for key in ('save_runtime','furniture','catalogue','clothing_profile','hra','feng_shui'):
+            self.assertEqual(report.get(key),prior.get(key))
+        for v in files.keys()-{BLOB,MODULE,0x19D40}:
+            self.assertEqual(files[v].extract(rom),before[v].extract(base),f'{v:08X}')
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        bindings=actions.control_bindings(source,files[actions.PLAYER_VROM].extract(rom),
+            files[CODE_VROM].extract(rom),original,old)
+        self.assertEqual(json.loads(json.dumps(bindings)),a['fan_control_flow'])
+        owner=bytearray(files[actions.PLAYER_VROM].extract(rom));owner[0x808B4A44-actions.PLAYER_RAM]^=1
+        with self.assertRaisesRegex(ValueError,'native player control API'):
+            actions.control_bindings(source,owner,files[CODE_VROM].extract(rom),original,old)
+        self.assertEqual(apply_ups(original,(CONTROLS/'asset-loader.ups').read_bytes()),rom)
+        self.assertEqual(struct.unpack_from('>2I',rom,0x10),n64_checksum(rom))
 
 
 class StartupTests(unittest.TestCase):

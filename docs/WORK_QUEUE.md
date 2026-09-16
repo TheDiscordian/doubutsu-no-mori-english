@@ -2,12 +2,34 @@
 
 ## Active: V3 optional GameCube imports
 
-The shared action-table adapter is installed in ABI 100 at
-`build/v3-player-action-tables-03/`. All 105 native actions retain their original
+The shared fan control flow is installed in ABI 101 at
+`build/v3-player-fan-controls-01/`. Controller press/hold, request priority,
+standard split-body initialization, repeat frames, bee timing, and walk/idle
+requests have real implementations in the existing action module. Two focused
+host/cartridge checks and twelve composition checks pass. The partial native
+retry verifies 22 assertions, then observes a valid walking request where its
+fixture incorrectly expects idle. The fixture now accounts for title-demo
+movement. Do not rerun this batch: retain its passing component evidence and
+include unfinished final guards/restoration/idle checks with the next meaningful
+action integration change. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-control-flow).
+
+Next, register the fan's actual sound program through a shared audio category.
+The source program at `0812..0831` uses donor bank-154 instrument 12, which
+matches native bank-140 instrument 12 completely. No new sample/bank is needed;
+retain the program's complete custom envelope and operands. Native sound ID
+`0167` still points at an unassigned slot, so do not trigger it before installing
+its program. Connect the per-frame movement/collision/item callback, draw
+dispatcher, net-angle reset, and four wait/walk/run/dash poll calls. Keep native
+selection/profile/acquisition and the outside-owner action audit in scope.
+All new callback entries and poll hooks remain disabled; this is not an enabled
+fan import. Source code is shared by all eight fans, not per-item installers.
+
+All 105 native actions retain their original
 metadata and callbacks; the complete donor metadata covers sixteen reserved
 indices `105..120`. Extra callbacks remain disabled and native setup rejects
 those requests. The fan retains donor action index 109. Continue its actual
-controller/request/setup/main/draw and frame-timed sound through these shared
+main/draw and frame-timed sound through these shared
 tables, not another action installer. The source net-angle callback for the fan
 is a reset routine, not null; submenu and settle callbacks are null. Audit
 remaining core-library action checks before enabling equipment.

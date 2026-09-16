@@ -511,18 +511,101 @@ def player_motion(debug,rom_path,record):
     data=files[equipment.PLAYER_VROM].extract(image);reloc=files[equipment.PLAYER_RELOC].extract(image)
     if owner&15 or not MODULE_RAM+0x8000<=owner<=0x80400000-len(data):
         raise ValueError('Native player constructor does not identify a loaded owner')
-    size=0x1100;allocation=call(0x8009BFC0,[size]);target=allocation+16
+    controls=resources.get('player_actions',{}).get('fan_control_flow')
+    size=0x6100 if controls else 0x1100
+    allocation=call(0x8009BFC0,[size]);target=allocation+16
     if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
         raise ValueError('Player-motion allocation outside native heap')
     sections=struct.unpack_from('>5I',reloc)
     spec=SimpleNamespace(ram=equipment.PLAYER_RAM,resident_bytes=len(data),sections=sections)
     expected=relocate_verified_data(spec,data,reloc,owner)
-    edge=b'V3PM'*4;end=target+equipment.PLAYER_CAPACITY
+    edge=b'V3PM'*4;end=target+(0x12D8 if controls else equipment.PLAYER_CAPACITY)
     for address in (allocation,target-16,end,allocation+size-16):debug.write_memory(address,edge)
     try:
         check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
         record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
         actions=resources.get('player_actions')
+        if controls:
+            # Exercise new control/setup code in this same category probe.
+            # The fake game owns an isolated full-size actor, two native-sized
+            # animation banks, and a player pointer. No live actor is edited.
+            game=allocation+0x2000;upper=allocation+0x4000;lower=allocation+0x5000
+            game_data=bytearray(0x1E00)
+            struct.pack_into('>I',game_data,0x1C90,target)
+            for index,bank in enumerate((upper,lower)):
+                struct.pack_into('>I',game_data,0x114+84*index,bank)
+                debug.write_memory(bank,bytes([0xA5])*equipment.PLAYER_CAPACITY)
+                debug.write_memory(bank-16,edge);debug.write_memory(bank+equipment.PLAYER_CAPACITY,edge)
+            debug.write_memory(game,game_data)
+            actor=bytearray(0x12D8)
+            struct.pack_into('>I',actor,0xCF0,7)
+            struct.pack_into('>2h',actor,0xDA0,0,1)
+            for field in (0xDAC,0xDB0,0xDB4):struct.pack_into('>i',actor,field,-1)
+            # Suppress held equipment through the real native override flag;
+            # fan inventory selection is deliberately not installed yet.
+            actor[0xE64]=1
+            debug.write_memory(target,actor)
+            symbols=actions['code']['symbols'];bridge=allocation+0x1400
+            debug.write_memory(bridge-16,edge);debug.write_memory(bridge+8,edge)
+            def control_call(name,args,want=None):
+                # The existing debugger's verified-call range is low RAM.
+                # Its ordinary eight-byte jump bridge reaches the independently
+                # compared cartridge-loaded Expansion Pak code above.
+                stub=struct.pack('>2I',equipment.jump(symbols[name]),0)
+                debug.write_memory(bridge,stub)
+                call(0x8002FE00,[bridge,8]);call(0x80034CE0,[bridge,8])
+                return call(bridge,args,want,(bridge,stub))
+            for trigger in (0,1):control_call('af_v3_player_fan_controller',[game,trigger],0)
+            check('missing or hidden fan does not change actor',target,actor)
+            control_call('af_v3_player_fan_request',[game,1,4],1)
+            check('fan request fields',target+0xD00,struct.pack('>3I',109,4,1))
+            check('fan request union',target+0xD58,struct.pack('>2I',1,0))
+            rejected=debug.read_memory(target,len(actor))
+            control_call('af_v3_player_fan_request',[game,0,4],0)
+            check('equal-priority request leaves actor unchanged',target,rejected)
+            segment=debug.read_memory(0x801458B8,4)
+            control_call('af_v3_player_fan_setup',[target,game])
+            check('fan setup and prior action',target+0xCF0,struct.pack('>2I',109,7))
+            check('fan eye pattern',target+0xCE8,struct.pack('>I',5))
+            check('full upper animation frame control',target+0x174,struct.pack('>5fI',1,9,9,0.5,1,1))
+            check('fan upper morph',target+0x194,struct.pack('>f',-5))
+            check('fan explicit part mask',target+0x10FC,bytes.fromhex(motion['mask_hex']))
+            swing=next(r for r in motion['records'] if r['index']==270)
+            check('complete swing DMA inside private bank',upper,
+                blob[swing['blob_offset']:swing['blob_offset']+swing['bytes']]+bytes([0xA5])*(equipment.PLAYER_CAPACITY-swing['bytes']))
+            check('native segment-six binding restored',0x801458B8,segment)
+            debug.write_memory(target+0xD58,bytes(4));debug.write_memory(target+0x1F4,struct.pack('>f',12.5))
+            control_call('af_v3_player_fan_setup',[target,game])
+            check('repeat preserves lower frame',target+0x1F4,struct.pack('>f',12.5))
+            check('repeat removes upper morph',target+0x194,bytes(4))
+            check('repeat removes lower morph',target+0x204,bytes(4))
+            debug.write_memory(target+0x184,struct.pack('>f',7.5))
+            control_call('af_v3_player_fan_finish',[target,game])
+            check('fan bee response timing',target+0x11B7,b'\x01')
+            # Title-demo movement remains live even though this isolated actor
+            # is not in the scene. Match the real controller, not assumed idle.
+            if call(0x8007D90C):controller=call(0x800B593C)
+            else:controller=struct.unpack('>I',debug.read_memory(0x8010EF90,4))[0]+0xA8
+            axes=struct.unpack('>2f',debug.read_memory(controller,8));moving=any(axes)
+            record(dict(fan_transition_controller_axes=list(axes),expected_action=8 if moving else 7))
+            debug.write_memory(target+0x184,struct.pack('>f',8.5))
+            control_call('af_v3_player_fan_finish',[target,game])
+            check('released fan respects movement and request priority',target+0xD00,struct.pack('>3I',8 if moving else 7,1,1))
+            if moving:check('native walk argument adaptation',target+0xD64,struct.pack('>fI',-5,0))
+            else:check('native wait argument adaptation',target+0xD58,struct.pack('>fI',-5,2))
+            for bank in (upper,lower):
+                for address in (bank-16,bank+equipment.PLAYER_CAPACITY):check('private animation bank guard',address,edge)
+            for address in (bridge-16,bridge+8):check('private call bridge guard',address,edge)
+            for address in (allocation,target-16,end,allocation+size-16):check('private actor/game guard',address,edge)
+            check('saved profile unchanged',0x8046C000,saved)
+            check('no CPU fault',0x8003CE34,bytes(4))
+            check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+            check('equipment guard',equipment.RAM+equipment.SIZE-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+            check('extended module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+            return dict(native_fan_controls_setup_transitions=True,assertions=assertions,
+                positive_equipped_controller_tested=False,fan_action_dispatched=False,
+                ordinary_gameplay_tested=False,hardware_tested=False,flash_written=False,
+                requires_checkpoint_restore=True)
         if actions:
             # Reuse this loaded-owner probe for the shared action-table category.
             # No live player, save, or callback table is edited.
