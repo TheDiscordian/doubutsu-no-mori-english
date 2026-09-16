@@ -85,11 +85,29 @@ a maintained list of individual items. Both directions must agree. Balloon
 models cross the `1xxx`/`3xxx` boundary and remain one parent item each.
 
 Each alias records the parent's official name and source hash, all four room
-rotations, accepted placement IDs, pickup ID, and the donor's
+rotations, accepted conversion IDs, pickup ID, and the donor's
 `no_convert_tools` condition. The seven worn-axe inputs share the axe model;
-the actual donor pickup returns the ordinary axe ID. This asymmetry is recorded,
-not interpreted as seven additional furniture imports. Native parent identity
-and gameplay remain unreviewed until independently established.
+the inverse display conversion returns the ordinary axe ID. This is a
+collection representation, not the result of an ordinary room drop. Native
+parent identity and gameplay remain unreviewed until independently established.
+
+Format `AFV3-DONOR-ROOM-ALIASES-2` verifies the complete three donor consumers,
+their relocation dependencies, and all four direct calls to the conversion.
+Both ordinary and bulk `mTG_room_put_proc` calls pass `no_convert_tools=1`;
+collection recording and checking pass zero. Unknown direct callers, changed
+arguments, branches, code, or relocations reject before classification. The
+whole-executable call scan is cached by immutable input bytes, not repeated per
+item; caller and relocation validation still runs for each discovery.
+
+Each record has `conversion_inputs` and matching `context_outputs` for room
+placement, collection recording, and collection checking. Eight balloons use
+display IDs in every context. The other forty representations are catalogue/
+collection models: tools, golden tools, fans, pinwheels, and diaries retain their
+parent IDs on ordinary room drops. All seven worn-axe inputs retain their actual
+wear-state ID on room drops, although collection conversion maps them to one axe
+display. Never apply the collection conversion unconditionally to room placement
+or infer that dropping an axe repairs it. `room_placement_uses_display` exposes
+that distinction to shared import/category code without item-specific switches.
 
 The full donor inventory, furniture scan, prepared-asset descriptors, and browser
 review data use these same records. Aliases stay unavailable as standalone
@@ -98,9 +116,10 @@ approve them, including when supplied through an older asset report. Artwork
 may still be prepared, with parent/placement/pickup dependencies retained.
 Unsupported graphics are separately recorded as `conversion_reason`; classifying
 an identity does not claim its artwork or runtime behaviour is implemented.
-Add native parent support and a shared room-conversion adapter before enabling
-the corresponding logical item. Do not offer both a parent and its display model
-as unrelated choices or substitute shop stock for parent acquisition.
+Add native parent support and context-correct collection/catalogue integration
+before enabling the corresponding logical item; add room conversion only where
+the donor uses it. Do not offer both a parent and its display model as unrelated
+choices or substitute shop stock for parent acquisition.
 
 ### Native alias records
 

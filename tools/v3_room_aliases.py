@@ -4,6 +4,7 @@ The checked conversion functions supply ranges and parent IDs. These records
 describe identity/dependencies, not implemented N64 placement or tool gameplay.
 """
 import struct
+from functools import lru_cache
 
 from aflib import sha256, u32
 
@@ -29,6 +30,75 @@ RANGES = (
     ('tool', 0x230, 0x238, 0x24C, 0x24C, 0x25C, 0x274, True, True),
 )
 
+# Complete consumers of the donor's context-sensitive conversion. The argument
+# instruction and actual branch are checked separately from the function hash.
+# These are call contracts, not per-item rules.
+CALLERS = (
+    ('collection_record', 0x70A0C, 'mPr_SetItemCollectBit', 472,
+     'd58adccfd4d27f28196a3b56d852ec198bc9062699eac2d4b084a91749754af3',
+     '038285c1d2d27cdbb67522e2f112bbdeed409a3de16d89ddd9043d5e729285fc',
+     ((0x10, 0x08, 0),)),
+    ('collection_check', 0x77B24, 'mSP_CollectCheck', 368,
+     '7b73e0f4eedd60eb98eb3074b853522887f8f9b69437bf652a7c24efcf251e7b',
+     'c8285714a52a16b7f1eeebd9fd34d82c1cd4dd8c604f01e084fd09ed5d2ae568',
+     ((0x18, 0x08, 0),)),
+    ('room_placement', 0x2856B8, 'mTG_room_put_proc', 1048,
+     'c5e50dc9b2ebd735fb93e17d04022c86ff27c8134db07c0427ebf27df467c5b2',
+     'c3bcfcbf449a9526e2c4bc1a68e1bae9c456ebecffac875213e9e409c18a7031',
+     ((0x64, 0x58, 1), (0x1C8, 0x1C0, 1))),
+)
+
+
+def branch_target(word, at):
+    if word >> 26 != 18 or word & 3 != 1:
+        return None
+    displacement = word & 0x03FFFFFC
+    if displacement & 0x02000000:
+        displacement -= 0x04000000
+    return at + displacement
+
+
+@lru_cache(maxsize=2)
+def direct_callers(rel, base, size, target):
+    """Scan an immutable donor once, not once for each candidate item.
+
+    The complete input bytes are the cache key; mutated test/source data cannot
+    reuse an earlier result. Consumer bytes and relocations are still checked
+    on every discovery call.
+    """
+    return frozenset(at for at in range(0, size-3, 4)
+                     if branch_target(u32(rel, base+at), at) == target)
+
+
+def conversion_contexts(source):
+    """Bind ordinary/bulk room drops and collection consumers to real flags."""
+    target = FUNCTIONS['place'][0]
+
+    expected_calls, result = set(), {}
+    for role, address, symbol, size, digest, relocation_digest, calls in CALLERS:
+        raw, receipt = source.function(address)
+        relocations = b''.join(struct.pack('>5I', at, *row)
+                               for at, row in sorted(receipt['relocations'].items()))
+        if (receipt['symbol'] != symbol or len(raw) != size or sha256(raw) != digest
+                or sha256(relocations) != relocation_digest):
+            raise ValueError('Changed donor room-alias consumer: ' + role)
+        records = []
+        for call, argument, mode in calls:
+            if (u32(raw, argument) != (0x38800000 | mode) or
+                    branch_target(u32(raw, call), address+call) != target or
+                    any(argument <= at < call+4 for at in receipt['relocations'])):
+                raise ValueError('Changed room-alias context argument/call: ' + role)
+            records.append(dict(call_offset=call, argument_offset=argument,
+                                no_convert_tools=bool(mode)))
+            expected_calls.add(address+call)
+        result[role] = dict(function=receipt, calls=records)
+
+    base, size = source.sections[1]
+    actual_calls = direct_callers(bytes(source.rel), base, size, target)
+    if actual_calls != expected_calls:
+        raise ValueError('Unreviewed donor room-alias direct caller')
+    return result
+
 
 def discover(source):
     """Bind both conversions, including rotations and worn-axe canonicalisation."""
@@ -39,6 +109,7 @@ def discover(source):
                 or receipt['relocations']):
             raise ValueError('Changed donor room-alias function: ' + role)
         code[role], evidence[role] = raw, receipt
+    contexts = conversion_contexts(source)
 
     def immediate(role, at, opcode):
         word = u32(code[role], at)
@@ -87,13 +158,14 @@ def discover(source):
                 parent_id=f'GAFE01-r0/item/{parent:04X}', parent_item_id=f'{parent:04X}',
                 parent_name=name, parent_name_symbol=symbol, parent_name_index=parent & 255,
                 parent_name_sha256=sha256(name_raw),
-                placement_inputs=[f'{parent:04X}'], pickup_item_id=f'{parent:04X}',
+                conversion_inputs=[f'{parent:04X}'], pickup_item_id=f'{parent:04X}',
                 suppressed_by_no_convert_tools=restricted, native_identity='unreviewed',
                 runtime_installed=False)
             parents.add(parent)
 
-    # Donor placement loses the axe's wear-state identity; record that actual
-    # asymmetry instead of treating seven worn axes as seven new furnishings.
+    # Collection conversion canonicalises worn axes, but ordinary room drops
+    # suppress that conversion and retain wear. Do not repair an axe by dropping
+    # it, or treat seven wear states as seven independent import choices.
     first = immediate('place', 0x25C, 10)
     last = immediate('place', 0x264, 10)
     target = immediate('place', 0x26C, 14)
@@ -102,17 +174,32 @@ def discover(source):
     states = {f'{i:04X}' for i in range(first, last+1)}
     if states & {f'{i:04X}' for i in parents}:
         raise ValueError('Worn-tool states overlap canonical parent identities')
-    rows[target]['placement_inputs'] += sorted(states)
+    rows[target]['conversion_inputs'] += sorted(states)
     rows[target]['pickup_canonicalises_state'] = True
-    return dict(format='AFV3-DONOR-ROOM-ALIASES-1', functions=evidence,
-                scope='extra room representations: balloons, diaries, fans, pinwheels, and tools',
+    for row in rows.values():
+        outputs = {}
+        for role, context in contexts.items():
+            modes = {call['no_convert_tools'] for call in context['calls']}
+            if len(modes) != 1:
+                raise ValueError('Ambiguous donor room-alias consumer context')
+            suppressed = modes.pop() and row['suppressed_by_no_convert_tools']
+            outputs[role] = [item if suppressed else row['display_item_id']
+                             for item in row['conversion_inputs']]
+        row['context_outputs'] = outputs
+        row['room_placement_uses_display'] = not row['suppressed_by_no_convert_tools']
+    return dict(format='AFV3-DONOR-ROOM-ALIASES-2', functions=evidence, contexts=contexts,
+                scope='room/collection representations: balloons, diaries, fans, pinwheels, and tools',
                 rows=[rows[item] for item in sorted(rows)])
 
 
 def pending_reason(alias):
-    return (f"Room display of {alias['parent_name']} ({alias['parent_item_id']}); "
-            'parent-item support and room placement/pickup integration are required, '
-            'not a separate furniture acquisition route.')
+    if alias['room_placement_uses_display']:
+        return (f"Room display of {alias['parent_name']} ({alias['parent_item_id']}); "
+                'parent-item support and room placement/pickup integration are required, '
+                'not a separate furniture acquisition route.')
+    return (f"Catalogue display of {alias['parent_name']} ({alias['parent_item_id']}); "
+            'parent-item support and catalogue/collection integration are required. '
+            'Ordinary room placement retains the parent item, not this furniture model.')
 
 
 def annotate_inventory(items, aliases):
@@ -132,7 +219,7 @@ def annotate_inventory(items, aliases):
         displays = parent.setdefault('room_display_ids', [])
         if alias['display_item_id'] not in displays:
             displays.append(alias['display_item_id'])
-        for state in alias['placement_inputs'][1:]:
+        for state in alias['conversion_inputs'][1:]:
             if state not in by_id:
                 raise ValueError('Missing donor worn-tool state')
             by_id[state].update(status='state_of_parent_item', canonical_parent_id=alias['parent_id'],

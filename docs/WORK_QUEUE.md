@@ -2,6 +2,17 @@
 
 ## Active: V3 optional GameCube imports
 
+Use the shared source-derived context records when integrating parent items.
+Both donor room-drop calls preserve tools, golden tools, fans, pinwheels, and
+diaries as inventory items; only their collection/catalogue paths use furniture
+representations. Worn axes retain wear on ordinary drops. Eight balloons do use
+room-display conversion. The importer verifies all four calls, complete consumer
+code, and relocation dependencies, and generates each context's actual output
+IDs. Do not install an unconditional parent-to-furniture conversion for these
+categories. Continue native parent readers, player actions, acquisition, and
+catalogue/collection integration; reuse prepared models rather than reconverting
+them. This discovery changes no ROM, save, installed choice, or served patcher.
+
 ABI 96 installs the shared room-alias runtime from generated parent/display
 records. The three installed garments retain names, prices, collection identity,
 footprints, and selection checks without a per-item conversion list. Twenty
@@ -9,9 +20,10 @@ focused checks and the corrected 187-record/177-assertion native run pass.
 Reuse these records and the existing importer's `--refresh-runtime` mode;
 do not add another per-item installer or native scenario. Retain the bounded
 passing evidence. Next, implement actual native parent inventory/gameplay and
-install the prepared display categories through the shared adapter. The 48
-additional donor aliases remain unfinished; worn-tool state aliases need an
-explicit many-input/one-parent extension. Neither served patcher changes.
+install the prepared display categories through context-correct adapters. The 48
+additional donor aliases remain unfinished; worn-tool collection aliases need an
+explicit many-input/one-parent extension, separate from unchanged room-drop IDs.
+Neither served patcher changes.
 
 The indexed-model-sequence category prepares all 24 fan, pinwheel, ordinary-tool,
 and golden-tool display models at

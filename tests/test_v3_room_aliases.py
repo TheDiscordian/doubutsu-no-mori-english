@@ -3,6 +3,7 @@ from collections import Counter
 import copy
 from pathlib import Path
 import sys
+import struct
 import tempfile
 import unittest
 
@@ -46,13 +47,57 @@ class RoomAliasesTests(unittest.TestCase):
         # Four balloons live in the older furniture range; don't discard them.
         self.assertEqual(sum(int(k,16) < 0x3000 for k in self.rows), 4)
 
-    def test_worn_axes_keep_the_actual_many_to_one_pickup_policy(self):
+    def test_worn_axes_keep_wear_when_dropped_and_share_collection_identity(self):
         axe = self.rows['3190']
-        self.assertEqual(axe['placement_inputs'], ['2201']+[f'{i:04X}' for i in range(0x223D,0x2244)])
+        inputs = ['2201']+[f'{i:04X}' for i in range(0x223D,0x2244)]
+        self.assertEqual(axe['conversion_inputs'], inputs)
         self.assertEqual(axe['pickup_item_id'], '2201')
         self.assertTrue(axe['pickup_canonicalises_state'])
-        self.assertEqual(sum(len(r['placement_inputs']) for r in self.rows.values()), 55)
+        self.assertEqual(axe['context_outputs']['room_placement'], inputs)
+        self.assertEqual(axe['context_outputs']['collection_record'], ['3190']*8)
+        self.assertEqual(axe['context_outputs']['collection_check'], ['3190']*8)
+        self.assertEqual(sum(len(r['conversion_inputs']) for r in self.rows.values()), 55)
         self.assertEqual(sum(bool(r.get('pickup_canonicalises_state')) for r in self.rows.values()), 1)
+
+    def test_actual_callers_distinguish_room_drops_from_collection(self):
+        contexts = self.catalogue['contexts']
+        self.assertEqual(self.catalogue['format'], 'AFV3-DONOR-ROOM-ALIASES-2')
+        self.assertEqual({role: [r['no_convert_tools'] for r in data['calls']]
+                          for role, data in contexts.items()},
+                         {'room_placement': [True, True], 'collection_record': [False],
+                          'collection_check': [False]})
+        for row in self.rows.values():
+            inputs = row['conversion_inputs']
+            display = [row['display_item_id']]*len(inputs)
+            placed = display if row['category']=='balloon' else inputs
+            self.assertEqual(row['context_outputs'],
+                             dict(room_placement=placed, collection_record=display,
+                                  collection_check=display))
+            self.assertEqual(row['room_placement_uses_display'], row['category']=='balloon')
+        self.assertEqual(sum(r['room_placement_uses_display'] for r in self.rows.values()), 8)
+
+    def test_context_changes_and_unreviewed_calls_reject_before_classification(self):
+        base = self.source.sections[1][0]
+        for _, address, _, size, _, _, calls in aliases.CALLERS:
+            for relative in (0, size-1, calls[0][0], calls[0][1]):
+                changed = copy.copy(self.source); changed.rel = bytearray(self.source.rel)
+                changed.rel[base+address+relative] ^= 1
+                with self.assertRaisesRegex(ValueError, 'room-alias consumer'):
+                    aliases.discover(changed)
+            changed = copy.copy(self.source)
+            relative = next(iter(self.source.function(address)[1]['relocations']))
+            changed.code_relocations = {**self.source.code_relocations,
+                                        address+relative:(10,0,1,0)}
+            with self.assertRaisesRegex(ValueError, 'room-alias consumer'):
+                aliases.discover(changed)
+        # A new direct consumer outside the three checked functions is not
+        # silently assigned the mode of an existing consumer.
+        changed = copy.copy(self.source); changed.rel = bytearray(self.source.rel)
+        at = 0
+        branch = 0x48000001 | ((aliases.FUNCTIONS['place'][0]-at)&0x03FFFFFC)
+        struct.pack_into('>I', changed.rel, base+at, branch)
+        with self.assertRaisesRegex(ValueError, 'Unreviewed.*caller'):
+            aliases.discover(changed)
 
     def test_changed_complete_code_helpers_or_relocations_fail_closed(self):
         text = self.source.sections[1][0]
@@ -102,6 +147,8 @@ class RoomAliasesTests(unittest.TestCase):
         self.assertEqual(inventory['room_aliases'], self.catalogue)
         fan=next(r for r in rows if r['item_id']=='314C')
         self.assertTrue(fan['asset_ready'])
+        self.assertIn('Catalogue display',fan['reason'])
+        self.assertFalse(fan['room_alias']['room_placement_uses_display'])
         self.assertNotIn('conversion_reason',fan)
         balloon=next(r for r in rows if r['item_id']=='3000')
         self.assertFalse(balloon['asset_ready'])

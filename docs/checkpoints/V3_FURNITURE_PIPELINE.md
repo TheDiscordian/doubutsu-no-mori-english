@@ -1,5 +1,56 @@
 # Automatic furniture pipeline checkpoint
 
+## Parent display contexts
+
+The donor's conversion flag has different values in ordinary room placement
+and collection recording/checking. This changes the integration plan for forty
+of the forty-eight extra display representations: tools, golden tools, fans,
+pinwheels, and diaries keep their inventory IDs when dropped indoors. Their
+furniture models are catalogue/collection representations. The eight balloons
+use furniture IDs in both contexts. The earlier generic placement terminology
+must not be interpreted as an unconditional room conversion.
+
+`tools/v3_room_aliases.py` now verifies complete `mTG_room_put_proc`,
+`mPr_SetItemCollectBit`, and `mSP_CollectCheck` implementations and their complete
+relocation dependencies. It checks each conversion branch and flag-setting
+instruction independently, and finds exactly four direct callers in the donor
+executable: two room drops with flag one and two collection calls with flag zero.
+Unknown consumers and changed code/relocations fail before item classification.
+The call scan is cached against immutable complete source bytes to avoid repeating
+an executable scan for each candidate; consumer verification remains uncached.
+
+Format `AFV3-DONOR-ROOM-ALIASES-2` renames ambiguous `placement_inputs` to
+`conversion_inputs` and generates actual `context_outputs` for every accepted
+input. The seven worn-axe states map to one collection display, but each keeps
+its wear-state ID on ordinary and bulk room drops. Inverse display conversion
+returning an ordinary axe does not mean ordinary dropping repairs an axe.
+The full donor inventory, furniture scan, and browser review records inherit
+the correct context and pending reason from this one discovery implementation.
+
+Eight focused tests pass, covering all 48 aliases/55 accepted inputs, context
+outputs, ordinary/bulk call modes, complete code and relocation mutation,
+unreviewed direct callers, worn-state retention, all 2,333 donor inventory
+identities, and rejection of standalone furniture installation. Existing current
+converted furniture still passes source/asset verification. The first run takes
+69.483 seconds; after adding the immutable call-scan cache, the final-source run
+passes in 26.649 seconds. These are host/source checks, not emulator gameplay.
+
+Generated outputs:
+
+- `build/v3-alias-contexts-01/inventory.json`, SHA-256
+  `3593bdd48e5411d24e5bb0a712cced4517dd24c6eae0a7e56f2b69d3c4fc7ecf`.
+- `build/v3-alias-contexts-01/donor-catalogue.json`, SHA-256
+  `63f9d9f1e9d9b4b4fa1d1e5b8eff62039289cab3817b9278b4293ed1bcba3611`.
+
+The scan retains 76 converter-supported and 166 review entries, with no new
+fully eligible furniture. ABI 96, its pinned cartridge, 104 installed choices,
+saved format 2, and both served V2 patchers remain unchanged. No emulator replay
+is required for this source-discovery change. Next: actual parent inventory/
+player actions/acquisition and context-correct catalogue/collection integration,
+reusing the complete prepared artwork. Do not add a global tool-to-furniture
+room conversion, duplicate original tools, or claim prepared graphics as usable
+parent items.
+
 ## Shared native display aliases
 
 ABI 96 replaces the conversion/readers/garment-roster lists with generated

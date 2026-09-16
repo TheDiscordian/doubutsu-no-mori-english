@@ -2,6 +2,19 @@
 
 ## Active development
 
+The shared importer distinguishes ordinary room drops from catalogue/collection
+representations using all four actual donor calls and three complete consumer
+implementations. Tools, golden tools, fans, pinwheels, and diaries retain their
+parent IDs when dropped indoors; worn axes retain wear. Eight balloon aliases
+use their display IDs in both contexts. Generated records expose the actual
+output IDs for every input/context, preventing an unconditional furniture
+conversion from being mistaken for faithful parent-item support. Eight focused
+checks pass; full donor inventory and current furniture scan regenerate
+successfully. This is importer integration evidence, not new gameplay or new
+selectable items. The development ROM, saved format, and both patchers remain
+unchanged. Continue actual parent readers/actions/acquisition and context-correct
+catalogue integration using the prepared models.
+
 The shared native room-alias adapter uses generated parent/display records for
 conversion, pickup, names, prices, ownership, footprints, and garment lookup.
 All three installed garments use this path without adding new item choices.
