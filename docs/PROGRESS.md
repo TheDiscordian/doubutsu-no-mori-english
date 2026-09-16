@@ -2,6 +2,18 @@
 
 ## Active development
 
+The shared handheld pipeline prepares a complete 7,760-byte motion bundle:
+sixteen equipment animations, six constant player poses, fan idle, and fan
+swing. Twenty skeleton descriptions retain actual joint/model dependencies;
+their geometry and player integration remain separate work. Complete source
+selectors connect all 79 equipment identities/states to their real holding
+animations. The shared keyframe format preserves every constant, frame, value,
+velocity, hierarchy, and relocated pointer without resampling. Fourteen focused
+checks pass across the initial run and one corrected mutation fixture. The
+bundle remains prepared-only; no cartridge, save, choice, or patcher changes.
+Continue native model ownership and action/animation binding using these
+resources. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#held-motion-dependencies).
+
 The [shared handheld adapter](../specs/V3_HANDHELD_ITEMS.md) discovers all 79
 donor equipment IDs/states and prepares fourteen actual held models in one
 batch: eight fans, ordinary/golden shovels, and four axe appearances. The

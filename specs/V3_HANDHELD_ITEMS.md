@@ -61,6 +61,53 @@ table. Neither group is converted into a static substitute. Prepared output has
 the distinct `AFV3-HANDHELD-PREPARED-ASSETS-1` format, which the furniture installer
 rejects. Runtime and save-profile selection remain off.
 
+## Shared skeleton and motion data
+
+`tools/v3_keyframes.py` supplies reusable rotational-skeleton and keyframe
+format handling. It follows complete header relocations, preserves every joint's
+translation, child count, model root, and draw stream, and checks the complete
+preorder hierarchy. Animation traversal accounts for root translation and every
+joint rotation, consuming exactly the declared constant values, track counts,
+and frame/value/velocity triples. Tracks must be ordered and within duration;
+signed native index limits are enforced. Constant-only poses retain null key
+and count pointers instead of inventing unused arrays.
+
+The converter copies complete arrays without resampling or shortening motion.
+It deduplicates source roots, aligns data, and rewrites only the four animation
+pointers to segment-six addresses. Array/header receipts, all relocation targets,
+and source bindings accompany the output. Its layout follows the native
+`BaseAnimationR` and `JointElemR` formats; player-specific rig compatibility,
+graphics matrices, action dispatch, and buffer ownership are separate work.
+
+The shared handheld category prepares one complete dependency bundle:
+
+```sh
+python3 tools/v3_furniture_pipeline.py convert --representation handheld \
+  --assets-only --category held-motion --output build/held-motion
+```
+
+This preparation category rejects `--select`; it packs the shared source
+dependencies once, not a selected gameplay profile. Individual item selection
+belongs to the eventual native/profile integration. The distinct
+`AFV3-HELD-MOTION-PREPARED-1` format is not a furniture installation.
+
+The checked equipment resource/type tables supply all sixteen equipment
+animations and twenty skeleton descriptions. Every animated parent records its
+real default animation and same-resource-type variants, with matching joint
+counts. Complete player-animation pointer/default selectors supply seven
+equipment holding animations. The complete fan setup function supplies its
+actual swing index, checked against the same table. The combined twenty-four
+animations retain 84 arrays in 7,760 bytes: sixteen equipment motions, six
+constant player poses, fan idle, and fan swing. Fan idle has seventeen frames;
+fan swing has nine. Neither timing is inferred from a catalogue model.
+
+Skeleton descriptions preserve actual model dependencies but do not convert
+those graphics or install draw callbacks. Net/rod joint-matrix commands and
+balloon texture formats still require shared graphics support. Pinwheel model
+preflight accepts its existing material commands, but complete rig/model
+packing and native player ownership remain unfinished. No animated model is
+flattened to pass the static converter.
+
 ## Native integration work
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
@@ -83,8 +130,9 @@ For fans, the donor implementation is in `m_player_item_fan.c_inc` and
 action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.text:164628`. The full player wait/swing animation descriptors are
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
-button/timing behaviour, and sound still need native integration. The prepared
-held graphics alone do not implement them.
+button/timing behaviour, and sound still need native integration. The complete
+wait/swing data is in the prepared motion bundle; it is not connected to native
+player actions yet. Prepared held graphics and motion data do not implement them.
 
 Inventory/ground readers, official names and prices, acquisition, context-correct
 catalogue/collection integration, optional selection, and save/profile handling

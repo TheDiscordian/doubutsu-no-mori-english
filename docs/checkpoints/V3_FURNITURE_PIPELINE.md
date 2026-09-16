@@ -1,5 +1,52 @@
 # Automatic furniture pipeline checkpoint
 
+## Held-motion dependencies
+
+`tools/v3_keyframes.py` implements shared complete rotational-skeleton and
+keyframe parsing/packing. Source-derived equipment and player selectors feed it;
+there is no maintained per-item animation list. All twenty held skeletons retain
+their actual joint hierarchy, translations, streams, and model roots. The
+sixteen equipment animations and eight equipment-related player animations
+produce one 7,760-byte native-format object containing 84 complete arrays and
+24 relocated headers. The fan swing comes from the complete donor setup
+function's actual initializer argument, not a guessed animation name.
+
+Output: `build/v3-held-motion-prepared-01/`.
+
+- `held-motion.n64obj.bin` SHA-256:
+  `e17c8d6251ee37845c3c693b2b226e2e911aba5043b6e493270ee8e70289663c`.
+- `art.json` SHA-256:
+  `09bac790415a75834fbfad6f58413e43a70c573e3e9c5beb96149928e0eae9d8`.
+
+The same `v3_furniture_pipeline.py convert --representation handheld
+--assets-only` command accepts `--category held-motion`. This is a complete
+dependency bundle, not a selected gameplay profile. Individual gameplay
+selection remains native/profile integration work. No alternate installer,
+prepared furniture substitution, or public output is introduced.
+
+Fourteen distinct focused checks pass: eight keyframe/source/packing checks and
+six existing held-source checks. Complete source arrays and header pointers are
+compared independently; root translation and every joint rotation consume
+exactly the expected constants and keyframe tracks. Topology, source/player
+bindings, preserved null pointers, malformed flags/counts/frames, stale
+descriptions, and changed source selectors/setup reject as intended. The
+initial run passes thirteen and exposes a stale cached relocation-address list
+in one mutation fixture. Updating both fixture indexes gives a passing focused
+retry; production source parsing is unchanged by that fixture correction.
+
+The initial conversion identifies constant-only player poses with null key/count
+pointers. Shared format handling preserves those nulls and validates their full
+constant arrays; it does not create fake animation tracks. The prepared bundle
+contains six such poses plus the fan's seventeen-frame idle and nine-frame swing.
+No movement is resampled or shortened.
+
+Native rig/model ownership and buffers, player actions, part masks, sound,
+inventory readers, acquisition, and profile integration remain unfinished.
+Net/rod graphics require joint-matrix commands; balloon graphics require wider
+texture support. Pinwheel graphics pass existing preflight but have no complete
+native rig/model installation. ABI 96, its 104 choices, saves, and both served
+V2 patchers remain unchanged. No emulator or hardware result is claimed.
+
 ## Actual held-model batch
 
 The shared converter prepares fourteen actual handheld models for nineteen

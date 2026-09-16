@@ -28,15 +28,15 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
-def discover(source):
-    """Follow item -> equipment kind -> shape/animation -> actual resource root."""
+def selector_tables(source, specifications):
+    """Read complete bounded tables through their verified donor consumers."""
     functions, tables, values = {}, {}, {}
     byte_tables = {}
     for name, location, span in re.findall(
             r'^(\S+) = \.rodata:0x([0-9A-Fa-f]+);[^\n]* size:0x([0-9A-Fa-f]+) ',
             source.symbols,re.M):
         byte_tables.setdefault(int(location,16),[]).append((name,int(span,16)))
-    for role, (address, symbol, size, digest, section, low) in FUNCTIONS.items():
+    for role, (address, symbol, size, digest, section, low) in specifications.items():
         raw, receipt = source.function(address)
         high = receipt['relocations'].get(0x12)
         if (receipt['symbol'] != symbol or len(raw) != size or sha256(raw) != digest
@@ -70,6 +70,12 @@ def discover(source):
         tables[role] = dict(section=section,offset=at,bytes=n,count=count,sha256=sha256(data),
                             pointers=pointers)
         values[role] = data
+    return functions, tables, values
+
+
+def discover(source):
+    """Follow item -> equipment kind -> shape/animation -> actual resource root."""
+    functions, tables, values = selector_tables(source, FUNCTIONS)
 
     count=tables['data']['count']
     if tables['type']['count'] != count or tables['shape']['count'] != tables['animation']['count']:
@@ -124,6 +130,90 @@ def discover(source):
         rejected_item_ids=rejected,rows=rows)
 
 
+def motion(source):
+    """Discover complete held rigs and equipment-related player animations."""
+    from v3_keyframes import animation, skeleton
+    functions, tables, values = selector_tables(source, {
+        'player_data': (0x68A44, 'mPlib_Get_Pointer_Animation', 48,
+            '869d78d47d9b401bab78a6b6c6ede7327e07c65aec23380d7927258b7b59ebc1', 5, 0x1A),
+        'player_default': (0x68A74, 'mPlib_Get_BasicPlayerAnimeIndex_fromItemKind', 40,
+            '02499ead02c19ebf1b8904dc7cd7e88ef792ad61daec146dc9322b91019b713f', 4, 0x16),
+    })
+    equipment = discover(source)
+    if tables['player_default']['count'] != equipment['tables']['shape']['count']:
+        raise ValueError('Player and equipment kind tables disagree')
+    types_at = source.sections[4][0]+equipment['tables']['type']['offset']
+    types = source.rel[types_at:types_at+equipment['tables']['type']['count']]
+    rigs, animations = {}, {}
+    for index, kind in enumerate(types):
+        root = equipment['tables']['data']['pointers'][index*4][3]
+        if kind == 1:
+            rigs[index] = skeleton(source, root)
+        elif kind in (2,3,4,5):
+            animations[index] = dict(resource_type=kind, **animation(source, root))
+        elif kind != 0:
+            raise ValueError('Unknown equipment motion resource type')
+    parents, player_indices = [], set()
+    for row in equipment['rows']:
+        index = values['player_default'][row['equipment_kind']]
+        if index >= tables['player_data']['count']:
+            raise ValueError('Equipment player animation exceeds its source table')
+        player_indices.add(index)
+        parent = dict(item_id=row['item_id'], equipment_kind=row['equipment_kind'],
+                      player_default_animation=index)
+        if row['category'] == 'animated-held-model':
+            shape, initial = row['shape_index'], row['animation_index']
+            if initial not in animations:
+                raise ValueError('Held rig has no real default animation')
+            family = animations[initial]['resource_type']
+            variants = [i for i,a in animations.items() if a['resource_type']==family]
+            if any(animations[i]['joints'] != rigs[shape]['joints'] for i in variants):
+                raise ValueError('Equipment animation family does not fit its held rig')
+            parent.update(shape_index=shape, default_animation=initial, animation_resources=variants)
+        parents.append(parent)
+    # The complete fan setup requests player animation r5=0x8C at its actual
+    # split-body initializer call. This adds the swing, not just the idle pose.
+    raw, fan_setup = source.function(0x1962B0)
+    if (fan_setup['symbol'] != 'Player_actor_setup_main_Swing_fan'
+            or len(raw)!=172 or sha256(raw) !=
+            '752b1ac4425874027cec62ed68b4d76afbebcbf0a29797301b599a843cd7f0bb'
+            or sha256(json.dumps({str(k):v for k,v in fan_setup['relocations'].items()},
+                sort_keys=True,separators=(',',':')).encode()) !=
+            '8710fe69485d835b21b7fd8395bbcb9f6083d73c2ebb112d826e211311329414'):
+        raise ValueError('Changed complete fan animation setup')
+    swing = u32(raw, 0x6C)&0xFFFF
+    if swing >= tables['player_data']['count']:
+        raise ValueError('Fan swing exceeds player animation table')
+    player_indices.add(swing)
+    player = {index:animation(source,tables['player_data']['pointers'][index*4][3],joints=26)
+              for index in sorted(player_indices)}
+    return dict(format='AFV3-HELD-MOTION-SOURCES-1',
+        source_rel_sha256=sha256(source.rel), source_symbols_sha256=sha256(source.symbols.encode()),
+        selector_functions=functions, selector_tables=tables, fan_setup=fan_setup,
+        fan_swing_animation=swing, equipment=equipment, parents=parents,
+        skeletons=rigs, equipment_animations=animations, player_animations=player,
+        runtime_installed=False, selectable=False)
+
+
+def convert_motion(source, output):
+    from v3_keyframes import compile_animations
+    description = motion(source)
+    rows = [{k:v for k,v in row.items() if k!='resource_type'}
+            for row in description['equipment_animations'].values()]
+    rows += list(description['player_animations'].values())
+    # Shared source roots remain a single resource regardless of consumers.
+    unique = {row['header']['donor_offset']:row for row in rows}
+    asset, compiled = compile_animations(source, list(unique.values()))
+    report = dict(format='AFV3-HELD-MOTION-PREPARED-1', version=1,
+        object_file='held-motion.n64obj.bin', object_bytes=len(asset), object_sha256=sha256(asset),
+        **compiled, source=description, selectable=False,
+        pending_reason='Motion data only; native rig bindings, player actions, and selected ownership remain.')
+    output.mkdir(parents=True,exist_ok=False)
+    write_new(output/report['object_file'],asset)
+    write_new(output/'art.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report
+
+
 def annotate_inventory(items,held):
     """Attach actual equipment dependencies to the single donor inventory."""
     by_id={row['donor_item_id']:row for row in items}
@@ -169,6 +259,9 @@ def scan(source):
 
 def convert(source,output,selected=(),*,category=None):
     from v3_furniture_pipeline import prepare_models,compile_models
+    if category == 'held-motion':
+        if selected:raise ValueError('Held-motion preparation uses the complete source dependency bundle')
+        return convert_motion(source,output)
     if category not in (None,'static-held-model'):
         raise ValueError('Unsupported handheld conversion category')
     inventory=scan(source)

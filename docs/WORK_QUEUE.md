@@ -2,6 +2,21 @@
 
 ## Active: V3 optional GameCube imports
 
+Reuse `build/v3-held-motion-prepared-01/held-motion.n64obj.bin` for native
+motion integration. Its complete twenty-four animations occupy 7,760 bytes;
+all sixteen equipment motions and eight player holding/action animations retain
+full source data. `tools/v3_keyframes.py` handles shared skeleton/keyframe
+formats, and the existing pipeline's `held-motion` category prepares the bundle.
+Twenty actual held skeletons are described, not flattened or installed. Connect
+selected model ownership/loading, native rig buffers, player action dispatch,
+and source timing/part masks. Fans need their actual waving action; net/rod
+joint-matrix commands and balloon textures need shared graphics support.
+Pinwheel graphics preflight succeeds, but complete rig/model packing and action
+ownership remain work. Keep real inventory/readers/acquisition/profile and
+context-correct catalogue dependencies; motion data alone enables no item.
+Fourteen focused source/packing checks pass. Do not replay unchanged cartridge
+tests until a native integration change warrants them.
+
 Continue native equipment integration using the
 [shared handheld records](../specs/V3_HANDHELD_ITEMS.md), not per-item scripts.
 `build/v3-handheld-static-prepared-02/` contains fourteen complete actual held
