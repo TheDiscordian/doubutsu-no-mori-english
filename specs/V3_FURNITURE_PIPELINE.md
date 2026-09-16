@@ -28,6 +28,14 @@ standalone installer accepts an existing conversion through `--art`; it performs
 the same source and base checks. Use fresh ignored output paths. No ROM, save,
 source artwork, served website, or existing generated build is overwritten.
 
+`--representation handheld` selects the
+[actual player-equipment adapter](V3_HANDHELD_ITEMS.md). It uses the same
+complete model/resource converter and compiler, with source-discovered held
+roots instead of furniture profiles. Only `scan` and `convert --assets-only`
+are available until player integration is implemented. Its distinct prepared
+format cannot enter the furniture installer. Catalogue/collection previews
+never substitute for the actual held model or its gameplay.
+
 Shared reader changes use the same installer's `--refresh-runtime` mode. It
 updates the checked current cartridge without reconverting or reinstalling any
 artwork. It retains the complete DMA directory, existing allocations, profile,

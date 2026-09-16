@@ -2,6 +2,22 @@
 
 ## Active: V3 optional GameCube imports
 
+Continue native equipment integration using the
+[shared handheld records](../specs/V3_HANDHELD_ITEMS.md), not per-item scripts.
+`build/v3-handheld-static-prepared-02/` contains fourteen complete actual held
+models shared by nineteen item/state IDs. Reuse their 25,888 verified bytes;
+catalogue models are separate representations. Complete source selection covers
+all 79 donor equipment IDs/states. The original/current native selector at
+`808BD3F8` accepts only `2200..2223`; new fan, golden-tool, and toy IDs require
+real selection/action/animation support. Preserve original kind meanings and
+audit dependent indexed readers. Establish selected model loading, graphics
+bindings, cleanup, take-out/put-away, and category actions before enabling items.
+The donor fan action/animation entries are identified in the spec. Do not use
+umbrella behaviour as a fan substitute or duplicate original tools. Animated
+held models and separate umbrella owners remain explicit conversion work.
+Eleven focused checks pass; retain that unchanged evidence. No native run is
+needed until cartridge code changes. Both served patchers remain V2.
+
 Use the shared source-derived context records when integrating parent items.
 Both donor room-drop calls preserve tools, golden tools, fans, pinwheels, and
 diaries as inventory items; only their collection/catalogue paths use furniture

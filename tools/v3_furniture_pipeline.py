@@ -461,7 +461,16 @@ class Source:
 
 def prepare(source, item):
     """Discover every model, texture, palette, and vertex dependency from the ROM."""
-    descriptor = source.profile(item)
+    return prepare_models(source, source.profile(item))
+
+
+def prepare_models(source, descriptor):
+    """Convert checked model roots independently of furniture/item identity.
+
+    Furniture profiles and handheld equipment tables have separate source
+    discovery. Both feed the same complete resource/material/geometry converter.
+    This function supplies artwork, never gameplay or installation eligibility.
+    """
     palettes, textures, vertex_arrays, raw_models = {}, {}, {}, {}
     adapter = descriptor.get('callback_adapter', {})
     fading = adapter.get('category') == 'switch-palette-fade'
@@ -551,6 +560,29 @@ def prepare(source, item):
             offsets[adapter['endpoints']['on']['donor_offset']],
             offsets[adapter['endpoints']['off']['donor_offset']],*destinations,0)
     return descriptor, bytes(body), resources, offsets, models, commands, sections
+
+
+def compile_models(directory, prepared):
+    """Emit a complete native object from the shared preflight description."""
+    profile, body, resources, offsets, models, commands, sections = prepared
+    source_file = directory/'commands.c'; write_new(source_file, commands.encode())
+    compiled = compile_commands(directory/'gbi', source_file, sections)
+    asset, destinations, records = bytearray(body), {}, []
+    for label, model in models.items():
+        asset.extend(bytes(-len(asset)%8)); destinations[label] = len(asset); asset.extend(compiled[label])
+        records.append(dict(layer=label, symbol=model['symbol'], source_sha256=model['source_sha256'],
+            **({'source_parts':model['source_parts']} if 'source_parts' in model else {}),
+            native_offset=destinations[label], bytes=len(compiled[label]), output_sha256=sha256(compiled[label]),
+            triangles=sum(len(r.get('triangles',[])) for r in model['rows'])))
+    sequence_record,sequence=draw_sequence(profile,len(body),sections)
+    if sequence_record:
+        if (sequence_record['model_offsets']!=destinations or sequence_record['native_offset']!=len(asset)):
+            raise ValueError('Static draw sequence differs from compiled layout')
+        asset.extend(sequence)
+    asset.extend(bytes(-len(asset)%16))
+    expected = (len(body)+sum(n for _,n in sections)+len(sequence)+15)&~15
+    if len(asset) != expected: raise ValueError('Compiled object size differs from preflight')
+    return bytes(asset), destinations, records, sequence_record
 
 
 def draw_sequence(profile, body_bytes, sections):
@@ -722,23 +754,10 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
     objects = []
     for row in rows:
         item = int(row['item_id'], 16)
-        profile, body, resources, offsets, models, commands, sections = prepare(source, item)
+        prepared = prepare(source, item)
+        profile, body, resources, offsets, models, commands, sections = prepared
         directory = output/row['item_id']; directory.mkdir()
-        source_file = directory/'commands.c'; write_new(source_file, commands.encode())
-        compiled = compile_commands(directory/'gbi', source_file, sections)
-        asset, destinations, records = bytearray(body), {}, []
-        for label, model in models.items():
-            asset.extend(bytes(-len(asset)%8)); destinations[label] = len(asset); asset.extend(compiled[label])
-            records.append(dict(layer=label, symbol=model['symbol'], source_sha256=model['source_sha256'],
-                **({'source_parts':model['source_parts']} if 'source_parts' in model else {}),
-                native_offset=destinations[label], bytes=len(compiled[label]), output_sha256=sha256(compiled[label]),
-                triangles=sum(len(r.get('triangles',[])) for r in model['rows'])))
-        sequence_record,sequence=draw_sequence(profile,len(body),sections)
-        if sequence_record:
-            if (sequence_record['model_offsets']!=destinations or sequence_record['native_offset']!=len(asset)):
-                raise ValueError('Static draw sequence differs from compiled layout')
-            asset.extend(sequence)
-        asset.extend(bytes(-len(asset)%16))
+        asset, destinations, records, sequence_record = compile_models(directory, prepared)
         if len(asset) != row['object_bytes']: raise ValueError('Compiled object size differs from preflight')
         name = row['item_id']+'.n64obj.bin'; write_new(output/name, asset)
         objects.append(dict(**row.get('metadata',names[row['item_id']]), profile=profile, resources=resources, models=records,
@@ -763,15 +782,29 @@ def main():
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--select', action='append', default=[], help='Canonical donor ID; defaults to all supported new furniture')
     parser.add_argument('--category', help='Restrict to a discovered shared category, without an item list')
+    parser.add_argument('--representation', choices=('furniture','handheld'), default='furniture',
+                        help='Discover furniture profiles or actual held-equipment roots')
     parser.add_argument('--assets-only', action='store_true',
                         help='convert only: prepare artwork even when metadata/acquisition is unsupported; never install')
     parser.add_argument('--base-lock', type=Path, default=ROOT/'config/v3-import-build.json')
     args = parser.parse_args(); output = args.output.resolve()
     if args.assets_only and args.command != 'convert': parser.error('--assets-only requires convert')
     if args.category and args.command == 'scan': parser.error('--category requires convert or import')
+    if args.representation == 'handheld' and (args.command == 'import' or
+            args.command == 'convert' and not args.assets_only):
+        parser.error('Handheld assets require convert --assets-only; runtime integration is unfinished')
     if output.exists() or not output.is_relative_to(ROOT/'build'): raise ValueError('Use a fresh ignored build path')
     source = Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
                     (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    if args.representation == 'handheld':
+        from v3_handheld_items import scan as scan_handheld, convert as convert_handheld
+        if args.command == 'scan':
+            report = scan_handheld(source); output.parent.mkdir(parents=True, exist_ok=True)
+            write_new(output, (json.dumps(report, indent=2)+'\n').encode())
+            print(json.dumps(report['counts']))
+        else:
+            convert_handheld(source,output,args.select,category=args.category)
+        return
     worksheet = ROOT/'build/item-identity-megasheet.xlsx'
     from v3_furniture_install import inputs, build
     _, base_report = inputs(args.base_lock)

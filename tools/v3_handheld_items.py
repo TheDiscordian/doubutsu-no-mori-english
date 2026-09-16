@@ -1,0 +1,200 @@
+"""Source-discovered held equipment using the shared complete model converter.
+
+This is the player's actual equipment representation, not a catalogue model.
+Prepared objects do not enable inventory items, player actions, or acquisition.
+"""
+from collections import Counter
+import json
+import re
+import struct
+
+from aflib import sha256, u32
+from apply_translation import write_new
+
+
+FUNCTIONS = {
+    'item_kind': (0x69914, 'mPlib_Get_ItemNoToItemKind', 680,
+        '16977a47b6ceefbb9e55f6f6fe4cdce6d68f1aefa545a0e71a092eedc77f745c', 5, 0x1A),
+    'shape': (0x68AF4, 'mPlib_Get_BasicItemShapeIndex_fromItemKind', 44,
+        '379203f745c51d20cd81160595f62217b07772631eb42c7292f9c7d016d030bf', 4, 0x16),
+    'animation': (0x68B20, 'mPlib_Get_BasicItemAnimeIndex_fromItemKind', 44,
+        '379203f745c51d20cd81160595f62217b07772631eb42c7292f9c7d016d030bf', 4, 0x16),
+    'data': (0x68AC8, 'mPlib_Get_Item_DataPointer', 44,
+        'c680a1a4c11a931f5e25d0f72862b50b9dfd32a08502068981871eadc6151788', 5, 0x1A),
+    'type': (0x68B4C, 'mPlib_Get_Item_DataPointerType', 40,
+        'f168c50cbb095edfa0c11dfea34422ad106327937e8aa38b90e84d4a6a2e5af6', 4, 0x16),
+}
+PENDING = ('Prepared held artwork only; native equipment selection, player actions/animation, '
+           'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
+
+
+def discover(source):
+    """Follow item -> equipment kind -> shape/animation -> actual resource root."""
+    functions, tables, values = {}, {}, {}
+    byte_tables = {}
+    for name, location, span in re.findall(
+            r'^(\S+) = \.rodata:0x([0-9A-Fa-f]+);[^\n]* size:0x([0-9A-Fa-f]+) ',
+            source.symbols,re.M):
+        byte_tables.setdefault(int(location,16),[]).append((name,int(span,16)))
+    for role, (address, symbol, size, digest, section, low) in FUNCTIONS.items():
+        raw, receipt = source.function(address)
+        high = receipt['relocations'].get(0x12)
+        if (receipt['symbol'] != symbol or len(raw) != size or sha256(raw) != digest
+                or high is None or high[:3] != (6,1,section)
+                or receipt['relocations'] != {0x12:high,low:(4,1,section,high[3])}):
+            raise ValueError('Changed handheld equipment selector: '+role)
+        count = u32(raw,8)&0xFFFF
+        if role == 'item_kind': count += 1
+        stride = 4 if section == 5 else 1
+        at, n = high[3], count*stride
+        base, length = source.sections[section]
+        if not count or at+n > length:
+            raise ValueError('Handheld selector table escapes donor section')
+        data = source.data[at:at+n] if section == 5 else source.rel[base+at:base+at+n]
+        if section == 5 and source.containing(at,exact=True)[1:] != (at,n):
+            raise ValueError('Handheld selector does not use a complete table')
+        pointers = {}
+        if section == 5:
+            pointers = {key-at:row for key,row in source.relocations.items() if at <= key < at+n}
+            expected_section = 1 if role == 'item_kind' else 5
+            if (data != bytes(n) or set(pointers) != set(range(0,n,4)) or
+                    any(row[:3] != (1,True,expected_section) for row in pointers.values())):
+                raise ValueError('Incomplete or external handheld table pointers')
+        else:
+            # These are complete immutable byte tables, not pointer arrays.
+            # Their bounds come from the verified consumer, not an item count.
+            matches = byte_tables.get(at,[])
+            if len(matches)!=1 or matches[0][1]!=n:
+                raise ValueError('Handheld selector does not use a complete byte table')
+        functions[role] = receipt
+        tables[role] = dict(section=section,offset=at,bytes=n,count=count,sha256=sha256(data),
+                            pointers=pointers)
+        values[role] = data
+
+    count=tables['data']['count']
+    if tables['type']['count'] != count or tables['shape']['count'] != tables['animation']['count']:
+        raise ValueError('Handheld table counts disagree')
+    raw,_=source.function(FUNCTIONS['item_kind'][0])
+    first=-struct.unpack_from('>h',raw,6)[0]
+    rows=[]; rejected=[]
+    names=source.raw('itemName_tool')
+    if first>>8 != 0x22 or len(names) != tables['item_kind']['count']*16:
+        raise ValueError('Handheld selector/name inventory disagrees')
+    for i in range(tables['item_kind']['count']):
+        target=tables['item_kind']['pointers'][i*4][3]
+        relative=target-FUNCTIONS['item_kind'][0]
+        if (relative<0x28 or relative%8 or relative+8>len(raw)
+                or u32(raw,relative)&0xFFFF0000 != 0x38600000
+                or u32(raw,relative+4)!=0x4E800020):
+            raise ValueError('Handheld switch target is not a complete constant return')
+        kind=struct.unpack_from('>h',raw,relative+2)[0]
+        item=first+i
+        if kind==-1:
+            rejected.append(f'{item:04X}');continue
+        if not 0<=kind<tables['shape']['count']-1:
+            raise ValueError('Handheld equipment kind escapes complete tables')
+        shape=struct.unpack_from('b',values['shape'],kind)[0]
+        animation=struct.unpack_from('b',values['animation'],kind)[0]
+        if not -1<=shape<count or not -1<=animation<count:
+            raise ValueError('Handheld shape/animation escapes resource table')
+        name_raw=names[(item&255)*16:(item&255)*16+16]
+        name=name_raw.decode('ascii').rstrip(' ')
+        if not name or len(name_raw)!=16:
+            raise ValueError('Handheld parent has no complete name')
+        row=dict(id=f'GAFE01-r0/item/{item:04X}',item_id=f'{item:04X}',name=name,
+            name_sha256=sha256(name_raw),name_source_symbol='itemName_tool',name_source_index=item&255,
+            equipment_kind=kind,shape_index=shape,
+            animation_index=animation,runtime_installed=False,selectable=False)
+        if shape==-1:
+            row.update(category='separate-equipment-owner',
+                       reason='The donor selects no root here; umbrella ownership needs its separate adapter.')
+        else:
+            root=tables['data']['pointers'][shape*4][3]
+            name,at,n=source.containing(root,exact=True)
+            data_type=values['type'][shape]
+            if data_type not in (0,1):
+                raise ValueError('Handheld shape selects an animation or unknown resource type')
+            row.update(data_type=data_type,model_root=dict(symbol=name,offset=at,bytes=n),
+                       category='static-held-model' if data_type==0 else 'animated-held-model')
+            if data_type!=0:
+                row['reason']='Actual held skeleton/animation and player behaviour need integration; not a static model.'
+        rows.append(row)
+    return dict(format='AFV3-HANDHELD-SOURCES-1',source_rel_sha256=sha256(source.rel),
+        source_symbols_sha256=sha256(source.symbols.encode()),functions=functions,tables=tables,
+        rejected_item_ids=rejected,rows=rows)
+
+
+def annotate_inventory(items,held):
+    """Attach actual equipment dependencies to the single donor inventory."""
+    by_id={row['donor_item_id']:row for row in items}
+    if len(by_id)!=len(items):raise ValueError('Duplicate donor inventory identity')
+    for row in held['rows']:
+        target=by_id.get(row['item_id'])
+        if target is None or target['name_sha256']!=row['name_sha256'] or target['selectable']:
+            raise ValueError('Handheld source does not bind the complete donor inventory')
+        target['handheld']=row
+
+
+def descriptor(row):
+    if row['category']!='static-held-model' or row.get('data_type')!=0:
+        raise ValueError('Handheld skeletons/owners cannot become static substitutes')
+    model=row['model_root']
+    return dict(kind='static-held-model',shape_index=row['shape_index'],
+                models={'opaque':(model['symbol'],model['offset'],model['bytes'])})
+
+
+def scan(source):
+    from v3_furniture_pipeline import prepare_models
+    report=discover(source)
+    prepared={}
+    for row in report['rows']:
+        row['asset_ready']=False
+        if row['category']!='static-held-model':continue
+        index=row['shape_index']
+        if index not in prepared:
+            try:
+                _,body,resources,_,models,_,sections=prepare_models(source,descriptor(row))
+                prepared[index]=dict(asset_ready=True,object_bytes=(len(body)+sum(n for _,n in sections)+15)&~15,
+                    vertices=sum(r['bytes']//16 for r in resources if r['kind']=='vertices'),
+                    triangles=sum(len(r.get('triangles',[])) for m in models.values() for r in m['rows']),
+                    reason=PENDING)
+            except ValueError as error:
+                prepared[index]=dict(asset_ready=False,reason=str(error))
+        row.update(prepared[index])
+    report['counts']=dict(Counter(r['category'] for r in report['rows']))
+    report['counts']['prepared_model_roots']=sum(r['asset_ready'] for r in prepared.values())
+    report['counts']['usable_imports']=0
+    return report
+
+
+def convert(source,output,selected=(),*,category=None):
+    from v3_furniture_pipeline import prepare_models,compile_models
+    if category not in (None,'static-held-model'):
+        raise ValueError('Unsupported handheld conversion category')
+    inventory=scan(source)
+    requested=set(selected)
+    candidates=[r for r in inventory['rows'] if not requested or r['item_id'] in requested]
+    if requested and (requested!={r['item_id'] for r in candidates} or
+                      any(not r['asset_ready'] for r in candidates)):
+        raise ValueError('Unsupported or unknown selected handheld item')
+    candidates=[r for r in candidates if r['asset_ready']]
+    if not candidates:raise ValueError('No supported handheld models')
+    output.mkdir(parents=True,exist_ok=False);objects=[]
+    for index in sorted({r['shape_index'] for r in candidates}):
+        parents=[r for r in candidates if r['shape_index']==index]
+        prepared=prepare_models(source,descriptor(parents[0]))
+        key=f'data-{index:04X}';directory=output/key;directory.mkdir()
+        asset,locations,models,sequence=compile_models(directory,prepared)
+        if sequence is not None or len(asset)!=parents[0]['object_bytes']:
+            raise ValueError('Handheld compilation differs from shared preflight')
+        filename=key+'.n64obj.bin';write_new(output/filename,asset)
+        objects.append(dict(shape_index=index,parent_item_ids=[r['item_id'] for r in parents],
+            profile=prepared[0],resources=prepared[2],models=models,model_offsets=locations,
+            object_file=filename,object_bytes=len(asset),object_sha256=sha256(asset)))
+        print(json.dumps(dict(converted=key,parents=[r['item_id'] for r in parents],bytes=len(asset))),flush=True)
+    report=dict(format='AFV3-HANDHELD-PREPARED-ASSETS-1',version=1,
+        source_rel_sha256=inventory['source_rel_sha256'],source_symbols_sha256=inventory['source_symbols_sha256'],
+        objects=objects,runtime_installed=False,selectable=False,pending_reason=PENDING)
+    write_new(output/'inventory.json',(json.dumps(inventory,indent=2)+'\n').encode())
+    write_new(output/'art.json',(json.dumps(report,indent=2)+'\n').encode())
+    return report

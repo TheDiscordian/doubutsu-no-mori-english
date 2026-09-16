@@ -1,5 +1,56 @@
 # Automatic furniture pipeline checkpoint
 
+## Actual held-model batch
+
+The shared converter prepares fourteen actual handheld models for nineteen
+donor item/state IDs: eight fans, the ordinary/golden shovel, and four axe
+appearances. Complete source discovery follows item-to-kind, kind-to-shape/
+animation, resource-pointer, and resource-type functions and their full tables.
+It classifies 79 equipment records: nineteen static, twenty animated, and forty
+using separate umbrella ownership. Thirteen rejected item IDs remain rejected.
+The full donor inventory attaches these records to its existing identities.
+
+`prepare_models` and `compile_models` are shared with the furniture path;
+no second graphics converter or per-item integration script is introduced.
+The batch retains all 25,888 artwork bytes, 334 vertices, and 244 triangles.
+It is prepared-only: native selection/actions/animation, model ownership,
+readers, acquisition, catalogue/collection, and save-profile integration remain.
+The distinct prepared format is rejected by the furniture installer. Static
+models are not substituted for skeletons, and ordinary tools are not new choices.
+
+Generated outputs:
+
+- `build/v3-handheld-static-prepared-02/art.json`, SHA-256
+  `a7f97f5ef8ecf6c8c4df3b1961a1f38cf5974b5696e8e0c4904897a6cfd724e6`.
+- `build/v3-handheld-static-prepared-02/inventory.json`, SHA-256
+  `8af47296a224e1d524108e71b16c8526be4d2adc6811b468a76587a9d3434ab4`.
+- `build/v3-handheld-source-02/donor-catalogue.json`, SHA-256
+  `956a4d7305b97ab8489061613234c2a44f0db8f21cb49e6616d68f7f91d4942f`.
+
+Eleven distinct focused checks pass: nine in `test_v3_handheld_items`, plus
+the existing static-linker and complete-current-furniture-artwork checks.
+Coverage includes full source functions/tables/relocations, correct wear-state
+shapes, single-inventory identity/name binding, unsupported-selection and
+installation rejection, and every model's complete texels, vertices, triangles,
+material state, bounds, and native commands. Recompiling the two current
+constant-model-sequence assets through the factored compiler reproduces their
+complete objects and receipts. This is not an old-cartridge emulator replay.
+
+The initial seven-test run passes six checks and finds an incorrect custom-
+umbrella range in one new test: the actual donor accepts `2224..222B`, not
+through `2230`. Production discovery already has the correct bounds. The
+corrected focused check and two existing checks pass; two further CLI/type
+rejection checks also pass. No inconclusive or failed game result is hidden.
+
+The original and ABI-96 native equipment selector agree over all 396 bytes at
+`808BD3F8..808BD583`, SHA-256
+`3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b`.
+It only accepts ordinary IDs `2200..2223`; new held graphics therefore require
+actual player integration. The donor fan draw/action and player-animation
+entries are identified in [the equipment spec](../../specs/V3_HANDHELD_ITEMS.md).
+The current cartridge/ABI, 104 installed choices, saved format, and both served
+patchers remain unchanged. No new ordinary gameplay or hardware claim is made.
+
 ## Parent display contexts
 
 The donor's conversion flag has different values in ordinary room placement

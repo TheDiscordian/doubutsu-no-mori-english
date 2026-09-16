@@ -565,10 +565,11 @@ class DonorTests(unittest.TestCase):
             self.assertEqual(struct.unpack_from('>4I',native,16),(0x06000000+linked['native_offset'],0,0,0))
             self.assertEqual(native[32:48],bytes(16));self.assertEqual(native[-4:],bytes(4))
 
-    def check_complete_artwork(self,art,report):
+    def check_complete_artwork(self,art,report,prepare=None):
+        prepare = prepare or (lambda row:pipeline.prepare(self.source,int(row['item_id'],16)))
         for row in report['objects']:
             asset=(art/row['object_file']).read_bytes()
-            descriptor,body,resources,offsets,models,_,sections=pipeline.prepare(self.source,int(row['item_id'],16))
+            descriptor,body,resources,offsets,models,_,sections=prepare(row)
             self.assertEqual(asset[:len(body)],body)
             self.assertEqual(sha256(asset),row['object_sha256'])
             vertex=next(r for r in resources if r['kind']=='vertices')

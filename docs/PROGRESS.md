@@ -2,6 +2,20 @@
 
 ## Active development
 
+The [shared handheld adapter](../specs/V3_HANDHELD_ITEMS.md) discovers all 79
+donor equipment IDs/states and prepares fourteen actual held models in one
+batch: eight fans, ordinary/golden shovels, and four axe appearances. The
+25,888-byte batch retains 334 vertices and 244 triangles through the existing
+complete furniture graphics converter. Nineteen item/state records share these
+fourteen roots. Animated equipment and separate umbrella owners retain their
+missing dependencies; no static substitutes or selectable imports are created.
+Eleven focused checks pass, including complete artwork and unchanged current
+furniture output from the shared compiler. The full donor inventory carries the
+same equipment dependencies without duplicate identities. Native player actions,
+model ownership, readers, acquisition, catalogue, and profile integration remain
+work; the cartridge, saves, and both patchers are unchanged. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#actual-held-model-batch).
+
 The shared importer distinguishes ordinary room drops from catalogue/collection
 representations using all four actual donor calls and three complete consumer
 implementations. Tools, golden tools, fans, pinwheels, and diaries retain their

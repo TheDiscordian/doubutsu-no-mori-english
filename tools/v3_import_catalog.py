@@ -174,8 +174,12 @@ def build_catalog(n64_path, disc_path, decomp):
         raise ValueError('Duplicate V3 donor identity')
     from v3_furniture_pipeline import Source
     from v3_room_aliases import discover, annotate_inventory
-    aliases = discover(Source(rel, symbol_bytes))
+    from v3_handheld_items import discover as discover_held, annotate_inventory as annotate_held
+    source = Source(rel, symbol_bytes)
+    aliases = discover(source)
     annotate_inventory(items, aliases)
+    handheld = discover_held(source)
+    annotate_held(items, handheld)
     return {
         'format': 'AFV3-INVENTORY-1',
         'status': 'research_inventory_not_patch_or_supported_options',
@@ -192,6 +196,7 @@ def build_catalog(n64_path, disc_path, decomp):
             'selectable_imports': 0,
         },
         'villagers': villagers, 'item_groups': groups, 'items': items, 'room_aliases': aliases,
+        'handheld_equipment': handheld,
     }
 
 
