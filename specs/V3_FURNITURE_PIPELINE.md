@@ -200,6 +200,29 @@ This linking method is independent of an item's identity or theme. A constant
 draw callback is removed only after its complete lack of additional effects is
 verified; this is not a mechanism for stripping animations.
 
+The `indexed-model-sequence` category supports constant identity-indexed draws
+with one or two ordered opaque lists and an optional conditional translucent
+pair. Complete reviewed instructions, all relocations, matrix-helper targets,
+full pointer tables, bounded index masks, and the conditional selector establish
+the rule. The table origin and conditional identity are checked parameters, not
+per-item code. Every lifecycle callback must still be a complete no-op. Changed
+effects, missing pointers, unsupported branches, or out-of-range selection fail.
+
+Material-only and geometry-only lists are joined in their actual call order for
+each command stream. Only intermediate final-return commands are removed; all
+state, resources, and geometry remain. Complete per-part source offsets, sizes,
+hashes, and joined positions are retained in `source_parts`. The usual strict
+material/triangle parser processes the resulting list, so an incomplete state
+setup, bad termination, nested unsupported call, or unaccounted relocation still
+fails. Opaque and translucent lists stay separate native profile slots; the
+fishing rods' conditional translucent pieces are not omitted or drawn opaque.
+No runtime callback or new allocation is needed for this constant selection.
+
+This shared category prepares all eight fans, eight pinwheels, four golden-tool
+displays, and four ordinary-tool displays with one conversion command. These
+remain parent-item aliases requiring actual parent gameplay and room conversion;
+prepared graphics do not make them standalone furniture imports.
+
 The `switch-palette-fade` category discovers the complete shared building-model
 callbacks. It checks all four compiled functions, normalising only verified
 address relocations and local call displacements. Every call target, paired
@@ -271,7 +294,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 8 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 9 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -281,7 +304,7 @@ being discarded. New art starts at that checked boundary, followed by the rebuil
 owners and updated DMA mappings. Existing model VROMs and saved identities do
 not move. The receipt records the reused range and source hashes. Only the fresh
 output changes; input ROMs, earlier builds, and saves remain untouched.
-Revision-7 artwork uses the same model format and remains accepted only after
+Revision-7/8 artwork uses the same model format and remains accepted only after
 all current source, identity, metadata, and complete-asset checks pass.
 
 Stock and catalogue builders accept verified records without family switches.

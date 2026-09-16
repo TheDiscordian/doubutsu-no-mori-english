@@ -24,7 +24,7 @@ from v3_registry import FURNITURE
 from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 8
+VERSION = 9
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -56,6 +56,15 @@ STATIC_SEQUENCE_CODE = {
     116: ('76825aad3256c4118369c78a4240d0264e2e3dc18516ad1d386edf10dfaad8d1', ((0x3E,0x4A),)),
     172: ('d6dde5a8fad4d727364de9b717ef27562e128d4149e3e6da49846727ac9e7d2d',
           ((0x3E,0x52),(0x42,0x56),(0x46,0x5E))),
+}
+# Complete indexed draw shapes. Checked table bases/conditional selectors are
+# parameters; no item names or per-item model descriptions select this category.
+INDEXED_SEQUENCE_CODE = {
+    136: ('b472481116e0056e1a592d37240c1c2394c07cdbdbaaed42354a180696c30288', ((0x4A,0x5A),)),
+    168: ('6ed186883c4fd49a47d3e9a7077c111a37ac685cb7462e0167cfd475e4cebb33',
+          ((0x4A,0x5E),(0x4E,0x62))),
+    284: ('288e2fc954229a6c8ac6dc48702c5dcedabc03857f352c02508926d0e02e7459',
+          ((0x52,0x66),(0x56,0x6A))),
 }
 
 
@@ -157,12 +166,17 @@ class Source:
         return raw, dict(symbol=name, offset=target, bytes=n, sha256=sha256(raw),
                         relocations=relocations)
 
-    def checked_callback_code(self, receipt, size, digest, expected, calls, category):
-        """Normalise only independently checked address fields and helper calls."""
+    def checked_callback_code(self, receipt, size, digest, expected, calls, category, constants=None):
+        """Normalise checked addresses, helper calls, and bounded selector fields."""
         def reject(reason): raise ReviewRequired('custom callbacks: '+category+' '+reason)
         if receipt['bytes'] != size or receipt['relocations'] != expected:
             reject('changed dependencies')
         raw, _ = self.function(receipt['offset']); normalized = bytearray(raw)
+        constants = {} if constants is None else constants
+        for loc, value in constants.items():
+            if loc%4 != 2 or not 0 <= loc < size-1 or loc in expected or struct.unpack_from('>H',raw,loc)[0] != value:
+                reject('changed selector constant')
+            normalized[loc:loc+2] = bytes(2)
         for loc, (kind, _, _, _) in expected.items():
             if kind in (4,6): normalized[loc:loc+2] = bytes(2)
             elif kind == 10: struct.pack_into('>I',normalized,loc,u32(raw,loc)&0xFC000003)
@@ -184,6 +198,7 @@ class Source:
         if set(found) != set(calls) or sha256(normalized) != digest:
             reject('unrecognised complete implementation')
         receipt.update(normalized_sha256=digest, local_calls=found)
+        if constants: receipt['selector_constants'] = constants
         return helpers
 
     def callback_models(self, profile_at, index):
@@ -211,6 +226,8 @@ class Source:
         draw = functions['draw']
         if draw['bytes'] in STATIC_SEQUENCE_CODE:
             return self.static_sequence_models(name,at,functions)
+        if draw['bytes'] in INDEXED_SEQUENCE_CODE:
+            return self.indexed_sequence_models(name,at,functions,index)
         if draw['sha256'] != INDEXED_STATIC_DRAW_SHA: reject('unrecognised draw implementation')
         raw, _ = self.function(draw['offset'])
         table_pointer = draw['relocations'].get(0x1A)
@@ -256,6 +273,73 @@ class Source:
         return models,{},dict(category='constant-model-sequence',vtable_symbol=name,vtable_offset=at,
             functions=functions,helpers=helpers,model_order=list(models),draw_arena='opaque',
             null_callbacks=[r for r in ('create','move','destroy') if r not in functions])
+
+    def indexed_sequence_models(self, name, at, functions, index):
+        """Select complete ordered lists, retaining conditional translucent parts."""
+        def reject(reason): raise ReviewRequired('custom callbacks: indexed sequence ' + reason)
+        draw=functions['draw'];size=draw['bytes'];digest,pairs=INDEXED_SEQUENCE_CODE[size]
+        raw,_=self.function(draw['offset']);module=u32(self.rel,0)
+        special=size==284;constant=0x32 if special else 0x2A
+        first=-struct.unpack_from('>h',raw,constant)[0]
+        mask=u32(raw,0x3C if special else 0x34)
+        leading=mask>>6&31
+        if leading not in (29,30) or mask>>11&31 or mask>>1&31!=31:
+            reject('unsupported index mask')
+        count=1<<(32-leading);selected=index-first
+        if not 0 <= selected < count: reject('selector escapes the complete table')
+        constants={constant:(-first)&65535}
+        expected={0x10:(10,0,4,0x8009AECC if special else 0x8009AED4),
+                  size-20:(10,0,4,0x8009AF18 if special else 0x8009AF20)}
+        parts=[];tables=[]
+        for hi,lo in pairs:
+            pointer=draw['relocations'].get(hi)
+            if pointer is None or pointer[:3]!=(6,module,5):reject('missing selector table')
+            target=pointer[3];symbol,base,n=self.containing(target,exact=True)
+            if n!=count*4 or self.data[base:base+n]!=bytes(n):reject('changed complete selector table')
+            pointers=self.pointers(base,n)
+            if set(pointers)!=set(range(base,base+n,4)):reject('incomplete selector table')
+            models=[self.containing(pointers[p],exact=True) for p in range(base,base+n,4)]
+            expected.update({hi:(6,module,5,target),lo:(4,module,5,target)})
+            tables.append(dict(symbol=symbol,offset=base,bytes=n,sha256=sha256(self.data[base:base+n]),
+                               pointers=pointers))
+            parts.append(models[selected])
+        sequences={'opaque':parts};conditional=[]
+        if special:
+            selector=struct.unpack_from('>H',raw,0x9E)[0]
+            if selector!=first+count-1:reject('changed conditional layer selector')
+            constants[0x9E]=selector
+            for hi,lo in ((0xCA,0xDA),(0xCE,0xDE)):
+                pointer=draw['relocations'].get(hi)
+                if pointer is None or pointer[:3]!=(6,module,5):reject('missing translucent dependency')
+                target=pointer[3];conditional.append(self.containing(target,exact=True))
+                expected.update({hi:(6,module,5,target),lo:(4,module,5,target)})
+            if index==selector:sequences['translucent']=conditional
+        calls={loc:(643604,'_Matrix_to_Mtx_new') for loc in ((0x48,0xC0) if special else (0x40,))}
+        helpers=self.checked_callback_code(draw,size,digest,expected,calls,'indexed sequence',constants)
+        return {label:parts[0] for label,parts in sequences.items()}, {}, dict(
+            category='indexed-model-sequence',vtable_symbol=name,vtable_offset=at,
+            functions=functions,helpers=helpers,tables=tables,first_runtime_index=first,
+            selected_index=selected,entries=count,model_sequences=sequences,
+            conditional_translucent=conditional)
+
+    def model_sequence(self, parts):
+        """Join ordered state/geometry lists, removing only intermediate returns."""
+        joined=bytearray();pointers={};receipts=[]
+        for i,(name,at,n) in enumerate(parts):
+            if n<8 or n%8 or self.containing(at,exact=True)!=(name,at,n):
+                raise ReviewRequired('invalid complete model sequence part')
+            raw=self.data[at:at+n]
+            if raw[-8:]!=struct.pack('>II',0xDF000000,0):
+                raise ReviewRequired('model sequence part lacks a final return')
+            fixes=self.pointers(at,n)
+            if any(p>=at+n-8 for p in fixes):
+                raise ReviewRequired('relocated model sequence return')
+            receipts.append(dict(symbol=name,donor_offset=at,bytes=n,sha256=sha256(raw),
+                                 joined_offset=len(joined)))
+            pointers.update({len(joined)+p-at:target for p,target in fixes.items()})
+            joined.extend(raw[:-8] if i<len(parts)-1 else raw)
+        if not receipts:raise ReviewRequired('empty model sequence')
+        return bytes(joined),pointers,receipts
 
     def palette_fade_models(self, name, at, functions):
         """Resolve the shared three-model, two-endpoint light-switch behaviour."""
@@ -388,7 +472,11 @@ def prepare(source, item):
     bindings, used_bindings = descriptor.get('palette_bindings', {}), set()
     for label, (name, at, n) in descriptor['models'].items():
         if n%8: raise ReviewRequired('unaligned display list')
-        raw, pointers = source.data[at:at+n], source.pointers(at, n)
+        parts=adapter.get('model_sequences',{}).get(label)
+        if parts:
+            raw,pointers,receipts=source.model_sequence(parts);at=0;n=len(raw)
+        else:
+            raw,pointers,receipts=source.data[at:at+n],source.pointers(at,n),None
         position = 0
         while position < n:
             a, b = struct.unpack_from('>II', raw, position)
@@ -423,7 +511,7 @@ def prepare(source, item):
                 position += (1 + (max(0, count-3)+3)//4)*8
             else: position += 8
             if position > n: raise ReviewRequired('truncated packed model')
-        raw_models[label] = name, at, raw, pointers
+        raw_models[label] = name, at, raw, pointers, receipts
     if used_bindings != set(bindings): raise ReviewRequired('unused constant palette binding')
     if fading and not dynamic_used: raise ReviewRequired('unused palette-fade dependency')
     if (any(r[4]==2 for r in textures.values()) and not palettes) or len(vertex_arrays) != 1:
@@ -444,8 +532,9 @@ def prepare(source, item):
     vertex, (name, n) = next(iter(vertex_arrays.items()))
     add(vertex, name, n, lambda data: normalise_vertex_flags(data)[0], kind='vertices')
     models = {}
-    for label, (name, at, raw, pointers) in raw_models.items():
+    for label, (name, at, raw, pointers, receipts) in raw_models.items():
         models[label] = dict(symbol=name, donor_offset=at, source_sha256=sha256(raw),
+            **({'source_parts':receipts} if receipts else {}),
             rows=parse_model(raw, at, pointers, tuple(palettes),
                 {p:(r[2], r[3]) for p,r in textures.items()}, vertex, n, static_materials=True,
                 palette_bindings=bindings, palette_fade=fading))
@@ -641,6 +730,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
         for label, model in models.items():
             asset.extend(bytes(-len(asset)%8)); destinations[label] = len(asset); asset.extend(compiled[label])
             records.append(dict(layer=label, symbol=model['symbol'], source_sha256=model['source_sha256'],
+                **({'source_parts':model['source_parts']} if 'source_parts' in model else {}),
                 native_offset=destinations[label], bytes=len(compiled[label]), output_sha256=sha256(compiled[label]),
                 triangles=sum(len(r.get('triangles',[])) for r in model['rows'])))
         sequence_record,sequence=draw_sequence(profile,len(body),sections)

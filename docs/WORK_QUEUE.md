@@ -2,6 +2,16 @@
 
 ## Active: V3 optional GameCube imports
 
+The indexed-model-sequence category prepares all 24 fan, pinwheel, ordinary-tool,
+and golden-tool display models at
+`build/v3-furniture-indexed-sequence-prepared-01/`. Their complete 46,832 bytes,
+852 vertices, 566 triangles, and 44 source parts are retained, including both
+fishing rods' separate translucent layers. One shared rule derives the tables,
+indices, conditions, and material/geometry order; no item-specific installer or
+runtime callback is needed. Reuse these assets when implementing parent gameplay
+and the shared room placement/pickup adapter. They remain prepared-only, not
+selectable independent furniture. ABI 95 and both served patchers are unchanged.
+
 The shared room-alias discovery connects all 48 extra donor display models to
 their actual parent items; 44 appear in the `3xxx` queue. It retains both
 conversion functions, original name evidence, rotations, the no-tool-conversion
@@ -9,7 +19,7 @@ condition, and the seven worn-axe inputs returning the ordinary axe. The full
 donor catalogue and browser review data use these records. Native parent identity
 and room conversion remain work; discovery does not enable standalone display
 models. Continue one shared parent/placement/pickup implementation, not separate
-furniture acquisition scripts. New converter revision 8 leaves ABI 95, saves,
+furniture acquisition scripts. Converter revision 9 leaves ABI 95, saves,
 and both served V2 patchers unchanged. See the
 [pipeline checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 

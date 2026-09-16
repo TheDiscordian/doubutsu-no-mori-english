@@ -227,6 +227,64 @@ class DonorTests(unittest.TestCase):
         cls.art=ROOT/current['automatic_furniture']['art_directory']
         cls.report=json.loads((cls.art/'art.json').read_bytes())
 
+    def test_indexed_model_sequences_discover_complete_categories_and_conditional_layers(self):
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',[])
+        rows=[r for r in inventory['rows'] if 'indexed-model-sequence' in r.get('categories',[])]
+        self.assertEqual(len(rows),24)
+        self.assertTrue(all(r['asset_ready'] and r['status']=='review' and 'room_alias' in r for r in rows))
+        self.assertEqual(sum('translucent' in r['profile']['models'] for r in rows),2)
+        for row in rows:
+            item=int(row['item_id'],16);profile,_,_,_,models,_,_=pipeline.prepare(self.source,item)
+            adapter=profile['callback_adapter'];draw=adapter['functions']['draw']
+            self.assertEqual(draw['normalized_sha256'],pipeline.INDEXED_SEQUENCE_CODE[draw['bytes']][0])
+            self.assertEqual(adapter['selected_index'],1024+(item-0x3000)//4-adapter['first_runtime_index'])
+            self.assertEqual(set(models),set(adapter['model_sequences']))
+            for label,parts in adapter['model_sequences'].items():
+                raw,pointers,receipts=self.source.model_sequence(parts)
+                originals=[self.source.data[a:a+n] for _,a,n in parts]
+                self.assertEqual(raw,b''.join(r[:-8] for r in originals[:-1])+originals[-1])
+                self.assertEqual(receipts,models[label]['source_parts'])
+                self.assertEqual(sha256(raw),models[label]['source_sha256'])
+                for part in receipts:
+                    a,n=part['donor_offset'],part['bytes']
+                    self.assertEqual(part['sha256'],sha256(self.source.data[a:a+n]))
+                    for p,target in data_pointers(self.source.rel,a,n).items():
+                        self.assertEqual(pointers[part['joined_offset']+p-a],target)
+            if adapter['conditional_translucent']:
+                self.assertEqual('translucent' in models,adapter['selected_index']==adapter['entries']-1)
+                if 'translucent' in models:
+                    self.assertEqual(adapter['model_sequences']['translucent'],adapter['conditional_translucent'])
+
+    def test_indexed_sequences_reject_extra_effects_incomplete_tables_and_bad_returns(self):
+        # One representative per actual compiled draw shape, not one scenario per item.
+        inventory=pipeline.scan(self.source,ROOT/'build/item-identity-megasheet.xlsx',[])
+        shapes={r['profile']['callback_adapter']['functions']['draw']['bytes']:r
+            for r in inventory['rows'] if 'indexed-model-sequence' in r.get('categories',[])}
+        self.assertEqual(set(shapes),{136,168,284})
+        for row in shapes.values():
+            item=int(row['item_id'],16);adapter=row['profile']['callback_adapter'];draw=adapter['functions']['draw']
+            changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+            changed.rel[self.source.sections[1][0]+draw['offset']+0x20]^=1
+            with self.assertRaisesRegex(ValueError,'indexed sequence'):changed.profile(item)
+            changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+            changed.relocations.pop(adapter['tables'][0]['offset'])
+            changed.relocation_addresses=sorted(changed.relocations)
+            with self.assertRaisesRegex(ValueError,'selector table'):changed.profile(item)
+            parts=adapter['model_sequences']['opaque'];_,at,n=parts[-1]
+            changed=copy.copy(self.source);changed.data=bytearray(self.source.data)
+            changed.data[at+n-1]^=1
+            with self.assertRaisesRegex(ValueError,'final return'):changed.model_sequence(parts)
+            changed=copy.copy(self.source);changed.relocations=dict(self.source.relocations)
+            changed.relocations[at+n-4]=(1,True,5,at)
+            changed.relocation_addresses=sorted(changed.relocations)
+            with self.assertRaisesRegex(ValueError,'relocated model sequence return'):changed.model_sequence(parts)
+            with self.assertRaisesRegex(ValueError,'selector escapes'):
+                self.source.callback_models(row['profile']['profile_offset'],adapter['first_runtime_index']-1)
+            if adapter['conditional_translucent']:
+                changed=copy.copy(self.source);changed.rel=bytearray(self.source.rel)
+                changed.rel[self.source.sections[1][0]+draw['offset']+0x9F]^=1
+                with self.assertRaisesRegex(ValueError,'conditional layer selector'):changed.profile(item)
+
     def test_actual_donor_executable_maps_direct_colour_to_rgb5a3(self):
         from v3_villager_audio import read_audio_donor
         dol,_=read_audio_donor(ROOT/'local/gamecube/Animal Crossing (USA, Canada).ciso')
@@ -460,6 +518,16 @@ class DonorTests(unittest.TestCase):
                 with self.assertRaises(pipeline.ReviewRequired) as error:
                     pipeline.metadata(self.source,item,self.source.profile(item),identities[item])
                 self.assertEqual(str(error.exception),row['pending_reason'])
+            if 'room_alias' in row:
+                alias=next(r for r in pipeline.room_aliases(self.source)['rows'] if r['display_item_id']==row['item_id'])
+                self.assertEqual(row['room_alias'],alias)
+            if row['profile'].get('callback_adapter',{}).get('category')=='indexed-model-sequence':
+                native=install.profile(row,0x02500000)
+                self.assertEqual(struct.unpack_from('>4I',native,16),tuple(
+                    0x06000000+row['model_offsets'][label] if label in row['model_offsets'] else 0
+                    for label in pipeline.LAYERS))
+                self.assertEqual(native[32:48],bytes(16))
+                self.assertEqual(native[-4:],bytes(4))
         self.check_complete_artwork(art,report)
 
     def test_shared_palette_runtime_with_prepared_source_objects_under_sanitizers(self):
@@ -530,6 +598,7 @@ class DonorTests(unittest.TestCase):
                         self.assertEqual(native[start+6:start+8],bytes(2))
                         self.assertEqual(native[start+8:start+16],donor[start+8:start+16])
             for model in row['models']:
+                self.assertEqual(model.get('source_parts'),models[model['layer']].get('source_parts'))
                 start,n=model['native_offset'],model['bytes']; faces=[]; state=[]; loads=[]
                 self.assertEqual(n,dict(sections)[model['layer']])
                 first,count=0,0

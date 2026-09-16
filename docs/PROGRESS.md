@@ -2,6 +2,16 @@
 
 ## Active development
 
+The [indexed model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
+automatically converts all 24 fan, pinwheel, and tool display models in one batch:
+46,832 bytes, 852 vertices, and 566 triangles. Complete source verification
+preserves 44 original model parts across 26 native lists, including both fishing
+rods' translucent layers. Material and geometry lists retain their actual order;
+no per-item script or runtime callback is added. Parent-item and room-conversion
+dependencies remain explicit, so these are prepared assets, not new selectable
+imports. Converter/installer revision 9 leaves ABI 95, saves, and served patchers
+unchanged.
+
 The shared [room-alias discovery](checkpoints/V3_FURNITURE_PIPELINE.md)
 connects 48 room-display models to parent items across balloons, diaries, fans,
 pinwheels, ordinary tools, and golden tools. Complete donor placement/pickup and
@@ -10,7 +20,7 @@ actual single parent. The full donor catalogue, furniture scan, prepared-asset
 records, and browser review data consume this relationship. Forty-four aliases
 occur in the `3xxx` furniture queue. They cannot install as unrelated furniture;
 their missing parent/room support and separate artwork gaps remain explicit.
-Converter/installer revision 8 changes discovery, not the cartridge or saves.
+Room-alias discovery changes no cartridge code or saves.
 ABI 95 and both served V2 patchers remain unchanged.
 
 The [constant model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
@@ -73,9 +83,9 @@ The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplie
 forty-two additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
 installer, graphics description, or native scenario is needed. Converter/installer
-revision 8 includes winter-camping rewards, shared winter/summer selection,
+revision 9 includes winter-camping rewards, shared winter/summer selection,
 data-driven palette callbacks, constant model sequences, and parent-item alias
-classification. No item-specific browser entry is required.
+classification/indexed model sequences. No item-specific browser entry is required.
 
 The development cartridge uses source-derived canonical reward records
 for camping and Gulliver. No summer-item array is maintained in the runtime.

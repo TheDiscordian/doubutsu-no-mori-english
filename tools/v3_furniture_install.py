@@ -28,7 +28,7 @@ import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 8
+VERSION = 9
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
@@ -164,10 +164,9 @@ def scoring(base, prior, rows, source):
 
 def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
-    # Revision 8 adds identity/dependency records, not a changed model format.
-    # Prior revision-7 objects still undergo complete current metadata checks;
+    # Prior objects still undergo complete current metadata and model checks;
     # a display alias cannot pass as standalone furniture through an old report.
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, VERSION)
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, 8, VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')
@@ -199,6 +198,8 @@ def checked_assets(art_path, source, worksheet):
                 raise ValueError('Changed complete static draw order or targets')
         # Verify compiled display lists against the emitter's checked receipt.
         for model in row['models']:
+            if model.get('source_parts')!=models[model['layer']].get('source_parts'):
+                raise ValueError('Changed complete source model sequence')
             at,n = row['model_offsets'][model['layer']],model['bytes']
             if sha256(asset[at:at+n]) != model['output_sha256']:
                 raise ValueError('Changed converted display list')

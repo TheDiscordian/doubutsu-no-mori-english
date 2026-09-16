@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Indexed model-sequence conversion
+
+Converter/installer revision 9 adds the shared `indexed-model-sequence` category.
+The complete donor draw instructions, actual pointer-table relocations, bounded
+index masks, and matrix-helper calls identify three draw shapes. The ordinary
+and golden-tool callbacks use one normalised implementation with checked base
+and conditional-index parameters. All create/move/destroy callbacks remain
+verified no-ops. No item-specific model list, converter, or native scenario is
+added.
+
+The shared converter retains complete material-only and geometry-only lists in
+their original order. It removes only intermediate final returns when joining
+lists on the same command stream. Every original part retains its source offset,
+size, hash, and joined position. The ordinary strict graphics parser then checks
+the complete joined list. The fishing rods retain both their opaque sequence
+and conditional translucent sequence in separate native profile slots.
+No runtime callback, source resizing, model simplification, or new allocation
+is introduced.
+
+One unrestricted category conversion completes all 24 display models at
+`build/v3-furniture-indexed-sequence-prepared-01/`: eight fans, eight pinwheels,
+four ordinary tools, and four golden tools. They retain 46,832 bytes, 852 vertices,
+and 566 triangles. Forty-four original source parts become 26 complete native
+lists. All source-derived parent relationships and pending placement/pickup
+requirements remain attached to the prepared records. They are not selectable
+standalone furniture or completed parent-item gameplay.
+
+- Art receipt SHA-256: `fca095571099332fc5c451a2e578bd26095418aba76bc5d23d06af27c73ad436`.
+- Inventory SHA-256: `ca0ee62b46cfad05d5e012e10ca35ea180c024bb68c3966e99870ddab0b30680`.
+
+The donor's display names differ from the actual parent name for two entries:
+`gold pinwheel` represents `striped pinwheel`, and `bug net` represents `net`.
+The parent source records retain the correct inventory names; these are not
+additional items or grounds to replace the actual parent wording.
+
+The focused donor/alias suite runs 26 tests: 24 pass, one palette-only prepared
+test is inapplicable to this batch, and one deliberately damaged-pointer test
+has an inconsistent fixture index. Updating the fixture's address index with its
+modified relocation dictionary resolves the test setup error; its targeted
+retry passes. A targeted extension of the prepared-artwork check also passes,
+verifying all native opaque/translucent profile bindings and null runtime
+callbacks. Across these runs, 25 distinct checks pass and one is skipped.
+
+Checks cover every complete texture sample, vertex, triangle, material command,
+source part and relocation, all actual selector rows, both conditional layers,
+changed code/effects, missing table pointers, malformed/relocated returns,
+out-of-range selectors, parent dependencies, and installer rejection of
+prepared-only output. The current revision-7 installed batch still passes the
+current complete source/asset checks; unchanged palette/static categories retain
+their passing donor checks. No native emulator replay is needed for this
+converter-only change.
+
+The ABI-95 build lock, 104 installed choices, runtime, saved format, and both
+served V2 patchers remain unchanged. Reuse this prepared batch for shared native
+parent-item and room-conversion work; do not redo the artwork per item or claim
+hardware/playability evidence from conversion checks.
+
 ## Parent-item and room-display discovery
 
 Converter/installer revision 8 adds `tools/v3_room_aliases.py`, shared by the
