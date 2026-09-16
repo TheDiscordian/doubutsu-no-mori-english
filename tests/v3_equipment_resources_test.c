@@ -7,6 +7,34 @@ u32 af_equipment_native_pointers[17], af_equipment_native_bounds[18];
 u8 af_equipment_native_types[17];
 u32 af_equipment_header[2048];
 
+#ifdef AF_V3_EQUIPMENT_KINDS
+u32 af_equipment_kind_header[241];
+static void kind_tests(void) {
+    af_equipment_kind_header[0]=0x41464B44;af_equipment_kind_header[1]=1;
+    af_equipment_kind_header[2]=79;af_equipment_kind_header[3]=12;
+    s16 *rows=(s16 *)(af_equipment_kind_header+4);
+    for(int i=0;i<79;++i)for(unsigned int j=0;j<6;++j) {
+        rows[i*6+j]=(s16)(256+i*6+j);
+        assert(af_v3_equipment_kind_field(36+i,j)==256+i*6+(int)j);
+    }
+    rows[71*6]=269;rows[71*6+2]=59;rows[71*6+3]=-1;
+    assert(af_v3_equipment_kind_field(107,0)==269);
+    assert(af_v3_equipment_kind_field(107,2)==59);
+    assert(af_v3_equipment_kind_field(107,3)==-1);
+    const int bad[]={INT_MIN,-1,0,35,115,INT_MAX};
+    const int missing[]={-1,0,-1,-1,33,34};
+    for(unsigned int i=0;i<sizeof(bad)/sizeof(bad[0]);++i)
+        for(unsigned int j=0;j<6;++j)assert(af_v3_equipment_kind_field(bad[i],j)==missing[j]);
+    assert(af_v3_equipment_kind_field(107,6)==-1);
+    assert(af_v3_equipment_kind_field(107,UINT_MAX)==-1);
+    for(int i=0;i<4;++i) {
+        af_equipment_kind_header[i]^=1;
+        for(unsigned int j=0;j<6;++j)assert(af_v3_equipment_kind_field(107,j)==missing[j]);
+        af_equipment_kind_header[i]^=1;
+    }
+}
+#endif
+
 #ifdef AF_V3_PLAYER_MOTION
 u32 af_player_native_bounds[131],af_player_header[644];
 u8 af_player_fan_mask[27];
@@ -106,6 +134,9 @@ int main(void) {
     for(int i=0;i<4;++i) {af_equipment_header[i]^=1;invalid(66);af_equipment_header[i]^=1;}
 #ifdef AF_V3_PLAYER_MOTION
     player_tests();
+#endif
+#ifdef AF_V3_EQUIPMENT_KINDS
+    kind_tests();
 #endif
     puts("pass: native fallback, shared static/motion readers, invalid indices and records");
 }

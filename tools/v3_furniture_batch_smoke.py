@@ -525,9 +525,24 @@ def player_motion(debug,rom_path,record):
         pointer=owner+0x808B468C-equipment.PLAYER_RAM;part=owner+0x808B5B38-equipment.PLAYER_RAM
         pointer_proof=(pointer,expected[pointer-owner:pointer-owner+56])
         part_proof=(part,expected[part-owner:part-owner+40])
-        # Distinct constant holding, toy holding, fan idle, and fan waving data.
+        kinds=resources.get('kind_readers')
+        if kinds:
+            kind_rows={r['native_kind']:r for r in kinds['rows']}
+            for hook in kinds['owner_hooks']:
+                address=owner+hook['entry']-equipment.PLAYER_RAM
+                proof=(address,expected[address-owner:address-owner+40])
+                # Shared reader categories, original tools, and both invalid bounds.
+                for kind in (0,1,35,44,99,107,0xFFFFFFFF,115):
+                    if kind<36:
+                        value=bytes.fromhex(hook['table_hex'])[kind]
+                        if hook['field']!='player_animation' and value>=128:value-=256
+                    elif kind in kind_rows:value=kind_rows[kind]['fields'][hook['column']]
+                    else:value=hook['missing']
+                    call(address,[kind],value&0xFFFFFFFF,proof)
+        # New transition motions when present; otherwise representative holding,
+        # toy, idle, and waving resources. Preserve prior unchanged DMA evidence.
         selected={}
-        for row in motion['records']:
+        for row in kinds['new_player_motions'] if kinds else motion['records']:
             key=(bool(row['source']['keyed_channels']),row['type'],row['source']['duration'])
             selected.setdefault(key,row)
         rows=list(selected.values());native=files[0x00B36000].extract(image)
@@ -564,4 +579,5 @@ def player_motion(debug,rom_path,record):
     finally:call(0x8009C040,[allocation])
     return dict(native_player_motion_resources=True,representative_transfers=len(rows),part_masks=5,
         assertions=assertions,player_actions_tested=False,ordinary_menu_reload_tested=False,
+        kind_readers_tested=bool(resources.get('kind_readers')),
         hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)

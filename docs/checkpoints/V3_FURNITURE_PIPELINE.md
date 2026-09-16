@@ -1,5 +1,94 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared equipment kind readers
+
+The existing importer's `--refresh-runtime --equipment-kinds` mode connects all
+six kind-indexed native readers through one complete source-derived table.
+Seventy-nine donor kinds use stable indices `36 + source kind`; all original
+kind meanings, tables, and table relocations remain. Sixteen-bit fields preserve
+the fan holding animation index 269 without clipping it to a byte. There is no
+per-item definition, installer, or dedicated fan test scenario.
+
+Complete donor functions/tables supply holding pose, item routine, model,
+equipment animation, tumble, and get-up. The latter two are actual fall/recovery
+consumers, not take-out/put-away readers. Four complete source motions 25–28 add
+5,744 bytes, retaining their 17-/32-frame timing and all key data. They fit the
+original 3,848-byte animation banks. The original eight imported player motions,
+fourteen held models, and sixteen equipment motions remain unchanged.
+
+Output: `build/v3-equipment-kinds-runtime-01/`, ABI 99.
+
+- ROM SHA-256:
+  `c4c5e56687edeaa2ae0ce6dfd1bc9471f9a8a22c27f4768f85f522c1fbc12749`.
+- UPS SHA-256:
+  `b94c92dc4eae3a33ddba7ff952f555730b343e618d9e546fa4fad95e162bfcfc`.
+- Build receipt SHA-256:
+  `bbf6828e4f29a7ce26436d0326893f2c759d8b2f665dc93126399a2b42e10ac9`.
+- Shared module: 1,472 code bytes; existing 8,192-byte allocation and VROM
+  `02537DC0` remain. Startup remains 952 of 992 bytes.
+- Import blob: 3,455,264 bytes; 673,504 bytes remain before English choices.
+
+The new `AFKD` header/records occupy module offsets `B00..EC3`; code is bounded
+below `B00` and the native part-copy bridge remains at `FE0`. Getters at
+`808BD668`, `808BD690`, `808BD6B8`, `808BD6E0`, `808C2D4C`, and `808C32CC`
+retain native table HI/LO relocations at offsets 12/24. Imported values delegate
+to one shared reader with an explicit field index. Invalid indices preserve
+the distinct original defaults. Existing motion/resource hooks are rebound to
+the compiled helpers without changing their resources or semantics.
+
+All nineteen static item/state resource pairs fit the combined 4,376-byte
+equipment-bank limit; the largest is 4,032 bytes. Unsupported skeleton slots
+remain missing, not approved substitutes. The actual item selector remains
+unchanged and therefore still rejects the extra inventory identities. Source
+item-routine values 21–23 are stored as dependencies, not installed dispatchers.
+
+### Verification and next work
+
+Risk: incorrect kind offsets, narrowed animation indices, changed native table
+relocation, or oversized combined resources. The existing player-motion suite
+now covers source-bound records, mutation rejection, every table field, all four
+new complete animations, retained resources, exact cartridge ownership, two
+relocation bases, source/ROM checksums, and reconstructible patches. The real C
+readers pass address/undefined-behaviour sanitizers, including indices above
+255, negative/missing resources, both kind bounds, and malformed headers.
+All six checks pass on the first run.
+
+The twelve current-build optional-composition checks pass, including exact V2
+for no imports, exact ABI 99 for all imports, sparse selections, dependency
+rejection, and save-profile codec. The first invocation stops before executing
+tests because the temporary prospective-build override omitted `REPORT_SHA`.
+The corrected invocation supplies all four existing pins and passes; no ROM or
+composer change is needed. This is the single corrected setup retry.
+
+The first native run, `build/smoke-v3-equipment-kinds-01/results.json`, passes
+126 records and 106 assertions, SHA-256
+`afea974561fd0498d7f7d764f754c8e54522646bab1953371a846965cbe4442e`.
+The shared player-motion probe reuses the actual loaded owner, verifies its
+complete relocated code, and calls all six getters for original tools, three
+extended categories, and invalid bounds. Four representative animation
+transfers cover tumble/get-up and two original indices, with full data and
+untouched-tail comparisons. All five masks, equipment fallbacks, guards,
+saved-profile retention, checkpoint restore, and graceful shutdown pass.
+Isolated FlashRAM remains erased; there is no audio or user-save write.
+
+The 104 choices and saved format 2 remain unchanged. Same-profile compatibility
+with ABI 98 is expected in both directions; this batch does not claim another
+ordinary save/restart or hardware playthrough. V3 saves remain unsuitable for
+V2. Both served patchers stay unchanged.
+
+Continue actual equipment selection, category/scene permissions, item drawing,
+and the fan controller/request/action. Audit native action dispatch and all
+action-indexed permission tables before adding a fan action; do not repurpose
+an existing action or widen bounds over short tables. Preserve source swing
+animation 140/native 270, explicit mask four, and frame-timed sound.
+`Player_actor_sound_uchiwa` is donor `.text:16FA00`, calling
+`Player_actor_set_sound_common2` with `NA_SE_UCHIWA`; the actual native sound
+resource still needs identification/conversion, not an unrelated substitution.
+Fan inventory, names/prices, acquisition, catalogue/collection, selected profiles,
+ordinary take-out/put-away, and persistence remain. Balloon joint-work capacity,
+net/rod graphics matrices, and pinwheel rig packing remain separate shared
+category dependencies. No new handheld item is selectable or claimed playable.
+
 ## Native player motion and part masks
 
 The existing importer's `--refresh-runtime --player-motion` mode extends the

@@ -17,6 +17,28 @@ extern u32 af_equipment_header[2048];
 #define header af_equipment_header
 #endif
 
+#ifdef AF_V3_EQUIPMENT_KINDS
+typedef signed short s16;
+#ifdef __mips__
+#define kind_header ((const u32 *)0x804A3B00u)
+#else
+extern u32 af_equipment_kind_header[241];
+#define kind_header af_equipment_kind_header
+#endif
+
+/* Native owner getters retain their original tables; only extended kinds
+   reach this reader. No item selector or gameplay action is enabled here. */
+int af_v3_equipment_kind_field(int kind,unsigned int field) {
+    static const s16 missing[6]={-1,0,-1,-1,33,34};
+    unsigned int slot=(unsigned int)kind-36u;
+    if(field>=6u)return -1;
+    if(slot>=79u || kind_header[0]!=0x41464B44u || kind_header[1]!=1u
+            || kind_header[2]!=79u || kind_header[3]!=12u)return missing[field];
+    const s16 *rows=(const s16 *)(kind_header+4);
+    return rows[slot*6u+field];
+}
+#endif
+
 static const Resource *imported(int index) {
     u32 slot = (u32)index-17u;
     if (slot >= 50u || header[0] != 0x41464852u || header[1] != 1u

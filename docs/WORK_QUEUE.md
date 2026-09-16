@@ -2,21 +2,26 @@
 
 ## Active: V3 optional GameCube imports
 
-ABI 98 installs the eight complete player holding/action animations and the fan
-split-body mask through the existing shared module. The checked current build
-is `build/v3-player-motion-runtime-01/`. Seventeen focused checks pass, as does
-the corrected native run: 102 records and 79 assertions using the actual loaded
+ABI 99 connects the six equipment-kind readers using complete donor tables and
+stable extended indices. It retains the eight holding/action animations and
+adds four complete tumble/get-up animations through the same module. The checked
+build is `build/v3-equipment-kinds-runtime-01/`. Eighteen focused checks and the
+first native run pass: 126 records and 106 assertions using the actual loaded
 player owner. Reuse these results and the retained held-resource evidence;
 fourteen models and sixteen equipment animations remain intact. No item is
 enabled by loading its resources. Next connect native equipment-kind selection
-and indexed readers, proper fan controller/request/action flow, source-timed
-sound, and selected-only inventory/acquisition/profile handling. The fan action
+and category permissions, proper fan controller/request/action flow, source-timed
+sound, and selected-only inventory/acquisition/profile handling. Audit the main
+action dispatch and every action-indexed permission table before appending the
+fan action; do not reuse a native action or merely raise bounds over short arrays.
+The fan action
 explicitly uses mask four, while its generic animation-part lookup returns
-three; preserve the donor's explicit initializer argument. Audit combined model/animation sizes
-and joint work buffers before enabling rigs; the native actor has seven vectors,
+three; preserve the donor's explicit initializer argument. Nineteen static
+item/state pairs fit the combined bank limit; uninstalled rigs still need their
+combined size and joint work checked. The native actor has seven vectors,
 where the donor has eight. Do not flatten animated models or borrow unrelated
 actions. The 104 existing choices, saved format 2, and both V2 patchers remain
-unchanged. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-player-motion-and-part-masks).
+unchanged. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-equipment-kind-readers).
 
 Reuse `build/v3-held-motion-prepared-01/held-motion.n64obj.bin` for native
 motion integration. Its complete twenty-four animations occupy 7,760 bytes;

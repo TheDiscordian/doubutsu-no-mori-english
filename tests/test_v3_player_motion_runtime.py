@@ -17,13 +17,14 @@ from npc_mail_show import relocate_verified_data
 import v3_equipment_runtime as runtime
 import tests.test_v3_equipment_runtime as shared_tests
 
-OUTPUT=ROOT/os.environ.get('V3_PLAYER_MOTION_BUILD','build/v3-player-motion-runtime-01')
+OUTPUT=ROOT/os.environ.get('V3_PLAYER_MOTION_BUILD','build/v3-equipment-kinds-runtime-01')
 
 
 class HostTests(unittest.TestCase):
     sanitized=shared_tests.HostTests.sanitized
     def test_actual_shared_equipment_and_player_readers(self):
-        self.sanitized('v3_equipment_resources_test.c',defines=('-DAF_V3_PLAYER_MOTION=1',))
+        self.sanitized('v3_equipment_resources_test.c',
+            defines=('-DAF_V3_PLAYER_MOTION=1','-DAF_V3_EQUIPMENT_KINDS=1'))
 
 
 @unittest.skipUnless((OUTPUT/'build.json').is_file(),'Current player-motion cartridge required')
@@ -44,7 +45,9 @@ class CartridgeTests(unittest.TestCase):
         self.assertEqual(json.loads(json.dumps(evidence)),self.motion['evidence']);self.assertEqual(len(records),8)
         module=self.blob[self.e['blob_offset']:self.e['blob_offset']+runtime.SIZE]
         self.assertEqual(module[runtime.PLAYER_MASK:runtime.PLAYER_MASK+27],mask)
-        for expected,row in zip(records,self.motion['records']):
+        actual={r['source_index']:r for r in self.motion['records']}
+        for expected in records:
+            row=actual[expected['source_index']]
             self.assertEqual(expected,{k:v for k,v in row.items() if k not in ('vrom','blob_offset')})
             at=row['blob_offset'];self.assertEqual(self.blob[at:at+row['bytes']],assets[row['source_index']])
             self.assertLessEqual(row['bytes'],runtime.PLAYER_CAPACITY)
@@ -54,10 +57,56 @@ class CartridgeTests(unittest.TestCase):
             at=row['blob_offset'];self.assertEqual(self.blob[at:at+row['bytes']],self.old_blob[at:at+row['bytes']])
         self.assertEqual(self.e['records'],self.prior['equipment_resources']['records'])
 
+    def test_shared_kind_source_fields_complete_motions_and_buffers(self):
+        kind=self.e.get('kind_readers')
+        if not kind:self.skipTest('Kind readers are not installed')
+        from unittest.mock import patch
+        source=runtime.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        bindings=runtime.kind_bindings(source)
+        self.assertEqual(json.loads(json.dumps(bindings['functions'])),kind['source_functions'])
+        self.assertEqual(json.loads(json.dumps(bindings['tables'])),kind['source_tables'])
+        rows=kind['rows'];self.assertEqual(len(rows),79)
+        module=self.blob[self.e['blob_offset']:self.e['blob_offset']+runtime.SIZE]
+        self.assertEqual(struct.unpack_from('>4I',module,runtime.KIND_TABLE),(0x41464B44,1,79,12))
+        resources={r['source_index']:r for r in self.e['records']}
+        for source_row,row in zip(bindings['rows'],rows):
+            for key,value in source_row.items():self.assertEqual(row[key],value)
+            expected=[]
+            for _,_,field,_ in runtime.KIND_ENTRIES:
+                value=source_row[field]
+                if field in ('player_animation','tumble','getup'):value+=130
+                elif field in ('shape','animation'):value=value+17 if value in resources else -1
+                expected.append(value)
+            self.assertEqual(row['fields'],expected)
+            self.assertEqual(struct.unpack_from('>6h',module,runtime.KIND_TABLE+16+12*row['source_kind']),tuple(expected))
+            self.assertFalse(row['selectable']);self.assertFalse(row['player_actions_installed'])
+            if row['combined_bank_bytes'] is not None:self.assertLessEqual(row['combined_bank_bytes'],runtime.CAPACITY)
+        self.assertEqual({r['source_index'] for r in kind['new_player_motions']},{25,26,27,28})
+        for row in kind['new_player_motions']:
+            asset,compiled=runtime.compile_animations(source,[row['source']])
+            at=row['blob_offset'];self.assertEqual(self.blob[at:at+row['bytes']],asset)
+            self.assertEqual(row['compiled'],compiled);self.assertLessEqual(len(asset),runtime.PLAYER_CAPACITY)
+            self.assertEqual(struct.unpack_from('>4I',module,runtime.PLAYER_TABLE+16+16*row['source_index']),
+                (row['vrom'],row['bytes'],row['pointer'],row['type']))
+        old_motion=self.prior['equipment_resources']['player_motion']['records']
+        for row in old_motion:
+            self.assertIn(row,self.motion['records']);at=row['blob_offset']
+            self.assertEqual(self.blob[at:at+row['bytes']],self.old_blob[at:at+row['bytes']])
+        # Verify the actual source guards reject changes, not just fixture counts.
+        original_function=source.function
+        for changed in (0x1708CC,0x177A14,0x178144):
+            def mutate(address):
+                raw,receipt=original_function(address)
+                return (bytes([raw[0]^1])+raw[1:],receipt) if address==changed else (raw,receipt)
+            with patch.object(source,'function',side_effect=mutate),self.assertRaises(ValueError):
+                runtime.kind_bindings(source)
+
     def test_exact_owner_hooks_and_complete_relocation(self):
         vrom=self.motion['owner_vrom'];data=self.files[vrom].extract(self.rom)
         old=self.before[vrom].extract(self.base);restored=bytearray(data)
-        for row in self.motion['owner_hooks']:
+        hooks=self.motion['owner_hooks']+self.e.get('kind_readers',{}).get('owner_hooks',[])
+        for row in hooks:
             at=row['entry']-runtime.PLAYER_RAM;n=row['end']-row['entry']
             self.assertEqual(data[at:at+n].hex(),row['after']);self.assertEqual(old[at:at+n].hex(),row['before'])
             restored[at:at+n]=old[at:at+n]
@@ -68,12 +117,15 @@ class CartridgeTests(unittest.TestCase):
         for base in (0x80200000,0x80300000):
             actual=relocate_verified_data(spec,data,reloc,base)
             previous=relocate_verified_data(spec,old,reloc,base)
-            for row in self.motion['owner_hooks']:
+            for row in hooks:
                 at=row['entry']-runtime.PLAYER_RAM
                 for offset in row['retained_relocations']:
                     self.assertEqual(actual[at+offset:at+offset+4],previous[at+offset:at+offset+4])
                 end=row['end']-runtime.PLAYER_RAM
-                self.assertIn(struct.pack('>I',runtime.jump(self.e['code']['symbols'][row['helper']])),actual[at:end])
+                helper=row.get('helper','af_v3_equipment_kind_field')
+                self.assertIn(struct.pack('>I',runtime.jump(self.e['code']['symbols'][helper])),actual[at:end])
+        self.assertEqual(data[0x808BD3F8-runtime.PLAYER_RAM:0x808BD584-runtime.PLAYER_RAM],
+                         old[0x808BD3F8-runtime.PLAYER_RAM:0x808BD584-runtime.PLAYER_RAM])
 
     def test_declared_core_module_and_other_owners(self):
         core=bytearray(self.files[CODE_VROM].extract(self.rom));old_core=self.before[CODE_VROM].extract(self.base)
@@ -97,6 +149,7 @@ class CartridgeTests(unittest.TestCase):
         e=self.e;module=self.blob[e['blob_offset']:e['blob_offset']+runtime.SIZE]
         self.assertEqual(sha256(module),e['sha256']);self.assertEqual(zlib.crc32(module),e['crc32'])
         self.assertLessEqual(e['code']['bytes'],runtime.PLAYER_BRIDGE)
+        if e.get('kind_readers'):self.assertLessEqual(e['code']['bytes'],runtime.KIND_TABLE)
         self.assertEqual(sha256(module[:e['code']['bytes']]),e['code']['sha256'])
         self.assertEqual(module[runtime.PLAYER_BRIDGE:runtime.PLAYER_BRIDGE+16],
             bytes.fromhex('27BDFF80AFBF001C')+struct.pack('>II',runtime.jump(0x800B1DF0),0))

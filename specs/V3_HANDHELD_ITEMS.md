@@ -181,27 +181,69 @@ getter `808B468C` and default-part getter `808B5B38` retain their native tables
 and every HI/LO relocation. Their out-of-native-range paths delegate to the
 shared module. No animation index limit is raised over an unchanged short table.
 
-The complete module has 1,304 code bytes inside its existing reservation.
+The combined module has 1,472 code bytes inside its existing reservation.
 Original equipment hooks are rebound to the compiled symbols; existing models,
 motions, and native table meanings stay intact. Footstep/event readers whose
 native limit is 130 continue to reject imported animations; action-specific
 sound needs its explicit donor timing, not an unrelated original sound table.
 This installs resource readers and masks, not player actions or selectable fans.
 
+### Kind-indexed readers
+
+`--refresh-runtime --equipment-kinds` adds the six native kind-indexed consumers
+through the same importer/module. `kind_bindings` verifies complete donor
+functions, table spans, and relocations for holding pose, item main routine,
+shape, equipment motion, tumble, and get-up. All 79 donor equipment kinds have
+stable extended indices `36 + source kind`, remaining below signed-byte 128.
+This namespace does not duplicate inventory items or offer existing tools as
+new browser choices. The actual equipment selector remains unchanged until
+category actions, permissions, acquisition, and selected profiles are ready.
+
+An `AFKD` version-one header and 79 twelve-byte records occupy module offsets
+`B00..EC3`, before the unchanged `FE0` native part-copy bridge. The linker caps
+code at `B00`. Six signed sixteen-bit fields retain animation indices above
+255 and negative missing-resource values. Missing skeleton models stay `-1`;
+separate umbrella ownership is not represented as an invented model. The
+complete source binding remains in the build receipt. Dispatch values 21–23
+describe pending balloon/pinwheel/fan routines; reader installation does not
+install those routines or permit a new kind to reach ordinary gameplay.
+
+Native getters at `808BD668`, `808BD690`, `808BD6B8`, `808BD6E0`, `808C2D4C`,
+and `808C32CC` retain all 36 original table entries and both HI/LO relocations.
+Only non-native kinds delegate to the shared reader. Negative/out-of-range
+kinds retain each getter's original fallback; malformed headers reject too.
+The last two functions select tumble/get-up motions, not take-out/put-away.
+No table bound is raised over an unchanged native array.
+
+The same source tables require four complete player animations, source indices
+25–28. Their 5,744 bytes retain full 17-/32-frame timing and fit the original
+3,848-byte animation buffers. They extend the existing sparse `AFPM` table;
+the eight previously installed motions remain unchanged. Fans use the donor's
+axe-style tumble/get-up pose, rather than the unequipped fallback. Actual fan
+button/actions and ordinary take-out/put-away still need implementation.
+
+Combined model/animation size is checked per source record. Nineteen static
+item/state records have complete resource pairs, with a maximum of 4,032 bytes
+inside the 4,376-byte bank bound. Uninstalled rigs are not approved by that
+check; their geometry and joint-work arrays remain dependencies. There is no
+resident-memory, actor, saved-format, or optional-profile growth. The current
+[checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-equipment-kind-readers)
+records native relocation/readers and representative motion-transfer evidence.
+
 ### Player ownership and actions
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
 `3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b` in both the
-original and current ABI-98 cartridge. It reads ordinary saved equipment at
+original and current ABI-99 cartridge. It reads ordinary saved equipment at
 player-private offset `3EC`, or title-demo equipment at controller offset `3C`.
 It accepts only `2200..2223`, using a 36-entry jump table at `808E0274` with
 SHA-256 `b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.
 The extra donor handheld IDs are therefore not existing native player support.
 
-The next implementation must extend equipment selection and all dependent
-kind-indexed readers without changing original kind meanings or overstepping
-signed-byte bounds. Connect selected models to the shared loader, safe cleanup and
+The next implementation must extend equipment selection and category permissions
+using the shared kind readers without changing original kind meanings or
+overstepping signed-byte bounds. Connect selected models to the shared loader, safe cleanup and
 graphics bindings, take-out/put-away, and actual per-category actions. Do not
 route a fan through an unrelated umbrella or ordinary tool action.
 
@@ -221,7 +263,7 @@ action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.text:164628`. The full player wait/swing animation descriptors are
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
 button/timing behaviour, and sound still need native integration. The complete
-wait/swing data is installed through the shared animation readers; it is not
+wait/swing and tumble/get-up data is installed through the shared animation readers; it is not
 connected to native player actions yet. Held graphics and motion data do not
 implement the controller/request/action flow on their own.
 

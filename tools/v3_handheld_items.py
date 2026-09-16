@@ -130,6 +130,34 @@ def discover(source):
         rejected_item_ids=rejected,rows=rows)
 
 
+def kind_bindings(source):
+    """All kind-indexed player consumers, derived once for every equipment ID."""
+    functions,tables,values=selector_tables(source, {
+        'player_default': (0x68A74,'mPlib_Get_BasicPlayerAnimeIndex_fromItemKind',40,
+            '02499ead02c19ebf1b8904dc7cd7e88ef792ad61daec146dc9322b91019b713f',4,0x16),
+        'item_main': (0x1708CC,'Player_actor_Get_BasicItemMainIndex_fromItemKind',44,
+            'ea396731baec36f2c7a5f9077819b555b31db357f74e88a9e7023407bf99b275',4,0x16),
+        'tumble': (0x177A14,'Player_actor_Get_PlayerAnimeIndex_fromItemKind_Tumble',40,
+            'd817723fa836715ae2fa26d12412f3aa13db1b6dd0bc62f93cc86283655e5986',4,0x16),
+        'getup': (0x178144,'Player_actor_Get_PlayerAnimeIndex_fromItemKind_Tumble_getup',40,
+            'afe5f139d75452dc292039e34272d90d1ae154a4f4ebad83162f85b39a5f55bc',4,0x16),
+    })
+    equipment=discover(source);count=equipment['tables']['shape']['count']-1
+    if any(t['count']!=count+1 for t in tables.values()):
+        raise ValueError('Equipment kind consumer tables have inconsistent complete bounds')
+    rows=[];seen=set()
+    for row in sorted(equipment['rows'],key=lambda r:r['equipment_kind']):
+        kind=row['equipment_kind']
+        if kind in seen:raise ValueError('Ambiguous equipment kind identity')
+        seen.add(kind)
+        rows.append(dict(item_id=row['item_id'],source_kind=kind,
+            player_animation=values['player_default'][kind],item_main=values['item_main'][kind],
+            shape=row['shape_index'],animation=row['animation_index'],
+            tumble=values['tumble'][kind],getup=values['getup'][kind]))
+    if seen!=set(range(count)):raise ValueError('Incomplete equipment kind namespace')
+    return dict(functions=functions,tables=tables,rows=rows,equipment=equipment)
+
+
 def motion(source):
     """Discover complete held rigs and equipment-related player animations."""
     from v3_keyframes import animation, skeleton

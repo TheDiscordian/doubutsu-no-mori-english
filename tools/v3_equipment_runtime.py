@@ -13,8 +13,8 @@ from v3_asset_loader import BLOB, ROOT, compile_part
 from v3_import_storage import PACKAGE_RAM, END, jump
 from v3_campsite_calendar import PACKAGE_SIZE
 from v3_furniture_pipeline import Source, prepare_models
-from v3_handheld_items import scan, descriptor, motion, selector_tables
-from v3_keyframes import compile_animations
+from v3_handheld_items import scan, descriptor, motion, selector_tables, kind_bindings
+from v3_keyframes import compile_animations, animation
 from v3_npc_clothing import guard_incoming
 
 RAM, SIZE, TABLE, MAGIC, GUARD = 0x804A3000, 0x2000, 0x1000, 0x41464852, 0xAF48C0DE
@@ -32,6 +32,15 @@ ENTRIES = (
 PLAYER_VROM, PLAYER_RELOC, PLAYER_RAM = 0x007AC420, 0x007D9BA0, 0x808B2D50
 PLAYER_TABLE, PLAYER_MASK, PLAYER_BRIDGE = 0x1340, 0x1FD0, 0xFE0
 PLAYER_FIRST, PLAYER_COUNT, PLAYER_CAPACITY = 130, 157, 3848
+KIND_TABLE, KIND_FIRST, KIND_COUNT, KIND_STRIDE = 0xB00, 36, 79, 12
+KIND_ENTRIES = (
+    (0x808BD668,0x808DF508,'player_animation',-1),
+    (0x808BD690,0x808DF52C,'item_main',0),
+    (0x808BD6B8,0x808DF550,'shape',-1),
+    (0x808BD6E0,0x808DF574,'animation',-1),
+    (0x808C2D4C,0x808DF9D0,'tumble',33),
+    (0x808C32CC,0x808DF9F4,'getup',34),
+)
 PLAYER_ENTRIES = (
     (0x800B11B0,0x800B11F8,'af_v3_player_animation_size'),
     (0x800B1264,0x800B12A0,'af_v3_player_animation_origin'),
@@ -277,4 +286,126 @@ def install_player_motion(base,prior,blob,core,original,output):
         mask_hex=mask.hex(),table_offset=PLAYER_TABLE,mask_offset=PLAYER_MASK,
         bridge_offset=PLAYER_BRIDGE,first_index=PLAYER_FIRST,source_slots=PLAYER_COUNT,
         animation_buffer_bytes_changed=False,player_actions_installed=False)
+    return report,{PLAYER_VROM:bytes(owner)}
+
+
+def install_kind_readers(base,prior,blob,core,original,output):
+    """Connect all six kind-indexed readers without enabling unfinished actions."""
+    from v3_npc_draw import relocation_offsets
+    old=prior.get('equipment_resources')
+    if not old or not old.get('player_motion') or old.get('kind_readers'):
+        raise ValueError('Equipment kind readers require the existing player-motion module')
+    at=old['blob_offset'];module=bytearray(blob[at:at+SIZE])
+    table_end=KIND_TABLE+16+KIND_COUNT*KIND_STRIDE
+    if (len(module)!=SIZE or sha256(module)!=old['sha256'] or old['ram']!=RAM
+            or old['vrom']!=BLOB+at or old['bytes']!=SIZE
+            or old['code']['bytes']>KIND_TABLE or table_end>PLAYER_BRIDGE
+            or any(module[KIND_TABLE:PLAYER_BRIDGE])):
+        raise ValueError('Changed held-resource module or occupied kind-table reservation')
+    files=by_vrom(base);native=by_vrom(original)
+    owner=bytearray(files[PLAYER_VROM].extract(base));native_owner=native[PLAYER_VROM].extract(original)
+    reloc=files[PLAYER_RELOC].extract(base)
+    if (sha256(owner)!=old['player_motion']['owner_sha256']
+            or reloc!=native[PLAYER_RELOC].extract(original)):
+        raise ValueError('Changed player owner or relocation resource')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=kind_bindings(source);description=motion(source)
+    if len(bindings['rows'])!=KIND_COUNT or KIND_FIRST+KIND_COUNT>128:
+        raise ValueError('Equipment kinds exceed native signed-byte storage')
+    report=copy.deepcopy(old);motion_report=report['player_motion']
+    required={r[key] for r in bindings['rows'] for key in ('player_animation','tumble','getup')}
+    installed={r['source_index'] for r in motion_report['records']}
+    new_motion=[]
+    for index in sorted(required-installed):
+        pointers=description['selector_tables']['player_data']['pointers']
+        desc=animation(source,pointers[index*4][3],joints=26)
+        asset,compiled_motion=compile_animations(source,[desc])
+        if len(asset)>PLAYER_CAPACITY:raise ValueError('Equipment transition exceeds native player-animation bank')
+        part=source.rel[source.sections[4][0]+motion_report['evidence']['tables']['player_part']['offset']+index]
+        if part>=5:raise ValueError('Equipment transition uses an unsupported part mask')
+        blob.extend(bytes(-len(blob)%16));position=len(blob);blob.extend(asset)
+        row=dict(source_index=index,index=PLAYER_FIRST+index,bytes=len(asset),
+            pointer=0x06000000+compiled_motion['headers'][0]['native_offset'],type=part,
+            sha256=sha256(asset),source=desc,compiled=compiled_motion,vrom=BLOB+position,blob_offset=position)
+        motion_report['records'].append(row);new_motion.append(row)
+        slot=PLAYER_TABLE+16+16*index
+        if any(module[slot:slot+16]):raise ValueError('New equipment motion overwrites a live resource')
+        struct.pack_into('>4I',module,slot,row['vrom'],row['bytes'],row['pointer'],row['type'])
+    motion_report['records'].sort(key=lambda r:r['source_index'])
+    code,compiled=compile_part('equipment_resources',output/'equipment_resources',
+        defines=('AF_V3_PLAYER_MOTION=1','AF_V3_EQUIPMENT_KINDS=1'))
+    if len(code)>KIND_TABLE:raise ValueError('Shared equipment code exceeds kind-table boundary')
+    module[:KIND_TABLE]=code+bytes(KIND_TABLE-len(code))
+    struct.pack_into('>4I',module,KIND_TABLE,0x41464B44,1,KIND_COUNT,KIND_STRIDE)
+    resources={r['source_index']:r for r in old['records']};rows=[]
+    for row in bindings['rows']:
+        values=[]
+        for _,_,field,_ in KIND_ENTRIES:
+            value=row[field]
+            if field in ('player_animation','tumble','getup'):value+=PLAYER_FIRST
+            elif field in ('shape','animation'):value=FIRST+value if value in resources else -1
+            values.append(value)
+        shape=resources.get(row['shape']);anim=resources.get(row['animation'])
+        combined=(shape['bytes']+(anim['bytes'] if anim else 0)) if shape else None
+        if combined is not None and combined>CAPACITY:
+            raise ValueError('Equipment model and animation exceed combined native bank')
+        row=dict(row,native_kind=KIND_FIRST+row['source_kind'],fields=values,
+            combined_bank_bytes=combined,shape_installed=shape is not None,
+            resource_ready=shape is not None and (row['animation']==-1 or anim is not None),
+            selectable=False,player_actions_installed=False)
+        rows.append(row)
+        struct.pack_into('>6h',module,KIND_TABLE+16+row['source_kind']*KIND_STRIDE,*values)
+    # Recompile and rebind the existing readers; their resources and original
+    # lookup meanings remain unchanged even if helper code addresses move.
+    for hooks in (report['hooks'],motion_report['hooks']):
+        for hook in hooks:
+            off=hook['entry']-CODE_RAM;before=bytes(core[off:off+8])
+            if before.hex()!=hook['after']:raise ValueError('Changed installed equipment core hook')
+            target=compiled['symbols'][hook['helper']];after=struct.pack('>II',jump(target),0)
+            core[off:off+8]=after;hook.update(before=before.hex(),after=after.hex(),target=target)
+    for hook in motion_report['owner_hooks']:
+        off=hook['entry']-PLAYER_RAM;n=hook['end']-hook['entry'];before=bytes(owner[off:off+n])
+        if before.hex()!=hook['after']:raise ValueError('Changed installed player motion getter')
+        old_jump=struct.pack('>I',jump(old['code']['symbols'][hook['helper']]))
+        new_jump=struct.pack('>I',jump(compiled['symbols'][hook['helper']]))
+        positions=[i for i in range(0,n,4) if before[i:i+4]==old_jump]
+        if len(positions)!=1:raise ValueError('Ambiguous installed player helper call')
+        position=positions[0];after=before[:position]+new_jump+before[position+4:]
+        owner[off:off+n]=after;hook.update(before=before.hex(),after=after.hex())
+    slots=relocation_offsets(reloc,len(owner));hooks=[]
+    guard_incoming(owner,struct.unpack_from('>I',reloc)[0],PLAYER_RAM,
+                   [(a-PLAYER_RAM,40) for a,_,_,_ in KIND_ENTRIES])
+    for column,(entry,table,field,missing) in enumerate(KIND_ENTRIES):
+        off=entry-PLAYER_RAM;before=bytes(owner[off:off+40]);original_words=struct.unpack('>10I',before)
+        table_off=table-PLAYER_RAM;table_bytes=owner[table_off:table_off+KIND_FIRST]
+        if (before!=native_owner[off:off+40] or table_bytes!=native_owner[table_off:table_off+KIND_FIRST]
+                or slots & set(range(off,off+40,4))!={off+12,off+24}
+                or original_words[:3]!=(0x04800006,0x28810024,0x10200004)
+                or original_words[5]!=0x03E00008
+                or ((original_words[3]&0xFFFF)<<16)+struct.unpack('>h',before[26:28])[0]!=table):
+            raise ValueError('Changed complete native equipment kind getter/table')
+        patch=[0x2C810024,0x10200005,0,*original_words[3:7],
+               jump(compiled['symbols']['af_v3_equipment_kind_field']),0x24050000|column,0]
+        after=struct.pack('>10I',*patch);owner[off:off+40]=after
+        hooks.append(dict(entry=entry,end=entry+40,field=field,column=column,missing=missing,
+            table_ram=table,table_hex=table_bytes.hex(),before=before.hex(),after=after.hex(),
+            retained_relocations=[12,24]))
+    # The actual equipment selector must remain original until category actions,
+    # inventory, selected profiles, and all dependent permissions are integrated.
+    selector_start,selector_end=0x808BD3F8-PLAYER_RAM,0x808BD584-PLAYER_RAM
+    if owner[selector_start:selector_end]!=native_owner[selector_start:selector_end]:
+        raise ValueError('Equipment selector enables unapproved item identities')
+    blob[at:at+SIZE]=module
+    if BLOB+len(blob)>END:raise ValueError('Equipment kind resources exceed ROM storage')
+    motion_report.update(owner_sha256=sha256(owner))
+    report.update(code=compiled,sha256=sha256(module),crc32=zlib.crc32(module),additional_resident_bytes=0)
+    report['kind_readers']=dict(format='AFV3-EQUIPMENT-KINDS-1',rows=rows,
+        source_functions=bindings['functions'],source_tables=bindings['tables'],
+        equipment_source_functions=bindings['equipment']['functions'],
+        source_rel_sha256=sha256(source.rel),source_symbols_sha256=sha256(source.symbols.encode()),
+        owner_hooks=hooks,new_player_motions=new_motion,table_offset=KIND_TABLE,
+        first_index=KIND_FIRST,count=KIND_COUNT,stride=KIND_STRIDE,
+        selector_sha256=sha256(owner[selector_start:selector_end]),selector_changed=False,
+        item_bank_bytes_changed=False,actions_installed=False,logical_imports_added=0)
     return report,{PLAYER_VROM:bytes(owner)}

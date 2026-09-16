@@ -49,6 +49,11 @@ for each item.
 complete source-derived player motions and split-body masks. It retains the
 native player owner's table relocations and all original animation meanings;
 resource availability does not enable item actions or add profile choices.
+`--refresh-runtime --equipment-kinds` connects the six dependent kind-indexed
+readers and source-selected tumble/get-up animations in that module. It retains
+the original equipment selector until actual category actions and profile-aware
+inventory/acquisition are ready. These shared records do not create per-item
+installers or independent options for worn states and catalogue models.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing
