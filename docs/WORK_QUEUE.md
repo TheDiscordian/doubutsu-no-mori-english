@@ -2,34 +2,29 @@
 
 ## Active: V3 optional GameCube imports
 
-The shared fan control flow is installed in ABI 101 at
-`build/v3-player-fan-controls-01/`. Controller press/hold, request priority,
-standard split-body initialization, repeat frames, bee timing, and walk/idle
-requests have real implementations in the existing action module. Two focused
-host/cartridge checks and twelve composition checks pass. The partial native
-retry verifies 22 assertions, then observes a valid walking request where its
-fixture incorrectly expects idle. The fixture now accounts for title-demo
-movement. Do not rerun this batch: retain its passing component evidence and
-include unfinished final guards/restoration/idle checks with the next meaningful
-action integration change. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-control-flow).
+ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
+callback and shared sound-program converter. Its actual `0167` program retains
+the pitch sweep, custom envelope, duration, and priority while reusing native
+bank-140 instrument 12. The sequence adds 32 loaded bytes within the current
+audio heap. Frame speed and braking match the native update interval. Six focused
+checks and the silent 119-record/70-assertion native check pass, including sound
+sample transfers, the live-player callback, guards, and restored checkpoint.
+Twelve current optional-composition checks pass, including the unchanged V2 path.
+Retain those results; no historical rerun or further sound harness is needed.
+See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions).
 
-Next, register the fan's actual sound program through a shared audio category.
-The source program at `0812..0831` uses donor bank-154 instrument 12, which
-matches native bank-140 instrument 12 completely. No new sample/bank is needed;
-retain the program's complete custom envelope and operands. Native sound ID
-`0167` still points at an unassigned slot, so do not trigger it before installing
-its program. Connect the per-frame movement/collision/item callback, draw
-dispatcher, net-angle reset, and four wait/walk/run/dash poll calls. Keep native
-selection/profile/acquisition and the outside-owner action audit in scope.
-All new callback entries and poll hooks remain disabled; this is not an enabled
-fan import. Source code is shared by all eight fans, not per-item installers.
+Next, extend the complete native held-item main/draw tables for category 23
+without changing original entries; connect source fan drawing and net-angle
+reset. Complete the four wait/walk/run/dash poll calls, native selected
+equipment/profile/acquisition, and outside-owner action audit before enabling
+ordinary fan use. All new action callback entries and poll hooks remain disabled.
+The eight fans share code and source-derived records, not per-item installers.
 
 All 105 native actions retain their original
 metadata and callbacks; the complete donor metadata covers sixteen reserved
 indices `105..120`. Extra callbacks remain disabled and native setup rejects
 those requests. The fan retains donor action index 109. Continue its actual
-main/draw and frame-timed sound through these shared
+draw/net reset and installed per-frame/sound code through these shared
 tables, not another action installer. The source net-angle callback for the fan
 is a reset routine, not null; submenu and settle callbacks are null. Audit
 remaining core-library action checks before enabling equipment.

@@ -284,19 +284,20 @@ outside the player owner still need their own audit before enabling actions.
 ### Player ownership and actions
 
 The same `--refresh-runtime --player-actions` adapter extends an existing action
-module with source-derived fan controls, requests, setup, and end-of-swing
-transitions. `overlays/v3/player_actions.c` resolves each owner function against
+module with source-derived fan controls, requests, setup, per-frame movement,
+sound, and end-of-swing transitions. `overlays/v3/player_actions.c` resolves each owner function against
 the currently loaded constructor; no heap address is captured at build time.
 The complete donor functions and every called native API are recorded and
 checked. The installed dispatch entries and all action tables stay unchanged.
-The code occupies 1,436 bytes of the existing 8-KiB code reservation. In-place
-refresh preserves the ROM allocations, animation banks, actor size, and save
-profile. It adds no selectable items.
+The code occupies 1,772 bytes of the existing 8-KiB code reservation. In-place
+code refresh preserves animation banks, actor size, and save profile. The sound
+adapter appends a relocated complete sequence, retaining existing banks/samples.
+It adds no selectable items.
 
 Press and hold are distinct, including title-demo controller bytes `38` and
 `39`. Fan kinds `107..114` use the normal scene/visibility-aware kind getter.
-Walking/running/dashing reject fan input at animation speed `>= 0.5`; the
-original umbrella helper retains its own `1.0` gate. The prepared shared poll
+Walking/running/dashing reject fan input at native animation speed `>= 1.0`;
+the original umbrella helper remains unchanged. The prepared shared poll
 calls umbrella then fan, matching the donor order. Its four ordinary caller
 hooks remain uninstalled, as do the fan action callbacks.
 
@@ -305,11 +306,20 @@ at `D58`, only after the original priority/permission checks accept it. Setup
 uses native `808B4A44`, the ten-argument standard initializer with separate
 frames, speed, morph, mode, and mask. `808B4B6C` is the reverse initializer and
 has a different signature. The upper layer uses imported animation 270, the
-lower uses native WAIT1 zero, speed is `0.5`, repeat mode is one, and explicit
+lower uses native WAIT1 zero, speed is `1.0`, repeat mode is one, and explicit
 part mask is four. Initial waving starts both frames at one with morph `-5`;
 repeat waving preserves the lower current frame and uses zero morph. The
 donor's continue-animation optimization applies only to WAIT1 in the upper
 layer, so it cannot change this fan initializer.
+
+The retained WAIT1 animation has duration 33 in both games, but its donor
+initializer uses speed `0.5` while native `808C1118` uses `1.0`. The adapter
+preserves source keyframe coordinates and doubles the fan's playback speed and
+input-speed threshold to match the native update interval. Source event frames
+remain unchanged. Native morphing advances by one per update, versus the donor's
+half-step; the common `-5` initial morph value needs no change. Movement uses
+native common braking `808B3C74`, including its native `0.75` step, instead of
+copying the donor's per-update `0.32625001` constant into native physics.
 
 At frame `7.5`, the transition routine settles priority and sets the bee-attack
 state. From frame eight, holding A can request another swing. Otherwise movement
@@ -320,11 +330,14 @@ setup does not consume it; flag two is also ignored by both idle initializers.
 The adapter preserves the effective donor behaviour instead of passing a float
 frame value into the native flags argument.
 
-These functions are installed dependencies, not an enabled main action. The
-complete per-frame movement/collision/item callback, net-angle reset, drawing,
-frame-timed sound, native item selection, and profile/acquisition integration
-remain required. The action tables still reject every unfinished imported
-action. No temporary silent or unrelated sound substitutes for the fan sound.
+The complete per-frame callback preserves donor order: brake, forced-position
+input, animation, frame-event sound, lean recovery, standing-object correction,
+background collision, held-item update, and end-of-swing requests. Sound triggers
+at frame `1.5` only when animation advances; a frozen frame cannot retrigger it.
+These functions are installed dependencies, not an enabled main action.
+Net-angle reset, drawing, ordinary polling, native item selection, and
+profile/acquisition integration remain required. The action tables still reject
+every unfinished imported action.
 
 The actual donor fan sound uses group-one program `0167`, at sequence offset
 `0812..0831`. Its 32 complete bytes have SHA-256
@@ -333,12 +346,18 @@ The complete donor bank-154 instrument 12 matches native bank-140 instrument
 12: ranges, decay, envelope, tuning, sample, loop, and predictor. The sample has
 3,726 bytes and SHA-256
 `92b3c527d5e80475098149b98901f53f0e72ad639c4de1cfc149d8c7cd05a99c`.
-Both priority-table entries for `0167` contain 60, but the original native
-group has only 97 entries. Its numeric sound ID is not playable merely because
-the instrument exists. Extend the shared sequence-program installer and retain
-the complete custom envelope, gate, pitch, duration, and channel operands; no
-new sample or sound bank is needed for this verified category. Registration
-and native synthesis remain work.
+Both priority-table entries for `0167` contain 60. The expanded native group has
+106 slots; the shared converter registers the previously empty `0167` slot.
+`tools/v3_sound_programs.py` accepts explicit-bank single-layer notes with custom
+envelopes and optional special-mode pitch sweeps. It preserves all operands and
+only rebinds the layer/envelope pointers and equivalent instrument index. Full
+instrument, envelope, sample, loop, predictor, tuning, priority, interpreter,
+and heap checks reject unsupported dependencies. It imports source IDs in a
+batch, without per-item conversion code. No new sample or bank is needed here.
+The sequence grows by 32 bytes to 20,208 bytes; complete permanent-resource
+accounting leaves 224 bytes spare without enlarging the audio heap. Silent native
+verification covers loading, triggering, sample transfers, and the live per-frame
+callback. No listening, ordinary equipped-fan, or hardware result is claimed.
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
@@ -370,7 +389,8 @@ For fans, the donor implementation is in `m_player_item_fan.c_inc` and
 action entries are `.text:1962B0` and `.text:1965A4`; the controller check is
 `.text:164628`. The full player wait/swing animation descriptors are
 `.data:16A2A8` and `.data:16A49C`. Those animations, the split-body fan mask,
-per-frame callback, drawing, and sound still need native integration. The complete
+per-frame callback, drawing, and sound define the action's dependencies. The
+callback and sound are installed as described above; drawing remains work. The complete
 wait/swing and tumble/get-up data is installed through the shared animation readers; it is not
 connected to dispatched player actions yet. Prepared controls and setup do not
 make the complete handheld item selectable or playable.

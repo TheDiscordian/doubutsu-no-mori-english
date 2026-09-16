@@ -2,25 +2,28 @@
 
 ## Active development
 
-ABI 101 adds the donor fan's controller, request, animation setup, and
-end-of-swing transitions to the shared action module. The 1,436-byte code uses
-existing ROM/RAM space, native permission/priority checks, separate press/hold
-input, the complete swing motion, and explicit split-body mask. Initial and
-repeat swings retain different lower-frame/morph behaviour. Two focused checks
-pass, including sanitizer coverage; twelve current optional-composition checks
-pass. The silent native retry verifies 22 assertions before a fixture assumes
-idle despite active title-demo movement. The observed request is walking,
-consistent with the native priority rules. The corrected final expectation is
-not rerun; final guards/checkpoint restoration and native idle acceptance remain
-unverified for this batch. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-control-flow).
+ABI 102 adds the complete fan per-frame callback and a reusable single-layer
+sound-program converter. Source pitch sweep, envelope, timing, and priority are
+retained; the complete instrument/sample already exists in N64. Registration
+adds 32 loaded bytes without enlarging the audio heap. Playback speed and braking
+use the native update interval. The action code occupies 1,772 bytes of its
+existing 8-KiB reservation; no actor, animation bank, or saved field grows.
 
-Fan callbacks and polling hooks remain disabled until the per-frame callback,
-drawing, sound registration, selected inventory, and acquisition are complete.
-No new selectable items or saved fields are added. The donor's complete fan
-instrument/sample matches an existing native instrument; only its playback
-program needs registration, not another sample or bank. Continue that shared
-sound-program category and connect the actual callbacks without per-item scripts.
+Six focused checks pass, including sanitizer coverage, complete resource
+retention, rejected unsupported sound forms, and patch reconstruction. The
+silent native check passes all 119 records with 70 passing assertions: actual
+sound loading/trigger/sample transfers, live-player per-frame animation and
+collision calls, native morph timing, guards, and checkpoint restoration.
+No speakers/headphones or user saves are used. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-sound-programs-and-per-frame-actions).
+Twelve current optional-composition checks also pass, including exact no-import
+V2, all-import ABI 102, sparse profiles, dependencies, and the real save codec.
+
+Fan callbacks and polling hooks remain disabled until drawing, net-angle reset,
+selected inventory, and acquisition are connected. No new selectable items are
+added. Continue those shared dependencies and the outside-owner action audit;
+do not repeat passing component checks or create per-item scripts. Ordinary
+equipped-fan gameplay and hardware testing remain pending.
 
 The shared 121-entry player action tables contain 22 metadata categories
 and five callback categories, preserving all 105 native actions. The source
@@ -106,10 +109,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 101 at
-`build/v3-player-fan-controls-01/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 102 at
+`build/v3-player-frame-sound-01/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 100 is expected in both directions; this
+Same-profile compatibility with ABI 101 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

@@ -47,9 +47,9 @@ int af_v3_player_fan_check(void *game, int trigger, int start, int priority) {
     if (!af_v3_player_fan_controller(game, trigger)) return 0;
     void *actor = FN(0x800B1C84u, void *, void *)(game);
     int action = WORD(actor, 0xCF0);
-    /* Fan uses the donor's half-frame speed gate. The original umbrella's
-       separate one-frame gate must not be changed to implement this. */
-    if (action >= 8 && action <= 10 && REAL(actor, 0x180) >= 0.5f) return 0;
+    /* Existing WAIT/WALK frames advance twice as far per native update as
+       in GAFE01. Compare against the native equivalent of its 0.5 gate. */
+    if (action >= 8 && action <= 10 && REAL(actor, 0x180) >= 1.0f) return 0;
     return af_v3_player_fan_request(game, start, priority);
 }
 
@@ -68,10 +68,30 @@ void af_v3_player_fan_setup(void *actor, void *game) {
        layers and therefore cannot alter this fan initializer. */
     FN(0x808B4A44u, void, void *, void *, int, int,
        float, float, float, float, int, int)
-        (actor, game, 270, 0, 1.0f, frame, 0.5f, morph, 1, 4);
+        (actor, game, 270, 0, 1.0f, frame, 1.0f, morph, 1, 4);
     FN(0x808B3BD0u, void, void *, void *)(actor, game);
     FN(0x808B36E8u, void, void *, int)(actor, 5);
 }
+
+#ifdef AF_V3_FAN_SOUND
+void af_v3_player_fan_finish(void *actor, void *game);
+void af_v3_player_fan_main(void *actor, void *game) {
+    float last_frame;
+    /* Use the corresponding native braking routine, not the donor's
+       per-update movement constant. Native physics uses a different step. */
+    FN(0x808B3C74u, int, void *)(actor);
+    FN(0x808B61E4u, void, void *, void *)(actor, game);
+    FN(0x808B488Cu, int, void *, float *)(actor, &last_frame);
+    if (!FN(0x808B5698u, int, void *, float)(actor, last_frame) &&
+        FN(0x808B5844u, int, void *, float)((u8 *)actor + 0x174, 1.5f))
+        FN(0x800D1D58u, void, int, void *)(AF_V3_FAN_SOUND, (u8 *)actor + 0x28);
+    FN(0x808B5310u, void, void *)(actor);
+    FN(0x808B4DACu, void, void *, void *)(actor, game);
+    FN(0x808B5FB0u, void, void *)(actor);
+    FN(0x808BF410u, void, void *, void *)(actor, game);
+    af_v3_player_fan_finish(actor, game);
+}
+#endif
 
 void af_v3_player_fan_finish(void *actor, void *game) {
     void *frame_control = (u8 *)actor + 0x174;

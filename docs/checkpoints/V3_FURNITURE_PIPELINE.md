@@ -1,5 +1,71 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared sound programs and per-frame actions
+
+The existing player-action refresh adapter installs the fan's complete per-frame
+callback and `tools/v3_sound_programs.py`, a reusable batch converter for
+explicit-bank, single-layer notes with custom envelopes and optional special-mode
+pitch sweeps. The source function supplies sound ID `0167`; no per-item sound
+script, copied instrument, or extra sample is needed. The converter checks the
+complete native instrument identity, interpreter handlers, priority, pointers,
+and permanent-resource budget. Occupied slots and unsupported forms reject.
+
+The player callback retains the donor's movement/input/animation/sound/collision/
+item/transition order. Sound occurs at frame `1.5` only if animation advances.
+The native WAIT initializer advances the same 33-frame motion at speed `1.0`,
+versus donor `0.5`; the fan's retained motion and input threshold use native
+speed `1.0`. Event coordinates remain unchanged. Common native braking uses
+`0.75`, not the donor's per-update `0.32625001`. The native run verifies one-step
+frame and morph advancement through the actual live player's skeleton.
+
+### Build and memory
+
+- ABI 102: `build/v3-player-frame-sound-01/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256: `92bffc4eced4cf170922db9080510d347212d65255538f8c8d828cceaf779cc7`.
+- UPS SHA-256: `79579190df6845ba6efb7007ed187fec2509dc97e1f6551ebe9978c0a1c55b46`.
+- Receipt SHA-256: `fb8a8256883c9640c999290cde48465e6c5a7dad8adf39bc43ba22dab0660a31`.
+- Shared action code: 1,772 bytes, maximum direct stack 64 bytes, original
+  68-byte dispatch prefix retained, unchanged 24,576-byte module allocation.
+- The complete 20,208-byte sound sequence is appended in ROM; all prior sound
+  programs retain their offsets. Only the previously empty dispatch entry and
+  sequence header change. The sequence adds 32 loaded bytes. The full permanent
+  resource inventory requires 109,344 of 109,568 bytes, leaving 224 bytes spare.
+- Blob: 3,517,632 bytes, with 611,136 free before English choice resources.
+  The three terminal catalogue/shop owners move without content changes. Models,
+  motions, player owner/relocations, callback tables, and profiles remain intact.
+- Startup: 952 of 992 bytes. The 104 choices and saved format 2 are unchanged.
+  Same-profile ABI-101/102 saves are expected to work in both directions; the
+  real codec passes, but this is not another ordinary save/restart or hardware
+  playthrough. V3 saves are not for V2. Both served patchers remain V2.
+
+### Verification
+
+Six focused checks pass in 5.625 seconds: sanitizer-covered controller/setup/
+transition/per-frame order, once-per-crossing sound, stopped frames, native
+timing, complete sound conversion, malformed/occupied-slot rejection, resource
+retention, CRCs, and reconstructible patch. Twelve current composition checks
+pass in 8.411 seconds, including exact no-import V2 and all-import ABI 102.
+
+The single silent native attempt passes all 119 records with 70 passing
+assertions. `build/smoke-v3-player-frame-sound-01/results.json` has SHA-256
+`7d16d4d8a260bbe68735811d6d722a3640803a28ade742af4227b234f8f9d209`.
+The shared probe SHA-256 is
+`5ab3dbd8d5c0f8eb721d5ea2228f7febaa3e6bf93903be1797eb6a430a083cf1`.
+It verifies actual sequence loading and dispatch, priority 60, fifteen completed
+sample-DMA observations, native heap bounds, real-player animation/collision
+callback, private and live bank restoration, saved-profile retention, guards,
+and checkpoint restoration. The title-demo movement is `(-0.3934426, 0)` and
+correctly produces a walk request. Native idle acceptance remains unexecuted;
+the host check covers it. FlashRAM remains 131,072 `FF` bytes, SHA-256
+`b5a41c3758763bbec72769fab4a2533bf2db0b6312d93d25a695f9e4b9e02260`.
+
+This is component execution, not an ordinary equipped fan or a hardware result.
+No audio reaches speakers/headphones; PCM/listening quality is unverified. The
+callback tables and input-poll hooks remain off. Continue the shared held-item
+main/draw tables, source fan draw and net reset, four ordinary polling sites,
+selected inventory/acquisition/profile handling, and outside-owner action audit.
+Do not repeat unchanged passing checks or introduce per-item installers.
+
 ## Shared fan control flow
 
 The existing `--refresh-runtime --player-actions` mode installs the donor fan's

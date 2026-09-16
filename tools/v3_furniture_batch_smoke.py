@@ -482,6 +482,66 @@ def equipment_resources(debug,rom_path,record):
         hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)
 
 
+def sound_programs_probe(debug,image,resources,check,call,record):
+    """Exercise one representative of the shared single-layer sound format."""
+    from aflib import CODE_VROM,u32
+    from v3_sound_programs import installed_resource
+    sound=resources['sound_programs'];row=sound['imports'][0]
+    code=by_vrom(image)[CODE_VROM].extract(image)
+    def word(at):return u32(debug.read_memory(at,4),0)
+    def bounded(at,n):
+        if at&3 or not 0x80000400<=at<=0x80400000-n:
+            raise ValueError('Shared sound pointer escapes native RAM')
+        return at
+    seq=sound['sequence'];data=image[seq['physical']:seq['physical']+seq['bytes']]
+    header=bytearray.fromhex(seq['header_after']);struct.pack_into('>I',header,0,seq['physical'])
+    check('shared sound loaded header',seq['header_address'],header)
+    sequence=bounded(word(0x8014CBA8),seq['bytes'])
+    check('shared sound complete program and envelope',sequence+row['offset'],
+          data[row['offset']:row['offset']+row['bytes']])
+    table=struct.unpack_from('>H',data,0x18A)[0];sid=row['native_sound_id']
+    check('shared sound registered dispatch',sequence+table+(sid&255)*2,struct.pack('>H',row['offset']))
+    start,current,size,count=struct.unpack('>4I',debug.read_memory(0x8014C260,16))
+    bounded(start,size)
+    if size!=sound['after_budget']['capacity'] or not start<=current<=start+size or not count:
+        raise ValueError('Shared sound permanent allocation exceeds its checked heap')
+    record(dict(shared_sound_heap_capacity=size,used=current-start,remaining=start+size-current,
+        conservative_spare=sound['after_budget']['conservative_spare'],assertion='passed'))
+    bank,entry,_=installed_resource(image,code,'bank',row['native_bank'])
+    _,_,wave=installed_resource(image,code,'wave',entry[10])
+    instrument=u32(bank,8+row['native_instrument']*4)
+    sample=u32(bank,instrument+16);sample_bytes=u32(bank,sample)&0xFFFFFF
+    sample_start=wave+u32(bank,sample+4)
+    if sample_bytes!=row['instrument_identity']['samples'][1]['sample_bytes']:
+        raise ValueError('Shared sound representative needs its checked middle sample')
+    call(0x800F8D5C,[sid])
+    slots=debug.read_memory(0x80113C34,6*32)
+    matches=[i for i in range(6) if struct.unpack_from('>H',slots,i*32)[0]==sid]
+    if len(matches)!=1:raise ValueError('Shared sound did not allocate its native trigger slot')
+    check('shared sound original priority',0x80113C34+matches[0]*32+28,bytes((row['trigger_priority'],)))
+    observations=0
+    for frame in range(8):
+        record(debug.advance_game_frame())
+        count=word(0x8014BB20)
+        if not 0<count<=256:raise ValueError('Unbounded sound sample-DMA list')
+        entries=debug.read_memory(bounded(word(0x8014BB1C),count*16),count*16)
+        for i in range(count):
+            r=entries[i*16:(i+1)*16];ram,device=struct.unpack_from('>2I',r)
+            n=struct.unpack_from('>H',r,10)[0]
+            first,last=max(device,sample_start),min(device+n,sample_start+sample_bytes)
+            if first>=last or not r[14]:continue
+            got=debug.read_memory(bounded(ram,n)+first-device,last-first)
+            if got==image[first:last]:
+                observations+=1
+                record(dict(shared_sound_sample_dma=True,frame=frame+1,slot=i,
+                    first=first-sample_start,last=last-sample_start,sha256=sha256(got),assertion='passed'))
+    if not observations:raise ValueError('No complete sample transfer observed for shared sound')
+    check('shared sound retains program after playback',sequence+row['offset'],
+          data[row['offset']:row['offset']+row['bytes']])
+    return dict(sound_id=sid,native_loader_trigger_and_sample_dma=True,observations=observations,
+                physical_audio_played=False,pcm_or_listening_verified=False)
+
+
 def player_motion(debug,rom_path,record):
     """Load the actual player owner and exercise its shared animation category."""
     import v3_equipment_runtime as equipment
@@ -567,7 +627,8 @@ def player_motion(debug,rom_path,record):
             control_call('af_v3_player_fan_setup',[target,game])
             check('fan setup and prior action',target+0xCF0,struct.pack('>2I',109,7))
             check('fan eye pattern',target+0xCE8,struct.pack('>I',5))
-            check('full upper animation frame control',target+0x174,struct.pack('>5fI',1,9,9,0.5,1,1))
+            check('full upper animation frame control',target+0x174,
+                  struct.pack('>5fI',1,9,9,controls['frame_speed'],1,1))
             check('fan upper morph',target+0x194,struct.pack('>f',-5))
             check('fan explicit part mask',target+0x10FC,bytes.fromhex(motion['mask_hex']))
             swing=next(r for r in motion['records'] if r['index']==270)
@@ -593,6 +654,43 @@ def player_motion(debug,rom_path,record):
             check('released fan respects movement and request priority',target+0xD00,struct.pack('>3I',8 if moving else 7,1,1))
             if moving:check('native walk argument adaptation',target+0xD64,struct.pack('>fI',-5,0))
             else:check('native wait argument adaptation',target+0xD58,struct.pack('>fI',-5,2))
+            sound_result=None;frame_result=None
+            if actions.get('fan_frame_flow'):
+                sound_result=sound_programs_probe(debug,image,resources,check,call,record)
+                check('player owner retained across audio frames',0x80143900,struct.pack('>I',constructor))
+                real_game=struct.unpack('>I',debug.read_memory(0x8010EF90,4))[0]
+                if real_game&3 or not 0x80000400<=real_game<=0x80400000-0x1E00:
+                    raise ValueError('Per-frame probe requires the live play-game owner')
+                real_actor=struct.unpack('>I',debug.read_memory(real_game+0x1C90,4))[0]
+                if real_actor&3 or not 0x80000400<=real_actor<=0x80400000-0x12D8:
+                    raise ValueError('Per-frame probe requires the actual initialized player')
+                # Collision and skeleton updates require a real actor. The
+                # enclosing checkpoint isolates this call; restore its actor
+                # and both animation banks before returning to ordinary play.
+                actor_before=debug.read_memory(real_actor,0x12D8);banks={}
+                for index in struct.unpack_from('>2h',actor_before,0xDA0):
+                    if not 0<=index<8:raise ValueError('Unbounded live animation-bank selector')
+                    address=struct.unpack('>I',debug.read_memory(real_game+0x114+84*index,4))[0]
+                    if address&15 or not 0x80000400<=address<=0x80400000-equipment.PLAYER_CAPACITY:
+                        raise ValueError('Live animation bank escapes native RAM')
+                    banks[address]=debug.read_memory(address,equipment.PLAYER_CAPACITY)
+                try:
+                    debug.write_memory(real_actor+0xE64,b'\x01')
+                    debug.write_memory(real_actor+0xD00,struct.pack('>3I',109,4,1))
+                    debug.write_memory(real_actor+0xD58,struct.pack('>I',1))
+                    control_call('af_v3_player_fan_setup',[real_actor,real_game])
+                    control_call('af_v3_player_fan_main',[real_actor,real_game])
+                    check('per-frame native animation advancement',real_actor+0x184,struct.pack('>f',2))
+                    check('per-frame native morph advancement',real_actor+0x194,struct.pack('>f',-4))
+                    check('per-frame action remains fan',real_actor+0xCF0,struct.pack('>I',109))
+                    check('per-frame callback has no CPU fault',0x8003CE34,bytes(4))
+                    frame_result=dict(native_main_called=True,live_collision_and_skeleton=True,
+                        action_table_dispatched=False,ordinary_equipped_fan_tested=False)
+                finally:
+                    for address,value in banks.items():debug.write_memory(address,value)
+                    debug.write_memory(real_actor,actor_before)
+                check('live player restored after per-frame check',real_actor,actor_before)
+                for address,value in banks.items():check('live animation bank restored',address,value)
             for bank in (upper,lower):
                 for address in (bank-16,bank+equipment.PLAYER_CAPACITY):check('private animation bank guard',address,edge)
             for address in (bridge-16,bridge+8):check('private call bridge guard',address,edge)
@@ -603,6 +701,7 @@ def player_motion(debug,rom_path,record):
             check('equipment guard',equipment.RAM+equipment.SIZE-16,struct.pack('>4I',*([equipment.GUARD]*4)))
             check('extended module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
             return dict(native_fan_controls_setup_transitions=True,assertions=assertions,
+                shared_sound=sound_result,per_frame_callback=frame_result,
                 positive_equipped_controller_tested=False,fan_action_dispatched=False,
                 ordinary_gameplay_tested=False,hardware_tested=False,flash_written=False,
                 requires_checkpoint_restore=True)

@@ -15,6 +15,7 @@ from v3_equipment_runtime import RAM, SIZE, GUARD, PLAYER_RAM, PLAYER_VROM, PLAY
 from v3_furniture_pipeline import Source
 from v3_import_storage import END, jump
 from v3_npc_draw import relocation_offsets
+import v3_sound_programs as sound_programs
 
 NATIVE_COUNT, COUNT = 105, 121
 CODE_OFFSET, TABLE_OFFSET, MODULE_SIZE = 0x2000, 0x4000, 0x6000
@@ -59,7 +60,7 @@ RETAINED_BOUNDARY = (0x808B99D0,0x808B99D8,0x808DF2BC)
 SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'tools/v3_asset_loader.py','overlays/v3/startup.c',
            'overlays/v3/player_actions.S','overlays/v3/player_actions.c',
-           'overlays/v3/player_actions.ld')
+           'overlays/v3/player_actions.ld') + sound_programs.SOURCES
 
 
 def control_bindings(source,owner,core,original,prior):
@@ -67,6 +68,15 @@ def control_bindings(source,owner,core,original,prior):
     functions=(0x164628,0x169484,0x169544,0x19623C,0x1962B0,0x196468,
                0x166460,0x166650,0x175A3C,0x175B0C,0x175E90,
                0x175CDC,0x1767F8,0x176E6C,0x1777FC)
+    frame_functions={'Player_actor_Movement_Swing_fan','Player_actor_CulcAnimation_Swing_fan',
+        'Player_actor_SetSound_Swing_fan','Player_actor_SearchAnimation_Swing_fan',
+        'Player_actor_ObjCheck_Swing_fan','Player_actor_BGcheck_Swing_fan',
+        'Player_actor_main_Swing_fan','Player_actor_sound_uchiwa',
+        'Player_actor_Movement_Base_Braking','Player_actor_set_sound_common1',
+        'Player_actor_set_sound_common2'}
+    extra=[at for at,rows in source.functions.items() if any(n in frame_functions for n,_ in rows)]
+    if len(extra)!=len(frame_functions):raise ValueError('Missing complete donor per-frame dependency')
+    functions+=tuple(sorted(extra))
     receipts=[source.function(at)[1] for at in functions]
     if [r['symbol'] for r in receipts[:6]]!=[
             'Player_actor_CheckController_forFan','Player_actor_CheckAbleSpeed_forItem',
@@ -87,7 +97,7 @@ def control_bindings(source,owner,core,original,prior):
         boundaries.extend(int(a,16) for a in re.findall(r'= 0x([0-9A-Fa-f]+); // type:func',
             (ROOT/'upstream/af/linker_scripts/jp'/name).read_text()))
     code=(ROOT/'overlays/v3/player_actions.c').read_text()
-    entries=sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)})
+    entries=sorted({int(a,16) for a in re.findall(r'FN\(0x([0-9A-F]+)u,',code)}|{0x808C1118})
     native=[]
     for entry in entries:
         end=min(a for a in boundaries if a>entry)
@@ -96,13 +106,64 @@ def control_bindings(source,owner,core,original,prior):
         if not value or value!=expected[entry-base:end-base]:
             raise ValueError(f'Changed native player control API {entry:08X}')
         native.append(dict(entry=entry,end=end,bytes=len(value),sha256=sha256(value)))
+    rodata=source.sections[4][0]
+    if (source.rel[rodata+23256:rodata+23260]!=struct.pack('>f',0.5)
+            or u32(restored,0x808C1174-PLAYER_RAM)!=0x3C013F80
+            or u32(restored,0x808C1180-PLAYER_RAM)!=0x44814000
+            or u32(restored,0x808C11AC-PLAYER_RAM)!=0xE7A80018):
+        raise ValueError('Changed donor/native WAIT animation speed binding')
     return dict(source_functions=receipts,native_functions=native,
         fan_action=109,fan_kind_first=107,fan_kind_count=8,
-        swing_animation=270,lower_animation=0,part_mask=4,frame_speed=0.5,
+        swing_animation=270,lower_animation=0,part_mask=4,frame_speed=1.0,
+        timing=dict(donor_frame_speed=0.5,native_frame_speed=1.0,
+            donor_wait_speed_constant=23256,native_wait_initializer=0x808C1118,
+            native_braking=0x808B3C74,source_frame_events_retained=True),
         request_union_offset=0xD58,initializer=0x808B4A44,
         wait_signature='game, morph, flags, priority',
         donor_wait_delay_consumed=False,poll_hooks_installed=False,
         action_callbacks_installed=False,ordinary_gameplay_tested=False)
+
+
+def refresh_frame_flow(base,prior,blob,core,original,output):
+    """Add the complete per-frame category and its shared sound dependencies."""
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']]);files=by_vrom(base)
+    if (old['bytes']!=MODULE_SIZE or sha256(module)!=old['sha256']
+            or actions['enabled_imported_actions'] or actions.get('fan_frame_flow')
+            or sha256(files[PLAYER_VROM].extract(base))!=actions['owner_sha256']
+            or sha256(files[PLAYER_RELOC].extract(base))!=actions['relocation_sha256']):
+        raise ValueError('Per-frame integration requires checked disabled action tables')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    bindings=control_bindings(source,files[PLAYER_VROM].extract(base),core,original,old)
+    raw,receipt=source.function(0x16FA00)
+    if u32(raw,8)&0xFFFF0000!=0x38800000 or u32(raw,16)!=0x4BFFF6B9:
+        raise ValueError('Changed source sound-ID argument or positional sound call')
+    sid=u32(raw,8)&65535
+    sounds=sound_programs.install(base,prior,blob,core,[sid])
+    native_sid=sounds['imports'][0]['native_sound_id']
+    previous=actions['code'];n=previous['bytes']
+    if (sha256(module[CODE_OFFSET:CODE_OFFSET+n])!=previous['sha256']
+            or any(module[CODE_OFFSET+n:TABLE_OFFSET])):
+        raise ValueError('Changed shared action-code reservation')
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',extra_sources=('overlays/v3/player_actions.c',),
+        defines=(f'AF_V3_FAN_SOUND=0x{native_sid:04X}',))
+    if len(code)>TABLE_OFFSET-CODE_OFFSET or code[:68]!=module[CODE_OFFSET:CODE_OFFSET+68]:
+        raise ValueError('Per-frame adapter changes original shared dispatch')
+    for name in ('af_v3_player_action_v0','af_v3_player_action_t9'):
+        if compiled['symbols'][name]!=previous['symbols'][name]:
+            raise ValueError('Per-frame adapter moves installed dispatch')
+    module[CODE_OFFSET:TABLE_OFFSET]=code+bytes(TABLE_OFFSET-CODE_OFFSET-len(code))
+    blob[at:at+len(module)]=module
+    report=copy.deepcopy(old)
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module),sound_programs=sounds)
+    report['player_actions'].update(code=compiled,fan_control_flow=bindings,
+        fan_frame_flow=dict(source_sound=receipt,native_sound_id=native_sid,
+            sound_frame=1.5,native_braking=True,main_callback_compiled=True,
+            action_callbacks_installed=False,poll_hooks_installed=False,
+            ordinary_gameplay_tested=False))
+    return report,{}
 
 
 def refresh_controls(base,prior,blob,core,original,output):
@@ -258,6 +319,8 @@ def expanded_tables(source,owner,reloc):
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old['player_actions'].get('fan_control_flow'):
+            return refresh_frame_flow(base,prior,blob,core,original,output)
         return refresh_controls(base,prior,blob,core,original,output)
     if not old.get('kind_readers') or old.get('player_actions') or old.get('bytes')!=SIZE:
         raise ValueError('Action tables require the complete, unextended equipment-kind module')

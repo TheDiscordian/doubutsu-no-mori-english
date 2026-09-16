@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-player-fan-controls-01",
-  "runtime_abi": 101,
-  "rom_sha256": "1763e613b3f080a4cacc26cbfa9d244a742b6e34cff077bbc9e142ac4aeeaa38",
-  "report_sha256": "faa4db40813490033dd2ba7d538c9bcedd9b8eb4639689c8dc3fa25e7dde1abb"
+  "directory": "build/v3-player-frame-sound-01",
+  "runtime_abi": 102,
+  "rom_sha256": "92bffc4eced4cf170922db9080510d347212d65255538f8c8d828cceaf779cc7",
+  "report_sha256": "fb8a8256883c9640c999290cde48465e6c5a7dad8adf39bc43ba22dab0660a31"
 }

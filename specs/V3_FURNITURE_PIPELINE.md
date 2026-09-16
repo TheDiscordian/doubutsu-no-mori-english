@@ -63,8 +63,11 @@ checked startup transfer covers its additional 16-KiB reservation. See
 On a cartridge with those tables, the same adapter installs the donor fan's
 controls/setup/transitions into unused action-code space. The shared refresh
 supports in-place code updates without growing or relocating unchanged ROM
-resources. Incomplete action callbacks and polling hooks remain disabled until
-their remaining gameplay dependencies are implemented.
+resources. The same adapter adds the per-frame callback and shared single-layer
+sound-program conversion, retaining the source pitch sweep/envelope and reusing
+an equivalent native instrument/sample. Native frame speed and braking use the
+corresponding N64 timing. Incomplete action callbacks and polling hooks remain
+disabled until their remaining gameplay dependencies are implemented.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing
