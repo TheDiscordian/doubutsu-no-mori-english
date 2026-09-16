@@ -13,10 +13,7 @@ _Alignas(16) unsigned char af_v3_memory[AF_V3_BLOB_SIZE];
 _Alignas(16) unsigned char af_v3_accessory_memory[AF_V3_ACCESSORY_BYTES];
 static _Alignas(16) unsigned char source[AF_V3_BLOB_SIZE], art[AF_V3_ACCESSORY_BYTES];
 volatile u32 af_v3_config[4], af_v3_installed, af_v3_memsize;
-static int transfers, failure, executions, writes, invalidations, item_invalidations;
-#ifdef AF_V3_CAMPSITE
-static int campsite_invalidations;
-#endif
+static int transfers, failure, executions, writes, invalidations, package_invalidations;
 int af_v3_previous(void) { return 1; }
 int af_v3_dma(void *out, u32 vrom, u32 size) {
     ++transfers;
@@ -31,25 +28,11 @@ int af_v3_dma(void *out, u32 vrom, u32 size) {
 }
 void af_v3_writeback(void *p, u32 size) { (void)p; (void)size; ++writes; }
 void af_v3_invalidate(void *p, u32 size) {
-    (void)p; (void)size; ++invalidations;
-#ifdef AF_V3_WESTERN_LARGE
-    if (p == af_v3_accessory_memory + 0x10000) {
-        assert(size == 0x1000 && size <= sizeof(art) - 0x10000);
-        ++item_invalidations;
-    }
-#endif
-#ifdef AF_V3_CAMPSITE
-    if (p == af_v3_accessory_memory + 0x2D100) {
-#ifdef AF_V3_CAMPER
-        assert(size == 0x2F00 && size <= sizeof(art) - 0x2D100);
-#elif defined(AF_V3_CAMPER_CALENDAR)
-        assert(size == 0x2A00 && size <= sizeof(art) - 0x2D100);
-#else
-        assert(size == 0xF00 && size <= sizeof(art) - 0x2D100);
-#endif
-        ++campsite_invalidations;
-    }
-#endif
+    ++invalidations;
+    if (p == af_v3_accessory_memory + 0x100) {
+        assert(size == sizeof(art)-0x110);
+        ++package_invalidations;
+    } else assert(p == af_v3_memory+0x100 && size == sizeof(source)-0x110);
 }
 int af_v3_execute(void) { ++executions; return 1; }
 static void reset(void) {
@@ -65,10 +48,7 @@ static void reset(void) {
     af_v3_config[0] = AF_V3_STORAGE_VROM; af_v3_config[1] = sizeof(source);
     af_v3_config[2] = af_crc32(source, sizeof(source)); af_v3_config[3] = AF_V3_ABI;
     af_v3_memsize = 0x800000; af_v3_installed = 0;
-    transfers = failure = executions = writes = invalidations = item_invalidations = 0;
-#ifdef AF_V3_CAMPSITE
-    campsite_invalidations = 0;
-#endif
+    transfers = failure = executions = writes = invalidations = package_invalidations = 0;
 }
 int main(void) {
     reset(); af_v3_memsize = 0x400000;
@@ -86,13 +66,7 @@ int main(void) {
         assert(!af_v3_startup() && !writes && !executions);
     }
     reset(); assert(af_v3_startup() && af_v3_installed == 1 && transfers == 2 && executions == 1);
-#ifdef AF_V3_CAMPSITE
-    assert(invalidations == 4 && item_invalidations == 1 && campsite_invalidations == 1);
-#elif defined(AF_V3_WESTERN_LARGE)
-    assert(invalidations == 3 && item_invalidations == 1);
-#else
-    assert(invalidations == 2 && !item_invalidations);
-#endif
+    assert(invalidations == 2 && package_invalidations == 1);
     assert(writes == 2 && !memcmp(art, af_v3_accessory_memory, sizeof(art)));
     assert(af_v3_startup() && transfers == 2);
     puts("accessory startup guards, DMA, CRC, caches, and low-memory path pass");

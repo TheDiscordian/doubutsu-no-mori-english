@@ -110,10 +110,55 @@ flattened to pass the static converter.
 
 ## Native integration work
 
+### Shared resource loader
+
+The existing importer accepts the complete checked static-held category:
+
+```sh
+python3 tools/v3_furniture_install.py --refresh-runtime \
+  --equipment-art build/v3-handheld-static-prepared-02 --output build/held-runtime
+```
+
+`tools/v3_equipment_runtime.py` verifies the prepared graphics and derives all
+equipment motions from the source selectors. Fourteen complete models and
+sixteen independently packed animations occupy 31,584 bytes. Their indices are
+`17 + source resource index`; native indices `0..16` keep their original
+meanings. Fifty fixed source slots preserve holes for unsupported skeletons.
+This installs no new inventory identity, equipment kind, action, or choice.
+Player holding/swing animations remain prepared separately, not installed here.
+
+Five native resource getters at `800B12C8`, `800B12F4`, `800B131C`, `800B1614`,
+and `800B1650` delegate to shared readers. They supply model/animation pointers,
+types, sizes, segment origins, and VROMs. Original lookup tables and the real
+DMA/bias functions at `800B167C` and `800B16D0` remain unchanged. The same DMA
+functions are used by `808B5A10` when changing equipment and by
+`mSM_load_player_anime` after menus. A transfer probe does not establish ordinary
+menu-close or take-out/put-away gameplay acceptance.
+
+The 8-KiB resident module occupies `804A3000..804A4FFF`, after the accessory
+package and before the existing furniture model pool. Code is bounded below
+`804A4000`; an `AFHR` version-one header and fifty 16-byte records follow.
+Each record is `(vrom, bytes, segment-six pointer, type)`. Four `AF48C0DE` footer
+words guard its end. Empty slots, negative/out-of-range indices, unsupported
+skeleton type one, malformed sizes/pointers, and out-of-storage transfers reject.
+Individual transfers fit the existing 4,376-byte equipment-bank lower bound.
+This does not approve arbitrary combined model-plus-animation sizes.
+
+The importer appends payloads and the module before the checked terminal
+catalogue/shop resources, moving only those three unchanged DMA owners.
+Existing model VROMs, saved profiles, original player owner, and item actions
+remain unchanged. Startup loads/checks the entire module against a compiled CRC
+before publishing its code. Shared transfer verification and one instruction-cache
+flush covering the complete accessory package keep startup at 952 bytes inside
+the unchanged 992-byte reservation. The linker still rejects overlaps; no guard,
+configuration, or call-return scratch space is repurposed.
+
+### Player ownership and actions
+
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
 `3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b` in both the
-original and current ABI-96 cartridge. It reads ordinary saved equipment at
+original and current ABI-97 cartridge. It reads ordinary saved equipment at
 player-private offset `3EC`, or title-demo equipment at controller offset `3C`.
 It accepts only `2200..2223`, using a 36-entry jump table at `808E0274` with
 SHA-256 `b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.
@@ -121,9 +166,19 @@ The extra donor handheld IDs are therefore not existing native player support.
 
 The next implementation must extend equipment selection and all dependent
 kind-indexed readers without changing original kind meanings or overstepping
-signed-byte bounds. Add selected model ownership/loading, safe cleanup and
+signed-byte bounds. Connect selected models to the shared loader, safe cleanup and
 graphics bindings, take-out/put-away, and actual per-category actions. Do not
 route a fan through an unrelated umbrella or ordinary tool action.
+
+The native player holds two model buffers at `DBC`, animation pointers at
+`DC4`, segment bases at `DCC`/`DD4`, and shape/animation indices at `DDC`/`DE4`;
+the active-bank index is at `DEC`. `808B5A10` places an animation immediately
+after its model, so combined sizes need explicit bounds before enabling new
+pairs. The native skeleton initializer at `808BD934` uses item skeleton state
+at `A18`, joint work at `A88`, and morph work at `AB2`: seven vectors per array.
+The donor uses eight. A seven-joint balloon needs eight vectors including root
+translation; do not enable it with the current native buffers or paste the
+GameCube player structure's offsets into the N64 owner.
 
 For fans, the donor implementation is in `m_player_item_fan.c_inc` and
 `m_player_main_swing_fan.c_inc`. Its draw entry is `.text:173A84`; setup and main

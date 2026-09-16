@@ -1569,7 +1569,8 @@ def main():
                 if not (out/'test.bs1').is_file():
                     raise ValueError('Furniture batch probes require an emulator checkpoint')
                 needs_checkpoint_restore = True
-                results.append(exercise(debug,args.rom,record))
+                results.append(exercise(debug,args.rom,record,
+                    section=action.get('item_batch_section','automatic_furniture')))
             if action.get('test_v3_school_desks'):
                 from v3_school_desks_smoke import exercise
                 if not (out/'test.bs1').is_file():

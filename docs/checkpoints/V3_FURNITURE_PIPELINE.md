@@ -1,5 +1,83 @@
 # Automatic furniture pipeline checkpoint
 
+## Native held-resource loading
+
+`--refresh-runtime --equipment-art` installs one source-derived category through
+the existing importer: fourteen complete static held models and sixteen complete
+equipment animations. It reuses the prepared graphics, packs each animation for
+independent native DMA, and reserves stable indices `17 + source index` in a
+fifty-slot table. Unsupported skeleton slots remain empty. The eight prepared
+player animations are not installed by this batch. No item choice or action is
+enabled merely because its resource can load.
+
+Output: `build/v3-equipment-resources-runtime-03/`, ABI 97, pinned by
+`config/v3-import-build.json`.
+
+- ROM SHA-256:
+  `2ae396a32a1fbd86411c2dec5420fb45c702fdfb048828b8ddabce84185a4e3a`.
+- UPS SHA-256:
+  `1e175606802ef57eb4233f8a4e3f90faa5edc6f189acac9d24b5b5ffb778e743`.
+- Build receipt SHA-256:
+  `90068e8fa585961789f63638827f624039c837ebfe78e9538fd9b3d06dc74580`.
+- Resources: 31,584 bytes; shared resident module: 8,192 bytes, 644 code bytes.
+- Module RAM: `804A3000..804A4FFF`; VROM: `02537DC0`.
+- Startup: 952 of 992 reserved bytes. Import blob: 3,447,264 bytes;
+  681,504 bytes remain before the English-choice resource.
+
+Five shared native getters provide pointers, types, sizes, segment origins, and
+VROMs. Original indices, lookup tables, DMA, and segment-bias routines retain
+their semantics. The original player bank switch and menu-close reload both
+call those DMA routines; they are not separately reimplemented. The importer
+moves only the three unchanged terminal catalogue/shop owners to append these
+resources. All existing graphics, owner data, catalogue content, profiles, and
+save code remain unchanged.
+
+Initial linking exposed a 52-byte startup overflow. Sharing CRC-checked transfer
+code and consolidating package instruction-cache coverage resolves it without
+expanding the reservation or consuming configuration/scratch space. The complete
+equipment module, including its header/footer, is bound by a compiled CRC.
+No failed build is promoted. Intermediate local output directories remain intact.
+
+### Verification and limits
+
+Risk: changed startup and native equipment readers must not corrupt the resident
+packages, original tools, or existing imports. Stop after shared reader/startup
+sanitizers, current cartridge ownership/source checks, optional composition,
+and one bounded representative native DMA pass. Do not add individual item tests
+or infer playable actions from successful transfers.
+
+All eighteen focused tests pass: six in `test_v3_equipment_runtime` and twelve
+existing optional-composition tests directed at the new cartridge. Coverage
+includes native-index fallback, malformed/empty records, all four startup
+transfers and failure paths, complete source artwork/motion comparison, retained
+unrelated owners, future terminal-tail reuse, code bounds, CRCs, N64 checksums,
+UPS reconstruction, and optional/profile handling. Empty selection reproduces
+the exact stable V2 cartridge; full selection reproduces ABI 97.
+
+The first silent native run, `build/smoke-v3-equipment-resources-01/`, completes
+115 records with 96 assertions. `results.json` SHA-256:
+`0aa9746def1cbf54783a9b83be923983a9f60c3b71a4541e1ef5cd0f8510365f`.
+The existing shared batch probe selects the largest object in each of five
+imported resource categories and four original resources. All nine complete
+transfers, untouched tails, pointers/types/origins, segment-base calculation,
+invalid indices, allocation guards, resident guards, and unchanged saved profile
+pass. The checkpoint restores, CPU fault status remains clear, shutdown is
+clean, and isolated FlashRAM retains its blank hash. No user save is opened.
+
+The 104 choices and saved format 2 remain unchanged. Same-profile compatibility
+with ABI 96 is expected in both directions; no new ordinary save/restart or
+hardware playthrough is claimed. V3 saves remain unsuitable for V2, and profiles
+must include any imported identities already saved. Both served patchers remain
+unchanged and this build is not a new playtest/release handoff.
+
+Next: actual native kind selection and indexed readers, player holding/action
+animations, fan waving with source timing/part masks, inventory/acquisition,
+and selected-only profiles. Native player arrays contain seven work vectors,
+while the donor has eight; balloon rigs need explicit buffer work. The bank
+switch places animation after model, so paired sizes require separate validation.
+Ordinary take-out/put-away, menu-close reload, model drawing, and player actions
+remain untested. Resource loading alone is not a completed handheld import.
+
 ## Held-motion dependencies
 
 `tools/v3_keyframes.py` implements shared complete rotational-skeleton and

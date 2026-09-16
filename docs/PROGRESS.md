@@ -2,6 +2,16 @@
 
 ## Active development
 
+ABI 97 contains the shared held-resource loader: fourteen complete models and
+sixteen equipment animations, with 31,584 resource bytes and an 8-KiB resident
+module. Startup, five shared native readers, and actual item DMA pass bounded
+verification. Eighteen host/cartridge/composition checks pass; the first silent
+native run passes 115 records with 96 assertions across nine representative
+transfers, retained original equipment, guards, and restored isolated state.
+There are no new selectable items yet: native kinds/actions, player animations,
+combined bank and rig buffers, inventory/acquisition, and optional profiles still
+need integration. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-held-resource-loading).
+
 The shared handheld pipeline prepares a complete 7,760-byte motion bundle:
 sixteen equipment animations, six constant player poses, fan idle, and fan
 swing. Twenty skeleton descriptions retain actual joint/model dependencies;
@@ -10,8 +20,8 @@ selectors connect all 79 equipment identities/states to their real holding
 animations. The shared keyframe format preserves every constant, frame, value,
 velocity, hierarchy, and relocated pointer without resampling. Fourteen focused
 checks pass across the initial run and one corrected mutation fixture. The
-bundle remains prepared-only; no cartridge, save, choice, or patcher changes.
-Continue native model ownership and action/animation binding using these
+player motions remain prepared-only; the equipment motions use the shared loader
+above. Continue native player ownership and action/animation binding using these
 resources. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#held-motion-dependencies).
 
 The [shared handheld adapter](../specs/V3_HANDHELD_ITEMS.md) discovers all 79
@@ -25,7 +35,8 @@ Eleven focused checks pass, including complete artwork and unchanged current
 furniture output from the shared compiler. The full donor inventory carries the
 same equipment dependencies without duplicate identities. Native player actions,
 model ownership, readers, acquisition, catalogue, and profile integration remain
-work; the cartridge, saves, and both patchers are unchanged. See the
+work; resource installation alone does not enable them. Saves and both patchers
+remain unchanged. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#actual-held-model-batch).
 
 The shared importer distinguishes ordinary room drops from catalogue/collection
@@ -52,10 +63,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 96 at
-`build/v3-shared-display-runtime-01/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 97 at
+`build/v3-equipment-resources-runtime-03/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 95 is expected in both directions; this
+Same-profile compatibility with ABI 96 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

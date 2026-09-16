@@ -433,8 +433,8 @@ def build(output, art_path, lock=LOCK):
     return report
 
 
-def refresh_runtime(output, lock=LOCK):
-    """Update shared readers without reconverting or reinstalling item artwork."""
+def refresh_runtime(output, lock=LOCK, *, equipment_art=None):
+    """Update shared readers; optionally install the shared held-resource adapter."""
     output=output.resolve()
     if output.exists() or not output.is_relative_to(ROOT/'build'):
         raise ValueError('Use a fresh ignored build directory')
@@ -442,18 +442,35 @@ def refresh_runtime(output, lock=LOCK):
     base_pin=json.loads(lock.read_bytes())
     if base_pin['rom_sha256']!=sha256(base): raise ValueError('Base lock changed during the build')
     original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
-    blob=bytearray(files[BLOB].extract(base)); core=bytearray(files[CODE_VROM].extract(base))
+    old_blob=files[BLOB].extract(base);blob=bytearray(old_blob)
+    core=bytearray(files[CODE_VROM].extract(base))
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]
     if (sha256(blob)!=prior['blob_sha256'] or sha256(package)!=prior['import_storage']['package_sha256']
             or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
         raise ValueError('Changed shared runtime package')
     output.mkdir(parents=True)
+    moved=[];equipment_report=None;reused=None
+    if equipment_art is not None:
+        blob,reused=reuse_resource_tail(base,prior,old_blob)
+        if not reused['reused_bytes']:
+            raise ValueError('Equipment integration requires the checked shared resource tail')
     display_report,alias_report=display_aliases.install(prior,blob,core,output)
+    if equipment_art is not None:
+        import v3_equipment_runtime as equipment
+        equipment_report=equipment.install(prior,blob,core,original,output,equipment_art)
+        for row in sorted(reused['retired_resources'],key=lambda r:r['blob_offset']):
+            data=files[row['vrom']].extract(base)
+            blob.extend(bytes(-len(blob)%16));at=len(blob);blob.extend(data)
+            moved.append(dict(vrom=row['vrom'],blob_offset=at,bytes=len(data),
+                              physical=files[BLOB].pstart+at,sha256=sha256(data)))
     abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
     package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
     module=bytearray(files[MODULE].extract(base)); old=prior['startup']
     defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
         for f in old['flags'] if f.startswith('-D'))
+    if equipment_report:
+        defines+=(f'AF_V3_EQUIPMENT_VROM=0x{equipment_report["vrom"]:08X}u',
+                  f'AF_V3_EQUIPMENT_CRC=0x{equipment_report["crc32"]:08X}u')
     startup,startup_report=compile_part('startup',output/'startup',defines=defines)
     if (sha256(module[STARTUP:STARTUP+old['bytes']])!=old['sha256']
             or any(module[STARTUP+old['bytes']:CONFIG]) or len(startup)>CONFIG-STARTUP):
@@ -461,17 +478,38 @@ def refresh_runtime(output, lock=LOCK):
     module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
     struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
     result=bytearray(base)
+    if equipment_report:
+        start=files[BLOB].pstart+len(old_blob);end=files[BLOB].pstart+len(blob)
+        if (len(blob)<=len(old_blob) or BLOB+len(blob)>END or end>len(base) or any(base[start:end])
+                or any(e.pstart<end and start<(e.pend or e.pstart+e.size)
+                       for v,e in files.items() if v!=BLOB and e.pstart!=0xFFFFFFFF)
+                or any(e.vstart<BLOB+len(blob) and BLOB+len(old_blob)<e.vend
+                       for v,e in files.items() if v!=BLOB)):
+            raise ValueError('Equipment resource growth overlaps live cartridge data')
     for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module)):
         entry=files[vrom]
-        if entry.pend or entry.size!=len(data): raise ValueError('Runtime update changes a resource allocation')
+        if entry.pend or entry.size!=len(data) and not (equipment_report and vrom==BLOB):
+            raise ValueError('Runtime update changes an undeclared resource allocation')
         result[entry.pstart:entry.pstart+len(data)]=data
+    if equipment_report:
+        struct.pack_into('>I',result,DMA_START+files[BLOB].index*16+4,BLOB+len(blob))
+        for row in moved:
+            struct.pack_into('>4I',result,DMA_START+files[row['vrom']].index*16,
+                             row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
     fix_checksum(result);result=bytes(result)
-    if result[DMA_START:DMA_END]!=base[DMA_START:DMA_END]: raise ValueError('Runtime update changes the DMA directory')
+    expected=bytearray(base[DMA_START:DMA_END])
+    if equipment_report:
+        struct.pack_into('>I',expected,files[BLOB].index*16+4,BLOB+len(blob))
+        for row in moved:
+            struct.pack_into('>4I',expected,files[row['vrom']].index*16,
+                             row['vrom'],row['vrom']+row['bytes'],row['physical'],0)
+    if result[DMA_START:DMA_END]!=expected:raise ValueError('Undeclared DMA-directory change')
     patch=make_ups(original,result)
     if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')
     report=copy.deepcopy(prior)
     report.update(build='v3-shared-item-runtime',runtime_abi=abi,input_build_sha256=sha256(base),
         output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
+        blob_bytes=len(blob),blob_file_bytes=len(blob),
         startup=startup_report,display_aliases=alias_report,
         native_test='pending changed shared item readers')
     report['clothing']['display']=display_report
@@ -482,6 +520,15 @@ def refresh_runtime(output, lock=LOCK):
         artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
         saved_profile_changed=False,web_patcher_enabled=False)
     report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_furniture_install.py',)+display_aliases.SOURCES})
+    if equipment_report:
+        report['equipment_resources']=equipment_report
+        report['automatic_furniture']['resource_moves']=moved
+        report['import_storage']['remaining_bytes']=END-BLOB-len(blob)
+        report['shared_runtime_refresh'].update(adapters=['display_aliases','equipment_resources'],
+            resource_allocations_changed=True,resource_tail_reuse=reused,
+            unchanged_owner_moves=moved,additional_resident_bytes=equipment_report['bytes'])
+        report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
+        report['native_test']='pending shared equipment resource DMA/readers'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)
     write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
@@ -499,6 +546,10 @@ if __name__=='__main__':
     mode.add_argument('--art',type=Path)
     mode.add_argument('--refresh-runtime',action='store_true')
     parser.add_argument('--base-lock',type=Path,default=LOCK)
+    parser.add_argument('--equipment-art',type=Path,
+        help='With --refresh-runtime, install prepared shared held models and source-derived motion resources')
     args=parser.parse_args()
-    result=refresh_runtime(args.output,args.base_lock) if args.refresh_runtime else build(args.output,args.art,args.base_lock)
+    if args.equipment_art and not args.refresh_runtime:parser.error('--equipment-art requires --refresh-runtime')
+    result=(refresh_runtime(args.output,args.base_lock,equipment_art=args.equipment_art)
+            if args.refresh_runtime else build(args.output,args.art,args.base_lock))
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

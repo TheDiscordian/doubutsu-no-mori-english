@@ -38,9 +38,13 @@ never substitute for the actual held model or its gameplay.
 
 Shared reader changes use the same installer's `--refresh-runtime` mode. It
 updates the checked current cartridge without reconverting or reinstalling any
-artwork. It retains the complete DMA directory, existing allocations, profile,
-and saved identities, and emits a new build lock and reconstructible patch.
-This is a shared runtime update, not a separate installer for each item.
+existing artwork. Ordinary reader refreshes retain the complete DMA directory
+and allocations. The optional `--equipment-art` adapter installs the complete
+checked held-resource category and its shared loader, moving only the three
+unchanged terminal catalogue/shop owners; see [held equipment](V3_HANDHELD_ITEMS.md).
+Both paths preserve profiles and saved identities and emit a new build lock and
+reconstructible patch. This is a shared runtime update, not a separate installer
+for each item.
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

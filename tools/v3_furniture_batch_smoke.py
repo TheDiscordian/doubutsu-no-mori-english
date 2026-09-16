@@ -28,6 +28,7 @@ def representatives(rows):
 
 
 def exercise(debug, rom_path, record, *, section='automatic_furniture'):
+    if section=='equipment_resources':return equipment_resources(debug,rom_path,record)
     path = Path(rom_path)
     image = path.read_bytes()
     report = json.loads((path.parent / 'build.json').read_bytes())
@@ -410,3 +411,71 @@ def exercise(debug, rom_path, record, *, section='automatic_furniture'):
                 native_palette_callbacks=tested_palettes,
                 ordinary_bed_gameplay_tested=False,
                 gpu_or_hardware_tested=False, flash_written=False, requires_checkpoint_restore=True)
+
+
+def equipment_resources(debug,rom_path,record):
+    """Exercise source-derived resource categories through the real item DMA."""
+    import v3_equipment_runtime as equipment
+    path=Path(rom_path);image=path.read_bytes();report=json.loads((path.parent/'build.json').read_bytes())
+    if sha256(image)!=report['output_sha256']:raise ValueError('Changed equipment cartridge')
+    resources=report['equipment_resources'];files=by_vrom(image);blob=files[runtime.BLOB].extract(image)
+    assertions=0
+    def check(label,at,want):
+        nonlocal assertions
+        got=debug.read_memory(at,len(want));passed=got==want
+        record(dict(equipment_check=label,address=f'{at:08X}',bytes=len(want),
+                    assertion='passed' if passed else 'failed',observed_sha256=sha256(got),expected_sha256=sha256(want)))
+        if not passed:raise ValueError('Equipment mismatch: '+label)
+        assertions+=1
+    def call(at,args=(),want=None):
+        nonlocal assertions
+        result=debug.call(f'{at:08X}',list(args),return_address=MODULE_RAM+0x6480)
+        if want is not None:
+            result['assertion']='passed' if result['return_value']==want else 'failed';assertions+=1
+        record(result)
+        if want is not None and result['return_value']!=want:raise ValueError(f'Equipment call {at:08X} mismatch')
+        return result['return_value']
+    at=resources['blob_offset']
+    check('complete startup-loaded code and resource table',equipment.RAM,blob[at:at+equipment.SIZE])
+    saved=debug.read_memory(0x8046C000,864)
+    # Largest transfer in each distinct category, plus original native categories.
+    selected={}
+    for row in resources['records']:
+        key=(row['kind'],row['type'])
+        if key not in selected or row['bytes']>selected[key]['bytes']:selected[key]=row
+    rows=list(selected.values());contract=resources['native_contract']
+    original=files[0x00B8B000].extract(image)
+    for i in (0,1,2,16):
+        origin=contract['bounds'][i]-0x06000000+8;n=contract['sizes'][i]
+        rows.append(dict(index=i,pointer=contract['pointers'][i],type=contract['types'][i],bytes=n,
+            vrom=0x00B8B000+origin,origin=origin,expected=original[origin:origin+n]))
+    size=0x1200;allocation=call(0x8009BFC0,[size]);target=allocation+16
+    if allocation&15 or not MODULE_RAM+0x8000<=allocation<=0x80400000-size:
+        raise ValueError('Equipment scratch allocation outside native heap')
+    edge=b'V3HR'*4;end=target+equipment.CAPACITY
+    debug.write_memory(allocation,edge);debug.write_memory(end,edge)
+    try:
+        for row in rows:
+            index=row['index'];origin=row.get('origin',0)
+            for address,want in ((0x800B12C8,row['pointer']),(0x800B12F4,row['type']),
+                    (0x800B131C,row['bytes']),(0x800B1614,origin),(0x800B1650,row['vrom'])):
+                call(address,[index],want)
+            fill=bytes([0xA5])*equipment.CAPACITY;debug.write_memory(target,fill)
+            call(0x800B167C,[target,index])
+            expected=row.get('expected')
+            if expected is None:expected=blob[row['blob_offset']:row['blob_offset']+row['bytes']]
+            check('complete held resource DMA',target,expected+fill[len(expected):])
+            call(0x800B16D0,[index,target],target-origin)
+            check('resource DMA left guard',allocation,edge);check('resource DMA right guard',end,edge)
+        missing=next(i for i in range(equipment.COUNT) if equipment.FIRST+i not in {r['index'] for r in resources['records']})
+        for index in (0xFFFFFFFF,equipment.FIRST+equipment.COUNT,equipment.FIRST+missing):
+            call(0x800B131C,[index],0);call(0x800B12C8,[index],0)
+        check('save/profile unchanged',0x8046C000,saved)
+        check('no faulted CPU thread',0x8003CE34,bytes(4))
+        check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+        check('resident package guard',0x804A2FF0,bytes.fromhex('AFACC0DE')*4)
+        check('equipment module guard',equipment.RAM+equipment.SIZE-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+    finally:call(0x8009C040,[allocation])
+    return dict(native_equipment_resources=True,representative_transfers=len(rows),assertions=assertions,
+        imported_categories=len(selected),ordinary_menu_reload_tested=False,player_actions_tested=False,
+        hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)

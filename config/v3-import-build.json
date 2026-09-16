@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-shared-display-runtime-01",
-  "runtime_abi": 96,
-  "rom_sha256": "76d148124f4f2e3f4b7157608feb69c9a329612f814f1dffde320287e75ba406",
-  "report_sha256": "c601ec56e93a35e035589a0a5c7ec2835e88715ca233f7308d8fe258b280a50c"
+  "directory": "build/v3-equipment-resources-runtime-03",
+  "runtime_abi": 97,
+  "rom_sha256": "2ae396a32a1fbd86411c2dec5420fb45c702fdfb048828b8ddabce84185a4e3a",
+  "report_sha256": "90068e8fa585961789f63638827f624039c837ebfe78e9538fd9b3d06dc74580"
 }

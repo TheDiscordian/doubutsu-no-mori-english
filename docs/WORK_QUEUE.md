@@ -2,6 +2,20 @@
 
 ## Active: V3 optional GameCube imports
 
+ABI 97 installs shared held-resource loading: fourteen complete models and
+sixteen equipment animations, 31,584 resource bytes plus an 8-KiB resident module.
+The checked current build is `build/v3-equipment-resources-runtime-03/`.
+Eighteen focused host/cartridge/composition checks and the first silent native
+run pass; nine representative transfers cover static models, four animation
+types, and original equipment. Reuse those results. No item is enabled by this
+resource batch. Next connect native equipment-kind selection and indexed
+readers, player holding/action animations, proper fan waving, and selected-only
+inventory/acquisition/profile handling. Audit combined model/animation sizes
+and joint work buffers before enabling rigs; the native actor has seven vectors,
+where the donor has eight. Do not flatten animated models or borrow unrelated
+actions. The 104 existing choices, saved format 2, and both V2 patchers remain
+unchanged. See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#native-held-resource-loading).
+
 Reuse `build/v3-held-motion-prepared-01/held-motion.n64obj.bin` for native
 motion integration. Its complete twenty-four animations occupy 7,760 bytes;
 all sixteen equipment motions and eight player holding/action animations retain
@@ -14,8 +28,8 @@ joint-matrix commands and balloon textures need shared graphics support.
 Pinwheel graphics preflight succeeds, but complete rig/model packing and action
 ownership remain work. Keep real inventory/readers/acquisition/profile and
 context-correct catalogue dependencies; motion data alone enables no item.
-Fourteen focused source/packing checks pass. Do not replay unchanged cartridge
-tests until a native integration change warrants them.
+Fourteen focused source/packing checks pass. Equipment resource loading uses
+the native adapter above; player motions and complete rigs remain integration work.
 
 Continue native equipment integration using the
 [shared handheld records](../specs/V3_HANDHELD_ITEMS.md), not per-item scripts.
@@ -30,8 +44,8 @@ bindings, cleanup, take-out/put-away, and category actions before enabling items
 The donor fan action/animation entries are identified in the spec. Do not use
 umbrella behaviour as a fan substitute or duplicate original tools. Animated
 held models and separate umbrella owners remain explicit conversion work.
-Eleven focused checks pass; retain that unchanged evidence. No native run is
-needed until cartridge code changes. Both served patchers remain V2.
+Eleven focused source/art checks pass; retain that unchanged evidence. The native
+resource adapter retains those complete models. Both served patchers remain V2.
 
 Use the shared source-derived context records when integrating parent items.
 Both donor room-drop calls preserve tools, golden tools, fans, pinwheels, and
