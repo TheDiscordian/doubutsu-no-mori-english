@@ -12,12 +12,23 @@ pass. No allocation, saved format, or selectable identity changes. Preserve the
 unchanged held-draw and sound evidence instead of replaying those batches.
 See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-action-activation).
 
-Next, add profile-aware native equipment selection, scene/special-action
-permissions, and parent inventory/names/prices/acquisition/catalogue/persistence
-before offering fans as choices. The current native item selector still rejects
-their IDs. Use source-derived category records and context-specific collection
-representations. Keep full scene rendering and ordinary equipped-fan use explicit;
-direct callback execution is not that proof.
+The next shared selection adapter is implemented but unpromoted in ABI 105 at
+`build/v3-held-selection-01/`. Its 752-byte source-derived table supplies all
+eight fan item/kind/profile relationships without enabling any profile bit.
+Native equipment and scene/visibility rules remain; passive-item permission
+extends to selected imports. Six focused checks pass across the recorded commands.
+Two native attempts stop on independently identified fixture errors before
+imported-selection testing: permission value two is absent, and native item
+`2202` is kind 35 rather than two. The probe now reads original switch returns;
+its dedicated fixture check passes. No third emulator attempt is queued for this
+batch, and ABI 104 remains the checked main lock.
+
+Next, integrate parent inventory/names/prices/acquisition, context-correct
+catalogue/collection, and optional composition using the prepared records and
+ABI-105 candidate lock. Run the corrected selector/visibility tail with that
+meaningful integration change, not as a historical replay. Keep ordinary
+take-out/put-away, full scene drawing, persistence, and equipped-fan use explicit;
+direct callbacks and host checks do not establish those results.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains

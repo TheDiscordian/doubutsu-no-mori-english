@@ -200,8 +200,8 @@ functions, table spans, and relocations for holding pose, item main routine,
 shape, equipment motion, tumble, and get-up. All 79 donor equipment kinds have
 stable extended indices `36 + source kind`, remaining below signed-byte 128.
 This namespace does not duplicate inventory items or offer existing tools as
-new browser choices. The actual equipment selector remains unchanged until
-category actions, permissions, acquisition, and selected profiles are ready.
+new browser choices. The shared equipment selector below consults independent
+profile bits; preparing a category does not enable those bits or add choices.
 
 An `AFKD` version-one header and 79 twelve-byte records occupy module offsets
 `B00..EC3`, before the unchanged `FE0` native part-copy bridge. The linker caps
@@ -293,7 +293,8 @@ sound, and end-of-swing transitions. `overlays/v3/player_actions.c` resolves eac
 the currently loaded constructor; no heap address is captured at build time.
 The complete donor functions and every called native API are recorded and
 checked. The installed dispatch entry addresses and all original actions stay
-unchanged. The code occupies 1,944 bytes of the existing 8-KiB code reservation. In-place
+unchanged. The promoted action code occupies 1,944 bytes; the unpromoted selection
+build occupies 2,504 bytes of the existing 8-KiB code reservation. In-place
 code refresh preserves animation banks, actor size, and save profile. The sound
 adapter appends a relocated complete sequence, retaining existing banks/samples.
 It adds no selectable items.
@@ -345,7 +346,7 @@ The complete per-frame callback preserves donor order: brake, forced-position
 input, animation, frame-event sound, lean recovery, standing-object correction,
 background collision, held-item update, and end-of-swing requests. Sound triggers
 at frame `1.5` only when animation advances; a frozen frame cannot retrigger it.
-These functions form the registered fan action. Native item selection and
+These functions form the registered fan action. Parent inventory and
 profile/acquisition integration remain required. The action tables still reject
 every unfinished imported action.
 
@@ -391,29 +392,61 @@ Balloon and pinwheel indices 21 and 22 remain null pending their actual rigs.
 
 The donor fan net reset matches native `808BE140`: angles `(0, 182, -7281)`,
 fraction `0.2`, and step arguments `2730` and `100`. The native callback is
-registered in action 109. Full scene rendering, profile-aware inventory and
-equipment selection, scene permissions, acquisition, and persistence still need
-integration. Ordinary equipped-fan use is not established by direct callbacks.
+registered in action 109. The shared selector retains scene permissions and
+extends passive-equipment permissions. Full scene rendering, parent inventory,
+acquisition, and persistence still need integration. Ordinary equipped-fan use
+is not established by direct callbacks.
 
 The refresh updates an already resident player relocation resource in place
 inside the import blob. Its reported blob checksum includes that change; it
 must not write the new relocation bytes only after computing the blob receipt.
 No owner, table, or audio allocation moves for this update.
 
-The current native player equipment selector is `808BD3F8..808BD583` in owner
-VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
-`3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b` in both the
-original and current experimental cartridge. It reads ordinary saved equipment at
-player-private offset `3EC`, or title-demo equipment at controller offset `3C`.
-It accepts only `2200..2223`, using a 36-entry jump table at `808E0274` with
-SHA-256 `b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.
-The extra donor handheld IDs are therefore not existing native player support.
+### Selected equipment and visibility
 
-The next implementation must extend equipment selection and category permissions
-using the shared kind readers without changing original kind meanings or
-overstepping signed-byte bounds. Connect selected models to the shared loader, safe cleanup and
-graphics bindings, take-out/put-away, and actual per-category actions. Do not
-route a fan through an unrelated umbrella or ordinary tool action.
+This implementation is in unpromoted ABI 105 at `build/v3-held-selection-01/`.
+The checked main lock remains ABI 104. Host/cartridge checks pass, but the native
+probe stops on two independently identified fixture errors before imported
+selection/visibility executes. The fixture corrections are retained for the next
+meaningful inventory integration batch; neither missing result is claimed passed.
+
+The native player selector at `808BD3F8..808BD583` reads ordinary saved equipment
+at player-private offset `3EC`, or title-demo equipment at controller offset
+`3C`. The shared hook at `808BD430` preserves that choice and the complete native
+36-entry switch for `2200..2223`. Its table at `808E0274` retains SHA-256
+`b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.
+Other item IDs use the selected-equipment reader, not a widened short switch.
+The hook's native continuation resolves against the current owner constructor.
+
+An `AFHS` version-one table occupies 752 bytes at module offset `5500`, RAM
+`804A8500`. Its four-word header contains magic, version, 92 source slots, and
+eight-byte stride. Slots use donor `2200 + index`; each record contains parent
+item, signed extended kind, passive-visibility flag, profile-byte offset, mask,
+and equipment-ready flag. Empty slots reject. Bounds, identity, header, ready
+state, flag values, and exactly-one-bit masks are checked before profile reads.
+
+`selection_records` combines the complete source item/kind selectors, shared
+room aliases, implemented action/held categories, and installed resource-size
+checks. It generates all eight fan records without an item list. Their inventory
+IDs are `2254..225B`, extended kinds `107..114`, and canonical collection-display
+IDs `314C..3168`. Each uses its display's existing furniture-profile bit, not a
+second bit or a selection-order ID. Current profiles leave those bits clear;
+these are prepared equipment records, not enabled inventory items or web choices.
+The importer rejects collisions with an already selected profile identity.
+
+The visibility hook at `808BD638` runs only on the native passive-item branch.
+It retains the native umbrella rule and adds selected source-category records.
+The earlier scene, hidden-item, force-visible, and all-items checks stay intact;
+force-visible still cannot bypass a forbidden scene or the hidden-item flag.
+All three complete native selector/scene/visibility bodies are bound before patching,
+and the source visibility function is hash-checked. No table relocation is
+removed by these two hooks. Rebuilding shared code rebinds existing fan callback,
+draw, and poll pointers to their actual compiled symbols.
+
+Connect parent inventory/readers, acquisition, context-correct catalogue and
+collection, and optional composition before enabling profile bits. Check complete
+take-out/put-away, drawing, and persistence through ordinary gameplay. Keep
+unsupported equipment categories disabled; do not borrow unrelated tool actions.
 
 The native player holds two model buffers at `DBC`, animation pointers at
 `DC4`, segment bases at `DCC`/`DD4`, and shape/animation indices at `DDC`/`DE4`;

@@ -21,6 +21,105 @@ OUTPUT=ROOT/os.environ.get('V3_PLAYER_ACTIONS_BUILD','build/v3-player-action-tab
 CONTROLS=ROOT/os.environ.get('V3_PLAYER_CONTROLS_BUILD','build/v3-player-fan-controls-01')
 HELD=ROOT/os.environ.get('V3_HELD_DISPATCH_BUILD','build/v3-held-item-dispatch-02')
 ACTIVE=ROOT/os.environ.get('V3_FAN_ACTION_BUILD','build/v3-fan-action-dispatch-03')
+SELECTION=ROOT/os.environ.get('V3_HELD_SELECTION_BUILD','build/v3-held-selection-01')
+
+
+class SelectionHostTests(unittest.TestCase):
+    sanitized=shared_tests.HostTests.sanitized
+
+    def test_selected_equipment_bounds_and_passive_permissions(self):
+        self.sanitized('v3_held_selection_test.c')
+
+    def test_native_probe_uses_original_switch_and_actual_permission_values(self):
+        from v3_furniture_batch_smoke import original_equipment_kinds
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        kinds=original_equipment_kinds(original)
+        self.assertEqual([kinds[i] for i in (0,1,2,35)],[1,0,35,33])
+        self.assertEqual(sorted(kinds),list(range(36)))
+        report=json.loads((SELECTION/'build.json').read_bytes());equipment=report['equipment_resources']
+        rom=(SELECTION/'animal-forest-v3-asset-loader.z64').read_bytes();blob=by_vrom(rom)[BLOB].extract(rom)
+        row=next(r for r in equipment['player_actions']['tables'] if r['native_entry']==0x808B63EC)
+        values=blob[equipment['blob_offset']+row['offset']:equipment['blob_offset']+row['offset']+row['bytes']]
+        self.assertEqual(set(values),{0,1,3})
+
+
+@unittest.skipUnless((SELECTION/'build.json').is_file(),'Current held-selection cartridge required')
+class SelectionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom=(SELECTION/'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report=json.loads((SELECTION/'build.json').read_bytes())
+        cls.base,cls.prior=inputs(SELECTION/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.e=cls.report['equipment_resources'];cls.a=cls.e['player_actions'];cls.s=cls.a['equipment_selection']
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.old_blob=cls.before[BLOB].extract(cls.base)
+        at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+
+    def test_source_records_bind_individual_profiles_without_enabling_inventory(self):
+        from v3_handheld_items import selection_records
+        import copy
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        table,receipt=selection_records(source,self.prior['equipment_resources'])
+        self.assertEqual(self.module[actions.SELECTION_OFFSET:actions.SELECTION_OFFSET+len(table)],table)
+        for key,value in receipt.items():self.assertEqual(self.s[key],json.loads(json.dumps(value)))
+        self.assertEqual(len(self.s['rows']),8);self.assertEqual(self.s['profile_bits_enabled'],0)
+        for row in self.s['rows']:
+            item=int(row['item_id'],16);at=16+(item-0x2200)*8
+            self.assertEqual(struct.unpack_from('>HbBHBB',table,at),
+                (item,row['native_kind'],1,row['profile_byte'],row['profile_mask'],1))
+            self.assertFalse(self.blob[0x20+row['profile_byte']]&row['profile_mask'])
+            self.assertFalse(row['selectable']);self.assertFalse(row['room_placement_uses_display'])
+        self.assertEqual(table[16:16+84*8],bytes(84*8))
+        altered=copy.deepcopy(self.prior['equipment_resources'])
+        altered['kind_readers']['rows'][-1]['combined_bank_bytes']=4377
+        with self.assertRaisesRegex(ValueError,'dependency'):selection_records(source,altered)
+        altered=copy.deepcopy(self.prior['equipment_resources'])
+        altered['player_actions']['enabled_imported_actions']=[]
+        with self.assertRaisesRegex(ValueError,'complete fan'):selection_records(source,altered)
+
+    def test_native_switch_scene_rules_and_resident_jumps_survive_relocation(self):
+        owner=self.files[actions.PLAYER_VROM].extract(self.rom)
+        old=self.before[actions.PLAYER_VROM].extract(self.base);restored=bytearray(owner)
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        native=by_vrom(original)[actions.PLAYER_VROM].extract(original)
+        prior_patches={r['offset']:r for r in self.prior['equipment_resources']['player_actions']['patches']}
+        for row in self.a['patches']:
+            at=row['offset'];self.assertEqual(struct.unpack_from('>I',owner,at)[0],row['after'])
+            struct.pack_into('>I',restored,at,prior_patches.get(at,{}).get('after',row['before']))
+        self.assertEqual(restored,old)
+        at=0x808E0274-actions.PLAYER_RAM;self.assertEqual(owner[at:at+144],native[at:at+144])
+        reloc=self.files[actions.PLAYER_RELOC].extract(self.rom)
+        self.assertEqual(reloc,self.before[actions.PLAYER_RELOC].extract(self.base))
+        spec=SimpleNamespace(ram=actions.PLAYER_RAM,resident_bytes=len(owner),sections=struct.unpack_from('>5I',reloc))
+        for base in (0x80200000,0x80300000):
+            live=relocate_verified_data(spec,owner,reloc,base)
+            for hook in self.s['hooks']:
+                self.assertEqual(struct.unpack_from('>2I',live,hook['entry']-actions.PLAYER_RAM),
+                                 (actions.jump(hook['target']),0))
+            for entry,*_ in actions.POLL_SITES:
+                self.assertEqual(struct.unpack_from('>I',live,entry-actions.PLAYER_RAM)[0],
+                    actions.jump(self.a['code']['symbols']['af_v3_player_handheld_poll'],link=True))
+        self.assertEqual(sha256(owner),self.e['player_motion']['owner_sha256'])
+
+    def test_callback_rebinding_resources_save_profile_and_patch(self):
+        code=self.a['code'];at=actions.CODE_OFFSET
+        self.assertEqual(sha256(self.module[at:at+code['bytes']]),code['sha256'])
+        self.assertEqual(sha256(self.module),self.e['sha256']);self.assertEqual(zlib.crc32(self.module),self.e['crc32'])
+        for row in self.a['tables']+self.a['held_dispatch']['tables']:
+            self.assertEqual(sha256(self.module[row['offset']:row['offset']+row['bytes']]),row['sha256'])
+        for row in self.a['fan_activation']['callbacks']:
+            self.assertEqual(struct.unpack_from('>I',self.module,row['offset'])[0],row['target'])
+        for key in ('save_runtime','furniture','catalogue','clothing_profile','hra','feng_shui'):
+            self.assertEqual(self.report.get(key),self.prior.get(key))
+        for key in ('records','sound_programs'):self.assertEqual(self.e[key],self.prior['equipment_resources'][key])
+        for v in self.files.keys()-{BLOB,MODULE,actions.PLAYER_VROM,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),f'{v:08X}')
+        self.assertEqual(sha256(self.blob),self.report['blob_sha256'])
+        self.assertFalse(self.report['shared_runtime_refresh']['resource_allocations_changed'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(SELECTION/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,0x10),n64_checksum(self.rom))
 
 
 @unittest.skipUnless((ACTIVE/'build.json').is_file(),'Current activated-action cartridge required')

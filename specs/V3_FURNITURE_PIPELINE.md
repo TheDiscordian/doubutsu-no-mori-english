@@ -72,9 +72,12 @@ input polls through the shared umbrella-then-fan helper. The source/owner audit
 retains unrelated core limits and umbrella repeat behaviour; obsolete local JAL
 relocations are removed for resident calls. Crossed and wrapped frame events
 retain release/repeat transitions at the native update interval. Other incomplete
-action groups remain disabled. Profile-aware equipment selection, scene
-permissions, and parent inventory/acquisition are still required before choices
-are enabled.
+action groups remain disabled. The same adapter installs source-derived selected
+equipment records and extends passive-item visibility without replacing the
+native switch or bypassing scene/hidden-item checks. Each parent uses its actual
+collection identity's profile bit; preparing records does not enable that bit.
+Parent inventory/readers/acquisition and optional composition remain required
+before choices are enabled.
 The table converter also extends the two held-item main/draw tables, preserving
 all original tools. Source static-held drawing uses the existing equipment
 resources and native outer draw setup. Unimplemented rig categories retain null

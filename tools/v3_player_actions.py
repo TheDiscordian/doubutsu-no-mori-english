@@ -2,7 +2,8 @@
 
 Keep every original action. Reserve the donor's additional action indices with
 their actual metadata, but null callbacks until their complete implementations
-are installed. This adapter does not enable equipment or new gameplay actions.
+are installed. Shared category stages register complete actions and equipment
+readers without claiming unfinished inventory/acquisition or adding choices.
 """
 import copy
 import re
@@ -66,7 +67,10 @@ RETAINED_BOUNDARY = (0x808B99D0,0x808B99D8,0x808DF2BC)
 SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'tools/v3_asset_loader.py','overlays/v3/startup.c',
            'overlays/v3/player_actions.S','overlays/v3/player_actions.c',
-           'overlays/v3/player_actions.ld') + sound_programs.SOURCES
+           'overlays/v3/player_actions.ld','overlays/v3/held_selection.c',
+           'tools/v3_handheld_items.py') + sound_programs.SOURCES
+
+SELECTION_OFFSET=0x5500
 
 
 def control_bindings(source,owner,core,original,prior):
@@ -283,6 +287,96 @@ def fan_action_audit(source,owner,core,original):
             returns=[-1,7,8,9,10],actor_slot=0x1278),
         event_position=dict(source_table_offset=7912,source_sha256=sha256(gc_table),
             source_fan_value=0,native_out_of_range_value=0),core_changes_required=False)
+
+
+def refresh_selection(base,prior,blob,core,original,output):
+    """Connect selected equipment and passive visibility through shared records."""
+    from v3_handheld_items import selection_records
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']]);files=by_vrom(base)
+    owner=files[PLAYER_VROM].extract(base);reloc=files[PLAYER_RELOC].extract(base)
+    if (sha256(module)!=old['sha256'] or sha256(owner)!=actions['owner_sha256']
+            or sha256(reloc)!=actions['relocation_sha256'] or actions.get('equipment_selection')):
+        raise ValueError('Changed shared action/selection base')
+    native_owner=by_vrom(original)[PLAYER_VROM].extract(original)
+    first,last=0x808BD3F8,0x808BD668
+    value=owner[first-PLAYER_RAM:last-PLAYER_RAM]
+    if value!=native_owner[first-PLAYER_RAM:last-PLAYER_RAM]:
+        raise ValueError('Changed complete native equipment/scene/visibility selectors')
+    table_start=0x808E0274-PLAYER_RAM
+    if owner[table_start:table_start+144]!=native_owner[table_start:table_start+144]:
+        raise ValueError('Changed native equipment item switch')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    table,selection=selection_records(source,old)
+    if SELECTION_OFFSET+len(table)>MODULE_SIZE-16 or any(module[SELECTION_OFFSET:SELECTION_OFFSET+len(table)]):
+        raise ValueError('Equipment selection table overlaps an installed resource')
+    profile=bytes.fromhex(prior['save_runtime']['profile_hex'])
+    if len(profile)!=192 or blob[0x20:0xE0]!=profile:
+        raise ValueError('Changed actual selected import profile')
+    if any(profile[r['profile_byte']]&r['profile_mask'] for r in selection['rows']):
+        raise ValueError('Prepared equipment identity already occupies a selected profile bit')
+    previous=actions['code'];n=previous['bytes']
+    if sha256(module[CODE_OFFSET:CODE_OFFSET+n])!=previous['sha256'] or any(module[CODE_OFFSET+n:TABLE_OFFSET]):
+        raise ValueError('Changed complete shared action-code reservation')
+    code,compiled=compile_part('player_actions',output/'player_actions',
+        primary_source='overlays/v3/player_actions.S',
+        extra_sources=('overlays/v3/player_actions.c','overlays/v3/held_selection.c'),
+        defines=(f'AF_V3_FAN_SOUND=0x{actions["fan_frame_flow"]["native_sound_id"]:04X}',
+                 f'AF_V3_HELD_POINTER=0x{old["code"]["symbols"]["af_v3_equipment_pointer"]:08X}u',
+                 'AF_V3_HELD_SELECTION=1'))
+    if code[:80]!=module[CODE_OFFSET:CODE_OFFSET+80] or len(code)>TABLE_OFFSET-CODE_OFFSET:
+        raise ValueError('Selection rebuild moves a shared dispatcher or exceeds its code bound')
+    module[CODE_OFFSET:TABLE_OFFSET]=code+bytes(TABLE_OFFSET-CODE_OFFSET-len(code))
+    module[SELECTION_OFFSET:SELECTION_OFFSET+len(table)]=table
+    report=copy.deepcopy(old);current=report['player_actions'];symbols=compiled['symbols']
+    # Rebind installed callbacks and poll calls by their actual symbols, not
+    # their incidental locations in the preceding C link.
+    names={'Player_actor_setup_main_Swing_fan':'af_v3_player_fan_setup',
+           'Player_actor_main_Swing_fan':'af_v3_player_fan_main'}
+    for entry in current['fan_activation']['callbacks']:
+        if entry['source'] not in names:continue
+        row=next(r for r in current['tables'] if r['native_entry']==entry['consumer'])
+        if (sha256(module[row['offset']:row['offset']+row['bytes']])!=row['sha256']
+                or u32(module,entry['offset'])!=entry['target']):
+            raise ValueError('Changed complete registered action callback')
+        entry['target']=symbols[names[entry['source']]]
+        struct.pack_into('>I',module,entry['offset'],entry['target'])
+        row['sha256']=sha256(module[row['offset']:row['offset']+row['bytes']])
+    draw=current['held_dispatch']['tables'][1];start=draw['offset'];n=draw['bytes']
+    if sha256(module[start:start+n])!=draw['sha256']:raise ValueError('Changed held drawing table')
+    struct.pack_into('>I',module,start+23*4,symbols['af_v3_player_draw_static_item'])
+    draw['sha256']=sha256(module[start:start+n])
+    patched=bytearray(owner);patches=current['patches']
+    for call,*_ in POLL_SITES:
+        row=next(r for r in patches if r['offset']==call-PLAYER_RAM)
+        if u32(patched,row['offset'])!=row['after']:raise ValueError('Changed registered input poll')
+        row['after']=jump(symbols['af_v3_player_handheld_poll'],link=True)
+        struct.pack_into('>I',patched,row['offset'],row['after'])
+    _,_,_,locations,_=native_references(owner,reloc)
+    hooks=[]
+    for entry,name,expected in (
+            (0x808BD430,'af_v3_player_equipment_select',(0x2DE10024,0x1020004F)),
+            (0x808BD638,'af_v3_player_equipment_passive',(0x28A30002,0x38640001))):
+        offset=entry-PLAYER_RAM
+        if struct.unpack_from('>2I',owner,offset)!=expected or any(offset+i in locations for i in (0,4)):
+            raise ValueError('Changed native selection branch or relocation')
+        for i,after in enumerate((jump(symbols[name]),0)):
+            patches.append(dict(offset=offset+i*4,before=expected[i],after=after))
+            struct.pack_into('>I',patched,offset+i*4,after)
+        hooks.append(dict(entry=entry,symbol=name,target=symbols[name],before=struct.pack('>2I',*expected).hex()))
+    selection.update(table_offset=SELECTION_OFFSET,table_ram=RAM+SELECTION_OFFSET,hooks=hooks,
+        native_consumers=dict(start=first,end=last,sha256=sha256(value)),
+        original_switch_sha256=sha256(owner[table_start:table_start+144]),
+        scene_rules_retained=True,hidden_and_force_visible_retained=True,
+        native_selection_tested=False,ordinary_equipped_fan_tested=False)
+    current.update(code=compiled,equipment_selection=selection,owner_sha256=sha256(patched))
+    current['fan_activation']['inventory_selection_installed']=True
+    report['kind_readers']['selector_changed']=True
+    report['player_motion']['owner_sha256']=sha256(patched)
+    blob[at:at+len(module)]=module
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    return report,{PLAYER_VROM:bytes(patched)}
 
 
 def activate_fan_action(base,prior,blob,core,original,output):
@@ -526,6 +620,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old['player_actions'].get('fan_activation'):
+            return refresh_selection(base,prior,blob,core,original,output)
         if old['player_actions'].get('held_dispatch'):
             return activate_fan_action(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_frame_flow'):

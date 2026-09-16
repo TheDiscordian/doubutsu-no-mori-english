@@ -28,6 +28,53 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
+def selection_records(source, equipment):
+    """Build shared item/kind/profile records from implemented source categories.
+
+    The parent's canonical collection identity owns its one profile bit. These
+    records do not set that bit, install inventory readers, or add web choices.
+    """
+    from v3_room_aliases import discover as room_aliases
+    from v3_registry import furniture_identity
+    inventory=discover(source);aliases=room_aliases(source)
+    raw,visibility=source.function(0x1707E4)
+    if (visibility['symbol']!='Player_actor_Get_ItemKind' or len(raw)!=232
+            or sha256(raw)!='929013de1a36bb0912b94a5804290ce08a49a6fe3607f8f562b848355de0f58f'):
+        raise ValueError('Changed complete donor held-item visibility rules')
+    actions=equipment['player_actions']
+    if (actions['enabled_imported_actions']!=[109] or not actions.get('fan_activation')
+            or not actions['held_dispatch']['net_reset']['installed']):
+        raise ValueError('Equipment selection requires the complete fan action category')
+    kinds={r['item_id']:r for r in equipment['kind_readers']['rows']}
+    source_rows={r['id']:r for r in inventory['rows']}
+    records=[];table=bytearray(struct.pack('>4I',0x41464853,1,92,8)+bytes(92*8))
+    for alias in aliases['rows']:
+        if alias['category']!='fan':continue
+        item=int(alias['parent_item_id'],16);row=source_rows[alias['parent_id']];kind=kinds[row['item_id']]
+        display=int(alias['display_item_id'],16);index,_=furniture_identity(display)
+        if (not 0x2224<=item<0x225C or kind['source_kind']!=row['equipment_kind']
+                or kind['native_kind']!=36+row['equipment_kind']
+                or not kind['resource_ready'] or not kind['shape_installed']
+                or kind['combined_bank_bytes']>4376 or kind['item_main']!=23
+                or not 107<=kind['native_kind']<115
+                or alias['context_outputs']['room_placement']!=[row['item_id']]
+                or alias['context_outputs']['collection_record']!=[alias['display_item_id']]):
+            raise ValueError('Incomplete source-held category dependency or identity')
+        slot=index-1024;byte=32+slot//8;mask=1<<(slot%8)
+        struct.pack_into('>HbBHBB',table,16+(item-0x2200)*8,item,kind['native_kind'],1,byte,mask,1)
+        records.append(dict(id=row['id'],item_id=row['item_id'],native_kind=kind['native_kind'],
+            passive=True,profile_byte=byte,profile_mask=mask,display_item_id=alias['display_item_id'],
+            collection_index=index,room_placement_uses_display=False,equipment_ready=True,
+            inventory_installed=False,selectable=False,source=row,alias=alias))
+    if len(records)!=8 or len({r['native_kind'] for r in records})!=8:
+        raise ValueError('Incomplete shared fan selection category')
+    return bytes(table),dict(format='AFV3-HELD-SELECTION-1',rows=records,
+        donor_visibility=visibility,source_functions=inventory['functions'],
+        source_tables=inventory['tables'],alias_functions=aliases['functions'],
+        source_rel_sha256=sha256(source.rel),table_bytes=len(table),table_sha256=sha256(table),
+        original_items_retained=36,logical_imports_added=0,profile_bits_enabled=0)
+
+
 def selector_tables(source, specifications):
     """Read complete bounded tables through their verified donor consumers."""
     functions, tables, values = {}, {}, {}

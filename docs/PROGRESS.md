@@ -2,6 +2,24 @@
 
 ## Active development
 
+The shared selected-equipment adapter is implemented in unpromoted ABI 105 at
+`build/v3-held-selection-01/`. One generated 752-byte table connects all eight
+fan IDs to their actual kinds and independent canonical collection-profile bits.
+Original equipment keeps its native switch; passive-item visibility retains
+scene, hidden-item, and force-visible rules. No profile bits or choices are
+enabled. Six focused checks pass across the recorded commands, including host
+sanitizers, source records, owner relocation, complete callback rebinding, resource
+retention, and UPS reconstruction.
+
+Native selection/visibility verification remains incomplete. Two bounded attempts
+stop on fixture assumptions: an unused permission value, then an incorrect expected
+native item kind. The latter cartridge return agrees with the original switch.
+The corrected probe derives expected kinds from the original ROM and has a focused
+fixture check. Do not retry this native batch or promote ABI 105 yet. Continue
+parent inventory/readers/acquisition and include the unfinished selector checks
+with that meaningful integration change. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-selected-equipment-adapter).
+
 ABI 104 registers fan action 109's complete setup/main/net-reset group and its
 four ordinary input polls through the shared importer. A complete core-bound
 audit preserves unrelated native limits and umbrella repeat behaviour. Native
@@ -32,8 +50,8 @@ sweep, envelope, and sample are retained without enlarging the audio heap.
 The complete 24-KiB module transfer is checksum-bound; startup remains 952 of
 992 bytes. Models, motions, actor sizes, animation banks, saved format 2, and
 104 choices remain unchanged. No fan is offered as a selectable import yet.
-Next connect profile-aware equipment selection, scene permissions, parent
-inventory/readers/acquisition, and context-correct catalogue/persistence. Do not
+Next integrate the unpromoted selector with parent inventory/readers/acquisition
+and context-correct catalogue/persistence. Do not
 repeat passing component checks or create per-item scripts. Original-hardware
 testing and ordinary equipped-fan gameplay remain pending.
 

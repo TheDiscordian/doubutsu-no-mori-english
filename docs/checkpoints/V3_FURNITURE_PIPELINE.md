@@ -1,5 +1,71 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared selected-equipment adapter
+
+The same category importer extends actual equipment selection and passive-item
+visibility. `selection_records` combines the source item/kind tables, room aliases,
+implemented callbacks, and checked model/animation pairs. It produces all eight
+fan records in one 752-byte `AFHS` table at `804A8500`, without a per-item list.
+Each item uses its canonical collection display's independent saved-profile bit.
+No bit is enabled, no inventory reader/acquisition is installed, and no logical
+choice is added. The original native 36-item switch stays intact. Two branch
+hooks retain original ordinary/title equipment sources and existing scene,
+hidden-item, force-visible, and all-items rules. Only the passive-item branch
+adds selected category records. Existing fan callbacks, draw, and poll pointers
+are rebound to the new compiled symbols. No relocation record changes.
+
+### Candidate and focused checks
+
+- Unpromoted ABI 105: `build/v3-held-selection-01/animal-forest-v3-asset-loader.z64`.
+- ROM SHA-256: `111f011b45793a94d770da86ddb1c9055b226110398478d356e13f4a08d24f5e`.
+- UPS SHA-256: `89d248e672843d8fc54da0487c919d7c1d5e4f5d3640e546681f49faa7023e4a`.
+- Receipt SHA-256: `700014c5bf2eb88a3b2c5449df29dff15525b111b68f24c75f86345d70ed2ed5`.
+- Compiled code is 2,504 bytes, inside the existing 8-KiB code reservation.
+  The complete 24,576-byte module, 3,517,632-byte blob, startup, models, motions,
+  audio, saved format 2, and 104 choices retain their allocations/identities.
+- Current promoted lock remains ABI 104. Same-profile compatibility is expected,
+  not a newly verified ordinary save/reload result. Do not use V3 saves with V2.
+  Both served patchers remain V2; no playtest handoff is made from this candidate.
+
+The selected-equipment host sanitizer passes in 0.164 seconds: all 16-bit input
+IDs, individual fan bits, original passive umbrellas, unsupported kinds, malformed
+headers/records, invalid masks, readiness, and permission flags. Three candidate
+cartridge checks pass in the 5.576-second combined command, checking actual source
+relationships, mutation rejection, complete table bytes, two relocation bases,
+retained native switch, callback rebinding, profiles/resources, and UPS/CRC.
+That command also names a nonexistent control-test method and therefore ends
+with an import error, not a fully green command. The corrected control host
+method alone passes in 0.183 seconds; the three passing cartridge tests are not
+replayed. A focused original-switch/permission fixture check passes in 0.090
+seconds. Six tests pass across these commands.
+
+### Bounded native attempts
+
+`build/smoke-v3-held-selection-01/results.json` stops after 12 records because
+the probe requests permission value two, absent from the actual table; its
+values are zero, one, and three. It has not called the changed selector yet.
+Its result SHA-256 is
+`bd3b39823c0962dfee7c318d9d9a288b81811842a33305a0d22ae9f814349b6a`.
+The one corrected retry, `build/smoke-v3-held-selection-02/results.json`, stops
+after 16 records when the probe expects item `2202` to return kind two. The
+actual return is 35, exactly matching the original ROM's switch target and
+constant-return instruction. The first two native item returns and retained
+stack checks pass. This mismatch is not a cartridge defect.
+The retry result SHA-256 is
+`f57112a4d796baaec05d7d0e547058fabdac4fd9e10a715dc16001dc91ef59a7`.
+
+The probe now derives expected native kinds from the original complete switch,
+checking its hash and constant-return branches; the original last item is also
+kind 33, not the fixture's guessed 35. The fixture check covers both mistakes.
+No third native attempt is made for this batch. Imported positive selection,
+passive visibility, final restoration/guards, and the completed scenario remain
+unverified; no successful native or ordinary-equipment result is claimed.
+The corrected probe is retained for the next meaningful inventory integration.
+
+Continue parent inventory/names/prices/acquisition, context-correct collection/
+catalogue, and optional composition from the candidate's explicit build lock.
+Retain the promoted ABI-104 artifact until the changed native path is verified.
+
 ## Shared fan action activation
 
 The existing action adapter registers the complete source fan callback group:

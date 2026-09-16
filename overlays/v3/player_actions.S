@@ -40,3 +40,47 @@ af_v3_player_action_v1:
     j af_v3_player_action_t9
     nop
 .end af_v3_player_action_v1
+
+#ifdef AF_V3_HELD_SELECTION
+/* The native selector has already read the real or title-demo item into v1.
+   Retain its original switch for the first 36 IDs. Its 24-byte stack frame
+   supplies ABI call space and the original return address. */
+.section .text.af_v3_player_equipment_select,"ax",@progbits
+.globl af_v3_player_equipment_select
+.ent af_v3_player_equipment_select
+af_v3_player_equipment_select:
+    sltiu $at, $t7, 36
+    bnez $at, 2f
+    li $v0, -1
+    jal af_v3_player_selected_equipment
+    move $a0, $v1
+    lw $ra, 20($sp)
+    jr $ra
+    addiu $sp, $sp, 24
+2:
+    lui $t9, 0x808B
+    ori $t9, $t9, 0xD43C
+    j af_v3_player_action_t9
+    nop
+.end af_v3_player_equipment_select
+
+/* This branch runs only after the native scene, hidden-item, force-visible,
+   and all-items rules. Extend the passive-item rule without bypassing them. */
+.section .text.af_v3_player_equipment_passive,"ax",@progbits
+.globl af_v3_player_equipment_passive
+.ent af_v3_player_equipment_passive
+af_v3_player_equipment_passive:
+    sw $a1, 24($sp)
+    jal af_v3_player_passive_equipment
+    move $a0, $a1
+    lw $t0, 24($sp)
+    bnez $v0, 3f
+    li $v0, -1
+    li $t0, -1
+3:
+    move $v0, $t0
+    lw $ra, 20($sp)
+    jr $ra
+    addiu $sp, $sp, 32
+.end af_v3_player_equipment_passive
+#endif

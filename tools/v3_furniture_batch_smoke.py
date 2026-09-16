@@ -542,6 +542,28 @@ def sound_programs_probe(debug,image,resources,check,call,record):
                 physical_audio_played=False,pcm_or_listening_verified=False)
 
 
+def original_equipment_kinds(original):
+    """Read original switch returns for the shared probe, not guessed item order."""
+    from aflib import verified_rom
+    from v3_equipment_runtime import PLAYER_VROM,PLAYER_RAM
+    data=by_vrom(verified_rom(original))[PLAYER_VROM].extract(original)
+    table=data[0x808E0274-PLAYER_RAM:0x808E0274-PLAYER_RAM+144]
+    if sha256(table)!='b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1':
+        raise ValueError('Changed original equipment switch for native probe')
+    result=[]
+    for pointer in struct.unpack('>36I',table):
+        branch,value=struct.unpack_from('>II',data,pointer-PLAYER_RAM)
+        distance=struct.unpack('>h',struct.pack('>H',branch&65535))[0]*4
+        if branch>>16!=0x1000 or pointer+4+distance!=0x808BD574:
+            raise ValueError('Original equipment case is not a constant return')
+        if value==0x00001025:kind=0
+        elif value>>16==0x2402:kind=value&65535
+        else:raise ValueError('Original equipment case has an unknown delay slot')
+        result.append(kind)
+    if sorted(result)!=list(range(36)):raise ValueError('Original equipment switch is incomplete')
+    return result
+
+
 def player_motion(debug,rom_path,record):
     """Load the actual player owner and exercise its shared animation category."""
     import v3_equipment_runtime as equipment
@@ -585,6 +607,75 @@ def player_motion(debug,rom_path,record):
         check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
         record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
         actions=resources.get('player_actions')
+        if actions and actions.get('equipment_selection'):
+            from aflib import CODE_RAM,CODE_VROM
+            selection=actions['equipment_selection'];core=files[CODE_VROM].extract(image)
+            def owner_call(entry,args=(),want=None,end=0x808BD584):
+                address=owner+entry-equipment.PLAYER_RAM
+                return call(address,args,want,(address,expected[entry-equipment.PLAYER_RAM:end-equipment.PLAYER_RAM]))
+            def core_call(entry,end):
+                return call(entry,proof=(entry,core[entry-CODE_RAM:end-CODE_RAM]))
+            title=core_call(0x8007D90C,0x8007D91C)
+            if title:
+                pointer=core_call(0x800B593C,0x800B594C);field=pointer+0x3C
+            else:
+                pointer=struct.unpack('>I',debug.read_memory(0x80136FD8,4))[0];field=pointer+0x3EC
+            if pointer&3 or not 0x80000400<=pointer<=field<=0x80400000-2:
+                raise ValueError('Current native equipment source is not initialized')
+            profile_address=0x80460020;scene_address=0x80126EB4
+            before_profile=debug.read_memory(profile_address,192)
+            before_item=debug.read_memory(field,2);before_scene=debug.read_memory(scene_address,4)
+            debug.write_memory(target,bytes(0x12D8))
+            permission=next(r for r in actions['tables'] if r['native_entry']==0x808B63EC)
+            kinds=blob[at+permission['offset']:at+permission['offset']+permission['bytes']]
+            modes={value:kinds.index(value) for value in (0,1,3)}
+            record(dict(selection_source='title-demo' if title else 'player-private',
+                        equipped_field=f'{field:08X}',permission_actions=modes))
+            def select(item):debug.write_memory(field,struct.pack('>H',item))
+            try:
+                debug.write_memory(scene_address,bytes(4))
+                native_kinds=original_equipment_kinds((runtime.ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+                native_cases=[(item,native_kinds[item-0x2200]) for item in (0x2200,0x2201,0x2202,0x2223)]
+                for item,want in native_cases+[(item,0xFFFFFFFF) for item in (0,0x2224,0x2253,0xFFFF)]:
+                    select(item);owner_call(0x808BD3F8,want=want)
+                for row in selection['rows']:
+                    item=int(row['item_id'],16);select(item)
+                    owner_call(0x808BD3F8,want=0xFFFFFFFF)
+                    active=bytearray(before_profile);active[row['profile_byte']]|=row['profile_mask']
+                    debug.write_memory(profile_address,active)
+                    owner_call(0x808BD3F8,want=row['native_kind'])
+                    debug.write_memory(profile_address,before_profile)
+                row=selection['rows'][0];select(int(row['item_id'],16))
+                active=bytearray(before_profile);active[row['profile_byte']]|=row['profile_mask']
+                debug.write_memory(profile_address,active)
+                for mode,action in modes.items():
+                    owner_call(0x808BD5C4,[target,action],row['native_kind'] if mode in (0,1) else 0xFFFFFFFF,
+                               end=0x808BD668)
+                debug.write_memory(target+0xE64,b'\x01')
+                owner_call(0x808BD5C4,[target,modes[0]],0xFFFFFFFF,end=0x808BD668)
+                debug.write_memory(target+0xE65,b'\x01')
+                owner_call(0x808BD5C4,[target,modes[0]],0xFFFFFFFF,end=0x808BD668)
+                debug.write_memory(target+0xE64,b'\0')
+                owner_call(0x808BD5C4,[target,modes[3]],row['native_kind'],end=0x808BD668)
+                # No scene permits an out-of-range scene index, even with the
+                # demo visibility override. The actual scene getter owns this.
+                debug.write_memory(scene_address,struct.pack('>I',35))
+                owner_call(0x808BD5C4,[target,modes[0]],0xFFFFFFFF,end=0x808BD668)
+            finally:
+                debug.write_memory(profile_address,before_profile);debug.write_memory(field,before_item)
+                debug.write_memory(scene_address,before_scene)
+            check('selected-equipment profile restored',profile_address,before_profile)
+            check('native equipment source restored',field,before_item)
+            check('native scene restored',scene_address,before_scene)
+            check('selected-equipment saved state unchanged',0x8046C000,saved)
+            for address in (allocation,end,allocation+size-16):check('selected-equipment scratch guard',address,edge)
+            check('selected-equipment no CPU fault',0x8003CE34,bytes(4))
+            check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
+            check('equipment module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
+            return dict(native_selected_equipment=True,native_passive_permissions=True,assertions=assertions,
+                selection_source='title-demo' if title else 'player-private',ordinary_inventory_tested=False,
+                ordinary_equipped_fan_tested=False,hardware_tested=False,flash_written=False,
+                requires_checkpoint_restore=True)
         if actions and actions.get('fan_activation'):
             def owner_call(entry,args=(),want=None,end=None):
                 if end is None:end=next(t['native_end'] for t in actions['tables'] if t['native_entry']==entry)
