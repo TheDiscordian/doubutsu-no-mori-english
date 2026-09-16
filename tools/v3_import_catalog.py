@@ -172,6 +172,10 @@ def build_catalog(n64_path, disc_path, decomp):
     all_ids = [r['id'] for r in villagers + items]
     if len(set(all_ids)) != len(all_ids):
         raise ValueError('Duplicate V3 donor identity')
+    from v3_furniture_pipeline import Source
+    from v3_room_aliases import discover, annotate_inventory
+    aliases = discover(Source(rel, symbol_bytes))
+    annotate_inventory(items, aliases)
     return {
         'format': 'AFV3-INVENTORY-1',
         'status': 'research_inventory_not_patch_or_supported_options',
@@ -187,7 +191,7 @@ def build_catalog(n64_path, disc_path, decomp):
             'donor_item_name_records': len(items), 'new_item_identities': None,
             'selectable_imports': 0,
         },
-        'villagers': villagers, 'item_groups': groups, 'items': items,
+        'villagers': villagers, 'item_groups': groups, 'items': items, 'room_aliases': aliases,
     }
 
 

@@ -2,6 +2,17 @@
 
 ## Active: V3 optional GameCube imports
 
+The shared room-alias discovery connects all 48 extra donor display models to
+their actual parent items; 44 appear in the `3xxx` queue. It retains both
+conversion functions, original name evidence, rotations, the no-tool-conversion
+condition, and the seven worn-axe inputs returning the ordinary axe. The full
+donor catalogue and browser review data use these records. Native parent identity
+and room conversion remain work; discovery does not enable standalone display
+models. Continue one shared parent/placement/pickup implementation, not separate
+furniture acquisition scripts. New converter revision 8 leaves ABI 95, saves,
+and both served V2 patchers unchanged. See the
+[pipeline checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
+
 Use the [generated browser plan](../specs/V3_OPTIONAL_COMPOSITION.md), not a second
 maintained item list, for browser selection. The independent JS composer and
 real worker match the recorded offline outputs; current plan generation consumes
@@ -56,9 +67,10 @@ source-verified RGB5A3 colour and binary alpha, alongside CI4/I4 materials.
 Diver Dan's complete 5,120-byte model still requires island acquisition; the
 miniature car's actual acquisition remains unresolved. No ordinary stock is
 invented. Remaining models retain six harvest, five island, and twelve
-Tortimer-gift dependencies; twenty-nine
+Tortimer-gift dependencies; thirteen
 entries have no identified acquisition list, and two need native identity review.
-Some entries, including sixteen diary models, also need separate gameplay.
+Sixteen further entries are diary display aliases needing parent gameplay and
+room conversion, not unknown furniture acquisition lists.
 The sixteen actual shared-dummy-profile entries remain excluded from preparation;
 their artwork is absent in this donor, not established unused in every edition.
 Continue shared acquisition and callback categories; do not repeat complete
@@ -75,12 +87,11 @@ implementation. Prepared-only output cannot pass the installer. Keep that shared
 dependency explicit and continue graphics/contact/callback categories instead of
 blocking bulk imports on it. Continue the fifteen clocked station models,
 roof-colour selectors, or remaining animated/effect categories; preserve their
-actual effects. Before treating tools, fans, pinwheels, or diaries as standalone
-furniture imports, follow the donor's room-display aliases back to their parent
-item identities. `mRmTp_Item1ItemNo2FtrItemNo_AtPlayerRoom` and its inverse in
-`local/ac-decomp/src/game/m_room_type.c` establish these conversions. The native
-functions currently lack those extra categories. Do not duplicate a parent's
-identity or assume its room-conversion support is complete. The eight
+actual effects. Use `tools/v3_room_aliases.py` for the verified donor parent/display
+mapping, not independent furniture choices for tools, fans, pinwheels, or diaries.
+The native room-conversion functions lack those extra categories. Implement
+their actual parent support and shared conversion; classification alone does
+not complete them. The eight
 palette-animated buildings share one implemented category.
 Their prepared assets are in `build/v3-furniture-palette-fade-prepared-02/`;
 seven need acquisition integration, not another artwork converter.

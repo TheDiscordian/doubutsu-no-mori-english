@@ -28,11 +28,11 @@ import v3_hra as hra
 import v3_feng_shui as feng
 import v3_shops as shops
 
-VERSION = 7
+VERSION = 8
 LOCK = ROOT/'config/v3-import-build.json'
 STABLE = ROOT/'build/v2-keyboard-fit-11/Animal Forest English V2.z64'
 STABLE_SHA = '8bbd1955536a2a3ac9f76d6f323842f5ce25c037e1ff5fd3da9f28d6dfe20507'
-SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py',
+SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 'tools/v3_room_aliases.py',
     'tools/v3_furniture_art.py', 'tools/v3_registry.py', 'tools/v3_catalogue.py',
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
     'overlays/v3/startup.c', 'translations/provenance.json',
@@ -164,7 +164,10 @@ def scoring(base, prior, rows, source):
 
 def checked_assets(art_path, source, worksheet):
     raw = (art_path/'art.json').read_bytes(); art = json.loads(raw)
-    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] != VERSION
+    # Revision 8 adds identity/dependency records, not a changed model format.
+    # Prior revision-7 objects still undergo complete current metadata checks;
+    # a display alias cannot pass as standalone furniture through an old report.
+    if (art['format'] != 'AFV3-AUTO-FURNITURE-ASSETS-1' or art['version'] not in (7, VERSION)
             or art['source_rel_sha256'] != sha256(source.rel)
             or art['source_symbols_sha256'] != sha256(source.symbols.encode())):
         raise ValueError('Unknown converter/source revision')

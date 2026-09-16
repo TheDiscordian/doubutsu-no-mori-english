@@ -228,6 +228,12 @@ and ordinary groups, including clothing, stationery, walls/floors, tools, songs,
 fish/insects, and miscellaneous items. Do not mistake stack states, rotations,
 or alternate representations for independent imports.
 
+The [shared room-alias discovery](V3_FURNITURE_PIPELINE.md#room-display-aliases)
+connects 48 donor display models to their actual parent items, including four
+balloons in the older furniture range. The full donor inventory also identifies
+seven worn-axe states as one parent identity. These are source-derived
+relationships, not extra selectable furniture or completed native conversions.
+
 Build a complete simple decorative-furniture import first. It must display the
 right model and English name, use correct dimensions/collision/rotation and
 price, appear through an ordinary acquisition route, place/pick up correctly,

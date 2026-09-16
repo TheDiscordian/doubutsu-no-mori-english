@@ -393,7 +393,7 @@ class DonorTests(unittest.TestCase):
             pipeline.metadata(changed,0x30E8,profile,identities[0x30E8])
         # Diary display models are not ordinary furniture: recognising their
         # collision flag must not bypass the missing gameplay/acquisition route.
-        with self.assertRaisesRegex(ValueError,'acquisition needs an adapter'):
+        with self.assertRaisesRegex(ValueError,'parent-item support'):
             pipeline.metadata(self.source,0x30FC,self.source.profile(0x30FC),identities[0x30FC])
 
     def test_indexed_static_callback_category_uses_every_actual_selector_row(self):

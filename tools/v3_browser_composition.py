@@ -152,6 +152,7 @@ def review_catalogue(plan, report):
             raise ValueError('Installed furniture is missing from the composition plan')
         unavailable.append({'id': key, 'name': row['name'] or 'Unnamed donor furniture',
             'kind': 'furniture', 'selectable': False,
+            **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
             'reason': row.get('reason') or 'Conversion supported; runtime installation is pending.'})
     return {'format': 'AFV3-BROWSER-REVIEW-1', 'base_sha256': plan['base_sha256'],
             'scope': 'GAFE01-r0 3xxx furniture import queue, not all donor items',

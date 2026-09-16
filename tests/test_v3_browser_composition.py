@@ -54,7 +54,12 @@ class BrowserCompositionTests(unittest.TestCase):
         self.assertEqual(review['base_sha256'], composer.BASE_SHA)
         self.assertEqual(review['pipeline_version'], pipeline.VERSION)
         self.assertTrue(all(row['selectable'] is False and row['reason'] for row in unavailable.values()))
-        self.assertIn('callbacks', unavailable['GAFE01-r0/item/3010']['reason'])
+        # A converted item may leave the review queue as later batches install
+        # it; inspect an actual unresolved alias, not a historical item example.
+        alias = unavailable['GAFE01-r0/item/314C']
+        self.assertEqual(alias['room_alias']['parent_id'], 'GAFE01-r0/item/2254')
+        self.assertIn('parent-item support', alias['reason'])
+        self.assertEqual(sum('room_alias' in row for row in unavailable.values()), 44)
         self.assertNotIn('GAFE01-r0/item/3350', unavailable)  # Installed animated import is not downgraded.
 
     def test_browser_output_matches_authoritative_composition_for_representative_profiles(self):

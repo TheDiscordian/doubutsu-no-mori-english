@@ -68,6 +68,34 @@ attribution is never overwritten; conflicting attribution stops the build for
 review. The patch is a proposed edit to the single catalogue, not another text
 source catalogue. The receipt states whether attribution is complete.
 
+## Room-display aliases
+
+`tools/v3_room_aliases.py` supplies the shared identity relationship for extra
+donor room representations: balloons, diaries, fans, pinwheels, and tools.
+Complete placement, pickup, and both furniture-index functions are hash-bound;
+unexpected code, relocations, ranges, or inverse mappings fail. Category ranges,
+parent IDs, and display IDs come from their actual compiled instructions, not
+a maintained list of individual items. Both directions must agree. Balloon
+models cross the `1xxx`/`3xxx` boundary and remain one parent item each.
+
+Each alias records the parent's official name and source hash, all four room
+rotations, accepted placement IDs, pickup ID, and the donor's
+`no_convert_tools` condition. The seven worn-axe inputs share the axe model;
+the actual donor pickup returns the ordinary axe ID. This asymmetry is recorded,
+not interpreted as seven additional furniture imports. Native parent identity
+and gameplay remain unreviewed until independently established.
+
+The full donor inventory, furniture scan, prepared-asset descriptors, and browser
+review data use these same records. Aliases stay unavailable as standalone
+furniture; installation rejects them before ordinary acquisition metadata can
+approve them, including when supplied through an older asset report. Artwork
+may still be prepared, with parent/placement/pickup dependencies retained.
+Unsupported graphics are separately recorded as `conversion_reason`; classifying
+an identity does not claim its artwork or runtime behaviour is implemented.
+Add native parent support and a shared room-conversion adapter before enabling
+the corresponding logical item. Do not offer both a parent and its display model
+as unrelated choices or substitute shop stock for parent acquisition.
+
 ## Discovery and supported categories
 
 Both actual donor `furniture_quality` tables must identify the same complete
@@ -243,7 +271,7 @@ identity. Object storage is appended at 16-byte alignment with complete physical
 and virtual overlap checks, the 9,216-byte model-bank limit, ROM boundary checks,
 CRC updates, and full patch reconstruction. No new DMA-directory entry is needed.
 
-Converter/installer revision 7 retains reuse of the preceding automatic batch's terminal
+Converter/installer revision 8 retains reuse of the preceding automatic batch's terminal
 catalogue, relocation, and shop resources, because all three are regenerated.
 `reuse_resource_tail` verifies the exact three-owner inventory, complete hashes,
 DMA mappings, contiguous aligned extents, zero padding, terminal boundary,
@@ -253,6 +281,8 @@ being discarded. New art starts at that checked boundary, followed by the rebuil
 owners and updated DMA mappings. Existing model VROMs and saved identities do
 not move. The receipt records the reused range and source hashes. Only the fresh
 output changes; input ROMs, earlier builds, and saves remain untouched.
+Revision-7 artwork uses the same model format and remains accepted only after
+all current source, identity, metadata, and complete-asset checks pass.
 
 Stock and catalogue builders accept verified records without family switches.
 Catalogue eligibility uses byte 24 of each existing 32-byte sparse item record:

@@ -2,6 +2,17 @@
 
 ## Active development
 
+The shared [room-alias discovery](checkpoints/V3_FURNITURE_PIPELINE.md)
+connects 48 room-display models to parent items across balloons, diaries, fans,
+pinwheels, ordinary tools, and golden tools. Complete donor placement/pickup and
+index functions supply the ranges; the seven worn-axe states also map to their
+actual single parent. The full donor catalogue, furniture scan, prepared-asset
+records, and browser review data consume this relationship. Forty-four aliases
+occur in the `3xxx` furniture queue. They cannot install as unrelated furniture;
+their missing parent/room support and separate artwork gaps remain explicit.
+Converter/installer revision 8 changes discovery, not the cartridge or saves.
+ABI 95 and both served V2 patchers remain unchanged.
+
 The [constant model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
 installs Lady Liberty and the tanabata palm automatically, including all 11,152
 artwork bytes, 248 vertices, and 179 triangles. Complete draw-only callback
@@ -62,8 +73,9 @@ The [automatic furniture pipeline](checkpoints/V3_FURNITURE_PIPELINE.md) supplie
 forty-two additional items through source-discovered records and shared graphics,
 metadata, acquisition, catalogue, scoring, and profile installation. No per-item
 installer, graphics description, or native scenario is needed. Converter/installer
-revision 7 includes winter-camping rewards, shared winter/summer selection,
-data-driven palette callbacks, and constant model sequences. No item-specific browser entry is required.
+revision 8 includes winter-camping rewards, shared winter/summer selection,
+data-driven palette callbacks, constant model sequences, and parent-item alias
+classification. No item-specific browser entry is required.
 
 The development cartridge uses source-derived canonical reward records
 for camping and Gulliver. No summer-item array is maintained in the runtime.
@@ -85,10 +97,10 @@ it is not a served V3 site or a claim of fresh interface testing on ABI 95.
 The shared CI4/I4/RGBA16 and constant indexed-palette converters retain every
 supported material/model layer and reject unsupported effects rather than dropping
 them. Fifty-four additional non-placeholder models pass artwork preparation but
-retain acquisition, identity, or gameplay dependencies: 29 unidentified routes,
-12 Tortimer gifts, six harvest items, five island items, and two native-identity
-reviews. Sixteen diary display models also need diary
-gameplay. Prepared-only output cannot pass installation; donor dummy profiles
+retain acquisition, identity, or gameplay dependencies: 13 unidentified routes,
+12 Tortimer gifts, six harvest items, five island items, two native-identity
+reviews, and sixteen diary aliases needing parent gameplay and room conversion.
+Prepared-only output cannot pass installation; donor dummy profiles
 remain explicit missing-artwork records. Continue shared acquisition and animated
 callback categories using the bulk-prepared assets.
 

@@ -1,5 +1,62 @@
 # Automatic furniture pipeline checkpoint
 
+## Parent-item and room-display discovery
+
+Converter/installer revision 8 adds `tools/v3_room_aliases.py`, shared by the
+full donor inventory, furniture pipeline, and browser review generator. Complete
+donor placement, pickup, and both item/index functions are checked before their
+actual range constants supply the records. No per-item identity list, converter,
+installer, or scenario is added.
+
+The six categories contain 48 room-display models: eight balloons, sixteen
+diaries, eight fans, eight pinwheels, four golden tools, and four ordinary tools.
+Four balloon models fall in `1xxx`; the other 44 entries occur in the `3xxx`
+queue. Every record retains the official parent name/source hash, parent ID,
+all four rotations, pickup ID, and the actual `no_convert_tools` condition.
+Seven worn-axe inputs share the ordinary axe's model and return the ordinary
+axe ID on pickup. That donor asymmetry is explicit, not seven new furnishings.
+
+Aliases cannot install as standalone furniture, including through older asset
+reports. Prepared artwork retains the parent relationship; unsupported graphics
+keep a separate `conversion_reason`. The full 2,333-name donor inventory keeps
+its original identities and links each parent/display pair; the worn states
+also link to their canonical parent. Classification does not approve a native
+identity, complete room conversion, or implement the parent's actual gameplay.
+No new selectable option is claimed. Both served patchers remain V2.
+
+Actual supplied-disc/N64 inventory generation succeeds at
+`build/v3-room-alias-discovery-01/donor-catalogue.json`, SHA-256
+`29b575ef4705816d90b70298628e47d05336e6edd3cc65fdfeda323142901363`.
+The final current scan is `build/v3-room-alias-discovery-02/inventory.json`,
+SHA-256 `771dd65a627aec167e3844ab64fd7ba9788cb2e1e40fae30c2a4cc1db2366f6b`.
+It records 76 converter-supported and 166 review rows, with no supported new
+uninstalled furniture. Those statuses describe converter eligibility, not the
+larger installed set or completed gameplay. Of the 54 uninstalled entries in
+the existing bulk-prepared batch, sixteen are diary aliases, thirteen retain
+unknown acquisition, twelve require Tortimer gifts, six harvest acquisition,
+five island acquisition, and two native identity review.
+
+The focused run executes 44 tests: 41 pass, two optional prepared-asset tests
+are skipped, and one assertion still expects the old diary acquisition reason.
+Its correction verifies the actual parent-support rejection. The targeted run
+passes seven tests, including the corrected assertion, the six alias tests,
+and current revision-7 artwork acceptance through complete current validation.
+Across both runs, 43 distinct checks pass and two are skipped. Coverage includes
+all ranges/rotations, cross-range balloons, every parent name, worn-state
+canonicalisation, changed complete code/helpers/relocations, full inventory
+links and repeat annotation, shared scan/metadata rejection, rejection before
+conversion creates files, installed-alias refusal, and generated browser review
+data. Existing graphics/parser/material checks also pass. No emulator is replayed
+for a discovery-only change.
+
+The ABI-95 cartridge retains SHA-256
+`01c7da7f945f02a4eebb1bafdc258b0485db5dd9240cf2254a51f3eefaccd68c`.
+Its build lock, 104 installed choices, saved format, and runtime are unchanged.
+The private browser interface export is not regenerated or served.
+Next work is native parent identity/gameplay and shared placement/pickup support,
+plus the still-missing graphics categories; these dependencies are not waived
+by recognising the aliases.
+
 ## Constant model-sequence imports
 
 Converter/installer revision 7 adds the shared `constant-model-sequence`

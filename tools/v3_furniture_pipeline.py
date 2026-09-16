@@ -21,9 +21,10 @@ from title_assets import model_texture_shape, pack4, rgb5a3, untile
 from v3_asset_loader import ROOT
 from v3_furniture_art import SEGMENT, command_source, parse_model, verify_sources
 from v3_registry import FURNITURE
+from v3_room_aliases import discover as room_aliases, pending_reason as room_alias_reason
 from v3_villager_art import native_palette, normalise_vertex_flags
 
-VERSION = 7
+VERSION = 8
 LAYERS = ('opaque', 'opaque1', 'translucent', 'translucent1')
 BEHAVIOURS = {0: 'static', 1: 'front-seat', 2: 'any-direction-seat', 4: 'front-sofa',
               8: 'single-bed', 16: 'double-bed'}
@@ -508,6 +509,9 @@ def name_metadata(source, item, identity):
 
 
 def metadata(source, item, profile, identity):
+    alias = next((row for row in room_aliases(source)['rows'] if int(row['display_item_id'],16)==item), None)
+    if alias:
+        raise ReviewRequired(room_alias_reason(alias))
     number, sheet = identity
     if any(sheet.get(k) != '-' for k in ('C', 'H', 'CG', 'CJ')):
         raise ReviewRequired('native identity/artwork correspondence needs review')
@@ -571,6 +575,8 @@ def metadata(source, item, profile, identity):
 
 def scan(source, worksheet, installed=None):
     installed = set(FURNITURE) if installed is None else set(installed)
+    alias_catalogue = room_aliases(source)
+    aliases = {int(row['display_item_id'],16):row for row in alias_catalogue['rows']}
     result = []
     for item, identity in sorted(identity_rows(worksheet).items()):
         row = dict(item_id=f'{item:04X}', name=identity[1].get('J'), installed=item in installed,
@@ -599,10 +605,17 @@ def scan(source, worksheet, installed=None):
             row.update(status='supported', metadata=meta, categories=categories+[meta['donor_list']])
         except ValueError as error:
             row.update(status='review', reason=str(error))
+        if item in aliases:
+            if row['installed']:
+                raise ValueError('Room alias is incorrectly installed as independent furniture')
+            if not row['asset_ready'] and row.get('reason'):
+                row['conversion_reason'] = row['reason']
+            row.update(status='review', room_alias=aliases[item], reason=room_alias_reason(aliases[item]))
         result.append(row)
     return dict(format='AFV3-AUTO-FURNITURE-1', version=VERSION,
                 source_rel_sha256=sha256(source.rel), source_symbols_sha256=sha256(source.symbols.encode()),
-                worksheet_sha256=SHEET_SHA, counts=dict(Counter(r['status'] for r in result)), rows=result)
+                worksheet_sha256=SHEET_SHA, room_aliases=alias_catalogue,
+                counts=dict(Counter(r['status'] for r in result)), rows=result)
 
 
 def convert(source, worksheet, output, selected=(), installed=None, *, assets_only=False, category=None):
@@ -640,6 +653,7 @@ def convert(source, worksheet, output, selected=(), installed=None, *, assets_on
         name = row['item_id']+'.n64obj.bin'; write_new(output/name, asset)
         objects.append(dict(**row.get('metadata',names[row['item_id']]), profile=profile, resources=resources, models=records,
             import_ready=row['status']=='supported', pending_reason=row.get('reason'),
+            **({'room_alias':row['room_alias']} if 'room_alias' in row else {}),
             native_profile_scalar_hex=profile['scalar_hex'], model_offsets=destinations,
             **({'draw_sequence':sequence_record} if sequence_record else {}),
             object_file=name, object_bytes=len(asset), object_sha256=sha256(asset)))
