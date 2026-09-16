@@ -7,6 +7,8 @@ af_v3_base_item_place = 0x8046DA6C;
 af_v3_base_item_price = 0x8046DB2C;
 af_v3_prior_catalogue_record = 0x80466F00;
 af_v3_prior_catalogue_owned = 0x80466F10;
+af_v3_held_item_name = 0x804A6000;
+af_v3_held_item_price = 0x804A6100;
 SECTIONS
 {
     . = 0x80466C00;

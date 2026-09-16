@@ -610,6 +610,27 @@ def player_motion(debug,rom_path,record):
         if actions and actions.get('equipment_selection'):
             from aflib import CODE_RAM,CODE_VROM
             selection=actions['equipment_selection'];core=files[CODE_VROM].extract(image)
+            parents=resources.get('parent_readers');text_buffer=allocation+0x1800
+            if parents:
+                reader=report['clothing']['display']['readers']['code']
+                check('complete selected parent wrapper',0x80466C00,blob[0x6C00:0x6C00+reader['bytes']])
+                parent_rows={r['item_id']:r for r in parents['rows']}
+                name_code=files[runtime.MODULE].extract(image)
+                name_entry=0x801969C8;name_offset=name_entry-MODULE_RAM
+                # Resident entry calls use the harness's linked-module bounds;
+                # the separate verified-code escape accepts only other owners.
+                check('complete resident public item-name entry',name_entry,
+                      name_code[name_offset:name_offset+0x16C])
+                price_entry=0x800C0194
+                price_proof=(price_entry,core[price_entry-CODE_RAM:price_entry-CODE_RAM+0x2FC])
+                def parent_check(row,enabled):
+                    item=int(row['item_id'],16);sentinel=b'V3PI'*5
+                    debug.write_memory(text_buffer,sentinel)
+                    call(name_entry,[text_buffer+2,16,item],int(enabled))
+                    want=parent_rows[row['item_id']]['name'].encode('ascii').ljust(16,b' ')
+                    check('parent name and adjacent guard' if enabled else 'unselected parent writes nothing',
+                          text_buffer,sentinel[:2]+want+sentinel[-2:] if enabled else sentinel)
+                    call(price_entry,[item],parent_rows[row['item_id']]['price'] if enabled else 0,price_proof)
             def owner_call(entry,args=(),want=None,end=0x808BD584):
                 address=owner+entry-equipment.PLAYER_RAM
                 return call(address,args,want,(address,expected[entry-equipment.PLAYER_RAM:end-equipment.PLAYER_RAM]))
@@ -641,13 +662,19 @@ def player_motion(debug,rom_path,record):
                 for row in selection['rows']:
                     item=int(row['item_id'],16);select(item)
                     owner_call(0x808BD3F8,want=0xFFFFFFFF)
+                    if parents:parent_check(row,False)
                     active=bytearray(before_profile);active[row['profile_byte']]|=row['profile_mask']
                     debug.write_memory(profile_address,active)
                     owner_call(0x808BD3F8,want=row['native_kind'])
+                    if parents:parent_check(row,True)
                     debug.write_memory(profile_address,before_profile)
                 row=selection['rows'][0];select(int(row['item_id'],16))
                 active=bytearray(before_profile);active[row['profile_byte']]|=row['profile_mask']
                 debug.write_memory(profile_address,active)
+                if parents:
+                    debug.write_memory(text_buffer,b'V3PI'*5)
+                    call(name_entry,[text_buffer+2,15,int(row['item_id'],16)],0)
+                    check('undersized parent name destination unchanged',text_buffer,b'V3PI'*5)
                 for mode,action in modes.items():
                     owner_call(0x808BD5C4,[target,action],row['native_kind'] if mode in (0,1) else 0xFFFFFFFF,
                                end=0x808BD668)
@@ -673,6 +700,7 @@ def player_motion(debug,rom_path,record):
             check('translation guard',0x8019C8D0,bytes.fromhex('AF32C0DE')*4)
             check('equipment module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
             return dict(native_selected_equipment=True,native_passive_permissions=True,assertions=assertions,
+                native_parent_names_prices=bool(parents),
                 selection_source='title-demo' if title else 'player-private',ordinary_inventory_tested=False,
                 ordinary_equipped_fan_tested=False,hardware_tested=False,flash_written=False,
                 requires_checkpoint_restore=True)

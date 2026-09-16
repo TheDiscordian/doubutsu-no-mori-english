@@ -22,6 +22,7 @@ CONTROLS=ROOT/os.environ.get('V3_PLAYER_CONTROLS_BUILD','build/v3-player-fan-con
 HELD=ROOT/os.environ.get('V3_HELD_DISPATCH_BUILD','build/v3-held-item-dispatch-02')
 ACTIVE=ROOT/os.environ.get('V3_FAN_ACTION_BUILD','build/v3-fan-action-dispatch-03')
 SELECTION=ROOT/os.environ.get('V3_HELD_SELECTION_BUILD','build/v3-held-selection-01')
+PARENTS=ROOT/os.environ.get('V3_HELD_PARENTS_BUILD','build/v3-held-parent-readers-01')
 
 
 class SelectionHostTests(unittest.TestCase):
@@ -29,6 +30,9 @@ class SelectionHostTests(unittest.TestCase):
 
     def test_selected_equipment_bounds_and_passive_permissions(self):
         self.sanitized('v3_held_selection_test.c')
+
+    def test_parent_names_prices_and_bounded_writes(self):
+        self.sanitized('v3_held_items_test.c')
 
     def test_native_probe_uses_original_switch_and_actual_permission_values(self):
         from v3_furniture_batch_smoke import original_equipment_kinds
@@ -41,6 +45,68 @@ class SelectionHostTests(unittest.TestCase):
         row=next(r for r in equipment['player_actions']['tables'] if r['native_entry']==0x808B63EC)
         values=blob[equipment['blob_offset']+row['offset']:equipment['blob_offset']+row['offset']+row['bytes']]
         self.assertEqual(set(values),{0,1,3})
+
+
+@unittest.skipUnless((PARENTS/'build.json').is_file(),'Current parent-reader cartridge required')
+class ParentTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.rom=(PARENTS/'animal-forest-v3-asset-loader.z64').read_bytes()
+        cls.report=json.loads((PARENTS/'build.json').read_bytes())
+        cls.base,cls.prior=inputs(PARENTS/'base-lock.json')
+        cls.files,cls.before=by_vrom(cls.rom),by_vrom(cls.base)
+        cls.blob=cls.files[BLOB].extract(cls.rom);cls.e=cls.report['equipment_resources']
+        cls.p=cls.e['parent_readers'];at=cls.e['blob_offset'];cls.module=cls.blob[at:at+cls.e['bytes']]
+
+    def test_source_metadata_and_single_provenance_catalogue(self):
+        import copy
+        from v3_handheld_items import parent_records
+        source=actions.Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+            (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+        table,receipt=parent_records(source,self.prior['equipment_resources'])
+        self.assertEqual(self.module[actions.PARENT_TABLE_OFFSET:actions.PARENT_TABLE_OFFSET+len(table)],table)
+        for key,value in receipt.items():self.assertEqual(self.p[key],json.loads(json.dumps(value)))
+        self.assertTrue(self.p['provenance_complete'])
+        catalogue={r['id']:r for r in json.loads((ROOT/'translations/provenance.json').read_bytes())['entries']}
+        for row in self.p['rows']:
+            locale=catalogue[row['id']+'/name']['locales']['en']
+            self.assertEqual(locale['credit'],'official');self.assertEqual(locale['encoded_sha256'],row['name_sha256'])
+            self.assertEqual(locale['source']['symbol'],'itemName_tool')
+            self.assertEqual(locale['source']['index'],row['name_source_index'])
+            self.assertFalse(self.blob[0x20+row['profile_byte']]&row['profile_mask'])
+            self.assertEqual(row['source_type'],43)
+        bad=copy.deepcopy(self.prior['equipment_resources'])
+        bad['player_actions']['equipment_selection']['rows'][0]['item_id']='2253'
+        with self.assertRaisesRegex(ValueError,'installed source-derived'):parent_records(source,bad)
+        data=bytearray(source.data);data[source.symbol('tool_price_table')[0]]^=1;source.data=bytes(data)
+        with self.assertRaisesRegex(ValueError,'complete parent table'):parent_records(source,self.prior['equipment_resources'])
+
+    def test_complete_readers_preserve_actions_resources_and_profile(self):
+        old_blob=self.before[BLOB].extract(self.base);at=self.e['blob_offset']
+        old=old_blob[at:at+self.e['bytes']];restored=bytearray(self.module)
+        for offset,n in ((actions.PARENT_CODE_OFFSET,self.p['code']['bytes']),
+                         (actions.PARENT_TABLE_OFFSET,self.p['table_bytes'])):
+            self.assertEqual(old[offset:offset+n],bytes(n));restored[offset:offset+n]=bytes(n)
+        self.assertEqual(restored,old)
+        self.assertEqual(self.e['player_actions'],self.prior['equipment_resources']['player_actions'])
+        self.assertEqual(sha256(self.module),self.e['sha256']);self.assertEqual(zlib.crc32(self.module),self.e['crc32'])
+        start=actions.PARENT_CODE_OFFSET
+        self.assertEqual(sha256(self.module[start:start+self.p['code']['bytes']]),self.p['code']['sha256'])
+        readers=self.report['clothing']['display']['readers'];self.assertTrue(readers['held_parent_readers'])
+        self.assertLessEqual(readers['code']['bytes'],768)
+        self.assertEqual(sha256(self.blob[0x6C00:0x6C00+readers['code']['bytes']]),readers['code']['sha256'])
+        for row in readers['item_hooks']+readers['collection_hooks']:
+            at=row['entry']-0x80460000
+            self.assertEqual(self.blob[at:at+8],bytes.fromhex(row['after']))
+        for key in ('save_runtime','furniture','catalogue','clothing_profile','hra','feng_shui'):
+            self.assertEqual(self.report.get(key),self.prior.get(key))
+        for v in self.files.keys()-{BLOB,MODULE,0x19D40}:
+            self.assertEqual(self.files[v].extract(self.rom),self.before[v].extract(self.base),f'{v:08X}')
+        self.assertFalse(self.report['shared_runtime_refresh']['resource_allocations_changed'])
+        self.assertFalse(self.p['native_inventory_category_installed'])
+        original=(ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes()
+        self.assertEqual(apply_ups(original,(PARENTS/'asset-loader.ups').read_bytes()),self.rom)
+        self.assertEqual(struct.unpack_from('>2I',self.rom,0x10),n64_checksum(self.rom))
 
 
 @unittest.skipUnless((SELECTION/'build.json').is_file(),'Current held-selection cartridge required')

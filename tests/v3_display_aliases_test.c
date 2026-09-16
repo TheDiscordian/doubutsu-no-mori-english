@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #define AF_V3_DISPLAY_ALIASES 1
+#define AF_V3_HELD_ITEMS 1
 #include "../overlays/v3/display_items.c"
 #include "../overlays/v3/display_conversion.c"
 #include "../overlays/v3/display_roster.c"
@@ -31,6 +32,12 @@ int af_v3_base_item_place(u32 item,int x,int z,void *out) {
     last=item;assert(x==-4 && z==7 && out);return 0;
 }
 u32 af_v3_base_item_price(u32 item) { last=item;return item+12; }
+int af_v3_held_item_name(u8 *out,u32 capacity,u32 item) {
+    last=item;
+    if (!out || capacity<16) return 0;
+    memset(out,'H',16);return 1;
+}
+u32 af_v3_held_item_price(u32 item) { last=item;return item+20; }
 void af_v3_prior_catalogue_record(u32 item) { last=item; }
 int af_v3_prior_catalogue_owned(const u8 *private,u32 item) { assert(private);last=item;return 1; }
 u16 af_v3_prior_display_item(u32 item) { last=item;return (u16)item; }
@@ -51,6 +58,14 @@ int main(void) {
      * One uses its own generated footprint, one the garment category. */
     add(0x2200,0x318C,0);add(0x3407,0x381C,0x17AC);
     u8 text[18],private[4]={0};
+    for (u32 item=0x2224;item<0x225C;++item) {
+        memset(text,0xA5,sizeof text);
+        assert(af_v3_display_item_name(text+1,16,item));
+        assert(last==item && text[1]=='H' && text[0]==0xA5 && text[17]==0xA5);
+        assert(af_v3_display_item_price(0xABCD0000|item)==item+20 && last==item);
+        assert(!af_v3_display_item_name(text+1,15,item));
+        assert(!af_v3_display_item_name(text+1,16,0xABCD0000|item));
+    }
     for (u32 i=0;i<af_v3_test_alias_index.count;++i) {
         u32 parent=af_v3_test_alias_index.rows[i].parent;
         u32 display=af_v3_test_alias_index.rows[i].display;

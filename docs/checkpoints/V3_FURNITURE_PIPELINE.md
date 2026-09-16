@@ -1,5 +1,77 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared parent name and price readers
+
+ABI 106 connects the eight implemented fan equipment records to the existing
+public name/price paths through the same category importer. `parent_records`
+verifies complete donor tables and consumer functions, price sentinel, and
+pointer dependencies. The 1,360-byte `AFHI` table preserves official names,
+donor prices, source category 43, canonical collection IDs, and equipment kinds.
+All eight official names are credited in `translations/provenance.json`, using
+`itemName_tool` and their actual indices. No second source catalogue is created.
+
+The parent reader is 512 bytes at `804A6000`; the expanded display wrapper is
+696 of 768 bytes. Names require sixteen writable bytes and selected equipment;
+prices retain the native sixteen-bit argument convention. Action code, callbacks,
+owner relocation, models, motions, sound, allocations, 104 choices, and saved
+format 2 remain unchanged. No fan selection bit is enabled. Donor category 43
+is recorded, not installed as an unchecked native menu/icon index.
+
+Artifacts and verification:
+
+- Build: `build/v3-held-parent-readers-01/`, promoted in the main build lock.
+- ROM SHA-256: `46bfef14b0849f202bc0569408bc8d6337b889a1677c092c85c28111c48f2e7c`.
+- UPS SHA-256: `51c815430898783f4d607ce5bc7f92b76261028386ea774b53b31a2fdcac42dd`.
+- Build receipt SHA-256: `544bd16e49375135f37487eb554f5524bef0d344f975c6360f3ce9ec0859f48e`.
+- Two cartridge checks pass in the initial 5.839-second command: complete source
+  records/provenance, mutation rejection, all declared reader/table bytes,
+  retained action module/resources/profile, CRC, and UPS reconstruction. The
+  accompanying host fixture fails compilation because a sixteen-character
+  string initializer would omit its terminator under the host warning policy.
+  That command is not wholly green. The fixture explicitly copies sixteen name
+  bytes; its corrected ASan/UBSan check passes in 0.159 seconds, without replaying
+  the two passing cartridge checks.
+- The shared display-wrapper ASan/UBSan check passes in 0.148 seconds, including
+  the extended parent range, native argument widths, exact write bounds, and
+  existing synthetic display/garment categories. Four focused checks pass across
+  these commands.
+- Twelve current optional-composition tests pass in 8.920 seconds. The test
+  process binds the candidate lock before running the existing suite. Empty
+  selections reproduce V2-11; all selections reproduce ABI 106. Actual codec,
+  sparse selections, dependency checks, catalogue packing, and collision guards
+  pass. Neither patcher is updated.
+
+The first native run at `build/smoke-v3-held-parent-readers-01/` stops at 23
+records/13 passing assertions. Its name-call proof incorrectly uses the harness
+escape reserved for code outside the translation module. The harness rejects
+that call before executing it. This is a fixture error, not a game failure.
+Result SHA-256: `d7a42c2b209979dd72e30d2b0f392ab7fcf7a745f01ccc9e9c51516ef37cb9f6`.
+
+The single corrected retry at `build/smoke-v3-held-parent-readers-02/` uses the
+ordinary linked-module call after verifying the complete resident name entry.
+It runs the same ROM and passes 112 records with 98 passing assertions. It
+exercises the real loaded player selector, native switch returns, rejected IDs,
+all eight independent selected/unselected fans, actual public English names and
+prices, adjacent name guards, and undersized destination rejection. It verifies
+passive/all/blocked permissions, hidden/force-visible priority, forbidden scene
+rejection, state restoration, heap/module guards, no CPU fault, checkpoint
+restoration, erased FlashRAM, and graceful shutdown. The equipment source is the
+title-demo field; ordinary pocket/equip gameplay is not claimed.
+Result SHA-256: `98390eafcc39ef4cb632f02f24bbee8f68711350f9b8e2df3d01e95b324b342e`.
+Probe SHA-256: `ee253e9a8711f2d764aa7242c3ff533836ff8cfe218b8fb8778dad83d1b9c27f`.
+
+This meaningful reader integration also completes the previously pending
+selector/visibility checks; ABI 105 is not separately replayed. No physical
+audio, user save, ordinary save/restart, or hardware test is involved.
+Same-profile ABI 104/105 compatibility is expected in both directions, not newly
+verified by ordinary save/reload. Do not use import-enabled V3 saves with V2.
+
+Continue shared inventory/ground category, menu/icon, and inventory-screen
+equipment selector/draw integration. The latter is its own owner and is not
+covered by world-player drawing. Then connect acquisition, actual collection/
+catalogue representations, optional selection, and ordinary lifecycle/persistence.
+No fan is selectable or offered for playtesting yet; both V2 patchers stay intact.
+
 ## Shared selected-equipment adapter
 
 The same category importer extends actual equipment selection and passive-item

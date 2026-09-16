@@ -10,6 +10,10 @@ extern int af_v3_base_item_place(u32, int, int, void *);
 extern u32 af_v3_base_item_price(u32);
 extern void af_v3_prior_catalogue_record(u32);
 extern int af_v3_prior_catalogue_owned(const u8 *, u32);
+#ifdef AF_V3_HELD_ITEMS
+extern int af_v3_held_item_name(u8 *, u32, u32);
+extern u32 af_v3_held_item_price(u32);
+#endif
 #ifdef AF_V3_DISPLAY_ALIASES
 #include "display_aliases.h"
 #endif
@@ -32,7 +36,11 @@ u32 af_v3_display_pocket_item(u32 item) {
 }
 
 int af_v3_display_item_name(u8 *destination, u32 capacity, u32 item) {
-    return af_v3_base_item_name(destination, capacity, af_v3_display_pocket_item(item));
+    item=af_v3_display_pocket_item(item);
+#ifdef AF_V3_HELD_ITEMS
+    if (item-0x2224u<56u) return af_v3_held_item_name(destination,capacity,item);
+#endif
+    return af_v3_base_item_name(destination, capacity, item);
 }
 
 int af_v3_display_item_type(u32 argument) {
@@ -59,6 +67,9 @@ int af_v3_display_item_place(u32 argument, int x, int z, void *destination) {
 
 u32 af_v3_display_item_price(u32 argument) {
     u32 item = (u16)argument, canonical = af_v3_display_pocket_item(item);
+#ifdef AF_V3_HELD_ITEMS
+    if (canonical-0x2224u<56u) return af_v3_held_item_price(canonical);
+#endif
     return af_v3_base_item_price(canonical != item ? canonical : argument);
 }
 

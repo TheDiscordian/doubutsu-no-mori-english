@@ -28,6 +28,59 @@ PENDING = ('Prepared held artwork only; native equipment selection, player actio
            'inventory/ground readers, acquisition, catalogue/collection, and saved-profile integration remain.')
 
 
+def parent_records(source, equipment):
+    """Names/prices for implemented equipment categories; never enable an item."""
+    _,selection=selection_records(source,equipment)
+    installed=equipment['player_actions'].get('equipment_selection')
+    if not installed or json.loads(json.dumps(selection['rows']))!=installed['rows']:
+        raise ValueError('Parent readers require the installed source-derived selection records')
+    tables={}
+    for name,size,digest in (
+            ('tool_price_table',186,'74a75db25db4e9eaf805f08d6b8475794acaea3a7bd990537805f5ecf03e8f45'),
+            ('item1_2_tableNo',92,'d07c0e001d578fc1bb754c8b24ad7eb782c6bf94ba1ddff2b2c3239f97767975'),
+            ('itemName_tool',1472,'b2f7827622de6c6db3102080320c79c77268bde1f7e3df7515dd9fa0c92222a8'),
+            ('mSP_item1_start_idx_table',32,'4ba8d1ef30f8a15cb8db96b9a6f4c7ecb008b99b66302e7863f1e22a7550e05c')):
+        data=source.raw(name)
+        if len(data)!=size or sha256(data)!=digest:raise ValueError('Changed complete parent table: '+name)
+        tables[name]=dict(offset=source.symbol(name)[0],bytes=size,sha256=digest)
+    functions=[]
+    for at,size,digest in (
+            (0x784E0,544,'3f45cc5bf10f883d41575bc4f66cd1f8cfa1f86e46795ec386baaf412a7edb2b'),
+            (0x78408,36,'7bf2f0cfba36247d0178e9df17c8462a710ab2dbb629273dfc3bfe865e094ca3'),
+            (0x58E00,168,'63c24d921f9fd6a69471682d6593883ceb329b3f22af5a725b5cd73f441c6d8f')):
+        raw,receipt=source.function(at)
+        if len(raw)!=size or sha256(raw)!=digest:raise ValueError('Changed complete parent reader')
+        functions.append(receipt)
+    links=[]
+    for container,offset,target in (('l_price_info',8,'l_tool_price_info'),
+            ('l_tool_price_info',0,'tool_price_table'),('item1_tableNo$430',8,'item1_2_tableNo')):
+        at=source.symbol(container)[0]+offset;pointer=source.relocations.get(at)
+        if source.data[at:at+4]!=bytes(4) or pointer!=(1,True,5,source.symbol(target)[0]):
+            raise ValueError('Changed parent metadata pointer dependency')
+        links.append(dict(container=container,offset=offset,target=target))
+    names=source.raw('itemName_tool');prices=source.raw('tool_price_table');types=source.raw('item1_2_tableNo')
+    if prices[-2:]!=b'\xff\xff' or b'\xff\xff' in [prices[i:i+2] for i in range(0,184,2)]:
+        raise ValueError('Changed bounded parent price sentinel')
+    table=bytearray(struct.pack('>4I',0x41464849,1,56,24)+bytes(56*24));rows=[]
+    for selected in selection['rows']:
+        original=selected['source'];item=int(selected['item_id'],16);index=item-0x2200
+        name=names[index*16:index*16+16];price=struct.unpack_from('>H',prices,index*2)[0]
+        if sha256(name)!=original['name_sha256'] or name.decode('ascii').rstrip(' ')!=original['name']:
+            raise ValueError('Parent name disagrees with selected source identity')
+        raw=struct.pack('>HHHBB',item,price,int(selected['display_item_id'],16),selected['native_kind'],types[index])+name
+        table[16+(index-36)*24:16+(index-35)*24]=raw
+        rows.append(dict(id=original['id'],item_id=selected['item_id'],name=original['name'],
+            name_sha256=original['name_sha256'],name_source_symbol='itemName_tool',name_source_index=index,
+            price=price,price_source_symbol='tool_price_table',price_source_index=index,
+            source_type=types[index],native_kind=selected['native_kind'],
+            display_item_id=selected['display_item_id'],profile_byte=selected['profile_byte'],
+            profile_mask=selected['profile_mask'],record_sha256=sha256(raw),selectable=False))
+    return bytes(table),dict(format='AFV3-HELD-PARENTS-1',rows=rows,source_tables=tables,
+        source_functions=functions,pointer_dependencies=links,table_bytes=len(table),table_sha256=sha256(table),
+        names_installed=True,prices_installed=True,native_inventory_category_installed=False,
+        acquisition_installed=False,collection_installed=False,logical_imports_added=0,profile_bits_enabled=0)
+
+
 def selection_records(source, equipment):
     """Build shared item/kind/profile records from implemented source categories.
 

@@ -108,7 +108,7 @@ def provenance_patch(rows):
             continue
         entry = dict(id=key,native_sha256=None,locales={'en':dict(credit='official',
             locator=['tools/v3_furniture_pipeline.py','tools/v3_furniture_install.py'],
-            source=dict(source='user-supplied GAFE01 revision 0 disc',symbol='ftrName2_table',
+            source=dict(source='user-supplied GAFE01 revision 0 disc',symbol=row.get('name_source_symbol','ftrName2_table'),
                 index=row['name_source_index'],reference_sha256=row['name_sha256']),
             text=row['name'],evidence_id=key,human_review='not_recorded',encoded_sha256=row['name_sha256'])})
         additions.append('+'+'    '+json.dumps(entry,separators=(',',':'))+',')
@@ -457,7 +457,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         blob,reused=reuse_resource_tail(base,prior,old_blob)
         if not reused['reused_bytes']:
             raise ValueError('Equipment integration requires the checked shared resource tail')
-    display_report,alias_report=display_aliases.install(prior,blob,core,output)
+    parent_readers=bool(player_actions and prior.get('equipment_resources',{}).get('player_actions',{}).get('equipment_selection'))
+    display_report,alias_report=display_aliases.install(prior,blob,core,output,held_items=parent_readers)
     if equipment_art is not None:
         import v3_equipment_runtime as equipment
         equipment_report=equipment.install(prior,blob,core,original,output,equipment_art)
@@ -471,6 +472,10 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         import v3_player_actions as equipment
         equipment_report,owner_changes=equipment.install(base,prior,blob,core,original,output)
     if equipment_report:
+        if equipment_report.get('parent_readers'):
+            attribution=provenance_patch(equipment_report['parent_readers']['rows'])
+            if attribution:write_new(output/'provenance.patch',attribution.encode())
+            equipment_report['parent_readers']['provenance_complete']=not bool(attribution)
         # Changed compressed owners keep their logical DMA identity/size but
         # receive checked uncompressed storage before the ordinary resource tail.
         for vrom,data in owner_changes.items():
@@ -574,6 +579,8 @@ def refresh_runtime(output, lock=LOCK, *, equipment_art=None, player_motion=Fals
         if player_actions:
             report['shared_runtime_refresh']['adapters'].append('player_actions')
         report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in equipment.SOURCES})
+        if equipment_report.get('parent_readers'):
+            report['sources']['translations/provenance.json']=sha256((ROOT/'translations/provenance.json').read_bytes())
         report['native_test']='pending shared equipment resource DMA/readers'
     write_new(output/'animal-forest-v3-asset-loader.z64',result)
     write_new(output/'asset-loader.ups',patch)

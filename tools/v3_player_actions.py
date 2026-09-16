@@ -68,9 +68,43 @@ SOURCES = ('tools/v3_player_actions.py','tools/v3_furniture_pipeline.py',
            'tools/v3_asset_loader.py','overlays/v3/startup.c',
            'overlays/v3/player_actions.S','overlays/v3/player_actions.c',
            'overlays/v3/player_actions.ld','overlays/v3/held_selection.c',
+           'overlays/v3/held_items.c','overlays/v3/held_items.ld',
            'tools/v3_handheld_items.py') + sound_programs.SOURCES
 
 SELECTION_OFFSET=0x5500
+PARENT_CODE_OFFSET,PARENT_TABLE_OFFSET=0x3000,0x57F0
+
+
+def refresh_parent_readers(base,prior,blob,core,original,output):
+    """Connect parent metadata without new equipment-specific installers."""
+    from v3_handheld_items import parent_records
+    old=prior['equipment_resources'];actions=old['player_actions'];at=old['blob_offset']
+    module=bytearray(blob[at:at+old['bytes']])
+    if old.get('parent_readers') or sha256(module)!=old['sha256']:
+        raise ValueError('Parent readers already installed or equipment module changed')
+    existing=actions['code']
+    if (existing['bytes']>PARENT_CODE_OFFSET-CODE_OFFSET
+            or sha256(module[CODE_OFFSET:CODE_OFFSET+existing['bytes']])!=existing['sha256']
+            or any(module[CODE_OFFSET+existing['bytes']:TABLE_OFFSET])):
+        raise ValueError('Parent reader code overlaps existing action code')
+    source=Source((ROOT/'build/gamecube/files/foresta.rel.szs.decoded').read_bytes(),
+                  (ROOT/'local/ac-decomp/config/GAFE01_00/foresta/symbols.txt').read_bytes())
+    table,receipt=parent_records(source,old)
+    if PARENT_TABLE_OFFSET+len(table)>MODULE_SIZE-16 or any(module[PARENT_TABLE_OFFSET:PARENT_TABLE_OFFSET+len(table)]):
+        raise ValueError('Parent metadata overlaps an existing equipment resource')
+    code,compiled=compile_part('held_items',output/'held_items',defines=(
+        f'AF_V3_HELD_SELECTED=0x{existing["symbols"]["af_v3_player_selected_equipment"]:08X}u',))
+    if (len(code)>TABLE_OFFSET-PARENT_CODE_OFFSET
+            or compiled['symbols']['af_v3_held_item_price']!=RAM+PARENT_CODE_OFFSET+0x100):
+        raise ValueError('Parent reader public entries or allocation changed')
+    module[PARENT_CODE_OFFSET:PARENT_CODE_OFFSET+len(code)]=code
+    module[PARENT_TABLE_OFFSET:PARENT_TABLE_OFFSET+len(table)]=table
+    receipt.update(code=compiled,code_offset=PARENT_CODE_OFFSET,table_offset=PARENT_TABLE_OFFSET,
+        table_ram=RAM+PARENT_TABLE_OFFSET,native_tested=False)
+    report=copy.deepcopy(old);report['parent_readers']=receipt
+    report.update(sha256=sha256(module),crc32=zlib.crc32(module))
+    blob[at:at+len(module)]=module
+    return report,{}
 
 
 def control_bindings(source,owner,core,original,prior):
@@ -620,6 +654,8 @@ def expanded_tables(source,owner,reloc,*,categories=CATEGORIES,native_count=NATI
 def install(base,prior,blob,core,original,output):
     old=prior.get('equipment_resources',{})
     if old.get('player_actions'):
+        if old['player_actions'].get('equipment_selection'):
+            return refresh_parent_readers(base,prior,blob,core,original,output)
         if old['player_actions'].get('fan_activation'):
             return refresh_selection(base,prior,blob,core,original,output)
         if old['player_actions'].get('held_dispatch'):

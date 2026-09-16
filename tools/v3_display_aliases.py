@@ -65,7 +65,8 @@ def encode(rows):
     return table.ljust(LIMIT-RAM,b'\0'),metadata
 
 
-def install(prior, blob, core, output):
+def install(prior, blob, core, output, *, held_items=False):
+    held_items=bool(held_items or prior.get('equipment_resources',{}).get('parent_readers'))
     rows=records(prior,blob); table,metadata=encode(rows)
     previous=prior.get('display_aliases')
     display=copy.deepcopy(prior['clothing']['display'])
@@ -89,7 +90,8 @@ def install(prior, blob, core, output):
         # Disabled as independent furniture: readers delegate to the selected
         # parent. This does not create another name, price, or ownership bit.
         blob[at:at+32]=expected
-    if previous and all(prior['sources'].get(p)==sha256((ROOT/p).read_bytes()) for p in SOURCES):
+    if (previous and display['readers'].get('held_parent_readers',False)==held_items
+            and all(prior['sources'].get(p)==sha256((ROOT/p).read_bytes()) for p in SOURCES)):
         return display,copy.deepcopy(previous)
 
     parts={}
@@ -100,6 +102,7 @@ def install(prior, blob, core, output):
         if (sha256(blob[at:at+old['bytes']])!=old['sha256'] or any(blob[at+old['bytes']:end])):
             raise ValueError('Changed complete alias-code reservation: '+part)
         defines=('AF_V3_DISPLAY_ALIASES=1',)
+        if part=='display_items' and held_items:defines+=('AF_V3_HELD_ITEMS=1',)
         extra=()
         if part=='display_roster':
             defines+=('AF_V3_DISPLAY_ROSTER_BRIDGE=1',);extra=('overlays/v3/clothing_roster.S',)
@@ -124,6 +127,7 @@ def install(prior, blob, core, output):
         target=parts['display_conversion']['symbols']['af_v3_room_'+row['kind']+'_item']
         row.update(after=redirect(core,row['entry']-CODE_RAM,row['after'],target),target=target)
     display['readers']['code']=parts['display_items']
+    display['readers']['held_parent_readers']=held_items
     display['conversion']['code']=parts['display_conversion']
     display['roster_code']=parts['display_roster']
     return display,dict(format='AFV3-DISPLAY-ALIASES-1',rows=rows,table_ram=RAM,

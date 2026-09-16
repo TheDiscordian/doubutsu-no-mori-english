@@ -1,0 +1,59 @@
+#include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include "../overlays/v3/held_selection.c"
+u32 af_test_held_selection[188];
+u8 af_test_held_profile[192];
+#undef header
+#undef profile
+#include "../overlays/v3/held_items.c"
+u32 af_test_held_items[340];
+int af_test_held_selected(u32 item) { return af_v3_player_selected_equipment(item); }
+
+int main(void) {
+    u32 *s=af_test_held_selection;
+    s[0]=0x41464853u;s[1]=1;s[2]=92;s[3]=8;
+    header[0]=0x41464849u;header[1]=1;header[2]=56;header[3]=24;
+    Entry *selectors=(Entry *)(s+4);
+    HeldItem *rows=(HeldItem *)(header+4);
+    for (int i=0;i<8;++i) {
+        u16 item=0x2254+i;
+        selectors[item-0x2200]=(Entry){item,107+i,1,42+i/8,1u<<(i%8),1};
+        rows[item-0x2224]=(HeldItem){item,600+i,0x314C+4*i,107+i,43,{0}};
+        memcpy(rows[item-0x2224].name,"0123456789abcdef",16);
+    }
+    u8 out[20],unchanged[20];memset(unchanged,0xDB,20);
+    for (u32 item=0;item<65536;++item) {
+        memcpy(out,unchanged,20);
+        assert(!af_v3_held_item_name(out+2,16,item));
+        assert(!af_v3_held_item_price(item));assert(!memcmp(out,unchanged,20));
+    }
+    for (int i=0;i<8;++i) {
+        memset(af_test_held_profile,0,192);af_test_held_profile[42]=1u<<i;
+        for (u32 item=0x2224;item<0x225C;++item) {
+            int enabled=item==0x2254u+i;memcpy(out,unchanged,20);
+            assert(af_v3_held_item_name(out+2,16,item)==enabled);
+            assert(af_v3_held_item_price(item)==(enabled?600u+i:0));
+            assert(af_v3_held_item_price(0x10000u|item)==(enabled?600u+i:0));
+            if (enabled) assert(!memcmp(out+2,"0123456789abcdef",16));
+            else assert(!memcmp(out,unchanged,20));
+            assert(out[0]==0xDB && out[1]==0xDB && out[18]==0xDB && out[19]==0xDB);
+        }
+        memcpy(out,unchanged,20);
+        assert(!af_v3_held_item_name(out+2,15,0x2254+i));
+        assert(!af_v3_held_item_name(NULL,16,0x2254+i));
+        assert(!af_v3_held_item_name(out+2,16,0x12254+i));
+        assert(!memcmp(out,unchanged,20));
+    }
+    HeldItem *last=&rows[55],saved=*last;
+    for (int i=0;i<4;++i) {
+        u32 prior=header[i];header[i]^=1;
+        assert(!af_v3_held_item_name(out,16,0x225B));assert(!af_v3_held_item_price(0x225B));
+        header[i]=prior;
+    }
+    last->item=0;assert(!af_v3_held_item_price(0x225B));*last=saved;
+    last->kind=106;assert(!af_v3_held_item_price(0x225B));*last=saved;
+    last->display|=1;assert(!af_v3_held_item_price(0x225B));*last=saved;
+    selectors[91].ready=0;assert(!af_v3_held_item_price(0x225B));
+    puts("Shared held parent names, prices, selection, and bounded writes pass");
+}

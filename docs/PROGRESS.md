@@ -2,23 +2,28 @@
 
 ## Active development
 
-The shared selected-equipment adapter is implemented in unpromoted ABI 105 at
-`build/v3-held-selection-01/`. One generated 752-byte table connects all eight
-fan IDs to their actual kinds and independent canonical collection-profile bits.
-Original equipment keeps its native switch; passive-item visibility retains
-scene, hidden-item, and force-visible rules. No profile bits or choices are
-enabled. Six focused checks pass across the recorded commands, including host
-sanitizers, source records, owner relocation, complete callback rebinding, resource
-retention, and UPS reconstruction.
+Current ABI 106 at `build/v3-held-parent-readers-01/` connects shared parent
+names/prices and selected equipment for all eight fan records. The same importer
+derives official names, prices, source categories, and canonical collection
+identities from checked donor tables. All eight names have official credits in
+the single provenance catalogue. No item-specific installer or option list is
+added. No fan profile bit or browser choice is enabled.
 
-Native selection/visibility verification remains incomplete. Two bounded attempts
-stop on fixture assumptions: an unused permission value, then an incorrect expected
-native item kind. The latter cartridge return agrees with the original switch.
-The corrected probe derives expected kinds from the original ROM and has a focused
-fixture check. Do not retry this native batch or promote ABI 105 yet. Continue
-parent inventory/readers/acquisition and include the unfinished selector checks
-with that meaningful integration change. See the
-[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-selected-equipment-adapter).
+Four focused checks pass across the recorded commands, including sanitizer
+coverage of the parent readers and existing display wrapper. The combined silent
+native check passes 112 records with 98 assertions: actual native item selection,
+independent enabled/disabled fan bits, complete English names, donor prices,
+bounded name writes, passive/scene/hidden/force-visible rules, restored state,
+guards, and checkpoint. Twelve current composition checks pass, including exact
+no-import V2 output. The [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-name-and-price-readers)
+records the initial harness failure and corrected retry; no game-code retry or
+old-build replay is required.
+
+Next integrate inventory/ground categories, menu/icon readers, and the inventory
+screen's separate player-item model selector/draw tables. The donor fan category
+is 43, absent from the native equipment table; it must not be substituted with
+generic tools or umbrellas. Acquisition, context-correct collection/catalogue,
+optional composition, ordinary take-out/put-away, and persistence remain work.
 
 ABI 104 registers fan action 109's complete setup/main/net-reset group and its
 four ordinary input polls through the shared importer. A complete core-bound
@@ -50,7 +55,7 @@ sweep, envelope, and sample are retained without enlarging the audio heap.
 The complete 24-KiB module transfer is checksum-bound; startup remains 952 of
 992 bytes. Models, motions, actor sizes, animation banks, saved format 2, and
 104 choices remain unchanged. No fan is offered as a selectable import yet.
-Next integrate the unpromoted selector with parent inventory/readers/acquisition
+Next integrate inventory categories/acquisition
 and context-correct catalogue/persistence. Do not
 repeat passing component checks or create per-item scripts. Original-hardware
 testing and ordinary equipped-fan gameplay remain pending.
@@ -122,10 +127,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 104 at
-`build/v3-fan-action-dispatch-03/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 106 at
+`build/v3-held-parent-readers-01/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 103 is expected in both directions; this
+Same-profile compatibility with ABI 104/105 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.

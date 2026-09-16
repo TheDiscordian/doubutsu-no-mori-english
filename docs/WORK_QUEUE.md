@@ -2,33 +2,26 @@
 
 ## Active: V3 optional GameCube imports
 
-Current ABI 104 is `build/v3-fan-action-dispatch-03/`. The shared importer
-registers fan action 109's complete setup/main/net-reset group and four ordinary
-input polls. The outside-owner audit preserves unrelated core limits. Native
-release/repeat handling retains crossed and wrapped end events, fixing the
-skipped-release defect from the initial native run. Four focused checks, the
-corrected 60-record/37-assertion native run, and twelve current composition checks
-pass. No allocation, saved format, or selectable identity changes. Preserve the
-unchanged held-draw and sound evidence instead of replaying those batches.
-See the [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-fan-action-activation).
+Current ABI 106 is `build/v3-held-parent-readers-01/`, pinned by the main build
+lock. The shared importer connects source-derived parent names/prices and the
+eight fan equipment/profile relationships. Four focused checks, the combined
+112-record/98-assertion native run, and twelve current composition checks pass.
+No allocation, saved format, profile bit, or selectable identity changes.
+Preserve the unchanged action/held-draw/sound evidence. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-parent-name-and-price-readers).
 
-The next shared selection adapter is implemented but unpromoted in ABI 105 at
-`build/v3-held-selection-01/`. Its 752-byte source-derived table supplies all
-eight fan item/kind/profile relationships without enabling any profile bit.
-Native equipment and scene/visibility rules remain; passive-item permission
-extends to selected imports. Six focused checks pass across the recorded commands.
-Two native attempts stop on independently identified fixture errors before
-imported-selection testing: permission value two is absent, and native item
-`2202` is kind 35 rather than two. The probe now reads original switch returns;
-its dedicated fixture check passes. No third emulator attempt is queued for this
-batch, and ABI 104 remains the checked main lock.
+Next, extend the shared inventory category/menu/icon consumers and the separate
+inventory-screen equipment owner from donor category records. Source fans have
+category 43; native `mNT_get_itemTableNo` has only 36 equipment entries. Do not
+map fans to generic tools or umbrellas. The donor inventory owner also uses its
+own item/shape/animation tables and static fan draw callback; the world-player
+adapter does not update those automatically. Reuse the complete held resources.
 
-Next, integrate parent inventory/names/prices/acquisition, context-correct
-catalogue/collection, and optional composition using the prepared records and
-ABI-105 candidate lock. Run the corrected selector/visibility tail with that
-meaningful integration change, not as a historical replay. Keep ordinary
-take-out/put-away, full scene drawing, persistence, and equipped-fan use explicit;
-direct callbacks and host checks do not establish those results.
+Then connect source acquisition, context-correct catalogue/collection, and
+optional composition through the same descriptors. Keep ordinary take-out/
+put-away, full scene drawing, persistence, and equipped-fan use explicit;
+native direct-reader checks do not establish ordinary inventory gameplay.
+No further selector/name/price native replay is needed without a relevant change.
 
 ABI 102 at `build/v3-player-frame-sound-01/` contains the complete fan per-frame
 callback and shared sound-program converter. Its actual `0167` program retains

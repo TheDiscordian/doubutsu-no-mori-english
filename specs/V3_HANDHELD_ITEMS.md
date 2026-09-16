@@ -469,7 +469,55 @@ wait/swing and tumble/get-up data is installed through the shared animation
 readers; action 109 reaches its setup/main through native dispatch. This does
 not make the complete handheld item selectable or playable.
 
-Inventory/ground readers, official names and prices, acquisition, context-correct
-catalogue/collection integration, optional selection, and save/profile handling
-remain required before enabling new handheld items. Original tools must not be
-duplicated as new imports. Preserve existing ROMs/saves and both V2 patchers.
+## Shared parent names and prices
+
+`parent_records` consumes the installed selected-equipment records, not a second
+list of item IDs. It verifies the complete donor name, price, and item-category
+tables, price/category consumers, pointer dependencies, and terminal price
+sentinel. The parent's official `itemName_tool` name and `tool_price_table` price
+are independent of the furniture catalogue model's metadata. Every installed
+name is credited in `translations/provenance.json`; the ordinary shared importer
+generates any missing entries using the descriptor's source symbol/index.
+
+The `AFHI` table at `804A87F0` has four 32-bit header words: magic `41464849`,
+version one, count 56, and stride 24. It covers IDs `2224..225B`; absent records
+remain zero. Each record contains:
+
+| Offset | Bytes | Value |
+| --- | ---: | --- |
+| `00` | 2 | Parent item ID |
+| `02` | 2 | Donor price |
+| `04` | 2 | Canonical collection display ID |
+| `06` | 1 | Extended equipment kind |
+| `07` | 1 | Donor inventory category, not a native category assignment |
+| `08` | 16 | Complete official English name, space-padded |
+
+The table occupies 1,360 bytes and ends at `804A8D40`, before the existing
+module footer. Eight fan records are populated; no selection bit changes.
+The runtime requires a valid header/identity and the same selected, ready kind
+as the equipment selector. Missing or disabled items return no name/price.
+Name writes require a non-null destination with at least sixteen bytes; wider
+item-name arguments reject. Prices retain the native sixteen-bit argument rule.
+
+Shared reader entry points are `804A6000` for names and `804A6100` for prices.
+Their 512-byte image uses existing unused action-module space. Player action
+code is bounded below `804A6000`; parent-reader code is bounded below the action
+tables at `804A7000`. Existing action callbacks and owner relocation do not move.
+The 696-byte display wrapper delegates only the new parent range to these
+entries, keeping native items and existing furniture/clothing paths intact.
+No permanent allocation, model/animation resource, or saved field grows.
+
+The donor gives fans item category 43. The native `mNT_get_itemTableNo` has a
+36-entry equipment table, and its menu/icon consumers need explicit category
+support before fans become inventory choices. Do not substitute generic tools,
+umbrellas, or furniture leaves for that work. The inventory-screen player model
+also has its own item selector, kind tables, and draw callback: source
+`m_inventory_ovl.c` functions `mIV_Get_player_item_shape_index` and
+`mIV_pl_shape_item_draw_fan`. The world-player action/draw adapter does not
+automatically update that owner.
+
+Inventory/ground categories and menus, inventory-screen equipment drawing,
+acquisition, context-correct catalogue/collection, optional selection, and
+ordinary persistence remain required before enabling new handheld items.
+Original tools must not be duplicated as imports. Preserve existing ROMs/saves
+and both V2 patchers.
