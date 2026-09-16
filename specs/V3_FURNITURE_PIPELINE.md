@@ -28,6 +28,12 @@ standalone installer accepts an existing conversion through `--art`; it performs
 the same source and base checks. Use fresh ignored output paths. No ROM, save,
 source artwork, served website, or existing generated build is overwritten.
 
+Shared reader changes use the same installer's `--refresh-runtime` mode. It
+updates the checked current cartridge without reconverting or reinstalling any
+artwork. It retains the complete DMA directory, existing allocations, profile,
+and saved identities, and emits a new build lock and reconstructible patch.
+This is a shared runtime update, not a separate installer for each item.
+
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing
 metadata/gameplay/acquisition reasons. It produces a distinct **prepared-assets**
@@ -95,6 +101,44 @@ an identity does not claim its artwork or runtime behaviour is implemented.
 Add native parent support and a shared room-conversion adapter before enabling
 the corresponding logical item. Do not offer both a parent and its display model
 as unrelated choices or substitute shop stock for parent acquisition.
+
+### Native alias records
+
+`tools/v3_display_aliases.py` generates native relationships from installed
+parent/display descriptors. The three installed garments use this shared path;
+the prepared tool/fan/pinwheel parents still require their actual inventory and
+gameplay support. No prepared alias becomes enabled or selectable automatically.
+Existing garment profile owners and the original mannequin renderer stay intact.
+
+One immutable forward index occupies verified unused package space
+`804A0010..804A00FF`, after the preserved `804A0000` guard and before campsite
+code at `804A0100`. Its `AFD1` magic and 32-bit count precede up to 58 sorted
+four-byte parent/display pairs. Capacity, duplicate identities, cycles, source
+bindings, and occupied destinations are checked before installation. The current
+one-parent/one-display format does not yet implement worn-tool state aliases.
+
+Each display's canonical 32-byte sparse item slot stores its runtime index and
+display identity, with its parent at bytes 28–29 and optional native footprint
+equivalent at bytes 30–31. Display-only records remain disabled as independent
+furniture. They introduce no second name, price, ownership bit, or browser option.
+Zero footprint means use the display's own generated footprint; only a checked
+category equivalent delegates to an original native item. Ordinary furniture
+records keep these four bytes zero.
+
+Forward conversion checks the bounded index and selected inverse relationship.
+Inverse conversion, names, prices, collection, and category readers share direct
+canonical-slot lookup. The garment roster consumes the same parent field,
+retaining original garment indices and the actual selected clothing dependency.
+All four room orientations and the native argument-width conventions remain.
+Unselected/missing relationships fall through to the unchanged original paths.
+
+The helpers remain in their existing reservations: conversion
+`80466270..8046637F`, roster/bridge `80466380..8046653F`, and metadata readers
+`80466C00..80466EFF`. Their compiled lengths are 260, 360, and 640 bytes.
+Linker limits, complete previous code hashes, and unused tails are checked.
+No permanent allocation, heap, saved format, or saved-profile bit grows.
+Future shared furniture installations reuse these verified records and code;
+they do not rebuild an unchanged alias adapter.
 
 ## Discovery and supported categories
 
@@ -314,7 +358,8 @@ items. Byte 25 stores the donor action-sound category: `0` for none, `1` for
 soft chairs, and `2` for hard chairs. Byte 26 holds the donor catalogue framing
 index plus one; zero means no furniture-framing override. Byte 27 holds an
 optional NPC reward route, using the actual donor list-type number; zero means
-no shared NPC reward. The other four reserved bytes remain zero.
+no shared NPC reward. Ordinary furniture keeps the remaining four bytes zero;
+display-only aliases use the parent/footprint fields described above.
 The builder populates masks for **all** installed furniture, retaining existing
 non-orderable rewards and
 the separate clothing-display route. Native gameplay IDs and saved formats do

@@ -2,6 +2,17 @@
 
 ## Active: V3 optional GameCube imports
 
+ABI 96 installs the shared room-alias runtime from generated parent/display
+records. The three installed garments retain names, prices, collection identity,
+footprints, and selection checks without a per-item conversion list. Twenty
+focused checks and the corrected 187-record/177-assertion native run pass.
+Reuse these records and the existing importer's `--refresh-runtime` mode;
+do not add another per-item installer or native scenario. Retain the bounded
+passing evidence. Next, implement actual native parent inventory/gameplay and
+install the prepared display categories through the shared adapter. The 48
+additional donor aliases remain unfinished; worn-tool state aliases need an
+explicit many-input/one-parent extension. Neither served patcher changes.
+
 The indexed-model-sequence category prepares all 24 fan, pinwheel, ordinary-tool,
 and golden-tool display models at
 `build/v3-furniture-indexed-sequence-prepared-01/`. Their complete 46,832 bytes,
@@ -10,7 +21,7 @@ fishing rods' separate translucent layers. One shared rule derives the tables,
 indices, conditions, and material/geometry order; no item-specific installer or
 runtime callback is needed. Reuse these assets when implementing parent gameplay
 and the shared room placement/pickup adapter. They remain prepared-only, not
-selectable independent furniture. ABI 95 and both served patchers are unchanged.
+selectable independent furniture. Both served patchers remain unchanged.
 
 The shared room-alias discovery connects all 48 extra donor display models to
 their actual parent items; 44 appear in the `3xxx` queue. It retains both
@@ -19,8 +30,8 @@ condition, and the seven worn-axe inputs returning the ordinary axe. The full
 donor catalogue and browser review data use these records. Native parent identity
 and room conversion remain work; discovery does not enable standalone display
 models. Continue one shared parent/placement/pickup implementation, not separate
-furniture acquisition scripts. Converter revision 9 leaves ABI 95, saves,
-and both served V2 patchers unchanged. See the
+furniture acquisition scripts. Converter revision 9 retains saved identities
+and both served V2 patchers. See the
 [pipeline checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
 Use the [generated browser plan](../specs/V3_OPTIONAL_COMPOSITION.md), not a second
@@ -114,7 +125,7 @@ save/restart remain for the gameplay pass. Saved format 2 is unchanged, but save
 using the ABI-95 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-furniture-static-sequence-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-shared-display-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

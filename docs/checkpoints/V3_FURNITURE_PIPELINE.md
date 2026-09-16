@@ -1,5 +1,65 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared native display aliases
+
+ABI 96 replaces the conversion/readers/garment-roster lists with generated
+relationships from the actual installed parent and display records. The same
+metadata serves placement, pickup, full names, prices, ownership, footprints,
+and garment resources. All three existing garments retain their actual profile
+owners, selected dependencies, and native mannequin drawing. No item identity,
+artwork, acquisition route, logical option, or saved format changes.
+
+The existing furniture installer supplies `--refresh-runtime`, which updates
+shared readers without reconverting artwork or installing another item batch.
+Normal furniture installation uses the same adapter and reuses unchanged code.
+The forward index consumes 240 verified unused bytes inside the existing
+package; canonical display records use the last four bytes of their existing
+sparse slots. Permanent RAM reservations and the entire DMA directory remain.
+The compiled conversion, roster/bridge, and metadata readers are 260, 360, and
+640 bytes, each within its checked original reservation.
+
+Output: `build/v3-shared-display-runtime-01/`, pinned by the active build lock.
+
+- ROM SHA-256: `76d148124f4f2e3f4b7157608feb69c9a329612f814f1dffde320287e75ba406`.
+- Receipt SHA-256: `c601ec56e93a35e035589a0a5c7ec2835e88715ca233f7308d8fe258b280a50c`.
+- UPS SHA-256: `fe0c878a2abb0590e169c3e4dc9c51133cdf90a5abf1741307895f5e2a7dad62`.
+
+Six dedicated shared-alias checks pass, including sanitizer execution with
+synthetic identities absent from the installed list, both footprint behaviours,
+malformed/recursive/duplicate records, all rotations, strict argument handling,
+selection rejection, complete unrelated-resource retention, current CRCs,
+reconstruction, and repeat-install reuse. Twelve current-cartridge selection/
+save-profile checks pass; all-selected reproduces the new cartridge and empty
+selection reproduces stable V2. Two targeted legacy-wrapper host checks pass.
+One host test invocation used the wrong class name; the correctly named targeted
+check passes. No old-build native scenario is replayed.
+
+The first current native attempt stops at the first metadata-reader call because
+the fixture requests a direct upper-memory entry, which the debugger deliberately
+forbids. The failure occurs before dispatch, not inside game code. The one
+justified retry uses the normal installed low-memory native entries for names,
+types, prices, and footprints. It passes 187 records and 177 assertions at
+`build/v3-shared-display-native-02/results.json`, SHA-256
+`f5faf5a000150db6fa27d984a146896460fd45234e7f5dd172c124e91b897856`.
+All three pairs, four rotations, full-width conversion arguments, complete
+English names, prices, native footprint cells, independent clothing/display
+selection flags, original category fallbacks, restored profile, stack and buffer
+guards, clean return, and shutdown pass. The existing scenario omits unchanged
+HRA/feng-shui runs instead of replaying unrelated evidence.
+
+The 104 installed choices, all artwork, complete save codec/profile, and saved
+format 2 remain unchanged. Same-profile ABI-95/96 compatibility is expected in
+both directions, without claiming a new ordinary save/restart or hardware run.
+The original 48 extra donor aliases are still pending actual parent inventory/
+gameplay integration. The bounded index supports one parent per display; worn-axe
+placement states still need their many-input mapping. No new tool/fan/pinwheel
+gameplay is claimed, and neither served V2 patcher changes.
+
+The current-lock scan also completes at
+`build/v3-shared-display-scan-01/inventory.json`: 76 converter-supported entries,
+166 review entries, and no uninstalled fully eligible furniture. This adapter
+does not misclassify prepared parent displays as newly usable imports.
+
 ## Indexed model-sequence conversion
 
 Converter/installer revision 9 adds the shared `indexed-model-sequence` category.

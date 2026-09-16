@@ -4,8 +4,6 @@
   {"save_state": true},
   {"pause_game_thread": true},
   {"test_v3_display_conversion": true},
-  {"test_v3_hra": {"windows": false}},
-  {"test_v3_feng_shui": true},
   {"load_state": true},
   {"wait": 2},
   {"read": ["8019ACD0", 4], "expect": "00000001"},

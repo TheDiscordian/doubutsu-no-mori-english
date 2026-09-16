@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-furniture-static-sequence-runtime-01",
-  "runtime_abi": 95,
-  "rom_sha256": "01c7da7f945f02a4eebb1bafdc258b0485db5dd9240cf2254a51f3eefaccd68c",
-  "report_sha256": "0f3991f6e27f59cd9698bbffe7dbe618b528e719773efd5906905b469bd75c9a"
+  "directory": "build/v3-shared-display-runtime-01",
+  "runtime_abi": 96,
+  "rom_sha256": "76d148124f4f2e3f4b7157608feb69c9a329612f814f1dffde320287e75ba406",
+  "report_sha256": "c601ec56e93a35e035589a0a5c7ec2835e88715ca233f7308d8fe258b280a50c"
 }

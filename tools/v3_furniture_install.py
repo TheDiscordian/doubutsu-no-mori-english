@@ -23,6 +23,7 @@ import v3_furniture_placement as placement
 import v3_furniture_rewards as rewards
 import v3_camper_trade as camper_trade
 import v3_furniture_palette as palette_fade
+import v3_display_aliases as display_aliases
 import v3_catalogue as catalogue
 import v3_hra as hra
 import v3_feng_shui as feng
@@ -37,7 +38,7 @@ SOURCES = ('tools/v3_furniture_pipeline.py', 'tools/v3_furniture_install.py', 't
     'tools/v3_garden_runtime.py', 'tools/v3_shops.py', 'overlays/v3/catalogue.c',
     'overlays/v3/startup.c', 'translations/provenance.json',
     'tools/v3_camper_trade.py','tools/v3_camping_items.py','overlays/v3/camper_trade.c',
-    'overlays/v3/camper_trade.h','overlays/v3/camper_trade.ld','overlays/v3/camper_trade_tail.S') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES + palette_fade.SOURCES
+    'overlays/v3/camper_trade.h','overlays/v3/camper_trade.ld','overlays/v3/camper_trade_tail.S') + behaviours.SOURCES + placement.SOURCES + rewards.SOURCES + palette_fade.SOURCES + display_aliases.SOURCES
 
 
 def inputs(lock=LOCK):
@@ -315,6 +316,7 @@ def build(output, art_path, lock=LOCK):
     goods,table_at,stock_rows = shops.goods(stable,source.rel,source.symbols.encode(),
         [r for r in imports if r['item_id'] in stock_ids],reviewed_rows=stock_rows)
     code = bytearray(files[CODE_VROM].extract(base)); stock = prior['shops']
+    display_report,alias_report=display_aliases.install(prior,blob,code,output)
     if (sha256(files[shops.VROM].extract(base)) != stock['output_sha256']
             or struct.unpack_from('>3I',code,shops.DESCRIPTOR-CODE_RAM) !=
                 (shops.VROM,shops.VROM+stock['bytes'],0x06000000|stock['table_offset'])):
@@ -391,6 +393,8 @@ def build(output, art_path, lock=LOCK):
         furniture_placement=placement_report,camper_trade=trade_report,**score_reports,
         native_test='pending representative automatic-import execution')
     if reward_report: report['furniture_rewards']=reward_report
+    report['clothing']['display']=display_report
+    report['display_aliases']=alias_report
     if palette_report:
         report['furniture_palette_fade']=palette_report
         linked=palette_report['code'];at=PACKAGE+palette_report['ram']-PACKAGE_RAM
@@ -429,9 +433,72 @@ def build(output, art_path, lock=LOCK):
     return report
 
 
+def refresh_runtime(output, lock=LOCK):
+    """Update shared readers without reconverting or reinstalling item artwork."""
+    output=output.resolve()
+    if output.exists() or not output.is_relative_to(ROOT/'build'):
+        raise ValueError('Use a fresh ignored build directory')
+    base,prior=inputs(lock); files=by_vrom(base)
+    base_pin=json.loads(lock.read_bytes())
+    if base_pin['rom_sha256']!=sha256(base): raise ValueError('Base lock changed during the build')
+    original=verified_rom((ROOT/'local/rom/Doubutsu no Mori (Japan).z64').read_bytes())
+    blob=bytearray(files[BLOB].extract(base)); core=bytearray(files[CODE_VROM].extract(base))
+    package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]
+    if (sha256(blob)!=prior['blob_sha256'] or sha256(package)!=prior['import_storage']['package_sha256']
+            or struct.unpack_from('>4I',blob,0xF0)!=(BLOB+PACKAGE,PACKAGE_SIZE,zlib.crc32(package),PACKAGE_RAM)):
+        raise ValueError('Changed shared runtime package')
+    output.mkdir(parents=True)
+    display_report,alias_report=display_aliases.install(prior,blob,core,output)
+    abi=prior['runtime_abi']+1; struct.pack_into('>I',blob,4,abi)
+    package=blob[PACKAGE:PACKAGE+PACKAGE_SIZE]; struct.pack_into('>I',blob,0xF8,zlib.crc32(package))
+    module=bytearray(files[MODULE].extract(base)); old=prior['startup']
+    defines=tuple(f[2:] if not f.startswith('-DAF_V3_ABI=') else f'AF_V3_ABI={abi}'
+        for f in old['flags'] if f.startswith('-D'))
+    startup,startup_report=compile_part('startup',output/'startup',defines=defines)
+    if (sha256(module[STARTUP:STARTUP+old['bytes']])!=old['sha256']
+            or any(module[STARTUP+old['bytes']:CONFIG]) or len(startup)>CONFIG-STARTUP):
+        raise ValueError('Changed runtime startup reservation')
+    module[STARTUP:CONFIG]=startup+bytes(CONFIG-STARTUP-len(startup))
+    struct.pack_into('>4I',module,CONFIG,BLOB,0xC000,zlib.crc32(blob[:0xC000]),abi)
+    result=bytearray(base)
+    for vrom,data in ((BLOB,blob),(CODE_VROM,core),(MODULE,module)):
+        entry=files[vrom]
+        if entry.pend or entry.size!=len(data): raise ValueError('Runtime update changes a resource allocation')
+        result[entry.pstart:entry.pstart+len(data)]=data
+    fix_checksum(result);result=bytes(result)
+    if result[DMA_START:DMA_END]!=base[DMA_START:DMA_END]: raise ValueError('Runtime update changes the DMA directory')
+    patch=make_ups(original,result)
+    if apply_ups(original,patch)!=result: raise ValueError('Runtime patch reconstruction failed')
+    report=copy.deepcopy(prior)
+    report.update(build='v3-shared-item-runtime',runtime_abi=abi,input_build_sha256=sha256(base),
+        output_sha256=sha256(result),patch_sha256=sha256(patch),blob_sha256=sha256(blob),
+        startup=startup_report,display_aliases=alias_report,
+        native_test='pending changed shared item readers')
+    report['clothing']['display']=display_report
+    for section in report.values():
+        if isinstance(section,dict) and 'package_sha256' in section: section['package_sha256']=sha256(package)
+    report['import_storage']['item_rows_sha256']=sha256(blob[ITEMS:TABLE_END])
+    report['shared_runtime_refresh']=dict(base=base_pin,adapters=['display_aliases'],
+        artwork_changed=False,resource_allocations_changed=False,saved_format_changed=False,
+        saved_profile_changed=False,web_patcher_enabled=False)
+    report['sources'].update({p:sha256((ROOT/p).read_bytes()) for p in ('tools/v3_furniture_install.py',)+display_aliases.SOURCES})
+    write_new(output/'animal-forest-v3-asset-loader.z64',result)
+    write_new(output/'asset-loader.ups',patch)
+    write_new(output/'build.json',(json.dumps(report,indent=2,sort_keys=True)+'\n').encode())
+    pin=dict(directory=str(output.relative_to(ROOT)),runtime_abi=abi,rom_sha256=sha256(result),
+        report_sha256=sha256((output/'build.json').read_bytes()))
+    write_new(output/'build-lock.json',(json.dumps(pin,indent=2)+'\n').encode())
+    write_new(output/'base-lock.json',(json.dumps(base_pin,indent=2)+'\n').encode())
+    return report
+
+
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--output',type=Path,required=True); parser.add_argument('--art',type=Path,required=True)
+    parser.add_argument('--output',type=Path,required=True)
+    mode=parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--art',type=Path)
+    mode.add_argument('--refresh-runtime',action='store_true')
     parser.add_argument('--base-lock',type=Path,default=LOCK)
-    args=parser.parse_args(); result=build(args.output,args.art,args.base_lock)
+    args=parser.parse_args()
+    result=refresh_runtime(args.output,args.base_lock) if args.refresh_runtime else build(args.output,args.art,args.base_lock)
     print(json.dumps({k:result[k] for k in ('runtime_abi','output_sha256','patch_sha256')},indent=2))

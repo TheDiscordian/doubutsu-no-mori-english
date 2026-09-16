@@ -2,6 +2,25 @@
 
 ## Active development
 
+The shared native room-alias adapter uses generated parent/display records for
+conversion, pickup, names, prices, ownership, footprints, and garment lookup.
+All three installed garments use this path without adding new item choices.
+Shared runtime updates run through the existing importer with
+`--refresh-runtime`; artwork, resource allocations, saved identities, and
+profile bits remain unchanged. Twenty focused host/cartridge/composition checks
+pass. The corrected current native run passes 187 records with 177 assertions,
+including all rotations, English names, prices, native footprints, independent
+selection rejection, original fallbacks, restored state, and guards. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
+
+Current development uses ABI 96 at
+`build/v3-shared-display-runtime-01/animal-forest-v3-asset-loader.z64`, pinned by
+`config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
+Same-profile compatibility with ABI 95 is expected in both directions; this
+batch does not claim another ordinary save/restart or hardware playthrough.
+The 48 additional donor aliases still need native parent support and integration;
+prepared artwork alone is not a completed import. Both served patchers remain V2.
+
 The [indexed model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
 automatically converts all 24 fan, pinwheel, and tool display models in one batch:
 46,832 bytes, 852 vertices, and 566 triangles. Complete source verification
@@ -9,8 +28,8 @@ preserves 44 original model parts across 26 native lists, including both fishing
 rods' translucent layers. Material and geometry lists retain their actual order;
 no per-item script or runtime callback is added. Parent-item and room-conversion
 dependencies remain explicit, so these are prepared assets, not new selectable
-imports. Converter/installer revision 9 leaves ABI 95, saves, and served patchers
-unchanged.
+imports. Converter/installer revision 9 supplies these prepared assets without
+enabling unfinished parent items or changing either served patcher.
 
 The shared [room-alias discovery](checkpoints/V3_FURNITURE_PIPELINE.md)
 connects 48 room-display models to parent items across balloons, diaries, fans,
@@ -20,8 +39,8 @@ actual single parent. The full donor catalogue, furniture scan, prepared-asset
 records, and browser review data consume this relationship. Forty-four aliases
 occur in the `3xxx` furniture queue. They cannot install as unrelated furniture;
 their missing parent/room support and separate artwork gaps remain explicit.
-Room-alias discovery changes no cartridge code or saves.
-ABI 95 and both served V2 patchers remain unchanged.
+Room-alias discovery itself changes no cartridge code or saves.
+Both served V2 patchers remain unchanged.
 
 The [constant model-sequence category](checkpoints/V3_FURNITURE_PIPELINE.md)
 installs Lady Liberty and the tanabata palm automatically, including all 11,152
@@ -31,9 +50,8 @@ there is no new runtime callback, per-item installer, or memory reservation.
 Official names, Gulliver/event acquisition, catalogue, scoring, and optional
 selection use the shared pipeline. Automatic additions total 42.
 
-The complete ABI-95 development cartridge is
-`build/v3-furniture-static-sequence-runtime-01/animal-forest-v3-asset-loader.z64`,
-pinned by `config/v3-import-build.json`. The combined suite passes 59 checks;
+The installed constant-model-sequence batch retains its passing ABI-95 evidence
+at `build/v3-furniture-static-sequence-runtime-01/`. Its suite passes 59 checks;
 one scoring-alias test is inapplicable to this batch. The first silent native
 run passes 124 records and 85 assertions, including complete model DMA,
 source framing, selected-only rewards, event stock, ownership, restoration,

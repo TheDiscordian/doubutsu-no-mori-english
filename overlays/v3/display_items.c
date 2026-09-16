@@ -10,9 +10,15 @@ extern int af_v3_base_item_place(u32, int, int, void *);
 extern u32 af_v3_base_item_price(u32);
 extern void af_v3_prior_catalogue_record(u32);
 extern int af_v3_prior_catalogue_owned(const u8 *, u32);
+#ifdef AF_V3_DISPLAY_ALIASES
+#include "display_aliases.h"
+#endif
 
 u32 af_v3_display_pocket_item(u32 item) {
-#ifdef AF_V3_ALOHA_DISPLAY
+#ifdef AF_V3_DISPLAY_ALIASES
+    const u16 *alias=af_v3_raw_display_alias(item);
+    if (alias && af_v3_furniture_import_profile(1024u+((item&0xFFFu)>>2))) return alias[0];
+#elif defined(AF_V3_ALOHA_DISPLAY)
     u32 base=item&0xFFFCu;
     if (item<=65535u && (base==AF_V3_CLOTHING_DISPLAY_ITEM ||
             base==AF_V3_RED_DISPLAY_ITEM || base==AF_V3_BLUE_DISPLAY_ITEM) &&
@@ -38,7 +44,16 @@ int af_v3_display_item_type(u32 argument) {
 int af_v3_display_item_place(u32 argument, int x, int z, void *destination) {
     u32 item = (u16)argument;
     /* Reuse all four native mannequin footprint cells, including their offsets. */
-    if (af_v3_display_pocket_item(item) != item) argument = 0x17ACu | (item & 3u);
+    if (af_v3_display_pocket_item(item) != item) {
+#ifdef AF_V3_DISPLAY_ALIASES
+        u32 footprint=af_v3_raw_display_alias(item)[1];
+        /* Zero retains the display's own generated footprint. Only categories
+         * with a checked native equivalent use the recorded replacement. */
+        if (footprint) argument=footprint | (item & 3u);
+#else
+        argument = 0x17ACu | (item & 3u);
+#endif
+    }
     return af_v3_base_item_place(argument, x, z, destination);
 }
 
