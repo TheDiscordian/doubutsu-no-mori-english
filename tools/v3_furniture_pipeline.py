@@ -131,7 +131,7 @@ class Source:
         imports = list(struct.iter_unpack('>II', rel[table:table+n]))
         starts = {row[1] for row in imports}
         if len(starts) != len(imports): raise ValueError('Duplicate relocation streams')
-        result, self.code_relocations = {}, {}
+        result, self.code_relocations, self.section_relocations = {}, {}, {}
         for imported, first in imports:
             if first%4 or not 0 <= first < len(rel): raise ValueError('Invalid relocation stream')
             end = min((s for s in starts if s > first), default=len(rel))
@@ -147,6 +147,9 @@ class Source:
                 address += delta
                 if address > self.sections[section][1]: raise ValueError('Relocation exceeds section')
                 if kind in (0, 201, 204): continue
+                key = (section, address)
+                if key in self.section_relocations: raise ValueError('Duplicate section relocation')
+                self.section_relocations[key] = (kind, imported, target_section, target)
                 if section == 1:
                     if address in self.code_relocations: raise ValueError('Duplicate code relocation')
                     self.code_relocations[address] = (kind, imported, target_section, target)

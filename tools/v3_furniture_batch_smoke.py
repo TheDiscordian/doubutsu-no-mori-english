@@ -504,7 +504,7 @@ def player_motion(debug,rom_path,record):
         record(result)
         if want is not None and result['return_value']!=want:raise ValueError(f'Player motion call {at:08X} mismatch')
         return result['return_value']
-    at=resources['blob_offset'];check('complete extended resident module',equipment.RAM,blob[at:at+equipment.SIZE])
+    at=resources['blob_offset'];check('complete extended resident module',equipment.RAM,blob[at:at+resources['bytes']])
     saved=debug.read_memory(0x8046C000,864)
     constructor=struct.unpack('>I',debug.read_memory(0x80143900,4))[0]
     owner=constructor-(0x808DD748-equipment.PLAYER_RAM)
@@ -522,6 +522,55 @@ def player_motion(debug,rom_path,record):
     try:
         check('actual game-loaded player code and relocations',owner,expected[:sections[0]])
         record(dict(game_loaded_player_owner=f'{owner:08X}',constructor=f'{constructor:08X}'))
+        actions=resources.get('player_actions')
+        if actions:
+            # Reuse this loaded-owner probe for the shared action-table category.
+            # No live player, save, or callback table is edited.
+            def owner_call(entry,args=(),want=None):
+                finish=next((t['native_end'] for t in actions['tables'] if t['native_entry']==entry),None)
+                if finish is None:raise ValueError('Action probe needs a complete consumer binding')
+                address=owner+entry-equipment.PLAYER_RAM
+                return call(address,args,want,(address,expected[entry-equipment.PLAYER_RAM:finish-equipment.PLAYER_RAM]))
+            for entry,missing in ((0x808B35C8,-1),(0x808B63B4,0),(0x808B87C8,0)):
+                table=next(t for t in actions['tables'] if t['native_entry']==entry)
+                values=blob[at+table['offset']:at+table['offset']+table['bytes']]
+                for index in (7,104,105,109,120,121,0xFFFFFFFF):
+                    value=values[index] if index<121 else missing
+                    if value>=128:value-=256
+                    owner_call(entry,[index],value&0xFFFFFFFF)
+            for index in (105,109,120,121,0xFFFFFFFF):
+                actor=bytearray(equipment.PLAYER_CAPACITY)
+                struct.pack_into('>I',actor,0xD00,index);struct.pack_into('>I',actor,0xD08,1)
+                debug.write_memory(target,actor)
+                owner_call(0x808DDA18,[target,0],0)
+                check('unfinished action cannot start or change its actor',target,actor)
+            # Compare one real original net dispatch with the same native
+            # callback called directly. Its scratch actor uses no live state.
+            actor=bytearray(equipment.PLAYER_CAPACITY);struct.pack_into('>I',actor,0xCF0,7)
+            debug.write_memory(target,actor)
+            linked=struct.unpack_from('>I',data,0x808DF628-equipment.PLAYER_RAM+7*4)[0]
+            if linked!=0x808BE140:raise ValueError('Changed representative native action callback')
+            callback=owner+linked-equipment.PLAYER_RAM
+            call(callback,[target],proof=(callback,expected[callback-owner:callback-owner+68]))
+            direct=debug.read_memory(target,len(actor));debug.write_memory(target,actor)
+            owner_call(0x808BE620,[target]);check('original callback through relocated shared dispatch',target,direct)
+            # Exercise both call-register variants with a native linked target
+            # and a resident imported target. Only these 16-byte call bridges
+            # are uploaded; all getters and dispatch code come from the ROM.
+            bridge=allocation+0x1000
+            priority=next(t for t in actions['tables'] if t['native_entry']==0x808B35C8)
+            native_want=blob[at+priority['offset']+7]
+            extra_want=next(r for r in resources['kind_readers']['rows'] if r['native_kind']==44)['fields'][0]
+            for register,name in ((2,'af_v3_player_action_v0'),(25,'af_v3_player_action_t9')):
+                for dest,args,want in ((0x808B35C8,[7],native_want),
+                        (resources['code']['symbols']['af_v3_equipment_kind_field'],[44,0],extra_want)):
+                    stub=struct.pack('>4I',0x3C000000|register<<16|dest>>16,
+                        0x34000000|register<<21|register<<16|dest&65535,
+                        equipment.jump(actions['code']['symbols'][name]),0)
+                    debug.write_memory(bridge,stub)
+                    call(0x8002FE00,[bridge,len(stub)]);call(0x80034CE0,[bridge,len(stub)])
+                    call(bridge,args,want&0xFFFFFFFF,(bridge,stub))
+            check('extended module footer',equipment.RAM+resources['bytes']-16,struct.pack('>4I',*([equipment.GUARD]*4)))
         pointer=owner+0x808B468C-equipment.PLAYER_RAM;part=owner+0x808B5B38-equipment.PLAYER_RAM
         pointer_proof=(pointer,expected[pointer-owner:pointer-owner+56])
         part_proof=(part,expected[part-owner:part-owner+40])
@@ -580,4 +629,5 @@ def player_motion(debug,rom_path,record):
     return dict(native_player_motion_resources=True,representative_transfers=len(rows),part_masks=5,
         assertions=assertions,player_actions_tested=False,ordinary_menu_reload_tested=False,
         kind_readers_tested=bool(resources.get('kind_readers')),
+        extended_action_tables_tested=bool(resources.get('player_actions')),
         hardware_tested=False,flash_written=False,requires_checkpoint_restore=True)

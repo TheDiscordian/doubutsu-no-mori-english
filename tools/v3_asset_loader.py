@@ -103,6 +103,7 @@ def compile_part(part, out, extra_sources=(), defines=(), primary_source=None):
                        'campsite_environment': ('af_v3_campsite_floor', 0x804A2F54),
                        'tent_lamp': ('af_v3_lamp_ct', 0x8046E000),
                        'equipment_resources': ('af_v3_equipment_pointer', 0x804A3000),
+                       'player_actions': ('af_v3_player_action_v0', 0x804A5000),
                        'room': ('af_v3_room_value', BLOB_RAM + 0x8000),
                        'identity': ('af_v3_identity_item', BLOB_RAM + 0x9D00),
                        'fields': ('af_v3_field_shop', BLOB_RAM + 0xA400),

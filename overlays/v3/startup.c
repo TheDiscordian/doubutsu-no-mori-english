@@ -97,18 +97,21 @@ int af_v3_startup(void) {
     invalidate(accessory_memory+0x100, AF_V3_ACCESSORY_BYTES-0x110u);
 #endif
 #ifdef AF_V3_EQUIPMENT_VROM
+#ifndef AF_V3_EQUIPMENT_BYTES
+#define AF_V3_EQUIPMENT_BYTES 0x2000u
+#endif
     /* Separate from the full resident package; no live artwork is moved. */
 #ifdef __mips__
     unsigned char *equipment = (unsigned char *)0x804A3000u;
 #else
-    extern unsigned char af_v3_equipment_memory[0x2000];
+    extern unsigned char af_v3_equipment_memory[AF_V3_EQUIPMENT_BYTES];
     unsigned char *equipment = af_v3_equipment_memory;
 #endif
-    if (!load_checked(equipment, AF_V3_EQUIPMENT_VROM, 0x2000u, AF_V3_EQUIPMENT_CRC)) return 0;
+    if (!load_checked(equipment, AF_V3_EQUIPMENT_VROM, AF_V3_EQUIPMENT_BYTES, AF_V3_EQUIPMENT_CRC)) return 0;
     /* The compiled checksum binds the complete module, including its table
        header and footer. Unlike the other packages, it is not a RAM descriptor. */
-    writeback(equipment, 0x2000u);
-    invalidate(equipment, 0x1000u);
+    writeback(equipment, AF_V3_EQUIPMENT_BYTES);
+    invalidate(equipment, AF_V3_EQUIPMENT_BYTES);
 #endif
     writeback(memory, AF_V3_BLOB_SIZE);
     invalidate(memory + 0x100, AF_V3_ABI >= 4 ? AF_V3_BLOB_SIZE - 0x110u : 0xF00u);

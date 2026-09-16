@@ -20,9 +20,9 @@ static unsigned int expected_equipment_crc;
 _Alignas(16) unsigned char af_v3_memory[AF_V3_BLOB_SIZE];
 _Alignas(16) unsigned char af_v3_save_extra[AF_V3_EXTRA_CODE_LIMIT];
 _Alignas(16) unsigned char af_v3_accessory_memory[AF_V3_ACCESSORY_BYTES];
-_Alignas(16) unsigned char af_v3_equipment_memory[0x2000];
+_Alignas(16) unsigned char af_v3_equipment_memory[AF_V3_EQUIPMENT_BYTES];
 static _Alignas(16) unsigned char prefix[AF_V3_BLOB_SIZE],extra[AF_V3_EXTRA_CODE_LIMIT];
-static _Alignas(16) unsigned char package[AF_V3_ACCESSORY_BYTES],equipment[0x2000];
+static _Alignas(16) unsigned char package[AF_V3_ACCESSORY_BYTES],equipment[AF_V3_EQUIPMENT_BYTES];
 volatile u32 af_v3_config[4],af_v3_installed,af_v3_memsize;
 static int calls,fail_dma,corrupt,writes,caches,executions,resets,tables,previous_ok;
 int af_v3_previous(void) {return previous_ok;}
@@ -46,7 +46,7 @@ void af_v3_writeback(void *p,u32 n) {
 void af_v3_invalidate(void *p,u32 n) {
     assert((p==af_v3_memory+0x100 && n==sizeof(prefix)-0x110) || (p==af_v3_save_extra && n==sizeof(extra)) ||
            (p==af_v3_accessory_memory+0x100 && n==sizeof(package)-0x110) ||
-           (p==af_v3_equipment_memory && n==0x1000));
+           (p==af_v3_equipment_memory && n==sizeof(equipment)));
     ++caches;
 }
 int af_v3_execute(void) {assert(writes==4 && caches==4);++executions;return 1;}

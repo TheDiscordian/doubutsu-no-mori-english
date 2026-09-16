@@ -2,19 +2,31 @@
 
 ## Active: V3 optional GameCube imports
 
-ABI 99 connects the six equipment-kind readers using complete donor tables and
-stable extended indices. It retains the eight holding/action animations and
-adds four complete tumble/get-up animations through the same module. The checked
-build is `build/v3-equipment-kinds-runtime-01/`. Eighteen focused checks and the
-first native run pass: 126 records and 106 assertions using the actual loaded
-player owner. Reuse these results and the retained held-resource evidence;
-fourteen models and sixteen equipment animations remain intact. No item is
-enabled by loading its resources. Next connect native equipment-kind selection
-and category permissions, proper fan controller/request/action flow, source-timed
-sound, and selected-only inventory/acquisition/profile handling. Audit the main
-action dispatch and every action-indexed permission table before appending the
-fan action; do not reuse a native action or merely raise bounds over short arrays.
-The fan action
+The shared action-table adapter is installed in ABI 100 at
+`build/v3-player-action-tables-03/`. All 105 native actions retain their original
+metadata and callbacks; the complete donor metadata covers sixteen reserved
+indices `105..120`. Extra callbacks remain disabled and native setup rejects
+those requests. The fan retains donor action index 109. Continue its actual
+controller/request/setup/main/draw and frame-timed sound through these shared
+tables, not another action installer. The source net-angle callback for the fan
+is a reset routine, not null; submenu and settle callbacks are null. Audit
+remaining core-library action checks before enabling equipment.
+
+The module has checked code space at `804A5000..804A6FFF`, tables at
+`804A7000`, and an end guard at `804A8FF0`. Its complete 24-KiB transfer uses the
+same startup call; startup remains 952 bytes. Preserve the original 8-KiB
+equipment subregion, current player-owner relocations, saved format 2, and both
+V2 patchers. Fifteen source/art/cartridge/startup and twelve composition checks
+pass. The corrected native run passes 173 records and 143 assertions, including
+both dispatch variants, actual loaded-owner relocation, and rejected unfinished
+actions. Reuse this bounded evidence; do not treat unused action slots as working
+gameplay or selectable imports.
+
+The six equipment-kind readers retain complete donor tables and stable extended
+indices, with eight holding/action animations and four complete tumble/get-up
+animations. Fourteen models and sixteen equipment animations remain intact.
+Connect native equipment-kind selection, category permissions, and selected-only
+inventory/acquisition/profile handling alongside actual fan behaviour. The fan action
 explicitly uses mask four, while its generic animation-part lookup returns
 three; preserve the donor's explicit initializer argument. Nineteen static
 item/state pairs fit the combined bank limit; uninstalled rigs still need their
@@ -189,7 +201,7 @@ save/restart remain for the gameplay pass. Saved format 2 is unchanged, but save
 using the ABI-95 additions must not be loaded in older builds or V2.
 
 Current integration:
-`build/v3-shared-display-runtime-01/animal-forest-v3-asset-loader.z64`, pinned
+`build/v3-player-action-tables-03/animal-forest-v3-asset-loader.z64`, pinned
 by `config/v3-import-build.json` for both the pipeline and offline composer.
 
 The [school desks](checkpoints/V3_SCHOOL_DESKS.md) are installed in ABI 84 with

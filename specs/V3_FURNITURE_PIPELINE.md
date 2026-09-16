@@ -54,6 +54,12 @@ readers and source-selected tumble/get-up animations in that module. It retains
 the original equipment selector until actual category actions and profile-aware
 inventory/acquisition are ready. These shared records do not create per-item
 installers or independent options for worn states and catalogue models.
+`--refresh-runtime --player-actions` extends the player's shared metadata and
+callback tables while preserving all 105 native actions. Full donor metadata
+does not enable unimplemented callbacks; the shared dispatch resolves the live
+player owner instead of retaining stale relocated pointers. The same module's
+checked startup transfer covers its additional 16-KiB reservation. See
+[held equipment](V3_HANDHELD_ITEMS.md#extended-action-tables).
 
 `--category` selects a discovered shared category without maintaining an item
 list. `convert --assets-only` prepares complete artwork while retaining missing

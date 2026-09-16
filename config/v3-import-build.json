@@ -1,6 +1,6 @@
 {
-  "directory": "build/v3-equipment-kinds-runtime-01",
-  "runtime_abi": 99,
-  "rom_sha256": "c4c5e56687edeaa2ae0ce6dfd1bc9471f9a8a22c27f4768f85f522c1fbc12749",
-  "report_sha256": "bbf6828e4f29a7ce26436d0326893f2c759d8b2f665dc93126399a2b42e10ac9"
+  "directory": "build/v3-player-action-tables-03",
+  "runtime_abi": 100,
+  "rom_sha256": "1cffa6906ac85234ee16e1e81b7b18f20fc92cc118ce477a002d5511c8648273",
+  "report_sha256": "f0b4b6d9b21a720f4004be590cd68170facdca3b6cc8e080288764904b8c098c"
 }

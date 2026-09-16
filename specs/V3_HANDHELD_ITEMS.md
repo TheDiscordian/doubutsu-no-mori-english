@@ -135,20 +135,24 @@ functions are used by `808B5A10` when changing equipment and by
 `mSM_load_player_anime` after menus. A transfer probe does not establish ordinary
 menu-close or take-out/put-away gameplay acceptance.
 
-The 8-KiB resident module occupies `804A3000..804A4FFF`, after the accessory
-package and before the existing furniture model pool. Code is bounded below
-`804A4000`; an `AFHR` version-one header and fifty 16-byte records follow.
-Each record is `(vrom, bytes, segment-six pointer, type)`. Four `AF48C0DE` footer
-words guard its end. Empty slots, negative/out-of-range indices, unsupported
+The shared equipment/action module occupies `804A3000..804A8FFF`, after the
+accessory package and before the existing furniture model pool. Equipment
+code is bounded below `804A3B00`; an `AFHR` version-one header and fifty
+16-byte records start at `804A4000`.
+Each record is `(vrom, bytes, segment-six pointer, type)`. Four `AF48C0DE` words
+guard both the original 8-KiB region and the complete 24-KiB module. Empty slots, negative/out-of-range indices, unsupported
 skeleton type one, malformed sizes/pointers, and out-of-storage transfers reject.
 Individual transfers fit the existing 4,376-byte equipment-bank lower bound.
 This does not approve arbitrary combined model-plus-animation sizes.
 
 The importer appends payloads and the module before the checked terminal
-catalogue/shop resources, moving only those three unchanged DMA owners.
-Existing model VROMs, saved profiles, original player owner, and item actions
-remain unchanged. Startup loads/checks the entire module against a compiled CRC
-before publishing its code. Shared transfer verification and one instruction-cache
+catalogue/shop resources. Changed compressed owners receive uncompressed
+storage without changing their logical DMA identity or size; the three unchanged
+terminal owners move after that storage. Existing model VROMs, saved profiles,
+and item selection remain unchanged. Startup loads/checks the entire module
+against a compiled CRC before publishing its code. The equipment length is an
+explicit compiled bound, not inferred from an unchecked RAM descriptor.
+Shared transfer verification and one instruction-cache
 flush covering the complete accessory package keep startup at 952 bytes inside
 the unchanged 992-byte reservation. The linker still rejects overlaps; no guard,
 configuration, or call-return scratch space is repurposed.
@@ -230,12 +234,59 @@ resident-memory, actor, saved-format, or optional-profile growth. The current
 [checkpoint](../docs/checkpoints/V3_FURNITURE_PIPELINE.md#shared-equipment-kind-readers)
 records native relocation/readers and representative motion-transfer evidence.
 
+### Extended action tables
+
+`--refresh-runtime --player-actions` installs shared action-table capacity in the
+existing importer. `tools/v3_player_actions.py` resolves all 22 byte metadata
+tables and five callback tables through complete GAFE01-r0 consumers, source
+symbols, and actual REL relocations. The common source reader indexes relocation
+records by section; `.rodata` callback arrays are not mistaken for all-zero data.
+Their zero placeholders acquire function pointers from relocation records.
+
+The 105 native action indices and every original value/callback remain unchanged.
+Indices `105..120` reserve the donor's own identities, including fan action 109.
+Their permissions, priorities, movement, texture, weight, bee, menu, camera,
+footstep, pitfall, and draw metadata come from the actual source tables. All new
+callbacks remain null until their complete implementations are installed. A
+request for an unfinished action therefore fails at the native setup-table gate;
+metadata installation does not enable waving, equipment selection, or imports.
+
+The `AFPA` version-one header and complete 121-entry tables occupy 5,164 bytes
+from `804A7000`. Shared dispatch code starts at `804A5000` and is bounded below
+the tables. The equipment module grows by 16 KiB, retaining all original
+equipment code, records, masks, and guards. One startup DMA/checksum/cache pass
+covers the complete 24 KiB without growing the 952-byte startup routine or its
+992-byte reservation. No actor, ordinary heap, animation bank, or saved field
+grows. The new reservation ends before the furniture pool at `80500000`.
+
+All 27 action bounds point into full-capacity tables. The importer redirects 28
+native HI/LO table references and removes exactly their 56 obsolete relocations,
+leaving other relocations and the original owner dimensions intact. It preserves
+the reference at `808B99D0/808B99D8`: that address is the exclusive end of the
+preceding eight-float spatial-search array, not an action lookup. Redirecting it
+would make that unrelated loop overrun its stack buffer. Unknown interior or
+shared references reject instead of being moved speculatively.
+
+Expanded callback tables retain native linked addresses, not a pointer captured
+from one heap allocation. The five native indirect calls use two shared register
+variants which resolve those addresses against the currently loaded player's
+constructor at `80143900`. Resident imported callbacks retain their fixed
+addresses. Argument registers, stack arguments, and return addresses are retained.
+Ordinary scene changes can therefore relocate the player owner without leaving
+stale callback targets. These thunks do not implement any missing action.
+
+Complete source callback dependencies remain in the receipt. In particular, the
+fan's net-angle callback is the donor reset routine, not null; its eventual
+integration must retain that dependency alongside setup and movement. The fan
+submenu and settle callbacks are null in the donor. Core-library action checks
+outside the player owner still need their own audit before enabling actions.
+
 ### Player ownership and actions
 
 The current native player equipment selector is `808BD3F8..808BD583` in owner
 VROM `007AC420`, linked at `808B2D50`. Its 396 bytes have SHA-256
 `3e1e9584685cef3dcb81e6fe99ef412ddc49fd4a8df74901f55b1742f234258b` in both the
-original and current ABI-99 cartridge. It reads ordinary saved equipment at
+original and current experimental cartridge. It reads ordinary saved equipment at
 player-private offset `3EC`, or title-demo equipment at controller offset `3C`.
 It accepts only `2200..2223`, using a 36-entry jump table at `808E0274` with
 SHA-256 `b46dbe4b89cb5647022dddcf27baa8e2ca8ea5ffc73c02a249f32b3c695c6af1`.

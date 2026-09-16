@@ -1,5 +1,101 @@
 # Automatic furniture pipeline checkpoint
 
+## Shared player action tables
+
+The existing importer installs `--refresh-runtime --player-actions` through one
+source-derived adapter. All 22 metadata tables and five callback tables in the
+native player owner have complete 121-entry storage. Original indices `0..104`
+retain every original value and callback. Extra indices `105..120` retain the
+donor's actual metadata, including fan action 109, but their callbacks stay null
+until implemented. This is action-table/dispatch integration, not working fan
+behaviour, additional item selections, or an import handoff.
+
+The source reader indexes actual `.rodata` relocations. The donor's callback
+tables contain zero pointer placeholders before relocation; treating those
+bytes as null callbacks would lose real dependencies. The fan needs the donor
+net-angle reset callback as well as its setup/main routines. Its submenu and
+settle callbacks really are null. The complete function/table/relocation
+receipts are retained for the next implementation, without per-item definitions.
+
+Twenty-eight table address pairs move to the extended immutable tables;
+exactly 56 obsolete HI/LO relocations are removed. The unrelated spatial-search
+loop's reference at `808B99D0/808B99D8` remains: it uses the old address as the
+exclusive end of the preceding eight-float array. The 27 action limits increase
+only alongside complete arrays. Five indirect calls use two shared register
+variants which resolve native linked callbacks against the current loaded
+player constructor. Imported resident pointers pass through unchanged. The
+original table objects, owner size, other relocations, arguments, and stack
+contracts remain intact.
+
+Output: `build/v3-player-action-tables-03/`, ABI 100.
+
+- ROM SHA-256:
+  `1cffa6906ac85234ee16e1e81b7b18f20fc92cc118ce477a002d5511c8648273`.
+- UPS SHA-256:
+  `ca38866d3dca1c10d3612d474312a250a042c6242e2587ca2e5447a0523a951c`.
+- Receipt SHA-256:
+  `f0b4b6d9b21a720f4004be590cd68170facdca3b6cc8e080288764904b8c098c`.
+- Shared equipment/action module: 24,576 bytes at `804A3000`, VROM `0253BD00`.
+  The original 8,192-byte equipment region remains unchanged; additional code
+  and table space uses 16 KiB before the existing furniture pool.
+- Dispatch code: 68 bytes at `804A5000`; tables: 5,164 bytes at `804A7000`.
+  Both the old internal guard and new end guard remain.
+- Startup: 952 of 992 bytes; one checksum-bound transfer and cache flush cover
+  the complete module. No actor, animation buffer, ordinary heap, or save grows.
+- Import blob: 3,497,424 bytes; 631,344 bytes remain before English choices.
+
+### Verification and remaining work
+
+Risk: stale relocated callback pointers, incomplete tables or relocation
+removal, disturbed unrelated table boundaries, and incomplete startup cache
+coverage. Six focused cartridge/startup checks and nine shared handheld/source/
+art checks pass. They cover both native relocation bases, all original and
+extended table contents, pending callback rejection, complete resource retention,
+source/bound mutation rejection, patch reconstruction, module bounds, and the
+real startup C under address/undefined-behaviour sanitizers. Twelve prospective
+current-build composition checks pass, including exact no-import V2, exact
+all-import output, sparse profiles, dependencies, and the actual save codec.
+
+The corrected silent native run at
+`build/smoke-v3-player-action-tables-02/results.json` passes 173 records and 143
+assertions. Result SHA-256:
+`29f8c7994066fa88190b06871d9f1ad2e8c455a0f341dd4cf46d72700cd1213c`.
+It verifies the complete module and actual game-loaded player code/relocations;
+reads representative native/new/invalid action metadata; rejects five unfinished
+or invalid requests without modifying their scratch actor; compares an original
+net callback with the same callback reached through shared dispatch; and tests
+both dispatch-register variants against native and resident targets. The only
+uploaded code consists of 16-byte call bridges in isolated heap scratch, not
+replacement callbacks. Existing kind readers, representative transfers, all
+five masks, profile retention, guards, checkpoint restoration, and graceful
+shutdown also pass. The isolated 131,072-byte FlashRAM remains erased. Audio is
+disabled; no user saves are touched. The probe source SHA-256 is
+`1eb87d3efece12d9f19ded64fbcb7c143f70570489d6507681e024704d5d82e7`.
+
+The first native attempt expected zero for the priority getter's invalid index;
+the original native function returns `-1`. Its instructions and observed return
+establish a fixture error. The single corrected retry passes without a ROM
+change. The initial build's allocation guard also correctly stopped an attempted
+in-place update of a compressed relocation resource. The shared importer now
+stores changed compressed owners in checked uncompressed storage, keeping their
+logical DMA identity and dimensions. Build `03` corrects the existing motion
+receipt's relocation-hash field; its ROM/UPS are identical to the tested build
+`02`. The six focused current-cartridge/startup checks cover that final receipt;
+unchanged native evidence is retained instead of replayed.
+
+The 104 choices and saved format 2 remain unchanged. Same-profile compatibility
+with ABI 99 is expected in both directions; ordinary save/restart and hardware
+testing are not claimed by this batch. V3 saves remain unsuitable for V2. Both
+served patchers remain untouched. No player-facing text is added, so the single
+text provenance catalogue needs no new entry.
+
+Continue actual fan controller/request/setup/main/drawing and source-timed sound
+using these shared tables. Audit core-library action checks outside this owner,
+then connect kind selection, complete inventory/readers/acquisition, and selected
+profiles. Fan swing uses animation 270 and explicit mask four. Other toy rigs,
+remaining item/villager gameplay, browser validation, and persistence remain in
+the full V3 queue; this infrastructure does not replace that scope.
+
 ## Shared equipment kind readers
 
 The existing importer's `--refresh-runtime --equipment-kinds` mode connects all

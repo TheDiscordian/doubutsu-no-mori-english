@@ -2,15 +2,30 @@
 
 ## Active development
 
-ABI 99 connects all six equipment-kind lookups through one source-derived
+ABI 100 installs shared 121-entry player action tables: 22 metadata categories
+and five callback categories, preserving all 105 native actions. The source
+reader follows real callback relocations, and the native dispatch resolves the
+currently loaded player owner. Sixteen new action slots retain their actual
+donor metadata but reject requests until their callbacks are implemented.
+This does not enable fans or add selectable items. One source-derived adapter
+covers the category; there is no per-item installer.
+
+The shared equipment/action module adds 16 KiB in Expansion Pak memory. Its
+complete 24-KiB startup transfer is checksum-bound; startup remains 952 of 992
+bytes. Existing models, motions, actor sizes, animation banks, saved format 2,
+and 104 choices remain unchanged. Fifteen focused source/art/cartridge/startup
+checks and twelve optional-composition checks pass. The corrected silent native
+run passes 173 records and 143 assertions, including live-owner dispatch,
+extended metadata, disabled-action rejection, guards, and checkpoint restoration. See the
+[checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md#shared-player-action-tables).
+
+All six equipment-kind lookups use one source-derived
 record format: holding pose, item routine, shape, equipment motion, tumble, and
-get-up. The 79 donor kinds retain stable indices without changing original
-tools. Four complete transition animations add 5,744 ROM bytes; all twelve
-installed player motions fit the original banks. Resident RAM, player actors,
-saved formats, and profiles do not grow. Eighteen focused host/cartridge/
-composition checks pass. The first silent native run passes 126 records and
-106 assertions on the actual loaded player owner, including original and
-extended lookups, representative transfers, masks, guards, and restored state.
+get-up. The 79 donor kinds retain stable indices without changing original tools.
+All twelve installed player motions fit the original banks. The complete
+transition motions retain their source timing and 5,744 ROM bytes. Their prior
+focused/native evidence remains applicable; the current native run also checks
+representative transfers, masks, and original/extended kind lookups.
 
 Fourteen held models and sixteen equipment animations retain their complete
 31,584 bytes and the passing shared-loader evidence. There are no new selectable
@@ -71,10 +86,10 @@ including all rotations, English names, prices, native footprints, independent
 selection rejection, original fallbacks, restored state, and guards. See the
 [checkpoint](checkpoints/V3_FURNITURE_PIPELINE.md).
 
-Current development uses ABI 99 at
-`build/v3-equipment-kinds-runtime-01/animal-forest-v3-asset-loader.z64`, pinned by
+Current development uses ABI 100 at
+`build/v3-player-action-tables-03/animal-forest-v3-asset-loader.z64`, pinned by
 `config/v3-import-build.json`. The 104 choices and saved format 2 are unchanged.
-Same-profile compatibility with ABI 98 is expected in both directions; this
+Same-profile compatibility with ABI 99 is expected in both directions; this
 batch does not claim another ordinary save/restart or hardware playthrough.
 The 48 additional donor aliases still need native parent support and integration;
 prepared artwork alone is not a completed import. Both served patchers remain V2.
